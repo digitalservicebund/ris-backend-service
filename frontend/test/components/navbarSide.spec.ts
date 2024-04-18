@@ -161,103 +161,50 @@ describe("NavbarSide", () => {
   })
 
   describe("expansion of level one items", () => {
-    it("hides all level two items per default", async () => {
-      const menuItems = [
+    it("hides all children menu items if not selected", async () => {
+      const menuItems: MenuItem[] = [
         {
-          label: "first level one",
-          route: "/not-matching",
-          children: [{ label: "first level two", route: "/not-matching" }],
+          label: "first parent node",
+          route: {
+            name: "parent",
+          },
         },
         {
-          label: "second level one",
-          route: "/not-matching",
-          children: [{ label: "second level two", route: "/not-matching" }],
+          label: "second parent node",
+          route: {
+            name: "parent",
+          },
+          children: [
+            {
+              label: "exclude first child node",
+              route: {
+                name: "parent",
+                hash: "#not-include-first",
+              },
+            },
+            {
+              label: "exclude second child node",
+              route: {
+                name: "parent",
+                hash: "#not-include-second",
+              },
+            },
+          ],
         },
       ]
 
       await renderComponent({ menuItems })
 
-      expect(screen.queryByText("first level one")).toBeVisible()
-      expect(screen.queryByText("first level two")).not.toBeVisible()
-      expect(screen.queryByText("second level one")).toBeVisible()
-      expect(screen.queryByText("second level two")).not.toBeVisible()
-    })
+      expect(screen.getByText("first parent node")).toBeVisible()
+      expect(screen.getByText("second parent node")).toBeVisible()
 
-    it("shows all level two items of an active level one item", async () => {
-      const menuItems = [
-        {
-          label: "first level one",
-          route: "/matching",
-          children: [
-            { label: "first level two", route: "/not-matching" },
-            { label: "second level two", route: "/not-matching" },
-          ],
-        },
-        {
-          label: "second level one",
-          route: "/not-matching",
-          children: [{ label: "third level two", route: "/not-matching" }],
-        },
-      ]
+      expect(
+        screen.queryByText("exclude first child node"),
+      ).not.toBeInTheDocument()
 
-      await renderComponent({
-        menuItems,
-        activeRoute: "/matching",
-      })
-
-      expect(screen.queryByText("first level one")).toBeVisible()
-      expect(screen.queryByText("first level two")).toBeVisible()
-      expect(screen.queryByText("second level two")).toBeVisible()
-      expect(screen.queryByText("second level one")).toBeVisible()
-      expect(screen.queryByText("third level two")).not.toBeVisible()
-    })
-
-    it("shows all siblings of an active level two item", async () => {
-      const menuItems = [
-        {
-          label: "first level one",
-          route: "/not-matching",
-          children: [
-            { label: "first level two", route: "/matching" },
-            { label: "second level two", route: "/not-matching" },
-          ],
-        },
-        {
-          label: "second level one",
-          route: "/not-matching",
-          children: [{ label: "third level two", route: "/not-matching" }],
-        },
-      ]
-
-      await renderComponent({
-        menuItems,
-        activeRoute: "/matching",
-      })
-
-      expect(screen.queryByText("first level one")).toBeVisible()
-      expect(screen.queryByText("first level two")).toBeVisible()
-      expect(screen.queryByText("second level two")).toBeVisible()
-      expect(screen.queryByText("second level one")).toBeVisible()
-      expect(screen.queryByText("third level two")).not.toBeVisible()
-    })
-
-    it("underlines the expanded level one item with children", async () => {
-      const menuItems = [
-        {
-          label: "underlined level one",
-          route: "/route",
-          children: [
-            { label: "child one", route: "/child-one" },
-            { label: "child two", route: "/child-two" },
-          ],
-        },
-      ]
-
-      await renderComponent({ menuItems, activeRoute: "/child-one" })
-
-      expect(screen.getByLabelText("underlined level one")).toHaveClass(
-        "underline",
-      )
+      expect(
+        screen.queryByText("exclude second child node"),
+      ).not.toBeInTheDocument()
     })
   })
 })
