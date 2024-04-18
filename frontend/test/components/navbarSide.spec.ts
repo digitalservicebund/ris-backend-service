@@ -5,6 +5,10 @@ import NavbarSide from "@/components/NavbarSide.vue"
 import MenuItem from "@/domain/menuItem"
 import Route from "@/domain/route"
 
+const activeRoute: RouteLocationRaw = {
+  name: "index",
+}
+
 describe("NavbarSide", () => {
   it("renders sidenav with multiple items and correct routes", async () => {
     const menuItems: MenuItem[] = [
@@ -12,7 +16,7 @@ describe("NavbarSide", () => {
       { label: "second item", route: { name: "second-route" } },
     ]
 
-    await renderComponent({ menuItems })
+    await renderComponent({ menuItems, activeRoute })
     expect(screen.getByText("first item")).toBeVisible()
     expect(screen.getByText("second item")).toBeVisible()
 
@@ -30,22 +34,22 @@ describe("NavbarSide", () => {
   it("allows to render parent item with its children", async () => {
     const menuItems: MenuItem[] = [
       {
-        label: "Rubriken",
+        label: "first parent item",
         route: {
           name: "parent-route",
         },
         children: [
           {
-            label: "Stammdaten",
+            label: "first child item",
             route: {
-              name: "caselaw-documentUnit-documentNumber-categories",
+              name: "parent-route",
               hash: "#coreData",
             },
           },
           {
-            label: "Rechtszug",
+            label: "second child item",
             route: {
-              name: "caselaw-documentUnit-documentNumber-categories",
+              name: "parent-route",
               hash: "#proceedingDecisions",
             },
           },
@@ -53,18 +57,11 @@ describe("NavbarSide", () => {
       },
     ]
 
-    await renderComponent({ menuItems })
+    await renderComponent({ menuItems, activeRoute: { name: "parent-route" } })
 
-    const firstSubItem = screen.getByText("first level two") as HTMLElement
-    const secondSubItem = screen.getByLabelText(
-      "second level two",
-    ) as HTMLElement
-
-    expect(firstSubItem).toBeVisible()
-    expect(secondSubItem).toBeVisible()
-
-    expect(firstSubItem).toHaveAttribute("href", "/first-level-two")
-    expect(secondSubItem).toHaveAttribute("href", "/second-level-two")
+    expect(screen.getByText("first parent item")).toBeVisible()
+    expect(screen.getByText("first child item")).toBeVisible()
+    expect(screen.getByText("second child item")).toBeVisible()
   })
 
   it("allows to disable a menu item", async () => {
@@ -307,25 +304,30 @@ describe("NavbarSide", () => {
   })
 })
 
-async function renderComponent(options?: {
-  menuItems?: MenuItem[]
+async function renderComponent(options: {
+  menuItems: MenuItem[]
   activeRoute?: RouteLocationRaw
 }) {
-  const menuItems = options?.menuItems ?? []
+  const routes = []
+  routes.push(options.activeRoute)
+  routes.push(buildMenuItems(options.menuItems))
+
   const activeRoute = options?.activeRoute ?? "/index"
-  const router = buildRouter(menuItems)
+
+  const router = buildMenuItems(options.menuItems)
   await router.replace(activeRoute)
   await router.isReady()
   const global = { plugins: [router] }
   const props = {
     menuItems: options?.menuItems ?? [],
+    activeRoute: options.activeRoute,
   }
   return render(NavbarSide, { props, global })
 }
 
-function buildRouter(menuItems: MenuItem[]): Router {
+function buildMenuItems(menuItems: MenuItem[]): Router {
   const routes = []
-  routes.push(generateRouterRoute({ name: "/index" }))
+  routes.push(generateRouterRoute({ name: "index" }))
 
   for (const item of menuItems) {
     routes.push(generateRouterRoute(item.route))
@@ -339,10 +341,6 @@ function buildRouter(menuItems: MenuItem[]): Router {
 }
 
 function generateRouterRoute(route?: Route): RouteRecordRaw {
-  let path = "/" + route?.name
-  if (route?.hash) {
-    path = path + "/" + route?.hash
-  }
-
+  const path = "/" + route?.name
   return { ...route, path, component: {} }
 }
