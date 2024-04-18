@@ -117,6 +117,40 @@ describe("NavbarSide", () => {
       expect(screen.getByText("active item")).toHaveClass("underline")
       expect(screen.getByTestId("active item")).toHaveClass("bg-blue-200")
     })
+    it("show child siblings if selected", async () => {
+      const menuItems: MenuItem[] = [
+        {
+          label: "parent node",
+          route: {
+            name: "parent",
+          },
+          children: [
+            {
+              label: "first child node",
+              route: {
+                name: "parent",
+                hash: "#active",
+              },
+            },
+            {
+              label: "second child node",
+              route: {
+                name: "parent",
+                hash: "#not-active",
+              },
+            },
+          ],
+        },
+      ]
+
+      await renderComponent({
+        menuItems,
+        activeRoute: "/parent#active",
+      })
+
+      expect(screen.getByText("first child node")).toBeInTheDocument()
+      expect(screen.getByText("second child node")).toBeInTheDocument()
+    })
 
     it("activated child styling: highlight child and underlines both parent and child", async () => {
       const menuItems: MenuItem[] = [
