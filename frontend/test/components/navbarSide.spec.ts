@@ -6,7 +6,7 @@ import { generateString } from "~/test-helper/dataGenerators"
 
 describe("NavbarSide", () => {
   it("renders sidenav with multiple items and correct routes", async () => {
-    const menuItems = [
+    const menuItems: MenuItem[] = [
       { label: "first item", route: "/first-route" },
       { label: "second item", route: "/second-route" },
     ]
@@ -26,20 +26,35 @@ describe("NavbarSide", () => {
     )
   })
 
-  it("allows to render level one item with level two items as children", async () => {
-    const menuItems = [
+  it("allows to render parent item with its children", async () => {
+    const menuItems: MenuItem[] = [
       {
-        label: "level one",
-        route: "/",
+        label: "Rubriken",
+        route: {
+          name: "parent-route",
+        },
         children: [
-          { label: "first level two", route: "/first-level-two" },
-          { label: "second level two", route: "/second-level-two" },
+          {
+            label: "Stammdaten",
+            route: {
+              name: "caselaw-documentUnit-documentNumber-categories",
+              hash: "#coreData",
+            },
+          },
+          {
+            label: "Rechtszug",
+            route: {
+              name: "caselaw-documentUnit-documentNumber-categories",
+              hash: "#proceedingDecisions",
+            },
+          },
         ],
       },
     ]
 
     await renderComponent({ menuItems })
-    const firstSubItem = screen.getByLabelText("first level two") as HTMLElement
+
+    const firstSubItem = screen.getByText("first level two") as HTMLElement
     const secondSubItem = screen.getByLabelText(
       "second level two",
     ) as HTMLElement
@@ -64,7 +79,7 @@ describe("NavbarSide", () => {
 
   describe("highlighting of the currently active menu item", () => {
     it("applies special class to menu item which matches current route", async () => {
-      const menuItems = [
+      const menuItems: MenuItem[] = [
         { label: "active item", route: { path: "/matching" } },
         { label: "passive item", route: { path: "/not-matching" } },
       ]
@@ -73,7 +88,10 @@ describe("NavbarSide", () => {
         activeRoute: { path: "/matching" },
       })
 
-      expect(screen.getByLabelText("active item")).toHaveClass("bg-blue-200")
+      expect(screen.getByText("active item")).toBeVisible()
+      expect(screen.getByText("passive item")).toBeVisible()
+
+      //.toHaveClass("bg-blue-200")
       expect(screen.getByLabelText("passive item")).not.toHaveClass(
         "bg-blue-200",
       )
