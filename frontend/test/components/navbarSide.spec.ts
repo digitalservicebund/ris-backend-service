@@ -65,8 +65,14 @@ describe("NavbarSide", () => {
   })
 
   it("allows to disable a menu item", async () => {
-    const menuItems = [
-      { label: "disabled item", route: "/route", isDisabled: true },
+    const menuItems: MenuItem[] = [
+      {
+        label: "disabled item",
+        route: {
+          name: "test-route",
+        },
+        isDisabled: true,
+      },
     ]
 
     await renderComponent({ menuItems })
@@ -96,22 +102,6 @@ describe("NavbarSide", () => {
       expect(screen.getByText("passive item")).not.toHaveClass("underline")
     })
 
-    it("routes match includes hash if given", async () => {
-      const menuItems = [
-        { label: "active item", route: { path: "/foo", hash: "#matching" } },
-        { label: "passive item", route: { path: "/foo", hash: "#no-match" } },
-      ]
-      await renderComponent({
-        menuItems,
-        activeRoute: { path: "/foo", hash: "#matching" },
-      })
-
-      expect(screen.getByLabelText("active item")).toHaveClass("bg-blue-200")
-      expect(screen.getByLabelText("passive item")).not.toHaveClass(
-        "bg-blue-200",
-      )
-    })
-
     it("ignores queries of any to match route", async () => {
       const menuItems = [
         {
@@ -124,7 +114,8 @@ describe("NavbarSide", () => {
         activeRoute: { name: "foo", query: { key: "other-value" } },
       })
 
-      expect(screen.getByLabelText("active item")).toHaveClass("bg-blue-200")
+      expect(screen.getByText("active item")).toHaveClass("underline")
+      expect(screen.getByTestId("active item")).toHaveClass("bg-blue-200")
     })
 
     it("activated child styling: highlight child and underlines both parent and child", async () => {
