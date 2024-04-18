@@ -76,10 +76,10 @@ describe("NavbarSide", () => {
   })
 
   describe("highlighting of the currently active menu item", () => {
-    it("applies special class to menu item which matches current route", async () => {
+    it("applies styling for parent active menu item", async () => {
       const menuItems: MenuItem[] = [
-        { label: "active item", route: { path: "/matching" } },
-        { label: "passive item", route: { path: "/not-matching" } },
+        { label: "active item", route: { name: "matching" } },
+        { label: "passive item", route: { name: "not-matching" } },
       ]
       await renderComponent({
         menuItems,
@@ -89,10 +89,11 @@ describe("NavbarSide", () => {
       expect(screen.getByText("active item")).toBeVisible()
       expect(screen.getByText("passive item")).toBeVisible()
 
-      //.toHaveClass("bg-blue-200")
-      expect(screen.getByLabelText("passive item")).not.toHaveClass(
-        "bg-blue-200",
-      )
+      expect(screen.getByTestId("active item")).toHaveClass("bg-blue-200")
+      expect(screen.getByTestId("passive item")).not.toHaveClass("bg-blue-200")
+
+      expect(screen.getByText("active item")).toHaveClass("underline")
+      expect(screen.getByText("passive item")).not.toHaveClass("underline")
     })
 
     it("routes match also by name", async () => {
