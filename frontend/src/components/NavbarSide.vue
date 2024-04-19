@@ -44,10 +44,15 @@ const isOnlyParentActive = (currentNavItem: MenuItem) => {
 </script>
 
 <template>
-  <FlexContainer class="w-[16rem] flex-col border-b-1 border-gray-400">
+  <FlexContainer
+    aria-labelledby="sidebar navigation"
+    class="w-[16rem] flex-col border-b-1 border-gray-400"
+  >
     <div v-for="navItem in props.menuItems" :key="navItem.label">
       <RouterLink
         v-if="!navItem.isDisabled"
+        id="menu-item"
+        :aria-label="`${navItem.label}`"
         class="w-full hover:bg-blue-200 hover:underline focus:bg-blue-200 focus:underline"
         :data-testid="navItem.route.name"
         :to="navItem.route"
