@@ -1,15 +1,12 @@
-import { ref } from "vue"
-import type { RouteLocationNormalizedLoaded } from "vue-router"
 import { useCaseLawMenuItems } from "@/composables/useCaseLawMenuItems"
 
 describe("useCaseLawMenuItems", () => {
   it("adds document identifier as route parameter to each menu item", () => {
-    const documentNumber = ref("fake-number")
-    const route = {} as unknown as RouteLocationNormalizedLoaded
+    const documentNumber = "fake-number"
 
-    const menuItems = useCaseLawMenuItems(documentNumber, route)
+    const menuItems = useCaseLawMenuItems(documentNumber, {})
 
-    for (const menuItem of menuItems.value) {
+    for (const menuItem of menuItems) {
       expect(menuItem.route.params).toMatchObject({
         documentNumber: "fake-number",
       })
@@ -19,24 +16,21 @@ describe("useCaseLawMenuItems", () => {
   it("clones current route query to menu item", () => {
     const route = {
       query: { foo: "bar" },
-    } as unknown as RouteLocationNormalizedLoaded
+    }
 
-    const menuItems = useCaseLawMenuItems(ref(""), route)
+    const menuItems = useCaseLawMenuItems("", route.query)
 
-    for (const menuItem of menuItems.value) {
+    for (const menuItem of menuItems) {
       expect(menuItem.route.query).toEqual({ foo: "bar" })
     }
   })
 
   it("lists all expected menu items", () => {
-    const menuItems = useCaseLawMenuItems(
-      ref(""),
-      {} as unknown as RouteLocationNormalizedLoaded,
-    )
+    const menuItems = useCaseLawMenuItems("", {})
 
-    const topLebelNames = menuItems.value.map((item) => item.label)
-    expect(topLebelNames).toContain("Rubriken")
-    expect(topLebelNames).toContain("Dokumente")
-    expect(topLebelNames).toContain("Veröffentlichen")
+    const topLabelNames = menuItems.map((item) => item.label)
+    expect(topLabelNames).toContain("Rubriken")
+    expect(topLabelNames).toContain("Dokumente")
+    expect(topLabelNames).toContain("Veröffentlichen")
   })
 })

@@ -22,6 +22,6 @@ test.describe("test the different layout options", () => {
 
     await page.getByLabel("Navigation öffnen").click()
     await expect(page).toHaveURL(/showNavBar=true/)
-    await expect(page.locator("aside", { hasText: "Rubriken" })).toBeVisible()
+    await expect(page.getByRole("link", { name: "Rubriken" })).toBeVisible()
   })
 })
