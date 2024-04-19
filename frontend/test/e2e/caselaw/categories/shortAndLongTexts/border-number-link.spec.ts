@@ -85,7 +85,7 @@ test("create and validate border number links", async ({
   const inputField = page.locator("[data-testid='Gründe']")
   await inputField.click()
   await page.keyboard.press(`${modifier}+KeyV`)
-  const inputFieldInnerHTML = await inputField.innerHTML()
+  const inputFieldInnerHTML = await inputField.innerText()
 
   // Check all text copied
   const inputFieldAlleText = await inputField.allTextContents()

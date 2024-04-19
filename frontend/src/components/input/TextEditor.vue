@@ -3,6 +3,7 @@ import { commands, selectActiveState } from "@guardian/prosemirror-invisibles"
 import { Bold } from "@tiptap/extension-bold"
 import { Color } from "@tiptap/extension-color"
 import { Document } from "@tiptap/extension-document"
+import { HardBreak } from "@tiptap/extension-hard-break"
 import { History } from "@tiptap/extension-history"
 import { Italic } from "@tiptap/extension-italic"
 import { Strike } from "@tiptap/extension-strike"
@@ -105,6 +106,7 @@ const editor = new Editor({
     TableRow,
     TableStyle,
     TextStyle,
+    HardBreak,
     InvisibleCharacters,
     TextAlign.configure({
       types: ["paragraph", "span"],
@@ -233,7 +235,7 @@ const buttons = computed(() => [
     icon: IconParagraph,
     ariaLabel: "invisible-characters",
     group: "view",
-    isCollapsable: true,
+    isCollapsable: false,
     callback: () =>
       commands.toggleActiveState()(editor.state, editor.view.dispatch),
   },
@@ -311,6 +313,7 @@ const ariaLabel = props.ariaLabel ? props.ariaLabel : null
 onMounted(() => {
   const editorContainer = document.querySelector(".editor")
   if (editorContainer != null) resizeObserver.observe(editorContainer)
+  commands.setActiveState(props.editable)(editor.state, editor.view.dispatch)
 })
 
 const resizeObserver = new ResizeObserver((entries) => {
