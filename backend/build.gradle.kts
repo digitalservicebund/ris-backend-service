@@ -211,7 +211,7 @@ dependencies {
     runtimeOnly("org.flywaydb:flyway-database-postgresql:10.11.0")
 
     implementation("io.getunleash:unleash-client-java:9.2.0")
-    implementation("org.apache.commons:commons-text:1.11.0")
+    implementation("org.apache.commons:commons-text:1.12.0")
     implementation("org.jsoup:jsoup:1.17.2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
