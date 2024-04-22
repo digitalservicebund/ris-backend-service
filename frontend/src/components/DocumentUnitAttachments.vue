@@ -117,7 +117,7 @@ async function upload(files: FileList) {
         html.value = response.data.html
       } else {
         if (response.error?.description) {
-          errors.value.push(response.error?.description)
+          errors.value.push(file.name + " - " + response.error?.description)
         }
       }
     }
@@ -171,7 +171,7 @@ function toggleDeleteModal() {
         <FlexItem class="flex-1 space-y-20" :class="classes">
           <TitleElement>Dokumente</TitleElement>
           <InfoModal
-            v-if="errors.length > 0"
+            v-if="errors.length > 0 && isLoading === false"
             class="mt-8"
             :description="errors"
             :title="errorTitle"

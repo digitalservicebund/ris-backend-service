@@ -77,13 +77,13 @@ const ariaLabelIcon = props.title + " icon"
 
     <div class="flex flex-col">
       <span class="ds-label-02-bold">{{ title }}</span>
-      <!-- eslint-disable vue/no-v-html -->
       <div v-if="isArray" class="ds-body-01-reg">
         <ul class="list-disc">
           <li v-for="(desc, index) in description" :key="index">{{ desc }}</li>
         </ul>
       </div>
-      <!--      <span v-else class="ds-body-01-reg" v-html="description"></span>-->
+      <!-- eslint-disable vue/no-v-html -->
+      <span v-else class="ds-body-01-reg" v-html="description"></span>
     </div>
   </div>
 </template>
