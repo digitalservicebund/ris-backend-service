@@ -11,6 +11,7 @@ import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import { ValidationError } from "@/components/input/types"
 import PreviousDecisions from "@/components/PreviousDecisions.vue"
+import useQuery from "@/composables/useQueryFromRoute"
 import { useScrollToHash } from "@/composables/useScrollToHash"
 import DocumentUnit, { Texts, CoreData } from "@/domain/documentUnit"
 import EnsuingDecision from "@/domain/ensuingDecision"
@@ -29,6 +30,8 @@ const route = useRoute()
 const showAttachmentPanelRef: Ref<boolean> = ref(
   props.showAttachmentPanel ? props.showAttachmentPanel : false,
 )
+
+const { pushQueryToRoute } = useQuery<"showAttachmentPanel">()
 
 const lastUpdatedDocumentUnit = ref()
 const selectedAttachmentIndex: Ref<number> = ref(0)
@@ -133,8 +136,11 @@ const { hash: routeHash } = toRefs(route)
 const headerOffset = 145
 useScrollToHash(routeHash, headerOffset)
 
-const togglePanel = () => {
+const toggleAttachmentPanel = () => {
   showAttachmentPanelRef.value = !showAttachmentPanelRef.value
+  pushQueryToRoute({
+    showAttachmentPanel: showAttachmentPanelRef.value.toString(),
+  })
 }
 
 const handleOnSelect = (index: number) => {
@@ -187,7 +193,7 @@ const handleOnSelect = (index: number) => {
           :document-unit-uuid="props.documentUnit.uuid"
           :is-expanded="showAttachmentPanelRef"
           @select="handleOnSelect"
-          @update="togglePanel"
+          @update="toggleAttachmentPanel"
         ></AttachmentViewSidePanel>
       </FlexContainer>
     </template>

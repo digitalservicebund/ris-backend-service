@@ -8,6 +8,7 @@ import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import TitleElement from "@/components/TitleElement.vue"
+import useQuery from "@/composables/useQueryFromRoute"
 import Attachment from "@/domain/attachment"
 import DocumentUnit from "@/domain/documentUnit"
 import fileService from "@/services/attachmentService"
@@ -21,6 +22,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   updateDocumentUnit: [updatedDocumentUnit: DocumentUnit]
 }>()
+
+const { pushQueryToRoute } = useQuery<"showAttachmentPanel">()
 
 console.log(props.showAttachmentPanel)
 const showAttachmentPanelRef: Ref<boolean> = ref(
@@ -70,10 +73,10 @@ const handleDeleteAttachment = async (index: number) => {
 
 const handleOnSelect = (index: number) => {
   if (selectedAttachmentIndex.value == index) {
-    showAttachmentPanelRef.value = !showAttachmentPanelRef.value
+    toggleAttachmentPanel()
   } else {
     selectedAttachmentIndex.value = index
-    showAttachmentPanelRef.value = true
+    toggleAttachmentPanel(true)
   }
 }
 
@@ -86,7 +89,7 @@ const deleteFile = (index: number) => {
   handleDeleteAttachment(index)
   toggleDeleteModal()
   if (showAttachmentPanelRef.value) {
-    togglePanel()
+    toggleAttachmentPanel()
   }
 }
 
@@ -107,8 +110,11 @@ async function upload(files: FileList) {
   }
 }
 
-const togglePanel = () => {
-  showAttachmentPanelRef.value = !showAttachmentPanelRef.value
+const toggleAttachmentPanel = (state?: boolean) => {
+  showAttachmentPanelRef.value = state || !showAttachmentPanelRef.value
+  pushQueryToRoute({
+    showAttachmentPanel: showAttachmentPanelRef.value.toString(),
+  })
 }
 
 function toggleDeleteModal() {
@@ -179,7 +185,7 @@ function toggleDeleteModal() {
           :document-unit-uuid="props.documentUnit.uuid"
           :is-expanded="showAttachmentPanelRef"
           @select="handleOnSelect"
-          @update="togglePanel"
+          @update="toggleAttachmentPanel"
         ></AttachmentViewSidePanel>
       </FlexContainer>
     </template>
