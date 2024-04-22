@@ -25,8 +25,8 @@ export default function useQuery<T extends string>() {
     return query
   }
 
-  function pushQueryToRoute(currentQuerry: Query<T>) {
-    void router.push({ query: truncateQuery(currentQuerry) })
+  function pushQueryToRoute(currentQuery: Query<T>) {
+    void router.push({ query: truncateQuery(currentQuery) })
   }
 
   return { getQueryFromRoute, pushQueryToRoute, route }
