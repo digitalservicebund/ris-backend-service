@@ -55,7 +55,7 @@ test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/fil
     await uploadTestfile(page, "sample.png")
     await expect(
       page.locator(
-        "text=sample.png - Das ausgewählte Dateiformat ist nicht korrekt. Versuchen Sie eine .docx-Version dieser Datei hochzuladen.",
+        "text=sample.png hat ein falsches Format. Laden Sie eine .docx-Version hoch.",
       ),
     ).toBeVisible()
 
