@@ -55,7 +55,12 @@ const isOnlyParentActive = (currentNavItem: MenuItem) => {
         :aria-label="`${navItem.label}`"
         class="w-full hover:bg-blue-200 hover:underline focus:bg-blue-200 focus:underline"
         :data-testid="navItem.route.name"
-        :to="navItem.route"
+        :to="{
+          ...navItem.route,
+          query: {
+            ...currentRoute.query,
+          },
+        }"
       >
         <div v-if="!props.isChild">
           <FlexItem
