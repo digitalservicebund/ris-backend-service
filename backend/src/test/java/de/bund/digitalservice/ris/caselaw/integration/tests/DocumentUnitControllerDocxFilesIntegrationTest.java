@@ -231,7 +231,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
         .is4xxClientError();
   }
 
-  @Disabled
+  @Disabled("temporarily till RISDEV-3558 is done")
   @Test
   void
       testAttachFileToDocumentationUnit_withECLIInFooter_shouldExtractECLIAndSetItInUnitIfNotSet() {

@@ -45,7 +45,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 @TestPropertySource(properties = "otc.obs.bucket-name:testBucket")
 @ExtendWith(SpringExtension.class)
 @Import({S3AttachmentService.class})
-public class S3AttachmentServiceTest {
+class S3AttachmentServiceTest {
   @SpyBean S3AttachmentService service;
 
   @MockBean AttachmentRepository repository;
