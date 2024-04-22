@@ -14,29 +14,29 @@ const props = withDefaults(defineProps<Props>(), {
   isChild: false,
 })
 
-const activeRoute = useRoute()
+const currentRoute = useRoute()
 
 const isChildActive = (currentNavItem: MenuItem) => {
-  return currentNavItem.route.hash === activeRoute.hash
+  return currentNavItem.route.hash === currentRoute.hash
 }
 
 const isParentActive = (currentNavItem: MenuItem) => {
-  if (currentNavItem.route.name == undefined || activeRoute.name == undefined)
+  if (currentNavItem.route.name == undefined || currentRoute.name == undefined)
     return false
 
-  return currentNavItem.route.name == activeRoute.name
+  return currentNavItem.route.name == currentRoute.name
 }
 
 const isOnlyParentActive = (currentNavItem: MenuItem) => {
   if (
     !(
       StringsUtil.isEmpty(currentNavItem.route.hash) &&
-      StringsUtil.isEmpty(activeRoute.hash)
+      StringsUtil.isEmpty(currentRoute.hash)
     )
   ) {
     return (
       isParentActive(currentNavItem) &&
-      currentNavItem.route.hash == activeRoute.hash
+      currentNavItem.route.hash == currentRoute.hash
     )
   }
   return isParentActive(currentNavItem)
