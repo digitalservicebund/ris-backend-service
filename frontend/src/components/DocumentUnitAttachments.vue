@@ -92,6 +92,7 @@ const handleOnSelect = (index: number) => {
 }
 
 const handleOnDelete = (index: number) => {
+  errors.value = []
   selectedAttachmentIndex.value = index
   toggleDeleteModal()
 }
