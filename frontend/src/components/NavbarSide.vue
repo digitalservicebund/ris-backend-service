@@ -14,29 +14,29 @@ const props = withDefaults(defineProps<Props>(), {
   isChild: false,
 })
 
-const activeRoute = useRoute()
+const currentRoute = useRoute()
 
 const isChildActive = (currentNavItem: MenuItem) => {
-  return currentNavItem.route.hash === activeRoute.hash
+  return currentNavItem.route.hash === currentRoute.hash
 }
 
 const isParentActive = (currentNavItem: MenuItem) => {
-  if (currentNavItem.route.name == undefined || activeRoute.name == undefined)
+  if (currentNavItem.route.name == undefined || currentRoute.name == undefined)
     return false
 
-  return currentNavItem.route.name == activeRoute.name
+  return currentNavItem.route.name == currentRoute.name
 }
 
 const isOnlyParentActive = (currentNavItem: MenuItem) => {
   if (
     !(
       StringsUtil.isEmpty(currentNavItem.route.hash) &&
-      StringsUtil.isEmpty(activeRoute.hash)
+      StringsUtil.isEmpty(currentRoute.hash)
     )
   ) {
     return (
       isParentActive(currentNavItem) &&
-      currentNavItem.route.hash == activeRoute.hash
+      currentNavItem.route.hash == currentRoute.hash
     )
   }
   return isParentActive(currentNavItem)
@@ -55,7 +55,12 @@ const isOnlyParentActive = (currentNavItem: MenuItem) => {
         :aria-label="`${navItem.label}`"
         class="w-full hover:bg-blue-200 hover:underline focus:bg-blue-200 focus:underline"
         :data-testid="navItem.route.name"
-        :to="navItem.route"
+        :to="{
+          ...navItem.route,
+          query: {
+            ...currentRoute.query,
+          },
+        }"
       >
         <div v-if="!props.isChild">
           <FlexItem
