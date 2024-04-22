@@ -52,8 +52,6 @@ test.describe("upload an original document to a doc unit", () => {
     await expect(page.locator(`text=Die ist ein Test`)).toBeHidden()
     await expect(page.locator(`text=Subheadline`)).toBeVisible()
 
-    // show in side panel when selected in table
-    await page.getByLabel("Dokumentansicht schließen").click()
     await expect(page.locator(`text=Subheadline`)).toBeHidden()
     await page.getByText("some-formatting.docx").locator("visible=true").click()
     await expect(page.locator(`text=Subheadline`)).toBeVisible()
