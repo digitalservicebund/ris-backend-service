@@ -206,6 +206,7 @@ test.describe("norm", () => {
     const listEntries = container.getByLabel("Listen Eintrag")
     await listEntries.first().click()
 
+    //cancel editing existing input falls back to last saved value
     await fillNormInputs(page, {
       normAbbreviation: "PBefG",
       singleNorms: [{ singleNorm: "§ 456" } as SingleNorm],
@@ -215,6 +216,16 @@ test.describe("norm", () => {
     await expect(container.getByText("PBefG")).toBeVisible()
     await expect(container.getByText("§ 123")).toBeVisible()
     await expect(container.getByText("§ 456")).toBeHidden()
+
+    await expect(listEntries).toHaveCount(1)
+    await container.getByLabel("Weitere Angabe").click()
+
+    //cancel editing new input deletes entry
+    await fillNormInputs(page, {
+      normAbbreviation: "AEG",
+    })
+    await container.getByLabel("Abbrechen").click()
+    await expect(listEntries).toHaveCount(1)
   })
 
   test("validates agaist duplicate norm abbreviations", async ({

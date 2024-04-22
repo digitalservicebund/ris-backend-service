@@ -97,6 +97,12 @@ function removeSingleNormEntry(index: number) {
   singleNorms.value.splice(index, 1)
 }
 
+function cancelEdit() {
+  if (new NormReference({ ...props.modelValue }).isEmpty)
+    emit("removeEntry", true)
+  emit("cancelEdit")
+}
+
 watch(
   () => props.modelValue,
   () => {
@@ -170,12 +176,11 @@ onBeforeUnmount(() => {
               @click.stop="addNormReference"
             />
             <TextButton
-              v-if="!lastSavedModelValue.isEmpty"
               aria-label="Abbrechen"
               button-type="ghost"
               label="Abbrechen"
               size="small"
-              @click.stop="emit('cancelEdit')"
+              @click.stop="cancelEdit"
             />
           </div>
         </div>
