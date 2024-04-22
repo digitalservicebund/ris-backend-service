@@ -8,7 +8,7 @@ public interface AttachmentService {
   Attachment attachFileToDocumentationUnit(
       UUID documentUnitUuid, ByteBuffer byteBuffer, HttpHeaders httpHeaders);
 
-  void deleteByS3path(String s3path);
+  void deleteByS3Path(String s3Path);
 
   void deleteAllObjectsFromBucketForDocumentationUnit(UUID documentationUnitId);
 }

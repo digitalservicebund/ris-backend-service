@@ -35,18 +35,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import software.amazon.awssdk.services.s3.S3AsyncClient;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
 
 @ExtendWith(SpringExtension.class)
 @Import({DocumentUnitService.class, DatabaseDocumentUnitStatusService.class})
-@TestPropertySource(properties = "otc.obs.bucket-name:testBucket")
 class DocumentUnitServiceTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final String ISSUER_ADDRESS = "test-issuer@exporter.neuris";
@@ -55,7 +51,6 @@ class DocumentUnitServiceTest {
   @MockBean private DocumentUnitRepository repository;
   @MockBean private DocumentNumberService documentNumberService;
   @MockBean private DocumentNumberRecyclingService documentNumberRecyclingService;
-  @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean private PublicationReportRepository publicationReportRepository;
   @MockBean private DatabaseDocumentUnitStatusService documentUnitStatusService;
@@ -87,90 +82,6 @@ class DocumentUnitServiceTest {
     verify(documentNumberService).generateDocumentNumber(documentationOffice.abbreviation(), 5);
     verify(repository).createNewDocumentUnit("nextDocumentNumber", documentationOffice);
   }
-
-  // @Test public void testGenerateNewDocumentUnit_withException() {}
-
-  //  @Test
-  //  void testAttachFileToDocumentUnit() {
-  //    // given
-  //    var byteBuffer = ByteBuffer.wrap(new byte[] {});
-  //    var headerMap = new LinkedMultiValueMap<String, String>();
-  //    headerMap.put("Content-Type", List.of("content/extension"));
-  //    headerMap.put("X-Filename", List.of("testfile.docx"));
-  //    var httpHeaders = HttpHeaders.readOnlyHttpHeaders(headerMap);
-  //
-  //    var savedDocumentUnit =
-  //        DocumentUnit.builder()
-  //            .uuid(TEST_UUID)
-  //            .attachments(
-  //                Collections.singletonList(
-  //                    OriginalFileDocument.builder()
-  //                        .s3path(TEST_UUID.toString())
-  //                        .extension("docx")
-  //                        .build()))
-  //            .build();
-  //    when(repository.attachFile(TEST_UUID, TEST_UUID.toString(), "docx", "testfile.docx"))
-  //        .thenReturn(Mono.just(savedDocumentUnit));
-  //    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.of(savedDocumentUnit));
-  //
-  //    doNothing().when(service).checkDocx(any(ByteBuffer.class));
-  //    when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
-  //        .thenReturn(CompletableFuture.completedFuture(PutObjectResponse.builder().build()));
-  //
-  //    var putObjectRequestCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
-  //    var asyncRequestBodyCaptor = ArgumentCaptor.forClass(AsyncRequestBody.class);
-  //
-  //    try (MockedStatic<UUID> mockedUUIDStatic = mockStatic(UUID.class)) {
-  //      mockedUUIDStatic.when(UUID::randomUUID).thenReturn(TEST_UUID);
-  //
-  //      // when and then
-  //      StepVerifier.create(service.attachFileToDocumentUnit(TEST_UUID, byteBuffer, httpHeaders))
-  //          .consumeNextWith(
-  //              documentUnit -> {
-  //                assertNotNull(documentUnit);
-  //                assertEquals(savedDocumentUnit, documentUnit);
-  //              })
-  //          .verifyComplete();
-  //
-  //      verify(s3AsyncClient)
-  //          .putObject(putObjectRequestCaptor.capture(), asyncRequestBodyCaptor.capture());
-  //      assertEquals("testBucket", putObjectRequestCaptor.getValue().bucket());
-  //      assertEquals(TEST_UUID.toString(), putObjectRequestCaptor.getValue().key());
-  //      assertEquals("content/extension", putObjectRequestCaptor.getValue().contentType());
-  //      StepVerifier.create(asyncRequestBodyCaptor.getValue())
-  //          .expectNext(ByteBuffer.wrap(new byte[] {}))
-  //          .verifyComplete();
-  //      verify(repository).attachFile(TEST_UUID, TEST_UUID.toString(), "docx", "testfile.docx");
-  //    }
-  //  }
-
-  //  @Test
-  //  void testRemoveFileFromDocumentUnit() {
-  //    var documentUnitBefore =
-  //        DocumentUnit.builder()
-  //            .uuid(TEST_UUID)
-  //
-  // .attachments(Collections.singletonList(OriginalFileDocument.builder().s3path(TEST_UUID.toString()).name("testfile.docx").build()))
-  //            .build();
-  //
-  //    var documentUnitAfter = DocumentUnit.builder().uuid(TEST_UUID).build();
-  //
-  //    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.of(documentUnitBefore));
-  //    // is the thenReturn ok? Or am I bypassing the actual functionality-test?
-  //    when(repository.removeFile(TEST_UUID)).thenReturn(documentUnitAfter);
-  //    when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
-  //        .thenReturn(buildEmptyDeleteObjectResponse());
-  //
-  //    StepVerifier.create(service.removeOriginalFile(TEST_UUID))
-  //        .consumeNextWith(
-  //            documentUnit -> {
-  //              assertNotNull(documentUnit);
-  //              assertEquals(documentUnitAfter, documentUnit);
-  //            })
-  //        .verifyComplete();
-  //
-  //    verify(repository).removeFile(TEST_UUID);
-  //  }
 
   //  @Test
   //  void testGenerateNewDocumentUnitAndAttachFile_withExceptionFromBucket() throws S3Exception {
@@ -218,7 +129,7 @@ class DocumentUnitServiceTest {
             })
         .verifyComplete();
 
-    verify(s3AsyncClient, times(0)).deleteObject(any(DeleteObjectRequest.class));
+    verify(attachmentService, times(0)).deleteAllObjectsFromBucketForDocumentationUnit(TEST_UUID);
   }
 
   //  @Test

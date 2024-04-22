@@ -78,7 +78,7 @@ public class S3AttachmentService implements AttachmentService {
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
-  public void deleteByS3path(String s3Path) {
+  public void deleteByS3Path(String s3Path) {
     deleteObjectFromBucket(s3Path);
     repository.deleteByS3ObjectPath(s3Path);
   }

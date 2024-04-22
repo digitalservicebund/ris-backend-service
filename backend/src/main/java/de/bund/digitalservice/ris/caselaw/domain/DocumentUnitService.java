@@ -157,7 +157,10 @@ public class DocumentUnitService {
               .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnitUuid));
 
       log.debug("Deleting DocumentUnitDTO " + documentUnitUuid);
-      attachmentService.deleteAllObjectsFromBucketForDocumentationUnit(documentUnitUuid);
+
+      if (documentUnit.attachments() != null && !documentUnit.attachments().isEmpty())
+        attachmentService.deleteAllObjectsFromBucketForDocumentationUnit(documentUnitUuid);
+
       saveForRecycling(documentUnit);
       repository.delete(documentUnit);
       return Mono.just("Dokumentationseinheit gelöscht: " + documentUnitUuid);

@@ -109,7 +109,7 @@ public class DocumentUnitController {
       @PathVariable UUID uuid, @PathVariable String s3Path) {
 
     try {
-      attachmentService.deleteByS3path(s3Path);
+      attachmentService.deleteByS3Path(s3Path);
       return Mono.just(ResponseEntity.noContent().build());
     } catch (Exception e) {
       return Mono.error(e);
