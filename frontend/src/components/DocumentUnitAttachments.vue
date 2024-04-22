@@ -25,7 +25,6 @@ const emit = defineEmits<{
 
 const { pushQueryToRoute } = useQuery<"showAttachmentPanel">()
 
-console.log(props.showAttachmentPanel)
 const showAttachmentPanelRef: Ref<boolean> = ref(
   props.showAttachmentPanel ? props.showAttachmentPanel : false,
 )
