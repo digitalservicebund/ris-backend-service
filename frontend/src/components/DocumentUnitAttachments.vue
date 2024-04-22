@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-
 import { computed, Ref, ref } from "vue"
 import AttachmentList from "@/components/AttachmentList.vue"
 import AttachmentViewSidePanel from "@/components/AttachmentViewSidePanel.vue"
@@ -216,7 +215,6 @@ function toggleDeleteModal() {
           :document-unit-uuid="props.documentUnit.uuid"
           :is-expanded="showAttachmentPanelRef"
           @select="handleOnSelect"
-
           @update="toggleAttachmentPanel"
         ></AttachmentViewSidePanel>
       </FlexContainer>
