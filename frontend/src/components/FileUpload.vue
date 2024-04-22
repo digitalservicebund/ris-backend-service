@@ -1,12 +1,10 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import InfoModal from "@/components/InfoModal.vue"
 import FileInput from "@/components/input/FileInput.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import IconUpload from "~icons/ic/outline-file-upload"
 
-const props = defineProps<{
-  error?: { title: string; description?: string }
+defineProps<{
   isLoading?: boolean
   accept?: string
 }>()
@@ -18,13 +16,11 @@ const emits = defineEmits<{
 interface Status {
   file: File | null
   inDrag: boolean
-  inDragError: string
 }
 
 const emptyStatus: Status = {
   file: null,
   inDrag: false,
-  inDragError: "",
 }
 
 const status = ref(emptyStatus)
@@ -95,20 +91,10 @@ function onFileSelect(event: Event) {
       </FileInput>
     </span>
   </div>
-
-  <InfoModal v-if="props.error" v-bind="props.error" class="mt-8" />
 </template>
 
 <style lang="scss" scoped>
 .upload-drop-area {
-  &__in-drag-error {
-    @apply border-3 border-dashed border-red-200;
-
-    &:hover {
-      @apply border-3 border-dashed border-red-800;
-    }
-  }
-
   &__in-drag {
     @apply border-3 border-dashed border-blue-500;
   }

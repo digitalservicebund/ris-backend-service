@@ -13,15 +13,6 @@ describe("FileUpload", () => {
     screen.getByText("Datei in diesen Bereich ziehen")
   })
 
-  test("shows upload error", async () => {
-    render(FileUpload, {
-      props: {
-        error: { title: "test", description: "this is an error" },
-      },
-    })
-    screen.getByText("this is an error")
-  })
-
   test.each([
     [
       [

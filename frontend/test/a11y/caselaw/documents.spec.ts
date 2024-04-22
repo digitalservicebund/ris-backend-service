@@ -54,7 +54,9 @@ test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/fil
     await navigateToFiles(page, documentNumber)
     await uploadTestfile(page, "sample.png")
     await expect(
-      page.locator("text=Das ausgewählte Dateiformat ist nicht korrekt."),
+      page.locator(
+        "text=sample.png - Das ausgewählte Dateiformat ist nicht korrekt. Versuchen Sie eine .docx-Version dieser Datei hochzuladen.",
+      ),
     ).toBeVisible()
 
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze()

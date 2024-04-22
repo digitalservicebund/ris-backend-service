@@ -9,7 +9,7 @@ const props = withDefaults(
   defineProps<{
     ariaLabel?: string
     title: string
-    description?: string
+    description?: string | string[]
     status?: InfoStatus
   }>(),
   {
@@ -57,6 +57,10 @@ const ModalIcon = computed(() => {
   })
 })
 
+const isArray = computed(() => {
+  return Array.isArray(props.description)
+})
+
 const ariaLabelIcon = props.title + " icon"
 </script>
 
@@ -73,8 +77,13 @@ const ariaLabelIcon = props.title + " icon"
 
     <div class="flex flex-col">
       <span class="ds-label-02-bold">{{ title }}</span>
+      <div v-if="isArray" class="ds-body-01-reg">
+        <ul class="m-0 list-disc ps-20">
+          <li v-for="(desc, index) in description" :key="index">{{ desc }}</li>
+        </ul>
+      </div>
       <!-- eslint-disable vue/no-v-html -->
-      <span class="ds-body-01-reg" v-html="description"></span>
+      <span v-else class="ds-body-01-reg" v-html="description"></span>
     </div>
   </div>
 </template>

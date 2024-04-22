@@ -1,19 +1,19 @@
 <script lang="ts" setup>
-import { Ref, ref } from "vue"
+import { computed, Ref, ref } from "vue"
 import AttachmentList from "@/components/AttachmentList.vue"
 import AttachmentViewSidePanel from "@/components/AttachmentViewSidePanel.vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import FileUpload from "@/components/FileUpload.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
+import InfoModal from "@/components/InfoModal.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import useQuery from "@/composables/useQueryFromRoute"
 import Attachment from "@/domain/attachment"
 import DocumentUnit from "@/domain/documentUnit"
-import fileService from "@/services/attachmentService"
+import attachmentService from "@/services/attachmentService"
 import documentUnitService from "@/services/documentUnitService"
-import { ResponseError } from "@/services/httpClient"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
@@ -29,7 +29,7 @@ const showAttachmentPanelRef: Ref<boolean> = ref(
   props.showAttachmentPanel ? props.showAttachmentPanel : false,
 )
 
-const error = ref<ResponseError>()
+const errors = ref<string[]>([])
 const html = ref<string>()
 const isLoading = ref(false)
 const acceptedFileFormats = [".docx"]
@@ -37,6 +37,14 @@ const selectedAttachmentIndex: Ref<number> = ref(0)
 
 const showDeleteModal = ref(false)
 const deleteModalHeaderText = "Anhang löschen"
+
+const errorTitle = computed(() => {
+  if (errors.value.length === 1) {
+    return "1 Datei konnte nicht hochgeladen werden."
+  } else if (errors.value.length > 1) {
+    return `${errors.value.length} Dateien konnten nicht hochgeladen werden.`
+  } else return ""
+})
 
 const getAttachments = (): Attachment[] => {
   return props.documentUnit.attachments
@@ -54,8 +62,12 @@ const handleDeleteAttachment = async (index: number) => {
   }
 
   if (
-    (await fileService.delete(props.documentUnit.uuid, fileToDelete.s3path))
-      .status < 300
+    (
+      await attachmentService.delete(
+        props.documentUnit.uuid,
+        fileToDelete.s3path,
+      )
+    ).status < 300
   ) {
     const updateResponse = await documentUnitService.getByDocumentNumber(
       props.documentUnit.documentNumber as string,
@@ -80,6 +92,7 @@ const handleOnSelect = (index: number) => {
 }
 
 const handleOnDelete = (index: number) => {
+  errors.value = []
   selectedAttachmentIndex.value = index
   toggleDeleteModal()
 }
@@ -93,14 +106,26 @@ const deleteFile = (index: number) => {
 }
 
 async function upload(files: FileList) {
+  errors.value = []
   try {
     for (const file of Array.from(files)) {
       isLoading.value = true
-      const response = await fileService.upload(props.documentUnit.uuid, file)
+      const response = await attachmentService.upload(
+        props.documentUnit.uuid,
+        file,
+      )
       if (response.status === 200 && response.data) {
         html.value = response.data.html
       } else {
-        error.value = response.error
+        if (response.error?.description) {
+          errors.value.push(
+            file.name +
+              " " +
+              response.error?.title +
+              " " +
+              response.error?.description,
+          )
+        }
       }
     }
   } finally {
@@ -163,11 +188,16 @@ function toggleDeleteModal() {
             @delete="handleOnDelete"
             @select="handleOnSelect"
           />
+          <InfoModal
+            v-if="errors.length > 0 && isLoading === false"
+            class="mt-8"
+            :description="errors"
+            :title="errorTitle"
+          />
           <div>
             <div class="flex flex-col items-start">
               <FileUpload
                 :accept="acceptedFileFormats.toString()"
-                :error="error"
                 :is-loading="isLoading"
                 @files-selected="(files) => upload(files)"
               />

@@ -100,7 +100,7 @@ public class DocumentUnitController {
             attachmentService.attachFileToDocumentationUnit(uuid, byteBuffer, httpHeaders).s3path())
         .doOnNext(docx2html -> service.updateECLI(uuid, docx2html))
         .map(docx2Html -> ResponseEntity.status(HttpStatus.OK).body(docx2Html))
-        .onErrorReturn(ResponseEntity.internalServerError().build());
+        .onErrorReturn(ResponseEntity.unprocessableEntity().build());
   }
 
   @DeleteMapping(value = "/{uuid}/file/{s3Path}")
