@@ -1,26 +1,26 @@
-import { computed } from "vue"
-import type { Ref } from "vue"
-import type { RouteLocationNormalizedLoaded } from "vue-router"
+import { LocationQuery } from "vue-router"
+import MenuItem from "@/domain/menuItem"
 
 export function useCaseLawMenuItems(
-  documentNumber: Ref<string | undefined>,
-  route: RouteLocationNormalizedLoaded,
-) {
+  documentNumber: string | undefined,
+  routeQuery: LocationQuery, // Replace with the appropriate type for route query
+): MenuItem[] {
   const baseRoute = {
-    params: { documentNumber: documentNumber.value },
-    query: route.query,
+    params: { documentNumber },
+    query: routeQuery,
   }
 
-  return computed(() => [
+  return [
     {
       label: "Rubriken",
       route: {
-        ...baseRoute,
         name: "caselaw-documentUnit-documentNumber-categories",
+        ...baseRoute,
       },
       children: [
         {
           label: "Stammdaten",
+
           route: {
             ...baseRoute,
             name: "caselaw-documentUnit-documentNumber-categories",
@@ -67,5 +67,5 @@ export function useCaseLawMenuItems(
         name: "caselaw-documentUnit-documentNumber-publication",
       },
     },
-  ])
+  ]
 }

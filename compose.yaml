@@ -90,7 +90,7 @@ services:
     restart: always
     container_name: postgres14
     volumes:
-      - postgres14-data:/var/lib/postgresql/data
+      - postgres14-minimal:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=neuris
       - POSTGRES_PASSWORD=test
@@ -131,7 +131,7 @@ services:
       timeout: 3s
 
   redis:
-    image: cgr.dev/chainguard/redis@sha256:5c5193e437be1cb5af4f853c814878a83553d95e55421ae5e7227eb58ea7a26a
+    image: cgr.dev/chainguard/redis@sha256:10cf338f28a91c61dcce127ecacd26a1ff23979c0e1b2c13e5915ced43e9ca09
     extra_hosts:
       - localhost:host-gateway
     container_name: redis
@@ -157,4 +157,4 @@ services:
 
 volumes:
   gradle-cache:
-  postgres14-data:
+  postgres14-minimal:

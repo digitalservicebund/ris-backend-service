@@ -26,7 +26,6 @@ const emit = defineEmits<{
 
 const handleOnSelect = (index: number) => {
   emit("select", index)
-  console.log(index)
 }
 
 const handlePanelExpanded = (isExpanded: boolean) => {

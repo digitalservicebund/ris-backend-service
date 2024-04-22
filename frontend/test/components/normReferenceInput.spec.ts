@@ -203,6 +203,16 @@ describe("NormReferenceEntry", () => {
     await screen.findByText(/Inhalt nicht valide/)
   })
 
+  it("validates ambiguous norm reference input", async () => {
+    renderComponent({
+      modelValue: {
+        normAbbreviationRawValue: "EWGAssRBes 1/80",
+      } as NormReference,
+    })
+
+    expect(screen.getByText("Mehrdeutiger Verweis")).toBeInTheDocument()
+  })
+
   it("new input removes error message", async () => {
     const { user } = renderComponent({
       modelValue: {

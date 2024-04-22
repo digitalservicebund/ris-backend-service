@@ -35,7 +35,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 @Slf4j
 @Service
-public class DatabaseAttachmentService implements AttachmentService {
+public class S3AttachmentService implements AttachmentService {
   private final AttachmentRepository repository;
   private final S3AsyncClient s3AsyncClient;
   private final DatabaseDocumentationUnitRepository documentUnitRepository;
@@ -43,7 +43,7 @@ public class DatabaseAttachmentService implements AttachmentService {
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
 
-  public DatabaseAttachmentService(
+  public S3AttachmentService(
       AttachmentRepository repository,
       S3AsyncClient s3AsyncClient,
       DatabaseDocumentationUnitRepository documentUnitRepository) {

@@ -7,6 +7,30 @@ import IconClear from "~icons/ic/baseline-clear"
 
 <template>
   <KitchensinkPage name="Button">
+    <KitchensinkStory name="Icons">
+      <div class="flex gap-20">
+        <p>
+          All icons in the
+          <a
+            class="ds-link-01-bold"
+            href="https://icon-sets.iconify.design/ic/"
+            rel="noopener"
+            target="_blank"
+            >Google Material</a
+          >
+          and
+          <a
+            class="ds-link-01-bold"
+            href="https://icon-sets.iconify.design/material-symbols"
+            rel="noopener"
+            target="_blank"
+            >Material Symbols</a
+          >
+          sets can be used
+        </p>
+      </div>
+    </KitchensinkStory>
+
     <KitchensinkStory name="Primary">
       <div class="flex gap-20">
         <TextButton button-type="primary" label="Button Primary" />

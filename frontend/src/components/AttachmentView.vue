@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from "vue"
+import LoadingSpinner from "./LoadingSpinner.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import TextEditor from "@/components/input/TextEditor.vue"
@@ -11,14 +12,18 @@ const props = defineProps<{
   s3Path?: string
 }>()
 
+const isLoading = ref(false)
+
 const fileAsHTML = ref<Docx2HTML>()
 
 const getAttachmentHTML = async () => {
+  isLoading.value = true
   if (props.documentUnitUuid && props.s3Path) {
     const htmlResponse = await fileService.getAttachmentAsHtml(
       props.documentUnitUuid,
       props.s3Path,
     )
+    isLoading.value = false
     if (htmlResponse.error === undefined) fileAsHTML.value = htmlResponse.data
   }
 }
@@ -38,7 +43,14 @@ watch(
     class="sticky top-0 flex w-full flex-col gap-40 bg-white p-24"
     v-bind="$attrs"
   >
+    <div
+      v-if="isLoading"
+      class="my-112 grid justify-items-center bg-white bg-opacity-60"
+    >
+      <LoadingSpinner />
+    </div>
     <FlexItem
+      v-else
       class="h-[65vh] overflow-scroll border-1 border-solid border-gray-400"
     >
       <TextEditor

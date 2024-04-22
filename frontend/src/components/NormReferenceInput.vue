@@ -66,7 +66,10 @@ const normAbbreviation = computed({
 })
 
 async function addNormReference() {
-  if (!validationStore.getByMessage("Inhalt nicht valide").length) {
+  if (
+    !validationStore.getByMessage("Inhalt nicht valide").length &&
+    !validationStore.getByMessage("RIS-Abkürzung bereits eingegeben").length
+  ) {
     const normRef = new NormReference({
       ...norm.value,
       singleNorms: singleNorms.value
@@ -99,7 +102,11 @@ watch(
   () => {
     norm.value = new NormReference({ ...props.modelValue })
     lastSavedModelValue.value = new NormReference({ ...props.modelValue })
-    if (lastSavedModelValue.value.isEmpty) validationStore.reset()
+    if (lastSavedModelValue.value.isEmpty) {
+      validationStore.reset()
+    } else if (lastSavedModelValue.value.hasAmbiguousNormReference) {
+      validationStore.add("Mehrdeutiger Verweis", "normAbbreviation")
+    }
     //when list is empty, add new empty single norm entry
     if (singleNorms.value?.length == 0 || !singleNorms.value)
       addSingleNormEntry()
@@ -128,6 +135,7 @@ onBeforeUnmount(() => {
         :item-service="ComboboxItemService.getRisAbbreviations"
         no-clear
         placeholder="Abkürzung, Kurz-oder Langtitel oder Region eingeben..."
+        @input="validationStore.remove('normAbbreviation')"
       ></ComboboxInput>
     </InputField>
     <div v-if="normAbbreviation || norm.normAbbreviationRawValue">

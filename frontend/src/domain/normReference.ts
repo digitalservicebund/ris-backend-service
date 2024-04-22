@@ -18,8 +18,8 @@ export default class NormReference implements EditableListItem {
     Object.assign(this, data)
   }
 
-  get isReadOnly(): boolean {
-    return false
+  get hasAmbiguousNormReference(): boolean {
+    return !this.normAbbreviation && !!this.normAbbreviationRawValue
   }
 
   get renderDecision(): string {
@@ -53,10 +53,6 @@ export default class NormReference implements EditableListItem {
       }
     })
     return isEmpty
-  }
-
-  get showSummaryOnEdit(): boolean {
-    return false
   }
 
   private fieldIsEmpty(

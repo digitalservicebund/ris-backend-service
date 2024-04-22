@@ -44,12 +44,12 @@ test("copy-paste from side panel", async ({ page, documentNumber }) => {
   await expect(page.locator(`text=${rightAlignText}`)).toBeVisible()
   await expect(page.locator(`text=${centerAlignText}`)).toBeVisible()
   await expect(page.locator(`text=${justifyAlignText}`)).toBeVisible()
-  const originalFileParagraph = page.locator(`text=${leftAlignText}`)
+  const originalFileParagraph = page.locator(`text=centered`)
   await expect(originalFileParagraph).toBeVisible()
 
   // Selected all text from sidepanel
   await originalFileParagraph.evaluate((element) => {
-    const originalFile = element.parentElement?.parentElement
+    const originalFile = element.parentElement
 
     if (!originalFile) {
       throw new Error("No original file available.")
@@ -78,7 +78,6 @@ test("copy-paste from side panel", async ({ page, documentNumber }) => {
   const inputField = page.locator("[data-testid='Leitsatz']")
   await inputField.click()
   await page.keyboard.press(`${modifier}+KeyV`)
-  const inputFieldInnerHTML = await inputField.innerHTML()
 
   // Check all text copied
   const inputFieldAlleText = await inputField.allTextContents()
@@ -87,6 +86,11 @@ test("copy-paste from side panel", async ({ page, documentNumber }) => {
   expect(inputFieldAlleText[0].includes(centerAlignText)).toBeTruthy()
   expect(inputFieldAlleText[0].includes(justifyAlignText)).toBeTruthy()
 
+  // hide invisible characters
+  await inputField.click()
+  await page.getByLabel("invisible-characters").click()
+
+  const inputFieldInnerHTML = await inputField.innerHTML()
   // Check all text copied with style
   expect(inputFieldInnerHTML.includes(leftAlignTextWithStyle)).toBeTruthy()
   expect(inputFieldInnerHTML.includes(rightAlignTextWithStyle)).toBeTruthy()
