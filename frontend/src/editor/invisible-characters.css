@@ -1,3 +1,7 @@
 .invisible--soft-hyphen:before {
   content: "-";
 }
+
+.invisible--tab:before {
+  content: "→";
+}
