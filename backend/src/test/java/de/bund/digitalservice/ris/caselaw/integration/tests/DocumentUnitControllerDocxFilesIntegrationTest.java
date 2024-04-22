@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseAttachmentService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
@@ -20,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.S3AttachmentService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
@@ -87,7 +87,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
       AuthService.class,
       TestConfig.class,
       DocumentNumberPatternConfig.class,
-      DatabaseAttachmentService.class,
+      S3AttachmentService.class,
     },
     controllers = {DocumentUnitController.class})
 class DocumentUnitControllerDocxFilesIntegrationTest {
