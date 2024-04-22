@@ -176,8 +176,8 @@ class DocumentationUnitTransformerTest {
 
   @ParameterizedTest
   @ValueSource(strings = {"BGH", "BVerwG", "BFH", "BVerfG", "BAG", "BSG"})
-  void
-      testTransformToDTO_addLegalEffectWithCourtChangedAndSuperiorCourt_shouldSetLegalEffectToYes() {
+  void testTransformToDTO_addLegalEffectWithCourtChangedAndSuperiorCourt_shouldSetLegalEffectToYes(
+      String courtType) {
     DocumentationUnitDTO currentDto =
         DocumentationUnitDTO.builder()
             .court(
@@ -192,7 +192,7 @@ class DocumentationUnitTransformerTest {
                     .court(
                         Court.builder()
                             .id(UUID.fromString("CCCCCCCC-2222-3333-4444-55555555555"))
-                            .type("BGH")
+                            .type(courtType)
                             .build())
                     .legalEffect("Nein")
                     .build())
