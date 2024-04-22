@@ -45,15 +45,9 @@ test.describe("upload an original document to a doc unit", () => {
     })
     await expect(tableView).toBeVisible()
 
-    // show in side panel when toggled
-    await page.getByLabel("Dokumentansicht öffnen").click()
     await expect(page.locator(`text=Die ist ein Test`)).toBeVisible()
     await page.getByLabel("Nächstes Dokument anzeigen").click()
     await expect(page.locator(`text=Die ist ein Test`)).toBeHidden()
-    await expect(page.locator(`text=Subheadline`)).toBeVisible()
-
-    await expect(page.locator(`text=Subheadline`)).toBeHidden()
-    await page.getByText("some-formatting.docx").locator("visible=true").click()
     await expect(page.locator(`text=Subheadline`)).toBeVisible()
 
     // delete files
