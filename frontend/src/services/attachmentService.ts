@@ -53,6 +53,11 @@ const service: AttachmentService = {
         title: errorMessages.WRONG_MEDIA_TYPE_DOCX_REQUIRED.title,
         description: errorMessages.WRONG_MEDIA_TYPE_DOCX_REQUIRED.description,
       }
+    } else if (response.status === 422) {
+      response.error = {
+        title: errorMessages.DOCX_PARSING_ERROR.title,
+        description: errorMessages.DOCX_PARSING_ERROR.description,
+      }
     } else if (response.status >= 300) {
       response.error = {
         title: errorMessages.SERVER_ERROR.title,

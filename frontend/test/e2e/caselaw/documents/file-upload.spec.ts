@@ -79,7 +79,7 @@ test.describe("upload an original document to a doc unit", () => {
     await uploadTestfile(page, "sample.png")
     await expect(
       page.locator(
-        "text=sample.png - Das ausgewählte Dateiformat ist nicht korrekt. Versuchen Sie eine .docx-Version dieser Datei hochzuladen.",
+        "text=sample.png hat ein falsches Format. Laden Sie eine .docx-Version hoch.",
       ),
     ).toBeVisible()
   })
@@ -130,7 +130,7 @@ test.describe("upload an original document to a doc unit", () => {
     await page.dispatchEvent("#upload-drop-area", "drop", { dataTransfer })
     await expect(
       page.locator(
-        "text=sample.png - Das ausgewählte Dateiformat ist nicht korrekt. Versuchen Sie eine .docx-Version dieser Datei hochzuladen.",
+        "text=sample.png hat ein falsches Format. Laden Sie eine .docx-Version hoch.",
       ),
     ).toBeVisible()
   })

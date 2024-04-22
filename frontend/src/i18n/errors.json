@@ -20,20 +20,16 @@
     "description": ""
   },
   "WRONG_MEDIA_TYPE_DOCX_REQUIRED": {
-    "title": "Das ausgewählte Dateiformat ist nicht korrekt.",
-    "description": "Versuchen Sie eine .docx-Version dieser Datei hochzuladen."
-  },
-  "WRONG_MEDIA_TYPE_ZIP_REQUIRED": {
-    "title": "Das Dateiformat wird nicht unterstützt.",
-    "description": "Bitte verwenden Sie eine Zip-Datei."
+    "title": "hat ein falsches Format.",
+    "description": "Laden Sie eine .docx-Version hoch."
   },
   "FILE_TOO_LARGE_CASELAW": {
-    "title": "Die Datei darf max. 20 MB groß sein.",
-    "description": "Bitte laden Sie eine kleinere Datei hoch."
+    "title": "überschreitet das Limit von 20MB Größe.",
+    "description": "Laden Sie eine kleinere Datei hoch."
   },
-  "FILE_TOO_LARGE_NORMS": {
-    "title": "Die Datei überschreitet die maximale Dateigröße von 20 MB.",
-    "description": ""
+  "DOCX_PARSING_ERROR": {
+    "title": "konnte nicht verarbeitet werden.",
+    "description": "Bitte überprüfen Sie die Datei."
   },
   "NAME_COULD_NOT_BE_LOADED": {
     "title": "Name konnte nicht geladen werden.",

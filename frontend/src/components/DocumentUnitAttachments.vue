@@ -120,7 +120,7 @@ async function upload(files: FileList) {
         if (response.error?.description) {
           errors.value.push(
             file.name +
-              " - " +
+              " " +
               response.error?.title +
               " " +
               response.error?.description,

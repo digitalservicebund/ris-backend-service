@@ -97,7 +97,7 @@ public class DocumentUnitController {
         .getConvertedObject(
             attachmentService.attachFileToDocumentationUnit(uuid, byteBuffer, httpHeaders).s3path())
         .map(docx2Html -> ResponseEntity.status(HttpStatus.OK).body(docx2Html))
-        .onErrorReturn(ResponseEntity.internalServerError().build());
+        .onErrorReturn(ResponseEntity.unprocessableEntity().build());
   }
 
   @DeleteMapping(value = "/{uuid}/file/{s3Path}")
