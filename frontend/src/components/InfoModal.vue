@@ -78,7 +78,7 @@ const ariaLabelIcon = props.title + " icon"
     <div class="flex flex-col">
       <span class="ds-label-02-bold">{{ title }}</span>
       <div v-if="isArray" class="ds-body-01-reg">
-        <ul class="list-disc">
+        <ul class="m-0 list-disc ps-20">
           <li v-for="(desc, index) in description" :key="index">{{ desc }}</li>
         </ul>
       </div>

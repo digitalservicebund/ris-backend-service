@@ -176,18 +176,18 @@ function toggleDeleteModal() {
         />
         <FlexItem class="flex-1 space-y-20" :class="classes">
           <TitleElement>Dokumente</TitleElement>
-          <InfoModal
-            v-if="errors.length > 0 && isLoading === false"
-            class="mt-8"
-            :description="errors"
-            :title="errorTitle"
-          />
           <AttachmentList
             v-if="props.documentUnit.hasAttachments"
             id="file-table"
             :files="getAttachments()"
             @delete="handleOnDelete"
             @select="handleOnSelect"
+          />
+          <InfoModal
+            v-if="errors.length > 0 && isLoading === false"
+            class="mt-8"
+            :description="errors"
+            :title="errorTitle"
           />
           <div>
             <div class="flex flex-col items-start">
