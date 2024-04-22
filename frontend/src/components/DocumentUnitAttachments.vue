@@ -106,6 +106,7 @@ async function upload(files: FileList) {
   } finally {
     isLoading.value = false
     emit("updateDocumentUnit", props.documentUnit)
+    toggleAttachmentPanel(true)
   }
 }
 
