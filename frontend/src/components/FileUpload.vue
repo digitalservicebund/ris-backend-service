@@ -16,13 +16,11 @@ const emits = defineEmits<{
 interface Status {
   file: File | null
   inDrag: boolean
-  inDragError: string
 }
 
 const emptyStatus: Status = {
   file: null,
   inDrag: false,
-  inDragError: "",
 }
 
 const status = ref(emptyStatus)
@@ -97,14 +95,6 @@ function onFileSelect(event: Event) {
 
 <style lang="scss" scoped>
 .upload-drop-area {
-  &__in-drag-error {
-    @apply border-3 border-dashed border-red-200;
-
-    &:hover {
-      @apply border-3 border-dashed border-red-800;
-    }
-  }
-
   &__in-drag {
     @apply border-3 border-dashed border-blue-500;
   }

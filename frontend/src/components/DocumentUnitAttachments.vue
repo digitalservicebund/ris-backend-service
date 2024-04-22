@@ -117,7 +117,13 @@ async function upload(files: FileList) {
         html.value = response.data.html
       } else {
         if (response.error?.description) {
-          errors.value.push(file.name + " - " + response.error?.description)
+          errors.value.push(
+            file.name +
+              " - " +
+              response.error?.title +
+              " " +
+              response.error?.description,
+          )
         }
       }
     }
