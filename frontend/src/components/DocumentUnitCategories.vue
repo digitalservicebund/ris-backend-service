@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, toRefs, Ref } from "vue"
-import { useRoute, useRouter } from "vue-router"
+import { useRoute } from "vue-router"
 import AttachmentViewSidePanel from "@/components/AttachmentViewSidePanel.vue"
 import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContentRelatedIndexing.vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
@@ -12,7 +12,6 @@ import FlexItem from "@/components/FlexItem.vue"
 import { ValidationError } from "@/components/input/types"
 import PreviousDecisions from "@/components/PreviousDecisions.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
-import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import DocumentUnit, { Texts, CoreData } from "@/domain/documentUnit"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import PreviousDecision from "@/domain/previousDecision"
@@ -21,17 +20,16 @@ import { ServiceResponse } from "@/services/httpClient"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
+  showAttachmentPanel?: boolean
 }>()
 const updatedDocumentUnit = ref<DocumentUnit>(props.documentUnit)
 const validationErrors = ref<ValidationError[]>([])
-const router = useRouter()
 const route = useRoute()
-const showDocPanel = useToggleStateInRouteQuery(
-  "showDocPanel",
-  route,
-  router.replace,
-  false,
+
+const showAttachmentPanelRef: Ref<boolean> = ref(
+  props.showAttachmentPanel ? props.showAttachmentPanel : false,
 )
+
 const lastUpdatedDocumentUnit = ref()
 const selectedAttachmentIndex: Ref<number> = ref(0)
 
@@ -136,7 +134,7 @@ const headerOffset = 145
 useScrollToHash(routeHash, headerOffset)
 
 const togglePanel = () => {
-  showDocPanel.value = !showDocPanel.value
+  showAttachmentPanelRef.value = !showAttachmentPanelRef.value
 }
 
 const handleOnSelect = (index: number) => {
@@ -187,7 +185,7 @@ const handleOnSelect = (index: number) => {
           :attachments="documentUnit.attachments"
           :current-index="selectedAttachmentIndex"
           :document-unit-uuid="props.documentUnit.uuid"
-          :is-expanded="showDocPanel"
+          :is-expanded="showAttachmentPanelRef"
           @select="handleOnSelect"
           @update="togglePanel"
         ></AttachmentViewSidePanel>

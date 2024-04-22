@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { Ref, ref } from "vue"
-import { useRoute, useRouter } from "vue-router"
 import AttachmentList from "@/components/AttachmentList.vue"
 import AttachmentViewSidePanel from "@/components/AttachmentViewSidePanel.vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
@@ -9,26 +8,25 @@ import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import TitleElement from "@/components/TitleElement.vue"
-import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import Attachment from "@/domain/attachment"
 import DocumentUnit from "@/domain/documentUnit"
 import fileService from "@/services/attachmentService"
 import documentUnitService from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
 
-const props = defineProps<{ documentUnit: DocumentUnit }>()
+const props = defineProps<{
+  documentUnit: DocumentUnit
+  showAttachmentPanel?: boolean
+}>()
 const emit = defineEmits<{
   updateDocumentUnit: [updatedDocumentUnit: DocumentUnit]
 }>()
 
-const router = useRouter()
-const route = useRoute()
-const showDocPanel = useToggleStateInRouteQuery(
-  "showDocPanel",
-  route,
-  router.replace,
-  false,
+console.log(props.showAttachmentPanel)
+const showAttachmentPanelRef: Ref<boolean> = ref(
+  props.showAttachmentPanel ? props.showAttachmentPanel : false,
 )
+
 const error = ref<ResponseError>()
 const html = ref<string>()
 const isLoading = ref(false)
@@ -72,10 +70,10 @@ const handleDeleteAttachment = async (index: number) => {
 
 const handleOnSelect = (index: number) => {
   if (selectedAttachmentIndex.value == index) {
-    showDocPanel.value = !showDocPanel.value
+    showAttachmentPanelRef.value = !showAttachmentPanelRef.value
   } else {
     selectedAttachmentIndex.value = index
-    showDocPanel.value = true
+    showAttachmentPanelRef.value = true
   }
 }
 
@@ -87,7 +85,7 @@ const handleOnDelete = (index: number) => {
 const deleteFile = (index: number) => {
   handleDeleteAttachment(index)
   toggleDeleteModal()
-  if (showDocPanel) {
+  if (showAttachmentPanelRef.value) {
     togglePanel()
   }
 }
@@ -110,7 +108,7 @@ async function upload(files: FileList) {
 }
 
 const togglePanel = () => {
-  showDocPanel.value = !showDocPanel.value
+  showAttachmentPanelRef.value = !showAttachmentPanelRef.value
 }
 
 function toggleDeleteModal() {
@@ -179,7 +177,7 @@ function toggleDeleteModal() {
           :attachments="documentUnit.attachments"
           :current-index="selectedAttachmentIndex"
           :document-unit-uuid="props.documentUnit.uuid"
-          :is-expanded="showDocPanel"
+          :is-expanded="showAttachmentPanelRef"
           @select="handleOnSelect"
           @update="togglePanel"
         ></AttachmentViewSidePanel>
