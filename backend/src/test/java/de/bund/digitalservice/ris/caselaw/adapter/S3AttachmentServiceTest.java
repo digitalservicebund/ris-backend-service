@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -16,11 +17,16 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentReposit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentException;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +41,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.test.StepVerifier;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -65,8 +72,6 @@ class S3AttachmentServiceTest {
 
     when(repository.save(any(AttachmentDTO.class)))
         .thenAnswer(invocation -> invocation.getArgument(0));
-
-    doNothing().when(service).checkDocx(any(ByteBuffer.class));
   }
 
   @Test
@@ -76,6 +81,7 @@ class S3AttachmentServiceTest {
     headerMap.put("Content-Type", List.of("content/extension"));
     headerMap.put("X-Filename", List.of("testfile.docx"));
     var httpHeaders = HttpHeaders.readOnlyHttpHeaders(headerMap);
+    doNothing().when(service).checkDocx(any(ByteBuffer.class));
 
     service.attachFileToDocumentationUnit(documentationUnitDTO.getId(), byteBuffer, httpHeaders);
 
@@ -103,6 +109,7 @@ class S3AttachmentServiceTest {
     var headerMap = new LinkedMultiValueMap<String, String>();
     headerMap.put("Content-Type", List.of("content/extension"));
     var httpHeaders = HttpHeaders.readOnlyHttpHeaders(headerMap);
+    doNothing().when(service).checkDocx(any(ByteBuffer.class));
 
     service.attachFileToDocumentationUnit(documentationUnitDTO.getId(), byteBuffer, httpHeaders);
 
@@ -156,5 +163,49 @@ class S3AttachmentServiceTest {
     List<DeleteObjectRequest> capturedRequests = deleteObjectRequestCaptor.getAllValues();
     assertTrue(capturedRequests.stream().anyMatch(request -> request.key().equals("fooS3Path")));
     assertTrue(capturedRequests.stream().anyMatch(request -> request.key().equals("barS3Path")));
+  }
+
+  @Test
+  void testCheckDocx_withValidDocument() {
+    ByteBuffer byteBuffer = buildBuffer("word/document.xml");
+    assertDoesNotThrow(() -> service.checkDocx(byteBuffer));
+  }
+
+  @Test
+  void testCheckDocx_withInvalidFormat() {
+    ByteBuffer byteBuffer = buildBuffer("word/document.csv");
+    assertThrows(ResponseStatusException.class, () -> service.checkDocx(byteBuffer));
+  }
+
+  @Test
+  void testCheckDocx_withCorruptedDocx() {
+    byte[] corruptedData = new byte[1024];
+    new Random().nextBytes(corruptedData);
+    ByteBuffer byteBuffer = ByteBuffer.wrap(corruptedData);
+
+    assertThrows(ResponseStatusException.class, () -> service.checkDocx(byteBuffer));
+  }
+
+  @Test
+  void testCheckDocx_withEmptyBuffer() {
+    byte[] emptyData = new byte[] {};
+    ByteBuffer byteBuffer = ByteBuffer.wrap(emptyData);
+
+    assertThrows(ResponseStatusException.class, () -> service.checkDocx(byteBuffer));
+  }
+
+  private ByteBuffer buildBuffer(String entry) {
+    try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
+      ZipEntry zipEntry = new ZipEntry(entry);
+      zipOutputStream.putNextEntry(zipEntry);
+      zipOutputStream.closeEntry();
+      zipOutputStream.finish();
+
+      byte[] zipBytes = byteArrayOutputStream.toByteArray();
+      return ByteBuffer.wrap(zipBytes);
+    } catch (IOException exception) {
+      throw new RuntimeException("Failed to create zip", exception);
+    }
   }
 }

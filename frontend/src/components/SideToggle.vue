@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue"
-import IconChevronLeft from "~icons/ic/baseline-chevron-left"
-import IconChevronRight from "~icons/ic/baseline-chevron-right"
+import IconChevronLeft from "~icons/ic/baseline-keyboard-double-arrow-left"
+import IconChevronRight from "~icons/ic/baseline-keyboard-double-arrow-right"
 
 interface Props {
   isExpanded?: boolean
@@ -24,8 +24,8 @@ const postFix = computed(() => (props.isExpanded ? "schließen" : "öffnen"))
 const classes = computed(() => ({
   "right-0": props.openingDirection == OpeningDirection.RIGHT,
   "left-0": props.openingDirection == OpeningDirection.LEFT,
-  "-mr-12": props.openingDirection == OpeningDirection.RIGHT,
-  "-ml-12": props.openingDirection == OpeningDirection.LEFT,
+  "-mr-20": props.openingDirection == OpeningDirection.RIGHT,
+  "-ml-20": props.openingDirection == OpeningDirection.LEFT,
 }))
 
 const toggle = () => {
@@ -41,14 +41,14 @@ export enum OpeningDirection {
 </script>
 
 <template>
-  <div class="relative bg-white pr-[1.25rem]">
+  <div class="relative bg-white pr-[2.25rem]">
     <button
       :aria-label="props.label + ' ' + postFix"
       class="absolute top-28 z-20 flex items-center"
       :class="classes"
     >
       <span
-        class="w-icon rounded-full border-1 border-solid border-gray-400 bg-white text-16 text-gray-900"
+        class="w-icon rounded-full border-1 border-solid border-gray-400 bg-white p-6 text-20 text-gray-900"
       >
         <IconChevronLeft
           v-if="

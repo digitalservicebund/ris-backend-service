@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -15,9 +16,6 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import jakarta.validation.Validator;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -25,8 +23,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -132,55 +128,39 @@ class DocumentUnitServiceTest {
     verify(attachmentService, times(0)).deleteAllObjectsFromBucketForDocumentationUnit(TEST_UUID);
   }
 
-  //  @Test
-  //  void testDeleteByUuid_withFileAttached() {
-  //    DocumentUnit documentUnit =
-  //        DocumentUnit.builder().uuid(TEST_UUID)
-  //
-  // .attachments(Collections.singletonList(OriginalFileDocument.builder().s3path(TEST_UUID.toString()).build()))
-  //                .build();
-  //
-  //    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.ofNullable(documentUnit));
-  //    when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
-  //        .thenReturn(buildEmptyDeleteObjectResponse());
-  //
-  //    StepVerifier.create(service.deleteByUuid(TEST_UUID))
-  //        .consumeNextWith(
-  //            string -> {
-  //              assertNotNull(string);
-  //              assertEquals("Dokumentationseinheit gelöscht: " + TEST_UUID, string);
-  //            })
-  //        .verifyComplete();
-  //
-  //    verify(s3AsyncClient, times(1)).deleteObject(any(DeleteObjectRequest.class));
-  //  }
+  @Test
+  void testDeleteByUuid_withFileAttached() {
+    DocumentUnit documentUnit =
+        DocumentUnit.builder()
+            .uuid(TEST_UUID)
+            .attachments(
+                Collections.singletonList(
+                    Attachment.builder().s3path(TEST_UUID.toString()).build()))
+            .build();
 
-  //  @Test
-  //  void testDeleteByUuid_withoutFileAttached_withExceptionFromBucket() {
-  //    when(repository.findByUuid(TEST_UUID))
-  //        .thenReturn(Optional.ofNullable(DocumentUnit.builder()
-  //
-  // .attachments(Collections.singletonList(OriginalFileDocument.builder().s3path("fooPath").build()))
-  //                .build()));
-  //    when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
-  //        .thenThrow(SdkException.create("exception", null));
-  //
-  //    StepVerifier.create(service.deleteByUuid(TEST_UUID)).expectError().verify();
-  //
-  //    verify(repository).findByUuid(TEST_UUID);
-  //  }
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.ofNullable(documentUnit));
 
-  //  @Test
-  //  void testDeleteByUuid_withoutFileAttached_withExceptionFromRepository() {
-  //    when(repository.findByUuid(TEST_UUID))
-  //        .thenReturn(Optional.ofNullable(DocumentUnit.builder().build()));
-  //    doThrow(new
-  // IllegalArgumentException()).when(repository).delete(DocumentUnit.builder().build());
-  //
-  //    StepVerifier.create(service.deleteByUuid(TEST_UUID)).expectError().verify();
-  //
-  //    verify(repository).findByUuid(TEST_UUID);
-  //  }
+    StepVerifier.create(service.deleteByUuid(TEST_UUID))
+        .consumeNextWith(
+            string -> {
+              assertNotNull(string);
+              assertEquals("Dokumentationseinheit gelöscht: " + TEST_UUID, string);
+            })
+        .verifyComplete();
+
+    verify(attachmentService).deleteAllObjectsFromBucketForDocumentationUnit(TEST_UUID);
+  }
+
+  @Test
+  void testDeleteByUuid_withoutFileAttached_withExceptionFromRepository() {
+    when(repository.findByUuid(TEST_UUID))
+        .thenReturn(Optional.ofNullable(DocumentUnit.builder().build()));
+    doThrow(new IllegalArgumentException()).when(repository).delete(DocumentUnit.builder().build());
+
+    StepVerifier.create(service.deleteByUuid(TEST_UUID)).expectError().verify();
+
+    verify(repository).findByUuid(TEST_UUID);
+  }
 
   @Test
   void testDeleteByUuid_withLinks() {
@@ -379,35 +359,6 @@ class DocumentUnitServiceTest {
             pageRequest, documentationOffice, documentationUnitSearchInput);
   }
 
-  //  @Test
-  //  void testCheckDocx_withValidDocument() {
-  //    ByteBuffer byteBuffer = buildBuffer("word/document.xml");
-  //    assertDoesNotThrow(() -> service.checkDocx(byteBuffer));
-  //  }
-
-  //  @Test
-  //  void testCheckDocx_withInvalidFormat() {
-  //    ByteBuffer byteBuffer = buildBuffer("word/document.csv");
-  //    assertThrows(ResponseStatusException.class, () -> service.checkDocx(byteBuffer));
-  //  }
-  //
-  //  @Test
-  //  void testCheckDocx_withCorruptedDocx() {
-  //    byte[] corruptedData = new byte[1024];
-  //    new Random().nextBytes(corruptedData);
-  //    ByteBuffer byteBuffer = ByteBuffer.wrap(corruptedData);
-  //
-  //    assertThrows(ResponseStatusException.class, () -> service.checkDocx(byteBuffer));
-  //  }
-  //
-  //  @Test
-  //  void testCheckDocx_withEmptyBuffer() {
-  //    byte[] emptyData = new byte[] {};
-  //    ByteBuffer byteBuffer = ByteBuffer.wrap(emptyData);
-  //
-  //    assertThrows(ResponseStatusException.class, () -> service.checkDocx(byteBuffer));
-  //  }
-
   @Test
   void testPreviewPublication() {
     DocumentUnit testDocumentUnit = DocumentUnit.builder().build();
@@ -424,20 +375,5 @@ class DocumentUnitServiceTest {
 
   private CompletableFuture<DeleteObjectResponse> buildEmptyDeleteObjectResponse() {
     return CompletableFuture.completedFuture(DeleteObjectResponse.builder().build());
-  }
-
-  private ByteBuffer buildBuffer(String entry) {
-    try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
-      ZipEntry zipEntry = new ZipEntry(entry);
-      zipOutputStream.putNextEntry(zipEntry);
-      zipOutputStream.closeEntry();
-      zipOutputStream.finish();
-
-      byte[] zipBytes = byteArrayOutputStream.toByteArray();
-      return ByteBuffer.wrap(zipBytes);
-    } catch (IOException exception) {
-      throw new RuntimeException("Failed to create zip", exception);
-    }
   }
 }

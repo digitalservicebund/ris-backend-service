@@ -329,7 +329,7 @@ describe("NormReferenceEntry", () => {
     expect(emitted("removeEntry")).toBeTruthy()
   })
 
-  it("cancels edit mode", async () => {
+  it("emits cancel edit", async () => {
     const { user, emitted } = renderComponent({
       modelValue: {
         normAbbreviation: { id: "123", abbreviation: "ABC" },
@@ -340,5 +340,23 @@ describe("NormReferenceEntry", () => {
     await user.click(cancelEdit)
 
     expect(emitted("cancelEdit")).toBeTruthy()
+  })
+
+  it("removes entry on cancel edit, when not previously saved yet", async () => {
+    const { user, emitted } = renderComponent()
+
+    const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
+    await user.type(abbreviationField, "1000")
+    const dropdownItems = screen.getAllByLabelText(
+      "dropdown-option",
+    ) as HTMLElement[]
+    expect(dropdownItems[0]).toHaveTextContent("1000g-BefV")
+    await user.click(dropdownItems[0])
+
+    const cancelEdit = screen.getByLabelText("Abbrechen")
+    await user.click(cancelEdit)
+
+    expect(emitted("cancelEdit")).toBeTruthy()
+    expect(emitted("removeEntry")).toBeTruthy()
   })
 })

@@ -41,12 +41,11 @@ const listEntries = computed(() => {
 })
 
 const showModal = ref(false)
-const popupModalText = ref("")
-const modalConfirmText = ref("Löschen")
-const modalHeaderText = "Dokumentationseinheit löschen"
-const modalCancelButtonType = "ghost"
-const modalConfirmButtonType = "secondary"
 const selectedDocumentUnitListEntry = ref<DocumentUnitListEntry>()
+const popupModalText = computed(
+  () =>
+    `Möchten Sie die Dokumentationseinheit ${selectedDocumentUnitListEntry?.value?.documentNumber} wirklich dauerhaft löschen?`,
+)
 
 /**
  * Stops propagation of scrolling event, and toggles the showModal value
@@ -74,7 +73,6 @@ function setSelectedDocumentUnitListEntry(
   documentUnitListEntry: DocumentUnitListEntry,
 ) {
   selectedDocumentUnitListEntry.value = documentUnitListEntry
-  popupModalText.value = `Möchten Sie die Dokumentationseinheit ${selectedDocumentUnitListEntry.value.documentNumber} wirklich dauerhaft löschen?`
   toggleModal()
 }
 
@@ -93,12 +91,12 @@ function onDelete() {
   <div>
     <PopupModal
       v-if="showModal"
-      :aria-label="modalHeaderText"
-      :cancel-button-type="modalCancelButtonType"
-      :confirm-button-type="modalConfirmButtonType"
-      :confirm-text="modalConfirmText"
+      aria-label="Dokumentationseinheit löschen"
+      cancel-button-type="tertiary"
+      confirm-button-type="destructive"
+      confirm-text="Löschen"
       :content-text="popupModalText"
-      :header-text="modalHeaderText"
+      header-text="Dokumentationseinheit löschen"
       @close-modal="toggleModal"
       @confirm-action="onDelete"
     />

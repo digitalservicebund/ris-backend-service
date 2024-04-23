@@ -49,10 +49,7 @@ watch(
     >
       <LoadingSpinner />
     </div>
-    <FlexItem
-      v-else
-      class="h-[65vh] overflow-scroll border-1 border-solid border-gray-400"
-    >
+    <FlexItem v-else class="h-[65vh] overflow-scroll">
       <TextEditor
         data-testid="text-editor"
         element-id="text-editor"
