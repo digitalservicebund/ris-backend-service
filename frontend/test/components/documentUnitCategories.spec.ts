@@ -45,6 +45,7 @@ function renderComponent() {
     user,
     ...render(DocumentUnitCategories, {
       props: {
+        showNavigationPanel: true,
         documentUnit: new DocumentUnit("foo", {
           documentNumber: "1234567891234",
           coreData: {},
