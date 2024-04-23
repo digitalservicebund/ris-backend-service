@@ -14,10 +14,41 @@ import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
       />
     </KitchensinkStory>
 
+    <KitchensinkStory name="Error multipart">
+      <InfoModal
+        :description="['The messages', 'are shown here']"
+        title="The messages title is shown here"
+      />
+    </KitchensinkStory>
+
     <KitchensinkStory name="Success">
       <InfoModal
         description="The messages are shown here."
         :status="InfoStatus.SUCCEED"
+        title="The messages title is shown here"
+      />
+    </KitchensinkStory>
+
+    <KitchensinkStory name="Success multipart">
+      <InfoModal
+        :description="['The messages', 'are shown here']"
+        :status="InfoStatus.SUCCEED"
+        title="The messages title is shown here"
+      />
+    </KitchensinkStory>
+
+    <KitchensinkStory name="Info">
+      <InfoModal
+        description="The messages are shown here"
+        :status="InfoStatus.INFO"
+        title="The messages title is shown here"
+      />
+    </KitchensinkStory>
+
+    <KitchensinkStory name="Info multipart">
+      <InfoModal
+        :description="['The messages', 'are shown here']"
+        :status="InfoStatus.INFO"
         title="The messages title is shown here"
       />
     </KitchensinkStory>
