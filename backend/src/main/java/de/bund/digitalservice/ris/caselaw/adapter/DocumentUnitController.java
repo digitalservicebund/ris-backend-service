@@ -105,7 +105,7 @@ public class DocumentUnitController {
 
   @DeleteMapping(value = "/{uuid}/file/{s3Path}")
   @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
-  public Mono<ResponseEntity<Object>> removeFileFromDocumentUnit(
+  public Mono<ResponseEntity<Object>> removeAttachmentFromDocumentationUnit(
       @PathVariable UUID uuid, @PathVariable String s3Path) {
 
     try {

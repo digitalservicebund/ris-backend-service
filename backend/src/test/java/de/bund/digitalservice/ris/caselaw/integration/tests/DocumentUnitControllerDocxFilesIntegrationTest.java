@@ -3,10 +3,8 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDefaultDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
@@ -20,6 +18,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.S3AttachmentService;
+import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverter;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
@@ -33,32 +32,28 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
-import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import javax.xml.parsers.DocumentBuilderFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -67,9 +62,13 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import reactor.core.publisher.Mono;
+import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
+import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
@@ -88,6 +87,8 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
       TestConfig.class,
       DocumentNumberPatternConfig.class,
       S3AttachmentService.class,
+      DocxConverterService.class,
+      DocxConverter.class
     },
     controllers = {DocumentUnitController.class})
 class DocumentUnitControllerDocxFilesIntegrationTest {
@@ -114,14 +115,15 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   @Autowired private DatabaseCourtRepository courtRepository;
   @Autowired private AttachmentService attachmentService;
   @Autowired private AttachmentRepository attachmentRepository;
+  @Autowired private DocxConverterService docxConverterService;
 
   @SpyBean private DocumentUnitService service;
 
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
-  @MockBean private DocxConverterService docxConverterService;
   @MockBean private UserService userService;
   @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private DocumentBuilderFactory documentBuilderFactory;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
 
@@ -231,10 +233,13 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
         .is4xxClientError();
   }
 
-  @Disabled("temporarily till RISDEV-3558 is done")
   @Test
-  void
-      testAttachFileToDocumentationUnit_withECLIInFooter_shouldExtractECLIAndSetItInUnitIfNotSet() {
+  void testAttachFileToDocumentationUnit_withECLIInFooter_shouldExtractECLIAndSetItInUnitIfNotSet()
+      throws IOException {
+    var attachmentWithEcli =
+        Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment_ecli.docx"));
+    mockS3AsyncClientToReturnFile(attachmentWithEcli);
+
     DocumentationUnitDTO dto =
         repository.save(
             DocumentationUnitDTO.builder()
@@ -242,24 +247,11 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
                 .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
                 .build());
 
-    Docx2Html docx2Html = new Docx2Html("html", List.of("ecli"));
-
-    doReturn(
-            Mono.just(
-                DocumentUnit.builder()
-                    .attachments(
-                        Collections.singletonList(Attachment.builder().s3path("filename").build()))
-                    .build()))
-        .when(attachmentService)
-        .attachFileToDocumentationUnit(
-            eq(dto.getId()), any(ByteBuffer.class), any(HttpHeaders.class));
-    when(docxConverterService.getConvertedObject("filename")).thenReturn(Mono.just(docx2Html));
-
     risWebTestClient
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file")
-        .body(BodyInserters.fromValue(new byte[] {}))
+        .body(BodyInserters.fromValue(attachmentWithEcli))
         .exchange()
         .expectStatus()
         .isOk()
@@ -267,62 +259,49 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().ecliList()).containsExactly("ecli");
+              assertThat(response.getResponseBody().ecliList())
+                  .containsExactly("ECLI:DE:BGH:2023:210423UVZR86.22.0");
             });
 
-    verify(service).updateECLI(dto.getId(), docx2Html);
-
     DocumentationUnitDTO savedDTO = repository.findById(dto.getId()).get();
-    assertThat(savedDTO.getEcli()).isEqualTo("ecli");
-
-    // todo: part of docx unit test?
+    assertThat(savedDTO.getEcli()).isEqualTo("ECLI:DE:BGH:2023:210423UVZR86.22.0");
   }
 
-  //  @Test
-  //  void
-  //
-  // testAttachFileToDocumentationUnit_withECLIInFooter_shouldExtractECLIAndNotChangeTheECLIInUnitIfECLIIsSet() {
-  //    Docx2Html docx2Html = new Docx2Html("html", List.of("oldEcli"));
-  //    DocumentationUnitDTO dto =
-  //        repository.save(
-  //            DocumentationUnitDTO.builder()
-  //                .documentNumber("1234567890123")
-  //                .ecli("oldEcli")
-  //                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
-  //                .build());
-  //
-  //    doReturn(
-  //            Mono.just(
-  //                DocumentUnit.builder()
-  //                    .attachments(
-  //                        Collections.singletonList(
-  //                            OriginalFileDocument.builder().s3path("filename").build()))
-  //                    .build()))
-  //        .when(originalFileDocumentService)
-  //        .attachFileToDocumentationUnit(eq(dto.getId()), any(ByteBuffer.class),
-  // any(HttpHeaders.class));
-  //    when(docxConverterService.getConvertedObject("filename")).thenReturn(Mono.just(docx2Html));
-  //
-  //    risWebTestClient
-  //        .withDefaultLogin()
-  //        .put()
-  //        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file")
-  //        .body(BodyInserters.fromValue(new byte[] {}))
-  //        .exchange()
-  //        .expectStatus()
-  //        .isOk()
-  //        .expectBody(Docx2Html.class)
-  //        .consumeWith(
-  //            response -> {
-  //              assertThat(response.getResponseBody()).isNotNull();
-  //              assertThat(response.getResponseBody().ecliList()).containsExactly("oldEcli");
-  //            });
-  //
-  //    verify(service).updateECLI(dto.getId(), docx2Html);
-  //
-  //    DocumentationUnitDTO savedDTO = repository.findById(dto.getId()).get();
-  //    assertThat(savedDTO.getEcli()).isEqualTo("oldEcli");
-  //  }
+  @Test
+  void
+      testAttachFileToDocumentationUnit_withECLIInFooter_shouldExtractECLIAndNotChangeTheECLIInUnitIfECLIIsSet()
+          throws IOException {
+    var attachmentWithEcli =
+        Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment_ecli.docx"));
+    mockS3AsyncClientToReturnFile(attachmentWithEcli);
+
+    DocumentationUnitDTO dto =
+        repository.save(
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .ecli("oldEcli")
+                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .build());
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file")
+        .body(BodyInserters.fromValue(attachmentWithEcli))
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(Docx2Html.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().ecliList())
+                  .containsExactly("ECLI:DE:BGH:2023:210423UVZR86.22.0");
+            });
+
+    DocumentationUnitDTO savedDTO = repository.findById(dto.getId()).get();
+    assertThat(savedDTO.getEcli()).isEqualTo("oldEcli");
+  }
 
   @Test
   void testRemoveFileFromDocumentUnit() {
@@ -367,5 +346,19 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
         .exchange()
         .expectStatus()
         .is4xxClientError();
+  }
+
+  private void mockS3AsyncClientToReturnFile(byte[] file) throws IOException {
+    when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
+        .thenReturn(CompletableFuture.completedFuture(PutObjectResponse.builder().build()));
+
+    when(s3AsyncClient.getObject(
+            any(GetObjectRequest.class),
+            Mockito
+                .<AsyncResponseTransformer<GetObjectResponse, ResponseBytes<GetObjectResponse>>>
+                    any()))
+        .thenReturn(
+            CompletableFuture.completedFuture(
+                ResponseBytes.fromByteArray(GetObjectResponse.builder().build(), file)));
   }
 }
