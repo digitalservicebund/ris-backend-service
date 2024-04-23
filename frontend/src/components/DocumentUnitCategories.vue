@@ -22,14 +22,13 @@ import { ServiceResponse } from "@/services/httpClient"
 const props = defineProps<{
   documentUnit: DocumentUnit
   showAttachmentPanel?: boolean
+  showNavigationPanel: boolean
 }>()
 const updatedDocumentUnit = ref<DocumentUnit>(props.documentUnit)
 const validationErrors = ref<ValidationError[]>([])
 const route = useRoute()
 
-const showAttachmentPanelRef: Ref<boolean> = ref(
-  props.showAttachmentPanel ? props.showAttachmentPanel : false,
-)
+const showAttachmentPanelRef: Ref<boolean> = ref(props.showAttachmentPanel)
 
 const { pushQueryToRoute } = useQuery<"showAttachmentPanel">()
 
@@ -152,6 +151,7 @@ const handleOnSelect = (index: number) => {
   <DocumentUnitWrapper
     :document-unit="updatedDocumentUnit as DocumentUnit"
     :save-callback="handleUpdateDocumentUnit"
+    :show-navigation-panel="showNavigationPanel"
   >
     <template #default="{ classes }">
       <FlexContainer class="w-full flex-grow">
