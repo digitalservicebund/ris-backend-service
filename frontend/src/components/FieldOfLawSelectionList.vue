@@ -35,7 +35,6 @@ function handleRemove(item: FieldOfLawNode) {
   <div class="pt-20">
     <div v-if="!modelValue.length">Die Liste ist aktuell leer</div>
     <div v-else>
-      <hr class="mt-20 w-full border-blue-500" />
       <FieldOfLawListEntry
         v-for="fieldOfLaw in localModelValue"
         :key="fieldOfLaw.identifier"

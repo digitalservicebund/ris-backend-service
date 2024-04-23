@@ -7,7 +7,9 @@ import Navbar from "./components/NavbarTop.vue"
     <Navbar />
 
     <Suspense>
-      <router-view class="grow" />
+      <main>
+        <router-view class="grow" />
+      </main>
     </Suspense>
   </div>
 </template>
