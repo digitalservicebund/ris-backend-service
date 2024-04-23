@@ -116,16 +116,14 @@ async function upload(files: FileList) {
       )
       if (response.status === 200 && response.data) {
         html.value = response.data.html
-      } else {
-        if (response.error?.description) {
-          errors.value.push(
-            file.name +
-              " " +
-              response.error?.title +
-              " " +
-              response.error?.description,
-          )
-        }
+      } else if (response.error?.description) {
+        errors.value.push(
+          file.name +
+            " " +
+            response.error?.title +
+            " " +
+            response.error?.description,
+        )
       }
     }
   } finally {
