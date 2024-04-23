@@ -149,24 +149,21 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
 
   @Test
   void testAttachDocxToDocumentationUnit() throws IOException {
+    var attachment = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
+    mockS3AsyncClientToReturnFile(attachment);
+
     DocumentationUnitDTO dto =
         repository.save(
             DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
                 .build());
-    byte[] docxBytes = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
-
-    when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
-        .thenReturn(CompletableFuture.completedFuture(PutObjectResponse.builder().build()));
-    when(docxConverterService.getConvertedObject(any(String.class)))
-        .thenReturn(Mono.just(Docx2Html.EMPTY));
 
     risWebTestClient
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file")
-        .body(BodyInserters.fromValue(docxBytes))
+        .body(BodyInserters.fromValue(attachment))
         .exchange()
         .expectStatus()
         .isOk();
@@ -178,24 +175,21 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
 
   @Test
   void testAttachMultipleDocxToDocumentationUnitSequentially() throws IOException {
+    var attachment = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
+    mockS3AsyncClientToReturnFile(attachment);
+
     DocumentationUnitDTO documentationUnitDto =
         repository.save(
             DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
                 .build());
-    byte[] docxBytes = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
-
-    when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
-        .thenReturn(CompletableFuture.completedFuture(PutObjectResponse.builder().build()));
-    when(docxConverterService.getConvertedObject(any(String.class)))
-        .thenReturn(Mono.just(Docx2Html.EMPTY));
 
     risWebTestClient
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentationUnitDto.getId() + "/file")
-        .body(BodyInserters.fromValue(docxBytes))
+        .body(BodyInserters.fromValue(attachment))
         .exchange()
         .expectStatus()
         .isOk();
@@ -204,7 +198,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentationUnitDto.getId() + "/file")
-        .body(BodyInserters.fromValue(docxBytes))
+        .body(BodyInserters.fromValue(attachment))
         .exchange()
         .expectStatus()
         .isOk();
@@ -213,7 +207,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentationUnitDto.getId() + "/file")
-        .body(BodyInserters.fromValue(docxBytes))
+        .body(BodyInserters.fromValue(attachment))
         .exchange()
         .expectStatus()
         .isOk();
