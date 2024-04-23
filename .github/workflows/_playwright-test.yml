@@ -105,6 +105,7 @@ jobs:
                   -H "Content-Type: application/json" \
                   -d "{\"test\": \"${test_title}\"}"
           done
+        working-directory: ./frontend
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
