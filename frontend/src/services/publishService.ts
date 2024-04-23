@@ -87,14 +87,15 @@ const service: PublishService = {
         ? Number(response.data.statusCode)
         : response.status
 
-      const description =
-        response.data?.statusMessages && response.data.statusMessages.length > 0
-          ? response.data.statusMessages
-          : errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_PREVIEW.description
-
       response.error = {
         title: errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_PREVIEW.title,
-        description,
+        description:
+          errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_PREVIEW.description,
+        multipartDescription:
+          response.data?.statusMessages &&
+          response.data.statusMessages.length > 0
+            ? response.data?.statusMessages
+            : undefined,
       }
     }
 
