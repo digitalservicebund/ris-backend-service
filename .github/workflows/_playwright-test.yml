@@ -96,17 +96,6 @@ jobs:
           path: |
             ./frontend/test-results/**/*.png
             ./frontend/test-results/**/trace.zip
-      - name: Send failed tests to metrics endpoint
-        if: always()
-        run: |
-          jq -r '.suites[]? | .specs[]? | select(.ok == true) | .title' test-results.json | while read test_title
-          do
-            curl -X POST ${{ secrets.E2E_TEST_METRICS_ENDPOINT }} \
-                  -H "xc-token: ${{ secrets.E2E_TEST_METRICS_TOKEN }}" \
-                  -H "Content-Type: application/json" \
-                  -d "{\"test\": \"${test_title}\"}"
-          done
-        working-directory: ./frontend
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
