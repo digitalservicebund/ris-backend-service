@@ -18,6 +18,7 @@ import documentUnitService from "@/services/documentUnitService"
 const props = defineProps<{
   documentUnit: DocumentUnit
   showAttachmentPanel?: boolean
+  showNavigationPanel?: boolean
 }>()
 const emit = defineEmits<{
   updateDocumentUnit: [updatedDocumentUnit: DocumentUnit]
@@ -160,7 +161,10 @@ function toggleDeleteModal() {
 </script>
 
 <template>
-  <DocumentUnitWrapper :document-unit="documentUnit">
+  <DocumentUnitWrapper
+    :document-unit="documentUnit"
+    :show-navigation-panel="props.showNavigationPanel"
+  >
     <template #default="{ classes }">
       <FlexContainer class="w-full">
         <PopupModal

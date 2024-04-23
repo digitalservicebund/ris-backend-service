@@ -46,7 +46,6 @@ test("create and validate border number links", async ({
 
   // Click on "Rubriken" und check if original document loaded
   await navigateToCategories(page, documentNumber)
-  await page.getByLabel("Dokumentansicht öffnen").click()
   await expect(page.getByLabel("Ladestatus")).toBeHidden()
   await expect(page.locator(`text=${firstReason}`)).toBeVisible()
   await expect(page.locator(`text=${secondReason}`)).toBeVisible()

@@ -78,7 +78,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <DocumentUnitWrapper :document-unit="documentUnit">
+  <DocumentUnitWrapper :document-unit="documentUnit" show-navigation-panel>
     <template #default="{ classes }">
       <div :class="classes">
         <PublicationDocument
