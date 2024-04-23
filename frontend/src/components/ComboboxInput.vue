@@ -304,16 +304,15 @@ export type InputModelProps =
       class="absolute left-0 right-0 top-[100%] z-20 flex max-h-[300px] flex-col overflow-y-scroll bg-white px-8 py-12 drop-shadow-md"
       tabindex="-1"
     >
-      <div
+      <button
         v-for="(item, index) in currentlyDisplayedItems"
         :key="index"
         aria-label="dropdown-option"
-        class="cursor-pointer px-16 py-12 hover:bg-blue-100 focus:border-l-4 focus:border-solid focus:border-l-blue-800 focus:bg-blue-200 focus:outline-none"
+        class="cursor-pointer px-16 py-12 text-left hover:bg-blue-100 focus:border-l-4 focus:border-solid focus:border-l-blue-800 focus:bg-blue-200 focus:outline-none"
         :class="{
           'border-l-4 border-solid border-l-blue-800 bg-blue-200':
             candidateForSelection === item,
         }"
-        role="button"
         tabindex="0"
         @click="setChosenItem(item)"
         @keydown.tab="closeDropdownAndRevertToLastSavedValue"
@@ -331,13 +330,12 @@ export type InputModelProps =
             {{ item.additionalInformation }}
           </div>
         </span>
-      </div>
-      <div
+      </button>
+      <button
         v-if="createNewItem"
         key="createNewItem"
         aria-label="dropdown-option"
-        class="cursor-pointer px-16 py-12 hover:bg-blue-100 focus:border-l-4 focus:border-solid focus:border-l-blue-800 focus:bg-blue-200 focus:outline-none"
-        role="button"
+        class="cursor-pointer px-16 py-12 text-left hover:bg-blue-100 focus:border-l-4 focus:border-solid focus:border-l-blue-800 focus:bg-blue-200 focus:outline-none"
         tabindex="0"
         @click="setChosenItem(createNewItem)"
         @keydown.tab="closeDropdownAndRevertToLastSavedValue"
@@ -350,7 +348,7 @@ export type InputModelProps =
             createNewItem?.label
           }}</span>
         </span>
-      </div>
+      </button>
     </div>
   </div>
 </template>
