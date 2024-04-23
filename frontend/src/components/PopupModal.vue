@@ -57,24 +57,28 @@ onMounted(() => {
     @keydown.esc="$emit('closeModal')"
   >
     <div
-      class="modal-container box-border flex flex-col items-start gap-[1rem] border-2 border-solid border-blue-800 bg-white px-[3.5rem] py-[2.5rem]"
+      class="modal-container box-border flex flex-col items-start gap-[1rem] rounded-sm bg-white px-[1.5rem] py-[1.5rem]"
     >
       <div class="ds-label-01-bold text-black">
         {{ headerText }}
       </div>
       <div class="ds-label-03-reg text-black">{{ contentText }}</div>
-      <div class="modal-buttons-container flex flex-row gap-[1rem]">
-        <TextButton
-          aria-label="Abbrechen"
-          :button-type="cancelButtonType"
-          label="Abbrechen"
-          @click="$emit('closeModal')"
-        />
+      <div
+        class="modal-buttons-container flex w-full flex-row justify-end gap-[1rem]"
+      >
         <TextButton
           :aria-label="confirmText"
           :button-type="confirmButtonType"
           :label="confirmText"
+          size="small"
           @click="$emit('confirmAction')"
+        />
+        <TextButton
+          aria-label="Abbrechen"
+          :button-type="cancelButtonType"
+          label="Abbrechen"
+          size="small"
+          @click="$emit('closeModal')"
         />
       </div>
     </div>
