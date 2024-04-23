@@ -83,11 +83,13 @@ const handleDeleteAttachment = async (index: number) => {
 }
 
 const handleOnSelect = (index: number) => {
-  if (selectedAttachmentIndex.value == index) {
-    toggleAttachmentPanel()
-  } else {
-    selectedAttachmentIndex.value = index
-    toggleAttachmentPanel(true)
+  if (index >= 0 && index <= getAttachments().length) {
+    if (selectedAttachmentIndex.value == index) {
+      toggleAttachmentPanel()
+    } else {
+      selectedAttachmentIndex.value = index
+      toggleAttachmentPanel(true)
+    }
   }
 }
 
@@ -129,6 +131,7 @@ async function upload(files: FileList) {
   } finally {
     isLoading.value = false
     emit("updateDocumentUnit", props.documentUnit)
+    handleOnSelect(getAttachments().length)
     toggleAttachmentPanel(true)
   }
 }
