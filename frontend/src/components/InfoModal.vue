@@ -82,8 +82,7 @@ const ariaLabelIcon = props.title + " icon"
           <li v-for="(desc, index) in description" :key="index">{{ desc }}</li>
         </ul>
       </div>
-      <!-- eslint-disable vue/no-v-html -->
-      <span v-else class="ds-body-01-reg" v-html="description"></span>
+      <span v-else class="ds-body-01-reg">{{ description }}</span>
     </div>
   </div>
 </template>
