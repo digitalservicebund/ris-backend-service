@@ -190,7 +190,7 @@ dependencies {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
-//     implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.8.37.jar"))
+//     implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.8.38.jar"))
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.17.0")
 

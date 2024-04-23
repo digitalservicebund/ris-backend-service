@@ -25,6 +25,8 @@ fileignoreconfig:
   checksum: b270e144ecc5df8730a03237f05e0c4aebe4a62e033103e8876a87d50858362c
 - filename: doc/adr/0020-db-migrations-as-library.md
   checksum: 347d83a8e1bd768b2e23a38fed1371faad0732d19866d8e6e79c1aff20593eb9
+- filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/adapter/XmlExporterTest.java
+  checksum: 4e1249fb90656ef7f2bfbd87999c7249812d460029686b655ac400c9d4db7715
   ignore_detectors:
   - secrets
 scopeconfig:
