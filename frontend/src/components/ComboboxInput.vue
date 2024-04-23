@@ -317,8 +317,8 @@ export type InputModelProps =
         tabindex="0"
         @click="setChosenItem(item)"
         @keydown.tab="closeDropdownAndRevertToLastSavedValue"
-        @keypress.enter="setChosenItem(item)"
         @keyup.down="keydown"
+        @keyup.enter="setChosenItem(item)"
         @keyup.up="keyup"
       >
         <span>
@@ -341,8 +341,8 @@ export type InputModelProps =
         tabindex="0"
         @click="setChosenItem(createNewItem)"
         @keydown.tab="closeDropdownAndRevertToLastSavedValue"
-        @keypress.enter="setChosenItem(createNewItem)"
         @keyup.down="keydown"
+        @keyup.enter="setChosenItem(createNewItem)"
         @keyup.up="keyup"
       >
         <span>
