@@ -10,6 +10,8 @@ import { useStatusBadge } from "@/composables/useStatusBadge"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import DocumentUnit from "@/domain/documentUnit"
 import { ServiceResponse } from "@/services/httpClient"
+import IconChevronLeft from "~icons/ic/baseline-chevron-left"
+import IconChevronRight from "~icons/ic/baseline-chevron-right"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
@@ -73,7 +75,10 @@ watchEffect(() => {
       <SideToggle
         v-model:is-expanded="navigationIsOpen"
         class="sticky top-0 z-20"
+        :close-icon="IconChevronLeft"
         label="Navigation"
+        :open-icon="IconChevronRight"
+        size="small"
       >
         <NavbarSide :is-child="false" :menu-items="menuItems" :route="route" />
       </SideToggle>

@@ -4,6 +4,8 @@ import FileNavigator from "@/components/FileNavigator.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
 import Attachment from "@/domain/attachment"
+import IconChevronLeft from "~icons/ic/baseline-keyboard-double-arrow-left"
+import IconChevronRight from "~icons/ic/baseline-keyboard-double-arrow-right"
 
 interface Props {
   isExpanded: boolean
@@ -42,9 +44,12 @@ const handlePanelExpanded = (isExpanded: boolean) => {
   >
     <SideToggle
       class="sticky top-[8rem] z-20"
+      :close-icon="IconChevronLeft"
       :is-expanded="props.isExpanded"
       label="Dokumentansicht"
+      :open-icon="IconChevronRight"
       :opening-direction="OpeningDirection.LEFT"
+      size="medium"
       @update:is-expanded="handlePanelExpanded"
     >
       <FileNavigator
