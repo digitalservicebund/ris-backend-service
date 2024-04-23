@@ -39,7 +39,6 @@ test("copy-paste from side panel", async ({ page, documentNumber }) => {
   // Click on "Rubriken" und check if original document loaded
   await navigateToCategories(page, documentNumber)
 
-  await page.getByLabel("Dokumentansicht öffnen").click()
   await expect(page.getByLabel("Ladestatus")).toBeHidden()
   await expect(page.locator(`text=${rightAlignText}`)).toBeVisible()
   await expect(page.locator(`text=${centerAlignText}`)).toBeVisible()
