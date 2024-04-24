@@ -125,7 +125,6 @@ async function upload(files: FileList) {
     isLoading.value = false
     emit("updateDocumentUnit")
     if (!showAttachmentPanelRef.value && anySuccessful) {
-      // handleOnSelect(getAttachments().length - 1)
       toggleAttachmentPanel(true)
     }
   }
