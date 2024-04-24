@@ -8,7 +8,7 @@ import IcOutlineArrowBack from "~icons/ic/outline-arrow-back"
 import IcOutlineArrowForward from "~icons/ic/outline-arrow-forward"
 
 const props = defineProps<{
-  files: Attachment[]
+  attachments: Attachment[]
   currentIndex: number
 }>()
 
@@ -26,7 +26,7 @@ const decreaseFileIndex = () => {
 }
 
 const hasNext = computed(() => {
-  return props.currentIndex.valueOf() < props.files.length - 1
+  return props.currentIndex.valueOf() < props.attachments.length - 1
 })
 
 const hasPrevious = computed(() => {
@@ -36,11 +36,11 @@ const hasPrevious = computed(() => {
 
 <template>
   <FlexContainer
-    v-if="files.length > 1"
+    v-if="attachments.length > 1"
     class="float-end m-16 ml-20 items-center space-x-8 px-8"
   >
     <FlexItem class="ds-label-01-bold">
-      {{ props.files[currentIndex].name }}
+      {{ props.attachments[currentIndex].name }}
     </FlexItem>
     <TextButton
       id="decrease"

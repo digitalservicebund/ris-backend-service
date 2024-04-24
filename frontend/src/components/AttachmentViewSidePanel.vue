@@ -49,8 +49,8 @@ const handlePanelExpanded = (isExpanded: boolean) => {
       @update:is-expanded="handlePanelExpanded"
     >
       <FileNavigator
+        :attachments="props.attachments"
         :current-index="props.currentIndex"
-        :files="props.attachments"
         @select="handleOnSelect"
       ></FileNavigator>
       <AttachmentView

@@ -26,8 +26,8 @@ const handleOnSelect = (index: number) => {
 <template>
   <KitchensinkPage name="File Navigator">
     <FileNavigator
+      :attachments="files"
       :current-index="fileIndex"
-      :files="files"
       @select="handleOnSelect"
     ></FileNavigator>
   </KitchensinkPage>
