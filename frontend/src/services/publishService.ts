@@ -87,31 +87,14 @@ const service: PublishService = {
         ? Number(response.data.statusCode)
         : response.status
 
-      let description =
-        errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_PREVIEW.description
-      if (
-        response.data?.statusMessages &&
-        response.data.statusMessages.length > 0
-      ) {
-        description = '<ul class="list-disc">'
-      }
-      response.data?.statusMessages?.forEach(
-        (value) =>
-          (description +=
-            '<li class="ds-body-02-reg font-bold ml-[1rem] list-item">' +
-            value +
-            "</li>"),
-      )
-      if (
-        response.data?.statusMessages &&
-        response.data.statusMessages.length > 0
-      ) {
-        description += "</ul>"
-      }
-
       response.error = {
         title: errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_PREVIEW.title,
-        description,
+        description:
+          response.data?.statusMessages &&
+          response.data.statusMessages.length > 0
+            ? response.data?.statusMessages
+            : errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_PREVIEW
+                .description,
       }
     }
 

@@ -323,12 +323,12 @@ const fieldsMissing = computed(() => {
     >
       <CodeSnippet title="" :xml="preview.xml" />
     </ExpandableContent>
-
     <InfoModal
       v-if="errorMessage"
       aria-label="Fehler bei Veröffentlichung"
       class="mt-8"
-      v-bind="errorMessage"
+      :description="errorMessage.description"
+      :title="errorMessage.title"
     />
     <InfoModal
       v-if="succeedMessage"

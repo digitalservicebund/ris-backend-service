@@ -4,6 +4,7 @@ import DocumentationOffice from "@/domain/documentationOffice"
 import { Court, DocumentType, Procedure } from "@/domain/documentUnit"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
+import { ResponseError } from "@/services/httpClient"
 
 export enum InputType {
   TEXT = "text",
@@ -139,11 +140,7 @@ export interface ComboboxAttributes extends BaseInputAttributes {
   itemService: (filter?: string) => Promise<{
     status: number
     data?: ComboboxItem[]
-    error?: {
-      title: string
-      description?: string
-      validationErrors?: ValidationError[]
-    }
+    error?: ResponseError
   }>
   placeholder?: string
   manualEntry?: boolean
