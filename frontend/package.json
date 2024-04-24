@@ -16,7 +16,7 @@
     "test:a11y": "playwright test --project=a11y",
     "test:queries": "playwright test --project=queries --reporter=./test/queries/queries_log_reporter.ts",
     "coverage": "TZ=UTC vitest run --coverage",
-    "check": "npm run style:check && npm test && npm run test:e2e && npm run test:a11y",
+    "check": "npm run style:check && npm test && npm run test:e2e -- --project='chromium' && npm run test:a11y -- --project='chromium'",
     "dev": "vite",
     "prettier:check": "f() { prettier --check ${@:-.}; }; f",
     "prettier:fix": "f() { prettier --write ${@:-.}; }; f",
