@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { watch, ref, computed, onMounted, onBeforeUnmount } from "vue"
+import { ValidationError } from "./input/types"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import CheckboxInput from "@/components/input/CheckboxInput.vue"
@@ -99,9 +100,11 @@ async function validateRequiredInput() {
 }
 
 async function addEnsuingDecision() {
-  validateRequiredInput()
-  emit("update:modelValue", ensuingDecision.value as EnsuingDecision)
-  emit("addEntry")
+  if (!validationStore.getByMessage("Kein valides Datum").length) {
+    validateRequiredInput()
+    emit("update:modelValue", ensuingDecision.value as EnsuingDecision)
+    emit("addEntry")
+  }
 }
 
 async function addEnsuingDecisionFromSearch(decision: RelatedDocumentation) {
@@ -134,6 +137,14 @@ function scrollToTop() {
       behavior: "smooth",
     })
   }
+}
+
+function updateDateFormatValidation(
+  validationError: ValidationError | undefined,
+) {
+  if (validationError)
+    validationStore.add(validationError.message, "decisionDate")
+  else validationStore.remove("decisionDate")
 }
 
 watch(
@@ -204,6 +215,9 @@ onBeforeUnmount(() => {
             v-slot="slotProps"
             label="Entscheidungsdatum *"
             :validation-error="validationStore.getByField('decisionDate')"
+            @update:validation-error="
+              (validationError) => updateDateFormatValidation(validationError)
+            "
           >
             <DateInput
               id="decisionDate"

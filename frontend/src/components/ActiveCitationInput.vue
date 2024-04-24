@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, onMounted, onBeforeUnmount, ref, watch } from "vue"
+import { ValidationError } from "./input/types"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
@@ -116,9 +117,11 @@ async function validateRequiredInput() {
 }
 
 async function addActiveCitation() {
-  validateRequiredInput()
-  emit("update:modelValue", activeCitation.value as ActiveCitation)
-  emit("addEntry")
+  if (!validationStore.getByMessage("Kein valides Datum").length) {
+    validateRequiredInput()
+    emit("update:modelValue", activeCitation.value as ActiveCitation)
+    emit("addEntry")
+  }
 }
 
 async function addActiveCitationFromSearch(decision: RelatedDocumentation) {
@@ -154,6 +157,14 @@ function scrollToTop() {
     })
   }
 }
+function updateDateFormatValidation(
+  validationError: ValidationError | undefined,
+) {
+  if (validationError)
+    validationStore.add(validationError.message, "decisionDate")
+  else validationStore.remove("decisionDate")
+}
+
 watch(
   activeCitation,
   () => {
@@ -231,6 +242,9 @@ onBeforeUnmount(() => {
           v-slot="slotProps"
           label="Entscheidungsdatum *"
           :validation-error="validationStore.getByField('decisionDate')"
+          @update:validation-error="
+            (validationError) => updateDateFormatValidation(validationError)
+          "
         >
           <DateInput
             id="activeCitationDecisionDate"

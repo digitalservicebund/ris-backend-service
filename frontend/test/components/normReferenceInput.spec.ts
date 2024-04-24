@@ -82,7 +82,7 @@ describe("NormReferenceEntry", () => {
         normAbbreviation: { id: "123", abbreviation: "ABC" },
         singleNorms: [
           {
-            singleNorm: "12",
+            singleNorm: "§ 000",
             dateOfVersion: "2022-01-31",
             dateOfRelevance: "2023",
           },
@@ -99,8 +99,9 @@ describe("NormReferenceEntry", () => {
         ],
       } as NormReference,
     })
-
-    expect((await screen.findAllByLabelText("Einzelnorm")).length).toBe(3)
+    expect(
+      (await screen.findAllByLabelText("Einzelnorm der Norm")).length,
+    ).toBe(3)
   })
 
   it("adds new single norm", async () => {
@@ -115,10 +116,14 @@ describe("NormReferenceEntry", () => {
       } as NormReference,
     })
 
-    expect((await screen.findAllByLabelText("Einzelnorm")).length).toBe(1)
+    expect(
+      (await screen.findAllByLabelText("Einzelnorm der Norm")).length,
+    ).toBe(1)
     const addSingleNormButton = screen.getByLabelText("Weitere Einzelnorm")
     await user.click(addSingleNormButton)
-    expect((await screen.findAllByLabelText("Einzelnorm")).length).toBe(2)
+    expect(
+      (await screen.findAllByLabelText("Einzelnorm der Norm")).length,
+    ).toBe(2)
   })
 
   it("removes single norm", async () => {
@@ -136,11 +141,15 @@ describe("NormReferenceEntry", () => {
       } as NormReference,
     })
 
-    expect((await screen.findAllByLabelText("Einzelnorm")).length).toBe(2)
+    expect(
+      (await screen.findAllByLabelText("Einzelnorm der Norm")).length,
+    ).toBe(2)
     const removeSingleNormButtons =
       screen.getAllByLabelText("Einzelnorm löschen")
     await user.click(removeSingleNormButtons[0])
-    expect((await screen.findAllByLabelText("Einzelnorm")).length).toBe(1)
+    expect(
+      (await screen.findAllByLabelText("Einzelnorm der Norm")).length,
+    ).toBe(1)
   })
 
   it("removes last single norm in list", async () => {
@@ -155,11 +164,13 @@ describe("NormReferenceEntry", () => {
       } as NormReference,
     })
 
-    expect((await screen.findAllByLabelText("Einzelnorm")).length).toBe(1)
+    expect(
+      (await screen.findAllByLabelText("Einzelnorm der Norm")).length,
+    ).toBe(1)
     const removeSingleNormButtons =
       screen.getAllByLabelText("Einzelnorm löschen")
     await user.click(removeSingleNormButtons[0])
-    expect(screen.queryByText("Einzelnorm")).not.toBeInTheDocument()
+    expect(screen.queryByText("Einzelnorm der Norm")).not.toBeInTheDocument()
   })
 
   it("validates invalid norm input on blur", async () => {
@@ -201,6 +212,63 @@ describe("NormReferenceEntry", () => {
     expect(singleNormInput).toHaveValue("12")
 
     await screen.findByText(/Inhalt nicht valide/)
+  })
+
+  it("does not add norm with invalid single norm input", async () => {
+    renderComponent({
+      modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
+        singleNorms: [
+          {
+            singleNorm: "12",
+          },
+        ],
+      } as NormReference,
+    })
+
+    const singleNormInput = await screen.findByLabelText("Einzelnorm der Norm")
+    expect(singleNormInput).toHaveValue("12")
+
+    await screen.findByText(/Inhalt nicht valide/)
+    screen.getByLabelText("Norm speichern").click()
+    expect(singleNormInput).toBeVisible()
+  })
+
+  it("does not add norm with invalid version date input", async () => {
+    const { user } = renderComponent({
+      modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
+      } as NormReference,
+    })
+
+    const dateInput = await screen.findByLabelText("Fassungsdatum der Norm")
+    expect(dateInput).toHaveValue("")
+
+    await user.type(dateInput, "00.00.0231")
+
+    await screen.findByText(/Kein valides Datum/)
+    screen.getByLabelText("Norm speichern").click()
+    expect(dateInput).toBeVisible()
+  })
+
+  it("does not add norm with invalid year input", async () => {
+    renderComponent({
+      modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
+        singleNorms: [
+          {
+            dateOfRelevance: "0000",
+          },
+        ],
+      } as NormReference,
+    })
+
+    const yearInput = await screen.findByLabelText("Jahr der Norm")
+    expect(yearInput).toHaveValue("0000")
+
+    await screen.findByText(/Kein valides Jahr/)
+    screen.getByLabelText("Norm speichern").click()
+    expect(yearInput).toBeVisible()
   })
 
   it("validates ambiguous norm reference input", async () => {

@@ -126,11 +126,8 @@ test.describe("norm", () => {
     await expect(container.getByLabel("Norm speichern")).toBeVisible()
 
     await container.getByLabel("Norm speichern").click()
-    await expect(container.getByText("PBefG")).toBeVisible()
-    await expect(container.getByText("§ 123")).toBeVisible()
-    await expect(container.getByText("0023")).toBeHidden()
-    await expect(container.getByText("29.02.2021")).toBeHidden()
-    await expect(container.getByText("Norm speichern")).toBeHidden()
+    // does not save, does not close the edit mode
+    await expect(container.getByLabel("Norm speichern")).toBeVisible()
   })
 
   test("adding and deleting multiple single norms", async ({

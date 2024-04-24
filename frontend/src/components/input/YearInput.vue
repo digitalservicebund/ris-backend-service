@@ -2,7 +2,7 @@
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import { vMaska, MaskaDetail } from "maska"
-import { computed, ref, watch, watchEffect } from "vue"
+import { computed, ref, watch } from "vue"
 import TextInput from "@/components/input/TextInput.vue"
 import { ValidationError } from "@/components/input/types"
 
@@ -44,7 +44,6 @@ function emitModelValue(value: string | undefined): void {
   const nextValue = onlyAllowNumbers(value)
 
   localModelValue.value = nextValue
-  userHasFinished.value = false
 
   if (validateYear(nextValue)) emit("update:modelValue", nextValue)
   else if (!nextValue) emit("update:modelValue", undefined)
@@ -67,22 +66,10 @@ function checkInputCompleted(event: CustomEvent<MaskaDetail>) {
   inputCompleted.value = event.detail.completed
 }
 
-// This will be true if we think that the user is no longer working on the
-// input, e.g. on blur. We'll set it to false if the local value changes, i.e.
-// the user is typing. We'll try not to annoy users with validation errors
-// if they are still changing the value.
-const userHasFinished = ref<boolean>(false)
-
-const shouldShowValidationState = computed(() =>
-  Boolean(
-    localModelValue.value && (inputCompleted.value || userHasFinished.value),
-  ),
-)
-
 const isValid = computed(() => validateYear(localModelValue.value))
 
-watchEffect(() => {
-  if (!isValid.value && shouldShowValidationState.value) {
+function validateInput() {
+  if (!isValid.value) {
     emit("update:validationError", {
       message: "Kein valides Jahr",
       instance: props.id,
@@ -90,6 +77,16 @@ watchEffect(() => {
   } else {
     emit("update:validationError", undefined)
   }
+}
+
+function backspaceDelete() {
+  emit("update:validationError", undefined)
+  if (localModelValue.value === "")
+    emit("update:modelValue", localModelValue.value)
+}
+
+watch(inputCompleted, (is) => {
+  if (is) validateInput()
 })
 
 // Valid years = 1000 - 9999
@@ -107,12 +104,13 @@ function validateYear(input: string | undefined): boolean {
     v-maska
     :aria-label="($attrs.ariaLabel as string) ?? ''"
     data-maska="####"
-    :has-error="hasError || (shouldShowValidationState && !isValid)"
+    :has-error="hasError || (inputCompleted && !isValid)"
     maxlength="4"
     :model-value="localModelValue"
     placeholder="JJJJ"
     type="text"
-    @blur="userHasFinished = true"
+    @blur="validateInput"
+    @keydown.delete="backspaceDelete"
     @maska="checkInputCompleted"
     @update:model-value="emitModelValue"
   />

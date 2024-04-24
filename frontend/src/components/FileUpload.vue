@@ -2,7 +2,7 @@
 import { ref } from "vue"
 import FileInput from "@/components/input/FileInput.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
-import IconUpload from "~icons/ic/outline-file-upload"
+import IconUpload from "~icons/ic/baseline-upload-file"
 
 defineProps<{
   isLoading?: boolean
@@ -41,6 +41,7 @@ function dragleave() {
 function drop(e: DragEvent) {
   e.preventDefault()
   reset()
+  status.value.inDrag = false
   if (e.dataTransfer) {
     emits("filesSelected", e.dataTransfer.files)
   }
@@ -60,7 +61,7 @@ function onFileSelect(event: Event) {
   <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
   <div
     id="upload-drop-area"
-    class="upload-drop-area flex w-full flex-col items-center rounded-lg border-3 border-dashed border-blue-300 bg-white p-[3.125rem] text-center hover:border-3"
+    class="upload-drop-area justfy-center flex w-full flex-grow flex-col items-center border-1 border-dashed border-blue-300 bg-white p-[3.125rem] text-center"
     :class="{
       'upload-drop-area__in-drag': status.inDrag,
     }"
@@ -74,10 +75,14 @@ function onFileSelect(event: Event) {
       <div>{{ status.file ? status.file.name : "" }}</div>
     </span>
     <span v-else class="flex flex-col items-center">
-      <IconUpload class="text-72 text-blue-800" />
+      <span
+        class="w-icon rounded-full border-1 border-solid bg-blue-200 p-12 text-32 text-blue-800"
+      >
+        <IconUpload />
+      </span>
 
-      <div class="ds-heading-03-reg mt-[0.5rem]">
-        Datei in diesen Bereich ziehen
+      <div class="ds-label-01-bold mt-[0.5rem] pt-6">
+        Ziehen Sie Ihre Dateien in diesem Bereich.
       </div>
       <FileInput
         id="file-upload"
@@ -86,7 +91,7 @@ function onFileSelect(event: Event) {
         @input="onFileSelect"
       >
         <span class="ds-link-03-bold mt-[0.438rem] hover:underline"
-          >oder Datei auswählen</span
+          >Oder hier auswählen</span
         >
       </FileInput>
     </span>
@@ -96,7 +101,7 @@ function onFileSelect(event: Event) {
 <style lang="scss" scoped>
 .upload-drop-area {
   &__in-drag {
-    @apply border-3 border-dashed border-blue-500;
+    @apply bg-blue-200;
   }
 }
 </style>

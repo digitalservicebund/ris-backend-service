@@ -8,7 +8,7 @@ test.describe("create a doc unit and delete it again", () => {
     await page
       .getByRole("button", { name: "Neue Dokumentationseinheit", exact: true })
       .click()
-    await expect(page.locator(`text=oder Datei auswählen`)).toBeVisible()
+    await expect(page.locator(`text=Oder hier auswählen`)).toBeVisible()
     await expect(page).toHaveURL(
       /\/caselaw\/documentunit\/[A-Z0-9]{13}\/files$/,
     )

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, onBeforeUnmount, ref, watch } from "vue"
+import { ValidationError } from "./input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
@@ -23,7 +24,14 @@ const emit = defineEmits<{
 }>()
 
 const validationStore =
-  useValidationStore<["normAbbreviation", "singleNorm"][number]>()
+  useValidationStore<
+    [
+      "normAbbreviation",
+      "singleNorm",
+      "dateOfVersion",
+      "dateOfRelevance",
+    ][number]
+  >()
 
 const norm = ref(new NormReference({ ...props.modelValue }))
 const lastSavedModelValue = ref(new NormReference({ ...props.modelValue }))
@@ -67,7 +75,9 @@ const normAbbreviation = computed({
 
 async function addNormReference() {
   if (
-    !validationStore.getByMessage("Inhalt nicht valide").length &&
+    !validationStore.getByField("singleNorm") &&
+    !validationStore.getByField("dateOfVersion") &&
+    !validationStore.getByField("dateOfRelevance") &&
     !validationStore.getByMessage("RIS-Abkürzung bereits eingegeben").length
   ) {
     const normRef = new NormReference({
@@ -89,6 +99,7 @@ async function removeNormReference() {
 function addSingleNormEntry() {
   singleNorms.value.push(new SingleNorm())
 }
+
 /**
  * Removes the single norm entry, with the given index.
  * @param {number} index - The index of the list item to be removed
@@ -101,6 +112,26 @@ function cancelEdit() {
   if (new NormReference({ ...props.modelValue }).isEmpty)
     emit("removeEntry", true)
   emit("cancelEdit")
+}
+
+function updateFormatValidation(
+  validationError: ValidationError | undefined,
+  field: string,
+) {
+  if (validationError) {
+    validationStore.add(
+      validationError.message,
+      validationError.instance as [
+        "singleNorm",
+        "dateOfVersion",
+        "dateOfRelevance",
+      ][number],
+    )
+  } else {
+    validationStore.remove(
+      field as ["singleNorm", "dateOfVersion", "dateOfRelevance"][number],
+    )
+  }
 }
 
 watch(
@@ -151,11 +182,11 @@ onBeforeUnmount(() => {
         v-model="singleNorms[index] as SingleNorm"
         aria-label="Einzelnorm"
         norm-abbreviation="normAbbreviation.abbreviation"
-        @add-validation-error="
-          validationStore.add('Inhalt nicht valide', 'singleNorm')
-        "
         @remove-entry="removeSingleNormEntry(index)"
-        @remove-validation-error="validationStore.remove('singleNorm')"
+        @update:validation-error="
+          (validationError, field) =>
+            updateFormatValidation(validationError, field)
+        "
       />
       <div class="flex w-full flex-row justify-between">
         <div>

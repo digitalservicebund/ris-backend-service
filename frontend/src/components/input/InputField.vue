@@ -22,6 +22,10 @@ const props = withDefaults(defineProps<Props>(), {
   validationError: undefined,
 })
 
+const emit = defineEmits<{
+  "update:validationError": [value?: ValidationError]
+}>()
+
 defineSlots<{
   default(props: {
     id: Props["id"]
@@ -51,6 +55,12 @@ const labelConverted = computed(() => {
 
 function updateValidationError(newValidationError?: ValidationError) {
   localValidationError.value = newValidationError
+  if (newValidationError)
+    emit("update:validationError", {
+      message: newValidationError.message,
+      instance: newValidationError.instance,
+    })
+  else emit("update:validationError", undefined)
 }
 
 const localValidationError = ref<ValidationError | undefined>(
