@@ -1,7 +1,6 @@
 # general
 brew "lefthook"
 brew "gh"
-brew "talisman"
 tap "homebrew/cask"
 cask "docker"
 brew "gopass"
