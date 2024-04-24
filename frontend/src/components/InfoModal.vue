@@ -84,6 +84,7 @@ const ariaLabelIcon = props.title + " icon"
       </div>
       <!-- eslint-disable vue/no-v-html -->
       <span v-else class="ds-body-01-reg" v-html="description"></span>
+      <span v-if="!isArray" class="ds-body-01-reg" v-html="description"></span>
     </div>
   </div>
 </template>
