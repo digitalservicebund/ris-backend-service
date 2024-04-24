@@ -328,7 +328,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
         .expectStatus()
         .isNoContent();
 
-    assertThat(attachmentRepository.findAll()).hasSize(0);
+    assertThat(attachmentRepository.findAll()).isEmpty();
   }
 
   @Test
