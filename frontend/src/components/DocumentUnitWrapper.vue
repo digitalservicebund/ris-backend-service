@@ -10,8 +10,6 @@ import useQuery from "@/composables/useQueryFromRoute"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import DocumentUnit from "@/domain/documentUnit"
 import { ServiceResponse } from "@/services/httpClient"
-import IconChevronLeft from "~icons/ic/baseline-chevron-left"
-import IconChevronRight from "~icons/ic/baseline-chevron-right"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
@@ -81,10 +79,8 @@ const toggleNavigationPanel = (state?: boolean) => {
     >
       <SideToggle
         class="sticky top-0 z-20"
-        :close-icon="IconChevronLeft"
         :is-expanded="showNavigationPanelRef"
         label="Navigation"
-        :open-icon="IconChevronRight"
         size="small"
         @update:is-expanded="toggleNavigationPanel"
       >

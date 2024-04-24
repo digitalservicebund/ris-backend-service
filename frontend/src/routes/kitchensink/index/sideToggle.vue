@@ -3,8 +3,6 @@ import { ref } from "vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
-import IconChevronLeft from "~icons/ic/baseline-chevron-left"
-import IconChevronRight from "~icons/ic/baseline-chevron-right"
 
 const toggleShow = ref(true)
 </script>
@@ -14,10 +12,8 @@ const toggleShow = ref(true)
     <FlexContainer class="h-[10rem] justify-between gap-[3rem]">
       <SideToggle
         class="float-right"
-        :close-icon="IconChevronLeft"
         :is-expanded="toggleShow"
         label="Inhalt links"
-        :open-icon="IconChevronRight"
         :opening-direction="OpeningDirection.LEFT"
         @update:is-expanded="toggleShow = !toggleShow.valueOf()"
       >
@@ -29,10 +25,8 @@ const toggleShow = ref(true)
         </div>
       </SideToggle>
       <SideToggle
-        :close-icon="IconChevronLeft"
         :is-expanded="!toggleShow"
         label="Inhalt rechts"
-        :open-icon="IconChevronRight"
         :opening-direction="OpeningDirection.RIGHT"
         @update:is-expanded="toggleShow = !toggleShow"
       >

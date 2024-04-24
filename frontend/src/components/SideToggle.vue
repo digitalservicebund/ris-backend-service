@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-import { Component, computed } from "vue"
+import { computed } from "vue"
+import IconChevronLeft from "~icons/ic/baseline-chevron-left"
+import IconChevronRight from "~icons/ic/baseline-chevron-right"
 
 interface Props {
   isExpanded?: boolean
   openingDirection?: OpeningDirection
   label?: string
   size?: "small" | "medium"
-  closeIcon: Component
-  openIcon: Component
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -66,7 +66,7 @@ export enum OpeningDirection {
       :class="classes"
     >
       <span :class="iconClasses">
-        <props.closeIcon
+        <IconChevronLeft
           v-if="
             props.openingDirection === OpeningDirection.LEFT
               ? !isExpanded
@@ -74,7 +74,7 @@ export enum OpeningDirection {
           "
           @click="toggle"
         />
-        <props.openIcon v-else @click="toggle" />
+        <IconChevronRight v-else @click="toggle" />
       </span>
     </button>
     <div v-show="isExpanded" class="-mr-[1.25rem]">
