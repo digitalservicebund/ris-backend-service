@@ -69,7 +69,7 @@ export const uploadTestfile = async (
 ) => {
   const [fileChooser] = await Promise.all([
     page.waitForEvent("filechooser"),
-    page.locator("text=oder Datei auswählen").click(),
+    page.locator("text=Oder hier auswählen").click(),
   ])
   if (Array.isArray(filename)) {
     await fileChooser.setFiles(

@@ -30,7 +30,9 @@ test.describe("upload an original document to a doc unit", () => {
     await expect(page.locator(`text=sample.docx`)).toBeHidden()
 
     await page.reload()
-    await expect(page.getByText("Datei in diesen Bereich ziehen")).toBeVisible()
+    await expect(
+      page.getByText("Ziehen Sie Ihre Dateien in diesem Bereich."),
+    ).toBeVisible()
     await expect(tableView).toBeHidden()
     await expect(attachmentView).toBeHidden()
   })
@@ -67,7 +69,9 @@ test.describe("upload an original document to a doc unit", () => {
     await expect(page.locator(`text=some-formatting.docx`)).toBeHidden()
 
     await page.reload()
-    await expect(page.getByText("Datei in diesen Bereich ziehen")).toBeVisible()
+    await expect(
+      page.getByText("Ziehen Sie Ihre Dateien in diesem Bereich."),
+    ).toBeVisible()
     await expect(tableView).toBeHidden()
   })
 
@@ -93,7 +97,7 @@ test.describe("upload an original document to a doc unit", () => {
 
     await page.dispatchEvent(".upload-drop-area", "dragover", { dataTransfer })
     await expect(
-      page.locator("text=Datei in diesen Bereich ziehen"),
+      page.locator("text=Ziehen Sie Ihre Dateien in diesem Bereich."),
     ).toBeVisible()
   })
 

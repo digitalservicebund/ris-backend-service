@@ -159,7 +159,7 @@ function toggleDeleteModal() {
     :show-navigation-panel="props.showNavigationPanel"
   >
     <template #default="{ classes }">
-      <FlexContainer class="w-full">
+      <FlexContainer class="min-h-[74vh] w-full">
         <PopupModal
           v-if="
             showDeleteModal &&
@@ -192,8 +192,8 @@ function toggleDeleteModal() {
             :description="errors"
             :title="errorTitle"
           />
-          <div>
-            <div class="flex flex-col items-start">
+          <div class="flex-grow">
+            <div class="flex h-full flex-col items-start">
               <FileUpload
                 :accept="acceptedFileFormats.toString()"
                 :is-loading="isLoading"
@@ -201,9 +201,14 @@ function toggleDeleteModal() {
               />
             </div>
           </div>
-          <div class="ds-label-02-reg text-gray-900">
-            Zulässige Dateiformate:
-            {{ acceptedFileFormats.toString().replace(/\./g, " ") }}
+          <div class="flex flex-row justify-between">
+            <div class="ds-label-02-reg text-gray-900">
+              Zulässige Dateiformate:
+              {{ acceptedFileFormats.toString().replace(/\./g, " ") }}
+            </div>
+            <div class="ds-label-02-reg text-gray-900">
+              Maximale Dateigröße: 20 MB
+            </div>
           </div>
         </FlexItem>
         <AttachmentViewSidePanel

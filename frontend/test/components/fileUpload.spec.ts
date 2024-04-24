@@ -10,7 +10,7 @@ describe("FileUpload", () => {
       },
     })
 
-    screen.getByText("Datei in diesen Bereich ziehen")
+    screen.getByText("Ziehen Sie Ihre Dateien in diesem Bereich.")
   })
 
   test.each([
@@ -34,7 +34,7 @@ describe("FileUpload", () => {
     ],
   ])(`fires events on files selected`, async (files) => {
     const { emitted } = render(FileUpload)
-    const inputEl = screen.getByLabelText("oder Datei auswählen", {
+    const inputEl = screen.getByLabelText("Oder hier auswählen", {
       selector: "input",
       exact: false,
     })
