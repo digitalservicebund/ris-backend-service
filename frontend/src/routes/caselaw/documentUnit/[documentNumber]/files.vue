@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
 import { useRoute } from "vue-router"
-import DocumentUnitFiles from "@/components/DocumentUnitAttachments.vue"
+import DocumentUnitAttachments from "@/components/DocumentUnitAttachments.vue"
 import RouteErrorDisplay from "@/components/RouteErrorDisplay.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
@@ -26,10 +26,15 @@ onMounted(() => loadDocumentUnit())
 </script>
 
 <template>
-  <DocumentUnitFiles
+  <DocumentUnitAttachments
     v-if="documentUnit"
     :document-unit="documentUnit as DocumentUnit"
     :show-attachment-panel="route.query.showAttachmentPanel === 'true'"
+    :show-navigation-panel="
+      route.query.showNavigationPanel
+        ? route.query.showNavigationPanel === 'true'
+        : true
+    "
     @update-document-unit="loadDocumentUnit"
   />
   <RouteErrorDisplay v-else :error="error" />

@@ -40,8 +40,9 @@ watch(
 <template>
   <FlexContainer
     v-if="fileAsHTML?.html"
-    class="sticky top-0 flex w-full flex-col gap-40 bg-white p-24"
     v-bind="$attrs"
+    id="attachment-view"
+    class="sticky top-0 flex w-full flex-col gap-40 bg-white p-24"
   >
     <div
       v-if="isLoading"

@@ -34,17 +34,17 @@ function handleTokenClick(token: Token) {
 </script>
 
 <template>
-  <span
+  <button
     v-for="(token, idx) in tokenizeText()"
     :key="idx"
+    class="text-left"
     :class="token.isLink && 'linked-field'"
-    role="button"
     tabindex="0"
     @click="handleTokenClick(token)"
     @keyup.enter="handleTokenClick(token)"
   >
     {{ token.content }}
-  </span>
+  </button>
 </template>
 
 <style lang="scss" scoped>

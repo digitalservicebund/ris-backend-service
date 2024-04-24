@@ -19,6 +19,9 @@ test.describe("upload an original document to a doc unit", () => {
       exact: true,
     })
 
+    const attachmentView = page.locator("#attachment-view")
+
+    await expect(attachmentView).toBeVisible()
     await expect(tableView).toBeVisible()
 
     // delete file
@@ -29,6 +32,7 @@ test.describe("upload an original document to a doc unit", () => {
     await page.reload()
     await expect(page.getByText("Datei in diesen Bereich ziehen")).toBeVisible()
     await expect(tableView).toBeHidden()
+    await expect(attachmentView).toBeHidden()
   })
 
   test("upload and delete multiple docx files per file chooser", async ({

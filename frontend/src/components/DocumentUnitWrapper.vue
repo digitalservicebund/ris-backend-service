@@ -1,31 +1,31 @@
 <script setup lang="ts">
 import dayjs from "dayjs"
-import { computed, ref, watchEffect } from "vue"
-import { useRoute, useRouter } from "vue-router"
+import { computed, Ref, ref, watchEffect } from "vue"
+import { useRoute } from "vue-router"
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import NavbarSide from "@/components/NavbarSide.vue"
 import SideToggle from "@/components/SideToggle.vue"
 import { useCaseLawMenuItems } from "@/composables/useCaseLawMenuItems"
+import useQuery from "@/composables/useQueryFromRoute"
 import { useStatusBadge } from "@/composables/useStatusBadge"
-import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import DocumentUnit from "@/domain/documentUnit"
 import { ServiceResponse } from "@/services/httpClient"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
   saveCallback?: () => Promise<ServiceResponse<void>>
+  showNavigationPanel: boolean
 }>()
+
 const route = useRoute()
-const router = useRouter()
+
+const showNavigationPanelRef: Ref<boolean> = ref(props.showNavigationPanel)
+
+const { pushQueryToRoute } = useQuery<"showNavigationPanel">()
 
 const menuItems = useCaseLawMenuItems(
   props.documentUnit.documentNumber,
   route.query,
-)
-const navigationIsOpen = useToggleStateInRouteQuery(
-  "showNavBar",
-  route,
-  router.replace,
 )
 
 const fileNumberInfo = computed(
@@ -63,6 +63,13 @@ const secondRowInfos = computed(() => [
 watchEffect(() => {
   statusBadge.value = useStatusBadge(props.documentUnit.status).value
 })
+
+const toggleNavigationPanel = (state?: boolean) => {
+  showNavigationPanelRef.value = state || !showNavigationPanelRef.value
+  pushQueryToRoute({
+    showNavigationPanel: showNavigationPanelRef.value.toString(),
+  })
+}
 </script>
 
 <template>
@@ -71,9 +78,11 @@ watchEffect(() => {
       class="sticky top-0 z-50 flex flex-col border-r-1 border-solid border-gray-400 bg-white"
     >
       <SideToggle
-        v-model:is-expanded="navigationIsOpen"
         class="sticky top-0 z-20"
+        :is-expanded="showNavigationPanelRef"
         label="Navigation"
+        size="small"
+        @update:is-expanded="toggleNavigationPanel"
       >
         <NavbarSide :is-child="false" :menu-items="menuItems" :route="route" />
       </SideToggle>

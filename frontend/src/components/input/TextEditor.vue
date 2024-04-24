@@ -251,15 +251,22 @@ const fixButtons = [
 ]
 
 const editorButtons = computed(() =>
-  buttons.value.map((button) => ({
-    ...button,
-    isActive:
-      button.group == "alignment"
-        ? editor.isActive({ textAlign: button.type })
-        : button.ariaLabel == "invisible-characters"
-          ? selectActiveState(editor.view.state)
-          : editor.isActive(button.type),
-  })),
+  buttons.value.map((button) => {
+    let isActive
+
+    if (button.group === "alignment") {
+      isActive = editor.isActive({ textAlign: button.type })
+    } else if (button.ariaLabel === "invisible-characters") {
+      isActive = selectActiveState(editor.view.state)
+    } else {
+      isActive = editor.isActive(button.type)
+    }
+
+    return {
+      ...button,
+      isActive,
+    }
+  }),
 )
 const buttonSize = 48
 const containerWidth = ref()

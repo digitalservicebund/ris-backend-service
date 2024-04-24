@@ -89,9 +89,9 @@ describe("EditableList", () => {
     expect(screen.queryByLabelText("Weitere Angabe")).not.toBeInTheDocument()
     expect(screen.getByLabelText("Listeneintrag speichern")).toBeVisible()
     expect(screen.getByLabelText("Listeneintrag speichern")).toBeDisabled()
+    expect(screen.getByLabelText("Abbrechen")).toBeVisible()
 
     //with no inputs, there is no cancel or delete button
-    expect(screen.queryByLabelText("Abbrechen")).not.toBeInTheDocument()
     expect(screen.queryByLabelText("Eintrag löschen")).not.toBeInTheDocument()
   })
 

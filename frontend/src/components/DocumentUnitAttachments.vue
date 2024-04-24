@@ -13,14 +13,14 @@ import useQuery from "@/composables/useQueryFromRoute"
 import Attachment from "@/domain/attachment"
 import DocumentUnit from "@/domain/documentUnit"
 import attachmentService from "@/services/attachmentService"
-import documentUnitService from "@/services/documentUnitService"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
   showAttachmentPanel?: boolean
+  showNavigationPanel?: boolean
 }>()
 const emit = defineEmits<{
-  updateDocumentUnit: [updatedDocumentUnit: DocumentUnit]
+  updateDocumentUnit: [void]
 }>()
 
 const { pushQueryToRoute } = useQuery<"showAttachmentPanel">()
@@ -30,7 +30,6 @@ const showAttachmentPanelRef: Ref<boolean> = ref(
 )
 
 const errors = ref<string[]>([])
-const html = ref<string>()
 const isLoading = ref(false)
 const acceptedFileFormats = [".docx"]
 const selectedAttachmentIndex: Ref<number> = ref(0)
@@ -69,21 +68,17 @@ const handleDeleteAttachment = async (index: number) => {
       )
     ).status < 300
   ) {
-    const updateResponse = await documentUnitService.getByDocumentNumber(
-      props.documentUnit.documentNumber as string,
-    )
-
-    if (updateResponse.error) {
-      console.error(updateResponse.error)
+    if (getAttachments().length > 1) {
+      selectedAttachmentIndex.value = index == 0 ? 0 : index - 1
     } else {
-      emit("updateDocumentUnit", updateResponse.data)
-      html.value = undefined
+      toggleAttachmentPanel(false)
     }
+    emit("updateDocumentUnit")
   }
 }
 
 const handleOnSelect = (index: number) => {
-  if (index >= 0 && index <= getAttachments().length) {
+  if (index >= 0 && index < getAttachments().length) {
     if (selectedAttachmentIndex.value == index) {
       toggleAttachmentPanel()
     } else {
@@ -102,13 +97,11 @@ const handleOnDelete = (index: number) => {
 const deleteFile = (index: number) => {
   handleDeleteAttachment(index)
   toggleDeleteModal()
-  if (showAttachmentPanelRef.value) {
-    toggleAttachmentPanel()
-  }
 }
 
 async function upload(files: FileList) {
   errors.value = []
+  let anySuccessful = false
   try {
     for (const file of Array.from(files)) {
       isLoading.value = true
@@ -117,7 +110,7 @@ async function upload(files: FileList) {
         file,
       )
       if (response.status === 200 && response.data) {
-        html.value = response.data.html
+        anySuccessful = true
       } else if (response.error?.description) {
         errors.value.push(
           file.name +
@@ -130,9 +123,10 @@ async function upload(files: FileList) {
     }
   } finally {
     isLoading.value = false
-    emit("updateDocumentUnit", props.documentUnit)
-    handleOnSelect(getAttachments().length)
-    toggleAttachmentPanel(true)
+    emit("updateDocumentUnit")
+    if (!showAttachmentPanelRef.value && anySuccessful) {
+      toggleAttachmentPanel(true)
+    }
   }
 }
 
@@ -160,7 +154,10 @@ function toggleDeleteModal() {
 </script>
 
 <template>
-  <DocumentUnitWrapper :document-unit="documentUnit">
+  <DocumentUnitWrapper
+    :document-unit="documentUnit"
+    :show-navigation-panel="props.showNavigationPanel"
+  >
     <template #default="{ classes }">
       <FlexContainer class="w-full">
         <PopupModal

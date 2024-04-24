@@ -19,6 +19,11 @@ const { data: documentUnit, error } =
     v-if="documentUnit"
     :document-unit="documentUnit"
     :show-attachment-panel="route.query.showAttachmentPanel === 'true'"
+    :show-navigation-panel="
+      route.query.showNavigationPanel
+        ? route.query.showNavigationPanel === 'true'
+        : true
+    "
   />
   <ErrorPage v-else :error="error" :title="error?.title" />
 </template>

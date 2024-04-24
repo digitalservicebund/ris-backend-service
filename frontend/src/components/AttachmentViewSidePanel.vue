@@ -45,11 +45,12 @@ const handlePanelExpanded = (isExpanded: boolean) => {
       :is-expanded="props.isExpanded"
       label="Dokumentansicht"
       :opening-direction="OpeningDirection.LEFT"
+      size="medium"
       @update:is-expanded="handlePanelExpanded"
     >
       <FileNavigator
+        :attachments="props.attachments"
         :current-index="props.currentIndex"
-        :files="props.attachments"
         @select="handleOnSelect"
       ></FileNavigator>
       <AttachmentView

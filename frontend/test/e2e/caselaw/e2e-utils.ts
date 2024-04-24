@@ -2,6 +2,12 @@ import { expect, Page } from "@playwright/test"
 import { generateString } from "../../test-helper/dataGenerators"
 import SingleNorm from "@/domain/singleNorm"
 
+const getAllQueryParamsFromUrl = (page: Page): string => {
+  const url = new URL(page.url())
+  const params = url.searchParams.toString()
+  return params ? `?${params}` : ""
+}
+
 export const navigateToSearch = async (page: Page) => {
   await page.goto(`/caselaw`)
   await page.waitForURL("/caselaw")
@@ -15,7 +21,10 @@ export const navigateToCategories = async (
   page: Page,
   documentNumber: string,
 ) => {
-  await page.goto(`/caselaw/documentunit/${documentNumber}/categories`)
+  const queryParams = getAllQueryParamsFromUrl(page)
+  const baseUrl = `/caselaw/documentunit/${documentNumber}/categories${queryParams}`
+
+  await page.goto(baseUrl)
   await expect(page.locator("text=Spruchkörper")).toBeVisible({
     timeout: 15000, // for backend warm up
   })
@@ -23,7 +32,8 @@ export const navigateToCategories = async (
 }
 
 export const navigateToFiles = async (page: Page, documentNumber: string) => {
-  await page.goto(`/caselaw/documentunit/${documentNumber}/files`)
+  const queryParams = getAllQueryParamsFromUrl(page)
+  await page.goto(`/caselaw/documentunit/${documentNumber}/files${queryParams}`)
   await expect(page.locator("h1:has-text('Dokumente')")).toBeVisible({
     timeout: 15000, // for backend warm up
   })
