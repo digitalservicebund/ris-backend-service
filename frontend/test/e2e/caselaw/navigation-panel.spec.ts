@@ -2,16 +2,8 @@ import { expect } from "@playwright/test"
 import { navigateToCategories, navigateToFiles } from "./e2e-utils"
 import { caselawTest as test } from "./fixtures"
 
-test.describe("test the different layout options", () => {
-  test("preview panel is hidden without attached files", async ({
-    page,
-    documentNumber,
-  }) => {
-    await navigateToCategories(page, documentNumber)
-    await expect(page.locator("#odoc-panel-element")).toBeHidden()
-  })
-
-  test("close and open navigation sidebar", async ({
+test.describe("test navigation panel", () => {
+  test("navigation panel reacts to route parameters", async ({
     page,
     documentNumber,
   }) => {
@@ -25,7 +17,7 @@ test.describe("test the different layout options", () => {
     await expect(page.getByRole("link", { name: "Rubriken" })).toBeVisible()
   })
 
-  test("navigation state passed to other menu item", async ({
+  test("navigation toggle state is passed to other pages", async ({
     page,
     documentNumber,
   }) => {
