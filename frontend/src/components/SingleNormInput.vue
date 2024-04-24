@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from "vue"
+import { ValidationError } from "./input/types"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextInput from "@/components/input/TextInput.vue"
@@ -17,8 +18,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   "update:modelValue": [value: SingleNorm]
   removeEntry: [void]
-  addValidationError: [void]
-  removeValidationError: [void]
+  "update:validationError": [value?: ValidationError, field?: string]
 }>()
 
 const validationStore = useValidationStore<(typeof SingleNorm.fields)[number]>()
@@ -35,7 +35,7 @@ const singleNorm = computed({
 
 async function validateNorm() {
   validationStore.reset()
-  emit("removeValidationError")
+  emit("update:validationError", undefined, "singleNorm")
 
   //validate singleNorm
   if (singleNorm.value?.singleNorm) {
@@ -49,13 +49,39 @@ async function validateNorm() {
 
     if (response.data !== "Ok") {
       validationStore.add("Inhalt nicht valide", "singleNorm")
-      emit("addValidationError")
+
+      emit(
+        "update:validationError",
+        {
+          message: "Inhalt nicht valide",
+          instance: "singleNorm",
+        },
+        "singleNorm",
+      )
     }
   }
 }
 
 async function removeSingleNormEntry() {
   emit("removeEntry")
+}
+
+function updateDateFormatValidation(
+  validationError: ValidationError | undefined,
+  field: string,
+) {
+  if (validationError) {
+    emit(
+      "update:validationError",
+      {
+        message: validationError.message,
+        instance: validationError.instance,
+      },
+      field,
+    )
+  } else {
+    emit("update:validationError", undefined, field)
+  }
 }
 
 onMounted(async () => {
@@ -70,13 +96,13 @@ onMounted(async () => {
 <template>
   <div class="mb-24 flex justify-between gap-24">
     <InputField
-      id="norm-reference-singleNorm-field"
+      id="singleNorm"
       v-slot="slotProps"
       label="Einzelnorm"
       :validation-error="validationStore.getByField('singleNorm')"
     >
       <TextInput
-        id="norm-reference-singleNorm"
+        id="singleNorm"
         ref="singleNormInput"
         v-model="singleNorm.singleNorm"
         aria-label="Einzelnorm der Norm"
@@ -87,13 +113,17 @@ onMounted(async () => {
       ></TextInput>
     </InputField>
     <InputField
-      id="norm-date-of-version"
+      id="dateOfVersion"
       v-slot="slotProps"
       label="Fassungsdatum"
       :validation-error="validationStore.getByField('dateOfVersion')"
+      @update:validation-error="
+        (validationError) =>
+          updateDateFormatValidation(validationError, 'dateOfVersion')
+      "
     >
       <DateInput
-        id="norm-date-of-version"
+        id="dateOfVersion"
         v-model="singleNorm.dateOfVersion"
         aria-label="Fassungsdatum der Norm"
         class="ds-input-medium"
@@ -102,13 +132,17 @@ onMounted(async () => {
       />
     </InputField>
     <InputField
-      id="norm-date-of-relevance"
+      id="dateOfRelevance"
       v-slot="slotProps"
       label="Jahr"
       :validation-error="validationStore.getByField('dateOfRelevance')"
+      @update:validation-error="
+        (validationError) =>
+          updateDateFormatValidation(validationError, 'dateOfRelevance')
+      "
     >
       <YearInput
-        id="norm-date-of-relevance"
+        id="dateOfRelevance"
         v-model="singleNorm.dateOfRelevance"
         aria-label="Jahr der Norm"
         :has-error="slotProps.hasError"

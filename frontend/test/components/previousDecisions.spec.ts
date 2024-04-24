@@ -398,4 +398,19 @@ describe("PreviousDecisions", () => {
     await user.click(itemHeader)
     expect(screen.getAllByText(/Pflichtfeld nicht befüllt/).length).toBe(1)
   })
+
+  it("does not add norm with invalid version date input", async () => {
+    const { user } = renderComponent()
+
+    const dateInput = await screen.findByLabelText(
+      "Entscheidungsdatum Vorgehende Entscheidung",
+    )
+    expect(dateInput).toHaveValue("")
+
+    await user.type(dateInput, "00.00.0231")
+
+    await screen.findByText(/Kein valides Datum/)
+    screen.getByLabelText("Vorgehende Entscheidung speichern").click()
+    expect(dateInput).toBeVisible()
+  })
 })
