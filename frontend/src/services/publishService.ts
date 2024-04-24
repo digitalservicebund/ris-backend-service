@@ -90,12 +90,11 @@ const service: PublishService = {
       response.error = {
         title: errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_PREVIEW.title,
         description:
-          errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_PREVIEW.description,
-        multipartDescription:
           response.data?.statusMessages &&
           response.data.statusMessages.length > 0
             ? response.data?.statusMessages
-            : undefined,
+            : errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_PREVIEW
+                .description,
       }
     }
 

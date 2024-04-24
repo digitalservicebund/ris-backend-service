@@ -65,6 +65,6 @@ describe("publishService", () => {
     expect(result.error?.title).toEqual(
       "Fehler beim Laden der Veröffentlichungs-Vorschau",
     )
-    expect(result.error?.multipartDescription).toContain("Fehler 2")
+    expect(result.error?.description).toContain("Fehler 2")
   })
 })
