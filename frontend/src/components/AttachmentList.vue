@@ -31,6 +31,7 @@ const onSelect = (index: number) => {
 
 <template>
   <TableView
+    id="attachment-list"
     class="relative table w-full border-separate"
     data-testid="attachment-list"
   >

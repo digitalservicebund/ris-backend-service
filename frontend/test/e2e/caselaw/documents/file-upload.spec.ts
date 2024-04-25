@@ -41,9 +41,11 @@ test.describe("upload an original document to a doc unit", () => {
     page,
   }) => {
     await uploadTestfile(page, ["sample.docx", "some-formatting.docx"])
-    await expect(page.locator("text=Hochgeladen am")).toBeVisible()
-    await expect(page.locator(`text=sample.docx`).first()).toBeVisible()
-    await expect(page.locator(`text=some-formatting.docx`)).toBeVisible()
+
+    await expect(page.getByRole("cell", { name: "sample.docx" })).toBeVisible()
+    await expect(
+      page.getByRole("cell", { name: "some-formatting.docx" }),
+    ).toBeVisible()
 
     const tableView = page.getByRole("cell", {
       name: "Dateiname",
@@ -51,22 +53,30 @@ test.describe("upload an original document to a doc unit", () => {
     })
     await expect(tableView).toBeVisible()
 
-    await expect(page.locator(`text=Die ist ein Test`)).toBeVisible()
+    await expect(page.getByText("Die ist ein Test")).toBeVisible()
     await page.getByLabel("Nächstes Dokument anzeigen").click()
-    await expect(page.locator(`text=Die ist ein Test`)).toBeHidden()
-    await expect(page.locator(`text=Subheadline`)).toBeVisible()
+    await expect(page.getByText("Die ist ein Test")).toBeHidden()
+    await expect(page.getByText("Subheadline")).toBeVisible()
 
     // delete files
     await expect(page.getByLabel("Datei löschen")).toHaveCount(2)
-    await page.getByLabel("Datei löschen").nth(0).click()
-    await page.getByLabel("Löschen", { exact: true }).click() // confirm
-    await expect(page.getByText("sample.docx").nth(0)).toBeHidden() // in table
-    await expect(page.getByText("sample.docx").nth(1)).toBeHidden() // in sidepanel
 
-    await expect(page.getByLabel("Datei löschen")).toHaveCount(1)
-    await page.getByLabel("Datei löschen").nth(0).click()
+    const deleteFirstDocument = page
+      .getByTestId("listEntry-0")
+      .getByLabel("Datei löschen")
+    await deleteFirstDocument.click()
     await page.getByLabel("Löschen", { exact: true }).click() // confirm
-    await expect(page.locator(`text=some-formatting.docx`)).toBeHidden()
+    await expect(page.getByRole("cell", { name: "sample.docx" })).toBeHidden()
+
+    const deleteSecondDocument = page
+      .getByTestId("listEntry-0")
+      .getByLabel("Datei löschen")
+    await expect(deleteSecondDocument).toBeVisible()
+    await deleteSecondDocument.click()
+    await page.getByLabel("Löschen", { exact: true }).click() // confirm
+    await expect(
+      page.getByRole("cell", { name: "some-formatting.docx" }),
+    ).toBeHidden()
 
     await page.reload()
     await expect(
