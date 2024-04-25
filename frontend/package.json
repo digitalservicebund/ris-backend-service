@@ -2,10 +2,6 @@
   "name": "neuris-frontend",
   "version": "0.0.0",
   "private": true,
-  "engines": {
-    "node": ">=20.12.1"
-  },
-  "engineStrict": true,
   "scripts": {
     "preserve": "vite build",
     "serve": "vite preview",
