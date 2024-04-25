@@ -301,24 +301,26 @@ tasks {
         )
     }
 
-    getByName<BootBuildImage>("bootBuildImage") {
+    bootBuildImage {
         val containerRegistry = System.getenv("CONTAINER_REGISTRY") ?: "ghcr.io"
         val containerImageName =
-            System.getenv("CONTAINER_IMAGE_NAME") ?: "digitalservicebund/${rootProject.name}"
+            System.getenv("CONTAINER_IMAGE_NAME")
+                ?: "digitalservicebund/${rootProject.name}"
         val containerImageVersion = System.getenv("CONTAINER_IMAGE_VERSION") ?: "latest"
 
-        imageName.set("${containerRegistry}/${containerImageName}:${containerImageVersion}")
-        builder.set("paketobuildpacks/builder-jammy-tiny@sha256:61b59d061af9dbb117952dbc916dc2e0af87fd2e8b5ee24ff1573a1e3fffe0aa")
+        imageName.set("$containerRegistry/$containerImageName:$containerImageVersion")
+        builder.set("paketobuildpacks/builder-jammy-tiny")
         publish.set(false)
+
         docker {
             publishRegistry {
                 username.set(System.getenv("CONTAINER_REGISTRY_USER") ?: "")
                 password.set(System.getenv("CONTAINER_REGISTRY_PASSWORD") ?: "")
-                url.set("https://${containerRegistry}")
+                url.set("https://$containerRegistry")
             }
         }
     }
-
+    
     val delombok by registering(DelombokTask::class) {
         dependsOn(compileJava)
         mainClass.set("lombok.launch.Main")
