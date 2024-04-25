@@ -145,8 +145,7 @@ describe("Year Input", () => {
 
     await userEvent.type(input, "{backspace}")
     await userEvent.tab()
-    // Todo: check, why this line is failing
-    // expect(input).toHaveClass("has-error")
+    expect(input).toHaveClass("has-error")
   })
 
   it("does not render a validation error for a partial year while editing", async () => {

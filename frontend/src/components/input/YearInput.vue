@@ -28,6 +28,18 @@ const emit = defineEmits<{
 // parent component.
 const localModelValue = ref(props.modelValue)
 
+// This will be true if we think that the user is no longer working on the
+// input, e.g. on blur. We'll set it to false if the local value changes, i.e.
+// the user is typing. We'll try not to annoy users with validation errors
+// if they are still changing the value.
+const userHasFinished = ref<boolean>(false)
+
+const shouldShowValidationState = computed(() =>
+  Boolean(
+    localModelValue.value && (inputCompleted.value || userHasFinished.value),
+  ),
+)
+
 watch(
   () => props.modelValue,
   () => {
@@ -42,6 +54,7 @@ function emitModelValue(value: string | undefined): void {
   if (value === localModelValue.value) return
 
   const nextValue = onlyAllowNumbers(value)
+  userHasFinished.value = false
 
   localModelValue.value = nextValue
 
@@ -69,7 +82,7 @@ function checkInputCompleted(event: CustomEvent<MaskaDetail>) {
 const isValid = computed(() => validateYear(localModelValue.value))
 
 function validateInput() {
-  if (!isValid.value) {
+  if (!isValid.value && localModelValue.value) {
     emit("update:validationError", {
       message: "Kein valides Jahr",
       instance: props.id,
@@ -85,7 +98,7 @@ function backspaceDelete() {
     emit("update:modelValue", localModelValue.value)
 }
 
-watch(inputCompleted, (is) => {
+watch(shouldShowValidationState, (is) => {
   if (is) validateInput()
 })
 
@@ -104,12 +117,12 @@ function validateYear(input: string | undefined): boolean {
     v-maska
     :aria-label="($attrs.ariaLabel as string) ?? ''"
     data-maska="####"
-    :has-error="hasError || (inputCompleted && !isValid)"
+    :has-error="hasError || (shouldShowValidationState && !isValid)"
     maxlength="4"
     :model-value="localModelValue"
     placeholder="JJJJ"
     type="text"
-    @blur="validateInput"
+    @blur="userHasFinished = true"
     @keydown.delete="backspaceDelete"
     @maska="checkInputCompleted"
     @update:model-value="emitModelValue"
