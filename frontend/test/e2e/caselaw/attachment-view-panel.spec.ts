@@ -12,7 +12,7 @@ test.describe("test attachement panel", () => {
     await uploadTestfile(page, "sample.docx")
   })
 
-  test("attachment panel is shown when doucment is uploaded", async ({
+  test("attachment panel is shown after attachment is uploaded", async ({
     page,
   }) => {
     const attachmentView = page.locator("#attachment-view")
@@ -20,7 +20,7 @@ test.describe("test attachement panel", () => {
     await expect(page).toHaveURL(/showAttachmentPanel=true/)
   })
 
-  test("attachment panel state is passed to catagories", async ({
+  test("attachment panel state is passed to categories", async ({
     page,
     documentNumber,
   }) => {
