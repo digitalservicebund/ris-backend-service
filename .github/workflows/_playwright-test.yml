@@ -96,6 +96,17 @@ jobs:
           path: |
             ./frontend/test-results/**/*.png
             ./frontend/test-results/**/trace.zip
+      - name: Send failed tests to metrics endpoint
+        if: always()
+        run: |
+          jq -r '.suites[] | .specs[]?, .suites[]?.specs[]? | select(.tests[].results[].status == "failed" or .tests[].results[].status == "timedOut") | .title' test-results.json | while read test_title
+          do
+            curl -X POST ${{ secrets.E2E_TEST_METRICS_ENDPOINT }} \
+                  -H "xc-token: ${{ secrets.E2E_TEST_METRICS_TOKEN }}" \
+                  -H "Content-Type: application/json" \
+                  -d "{\"test\": \"${test_title}\"}"
+          done
+        working-directory: ./frontend
       - name: Upload test reports
         uses: actions/upload-artifact@v4
         if: ${{ always() }}
