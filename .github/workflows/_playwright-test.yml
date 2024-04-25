@@ -99,7 +99,7 @@ jobs:
       - name: Send failed tests to metrics endpoint
         if: always()
         run: |
-          jq -r '.suites[] | .specs[]?, .suites[]?.specs[]? | select(.tests[].results[].status == "failed" or .tests[].results[].status == "timedOut") | .title' test-results.json | while read test_title
+          jq -r '[.suites[] | .specs[]?, .suites[]?.specs[]? | select(.tests[].results[].status == "failed" or .tests[].results[].status == "timedOut") | .title] | unique[]' test-results.json | while read test_title
           do
             curl -X POST ${{ secrets.E2E_TEST_METRICS_ENDPOINT }} \
                   -H "xc-token: ${{ secrets.E2E_TEST_METRICS_TOKEN }}" \
