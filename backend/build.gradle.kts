@@ -10,7 +10,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.2.4"
+    id("org.springframework.boot") version "3.2.5"
     id("io.spring.dependency-management") version "1.1.4"
     id("com.diffplug.spotless") version "6.25.0"
     id("org.sonarqube") version "5.0.0.4638"
@@ -154,12 +154,12 @@ dependencies {
 
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.5.0")
 
-    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.0")
+    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.1")
 
     // CVE-2024-26308
     implementation("org.apache.commons:commons-compress:1.26.1")
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:4.26.0")
+    implementation("com.google.protobuf:protobuf-java:4.26.1")
     // CVE-2023-52428 in spring-boot-starter-oauth2-client:3.2.3
     implementation("com.nimbusds:nimbus-jose-jwt:9.37.3")
     // CVE-2023-31582
@@ -169,12 +169,12 @@ dependencies {
 
     implementation("com.sendinblue:sib-api-v3-sdk:7.0.0")
     // CVE-2022-4244
-    implementation("org.codehaus.plexus:plexus-utils:4.0.0")
+    implementation("org.codehaus.plexus:plexus-utils:4.0.1")
     // CVE-2024-29025
-    implementation("io.netty:netty-codec-http:4.1.108.Final")
-    implementation("io.netty:netty-codec-http2:4.1.108.Final")
+    implementation("io.netty:netty-codec-http:4.1.109.Final")
+    implementation("io.netty:netty-codec-http2:4.1.109.Final")
 
-    implementation(platform("software.amazon.awssdk:bom:2.25.16"))
+    implementation(platform("software.amazon.awssdk:bom:2.25.38"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -194,8 +194,8 @@ dependencies {
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.17.0")
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.12.4")
-    implementation("io.micrometer:micrometer-core:1.12.4")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.12.5")
+    implementation("io.micrometer:micrometer-core:1.12.5")
 
     implementation(platform("io.sentry:sentry-bom:7.8.0"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
@@ -205,10 +205,10 @@ dependencies {
     // => CVE-2023-2976
     implementation("com.google.guava:guava:33.1.0-jre")
 
-    var flywayCore = "org.flywaydb:flyway-core:10.11.0"
+    var flywayCore = "org.flywaydb:flyway-core:10.11.1"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.11.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.11.1")
 
     implementation("io.getunleash:unleash-client-java:9.2.0")
     implementation("org.apache.commons:commons-text:1.12.0")
@@ -220,8 +220,9 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:5.11.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("io.projectreactor:reactor-test:3.6.4")
-    testImplementation("org.springframework.security:spring-security-test:6.2.3")
+    testImplementation("io.projectreactor:reactor-test:3.6.5")
+    testImplementation("org.springframework.security:spring-security-test:6.2.4")
+    testImplementation("org.springframework.security:spring-security-test:6.2.4")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.3.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
