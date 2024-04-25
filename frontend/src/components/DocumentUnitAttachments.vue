@@ -178,7 +178,7 @@ function toggleDeleteModal() {
           @confirm-action="deleteFile(selectedAttachmentIndex)"
         />
         <FlexItem class="flex-1 space-y-20" :class="classes">
-          <TitleElement>Dokumente</TitleElement>
+          <TitleElement class="mb-0">Dokumente</TitleElement>
           <AttachmentList
             v-if="props.documentUnit.hasAttachments"
             id="file-table"

@@ -61,7 +61,7 @@ function onFileSelect(event: Event) {
   <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
   <div
     id="upload-drop-area"
-    class="upload-drop-area justfy-center flex w-full flex-grow flex-col items-center border-1 border-dashed border-blue-300 bg-white p-[3.125rem] text-center"
+    class="upload-drop-area flex w-full flex-grow flex-col items-center justify-center border-1 border-dashed border-blue-300 bg-white text-center"
     :class="{
       'upload-drop-area__in-drag': status.inDrag,
     }"
