@@ -100,7 +100,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
-          name: test-results-${{ inputs.mode }}-tests-${{ inputs.browser }}
+          name: test-results-${{ inputs.mode }}-${{ inputs.subproject }}-${{ inputs.browser }}
           path: ./frontend/test-results.json
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
