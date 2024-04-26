@@ -20,11 +20,14 @@ import { computed, watch, ref, onMounted } from "vue"
 import TextEditorButton, {
   EditorButton,
 } from "@/components/input/TextEditorButton.vue"
+import { TextAreaInputAttributes } from "@/components/input/types"
+import { useCollapsingMenuBar } from "@/composables/useCollapsingMenuBar"
 import {
   BorderNumber,
   BorderNumberContent,
   BorderNumberNumber,
 } from "@/editor/borderNumber"
+import { BorderNumberLink } from "@/editor/borderNumberLink"
 import { CustomBulletList } from "@/editor/bulletList"
 import { FontSize } from "@/editor/fontSize"
 import { CustomImage } from "@/editor/image"
@@ -34,9 +37,6 @@ import { CustomOrderedList } from "@/editor/orderedList"
 import { CustomParagraph } from "@/editor/paragraph"
 import { CustomSuperscript, CustomSubscript } from "@/editor/scriptText"
 import { TableStyle } from "@/editor/tableStyle"
-import { TextAreaInputAttributes } from "@/components/input/types"
-import { useCollapsingMenuBar } from "@/composables/useCollapsingMenuBar"
-import { BorderNumberLink } from "@/editor/borderNumberLink"
 import IconExpand from "~icons/ic/baseline-expand"
 import IconAlignJustify from "~icons/ic/baseline-format-align-justify"
 import IconAlignRight from "~icons/ic/baseline-format-align-right"

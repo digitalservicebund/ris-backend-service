@@ -1,12 +1,8 @@
 <script setup lang="ts">
-import { ref } from "vue"
 import { useRoute } from "vue-router"
-import DocumentUnitCategories from "@/components/DocumentUnitCategories.vue"
 import DocumentUnitPreview from "@/components/DocumentUnitPreview.vue"
 import ErrorPage from "@/components/ErrorPage.vue"
-import DocumentUnit from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
-import { ResponseError } from "@/services/httpClient"
 
 const props = defineProps<{ documentNumber: string }>()
 
