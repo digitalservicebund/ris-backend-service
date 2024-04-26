@@ -33,21 +33,13 @@ public class FlywayConfig {
   @Bean
   public Flyway flyway() {
     final String url = "jdbc:postgresql://" + host + ":" + port + "/" + database;
-    String locationsPath = seed ? "classpath:db" : "classpath:db/migration";
+    String locationsPath = seed ? "classpath:db-scripts" : "classpath:db-scripts/migration";
     return Flyway.configure()
         .dataSource(url, user, password)
         .baselineOnMigrate(true)
         .baselineVersion("0.0")
         .locations(locationsPath)
         .load();
-  }
-
-  @Bean
-  public FlywayMigrationStrategy defaultMigrationStrategy() {
-    return flyway -> {
-      flyway.repair();
-      flyway.migrate();
-    };
   }
 
   @Bean
