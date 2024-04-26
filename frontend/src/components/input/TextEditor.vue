@@ -21,16 +21,16 @@ import {
   BorderNumber,
   BorderNumberContent,
   BorderNumberNumber,
-} from "../../editor/borderNumber"
-import { CustomBulletList } from "../../editor/bulletList"
-import { FontSize } from "../../editor/fontSize"
-import { CustomImage } from "../../editor/image"
-import { InvisibleCharacters } from "../../editor/invisibleCharacters"
-import { CustomListItem } from "../../editor/listItem"
-import { CustomOrderedList } from "../../editor/orderedList"
-import { CustomParagraph } from "../../editor/paragraph"
-import { CustomSuperscript, CustomSubscript } from "../../editor/scriptText"
-import { TableStyle } from "../../editor/tableStyle"
+} from "@/editor/borderNumber"
+import { CustomBulletList } from "@/editor/bulletList"
+import { FontSize } from "@/editor/fontSize"
+import { CustomImage } from "@/editor/image"
+import { InvisibleCharacters } from "@/editor/invisibleCharacters"
+import { CustomListItem } from "@/editor/listItem"
+import { CustomOrderedList } from "@/editor/orderedList"
+import { CustomParagraph } from "@/editor/paragraph"
+import { CustomSuperscript, CustomSubscript } from "@/editor/scriptText"
+import { TableStyle } from "@/editor/tableStyle"
 import TextEditorButton, {
   EditorButton,
 } from "@/components/input/TextEditorButton.vue"

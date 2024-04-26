@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import TextEditor from "../components/input/TextEditor.vue"
 import CellItem from "@/components/CellItem.vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import TableRow from "@/components/TableRow.vue"
 import TableView from "@/components/TableView.vue"
 import TitleElement from "@/components/TitleElement.vue"
-import legalEffectTypes from "@/data/legalEffectTypes.json"
 import DocumentUnit from "@/domain/documentUnit"
 
 const props = defineProps<{
@@ -119,7 +119,7 @@ const props = defineProps<{
           documentUnit.ensuingDecisions?.length > 0
         "
       >
-        <CellItem>Nachgehende Entscheidungen </CellItem>
+        <CellItem>Nachgehende Entscheidungen</CellItem>
         <CellItem>
           <ul>
             <li
@@ -206,35 +206,35 @@ const props = defineProps<{
     <TableView>
       <TableRow>
         <CellItem>Entscheidungsname</CellItem>
-        <CellItem>{{ documentUnit.texts.decisionName }}</CellItem>
+        <TextEditor :value="documentUnit.texts.decisionName"></TextEditor>
       </TableRow>
       <TableRow>
         <CellItem>Titelzeile</CellItem>
-        <CellItem>{{ documentUnit.texts.headline }}</CellItem>
+        <TextEditor :value="documentUnit.texts.headline"></TextEditor>
       </TableRow>
       <TableRow>
         <CellItem>Leitsatz</CellItem>
-        <CellItem>{{ documentUnit.texts.guidingPrinciple }}</CellItem>
+        <TextEditor :value="documentUnit.texts.guidingPrinciple"></TextEditor>
       </TableRow>
       <TableRow>
         <CellItem>Orientierungssatz</CellItem>
-        <CellItem>{{ documentUnit.texts.headnote }}</CellItem>
+        <TextEditor :value="documentUnit.texts.headnote"></TextEditor>
       </TableRow>
       <TableRow>
         <CellItem>Tenor</CellItem>
-        <CellItem>{{ documentUnit.texts.tenor }}</CellItem>
+        <TextEditor :value="documentUnit.texts.tenor"></TextEditor>
       </TableRow>
       <TableRow>
         <CellItem>Gründe</CellItem>
-        <CellItem>{{ documentUnit.texts.reasons }}</CellItem>
+        <TextEditor :value="documentUnit.texts.reasons"></TextEditor>
       </TableRow>
       <TableRow>
         <CellItem>Tatbestand</CellItem>
-        <CellItem>{{ documentUnit.texts.reasons }}</CellItem>
+        <TextEditor :value="documentUnit.texts.caseFacts"></TextEditor>
       </TableRow>
       <TableRow>
         <CellItem>Entscheidungsgründe</CellItem>
-        <CellItem>{{ documentUnit.texts.caseFacts }}</CellItem>
+        <TextEditor :value="documentUnit.texts.decisionReasons"></TextEditor>
       </TableRow>
     </TableView>
   </DocumentUnitWrapper>
