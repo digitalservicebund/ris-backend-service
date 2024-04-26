@@ -186,15 +186,13 @@ const props = defineProps<{
       >
         <PreviewLeftCell> Schlagwörter </PreviewLeftCell>
         <PreviewRightCell>
-          <ul>
-            <li
-              v-for="(keyword, index) in props.documentUnit
-                .contentRelatedIndexing.keywords"
-              :key="index"
-            >
-              {{ keyword }}
-            </li>
-          </ul>
+          <div
+            v-for="(keyword, index) in props.documentUnit.contentRelatedIndexing
+              .keywords"
+            :key="index"
+          >
+            {{ keyword }}
+          </div>
         </PreviewRightCell>
       </tr>
       <tr
@@ -205,15 +203,13 @@ const props = defineProps<{
       >
         <PreviewLeftCell> Sachgebiete </PreviewLeftCell>
         <PreviewRightCell>
-          <ul>
-            <li
-              v-for="(fieldOfLaw, index) in props.documentUnit
-                .contentRelatedIndexing.fieldsOfLaw"
-              :key="index"
-            >
-              {{ fieldOfLaw.identifier }}, {{ fieldOfLaw.text }}
-            </li>
-          </ul>
+          <div
+            v-for="(fieldOfLaw, index) in props.documentUnit
+              .contentRelatedIndexing.fieldsOfLaw"
+            :key="index"
+          >
+            {{ fieldOfLaw.identifier }}, {{ fieldOfLaw.text }}
+          </div>
         </PreviewRightCell>
       </tr>
 
@@ -225,19 +221,15 @@ const props = defineProps<{
       >
         <PreviewLeftCell> Normen </PreviewLeftCell>
         <PreviewRightCell>
-          <ul>
-            <li
-              v-for="(norm, index) in props.documentUnit.contentRelatedIndexing
-                .norms"
-              :key="index"
-            >
-              <ul>
-                <li v-for="(singleNorm, i) in norm.singleNorms" :key="i">
-                  {{ norm.renderDecision }} - {{ singleNorm.renderDecision }}
-                </li>
-              </ul>
-            </li>
-          </ul>
+          <div
+            v-for="(norm, index) in props.documentUnit.contentRelatedIndexing
+              .norms"
+            :key="index"
+          >
+            <div v-for="(singleNorm, i) in norm.singleNorms" :key="i">
+              {{ norm.renderDecision }} - {{ singleNorm.renderDecision }}
+            </div>
+          </div>
         </PreviewRightCell>
       </tr>
     </TableView>
