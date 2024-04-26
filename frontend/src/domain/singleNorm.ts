@@ -4,6 +4,7 @@ export default class SingleNorm {
   public singleNorm?: string
   public dateOfVersion?: string
   public dateOfRelevance?: string
+  public legalForce?: LegalForce
 
   static readonly fields = [
     "singleNorm",
@@ -67,4 +68,22 @@ export const normFieldLabels: { [name: string]: string } = {
 export type SingleNormValidationInfo = {
   singleNorm: string
   normAbbreviation?: string
+}
+
+export type LegalForce = {
+  uuid?: string
+  type?: LegalForceType
+  region?: LegalForceRegion
+}
+
+export type LegalForceType = {
+  uuid?: string
+  abbreviation?: string
+  label: string
+}
+
+export type LegalForceRegion = {
+  uuid?: string
+  code?: string
+  label: string
 }

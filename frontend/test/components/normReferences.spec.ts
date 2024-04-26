@@ -7,6 +7,7 @@ import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
 import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
+import featureToggleService from "@/services/featureToggleService"
 
 function renderComponent(options?: { modelValue?: NormReference[] }) {
   const props = {
@@ -49,6 +50,10 @@ describe("Norm references", () => {
   ]
   vi.spyOn(comboboxItemService, "getRisAbbreviations").mockImplementation(() =>
     Promise.resolve({ status: 200, data: dropdownAbbreviationItems }),
+  )
+
+  vi.spyOn(featureToggleService, "isEnabled").mockImplementation(() =>
+    Promise.resolve({ status: 200, data: true }),
   )
 
   it("renders empty norm reference in edit mode, when no norm references in list", async () => {

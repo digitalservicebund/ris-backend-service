@@ -1,3 +1,4 @@
+import { LegalForceType, LegalForceRegion } from "./../domain/singleNorm"
 import httpClient, { ServiceResponse } from "./httpClient"
 import { ComboboxInputModelType, ComboboxItem } from "@/components/input/types"
 import { Page } from "@/components/Pagination.vue"
@@ -14,6 +15,8 @@ enum Endpoint {
   fieldOfLawSearchByIdentifier = "fieldsoflaw/search-by-identifier",
   risAbbreviations = `normabbreviation/search?pg=0&sz=30`,
   procedures = `procedure`,
+  legalForceRegions = `legal-force-regions`,
+  legalForceTypes = `legal-force-types`,
 }
 
 function formatDropdownItems(
@@ -63,6 +66,24 @@ function formatDropdownItems(
           additionalInformation: `${
             item.documentUnitCount ?? 0
           } Dokumentationseinheiten`,
+        }),
+      )
+    }
+    case Endpoint.legalForceTypes: {
+      return (responseData as unknown as Page<LegalForceType>).content.map(
+        (item) => ({
+          label: item.label,
+          value: item,
+          additionalInformation: item.abbreviation,
+        }),
+      )
+    }
+    case Endpoint.legalForceRegions: {
+      return (responseData as unknown as Page<LegalForceRegion>).content.map(
+        (item) => ({
+          label: item.label,
+          value: item,
+          additionalInformation: item.code,
         }),
       )
     }
@@ -127,6 +148,10 @@ const service: ComboboxItemService = {
     await fetchFromEndpoint(Endpoint.citationTypes, filter),
   getProcedures: async (filter?: string) =>
     await fetchFromEndpoint(Endpoint.procedures, filter, 10),
+  getLegalForceTypes: async (filter?: string) =>
+    await fetchFromEndpoint(Endpoint.legalForceTypes, filter),
+  getLegalForceRegions: async (filter?: string) =>
+    await fetchFromEndpoint(Endpoint.legalForceRegions, filter),
 }
 
 export default service

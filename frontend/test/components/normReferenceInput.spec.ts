@@ -6,6 +6,7 @@ import { NormAbbreviation } from "@/domain/normAbbreviation"
 import NormReference from "@/domain/normReference"
 import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
+import featureToggleService from "@/services/featureToggleService"
 
 function renderComponent(options?: { modelValue?: NormReference }) {
   // eslint-disable-next-line testing-library/await-async-events
@@ -32,6 +33,9 @@ describe("NormReferenceEntry", () => {
   )
   vi.spyOn(documentUnitService, "validateSingleNorm").mockImplementation(() =>
     Promise.resolve({ status: 200, data: "Ok" }),
+  )
+  vi.spyOn(featureToggleService, "isEnabled").mockImplementation(() =>
+    Promise.resolve({ status: 200, data: true }),
   )
   it("render empty norm input group on initial load", async () => {
     renderComponent()
