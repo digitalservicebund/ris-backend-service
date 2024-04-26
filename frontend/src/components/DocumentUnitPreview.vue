@@ -122,6 +122,10 @@ const props = defineProps<{
         </CellItem>
       </TableRow>
     </TableView>
+
+    <TableView> </TableView>
+
+    <TableView> </TableView>
     <TitleElement>{{ documentUnit }}</TitleElement>
   </DocumentUnitWrapper>
 </template>
