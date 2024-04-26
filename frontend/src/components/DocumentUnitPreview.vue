@@ -90,40 +90,118 @@ const props = defineProps<{
       </TableRow>
     </TableView>
 
-    <TableView>
-      <TableRow>
-        <CellItem
-          v-if="
-            documentUnit.previousDecisions &&
-            documentUnit.previousDecisions?.length > 0
-          "
-          >Vorinstanz
-        </CellItem>
-        <CellItem
-          v-for="(previousDecision, index) in documentUnit.previousDecisions"
-          :key="index"
-        >
-          {{ previousDecision.renderDecision }}
+    <TableView
+      v-if="documentUnit.previousDecisions || documentUnit.ensuingDecisions"
+    >
+      <TableRow
+        v-if="
+          documentUnit.previousDecisions &&
+          documentUnit.previousDecisions?.length > 0
+        "
+      >
+        <CellItem>Vorinstanz</CellItem>
+        <CellItem>
+          <ul>
+            <li
+              v-for="(
+                previousDecision, index
+              ) in documentUnit.previousDecisions"
+              :key="index"
+            >
+              {{ previousDecision.renderDecision }}
+            </li>
+          </ul>
         </CellItem>
       </TableRow>
-      <TableRow>
-        <CellItem
-          v-if="
-            documentUnit.ensuingDecisions &&
-            documentUnit.ensuingDecisions?.length > 0
-          "
-          >Nachgehende Entscheidungen
-        </CellItem>
-        <CellItem
-          v-for="(ensuingDecision, index) in documentUnit.ensuingDecisions"
-          :key="index"
-        >
-          {{ ensuingDecision.renderDecision }}
+      <TableRow
+        v-if="
+          documentUnit.ensuingDecisions &&
+          documentUnit.ensuingDecisions?.length > 0
+        "
+      >
+        <CellItem>Nachgehende Entscheidungen </CellItem>
+        <CellItem>
+          <ul>
+            <li
+              v-for="(ensuingDecision, index) in documentUnit.ensuingDecisions"
+              :key="index"
+            >
+              {{ ensuingDecision.renderDecision }}
+            </li>
+          </ul>
         </CellItem>
       </TableRow>
     </TableView>
 
-    <TableView></TableView>
+    <TableView>
+      <TableRow>
+        <CellItem
+          v-if="
+            documentUnit.contentRelatedIndexing.keywords &&
+            documentUnit.contentRelatedIndexing.keywords?.length > 0
+          "
+        >
+          Schlagwörter
+        </CellItem>
+        <CellItem>
+          <ul>
+            <li
+              v-for="(keyword, index) in documentUnit.contentRelatedIndexing
+                .keywords"
+              :key="index"
+            >
+              {{ keyword }}
+            </li>
+          </ul>
+        </CellItem>
+      </TableRow>
+      <TableRow>
+        <CellItem
+          v-if="
+            documentUnit.contentRelatedIndexing.fieldsOfLaw &&
+            documentUnit.contentRelatedIndexing.fieldsOfLaw?.length > 0
+          "
+        >
+          Sachgebiete
+        </CellItem>
+        <CellItem>
+          <ul>
+            <li
+              v-for="(fieldOfLaw, index) in documentUnit.contentRelatedIndexing
+                .fieldsOfLaw"
+              :key="index"
+            >
+              {{ fieldOfLaw.identifier }}, {{ fieldOfLaw.text }}
+            </li>
+          </ul>
+        </CellItem>
+      </TableRow>
+
+      <TableRow>
+        <CellItem
+          v-if="
+            documentUnit.contentRelatedIndexing.norms &&
+            documentUnit.contentRelatedIndexing.norms?.length > 0
+          "
+        >
+          Normen
+        </CellItem>
+        <CellItem>
+          <ul>
+            <li
+              v-for="(norm, index) in documentUnit.contentRelatedIndexing.norms"
+              :key="index"
+            >
+              <ul>
+                <li v-for="(singleNorm, i) in norm.singleNorms" :key="i">
+                  {{ norm.renderDecision }} - {{ singleNorm.renderDecision }}
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </CellItem>
+      </TableRow>
+    </TableView>
 
     <TableView>
       <TableRow>
