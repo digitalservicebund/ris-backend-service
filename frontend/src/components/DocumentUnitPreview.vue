@@ -4,8 +4,8 @@ import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import TableRow from "@/components/TableRow.vue"
 import TableView from "@/components/TableView.vue"
 import TitleElement from "@/components/TitleElement.vue"
-import DocumentUnit from "@/domain/documentUnit"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
+import DocumentUnit from "@/domain/documentUnit"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
@@ -92,14 +92,33 @@ const props = defineProps<{
 
     <TableView>
       <TableRow>
-        <CellItem v-if="documentUnit.previousDecisions?.length > 0"
+        <CellItem
+          v-if="
+            documentUnit.previousDecisions &&
+            documentUnit.previousDecisions?.length > 0
+          "
           >Vorinstanz
         </CellItem>
         <CellItem
           v-for="(previousDecision, index) in documentUnit.previousDecisions"
           :key="index"
         >
-          {{ previousDecision.court?.type }}
+          {{ previousDecision.renderDecision }}
+        </CellItem>
+      </TableRow>
+      <TableRow>
+        <CellItem
+          v-if="
+            documentUnit.ensuingDecisions &&
+            documentUnit.ensuingDecisions?.length > 0
+          "
+          >Nachgehende Entscheidungen
+        </CellItem>
+        <CellItem
+          v-for="(ensuingDecision, index) in documentUnit.ensuingDecisions"
+          :key="index"
+        >
+          {{ ensuingDecision.renderDecision }}
         </CellItem>
       </TableRow>
     </TableView>
