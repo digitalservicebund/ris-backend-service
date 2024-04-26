@@ -123,9 +123,41 @@ const props = defineProps<{
       </TableRow>
     </TableView>
 
-    <TableView> </TableView>
+    <TableView></TableView>
 
-    <TableView> </TableView>
-    <TitleElement>{{ documentUnit }}</TitleElement>
+    <TableView>
+      <TableRow>
+        <CellItem>Entscheidungsname</CellItem>
+        <CellItem>{{ documentUnit.texts.decisionName }}</CellItem>
+      </TableRow>
+      <TableRow>
+        <CellItem>Titelzeile</CellItem>
+        <CellItem>{{ documentUnit.texts.headline }}</CellItem>
+      </TableRow>
+      <TableRow>
+        <CellItem>Leitsatz</CellItem>
+        <CellItem>{{ documentUnit.texts.guidingPrinciple }}</CellItem>
+      </TableRow>
+      <TableRow>
+        <CellItem>Orientierungssatz</CellItem>
+        <CellItem>{{ documentUnit.texts.headnote }}</CellItem>
+      </TableRow>
+      <TableRow>
+        <CellItem>Tenor</CellItem>
+        <CellItem>{{ documentUnit.texts.tenor }}</CellItem>
+      </TableRow>
+      <TableRow>
+        <CellItem>Gründe</CellItem>
+        <CellItem>{{ documentUnit.texts.reasons }}</CellItem>
+      </TableRow>
+      <TableRow>
+        <CellItem>Tatbestand</CellItem>
+        <CellItem>{{ documentUnit.texts.reasons }}</CellItem>
+      </TableRow>
+      <TableRow>
+        <CellItem>Entscheidungsgründe</CellItem>
+        <CellItem>{{ documentUnit.texts.caseFacts }}</CellItem>
+      </TableRow>
+    </TableView>
   </DocumentUnitWrapper>
 </template>
