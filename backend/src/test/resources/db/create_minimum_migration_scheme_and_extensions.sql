@@ -11,6 +11,8 @@ CREATE TABLE IF NOT EXISTS
   incremental_migration.region (
     id uuid NOT NULL,
     code character varying(255) COLLATE pg_catalog."default",
+    long_text text,
+    applicability bool not null default false,
     CONSTRAINT region_pkey PRIMARY KEY (id),
     CONSTRAINT uc_region_code UNIQUE (code)
   );
@@ -28,6 +30,32 @@ CREATE TABLE IF NOT EXISTS
     source character varying(1) COLLATE pg_catalog."default",
     CONSTRAINT norm_abbreviation_pkey PRIMARY KEY (id),
     CONSTRAINT uc_norm_abbreviation_document_id UNIQUE (document_id)
+  );
+
+CREATE TABLE
+  incremental_migration.legal_force (
+    id uuid NOT NULL,
+    legal_force_type_id uuid NOT NULL,
+    norm_abbreviation_id uuid,
+    norm_abbreviation_raw_value character varying(255) NOT NULL,
+    single_norm character varying(255),
+    date_of_version date,
+    date_of_relevance character varying(4),
+    region_id uuid NOT NULL,
+    documentation_unit_id uuid NOT NULL,
+    norm_reference_id uuid,
+    rank integer DEFAULT '-1'::integer NOT NULL
+  );
+
+--
+-- Name: legal_force_type; Type: TABLE; Schema: incremental_migration; Owner: -
+--
+CREATE TABLE
+  incremental_migration.legal_force_type (
+    id uuid NOT NULL,
+    abbreviation character varying(255) NOT NULL,
+    label character varying(255) NOT NULL,
+    juris_id integer NOT NULL
   );
 
 CREATE TABLE IF NOT EXISTS

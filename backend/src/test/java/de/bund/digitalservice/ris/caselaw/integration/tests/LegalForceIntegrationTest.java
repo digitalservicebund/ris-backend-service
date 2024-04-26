@@ -4,6 +4,7 @@ import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDefaultDocOffice
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
 import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
@@ -17,32 +18,33 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitSearchRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalForceTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseNormAbbreviationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseNormReferenceRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalForceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalForceTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
 import de.bund.digitalservice.ris.caselaw.config.FeatureToggleConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
-import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
-import de.bund.digitalservice.ris.caselaw.domain.CoreData;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
-import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
-import java.util.ArrayList;
+import jakarta.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +53,7 @@ import org.springframework.security.oauth2.client.registration.ReactiveClientReg
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import reactor.core.publisher.Mono;
@@ -73,7 +76,11 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
     },
     controllers = {DocumentUnitController.class},
     timeout = "PT2M")
-class SaveNormIntegrationTest {
+@Sql(scripts = {"classpath:legal_force_init.sql"})
+@Sql(
+    scripts = {"classpath:legal_force_cleanup.sql"},
+    executionPhase = AFTER_TEST_METHOD)
+class LegalForceIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
       new PostgreSQLContainer<>("postgres:14")
@@ -92,6 +99,8 @@ class SaveNormIntegrationTest {
   @Autowired private DatabaseDocumentationUnitRepository repository;
   @Autowired private DatabaseNormReferenceRepository normRepository;
   @Autowired private DatabaseNormAbbreviationRepository normAbbreviationRepository;
+  @Autowired private DatabaseLegalForceTypeRepository legalForceTypeRepository;
+  @Autowired private DatabaseRegionRepository regionRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
@@ -122,172 +131,70 @@ class SaveNormIntegrationTest {
                 }));
   }
 
-  @AfterEach
-  void cleanUp() {
-    normRepository.deleteAll();
-    repository.deleteAll();
-    normAbbreviationRepository.deleteAll();
-  }
-
-  // TODO: write a test for add a document extension with a wrong shortcut
-
   @Test
-  void testSaveNorm_withoutNorm() {
+  @Transactional
+  void testLegalForce_withNormReference_withoutLegalForce() {
     DocumentationUnitDTO dto =
         DocumentationUnitDTO.builder()
             .documentNumber("1234567890123")
             .documentationOffice(documentationOfficeDTO)
             .build();
-
-    repository.save(dto);
-
-    DocumentUnit documentUnitFromFrontend = generateDocumentationUnit(dto.getId());
-
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
-        .bodyValue(documentUnitFromFrontend)
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(DocumentUnit.class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().contentRelatedIndexing()).isNotNull();
-              assertThat(response.getResponseBody().contentRelatedIndexing().norms()).isEmpty();
-            });
-  }
-
-  @Test
-  void testSaveNorm_withOneNormAndNoChange() {
-    NormAbbreviationDTO normAbbreviation = addNormToDB(2352);
-    DocumentationUnitDTO savedDocumentationUnitDTO =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890124")
-                .documentationOffice(documentationOfficeDTO)
-                .normReferences(
-                    List.of(
-                        NormReferenceDTO.builder()
-                            .rank(1)
-                            .normAbbreviation(normAbbreviation)
-                            .build()))
-                .build());
-
-    DocumentUnit documentUnitFromFrontend =
-        generateDocumentationUnit(savedDocumentationUnitDTO.getId());
-
-    documentUnitFromFrontend
-        .contentRelatedIndexing()
-        .norms()
-        .add(
-            NormReference.builder()
-                .normAbbreviation(NormAbbreviation.builder().id(normAbbreviation.getId()).build())
-                .build());
-
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + savedDocumentationUnitDTO.getId())
-        .bodyValue(documentUnitFromFrontend)
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(DocumentUnit.class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().contentRelatedIndexing()).isNotNull();
-              assertThat(response.getResponseBody().contentRelatedIndexing().norms()).hasSize(1);
-              assertThat(
-                      response
-                          .getResponseBody()
-                          .contentRelatedIndexing()
-                          .norms()
-                          .get(0)
-                          .normAbbreviation()
-                          .id())
-                  .isEqualTo(normAbbreviation.getId());
-            });
-  }
-
-  /** Sorting by remove norm abbreviation of an existing norm reference */
-  @Test
-  void testSaveNorm_RISDEV2185() {
-    var dbNormAbbreviation1 = addNormToDB(1);
-    var dbNormAbbreviation2 = addNormToDB(2);
-
-    DocumentationUnitDTO dto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(documentationOfficeDTO)
-                .build());
-
-    DocumentUnit documentUnitFromFrontend = generateDocumentationUnit(dto.getId());
-
-    NormReference norm1 =
-        NormReference.builder()
-            .normAbbreviation(NormAbbreviation.builder().id(dbNormAbbreviation1.getId()).build())
-            .build();
-    NormReference norm2 =
-        NormReference.builder()
-            .normAbbreviation(NormAbbreviation.builder().id(dbNormAbbreviation2.getId()).build())
-            .build();
-    documentUnitFromFrontend.contentRelatedIndexing().norms().addAll(List.of(norm1, norm2));
-
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
-        .bodyValue(documentUnitFromFrontend)
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(DocumentUnit.class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().contentRelatedIndexing()).isNotNull();
-              assertThat(response.getResponseBody().contentRelatedIndexing().norms()).hasSize(2);
-              assertThat(
-                      response
-                          .getResponseBody()
-                          .contentRelatedIndexing()
-                          .norms()
-                          .get(0)
-                          .normAbbreviation()
-                          .id())
-                  .isEqualTo(dbNormAbbreviation1.getId());
-              assertThat(
-                      response
-                          .getResponseBody()
-                          .contentRelatedIndexing()
-                          .norms()
-                          .get(1)
-                          .normAbbreviation()
-                          .id())
-                  .isEqualTo(dbNormAbbreviation2.getId());
-            });
-  }
-
-  private DocumentUnit generateDocumentationUnit(UUID uuid) {
-    return DocumentUnit.builder()
-        .uuid(uuid)
-        .documentNumber("1234567890123")
-        .coreData(CoreData.builder().documentationOffice(docOffice).build())
-        .contentRelatedIndexing(ContentRelatedIndexing.builder().norms(new ArrayList<>()).build())
-        .build();
-  }
-
-  private NormAbbreviationDTO addNormToDB(int index) {
     NormAbbreviationDTO normAbbreviationDTO =
-        NormAbbreviationDTO.builder()
-            .abbreviation("norm abbreviation " + index)
-            .documentId((long) index)
+        normAbbreviationRepository
+            .findById(UUID.fromString("33333333-2222-3333-4444-555555555555"))
+            .get();
+    NormReferenceDTO normReferenceDTO =
+        NormReferenceDTO.builder()
+            .normAbbreviation(normAbbreviationDTO)
+            .singleNorm("single norm")
+            .dateOfRelevance("1990")
+            .dateOfVersion(LocalDate.of(2011, Month.APRIL, 7))
+            .rank(1)
             .build();
-    return normAbbreviationRepository.saveAndFlush(normAbbreviationDTO);
+    dto.getNormReferences().add(normReferenceDTO);
+    DocumentationUnitDTO savedDTO = repository.save(dto);
+
+    DocumentationUnitDTO result = repository.findById(savedDTO.getId()).get();
+
+    assertThat(result.getNormReferences()).hasSize(1);
+    assertThat(result.getNormReferences().get(0).getLegalForce()).isNull();
+  }
+
+  @Test
+  @Transactional
+  void testLegalForce_withNormReference_withLegalForce() {
+    DocumentationUnitDTO dto =
+        DocumentationUnitDTO.builder()
+            .documentNumber("1234567890123")
+            .documentationOffice(documentationOfficeDTO)
+            .build();
+    NormAbbreviationDTO normAbbreviationDTO =
+        normAbbreviationRepository
+            .findById(UUID.fromString("33333333-2222-3333-4444-555555555555"))
+            .get();
+    LegalForceTypeDTO legalForceTypeDTO =
+        legalForceTypeRepository
+            .findById(UUID.fromString("11111111-2222-3333-4444-555555555555"))
+            .get();
+    RegionDTO regionDTO =
+        regionRepository.findById(UUID.fromString("55555555-2222-3333-4444-555555555555")).get();
+    LegalForceDTO legalForceDTO =
+        LegalForceDTO.builder().legalForceType(legalForceTypeDTO).region(regionDTO).build();
+    NormReferenceDTO normReferenceDTO =
+        NormReferenceDTO.builder()
+            .normAbbreviation(normAbbreviationDTO)
+            .singleNorm("single norm")
+            .dateOfRelevance("1990")
+            .dateOfVersion(LocalDate.of(2011, Month.APRIL, 7))
+            .legalForce(legalForceDTO)
+            .rank(1)
+            .build();
+    dto.getNormReferences().add(normReferenceDTO);
+    DocumentationUnitDTO savedDTO = repository.save(dto);
+
+    DocumentationUnitDTO result = repository.findById(savedDTO.getId()).get();
+
+    assertThat(result.getNormReferences()).hasSize(1);
+    assertThat(result.getNormReferences().get(0).getLegalForce()).isNotNull();
   }
 }

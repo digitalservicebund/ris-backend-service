@@ -49,6 +49,11 @@ import org.jsoup.nodes.Document;
 public class DocumentationUnitTransformer {
   private DocumentationUnitTransformer() {}
 
+  public static DocumentationUnitDTO transformToDTO(
+      DocumentationUnitDTO currentDto, DocumentUnit updatedDomainObject) {
+    return transformToDTO(currentDto, updatedDomainObject, false);
+  }
+
   /**
    * Transforms a documentation unit object from its domain representation into a database object
    *
@@ -58,7 +63,7 @@ public class DocumentationUnitTransformer {
    *     updatedDomainObject
    */
   public static DocumentationUnitDTO transformToDTO(
-      DocumentationUnitDTO currentDto, DocumentUnit updatedDomainObject) {
+      DocumentationUnitDTO currentDto, DocumentUnit updatedDomainObject, boolean featureActive) {
 
     log.debug("transform database documentation unit '{}'", currentDto.getId());
 
@@ -107,7 +112,7 @@ public class DocumentationUnitTransformer {
       ContentRelatedIndexing contentRelatedIndexing = updatedDomainObject.contentRelatedIndexing();
 
       addActiveCitations(builder, contentRelatedIndexing);
-      addNormReferences(builder, contentRelatedIndexing);
+      addNormReferences(builder, contentRelatedIndexing, featureActive);
     }
 
     if (updatedDomainObject.texts() != null) {
@@ -149,7 +154,9 @@ public class DocumentationUnitTransformer {
   }
 
   private static void addNormReferences(
-      DocumentationUnitDTOBuilder builder, ContentRelatedIndexing contentRelatedIndexing) {
+      DocumentationUnitDTOBuilder builder,
+      ContentRelatedIndexing contentRelatedIndexing,
+      boolean featureActive) {
     if (contentRelatedIndexing.norms() == null) {
       return;
     }
@@ -161,7 +168,7 @@ public class DocumentationUnitTransformer {
         .forEach(
             norm -> {
               List<NormReferenceDTO> normReferenceDTOs =
-                  NormReferenceTransformer.transformToDTO(norm);
+                  NormReferenceTransformer.transformToDTO(norm, featureActive);
               normReferenceDTOs.forEach(
                   normReferenceDTO -> normReferenceDTO.setRank(i.getAndIncrement()));
               flattenNormReferenceDTOs.addAll(normReferenceDTOs);

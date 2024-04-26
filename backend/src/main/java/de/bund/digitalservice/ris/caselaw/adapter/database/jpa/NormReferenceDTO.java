@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -7,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import java.time.LocalDate;
@@ -48,6 +50,10 @@ public class NormReferenceDTO {
 
   @Column(name = "rank")
   private Integer rank;
+
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(referencedColumnName = "norm_reference_id", name = "id")
+  private LegalForceDTO legalForce;
 
   @Transient
   public boolean isSingleNormEmpty() {

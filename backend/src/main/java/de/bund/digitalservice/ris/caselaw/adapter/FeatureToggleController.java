@@ -20,6 +20,6 @@ public class FeatureToggleController {
   @GetMapping("/{toggleName}")
   @PreAuthorize("isAuthenticated()")
   public Mono<Boolean> isEnabled(@PathVariable String toggleName) {
-    return service.isEnabled(toggleName);
+    return Mono.just(service.isEnabled(toggleName));
   }
 }

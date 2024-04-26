@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
+import de.bund.digitalservice.ris.caselaw.domain.SingleNorm.SingleNormBuilder;
 
 public class SingleNormTransformer {
 
@@ -12,11 +13,13 @@ public class SingleNormTransformer {
       return null;
     }
 
-    return SingleNorm.builder()
-        .id(normReferenceDTO.getId())
-        .singleNorm(normReferenceDTO.getSingleNorm())
-        .dateOfRelevance(normReferenceDTO.getDateOfRelevance())
-        .dateOfVersion(normReferenceDTO.getDateOfVersion())
-        .build();
+    SingleNormBuilder builder =
+        SingleNorm.builder()
+            .id(normReferenceDTO.getId())
+            .singleNorm(normReferenceDTO.getSingleNorm())
+            .dateOfRelevance(normReferenceDTO.getDateOfRelevance())
+            .dateOfVersion(normReferenceDTO.getDateOfVersion());
+
+    return builder.build();
   }
 }

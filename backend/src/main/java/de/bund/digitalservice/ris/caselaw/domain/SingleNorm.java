@@ -8,4 +8,8 @@ import lombok.Builder;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record SingleNorm(
-    UUID id, String singleNorm, LocalDate dateOfVersion, String dateOfRelevance) {}
+    UUID id,
+    String singleNorm,
+    LocalDate dateOfVersion,
+    String dateOfRelevance,
+    LegalForce legalForce) {}

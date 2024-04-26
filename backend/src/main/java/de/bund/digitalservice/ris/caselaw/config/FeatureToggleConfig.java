@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.ConfigurableEnvironment;
-import reactor.core.publisher.Mono;
 
 @Configuration
 public class FeatureToggleConfig {
@@ -58,8 +57,8 @@ public class FeatureToggleConfig {
       }
 
       @Override
-      public Mono<Boolean> isEnabled(String toggleName) {
-        return Mono.just(true);
+      public boolean isEnabled(String toggleName) {
+        return true;
       }
     };
   }

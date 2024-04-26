@@ -4,4 +4,4 @@ import java.util.UUID;
 import lombok.Builder;
 
 @Builder
-public record Region(UUID id, String code, String longText, boolean applicability) {}
+public record LegalForceType(UUID id, String abbreviation, String label) {}

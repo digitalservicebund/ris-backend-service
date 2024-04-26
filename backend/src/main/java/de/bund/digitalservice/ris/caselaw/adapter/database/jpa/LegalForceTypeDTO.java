@@ -6,28 +6,38 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
-@Table(name = "region", schema = "incremental_migration")
-public class RegionDTO {
-
+@Table(name = "legal_force_type", schema = "incremental_migration")
+public class LegalForceTypeDTO {
   @Id @GeneratedValue private UUID id;
 
-  @Column @NotBlank private String code;
+  @Column
+  @Size(max = 255)
+  @NotBlank
+  private String abbreviation;
 
-  @Column(name = "long_text")
-  private String longText;
+  @Column
+  @Size(max = 255)
+  @NotBlank
+  private String label;
 
-  @Column private @Builder.Default boolean applicability = false;
+  @Column(name = "juris_id")
+  @ToString.Include
+  @NotNull
+  private Integer jurisId;
 }

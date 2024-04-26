@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO.NormReferenceDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import java.util.ArrayList;
@@ -25,7 +26,8 @@ public class NormReferenceTransformer {
         .build();
   }
 
-  public static List<NormReferenceDTO> transformToDTO(NormReference normReference) {
+  public static List<NormReferenceDTO> transformToDTO(
+      NormReference normReference, boolean featureActive) {
     if (normReference == null) {
       return Collections.emptyList();
     }
@@ -41,14 +43,21 @@ public class NormReferenceTransformer {
 
     return normReference.singleNorms().stream()
         .map(
-            singleNorm ->
-                NormReferenceDTO.builder()
-                    .id(singleNorm.id())
-                    .normAbbreviation(normAbbreviationDTO)
-                    .singleNorm(singleNorm.singleNorm())
-                    .dateOfVersion(singleNorm.dateOfVersion())
-                    .dateOfRelevance(singleNorm.dateOfRelevance())
-                    .build())
+            singleNorm -> {
+              NormReferenceDTOBuilder builder =
+                  NormReferenceDTO.builder()
+                      .id(singleNorm.id())
+                      .normAbbreviation(normAbbreviationDTO)
+                      .singleNorm(singleNorm.singleNorm())
+                      .dateOfVersion(singleNorm.dateOfVersion())
+                      .dateOfRelevance(singleNorm.dateOfRelevance());
+
+              if (featureActive) {
+                builder.legalForce(LegalForceTransformer.transformDomain(singleNorm.legalForce()));
+              }
+
+              return builder.build();
+            })
         .toList();
   }
 }

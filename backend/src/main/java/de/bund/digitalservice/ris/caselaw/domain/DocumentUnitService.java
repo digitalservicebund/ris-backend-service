@@ -32,6 +32,7 @@ public class DocumentUnitService {
   private final DocumentUnitStatusService documentUnitStatusService;
   private final AttachmentService attachmentService;
   private final DocumentNumberRecyclingService documentNumberRecyclingService;
+  private final FeatureToggleService featureService;
   private final Validator validator;
 
   @Value("${otc.obs.bucket-name}")
@@ -48,7 +49,8 @@ public class DocumentUnitService {
       PublicationReportRepository publicationReportRepository,
       DocumentNumberRecyclingService documentNumberRecyclingService,
       Validator validator,
-      AttachmentService attachmentService) {
+      AttachmentService attachmentService,
+      FeatureToggleService featureService) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
@@ -58,6 +60,7 @@ public class DocumentUnitService {
     this.documentNumberRecyclingService = documentNumberRecyclingService;
     this.validator = validator;
     this.attachmentService = attachmentService;
+    this.featureService = featureService;
   }
 
   public Mono<DocumentUnit> generateNewDocumentUnit(DocumentationOffice documentationOffice) {
@@ -173,7 +176,7 @@ public class DocumentUnitService {
     repository.saveFieldsOfLaw(documentUnit);
     repository.saveProcedures(documentUnit);
 
-    repository.save(documentUnit);
+    repository.save(documentUnit, featureService.isEnabled("neuris.legal-force"));
 
     try {
       return Mono.just(

@@ -520,6 +520,7 @@ CREATE TABLE
     date_of_relevance character varying(4),
     region_id uuid NOT NULL,
     documentation_unit_id uuid NOT NULL,
+    norm_reference_id uuid,
     rank integer DEFAULT '-1'::integer NOT NULL
   );
 
@@ -658,7 +659,12 @@ CREATE TABLE
 -- Name: region; Type: TABLE; Schema: incremental_migration; Owner: -
 --
 CREATE TABLE
-  incremental_migration.region (id uuid NOT NULL, code character varying(255));
+  incremental_migration.region (
+    id uuid NOT NULL,
+    code character varying(255),
+    long_text text,
+    applicability bool not null default false
+  );
 
 --
 -- Name: norm_abbreviation_search_migration; Type: MATERIALIZED VIEW; Schema: incremental_migration; Owner: -

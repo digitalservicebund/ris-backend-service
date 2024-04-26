@@ -6,9 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface DatabaseRegionRepository extends JpaRepository<RegionDTO, UUID> {
-  List<RegionDTO> findAllByCodeStartsWithOrLongTextStartsWith(
+public interface DatabaseLegalForceTypeRepository extends JpaRepository<LegalForceTypeDTO, UUID> {
+  List<LegalForceTypeDTO> findAllByAbbreviationStartsWithOrLabelStartsWith(
       String searchString1, String searchString2);
 
-  List<RegionDTO> findAllByOrderByCode();
+  List<LegalForceTypeDTO> findAllByOrderByAbbreviation();
 }

@@ -32,6 +32,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
+import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -92,6 +93,7 @@ class DeviatingObjectIntegrationTest {
   @MockBean private UserService userService;
   @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
   @MockBean private AttachmentService attachmentService;
+  @MockBean private FeatureToggleService featureService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
 

@@ -43,7 +43,7 @@ public interface DocumentUnitRepository {
    *
    * @param documentUnit the documentation unit to save
    */
-  void save(DocumentUnit documentUnit);
+  void save(DocumentUnit documentUnit, boolean featureActive);
 
   /**
    * Save the keywords of a documentation unit

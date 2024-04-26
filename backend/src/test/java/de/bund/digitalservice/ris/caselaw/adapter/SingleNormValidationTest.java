@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.mockito.Mockito.when;
 
+import de.bund.digitalservice.ris.caselaw.config.FeatureToggleConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
@@ -31,7 +32,12 @@ import reactor.test.StepVerifier;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @ExtendWith(SpringExtension.class)
-@Import({DocumentUnitService.class, SingleNormValidator.class, LocalValidatorFactoryBean.class})
+@Import({
+  DocumentUnitService.class,
+  SingleNormValidator.class,
+  LocalValidatorFactoryBean.class,
+  FeatureToggleConfig.class
+})
 class SingleNormValidationTest {
 
   @Autowired private DocumentUnitService service;

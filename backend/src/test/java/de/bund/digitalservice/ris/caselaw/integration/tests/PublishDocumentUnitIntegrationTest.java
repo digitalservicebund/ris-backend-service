@@ -32,6 +32,7 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecordType;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
@@ -112,6 +113,7 @@ class PublishDocumentUnitIntegrationTest {
   @MockBean private HttpMailSender mailSender;
   @MockBean DocxConverterService docxConverterService;
   @MockBean AttachmentService attachmentService;
+  @MockBean private FeatureToggleService featureService;
 
   private DocumentationOfficeDTO docOffice;
 
