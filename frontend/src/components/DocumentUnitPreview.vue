@@ -133,16 +133,14 @@ const props = defineProps<{
       </TableRow>
     </TableView>
 
-    <TableView>
+    <TableView
+      v-if="
+        documentUnit.contentRelatedIndexing.keywords &&
+        documentUnit.contentRelatedIndexing.keywords?.length > 0
+      "
+    >
       <TableRow>
-        <CellItem
-          v-if="
-            documentUnit.contentRelatedIndexing.keywords &&
-            documentUnit.contentRelatedIndexing.keywords?.length > 0
-          "
-        >
-          Schlagwörter
-        </CellItem>
+        <CellItem> Schlagwörter </CellItem>
         <CellItem>
           <ul>
             <li
@@ -155,15 +153,13 @@ const props = defineProps<{
           </ul>
         </CellItem>
       </TableRow>
-      <TableRow>
-        <CellItem
-          v-if="
-            documentUnit.contentRelatedIndexing.fieldsOfLaw &&
-            documentUnit.contentRelatedIndexing.fieldsOfLaw?.length > 0
-          "
-        >
-          Sachgebiete
-        </CellItem>
+      <TableRow
+        v-if="
+          documentUnit.contentRelatedIndexing.fieldsOfLaw &&
+          documentUnit.contentRelatedIndexing.fieldsOfLaw?.length > 0
+        "
+      >
+        <CellItem> Sachgebiete </CellItem>
         <CellItem>
           <ul>
             <li
@@ -177,15 +173,13 @@ const props = defineProps<{
         </CellItem>
       </TableRow>
 
-      <TableRow>
-        <CellItem
-          v-if="
-            documentUnit.contentRelatedIndexing.norms &&
-            documentUnit.contentRelatedIndexing.norms?.length > 0
-          "
-        >
-          Normen
-        </CellItem>
+      <TableRow
+        v-if="
+          documentUnit.contentRelatedIndexing.norms &&
+          documentUnit.contentRelatedIndexing.norms?.length > 0
+        "
+      >
+        <CellItem> Normen </CellItem>
         <CellItem>
           <ul>
             <li
