@@ -31,6 +31,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicati
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
+import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
@@ -77,6 +78,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       PostgresDocumentationUnitRepositoryImpl.class,
       PostgresPublicationReportRepositoryImpl.class,
       PostgresJPAConfig.class,
+      FlywayConfig.class,
       SecurityConfig.class,
       AuthService.class,
       TestConfig.class,
@@ -86,8 +88,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 class PreviousDecisionIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
-      new PostgreSQLContainer<>("postgres:14")
-          .withInitScript("db/create_migration_scheme_and_extensions.sql");
+      new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
 
   private DocumentCategoryDTO category;
   private CourtDTO testCourt;

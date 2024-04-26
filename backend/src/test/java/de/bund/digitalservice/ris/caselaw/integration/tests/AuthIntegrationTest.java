@@ -7,6 +7,7 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthController;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
+import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
@@ -23,6 +24,7 @@ import org.testcontainers.junit.jupiter.Container;
 @RISIntegrationTest(
     imports = {
       PostgresJPAConfig.class,
+      FlywayConfig.class,
       KeycloakUserService.class,
       SecurityConfig.class,
       TestConfig.class,
@@ -32,8 +34,9 @@ import org.testcontainers.junit.jupiter.Container;
 class AuthIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
-      new PostgreSQLContainer<>("postgres:14")
-          .withInitScript("db/create_migration_scheme_and_extensions.sql");
+      new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
+
+  ;
 
   @DynamicPropertySource
   static void registerDynamicProperties(DynamicPropertyRegistry registry) {

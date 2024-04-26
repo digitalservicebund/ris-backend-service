@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.AliasFor;
+import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Target(ElementType.TYPE)
@@ -20,6 +21,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers(disabledWithoutDocker = true)
 @AutoConfigureDataJpa
 @AutoConfigureWebTestClient(timeout = "PT10S")
+@Sql(scripts = {"classpath:doc_office_init.sql"})
 public @interface RISIntegrationTest {
   @AliasFor(annotation = Import.class, attribute = "value")
   Class<?>[] imports();

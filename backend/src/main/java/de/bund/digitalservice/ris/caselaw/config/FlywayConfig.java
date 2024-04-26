@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.flyway.FlywayMigrationInitializer;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class FlywayConfig {
@@ -40,6 +41,12 @@ public class FlywayConfig {
         .baselineVersion("0.0")
         .locations(locationsPath)
         .load();
+  }
+
+  @Bean
+  @Primary
+  public FlywayMigrationStrategy flywayMigrationStrategy() {
+    return new MultiSchemaFlywayMigrationStrategy();
   }
 
   @Bean
