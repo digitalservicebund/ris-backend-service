@@ -159,7 +159,7 @@ function toggleDeleteModal() {
     :show-navigation-panel="props.showNavigationPanel"
   >
     <template #default="{ classes }">
-      <FlexContainer class="min-h-[74vh] w-full">
+      <FlexContainer class="h-full w-full">
         <PopupModal
           v-if="
             showDeleteModal &&

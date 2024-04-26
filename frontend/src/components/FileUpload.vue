@@ -74,7 +74,7 @@ function onFileSelect(event: Event) {
       <div class="ds-heading-03-reg mt-[0.5rem]">Upload läuft</div>
       <div>{{ status.file ? status.file.name : "" }}</div>
     </span>
-    <span v-else class="flex flex-col items-center">
+    <span v-else class="flex flex-col items-center p-24">
       <span
         class="w-icon rounded-full border-1 border-solid bg-blue-200 p-12 text-32 text-blue-800"
       >
