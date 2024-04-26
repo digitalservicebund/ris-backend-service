@@ -169,7 +169,7 @@ onMounted(async () => {
         <IconClear />
       </button>
     </div>
-    <div class="grid grid-flow-col gap-24">
+    <div class="flex flex-row justify-between gap-24">
       <InputField
         id="singleNorm"
         v-slot="slotProps"
