@@ -17,6 +17,9 @@ import { TextStyle } from "@tiptap/extension-text-style"
 import { Underline } from "@tiptap/extension-underline"
 import { EditorContent, Editor } from "@tiptap/vue-3"
 import { computed, watch, ref, onMounted } from "vue"
+import TextEditorButton, {
+  EditorButton,
+} from "@/components/input/TextEditorButton.vue"
 import {
   BorderNumber,
   BorderNumberContent,
@@ -31,9 +34,6 @@ import { CustomOrderedList } from "@/editor/orderedList"
 import { CustomParagraph } from "@/editor/paragraph"
 import { CustomSuperscript, CustomSubscript } from "@/editor/scriptText"
 import { TableStyle } from "@/editor/tableStyle"
-import TextEditorButton, {
-  EditorButton,
-} from "@/components/input/TextEditorButton.vue"
 import { TextAreaInputAttributes } from "@/components/input/types"
 import { useCollapsingMenuBar } from "@/composables/useCollapsingMenuBar"
 import { BorderNumberLink } from "@/editor/borderNumberLink"
