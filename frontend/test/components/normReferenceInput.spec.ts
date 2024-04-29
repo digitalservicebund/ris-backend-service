@@ -431,4 +431,28 @@ describe("NormReferenceEntry", () => {
     expect(emitted("cancelEdit")).toBeTruthy()
     expect(emitted("removeEntry")).toBeTruthy()
   })
+
+  it("shows Gesetzeskraft checkbox, toggles comboboxes", async () => {
+    //Todo: only show checkbox, when court is superior court
+    const { user } = renderComponent()
+    const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
+    await user.type(abbreviationField, "1000")
+    const dropdownItems = screen.getAllByLabelText(
+      "dropdown-option",
+    ) as HTMLElement[]
+    expect(dropdownItems[0]).toHaveTextContent("1000g-BefV")
+    await user.click(dropdownItems[0])
+
+    const legalForceField = screen.getByLabelText("Mit Gesetzeskraft")
+    expect(legalForceField).toBeVisible()
+    expect(legalForceField).not.toBeChecked()
+    expect(screen.queryByLabelText("Gesetzeskraft Typ")).not.toBeInTheDocument()
+    expect(
+      screen.queryByLabelText("Gesetzeskraft Geltungsbereich"),
+    ).not.toBeInTheDocument()
+    await user.click(legalForceField)
+    expect(legalForceField).toBeChecked()
+    expect(screen.getByLabelText("Gesetzeskraft Typ")).toBeVisible()
+    expect(screen.getByLabelText("Gesetzeskraft Geltungsbereich")).toBeVisible()
+  })
 })
