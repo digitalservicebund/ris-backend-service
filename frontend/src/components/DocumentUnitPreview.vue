@@ -68,6 +68,7 @@ defineProps<{
           documentUnit.texts.tenor
         "
         :texts="documentUnit.texts"
+        :valid-border-numbers="documentUnit.borderNumbers"
       />
     </div>
   </DocumentUnitWrapper>
