@@ -15,8 +15,8 @@ enum Endpoint {
   fieldOfLawSearchByIdentifier = "fieldsoflaw/search-by-identifier",
   risAbbreviations = `normabbreviation/search?pg=0&sz=30`,
   procedures = `procedure`,
-  legalForceRegions = `legal-force-regions`,
-  legalForceTypes = `legal-force-types`,
+  legalForceRegions = `region/applicabile`,
+  legalForceTypes = `legalforcetype`,
 }
 
 function formatDropdownItems(
@@ -70,22 +70,18 @@ function formatDropdownItems(
       )
     }
     case Endpoint.legalForceTypes: {
-      return (responseData as unknown as Page<LegalForceType>).content.map(
-        (item) => ({
-          label: item.label,
-          value: item,
-          additionalInformation: item.abbreviation,
-        }),
-      )
+      return (responseData as LegalForceType[]).map((item) => ({
+        label: item.abbreviation,
+        value: item,
+        additionalInformation: item.label,
+      }))
     }
     case Endpoint.legalForceRegions: {
-      return (responseData as unknown as Page<LegalForceRegion>).content.map(
-        (item) => ({
-          label: item.label,
-          value: item,
-          additionalInformation: item.code,
-        }),
-      )
+      return (responseData as LegalForceRegion[]).map((item) => ({
+        label: item.label,
+        value: item,
+        additionalInformation: item.code,
+      }))
     }
   }
 }

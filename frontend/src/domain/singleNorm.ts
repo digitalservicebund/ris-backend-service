@@ -78,7 +78,7 @@ export type LegalForce = {
 
 export type LegalForceType = {
   uuid?: string
-  abbreviation?: string
+  abbreviation: string
   label: string
 }
 
