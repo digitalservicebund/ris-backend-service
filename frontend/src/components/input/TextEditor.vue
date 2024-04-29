@@ -55,6 +55,7 @@ import IconParagraph from "~icons/material-symbols/format-paragraph"
 interface Props {
   value?: string
   editable?: boolean
+  preview?: boolean
   ariaLabel?: string
   fieldSize?: TextAreaInputAttributes["fieldSize"]
 }
@@ -62,6 +63,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   value: undefined,
   editable: false,
+  preview: false,
   ariaLabel: "Editor Feld",
   fieldSize: "medium",
 })
@@ -76,8 +78,9 @@ const editor = new Editor({
   editorProps: {
     attributes: {
       tabindex: "0",
-      style:
-        "height: 100%; overflow-y: auto; padding: 0.75rem 1rem; outline: 0",
+      style: props.preview
+        ? "height: 100%; overflow-y: auto; outline: 0"
+        : "height: 100%; overflow-y: auto; padding: 0.75rem 1rem; outline: 0",
     },
   },
   content: props.value,

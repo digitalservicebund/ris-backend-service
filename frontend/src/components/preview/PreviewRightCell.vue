@@ -1,7 +1,5 @@
 <template>
-  <td
-    class="table-cell w-3/4 border-b-1 border-blue-300 px-16 py-12 text-black"
-  >
+  <td class="ds-body-01-reg table-cell w-5/6 px-16 py-4 text-black">
     <slot></slot>
   </td>
 </template>
