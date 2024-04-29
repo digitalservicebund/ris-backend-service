@@ -169,7 +169,12 @@ onMounted(async () => {
         <IconClear />
       </button>
     </div>
-    <div class="grid grid-flow-col gap-24">
+    <div
+      class="gap-24"
+      :class="
+        featureToggle ? 'grid grid-cols-3' : 'flex flex-row justify-between'
+      "
+    >
       <InputField
         id="singleNorm"
         v-slot="slotProps"
@@ -235,8 +240,8 @@ onMounted(async () => {
         <IconClear />
       </button>
     </div>
-    <div v-if="featureToggle && withLegalForce" class="flex flex-row gap-24">
-      <div class="w-1/3">
+    <div v-if="featureToggle && withLegalForce" class="grid grid-cols-3 gap-24">
+      <div>
         <InputField id="legalForceType" label="Typ der Ges.-Kraft *">
           <ComboboxInput
             id="forceOfLawType"
@@ -246,7 +251,7 @@ onMounted(async () => {
           ></ComboboxInput>
         </InputField>
       </div>
-      <div class="w-2/3">
+      <div class="col-span-2">
         <InputField id="legalForceRegion" label="Geltungsbereich *">
           <ComboboxInput
             id="forceOfLawRegion"
