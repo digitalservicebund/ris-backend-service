@@ -5,6 +5,7 @@ import {
   fillPreviousDecisionInputs,
   navigateToCategories,
   publishDocumentationUnit,
+  waitForSaving,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
@@ -226,74 +227,84 @@ test("clicking on link of referenced documentation unit added by search opens ne
   )
   await navigateToCategories(page, documentNumber)
 
-  const activeCitationContainer = page.getByLabel("Aktivzitierung")
-  const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
-  const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
-  const containers = [
-    activeCitationContainer,
-    previousDecisionContainer,
-    ensuingDecisionContainer,
-  ]
+  await waitForSaving(
+    async () => {
+      const activeCitationContainer = page.getByLabel("Aktivzitierung")
+      const previousDecisionContainer = page.getByLabel(
+        "Vorgehende Entscheidung",
+      )
+      const ensuingDecisionContainer = page.getByLabel(
+        "Nachgehende Entscheidung",
+      )
+      const containers = [
+        activeCitationContainer,
+        previousDecisionContainer,
+        ensuingDecisionContainer,
+      ]
 
-  for (const container of containers) {
-    await test.step(
-      "for category " + (await container.first().getAttribute("aria-label")),
-      async () => {
-        const inputs = {
-          court: prefilledDocumentUnit.coreData.court?.label,
-          fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-          documentType: prefilledDocumentUnit.coreData.documentType?.label,
-          decisionDate: "31.12.2019",
-        }
+      for (const container of containers) {
+        await test.step(
+          "for category " +
+            (await container.first().getAttribute("aria-label")),
+          async () => {
+            const inputs = {
+              court: prefilledDocumentUnit.coreData.court?.label,
+              fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
+              documentType: prefilledDocumentUnit.coreData.documentType?.label,
+              decisionDate: "31.12.2019",
+            }
 
-        if (container === activeCitationContainer) {
-          await fillActiveCitationInputs(page, inputs)
-        }
-        if (container === previousDecisionContainer) {
-          await fillPreviousDecisionInputs(page, inputs)
-        }
-        if (container === ensuingDecisionContainer) {
-          await fillEnsuingDecisionInputs(page, inputs)
-        }
+            if (container === activeCitationContainer) {
+              await fillActiveCitationInputs(page, inputs)
+            }
+            if (container === previousDecisionContainer) {
+              await fillPreviousDecisionInputs(page, inputs)
+            }
+            if (container === ensuingDecisionContainer) {
+              await fillEnsuingDecisionInputs(page, inputs)
+            }
 
-        await container.getByLabel("Nach Entscheidung suchen").click()
+            await container.getByLabel("Nach Entscheidung suchen").click()
 
-        await expect(container.getByText("1 Ergebnis gefunden")).toBeVisible()
+            await expect(
+              container.getByText("1 Ergebnis gefunden"),
+            ).toBeVisible()
 
-        const summary = `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`
+            const summary = `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`
 
-        const result = container.getByText(summary)
-        await expect(result).toBeVisible()
-        await container.getByLabel("Treffer übernehmen").click()
+            const result = container.getByText(summary)
+            await expect(result).toBeVisible()
+            await container.getByLabel("Treffer übernehmen").click()
 
-        //check if summary has link
+            //check if summary has link
 
-        const referencedDocumentNumber = container.getByText(
-          `${prefilledDocumentUnit.documentNumber}`,
+            const referencedDocumentNumber = container.getByText(
+              `${prefilledDocumentUnit.documentNumber}`,
+            )
+            await expect(referencedDocumentNumber).toBeVisible()
+
+            // clicking the link opens new tab but not the edit mode
+            const newTabPromise = page.waitForEvent("popup")
+            await referencedDocumentNumber.click()
+
+            const newTab = await newTabPromise
+            await newTab.waitForLoadState()
+
+            expect(newTab.url()).toContain(
+              `${prefilledDocumentUnit.documentNumber}/preview`,
+            )
+
+            await newTab.close()
+
+            // Clean up: We need to unlink the document units in order to be allowed to delete them in the fixtures
+            await container.getByText("AG Aachen, 31.12.2019").first().click()
+            await expect(container.getByLabel("Eintrag löschen")).toBeVisible()
+            await container.getByLabel("Eintrag löschen").click()
+          },
         )
-        await expect(referencedDocumentNumber).toBeVisible()
-
-        // clicking the link opens new tab but not the edit mode
-        const newTabPromise = page.waitForEvent("popup")
-        await referencedDocumentNumber.click()
-
-        const newTab = await newTabPromise
-        await newTab.waitForLoadState()
-
-        expect(newTab.url()).toContain(
-          `${prefilledDocumentUnit.documentNumber}/preview`,
-        )
-
-        await newTab.close()
-
-        // Clean up: We need to unlink the document units in order to be allowed to delete them in the fixtures
-        await container.getByText("AG Aachen, 31.12.2019").first().click()
-        await expect(container.getByLabel("Eintrag löschen")).toBeVisible()
-        await container.getByLabel("Eintrag löschen").click()
-      },
-    )
-  }
-
-  await page.getByText("Speichern").click()
-  await page.waitForEvent("requestfinished")
+      }
+    },
+    page,
+    { clickSaveButton: true },
+  )
 })
