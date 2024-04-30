@@ -10,6 +10,7 @@ export default class SingleNorm {
     "singleNorm",
     "dateOfVersion",
     "dateOfRelevance",
+    "legalForce",
   ] as const
 
   constructor(data: Partial<SingleNorm> = {}) {

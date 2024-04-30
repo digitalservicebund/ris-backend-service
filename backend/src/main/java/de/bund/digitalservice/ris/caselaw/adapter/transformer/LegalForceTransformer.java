@@ -13,10 +13,16 @@ public class LegalForceTransformer {
       return null;
     }
 
-    return LegalForceDTO.builder()
-        .id(legalForce.id())
-        .region(RegionDTO.builder().id(legalForce.region().id()).build())
-        .legalForceType(LegalForceTypeDTO.builder().id(legalForce.type().id()).build())
-        .build();
+    LegalForceDTO.LegalForceDTOBuilder builder = LegalForceDTO.builder().id(legalForce.id());
+
+    if (legalForce.region() != null) {
+      builder.region(RegionDTO.builder().id(legalForce.region().id()).build());
+    }
+
+    if (legalForce.type() != null) {
+      builder.legalForceType(LegalForceTypeDTO.builder().id(legalForce.type().id()).build());
+    }
+
+    return builder.build();
   }
 }

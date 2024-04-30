@@ -8,7 +8,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
@@ -23,17 +22,16 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 @Entity
 @Table(name = "legal_force", schema = "incremental_migration")
 public class LegalForceDTO {
   @Id @GeneratedValue private UUID id;
 
-  @Column @NotNull private Integer rank;
+  @Column private Integer rank;
 
   @ManyToOne
   @JoinColumn(name = "legal_force_type_id")
-  @NotNull
   private LegalForceTypeDTO legalForceType;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -42,7 +40,6 @@ public class LegalForceDTO {
 
   @Column(name = "norm_abbreviation_raw_value")
   @Size(max = 255)
-  @NotBlank
   private String normAbbreviationRawValue;
 
   @Column(name = "single_norm")
@@ -58,7 +55,6 @@ public class LegalForceDTO {
 
   @ManyToOne
   @JoinColumn(name = "region_id", updatable = false)
-  @NotNull
   private RegionDTO region;
 
   @ManyToOne
