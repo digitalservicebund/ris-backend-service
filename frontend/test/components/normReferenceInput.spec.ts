@@ -4,6 +4,7 @@ import { ComboboxItem } from "@/components/input/types"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import NormReference from "@/domain/normReference"
+import { LegalForceRegion, LegalForceType } from "@/domain/singleNorm"
 import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
@@ -22,20 +23,46 @@ describe("NormReferenceEntry", () => {
   const normAbbreviation: NormAbbreviation = {
     abbreviation: "1000g-BefV",
   }
+  const legalForceType: LegalForceType = {
+    label: "legal force type",
+    abbreviation: "abc",
+  }
+  const region: LegalForceRegion = {
+    label: "region",
+    code: "abc",
+  }
   const dropdownAbbreviationItems: ComboboxItem[] = [
     {
       label: normAbbreviation.abbreviation,
       value: normAbbreviation,
     },
   ]
+  const dropdownLegalForceTypeItems: ComboboxItem[] = [
+    {
+      label: legalForceType.label,
+      value: legalForceType,
+    },
+  ]
+  const dropdownRegionItems: ComboboxItem[] = [
+    {
+      label: region.label,
+      value: region,
+    },
+  ]
+  vi.spyOn(featureToggleService, "isEnabled").mockImplementation(() =>
+    Promise.resolve({ status: 200, data: true }),
+  )
   vi.spyOn(comboboxItemService, "getRisAbbreviations").mockImplementation(() =>
     Promise.resolve({ status: 200, data: dropdownAbbreviationItems }),
   )
+  vi.spyOn(comboboxItemService, "getLegalForceTypes").mockImplementation(() =>
+    Promise.resolve({ status: 200, data: dropdownLegalForceTypeItems }),
+  )
+  vi.spyOn(comboboxItemService, "getLegalForceRegions").mockImplementation(() =>
+    Promise.resolve({ status: 200, data: dropdownRegionItems }),
+  )
   vi.spyOn(documentUnitService, "validateSingleNorm").mockImplementation(() =>
     Promise.resolve({ status: 200, data: "Ok" }),
-  )
-  vi.spyOn(featureToggleService, "isEnabled").mockImplementation(() =>
-    Promise.resolve({ status: 200, data: true }),
   )
   it("render empty norm input group on initial load", async () => {
     renderComponent()
@@ -432,7 +459,7 @@ describe("NormReferenceEntry", () => {
     expect(emitted("removeEntry")).toBeTruthy()
   })
 
-  it("shows Gesetzeskraft checkbox, toggles comboboxes", async () => {
+  it("Gesetzeskraft checkbox toggles comboboxes", async () => {
     //Todo: only show checkbox, when court is superior court
     const { user } = renderComponent()
     const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
@@ -454,5 +481,105 @@ describe("NormReferenceEntry", () => {
     expect(legalForceField).toBeChecked()
     expect(screen.getByLabelText("Gesetzeskraft Typ")).toBeVisible()
     expect(screen.getByLabelText("Gesetzeskraft Geltungsbereich")).toBeVisible()
+  })
+
+  it("updates legal force type", async () => {
+    const { user, emitted } = renderComponent()
+
+    // Todo: when norm abbreviation is passed as model value, the feature toggle promise seems too slow and is only visible after a few nextTicks()
+    // Pass modelValue to renderComponent when feature toggle is gone
+    const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
+    await user.type(abbreviationField, "1000")
+    const dropdownItems = screen.getAllByLabelText(
+      "dropdown-option",
+    ) as HTMLElement[]
+    expect(dropdownItems[0]).toHaveTextContent("1000g-BefV")
+    await user.click(dropdownItems[0])
+
+    await user.click(screen.getByLabelText("Mit Gesetzeskraft"))
+    const legalForceType = screen.getByLabelText("Gesetzeskraft Typ")
+    await user.click(legalForceType)
+    const dropdownItemslegalForceType = screen.getAllByLabelText(
+      "dropdown-option",
+    ) as HTMLElement[]
+    expect(dropdownItemslegalForceType[0]).toHaveTextContent("legal force type")
+    await user.click(dropdownItemslegalForceType[0])
+
+    const button = screen.getByLabelText("Norm speichern")
+    await user.click(button)
+    expect(emitted("update:modelValue")).toEqual([
+      [
+        {
+          normAbbreviation: {
+            abbreviation: "1000g-BefV",
+          },
+          singleNorms: [
+            {
+              dateOfVersion: undefined,
+              dateOfRelevance: undefined,
+              singleNorm: undefined,
+              legalForce: {
+                type: {
+                  abbreviation: "abc",
+                  label: "legal force type",
+                },
+              },
+            },
+          ],
+          normAbbreviationRawValue: undefined,
+          hasForeignSource: false,
+        },
+      ],
+    ])
+  })
+
+  it("updates legal force region", async () => {
+    const { user, emitted } = renderComponent()
+
+    // Todo: when norm abbreviation is passed as model value, the feature toggle promise seems too slow and is only visible after a few nextTicks()
+    // Pass modelValue to renderComponent when feature toggle is gone
+    const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
+    await user.type(abbreviationField, "1000")
+    const dropdownItems = screen.getAllByLabelText(
+      "dropdown-option",
+    ) as HTMLElement[]
+    expect(dropdownItems[0]).toHaveTextContent("1000g-BefV")
+    await user.click(dropdownItems[0])
+
+    await user.click(screen.getByLabelText("Mit Gesetzeskraft"))
+    const regionInput = screen.getByLabelText("Gesetzeskraft Geltungsbereich")
+    await user.click(regionInput)
+    const dropdownItemslegalRegionInput = screen.getAllByLabelText(
+      "dropdown-option",
+    ) as HTMLElement[]
+    expect(dropdownItemslegalRegionInput[0]).toHaveTextContent("region")
+    await user.click(dropdownItemslegalRegionInput[0])
+
+    const button = screen.getByLabelText("Norm speichern")
+    await user.click(button)
+    expect(emitted("update:modelValue")).toEqual([
+      [
+        {
+          normAbbreviation: {
+            abbreviation: "1000g-BefV",
+          },
+          singleNorms: [
+            {
+              dateOfVersion: undefined,
+              dateOfRelevance: undefined,
+              singleNorm: undefined,
+              legalForce: {
+                region: {
+                  code: "abc",
+                  label: "region",
+                },
+              },
+            },
+          ],
+          normAbbreviationRawValue: undefined,
+          hasForeignSource: false,
+        },
+      ],
+    ])
   })
 })
