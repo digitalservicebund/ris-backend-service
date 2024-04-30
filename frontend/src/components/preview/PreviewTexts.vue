@@ -1,45 +1,20 @@
 <script setup lang="ts">
-import { computed } from "vue"
 import TextEditor from "@/components/input/TextEditor.vue"
 import PreviewLeftCell from "@/components/preview/PreviewLeftCell.vue"
 import PreviewRightCell from "@/components/preview/PreviewRightCell.vue"
 import TableView from "@/components/TableView.vue"
+import { useValidBorderNumbers } from "@/composables/useValidBorderNumbers"
 import { Texts } from "@/domain/documentUnit"
-import { texts as textsFields } from "@/fields/caselaw"
 
 const props = defineProps<{
   texts: Texts
   validBorderNumbers: string[]
 }>()
 
-const validateBorderNumberLinks = (divElem: HTMLDivElement) => {
-  const linkTags = Array.from(
-    divElem.getElementsByTagName("border-number-link"),
-  )
-
-  linkTags.forEach((linkTag) => {
-    const borderNumber = linkTag.getAttribute("nr")
-    const hasBorderNumber = borderNumber
-      ? props.validBorderNumbers.includes(borderNumber)
-      : false
-    linkTag.setAttribute("valid", hasBorderNumber.toString())
-  })
-  return divElem
-}
-
-const data = computed(() =>
-  textsFields.map((item) => {
-    const divElem = document.createElement("div")
-    divElem.innerHTML = props.texts[item.name as keyof Texts] ?? ""
-    const validatedContent = validateBorderNumberLinks(divElem).innerHTML
-    return {
-      id: item.name as keyof Texts,
-      label: item.label,
-      aria: item.label,
-      value: validatedContent,
-    }
-  }),
-)
+const data = useValidBorderNumbers(
+  props.texts,
+  props.validBorderNumbers,
+).filter((it) => it.value)
 </script>
 
 <template>

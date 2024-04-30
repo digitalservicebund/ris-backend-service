@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import dayjs from "dayjs"
+import { computed } from "vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import PreviewContentRelatedIndexing from "@/components/preview/PreviewContentRelatedIndexing.vue"
 import PreviewCoreData from "@/components/preview/PreviewCoreData.vue"
@@ -7,11 +8,45 @@ import PreviewProceedingDecisions from "@/components/preview/PreviewProceedingDe
 import PreviewTexts from "@/components/preview/PreviewTexts.vue"
 import DocumentUnit from "@/domain/documentUnit"
 
-defineProps<{
+const props = defineProps<{
   documentUnit: DocumentUnit
   showAttachmentPanel?: boolean
   showNavigationPanel: boolean
 }>()
+
+const hasProceedingDecisions = computed(() => {
+  return (
+    (props.documentUnit.ensuingDecisions &&
+      props.documentUnit.ensuingDecisions.length > 0) ||
+    (props.documentUnit.previousDecisions &&
+      props.documentUnit.previousDecisions.length > 0)
+  )
+})
+
+const hasContentRelatedIndexing = computed(() => {
+  return (
+    (props.documentUnit.contentRelatedIndexing.keywords &&
+      props.documentUnit.contentRelatedIndexing.keywords?.length > 0) ||
+    (props.documentUnit.contentRelatedIndexing.activeCitations &&
+      props.documentUnit.contentRelatedIndexing.activeCitations.length > 0) ||
+    (props.documentUnit.contentRelatedIndexing.fieldsOfLaw &&
+      props.documentUnit.contentRelatedIndexing.fieldsOfLaw.length > 0) ||
+    (props.documentUnit.contentRelatedIndexing.norms &&
+      props.documentUnit.contentRelatedIndexing.norms.length > 0)
+  )
+})
+const hasTexts = computed(() => {
+  return (
+    props.documentUnit.texts.caseFacts ||
+    props.documentUnit.texts.decisionName ||
+    props.documentUnit.texts.decisionReasons ||
+    props.documentUnit.texts.guidingPrinciple ||
+    props.documentUnit.texts.headline ||
+    props.documentUnit.texts.headnote ||
+    props.documentUnit.texts.reasons ||
+    props.documentUnit.texts.tenor
+  )
+})
 </script>
 
 <template>
@@ -34,39 +69,16 @@ defineProps<{
       </div>
       <PreviewCoreData :core-data="documentUnit.coreData" />
       <PreviewProceedingDecisions
-        v-if="
-          (documentUnit.ensuingDecisions &&
-            documentUnit.ensuingDecisions.length > 0) ||
-          (documentUnit.previousDecisions &&
-            documentUnit.previousDecisions.length > 0)
-        "
+        v-if="hasProceedingDecisions"
         :ensuing-decisions="documentUnit.ensuingDecisions"
         :previous-decisions="documentUnit.previousDecisions"
       />
       <PreviewContentRelatedIndexing
-        v-if="
-          (documentUnit.contentRelatedIndexing.keywords &&
-            documentUnit.contentRelatedIndexing.keywords?.length > 0) ||
-          (documentUnit.contentRelatedIndexing.activeCitations &&
-            documentUnit.contentRelatedIndexing.activeCitations.length > 0) ||
-          (documentUnit.contentRelatedIndexing.fieldsOfLaw &&
-            documentUnit.contentRelatedIndexing.fieldsOfLaw.length > 0) ||
-          (documentUnit.contentRelatedIndexing.norms &&
-            documentUnit.contentRelatedIndexing.norms.length > 0)
-        "
+        v-if="hasContentRelatedIndexing"
         :content-related-indexing="documentUnit.contentRelatedIndexing"
       />
       <PreviewTexts
-        v-if="
-          documentUnit.texts.caseFacts ||
-          documentUnit.texts.decisionName ||
-          documentUnit.texts.decisionReasons ||
-          documentUnit.texts.guidingPrinciple ||
-          documentUnit.texts.headline ||
-          documentUnit.texts.headnote ||
-          documentUnit.texts.reasons ||
-          documentUnit.texts.tenor
-        "
+        v-if="hasTexts"
         :texts="documentUnit.texts"
         :valid-border-numbers="documentUnit.borderNumbers"
       />

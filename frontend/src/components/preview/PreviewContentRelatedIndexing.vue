@@ -1,23 +1,47 @@
 <script setup lang="ts">
+import { computed } from "vue"
 import PreviewLeftCell from "@/components/preview/PreviewLeftCell.vue"
 import PreviewRightCell from "@/components/preview/PreviewRightCell.vue"
 import TableView from "@/components/TableView.vue"
 import { ContentRelatedIndexing } from "@/domain/documentUnit"
 
-defineProps<{
+const props = defineProps<{
   contentRelatedIndexing: ContentRelatedIndexing
 }>()
+
+const hasKeywords = computed(() => {
+  return (
+    props.contentRelatedIndexing.keywords &&
+    props.contentRelatedIndexing.keywords?.length > 0
+  )
+})
+
+const hasFieldsOfLaw = computed(() => {
+  return (
+    props.contentRelatedIndexing.fieldsOfLaw &&
+    props.contentRelatedIndexing.fieldsOfLaw?.length > 0
+  )
+})
+
+const hasNorms = computed(() => {
+  return (
+    props.contentRelatedIndexing.norms &&
+    props.contentRelatedIndexing.norms?.length > 0
+  )
+})
+
+const hasActiveCitations = computed(() => {
+  return (
+    props.contentRelatedIndexing.activeCitations &&
+    props.contentRelatedIndexing.activeCitations?.length > 0
+  )
+})
 </script>
 
 <template>
   <div class="mx-16 my-16 h-2 w-5/6 bg-blue-600" />
   <TableView class="table w-full table-fixed">
-    <tr
-      v-if="
-        contentRelatedIndexing.keywords &&
-        contentRelatedIndexing.keywords?.length > 0
-      "
-    >
+    <tr v-if="hasKeywords">
       <PreviewLeftCell> Schlagwörter </PreviewLeftCell>
       <PreviewRightCell>
         <div
@@ -28,12 +52,7 @@ defineProps<{
         </div>
       </PreviewRightCell>
     </tr>
-    <tr
-      v-if="
-        contentRelatedIndexing.fieldsOfLaw &&
-        contentRelatedIndexing.fieldsOfLaw?.length > 0
-      "
-    >
+    <tr v-if="hasFieldsOfLaw">
       <PreviewLeftCell> Sachgebiete </PreviewLeftCell>
       <PreviewRightCell>
         <div
@@ -45,11 +64,7 @@ defineProps<{
       </PreviewRightCell>
     </tr>
 
-    <tr
-      v-if="
-        contentRelatedIndexing.norms && contentRelatedIndexing.norms?.length > 0
-      "
-    >
+    <tr v-if="hasNorms">
       <PreviewLeftCell> Normen </PreviewLeftCell>
       <PreviewRightCell>
         <div v-for="(norm, index) in contentRelatedIndexing.norms" :key="index">
@@ -60,12 +75,7 @@ defineProps<{
       </PreviewRightCell>
     </tr>
 
-    <tr
-      v-if="
-        contentRelatedIndexing.activeCitations &&
-        contentRelatedIndexing.activeCitations?.length > 0
-      "
-    >
+    <tr v-if="hasActiveCitations">
       <PreviewLeftCell> Aktivzitierung </PreviewLeftCell>
       <PreviewRightCell>
         <div

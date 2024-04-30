@@ -3,8 +3,8 @@ import { computed } from "vue"
 import TextEditor from "../components/input/TextEditor.vue"
 import TextAreaInput from "@/components/input/TextAreaInput.vue"
 import TextInput from "@/components/input/TextInput.vue"
+import { useValidBorderNumbers } from "@/composables/useValidBorderNumbers"
 import { Texts } from "@/domain/documentUnit"
-import { texts as textsFields } from "@/fields/caselaw"
 
 const props = defineProps<{ texts: Texts; validBorderNumbers: string[] }>()
 
@@ -12,37 +12,9 @@ const emit = defineEmits<{
   updateValue: [updatedValue: [keyof Texts, string]]
 }>()
 
-const validateBorderNumberLinks = (divElem: HTMLDivElement) => {
-  const linkTags = Array.from(
-    divElem.getElementsByTagName("border-number-link"),
-  )
-
-  linkTags.forEach((linkTag) => {
-    const borderNumber = linkTag.getAttribute("nr")
-    const hasBorderNumber = borderNumber
-      ? props.validBorderNumbers.includes(borderNumber)
-      : false
-    linkTag.setAttribute("valid", hasBorderNumber.toString())
-  })
-  return divElem
-}
-
-const data = computed(() =>
-  textsFields.map((item) => {
-    const divElem = document.createElement("div")
-    divElem.innerHTML = props.texts[item.name as keyof Texts] ?? ""
-    const validatedContent = validateBorderNumberLinks(divElem).innerHTML
-    return {
-      id: item.name as keyof Texts,
-      name: item.name,
-      label: item.label,
-      aria: item.label,
-      value: validatedContent,
-      fieldType: item.fieldType,
-      fieldSize: item.fieldSize,
-    }
-  }),
-)
+const data = computed(() => {
+  return useValidBorderNumbers(props.texts, props.validBorderNumbers)
+})
 </script>
 
 <template>
