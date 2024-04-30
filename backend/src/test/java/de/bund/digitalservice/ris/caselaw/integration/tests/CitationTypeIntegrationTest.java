@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.CitationTypeController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCitationTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresCitationTypeRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentTypeRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CitationTypeService;
@@ -31,6 +32,7 @@ import org.testcontainers.junit.jupiter.Container;
     imports = {
       CitationTypeService.class,
       PostgresJPAConfig.class,
+      FlywayConfig.class,
       PostgresCitationTypeRepositoryImpl.class,
       PostgresDocumentTypeRepositoryImpl.class,
       SecurityConfig.class,
@@ -45,8 +47,7 @@ import org.testcontainers.junit.jupiter.Container;
 class CitationTypeIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
-      new PostgreSQLContainer<>("postgres:14")
-          .withInitScript("db/create_migration_scheme_and_extensions.sql");
+      new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
 
   @DynamicPropertySource
   static void registerDynamicProperties(DynamicPropertyRegistry registry) {

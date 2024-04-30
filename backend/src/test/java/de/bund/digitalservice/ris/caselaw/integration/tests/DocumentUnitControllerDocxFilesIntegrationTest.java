@@ -30,6 +30,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumbe
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
@@ -83,6 +84,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
       PostgresPublicationReportRepositoryImpl.class,
       PostgresDocumentationUnitRepositoryImpl.class,
       PostgresJPAConfig.class,
+      FlywayConfig.class,
       SecurityConfig.class,
       AuthService.class,
       TestConfig.class,
@@ -95,8 +97,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 class DocumentUnitControllerDocxFilesIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
-      new PostgreSQLContainer<>("postgres:14")
-          .withInitScript("db/create_migration_scheme_and_extensions.sql");
+      new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
 
   @DynamicPropertySource
   static void registerDynamicProperties(DynamicPropertyRegistry registry) {

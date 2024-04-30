@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.flyway.FlywayMigrationInitializer;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class FlywayConfig {
@@ -33,7 +34,7 @@ public class FlywayConfig {
   @Bean
   public Flyway flyway() {
     final String url = "jdbc:postgresql://" + host + ":" + port + "/" + database;
-    String locationsPath = seed ? "classpath:db" : "classpath:db/migration";
+    String locationsPath = seed ? "classpath:db-scripts" : "classpath:db-scripts/migration";
     return Flyway.configure()
         .dataSource(url, user, password)
         .baselineOnMigrate(true)
@@ -43,11 +44,9 @@ public class FlywayConfig {
   }
 
   @Bean
-  public FlywayMigrationStrategy defaultMigrationStrategy() {
-    return flyway -> {
-      flyway.repair();
-      flyway.migrate();
-    };
+  @Primary
+  public FlywayMigrationStrategy flywayMigrationStrategy() {
+    return new MultiSchemaFlywayMigrationStrategy();
   }
 
   @Bean

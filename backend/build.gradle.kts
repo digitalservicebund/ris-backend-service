@@ -192,6 +192,10 @@ dependencies {
     // for local development:
 //     implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.8.38.jar"))
 
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.2")
+    // for local development:
+//    implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.1-SNAPSHOT.jar"))
+
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.17.0")
 
     implementation("io.micrometer:micrometer-registry-prometheus:1.12.5")
@@ -321,7 +325,7 @@ tasks {
             }
         }
     }
-    
+
     val delombok by registering(DelombokTask::class) {
         dependsOn(compileJava)
         mainClass.set("lombok.launch.Main")

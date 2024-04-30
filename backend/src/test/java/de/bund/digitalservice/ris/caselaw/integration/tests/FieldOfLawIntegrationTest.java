@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawController;
 import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresFieldOfLawRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
@@ -38,6 +39,7 @@ import org.testcontainers.junit.jupiter.Container;
     imports = {
       FieldOfLawService.class,
       PostgresJPAConfig.class,
+      FlywayConfig.class,
       PostgresFieldOfLawRepositoryImpl.class,
       SecurityConfig.class,
       AuthService.class,
@@ -53,8 +55,7 @@ import org.testcontainers.junit.jupiter.Container;
 class FieldOfLawIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
-      new PostgreSQLContainer<>("postgres:14")
-          .withInitScript("db/create_migration_scheme_and_extensions.sql");
+      new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
 
   @DynamicPropertySource
   static void registerDynamicProperties(DynamicPropertyRegistry registry) {
