@@ -72,7 +72,7 @@ export const caselawTest = test.extend<MyFixtures>({
       const deleteResponse = await request.delete(
         `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
       )
-      expect(deleteResponse.ok).toBeTruthy()
+      expect(deleteResponse.ok()).toBeTruthy()
     }).toPass()
   },
 
