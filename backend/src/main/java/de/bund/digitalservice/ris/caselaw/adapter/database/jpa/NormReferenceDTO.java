@@ -57,6 +57,9 @@ public class NormReferenceDTO {
 
   @Transient
   public boolean isSingleNormEmpty() {
-    return singleNorm == null && dateOfVersion == null && dateOfRelevance == null;
+    return singleNorm == null
+        && dateOfVersion == null
+        && dateOfRelevance == null
+        && legalForce == null;
   }
 }

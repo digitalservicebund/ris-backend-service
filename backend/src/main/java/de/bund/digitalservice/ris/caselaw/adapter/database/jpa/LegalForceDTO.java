@@ -8,7 +8,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -28,28 +27,26 @@ import lombok.Setter;
 public class LegalForceDTO {
   @Id @GeneratedValue private UUID id;
 
-  @Column private Integer rank;
-
   @ManyToOne
-  @JoinColumn(name = "legal_force_type_id")
+  @JoinColumn(name = "legal_force_type_id", updatable = false)
   private LegalForceTypeDTO legalForceType;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "norm_abbreviation_id")
+  @JoinColumn(name = "norm_abbreviation_id", updatable = false, insertable = false)
   private NormAbbreviationDTO normAbbreviation;
 
-  @Column(name = "norm_abbreviation_raw_value")
+  @Column(name = "norm_abbreviation_raw_value", updatable = false, insertable = false)
   @Size(max = 255)
   private String normAbbreviationRawValue;
 
-  @Column(name = "single_norm")
+  @Column(name = "single_norm", updatable = false, insertable = false)
   @Size(max = 255)
   private String singleNorm;
 
-  @Column(name = "date_of_version")
+  @Column(name = "date_of_version", updatable = false, insertable = false)
   private LocalDate dateOfVersion;
 
-  @Column(name = "date_of_relevance")
+  @Column(name = "date_of_relevance", updatable = false, insertable = false)
   @Size(max = 4)
   private String dateOfRelevance;
 
@@ -58,7 +55,6 @@ public class LegalForceDTO {
   private RegionDTO region;
 
   @ManyToOne
-  @JoinColumn(name = "documentation_unit_id")
-  @NotNull
+  @JoinColumn(name = "documentation_unit_id", updatable = false, insertable = false)
   private DocumentationUnitDTO documentationUnit;
 }
