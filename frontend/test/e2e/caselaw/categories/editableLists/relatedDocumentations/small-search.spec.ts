@@ -281,7 +281,7 @@ test("clicking on link of referenced documentation unit added by search opens ne
         await newTab.waitForLoadState()
 
         expect(newTab.url()).toContain(
-          `${prefilledDocumentUnit.documentNumber}`,
+          `${prefilledDocumentUnit.documentNumber}/preview`,
         )
 
         await newTab.close()

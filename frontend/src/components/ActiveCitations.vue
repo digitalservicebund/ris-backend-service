@@ -37,7 +37,7 @@ function renderLink(dataEntry: ActiveCitation) {
       target: "_blank",
       tabindex: 0,
       to: {
-        name: "caselaw-documentUnit-documentNumber-categories",
+        name: "caselaw-documentUnit-documentNumber-preview",
         params: { documentNumber: dataEntry.documentNumber },
       },
       onClick: (e: Event) => {

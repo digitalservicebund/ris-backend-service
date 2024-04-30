@@ -44,7 +44,7 @@ function renderLink(dataEntry: EnsuingDecision) {
         e.stopPropagation()
       },
       to: {
-        name: "caselaw-documentUnit-documentNumber-categories",
+        name: "caselaw-documentUnit-documentNumber-preview",
         params: { documentNumber: dataEntry.documentNumber },
       },
     },
