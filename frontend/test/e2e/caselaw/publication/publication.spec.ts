@@ -241,7 +241,7 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     )
 
     await page.locator("[aria-label='Gericht']").fill("aalen")
-    await page.locator("text=AG Aalen").click()
+    await page.getByText("AG Aalen").click()
 
     await expect(page.locator("[aria-label='Gericht']")).toHaveValue("AG Aalen")
 
@@ -264,10 +264,10 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
       .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
       .click()
     await expect(
-      page.locator("text=Es sind noch nicht alle Pflichtfelder befüllt."),
+      page.getByText("Es sind noch nicht alle Pflichtfelder befüllt."),
     ).toBeVisible()
 
-    await expect(page.locator("text=unveröffentlicht")).toBeVisible()
+    await expect(page.getByText("unveröffentlicht")).toBeVisible()
   })
 
   test("publication possible when all required fields filled", async ({
@@ -277,17 +277,17 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await navigateToPublication(page, prefilledDocumentUnit.documentNumber!)
 
     await expect(
-      page.locator("text=XML Vorschau der Veröffentlichung"),
+      page.getByText("XML Vorschau der Veröffentlichung"),
     ).toBeVisible()
 
-    await page.locator("text=XML Vorschau der Veröffentlichung").click()
+    await page.getByText("XML Vorschau der Veröffentlichung").click()
 
     await expect(
       page.locator("text='        <entsch-datum>2019-12-31</entsch-datum>'"),
     ).toBeVisible()
 
     await expect(
-      page.locator("text=Alle Pflichtfelder sind korrekt ausgefüllt"),
+      page.getByText("Alle Pflichtfelder sind korrekt ausgefüllt"),
     ).toBeVisible()
 
     await expect(
@@ -300,10 +300,10 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
       .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
       .click()
 
-    await expect(page.locator("text=Email wurde versendet")).toBeVisible()
+    await expect(page.getByText("Email wurde versendet")).toBeVisible()
 
-    await expect(page.locator("text=Xml Email Abgabe -")).toBeVisible()
+    await expect(page.getByText("Xml Email Abgabe -")).toBeVisible()
 
-    await expect(page.locator("text=In Veröffentlichung")).toBeVisible()
+    await expect(page.getByText("In Veröffentlichung")).toBeVisible()
   })
 })

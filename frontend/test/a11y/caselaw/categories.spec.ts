@@ -27,8 +27,8 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
       page.locator("[aria-label='dropdown-option'] >> nth=4052"),
     ).toBeVisible()
 
-    await expect(page.locator("text=AG Aachen")).toBeVisible()
-    await expect(page.locator("text=AG Aalen")).toBeVisible()
+    await expect(page.getByText("AG Aachen")).toBeVisible()
+    await expect(page.getByText("AG Aalen")).toBeVisible()
     await page.locator("[aria-label='Gericht']").fill("bayern")
     await expect(page.locator("[aria-label='Gericht']")).toHaveValue("bayern")
     await expect(

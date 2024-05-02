@@ -35,15 +35,13 @@ test.describe("core data", () => {
     await waitForSaving(
       async () => {
         await page.locator("[aria-label='ECLI']").type("one")
-        await expect(page.locator("text=one").first()).toBeVisible()
+        await expect(page.getByText("one").first()).toBeVisible()
 
-        await expect(page.locator("text=Abweichender ECLI>")).toBeHidden()
+        await expect(page.getByText("Abweichender ECLI>")).toBeHidden()
 
         await page.locator("[aria-label='Abweichender ECLI anzeigen']").click()
 
-        await expect(
-          page.locator("text=Abweichender ECLI").first(),
-        ).toBeVisible()
+        await expect(page.getByText("Abweichender ECLI").first()).toBeVisible()
 
         await page.locator("[aria-label='Abweichender ECLI']").type("two")
         await page.keyboard.press("Enter")
@@ -57,11 +55,11 @@ test.describe("core data", () => {
     await page.reload()
 
     await page.locator("[aria-label='Abweichender ECLI anzeigen']").click()
-    await expect(page.locator("text=two").first()).toBeVisible()
-    await expect(page.locator("text=three").first()).toBeVisible()
+    await expect(page.getByText("two").first()).toBeVisible()
+    await expect(page.getByText("three").first()).toBeVisible()
 
     await page.locator("[aria-label='Abweichender ECLI schließen']").click()
-    await expect(page.locator("text=Abweichender ECLI").first()).toBeHidden()
+    await expect(page.getByText("Abweichender ECLI").first()).toBeHidden()
   })
 
   test("nested fileNumbers input toggles child input and correctly saves and displays data", async ({
@@ -78,19 +76,17 @@ test.describe("core data", () => {
         await page.locator("[aria-label='Aktenzeichen']").type("two")
         await page.keyboard.press("Enter")
 
-        await expect(page.locator("text=one").first()).toBeVisible()
-        await expect(page.locator("text=two").first()).toBeVisible()
+        await expect(page.getByText("one").first()).toBeVisible()
+        await expect(page.getByText("two").first()).toBeVisible()
 
-        await expect(
-          page.locator("text=Abweichendes Aktenzeichen>"),
-        ).toBeHidden()
+        await expect(page.getByText("Abweichendes Aktenzeichen>")).toBeHidden()
 
         await page
           .locator("[aria-label='Abweichendes Aktenzeichen anzeigen']")
           .click()
 
         await expect(
-          page.locator("text=Abweichendes Aktenzeichen").first(),
+          page.getByText("Abweichendes Aktenzeichen").first(),
         ).toBeVisible()
 
         await page
@@ -107,12 +103,12 @@ test.describe("core data", () => {
     await page
       .locator("[aria-label='Abweichendes Aktenzeichen anzeigen']")
       .click()
-    await expect(page.locator("text=three").first()).toBeVisible()
+    await expect(page.getByText("three").first()).toBeVisible()
     await page
       .locator("[aria-label='Abweichendes Aktenzeichen schließen']")
       .click()
     await expect(
-      page.locator("text=Abweichendes Aktenzeichen").first(),
+      page.getByText("Abweichendes Aktenzeichen").first(),
     ).toBeHidden()
   })
 
@@ -133,16 +129,16 @@ test.describe("core data", () => {
         await page.locator("[aria-label='Aktenzeichen']").type("testthree")
         await page.keyboard.press("Enter")
 
-        await expect(page.locator("text=testone").first()).toBeVisible()
-        await expect(page.locator("text=testtwo").first()).toBeVisible()
-        await expect(page.locator("text=testthree").first()).toBeVisible()
+        await expect(page.getByText("testone").first()).toBeVisible()
+        await expect(page.getByText("testtwo").first()).toBeVisible()
+        await expect(page.getByText("testthree").first()).toBeVisible()
 
         // Navigate back and delete on enter
         await page.keyboard.press("ArrowLeft")
         await page.keyboard.press("ArrowLeft")
         await page.keyboard.press("Enter")
 
-        await expect(page.locator("text=testtwo").first()).toBeHidden()
+        await expect(page.getByText("testtwo").first()).toBeHidden()
 
         // Tab out and in
         await page.keyboard.press("Tab")
@@ -161,14 +157,14 @@ test.describe("core data", () => {
         //Navigate back and delete on backspace
         await page.keyboard.press("Enter")
 
-        await expect(page.locator("text=testone").first()).toBeHidden()
+        await expect(page.getByText("testone").first()).toBeHidden()
       },
       page,
       { clickSaveButton: true },
     )
 
     await page.reload()
-    await expect(page.locator("text=testthree").first()).toBeVisible()
+    await expect(page.getByText("testthree").first()).toBeVisible()
   })
 
   test("legal effect dropdown", async ({ page, documentNumber }) => {
@@ -188,7 +184,7 @@ test.describe("core data", () => {
 
     // on start: closed dropdown, no input text
     await expect(page.locator("[aria-label='Dokumenttyp']")).toHaveValue("")
-    await expect(page.locator("text=AnU - Anerkenntnisurteil")).toBeHidden()
+    await expect(page.getByText("AnU - Anerkenntnisurteil")).toBeHidden()
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
 
     // open dropdown
@@ -200,8 +196,8 @@ test.describe("core data", () => {
     await expect(
       page.locator("[aria-label='dropdown-option']"),
     ).not.toHaveCount(0)
-    await expect(page.locator("text=Anerkenntnisurteil")).toBeVisible()
-    await expect(page.locator("text=Anhängiges Verfahren")).toBeVisible()
+    await expect(page.getByText("Anerkenntnisurteil")).toBeVisible()
+    await expect(page.getByText("Anhängiges Verfahren")).toBeVisible()
 
     // type search string: 3 results for "zwischen"
     await page.locator("[aria-label='Dokumenttyp']").fill("zwischen")
@@ -306,7 +302,7 @@ test.describe("core data", () => {
     await waitForSaving(
       async () => {
         await page.locator("[aria-label='Gericht']").fill("BGH")
-        await page.locator("text=BGH").click()
+        await page.getByText("BGH").click()
         await expect(nswInput).toBeVisible()
         await nswInput.fill(CITATION)
         await page.keyboard.press("Enter")
@@ -332,7 +328,7 @@ test.describe("core data", () => {
     await expect(nswChipTag, "Citation was not deleted").toBeHidden()
 
     await page.locator("[aria-label='Gericht']").fill("AG Aalen")
-    await page.locator("text=AG Aalen").click()
+    await page.getByText("AG Aalen").click()
     await expect(
       nswInput,
       "NSW Fundstelle is visible for other courts",

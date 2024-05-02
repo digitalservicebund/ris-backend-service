@@ -64,9 +64,7 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
 
       // saving should be forbidden
       await expect(
-        pageWithBghUser.locator(
-          "text=Fehler beim Speichern: Keine Berechtigung",
-        ),
+        pageWithBghUser.getByText("Fehler beim Speichern: Keine Berechtigung"),
       ).toBeVisible()
 
       // expect the old date
@@ -83,7 +81,7 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
       )
       await uploadTestfile(pageWithBghUser, "sample.docx")
       await expect(
-        pageWithBghUser.locator("text=Leider ist ein Fehler aufgetreten."),
+        pageWithBghUser.getByText("Leider ist ein Fehler aufgetreten."),
       ).toBeVisible()
     })
 
@@ -96,7 +94,7 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
         .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
         .click()
       await expect(
-        pageWithBghUser.locator("text=Leider ist ein Fehler aufgetreten."),
+        pageWithBghUser.getByText("Leider ist ein Fehler aufgetreten."),
       ).toBeVisible()
     })
   })

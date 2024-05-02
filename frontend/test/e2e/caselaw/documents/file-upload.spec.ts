@@ -11,7 +11,7 @@ test.describe("upload an original document to a doc unit", () => {
 
   test("upload and delete docx file per file chooser", async ({ page }) => {
     await uploadTestfile(page, "sample.docx")
-    await expect(page.locator("text=Hochgeladen am")).toBeVisible()
+    await expect(page.getByText("Hochgeladen am")).toBeVisible()
     await expect(page.locator(`text=sample.docx`)).toBeVisible()
 
     const tableView = page.getByRole("cell", {
@@ -27,7 +27,7 @@ test.describe("upload an original document to a doc unit", () => {
     // delete file
     await page.getByLabel("Datei löschen").click()
     await page.getByLabel("Löschen", { exact: true }).click() // confirm
-    await expect(page.locator(`text=sample.docx`)).toBeHidden()
+    await expect(page.getByText("sample.docx")).toBeHidden()
 
     await page.reload()
     await expect(
@@ -128,7 +128,7 @@ test.describe("upload an original document to a doc unit", () => {
 
     await page.dispatchEvent(".upload-drop-area", "dragover", { dataTransfer })
     await expect(
-      page.locator("text=Ziehen Sie Ihre Dateien in diesem Bereich."),
+      page.getByText("Ziehen Sie Ihre Dateien in diesem Bereich."),
     ).toBeVisible()
   })
 

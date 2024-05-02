@@ -25,7 +25,7 @@ test.describe("authentication", () => {
     await page.context().clearCookies()
 
     await page.goto(`/caselaw/documentunit/${documentNumber}/categories`)
-    await expect(page.locator("text=Spruchkörper")).toBeHidden()
+    await expect(page.getByText("Spruchkörper")).toBeHidden()
     await expect(page.getByLabel("E-Mailadresse")).toBeVisible()
   })
 
@@ -44,7 +44,7 @@ test.describe("authentication", () => {
     await page.context().clearCookies()
 
     await page.goto(`/caselaw/documentunit/${documentNumber}/categories`)
-    await expect(page.locator("text=Spruchkörper")).toBeHidden()
+    await expect(page.getByText("Spruchkörper")).toBeHidden()
     await expect(page.getByLabel("E-Mailadresse")).toBeVisible()
   })
 
@@ -65,7 +65,7 @@ test.describe("authentication", () => {
     await page.goto(`/caselaw/documentunit/${documentNumber}/categories`)
 
     // expect to be on login page
-    await expect(page.locator("text=Spruchkörper")).toBeHidden()
+    await expect(page.getByText("Spruchkörper")).toBeHidden()
     await expect(page.getByLabel("E-Mailadresse")).toBeVisible()
 
     // login
