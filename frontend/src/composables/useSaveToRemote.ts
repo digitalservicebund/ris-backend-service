@@ -23,11 +23,13 @@ export function useSaveToRemote(
     if (saveIsInProgress.value) return
 
     saveIsInProgress.value = true
-    lastSaveError.value = undefined
 
     try {
       const response = await saveCallback()
-      lastSaveError.value = response.error
+
+      if (response.status != 304) {
+        lastSaveError.value = response.error
+      }
 
       if (lastSaveError.value == undefined) {
         lastSavedOn.value = new Date()

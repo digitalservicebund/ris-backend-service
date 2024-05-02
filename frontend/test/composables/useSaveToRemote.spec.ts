@@ -156,4 +156,24 @@ describe("useSaveToRemote", () => {
     await flushPromises()
     expect(callback).toHaveBeenCalledTimes(3)
   })
+
+  it("does not reset error if callback did not change anything", async () => {
+    const callback = vi.fn()
+    const { triggerSave, formattedLastSavedOn, lastSaveError } =
+      useSaveToRemote(callback)
+
+    callback
+      .mockResolvedValueOnce({ status: 400, error: { title: "error" } })
+      .mockResolvedValueOnce({ status: 304, data: undefined })
+
+    // first save attempt with error response
+    await triggerSave()
+    expect(formattedLastSavedOn.value).toBeUndefined()
+    expect(lastSaveError.value).toEqual({ title: "error" })
+
+    // second save attepmpt, nothing changed
+    await triggerSave()
+    expect(formattedLastSavedOn.value).toBeUndefined()
+    expect(lastSaveError.value).toEqual({ title: "error" })
+  })
 })

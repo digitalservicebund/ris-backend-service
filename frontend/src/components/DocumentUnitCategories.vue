@@ -55,27 +55,30 @@ function hasDataChange(): boolean {
 }
 
 async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
-  if (hasDataChange()) {
-    lastUpdatedDocumentUnit.value = JSON.parse(
-      JSON.stringify(updatedDocumentUnit.value),
-    )
-    const response = await documentUnitService.update(
-      lastUpdatedDocumentUnit.value,
-    )
+  if (!hasDataChange())
+    return {
+      status: 304,
+      data: undefined,
+    } as ServiceResponse<void>
 
-    if (response?.error?.validationErrors) {
-      validationErrors.value = response.error.validationErrors
-    } else {
-      validationErrors.value = []
-    }
+  lastUpdatedDocumentUnit.value = JSON.parse(
+    JSON.stringify(updatedDocumentUnit.value),
+  )
+  const response = await documentUnitService.update(
+    lastUpdatedDocumentUnit.value,
+  )
 
-    if (!hasDataChange() && response.data) {
-      updatedDocumentUnit.value = response.data as DocumentUnit
-    }
-
-    return response as ServiceResponse<void>
+  if (response?.error?.validationErrors) {
+    validationErrors.value = response.error.validationErrors
+  } else {
+    validationErrors.value = []
   }
-  return { status: 200, data: undefined } as ServiceResponse<void>
+
+  if (!hasDataChange() && response.data) {
+    updatedDocumentUnit.value = response.data as DocumentUnit
+  }
+
+  return response as ServiceResponse<void>
 }
 
 const coreData = computed({
