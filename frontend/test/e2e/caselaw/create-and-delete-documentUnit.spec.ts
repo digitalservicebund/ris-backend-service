@@ -8,7 +8,7 @@ test.describe("create a doc unit and delete it again", () => {
     await page
       .getByRole("button", { name: "Neue Dokumentationseinheit", exact: true })
       .click()
-    await expect(page.locator(`text=Oder hier auswählen`)).toBeVisible()
+    await expect(page.getByText("Oder hier auswählen")).toBeVisible()
     await expect(page).toHaveURL(
       /\/caselaw\/documentunit\/[A-Z0-9]{13}\/files$/,
     )
@@ -25,7 +25,6 @@ test.describe("create a doc unit and delete it again", () => {
     await page.goto("/")
     await page.getByLabel("Dokumentnummer Suche").fill(documentNumber)
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-    //TODO: remove the timeout when search performance get better
     await expect(
       page.locator(".table-row", {
         hasText: documentNumber,

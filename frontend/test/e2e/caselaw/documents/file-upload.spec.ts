@@ -12,7 +12,7 @@ test.describe("upload an original document to a doc unit", () => {
   test("upload and delete docx file per file chooser", async ({ page }) => {
     await uploadTestfile(page, "sample.docx")
     await expect(page.getByText("Hochgeladen am")).toBeVisible()
-    await expect(page.locator(`text=sample.docx`)).toBeVisible()
+    await expect(page.getByText("sample.docx")).toBeVisible()
 
     const tableView = page.getByRole("cell", {
       name: "Dateiname",
