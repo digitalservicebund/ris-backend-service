@@ -18,7 +18,14 @@ public class SingleNormTransformer {
             .id(normReferenceDTO.getId())
             .singleNorm(normReferenceDTO.getSingleNorm())
             .dateOfRelevance(normReferenceDTO.getDateOfRelevance())
+            //
+            // .legalForce(LegalForceTransformer.transformDTO(normReferenceDTO.getLegalForce()))
             .dateOfVersion(normReferenceDTO.getDateOfVersion());
+
+    if (normReferenceDTO.getLegalForce() != null && !normReferenceDTO.getLegalForce().isEmpty()) {
+      builder.legalForce(
+          LegalForceTransformer.transformDTO(normReferenceDTO.getLegalForce().get(0)));
+    }
 
     return builder.build();
   }

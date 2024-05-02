@@ -8,10 +8,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -51,9 +52,12 @@ public class NormReferenceDTO {
   @Column(name = "rank")
   private Integer rank;
 
-  @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(referencedColumnName = "norm_reference_id", name = "id")
-  private LegalForceDTO legalForce;
+  @OneToMany(cascade = CascadeType.ALL)
+  @JoinColumn(name = "norm_reference_id", nullable = false)
+  private List<LegalForceDTO> legalForce;
+
+  //  @OneToOne(mappedBy = "normReference")
+  //  private LegalForceDTO legalForce;
 
   @Transient
   public boolean isSingleNormEmpty() {

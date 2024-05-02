@@ -25,4 +25,15 @@ public class LegalForceTransformer {
 
     return builder.build();
   }
+
+  public static LegalForce transformDTO(LegalForceDTO dto) {
+    if (dto == null) {
+      return null;
+    }
+
+    return new LegalForce(
+        dto.getId(),
+        LegalForceTypeTransformer.transformDTO(dto.getLegalForceType()),
+        RegionTransformer.transformDTO(dto.getRegion()));
+  }
 }

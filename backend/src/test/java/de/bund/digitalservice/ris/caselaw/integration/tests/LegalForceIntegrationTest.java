@@ -162,7 +162,7 @@ class LegalForceIntegrationTest {
   }
 
   @Test
-  @Transactional
+  //  @Transactional
   void testLegalForce_withNormReference_withLegalForce() {
     DocumentationUnitDTO dto =
         DocumentationUnitDTO.builder()
@@ -180,14 +180,20 @@ class LegalForceIntegrationTest {
     RegionDTO regionDTO =
         regionRepository.findById(UUID.fromString("55555555-2222-3333-4444-555555555555")).get();
     LegalForceDTO legalForceDTO =
-        LegalForceDTO.builder().legalForceType(legalForceTypeDTO).region(regionDTO).build();
+        LegalForceDTO.builder()
+            .legalForceType(legalForceTypeDTO)
+            .region(regionDTO)
+            .normAbbreviationRawValue("test")
+            .documentationUnit(dto)
+            .build();
     NormReferenceDTO normReferenceDTO =
         NormReferenceDTO.builder()
             .normAbbreviation(normAbbreviationDTO)
             .singleNorm("single norm")
             .dateOfRelevance("1990")
             .dateOfVersion(LocalDate.of(2011, Month.APRIL, 7))
-            .legalForce(legalForceDTO)
+            .legalForce(List.of(legalForceDTO))
+            //            .legalForce(legalForceDTO)
             .rank(1)
             .build();
     dto.getNormReferences().add(normReferenceDTO);

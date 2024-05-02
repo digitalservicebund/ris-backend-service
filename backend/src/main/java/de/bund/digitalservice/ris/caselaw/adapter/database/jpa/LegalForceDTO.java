@@ -32,21 +32,21 @@ public class LegalForceDTO {
   private LegalForceTypeDTO legalForceType;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "norm_abbreviation_id", updatable = false, insertable = false)
+  @JoinColumn(name = "norm_abbreviation_id", updatable = false)
   private NormAbbreviationDTO normAbbreviation;
 
-  @Column(name = "norm_abbreviation_raw_value", updatable = false, insertable = false)
+  @Column(name = "norm_abbreviation_raw_value", updatable = false)
   @Size(max = 255)
   private String normAbbreviationRawValue;
 
-  @Column(name = "single_norm", updatable = false, insertable = false)
+  @Column(name = "single_norm", updatable = false)
   @Size(max = 255)
   private String singleNorm;
 
-  @Column(name = "date_of_version", updatable = false, insertable = false)
+  @Column(name = "date_of_version", updatable = false)
   private LocalDate dateOfVersion;
 
-  @Column(name = "date_of_relevance", updatable = false, insertable = false)
+  @Column(name = "date_of_relevance", updatable = false)
   @Size(max = 4)
   private String dateOfRelevance;
 
@@ -55,6 +55,10 @@ public class LegalForceDTO {
   private RegionDTO region;
 
   @ManyToOne
-  @JoinColumn(name = "documentation_unit_id", updatable = false, insertable = false)
+  @JoinColumn(name = "documentation_unit_id", updatable = false)
   private DocumentationUnitDTO documentationUnit;
+
+  //  @OneToOne(cascade = CascadeType.ALL)
+  //  @JoinColumn(name = "norm_reference_id", referencedColumnName = "id")
+  //  private NormReferenceDTO normReference;
 }

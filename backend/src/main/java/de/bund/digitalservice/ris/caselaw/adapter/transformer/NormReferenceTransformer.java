@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO.NormReferenceDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import java.util.ArrayList;
@@ -15,6 +14,7 @@ public class NormReferenceTransformer {
   public static NormReference transformToDomain(NormReferenceDTO normDTO) {
     List<SingleNorm> list = new ArrayList<>();
     SingleNorm singleNorm = SingleNormTransformer.transformToDomain(normDTO);
+
     if (singleNorm != null) {
       list.add(singleNorm);
     }
@@ -44,7 +44,7 @@ public class NormReferenceTransformer {
     return normReference.singleNorms().stream()
         .map(
             singleNorm -> {
-              NormReferenceDTOBuilder builder =
+              var builder =
                   NormReferenceDTO.builder()
                       .id(singleNorm.id())
                       .normAbbreviation(normAbbreviationDTO)
@@ -53,7 +53,10 @@ public class NormReferenceTransformer {
                       .dateOfRelevance(singleNorm.dateOfRelevance());
 
               if (featureActive) {
-                builder.legalForce(LegalForceTransformer.transformDomain(singleNorm.legalForce()));
+                builder.legalForce(
+                    List.of(LegalForceTransformer.transformDomain(singleNorm.legalForce())));
+                //
+                // builder.legalForce(LegalForceTransformer.transformDomain(singleNorm.legalForce()));
               }
 
               return builder.build();

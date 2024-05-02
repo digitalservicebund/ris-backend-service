@@ -98,7 +98,7 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @Column(name = "judicial_body")
   private String judicialBody;
 
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
   @OrderBy("rank")
