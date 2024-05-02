@@ -459,7 +459,7 @@ describe("NormReferenceEntry", () => {
     expect(emitted("removeEntry")).toBeTruthy()
   })
 
-  it("Gesetzeskraft checkbox toggles comboboxes", async () => {
+  it("legal force checkbox toggles comboboxes", async () => {
     //Todo: only show checkbox, when court is superior court
     const { user } = renderComponent()
     const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
@@ -484,19 +484,15 @@ describe("NormReferenceEntry", () => {
   })
 
   it("updates legal force type", async () => {
-    const { user, emitted } = renderComponent()
+    const { user, emitted } = renderComponent({
+      modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
+      } as NormReference,
+    })
 
-    // Todo: when norm abbreviation is passed as model value, the feature toggle promise seems too slow and is only visible after a few nextTicks()
-    // Pass modelValue to renderComponent when feature toggle is gone
-    const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
-    await user.type(abbreviationField, "1000")
-    const dropdownItems = screen.getAllByLabelText(
-      "dropdown-option",
-    ) as HTMLElement[]
-    expect(dropdownItems[0]).toHaveTextContent("1000g-BefV")
-    await user.click(dropdownItems[0])
+    const checkbox = await screen.findByLabelText("Mit Gesetzeskraft")
 
-    await user.click(screen.getByLabelText("Mit Gesetzeskraft"))
+    await user.click(checkbox)
     const legalForceType = screen.getByLabelText("Gesetzeskraft Typ")
     await user.click(legalForceType)
     const dropdownItemslegalForceType = screen.getAllByLabelText(
@@ -511,7 +507,8 @@ describe("NormReferenceEntry", () => {
       [
         {
           normAbbreviation: {
-            abbreviation: "1000g-BefV",
+            abbreviation: "ABC",
+            id: "123",
           },
           singleNorms: [
             {
@@ -534,19 +531,15 @@ describe("NormReferenceEntry", () => {
   })
 
   it("updates legal force region", async () => {
-    const { user, emitted } = renderComponent()
+    const { user, emitted } = renderComponent({
+      modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
+      } as NormReference,
+    })
 
-    // Todo: when norm abbreviation is passed as model value, the feature toggle promise seems too slow and is only visible after a few nextTicks()
-    // Pass modelValue to renderComponent when feature toggle is gone
-    const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
-    await user.type(abbreviationField, "1000")
-    const dropdownItems = screen.getAllByLabelText(
-      "dropdown-option",
-    ) as HTMLElement[]
-    expect(dropdownItems[0]).toHaveTextContent("1000g-BefV")
-    await user.click(dropdownItems[0])
+    const checkbox = await screen.findByLabelText("Mit Gesetzeskraft")
 
-    await user.click(screen.getByLabelText("Mit Gesetzeskraft"))
+    await user.click(checkbox)
     const regionInput = screen.getByLabelText("Gesetzeskraft Geltungsbereich")
     await user.click(regionInput)
     const dropdownItemslegalRegionInput = screen.getAllByLabelText(
@@ -561,7 +554,8 @@ describe("NormReferenceEntry", () => {
       [
         {
           normAbbreviation: {
-            abbreviation: "1000g-BefV",
+            abbreviation: "ABC",
+            id: "123",
           },
           singleNorms: [
             {
@@ -581,5 +575,26 @@ describe("NormReferenceEntry", () => {
         },
       ],
     ])
+  })
+
+  it("legal force checkbox checked, when legal force set", async () => {
+    renderComponent({
+      modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
+        singleNorms: [
+          {
+            legalForce: {
+              region: {
+                code: "abc",
+                label: "region",
+              },
+            },
+          },
+        ],
+      } as NormReference,
+    })
+
+    const checkbox = await screen.findByLabelText("Mit Gesetzeskraft")
+    expect(checkbox).toBeChecked()
   })
 })

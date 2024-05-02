@@ -41,7 +41,7 @@ const singleNorm = computed({
 
 //Todo: implement isSuperiorCourt logic
 const isSuperiorCourt = ref(true)
-const withLegalForce = ref(false)
+const withLegalForce = ref(!!props.modelValue.legalForce)
 
 const legalForceType = computed({
   get: () =>
