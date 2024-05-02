@@ -86,7 +86,7 @@ export const uploadTestfile = async (
 export async function waitForSaving(
   body: () => Promise<void>,
   page: Page,
-  options?: { clickSaveButton?: boolean; reload?: boolean },
+  options?: { clickSaveButton?: boolean; reload?: boolean; error?: string },
 ) {
   if (options?.reload) {
     await page.reload()
@@ -106,13 +106,17 @@ export async function waitForSaving(
     await page.locator("[aria-label='Speichern Button']").click()
   }
 
-  await Promise.all([
-    await expect(page.getByText(`Zuletzt`).first()).toBeVisible(),
-    lastSaving ??
-      (await expect(
-        page.getByText(`Zuletzt ${lastSaving} Uhr`).first(),
-      ).toBeHidden()),
-  ])
+  if (options?.error) {
+    await expect(page.getByText(options.error).first()).toBeVisible()
+  } else {
+    await Promise.all([
+      await expect(page.getByText(`Zuletzt`).first()).toBeVisible(),
+      lastSaving ??
+        (await expect(
+          page.getByText(`Zuletzt ${lastSaving} Uhr`).first(),
+        ).toBeHidden()),
+    ])
+  }
 }
 
 export async function toggleFieldOfLawSection(page: Page): Promise<void> {
