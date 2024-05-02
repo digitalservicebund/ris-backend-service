@@ -35,7 +35,7 @@
   "dependencies": {
     "@braintree/sanitize-url": "^7.0.1",
     "@guardian/prosemirror-invisibles": "^3.0.3",
-    "@sentry/integrations": "^7.112.2",
+    "@sentry/integrations": "^7.113.0",
     "@sentry/vue": "^7.112.2",
     "@tiptap/extension-bold": "^2.3.0",
     "@tiptap/extension-bullet-list": "^2.3.0",
