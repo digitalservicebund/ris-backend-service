@@ -15,7 +15,7 @@ enum Endpoint {
   fieldOfLawSearchByIdentifier = "fieldsoflaw/search-by-identifier",
   risAbbreviations = `normabbreviation/search?pg=0&sz=30`,
   procedures = `procedure`,
-  legalForceRegions = `region/applicabile`,
+  legalForceRegions = `region/applicable`,
   legalForceTypes = `legalforcetype`,
 }
 
@@ -78,7 +78,7 @@ function formatDropdownItems(
     }
     case Endpoint.legalForceRegions: {
       return (responseData as LegalForceRegion[]).map((item) => ({
-        label: item.label,
+        label: item.longText,
         value: item,
         additionalInformation: item.code,
       }))

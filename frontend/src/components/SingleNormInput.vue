@@ -62,16 +62,20 @@ const legalForceType = computed({
 
 const legalForceRegion = computed({
   get: () =>
-    props.modelValue.legalForce && props.modelValue.legalForce.region
-      ? props.modelValue.legalForce.region
+    singleNorm.value.legalForce && singleNorm.value.legalForce.region
+      ? {
+          label: singleNorm.value.legalForce.region.longText,
+          value: singleNorm.value.legalForce.region,
+          additionalInformation: singleNorm.value.legalForce.region.code,
+        }
       : undefined,
   set: (newValue) => {
-    if (!newValue && singleNorm.value.legalForce) {
-      delete singleNorm.value.legalForce.region
+    if (!newValue) {
+      if (singleNorm.value.legalForce) delete singleNorm.value.legalForce.region
     } else {
       singleNorm.value.legalForce = {
         ...props.modelValue.legalForce,
-        region: newValue,
+        region: newValue.value,
       }
     }
   },

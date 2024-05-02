@@ -86,5 +86,5 @@ export type LegalForceType = {
 export type LegalForceRegion = {
   uuid?: string
   code?: string
-  label: string
+  longText: string
 }

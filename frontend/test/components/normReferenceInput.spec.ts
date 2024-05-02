@@ -586,7 +586,7 @@ describe("NormReferenceEntry", () => {
             legalForce: {
               region: {
                 code: "abc",
-                label: "region",
+                longText: "region",
               },
             },
           },
