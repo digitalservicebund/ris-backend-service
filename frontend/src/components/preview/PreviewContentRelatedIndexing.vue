@@ -39,7 +39,6 @@ const hasActiveCitations = computed(() => {
 </script>
 
 <template>
-  <div class="mx-16 my-16 h-2 w-5/6 bg-blue-600" />
   <TableView class="table w-full table-fixed">
     <tr v-if="hasKeywords">
       <PreviewLeftCell> Schlagwörter </PreviewLeftCell>

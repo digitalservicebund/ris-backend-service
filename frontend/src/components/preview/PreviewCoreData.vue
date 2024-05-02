@@ -66,6 +66,10 @@ defineProps<{
         >{{ coreData.deviatingEclis.toString() }}
       </PreviewRightCell>
     </tr>
+    <tr v-if="coreData.procedure">
+      <PreviewLeftCell>Vorgang</PreviewLeftCell>
+      <PreviewRightCell>{{ coreData.procedure.label }} </PreviewRightCell>
+    </tr>
     <tr
       v-if="
         coreData.previousProcedures && coreData.previousProcedures.length > 0

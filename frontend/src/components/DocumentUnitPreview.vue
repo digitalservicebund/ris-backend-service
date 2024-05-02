@@ -47,18 +47,13 @@ const hasTexts = computed(() => {
 </script>
 
 <template>
-  <div class="bg-white">
+  <div class="max-w-screen-xl bg-white">
     <div class="ds-heading-03-bold mt-16 px-16">
       {{ documentUnit.documentNumber }}
     </div>
-    <div
-      v-if="documentUnit.coreData.procedure"
-      class="ds-label-03-reg px-16 text-gray-900"
-    >
-      {{ documentUnit.coreData.procedure.label }}
-    </div>
     <div class="ds-label-03-reg mb-16 px-16">
-      Vorschau erstellt um {{ dayjs(new Date()).format("HH:mm:ss") }}
+      Vorschau erstellt am {{ dayjs(new Date()).format("DD.MM.YYYY") }} um
+      {{ dayjs(new Date()).format("HH:mm:ss") }}
     </div>
     <PreviewCoreData :core-data="documentUnit.coreData" />
     <PreviewProceedingDecisions
