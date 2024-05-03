@@ -1,6 +1,6 @@
 import { describe, expect, vi } from "vitest"
 import { provide as vueProvide, inject as vueInject, ref } from "vue"
-import { CourtTypeInjectionKey } from "@/composables/useProvideCourtType"
+import { CourtTypeInjectionKey } from "@/composables/useCourtType"
 
 // Create a mocked provide/inject implementation that works outside of setup()
 const provideData = new Map()
@@ -27,7 +27,7 @@ describe("useCourtType", () => {
 
   it("should provide court type value default injection key", async () => {
     const { useProvideCourtType, useInjectCourtType } = await import(
-      "@/composables/useProvideCourtType"
+      "@/composables/useCourtType"
     )
 
     const courtTypeRef = ref("BAG")
@@ -40,7 +40,7 @@ describe("useCourtType", () => {
 
   it("should provide court type value using custom injection key", async () => {
     const { useProvideCourtType, useInjectCourtType } = await import(
-      "@/composables/useProvideCourtType"
+      "@/composables/useCourtType"
     )
     const courtTypeRef = ref("BAG")
     const testKey: CourtTypeInjectionKey = Symbol("Test key")
