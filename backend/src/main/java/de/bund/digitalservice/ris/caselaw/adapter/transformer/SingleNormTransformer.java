@@ -22,9 +22,8 @@ public class SingleNormTransformer {
             // .legalForce(LegalForceTransformer.transformDTO(normReferenceDTO.getLegalForce()))
             .dateOfVersion(normReferenceDTO.getDateOfVersion());
 
-    if (normReferenceDTO.getLegalForce() != null && !normReferenceDTO.getLegalForce().isEmpty()) {
-      builder.legalForce(
-          LegalForceTransformer.transformDTO(normReferenceDTO.getLegalForce().get(0)));
+    if (normReferenceDTO.getLegalForce() != null) {
+      builder.legalForce(LegalForceTransformer.transformDTO(normReferenceDTO.getLegalForce()));
     }
 
     return builder.build();

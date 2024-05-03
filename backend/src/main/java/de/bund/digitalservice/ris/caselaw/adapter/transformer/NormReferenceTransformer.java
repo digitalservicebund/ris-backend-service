@@ -53,10 +53,7 @@ public class NormReferenceTransformer {
                       .dateOfRelevance(singleNorm.dateOfRelevance());
 
               if (featureActive && singleNorm.legalForce() != null) {
-                builder.legalForce(
-                    List.of(LegalForceTransformer.transformDomain(singleNorm.legalForce())));
-                //
-                // builder.legalForce(LegalForceTransformer.transformDomain(singleNorm.legalForce()));
+                builder.legalForce(LegalForceTransformer.transformDomain(singleNorm.legalForce()));
               }
 
               return builder.build();
