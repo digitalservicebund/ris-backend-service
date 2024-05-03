@@ -31,6 +31,15 @@ export default class SingleNorm {
     ].join(", ")
   }
 
+  get renderLegalForce(): string {
+    return [
+      ...(this.legalForce?.type ? [this.legalForce.type.label] : []),
+      ...(this.legalForce?.region
+        ? [`(${this.legalForce.region.longText})`]
+        : []),
+    ].join(" ")
+  }
+
   get isEmpty(): boolean {
     let isEmpty = true
 
@@ -42,8 +51,8 @@ export default class SingleNorm {
     return isEmpty
   }
 
-  get showSummaryOnEdit(): boolean {
-    return false
+  get hasLegalForce(): boolean {
+    return this.legalForce != undefined
   }
 
   private fieldIsEmpty(value: SingleNorm[(typeof SingleNorm.fields)[number]]) {
