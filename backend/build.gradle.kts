@@ -207,7 +207,7 @@ dependencies {
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
     // => CVE-2023-2976
-    implementation("com.google.guava:guava:33.1.0-jre")
+    implementation("com.google.guava:guava:33.2.0-jre")
 
     var flywayCore = "org.flywaydb:flyway-core:10.12.0"
     implementation(flywayCore)
