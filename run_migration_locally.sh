@@ -17,7 +17,6 @@ DATA_MIGRATION_SERVICE_PATH="../ris-data-migration"
 DATA_MIGRATION_IMPORT_PATH="./juris-xml-data"
 
 #  In ris-backend-service restart the database to add the user and the scheme:
-docker compose -f "compose.yaml" down postgres14 --remove-orphans
 docker compose -f "compose.yaml" up postgres14 -d
 echo "Docker run in background, waiting"
 sleep 15
@@ -40,9 +39,9 @@ else
   # Check if you can access the right bucket with
   aws s3 ls --profile otc --endpoint-url https://obs.eu-de.otc.t-systems.com s3://neuris-migration-juris-data
   # Download the lookup tables
-  aws s3 cp --profile otc --endpoint-url https://obs.eu-de.otc.t-systems.com --recursive s3://neuris-migration-juris-data/monthly/2023/09/Tabellen ./juris-xml-data/Tabellen
+  aws s3 cp --profile otc --endpoint-url https://obs.eu-de.otc.t-systems.com --recursive s3://neuris-migration-juris-data/monthly/2024/05/Tabellen ./juris-xml-data/Tabellen
   # Download BGH DocumentationUnits
-  aws s3 cp --profile otc --endpoint-url https://obs.eu-de.otc.t-systems.com --recursive s3://neuris-migration-juris-data/monthly/2023/09/BGH-juris/RSP/ ./juris-xml-data/BGH-juris/RSP/2022/
+  aws s3 cp --profile otc --endpoint-url https://obs.eu-de.otc.t-systems.com --recursive s3://neuris-migration-juris-data/monthly/2024/05/BGH-juris/RSP/2022/ ./juris-xml-data/BGH-juris/RSP/2022/
 fi
 
 #  For console logging
@@ -60,4 +59,3 @@ java -jar cli/build/libs/ris-data-migration-cli.jar juris-table seed
 # Import the BGH Documentation Units
 java -jar cli/build/libs/ris-data-migration-cli.jar juris-r migrate -p juris-xml-data/
 
-docker compose -f "compose.yaml" down postgres14 --remove-orphans

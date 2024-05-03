@@ -113,14 +113,9 @@ Now you can generate a new `.env` file containig the secrets:
 >
 > This needs to be repeated every time the secrets change.
 
-### Importing example data
+### Local Migration
 
-Learn how to import example data for the
-app [here](https://github.com/digitalservicebund/ris-backend-service/tree/main/backend#lookup-tables).
-Note that while
-this step isn't required to run the app, some tests may fail since they depend on preexisting data
-from the example data
-set.
+The caselaw application requires the initialization of lookup tables by the migration application. Follow the steps in [run_migration_locally.sh](run_migration_locally.sh)
 
 ## Development
 
