@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import dayjs from "dayjs"
 import { computed } from "vue"
-import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import PreviewContentRelatedIndexing from "@/components/preview/PreviewContentRelatedIndexing.vue"
 import PreviewCoreData from "@/components/preview/PreviewCoreData.vue"
 import PreviewProceedingDecisions from "@/components/preview/PreviewProceedingDecisions.vue"
@@ -10,8 +9,6 @@ import DocumentUnit from "@/domain/documentUnit"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
-  showAttachmentPanel?: boolean
-  showNavigationPanel: boolean
 }>()
 
 const hasProceedingDecisions = computed(() => {
@@ -50,38 +47,28 @@ const hasTexts = computed(() => {
 </script>
 
 <template>
-  <DocumentUnitWrapper
-    :document-unit="documentUnit"
-    :show-navigation-panel="showNavigationPanel"
-  >
-    <div class="bg-white">
-      <div class="ds-heading-03-bold mt-16 px-16">
-        {{ documentUnit.documentNumber }}
-      </div>
-      <div
-        v-if="documentUnit.coreData.procedure"
-        class="ds-label-03-reg px-16 text-gray-900"
-      >
-        {{ documentUnit.coreData.procedure.label }}
-      </div>
-      <div class="ds-label-03-reg mb-16 px-16">
-        Vorschau erstellt um {{ dayjs(new Date()).format("HH:mm:ss") }}
-      </div>
-      <PreviewCoreData :core-data="documentUnit.coreData" />
-      <PreviewProceedingDecisions
-        v-if="hasProceedingDecisions"
-        :ensuing-decisions="documentUnit.ensuingDecisions"
-        :previous-decisions="documentUnit.previousDecisions"
-      />
-      <PreviewContentRelatedIndexing
-        v-if="hasContentRelatedIndexing"
-        :content-related-indexing="documentUnit.contentRelatedIndexing"
-      />
-      <PreviewTexts
-        v-if="hasTexts"
-        :texts="documentUnit.texts"
-        :valid-border-numbers="documentUnit.borderNumbers"
-      />
+  <div class="max-w-screen-xl bg-white">
+    <div class="ds-heading-03-bold mt-16 px-16">
+      {{ documentUnit.documentNumber }}
     </div>
-  </DocumentUnitWrapper>
+    <div class="ds-label-03-reg mb-16 px-16">
+      Vorschau erstellt am {{ dayjs(new Date()).format("DD.MM.YYYY") }} um
+      {{ dayjs(new Date()).format("HH:mm:ss") }}
+    </div>
+    <PreviewCoreData :core-data="documentUnit.coreData" />
+    <PreviewProceedingDecisions
+      v-if="hasProceedingDecisions"
+      :ensuing-decisions="documentUnit.ensuingDecisions"
+      :previous-decisions="documentUnit.previousDecisions"
+    />
+    <PreviewContentRelatedIndexing
+      v-if="hasContentRelatedIndexing"
+      :content-related-indexing="documentUnit.contentRelatedIndexing"
+    />
+    <PreviewTexts
+      v-if="hasTexts"
+      :texts="documentUnit.texts"
+      :valid-border-numbers="documentUnit.borderNumbers"
+    />
+  </div>
 </template>

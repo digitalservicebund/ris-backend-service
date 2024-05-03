@@ -19,7 +19,7 @@ test.describe("saving behaviour", () => {
     await page.locator("[aria-label='Spruchkörper']").fill("VG-001")
     await page.locator("[aria-label='Speichern Button']").click()
 
-    await expect(page.locator("text='Fehler beim Speichern'")).toBeVisible()
+    await expect(page.getByText("Fehler beim Speichern")).toBeVisible()
   })
 
   test("input during save not lost", async ({ page, documentNumber }) => {

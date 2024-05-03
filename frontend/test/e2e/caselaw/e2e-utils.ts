@@ -12,7 +12,7 @@ export const navigateToSearch = async (page: Page) => {
   await page.goto(`/caselaw`)
   await page.waitForURL("/caselaw")
 
-  await expect(page.locator("text=Übersicht Rechtsprechung")).toBeVisible({
+  await expect(page.getByText("Übersicht Rechtsprechung")).toBeVisible({
     timeout: 15000, // for backend warm up
   })
 }
@@ -25,7 +25,7 @@ export const navigateToCategories = async (
   const baseUrl = `/caselaw/documentunit/${documentNumber}/categories${queryParams}`
 
   await page.goto(baseUrl)
-  await expect(page.locator("text=Spruchkörper")).toBeVisible({
+  await expect(page.getByText("Spruchkörper")).toBeVisible({
     timeout: 15000, // for backend warm up
   })
   await expect(page.getByText(documentNumber)).toBeVisible()
@@ -57,10 +57,10 @@ export const publishDocumentationUnit = async (
   await page
     .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
     .click()
-  await expect(page.locator("text=Email wurde versendet")).toBeVisible()
+  await expect(page.getByText("Email wurde versendet")).toBeVisible()
 
-  await expect(page.locator("text=Xml Email Abgabe -")).toBeVisible()
-  await expect(page.locator("text=In Veröffentlichung")).toBeVisible()
+  await expect(page.getByText("Xml Email Abgabe -")).toBeVisible()
+  await expect(page.getByText("In Veröffentlichung")).toBeVisible()
 }
 
 export const uploadTestfile = async (
@@ -69,7 +69,7 @@ export const uploadTestfile = async (
 ) => {
   const [fileChooser] = await Promise.all([
     page.waitForEvent("filechooser"),
-    page.locator("text=Oder hier auswählen").click(),
+    page.getByText("Oder hier auswählen").click(),
   ])
   if (Array.isArray(filename)) {
     await fileChooser.setFiles(
@@ -86,7 +86,7 @@ export const uploadTestfile = async (
 export async function waitForSaving(
   body: () => Promise<void>,
   page: Page,
-  options?: { clickSaveButton?: boolean; reload?: boolean },
+  options?: { clickSaveButton?: boolean; reload?: boolean; error?: string },
 ) {
   if (options?.reload) {
     await page.reload()
@@ -106,17 +106,21 @@ export async function waitForSaving(
     await page.locator("[aria-label='Speichern Button']").click()
   }
 
-  await Promise.all([
-    await expect(page.getByText(`Zuletzt`).first()).toBeVisible(),
-    lastSaving ??
-      (await expect(
-        page.getByText(`Zuletzt ${lastSaving} Uhr`).first(),
-      ).toBeHidden()),
-  ])
+  if (options?.error) {
+    await expect(page.getByText(options.error).first()).toBeVisible()
+  } else {
+    await Promise.all([
+      await expect(page.getByText(`Zuletzt`).first()).toBeVisible(),
+      lastSaving ??
+        (await expect(
+          page.getByText(`Zuletzt ${lastSaving} Uhr`).first(),
+        ).toBeHidden()),
+    ])
+  }
 }
 
 export async function toggleFieldOfLawSection(page: Page): Promise<void> {
-  await page.locator("text=Sachgebiete").click()
+  await page.getByText("Sachgebiete").click()
 }
 
 export async function deleteDocumentUnit(page: Page, documentNumber: string) {

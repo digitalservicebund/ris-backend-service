@@ -1,4 +1,4 @@
-import { Locator, Page, test } from "@playwright/test"
+import { Locator, Page, test, expect } from "@playwright/test"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import DocumentUnit from "../../../src/domain/documentUnit"
@@ -36,7 +36,6 @@ export const caselawTest = test.extend<MyFixtures>({
   prefilledDocumentUnit: async ({ request }, use) => {
     const response = await request.get(`/api/v1/caselaw/documentunits/new`)
     const prefilledDocumentUnit = await response.json()
-    const { documentNumber } = await response.json()
 
     const courtResponse = await request.get(`api/v1/caselaw/courts?q=AG+Aachen`)
     const court = await courtResponse.json()
@@ -69,13 +68,12 @@ export const caselawTest = test.extend<MyFixtures>({
 
     await use(await updateResponse.json())
 
-    const deleteResponse = await request.delete(
-      `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
-    )
-    if (!deleteResponse.ok()) {
-      throw Error(`DocumentUnit with number ${documentNumber} couldn't be deleted:
-      ${deleteResponse.status()} ${deleteResponse.statusText()}`)
-    }
+    await expect(async () => {
+      const deleteResponse = await request.delete(
+        `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
+      )
+      expect(deleteResponse.ok()).toBeTruthy()
+    }).toPass()
   },
 
   secondPrefilledDocumentUnit: async ({ request }, use) => {

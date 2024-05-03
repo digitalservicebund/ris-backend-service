@@ -25,7 +25,6 @@ test.describe("a11y of start page (/caselaw)", () => {
     ).toBeVisible()
     await page.getByLabel("Dokumentnummer Suche").fill(documentNumber)
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-    //TODO: remove the timeout when search performance get better
     await expect(
       page.locator(".table-row", {
         hasText: documentNumber,

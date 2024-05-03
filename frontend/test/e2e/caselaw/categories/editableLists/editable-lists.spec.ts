@@ -557,7 +557,7 @@ test.describe("related documentation units", () => {
           await page.keyboard.press("Tab")
 
           await expect(
-            container.locator("text=Unvollständiges Datum"),
+            container.getByText("Unvollständiges Datum"),
           ).toBeVisible()
         },
       )

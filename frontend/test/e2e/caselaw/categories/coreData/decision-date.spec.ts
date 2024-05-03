@@ -12,7 +12,7 @@ test.describe("decision date", () => {
     await page.locator("[aria-label='Entscheidungsdatum']").fill("03.02.2099")
 
     await expect(
-      page.locator("text=Das Datum darf nicht in der Zukunft liegen"),
+      page.getByText("Das Datum darf nicht in der Zukunft liegen"),
     ).toBeVisible()
   })
 
@@ -80,7 +80,7 @@ test.describe("decision date", () => {
       "03",
     )
 
-    await expect(page.locator("text=Unvollständiges Datum")).toBeVisible()
+    await expect(page.getByText("Unvollständiges Datum")).toBeVisible()
 
     await page.reload()
 
@@ -106,7 +106,7 @@ test.describe("decision date", () => {
         ).toHaveValue("03.02.2022")
 
         await expect(
-          page.locator("text=Abweichendes Entscheidungsdatum>"),
+          page.getByText("Abweichendes Entscheidungsdatum>"),
         ).toBeHidden()
 
         await page
@@ -114,7 +114,7 @@ test.describe("decision date", () => {
           .click()
 
         await expect(
-          page.locator("text=Abweichendes Entscheidungsdatum").first(),
+          page.getByText("Abweichendes Entscheidungsdatum").first(),
         ).toBeVisible()
 
         await page
@@ -145,7 +145,7 @@ test.describe("decision date", () => {
       .click()
 
     await expect(
-      page.locator("text=Abweichendes Entscheidungsdatum").first(),
+      page.getByText("Abweichendes Entscheidungsdatum").first(),
     ).toBeHidden()
   })
 })

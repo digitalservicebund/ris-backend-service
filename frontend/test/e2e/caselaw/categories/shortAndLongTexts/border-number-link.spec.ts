@@ -37,20 +37,19 @@ test("create and validate border number links", async ({
 
   // upload file
   await uploadTestfile(page, "some-border-numbers.docx")
-  await expect(page.locator(`text=some-border-numbers.docx`)).toBeVisible()
-  await expect(page.getByLabel(`Datei löschen`)).toBeVisible()
-  // todo: re-enable once file preview is re-instated
-  //await expect(page.locator(`text=${firstReason}`)).toBeVisible()
-  //await expect(page.locator(`text=${secondReason}`)).toBeVisible()
-  //await expect(page.locator(`text=${thirdReason}`)).toBeVisible()
+  await expect(page.getByText("some-border-numbers.docx")).toBeVisible()
+  await expect(page.getByLabel("Datei löschen")).toBeVisible()
+  await expect(page.getByText(firstReason)).toBeVisible()
+  await expect(page.getByText(secondReason)).toBeVisible()
+  await expect(page.getByText(thirdReason)).toBeVisible()
 
   // Click on "Rubriken" und check if original document loaded
   await navigateToCategories(page, documentNumber)
   await expect(page.getByLabel("Ladestatus")).toBeHidden()
-  await expect(page.locator(`text=${firstReason}`)).toBeVisible()
-  await expect(page.locator(`text=${secondReason}`)).toBeVisible()
-  await expect(page.locator(`text=${thirdReason}`)).toBeVisible()
-  const originalFileParagraph = page.locator(`text=${documentOrigin}`)
+  await expect(page.getByText(firstReason)).toBeVisible()
+  await expect(page.getByText(secondReason)).toBeVisible()
+  await expect(page.getByText(thirdReason)).toBeVisible()
+  const originalFileParagraph = page.getByText(documentOrigin)
   await expect(originalFileParagraph).toBeVisible()
 
   // Selected all text from sidepanel

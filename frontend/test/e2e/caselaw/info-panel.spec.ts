@@ -48,7 +48,7 @@ test.describe("info panel", () => {
     ).toBeVisible()
 
     await page.locator("[aria-label='Gericht']").fill("aalen")
-    await page.locator("text=AG Aalen").click()
+    await page.getByText("AG Aalen").click()
     await expect(page.locator("[aria-label='Gericht']")).toHaveValue("AG Aalen")
     await expect(infoPanel.getByText("AG Aalen")).toBeVisible()
   })

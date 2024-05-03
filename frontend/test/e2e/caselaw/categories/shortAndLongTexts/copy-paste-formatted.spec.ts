@@ -28,22 +28,21 @@ test("copy-paste from side panel", async ({ page, documentNumber }) => {
 
   // upload file
   await uploadTestfile(page, "some-text-aligment.docx")
-  await expect(page.locator(`text=some-text-aligment.docx`)).toBeVisible()
+  await expect(page.getByText("some-text-aligment.docx")).toBeVisible()
   await expect(page.getByLabel(`Datei löschen`)).toBeVisible()
-  // todo: re-enable once file preview is re-instated
-  // await expect(page.locator(`text=${leftAlignText}`)).toBeVisible()
-  // await expect(page.locator(`text=${rightAlignText}`)).toBeVisible()
-  // await expect(page.locator(`text=${centerAlignText}`)).toBeVisible()
-  // await expect(page.locator(`text=${justifyAlignText}`)).toBeVisible()
+  await expect(page.getByText(leftAlignText)).toBeVisible()
+  await expect(page.getByText(rightAlignText)).toBeVisible()
+  await expect(page.getByText(centerAlignText)).toBeVisible()
+  await expect(page.getByText(justifyAlignText)).toBeVisible()
 
   // Click on "Rubriken" und check if original document loaded
   await navigateToCategories(page, documentNumber)
 
   await expect(page.getByLabel("Ladestatus")).toBeHidden()
-  await expect(page.locator(`text=${rightAlignText}`)).toBeVisible()
-  await expect(page.locator(`text=${centerAlignText}`)).toBeVisible()
-  await expect(page.locator(`text=${justifyAlignText}`)).toBeVisible()
-  const originalFileParagraph = page.locator(`text=centered`)
+  await expect(page.getByText(rightAlignText)).toBeVisible()
+  await expect(page.getByText(centerAlignText)).toBeVisible()
+  await expect(page.getByText(justifyAlignText)).toBeVisible()
+  const originalFileParagraph = page.getByText("centered")
   await expect(originalFileParagraph).toBeVisible()
 
   // Selected all text from sidepanel
