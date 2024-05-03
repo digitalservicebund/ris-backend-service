@@ -162,7 +162,6 @@ class LegalForceIntegrationTest {
   }
 
   @Test
-  //  @Transactional
   void testLegalForce_withNormReference_withLegalForce() {
     DocumentationUnitDTO dto =
         DocumentationUnitDTO.builder()
