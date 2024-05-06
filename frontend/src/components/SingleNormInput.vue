@@ -67,6 +67,7 @@ const legalForceRegion = computed({
           label: singleNorm.value.legalForce.region.longText,
           value: singleNorm.value.legalForce.region,
           additionalInformation: singleNorm.value.legalForce.region.code,
+          longText: singleNorm.value.legalForce.region.longText,
         }
       : undefined,
   set: (newValue) => {
@@ -75,7 +76,7 @@ const legalForceRegion = computed({
     } else {
       singleNorm.value.legalForce = {
         ...props.modelValue.legalForce,
-        region: newValue.value,
+        region: newValue,
       }
     }
   },
