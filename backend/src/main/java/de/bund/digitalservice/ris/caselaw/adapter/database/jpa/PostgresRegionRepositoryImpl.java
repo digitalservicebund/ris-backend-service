@@ -18,7 +18,7 @@ public class PostgresRegionRepositoryImpl implements RegionRepository {
   @Override
   public List<Region> findApplicableBySearchStr(String searchString) {
     return repository
-        .findAllByCodeStartsWithOrLongTextStartsWith(searchString, searchString)
+        .findAllByCodeStartsWithIgnoreCaseOrLongTextStartsWithIgnoreCase(searchString, searchString)
         .stream()
         .filter(RegionDTO::isApplicability)
         .map(RegionTransformer::transformDTO)

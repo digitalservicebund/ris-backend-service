@@ -1,4 +1,4 @@
-import { LegalForceType, LegalForceRegion } from "./../domain/singleNorm"
+import { capitalize } from "vue"
 import httpClient, { ServiceResponse } from "./httpClient"
 import { ComboboxInputModelType, ComboboxItem } from "@/components/input/types"
 import { Page } from "@/components/Pagination.vue"
@@ -6,6 +6,7 @@ import { CitationType } from "@/domain/citationType"
 import { Court, Procedure, DocumentType } from "@/domain/documentUnit"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
+import { LegalForceType, LegalForceRegion } from "@/domain/singleNorm"
 import errorMessages from "@/i18n/errors.json"
 
 enum Endpoint {
@@ -71,16 +72,14 @@ function formatDropdownItems(
     }
     case Endpoint.legalForceTypes: {
       return (responseData as LegalForceType[]).map((item) => ({
-        label: item.abbreviation,
+        label: capitalize(item.abbreviation),
         value: item,
-        additionalInformation: item.label,
       }))
     }
     case Endpoint.legalForceRegions: {
       return (responseData as LegalForceRegion[]).map((item) => ({
         label: item.longText,
         value: item,
-        additionalInformation: item.code,
       }))
     }
   }

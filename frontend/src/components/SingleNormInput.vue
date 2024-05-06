@@ -46,10 +46,15 @@ const withLegalForce = ref(!!props.modelValue.legalForce)
 const legalForceType = computed({
   get: () =>
     props.modelValue.legalForce && props.modelValue.legalForce.type
-      ? props.modelValue.legalForce.type
+      ? {
+          uuid: props.modelValue.legalForce.type.uuid,
+          label: props.modelValue.legalForce.type.abbreviation,
+          value: props.modelValue.legalForce.type.abbreviation,
+          abbreviation: props.modelValue.legalForce.type.abbreviation,
+        }
       : undefined,
   set: (newValue) => {
-    if (!newValue && singleNorm.value.legalForce) {
+    if (!newValue && singleNorm.value.legalForce?.type) {
       delete singleNorm.value.legalForce.type
     } else {
       singleNorm.value.legalForce = {
@@ -65,14 +70,12 @@ const legalForceRegion = computed({
     singleNorm.value.legalForce && singleNorm.value.legalForce.region
       ? {
           label: singleNorm.value.legalForce.region.longText,
-          value: singleNorm.value.legalForce.region,
-          additionalInformation: singleNorm.value.legalForce.region.code,
           longText: singleNorm.value.legalForce.region.longText,
         }
       : undefined,
   set: (newValue) => {
-    if (!newValue) {
-      if (singleNorm.value.legalForce) delete singleNorm.value.legalForce.region
+    if (!newValue && singleNorm.value.legalForce?.region) {
+      delete singleNorm.value.legalForce.region
     } else {
       singleNorm.value.legalForce = {
         ...props.modelValue.legalForce,

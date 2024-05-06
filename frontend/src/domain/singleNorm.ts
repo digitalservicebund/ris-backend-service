@@ -1,4 +1,5 @@
 import dayjs from "dayjs"
+import { capitalize } from "vue"
 
 export default class SingleNorm {
   public singleNorm?: string
@@ -33,7 +34,9 @@ export default class SingleNorm {
 
   get renderLegalForce(): string {
     return [
-      ...(this.legalForce?.type ? [this.legalForce.type.label] : []),
+      ...(this.legalForce?.type
+        ? [capitalize(this.legalForce.type.abbreviation)]
+        : []),
       ...(this.legalForce?.region
         ? [`(${this.legalForce.region.longText})`]
         : []),
@@ -89,7 +92,6 @@ export type LegalForce = {
 export type LegalForceType = {
   uuid?: string
   abbreviation: string
-  label: string
 }
 
 export type LegalForceRegion = {
