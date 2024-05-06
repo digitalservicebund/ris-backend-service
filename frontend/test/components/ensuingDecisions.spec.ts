@@ -368,7 +368,7 @@ describe("EnsuingDecisions", () => {
     expect(screen.getAllByText(/Pflichtfeld nicht befüllt/).length).toBe(1)
   })
 
-  it("does not add norm with invalid version date input", async () => {
+  it("does not add ensuing decision with invalid date input", async () => {
     const { user } = renderComponent()
 
     const dateInput = await screen.findByLabelText(
@@ -379,6 +379,22 @@ describe("EnsuingDecisions", () => {
     await user.type(dateInput, "00.00.0231")
 
     await screen.findByText(/Kein valides Datum/)
+    screen.getByLabelText("Nachgehende Entscheidung speichern").click()
+    expect(dateInput).toBeVisible()
+  })
+
+  it("does not add ensuing decision with incomplete date input", async () => {
+    const { user } = renderComponent()
+
+    const dateInput = await screen.findByLabelText(
+      "Entscheidungsdatum Nachgehende Entscheidung",
+    )
+    expect(dateInput).toHaveValue("")
+
+    await user.type(dateInput, "01")
+    await user.tab()
+
+    await screen.findByText(/Unvollständiges Datum/)
     screen.getByLabelText("Nachgehende Entscheidung speichern").click()
     expect(dateInput).toBeVisible()
   })

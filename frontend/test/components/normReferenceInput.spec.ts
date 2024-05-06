@@ -255,6 +255,24 @@ describe("NormReferenceEntry", () => {
     expect(dateInput).toBeVisible()
   })
 
+  it("does not add norm with incomplete version date input", async () => {
+    const { user } = renderComponent({
+      modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
+      } as NormReference,
+    })
+
+    const dateInput = await screen.findByLabelText("Fassungsdatum der Norm")
+    expect(dateInput).toHaveValue("")
+
+    await user.type(dateInput, "01")
+    await user.tab()
+
+    await screen.findByText(/Unvollständiges Datum/)
+    screen.getByLabelText("Norm speichern").click()
+    expect(dateInput).toBeVisible()
+  })
+
   it("does not add norm with invalid year input", async () => {
     renderComponent({
       modelValue: {

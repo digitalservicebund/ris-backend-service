@@ -471,7 +471,7 @@ describe("active citations", () => {
     expect(screen.getAllByText(/Pflichtfeld nicht befüllt/).length).toBe(1)
   })
 
-  it("does not add norm with invalid version date input", async () => {
+  it("does not add active citation with invalid date input", async () => {
     const { user } = renderComponent()
 
     const dateInput = await screen.findByLabelText(
@@ -482,6 +482,22 @@ describe("active citations", () => {
     await user.type(dateInput, "00.00.0231")
 
     await screen.findByText(/Kein valides Datum/)
+    screen.getByLabelText("Aktivzitierung speichern").click()
+    expect(dateInput).toBeVisible()
+  })
+
+  it("does not add active citation with incomplete date input", async () => {
+    const { user } = renderComponent()
+
+    const dateInput = await screen.findByLabelText(
+      "Entscheidungsdatum Aktivzitierung",
+    )
+    expect(dateInput).toHaveValue("")
+
+    await user.type(dateInput, "01.02.")
+    await user.tab()
+
+    await screen.findByText(/Unvollständiges Datum/)
     screen.getByLabelText("Aktivzitierung speichern").click()
     expect(dateInput).toBeVisible()
   })
