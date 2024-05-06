@@ -20,7 +20,8 @@ public class NormReferenceTransformer {
     }
 
     return NormReference.builder()
-        .normAbbreviation(NormAbbreviationTransformer.transformDTO(normDTO.getNormAbbreviation()))
+        .normAbbreviation(
+            NormAbbreviationTransformer.transformToDomain(normDTO.getNormAbbreviation()))
         .normAbbreviationRawValue(normDTO.getNormAbbreviationRawValue())
         .singleNorms(list)
         .build();
@@ -53,7 +54,7 @@ public class NormReferenceTransformer {
                       .dateOfRelevance(singleNorm.dateOfRelevance());
 
               if (featureActive && singleNorm.legalForce() != null) {
-                builder.legalForce(LegalForceTransformer.transformDomain(singleNorm.legalForce()));
+                builder.legalForce(LegalForceTransformer.transformToDTO(singleNorm.legalForce()));
               }
 
               return builder.build();

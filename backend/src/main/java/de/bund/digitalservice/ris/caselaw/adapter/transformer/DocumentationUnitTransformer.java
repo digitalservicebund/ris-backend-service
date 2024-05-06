@@ -174,6 +174,12 @@ public class DocumentationUnitTransformer {
               flattenNormReferenceDTOs.addAll(normReferenceDTOs);
             });
 
+    flattenNormReferenceDTOs.forEach(
+        normReferenceDTO -> {
+          if (normReferenceDTO.getLegalForce() != null)
+            normReferenceDTO.getLegalForce().setNormReference(normReferenceDTO);
+        });
+
     builder.normReferences(flattenNormReferenceDTOs);
   }
 

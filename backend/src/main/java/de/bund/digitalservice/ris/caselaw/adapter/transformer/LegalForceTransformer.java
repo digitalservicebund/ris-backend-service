@@ -8,7 +8,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 public class LegalForceTransformer {
   private LegalForceTransformer() {}
 
-  public static LegalForceDTO transformDomain(LegalForce legalForce) {
+  public static LegalForceDTO transformToDTO(LegalForce legalForce) {
     if (legalForce == null) {
       return null;
     }
@@ -26,14 +26,14 @@ public class LegalForceTransformer {
     return builder.build();
   }
 
-  public static LegalForce transformDTO(LegalForceDTO dto) {
+  public static LegalForce transformToDomain(LegalForceDTO dto) {
     if (dto == null) {
       return null;
     }
 
     return new LegalForce(
         dto.getId(),
-        LegalForceTypeTransformer.transformDTO(dto.getLegalForceType()),
+        LegalForceTypeTransformer.transformToDomain(dto.getLegalForceType()),
         RegionTransformer.transformDTO(dto.getRegion()));
   }
 }

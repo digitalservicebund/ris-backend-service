@@ -18,14 +18,14 @@ public class PostgresLegalForceTypeRepositoryImpl implements LegalForceTypeRepos
   @Override
   public List<LegalForceType> findBySearchStr(String searchString) {
     return repository.findAllByAbbreviationStartsWithIgnoreCase(searchString).stream()
-        .map(LegalForceTypeTransformer::transformDTO)
+        .map(LegalForceTypeTransformer::transformToDomain)
         .toList();
   }
 
   @Override
   public List<LegalForceType> findAllByOrderByAbbreviation() {
     return repository.findAllByOrderByAbbreviation().stream()
-        .map(LegalForceTypeTransformer::transformDTO)
+        .map(LegalForceTypeTransformer::transformToDomain)
         .toList();
   }
 }

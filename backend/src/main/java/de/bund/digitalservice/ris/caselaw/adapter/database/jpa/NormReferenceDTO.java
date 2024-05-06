@@ -51,7 +51,11 @@ public class NormReferenceDTO {
   @Column(name = "rank")
   private Integer rank;
 
-  @OneToOne(mappedBy = "normReference", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @OneToOne(
+      mappedBy = "normReference",
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      orphanRemoval = true)
   private LegalForceDTO legalForce;
 
   @Transient

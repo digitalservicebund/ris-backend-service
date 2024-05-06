@@ -23,7 +23,7 @@ public class SingleNormTransformer {
             .dateOfVersion(normReferenceDTO.getDateOfVersion());
 
     if (normReferenceDTO.getLegalForce() != null) {
-      builder.legalForce(LegalForceTransformer.transformDTO(normReferenceDTO.getLegalForce()));
+      builder.legalForce(LegalForceTransformer.transformToDomain(normReferenceDTO.getLegalForce()));
     }
 
     return builder.build();

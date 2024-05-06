@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -53,14 +52,14 @@ public class LegalForceDTO {
   private String dateOfRelevance;
 
   @ManyToOne
-  @JoinColumn(name = "region_id", updatable = false)
+  @JoinColumn(name = "region_id")
   private RegionDTO region;
 
   @ManyToOne
   @JoinColumn(name = "documentation_unit_id", updatable = false)
   private DocumentationUnitDTO documentationUnit;
 
-  @OneToOne(cascade = CascadeType.ALL)
+  @OneToOne()
   @JoinColumn(name = "norm_reference_id", referencedColumnName = "id")
   private NormReferenceDTO normReference;
 }
