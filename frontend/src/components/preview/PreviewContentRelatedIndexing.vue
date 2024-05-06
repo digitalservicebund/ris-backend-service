@@ -41,7 +41,7 @@ const hasActiveCitations = computed(() => {
 <template>
   <TableView class="table w-full table-fixed">
     <tr v-if="hasKeywords">
-      <PreviewLeftCell> Schlagwörter </PreviewLeftCell>
+      <PreviewLeftCell>Schlagwörter</PreviewLeftCell>
       <PreviewRightCell>
         <div
           v-for="(keyword, index) in contentRelatedIndexing.keywords"
@@ -52,7 +52,7 @@ const hasActiveCitations = computed(() => {
       </PreviewRightCell>
     </tr>
     <tr v-if="hasFieldsOfLaw">
-      <PreviewLeftCell> Sachgebiete </PreviewLeftCell>
+      <PreviewLeftCell>Sachgebiete</PreviewLeftCell>
       <PreviewRightCell>
         <div
           v-for="(fieldOfLaw, index) in contentRelatedIndexing.fieldsOfLaw"
@@ -64,18 +64,23 @@ const hasActiveCitations = computed(() => {
     </tr>
 
     <tr v-if="hasNorms">
-      <PreviewLeftCell> Normen </PreviewLeftCell>
+      <PreviewLeftCell>Normen</PreviewLeftCell>
       <PreviewRightCell>
         <div v-for="(norm, index) in contentRelatedIndexing.norms" :key="index">
-          <div v-for="(singleNorm, i) in norm.singleNorms" :key="i">
-            {{ norm.renderDecision }} - {{ singleNorm.renderDecision }}
+          <div v-if="norm.singleNorms && norm.singleNorms.length > 0">
+            <div v-for="(singleNorm, i) in norm.singleNorms" :key="i">
+              {{ norm.renderDecision }} - {{ singleNorm.renderDecision }}
+            </div>
+          </div>
+          <div v-else>
+            {{ norm.renderDecision }}
           </div>
         </div>
       </PreviewRightCell>
     </tr>
 
     <tr v-if="hasActiveCitations">
-      <PreviewLeftCell> Aktivzitierung </PreviewLeftCell>
+      <PreviewLeftCell>Aktivzitierung</PreviewLeftCell>
       <PreviewRightCell>
         <div
           v-for="(

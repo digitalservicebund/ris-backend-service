@@ -48,6 +48,22 @@ defineProps<{
         dayjs(coreData.decisionDate).format("DD.MM.YYYY")
       }}</PreviewRightCell>
     </tr>
+    <tr
+      v-if="
+        coreData.deviatingDecisionDates &&
+        coreData.deviatingDecisionDates.length > 0
+      "
+    >
+      <PreviewLeftCell>Abweichendes Entscheidungsdatum</PreviewLeftCell>
+      <PreviewRightCell>
+        <div
+          v-for="(item, index) in coreData.deviatingDecisionDates"
+          :key="index"
+        >
+          {{ dayjs(item).format("DD.MM.YYYY") }}
+        </div>
+      </PreviewRightCell>
+    </tr>
     <tr v-if="coreData.appraisalBody">
       <PreviewLeftCell>Spruchkörper</PreviewLeftCell>
       <PreviewRightCell>{{ coreData.appraisalBody }}</PreviewRightCell>
