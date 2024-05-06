@@ -123,6 +123,7 @@ function onDelete() {
           class="underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
         >
           <router-link
+            target="_blank"
             :to="{
               name: 'caselaw-documentUnit-documentNumber-categories',
               params: { documentNumber: listEntry.documentNumber },
