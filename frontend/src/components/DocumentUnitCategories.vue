@@ -11,6 +11,7 @@ import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import { ValidationError } from "@/components/input/types"
 import PreviousDecisions from "@/components/PreviousDecisions.vue"
+import { useProvideCourtType } from "@/composables/useCourtType"
 import useQuery from "@/composables/useQueryFromRoute"
 import { useScrollToHash } from "@/composables/useScrollToHash"
 import DocumentUnit, { Texts, CoreData } from "@/domain/documentUnit"
@@ -27,6 +28,7 @@ const props = defineProps<{
 const updatedDocumentUnit = ref<DocumentUnit>(props.documentUnit)
 const validationErrors = ref<ValidationError[]>([])
 const route = useRoute()
+const courtTypeRef = ref<string>(props.documentUnit.coreData.court?.type ?? "")
 
 const showAttachmentPanelRef: Ref<boolean> = ref(props.showAttachmentPanel)
 
@@ -107,6 +109,7 @@ const coreData = computed({
     // ---
 
     Object.assign(updatedDocumentUnit.value.coreData, newValues)
+    courtTypeRef.value = updatedDocumentUnit.value.coreData.court?.type ?? ""
     if (triggerSaving) {
       handleUpdateDocumentUnit()
     }
@@ -137,6 +140,8 @@ const contentRelatedIndexing = computed({
 const { hash: routeHash } = toRefs(route)
 const headerOffset = 145
 useScrollToHash(routeHash, headerOffset)
+
+useProvideCourtType(courtTypeRef)
 
 const toggleAttachmentPanel = () => {
   showAttachmentPanelRef.value = !showAttachmentPanelRef.value
