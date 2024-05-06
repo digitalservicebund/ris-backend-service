@@ -40,8 +40,8 @@ function renderComponent(options?: {
         component: {},
       },
       {
-        path: "/caselaw/documentUnit/:documentNumber/categories",
-        name: "caselaw-documentUnit-documentNumber-categories",
+        path: "/caselaw/documentUnit/:documentNumber/preview",
+        name: "caselaw-documentUnit-documentNumber-preview",
         component: {},
       },
     ],

@@ -7,6 +7,7 @@ import DateInput from "@/components/input/DateInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import YearInput from "@/components/input/YearInput.vue"
+import { useInjectCourtType } from "@/composables/useCourtType"
 import { useValidationStore } from "@/composables/useValidationStore"
 import SingleNorm, { SingleNormValidationInfo } from "@/domain/singleNorm"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -28,6 +29,9 @@ const emit = defineEmits<{
 const validationStore = useValidationStore<(typeof SingleNorm.fields)[number]>()
 const singleNormInput = ref<InstanceType<typeof TextInput> | null>(null)
 
+const courtTypeRef = useInjectCourtType()
+const courtsWithLegalForce = ["BVerfG", "VerfGH", "VerfG", "StGH", "VGH", "OVG"]
+
 const featureToggle = ref()
 
 const singleNorm = computed({
@@ -39,9 +43,7 @@ const singleNorm = computed({
   },
 })
 
-//Todo: implement isSuperiorCourt logic
-const isSuperiorCourt = ref(true)
-const withLegalForce = ref(!!props.modelValue.legalForce)
+const withLegalForce = ref(false)
 
 const legalForceType = computed({
   get: () =>
@@ -83,6 +85,10 @@ const legalForceRegion = computed({
       }
     }
   },
+})
+
+const isCourtWithLegalForce = computed(() => {
+  return courtsWithLegalForce.includes(courtTypeRef.value)
 })
 
 async function validateNorm() {
@@ -151,7 +157,7 @@ onMounted(async () => {
 <template>
   <div class="mb-24 flex flex-col gap-24 border-b-1 border-b-blue-300 pb-24">
     <div
-      v-if="featureToggle && isSuperiorCourt"
+      v-if="featureToggle && isCourtWithLegalForce"
       class="flex flex-row justify-between gap-24"
     >
       <InputField
@@ -252,7 +258,7 @@ onMounted(async () => {
       <div>
         <InputField id="legalForceType" label="Typ der Ges.-Kraft *">
           <ComboboxInput
-            id="forceOfLawType"
+            id="legalForceType"
             v-model="legalForceType"
             aria-label="Gesetzeskraft Typ"
             :item-service="ComboboxItemService.getLegalForceTypes"
@@ -262,7 +268,7 @@ onMounted(async () => {
       <div class="col-span-2">
         <InputField id="legalForceRegion" label="Geltungsbereich *">
           <ComboboxInput
-            id="forceOfLawRegion"
+            id="legalForceRegion"
             v-model="legalForceRegion"
             aria-label="Gesetzeskraft Geltungsbereich"
             :item-service="ComboboxItemService.getLegalForceRegions"

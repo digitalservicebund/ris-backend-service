@@ -103,7 +103,10 @@ async function validateRequiredInput() {
 }
 
 async function addPreviousDecision() {
-  if (!validationStore.getByMessage("Kein valides Datum").length) {
+  if (
+    !validationStore.getByMessage("Kein valides Datum").length &&
+    !validationStore.getByMessage("Unvollständiges Datum").length
+  ) {
     validateRequiredInput()
     emit("update:modelValue", previousDecision.value as PreviousDecision)
     emit("addEntry")

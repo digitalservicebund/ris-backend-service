@@ -267,4 +267,32 @@ test.describe("norm", () => {
       container.getByText("RIS-Abkürzung bereits eingegeben"),
     ).toBeVisible()
   })
+
+  test.describe("legal force", () => {
+    test("display legal force feature only when the right court type is selected", async ({
+      page,
+      documentNumber,
+    }) => {
+      await navigateToCategories(page, documentNumber)
+
+      await page.locator("[aria-label='Gericht']").fill("aalen")
+      await page.locator("text=AG Aalen").click()
+      await expect(page.locator("[aria-label='Gericht']")).toHaveValue(
+        "AG Aalen",
+      )
+
+      await fillNormInputs(page, {
+        normAbbreviation: "PBefG",
+        singleNorms: [{ singleNorm: "§ 123" } as SingleNorm],
+      })
+
+      const normContainer = page.getByLabel("Norm")
+
+      await expect(normContainer.getByText("Mit Gesetzeskraft")).toBeHidden()
+
+      await page.locator("[aria-label='Gericht']").fill("VerfG")
+      await page.locator("text=VerfG Dessau").last().click()
+      await expect(normContainer.getByText("Mit Gesetzeskraft")).toBeVisible()
+    })
+  })
 })

@@ -162,14 +162,7 @@ function onDelete() {
               class="text-blue-800"
               data-testid="file-attached-icon"
             >
-              <router-link
-                :to="{
-                  name: 'caselaw-documentUnit-documentNumber-files',
-                  params: { documentNumber: listEntry.documentNumber },
-                }"
-              >
-                <IconAttachedFile />
-              </router-link>
+              <IconAttachedFile />
             </FlexItem>
             <FlexItem v-else class="text-gray-500">
               <IconAttachedFile />
