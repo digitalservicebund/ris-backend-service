@@ -119,7 +119,9 @@ async function validateRequiredInput() {
 async function addActiveCitation() {
   if (
     !validationStore.getByMessage("Kein valides Datum").length &&
-    !validationStore.getByMessage("Unvollständiges Datum").length
+    !validationStore.getByMessage("Unvollständiges Datum").length &&
+    !validationStore.getByMessage("Das Datum darf nicht in der Zukunft liegen")
+      .length
   ) {
     validateRequiredInput()
     emit("update:modelValue", activeCitation.value as ActiveCitation)

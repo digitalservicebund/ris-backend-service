@@ -102,7 +102,9 @@ async function validateRequiredInput() {
 async function addEnsuingDecision() {
   if (
     !validationStore.getByMessage("Kein valides Datum").length &&
-    !validationStore.getByMessage("Unvollständiges Datum").length
+    !validationStore.getByMessage("Unvollständiges Datum").length &&
+    !validationStore.getByMessage("Das Datum darf nicht in der Zukunft liegen")
+      .length
   ) {
     validateRequiredInput()
     emit("update:modelValue", ensuingDecision.value as EnsuingDecision)

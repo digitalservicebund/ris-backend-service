@@ -501,4 +501,20 @@ describe("active citations", () => {
     screen.getByLabelText("Aktivzitierung speichern").click()
     expect(dateInput).toBeVisible()
   })
+
+  it("does not add active citation with date in the future", async () => {
+    const { user } = renderComponent()
+
+    const dateInput = await screen.findByLabelText(
+      "Entscheidungsdatum Aktivzitierung",
+    )
+    expect(dateInput).toHaveValue("")
+
+    await user.type(dateInput, "01.02.2090")
+    await user.tab()
+
+    await screen.findByText(/Das Datum darf nicht in der Zukunft liegen/)
+    screen.getByLabelText("Aktivzitierung speichern").click()
+    expect(dateInput).toBeVisible()
+  })
 })

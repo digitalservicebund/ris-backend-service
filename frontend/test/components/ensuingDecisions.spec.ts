@@ -398,4 +398,20 @@ describe("EnsuingDecisions", () => {
     screen.getByLabelText("Nachgehende Entscheidung speichern").click()
     expect(dateInput).toBeVisible()
   })
+
+  it("does not add ensuing decision with date in future", async () => {
+    const { user } = renderComponent()
+
+    const dateInput = await screen.findByLabelText(
+      "Entscheidungsdatum Nachgehende Entscheidung",
+    )
+    expect(dateInput).toHaveValue("")
+
+    await user.type(dateInput, "01.02.2090")
+    await user.tab()
+
+    await screen.findByText(/Das Datum darf nicht in der Zukunft liegen/)
+    screen.getByLabelText("Nachgehende Entscheidung speichern").click()
+    expect(dateInput).toBeVisible()
+  })
 })
