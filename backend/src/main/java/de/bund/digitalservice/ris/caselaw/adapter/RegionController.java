@@ -20,16 +20,10 @@ public class RegionController {
     this.service = service;
   }
 
-  @GetMapping
+  @GetMapping("/applicable")
   @PreAuthorize("isAuthenticated()")
-  public Flux<Region> getRegions(@RequestParam(value = "q", required = false) String searchStr) {
-    return Flux.fromIterable(service.getRegions(searchStr));
-  }
-
-  @GetMapping("/applicabile")
-  @PreAuthorize("isAuthenticated()")
-  public Flux<Region> getApplicabileRegions(
+  public Flux<Region> getApplicableRegions(
       @RequestParam(value = "q", required = false) String searchStr) {
-    return Flux.fromIterable(service.getApplicabileRegions(searchStr));
+    return Flux.fromIterable(service.getApplicableRegions(searchStr));
   }
 }

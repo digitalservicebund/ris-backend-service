@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DatabaseRegionRepository extends JpaRepository<RegionDTO, UUID> {
-  List<RegionDTO> findAllByCodeStartsWithOrLongTextStartsWith(
+  List<RegionDTO> findAllByCodeStartsWithIgnoreCaseOrLongTextStartsWithIgnoreCase(
       String searchString1, String searchString2);
 
   List<RegionDTO> findAllByOrderByCode();
