@@ -187,7 +187,9 @@ onMounted(async () => {
     <div
       class="gap-24"
       :class="
-        featureToggle ? 'grid grid-cols-3' : 'flex flex-row justify-between'
+        featureToggle && isCourtWithLegalForce
+          ? 'grid grid-cols-3'
+          : 'flex flex-row justify-between'
       "
     >
       <InputField
@@ -246,7 +248,7 @@ onMounted(async () => {
         />
       </InputField>
       <button
-        v-if="!featureToggle"
+        v-if="!featureToggle || !isCourtWithLegalForce"
         aria-label="Einzelnorm löschen"
         class="mt-[25px] h-[50px] text-blue-800 focus:shadow-[inset_0_0_0_0.25rem] focus:shadow-blue-800 focus:outline-none"
         tabindex="0"
