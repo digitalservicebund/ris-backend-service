@@ -31,7 +31,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalForceTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.NormAbbreviationTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.RegionTransformer;
@@ -40,6 +39,8 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
+import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -64,6 +65,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import reactor.core.publisher.Mono;
@@ -87,7 +89,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
     },
     controllers = {DocumentUnitController.class},
     timeout = "PT2M")
-@Sql(scripts = {"classpath:legal_force_init.sql"})
+@Sql(scripts = {"classpath:doc_office_init.sql", "classpath:legal_force_init.sql"})
 @Sql(
     scripts = {"classpath:legal_force_cleanup.sql"},
     executionPhase = AFTER_TEST_METHOD)
@@ -135,6 +137,7 @@ class LegalForceIntegrationTest {
   }
 
   @Test
+  @Transactional
   void testLegalForce_withNormReference_withoutLegalForce() {
     DocumentationUnitDTO dto =
         DocumentationUnitDTO.builder()
@@ -163,6 +166,7 @@ class LegalForceIntegrationTest {
   }
 
   @Test
+  @Transactional
   void testLegalForce_withNormReference_withLegalForce() {
     DocumentationUnitDTO dto =
         DocumentationUnitDTO.builder()
@@ -205,15 +209,9 @@ class LegalForceIntegrationTest {
     assertThat(result.getNormReferences().get(0).getLegalForce().getNormReference()).isNotNull();
   }
 
+  @Transactional
   @Test
   void testLegalForce_withNormReference_withLegalForce_atController() {
-    DocumentationUnitDTO documentationUnitDTO =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(documentationOfficeDTO)
-                .build());
-
     NormAbbreviation normAbbreviation =
         NormAbbreviationTransformer.transformToDomain(
             normAbbreviationRepository
@@ -234,22 +232,31 @@ class LegalForceIntegrationTest {
 
     LegalForce legalForce = LegalForce.builder().region(region).type(legalForceType).build();
 
-    NormReference normReference =
-        NormReference.builder()
-            .normAbbreviation(normAbbreviation)
-            .singleNorms(
-                List.of(
-                    SingleNorm.builder().singleNorm("single norm").legalForce(legalForce).build()))
-            .build();
-
     DocumentUnit documentUnitFromFrontend =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
-    documentUnitFromFrontend.contentRelatedIndexing().norms().add(normReference);
+        DocumentUnit.builder()
+            .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .norms(
+                        List.of(
+                            NormReference.builder()
+                                .normAbbreviation(normAbbreviation)
+                                .singleNorms(
+                                    List.of(
+                                        SingleNorm.builder()
+                                            .singleNorm("single norm")
+                                            .legalForce(legalForce)
+                                            .build()))
+                                .build()))
+                    .build())
+            .build();
 
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentationUnitDTO.getId())
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
         .bodyValue(documentUnitFromFrontend)
         .exchange()
         .expectStatus()
@@ -269,7 +276,8 @@ class LegalForceIntegrationTest {
                   .isNotNull();
             });
 
-    DocumentationUnitDTO result = repository.findById(documentationUnitDTO.getId()).get();
+    DocumentationUnitDTO result =
+        repository.findById(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")).get();
 
     assertThat(result.getNormReferences()).hasSize(1);
 
