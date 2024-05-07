@@ -7,7 +7,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DatabaseLegalForceTypeRepository extends JpaRepository<LegalForceTypeDTO, UUID> {
-  List<LegalForceTypeDTO> findAllByAbbreviationStartsWithIgnoreCase(String searchString);
+  List<LegalForceTypeDTO> findAllByAbbreviationStartsWithOrLabelStartsWith(
+      String searchString1, String searchString2);
 
   List<LegalForceTypeDTO> findAllByOrderByAbbreviation();
 }

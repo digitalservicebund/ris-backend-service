@@ -594,7 +594,7 @@ class NormAbbreviationIntegrationTest {
         return this;
       }
 
-      region = Region.builder().code(regionDTO.getCode()).id(regionDTO.getId()).build();
+      region = Region.builder().code(regionDTO.getCode()).build();
 
       return this;
     }

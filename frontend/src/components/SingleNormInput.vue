@@ -48,15 +48,10 @@ const withLegalForce = ref(false)
 const legalForceType = computed({
   get: () =>
     props.modelValue.legalForce && props.modelValue.legalForce.type
-      ? {
-          uuid: props.modelValue.legalForce.type.uuid,
-          label: props.modelValue.legalForce.type.abbreviation,
-          value: props.modelValue.legalForce.type.abbreviation,
-          abbreviation: props.modelValue.legalForce.type.abbreviation,
-        }
+      ? props.modelValue.legalForce.type
       : undefined,
   set: (newValue) => {
-    if (!newValue && singleNorm.value.legalForce?.type) {
+    if (!newValue && singleNorm.value.legalForce) {
       delete singleNorm.value.legalForce.type
     } else {
       singleNorm.value.legalForce = {
@@ -69,14 +64,11 @@ const legalForceType = computed({
 
 const legalForceRegion = computed({
   get: () =>
-    singleNorm.value.legalForce && singleNorm.value.legalForce.region
-      ? {
-          label: singleNorm.value.legalForce.region.longText,
-          longText: singleNorm.value.legalForce.region.longText,
-        }
+    props.modelValue.legalForce && props.modelValue.legalForce.region
+      ? props.modelValue.legalForce.region
       : undefined,
   set: (newValue) => {
-    if (!newValue && singleNorm.value.legalForce?.region) {
+    if (!newValue && singleNorm.value.legalForce) {
       delete singleNorm.value.legalForce.region
     } else {
       singleNorm.value.legalForce = {
@@ -147,7 +139,6 @@ onMounted(async () => {
     await validateNorm()
   }
 
-  withLegalForce.value = singleNorm.value?.hasLegalForce
   singleNormInput.value?.focusInput()
   featureToggle.value = (
     await FeatureToggleService.isEnabled("neuris.legal-force")
@@ -187,9 +178,7 @@ onMounted(async () => {
     <div
       class="gap-24"
       :class="
-        featureToggle && isCourtWithLegalForce
-          ? 'grid grid-cols-3'
-          : 'flex flex-row justify-between'
+        featureToggle ? 'grid grid-cols-3' : 'flex flex-row justify-between'
       "
     >
       <InputField
@@ -248,7 +237,7 @@ onMounted(async () => {
         />
       </InputField>
       <button
-        v-if="!featureToggle || !isCourtWithLegalForce"
+        v-if="!featureToggle"
         aria-label="Einzelnorm löschen"
         class="mt-[25px] h-[50px] text-blue-800 focus:shadow-[inset_0_0_0_0.25rem] focus:shadow-blue-800 focus:outline-none"
         tabindex="0"
@@ -257,10 +246,7 @@ onMounted(async () => {
         <IconClear />
       </button>
     </div>
-    <div
-      v-if="featureToggle && withLegalForce && isCourtWithLegalForce"
-      class="grid grid-cols-3 gap-24"
-    >
+    <div v-if="featureToggle && withLegalForce" class="grid grid-cols-3 gap-24">
       <div>
         <InputField id="legalForceType" label="Typ der Ges.-Kraft *">
           <ComboboxInput

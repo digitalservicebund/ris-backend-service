@@ -4,4 +4,4 @@ import java.util.UUID;
 import lombok.Builder;
 
 @Builder
-public record Region(UUID id, String code, String longText) {}
+public record Region(UUID id, String code, String longText, boolean applicability) {}

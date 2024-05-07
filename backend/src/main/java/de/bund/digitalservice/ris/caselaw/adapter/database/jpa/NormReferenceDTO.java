@@ -51,18 +51,12 @@ public class NormReferenceDTO {
   @Column(name = "rank")
   private Integer rank;
 
-  @OneToOne(
-      mappedBy = "normReference",
-      cascade = CascadeType.ALL,
-      fetch = FetchType.LAZY,
-      orphanRemoval = true)
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(referencedColumnName = "norm_reference_id", name = "id")
   private LegalForceDTO legalForce;
 
   @Transient
   public boolean isSingleNormEmpty() {
-    return singleNorm == null
-        && dateOfVersion == null
-        && dateOfRelevance == null
-        && legalForce == null;
+    return singleNorm == null && dateOfVersion == null && dateOfRelevance == null;
   }
 }

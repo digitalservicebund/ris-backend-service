@@ -5,7 +5,7 @@ import org.springframework.data.repository.NoRepositoryBean;
 
 @NoRepositoryBean
 public interface RegionRepository {
-  List<Region> findApplicableBySearchStr(String searchString);
+  List<Region> findBySearchStr(String searchString);
 
-  List<Region> findAllApplicableByOrderByCode();
+  List<Region> findAllByOrderByCode();
 }

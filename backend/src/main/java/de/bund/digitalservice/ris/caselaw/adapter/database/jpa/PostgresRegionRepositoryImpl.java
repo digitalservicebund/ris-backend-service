@@ -16,20 +16,16 @@ public class PostgresRegionRepositoryImpl implements RegionRepository {
   }
 
   @Override
-  public List<Region> findApplicableBySearchStr(String searchString) {
+  public List<Region> findBySearchStr(String searchString) {
     return repository
-        .findAllByCodeStartsWithIgnoreCaseOrLongTextStartsWithIgnoreCase(searchString, searchString)
+        .findAllByCodeStartsWithOrLongTextStartsWith(searchString, searchString)
         .stream()
-        .filter(RegionDTO::isApplicability)
         .map(RegionTransformer::transformDTO)
         .toList();
   }
 
   @Override
-  public List<Region> findAllApplicableByOrderByCode() {
-    return repository.findAllByOrderByCode().stream()
-        .filter(RegionDTO::isApplicability)
-        .map(RegionTransformer::transformDTO)
-        .toList();
+  public List<Region> findAllByOrderByCode() {
+    return repository.findAllByOrderByCode().stream().map(RegionTransformer::transformDTO).toList();
   }
 }

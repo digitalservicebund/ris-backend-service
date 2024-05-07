@@ -5,10 +5,8 @@ import EditableList from "@/components/EditableList.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
 import NormReference from "@/domain/normReference"
-import SingleNorm from "@/domain/singleNorm"
 import IconError from "~icons/ic/baseline-error"
 import IconBook from "~icons/material-symbols/book-2"
-import IconBreakingNews from "~icons/material-symbols/breaking-news"
 import IconArrowRight from "~icons/material-symbols/subdirectory-arrow-right"
 
 const props = defineProps<{
@@ -40,23 +38,6 @@ function hasSingleNorms(normEntry: NormReference) {
 
 const defaultValue = new NormReference()
 
-function legalForceSummarizer(singleNorm: SingleNorm) {
-  return h("div", { class: ["flex flex-row items-center"] }, [
-    h("div", {}, "|"),
-    h(IconBreakingNews, { class: ["mr-8 ml-8"] }),
-    h("div", { class: ["link-01-reg mr-8"] }, singleNorm.renderLegalForce),
-  ])
-}
-
-function errorBadgeSummarizer() {
-  return h(IconBadge, {
-    backgroundColor: "bg-red-300",
-    color: "text-red-900",
-    icon: IconError,
-    label: ambiguousNormReferenceError,
-  })
-}
-
 function decisionSummarizer(normEntry: NormReference) {
   if (normEntry.singleNorms?.length === 1) {
     return h("div", { class: ["flex flex-col gap-32"] }, [
@@ -69,10 +50,14 @@ function decisionSummarizer(normEntry: NormReference) {
             ", " +
             normEntry.singleNorms[0].renderDecision,
         ),
-        normEntry.singleNorms[0].hasLegalForce
-          ? legalForceSummarizer(normEntry.singleNorms[0])
+        normEntry.hasAmbiguousNormReference
+          ? h(IconBadge, {
+              backgroundColor: "bg-red-300",
+              color: "text-red-900",
+              icon: IconError,
+              label: ambiguousNormReferenceError,
+            })
           : null,
-        normEntry.hasAmbiguousNormReference ? errorBadgeSummarizer() : null,
       ]),
     ])
   } else {
@@ -80,7 +65,14 @@ function decisionSummarizer(normEntry: NormReference) {
       h("div", { class: ["flex flex-row items-center"] }, [
         h(IconBook, { class: ["mr-8"] }),
         h("div", { class: ["link-01-reg mr-8"] }, normEntry.renderDecision),
-        normEntry.hasAmbiguousNormReference ? errorBadgeSummarizer() : null,
+        normEntry.hasAmbiguousNormReference
+          ? h(IconBadge, {
+              backgroundColor: "bg-red-300",
+              color: "text-red-900",
+              icon: IconError,
+              label: ambiguousNormReferenceError,
+            })
+          : null,
       ]),
       hasSingleNorms(normEntry)
         ? h(
@@ -92,14 +84,11 @@ function decisionSummarizer(normEntry: NormReference) {
                     h(IconArrowRight, { class: ["mr-8"] }),
                     h(
                       "div",
-                      { class: ["link-01-reg mr-8"] },
+                      { class: ["link-01-reg"] },
                       normEntry.renderDecision +
                         ", " +
                         singleNorm.renderDecision,
                     ),
-                    singleNorm.hasLegalForce
-                      ? legalForceSummarizer(singleNorm)
-                      : null,
                   ])
                 : null
             }),

@@ -1,5 +1,4 @@
 import dayjs from "dayjs"
-import { capitalize } from "vue"
 
 export default class SingleNorm {
   public singleNorm?: string
@@ -11,7 +10,6 @@ export default class SingleNorm {
     "singleNorm",
     "dateOfVersion",
     "dateOfRelevance",
-    "legalForce",
   ] as const
 
   constructor(data: Partial<SingleNorm> = {}) {
@@ -32,17 +30,6 @@ export default class SingleNorm {
     ].join(", ")
   }
 
-  get renderLegalForce(): string {
-    return [
-      ...(this.legalForce?.type
-        ? [capitalize(this.legalForce.type.abbreviation)]
-        : []),
-      ...(this.legalForce?.region
-        ? [`(${this.legalForce.region.longText})`]
-        : []),
-    ].join(" ")
-  }
-
   get isEmpty(): boolean {
     let isEmpty = true
 
@@ -54,8 +41,8 @@ export default class SingleNorm {
     return isEmpty
   }
 
-  get hasLegalForce(): boolean {
-    return this.legalForce != undefined
+  get showSummaryOnEdit(): boolean {
+    return false
   }
 
   private fieldIsEmpty(value: SingleNorm[(typeof SingleNorm.fields)[number]]) {
@@ -91,11 +78,12 @@ export type LegalForce = {
 
 export type LegalForceType = {
   uuid?: string
-  abbreviation: string
+  abbreviation?: string
+  label: string
 }
 
 export type LegalForceRegion = {
   uuid?: string
   code?: string
-  longText: string
+  label: string
 }

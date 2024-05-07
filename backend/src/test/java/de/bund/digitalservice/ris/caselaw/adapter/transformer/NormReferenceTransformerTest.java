@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
@@ -12,7 +11,6 @@ import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -179,47 +177,10 @@ class NormReferenceTransformerTest {
     assertThat(result.getNormReferences()).isEmpty();
   }
 
-  @Test
-  void testTransformToDomain_twoSingleNormsForTwoDifferentAbbreviations() {
-    DocumentationUnitDTO documentationUnitDTO = generateDocumentationUnitDTO();
-    addNormReferenceToDTO(documentationUnitDTO, NORM_ABBREVIATION_UUID_1, 1, "single norm 1");
-    addNormReferenceToDTO(documentationUnitDTO, NORM_ABBREVIATION_UUID_2, 2, "single norm 2");
-    NormReference normReference1 =
-        NormReference.builder()
-            .normAbbreviation(
-                NormAbbreviation.builder()
-                    .id(NORM_ABBREVIATION_UUID_1)
-                    .documentTypes(Collections.emptyList())
-                    .build())
-            .singleNorms(List.of(SingleNorm.builder().singleNorm("single norm 1").build()))
-            .build();
-    NormReference normReference2 =
-        NormReference.builder()
-            .normAbbreviation(
-                NormAbbreviation.builder()
-                    .id(NORM_ABBREVIATION_UUID_2)
-                    .documentTypes(Collections.emptyList())
-                    .build())
-            .singleNorms(List.of(SingleNorm.builder().singleNorm("single norm 2").build()))
-            .build();
-
-    DocumentUnit result = DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
-
-    assertThat(result.contentRelatedIndexing().norms())
-        .containsExactly(normReference1, normReference2);
-  }
-
   private DocumentUnit generateDocumentationUnit() {
     ContentRelatedIndexing contentRelatedIndexing =
         ContentRelatedIndexing.builder().norms(new ArrayList<>()).build();
     return DocumentUnit.builder().contentRelatedIndexing(contentRelatedIndexing).build();
-  }
-
-  private DocumentationUnitDTO generateDocumentationUnitDTO() {
-    return DocumentationUnitDTO.builder()
-        .documentationOffice(DocumentationOfficeDTO.builder().build())
-        .normReferences(new ArrayList<>())
-        .build();
   }
 
   private void addNormReferenceToDomain(

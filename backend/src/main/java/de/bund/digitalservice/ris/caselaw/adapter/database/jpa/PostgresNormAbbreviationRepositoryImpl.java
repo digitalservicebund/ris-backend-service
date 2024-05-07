@@ -19,7 +19,7 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
 
   @Override
   public NormAbbreviation findById(UUID id) {
-    return NormAbbreviationTransformer.transformToDomain(repository.findById(id).orElse(null));
+    return NormAbbreviationTransformer.transformDTO(repository.findById(id).orElse(null));
   }
 
   @Override
@@ -61,6 +61,6 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
           .forEach(results::add);
     }
 
-    return results.stream().map(NormAbbreviationTransformer::transformToDomain).toList();
+    return results.stream().map(NormAbbreviationTransformer::transformDTO).toList();
   }
 }
