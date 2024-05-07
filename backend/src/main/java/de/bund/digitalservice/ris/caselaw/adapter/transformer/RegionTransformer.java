@@ -7,6 +7,14 @@ public class RegionTransformer {
   private RegionTransformer() {}
 
   public static Region transformDTO(RegionDTO regionDTO) {
-    return Region.builder().code(regionDTO.getCode()).build();
+    if (regionDTO == null) {
+      return null;
+    }
+
+    return Region.builder()
+        .id(regionDTO.getId())
+        .code(regionDTO.getCode())
+        .longText(regionDTO.getLongText())
+        .build();
   }
 }
