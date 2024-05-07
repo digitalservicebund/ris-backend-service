@@ -10,7 +10,7 @@ import java.util.List;
 public class NormAbbreviationTransformer {
   private NormAbbreviationTransformer() {}
 
-  public static NormAbbreviation transformDTO(NormAbbreviationDTO normAbbreviationDTO) {
+  public static NormAbbreviation transformToDomain(NormAbbreviationDTO normAbbreviationDTO) {
     if (normAbbreviationDTO == null) {
       return null;
     }

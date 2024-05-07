@@ -15,15 +15,11 @@ public class RegionService {
     this.repository = repository;
   }
 
-  public List<Region> getRegions(String searchStr) {
+  public List<Region> getApplicableRegions(String searchStr) {
     if (searchStr != null && !searchStr.trim().isBlank()) {
-      return repository.findBySearchStr(searchStr.trim());
+      return repository.findApplicableBySearchStr(searchStr.trim());
     }
 
-    return repository.findAllByOrderByCode();
-  }
-
-  public List<Region> getApplicabileRegions(String searchStr) {
-    return getRegions(searchStr).stream().filter(Region::applicability).toList();
+    return repository.findAllApplicableByOrderByCode();
   }
 }
