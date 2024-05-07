@@ -66,12 +66,10 @@ describe("NormReferenceEntry", () => {
     Promise.resolve({ status: 200, data: "Ok" }),
   )
   vi.mock("@/composables/useCourtType", () => ({
-    __esModule: true,
     useInjectCourtType: vi.fn(() => {
       return ref("VerfG")
     }),
   }))
-  // vi.spyOn(SingleNormInput.options.computed, 'isCourtWithLegalForce').mockReturnValue(true)
   it("render empty norm input group on initial load", async () => {
     renderComponent()
     expect(screen.getByLabelText("RIS-Abkürzung")).toBeInTheDocument()
