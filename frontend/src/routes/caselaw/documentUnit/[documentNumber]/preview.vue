@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import DocumentUnitPreview from "@/components/DocumentUnitPreview.vue"
 import ErrorPage from "@/components/ErrorPage.vue"
+import DocumentUnitPreview from "@/components/preview/DocumentUnitPreview.vue"
 import documentUnitService from "@/services/documentUnitService"
 
 const props = defineProps<{ documentNumber: string }>()
