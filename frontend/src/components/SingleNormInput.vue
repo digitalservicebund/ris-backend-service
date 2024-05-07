@@ -147,6 +147,7 @@ onMounted(async () => {
     await validateNorm()
   }
 
+  withLegalForce.value = singleNorm.value?.hasLegalForce
   singleNormInput.value?.focusInput()
   featureToggle.value = (
     await FeatureToggleService.isEnabled("neuris.legal-force")
@@ -254,7 +255,10 @@ onMounted(async () => {
         <IconClear />
       </button>
     </div>
-    <div v-if="featureToggle && withLegalForce" class="grid grid-cols-3 gap-24">
+    <div
+      v-if="featureToggle && withLegalForce && isCourtWithLegalForce"
+      class="grid grid-cols-3 gap-24"
+    >
       <div>
         <InputField id="legalForceType" label="Typ der Ges.-Kraft *">
           <ComboboxInput

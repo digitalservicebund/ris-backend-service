@@ -1,5 +1,7 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { vi } from "vitest"
+import { ref } from "vue"
 import { ComboboxItem } from "@/components/input/types"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
@@ -24,12 +26,11 @@ describe("NormReferenceEntry", () => {
     abbreviation: "1000g-BefV",
   }
   const legalForceType: LegalForceType = {
-    label: "legal force type",
-    abbreviation: "abc",
+    abbreviation: "nichtig",
   }
   const region: LegalForceRegion = {
-    label: "region",
-    code: "abc",
+    longText: "region",
+    code: "BB",
   }
   const dropdownAbbreviationItems: ComboboxItem[] = [
     {
@@ -39,13 +40,13 @@ describe("NormReferenceEntry", () => {
   ]
   const dropdownLegalForceTypeItems: ComboboxItem[] = [
     {
-      label: legalForceType.label,
+      label: legalForceType.abbreviation,
       value: legalForceType,
     },
   ]
   const dropdownRegionItems: ComboboxItem[] = [
     {
-      label: region.label,
+      label: region.longText,
       value: region,
     },
   ]
@@ -64,6 +65,13 @@ describe("NormReferenceEntry", () => {
   vi.spyOn(documentUnitService, "validateSingleNorm").mockImplementation(() =>
     Promise.resolve({ status: 200, data: "Ok" }),
   )
+  vi.mock("@/composables/useCourtType", () => ({
+    __esModule: true,
+    useInjectCourtType: vi.fn(() => {
+      return ref("VerfG")
+    }),
+  }))
+  // vi.spyOn(SingleNormInput.options.computed, 'isCourtWithLegalForce').mockReturnValue(true)
   it("render empty norm input group on initial load", async () => {
     renderComponent()
     expect(screen.getByLabelText("RIS-Abkürzung")).toBeInTheDocument()
@@ -478,7 +486,6 @@ describe("NormReferenceEntry", () => {
   })
 
   it("legal force checkbox toggles comboboxes", async () => {
-    //Todo: only show checkbox, when court is superior court
     const { user } = renderComponent()
     const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
     await user.type(abbreviationField, "1000")
@@ -516,7 +523,7 @@ describe("NormReferenceEntry", () => {
     const dropdownItemslegalForceType = screen.getAllByLabelText(
       "dropdown-option",
     ) as HTMLElement[]
-    expect(dropdownItemslegalForceType[0]).toHaveTextContent("legal force type")
+    expect(dropdownItemslegalForceType[0]).toHaveTextContent("nichtig")
     await user.click(dropdownItemslegalForceType[0])
 
     const button = screen.getByLabelText("Norm speichern")
@@ -535,8 +542,7 @@ describe("NormReferenceEntry", () => {
               singleNorm: undefined,
               legalForce: {
                 type: {
-                  abbreviation: "abc",
-                  label: "legal force type",
+                  abbreviation: "nichtig",
                 },
               },
             },
@@ -582,8 +588,8 @@ describe("NormReferenceEntry", () => {
               singleNorm: undefined,
               legalForce: {
                 region: {
-                  code: "abc",
-                  label: "region",
+                  code: "BB",
+                  longText: "region",
                 },
               },
             },
