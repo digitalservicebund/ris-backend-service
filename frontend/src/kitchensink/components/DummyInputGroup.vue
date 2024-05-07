@@ -24,12 +24,6 @@ async function addListEntry() {
   emit("addEntry")
 }
 
-function cancelEdit() {
-  if (new DummyListItem({ ...props.modelValue }).isEmpty)
-    emit("removeEntry", true)
-  emit("cancelEdit")
-}
-
 watch(
   () => props.modelValue,
   () => {
@@ -68,11 +62,12 @@ onBeforeUnmount(() => {
             @click.stop="addListEntry"
           />
           <TextButton
+            v-if="!lastSavedModelValue.isEmpty"
             aria-label="Abbrechen"
             button-type="ghost"
             label="Abbrechen"
             size="small"
-            @click.stop="cancelEdit"
+            @click.stop="emit('cancelEdit')"
           />
         </div>
       </div>

@@ -44,12 +44,12 @@ test.describe("related documentation units", () => {
             await expect(
               container.getByLabel(`${containerLabel} speichern`),
             ).toBeHidden()
-          } else {
+          } else
             await expect(
               container.getByLabel(`${containerLabel} speichern`),
             ).toBeDisabled()
-            await expect(container.getByLabel("Abbrechen")).toBeVisible()
-          }
+
+          await expect(container.getByLabel("Abbrechen")).toBeHidden()
 
           await expect(container.getByLabel("Löschen")).toBeHidden()
         },
@@ -257,6 +257,11 @@ test.describe("related documentation units", () => {
             })
           }
 
+          //Todo remove this, when all editable lists are adapted -> RISDEV-3812
+          if (container !== normsContainer) {
+            await expect(container.getByLabel("Abbrechen")).toBeHidden()
+          }
+
           await expect(
             container.getByLabel("Löschen", { exact: true }),
           ).toBeHidden()
@@ -364,6 +369,7 @@ test.describe("related documentation units", () => {
           await container.getByLabel("Listen Eintrag").first().click()
           await container.getByLabel("Eintrag löschen").click()
 
+          await expect(container.getByLabel("Abbrechen")).toBeHidden()
           await expect(container.getByLabel("Eintrag löschen")).toBeHidden()
           await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
 
@@ -419,6 +425,10 @@ test.describe("related documentation units", () => {
             await fillNormInputs(page, {
               normAbbreviation: firstEntry,
             })
+          }
+          //Todo remove this, when all editable lists are adapted -> RISDEV-3812
+          if (container !== normsContainer) {
+            await expect(container.getByLabel("Abbrechen")).toBeHidden()
           }
 
           await container.getByLabel(`${containerLabel} speichern`).click()

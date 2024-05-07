@@ -143,12 +143,6 @@ async function addActiveCitationFromSearch(decision: RelatedDocumentation) {
   scrollToTop()
 }
 
-function cancelEdit() {
-  if (new ActiveCitation({ ...props.modelValue }).isEmpty)
-    emit("removeEntry", true)
-  emit("cancelEdit")
-}
-
 function scrollToTop() {
   const element = document.getElementById("activeCitations")
   if (element) {
@@ -309,11 +303,12 @@ onBeforeUnmount(() => {
             @click.stop="addActiveCitation"
           />
           <TextButton
+            v-if="!lastSavedModelValue.isEmpty"
             aria-label="Abbrechen"
             button-type="ghost"
             label="Abbrechen"
             size="small"
-            @click.stop="cancelEdit"
+            @click.stop="emit('cancelEdit')"
           />
         </div>
       </div>

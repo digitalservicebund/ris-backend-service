@@ -127,12 +127,6 @@ async function addPreviousDecisionFromSearch(decision: RelatedDocumentation) {
   scrollToTop()
 }
 
-function cancelEdit() {
-  if (new PreviousDecision({ ...props.modelValue }).isEmpty)
-    emit("removeEntry", true)
-  emit("cancelEdit")
-}
-
 function scrollToTop() {
   const element = document.getElementById("previousDecisions")
   if (element) {
@@ -320,11 +314,12 @@ onBeforeUnmount(() => {
             @click.stop="addPreviousDecision"
           />
           <TextButton
+            v-if="!lastSavedModelValue.isEmpty"
             aria-label="Abbrechen"
             button-type="ghost"
             label="Abbrechen"
             size="small"
-            @click.stop="cancelEdit"
+            @click.stop="emit('cancelEdit')"
           />
         </div>
       </div>
