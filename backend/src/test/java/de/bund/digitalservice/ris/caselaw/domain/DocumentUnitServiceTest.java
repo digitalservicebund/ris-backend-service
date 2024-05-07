@@ -355,7 +355,8 @@ class DocumentUnitServiceTest {
             Optional.empty(),
             Optional.empty(),
             Optional.empty());
-    assertThat(documentationUnitSearchEntries).contains(documentationUnitListItem);
+    assertThat(documentationUnitSearchEntries)
+        .contains(documentationUnitListItem.toBuilder().isEditableByCurrentUser(false).build());
     verify(repository)
         .searchByDocumentationUnitSearchInput(
             pageRequest, documentationOffice, documentationUnitSearchInput);

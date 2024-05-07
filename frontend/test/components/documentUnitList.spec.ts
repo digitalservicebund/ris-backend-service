@@ -45,6 +45,11 @@ function renderComponent(options?: {
                 component: {},
               },
               {
+                path: "/caselaw/documentUnit/:documentNumber/preview",
+                name: "caselaw-documentUnit-documentNumber-preview",
+                component: {},
+              },
+              {
                 path: "/",
                 name: "caselaw",
                 component: {},
@@ -106,6 +111,7 @@ describe("documentUnit list", () => {
             publicationStatus: PublicationState.PUBLISHED,
             withError: false,
           },
+          isEditableByCurrentUser: false,
         },
         {
           id: "id",
@@ -120,6 +126,7 @@ describe("documentUnit list", () => {
             publicationStatus: PublicationState.PUBLISHED,
             withError: false,
           },
+          isEditableByCurrentUser: true,
         },
       ],
     })
@@ -128,10 +135,9 @@ describe("documentUnit list", () => {
 
     //Spruchkörper visible
     expect(screen.getByText("cba")).toBeVisible()
-    expect(screen.getByRole("link", { name: "234" })).toHaveAttribute(
-      "href",
-      "/caselaw/documentUnit/234/categories",
-    )
+    expect(
+      screen.getByRole("link", { name: "Dokumentationseinheit bearbeiten" }),
+    ).toHaveAttribute("href", "/caselaw/documentUnit/234/categories")
   })
 
   test("delete emits event", async () => {
@@ -149,6 +155,7 @@ describe("documentUnit list", () => {
             publicationStatus: PublicationState.PUBLISHED,
             withError: false,
           },
+          isEditableByCurrentUser: true,
         },
       ],
     })

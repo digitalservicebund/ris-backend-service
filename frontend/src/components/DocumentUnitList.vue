@@ -19,12 +19,15 @@ import IconAttachedFile from "~icons/ic/baseline-attach-file"
 import IconDelete from "~icons/ic/baseline-close"
 import IconError from "~icons/ic/baseline-error"
 import IconSubject from "~icons/ic/baseline-subject"
+import IconEdit from "~icons/ic/outline-edit"
+import IconView from "~icons/ic/outline-remove-red-eye"
 
 const props = defineProps<{
   documentUnitListEntries?: DocumentUnitListEntry[]
   searchResponseError?: ResponseError
   isLoading?: boolean
   isDeletable?: boolean
+  isEditable?: boolean
   emptyState?: string
 }>()
 
@@ -109,28 +112,41 @@ function onDelete() {
         <CellHeaderItem> Aktenzeichen</CellHeaderItem>
         <CellHeaderItem> Spruchkörper</CellHeaderItem>
         <CellHeaderItem> Typ</CellHeaderItem>
-        <CellHeaderItem> Inhalte</CellHeaderItem>
         <CellHeaderItem> Status</CellHeaderItem>
         <CellHeaderItem> Fehler</CellHeaderItem>
-        <CellHeaderItem v-if="isDeletable"></CellHeaderItem>
+        <CellHeaderItem />
       </TableHeader>
       <TableRow
         v-for="(listEntry, id) in listEntries"
         :key="id"
         data-testid="listEntry"
       >
-        <CellItem
-          class="underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
-        >
-          <router-link
-            target="_blank"
-            :to="{
-              name: 'caselaw-documentUnit-documentNumber-categories',
-              params: { documentNumber: listEntry.documentNumber },
-            }"
-          >
-            {{ listEntry.documentNumber }}
-          </router-link>
+        <CellItem>
+          <FlexContainer class="flex-row space-x-8">
+            <FlexItem class="flex-grow">{{
+              listEntry.documentNumber
+            }}</FlexItem>
+            <FlexItem
+              v-if="listEntry.hasAttachments"
+              class="flex-end text-blue-800"
+              data-testid="file-attached-icon"
+            >
+              <IconAttachedFile class="h-20 w-20" />
+            </FlexItem>
+            <FlexItem v-else class="flex-end text-gray-500">
+              <IconAttachedFile class="h-20 w-20" />
+            </FlexItem>
+            <FlexItem
+              v-if="listEntry.hasHeadnoteOrPrinciple"
+              class="flex-end text-blue-800"
+              data-testid="headnote-principle-icon"
+            >
+              <IconSubject class="h-20 w-20" />
+            </FlexItem>
+            <span v-else class="text-gray-500"
+              ><IconSubject class="h-20 w-20"
+            /></span>
+          </FlexContainer>
         </CellItem>
         <CellItem>
           {{ listEntry.court?.type ?? "-" }}
@@ -157,28 +173,6 @@ function onDelete() {
           }}
         </CellItem>
         <CellItem>
-          <FlexContainer class="flex-row">
-            <FlexItem
-              v-if="listEntry.hasAttachments"
-              class="text-blue-800"
-              data-testid="file-attached-icon"
-            >
-              <IconAttachedFile />
-            </FlexItem>
-            <FlexItem v-else class="text-gray-500">
-              <IconAttachedFile />
-            </FlexItem>
-            <FlexItem
-              v-if="listEntry.hasHeadnoteOrPrinciple"
-              class="text-blue-800"
-              data-testid="headnote-principle-icon"
-            >
-              <IconSubject />
-            </FlexItem>
-            <span v-else class="text-gray-500"><IconSubject /></span>
-          </FlexContainer>
-        </CellItem>
-        <CellItem>
           <IconBadge
             v-if="listEntry.status?.publicationStatus"
             v-bind="useStatusBadge(listEntry.status).value"
@@ -194,27 +188,68 @@ function onDelete() {
           />
           <span v-else>-</span>
         </CellItem>
-        <CellItem v-if="isDeletable" class="text-end">
-          <button
-            aria-label="Dokumentationseinheit löschen"
-            class="cursor-pointer align-middle text-blue-800 focus:outline-none focus-visible:outline-blue-800"
-            @click="
-              setSelectedDocumentUnitListEntry(
-                documentUnitListEntries?.find(
-                  (entry) => entry.uuid == listEntry.uuid,
-                ) as DocumentUnitListEntry,
-              )
-            "
-            @keyup.enter="
-              setSelectedDocumentUnitListEntry(
-                documentUnitListEntries?.find(
-                  (entry) => entry.uuid == listEntry.uuid,
-                ) as DocumentUnitListEntry,
-              )
-            "
-          >
-            <IconDelete />
-          </button>
+        <CellItem class="flex">
+          <div class="flex">
+            <router-link
+              v-if="listEntry.isEditableByCurrentUser"
+              aria-label="Dokumentationseinheit bearbeiten"
+              class="cursor-pointer border-2 border-r-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus:outline-none focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
+              target="_blank"
+              :to="{
+                name: 'caselaw-documentUnit-documentNumber-categories',
+                params: { documentNumber: listEntry.documentNumber },
+              }"
+            >
+              <IconEdit />
+            </router-link>
+            <div
+              v-else
+              aria-label="Dokumentationseinheit bearbeiten"
+              class="border-2 border-r-0 border-solid border-gray-600 p-4 text-gray-600"
+            >
+              <IconEdit />
+            </div>
+
+            <router-link
+              aria-label="Dokumentationseinheit ansehen"
+              class="cursor-pointer border-2 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus:outline-none focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
+              target="_blank"
+              :to="{
+                name: 'caselaw-documentUnit-documentNumber-preview',
+                params: { documentNumber: listEntry.documentNumber },
+              }"
+            >
+              <IconView />
+            </router-link>
+            <button
+              v-if="isDeletable && listEntry.isEditableByCurrentUser"
+              aria-label="Dokumentationseinheit löschen"
+              class="cursor-pointer border-2 border-l-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus:outline-none focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
+              @click="
+                setSelectedDocumentUnitListEntry(
+                  documentUnitListEntries?.find(
+                    (entry) => entry.uuid == listEntry.uuid,
+                  ) as DocumentUnitListEntry,
+                )
+              "
+              @keyup.enter="
+                setSelectedDocumentUnitListEntry(
+                  documentUnitListEntries?.find(
+                    (entry) => entry.uuid == listEntry.uuid,
+                  ) as DocumentUnitListEntry,
+                )
+              "
+            >
+              <IconDelete />
+            </button>
+            <div
+              v-else
+              aria-label="Dokumentationseinheit löschen"
+              class="border-2 border-solid border-gray-600 p-4 text-gray-600"
+            >
+              <IconDelete />
+            </div>
+          </div>
         </CellItem>
       </TableRow>
     </TableView>

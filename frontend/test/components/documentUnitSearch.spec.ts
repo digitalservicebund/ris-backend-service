@@ -28,6 +28,11 @@ function renderComponent() {
         component: {},
       },
       {
+        path: "/caselaw/documentUnit/:documentNumber/preview",
+        name: "caselaw-documentUnit-documentNumber-preview",
+        component: {},
+      },
+      {
         path: "/caselaw/documentUnit/:documentNumber/files",
         name: "caselaw-documentUnit-documentNumber-files",
         component: {},
@@ -65,6 +70,7 @@ describe("Documentunit Search", () => {
             },
             documentNumber: "documentNumber",
             fileNumber: "fileNumber",
+            isEditableByCurrentUser: true,
           }),
         ],
         size: 0,

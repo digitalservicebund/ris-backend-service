@@ -57,7 +57,10 @@ public class DocumentationUnitListItemTransformer {
                 : StatusTransformer.transformToDomain(
                     documentationUnitListItemDTO.getStatus().stream()
                         .max(Comparator.comparing(StatusDTO::getCreatedAt))
-                        .orElse(null)));
+                        .orElse(null)))
+        .documentationOffice(
+            DocumentationOfficeTransformer.transformToDomain(
+                documentationUnitListItemDTO.getDocumentationOffice()));
     return builder.build();
   }
 

@@ -27,4 +27,6 @@ public interface DocumentationUnitListItemDTO {
   DocumentTypeDTO getDocumentType();
 
   List<StatusDTO> getStatus();
+
+  DocumentationOfficeDTO getDocumentationOffice();
 }

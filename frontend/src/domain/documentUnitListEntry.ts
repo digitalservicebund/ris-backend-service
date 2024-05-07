@@ -12,6 +12,7 @@ export default class DocumentUnitListEntry {
   appraisalBody?: string
   hasHeadnoteOrPrinciple?: boolean
   hasAttachments?: boolean
+  isEditableByCurrentUser?: boolean
 
   constructor(data: Partial<DocumentUnitListEntry> = {}) {
     Object.assign(this, data)
