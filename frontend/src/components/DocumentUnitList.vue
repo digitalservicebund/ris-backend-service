@@ -245,7 +245,7 @@ function onDelete() {
             <div
               v-else
               aria-label="Dokumentationseinheit löschen"
-              class="border-2 border-solid border-gray-600 p-4 text-gray-600"
+              class="border-2 border-l-0 border-solid border-gray-600 p-4 text-gray-600"
             >
               <IconDelete />
             </div>
