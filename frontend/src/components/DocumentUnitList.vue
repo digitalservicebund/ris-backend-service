@@ -193,7 +193,7 @@ function onDelete() {
             <router-link
               v-if="listEntry.isEditableByCurrentUser"
               aria-label="Dokumentationseinheit bearbeiten"
-              class="cursor-pointer border-2 border-r-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus:outline focus:outline-4 focus:outline-offset-4 focus:outline-blue-800 active:border-blue-200 active:bg-blue-200"
+              class="cursor-pointer border-2 border-r-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
               target="_blank"
               :to="{
                 name: 'caselaw-documentUnit-documentNumber-categories',
@@ -212,7 +212,7 @@ function onDelete() {
 
             <router-link
               aria-label="Dokumentationseinheit ansehen"
-              class="cursor-pointer border-2 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus:outline focus:outline-4 focus:outline-offset-4 focus:outline-blue-800 active:border-blue-200 active:bg-blue-200"
+              class="cursor-pointer border-2 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
               target="_blank"
               :to="{
                 name: 'caselaw-documentUnit-documentNumber-preview',
@@ -224,7 +224,7 @@ function onDelete() {
             <button
               v-if="isDeletable && listEntry.isEditableByCurrentUser"
               aria-label="Dokumentationseinheit löschen"
-              class="cursor-pointer border-2 border-l-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus:outline focus:outline-4 focus:outline-offset-4 focus:outline-blue-800 active:border-blue-200 active:bg-blue-200"
+              class="cursor-pointer border-2 border-l-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
               @click="
                 setSelectedDocumentUnitListEntry(
                   documentUnitListEntries?.find(
