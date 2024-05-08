@@ -33,10 +33,13 @@ public class NormReferenceTransformer {
       return Collections.emptyList();
     }
 
+    if (normReference.normAbbreviation() == null) {
+      throw new DocumentUnitTransformerException(
+          "Norm reference has no norm abbreviation, but is required.");
+    }
+
     NormAbbreviationDTO normAbbreviationDTO =
-        normReference.normAbbreviation() != null
-            ? NormAbbreviationDTO.builder().id(normReference.normAbbreviation().id()).build()
-            : null;
+        NormAbbreviationDTO.builder().id(normReference.normAbbreviation().id()).build();
 
     if (normReference.singleNorms() == null || normReference.singleNorms().isEmpty()) {
       return List.of(NormReferenceDTO.builder().normAbbreviation(normAbbreviationDTO).build());
