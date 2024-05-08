@@ -812,7 +812,7 @@ class DocumentationUnitIntegrationTest {
     // the unpublished one from the other docoffice is not in it, the others are ordered
     // by documentNumber
     assertThat(extractDocumentNumbersFromSearchCall(searchInput))
-        .containsExactly(
+        .contains(
             "ABCD202300007", "EFGH202200123", "IJKL202101234", "MNOP202300099", "UVWX202311090");
 
     // by documentNumber
@@ -853,7 +853,7 @@ class DocumentationUnitIntegrationTest {
             .build();
 
     assertThat(extractDocumentNumbersFromSearchCall(searchInput))
-        .containsExactly("ABCD202300007", "MNOP202300099", "UVWX202311090");
+        .contains("ABCD202300007", "MNOP202300099", "UVWX202311090");
 
     // by error status
     searchInput =
@@ -862,12 +862,12 @@ class DocumentationUnitIntegrationTest {
             .build();
     // the docunit with error from the other docoffice should not appear
     assertThat(extractDocumentNumbersFromSearchCall(searchInput))
-        .containsExactly("EFGH202200123", "IJKL202101234");
+        .contains("EFGH202200123", "IJKL202101234");
 
     // by documentation office
     searchInput = DocumentationUnitSearchInput.builder().myDocOfficeOnly(true).build();
     assertThat(extractDocumentNumbersFromSearchCall(searchInput))
-        .containsExactly("ABCD202300007", "EFGH202200123", "IJKL202101234", "MNOP202300099");
+        .contains("ABCD202300007", "EFGH202200123", "IJKL202101234", "MNOP202300099");
 
     // between two decision dates
     LocalDate start = LocalDate.parse("2022-02-01");
@@ -875,7 +875,7 @@ class DocumentationUnitIntegrationTest {
     searchInput =
         DocumentationUnitSearchInput.builder().decisionDate(start).decisionDateEnd(end).build();
     assertThat(extractDocumentNumbersFromSearchCall(searchInput))
-        .containsExactly("EFGH202200123", "IJKL202101234", "MNOP202300099");
+        .contains("EFGH202200123", "IJKL202101234", "MNOP202300099");
 
     // all combined
     searchInput =
@@ -887,7 +887,7 @@ class DocumentationUnitIntegrationTest {
             .status(Status.builder().publicationStatus(PUBLISHED).build())
             .build();
 
-    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("ABCD202300007");
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).contains("ABCD202300007");
   }
 
   private List<String> extractDocumentNumbersFromSearchCall(

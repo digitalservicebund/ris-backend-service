@@ -34,6 +34,7 @@ import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -49,6 +50,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
@@ -188,13 +190,20 @@ class DocumentationUnitSearchIntegrationTest {
   }
 
   @Test
-  void testOrderedByDocumentNumber() {
-    List<String> documentNumbers = Arrays.asList("EFGH202200123", "IJKL202300099", "ABCD202300007");
+  void testOrderedByDateDescending() {
+    List<LocalDate> dates =
+        Arrays.asList(
+            LocalDate.of(2022, 1, 23),
+            LocalDate.of(2022, 1, 23),
+            null,
+            LocalDate.of(2023, 3, 15),
+            LocalDate.of(2023, 6, 7));
 
-    for (String documentNumber : documentNumbers) {
+    for (LocalDate date : dates) {
       repository.save(
           DocumentationUnitDTO.builder()
-              .documentNumber(documentNumber)
+              .documentNumber(RandomStringUtils.randomAlphabetic(13))
+              .decisionDate(date)
               .documentationOffice(docOfficeDTO)
               .build());
     }
@@ -210,11 +219,10 @@ class DocumentationUnitSearchIntegrationTest {
             .expectBody(String.class)
             .returnResult();
 
-    List<String> documentNumbersActual =
-        JsonPath.read(result.getResponseBody(), "$.content[*].documentNumber");
-    assertThat(documentNumbersActual)
-        .hasSize(3)
-        .containsExactly("ABCD202300007", "EFGH202200123", "IJKL202300099");
+    List<String> datesActual = JsonPath.read(result.getResponseBody(), "$.content[*].decisionDate");
+    assertThat(datesActual)
+        .hasSize(dates.size())
+        .containsExactly("2023-06-07", "2023-03-15", "2022-01-23", "2022-01-23", null);
   }
 
   @Test
