@@ -9,6 +9,7 @@ export type FieldOfLawNode = {
   linkedFields?: string[]
   norms: Norm[]
   children: FieldOfLawNode[]
+  parent: FieldOfLawNode
   childrenCount: number
   isExpanded?: boolean
   inDirectPathMode?: boolean

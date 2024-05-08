@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue"
+import FieldOfLawNodeView from "@/components/preview/FieldOfLawNodeView.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import PreviewCategory from "@/components/preview/PreviewCategory.vue"
 import PreviewContent from "@/components/preview/PreviewContent.vue"
@@ -59,7 +60,7 @@ const hasActiveCitations = computed(() => {
           v-for="(fieldOfLaw, index) in contentRelatedIndexing.fieldsOfLaw"
           :key="index"
         >
-          {{ fieldOfLaw.identifier }}, {{ fieldOfLaw.text }}
+          {{ fieldOfLaw.identifier }} <FieldOfLawNodeView :node="fieldOfLaw" />
         </div>
       </PreviewContent>
     </PreviewRow>
