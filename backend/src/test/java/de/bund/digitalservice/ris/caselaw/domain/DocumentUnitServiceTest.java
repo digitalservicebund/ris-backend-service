@@ -60,7 +60,8 @@ class DocumentUnitServiceTest {
   void testGenerateNewDocumentUnit()
       throws DocumentationUnitExistsException,
           DocumentNumberPatternException,
-          DocumentNumberFormatterException {
+          DocumentNumberFormatterException,
+          DocumentationUnitNotExistsException {
     DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
     DocumentUnit documentUnit = DocumentUnit.builder().build();
 
@@ -68,8 +69,7 @@ class DocumentUnitServiceTest {
         .thenReturn(Mono.just(documentUnit));
     when(documentNumberService.generateDocumentNumber(documentationOffice.abbreviation(), 5))
         .thenReturn("nextDocumentNumber");
-    when(documentUnitStatusService.setInitialStatus(documentUnit))
-        .thenReturn(Mono.just(documentUnit));
+    when(documentUnitStatusService.setInitialStatus(documentUnit)).thenReturn(documentUnit);
     // Can we use a captor to check if the document number was correctly created?
     // The chicken-egg-problem is, that we are dictating what happens when
     // repository.save(), so we can't just use a captor at the same time
@@ -183,7 +183,7 @@ class DocumentUnitServiceTest {
   }
 
   @Test
-  void testPublishByEmail() {
+  void testPublishByEmail() throws DocumentationUnitNotExistsException {
     when(repository.findByUuid(TEST_UUID))
         .thenReturn(Optional.ofNullable(DocumentUnit.builder().build()));
     XmlPublication xmlPublication =
@@ -201,7 +201,7 @@ class DocumentUnitServiceTest {
         .thenReturn(Mono.just(xmlPublication));
     when(documentUnitStatusService.setToPublishing(
             any(DocumentUnit.class), any(Instant.class), anyString()))
-        .thenReturn(Mono.just(DocumentUnit.builder().build()));
+        .thenReturn(DocumentUnit.builder().build());
     StepVerifier.create(service.publishAsEmail(TEST_UUID, ISSUER_ADDRESS))
         .consumeNextWith(
             mailResponse ->

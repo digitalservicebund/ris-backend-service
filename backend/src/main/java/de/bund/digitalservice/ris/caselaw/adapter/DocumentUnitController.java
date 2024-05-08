@@ -95,9 +95,11 @@ public class DocumentUnitController {
       @RequestBody ByteBuffer byteBuffer,
       @RequestHeader HttpHeaders httpHeaders) {
 
-    return converterService
-        .getConvertedObject(
-            attachmentService.attachFileToDocumentationUnit(uuid, byteBuffer, httpHeaders).s3path())
+    return Mono.just(
+            converterService.getConvertedObject(
+                attachmentService
+                    .attachFileToDocumentationUnit(uuid, byteBuffer, httpHeaders)
+                    .s3path()))
         .doOnNext(docx2html -> service.updateECLI(uuid, docx2html))
         .map(docx2Html -> ResponseEntity.status(HttpStatus.OK).body(docx2Html))
         .onErrorReturn(ResponseEntity.unprocessableEntity().build());
@@ -245,7 +247,7 @@ public class DocumentUnitController {
 
     return service
         .getByUuid(uuid)
-        .flatMap(documentUnit -> converterService.getConvertedObject(s3Path))
+        .flatMap(documentUnit -> Mono.justOrEmpty(converterService.getConvertedObject(s3Path)))
         .map(
             docx2Html ->
                 ResponseEntity.ok()

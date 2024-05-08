@@ -103,8 +103,7 @@ class DocumentUnitControllerAuthTest {
     when(attachmentService.attachFileToDocumentationUnit(
             eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class)))
         .thenReturn(Attachment.builder().s3path("fooPath").build());
-    when(docxConverterService.getConvertedObject(anyString()))
-        .thenReturn(Mono.just(Docx2Html.EMPTY));
+    when(docxConverterService.getConvertedObject(anyString())).thenReturn(Docx2Html.EMPTY);
     mockDocumentUnit(docOffice1, null, null);
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file";
@@ -224,7 +223,7 @@ class DocumentUnitControllerAuthTest {
   @Test
   void testGetHtml() {
     mockDocumentUnit(docOffice1, "123", Status.builder().publicationStatus(PUBLISHED).build());
-    when(docxConverterService.getConvertedObject("123")).thenReturn(Mono.empty());
+    when(docxConverterService.getConvertedObject("123")).thenReturn(null);
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/docx/123";
 

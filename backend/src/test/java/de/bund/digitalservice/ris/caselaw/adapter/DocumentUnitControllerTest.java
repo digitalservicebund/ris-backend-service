@@ -469,7 +469,7 @@ class DocumentUnitControllerTest {
                         Collections.singletonList(Attachment.builder().s3path("123").build()))
                     .coreData(CoreData.builder().documentationOffice(docOffice).build())
                     .build()));
-    when(docxConverterService.getConvertedObject("123")).thenReturn(Mono.empty());
+    when(docxConverterService.getConvertedObject("123")).thenReturn(null);
 
     risWebClient
         .withDefaultLogin()

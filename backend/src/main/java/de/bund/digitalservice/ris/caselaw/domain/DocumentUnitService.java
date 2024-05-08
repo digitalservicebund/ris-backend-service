@@ -68,7 +68,16 @@ public class DocumentUnitService {
         .flatMap(this::generateDocumentNumber)
         .flatMap(
             documentNumber -> repository.createNewDocumentUnit(documentNumber, documentationOffice))
-        .flatMap(documentUnitStatusService::setInitialStatus)
+        .flatMap(
+            documentUnit -> {
+              try {
+                documentUnitStatusService.setInitialStatus(documentUnit);
+              } catch (DocumentationUnitNotExistsException e) {
+                // TODO handle exception
+                throw new RuntimeException(e);
+              }
+              return Mono.just(documentUnit);
+            })
         .retryWhen(Retry.backoff(5, Duration.ofSeconds(2)).jitter(0.75))
         .doOnError(ex -> log.error("Couldn't create empty doc unit", ex));
   }
@@ -209,9 +218,14 @@ public class DocumentUnitService {
           .flatMap(
               mailResponse -> {
                 if (mailResponse.getStatusCode().equals(String.valueOf(HttpStatus.OK.value()))) {
-                  return documentUnitStatusService
-                      .setToPublishing(documentUnit, mailResponse.getPublishDate(), issuerAddress)
-                      .thenReturn(mailResponse);
+                  try {
+                    documentUnitStatusService.setToPublishing(
+                        documentUnit, mailResponse.getPublishDate(), issuerAddress);
+                    return Mono.just(mailResponse);
+                  } catch (DocumentationUnitNotExistsException e) {
+                    // TODO handle exception
+                    throw new RuntimeException(e);
+                  }
                 } else {
                   return Mono.just(mailResponse);
                 }
