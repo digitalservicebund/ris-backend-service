@@ -471,12 +471,13 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
 
     Set<DocumentationUnitListItemDTO> allResults =
         new TreeSet<>(
-            Comparator.nullsLast(
-                Comparator.comparing(
+            Comparator.comparing(
                     DocumentationUnitListItemDTO::getDecisionDate,
-                    Comparator.nullsLast(Comparator.reverseOrder()))));
+                    Comparator.nullsLast(Comparator.reverseOrder()))
+                .thenComparing(DocumentationUnitListItemDTO::getDocumentNumber));
     allResults.addAll(fileNumberResults.getContent());
     allResults.addAll(deviatingFileNumberResults.getContent());
+    log.info("printing" + allResults.stream().toList());
 
     // We can provide entries for a next page if ...
     // A) we already have collected more results than fit on the current page, or

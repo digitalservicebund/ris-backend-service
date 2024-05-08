@@ -193,7 +193,11 @@ class DocumentationUnitSearchIntegrationTest {
   void testOrderedByDateDescending() {
     List<LocalDate> dates =
         Arrays.asList(
-            LocalDate.of(2022, 1, 23), null, LocalDate.of(2023, 3, 15), LocalDate.of(2023, 6, 7));
+            LocalDate.of(2022, 1, 23),
+            LocalDate.of(2022, 1, 23),
+            null,
+            LocalDate.of(2023, 3, 15),
+            LocalDate.of(2023, 6, 7));
 
     for (LocalDate date : dates) {
       repository.save(
@@ -217,8 +221,8 @@ class DocumentationUnitSearchIntegrationTest {
 
     List<String> datesActual = JsonPath.read(result.getResponseBody(), "$.content[*].decisionDate");
     assertThat(datesActual)
-        .hasSize(4)
-        .containsExactly("2023-06-07", "2023-03-15", "2022-01-23", null);
+        .hasSize(dates.size())
+        .containsExactly("2023-06-07", "2023-03-15", "2022-01-23", "2022-01-23", null);
   }
 
   @Test
