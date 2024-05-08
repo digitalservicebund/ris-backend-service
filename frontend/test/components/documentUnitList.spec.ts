@@ -135,9 +135,21 @@ describe("documentUnit list", () => {
 
     //Spruchkörper visible
     expect(screen.getByText("cba")).toBeVisible()
+
+    // expect only one edit link to 234 documentation unit
     expect(
       screen.getByRole("link", { name: "Dokumentationseinheit bearbeiten" }),
     ).toHaveAttribute("href", "/caselaw/documentUnit/234/categories")
+
+    // expect only one delete button for 234 documentation unit
+    expect(
+      screen.getByRole("button", { name: "Dokumentationseinheit löschen" }),
+    ).toBeVisible()
+
+    // expect two view links
+    expect(
+      screen.getAllByRole("link", { name: "Dokumentationseinheit ansehen" }),
+    ).toHaveLength(2)
   })
 
   test("delete emits event", async () => {

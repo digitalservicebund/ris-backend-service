@@ -81,25 +81,6 @@ class DocumentUnitServiceTest {
     verify(repository).createNewDocumentUnit("nextDocumentNumber", documentationOffice);
   }
 
-  //  @Test
-  //  void testGenerateNewDocumentUnitAndAttachFile_withExceptionFromBucket() throws S3Exception {
-  //    // given
-  //    var byteBuffer = ByteBuffer.wrap(new byte[] {});
-  //
-  //    doNothing().when(service).checkDocx(any(ByteBuffer.class));
-  //    when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
-  //        .thenThrow(SdkException.create("exception", null));
-  //
-  //    // when and then
-  //    StepVerifier.create(service.attachFileToDocumentUnit(TEST_UUID, byteBuffer,
-  // HttpHeaders.EMPTY))
-  //        .expectErrorMatches(ex -> ex instanceof SdkException)
-  //        .verify();
-  //
-  //    verify(s3AsyncClient).putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class));
-  //    verify(repository, times(0)).save(any(DocumentUnit.class));
-  //  }
-
   @Test
   void testGetByDocumentnumber() {
     when(repository.findByDocumentNumber("ABCDE20220001"))
@@ -355,8 +336,96 @@ class DocumentUnitServiceTest {
             Optional.empty(),
             Optional.empty(),
             Optional.empty());
+    // if doc office is empty, user is not allowed to edit
     assertThat(documentationUnitSearchEntries)
         .contains(documentationUnitListItem.toBuilder().isEditableByCurrentUser(false).build());
+    verify(repository)
+        .searchByDocumentationUnitSearchInput(
+            pageRequest, documentationOffice, documentationUnitSearchInput);
+  }
+
+  @Test
+  void testSearchByDocumentUnitListEntry_shouldSetEditPermissions() {
+    DocumentationOffice documentationOffice =
+        DocumentationOffice.builder().abbreviation("DS").build();
+
+    DocumentationUnitListItem withoutOffice = DocumentationUnitListItem.builder().build();
+    DocumentationUnitListItem withSameOffice =
+        DocumentationUnitListItem.builder().documentationOffice(documentationOffice).build();
+    DocumentationUnitListItem withDifferentOffice =
+        DocumentationUnitListItem.builder()
+            .documentationOffice(DocumentationOffice.builder().abbreviation("FOO").build())
+            .build();
+
+    PageRequest pageRequest = PageRequest.of(0, 10);
+    DocumentationUnitSearchInput documentationUnitSearchInput =
+        DocumentationUnitSearchInput.builder().build();
+
+    when(repository.searchByDocumentationUnitSearchInput(
+            pageRequest, documentationOffice, documentationUnitSearchInput))
+        .thenReturn(new PageImpl<>(List.of(withoutOffice, withSameOffice, withDifferentOffice)));
+
+    Slice<DocumentationUnitListItem> documentationUnitSearchEntries =
+        service.searchByDocumentationUnitSearchInput(
+            pageRequest,
+            documentationOffice,
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty());
+    // if doc office is empty, user is not allowed to edit
+    assertThat(documentationUnitSearchEntries)
+        .containsAll(
+            List.of(
+                withoutOffice.toBuilder().isEditableByCurrentUser(false).build(),
+                withSameOffice.toBuilder().isEditableByCurrentUser(true).build(),
+                withDifferentOffice.toBuilder().isEditableByCurrentUser(false).build()));
+    verify(repository)
+        .searchByDocumentationUnitSearchInput(
+            pageRequest, documentationOffice, documentationUnitSearchInput);
+  }
+
+  @Test
+  void testSearchByDocumentUnitListEntry_shouldRestrictAccessIfUserDocOfficeIsEmpty() {
+    DocumentationUnitListItem withoutOffice = DocumentationUnitListItem.builder().build();
+    DocumentationUnitListItem withOffice =
+        DocumentationUnitListItem.builder()
+            .documentationOffice(DocumentationOffice.builder().abbreviation("FOO").build())
+            .build();
+
+    DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
+    PageRequest pageRequest = PageRequest.of(0, 10);
+    DocumentationUnitSearchInput documentationUnitSearchInput =
+        DocumentationUnitSearchInput.builder().build();
+
+    when(repository.searchByDocumentationUnitSearchInput(
+            pageRequest, documentationOffice, documentationUnitSearchInput))
+        .thenReturn(new PageImpl<>(List.of(withoutOffice, withOffice)));
+
+    Slice<DocumentationUnitListItem> documentationUnitSearchEntries =
+        service.searchByDocumentationUnitSearchInput(
+            pageRequest,
+            documentationOffice,
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty());
+    // if doc office is empty, user is not allowed to edit
+    assertThat(documentationUnitSearchEntries)
+        .containsAll(
+            List.of(
+                withoutOffice.toBuilder().isEditableByCurrentUser(false).build(),
+                withOffice.toBuilder().isEditableByCurrentUser(false).build()));
     verify(repository)
         .searchByDocumentationUnitSearchInput(
             pageRequest, documentationOffice, documentationUnitSearchInput);

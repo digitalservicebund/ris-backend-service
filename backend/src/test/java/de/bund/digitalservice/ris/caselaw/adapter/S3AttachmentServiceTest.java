@@ -44,10 +44,12 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.test.StepVerifier;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
+import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @TestPropertySource(properties = "otc.obs.bucket-name:testBucket")
 @ExtendWith(SpringExtension.class)
@@ -192,6 +194,24 @@ class S3AttachmentServiceTest {
     ByteBuffer byteBuffer = ByteBuffer.wrap(emptyData);
 
     assertThrows(ResponseStatusException.class, () -> service.checkDocx(byteBuffer));
+  }
+
+  @Test
+  void testGenerateNewDocumentUnitAndAttachFile_withExceptionFromBucket() throws S3Exception {
+    var byteBuffer = ByteBuffer.wrap(new byte[] {});
+
+    doNothing().when(service).checkDocx(any(ByteBuffer.class));
+    when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
+        .thenThrow(SdkException.create("exception", null));
+    var documentationUnitDTOId = documentationUnitDTO.getId();
+
+    assertThrows(
+        SdkException.class,
+        () ->
+            service.attachFileToDocumentationUnit(
+                documentationUnitDTOId, byteBuffer, HttpHeaders.EMPTY));
+
+    verify(s3AsyncClient).putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class));
   }
 
   private ByteBuffer buildBuffer(String entry) {
