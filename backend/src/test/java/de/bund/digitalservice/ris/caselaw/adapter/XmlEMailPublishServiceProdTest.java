@@ -35,7 +35,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
 @Import({XmlEMailPublishService.class})
@@ -114,12 +113,9 @@ class XmlEMailPublishServiceProdTest {
   void testPublishWithProdSubjectAndOriginalCourtAndFileNumber()
       throws ParserConfigurationException, TransformerException {
 
-    StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
-        .consumeNextWith(
-            response -> {
-              assertThat(response.mailSubject()).isEqualTo(PROD_MAIL_SUBJECT);
-            })
-        .verifyComplete();
+    var response = service.publish(documentUnit, RECEIVER_ADDRESS);
+
+    assertThat(response.mailSubject()).isEqualTo(PROD_MAIL_SUBJECT);
 
     verify(xmlExporter).generateXml(documentUnit);
     verify(repository).save(EXPECTED_BEFORE_SAVE_PROD);

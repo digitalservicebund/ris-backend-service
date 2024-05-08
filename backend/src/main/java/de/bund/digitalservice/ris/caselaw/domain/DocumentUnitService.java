@@ -6,18 +6,19 @@ import jakarta.validation.Validator;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
@@ -206,52 +207,45 @@ public class DocumentUnitService {
     }
   }
 
-  public Mono<Publication> publishAsEmail(UUID documentUnitUuid, String issuerAddress) {
-    try {
-      DocumentUnit documentUnit =
-          repository
-              .findByUuid(documentUnitUuid)
-              .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnitUuid));
+  public Publication publishAsEmail(UUID documentUnitUuid, String issuerAddress)
+      throws DocumentationUnitNotExistsException {
 
-      return publicationService
-          .publish(documentUnit, recipientAddress)
-          .flatMap(
-              mailResponse -> {
-                if (mailResponse.getStatusCode().equals(String.valueOf(HttpStatus.OK.value()))) {
-                  try {
-                    documentUnitStatusService.setToPublishing(
-                        documentUnit, mailResponse.getPublishDate(), issuerAddress);
-                    return Mono.just(mailResponse);
-                  } catch (DocumentationUnitNotExistsException e) {
-                    // TODO handle exception
-                    throw new RuntimeException(e);
-                  }
-                } else {
-                  return Mono.just(mailResponse);
-                }
-              });
-    } catch (Exception e) {
-      return Mono.error(e);
+    DocumentUnit documentUnit =
+        repository
+            .findByUuid(documentUnitUuid)
+            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnitUuid));
+
+    XmlPublication mailResponse = publicationService.publish(documentUnit, recipientAddress);
+    if (mailResponse.getStatusCode().equals(String.valueOf(HttpStatus.OK.value()))) {
+      try {
+        documentUnitStatusService.setToPublishing(
+            documentUnit, mailResponse.getPublishDate(), issuerAddress);
+        return mailResponse;
+      } catch (DocumentationUnitNotExistsException e) {
+        // TODO handle exception
+        throw new RuntimeException(e);
+      }
+    } else {
+      return mailResponse;
     }
   }
 
-  public Mono<XmlResultObject> previewPublication(UUID documentUuid) {
-    try {
-      DocumentUnit documentUnit =
-          repository
-              .findByUuid(documentUuid)
-              .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUuid));
-      return publicationService.getPublicationPreview(documentUnit);
-    } catch (Exception e) {
-      return Mono.error(e);
-    }
+  public XmlResultObject previewPublication(UUID documentUuid)
+      throws DocumentationUnitNotExistsException {
+    DocumentUnit documentUnit =
+        repository
+            .findByUuid(documentUuid)
+            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUuid));
+    return publicationService.getPublicationPreview(documentUnit);
   }
 
-  public Flux<PublicationHistoryRecord> getPublicationHistory(UUID documentUuid) {
-    return Flux.concat(
+  public List<PublicationHistoryRecord> getPublicationHistory(UUID documentUuid) {
+    List<PublicationHistoryRecord> list =
+        ListUtils.union(
             publicationService.getPublications(documentUuid),
-            Flux.fromIterable(publicationReportRepository.getAllByDocumentUnitUuid(documentUuid)))
-        .sort(Comparator.comparing(PublicationHistoryRecord::getDate).reversed());
+            publicationReportRepository.getAllByDocumentUnitUuid(documentUuid));
+    list.sort(Comparator.comparing(PublicationHistoryRecord::getDate).reversed());
+    return list;
   }
 
   public Slice<RelatedDocumentationUnit> searchLinkableDocumentationUnits(

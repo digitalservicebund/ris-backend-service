@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.Publication;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecord;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
@@ -199,16 +200,20 @@ public class DocumentUnitController {
   public Mono<ResponseEntity<Publication>> publishDocumentUnitAsEmail(
       @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
 
-    return service
-        .publishAsEmail(uuid, userService.getEmail(oidcUser))
-        .map(ResponseEntity::ok)
-        .doOnError(ex -> ResponseEntity.internalServerError().build());
+    try {
+      return Mono.justOrEmpty(service.publishAsEmail(uuid, userService.getEmail(oidcUser)))
+          .map(ResponseEntity::ok)
+          .doOnError(ex -> ResponseEntity.internalServerError().build());
+    } catch (DocumentationUnitNotExistsException e) {
+      // TODO
+      throw new RuntimeException(e);
+    }
   }
 
   @GetMapping(value = "/{uuid}/publish", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
   public Flux<PublicationHistoryRecord> getPublicationHistory(@PathVariable UUID uuid) {
-    return service.getPublicationHistory(uuid);
+    return Flux.fromIterable(service.getPublicationHistory(uuid));
   }
 
   @GetMapping(
@@ -216,7 +221,11 @@ public class DocumentUnitController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
   public Mono<XmlResultObject> getPublicationPreview(@PathVariable UUID uuid) {
-    return service.previewPublication(uuid);
+    try {
+      return Mono.just(service.previewPublication(uuid));
+    } catch (DocumentationUnitNotExistsException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @PutMapping(value = "/{documentNumberToExclude}/search-linkable-documentation-units")

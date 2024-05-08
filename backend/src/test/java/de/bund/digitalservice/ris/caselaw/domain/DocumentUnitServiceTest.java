@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -33,7 +34,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
@@ -198,15 +198,12 @@ class DocumentUnitServiceTest {
             .publishDate(Instant.now())
             .build();
     when(publishService.publish(eq(DocumentUnit.builder().build()), anyString()))
-        .thenReturn(Mono.just(xmlPublication));
+        .thenReturn(xmlPublication);
     when(documentUnitStatusService.setToPublishing(
             any(DocumentUnit.class), any(Instant.class), anyString()))
         .thenReturn(DocumentUnit.builder().build());
-    StepVerifier.create(service.publishAsEmail(TEST_UUID, ISSUER_ADDRESS))
-        .consumeNextWith(
-            mailResponse ->
-                assertThat(mailResponse).usingRecursiveComparison().isEqualTo(xmlPublication))
-        .verifyComplete();
+    var mailResponse = service.publishAsEmail(TEST_UUID, ISSUER_ADDRESS);
+    assertThat(mailResponse).usingRecursiveComparison().isEqualTo(xmlPublication);
     verify(repository).findByUuid(TEST_UUID);
     verify(publishService).publish(eq(DocumentUnit.builder().build()), anyString());
     verify(documentUnitStatusService)
@@ -217,7 +214,9 @@ class DocumentUnitServiceTest {
   void testPublishByEmail_withoutDocumentUnitForUuid() {
     when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.empty());
 
-    StepVerifier.create(service.publishAsEmail(TEST_UUID, ISSUER_ADDRESS)).verifyError();
+    Assertions.assertThrows(
+        DocumentationUnitNotExistsException.class,
+        () -> service.publishAsEmail(TEST_UUID, ISSUER_ADDRESS));
     verify(repository).findByUuid(TEST_UUID);
     verify(publishService, never()).publish(eq(DocumentUnit.builder().build()), anyString());
   }
@@ -234,14 +233,13 @@ class DocumentUnitServiceTest {
             .statusMessages(List.of("message"))
             .fileName("filename")
             .build();
-    when(publishService.getPublications(TEST_UUID)).thenReturn(Flux.just(xmlPublication));
+    when(publishService.getPublications(TEST_UUID)).thenReturn(List.of(xmlPublication));
     when(publicationReportRepository.getAllByDocumentUnitUuid(TEST_UUID))
         .thenReturn(Collections.emptyList());
 
-    StepVerifier.create(service.getPublicationHistory(TEST_UUID))
-        .consumeNextWith(
-            actual -> assertThat(xmlPublication).usingRecursiveComparison().isEqualTo(actual))
-        .verifyComplete();
+    var actual = service.getPublicationHistory(TEST_UUID);
+    assertThat(actual.get(0)).usingRecursiveComparison().isEqualTo(xmlPublication);
+
     verify(publishService).getPublications(TEST_UUID);
   }
 
@@ -251,12 +249,11 @@ class DocumentUnitServiceTest {
         new PublicationReport("documentNumber", "<html></html>", Instant.now());
     when(publicationReportRepository.getAllByDocumentUnitUuid(TEST_UUID))
         .thenReturn(List.of(report));
-    when(publishService.getPublications(TEST_UUID)).thenReturn(Flux.empty());
+    when(publishService.getPublications(TEST_UUID)).thenReturn(List.of());
 
-    StepVerifier.create(service.getPublicationHistory(TEST_UUID))
-        .consumeNextWith(
-            publications -> assertThat(publications).usingRecursiveComparison().isEqualTo(report))
-        .verifyComplete();
+    var publications = service.getPublicationHistory(TEST_UUID);
+    assertThat(publications.get(0)).usingRecursiveComparison().isEqualTo(report);
+
     verify(publishService).getPublications(TEST_UUID);
   }
 
@@ -298,15 +295,14 @@ class DocumentUnitServiceTest {
 
     when(publicationReportRepository.getAllByDocumentUnitUuid(TEST_UUID))
         .thenReturn(List.of(report2, report1));
-    when(publishService.getPublications(TEST_UUID))
-        .thenReturn(Flux.fromIterable(List.of(xml2, xml1)));
+    when(publishService.getPublications(TEST_UUID)).thenReturn(List.of(xml2, xml1));
 
-    StepVerifier.create(service.getPublicationHistory(TEST_UUID))
-        .consumeNextWith(entry -> assertThat(entry).usingRecursiveComparison().isEqualTo(report1))
-        .consumeNextWith(entry -> assertThat(entry).usingRecursiveComparison().isEqualTo(xml1))
-        .consumeNextWith(entry -> assertThat(entry).usingRecursiveComparison().isEqualTo(report2))
-        .consumeNextWith(entry -> assertThat(entry).usingRecursiveComparison().isEqualTo(xml2))
-        .verifyComplete();
+    List<PublicationHistoryRecord> list = service.getPublicationHistory(TEST_UUID);
+    assertThat(list).hasSize(4);
+    assertThat(list.get(0)).usingRecursiveComparison().isEqualTo(report1);
+    assertThat(list.get(1)).usingRecursiveComparison().isEqualTo(xml1);
+    assertThat(list.get(2)).usingRecursiveComparison().isEqualTo(report2);
+    assertThat(list.get(3)).usingRecursiveComparison().isEqualTo(xml2);
     verify(publishService).getPublications(TEST_UUID);
   }
 
@@ -432,17 +428,14 @@ class DocumentUnitServiceTest {
   }
 
   @Test
-  void testPreviewPublication() {
+  void testPreviewPublication() throws DocumentationUnitNotExistsException {
     DocumentUnit testDocumentUnit = DocumentUnit.builder().build();
     XmlResultObject mockXmlResultObject =
         new XmlResultObject("some xml", "200", List.of("success"), "foo.xml", Instant.now());
     when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.ofNullable(testDocumentUnit));
-    when(publishService.getPublicationPreview(testDocumentUnit))
-        .thenReturn(Mono.just(mockXmlResultObject));
+    when(publishService.getPublicationPreview(testDocumentUnit)).thenReturn(mockXmlResultObject);
 
-    StepVerifier.create(service.previewPublication(TEST_UUID))
-        .expectNext(mockXmlResultObject)
-        .verifyComplete();
+    Assertions.assertEquals(mockXmlResultObject, service.previewPublication(TEST_UUID));
   }
 
   private CompletableFuture<DeleteObjectResponse> buildEmptyDeleteObjectResponse() {

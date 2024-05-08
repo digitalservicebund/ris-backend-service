@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -25,8 +26,6 @@ import javax.xml.transform.TransformerException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @Service
 public class XmlEMailPublishService implements EmailPublishService {
@@ -58,12 +57,12 @@ public class XmlEMailPublishService implements EmailPublishService {
   }
 
   @Override
-  public Mono<XmlPublication> publish(DocumentUnit documentUnit, String receiverAddress) {
+  public XmlPublication publish(DocumentUnit documentUnit, String receiverAddress) {
     XmlResultObject xml;
     try {
       xml = xmlExporter.generateXml(getTestDocumentUnit(documentUnit));
     } catch (ParserConfigurationException | TransformerException ex) {
-      return Mono.error(new DocumentUnitPublishException("Couldn't generate xml.", ex));
+      throw new DocumentUnitPublishException("Couldn't generate xml.", ex);
     }
 
     String mailSubject = generateMailSubject(documentUnit);
@@ -71,20 +70,20 @@ public class XmlEMailPublishService implements EmailPublishService {
     XmlPublication xmlPublication =
         generateXmlPublication(documentUnit.uuid(), receiverAddress, mailSubject, xml);
     generateAndSendMail(xmlPublication);
-    return Mono.just(savePublishInformation(xmlPublication));
+    return savePublishInformation(xmlPublication);
   }
 
   @Override
-  public Flux<Publication> getPublications(UUID documentUnitUuid) {
-    return Flux.fromIterable(repository.getPublicationsByDocumentUnitUuid(documentUnitUuid));
+  public List<Publication> getPublications(UUID documentUnitUuid) {
+    return repository.getPublicationsByDocumentUnitUuid(documentUnitUuid);
   }
 
   @Override
-  public Mono<XmlResultObject> getPublicationPreview(DocumentUnit documentUnit) {
+  public XmlResultObject getPublicationPreview(DocumentUnit documentUnit) {
     try {
-      return Mono.just(xmlExporter.generateXml(documentUnit));
+      return xmlExporter.generateXml(documentUnit);
     } catch (ParserConfigurationException | TransformerException ex) {
-      return Mono.error(new DocumentUnitPublishException("Couldn't generate xml.", ex));
+      throw new DocumentUnitPublishException("Couldn't generate xml.", ex);
     }
   }
 
