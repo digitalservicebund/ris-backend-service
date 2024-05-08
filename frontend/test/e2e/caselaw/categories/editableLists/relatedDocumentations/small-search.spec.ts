@@ -142,7 +142,7 @@ test("search with changed parameters resets the page to 0", async ({
         await container.getByLabel("nächste Ergebnisse").click()
         await expect(container.getByText("Seite 2")).toBeVisible()
 
-        const input = { fileNumber: "I do not exist" }
+        const input = { fileNumber: "File number does not exist" }
 
         if (container === activeCitationContainer) {
           await fillActiveCitationInputs(page, input)
