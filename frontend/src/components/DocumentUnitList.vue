@@ -105,7 +105,7 @@ function onDelete() {
     />
     <TableView class="relative table w-full border-separate">
       <TableHeader>
-        <CellHeaderItem> Dokumentnummer</CellHeaderItem>
+        <CellHeaderItem class="w-[1%]"> Dokumentnummer</CellHeaderItem>
         <CellHeaderItem> Gerichtstyp</CellHeaderItem>
         <CellHeaderItem> Ort</CellHeaderItem>
         <CellHeaderItem> Datum</CellHeaderItem>
