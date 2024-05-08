@@ -84,17 +84,15 @@ class DocumentUnitControllerTest {
 
     when(service.getByUuid(TEST_UUID))
         .thenReturn(
-            Mono.just(
-                DocumentUnit.builder()
-                    .coreData(CoreData.builder().documentationOffice(docOffice).build())
-                    .build()));
+            DocumentUnit.builder()
+                .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                .build());
   }
 
   @Test
   void testGenerateNewDocumentUnit() {
     // userService.getDocumentationOffice is mocked in @BeforeEach
-    when(service.generateNewDocumentUnit(docOffice))
-        .thenReturn(Mono.just(DocumentUnit.builder().build()));
+    when(service.generateNewDocumentUnit(docOffice)).thenReturn(DocumentUnit.builder().build());
 
     risWebClient
         .withDefaultLogin()
@@ -112,10 +110,9 @@ class DocumentUnitControllerTest {
   void testGetByDocumentnumber() {
     when(service.getByDocumentNumber("ABCD202200001"))
         .thenReturn(
-            Mono.just(
-                DocumentUnit.builder()
-                    .coreData(CoreData.builder().documentationOffice(docOffice).build())
-                    .build()));
+            DocumentUnit.builder()
+                .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                .build());
 
     risWebClient
         .withDefaultLogin()
@@ -131,7 +128,7 @@ class DocumentUnitControllerTest {
 
   @Test
   void testGetByDocumentNumber_withInvalidDocumentNumber() {
-    when(service.getByDocumentNumber("abc")).thenReturn(Mono.empty());
+    when(service.getByDocumentNumber("abc")).thenReturn(null);
 
     risWebClient
         .withDefaultLogin()
@@ -144,7 +141,7 @@ class DocumentUnitControllerTest {
 
   @Test
   void testDeleteByUuid() {
-    when(service.deleteByUuid(TEST_UUID)).thenReturn(Mono.empty());
+    when(service.deleteByUuid(TEST_UUID)).thenReturn(null);
 
     risWebClient
         .withDefaultLogin()
@@ -159,7 +156,7 @@ class DocumentUnitControllerTest {
 
   @Test
   void testDeleteByUuid_withInvalidUuid() {
-    when(service.getByDocumentNumber("abc")).thenReturn(Mono.empty());
+    when(service.getByDocumentNumber("abc")).thenReturn(null);
 
     risWebClient
         .withDefaultLogin()
@@ -180,7 +177,7 @@ class DocumentUnitControllerTest {
             .build();
     DocumentUnit documentUnit = DocumentationUnitTransformer.transformToDomain(documentUnitDTO);
 
-    when(service.updateDocumentUnit(documentUnit)).thenReturn(Mono.empty());
+    when(service.updateDocumentUnit(documentUnit)).thenReturn(null);
 
     risWebClient
         .withDefaultLogin()
@@ -460,12 +457,10 @@ class DocumentUnitControllerTest {
   void testGetHtml() {
     when(service.getByUuid(TEST_UUID))
         .thenReturn(
-            Mono.just(
-                DocumentUnit.builder()
-                    .attachments(
-                        Collections.singletonList(Attachment.builder().s3path("123").build()))
-                    .coreData(CoreData.builder().documentationOffice(docOffice).build())
-                    .build()));
+            DocumentUnit.builder()
+                .attachments(Collections.singletonList(Attachment.builder().s3path("123").build()))
+                .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                .build());
     when(docxConverterService.getConvertedObject("123")).thenReturn(null);
 
     risWebClient

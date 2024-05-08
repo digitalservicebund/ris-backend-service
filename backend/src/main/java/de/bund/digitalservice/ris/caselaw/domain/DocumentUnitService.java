@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -19,8 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 
 @Service
 @Slf4j
@@ -64,29 +61,24 @@ public class DocumentUnitService {
     this.featureService = featureService;
   }
 
-  public Mono<DocumentUnit> generateNewDocumentUnit(DocumentationOffice documentationOffice) {
-    return Mono.just(documentationOffice)
-        .flatMap(this::generateDocumentNumber)
-        .flatMap(
-            documentNumber -> repository.createNewDocumentUnit(documentNumber, documentationOffice))
-        .flatMap(
-            documentUnit -> {
-              try {
-                documentUnitStatusService.setInitialStatus(documentUnit);
-              } catch (DocumentationUnitNotExistsException e) {
-                // TODO handle exception
-                throw new RuntimeException(e);
-              }
-              return Mono.just(documentUnit);
-            })
-        .retryWhen(Retry.backoff(5, Duration.ofSeconds(2)).jitter(0.75))
-        .doOnError(ex -> log.error("Couldn't create empty doc unit", ex));
+  public DocumentUnit generateNewDocumentUnit(DocumentationOffice documentationOffice) {
+    var documentNumber = generateDocumentNumber(documentationOffice);
+    var documentUnit = repository.createNewDocumentUnit(documentNumber, documentationOffice);
+
+    try {
+      documentUnitStatusService.setInitialStatus(documentUnit);
+    } catch (DocumentationUnitNotExistsException e) {
+      // TODO handle exception
+      throw new RuntimeException(e);
+    }
+    // TODO retryWhen(Retry.backoff(5, Duration.ofSeconds(2)).jitter(0.75))
+    // TODO .doOnError(ex -> log.error("Couldn't create empty doc unit", ex));
+    return documentUnit;
   }
 
-  private Mono<String> generateDocumentNumber(DocumentationOffice documentationOffice) {
+  private String generateDocumentNumber(DocumentationOffice documentationOffice) {
     try {
-      return Mono.just(
-          documentNumberService.generateDocumentNumber(documentationOffice.abbreviation(), 5));
+      return documentNumberService.generateDocumentNumber(documentationOffice.abbreviation(), 5);
     } catch (Exception e) {
       throw new DocumentationUnitException("Could not generate document number", e);
     }
@@ -138,20 +130,20 @@ public class DocumentUnitService {
                     .build());
   }
 
-  public Mono<DocumentUnit> getByDocumentNumber(String documentNumber) {
+  public DocumentUnit getByDocumentNumber(String documentNumber) {
     try {
       var optionalDocumentUnit = repository.findByDocumentNumber(documentNumber);
-      return Mono.just(optionalDocumentUnit.orElseThrow());
+      return optionalDocumentUnit.orElseThrow();
     } catch (Exception e) {
-      return Mono.empty();
+      return null;
     }
   }
 
-  public Mono<DocumentUnit> getByUuid(UUID documentUnitUuid) {
-    return Mono.just(repository.findByUuid(documentUnitUuid).orElseThrow());
+  public DocumentUnit getByUuid(UUID documentUnitUuid) {
+    return repository.findByUuid(documentUnitUuid).orElseThrow();
   }
 
-  public Mono<String> deleteByUuid(UUID documentUnitUuid) {
+  public String deleteByUuid(UUID documentUnitUuid) {
     try {
 
       Map<RelatedDocumentationType, Long> relatedEntities =
@@ -166,9 +158,8 @@ public class DocumentUnitService {
             documentUnitUuid,
             relatedEntities);
 
-        return Mono.error(
-            new DocumentUnitDeletionException(
-                "Die Dokumentationseinheit konnte nicht gelöscht werden, da", relatedEntities));
+        throw new DocumentUnitDeletionException(
+            "Die Dokumentationseinheit konnte nicht gelöscht werden, da", relatedEntities);
       }
 
       DocumentUnit documentUnit =
@@ -183,13 +174,14 @@ public class DocumentUnitService {
 
       saveForRecycling(documentUnit);
       repository.delete(documentUnit);
-      return Mono.just("Dokumentationseinheit gelöscht: " + documentUnitUuid);
+      return "Dokumentationseinheit gelöscht: " + documentUnitUuid;
     } catch (Exception e) {
-      return Mono.error(e);
+      // TODO
+      return null;
     }
   }
 
-  public Mono<DocumentUnit> updateDocumentUnit(DocumentUnit documentUnit) {
+  public DocumentUnit updateDocumentUnit(DocumentUnit documentUnit) {
     repository.saveKeywords(documentUnit);
     repository.saveFieldsOfLaw(documentUnit);
     repository.saveProcedures(documentUnit);
@@ -197,13 +189,13 @@ public class DocumentUnitService {
     repository.save(documentUnit, featureService.isEnabled("neuris.legal-force"));
 
     try {
-      return Mono.just(
-          repository
-              .findByUuid(documentUnit.uuid())
-              .orElseThrow(
-                  () -> new DocumentationUnitNotExistsException(documentUnit.documentNumber())));
+      return repository
+          .findByUuid(documentUnit.uuid())
+          .orElseThrow(
+              () -> new DocumentationUnitNotExistsException(documentUnit.documentNumber()));
     } catch (DocumentationUnitNotExistsException e) {
-      return Mono.error(e);
+      // TODO
+      return null;
     }
   }
 
@@ -258,14 +250,14 @@ public class DocumentUnitService {
         relatedDocumentationUnit, documentationOffice, documentNumberToExclude, pageable);
   }
 
-  public Mono<String> validateSingleNorm(SingleNormValidationInfo singleNormValidationInfo) {
+  public String validateSingleNorm(SingleNormValidationInfo singleNormValidationInfo) {
     Set<ConstraintViolation<SingleNormValidationInfo>> violations =
         validator.validate(singleNormValidationInfo);
 
     if (violations.isEmpty()) {
-      return Mono.just("Ok");
+      return "Ok";
     }
-    return Mono.just("Validation error");
+    return "Validation error";
   }
 
   public void updateECLI(UUID uuid, Docx2Html docx2html) {

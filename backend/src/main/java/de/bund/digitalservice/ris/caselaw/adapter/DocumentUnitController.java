@@ -72,7 +72,7 @@ public class DocumentUnitController {
 
     return userService
         .getDocumentationOffice(oidcUser)
-        .flatMap(service::generateNewDocumentUnit)
+        .flatMap(docOffice -> Mono.just(service.generateNewDocumentUnit(docOffice)))
         .map(documentUnit -> ResponseEntity.status(HttpStatus.CREATED).body(documentUnit))
         .doOnError(ex -> log.error("error in generate new documentation unit", ex))
         .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
@@ -165,15 +165,14 @@ public class DocumentUnitController {
           new DocumentationUnitException("Die Dokumentennummer unterstützt nur 13-14 Zeichen"));
     }
 
-    return service.getByDocumentNumber(documentNumber).map(ResponseEntity::ok);
+    return Mono.justOrEmpty(service.getByDocumentNumber(documentNumber)).map(ResponseEntity::ok);
   }
 
   @DeleteMapping(value = "/{uuid}")
   @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
   public Mono<ResponseEntity<String>> deleteByUuid(@PathVariable UUID uuid) {
 
-    return service
-        .deleteByUuid(uuid)
+    return Mono.justOrEmpty(service.deleteByUuid(uuid))
         .map(str -> ResponseEntity.status(HttpStatus.OK).body(str))
         .onErrorResume(ex -> Mono.just(ResponseEntity.internalServerError().body(ex.getMessage())));
   }
@@ -189,8 +188,7 @@ public class DocumentUnitController {
       return Mono.just(ResponseEntity.unprocessableEntity().body(DocumentUnit.builder().build()));
     }
 
-    return service
-        .updateDocumentUnit(documentUnit)
+    return Mono.justOrEmpty(service.updateDocumentUnit(documentUnit))
         .map(du -> ResponseEntity.status(HttpStatus.OK).body(du))
         .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
   }
@@ -254,8 +252,7 @@ public class DocumentUnitController {
   public Mono<ResponseEntity<Docx2Html>> getHtml(
       @PathVariable UUID uuid, @PathVariable String s3Path) {
 
-    return service
-        .getByUuid(uuid)
+    return Mono.just(service.getByUuid(uuid))
         .flatMap(documentUnit -> Mono.justOrEmpty(converterService.getConvertedObject(s3Path)))
         .map(
             docx2Html ->
@@ -269,8 +266,7 @@ public class DocumentUnitController {
   @PreAuthorize("isAuthenticated()")
   public Mono<ResponseEntity<String>> validateSingleNorm(
       @RequestBody SingleNormValidationInfo singleNormValidationInfo) {
-    return service
-        .validateSingleNorm(singleNormValidationInfo)
+    return Mono.just(service.validateSingleNorm(singleNormValidationInfo))
         .map(ResponseEntity::ok)
         .onErrorReturn(ResponseEntity.internalServerError().build());
   }

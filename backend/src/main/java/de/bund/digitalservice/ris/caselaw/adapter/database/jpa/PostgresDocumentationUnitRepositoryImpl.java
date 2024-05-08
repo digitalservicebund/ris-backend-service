@@ -39,7 +39,6 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Mono;
 
 /** Implementation of the DocumentUnitRepository for the Postgres database */
 @Repository
@@ -103,22 +102,20 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   }
 
   @Override
-  public Mono<DocumentUnit> createNewDocumentUnit(
+  public DocumentUnit createNewDocumentUnit(
       String documentNumber, DocumentationOffice documentationOffice) {
 
-    return Mono.just(
-            documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation()))
-        .flatMap(
-            documentationOfficeDTO ->
-                Mono.just(
-                    repository.save(
-                        DocumentationUnitDTO.builder()
-                            .id(UUID.randomUUID())
-                            .documentNumber(documentNumber)
-                            .documentationOffice(documentationOfficeDTO)
-                            .legalEffect(LegalEffectDTO.KEINE_ANGABE)
-                            .build())))
-        .map(DocumentationUnitTransformer::transformToDomain);
+    var documentationOfficeDTO =
+        documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
+    var documentationUnitDTO =
+        repository.save(
+            DocumentationUnitDTO.builder()
+                .id(UUID.randomUUID())
+                .documentNumber(documentNumber)
+                .documentationOffice(documentationOfficeDTO)
+                .legalEffect(LegalEffectDTO.KEINE_ANGABE)
+                .build());
+    return DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")

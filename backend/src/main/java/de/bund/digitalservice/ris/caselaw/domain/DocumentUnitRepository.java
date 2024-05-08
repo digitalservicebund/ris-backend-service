@@ -6,7 +6,6 @@ import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.repository.NoRepositoryBean;
-import reactor.core.publisher.Mono;
 
 /** Domain repository for documentation units */
 @NoRepositoryBean
@@ -35,7 +34,7 @@ public interface DocumentUnitRepository {
    * @param documentationOffice the documentation office
    * @return the new documentation unit
    */
-  Mono<DocumentUnit> createNewDocumentUnit(
+  DocumentUnit createNewDocumentUnit(
       String documentNumber, DocumentationOffice documentationOffice);
 
   /**
