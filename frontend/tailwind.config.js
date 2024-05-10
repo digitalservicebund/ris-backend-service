@@ -42,6 +42,10 @@ module.exports = {
       68: "4.25rem",
     },
     extend: {
+      screens: {
+        print: { raw: "print" },
+        screen: { raw: "screen" },
+      },
       borderWidth: {
         1: "1px",
         3: "3px",
