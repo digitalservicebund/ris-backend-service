@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import FlexContainer from "@/components/FlexContainer.vue"
 import TextEditor from "@/components/input/TextEditor.vue"
-import PreviewLeftCell from "@/components/preview/PreviewLeftCell.vue"
-import PreviewRightCell from "@/components/preview/PreviewRightCell.vue"
-import TableView from "@/components/TableView.vue"
+import PreviewCategory from "@/components/preview/PreviewCategory.vue"
+import PreviewContent from "@/components/preview/PreviewContent.vue"
 import { useValidBorderNumbers } from "@/composables/useValidBorderNumbers"
 import { Texts } from "@/domain/documentUnit"
 
@@ -18,17 +18,16 @@ const data = useValidBorderNumbers(
 </script>
 
 <template>
-  <TableView class="table w-full table-fixed">
-    <tr v-for="item in data" :key="item.id" class="">
-      <PreviewLeftCell>{{ item.label }}</PreviewLeftCell>
-      <PreviewRightCell
-        ><TextEditor
-          :id="item.id"
-          :aria-label="item.aria"
-          field-size="max"
-          preview
-          :value="item.value"
-      /></PreviewRightCell>
-    </tr>
-  </TableView>
+  <FlexContainer v-for="item in data" :key="item.id" class="flex-row">
+    <PreviewCategory>{{ item.label }}</PreviewCategory>
+    <PreviewContent>
+      <TextEditor
+        :id="item.id"
+        :aria-label="item.aria"
+        field-size="max"
+        preview
+        :value="item.value"
+      />
+    </PreviewContent>
+  </FlexContainer>
 </template>

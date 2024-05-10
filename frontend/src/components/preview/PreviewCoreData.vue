@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import dayjs from "dayjs"
-import PreviewLeftCell from "@/components/preview/PreviewLeftCell.vue"
-import PreviewRightCell from "@/components/preview/PreviewRightCell.vue"
-import TableView from "@/components/TableView.vue"
+import FlexContainer from "@/components/FlexContainer.vue"
+import PreviewCategory from "@/components/preview/PreviewCategory.vue"
+import PreviewContent from "@/components/preview/PreviewContent.vue"
 import { CoreData } from "@/domain/documentUnit"
 
 defineProps<{
@@ -11,98 +11,108 @@ defineProps<{
 </script>
 
 <template>
-  <TableView class="table w-full table-fixed">
-    <tr v-if="coreData.court">
-      <PreviewLeftCell>Gericht</PreviewLeftCell>
-      <PreviewRightCell>
+  <FlexContainer class="flex-col">
+    <FlexContainer v-if="coreData.court" class="flex-row">
+      <PreviewCategory>Gericht</PreviewCategory>
+      <PreviewContent>
         {{ coreData.court.type }}
         {{ coreData.court.location }}
-      </PreviewRightCell>
-    </tr>
-    <tr v-if="coreData.deviatingCourts && coreData.deviatingCourts.length > 0">
-      <PreviewLeftCell>Fehlerhaftes Gericht</PreviewLeftCell>
-      <PreviewRightCell>
+      </PreviewContent>
+    </FlexContainer>
+    <FlexContainer
+      v-if="coreData.deviatingCourts && coreData.deviatingCourts.length > 0"
+      class="flex-row"
+    >
+      <PreviewCategory>Fehlerhaftes Gericht</PreviewCategory>
+      <PreviewContent>
         {{ coreData.deviatingCourts.toString() }}
-      </PreviewRightCell>
-    </tr>
-    <tr v-if="coreData.fileNumbers && coreData.fileNumbers.length > 0">
-      <PreviewLeftCell> Aktenzeichen</PreviewLeftCell>
-      <PreviewRightCell>
+      </PreviewContent>
+    </FlexContainer>
+    <FlexContainer
+      v-if="coreData.fileNumbers && coreData.fileNumbers.length > 0"
+      class="flex-row"
+    >
+      <PreviewCategory> Aktenzeichen</PreviewCategory>
+      <PreviewContent>
         {{ coreData.fileNumbers.toString() }}
-      </PreviewRightCell>
-    </tr>
-    <tr
+      </PreviewContent>
+    </FlexContainer>
+    <FlexContainer
       v-if="
         coreData.deviatingFileNumbers &&
         coreData.deviatingFileNumbers.length > 0
       "
+      class="flex-row"
     >
-      <PreviewLeftCell> Abweichendes Aktenzeichen</PreviewLeftCell>
-      <PreviewRightCell>
+      <PreviewCategory> Abweichendes Aktenzeichen</PreviewCategory>
+      <PreviewContent>
         {{ coreData.deviatingFileNumbers.toString() }}
-      </PreviewRightCell>
-    </tr>
-    <tr v-if="coreData.decisionDate">
-      <PreviewLeftCell>Entscheidungsdatum</PreviewLeftCell>
-      <PreviewRightCell>{{
-        dayjs(coreData.decisionDate).format("DD.MM.YYYY")
-      }}</PreviewRightCell>
-    </tr>
-    <tr
+      </PreviewContent>
+    </FlexContainer>
+    <FlexContainer v-if="coreData.decisionDate" class="flex-row">
+      <PreviewCategory>Entscheidungsdatum</PreviewCategory>
+      <PreviewContent
+        >{{ dayjs(coreData.decisionDate).format("DD.MM.YYYY") }}
+      </PreviewContent>
+    </FlexContainer>
+    <FlexContainer
       v-if="
         coreData.deviatingDecisionDates &&
         coreData.deviatingDecisionDates.length > 0
       "
+      class="flex-row"
     >
-      <PreviewLeftCell>Abweichendes Entscheidungsdatum</PreviewLeftCell>
-      <PreviewRightCell>
+      <PreviewCategory>Abweichendes Entscheidungsdatum</PreviewCategory>
+      <PreviewContent>
         <div
           v-for="(item, index) in coreData.deviatingDecisionDates"
           :key="index"
         >
           {{ dayjs(item).format("DD.MM.YYYY") }}
         </div>
-      </PreviewRightCell>
-    </tr>
-    <tr v-if="coreData.appraisalBody">
-      <PreviewLeftCell>Spruchkörper</PreviewLeftCell>
-      <PreviewRightCell>{{ coreData.appraisalBody }}</PreviewRightCell>
-    </tr>
-    <tr v-if="coreData.documentType">
-      <PreviewLeftCell>Dokumenttyp</PreviewLeftCell>
-      <PreviewRightCell>{{ coreData.documentType.label }}</PreviewRightCell>
-    </tr>
-    <tr v-if="coreData.ecli">
-      <PreviewLeftCell>ECLI</PreviewLeftCell>
-      <PreviewRightCell>{{ coreData.ecli }}</PreviewRightCell>
-    </tr>
-    <tr v-if="coreData.deviatingEclis && coreData.deviatingEclis.length > 0">
-      <PreviewLeftCell>Abweichender ECLI</PreviewLeftCell>
-      <PreviewRightCell
-        >{{ coreData.deviatingEclis.toString() }}
-      </PreviewRightCell>
-    </tr>
-    <tr v-if="coreData.procedure">
-      <PreviewLeftCell>Vorgang</PreviewLeftCell>
-      <PreviewRightCell>{{ coreData.procedure.label }} </PreviewRightCell>
-    </tr>
-    <tr
+      </PreviewContent>
+    </FlexContainer>
+    <FlexContainer v-if="coreData.appraisalBody" class="flex-row">
+      <PreviewCategory>Spruchkörper</PreviewCategory>
+      <PreviewContent>{{ coreData.appraisalBody }}</PreviewContent>
+    </FlexContainer>
+    <FlexContainer v-if="coreData.documentType" class="flex-row">
+      <PreviewCategory>Dokumenttyp</PreviewCategory>
+      <PreviewContent>{{ coreData.documentType.label }}</PreviewContent>
+    </FlexContainer>
+    <FlexContainer v-if="coreData.ecli" class="flex-row">
+      <PreviewCategory>ECLI</PreviewCategory>
+      <PreviewContent>{{ coreData.ecli }}</PreviewContent>
+    </FlexContainer>
+    <FlexContainer
+      v-if="coreData.deviatingEclis && coreData.deviatingEclis.length > 0"
+      class="flex-row"
+    >
+      <PreviewCategory>Abweichender ECLI</PreviewCategory>
+      <PreviewContent>{{ coreData.deviatingEclis.toString() }}</PreviewContent>
+    </FlexContainer>
+    <FlexContainer v-if="coreData.procedure" class="flex-row">
+      <PreviewCategory>Vorgang</PreviewCategory>
+      <PreviewContent>{{ coreData.procedure.label }}</PreviewContent>
+    </FlexContainer>
+    <FlexContainer
       v-if="
         coreData.previousProcedures && coreData.previousProcedures.length > 0
       "
+      class="flex-row"
     >
-      <PreviewLeftCell>Vorgangshistorie</PreviewLeftCell>
-      <PreviewRightCell
+      <PreviewCategory>Vorgangshistorie</PreviewCategory>
+      <PreviewContent
         >{{ coreData.previousProcedures?.toReversed().toString() }}
-      </PreviewRightCell>
-    </tr>
-    <tr v-if="coreData.legalEffect">
-      <PreviewLeftCell>Rechtskraft</PreviewLeftCell>
-      <PreviewRightCell>{{ coreData.legalEffect }}</PreviewRightCell>
-    </tr>
-    <tr v-if="coreData.region">
-      <PreviewLeftCell>Region</PreviewLeftCell>
-      <PreviewRightCell>{{ coreData.region }}</PreviewRightCell>
-    </tr>
-  </TableView>
+      </PreviewContent>
+    </FlexContainer>
+    <FlexContainer v-if="coreData.legalEffect" class="flex-row">
+      <PreviewCategory>Rechtskraft</PreviewCategory>
+      <PreviewContent>{{ coreData.legalEffect }}</PreviewContent>
+    </FlexContainer>
+    <FlexContainer v-if="coreData.region" class="flex-row">
+      <PreviewCategory>Region</PreviewCategory>
+      <PreviewContent>{{ coreData.region }}</PreviewContent>
+    </FlexContainer>
+  </FlexContainer>
 </template>
