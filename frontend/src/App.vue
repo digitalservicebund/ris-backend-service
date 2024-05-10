@@ -1,6 +1,10 @@
 <script lang="ts" setup>
-import { useSeoMeta } from "@unhead/vue"
+import { useHead, useSeoMeta } from "@unhead/vue"
 import Navbar from "./components/NavbarTop.vue"
+
+useHead({
+  title: "NeuRIS Rechtsinformationssystem",
+})
 
 useSeoMeta({
   charset: "utf-8",
