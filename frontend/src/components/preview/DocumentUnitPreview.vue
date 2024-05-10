@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Head } from "@unhead/vue/components"
 import dayjs from "dayjs"
 import FlexContainer from "@/components/FlexContainer.vue"
 import PreviewContentRelatedIndexing from "@/components/preview/PreviewContentRelatedIndexing.vue"
@@ -14,11 +13,6 @@ defineProps<{
 </script>
 
 <template>
-  <Head>
-    <title>
-      {{ documentUnit.documentNumber + " · NeuRIS Rechtsinformationssystem" }}
-    </title>
-  </Head>
   <FlexContainer class="max-w-screen-xl flex-col">
     <h1 class="ds-heading-03-bold mt-16 px-16">
       {{ documentUnit.documentNumber }}
