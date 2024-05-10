@@ -1,11 +1,13 @@
 import { captureConsoleIntegration } from "@sentry/integrations"
 import * as Sentry from "@sentry/vue"
+import { createHead } from "@unhead/vue"
 import { createApp } from "vue"
 import "@/styles/global.scss"
 import App from "./App.vue"
 import router from "./router"
 
 const app = createApp(App)
+app.use(createHead())
 
 function targets(): string[] {
   return [`${window.location.origin}/api`]
