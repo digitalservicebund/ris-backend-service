@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useHead } from "@unhead/vue"
 import { useRoute } from "vue-router"
 import DocumentUnitCategories from "@/components/DocumentUnitCategories.vue"
 import ErrorPage from "@/components/ErrorPage.vue"
@@ -7,6 +8,10 @@ import documentUnitService from "@/services/documentUnitService"
 const props = defineProps<{
   documentNumber: string
 }>()
+
+useHead({
+  title: props.documentNumber + " · NeuRIS Rechtsinformationssystem",
+})
 
 const route = useRoute()
 

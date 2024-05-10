@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useHead } from "@unhead/vue"
 import { onMounted, ref } from "vue"
 import { useRoute } from "vue-router"
 import DocumentUnitPublication from "@/components/DocumentUnitPublication.vue"
@@ -11,6 +12,10 @@ const props = defineProps<{
   documentNumber: string
   showNavigationPanel?: boolean
 }>()
+
+useHead({
+  title: props.documentNumber + " · NeuRIS Rechtsinformationssystem",
+})
 
 const documentUnit = ref<DocumentUnit>()
 const error = ref<ResponseError>()
