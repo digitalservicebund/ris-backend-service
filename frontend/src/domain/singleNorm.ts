@@ -1,5 +1,6 @@
 import dayjs from "dayjs"
 import { capitalize } from "vue"
+import LegalForce from "./legalForce"
 
 export default class SingleNorm {
   public singleNorm?: string
@@ -51,7 +52,7 @@ export default class SingleNorm {
   }
 
   get hasLegalForce(): boolean {
-    return !!this.legalForce?.type || !!this.legalForce?.region
+    return !!this.legalForce
   }
 
   private fieldIsEmpty(value: SingleNorm[(typeof SingleNorm.fields)[number]]) {
@@ -77,21 +78,4 @@ export const normFieldLabels: { [name: string]: string } = {
 export type SingleNormValidationInfo = {
   singleNorm: string
   normAbbreviation?: string
-}
-
-export type LegalForce = {
-  uuid?: string
-  type?: LegalForceType
-  region?: LegalForceRegion
-}
-
-export type LegalForceType = {
-  uuid?: string
-  abbreviation: string
-}
-
-export type LegalForceRegion = {
-  uuid?: string
-  code?: string
-  longText: string
 }
