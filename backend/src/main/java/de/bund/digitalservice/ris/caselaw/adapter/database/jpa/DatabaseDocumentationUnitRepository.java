@@ -47,7 +47,7 @@ public interface DatabaseDocumentationUnitRepository
           + SELECT_STATUS_WHERE_LATEST
           + """
         AND status.withError = TRUE))
-ORDER BY documentationUnit.decisionDate DESC NULLS LAST
+ORDER BY documentationUnit.decisionDate DESC
 """;
 
   @Query(
