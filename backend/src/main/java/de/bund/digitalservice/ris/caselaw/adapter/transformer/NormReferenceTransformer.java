@@ -8,9 +8,24 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Utility class for transforming NormReference objects between DTOs (Data Transfer Objects) and
+ * domain objects.
+ */
 public class NormReferenceTransformer {
-  private NormReferenceTransformer() {}
 
+  private NormReferenceTransformer() {
+    // Private constructor to prevent instantiation of this utility class.
+  }
+
+  /**
+   * Transforms a NormReferenceDTO (Data Transfer Object) into a {@link NormReference} domain
+   * object, before all NormReferences with the same normAbbreviation are being grouped into one
+   * NormReference object in the {@link DocumentationUnitTransformer}
+   *
+   * @param normDTO The NormReferenceDTO to be transformed.
+   * @return The NormReference domain object representing the transformed NormReferenceDTO.
+   */
   public static NormReference transformToDomain(NormReferenceDTO normDTO) {
     List<SingleNorm> list = new ArrayList<>();
     SingleNorm singleNorm = SingleNormTransformer.transformToDomain(normDTO);
@@ -27,6 +42,15 @@ public class NormReferenceTransformer {
         .build();
   }
 
+  /**
+   * Transforms a NormReference domain object into a list of NormReferenceDTOs (Data Transfer
+   * Objects). When converting into a DTO object, each single norm in a normReference is converted
+   * into its own {@link NormReferenceDTO}.
+   *
+   * @param normReference The NormReference object to be transformed.
+   * @param featureActive A boolean indicating whether the feature is active or not.
+   * @return A list of NormReferenceDTOs representing the transformed NormReference object.
+   */
   public static List<NormReferenceDTO> transformToDTO(
       NormReference normReference, boolean featureActive) {
     if (normReference == null) {

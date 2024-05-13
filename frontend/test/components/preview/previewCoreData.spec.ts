@@ -9,12 +9,14 @@ function renderComponent(coreData?: CoreData) {
     },
   })
 }
+
 describe("preview core data", () => {
   test("renders all core data fields", async () => {
     renderComponent({
       court: {
         label: "BVerfG",
       },
+      leadingDecisionNormReferences: ["NSW WEG $ 14 (BGH-intern)"],
       deviatingCourts: ["BGH"],
       fileNumbers: ["abc-123"],
       deviatingFileNumbers: ["cde-456"],
@@ -55,9 +57,10 @@ describe("preview core data", () => {
     expect(await screen.findByText("Vorgangshistorie")).toBeInTheDocument()
     expect(await screen.findByText("Rechtskraft")).toBeInTheDocument()
     expect(await screen.findByText("Region")).toBeInTheDocument()
+    expect(await screen.findByText("BGH Nachschlagewerk")).toBeInTheDocument()
   })
 
-  test("renders nothing when lists are empty", async () => {
+  test("do not render empty list", async () => {
     renderComponent({
       deviatingCourts: [],
       fileNumbers: [],
@@ -65,6 +68,7 @@ describe("preview core data", () => {
       deviatingDecisionDates: [],
       deviatingEclis: [],
       previousProcedures: [],
+      leadingDecisionNormReferences: [],
     })
 
     expect(screen.queryByText("Fehlerhaftes Gericht")).not.toBeInTheDocument()
@@ -77,6 +81,7 @@ describe("preview core data", () => {
     ).not.toBeInTheDocument()
     expect(screen.queryByText("Abweichender ECLI")).not.toBeInTheDocument()
     expect(screen.queryByText("Vorgangshistorie")).not.toBeInTheDocument()
+    expect(screen.queryByText("BGH Nachschlagewerk")).not.toBeInTheDocument()
   })
 
   it.each([
@@ -97,6 +102,7 @@ describe("preview core data", () => {
         "Vorgangshistorie",
         "Rechtskraft",
         "Region",
+        "BGH Nachschlagewerk",
       ],
     ],
     [
@@ -116,6 +122,7 @@ describe("preview core data", () => {
         "Vorgangshistorie",
         "Rechtskraft",
         "Region",
+        "BGH Nachschlagewerk",
       ],
     ],
     [

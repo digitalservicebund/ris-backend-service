@@ -2,6 +2,7 @@
 import FlexContainer from "@/components/FlexContainer.vue"
 import PreviewCategory from "@/components/preview/PreviewCategory.vue"
 import PreviewContent from "@/components/preview/PreviewContent.vue"
+import PreviewRow from "@/components/preview/PreviewRow.vue"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import PreviousDecision from "@/domain/previousDecision"
 
@@ -13,10 +14,7 @@ defineProps<{
 
 <template>
   <FlexContainer class="flex-col">
-    <FlexContainer
-      v-if="previousDecisions && previousDecisions?.length > 0"
-      class="flex-row"
-    >
+    <PreviewRow v-if="previousDecisions && previousDecisions?.length > 0">
       <PreviewCategory>Vorinstanz</PreviewCategory>
       <PreviewContent>
         <div
@@ -26,17 +24,14 @@ defineProps<{
           {{ previousDecision.renderDecision }}
         </div>
       </PreviewContent>
-    </FlexContainer>
-    <FlexContainer
-      v-if="ensuingDecisions && ensuingDecisions?.length > 0"
-      class="flex-row"
-    >
+    </PreviewRow>
+    <PreviewRow v-if="ensuingDecisions && ensuingDecisions?.length > 0">
       <PreviewCategory>Nachgehende Entscheidungen</PreviewCategory>
       <PreviewContent>
         <div v-for="(ensuingDecision, index) in ensuingDecisions" :key="index">
           {{ ensuingDecision.renderDecision }}
         </div>
       </PreviewContent>
-    </FlexContainer>
+    </PreviewRow>
   </FlexContainer>
 </template>
