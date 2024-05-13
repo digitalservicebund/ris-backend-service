@@ -25,29 +25,10 @@ describe("NormReferenceEntry", () => {
   const normAbbreviation: NormAbbreviation = {
     abbreviation: "1000g-BefV",
   }
-  const legalForceType: LegalForceType = {
-    abbreviation: "nichtig",
-  }
-  const region: LegalForceRegion = {
-    longText: "region",
-    code: "BB",
-  }
   const dropdownAbbreviationItems: ComboboxItem[] = [
     {
       label: normAbbreviation.abbreviation,
       value: normAbbreviation,
-    },
-  ]
-  const dropdownLegalForceTypeItems: ComboboxItem[] = [
-    {
-      label: legalForceType.abbreviation,
-      value: legalForceType,
-    },
-  ]
-  const dropdownRegionItems: ComboboxItem[] = [
-    {
-      label: region.longText,
-      value: region,
     },
   ]
   vi.spyOn(featureToggleService, "isEnabled").mockImplementation(() =>
@@ -56,20 +37,9 @@ describe("NormReferenceEntry", () => {
   vi.spyOn(comboboxItemService, "getRisAbbreviations").mockImplementation(() =>
     Promise.resolve({ status: 200, data: dropdownAbbreviationItems }),
   )
-  vi.spyOn(comboboxItemService, "getLegalForceTypes").mockImplementation(() =>
-    Promise.resolve({ status: 200, data: dropdownLegalForceTypeItems }),
-  )
-  vi.spyOn(comboboxItemService, "getLegalForceRegions").mockImplementation(() =>
-    Promise.resolve({ status: 200, data: dropdownRegionItems }),
-  )
   vi.spyOn(documentUnitService, "validateSingleNorm").mockImplementation(() =>
     Promise.resolve({ status: 200, data: "Ok" }),
   )
-  vi.mock("@/composables/useCourtType", () => ({
-    useInjectCourtType: vi.fn(() => {
-      return ref("VerfG")
-    }),
-  }))
   it("render empty norm input group on initial load", async () => {
     renderComponent()
     expect(screen.getByLabelText("RIS-Abkürzung")).toBeInTheDocument()
@@ -483,140 +453,176 @@ describe("NormReferenceEntry", () => {
     expect(emitted("removeEntry")).toBeTruthy()
   })
 
-  it("legal force checkbox toggles comboboxes", async () => {
-    const { user } = renderComponent()
-    const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
-    await user.type(abbreviationField, "1000")
-    const dropdownItems = screen.getAllByLabelText(
-      "dropdown-option",
-    ) as HTMLElement[]
-    expect(dropdownItems[0]).toHaveTextContent("1000g-BefV")
-    await user.click(dropdownItems[0])
+  describe("legal force", () => {
+    const legalForceType: LegalForceType = {
+      abbreviation: "nichtig",
+    }
+    const region: LegalForceRegion = {
+      longText: "region",
+      code: "BB",
+    }
+    const dropdownLegalForceTypeItems: ComboboxItem[] = [
+      {
+        label: legalForceType.abbreviation,
+        value: legalForceType,
+      },
+    ]
+    const dropdownRegionItems: ComboboxItem[] = [
+      {
+        label: region.longText,
+        value: region,
+      },
+    ]
+    vi.spyOn(comboboxItemService, "getLegalForceTypes").mockImplementation(() =>
+      Promise.resolve({ status: 200, data: dropdownLegalForceTypeItems }),
+    )
+    vi.spyOn(comboboxItemService, "getLegalForceRegions").mockImplementation(
+      () => Promise.resolve({ status: 200, data: dropdownRegionItems }),
+    )
+    vi.mock("@/composables/useCourtType", () => ({
+      useInjectCourtType: vi.fn(() => {
+        return ref("VerfG")
+      }),
+    }))
+    it("legal force checkbox toggles comboboxes", async () => {
+      const { user } = renderComponent()
+      const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
+      await user.type(abbreviationField, "1000")
+      const dropdownItems = screen.getAllByLabelText(
+        "dropdown-option",
+      ) as HTMLElement[]
+      expect(dropdownItems[0]).toHaveTextContent("1000g-BefV")
+      await user.click(dropdownItems[0])
 
-    const legalForceField = screen.getByLabelText("Mit Gesetzeskraft")
-    expect(legalForceField).toBeVisible()
-    expect(legalForceField).not.toBeChecked()
-    expect(screen.queryByLabelText("Gesetzeskraft Typ")).not.toBeInTheDocument()
-    expect(
-      screen.queryByLabelText("Gesetzeskraft Geltungsbereich"),
-    ).not.toBeInTheDocument()
-    await user.click(legalForceField)
-    expect(legalForceField).toBeChecked()
-    expect(screen.getByLabelText("Gesetzeskraft Typ")).toBeVisible()
-    expect(screen.getByLabelText("Gesetzeskraft Geltungsbereich")).toBeVisible()
-  })
-
-  it("updates legal force type", async () => {
-    const { user, emitted } = renderComponent({
-      modelValue: {
-        normAbbreviation: { id: "123", abbreviation: "ABC" },
-      } as NormReference,
+      const legalForceField = screen.getByLabelText("Mit Gesetzeskraft")
+      expect(legalForceField).toBeVisible()
+      expect(legalForceField).not.toBeChecked()
+      expect(
+        screen.queryByLabelText("Gesetzeskraft Typ"),
+      ).not.toBeInTheDocument()
+      expect(
+        screen.queryByLabelText("Gesetzeskraft Geltungsbereich"),
+      ).not.toBeInTheDocument()
+      await user.click(legalForceField)
+      expect(legalForceField).toBeChecked()
+      expect(screen.getByLabelText("Gesetzeskraft Typ")).toBeVisible()
+      expect(
+        screen.getByLabelText("Gesetzeskraft Geltungsbereich"),
+      ).toBeVisible()
     })
 
-    const checkbox = await screen.findByLabelText("Mit Gesetzeskraft")
+    it("updates legal force type", async () => {
+      const { user, emitted } = renderComponent({
+        modelValue: {
+          normAbbreviation: { id: "123", abbreviation: "ABC" },
+        } as NormReference,
+      })
 
-    await user.click(checkbox)
-    const legalForceType = screen.getByLabelText("Gesetzeskraft Typ")
-    await user.click(legalForceType)
-    const dropdownItemslegalForceType = screen.getAllByLabelText(
-      "dropdown-option",
-    ) as HTMLElement[]
-    expect(dropdownItemslegalForceType[0]).toHaveTextContent("nichtig")
-    await user.click(dropdownItemslegalForceType[0])
+      const checkbox = await screen.findByLabelText("Mit Gesetzeskraft")
 
-    const button = screen.getByLabelText("Norm speichern")
-    await user.click(button)
-    expect(emitted("update:modelValue")).toEqual([
-      [
-        {
-          normAbbreviation: {
-            abbreviation: "ABC",
-            id: "123",
-          },
-          singleNorms: [
-            {
-              dateOfVersion: undefined,
-              dateOfRelevance: undefined,
-              singleNorm: undefined,
-              legalForce: {
-                type: {
-                  abbreviation: "nichtig",
+      await user.click(checkbox)
+      const legalForceType = screen.getByLabelText("Gesetzeskraft Typ")
+      await user.click(legalForceType)
+      const dropdownItemsLegalForceType = screen.getAllByLabelText(
+        "dropdown-option",
+      ) as HTMLElement[]
+      expect(dropdownItemsLegalForceType[0]).toHaveTextContent("nichtig")
+      await user.click(dropdownItemsLegalForceType[0])
+
+      const button = screen.getByLabelText("Norm speichern")
+      await user.click(button)
+      expect(emitted("update:modelValue")).toEqual([
+        [
+          {
+            normAbbreviation: {
+              abbreviation: "ABC",
+              id: "123",
+            },
+            singleNorms: [
+              {
+                dateOfVersion: undefined,
+                dateOfRelevance: undefined,
+                singleNorm: undefined,
+                legalForce: {
+                  type: {
+                    abbreviation: "nichtig",
+                  },
                 },
               },
-            },
-          ],
-          normAbbreviationRawValue: undefined,
-          hasForeignSource: false,
-        },
-      ],
-    ])
-  })
-
-  it("updates legal force region", async () => {
-    const { user, emitted } = renderComponent({
-      modelValue: {
-        normAbbreviation: { id: "123", abbreviation: "ABC" },
-      } as NormReference,
+            ],
+            normAbbreviationRawValue: undefined,
+            hasForeignSource: false,
+          },
+        ],
+      ])
     })
 
-    const checkbox = await screen.findByLabelText("Mit Gesetzeskraft")
+    it("updates legal force region", async () => {
+      const { user, emitted } = renderComponent({
+        modelValue: {
+          normAbbreviation: { id: "123", abbreviation: "ABC" },
+        } as NormReference,
+      })
 
-    await user.click(checkbox)
-    const regionInput = screen.getByLabelText("Gesetzeskraft Geltungsbereich")
-    await user.click(regionInput)
-    const dropdownItemslegalRegionInput = screen.getAllByLabelText(
-      "dropdown-option",
-    ) as HTMLElement[]
-    expect(dropdownItemslegalRegionInput[0]).toHaveTextContent("region")
-    await user.click(dropdownItemslegalRegionInput[0])
+      const checkbox = await screen.findByLabelText("Mit Gesetzeskraft")
 
-    const button = screen.getByLabelText("Norm speichern")
-    await user.click(button)
-    expect(emitted("update:modelValue")).toEqual([
-      [
-        {
-          normAbbreviation: {
-            abbreviation: "ABC",
-            id: "123",
+      await user.click(checkbox)
+      const regionInput = screen.getByLabelText("Gesetzeskraft Geltungsbereich")
+      await user.click(regionInput)
+      const dropdownItemsLegalRegionInput = screen.getAllByLabelText(
+        "dropdown-option",
+      ) as HTMLElement[]
+      expect(dropdownItemsLegalRegionInput[0]).toHaveTextContent("region")
+      await user.click(dropdownItemsLegalRegionInput[0])
+
+      const button = screen.getByLabelText("Norm speichern")
+      await user.click(button)
+      expect(emitted("update:modelValue")).toEqual([
+        [
+          {
+            normAbbreviation: {
+              abbreviation: "ABC",
+              id: "123",
+            },
+            singleNorms: [
+              {
+                dateOfVersion: undefined,
+                dateOfRelevance: undefined,
+                singleNorm: undefined,
+                legalForce: {
+                  region: {
+                    code: "BB",
+                    longText: "region",
+                  },
+                },
+              },
+            ],
+            normAbbreviationRawValue: undefined,
+            hasForeignSource: false,
           },
+        ],
+      ])
+    })
+
+    it("legal force checkbox checked, when legal force set", async () => {
+      renderComponent({
+        modelValue: {
+          normAbbreviation: { id: "123", abbreviation: "ABC" },
           singleNorms: [
             {
-              dateOfVersion: undefined,
-              dateOfRelevance: undefined,
-              singleNorm: undefined,
               legalForce: {
                 region: {
-                  code: "BB",
+                  code: "abc",
                   longText: "region",
                 },
               },
             },
           ],
-          normAbbreviationRawValue: undefined,
-          hasForeignSource: false,
-        },
-      ],
-    ])
-  })
+        } as NormReference,
+      })
 
-  it("legal force checkbox checked, when legal force set", async () => {
-    renderComponent({
-      modelValue: {
-        normAbbreviation: { id: "123", abbreviation: "ABC" },
-        singleNorms: [
-          {
-            legalForce: {
-              region: {
-                code: "abc",
-                longText: "region",
-              },
-            },
-          },
-        ],
-      } as NormReference,
+      const checkbox = await screen.findByLabelText("Mit Gesetzeskraft")
+      expect(checkbox).toBeChecked()
     })
-
-    const checkbox = await screen.findByLabelText("Mit Gesetzeskraft")
-    expect(checkbox).toBeChecked()
   })
 })

@@ -172,6 +172,7 @@ onMounted(async () => {
           :id="id"
           v-model="withLegalForce"
           aria-label="Gesetzeskraft der Norm"
+          data-testid="legal-force-checkbox"
           size="small"
         />
       </InputField>
@@ -267,6 +268,7 @@ onMounted(async () => {
             id="legalForceType"
             v-model="legalForceType"
             aria-label="Gesetzeskraft Typ"
+            data-testid="legal-force-type-combobox"
             :item-service="ComboboxItemService.getLegalForceTypes"
           ></ComboboxInput>
         </InputField>
@@ -277,6 +279,7 @@ onMounted(async () => {
             id="legalForceRegion"
             v-model="legalForceRegion"
             aria-label="Gesetzeskraft Geltungsbereich"
+            data-testid="legal-force-region-combobox"
             :item-service="ComboboxItemService.getLegalForceRegions"
           ></ComboboxInput>
         </InputField>

@@ -1,5 +1,6 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { describe } from "vitest"
 import { ComboboxItem } from "@/components/input/types"
 import NormReferences from "@/components/NormReferences.vue"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
@@ -294,5 +295,59 @@ describe("Norm references", () => {
 
     // Todo:
     // add check for error badge when implemented
+  })
+
+  describe("legal force", () => {
+    it("render summary with legal force type and region", () => {
+      const modelValue: NormReference[] = [
+        generateNormReference({
+          normAbbreviation: {
+            abbreviation: "1000g-BefV",
+          },
+          singleNorms: [
+            new SingleNorm({
+              singleNorm: "§ 345",
+              dateOfRelevance: "02-02-2022",
+              dateOfVersion: "2022",
+              legalForce: {
+                type: { abbreviation: "nichtig" },
+                region: { code: "BB", longText: "Brandenburg" },
+              },
+            }),
+          ],
+        }),
+      ]
+      renderComponent({ modelValue })
+
+      expect(screen.getByLabelText("Listen Eintrag")).toHaveTextContent(
+        "1000g-BefV, § 345, 01.01.2022, 02-02-2022|Nichtig (Brandenburg)",
+      )
+    })
+
+    it("render summary with legal force but without type and region", () => {
+      const modelValue: NormReference[] = [
+        generateNormReference({
+          normAbbreviation: {
+            abbreviation: "1000g-BefV",
+          },
+          singleNorms: [
+            new SingleNorm({
+              singleNorm: "§ 345",
+              dateOfRelevance: "02-02-2022",
+              dateOfVersion: "2022",
+              legalForce: {
+                type: undefined,
+                region: undefined,
+              },
+            }),
+          ],
+        }),
+      ]
+      renderComponent({ modelValue })
+
+      expect(screen.getByLabelText("Listen Eintrag")).toHaveTextContent(
+        "1000g-BefV, § 345, 01.01.2022, 02-02-2022",
+      )
+    })
   })
 })
