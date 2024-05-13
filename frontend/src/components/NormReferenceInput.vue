@@ -109,8 +109,10 @@ function removeSingleNormEntry(index: number) {
 }
 
 function cancelEdit() {
-  if (new NormReference({ ...props.modelValue }).isEmpty)
+  if (new NormReference({ ...props.modelValue }).isEmpty) {
     emit("removeEntry", true)
+    singleNorms.value = []
+  }
   emit("cancelEdit")
 }
 
