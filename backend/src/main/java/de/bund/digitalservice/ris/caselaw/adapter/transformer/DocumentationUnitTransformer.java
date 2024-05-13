@@ -26,6 +26,7 @@ import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.LocalDate;
@@ -153,6 +154,20 @@ public class DocumentationUnitTransformer {
     }
   }
 
+  /**
+   * Adds norm references to the documentation unit builder based on the provided content-related
+   * indexing information. Each {@link de.bund.digitalservice.ris.caselaw.domain.SingleNorm} are
+   * grouped in a list of single norms, according to the associated norm abbreviation and packed
+   * into a {@link NormReference}. When converting into a DTO object, each single norm in the
+   * normReference is converted into its own {@link NormReferenceDTO}. In order for JPA to be able
+   * to correctly link the legal force of each NormReferenceDTO, it must be explicitly set again.
+   * (Because legal force is the owning side of the one to one connection, it is not implicitly
+   * linked by jpa, when a norm with legal force is saved.)
+   *
+   * @param builder The builder for constructing the documentation unit DTO.
+   * @param contentRelatedIndexing The content-related indexing information containing the norms.
+   * @param featureActive A boolean indicating whether the feature is active or not.
+   */
   private static void addNormReferences(
       DocumentationUnitDTOBuilder builder,
       ContentRelatedIndexing contentRelatedIndexing,
@@ -551,6 +566,14 @@ public class DocumentationUnitTransformer {
     return builder.build();
   }
 
+  /**
+   * Adds norm references to the domain object based on the provided documentation unit DTO. A list
+   * of NormReferenceDTOs with the same normAbbreviation are grouped into one NormReference, with a
+   * list of {@link SingleNorm}.
+   *
+   * @param documentationUnitDTO The documentation unit DTO containing norm references to be added.
+   * @return A list of NormReference objects representing the added norm references.
+   */
   private static List<NormReference> addNormReferencesToDomain(
       DocumentationUnitDTO documentationUnitDTO) {
     List<NormReference> normReferences = new ArrayList<>();

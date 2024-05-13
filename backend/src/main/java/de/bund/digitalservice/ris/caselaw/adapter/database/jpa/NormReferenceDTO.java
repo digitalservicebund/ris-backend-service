@@ -20,6 +20,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+/** An interface representing a norm reference, linked to a documentation unit. */
 @Getter
 @Setter
 @NoArgsConstructor
