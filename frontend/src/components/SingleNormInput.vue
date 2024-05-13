@@ -28,7 +28,7 @@ const emit = defineEmits<{
 }>()
 
 const validationStore = useValidationStore<(typeof SingleNorm.fields)[number]>()
-const legalForceValidationScore =
+const legalForceValidationStore =
   useValidationStore<(typeof LegalForce.fields)[number]>()
 const singleNormInput = ref<InstanceType<typeof TextInput> | null>(null)
 
@@ -128,10 +128,12 @@ async function removeSingleNormEntry() {
 }
 
 function validateLegalForce() {
-  legalForceValidationScore.reset()
-  singleNorm.value.legalForce?.missingRequiredFields.forEach((field) =>
-    legalForceValidationScore.add("Pflichtfeld nicht befüllt", field),
-  )
+  legalForceValidationStore.reset()
+  if (singleNorm.value.legalForce?.missingRequiredFields?.length) {
+    singleNorm.value.legalForce?.missingRequiredFields.forEach((field) => {
+      legalForceValidationStore.add("Pflichtfeld nicht befüllt", field)
+    })
+  }
 }
 
 function updateDateFormatValidation(
@@ -158,7 +160,7 @@ onMounted(async () => {
   }
   validateLegalForce()
 
-  withLegalForce.value = singleNorm.value?.hasLegalForce
+  withLegalForce.value = !!singleNorm.value?.legalForce
   singleNormInput.value?.focusInput()
   featureToggle.value = (
     await FeatureToggleService.isEnabled("neuris.legal-force")
@@ -278,7 +280,7 @@ onMounted(async () => {
           id="legalForceType"
           v-slot="slotProps"
           label="Typ der Ges.-Kraft *"
-          :validation-error="legalForceValidationScore.getByField('type')"
+          :validation-error="legalForceValidationStore.getByField('type')"
         >
           <ComboboxInput
             id="legalForceType"
@@ -287,7 +289,7 @@ onMounted(async () => {
             data-testid="legal-force-type-combobox"
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getLegalForceTypes"
-            @click="legalForceValidationScore.remove('type')"
+            @click="legalForceValidationStore.remove('type')"
           ></ComboboxInput>
         </InputField>
       </div>
@@ -296,7 +298,7 @@ onMounted(async () => {
           id="legalForceRegion"
           v-slot="slotProps"
           label="Geltungsbereich *"
-          :validation-error="legalForceValidationScore.getByField('region')"
+          :validation-error="legalForceValidationStore.getByField('region')"
         >
           <ComboboxInput
             id="legalForceRegion"
@@ -305,7 +307,7 @@ onMounted(async () => {
             data-testid="legal-force-region-combobox"
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getLegalForceRegions"
-            @click="legalForceValidationScore.remove('region')"
+            @click="legalForceValidationStore.remove('region')"
           ></ComboboxInput>
         </InputField>
       </div>

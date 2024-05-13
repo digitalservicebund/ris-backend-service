@@ -51,10 +51,6 @@ export default class SingleNorm {
     return isEmpty
   }
 
-  get hasLegalForce(): boolean {
-    return !!this.legalForce
-  }
-
   private fieldIsEmpty(value: SingleNorm[(typeof SingleNorm.fields)[number]]) {
     if (
       value === undefined ||
