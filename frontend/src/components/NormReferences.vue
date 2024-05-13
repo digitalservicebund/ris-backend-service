@@ -42,19 +42,13 @@ function hasSingleNorms(normEntry: NormReference) {
 const defaultValue = new NormReference()
 
 function legalForceSummarizer(singleNorm: SingleNorm) {
-  console.log(
-    "legal force summarizer - " +
-      singleNorm.legalForce?.type?.abbreviation +
-      " - " +
-      singleNorm.legalForce?.region?.longText,
-  )
   return h("div", { class: ["flex flex-row items-center"] }, [
     h("div", {}, "|"),
     h(IconBreakingNews, { class: ["mr-8 ml-8"] }),
     h("div", { class: ["link-01-reg mr-8"] }, singleNorm.renderLegalForce),
     singleNorm.legalForce?.hasMissingRequiredFields
       ? errorBadgeSummarizer(missingDataError)
-      : errorBadgeSummarizer("hier könnte ihr fehler stehen"),
+      : null,
   ])
 }
 

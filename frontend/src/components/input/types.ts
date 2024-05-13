@@ -3,8 +3,8 @@ import { CitationType } from "@/domain/citationType"
 import DocumentationOffice from "@/domain/documentationOffice"
 import { Court, DocumentType, Procedure } from "@/domain/documentUnit"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
+import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
-import { LegalForceRegion, LegalForceType } from "@/domain/singleNorm"
 import { ResponseError } from "@/services/httpClient"
 
 export enum InputType {

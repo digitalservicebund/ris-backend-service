@@ -6,6 +6,7 @@ import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import SingleNormInput from "@/components/SingleNormInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
+import LegalForce from "@/domain/legalForce"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
@@ -83,7 +84,16 @@ async function addNormReference() {
     const normRef = new NormReference({
       ...norm.value,
       singleNorms: singleNorms.value
-        .map((norm) => (!norm.isEmpty ? new SingleNorm({ ...norm }) : null))
+        .map((norm) =>
+          !norm.isEmpty
+            ? new SingleNorm({
+                ...norm,
+                legalForce: norm.legalForce
+                  ? new LegalForce({ ...norm.legalForce })
+                  : undefined,
+              })
+            : null,
+        )
         .filter((norm) => norm !== null) as SingleNorm[],
     })
     emit("update:modelValue", normRef)
