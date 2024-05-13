@@ -279,7 +279,6 @@ onMounted(async () => {
           v-slot="slotProps"
           label="Typ der Ges.-Kraft *"
           :validation-error="legalForceValidationScore.getByField('type')"
-          @input="legalForceValidationScore.remove('type')"
         >
           <ComboboxInput
             id="legalForceType"
@@ -288,7 +287,7 @@ onMounted(async () => {
             data-testid="legal-force-type-combobox"
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getLegalForceTypes"
-            @input="legalForceValidationScore.remove('type')"
+            @click="legalForceValidationScore.remove('type')"
           ></ComboboxInput>
         </InputField>
       </div>
@@ -298,7 +297,6 @@ onMounted(async () => {
           v-slot="slotProps"
           label="Geltungsbereich *"
           :validation-error="legalForceValidationScore.getByField('region')"
-          @input="legalForceValidationScore.remove('region')"
         >
           <ComboboxInput
             id="legalForceRegion"
@@ -307,6 +305,7 @@ onMounted(async () => {
             data-testid="legal-force-region-combobox"
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getLegalForceRegions"
+            @click="legalForceValidationScore.remove('region')"
           ></ComboboxInput>
         </InputField>
       </div>
