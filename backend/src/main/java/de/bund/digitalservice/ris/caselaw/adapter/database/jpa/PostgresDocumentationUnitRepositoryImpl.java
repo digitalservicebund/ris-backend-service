@@ -22,11 +22,9 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfL
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -462,9 +460,11 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
               fixedPageRequest);
     }
 
-    Set<DocumentationUnitListItemDTO> allResults = new HashSet<>();
+    List<DocumentationUnitListItemDTO> allResults = new ArrayList<>();
+
     allResults.addAll(fileNumberResults.getContent());
     allResults.addAll(deviatingFileNumberResults.getContent());
+    log.info("printing" + allResults.stream().toList());
 
     // We can provide entries for a next page if ...
     // A) we already have collected more results than fit on the current page, or
@@ -478,7 +478,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
         allResults.stream()
             .sorted(
                 (o1, o2) -> {
-                  if (o1.getDocumentNumber() != null && o2.getDocumentNumber() != null) {
+                  if (o1.getDecisionDate() != null && o2.getDecisionDate() != null) {
                     return o1.getDocumentNumber().compareTo(o2.getDocumentNumber());
                   }
                   return 0;
