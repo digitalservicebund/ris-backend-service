@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import FlexContainer from "@/components/FlexContainer.vue"
 import TextEditor from "@/components/input/TextEditor.vue"
 import PreviewCategory from "@/components/preview/PreviewCategory.vue"
 import PreviewContent from "@/components/preview/PreviewContent.vue"
+import PreviewRow from "@/components/preview/PreviewRow.vue"
 import { useValidBorderNumbers } from "@/composables/useValidBorderNumbers"
 import { Texts } from "@/domain/documentUnit"
 
@@ -18,7 +18,7 @@ const data = useValidBorderNumbers(
 </script>
 
 <template>
-  <FlexContainer v-for="item in data" :key="item.id" class="flex-row">
+  <PreviewRow v-for="item in data" :key="item.id">
     <PreviewCategory>{{ item.label }}</PreviewCategory>
     <PreviewContent>
       <TextEditor
@@ -29,5 +29,5 @@ const data = useValidBorderNumbers(
         :value="item.value"
       />
     </PreviewContent>
-  </FlexContainer>
+  </PreviewRow>
 </template>

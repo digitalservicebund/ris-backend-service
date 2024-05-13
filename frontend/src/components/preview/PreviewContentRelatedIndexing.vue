@@ -3,6 +3,7 @@ import { computed } from "vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import PreviewCategory from "@/components/preview/PreviewCategory.vue"
 import PreviewContent from "@/components/preview/PreviewContent.vue"
+import PreviewRow from "@/components/preview/PreviewRow.vue"
 import { ContentRelatedIndexing } from "@/domain/documentUnit"
 
 const props = defineProps<{
@@ -40,7 +41,7 @@ const hasActiveCitations = computed(() => {
 
 <template>
   <FlexContainer class="flex-col">
-    <FlexContainer v-if="hasKeywords" class="flex-row">
+    <PreviewRow v-if="hasKeywords">
       <PreviewCategory>Schlagwörter</PreviewCategory>
       <PreviewContent>
         <div
@@ -50,8 +51,8 @@ const hasActiveCitations = computed(() => {
           {{ keyword }}
         </div>
       </PreviewContent>
-    </FlexContainer>
-    <FlexContainer v-if="hasFieldsOfLaw" class="flex-row">
+    </PreviewRow>
+    <PreviewRow v-if="hasFieldsOfLaw">
       <PreviewCategory>Sachgebiete</PreviewCategory>
       <PreviewContent>
         <div
@@ -61,9 +62,9 @@ const hasActiveCitations = computed(() => {
           {{ fieldOfLaw.identifier }}, {{ fieldOfLaw.text }}
         </div>
       </PreviewContent>
-    </FlexContainer>
+    </PreviewRow>
 
-    <FlexContainer v-if="hasNorms" class="flex-row">
+    <PreviewRow v-if="hasNorms">
       <PreviewCategory>Normen</PreviewCategory>
       <PreviewContent>
         <div v-for="(norm, index) in contentRelatedIndexing.norms" :key="index">
@@ -77,9 +78,9 @@ const hasActiveCitations = computed(() => {
           </div>
         </div>
       </PreviewContent>
-    </FlexContainer>
+    </PreviewRow>
 
-    <FlexContainer v-if="hasActiveCitations" class="flex-row">
+    <PreviewRow v-if="hasActiveCitations">
       <PreviewCategory>Aktivzitierung</PreviewCategory>
       <PreviewContent>
         <div
@@ -91,6 +92,6 @@ const hasActiveCitations = computed(() => {
           {{ activeCitation.renderDecision }}
         </div>
       </PreviewContent>
-    </FlexContainer>
+    </PreviewRow>
   </FlexContainer>
 </template>
