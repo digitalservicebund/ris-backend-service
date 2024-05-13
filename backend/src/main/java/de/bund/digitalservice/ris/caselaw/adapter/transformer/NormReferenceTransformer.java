@@ -33,16 +33,28 @@ public class NormReferenceTransformer {
       return Collections.emptyList();
     }
 
-    if (normReference.normAbbreviation() == null) {
+    if (normReference.normAbbreviation() == null
+        && normReference.normAbbreviationRawValue() == null) {
       throw new DocumentUnitTransformerException(
           "Norm reference has no norm abbreviation, but is required.");
     }
 
     NormAbbreviationDTO normAbbreviationDTO =
-        NormAbbreviationDTO.builder().id(normReference.normAbbreviation().id()).build();
+        normReference.normAbbreviation() != null
+            ? NormAbbreviationDTO.builder().id(normReference.normAbbreviation().id()).build()
+            : null;
+
+    String normAbbreviationRawValue =
+        normReference.normAbbreviationRawValue() != null
+            ? normReference.normAbbreviationRawValue()
+            : null;
 
     if (normReference.singleNorms() == null || normReference.singleNorms().isEmpty()) {
-      return List.of(NormReferenceDTO.builder().normAbbreviation(normAbbreviationDTO).build());
+      return List.of(
+          NormReferenceDTO.builder()
+              .normAbbreviation(normAbbreviationDTO)
+              .normAbbreviationRawValue(normAbbreviationRawValue)
+              .build());
     }
 
     return normReference.singleNorms().stream()
@@ -52,6 +64,7 @@ public class NormReferenceTransformer {
                   NormReferenceDTO.builder()
                       .id(singleNorm.id())
                       .normAbbreviation(normAbbreviationDTO)
+                      .normAbbreviationRawValue(normAbbreviationRawValue)
                       .singleNorm(singleNorm.singleNorm())
                       .dateOfVersion(singleNorm.dateOfVersion())
                       .dateOfRelevance(singleNorm.dateOfRelevance());
