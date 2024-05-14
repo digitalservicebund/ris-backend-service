@@ -181,16 +181,15 @@ class DocumentUnitControllerAuthIntegrationTest {
     assertThat(extractStatusByUuid(result.getResponseBody(), documentationUnitDTO.getId()))
         .isEqualTo(getResultStatus(publicationStatus).toString());
 
-    EntityExchangeResult<String> resultForSingleAccess =
-        risWebTestClient
-            .withLogin(userOfficeId)
-            .get()
-            .uri("/api/v1/caselaw/documentunits/" + documentationUnitDTO.getDocumentNumber())
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(String.class)
-            .returnResult();
+    risWebTestClient
+        .withLogin(userOfficeId)
+        .get()
+        .uri("/api/v1/caselaw/documentunits/" + documentationUnitDTO.getDocumentNumber())
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(String.class)
+        .returnResult();
   }
 
   @ParameterizedTest
