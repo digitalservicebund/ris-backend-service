@@ -21,7 +21,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = MailTrackingController.class)
@@ -49,7 +48,7 @@ class MailTrackingControllerTest {
 
     when(service.getMappedPublishState(mailTrackingEvent)).thenReturn(expectedEmailPublishState);
     when(service.updatePublishingState(TEST_UUID.toString(), mailTrackingEvent))
-        .thenReturn(Mono.just(ResponseEntity.ok().build()));
+        .thenReturn(ResponseEntity.ok().build());
 
     risWebTestClient
         .withDefaultLogin()
@@ -115,7 +114,7 @@ class MailTrackingControllerTest {
                         }""";
 
     when(service.updatePublishingState("no-uuid", "delivered"))
-        .thenReturn(Mono.just(ResponseEntity.noContent().build()));
+        .thenReturn(ResponseEntity.noContent().build());
     when(service.getMappedPublishState("delivered")).thenReturn(EmailPublishState.SUCCESS);
 
     risWebTestClient

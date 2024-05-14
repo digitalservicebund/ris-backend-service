@@ -17,6 +17,7 @@ import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormCode;
 import de.bund.digitalservice.ris.caselaw.domain.validator.SingleNormValidator;
 import java.util.List;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,7 +29,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import reactor.test.StepVerifier;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @ExtendWith(SpringExtension.class)
@@ -92,9 +92,8 @@ class SingleNormValidationTest {
     SingleNormValidationInfo singleNormValidationInfo =
         new SingleNormValidationInfo(singleNorm, normAbbreviation);
 
-    StepVerifier.create(service.validateSingleNorm(singleNormValidationInfo))
-        .expectNext("Ok")
-        .verifyComplete();
+    var message = service.validateSingleNorm(singleNormValidationInfo);
+    Assertions.assertEquals("Ok", message);
   }
 
   @ParameterizedTest
@@ -116,9 +115,8 @@ class SingleNormValidationTest {
     SingleNormValidationInfo singleNormValidationInfo =
         new SingleNormValidationInfo(singleNorm, normAbbreviation);
 
-    StepVerifier.create(service.validateSingleNorm(singleNormValidationInfo))
-        .expectNext("Validation error")
-        .verifyComplete();
+    var message = service.validateSingleNorm(singleNormValidationInfo);
+    Assertions.assertEquals("Validation error", message);
   }
 
   @Test
@@ -126,26 +124,23 @@ class SingleNormValidationTest {
     SingleNormValidationInfo singleNormValidationInfo =
         new SingleNormValidationInfo(null, "norm abbreviation");
 
-    StepVerifier.create(service.validateSingleNorm(singleNormValidationInfo))
-        .expectNext("Ok")
-        .verifyComplete();
+    var message = service.validateSingleNorm(singleNormValidationInfo);
+    Assertions.assertEquals("Ok", message);
   }
 
   @Test
   void testValidate_withNormAbbreviationIsNull() {
     SingleNormValidationInfo singleNormValidationInfo = new SingleNormValidationInfo("AB 1", null);
 
-    StepVerifier.create(service.validateSingleNorm(singleNormValidationInfo))
-        .expectNext("Ok")
-        .verifyComplete();
+    var message = service.validateSingleNorm(singleNormValidationInfo);
+    Assertions.assertEquals("Ok", message);
   }
 
   @Test
   void testValidate_withSingleNormAndNormAbbreviationAreNull() {
     SingleNormValidationInfo singleNormValidationInfo = new SingleNormValidationInfo(null, null);
 
-    StepVerifier.create(service.validateSingleNorm(singleNormValidationInfo))
-        .expectNext("Ok")
-        .verifyComplete();
+    var message = service.validateSingleNorm(singleNormValidationInfo);
+    Assertions.assertEquals("Ok", message);
   }
 }

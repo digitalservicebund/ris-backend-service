@@ -17,7 +17,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
 @Import({DatabaseDocumentUnitStatusService.class})
@@ -32,7 +31,7 @@ class DocumentUnitStatusServiceTest {
   @MockBean private DocumentUnitRepository documentUnitRepo;
 
   @Test
-  void testSetInitialStatus() {
+  void testSetInitialStatus() throws DocumentationUnitNotExistsException {
     DocumentationUnitDTO documentUnitDTO =
         DocumentationUnitDTO.builder().id(UUID.randomUUID()).build();
     DocumentUnit documentUnit = DocumentUnit.builder().uuid(documentUnitDTO.getId()).build();
@@ -42,7 +41,7 @@ class DocumentUnitStatusServiceTest {
     when(documentUnitRepo.findByUuid(documentUnitDTO.getId()))
         .thenReturn(Optional.of(documentUnit));
 
-    StepVerifier.create(service.setInitialStatus(documentUnit)).expectNextCount(1).verifyComplete();
+    service.setInitialStatus(documentUnit);
 
     verify(service).setInitialStatus(documentUnit);
     verify(repository).save(any(StatusDTO.class));

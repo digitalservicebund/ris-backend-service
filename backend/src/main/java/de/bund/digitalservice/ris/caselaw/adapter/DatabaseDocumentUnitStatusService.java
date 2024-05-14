@@ -9,12 +9,10 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
-import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 @Service
 @Slf4j
@@ -36,100 +34,83 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
   }
 
   @Override
-  public Mono<DocumentUnit> setInitialStatus(DocumentUnit documentUnit) {
-    try {
-      return Mono.just(
-              repository.save(
-                  StatusDTO.builder()
-                      .createdAt(Instant.now())
-                      .documentationUnitDTO(
-                          databaseDocumentationUnitRepository.getReferenceById(documentUnit.uuid()))
-                      .publicationStatus(PublicationStatus.UNPUBLISHED)
-                      .withError(false)
-                      .build()))
-          .then(
-              Mono.just(
-                  documentUnitRepository
-                      .findByUuid(documentUnit.uuid())
-                      .orElseThrow(
-                          () -> new DocumentationUnitNotExistsException(documentUnit.uuid()))));
-    } catch (DocumentationUnitNotExistsException e) {
-      return Mono.error(e);
-    }
-  }
-
-  @Override
-  public Mono<DocumentUnit> setToPublishing(
-      DocumentUnit documentUnit, Instant publishDate, String issuerAddress) {
-    try {
-      return Mono.just(
-              repository.save(
-                  StatusDTO.builder()
-                      .createdAt(publishDate)
-                      .documentationUnitDTO(
-                          databaseDocumentationUnitRepository.getReferenceById(documentUnit.uuid()))
-                      .publicationStatus(PublicationStatus.PUBLISHING)
-                      .withError(false)
-                      .issuerAddress(issuerAddress)
-                      .build()))
-          .then(
-              Mono.just(
-                  documentUnitRepository
-                      .findByUuid(documentUnit.uuid())
-                      .orElseThrow(
-                          () -> new DocumentationUnitNotExistsException(documentUnit.uuid()))));
-    } catch (DocumentationUnitNotExistsException e) {
-      return Mono.error(e);
-    }
-  }
-
-  @Override
-  public Mono<Void> update(String documentNumber, Status status)
+  public DocumentUnit setInitialStatus(DocumentUnit documentUnit)
       throws DocumentationUnitNotExistsException {
 
-    return getLatestPublishing(documentNumber)
-        .map(previousStatusDTO -> saveStatus(status, previousStatusDTO))
-        .then();
+    repository.save(
+        StatusDTO.builder()
+            .createdAt(Instant.now())
+            .documentationUnitDTO(
+                databaseDocumentationUnitRepository.getReferenceById(documentUnit.uuid()))
+            .publicationStatus(PublicationStatus.UNPUBLISHED)
+            .withError(false)
+            .build());
+
+    return documentUnitRepository
+        .findByUuid(documentUnit.uuid())
+        .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnit.uuid()));
   }
 
   @Override
-  public Mono<Void> update(UUID documentUuid, Status status) {
-    return getLatestPublishing(documentUuid)
-        .flatMap(previousStatusDTO -> saveStatus(status, previousStatusDTO))
-        .then();
+  public DocumentUnit setToPublishing(
+      DocumentUnit documentUnit, Instant publishDate, String issuerAddress)
+      throws DocumentationUnitNotExistsException {
+
+    repository.save(
+        StatusDTO.builder()
+            .createdAt(publishDate)
+            .documentationUnitDTO(
+                databaseDocumentationUnitRepository.getReferenceById(documentUnit.uuid()))
+            .publicationStatus(PublicationStatus.PUBLISHING)
+            .withError(false)
+            .issuerAddress(issuerAddress)
+            .build());
+
+    return documentUnitRepository
+        .findByUuid(documentUnit.uuid())
+        .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnit.uuid()));
   }
 
-  @NotNull
-  private Mono<StatusDTO> saveStatus(Status status, StatusDTO previousStatusDTO) {
-
-    return Mono.just(
-        repository.save(
-            StatusDTO.builder()
-                .createdAt(Instant.now())
-                .documentationUnitDTO(previousStatusDTO.getDocumentationUnitDTO())
-                .issuerAddress(previousStatusDTO.getIssuerAddress())
-                .publicationStatus(status.publicationStatus())
-                .withError(status.withError())
-                .build()));
+  @Override
+  public void update(String documentNumber, Status status)
+      throws DocumentationUnitNotExistsException {
+    saveStatus(status, getLatestPublishing(documentNumber));
   }
 
-  public Mono<String> getLatestIssuerAddress(String documentNumber) {
+  @Override
+  public void update(UUID documentUuid, Status status) throws DocumentationUnitNotExistsException {
+    saveStatus(status, getLatestPublishing(documentUuid));
+  }
+
+  private void saveStatus(Status status, StatusDTO previousStatusDTO) {
+
+    repository.save(
+        StatusDTO.builder()
+            .createdAt(Instant.now())
+            .documentationUnitDTO(previousStatusDTO.getDocumentationUnitDTO())
+            .issuerAddress(previousStatusDTO.getIssuerAddress())
+            .publicationStatus(status.publicationStatus())
+            .withError(status.withError())
+            .build());
+  }
+
+  public String getLatestIssuerAddress(String documentNumber) {
     try {
-      return getLatestPublishing(documentNumber).map(StatusDTO::getIssuerAddress);
+      return getLatestPublishing(documentNumber).getIssuerAddress();
     } catch (Exception e) {
-      return Mono.empty();
+      return null;
     }
   }
 
   @Override
-  public Mono<PublicationStatus> getLatestStatus(UUID documentUuid) {
-    return Mono.just(
-            repository.findFirstByDocumentationUnitDTOOrderByCreatedAtDesc(
-                databaseDocumentationUnitRepository.getReferenceById(documentUuid)))
-        .map(StatusDTO::getPublicationStatus);
+  public PublicationStatus getLatestStatus(UUID documentUuid) {
+    return repository
+        .findFirstByDocumentationUnitDTOOrderByCreatedAtDesc(
+            databaseDocumentationUnitRepository.getReferenceById(documentUuid))
+        .getPublicationStatus();
   }
 
-  private Mono<StatusDTO> getLatestPublishing(String documentNumber)
+  private StatusDTO getLatestPublishing(String documentNumber)
       throws DocumentationUnitNotExistsException {
     var documentUnit =
         databaseDocumentationUnitRepository
@@ -138,15 +119,11 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
     return getLatestPublishing(documentUnit.getId());
   }
 
-  private Mono<StatusDTO> getLatestPublishing(UUID documentUuid) {
-    try {
-      return Mono.just(
-          repository
-              .findFirstByDocumentationUnitDTO_IdAndPublicationStatusOrderByCreatedAtDesc(
-                  documentUuid, PublicationStatus.PUBLISHING)
-              .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUuid)));
-    } catch (Exception e) {
-      return Mono.error(e);
-    }
+  private StatusDTO getLatestPublishing(UUID documentUuid)
+      throws DocumentationUnitNotExistsException {
+    return repository
+        .findFirstByDocumentationUnitDTO_IdAndPublicationStatusOrderByCreatedAtDesc(
+            documentUuid, PublicationStatus.PUBLISHING)
+        .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUuid));
   }
 }

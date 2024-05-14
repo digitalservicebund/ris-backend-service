@@ -23,6 +23,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
@@ -46,7 +47,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
@@ -84,17 +84,15 @@ class DocumentUnitControllerTest {
 
     when(service.getByUuid(TEST_UUID))
         .thenReturn(
-            Mono.just(
-                DocumentUnit.builder()
-                    .coreData(CoreData.builder().documentationOffice(docOffice).build())
-                    .build()));
+            DocumentUnit.builder()
+                .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                .build());
   }
 
   @Test
   void testGenerateNewDocumentUnit() {
     // userService.getDocumentationOffice is mocked in @BeforeEach
-    when(service.generateNewDocumentUnit(docOffice))
-        .thenReturn(Mono.just(DocumentUnit.builder().build()));
+    when(service.generateNewDocumentUnit(docOffice)).thenReturn(DocumentUnit.builder().build());
 
     risWebClient
         .withDefaultLogin()
@@ -112,10 +110,9 @@ class DocumentUnitControllerTest {
   void testGetByDocumentnumber() {
     when(service.getByDocumentNumber("ABCD202200001"))
         .thenReturn(
-            Mono.just(
-                DocumentUnit.builder()
-                    .coreData(CoreData.builder().documentationOffice(docOffice).build())
-                    .build()));
+            DocumentUnit.builder()
+                .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                .build());
 
     risWebClient
         .withDefaultLogin()
@@ -131,7 +128,7 @@ class DocumentUnitControllerTest {
 
   @Test
   void testGetByDocumentNumber_withInvalidDocumentNumber() {
-    when(service.getByDocumentNumber("abc")).thenReturn(Mono.empty());
+    when(service.getByDocumentNumber("abc")).thenReturn(null);
 
     risWebClient
         .withDefaultLogin()
@@ -144,7 +141,7 @@ class DocumentUnitControllerTest {
 
   @Test
   void testDeleteByUuid() {
-    when(service.deleteByUuid(TEST_UUID)).thenReturn(Mono.empty());
+    when(service.deleteByUuid(TEST_UUID)).thenReturn(null);
 
     risWebClient
         .withDefaultLogin()
@@ -159,7 +156,7 @@ class DocumentUnitControllerTest {
 
   @Test
   void testDeleteByUuid_withInvalidUuid() {
-    when(service.getByDocumentNumber("abc")).thenReturn(Mono.empty());
+    when(service.getByDocumentNumber("abc")).thenReturn(null);
 
     risWebClient
         .withDefaultLogin()
@@ -180,7 +177,7 @@ class DocumentUnitControllerTest {
             .build();
     DocumentUnit documentUnit = DocumentationUnitTransformer.transformToDomain(documentUnitDTO);
 
-    when(service.updateDocumentUnit(documentUnit)).thenReturn(Mono.empty());
+    when(service.updateDocumentUnit(documentUnit)).thenReturn(null);
 
     risWebClient
         .withDefaultLogin()
@@ -211,21 +208,20 @@ class DocumentUnitControllerTest {
   }
 
   @Test
-  void testPublishAsEmail() {
+  void testPublishAsEmail() throws DocumentationUnitNotExistsException {
     when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
     when(service.publishAsEmail(TEST_UUID, ISSUER_ADDRESS))
         .thenReturn(
-            Mono.just(
-                XmlPublication.builder()
-                    .documentUnitUuid(TEST_UUID)
-                    .receiverAddress("receiver address")
-                    .mailSubject("mailSubject")
-                    .xml("xml")
-                    .statusCode("status-code")
-                    .statusMessages(List.of("status-messages"))
-                    .fileName("test.xml")
-                    .publishDate(Instant.parse("2020-01-01T01:01:01.00Z"))
-                    .build()));
+            XmlPublication.builder()
+                .documentUnitUuid(TEST_UUID)
+                .receiverAddress("receiver address")
+                .mailSubject("mailSubject")
+                .xml("xml")
+                .statusCode("status-code")
+                .statusMessages(List.of("status-messages"))
+                .fileName("test.xml")
+                .publishDate(Instant.parse("2020-01-01T01:01:01.00Z"))
+                .build());
 
     risWebClient
         .withDefaultLogin()
@@ -256,7 +252,7 @@ class DocumentUnitControllerTest {
   }
 
   @Test
-  void testPublishAsEmail_withServiceThrowsException() {
+  void testPublishAsEmail_withServiceThrowsException() throws DocumentationUnitNotExistsException {
     when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
     when(service.publishAsEmail(TEST_UUID, ISSUER_ADDRESS))
         .thenThrow(DocumentUnitPublishException.class);
@@ -277,26 +273,25 @@ class DocumentUnitControllerTest {
 
     when(service.getPublicationHistory(TEST_UUID))
         .thenReturn(
-            Flux.fromIterable(
-                List.of(
-                    PublicationReport.builder()
-                        .content("<html>2021 Report</html>")
-                        .receivedDate(Instant.parse("2021-01-01T01:01:01.00Z"))
-                        .build(),
-                    XmlPublication.builder()
-                        .documentUnitUuid(TEST_UUID)
-                        .receiverAddress("receiver address")
-                        .mailSubject("mailSubject")
-                        .xml("xml")
-                        .statusCode("status-code")
-                        .statusMessages(List.of("status-messages"))
-                        .fileName("test.xml")
-                        .publishDate(Instant.parse("2020-01-01T01:01:01.00Z"))
-                        .build(),
-                    PublicationReport.builder()
-                        .content("<html>2019 Report</html>")
-                        .receivedDate(Instant.parse("2019-01-01T01:01:01.00Z"))
-                        .build())));
+            List.of(
+                PublicationReport.builder()
+                    .content("<html>2021 Report</html>")
+                    .receivedDate(Instant.parse("2021-01-01T01:01:01.00Z"))
+                    .build(),
+                XmlPublication.builder()
+                    .documentUnitUuid(TEST_UUID)
+                    .receiverAddress("receiver address")
+                    .mailSubject("mailSubject")
+                    .xml("xml")
+                    .statusCode("status-code")
+                    .statusMessages(List.of("status-messages"))
+                    .fileName("test.xml")
+                    .publishDate(Instant.parse("2020-01-01T01:01:01.00Z"))
+                    .build(),
+                PublicationReport.builder()
+                    .content("<html>2019 Report</html>")
+                    .receivedDate(Instant.parse("2019-01-01T01:01:01.00Z"))
+                    .build()));
 
     risWebClient
         .withDefaultLogin()
@@ -359,17 +354,16 @@ class DocumentUnitControllerTest {
   }
 
   @Test
-  void testGetPublicationXmlPreview() {
+  void testGetPublicationXmlPreview() throws DocumentationUnitNotExistsException {
     when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
     when(service.previewPublication(TEST_UUID))
         .thenReturn(
-            Mono.just(
-                new XmlResultObject(
-                    "xml",
-                    "200",
-                    List.of("status-messages"),
-                    "test.xml",
-                    Instant.parse("2020-01-01T01:01:01.00Z"))));
+            new XmlResultObject(
+                "xml",
+                "200",
+                List.of("status-messages"),
+                "test.xml",
+                Instant.parse("2020-01-01T01:01:01.00Z")));
 
     risWebClient
         .withDefaultLogin()
@@ -463,13 +457,11 @@ class DocumentUnitControllerTest {
   void testGetHtml() {
     when(service.getByUuid(TEST_UUID))
         .thenReturn(
-            Mono.just(
-                DocumentUnit.builder()
-                    .attachments(
-                        Collections.singletonList(Attachment.builder().s3path("123").build()))
-                    .coreData(CoreData.builder().documentationOffice(docOffice).build())
-                    .build()));
-    when(docxConverterService.getConvertedObject("123")).thenReturn(Mono.empty());
+            DocumentUnit.builder()
+                .attachments(Collections.singletonList(Attachment.builder().s3path("123").build()))
+                .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                .build());
+    when(docxConverterService.getConvertedObject("123")).thenReturn(null);
 
     risWebClient
         .withDefaultLogin()

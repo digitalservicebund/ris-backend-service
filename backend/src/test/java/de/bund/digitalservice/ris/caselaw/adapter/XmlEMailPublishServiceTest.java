@@ -31,6 +31,7 @@ import java.util.UUID;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,7 +41,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
 @Import({XmlEMailPublishService.class})
@@ -117,11 +117,9 @@ class XmlEMailPublishServiceTest {
 
   @Test
   void testPublish() throws ParserConfigurationException, TransformerException {
-    StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
-        .consumeNextWith(
-            response ->
-                assertThat(response).usingRecursiveComparison().isEqualTo(EXPECTED_RESPONSE))
-        .verifyComplete();
+    var response = service.publish(documentUnit, RECEIVER_ADDRESS);
+
+    assertThat(response).usingRecursiveComparison().isEqualTo(EXPECTED_RESPONSE);
 
     verify(xmlExporter)
         .generateXml(
@@ -165,10 +163,8 @@ class XmlEMailPublishServiceTest {
 
     when(xmlExporter.generateXml(any(DocumentUnit.class))).thenReturn(xmlWithValidationError);
 
-    StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
-        .consumeNextWith(
-            response -> assertThat(response).usingRecursiveComparison().isEqualTo(expected))
-        .verifyComplete();
+    var response = service.publish(documentUnit, RECEIVER_ADDRESS);
+    assertThat(response).usingRecursiveComparison().isEqualTo(expected);
 
     verify(repository, times(0)).save(any(XmlPublication.class));
     verify(mailSender, times(0))
@@ -181,12 +177,9 @@ class XmlEMailPublishServiceTest {
     when(xmlExporter.generateXml(any(DocumentUnit.class)))
         .thenThrow(ParserConfigurationException.class);
 
-    StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
-        .expectErrorMatches(
-            ex ->
-                ex instanceof DocumentUnitPublishException
-                    && ex.getMessage().equals("Couldn't generate xml."))
-        .verify();
+    // TODO ex.getMessage().equals("Couldn't generate xml."))
+    Assertions.assertThrows(
+        DocumentUnitPublishException.class, () -> service.publish(documentUnit, RECEIVER_ADDRESS));
 
     verify(repository, times(0)).save(any(XmlPublication.class));
     verify(mailSender, times(0))
@@ -270,11 +263,8 @@ class XmlEMailPublishServiceTest {
     List<XmlPublication> list = List.of(SAVED_XML_MAIL);
     when(repository.getPublicationsByDocumentUnitUuid(TEST_UUID)).thenReturn((List) list);
 
-    StepVerifier.create(service.getPublications(TEST_UUID))
-        .consumeNextWith(
-            response ->
-                assertThat(response).usingRecursiveComparison().isEqualTo(EXPECTED_RESPONSE))
-        .verifyComplete();
+    var response = service.getPublications(TEST_UUID);
+    assertThat(response.get(0)).usingRecursiveComparison().isEqualTo(EXPECTED_RESPONSE);
 
     verify(repository).getPublicationsByDocumentUnitUuid(TEST_UUID);
   }

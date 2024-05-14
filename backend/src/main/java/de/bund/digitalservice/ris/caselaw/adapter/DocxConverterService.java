@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -50,7 +51,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import reactor.core.publisher.Mono;
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -110,13 +110,17 @@ public class DocxConverterService implements ConverterService {
     return originalText;
   }
 
-  public Mono<List<String>> getDocxFiles() {
+  public List<String> getDocxFiles() {
     ListObjectsV2Request request = ListObjectsV2Request.builder().bucket(bucketName).build();
 
     CompletableFuture<ListObjectsV2Response> futureResponse = client.listObjectsV2(request);
 
-    return Mono.fromFuture(futureResponse)
-        .map(response -> response.contents().stream().map(S3Object::key).toList());
+    try {
+      return futureResponse.get().contents().stream().map(S3Object::key).toList();
+    } catch (InterruptedException | ExecutionException e) {
+      // TODO: handle exception
+      throw new RuntimeException(e);
+    }
   }
 
   /**
@@ -127,9 +131,9 @@ public class DocxConverterService implements ConverterService {
    * @return the generated object with html content and metadata, if the file name is null a empty
    *     mono is returned
    */
-  public Mono<Docx2Html> getConvertedObject(String fileName) {
+  public Docx2Html getConvertedObject(String fileName) {
     if (fileName == null) {
-      return Mono.empty();
+      return null;
     }
 
     GetObjectRequest request = GetObjectRequest.builder().bucket(bucketName).key(fileName).build();
@@ -137,31 +141,32 @@ public class DocxConverterService implements ConverterService {
     CompletableFuture<ResponseBytes<GetObjectResponse>> futureResponse =
         client.getObject(request, AsyncResponseTransformer.toBytes());
 
-    return Mono.fromFuture(futureResponse)
-        .map(response -> parseAsDocumentUnitDocxList(response.asInputStream()))
-        .map(
-            documentUnitDocxList -> {
-              List<DocumentUnitDocx> packedList =
-                  DocumentUnitDocxListUtils.packList(documentUnitDocxList);
+    try {
+      List<DocumentUnitDocx> documentUnitDocxList =
+          parseAsDocumentUnitDocxList(futureResponse.get().asInputStream());
+      List<DocumentUnitDocx> packedList = DocumentUnitDocxListUtils.packList(documentUnitDocxList);
 
-              List<String> ecliList =
-                  packedList.stream()
-                      .filter(ECLIElement.class::isInstance)
-                      .map(ECLIElement.class::cast)
-                      .map(ECLIElement::getText)
-                      .toList();
+      List<String> ecliList =
+          packedList.stream()
+              .filter(ECLIElement.class::isInstance)
+              .map(ECLIElement.class::cast)
+              .map(ECLIElement::getText)
+              .toList();
 
-              String content = null;
-              if (!packedList.isEmpty()) {
-                content =
-                    packedList.stream()
-                        .map(DocumentUnitDocx::toHtmlString)
-                        .collect(Collectors.joining());
-              }
+      String content = null;
+      if (!packedList.isEmpty()) {
+        content =
+            packedList.stream().map(DocumentUnitDocx::toHtmlString).collect(Collectors.joining());
+      }
 
-              return new Docx2Html(content, ecliList);
-            })
-        .doOnError(ex -> log.error("Couldn't convert docx", ex));
+      return new Docx2Html(content, ecliList);
+    } catch (InterruptedException e) {
+      // TODO log.error("Couldn't convert docx", ex));
+      throw new RuntimeException(e);
+    } catch (ExecutionException e) {
+      // TODO log.error("Couldn't convert docx", ex));
+      throw new RuntimeException(e);
+    }
   }
 
   /**

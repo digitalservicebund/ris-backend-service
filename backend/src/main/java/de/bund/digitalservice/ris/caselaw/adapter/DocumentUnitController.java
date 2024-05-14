@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.Publication;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecord;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
@@ -71,7 +72,7 @@ public class DocumentUnitController {
 
     return userService
         .getDocumentationOffice(oidcUser)
-        .flatMap(service::generateNewDocumentUnit)
+        .flatMap(docOffice -> Mono.just(service.generateNewDocumentUnit(docOffice)))
         .map(documentUnit -> ResponseEntity.status(HttpStatus.CREATED).body(documentUnit))
         .doOnError(ex -> log.error("error in generate new documentation unit", ex))
         .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
@@ -95,9 +96,11 @@ public class DocumentUnitController {
       @RequestBody ByteBuffer byteBuffer,
       @RequestHeader HttpHeaders httpHeaders) {
 
-    return converterService
-        .getConvertedObject(
-            attachmentService.attachFileToDocumentationUnit(uuid, byteBuffer, httpHeaders).s3path())
+    return Mono.just(
+            converterService.getConvertedObject(
+                attachmentService
+                    .attachFileToDocumentationUnit(uuid, byteBuffer, httpHeaders)
+                    .s3path()))
         .doOnNext(docx2html -> service.updateECLI(uuid, docx2html))
         .map(docx2Html -> ResponseEntity.status(HttpStatus.OK).body(docx2Html))
         .onErrorReturn(ResponseEntity.unprocessableEntity().build());
@@ -162,15 +165,14 @@ public class DocumentUnitController {
           new DocumentationUnitException("Die Dokumentennummer unterstützt nur 13-14 Zeichen"));
     }
 
-    return service.getByDocumentNumber(documentNumber).map(ResponseEntity::ok);
+    return Mono.justOrEmpty(service.getByDocumentNumber(documentNumber)).map(ResponseEntity::ok);
   }
 
   @DeleteMapping(value = "/{uuid}")
   @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
   public Mono<ResponseEntity<String>> deleteByUuid(@PathVariable UUID uuid) {
 
-    return service
-        .deleteByUuid(uuid)
+    return Mono.justOrEmpty(service.deleteByUuid(uuid))
         .map(str -> ResponseEntity.status(HttpStatus.OK).body(str))
         .onErrorResume(ex -> Mono.just(ResponseEntity.internalServerError().body(ex.getMessage())));
   }
@@ -186,8 +188,7 @@ public class DocumentUnitController {
       return Mono.just(ResponseEntity.unprocessableEntity().body(DocumentUnit.builder().build()));
     }
 
-    return service
-        .updateDocumentUnit(documentUnit)
+    return Mono.justOrEmpty(service.updateDocumentUnit(documentUnit))
         .map(du -> ResponseEntity.status(HttpStatus.OK).body(du))
         .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
   }
@@ -197,16 +198,20 @@ public class DocumentUnitController {
   public Mono<ResponseEntity<Publication>> publishDocumentUnitAsEmail(
       @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
 
-    return service
-        .publishAsEmail(uuid, userService.getEmail(oidcUser))
-        .map(ResponseEntity::ok)
-        .doOnError(ex -> ResponseEntity.internalServerError().build());
+    try {
+      return Mono.justOrEmpty(service.publishAsEmail(uuid, userService.getEmail(oidcUser)))
+          .map(ResponseEntity::ok)
+          .doOnError(ex -> ResponseEntity.internalServerError().build());
+    } catch (DocumentationUnitNotExistsException e) {
+      // TODO
+      throw new RuntimeException(e);
+    }
   }
 
   @GetMapping(value = "/{uuid}/publish", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
   public Flux<PublicationHistoryRecord> getPublicationHistory(@PathVariable UUID uuid) {
-    return service.getPublicationHistory(uuid);
+    return Flux.fromIterable(service.getPublicationHistory(uuid));
   }
 
   @GetMapping(
@@ -214,7 +219,11 @@ public class DocumentUnitController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
   public Mono<XmlResultObject> getPublicationPreview(@PathVariable UUID uuid) {
-    return service.previewPublication(uuid);
+    try {
+      return Mono.just(service.previewPublication(uuid));
+    } catch (DocumentationUnitNotExistsException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @PutMapping(value = "/{documentNumberToExclude}/search-linkable-documentation-units")
@@ -243,9 +252,8 @@ public class DocumentUnitController {
   public Mono<ResponseEntity<Docx2Html>> getHtml(
       @PathVariable UUID uuid, @PathVariable String s3Path) {
 
-    return service
-        .getByUuid(uuid)
-        .flatMap(documentUnit -> converterService.getConvertedObject(s3Path))
+    return Mono.just(service.getByUuid(uuid))
+        .flatMap(documentUnit -> Mono.justOrEmpty(converterService.getConvertedObject(s3Path)))
         .map(
             docx2Html ->
                 ResponseEntity.ok()
@@ -258,8 +266,7 @@ public class DocumentUnitController {
   @PreAuthorize("isAuthenticated()")
   public Mono<ResponseEntity<String>> validateSingleNorm(
       @RequestBody SingleNormValidationInfo singleNormValidationInfo) {
-    return service
-        .validateSingleNorm(singleNormValidationInfo)
+    return Mono.just(service.validateSingleNorm(singleNormValidationInfo))
         .map(ResponseEntity::ok)
         .onErrorReturn(ResponseEntity.internalServerError().build());
   }

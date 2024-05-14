@@ -54,8 +54,7 @@ public class AuthService {
     return documentNumber ->
         Mono.defer(
             () ->
-                documentUnitService
-                    .getByDocumentNumber(documentNumber)
+                Mono.justOrEmpty(documentUnitService.getByDocumentNumber(documentNumber))
                     .flatMap(this::userHasReadAccess)
                     .switchIfEmpty(Mono.just(false)));
   }
@@ -65,8 +64,7 @@ public class AuthService {
     return uuid ->
         Mono.defer(
             () ->
-                documentUnitService
-                    .getByUuid(uuid)
+                Mono.justOrEmpty(documentUnitService.getByUuid(uuid))
                     .flatMap(this::userHasReadAccess)
                     .switchIfEmpty(Mono.just(false)));
   }
@@ -76,8 +74,7 @@ public class AuthService {
     return uuid ->
         Mono.defer(
             () ->
-                documentUnitService
-                    .getByUuid(uuid)
+                Mono.justOrEmpty(documentUnitService.getByUuid(uuid))
                     .flatMap(this::userHasSameDocOfficeAsDocument)
                     .defaultIfEmpty(false)
                     .onErrorReturn(false));

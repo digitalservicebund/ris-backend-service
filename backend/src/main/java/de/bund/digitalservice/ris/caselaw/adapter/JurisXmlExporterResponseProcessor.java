@@ -168,14 +168,12 @@ public class JurisXmlExporterResponseProcessor {
 
   private void setPublicationStatus(MessageWrapper messageWrapper) {
     try {
-      statusService
-          .update(
-              messageWrapper.getDocumentNumber(),
-              Status.builder()
-                  .publicationStatus(getPublicationStatus(messageWrapper.isPublished()))
-                  .withError(messageWrapper.hasErrors())
-                  .build())
-          .block();
+      statusService.update(
+          messageWrapper.getDocumentNumber(),
+          Status.builder()
+              .publicationStatus(getPublicationStatus(messageWrapper.isPublished()))
+              .withError(messageWrapper.hasErrors())
+              .build());
     } catch (Exception e) {
       throw new StatusImporterException("Could not update publicationStatus", e);
     }
@@ -187,7 +185,7 @@ public class JurisXmlExporterResponseProcessor {
       String subject = messageWrapper.getSubject();
       List<MailAttachment> mailAttachments = collectAttachments(messageWrapper);
 
-      var issuerAddress = statusService.getLatestIssuerAddress(documentNumber).block();
+      var issuerAddress = statusService.getLatestIssuerAddress(documentNumber);
       if (issuerAddress != null) {
         mailSender.sendMail(
             storeFactory.getUsername(),

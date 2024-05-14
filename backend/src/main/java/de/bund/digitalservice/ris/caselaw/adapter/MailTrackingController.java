@@ -29,7 +29,7 @@ public class MailTrackingController {
   public Mono<ResponseEntity<String>> setPublishState(
       @RequestBody @Valid MailTrackingResponsePayload payload) {
     if (payload != null && payload.tags() != null && !payload.tags().isEmpty()) {
-      return service.updatePublishingState(payload.tags().get(0), payload.event());
+      return Mono.just(service.updatePublishingState(payload.tags().get(0), payload.event()));
     }
     return Mono.just(ResponseEntity.badRequest().build());
   }
