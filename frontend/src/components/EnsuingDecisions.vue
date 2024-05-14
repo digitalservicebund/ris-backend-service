@@ -4,10 +4,11 @@ import { RouterLink } from "vue-router"
 import EnsuingDecisionInputGroup from "./EnsuingDecisionInputGroup.vue"
 import { withSummarizer } from "@/components/DataSetSummary.vue"
 import EditableList from "@/components/EditableList.vue"
+import IconBadge from "@/components/IconBadge.vue"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import BaselineArrowOutward from "~icons/ic/baseline-arrow-outward"
 import IconBaselineDescription from "~icons/ic/baseline-description"
-import IconErrorOutline from "~icons/ic/baseline-error-outline"
+import IconError from "~icons/ic/baseline-error"
 import IconOutlineDescription from "~icons/ic/outline-description"
 
 const props = defineProps<{
@@ -27,6 +28,18 @@ const ensuingDecisions = computed({
   },
 })
 const defaultValue = new EnsuingDecision()
+
+/**
+ * Returns a render function with an error icon badge
+ */
+function errorBadgeSummarizer() {
+  return h(IconBadge, {
+    backgroundColor: "bg-red-300",
+    color: "text-red-900",
+    icon: IconError,
+    label: "Fehlende Daten",
+  })
+}
 
 function renderLink(dataEntry: EnsuingDecision) {
   return h(
@@ -73,34 +86,20 @@ function decisionSummarizer(dataEntry: EnsuingDecision) {
       ]),
     ])
     // Ghost DocUnit
-  } else if (
-    !dataEntry.hasMissingRequiredFields ||
-    (dataEntry.missingRequiredFields.length === 1 &&
-      dataEntry.missingRequiredFields[0] === "decisionDate" &&
-      dataEntry.pending)
-  ) {
+  } else {
     return h("div", { class: ["flex flex-row items-center"] }, [
       h(
         h(h(IconOutlineDescription), {
           class: ["mr-8 "],
         }),
       ),
-      h("div", { class: ["ds-label-01-reg"] }, dataEntry.renderDecision),
-    ])
-    // Ghost DocUnit with missing fields
-  } else {
-    return h("div", { class: ["flex flex-row items-center"] }, [
-      h(
-        h(h(IconErrorOutline), {
-          "aria-label": "Fehlerhafte Eingabe",
-          class: ["mr-8 text-red-800"],
-        }),
-      ),
-      h(
-        "div",
-        { class: ["ds-label-01-reg text-red-800"] },
-        dataEntry.renderDecision,
-      ),
+      h("div", { class: ["ds-label-01-reg mr-8"] }, dataEntry.renderDecision),
+      !dataEntry.hasMissingRequiredFields ||
+      (dataEntry.missingRequiredFields.length === 1 &&
+        dataEntry.missingRequiredFields[0] === "decisionDate" &&
+        dataEntry.pending)
+        ? null
+        : errorBadgeSummarizer(),
     ])
   }
 }

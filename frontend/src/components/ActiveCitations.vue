@@ -4,10 +4,11 @@ import { RouterLink } from "vue-router"
 import ActiveCitationInput from "@/components/ActiveCitationInput.vue"
 import { withSummarizer } from "@/components/DataSetSummary.vue"
 import EditableList from "@/components/EditableList.vue"
+import IconBadge from "@/components/IconBadge.vue"
 import ActiveCitation from "@/domain/activeCitation"
 import BaselineArrowOutward from "~icons/ic/baseline-arrow-outward"
 import IconBaselineDescription from "~icons/ic/baseline-description"
-import IconErrorOutline from "~icons/ic/baseline-error-outline"
+import IconError from "~icons/ic/baseline-error"
 import IconOutlineDescription from "~icons/ic/outline-description"
 
 const props = defineProps<{
@@ -27,12 +28,24 @@ const activeCitations = computed({
 
 const defaultValue = new ActiveCitation()
 
+/**
+ * Returns a render function with an error icon badge
+ */
+function errorBadgeSummarizer() {
+  return h(IconBadge, {
+    backgroundColor: "bg-red-300",
+    color: "text-red-900",
+    icon: IconError,
+    label: "Fehlende Daten",
+  })
+}
+
 function renderLink(dataEntry: ActiveCitation) {
   return h(
     RouterLink,
     {
       class: [
-        "ds-link-03-bold ml-8 border-b-2 border-blue-800 flex flex-row leading-24 focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800",
+        "ds-link-03-bold ml-8 border-b-2 border-blue-800 flex flex-row leading-24 focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 mr-8",
       ],
       target: "_blank",
       tabindex: 0,
@@ -64,49 +77,16 @@ function renderLink(dataEntry: ActiveCitation) {
 function decisionSummarizer(dataEntry: ActiveCitation) {
   // Linked DocUnit
   if (dataEntry.hasForeignSource) {
-    if (!dataEntry.citationTypeIsSet) {
-      return h("div", { class: ["flex flex-row items-center"] }, [
-        h(h(IconErrorOutline), {
-          "aria-label": "Fehlerhafte Eingabe",
-          class: ["mr-8 text-red-800"],
-        }),
-        h("div", { class: ["flex flex-row items-baseline"] }, [
-          h(
-            "div",
-            { class: ["ds-label-01-reg text-red-800"] },
-            dataEntry.renderDecision,
-          ),
-          h("span", { class: ["ds-label-01-reg ml-8"] }, "|"),
-          renderLink(dataEntry),
-        ]),
-      ])
-    } else {
-      return h("div", { class: ["flex flex-row items-center"] }, [
-        h(h(IconBaselineDescription), {
-          class: ["mr-8 "],
-        }),
-        h("div", { class: ["flex flex-row items-baseline"] }, [
-          h("div", { class: ["ds-label-01-reg"] }, dataEntry.renderDecision),
-          h("span", { class: ["ds-label-01-reg ml-8"] }, "|"),
-          renderLink(dataEntry),
-        ]),
-      ])
-    }
-    // Ghost DocUnit with missing fields
-  } else if (dataEntry.hasMissingRequiredFields) {
     return h("div", { class: ["flex flex-row items-center"] }, [
-      h(
-        h(h(IconErrorOutline), {
-          "aria-label": "Fehlerhafte Eingabe",
-          class: ["mr-8 text-red-800"],
-        }),
-      ),
-
-      h(
-        "div",
-        { class: ["ds-label-01-reg text-red-800"] },
-        dataEntry.renderDecision,
-      ),
+      h(h(IconBaselineDescription), {
+        class: ["mr-8 "],
+      }),
+      h("div", { class: ["flex flex-row items-baseline"] }, [
+        h("div", { class: ["ds-label-01-reg"] }, dataEntry.renderDecision),
+        h("span", { class: ["ds-label-01-reg ml-8"] }, "|"),
+        renderLink(dataEntry),
+      ]),
+      !dataEntry.citationTypeIsSet ? errorBadgeSummarizer() : null,
     ])
     // Ghost DocUnit
   } else {
@@ -116,7 +96,9 @@ function decisionSummarizer(dataEntry: ActiveCitation) {
           class: ["mr-8 "],
         }),
       ),
-      h("div", { class: ["ds-label-01-reg"] }, dataEntry.renderDecision),
+
+      h("div", { class: ["ds-label-01-reg mr-8"] }, dataEntry.renderDecision),
+      dataEntry.hasMissingRequiredFields ? errorBadgeSummarizer() : null,
     ])
   }
 }
