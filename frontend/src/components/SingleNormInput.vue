@@ -49,9 +49,9 @@ const singleNorm = computed({
 const legalForce = computed({
   get: () => !!props.modelValue.legalForce,
   set: (newValue) => {
-    if (newValue) {
+    if (newValue && !props.modelValue.legalForce) {
       singleNorm.value.legalForce = new LegalForce()
-    } else {
+    } else if (!newValue) {
       singleNorm.value.legalForce = undefined
     }
   },
