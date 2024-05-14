@@ -43,7 +43,7 @@
     "@tiptap/extension-document": "^2.3.1",
     "@tiptap/extension-hard-break": "^2.3.1",
     "@tiptap/extension-history": "^2.3.1",
-    "@tiptap/extension-image": "^2.3.1",
+    "@tiptap/extension-image": "^2.4.0",
     "@tiptap/extension-italic": "^2.3.1",
     "@tiptap/extension-list-item": "^2.3.1",
     "@tiptap/extension-ordered-list": "^2.3.1",
