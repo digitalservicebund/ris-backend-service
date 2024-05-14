@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -36,7 +35,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
 
 @ExtendWith(SpringExtension.class)
 @Import({DocumentUnitService.class, DatabaseDocumentUnitStatusService.class})
@@ -443,9 +441,5 @@ class DocumentUnitServiceTest {
     StepVerifier.create(service.previewPublication(TEST_UUID))
         .expectNext(mockXmlResultObject)
         .verifyComplete();
-  }
-
-  private CompletableFuture<DeleteObjectResponse> buildEmptyDeleteObjectResponse() {
-    return CompletableFuture.completedFuture(DeleteObjectResponse.builder().build());
   }
 }

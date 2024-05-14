@@ -4,7 +4,6 @@ import de.bund.digitalservice.ris.caselaw.domain.ApiKey;
 import de.bund.digitalservice.ris.caselaw.domain.ImportApiKeyException;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
-import java.util.Locale;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -62,9 +61,9 @@ public class AuthController {
   @PutMapping(value = "api-key/import")
   @PreAuthorize("isAuthenticated()")
   public Mono<ResponseEntity<ApiKey>> generateImportApiKey(
-      @AuthenticationPrincipal OidcUser oidcUser, Locale locale) {
+      @AuthenticationPrincipal OidcUser oidcUser) {
 
-    ApiKey apiKey = authService.generateImportApiKey(oidcUser, locale);
+    ApiKey apiKey = authService.generateImportApiKey(oidcUser);
 
     return Mono.just(ResponseEntity.ok(apiKey));
   }
