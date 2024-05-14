@@ -100,6 +100,7 @@ public class DocumentUnitDocxListUtils {
    * @param mergedList - result of the first run
    * @return packed list of documentation unit docx objects
    */
+  @SuppressWarnings("java:S3776")
   private static List<DocumentUnitDocx> secondRun(
       List<DocumentUnitDocx> mergedList, AtomicReference<BorderNumber> finalBorderNumber) {
 

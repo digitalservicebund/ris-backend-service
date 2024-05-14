@@ -264,83 +264,79 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
       return;
     }
 
-    repository
-        .findById(documentUnit.uuid())
-        .ifPresent(
-            documentationUnitDTO -> {
-              Procedure procedure = documentUnit.coreData().procedure();
+    var documentationUnitDTOOptional = repository.findById(documentUnit.uuid());
+    if (documentationUnitDTOOptional.isEmpty()) {
+      return;
+    }
+    var documentationUnitDTO = documentationUnitDTOOptional.get();
+    Procedure procedure = documentUnit.coreData().procedure();
 
-              List<DocumentationUnitProcedureDTO> documentationUnitProcedureDTOs =
-                  new ArrayList<>();
+    List<DocumentationUnitProcedureDTO> documentationUnitProcedureDTOs = new ArrayList<>();
 
-              ProcedureDTO procedureDTO = null;
-              if (procedure.id() == null) {
-                Optional<ProcedureDTO> existingProcedure =
-                    procedureRepository.findAllByLabelAndDocumentationOffice(
-                        procedure.label().trim(), documentationUnitDTO.getDocumentationOffice());
+    ProcedureDTO procedureDTO =
+        getOrCreateProcedure(documentationUnitDTO.getDocumentationOffice(), procedure);
 
-                if (existingProcedure.isPresent()) {
-                  procedureDTO = existingProcedure.get();
-                } else {
-                  procedureDTO =
-                      ProcedureDTO.builder()
-                          .label(procedure.label().trim())
-                          .createdAt(Instant.now())
-                          .documentationOffice(documentationUnitDTO.getDocumentationOffice())
-                          .build();
+    boolean sameAsLast =
+        !documentationUnitDTO.getProcedures().isEmpty()
+            && documentationUnitDTO
+                .getProcedures()
+                .get(documentationUnitDTO.getProcedures().size() - 1)
+                .getProcedure()
+                .equals(procedureDTO);
 
-                  procedureDTO = procedureRepository.save(procedureDTO);
-                }
-              } else {
-                Optional<ProcedureDTO> optionalProcedureDTO =
-                    procedureRepository.findById(procedure.id());
-                if (optionalProcedureDTO.isPresent()) {
-                  procedureDTO = optionalProcedureDTO.get();
-                }
-              }
-              boolean sameAsLast =
-                  !documentationUnitDTO.getProcedures().isEmpty()
-                      && documentationUnitDTO
-                          .getProcedures()
-                          .get(documentationUnitDTO.getProcedures().size() - 1)
-                          .getProcedure()
-                          .equals(procedureDTO);
-
-              documentationUnitDTO
-                  .getProcedures()
-                  .forEach(
-                      documentationUnitProcedureDTO -> {
-                        DocumentationUnitProcedureDTO newLink =
-                            DocumentationUnitProcedureDTO.builder()
-                                .primaryKey(
-                                    new DocumentationUnitProcedureId(
-                                        documentationUnitDTO.getId(),
-                                        documentationUnitProcedureDTO.getProcedure().getId()))
-                                .documentationUnit(documentationUnitDTO)
-                                .procedure(documentationUnitProcedureDTO.getProcedure())
-                                .build();
-                        documentationUnitProcedureDTOs.add(newLink);
-                      });
-
-              if (procedureDTO != null && !sameAsLast) {
-                DocumentationUnitProcedureDTO documentationUnitProcedureDTO =
-                    DocumentationUnitProcedureDTO.builder()
-                        .primaryKey(
-                            new DocumentationUnitProcedureId(
-                                documentationUnitDTO.getId(), procedureDTO.getId()))
-                        .documentationUnit(documentationUnitDTO)
-                        .procedure(procedureDTO)
-                        .build();
-                documentationUnitProcedureDTOs.add(documentationUnitProcedureDTO);
-              }
-
-              updateProcedureRank(documentationUnitProcedureDTOs);
-
-              documentationUnitDTO.getProcedures().clear();
-              documentationUnitDTO.getProcedures().addAll(documentationUnitProcedureDTOs);
-
-              repository.save(documentationUnitDTO);
+    documentationUnitDTO
+        .getProcedures()
+        .forEach(
+            documentationUnitProcedureDTO -> {
+              DocumentationUnitProcedureDTO newLink =
+                  DocumentationUnitProcedureDTO.builder()
+                      .primaryKey(
+                          new DocumentationUnitProcedureId(
+                              documentationUnitDTO.getId(),
+                              documentationUnitProcedureDTO.getProcedure().getId()))
+                      .documentationUnit(documentationUnitDTO)
+                      .procedure(documentationUnitProcedureDTO.getProcedure())
+                      .build();
+              documentationUnitProcedureDTOs.add(newLink);
             });
+
+    if (procedureDTO != null && !sameAsLast) {
+      DocumentationUnitProcedureDTO documentationUnitProcedureDTO =
+          DocumentationUnitProcedureDTO.builder()
+              .primaryKey(
+                  new DocumentationUnitProcedureId(
+                      documentationUnitDTO.getId(), procedureDTO.getId()))
+              .documentationUnit(documentationUnitDTO)
+              .procedure(procedureDTO)
+              .build();
+      documentationUnitProcedureDTOs.add(documentationUnitProcedureDTO);
+    }
+
+    updateProcedureRank(documentationUnitProcedureDTOs);
+
+    documentationUnitDTO.getProcedures().clear();
+    documentationUnitDTO.getProcedures().addAll(documentationUnitProcedureDTOs);
+
+    repository.save(documentationUnitDTO);
+  }
+
+  private ProcedureDTO getOrCreateProcedure(
+      DocumentationOfficeDTO documentationOfficeDTO, Procedure procedure) {
+    if (procedure.id() == null) {
+      Optional<ProcedureDTO> existingProcedure =
+          procedureRepository.findAllByLabelAndDocumentationOffice(
+              procedure.label().trim(), documentationOfficeDTO);
+
+      return existingProcedure.orElseGet(
+          () ->
+              procedureRepository.save(
+                  ProcedureDTO.builder()
+                      .label(procedure.label().trim())
+                      .createdAt(Instant.now())
+                      .documentationOffice(documentationOfficeDTO)
+                      .build()));
+    }
+    return procedureRepository.findById(procedure.id()).orElse(null);
   }
 
   private void updateProcedureRank(
@@ -392,6 +388,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   }
 
   @NotNull
+  @SuppressWarnings("java:S107")
   private Slice<DocumentationUnitListItemDTO> getDocumentationUnitSearchResultDTOS(
       Pageable pageable,
       String courtType,
