@@ -30,6 +30,11 @@ const norms = computed({
   },
 })
 
+/**
+ * Returns a booleand value, if a given normEntry has single norms and resepctively renders the norms' summary in one
+ * compact line or in a sublist, below the norm abbreviation.
+ * @param normEntry The norm entry to check for single norms
+ */
 function hasSingleNorms(normEntry: NormReference) {
   if (normEntry.singleNorms)
     return (
@@ -40,6 +45,10 @@ function hasSingleNorms(normEntry: NormReference) {
 
 const defaultValue = new NormReference()
 
+/**
+ * Summarizer for a legal force
+ * @param singleNorm The single Norm that has a legal force
+ */
 function legalForceSummarizer(singleNorm: SingleNorm) {
   return h("div", { class: ["flex flex-row items-center"] }, [
     h("div", {}, "|"),
@@ -48,6 +57,9 @@ function legalForceSummarizer(singleNorm: SingleNorm) {
   ])
 }
 
+/**
+ * Returns a render function with an error icon badge
+ */
 function errorBadgeSummarizer() {
   return h(IconBadge, {
     backgroundColor: "bg-red-300",
@@ -57,6 +69,11 @@ function errorBadgeSummarizer() {
   })
 }
 
+/**
+ * Summarizer for a normEntry. With no or only one single norm, it is rendered in one line, if more single norms present,
+ * they are rendered as sub list.
+ * @param normEntry Norm Entry to be summarized.
+ */
 function decisionSummarizer(normEntry: NormReference) {
   if (normEntry.singleNorms?.length === 1) {
     return h("div", { class: ["flex flex-col gap-32"] }, [
