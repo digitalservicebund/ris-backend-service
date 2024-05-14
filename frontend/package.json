@@ -48,7 +48,7 @@
     "@tiptap/extension-list-item": "^2.3.1",
     "@tiptap/extension-ordered-list": "^2.3.1",
     "@tiptap/extension-paragraph": "^2.3.1",
-    "@tiptap/extension-strike": "^2.3.1",
+    "@tiptap/extension-strike": "^2.4.0",
     "@tiptap/extension-subscript": "^2.3.1",
     "@tiptap/extension-superscript": "^2.3.1",
     "@tiptap/extension-table": "^2.3.1",
