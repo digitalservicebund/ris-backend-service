@@ -46,7 +46,16 @@ const singleNorm = computed({
   },
 })
 
-const withLegalForce = ref(false)
+const legalForce = computed({
+  get: () => !!props.modelValue.legalForce,
+  set: (newValue) => {
+    if (newValue) {
+      singleNorm.value.legalForce = new LegalForce()
+    } else {
+      singleNorm.value.legalForce = undefined
+    }
+  },
+})
 
 const legalForceType = computed({
   get: () =>
@@ -160,7 +169,7 @@ onMounted(async () => {
   }
   validateLegalForce()
 
-  withLegalForce.value = !!singleNorm.value?.legalForce
+  legalForce.value = !!singleNorm.value?.legalForce
   singleNormInput.value?.focusInput()
   featureToggle.value = (
     await FeatureToggleService.isEnabled("neuris.legal-force")
@@ -183,7 +192,7 @@ onMounted(async () => {
       >
         <CheckboxInput
           :id="id"
-          v-model="withLegalForce"
+          v-model="legalForce"
           aria-label="Gesetzeskraft der Norm"
           data-testid="legal-force-checkbox"
           size="small"
@@ -272,7 +281,7 @@ onMounted(async () => {
       </button>
     </div>
     <div
-      v-if="featureToggle && withLegalForce && isCourtWithLegalForce"
+      v-if="featureToggle && legalForce && isCourtWithLegalForce"
       class="grid grid-cols-3 gap-24"
     >
       <div>
@@ -281,6 +290,7 @@ onMounted(async () => {
           v-slot="slotProps"
           label="Typ der Ges.-Kraft *"
           :validation-error="legalForceValidationStore.getByField('type')"
+          @input="legalForceValidationStore.remove('type')"
         >
           <ComboboxInput
             id="legalForceType"
@@ -299,6 +309,7 @@ onMounted(async () => {
           v-slot="slotProps"
           label="Geltungsbereich *"
           :validation-error="legalForceValidationStore.getByField('region')"
+          @input="legalForceValidationStore.remove('region')"
         >
           <ComboboxInput
             id="legalForceRegion"
