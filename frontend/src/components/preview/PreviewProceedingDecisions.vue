@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import PreviewLeftCell from "@/components/preview/PreviewLeftCell.vue"
-import PreviewRightCell from "@/components/preview/PreviewRightCell.vue"
-import TableView from "@/components/TableView.vue"
+import FlexContainer from "@/components/FlexContainer.vue"
+import PreviewCategory from "@/components/preview/PreviewCategory.vue"
+import PreviewContent from "@/components/preview/PreviewContent.vue"
+import PreviewRow from "@/components/preview/PreviewRow.vue"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import PreviousDecision from "@/domain/previousDecision"
 
@@ -12,28 +13,25 @@ defineProps<{
 </script>
 
 <template>
-  <TableView class="table w-full table-fixed">
-    <tr
-      v-if="previousDecisions && previousDecisions?.length > 0"
-      class="w-full"
-    >
-      <PreviewLeftCell>Vorinstanz</PreviewLeftCell>
-      <PreviewRightCell>
+  <FlexContainer class="flex-col">
+    <PreviewRow v-if="previousDecisions && previousDecisions?.length > 0">
+      <PreviewCategory>Vorinstanz</PreviewCategory>
+      <PreviewContent>
         <div
           v-for="(previousDecision, index) in previousDecisions"
           :key="index"
         >
           {{ previousDecision.renderDecision }}
         </div>
-      </PreviewRightCell>
-    </tr>
-    <tr v-if="ensuingDecisions && ensuingDecisions?.length > 0" class="w-full">
-      <PreviewLeftCell>Nachgehende Entscheidungen</PreviewLeftCell>
-      <PreviewRightCell>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="ensuingDecisions && ensuingDecisions?.length > 0">
+      <PreviewCategory>Nachgehende Entscheidungen</PreviewCategory>
+      <PreviewContent>
         <div v-for="(ensuingDecision, index) in ensuingDecisions" :key="index">
           {{ ensuingDecision.renderDecision }}
         </div>
-      </PreviewRightCell>
-    </tr>
-  </TableView>
+      </PreviewContent>
+    </PreviewRow>
+  </FlexContainer>
 </template>

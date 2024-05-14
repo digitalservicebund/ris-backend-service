@@ -29,7 +29,7 @@ public class LegalForceDTO {
   @Id @GeneratedValue private UUID id;
 
   @ManyToOne
-  @JoinColumn(name = "legal_force_type_id", updatable = false)
+  @JoinColumn(name = "legal_force_type_id")
   private LegalForceTypeDTO legalForceType;
 
   @ManyToOne(fetch = FetchType.LAZY)

@@ -36,6 +36,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
 
+
 @ExtendWith(SpringExtension.class)
 @Import({DocumentUnitService.class, DatabaseDocumentUnitStatusService.class})
 class DocumentUnitServiceTest {
@@ -419,9 +420,5 @@ class DocumentUnitServiceTest {
     when(publishService.getPublicationPreview(testDocumentUnit)).thenReturn(mockXmlResultObject);
 
     Assertions.assertEquals(mockXmlResultObject, service.previewPublication(TEST_UUID));
-  }
-
-  private CompletableFuture<DeleteObjectResponse> buildEmptyDeleteObjectResponse() {
-    return CompletableFuture.completedFuture(DeleteObjectResponse.builder().build());
   }
 }

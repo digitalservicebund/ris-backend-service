@@ -15,7 +15,6 @@ import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -118,7 +117,7 @@ public class AuthService {
    * @param oidcUser current user via openid connect system
    * @return the generated api key
    */
-  public ApiKey generateImportApiKey(OidcUser oidcUser, Locale locale) {
+  public ApiKey generateImportApiKey(OidcUser oidcUser) {
     Optional<ApiKeyDTO> apiKeyOptional =
         keyRepository.findByUserAccountAndValidUntilAfter(oidcUser.getEmail(), Instant.now());
 

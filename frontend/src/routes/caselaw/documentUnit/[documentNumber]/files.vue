@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useHead } from "@unhead/vue"
 import { onMounted, ref } from "vue"
 import { useRoute } from "vue-router"
 import DocumentUnitAttachments from "@/components/DocumentUnitAttachments.vue"
@@ -8,8 +9,12 @@ import documentUnitService from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
 
 const props = defineProps<{ documentNumber: string }>()
+
 const documentUnit = ref<DocumentUnit>()
 
+useHead({
+  title: props.documentNumber + " · NeuRIS Rechtsinformationssystem",
+})
 const route = useRoute()
 
 const error = ref<ResponseError>()

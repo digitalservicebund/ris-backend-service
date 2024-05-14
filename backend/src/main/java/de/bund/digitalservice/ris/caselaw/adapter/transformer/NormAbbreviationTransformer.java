@@ -7,9 +7,22 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.Docume
 import java.time.ZoneId;
 import java.util.List;
 
+/**
+ * Utility class for transforming NormAbbreviation objects between DTOs (Data Transfer Objects) and
+ * domain objects.
+ */
 public class NormAbbreviationTransformer {
-  private NormAbbreviationTransformer() {}
 
+  private NormAbbreviationTransformer() {
+    // Private constructor to prevent instantiation of this utility class.
+  }
+
+  /**
+   * Transforms a NormAbbreviationDTO (Data Transfer Object) into a NormAbbreviation domain object.
+   *
+   * @param normAbbreviationDTO The NormAbbreviationDTO to be transformed.
+   * @return The NormAbbreviation domain object representing the transformed NormAbbreviationDTO.
+   */
   public static NormAbbreviation transformToDomain(NormAbbreviationDTO normAbbreviationDTO) {
     if (normAbbreviationDTO == null) {
       return null;

@@ -79,4 +79,61 @@ values
     '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
     'documentnr001',
     'ba90a851-3c54-4858-b4fa-7742ffbe8f05'
+  ),
+  (
+    'f13e7fe2-78a5-11ee-b962-0242ac120002',
+    'documentnr002',
+    'ba90a851-3c54-4858-b4fa-7742ffbe8f05'
+  );
+
+insert into
+  incremental_migration.norm_reference (
+    id,
+    norm_abbreviation_raw_value,
+    single_norm,
+    date_of_version,
+    date_of_relevance,
+    documentation_unit_id,
+    norm_abbreviation_id,
+    rank
+  )
+values
+  (
+    'f0232240-7416-11ee-b962-0242ac120001',
+    '123',
+    'single norm 1',
+    '2011-01-21',
+    '2011',
+    '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
+    '33333333-2222-3333-4444-555555555555',
+    1
+  ),
+  (
+    'f0232240-7416-11ee-b962-0242ac120002',
+    '123',
+    'single norm 1',
+    '2011-01-21',
+    '2011',
+    'f13e7fe2-78a5-11ee-b962-0242ac120002',
+    '33333333-2222-3333-4444-555555555555',
+    1
+  );
+
+INSERT INTO
+  incremental_migration.legal_force (
+    id,
+    legal_force_type_id,
+    norm_abbreviation_id,
+    region_id,
+    documentation_unit_id,
+    norm_reference_id
+  )
+VALUES
+  (
+    '33333333-2222-3333-6666-555555555555',
+    '11111111-2222-3333-4444-555555555555',
+    '33333333-2222-3333-4444-555555555555',
+    '55555555-2222-3333-4444-555555555555',
+    'f13e7fe2-78a5-11ee-b962-0242ac120002',
+    'f0232240-7416-11ee-b962-0242ac120002'
   );

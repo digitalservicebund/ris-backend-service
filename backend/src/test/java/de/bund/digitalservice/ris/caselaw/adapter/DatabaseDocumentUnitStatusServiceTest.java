@@ -146,7 +146,7 @@ class DatabaseDocumentUnitStatusServiceTest {
     String documentNumber = "document number";
     Status status =
         Status.builder().publicationStatus(PublicationStatus.PUBLISHED).withError(true).build();
-    DocumentUnit documentationUnit = DocumentUnit.builder().uuid(TEST_UUID).build();
+    DocumentUnit.builder().uuid(TEST_UUID).build();
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitDTO.builder().id(TEST_UUID).documentNumber(documentNumber).build();
     StatusDTO statusDTO =

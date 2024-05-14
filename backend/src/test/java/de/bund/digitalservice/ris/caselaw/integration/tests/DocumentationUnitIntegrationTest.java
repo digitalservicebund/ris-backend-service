@@ -494,22 +494,21 @@ class DocumentationUnitIntegrationTest {
         databaseDocumentCategoryRepository.saveAndFlush(
             DocumentCategoryDTO.builder().label("C").build());
 
-    DocumentTypeDTO documentTypeDTOA =
-        databaseDocumentTypeRepository.save(
-            DocumentTypeDTO.builder()
-                .abbreviation("ABC")
-                .category(categoryA)
-                .label("ABC123")
-                .multiple(true)
-                .build());
-    DocumentTypeDTO documentTypeDTOC =
-        databaseDocumentTypeRepository.save(
-            DocumentTypeDTO.builder()
-                .abbreviation("ABC")
-                .category(categoryC)
-                .label("ABC123")
-                .multiple(true)
-                .build());
+    databaseDocumentTypeRepository.save(
+        DocumentTypeDTO.builder()
+            .abbreviation("ABC")
+            .category(categoryA)
+            .label("ABC123")
+            .multiple(true)
+            .build());
+
+    databaseDocumentTypeRepository.save(
+        DocumentTypeDTO.builder()
+            .abbreviation("ABC")
+            .category(categoryC)
+            .label("ABC123")
+            .multiple(true)
+            .build());
 
     var documentTypeDTOR =
         databaseDocumentTypeRepository.save(

@@ -1,6 +1,8 @@
 import { expect } from "@playwright/test"
 import SingleNorm from "@/domain/singleNorm"
 import {
+  clearInput,
+  fillInput,
   fillNormInputs,
   navigateToCategories,
   waitForSaving,
@@ -293,6 +295,78 @@ test.describe("norm", () => {
       await page.locator("[aria-label='Gericht']").fill("VerfG")
       await page.locator("text=VerfG Dessau").last().click()
       await expect(normContainer.getByText("Mit Gesetzeskraft")).toBeVisible()
+    })
+
+    test("add new legal force, edit and remove it", async ({
+      page,
+      documentNumber,
+    }) => {
+      await navigateToCategories(page, documentNumber)
+      const normContainer = page.getByLabel("Norm")
+
+      await page.locator("[aria-label='Gericht']").fill("VerfG")
+      await page.locator("text=VerfG Dessau").last().click()
+
+      await fillNormInputs(page, {
+        normAbbreviation: "PBefG",
+        singleNorms: [{ singleNorm: "§ 123" } as SingleNorm],
+      })
+
+      const checkbox = normContainer.getByTestId("legal-force-checkbox")
+      await expect(checkbox).toBeVisible()
+
+      const legalForceTypeCombobox = normContainer.getByTestId(
+        "legal-force-type-combobox",
+      )
+      const legalForceRegionCombobox = normContainer.getByTestId(
+        "legal-force-region-combobox",
+      )
+      await expect(legalForceTypeCombobox).toBeHidden()
+      await expect(legalForceRegionCombobox).toBeHidden()
+
+      await checkbox.click()
+
+      await expect(legalForceTypeCombobox).toBeVisible()
+      await expect(legalForceRegionCombobox).toBeVisible()
+
+      // add new legal force
+      await fillInput(page, "Gesetzeskraft Typ", "Nichtig")
+      await page.getByText("Nichtig").click()
+
+      await fillInput(page, "Gesetzeskraft Geltungsbereich", "Brandenburg")
+      await page.getByText("Brandenburg").click()
+
+      const saveNormButton = normContainer.getByLabel("Norm speichern")
+      await saveNormButton.click()
+
+      await page.getByText("Speichern").click()
+      await expect(page.locator("text=Nichtig (Brandenburg)")).toBeVisible()
+
+      // edit legal force
+      const listEntries = normContainer.getByLabel("Listen Eintrag")
+      await expect(listEntries).toHaveCount(2)
+      await listEntries.first().click()
+
+      await fillInput(page, "Gesetzeskraft Typ", "Vereinbar")
+      await page.getByText("Vereinbar").click()
+
+      await fillInput(page, "Gesetzeskraft Geltungsbereich", "Berlin")
+      await page.getByText("Berlin (Ost)").click()
+
+      await saveNormButton.click()
+
+      await page.getByText("Speichern").click()
+      await expect(page.locator("text=Vereinbar (Berlin (Ost))")).toBeVisible()
+
+      // remove legal force
+      await listEntries.first().click()
+
+      await clearInput(page, "Gesetzeskraft Typ")
+      await clearInput(page, "Gesetzeskraft Geltungsbereich")
+
+      await saveNormButton.click()
+      await page.getByText("Speichern").click()
+      await expect(page.locator("text=Vereinbar (Berlin (Ost))")).toBeHidden()
     })
   })
 })

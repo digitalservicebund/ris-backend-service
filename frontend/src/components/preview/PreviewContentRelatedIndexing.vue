@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed } from "vue"
-import PreviewLeftCell from "@/components/preview/PreviewLeftCell.vue"
-import PreviewRightCell from "@/components/preview/PreviewRightCell.vue"
-import TableView from "@/components/TableView.vue"
+import FlexContainer from "@/components/FlexContainer.vue"
+import PreviewCategory from "@/components/preview/PreviewCategory.vue"
+import PreviewContent from "@/components/preview/PreviewContent.vue"
+import PreviewRow from "@/components/preview/PreviewRow.vue"
 import { ContentRelatedIndexing } from "@/domain/documentUnit"
 
 const props = defineProps<{
@@ -39,33 +40,33 @@ const hasActiveCitations = computed(() => {
 </script>
 
 <template>
-  <TableView class="table w-full table-fixed">
-    <tr v-if="hasKeywords">
-      <PreviewLeftCell>Schlagwörter</PreviewLeftCell>
-      <PreviewRightCell>
+  <FlexContainer class="flex-col">
+    <PreviewRow v-if="hasKeywords">
+      <PreviewCategory>Schlagwörter</PreviewCategory>
+      <PreviewContent>
         <div
           v-for="(keyword, index) in contentRelatedIndexing.keywords"
           :key="index"
         >
           {{ keyword }}
         </div>
-      </PreviewRightCell>
-    </tr>
-    <tr v-if="hasFieldsOfLaw">
-      <PreviewLeftCell>Sachgebiete</PreviewLeftCell>
-      <PreviewRightCell>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="hasFieldsOfLaw">
+      <PreviewCategory>Sachgebiete</PreviewCategory>
+      <PreviewContent>
         <div
           v-for="(fieldOfLaw, index) in contentRelatedIndexing.fieldsOfLaw"
           :key="index"
         >
           {{ fieldOfLaw.identifier }}, {{ fieldOfLaw.text }}
         </div>
-      </PreviewRightCell>
-    </tr>
+      </PreviewContent>
+    </PreviewRow>
 
-    <tr v-if="hasNorms">
-      <PreviewLeftCell>Normen</PreviewLeftCell>
-      <PreviewRightCell>
+    <PreviewRow v-if="hasNorms">
+      <PreviewCategory>Normen</PreviewCategory>
+      <PreviewContent>
         <div v-for="(norm, index) in contentRelatedIndexing.norms" :key="index">
           <div v-if="norm.singleNorms && norm.singleNorms.length > 0">
             <div v-for="(singleNorm, i) in norm.singleNorms" :key="i">
@@ -76,12 +77,12 @@ const hasActiveCitations = computed(() => {
             {{ norm.renderDecision }}
           </div>
         </div>
-      </PreviewRightCell>
-    </tr>
+      </PreviewContent>
+    </PreviewRow>
 
-    <tr v-if="hasActiveCitations">
-      <PreviewLeftCell>Aktivzitierung</PreviewLeftCell>
-      <PreviewRightCell>
+    <PreviewRow v-if="hasActiveCitations">
+      <PreviewCategory>Aktivzitierung</PreviewCategory>
+      <PreviewContent>
         <div
           v-for="(
             activeCitation, index
@@ -90,7 +91,7 @@ const hasActiveCitations = computed(() => {
         >
           {{ activeCitation.renderDecision }}
         </div>
-      </PreviewRightCell>
-    </tr>
-  </TableView>
+      </PreviewContent>
+    </PreviewRow>
+  </FlexContainer>
 </template>

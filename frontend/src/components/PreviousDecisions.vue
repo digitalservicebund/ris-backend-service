@@ -4,10 +4,11 @@ import { RouterLink } from "vue-router"
 import PreviousDecisionInputGroup from "./PreviousDecisionInputGroup.vue"
 import { withSummarizer } from "@/components/DataSetSummary.vue"
 import EditableList from "@/components/EditableList.vue"
+import IconBadge from "@/components/IconBadge.vue"
 import PreviousDecision from "@/domain/previousDecision"
 import BaselineArrowOutward from "~icons/ic/baseline-arrow-outward"
 import IconBaselineDescription from "~icons/ic/baseline-description"
-import IconErrorOutline from "~icons/ic/baseline-error-outline"
+import IconError from "~icons/ic/baseline-error"
 import IconOutlineDescription from "~icons/ic/outline-description"
 
 const props = defineProps<{
@@ -27,6 +28,18 @@ const proceedingDecisions = computed({
   },
 })
 const defaultValue = new PreviousDecision()
+
+/**
+ * Returns a render function with an error icon badge
+ */
+function errorBadgeSummarizer() {
+  return h(IconBadge, {
+    backgroundColor: "bg-red-300",
+    color: "text-red-900",
+    icon: IconError,
+    label: "Fehlende Daten",
+  })
+}
 
 function renderLink(dataEntry: PreviousDecision) {
   return h(
@@ -72,21 +85,6 @@ function decisionSummarizer(dataEntry: PreviousDecision) {
         renderLink(dataEntry),
       ]),
     ])
-    // Ghost DocUnit with missing fields
-  } else if (dataEntry.hasMissingRequiredFields) {
-    return h("div", { class: ["flex flex-row items-center"] }, [
-      h(
-        h(h(IconErrorOutline), {
-          "aria-label": "Fehlerhafte Eingabe",
-          class: ["mr-8 text-red-800"],
-        }),
-      ),
-      h(
-        "div",
-        { class: ["ds-label-01-reg text-red-800"] },
-        dataEntry.renderDecision,
-      ),
-    ])
     // Ghost DocUnit
   } else {
     return h("div", { class: ["flex flex-row items-center"] }, [
@@ -95,7 +93,8 @@ function decisionSummarizer(dataEntry: PreviousDecision) {
           class: ["mr-8 "],
         }),
       ),
-      h("div", { class: ["ds-label-01-reg"] }, dataEntry.renderDecision),
+      h("div", { class: ["ds-label-01-reg mr-8"] }, dataEntry.renderDecision),
+      dataEntry.hasMissingRequiredFields ? errorBadgeSummarizer() : null,
     ])
   }
 }

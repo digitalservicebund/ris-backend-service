@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+/** An interface representing the type of a legal force. */
 @Getter
 @Setter
 @Builder(toBuilder = true)

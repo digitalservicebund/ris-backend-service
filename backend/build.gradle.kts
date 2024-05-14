@@ -161,7 +161,7 @@ dependencies {
     // CVE-2022-3171
     implementation("com.google.protobuf:protobuf-java:4.26.1")
     // CVE-2023-52428 in spring-boot-starter-oauth2-client:3.2.3
-    implementation("com.nimbusds:nimbus-jose-jwt:9.37.3")
+    implementation("com.nimbusds:nimbus-jose-jwt:9.38")
     // CVE-2023-31582
     implementation("org.bitbucket.b_c:jose4j:0.9.6")
 
@@ -192,7 +192,7 @@ dependencies {
     // for local development:
     // implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.8.38.jar"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.4")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.5")
     // for local development:
     // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.4.jar"))
 
@@ -201,7 +201,7 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus:1.12.5")
     implementation("io.micrometer:micrometer-core:1.12.5")
 
-    implementation(platform("io.sentry:sentry-bom:7.8.0"))
+    implementation(platform("io.sentry:sentry-bom:7.9.0"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
     implementation("io.sentry:sentry-logback")
 

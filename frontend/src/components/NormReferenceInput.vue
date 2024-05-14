@@ -42,6 +42,10 @@ const singleNorms = ref(
     : ([] as SingleNorm[]),
 )
 
+/**
+ * Data restructuring from norm abbreviation props to combobox item. When item in combobox set, it is validated
+ * against already existing norm abbreviations in the list.
+ */
 const normAbbreviation = computed({
   get: () =>
     norm.value.normAbbreviation
@@ -73,6 +77,10 @@ const normAbbreviation = computed({
   },
 })
 
+/**
+ * If there are no format validations, the new norm references is emitted to the parent and automatically
+ * sa new emtpy entry is added to the list
+ */
 async function addNormReference() {
   if (
     !validationStore.getByField("singleNorm") &&
@@ -91,11 +99,18 @@ async function addNormReference() {
   }
 }
 
+/**
+ * Emits to the editable list to removes the current norm reference and empties the local single norm list. The truthy
+ * boolean value indicates, that the edit index should be resetted to undefined, ergo show all list items in summary mode.
+ */
 async function removeNormReference() {
   emit("removeEntry", true)
   singleNorms.value = []
 }
 
+/**
+ * Adds a new single norm entry to the local single norms list.
+ */
 function addSingleNormEntry() {
   singleNorms.value.push(new SingleNorm())
 }
@@ -109,11 +124,19 @@ function removeSingleNormEntry(index: number) {
 }
 
 function cancelEdit() {
-  if (new NormReference({ ...props.modelValue }).isEmpty)
+  if (new NormReference({ ...props.modelValue }).isEmpty) {
     emit("removeEntry", true)
+    singleNorms.value = []
+  }
   emit("cancelEdit")
 }
 
+/**
+ * The child components emit format validations, this function updates the local validation store accordingly in order to
+ * prevent the norm reference input from being saved with validation errors
+ * @param validationError A validation error has either a message and an instance field or is undefined
+ * @param field If the validation error is undefined, the validation store for this field needs to be resetted
+ */
 function updateFormatValidation(
   validationError: ValidationError | undefined,
   field: string,
@@ -134,6 +157,12 @@ function updateFormatValidation(
   }
 }
 
+/**
+ * This updates the local norm with the updated model value from the props. It also stores a copy of the last saved
+ * model value, because the local norm might change in between. When the new model value is empty, all validation
+ * errors are resetted. If it has an amiguous norm reference, the validation store is updated. When the list of
+ * single norms is empty, a new empty single norm entry is added.
+ */
 watch(
   () => props.modelValue,
   () => {
@@ -144,13 +173,15 @@ watch(
     } else if (lastSavedModelValue.value.hasAmbiguousNormReference) {
       validationStore.add("Mehrdeutiger Verweis", "normAbbreviation")
     }
-    //when list is empty, add new empty single norm entry
     if (singleNorms.value?.length == 0 || !singleNorms.value)
       addSingleNormEntry()
   },
   { immediate: true },
 )
 
+/**
+ * When an empty component unmounts, meaning cancel or save was clicked, this self deletion is triggered.
+ */
 onBeforeUnmount(() => {
   if (norm.value.isEmpty) emit("removeEntry")
 })

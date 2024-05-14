@@ -159,11 +159,6 @@ watch(
 )
 
 onMounted(() => {
-  // On first mount, we don't need to validate. When the props.modelValue do not
-  // have the isEmpty getter, we can be sure that it has not been initialized as
-  // PreviousDecision and is therefore the inital load. As soons as we are using
-  // uuids, the check should be 'props.modelValue?.uuid !== undefined'
-
   if (props.modelValue?.isEmpty !== undefined) {
     validateRequiredInput()
   }

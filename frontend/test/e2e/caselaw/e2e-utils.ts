@@ -31,6 +31,17 @@ export const navigateToCategories = async (
   await expect(page.getByText(documentNumber)).toBeVisible()
 }
 
+export const navigateToPreview = async (page: Page, documentNumber: string) => {
+  const queryParams = getAllQueryParamsFromUrl(page)
+  const baseUrl = `/caselaw/documentunit/${documentNumber}/preview${queryParams}`
+
+  await page.goto(baseUrl)
+  await expect(page.getByTestId("preview")).toBeVisible({
+    timeout: 15000, // for backend warm up
+  })
+  await expect(page.getByText(documentNumber)).toBeVisible()
+}
+
 export const navigateToFiles = async (page: Page, documentNumber: string) => {
   const queryParams = getAllQueryParamsFromUrl(page)
   await page.goto(`/caselaw/documentunit/${documentNumber}/files${queryParams}`)
@@ -369,6 +380,21 @@ export async function fillEnsuingDecisionInputs(
   }
 }
 
+export async function fillInput(
+  page: Page,
+  ariaLabel: string,
+  value = generateString(),
+) {
+  const input = page.locator(`[aria-label='${ariaLabel}']`)
+  await input.fill(value ?? ariaLabel)
+  await waitForInputValue(page, `[aria-label='${ariaLabel}']`, value)
+}
+
+export async function clearInput(page: Page, ariaLabel: string) {
+  const input = page.locator(`[aria-label='${ariaLabel}']`)
+  await input.clear()
+}
+
 export async function fillNormInputs(
   page: Page,
   values?: {
@@ -376,14 +402,8 @@ export async function fillNormInputs(
     singleNorms?: SingleNorm[]
   },
 ): Promise<void> {
-  const fillInput = async (ariaLabel: string, value = generateString()) => {
-    const input = page.locator(`[aria-label='${ariaLabel}']`)
-    await input.fill(value ?? ariaLabel)
-    await waitForInputValue(page, `[aria-label='${ariaLabel}']`, value)
-  }
-
   if (values?.normAbbreviation) {
-    await fillInput("RIS-Abkürzung", values.normAbbreviation)
+    await fillInput(page, "RIS-Abkürzung", values.normAbbreviation)
     await page.getByText(values.normAbbreviation, { exact: true }).click()
     await waitForInputValue(
       page,
@@ -430,14 +450,8 @@ export async function fillActiveCitationInputs(
     documentType?: string
   },
 ): Promise<void> {
-  const fillInput = async (ariaLabel: string, value = generateString()) => {
-    const input = page.locator(`[aria-label='${ariaLabel}']`)
-    await input.fill(value ?? ariaLabel)
-    await waitForInputValue(page, `[aria-label='${ariaLabel}']`, value)
-  }
-
   if (values?.citationType) {
-    await fillInput("Art der Zitierung", values?.citationType)
+    await fillInput(page, "Art der Zitierung", values?.citationType)
     await page.getByText(values.citationType, { exact: true }).click()
     await waitForInputValue(
       page,
@@ -447,7 +461,7 @@ export async function fillActiveCitationInputs(
   }
 
   if (values?.court) {
-    await fillInput("Gericht Aktivzitierung", values?.court)
+    await fillInput(page, "Gericht Aktivzitierung", values?.court)
     await page.getByText(values.court, { exact: true }).click()
     await waitForInputValue(
       page,
@@ -456,13 +470,17 @@ export async function fillActiveCitationInputs(
     )
   }
   if (values?.decisionDate) {
-    await fillInput("Entscheidungsdatum Aktivzitierung", values?.decisionDate)
+    await fillInput(
+      page,
+      "Entscheidungsdatum Aktivzitierung",
+      values?.decisionDate,
+    )
   }
   if (values?.fileNumber) {
-    await fillInput("Aktenzeichen Aktivzitierung", values?.fileNumber)
+    await fillInput(page, "Aktenzeichen Aktivzitierung", values?.fileNumber)
   }
   if (values?.documentType) {
-    await fillInput("Dokumenttyp Aktivzitierung", values?.documentType)
+    await fillInput(page, "Dokumenttyp Aktivzitierung", values?.documentType)
     await page.getByText(values.documentType, { exact: true }).click()
     await waitForInputValue(
       page,

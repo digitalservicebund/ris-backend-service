@@ -2,9 +2,9 @@ name: Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   schedule:
     - cron: "0 18 * * *" # Every day at 8pm
   # Allow to run this workflow manually
@@ -655,13 +655,13 @@ jobs:
 
   e2e-tests:
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [ deploy-staging, prep-playwright-tests ]
+    needs: [deploy-staging, prep-playwright-tests]
     strategy:
       fail-fast: false
       matrix:
-        subproject: [ caselaw, shared ]
-        browser: [ chromium, firefox ]
-        mode: [ e2e ]
+        subproject: [caselaw, shared]
+        browser: [chromium, firefox]
+        mode: [e2e]
         include:
           - mode: a11y
             browser: a11y
@@ -674,7 +674,7 @@ jobs:
 
   query-performance-tests:
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [ e2e-tests, prep-playwright-tests ]
+    needs: [e2e-tests, prep-playwright-tests]
     uses: ./.github/workflows/_playwright-test.yml
     with:
       subproject: "all"
@@ -729,6 +729,8 @@ jobs:
       - push-backend-image-to-registry
       - e2e-tests
       - check-latest-deploy-tag
+      - analyze-backend
+      - analyze-frontend
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:

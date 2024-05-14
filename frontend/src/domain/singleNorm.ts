@@ -18,10 +18,6 @@ export default class SingleNorm {
     Object.assign(this, data)
   }
 
-  get isReadOnly(): boolean {
-    return false
-  }
-
   get renderDecision(): string {
     return [
       ...(this.singleNorm ? [this.singleNorm] : []),
@@ -55,7 +51,7 @@ export default class SingleNorm {
   }
 
   get hasLegalForce(): boolean {
-    return this.legalForce != undefined
+    return !!this.legalForce?.type || !!this.legalForce?.region
   }
 
   private fieldIsEmpty(value: SingleNorm[(typeof SingleNorm.fields)[number]]) {

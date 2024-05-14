@@ -76,7 +76,6 @@ function removeEntry(index: number, shouldResetEditIndex?: boolean) {
 /**
  * Updating the modelValue with the local modelValue list, is not propagated, until the user actively
  * decides to click the save button in edit mode. The edit index is resetted, to show list in summary mode.
- * @param {number} index - The index of the list item to be removed
  */
 function updateModel() {
   setEditIndex()

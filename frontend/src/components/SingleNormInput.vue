@@ -45,6 +45,9 @@ const singleNorm = computed({
 
 const withLegalForce = ref(false)
 
+/**
+ * Data restructuring from legal force type props to combobox item.
+ */
 const legalForceType = computed({
   get: () =>
     props.modelValue.legalForce && props.modelValue.legalForce.type
@@ -67,6 +70,9 @@ const legalForceType = computed({
   },
 })
 
+/**
+ * Data restructuring from legal force region props to combobox item.
+ */
 const legalForceRegion = computed({
   get: () =>
     singleNorm.value.legalForce && singleNorm.value.legalForce.region
@@ -91,11 +97,14 @@ const isCourtWithLegalForce = computed(() => {
   return courtsWithLegalForce.includes(courtTypeRef.value)
 })
 
+/**
+ * Validates a given single norm against with a given norm abbreviation against a validation endpoint.
+ * The validation endpint either responds with "Ok" oder "Validation error". In the latter case a validation error is emitted to the parent.
+ */
 async function validateNorm() {
   validationStore.reset()
   emit("update:validationError", undefined, "singleNorm")
 
-  //validate singleNorm
   if (singleNorm.value?.singleNorm) {
     const singleNormValidationInfo: SingleNormValidationInfo = {
       singleNorm: singleNorm.value?.singleNorm,
@@ -119,11 +128,21 @@ async function validateNorm() {
     }
   }
 }
-
+/**
+ * Emits the 'removeEntry' event to the parent, where the data entry is removed from the model value.
+ */
 async function removeSingleNormEntry() {
   emit("removeEntry")
 }
 
+/**
+ * Could be triggered by invalid date formats in the fields 'dateOfVersion' and 'dateOfRelevance'.
+ * This forwards the validation error to the parent, so it knows, that this single norm entry has a validation error.
+ * @param validationError The actual message
+ * @param field The name of the field with format validation. The validationError also holds this information ('instance'),
+ * but when the validationError resets to undefined, we do not have the instance information anymore.
+ * For this case this field is needed in order to identify, which field resetted it's valdiation error.
+ */
 function updateDateFormatValidation(
   validationError: ValidationError | undefined,
   field: string,
@@ -142,6 +161,10 @@ function updateDateFormatValidation(
   }
 }
 
+/**
+ * On mount, the first input is focussed, the local value for legal force is set.
+ * If the single norm entry mounts and the single norm field is filled, then it is validated immediately.
+ */
 onMounted(async () => {
   if (props.modelValue.singleNorm) {
     await validateNorm()
@@ -172,6 +195,7 @@ onMounted(async () => {
           :id="id"
           v-model="withLegalForce"
           aria-label="Gesetzeskraft der Norm"
+          data-testid="legal-force-checkbox"
           size="small"
         />
       </InputField>
@@ -267,6 +291,7 @@ onMounted(async () => {
             id="legalForceType"
             v-model="legalForceType"
             aria-label="Gesetzeskraft Typ"
+            data-testid="legal-force-type-combobox"
             :item-service="ComboboxItemService.getLegalForceTypes"
           ></ComboboxInput>
         </InputField>
@@ -277,6 +302,7 @@ onMounted(async () => {
             id="legalForceRegion"
             v-model="legalForceRegion"
             aria-label="Gesetzeskraft Geltungsbereich"
+            data-testid="legal-force-region-combobox"
             :item-service="ComboboxItemService.getLegalForceRegions"
           ></ComboboxInput>
         </InputField>

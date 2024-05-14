@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import dayjs from "dayjs"
-import PreviewLeftCell from "@/components/preview/PreviewLeftCell.vue"
-import PreviewRightCell from "@/components/preview/PreviewRightCell.vue"
-import TableView from "@/components/TableView.vue"
+import FlexContainer from "@/components/FlexContainer.vue"
+import FlexItem from "@/components/FlexItem.vue"
+import PreviewCategory from "@/components/preview/PreviewCategory.vue"
+import PreviewContent from "@/components/preview/PreviewContent.vue"
+import PreviewRow from "@/components/preview/PreviewRow.vue"
 import { CoreData } from "@/domain/documentUnit"
 
 defineProps<{
@@ -11,98 +13,119 @@ defineProps<{
 </script>
 
 <template>
-  <TableView class="table w-full table-fixed">
-    <tr v-if="coreData.court">
-      <PreviewLeftCell>Gericht</PreviewLeftCell>
-      <PreviewRightCell>
+  <FlexContainer class="flex-col">
+    <PreviewRow v-if="coreData.court">
+      <PreviewCategory>Gericht</PreviewCategory>
+      <PreviewContent>
         {{ coreData.court.type }}
         {{ coreData.court.location }}
-      </PreviewRightCell>
-    </tr>
-    <tr v-if="coreData.deviatingCourts && coreData.deviatingCourts.length > 0">
-      <PreviewLeftCell>Fehlerhaftes Gericht</PreviewLeftCell>
-      <PreviewRightCell>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow
+      v-if="coreData.deviatingCourts && coreData.deviatingCourts.length > 0"
+    >
+      <PreviewCategory>Fehlerhaftes Gericht</PreviewCategory>
+      <PreviewContent>
         {{ coreData.deviatingCourts.toString() }}
-      </PreviewRightCell>
-    </tr>
-    <tr v-if="coreData.fileNumbers && coreData.fileNumbers.length > 0">
-      <PreviewLeftCell> Aktenzeichen</PreviewLeftCell>
-      <PreviewRightCell>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="coreData.fileNumbers && coreData.fileNumbers.length > 0">
+      <PreviewCategory> Aktenzeichen</PreviewCategory>
+      <PreviewContent>
         {{ coreData.fileNumbers.toString() }}
-      </PreviewRightCell>
-    </tr>
-    <tr
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow
       v-if="
         coreData.deviatingFileNumbers &&
         coreData.deviatingFileNumbers.length > 0
       "
     >
-      <PreviewLeftCell> Abweichendes Aktenzeichen</PreviewLeftCell>
-      <PreviewRightCell>
+      <PreviewCategory> Abweichendes Aktenzeichen</PreviewCategory>
+      <PreviewContent>
         {{ coreData.deviatingFileNumbers.toString() }}
-      </PreviewRightCell>
-    </tr>
-    <tr v-if="coreData.decisionDate">
-      <PreviewLeftCell>Entscheidungsdatum</PreviewLeftCell>
-      <PreviewRightCell>{{
-        dayjs(coreData.decisionDate).format("DD.MM.YYYY")
-      }}</PreviewRightCell>
-    </tr>
-    <tr
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="coreData.decisionDate">
+      <PreviewCategory>Entscheidungsdatum</PreviewCategory>
+      <PreviewContent
+        >{{ dayjs(coreData.decisionDate).format("DD.MM.YYYY") }}
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow
       v-if="
         coreData.deviatingDecisionDates &&
         coreData.deviatingDecisionDates.length > 0
       "
     >
-      <PreviewLeftCell>Abweichendes Entscheidungsdatum</PreviewLeftCell>
-      <PreviewRightCell>
+      <PreviewCategory>Abweichendes Entscheidungsdatum</PreviewCategory>
+      <PreviewContent>
         <div
           v-for="(item, index) in coreData.deviatingDecisionDates"
           :key="index"
         >
           {{ dayjs(item).format("DD.MM.YYYY") }}
         </div>
-      </PreviewRightCell>
-    </tr>
-    <tr v-if="coreData.appraisalBody">
-      <PreviewLeftCell>Spruchkörper</PreviewLeftCell>
-      <PreviewRightCell>{{ coreData.appraisalBody }}</PreviewRightCell>
-    </tr>
-    <tr v-if="coreData.documentType">
-      <PreviewLeftCell>Dokumenttyp</PreviewLeftCell>
-      <PreviewRightCell>{{ coreData.documentType.label }}</PreviewRightCell>
-    </tr>
-    <tr v-if="coreData.ecli">
-      <PreviewLeftCell>ECLI</PreviewLeftCell>
-      <PreviewRightCell>{{ coreData.ecli }}</PreviewRightCell>
-    </tr>
-    <tr v-if="coreData.deviatingEclis && coreData.deviatingEclis.length > 0">
-      <PreviewLeftCell>Abweichender ECLI</PreviewLeftCell>
-      <PreviewRightCell
-        >{{ coreData.deviatingEclis.toString() }}
-      </PreviewRightCell>
-    </tr>
-    <tr v-if="coreData.procedure">
-      <PreviewLeftCell>Vorgang</PreviewLeftCell>
-      <PreviewRightCell>{{ coreData.procedure.label }} </PreviewRightCell>
-    </tr>
-    <tr
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="coreData.appraisalBody">
+      <PreviewCategory>Spruchkörper</PreviewCategory>
+      <PreviewContent>{{ coreData.appraisalBody }}</PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="coreData.documentType">
+      <PreviewCategory>Dokumenttyp</PreviewCategory>
+      <PreviewContent>{{ coreData.documentType.label }}</PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="coreData.ecli">
+      <PreviewCategory>ECLI</PreviewCategory>
+      <PreviewContent>{{ coreData.ecli }}</PreviewContent>
+    </PreviewRow>
+    <PreviewRow
+      v-if="coreData.deviatingEclis && coreData.deviatingEclis.length > 0"
+    >
+      <PreviewCategory>Abweichender ECLI</PreviewCategory>
+      <PreviewContent>{{ coreData.deviatingEclis.toString() }}</PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="coreData.procedure">
+      <PreviewCategory>Vorgang</PreviewCategory>
+      <PreviewContent>{{ coreData.procedure.label }}</PreviewContent>
+    </PreviewRow>
+    <PreviewRow
       v-if="
         coreData.previousProcedures && coreData.previousProcedures.length > 0
       "
     >
-      <PreviewLeftCell>Vorgangshistorie</PreviewLeftCell>
-      <PreviewRightCell
+      <PreviewCategory>Vorgangshistorie</PreviewCategory>
+      <PreviewContent
         >{{ coreData.previousProcedures?.toReversed().toString() }}
-      </PreviewRightCell>
-    </tr>
-    <tr v-if="coreData.legalEffect">
-      <PreviewLeftCell>Rechtskraft</PreviewLeftCell>
-      <PreviewRightCell>{{ coreData.legalEffect }}</PreviewRightCell>
-    </tr>
-    <tr v-if="coreData.region">
-      <PreviewLeftCell>Region</PreviewLeftCell>
-      <PreviewRightCell>{{ coreData.region }}</PreviewRightCell>
-    </tr>
-  </TableView>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="coreData.legalEffect">
+      <PreviewCategory>Rechtskraft</PreviewCategory>
+      <PreviewContent>{{ coreData.legalEffect }}</PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="coreData.region">
+      <PreviewCategory>Region</PreviewCategory>
+      <PreviewContent>{{ coreData.region }}</PreviewContent>
+    </PreviewRow>
+    <PreviewRow
+      v-if="
+        coreData.leadingDecisionNormReferences &&
+        coreData.leadingDecisionNormReferences.length > 0
+      "
+    >
+      <PreviewCategory>BGH Nachschlagewerk</PreviewCategory>
+      <PreviewContent>
+        <FlexContainer
+          v-for="(
+            leadingDecisionNormReference, index
+          ) in coreData.leadingDecisionNormReferences"
+          :key="index"
+          class="flex-col"
+        >
+          <FlexItem> {{ leadingDecisionNormReference }}</FlexItem>
+        </FlexContainer>
+      </PreviewContent>
+    </PreviewRow>
+  </FlexContainer>
 </template>
