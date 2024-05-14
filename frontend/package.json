@@ -38,7 +38,7 @@
     "@sentry/integrations": "^7.114.0",
     "@sentry/vue": "^7.114.0",
     "@tiptap/extension-bold": "^2.3.1",
-    "@tiptap/extension-bullet-list": "^2.3.1",
+    "@tiptap/extension-bullet-list": "^2.4.0",
     "@tiptap/extension-color": "^2.3.1",
     "@tiptap/extension-document": "^2.3.1",
     "@tiptap/extension-hard-break": "^2.3.1",
