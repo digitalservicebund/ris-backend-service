@@ -508,78 +508,77 @@ class LegalForceIntegrationTest {
             });
   }
 
-  /*
   @Transactional
   @Test
   void updateNormReference_deleteLegalForceType() {
 
     NormAbbreviation normAbbreviation =
-            NormAbbreviationTransformer.transformToDomain(
-                    normAbbreviationRepository
-                            .findById(UUID.fromString("33333333-2222-3333-4444-555555555555"))
-                            .get());
+        NormAbbreviationTransformer.transformToDomain(
+            normAbbreviationRepository
+                .findById(UUID.fromString("33333333-2222-3333-4444-555555555555"))
+                .get());
 
     Region region =
-            RegionTransformer.transformDTO(
-                    regionRepository
-                            .findById(UUID.fromString("55555555-2222-3333-4444-555555555555"))
-                            .get());
+        RegionTransformer.transformDTO(
+            regionRepository
+                .findById(UUID.fromString("55555555-2222-3333-4444-555555555555"))
+                .get());
 
     LegalForce legalForce = LegalForce.builder().region(region).build();
 
     DocumentUnit documentUnitFromFrontend =
-            DocumentUnit.builder()
-                    .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
-                    .documentNumber("documentnr001")
-                    .coreData(CoreData.builder().build())
-                    .contentRelatedIndexing(
-                            ContentRelatedIndexing.builder()
-                                    .norms(
-                                            List.of(
-                                                    NormReference.builder()
-                                                            .normAbbreviation(normAbbreviation)
-                                                            .singleNorms(
-                                                                    List.of(SingleNorm.builder()
-                                                                            .singleNorm("single norm")
-                                                                            .legalForce(legalForce)
-                                                                            .build()))
-                                                            .build()))
-                                    .build())
-                    .build();
+        DocumentUnit.builder()
+            .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .norms(
+                        List.of(
+                            NormReference.builder()
+                                .normAbbreviation(normAbbreviation)
+                                .singleNorms(
+                                    List.of(
+                                        SingleNorm.builder()
+                                            .singleNorm("single norm")
+                                            .legalForce(legalForce)
+                                            .build()))
+                                .build()))
+                    .build())
+            .build();
 
     risWebTestClient
-            .withDefaultLogin()
-            .put()
-            .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-            .bodyValue(documentUnitFromFrontend)
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(DocumentUnit.class)
-            .consumeWith(
-                    response -> {
-                      assertThat(
-                              response
-                                      .getResponseBody()
-                                      .contentRelatedIndexing()
-                                      .norms()
-                                      .get(0)
-                                      .singleNorms()
-                                      .get(0)
-                                      .legalForce())
-                              .isNotNull();
-                      assertThat(
-                              response
-                                      .getResponseBody()
-                                      .contentRelatedIndexing()
-                                      .norms()
-                                      .get(0)
-                                      .singleNorms()
-                                      .get(0)
-                                      .legalForce()
-                                      .type())
-                              .isNull();
-                    });
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .norms()
+                          .get(0)
+                          .singleNorms()
+                          .get(0)
+                          .legalForce())
+                  .isNotNull();
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .norms()
+                          .get(0)
+                          .singleNorms()
+                          .get(0)
+                          .legalForce()
+                          .type())
+                  .isNull();
+            });
   }
-  */
 }
