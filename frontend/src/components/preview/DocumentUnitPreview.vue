@@ -13,7 +13,7 @@ defineProps<{
 </script>
 
 <template>
-  <FlexContainer class="max-w-screen-xl flex-col">
+  <FlexContainer class="max-w-screen-xl flex-col" data-testid="preview">
     <h1 class="ds-heading-03-bold mt-16 px-16">
       {{ documentUnit.documentNumber }}
     </h1>

@@ -31,6 +31,17 @@ export const navigateToCategories = async (
   await expect(page.getByText(documentNumber)).toBeVisible()
 }
 
+export const navigateToPreview = async (page: Page, documentNumber: string) => {
+  const queryParams = getAllQueryParamsFromUrl(page)
+  const baseUrl = `/caselaw/documentunit/${documentNumber}/preview${queryParams}`
+
+  await page.goto(baseUrl)
+  await expect(page.getByTestId("preview")).toBeVisible({
+    timeout: 15000, // for backend warm up
+  })
+  await expect(page.getByText(documentNumber)).toBeVisible()
+}
+
 export const navigateToFiles = async (page: Page, documentNumber: string) => {
   const queryParams = getAllQueryParamsFromUrl(page)
   await page.goto(`/caselaw/documentunit/${documentNumber}/files${queryParams}`)
