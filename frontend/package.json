@@ -57,7 +57,7 @@
     "@tiptap/extension-table-row": "^2.3.1",
     "@tiptap/extension-text": "^2.3.1",
     "@tiptap/extension-text-align": "^2.3.1",
-    "@tiptap/extension-text-style": "^2.3.1",
+    "@tiptap/extension-text-style": "^2.4.0",
     "@tiptap/extension-underline": "^2.3.1",
     "@tiptap/vue-3": "^2.3.1",
     "@unhead/vue": "^1.9.10",
