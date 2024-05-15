@@ -17,7 +17,7 @@ public interface DatabaseDocumentationUnitRepository
   String SELECT_STATUS_WHERE_LATEST =
       "SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.createdAt = (SELECT MAX(s.createdAt) FROM StatusDTO s WHERE s.documentationUnitDTO.id = documentationUnit.id)";
 
-  String BASE_QUERY =
+  static final String BASE_QUERY =
       """
    (:documentNumber IS NULL OR upper(documentationUnit.documentNumber) like concat('%', upper(cast(:documentNumber as text)), '%'))
    AND (:documentNumberToExclude IS NULL OR documentationUnit.documentNumber != :documentNumberToExclude)
@@ -31,23 +31,23 @@ public interface DatabaseDocumentationUnitRepository
    AND
      (
         (:status IS NULL AND ((documentationUnit.documentationOffice.id = :documentationOfficeId OR EXISTS (
-   """
+        """
           + SELECT_STATUS_WHERE_LATEST
           + """
         AND status.publicationStatus IN (de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED, de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING)))))
      OR
         (:status IS NOT NULL AND EXISTS (
-     """
+        """
           + SELECT_STATUS_WHERE_LATEST
           + """
        AND status.publicationStatus = :status AND (:status IN ('PUBLISHED', 'PUBLISHING') OR documentationUnit.documentationOffice.id = :documentationOfficeId)))
      )
    AND (:withErrorOnly = FALSE OR documentationUnit.documentationOffice.id = :documentationOfficeId AND EXISTS (
-   """
+        """
           + SELECT_STATUS_WHERE_LATEST
           + """
         AND status.withError = TRUE))
-ORDER BY documentationUnit.decisionDate DESC NULLS LAST
+ORDER BY documentationUnit.documentNumber
 """;
 
   @Query(
