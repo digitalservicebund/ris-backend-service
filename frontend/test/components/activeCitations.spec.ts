@@ -431,7 +431,7 @@ describe("active citations", () => {
     )
     await user.clear(fileInput)
     await user.click(screen.getByLabelText("Aktivzitierung speichern"))
-    expect(screen.getByLabelText(/Fehlerhafte Eingabe/)).toBeInTheDocument()
+    expect(screen.getByText(/Fehlende Daten/)).toBeInTheDocument()
     await user.click(itemHeader)
     expect(screen.getAllByText(/Pflichtfeld nicht befüllt/).length).toBe(1)
   })

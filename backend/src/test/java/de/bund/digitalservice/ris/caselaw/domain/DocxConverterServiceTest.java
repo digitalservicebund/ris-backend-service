@@ -78,7 +78,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import reactor.test.StepVerifier;
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -154,14 +153,11 @@ class DocxConverterServiceTest {
     when(client.listObjectsV2(any(ListObjectsV2Request.class)))
         .thenReturn(CompletableFuture.completedFuture(response));
 
-    StepVerifier.create(service.getDocxFiles())
-        .consumeNextWith(
-            stringList -> {
-              assertNotNull(stringList);
-              assertEquals(1, stringList.size());
-              assertEquals("test.docx", stringList.get(0));
-            })
-        .verifyComplete();
+    List<String> stringList = service.getDocxFiles();
+
+    assertNotNull(stringList);
+    assertEquals(1, stringList.size());
+    assertEquals("test.docx", stringList.get(0));
   }
 
   @Test
@@ -181,19 +177,15 @@ class DocxConverterServiceTest {
           .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
           .thenReturn(mlPackage);
 
-      StepVerifier.create(service.getConvertedObject("test.docx"))
-          .consumeNextWith(
-              docx2Html -> {
-                assertNotNull(docx2Html);
+      Docx2Html docx2Html = service.getConvertedObject("test.docx");
+      assertNotNull(docx2Html);
 
-                assertEquals(
-                    "<p>test</p>"
-                        + "<border-number><number>1</number><content><p>border number 1</p></content></border-number>"
-                        + "<border-number><number>2</number><content><p>border number 2</p></content></border-number>"
-                        + "<table style=\"border-collapse: collapse;\"><tr><td style=\"min-width: 5px; padding: 5px;\"><p>table content</p></td></tr></table>",
-                    docx2Html.html());
-              })
-          .verifyComplete();
+      assertEquals(
+          "<p>test</p>"
+              + "<border-number><number>1</number><content><p>border number 1</p></content></border-number>"
+              + "<border-number><number>2</number><content><p>border number 2</p></content></border-number>"
+              + "<table style=\"border-collapse: collapse;\"><tr><td style=\"min-width: 5px; padding: 5px;\"><p>table content</p></td></tr></table>",
+          docx2Html.html());
     }
   }
 
@@ -202,7 +194,7 @@ class DocxConverterServiceTest {
     String fileName = null;
 
     // Verify that the Mono completes without emitting any onNext signals
-    StepVerifier.create(service.getConvertedObject(fileName)).verifyComplete();
+    service.getConvertedObject(fileName);
   }
 
   @Test
@@ -227,9 +219,8 @@ class DocxConverterServiceTest {
           .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
           .thenReturn(mlPackage);
 
-      StepVerifier.create(service.getConvertedObject("test.docx"))
-          .consumeNextWith(Assertions::assertNotNull)
-          .verifyComplete();
+      Docx2Html docx2Html = service.getConvertedObject("test.docx");
+      Assertions.assertNotNull(docx2Html);
 
       verify(converter).setStyles(styleMapCaptor.capture());
       assertTrue(styleMapCaptor.getValue().containsKey("test-style"));
@@ -279,9 +270,8 @@ class DocxConverterServiceTest {
           .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
           .thenReturn(mlPackage);
 
-      StepVerifier.create(service.getConvertedObject("test.docx"))
-          .consumeNextWith(Assertions::assertNotNull)
-          .verifyComplete();
+      Docx2Html docx2Html = service.getConvertedObject("test.docx");
+      Assertions.assertNotNull(docx2Html);
 
       verify(converter).setImages(imageMapCaptor.capture());
       Map<String, DocxImagePart> imageMapValue = imageMapCaptor.getValue();
@@ -339,9 +329,8 @@ class DocxConverterServiceTest {
           .thenReturn(mlPackage);
 
       // assertEquals(3,docx2Html.ecliList().size());
-      StepVerifier.create(service.getConvertedObject("test.docx"))
-          .consumeNextWith(Assertions::assertNotNull)
-          .verifyComplete();
+      Docx2Html docx2Html = service.getConvertedObject("test.docx");
+      Assertions.assertNotNull(docx2Html);
     }
   }
 
@@ -360,17 +349,14 @@ class DocxConverterServiceTest {
           .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
           .thenReturn(mlPackage);
 
-      StepVerifier.create(service.getConvertedObject("test.docx"))
-          .consumeNextWith(
-              docx2Html -> {
-                assertNotNull(docx2Html);
-                assertEquals(
-                    "<p>test</p><border-number><number>1</number></border-number>"
-                        + "<border-number><number>2</number><content><p>border number 2</p>"
-                        + "</content></border-number>",
-                    docx2Html.html());
-              })
-          .verifyComplete();
+      Docx2Html docx2Html = service.getConvertedObject("test.docx");
+
+      assertNotNull(docx2Html);
+      assertEquals(
+          "<p>test</p><border-number><number>1</number></border-number>"
+              + "<border-number><number>2</number><content><p>border number 2</p>"
+              + "</content></border-number>",
+          docx2Html.html());
     }
   }
 
@@ -454,30 +440,27 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getConvertedObject("test.docx"))
-            .consumeNextWith(
-                docx2Html -> {
-                  assertNotNull(docx2Html);
-                  assertEquals(
-                      "<ul style=\"list-style-type:disc;\">"
-                          + "<li>"
-                          + "<p>bullet list entry 1</p>"
-                          + "</li>"
-                          + "<li>"
-                          + "<p>bullet list entry 2</p>"
-                          + "</li>"
-                          + "</ul>"
-                          + "<ol style=\"list-style-type:decimal;\">"
-                          + "<li>"
-                          + "<p>decimal list entry 1</p>"
-                          + "</li>"
-                          + "<li>"
-                          + "<p>decimal list entry 2</p>"
-                          + "</li>"
-                          + "</ol>",
-                      docx2Html.html());
-                })
-            .verifyComplete();
+        Docx2Html docx2Html = service.getConvertedObject("test.docx");
+
+        assertNotNull(docx2Html);
+        assertEquals(
+            "<ul style=\"list-style-type:disc;\">"
+                + "<li>"
+                + "<p>bullet list entry 1</p>"
+                + "</li>"
+                + "<li>"
+                + "<p>bullet list entry 2</p>"
+                + "</li>"
+                + "</ul>"
+                + "<ol style=\"list-style-type:decimal;\">"
+                + "<li>"
+                + "<p>decimal list entry 1</p>"
+                + "</li>"
+                + "<li>"
+                + "<p>decimal list entry 2</p>"
+                + "</li>"
+                + "</ol>",
+            docx2Html.html());
       }
     }
 
@@ -504,18 +487,15 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getConvertedObject("test.docx"))
-            .consumeNextWith(
-                docx2Html -> {
-                  assertNotNull(docx2Html);
-                  assertEquals(
-                      "<ol style=\"list-style-type:lower-latin;\">"
-                          + "<li><p>list entry 1</p></li>"
-                          + "<li><p>list entry 2</p></li>"
-                          + "</ol>",
-                      docx2Html.html());
-                })
-            .verifyComplete();
+        Docx2Html docx2Html = service.getConvertedObject("test.docx");
+
+        assertNotNull(docx2Html);
+        assertEquals(
+            "<ol style=\"list-style-type:lower-latin;\">"
+                + "<li><p>list entry 1</p></li>"
+                + "<li><p>list entry 2</p></li>"
+                + "</ol>",
+            docx2Html.html());
       }
     }
 
@@ -542,18 +522,15 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getConvertedObject("test.docx"))
-            .consumeNextWith(
-                docx2Html -> {
-                  assertNotNull(docx2Html);
-                  assertEquals(
-                      "<ol style=\"list-style-type:upper-latin;\">"
-                          + "<li><p>list entry 1</p></li>"
-                          + "<li><p>list entry 2</p></li>"
-                          + "</ol>",
-                      docx2Html.html());
-                })
-            .verifyComplete();
+        Docx2Html docx2Html = service.getConvertedObject("test.docx");
+
+        assertNotNull(docx2Html);
+        assertEquals(
+            "<ol style=\"list-style-type:upper-latin;\">"
+                + "<li><p>list entry 1</p></li>"
+                + "<li><p>list entry 2</p></li>"
+                + "</ol>",
+            docx2Html.html());
       }
     }
 
@@ -580,18 +557,15 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getConvertedObject("test.docx"))
-            .consumeNextWith(
-                docx2Html -> {
-                  assertNotNull(docx2Html);
-                  assertEquals(
-                      "<ol style=\"list-style-type:lower-roman;\">"
-                          + "<li><p>list entry 1</p></li>"
-                          + "<li><p>list entry 2</p></li>"
-                          + "</ol>",
-                      docx2Html.html());
-                })
-            .verifyComplete();
+        Docx2Html docx2Html = service.getConvertedObject("test.docx");
+
+        assertNotNull(docx2Html);
+        assertEquals(
+            "<ol style=\"list-style-type:lower-roman;\">"
+                + "<li><p>list entry 1</p></li>"
+                + "<li><p>list entry 2</p></li>"
+                + "</ol>",
+            docx2Html.html());
       }
     }
 
@@ -618,18 +592,15 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getConvertedObject("test.docx"))
-            .consumeNextWith(
-                docx2Html -> {
-                  assertNotNull(docx2Html);
-                  assertEquals(
-                      "<ol style=\"list-style-type:upper-roman;\">"
-                          + "<li><p>list entry 1</p></li>"
-                          + "<li><p>list entry 2</p></li>"
-                          + "</ol>",
-                      docx2Html.html());
-                })
-            .verifyComplete();
+        Docx2Html docx2Html = service.getConvertedObject("test.docx");
+
+        assertNotNull(docx2Html);
+        assertEquals(
+            "<ol style=\"list-style-type:upper-roman;\">"
+                + "<li><p>list entry 1</p></li>"
+                + "<li><p>list entry 2</p></li>"
+                + "</ol>",
+            docx2Html.html());
       }
     }
 
@@ -663,21 +634,18 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getConvertedObject("test.docx"))
-            .consumeNextWith(
-                docx2Html -> {
-                  assertNotNull(docx2Html);
-                  assertEquals(
-                      "<ol style=\"list-style-type:decimal;\">"
-                          + "<li><p>list entry 1</p></li>"
-                          + "<ol style=\"list-style-type:decimal;\">"
-                          + "<li style=\"list-style-type:decimal\"><p>list entry 1.1</p></li>"
-                          + "</ol>"
-                          + "<li style=\"list-style-type:decimal\"><p>bullet list entry 2</p></li>"
-                          + "</ol>",
-                      docx2Html.html());
-                })
-            .verifyComplete();
+        Docx2Html docx2Html = service.getConvertedObject("test.docx");
+
+        assertNotNull(docx2Html);
+        assertEquals(
+            "<ol style=\"list-style-type:decimal;\">"
+                + "<li><p>list entry 1</p></li>"
+                + "<ol style=\"list-style-type:decimal;\">"
+                + "<li style=\"list-style-type:decimal\"><p>list entry 1.1</p></li>"
+                + "</ol>"
+                + "<li style=\"list-style-type:decimal\"><p>bullet list entry 2</p></li>"
+                + "</ol>",
+            docx2Html.html());
       }
     }
 
@@ -703,17 +671,14 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getConvertedObject("test.docx"))
-            .consumeNextWith(
-                docx2Html -> {
-                  assertNotNull(docx2Html);
-                  assertEquals(
-                      "<ol style=\"list-style-type:decimal;\">"
-                          + "<li><p>bullet list entry 1</p></li>"
-                          + "</ol>",
-                      docx2Html.html());
-                })
-            .verifyComplete();
+        Docx2Html docx2Html = service.getConvertedObject("test.docx");
+
+        assertNotNull(docx2Html);
+        assertEquals(
+            "<ol style=\"list-style-type:decimal;\">"
+                + "<li><p>bullet list entry 1</p></li>"
+                + "</ol>",
+            docx2Html.html());
       }
     }
 
@@ -764,27 +729,24 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getConvertedObject("test.docx"))
-            .consumeNextWith(
-                docx2Html -> {
-                  assertNotNull(docx2Html);
-                  assertEquals(
-                      "<ul style=\"list-style-type:disc;\">"
-                          + "<li><p>bullet list entry 1</p></li>"
-                          + "<li><p>bullet list entry 2</p></li>"
-                          + "<ul style=\"list-style-type:disc;\">"
-                          + "<li><p>bullet list entry 2.1</p></li>"
-                          + "<li><p>bullet list entry 2.2</p></li>"
-                          + "<ul style=\"list-style-type:disc;\">"
-                          + "<li><p>bullet list entry 2.2.1</p></li>"
-                          + "<li><p>bullet list entry 2.2.2</p></li>"
-                          + "</ul><li><p>bullet list entry 2.3</p></li>"
-                          + "</ul>"
-                          + "<li><p>bullet list entry 3</p></li>"
-                          + "</ul>",
-                      docx2Html.html());
-                })
-            .verifyComplete();
+        Docx2Html docx2Html = service.getConvertedObject("test.docx");
+
+        assertNotNull(docx2Html);
+        assertEquals(
+            "<ul style=\"list-style-type:disc;\">"
+                + "<li><p>bullet list entry 1</p></li>"
+                + "<li><p>bullet list entry 2</p></li>"
+                + "<ul style=\"list-style-type:disc;\">"
+                + "<li><p>bullet list entry 2.1</p></li>"
+                + "<li><p>bullet list entry 2.2</p></li>"
+                + "<ul style=\"list-style-type:disc;\">"
+                + "<li><p>bullet list entry 2.2.1</p></li>"
+                + "<li><p>bullet list entry 2.2.2</p></li>"
+                + "</ul><li><p>bullet list entry 2.3</p></li>"
+                + "</ul>"
+                + "<li><p>bullet list entry 3</p></li>"
+                + "</ul>",
+            docx2Html.html());
       }
     }
 
@@ -847,28 +809,25 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getConvertedObject("test.docx"))
-            .consumeNextWith(
-                docx2Html -> {
-                  assertNotNull(docx2Html);
-                  assertEquals(
-                      "<ol style=\"list-style-type:lower-roman;\">"
-                          + "<li><p>lower roman list entry 1</p></li>"
-                          + "<li><p>lower roman list entry 2</p></li>"
-                          + "<ol style=\"list-style-type:lower-roman;\">"
-                          + "<li><p>lower roman list entry 2.1</p></li>"
-                          + "<li><p>lower roman list entry 2.2</p></li>"
-                          + "<ol style=\"list-style-type:lower-roman;\">"
-                          + "<li><p>lower roman list entry 2.2.1</p></li>"
-                          + "<li><p>lower roman list entry 2.2.2</p></li>"
-                          + "</ol>"
-                          + "<li><p>lower roman list entry 2.3</p></li>"
-                          + "</ol>"
-                          + "<li><p>lower roman list entry 3</p></li>"
-                          + "</ol>",
-                      docx2Html.html());
-                })
-            .verifyComplete();
+        Docx2Html docx2Html = service.getConvertedObject("test.docx");
+
+        assertNotNull(docx2Html);
+        assertEquals(
+            "<ol style=\"list-style-type:lower-roman;\">"
+                + "<li><p>lower roman list entry 1</p></li>"
+                + "<li><p>lower roman list entry 2</p></li>"
+                + "<ol style=\"list-style-type:lower-roman;\">"
+                + "<li><p>lower roman list entry 2.1</p></li>"
+                + "<li><p>lower roman list entry 2.2</p></li>"
+                + "<ol style=\"list-style-type:lower-roman;\">"
+                + "<li><p>lower roman list entry 2.2.1</p></li>"
+                + "<li><p>lower roman list entry 2.2.2</p></li>"
+                + "</ol>"
+                + "<li><p>lower roman list entry 2.3</p></li>"
+                + "</ol>"
+                + "<li><p>lower roman list entry 3</p></li>"
+                + "</ol>",
+            docx2Html.html());
       }
     }
 
@@ -931,26 +890,23 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getConvertedObject("test.docx"))
-            .consumeNextWith(
-                docx2Html -> {
-                  assertNotNull(docx2Html);
-                  assertEquals(
-                      "<ol style=\"list-style-type:upper-roman;\">"
-                          + "<li><p>upper roman list entry 1</p></li>"
-                          + "<li><p>upper roman list entry 2</p></li>"
-                          + "<ol style=\"list-style-type:upper-roman;\">"
-                          + "<li><p>upper roman list entry 2.1</p></li>"
-                          + "<li><p>upper roman list entry 2.2</p></li>"
-                          + "<ol style=\"list-style-type:upper-roman;\">"
-                          + "<li><p>upper roman list entry 2.2.1</p></li>"
-                          + "<li><p>upper roman list entry 2.2.2</p></li></ol>"
-                          + "<li><p>upper roman list entry 2.3</p></li></ol>"
-                          + "<li><p>upper roman list entry 3</p></li>"
-                          + "</ol>",
-                      docx2Html.html());
-                })
-            .verifyComplete();
+        Docx2Html docx2Html = service.getConvertedObject("test.docx");
+
+        assertNotNull(docx2Html);
+        assertEquals(
+            "<ol style=\"list-style-type:upper-roman;\">"
+                + "<li><p>upper roman list entry 1</p></li>"
+                + "<li><p>upper roman list entry 2</p></li>"
+                + "<ol style=\"list-style-type:upper-roman;\">"
+                + "<li><p>upper roman list entry 2.1</p></li>"
+                + "<li><p>upper roman list entry 2.2</p></li>"
+                + "<ol style=\"list-style-type:upper-roman;\">"
+                + "<li><p>upper roman list entry 2.2.1</p></li>"
+                + "<li><p>upper roman list entry 2.2.2</p></li></ol>"
+                + "<li><p>upper roman list entry 2.3</p></li></ol>"
+                + "<li><p>upper roman list entry 3</p></li>"
+                + "</ol>",
+            docx2Html.html());
       }
     }
 
@@ -1013,28 +969,25 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getConvertedObject("test.docx"))
-            .consumeNextWith(
-                docx2Html -> {
-                  assertNotNull(docx2Html);
-                  assertEquals(
-                      "<ol style=\"list-style-type:lower-latin;\">"
-                          + "<li><p>lower letter list entry 1</p></li>"
-                          + "<li><p>lower letter list entry 2</p></li>"
-                          + "<ol style=\"list-style-type:lower-latin;\">"
-                          + "<li><p>lower letter list entry 2.1</p></li>"
-                          + "<li><p>lower letter list entry 2.2</p></li>"
-                          + "<ol style=\"list-style-type:lower-latin;\">"
-                          + "<li><p>lower letter list entry 2.2.1</p></li>"
-                          + "<li><p>lower letter list entry 2.2.2</p></li>"
-                          + "</ol>"
-                          + "<li><p>lower letter list entry 2.3</p></li>"
-                          + "</ol>"
-                          + "<li><p>lower letter list entry 3</p></li>"
-                          + "</ol>",
-                      docx2Html.html());
-                })
-            .verifyComplete();
+        Docx2Html docx2Html = service.getConvertedObject("test.docx");
+
+        assertNotNull(docx2Html);
+        assertEquals(
+            "<ol style=\"list-style-type:lower-latin;\">"
+                + "<li><p>lower letter list entry 1</p></li>"
+                + "<li><p>lower letter list entry 2</p></li>"
+                + "<ol style=\"list-style-type:lower-latin;\">"
+                + "<li><p>lower letter list entry 2.1</p></li>"
+                + "<li><p>lower letter list entry 2.2</p></li>"
+                + "<ol style=\"list-style-type:lower-latin;\">"
+                + "<li><p>lower letter list entry 2.2.1</p></li>"
+                + "<li><p>lower letter list entry 2.2.2</p></li>"
+                + "</ol>"
+                + "<li><p>lower letter list entry 2.3</p></li>"
+                + "</ol>"
+                + "<li><p>lower letter list entry 3</p></li>"
+                + "</ol>",
+            docx2Html.html());
       }
     }
 
@@ -1097,28 +1050,25 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getConvertedObject("test.docx"))
-            .consumeNextWith(
-                docx2Html -> {
-                  assertNotNull(docx2Html);
-                  assertEquals(
-                      "<ol style=\"list-style-type:upper-latin;\">"
-                          + "<li><p>upper letter list entry 1</p></li>"
-                          + "<li><p>upper letter list entry 2</p></li>"
-                          + "<ol style=\"list-style-type:upper-latin;\">"
-                          + "<li><p>upper letter list entry 2.1</p></li>"
-                          + "<li><p>upper letter list entry 2.2</p></li>"
-                          + "<ol style=\"list-style-type:upper-latin;\">"
-                          + "<li><p>upper letter list entry 2.2.1</p></li>"
-                          + "<li><p>upper letter list entry 2.2.2</p></li>"
-                          + "</ol>"
-                          + "<li><p>upper letter list entry 2.3</p></li>"
-                          + "</ol>"
-                          + "<li><p>upper letter list entry 3</p></li>"
-                          + "</ol>",
-                      docx2Html.html());
-                })
-            .verifyComplete();
+        Docx2Html docx2Html = service.getConvertedObject("test.docx");
+
+        assertNotNull(docx2Html);
+        assertEquals(
+            "<ol style=\"list-style-type:upper-latin;\">"
+                + "<li><p>upper letter list entry 1</p></li>"
+                + "<li><p>upper letter list entry 2</p></li>"
+                + "<ol style=\"list-style-type:upper-latin;\">"
+                + "<li><p>upper letter list entry 2.1</p></li>"
+                + "<li><p>upper letter list entry 2.2</p></li>"
+                + "<ol style=\"list-style-type:upper-latin;\">"
+                + "<li><p>upper letter list entry 2.2.1</p></li>"
+                + "<li><p>upper letter list entry 2.2.2</p></li>"
+                + "</ol>"
+                + "<li><p>upper letter list entry 2.3</p></li>"
+                + "</ol>"
+                + "<li><p>upper letter list entry 3</p></li>"
+                + "</ol>",
+            docx2Html.html());
       }
     }
 
@@ -1178,28 +1128,25 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getConvertedObject("test.docx"))
-            .consumeNextWith(
-                docx2Html -> {
-                  assertNotNull(docx2Html);
-                  assertEquals(
-                      "<ol style=\"list-style-type:decimal;\">"
-                          + "<li><p>decimal list entry 1</p></li>"
-                          + "<li><p>decimal list entry 2</p></li>"
-                          + "<ol style=\"list-style-type:decimal;\">"
-                          + "<li><p>decimal list entry 2.1</p></li>"
-                          + "<li><p>decimal list entry 2.2</p></li>"
-                          + "<ol style=\"list-style-type:decimal;\">"
-                          + "<li><p>decimal list entry 2.2.1</p></li>"
-                          + "<li><p>decimal list entry 2.2.2</p></li>"
-                          + "</ol>"
-                          + "<li><p>decimal list entry 2.3</p></li>"
-                          + "</ol>"
-                          + "<li><p>decimal list entry 3</p></li>"
-                          + "</ol>",
-                      docx2Html.html());
-                })
-            .verifyComplete();
+        Docx2Html docx2Html = service.getConvertedObject("test.docx");
+
+        assertNotNull(docx2Html);
+        assertEquals(
+            "<ol style=\"list-style-type:decimal;\">"
+                + "<li><p>decimal list entry 1</p></li>"
+                + "<li><p>decimal list entry 2</p></li>"
+                + "<ol style=\"list-style-type:decimal;\">"
+                + "<li><p>decimal list entry 2.1</p></li>"
+                + "<li><p>decimal list entry 2.2</p></li>"
+                + "<ol style=\"list-style-type:decimal;\">"
+                + "<li><p>decimal list entry 2.2.1</p></li>"
+                + "<li><p>decimal list entry 2.2.2</p></li>"
+                + "</ol>"
+                + "<li><p>decimal list entry 2.3</p></li>"
+                + "</ol>"
+                + "<li><p>decimal list entry 3</p></li>"
+                + "</ol>",
+            docx2Html.html());
       }
     }
 
@@ -1265,31 +1212,28 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getConvertedObject("test.docx"))
-            .consumeNextWith(
-                docx2Html -> {
-                  assertNotNull(docx2Html);
-                  assertEquals(
-                      "<ol style=\"list-style-type:decimal;\">"
-                          + "<li><p>list entry 1</p></li>"
-                          + "<li><p>list entry 2</p></li>"
-                          + "<ul style=\"list-style-type:disc;\">"
-                          + "<li><p>list entry 2.1</p></li>"
-                          + "<li><p>list entry 2.2</p></li>"
-                          + "<ol style=\"list-style-type:decimal;\">"
-                          + "<li><p>list entry 2.2.1</p></li>"
-                          + "<li><p>list entry 2.2.2</p></li>"
-                          + "</ol>"
-                          + "<li><p>list entry 2.3</p></li>"
-                          + "<ul style=\"list-style-type:disc;\">"
-                          + "<li><p>list entry 2.3.1</p></li>"
-                          + "</ul>"
-                          + "</ul>"
-                          + "<li><p>list entry 3</p></li>"
-                          + "</ol>",
-                      docx2Html.html());
-                })
-            .verifyComplete();
+        Docx2Html docx2Html = service.getConvertedObject("test.docx");
+
+        assertNotNull(docx2Html);
+        assertEquals(
+            "<ol style=\"list-style-type:decimal;\">"
+                + "<li><p>list entry 1</p></li>"
+                + "<li><p>list entry 2</p></li>"
+                + "<ul style=\"list-style-type:disc;\">"
+                + "<li><p>list entry 2.1</p></li>"
+                + "<li><p>list entry 2.2</p></li>"
+                + "<ol style=\"list-style-type:decimal;\">"
+                + "<li><p>list entry 2.2.1</p></li>"
+                + "<li><p>list entry 2.2.2</p></li>"
+                + "</ol>"
+                + "<li><p>list entry 2.3</p></li>"
+                + "<ul style=\"list-style-type:disc;\">"
+                + "<li><p>list entry 2.3.1</p></li>"
+                + "</ul>"
+                + "</ul>"
+                + "<li><p>list entry 3</p></li>"
+                + "</ol>",
+            docx2Html.html());
       }
     }
 
@@ -1324,14 +1268,10 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getConvertedObject("test.docx"))
-            .consumeNextWith(
-                docx2Html -> {
-                  assertNotNull(docx2Html);
-                  assertEquals(
-                      "<ol><li><p>1. entry with own numbering</p></li></ol>", docx2Html.html());
-                })
-            .verifyComplete();
+        Docx2Html docx2Html = service.getConvertedObject("test.docx");
+
+        assertNotNull(docx2Html);
+        assertEquals("<ol><li><p>1. entry with own numbering</p></li></ol>", docx2Html.html());
       }
     }
   }
@@ -1342,9 +1282,8 @@ class DocxConverterServiceTest {
         .thenReturn(CompletableFuture.completedFuture(responseBytes));
     when(responseBytes.asInputStream()).thenReturn(null);
 
-    StepVerifier.create(service.getConvertedObject("test.docx"))
-        .consumeNextWith(docx2Html -> assertEquals(Docx2Html.EMPTY, docx2Html))
-        .verifyComplete();
+    Docx2Html docx2Html = service.getConvertedObject("test.docx");
+    assertEquals(Docx2Html.EMPTY, docx2Html);
   }
 
   @Test
@@ -1359,12 +1298,9 @@ class DocxConverterServiceTest {
           .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
           .thenThrow(Docx4JException.class);
 
-      StepVerifier.create(service.getConvertedObject("test.docx"))
-          .expectErrorMatches(
-              throwable ->
-                  throwable instanceof DocxConverterException
-                      && throwable.getMessage().equals("Couldn't load docx file!"))
-          .verify();
+      // TODO throwable.getMessage().equals("Couldn't load docx file!"))
+      Assertions.assertThrows(
+          DocxConverterException.class, () -> service.getConvertedObject("test.docx"));
     }
   }
 

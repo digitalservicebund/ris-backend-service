@@ -31,8 +31,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,8 +45,7 @@ class XmlExporterTest {
   @Autowired private ObjectMapper objectMapper;
 
   @Test
-  void testExporter()
-      throws XmlExporterException, ParserConfigurationException, TransformerException {
+  void testExporter() throws XmlExporterException {
     DocumentUnit documentUnit =
         DocumentUnit.builder()
             .coreData(generateCoreData())

@@ -53,7 +53,6 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
 @Import({JurisXmlExporterResponseProcessor.class, JurisMessageWrapperFactory.class})
@@ -92,9 +91,9 @@ class JurisXmlExporterResponseProcessorTest {
         .thenReturn(Optional.of(processMessageWrapper));
 
     when(reportRepository.saveAll(any())).thenReturn(Collections.emptyList());
-    when(statusService.update(anyString(), any(Status.class))).thenReturn(Mono.empty());
+
     when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER))
-        .thenReturn(Mono.just("test@digitalservice.bund.de"));
+        .thenReturn("test@digitalservice.bund.de");
 
     responseProcessor =
         new JurisXmlExporterResponseProcessor(
@@ -137,7 +136,7 @@ class JurisXmlExporterResponseProcessorTest {
   void testMessageGetsNotMovedIfDocumentNumberNotFound()
       throws MessagingException, DocumentationUnitNotExistsException {
     when(inbox.getMessages()).thenReturn(new Message[] {importMessage});
-    when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER)).thenReturn(Mono.empty());
+    when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER)).thenReturn(null);
     TestMemoryAppender memoryAppender =
         new TestMemoryAppender(JurisXmlExporterResponseProcessor.class);
 
@@ -159,7 +158,7 @@ class JurisXmlExporterResponseProcessorTest {
   void testMessageEncoding() throws MessagingException, IOException {
     when(inbox.getMessages()).thenReturn(new Message[] {importMessage});
     when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER))
-        .thenReturn(Mono.just("test@digitalservice.bund.de"));
+        .thenReturn("test@digitalservice.bund.de");
 
     Multipart multipart = new MimeMultipart();
     BodyPart bodyPart = new MimeBodyPart();
@@ -195,7 +194,7 @@ class JurisXmlExporterResponseProcessorTest {
 
     Date now = new Date();
     when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER))
-        .thenReturn(Mono.just("test@digitalservice.bund.de"));
+        .thenReturn("test@digitalservice.bund.de");
     when(processMessageWrapper.getAttachments())
         .thenReturn(
             List.of(
@@ -228,7 +227,7 @@ class JurisXmlExporterResponseProcessorTest {
     when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
     Date now = new Date();
     when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER))
-        .thenReturn(Mono.just("test@digitalservice.bund.de"));
+        .thenReturn("test@digitalservice.bund.de");
     String providedHtml =
         """
                     <html>
@@ -453,7 +452,7 @@ class JurisXmlExporterResponseProcessorTest {
   void testLoggingForUnknownDocumentNumber()
       throws MessagingException, DocumentationUnitNotExistsException {
     when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
-    when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER)).thenReturn(Mono.empty());
+    when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER)).thenReturn(null);
 
     assertThatCode(responseProcessor::readEmails).doesNotThrowAnyException();
   }

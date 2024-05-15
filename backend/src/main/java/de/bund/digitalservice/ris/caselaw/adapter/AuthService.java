@@ -15,7 +15,6 @@ import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -55,8 +54,7 @@ public class AuthService {
     return documentNumber ->
         Mono.defer(
             () ->
-                documentUnitService
-                    .getByDocumentNumber(documentNumber)
+                Mono.justOrEmpty(documentUnitService.getByDocumentNumber(documentNumber))
                     .flatMap(this::userHasReadAccess)
                     .switchIfEmpty(Mono.just(false)));
   }
@@ -66,8 +64,7 @@ public class AuthService {
     return uuid ->
         Mono.defer(
             () ->
-                documentUnitService
-                    .getByUuid(uuid)
+                Mono.justOrEmpty(documentUnitService.getByUuid(uuid))
                     .flatMap(this::userHasReadAccess)
                     .switchIfEmpty(Mono.just(false)));
   }
@@ -77,8 +74,7 @@ public class AuthService {
     return uuid ->
         Mono.defer(
             () ->
-                documentUnitService
-                    .getByUuid(uuid)
+                Mono.justOrEmpty(documentUnitService.getByUuid(uuid))
                     .flatMap(this::userHasSameDocOfficeAsDocument)
                     .defaultIfEmpty(false)
                     .onErrorReturn(false));
@@ -121,7 +117,7 @@ public class AuthService {
    * @param oidcUser current user via openid connect system
    * @return the generated api key
    */
-  public ApiKey generateImportApiKey(OidcUser oidcUser, Locale locale) {
+  public ApiKey generateImportApiKey(OidcUser oidcUser) {
     Optional<ApiKeyDTO> apiKeyOptional =
         keyRepository.findByUserAccountAndValidUntilAfter(oidcUser.getEmail(), Instant.now());
 

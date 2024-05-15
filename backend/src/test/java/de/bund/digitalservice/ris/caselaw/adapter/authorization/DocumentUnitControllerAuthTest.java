@@ -25,10 +25,12 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import java.nio.ByteBuffer;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,8 +44,6 @@ import org.springframework.security.oauth2.client.registration.ReactiveClientReg
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.reactive.function.BodyInserters;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = DocumentUnitController.class)
@@ -79,7 +79,7 @@ class DocumentUnitControllerAuthTest {
   @Test
   void testGetByDocumentNumber_nonExistentDocumentNumber_shouldYield403Too() {
     // testGetByDocumentNumber() is also in DocumentUnitControllerAuthIntegrationTest
-    when(service.getByDocumentNumber(any(String.class))).thenReturn(Mono.empty());
+    when(service.getByDocumentNumber(any(String.class))).thenReturn(null);
 
     risWebTestClient
         .withLogin(docOffice1Group)
@@ -103,8 +103,7 @@ class DocumentUnitControllerAuthTest {
     when(attachmentService.attachFileToDocumentationUnit(
             eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class)))
         .thenReturn(Attachment.builder().s3path("fooPath").build());
-    when(docxConverterService.getConvertedObject(anyString()))
-        .thenReturn(Mono.just(Docx2Html.EMPTY));
+    when(docxConverterService.getConvertedObject(anyString())).thenReturn(Docx2Html.EMPTY);
     mockDocumentUnit(docOffice1, null, null);
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file";
@@ -152,7 +151,7 @@ class DocumentUnitControllerAuthTest {
 
   @Test
   void testDeleteByUuid() {
-    when(service.deleteByUuid(TEST_UUID)).thenReturn(Mono.empty());
+    when(service.deleteByUuid(TEST_UUID)).thenReturn(null);
     mockDocumentUnit(docOffice1, null, null);
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID;
@@ -171,8 +170,8 @@ class DocumentUnitControllerAuthTest {
   @Test
   void testUpdateByUuid() {
     DocumentUnit docUnit = mockDocumentUnit(docOffice2, null, null);
-    when(service.updateDocumentUnit(docUnit)).thenReturn(Mono.empty());
-    when(service.getByUuid(TEST_UUID)).thenReturn(Mono.just(docUnit));
+    when(service.updateDocumentUnit(docUnit)).thenReturn(null);
+    when(service.getByUuid(TEST_UUID)).thenReturn(docUnit);
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID;
 
@@ -197,7 +196,7 @@ class DocumentUnitControllerAuthTest {
         .isOk();
 
     UUID nonExistentUuid = UUID.fromString("12345678-1111-2222-3333-787878787878");
-    when(service.getByUuid(nonExistentUuid)).thenReturn(Mono.empty());
+    when(service.getByUuid(nonExistentUuid)).thenReturn(null);
     uri = "/api/v1/caselaw/documentunits/" + nonExistentUuid;
 
     risWebTestClient
@@ -224,7 +223,7 @@ class DocumentUnitControllerAuthTest {
   @Test
   void testGetHtml() {
     mockDocumentUnit(docOffice1, "123", Status.builder().publicationStatus(PUBLISHED).build());
-    when(docxConverterService.getConvertedObject("123")).thenReturn(Mono.empty());
+    when(docxConverterService.getConvertedObject("123")).thenReturn(null);
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/docx/123";
 
@@ -244,10 +243,10 @@ class DocumentUnitControllerAuthTest {
   }
 
   @Test
-  void testPublishDocumentUnitAsEmail() {
+  void testPublishDocumentUnitAsEmail() throws DocumentationUnitNotExistsException {
     mockDocumentUnit(docOffice2, null, null);
     when(userService.getEmail(any(OidcUser.class))).thenReturn("abc");
-    when(service.publishAsEmail(TEST_UUID, "abc")).thenReturn(Mono.empty());
+    when(service.publishAsEmail(TEST_UUID, "abc")).thenReturn(null);
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish";
 
@@ -265,7 +264,7 @@ class DocumentUnitControllerAuthTest {
   @Test
   void testGetPublishedMails() {
     mockDocumentUnit(docOffice1, null, Status.builder().publicationStatus(PUBLISHED).build());
-    when(service.getPublicationHistory(TEST_UUID)).thenReturn(Flux.empty());
+    when(service.getPublicationHistory(TEST_UUID)).thenReturn(List.of());
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish";
 
@@ -293,7 +292,7 @@ class DocumentUnitControllerAuthTest {
             .attachments(Collections.singletonList(Attachment.builder().s3path(s3path).build()))
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
             .build();
-    when(service.getByUuid(TEST_UUID)).thenReturn(Mono.just(docUnit));
+    when(service.getByUuid(TEST_UUID)).thenReturn(docUnit);
     return docUnit;
   }
 }

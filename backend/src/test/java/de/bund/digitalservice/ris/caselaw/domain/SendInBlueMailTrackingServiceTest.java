@@ -15,9 +15,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
 @Import(SendInBlueMailTrackingService.class)
@@ -54,24 +53,14 @@ class SendInBlueMailTrackingServiceTest {
   }
 
   @Test
-  void testUpdatePublishingState_success() {
+  void testUpdatePublishingState_success() throws DocumentationUnitNotExistsException {
     when(documentUnitStatusService.getLatestStatus(TEST_UUID))
-        .thenReturn(Mono.just(PublicationStatus.PUBLISHING));
-    when(documentUnitStatusService.update(
-            TEST_UUID,
-            Status.builder()
-                .publicationStatus(PublicationStatus.PUBLISHING)
-                .withError(false)
-                .build()))
-        .thenReturn(Mono.empty());
+        .thenReturn(PublicationStatus.PUBLISHING);
 
-    StepVerifier.create(
-            service.updatePublishingState("88888888-4444-4444-4444-121212121212", "delivered"))
-        .consumeNextWith(
-            responseEntity -> {
-              assertThat(responseEntity.getStatusCode().is2xxSuccessful()).isTrue();
-            })
-        .verifyComplete();
+    ResponseEntity<String> responseEntity =
+        service.updatePublishingState("88888888-4444-4444-4444-121212121212", "delivered");
+
+    assertThat(responseEntity.getStatusCode().is2xxSuccessful()).isTrue();
 
     verify(documentUnitStatusService).getLatestStatus(TEST_UUID);
     verify(documentUnitStatusService)
@@ -84,23 +73,13 @@ class SendInBlueMailTrackingServiceTest {
   }
 
   @Test
-  void testUpdatePublishingState_error() {
+  void testUpdatePublishingState_error() throws DocumentationUnitNotExistsException {
     when(documentUnitStatusService.getLatestStatus(TEST_UUID))
-        .thenReturn(Mono.just(PublicationStatus.PUBLISHING));
-    when(documentUnitStatusService.update(
-            TEST_UUID,
-            Status.builder()
-                .publicationStatus(PublicationStatus.PUBLISHING)
-                .withError(true)
-                .build()))
-        .thenReturn(Mono.empty());
+        .thenReturn(PublicationStatus.PUBLISHING);
 
-    StepVerifier.create(service.updatePublishingState(TEST_UUID.toString(), "error"))
-        .consumeNextWith(
-            responseEntity -> {
-              assertThat(responseEntity.getStatusCode().is2xxSuccessful()).isTrue();
-            })
-        .verifyComplete();
+    ResponseEntity<String> responseEntity =
+        service.updatePublishingState(TEST_UUID.toString(), "error");
+    assertThat(responseEntity.getStatusCode().is2xxSuccessful()).isTrue();
 
     verify(documentUnitStatusService).getLatestStatus(TEST_UUID);
     verify(documentUnitStatusService)
@@ -121,13 +100,10 @@ class SendInBlueMailTrackingServiceTest {
         "randomEvent"
       })
   void testUpdatePublishingState_noReactionOnOtherState(String event) {
-    StepVerifier.create(service.updatePublishingState(TEST_UUID.toString(), event))
-        .consumeNextWith(
-            responseEntity -> {
-              assertThat(responseEntity.getStatusCode().isSameCodeAs(HttpStatusCode.valueOf(204)))
-                  .isTrue();
-            })
-        .verifyComplete();
+    ResponseEntity<String> responseEntity =
+        service.updatePublishingState(TEST_UUID.toString(), event);
+
+    assertThat(responseEntity.getStatusCode().isSameCodeAs(HttpStatusCode.valueOf(204))).isTrue();
 
     verifyNoInteractions(documentUnitStatusService);
   }
@@ -135,14 +111,11 @@ class SendInBlueMailTrackingServiceTest {
   @Test
   void testUpdatePublishingState_noReactionOnPublishedDocs() {
     when(documentUnitStatusService.getLatestStatus(TEST_UUID))
-        .thenReturn(Mono.just(PublicationStatus.PUBLISHED));
+        .thenReturn(PublicationStatus.PUBLISHED);
 
-    StepVerifier.create(service.updatePublishingState(TEST_UUID.toString(), "error"))
-        .consumeNextWith(
-            responseEntity -> {
-              assertThat(responseEntity.getStatusCode().is2xxSuccessful()).isTrue();
-            })
-        .verifyComplete();
+    ResponseEntity<String> responseEntity =
+        service.updatePublishingState(TEST_UUID.toString(), "error");
+    assertThat(responseEntity.getStatusCode().is2xxSuccessful()).isTrue();
 
     verify(documentUnitStatusService).getLatestStatus(TEST_UUID);
     verifyNoMoreInteractions(documentUnitStatusService);

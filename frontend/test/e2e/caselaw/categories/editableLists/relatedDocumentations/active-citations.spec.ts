@@ -56,7 +56,7 @@ test.describe("active citations", () => {
       ),
     ).toBeVisible()
 
-    await expect(page.getByLabel("Fehlerhafte Eingabe")).toBeVisible()
+    await expect(page.getByText("Fehlende Daten")).toBeVisible()
 
     await page
       .getByText(
@@ -85,6 +85,6 @@ test.describe("active citations", () => {
       ),
     ).toBeVisible()
 
-    await expect(page.getByLabel("Fehlerhafte Eingabe")).toBeHidden()
+    await expect(page.getByText("Fehlende Daten")).toBeHidden()
   })
 })

@@ -7,7 +7,6 @@ import de.bund.digitalservice.ris.caselaw.domain.XmlPublicationRepository;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Mono;
 
 @Repository
 public class PostgresXmlPublicationRepositoryImpl implements XmlPublicationRepository {
@@ -54,14 +53,13 @@ public class PostgresXmlPublicationRepositoryImpl implements XmlPublicationRepos
   }
 
   @Override
-  public Mono<XmlPublication> getLastXmlPublication(UUID documentUnitUuid) {
+  public XmlPublication getLastXmlPublication(UUID documentUnitUuid) {
     DocumentationUnitDTO documentationUnitDTO =
         documentUnitRepository.findById(documentUnitUuid).orElseThrow();
 
     XmlPublicationDTO xmlPublicationDTO =
         repository.findTopByDocumentUnitIdOrderByPublishDateDesc(documentationUnitDTO.getId());
 
-    return Mono.just(
-        XmlPublicationTransformer.transformToDomain(xmlPublicationDTO, documentUnitUuid));
+    return XmlPublicationTransformer.transformToDomain(xmlPublicationDTO, documentUnitUuid);
   }
 }

@@ -175,7 +175,7 @@ test.describe("related documentation units", () => {
 
           await page.getByLabel(`${containerLabel} speichern`).click()
 
-          await expect(page.getByLabel("Fehlerhafte Eingabe")).toBeVisible()
+          await expect(page.getByText("Fehlende Daten")).toBeVisible()
           await page
             .getByLabel(containerLabel, { exact: true })
             .getByLabel("Listen Eintrag")
@@ -209,7 +209,7 @@ test.describe("related documentation units", () => {
 
           await page.getByLabel(`${containerLabel} speichern`).click()
 
-          await expect(page.getByLabel("Fehlerhafte Eingabe")).toBeHidden()
+          await expect(page.getByText("Fehlende Daten")).toBeHidden()
         },
       )
     }

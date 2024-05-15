@@ -374,6 +374,7 @@ class ProcedureIntegrationTest {
   }
 
   @Test
+  @SuppressWarnings("java:S5961")
   void testAddingProcedureToPreviousProcedures() {
     DocumentationUnitDTO dto =
         documentUnitRepository.save(

@@ -3,23 +3,21 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 
 @Service
 @Slf4j
@@ -63,20 +61,24 @@ public class DocumentUnitService {
     this.featureService = featureService;
   }
 
-  public Mono<DocumentUnit> generateNewDocumentUnit(DocumentationOffice documentationOffice) {
-    return Mono.just(documentationOffice)
-        .flatMap(this::generateDocumentNumber)
-        .flatMap(
-            documentNumber -> repository.createNewDocumentUnit(documentNumber, documentationOffice))
-        .flatMap(documentUnitStatusService::setInitialStatus)
-        .retryWhen(Retry.backoff(5, Duration.ofSeconds(2)).jitter(0.75))
-        .doOnError(ex -> log.error("Couldn't create empty doc unit", ex));
+  public DocumentUnit generateNewDocumentUnit(DocumentationOffice documentationOffice) {
+    var documentNumber = generateDocumentNumber(documentationOffice);
+    var documentUnit = repository.createNewDocumentUnit(documentNumber, documentationOffice);
+
+    try {
+      documentUnitStatusService.setInitialStatus(documentUnit);
+    } catch (DocumentationUnitNotExistsException e) {
+      // TODO handle exception
+      throw new RuntimeException(e);
+    }
+    // TODO retryWhen(Retry.backoff(5, Duration.ofSeconds(2)).jitter(0.75))
+    // TODO .doOnError(ex -> log.error("Couldn't create empty doc unit", ex));
+    return documentUnit;
   }
 
-  private Mono<String> generateDocumentNumber(DocumentationOffice documentationOffice) {
+  private String generateDocumentNumber(DocumentationOffice documentationOffice) {
     try {
-      return Mono.just(
-          documentNumberService.generateDocumentNumber(documentationOffice.abbreviation(), 5));
+      return documentNumberService.generateDocumentNumber(documentationOffice.abbreviation(), 5);
     } catch (Exception e) {
       throw new DocumentationUnitException("Could not generate document number", e);
     }
@@ -128,20 +130,20 @@ public class DocumentUnitService {
                     .build());
   }
 
-  public Mono<DocumentUnit> getByDocumentNumber(String documentNumber) {
+  public DocumentUnit getByDocumentNumber(String documentNumber) {
     try {
       var optionalDocumentUnit = repository.findByDocumentNumber(documentNumber);
-      return Mono.just(optionalDocumentUnit.orElseThrow());
+      return optionalDocumentUnit.orElseThrow();
     } catch (Exception e) {
-      return Mono.empty();
+      return null;
     }
   }
 
-  public Mono<DocumentUnit> getByUuid(UUID documentUnitUuid) {
-    return Mono.just(repository.findByUuid(documentUnitUuid).orElseThrow());
+  public DocumentUnit getByUuid(UUID documentUnitUuid) {
+    return repository.findByUuid(documentUnitUuid).orElseThrow();
   }
 
-  public Mono<String> deleteByUuid(UUID documentUnitUuid) {
+  public String deleteByUuid(UUID documentUnitUuid) {
     try {
 
       Map<RelatedDocumentationType, Long> relatedEntities =
@@ -156,9 +158,8 @@ public class DocumentUnitService {
             documentUnitUuid,
             relatedEntities);
 
-        return Mono.error(
-            new DocumentUnitDeletionException(
-                "Die Dokumentationseinheit konnte nicht gelöscht werden, da", relatedEntities));
+        throw new DocumentUnitDeletionException(
+            "Die Dokumentationseinheit konnte nicht gelöscht werden, da", relatedEntities);
       }
 
       DocumentUnit documentUnit =
@@ -173,13 +174,14 @@ public class DocumentUnitService {
 
       saveForRecycling(documentUnit);
       repository.delete(documentUnit);
-      return Mono.just("Dokumentationseinheit gelöscht: " + documentUnitUuid);
+      return "Dokumentationseinheit gelöscht: " + documentUnitUuid;
     } catch (Exception e) {
-      return Mono.error(e);
+      // TODO
+      return null;
     }
   }
 
-  public Mono<DocumentUnit> updateDocumentUnit(DocumentUnit documentUnit) {
+  public DocumentUnit updateDocumentUnit(DocumentUnit documentUnit) {
     repository.saveKeywords(documentUnit);
     repository.saveFieldsOfLaw(documentUnit);
     repository.saveProcedures(documentUnit);
@@ -187,57 +189,55 @@ public class DocumentUnitService {
     repository.save(documentUnit, featureService.isEnabled("neuris.legal-force"));
 
     try {
-      return Mono.just(
-          repository
-              .findByUuid(documentUnit.uuid())
-              .orElseThrow(
-                  () -> new DocumentationUnitNotExistsException(documentUnit.documentNumber())));
+      return repository
+          .findByUuid(documentUnit.uuid())
+          .orElseThrow(
+              () -> new DocumentationUnitNotExistsException(documentUnit.documentNumber()));
     } catch (DocumentationUnitNotExistsException e) {
-      return Mono.error(e);
+      // TODO
+      return null;
     }
   }
 
-  public Mono<Publication> publishAsEmail(UUID documentUnitUuid, String issuerAddress) {
-    try {
-      DocumentUnit documentUnit =
-          repository
-              .findByUuid(documentUnitUuid)
-              .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnitUuid));
+  public Publication publishAsEmail(UUID documentUnitUuid, String issuerAddress)
+      throws DocumentationUnitNotExistsException {
 
-      return publicationService
-          .publish(documentUnit, recipientAddress)
-          .flatMap(
-              mailResponse -> {
-                if (mailResponse.getStatusCode().equals(String.valueOf(HttpStatus.OK.value()))) {
-                  return documentUnitStatusService
-                      .setToPublishing(documentUnit, mailResponse.getPublishDate(), issuerAddress)
-                      .thenReturn(mailResponse);
-                } else {
-                  return Mono.just(mailResponse);
-                }
-              });
-    } catch (Exception e) {
-      return Mono.error(e);
+    DocumentUnit documentUnit =
+        repository
+            .findByUuid(documentUnitUuid)
+            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnitUuid));
+
+    XmlPublication mailResponse = publicationService.publish(documentUnit, recipientAddress);
+    if (mailResponse.getStatusCode().equals(String.valueOf(HttpStatus.OK.value()))) {
+      try {
+        documentUnitStatusService.setToPublishing(
+            documentUnit, mailResponse.getPublishDate(), issuerAddress);
+        return mailResponse;
+      } catch (DocumentationUnitNotExistsException e) {
+        // TODO handle exception
+        throw new RuntimeException(e);
+      }
+    } else {
+      return mailResponse;
     }
   }
 
-  public Mono<XmlResultObject> previewPublication(UUID documentUuid) {
-    try {
-      DocumentUnit documentUnit =
-          repository
-              .findByUuid(documentUuid)
-              .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUuid));
-      return publicationService.getPublicationPreview(documentUnit);
-    } catch (Exception e) {
-      return Mono.error(e);
-    }
+  public XmlResultObject previewPublication(UUID documentUuid)
+      throws DocumentationUnitNotExistsException {
+    DocumentUnit documentUnit =
+        repository
+            .findByUuid(documentUuid)
+            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUuid));
+    return publicationService.getPublicationPreview(documentUnit);
   }
 
-  public Flux<PublicationHistoryRecord> getPublicationHistory(UUID documentUuid) {
-    return Flux.concat(
+  public List<PublicationHistoryRecord> getPublicationHistory(UUID documentUuid) {
+    List<PublicationHistoryRecord> list =
+        ListUtils.union(
             publicationService.getPublications(documentUuid),
-            Flux.fromIterable(publicationReportRepository.getAllByDocumentUnitUuid(documentUuid)))
-        .sort(Comparator.comparing(PublicationHistoryRecord::getDate).reversed());
+            publicationReportRepository.getAllByDocumentUnitUuid(documentUuid));
+    list.sort(Comparator.comparing(PublicationHistoryRecord::getDate).reversed());
+    return list;
   }
 
   public Slice<RelatedDocumentationUnit> searchLinkableDocumentationUnits(
@@ -250,14 +250,14 @@ public class DocumentUnitService {
         relatedDocumentationUnit, documentationOffice, documentNumberToExclude, pageable);
   }
 
-  public Mono<String> validateSingleNorm(SingleNormValidationInfo singleNormValidationInfo) {
+  public String validateSingleNorm(SingleNormValidationInfo singleNormValidationInfo) {
     Set<ConstraintViolation<SingleNormValidationInfo>> violations =
         validator.validate(singleNormValidationInfo);
 
     if (violations.isEmpty()) {
-      return Mono.just("Ok");
+      return "Ok";
     }
-    return Mono.just("Validation error");
+    return "Validation error";
   }
 
   public void updateECLI(UUID uuid, Docx2Html docx2html) {

@@ -363,7 +363,7 @@ describe("EnsuingDecisions", () => {
     await user.click(
       screen.getByLabelText("Nachgehende Entscheidung speichern"),
     )
-    expect(screen.getByLabelText(/Fehlerhafte Eingabe/)).toBeInTheDocument()
+    expect(screen.getByText(/Fehlende Daten/)).toBeInTheDocument()
     await user.click(entryHeader)
     expect(screen.getAllByText(/Pflichtfeld nicht befüllt/).length).toBe(1)
   })

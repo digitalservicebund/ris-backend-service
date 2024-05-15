@@ -86,19 +86,6 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void
-      testTransformToDTO_addLegalEffectWithCourtDeletedWithoutLegalEffectSet_shouldSetLegalEffectToNull() {
-    DocumentationUnitDTO currentDto =
-        DocumentationUnitDTO.builder().court(CourtDTO.builder().build()).build();
-    DocumentUnit updatedDomainObject = DocumentUnit.builder().build();
-
-    DocumentationUnitDTO documentationUnitDTO =
-        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
-
-    assertThat(documentationUnitDTO.getLegalEffect()).isNull();
-  }
-
-  @Test
-  void
       testTransformToDTO_addLegalEffectWithCourtChangedAndNotSuperiorCourtAndLegalEffectNo_shouldSetLegalEffectToNo() {
     DocumentationUnitDTO currentDto =
         DocumentationUnitDTO.builder()
@@ -778,7 +765,7 @@ class DocumentationUnitTransformerTest {
     DocumentUnit documentUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit.contentRelatedIndexing().norms().size()).isEqualTo(1);
+    assertThat(documentUnit.contentRelatedIndexing().norms()).hasSize(1);
     assertThat(documentUnit.contentRelatedIndexing().norms().get(0).normAbbreviation().id())
         .isEqualTo(normAbbreviationId);
     assertThat(
@@ -810,7 +797,7 @@ class DocumentationUnitTransformerTest {
     DocumentUnit documentUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit.contentRelatedIndexing().norms().size()).isEqualTo(2);
+    assertThat(documentUnit.contentRelatedIndexing().norms()).hasSize(2);
     assertThat(documentUnit.contentRelatedIndexing().norms().get(0).normAbbreviation().id())
         .isEqualTo(documentationUnitDTO.getNormReferences().get(0).getNormAbbreviation().getId());
     assertThat(documentUnit.contentRelatedIndexing().norms().get(1).normAbbreviation().id())

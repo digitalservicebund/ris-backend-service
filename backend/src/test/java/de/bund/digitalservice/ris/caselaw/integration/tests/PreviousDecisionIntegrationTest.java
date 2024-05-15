@@ -51,6 +51,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
@@ -170,7 +171,7 @@ class PreviousDecisionIntegrationTest {
                         .rank(1)
                         .build()))
             .build();
-    parentDocumentUnitDTO = repository.save(parentDocumentUnitDTO);
+    repository.save(parentDocumentUnitDTO);
 
     risWebTestClient
         .withDefaultLogin()
@@ -220,7 +221,7 @@ class PreviousDecisionIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(response.getResponseBody().previousDecisions())
+              assertThat(Objects.requireNonNull(response.getResponseBody()).previousDecisions())
                   .extracting("fileNumber")
                   .containsExactly("test");
             });
@@ -242,7 +243,6 @@ class PreviousDecisionIntegrationTest {
             .documentationOffice(documentationOfficeDTO)
             .build();
     childDocumentUnitDTO = repository.save(childDocumentUnitDTO);
-    final UUID childDocumentationUnitUuid = childDocumentUnitDTO.getId();
 
     DocumentUnit documentUnit =
         DocumentUnit.builder()
@@ -511,31 +511,31 @@ class PreviousDecisionIntegrationTest {
 
   private LocalDate prepareDocumentUnitDTOs() {
     LocalDate date1 = LocalDate.parse("2023-01-02");
-    DocumentationUnitDTO documentUnit1 =
-        createDocumentUnit(
-            date1,
-            List.of("AkteX", "AkteY"),
-            "CD",
-            "DS",
-            Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
+
+    createDocumentUnit(
+        date1,
+        List.of("AkteX", "AkteY"),
+        "CD",
+        "DS",
+        Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
 
     LocalDate date2 = LocalDate.parse("2023-02-03");
-    DocumentationUnitDTO documentUnit2 =
-        createDocumentUnit(
-            date2,
-            null,
-            "EF",
-            "DS",
-            Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
+
+    createDocumentUnit(
+        date2,
+        null,
+        "EF",
+        "DS",
+        Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
 
     LocalDate date3 = LocalDate.parse("2023-03-04");
-    DocumentationUnitDTO documentUnit3 =
-        createDocumentUnit(
-            date3,
-            List.of("AkteX"),
-            "GH",
-            "DS",
-            Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
+
+    createDocumentUnit(
+        date3,
+        List.of("AkteX"),
+        "GH",
+        "DS",
+        Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
     return date1;
   }
 
