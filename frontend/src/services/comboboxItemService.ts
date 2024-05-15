@@ -5,8 +5,8 @@ import { Page } from "@/components/Pagination.vue"
 import { CitationType } from "@/domain/citationType"
 import { Court, Procedure, DocumentType } from "@/domain/documentUnit"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
+import { LegalForceType, LegalForceRegion } from "@/domain/legalForce"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
-import { LegalForceType, LegalForceRegion } from "@/domain/singleNorm"
 import errorMessages from "@/i18n/errors.json"
 
 enum Endpoint {

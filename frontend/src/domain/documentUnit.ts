@@ -7,6 +7,7 @@ import NormReference from "./normReference"
 import PreviousDecision from "./previousDecision"
 import SingleNorm from "./singleNorm"
 import Attachment from "@/domain/attachment"
+import LegalForce from "@/domain/legalForce"
 
 export type CoreData = {
   fileNumbers?: string[]
@@ -133,7 +134,13 @@ export default class DocumentUnit {
           new NormReference({
             ...norm,
             singleNorms: norm.singleNorms?.map(
-              (norm) => new SingleNorm({ ...norm }),
+              (norm) =>
+                new SingleNorm({
+                  ...norm,
+                  legalForce: norm.legalForce
+                    ? new LegalForce({ ...norm.legalForce })
+                    : undefined,
+                }),
             ),
           }),
       )

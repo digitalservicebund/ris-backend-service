@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/vue"
 import { describe } from "vitest"
 import { ComboboxItem } from "@/components/input/types"
 import NormReferences from "@/components/NormReferences.vue"
+import LegalForce from "@/domain/legalForce"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
@@ -309,10 +310,10 @@ describe("Norm references", () => {
               singleNorm: "§ 345",
               dateOfRelevance: "02-02-2022",
               dateOfVersion: "2022",
-              legalForce: {
+              legalForce: new LegalForce({
                 type: { abbreviation: "nichtig" },
                 region: { code: "BB", longText: "Brandenburg" },
-              },
+              }),
             }),
           ],
         }),
@@ -335,10 +336,10 @@ describe("Norm references", () => {
               singleNorm: "§ 345",
               dateOfRelevance: "02-02-2022",
               dateOfVersion: "2022",
-              legalForce: {
+              legalForce: new LegalForce({
                 type: undefined,
                 region: undefined,
-              },
+              }),
             }),
           ],
         }),
@@ -346,7 +347,7 @@ describe("Norm references", () => {
       renderComponent({ modelValue })
 
       expect(screen.getByLabelText("Listen Eintrag")).toHaveTextContent(
-        "1000g-BefV, § 345, 01.01.2022, 02-02-2022",
+        "1000g-BefV, § 345, 01.01.2022, 02-02-2022|Fehlende Daten",
       )
     })
   })

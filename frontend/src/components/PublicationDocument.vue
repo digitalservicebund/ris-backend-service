@@ -11,7 +11,6 @@ import DocumentUnit from "@/domain/documentUnit"
 import EnsuingDecision, {
   ensuingDecisionFieldLabels,
 } from "@/domain/ensuingDecision"
-import NormReference, { normFieldLabels } from "@/domain/normReference"
 import PreviousDecision, {
   previousDecisionFieldLabels,
 } from "@/domain/previousDecision"
@@ -125,24 +124,15 @@ function getMissingEnsuingDecisionFields(ensuingDecision: EnsuingDecision) {
 const missingNormsFields = ref(
   props.documentUnit.contentRelatedIndexing?.norms
     ?.filter((normReference) => {
-      return getMissingNormsFields(normReference).length > 0
+      return normReference.hasMissingFieldsInLegalForce
     })
     .map((normReference) => {
       return {
         identifier: normReference.renderDecision,
-        missingFields: getMissingNormsFields(normReference),
+        missingFields: ["Gesetzeskraft"],
       }
     }),
 )
-
-function getMissingNormsFields(normReference: NormReference) {
-  if (normReference.normAbbreviation === null) return []
-  else {
-    return normReference.missingRequiredFields.map(
-      (field) => normFieldLabels[field],
-    )
-  }
-}
 
 //Required Active Citation fields
 const missingActiveCitationFields = ref(

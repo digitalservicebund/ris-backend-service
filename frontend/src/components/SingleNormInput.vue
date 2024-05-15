@@ -9,6 +9,7 @@ import TextInput from "@/components/input/TextInput.vue"
 import YearInput from "@/components/input/YearInput.vue"
 import { useInjectCourtType } from "@/composables/useCourtType"
 import { useValidationStore } from "@/composables/useValidationStore"
+import LegalForce from "@/domain/legalForce"
 import SingleNorm, { SingleNormValidationInfo } from "@/domain/singleNorm"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
@@ -27,6 +28,8 @@ const emit = defineEmits<{
 }>()
 
 const validationStore = useValidationStore<(typeof SingleNorm.fields)[number]>()
+const legalForceValidationStore =
+  useValidationStore<(typeof LegalForce.fields)[number]>()
 const singleNormInput = ref<InstanceType<typeof TextInput> | null>(null)
 
 const courtTypeRef = useInjectCourtType()
@@ -43,7 +46,16 @@ const singleNorm = computed({
   },
 })
 
-const withLegalForce = ref(false)
+const hasLegalForce = computed({
+  get: () => !!props.modelValue.legalForce,
+  set: (newValue) => {
+    if (newValue && !props.modelValue.legalForce) {
+      singleNorm.value.legalForce = new LegalForce()
+    } else if (!newValue) {
+      singleNorm.value.legalForce = undefined
+    }
+  },
+})
 
 /**
  * Data restructuring from legal force type props to combobox item.
@@ -62,10 +74,10 @@ const legalForceType = computed({
     if (!newValue && singleNorm.value.legalForce?.type) {
       delete singleNorm.value.legalForce.type
     } else {
-      singleNorm.value.legalForce = {
+      singleNorm.value.legalForce = new LegalForce({
         ...props.modelValue.legalForce,
         type: newValue,
-      }
+      })
     }
   },
 })
@@ -85,10 +97,10 @@ const legalForceRegion = computed({
     if (!newValue && singleNorm.value.legalForce?.region) {
       delete singleNorm.value.legalForce.region
     } else {
-      singleNorm.value.legalForce = {
+      singleNorm.value.legalForce = new LegalForce({
         ...props.modelValue.legalForce,
         region: newValue,
-      }
+      })
     }
   },
 })
@@ -135,6 +147,15 @@ async function removeSingleNormEntry() {
   emit("removeEntry")
 }
 
+function validateLegalForce() {
+  legalForceValidationStore.reset()
+  if (singleNorm.value.legalForce?.missingRequiredFields?.length) {
+    singleNorm.value.legalForce?.missingRequiredFields.forEach((field) => {
+      legalForceValidationStore.add("Pflichtfeld nicht befüllt", field)
+    })
+  }
+}
+
 /**
  * Could be triggered by invalid date formats in the fields 'dateOfVersion' and 'dateOfRelevance'.
  * This forwards the validation error to the parent, so it knows, that this single norm entry has a validation error.
@@ -169,8 +190,9 @@ onMounted(async () => {
   if (props.modelValue.singleNorm) {
     await validateNorm()
   }
+  validateLegalForce()
 
-  withLegalForce.value = singleNorm.value?.hasLegalForce
+  hasLegalForce.value = !!singleNorm.value?.legalForce
   singleNormInput.value?.focusInput()
   featureToggle.value = (
     await FeatureToggleService.isEnabled("neuris.legal-force")
@@ -193,7 +215,7 @@ onMounted(async () => {
       >
         <CheckboxInput
           :id="id"
-          v-model="withLegalForce"
+          v-model="hasLegalForce"
           aria-label="Gesetzeskraft der Norm"
           data-testid="legal-force-checkbox"
           size="small"
@@ -282,28 +304,42 @@ onMounted(async () => {
       </button>
     </div>
     <div
-      v-if="featureToggle && withLegalForce && isCourtWithLegalForce"
+      v-if="featureToggle && hasLegalForce && isCourtWithLegalForce"
       class="grid grid-cols-3 gap-24"
     >
       <div>
-        <InputField id="legalForceType" label="Typ der Ges.-Kraft *">
+        <InputField
+          id="legalForceType"
+          v-slot="slotProps"
+          label="Typ der Ges.-Kraft *"
+          :validation-error="legalForceValidationStore.getByField('type')"
+        >
           <ComboboxInput
             id="legalForceType"
             v-model="legalForceType"
             aria-label="Gesetzeskraft Typ"
             data-testid="legal-force-type-combobox"
+            :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getLegalForceTypes"
+            @click="legalForceValidationStore.remove('type')"
           ></ComboboxInput>
         </InputField>
       </div>
       <div class="col-span-2">
-        <InputField id="legalForceRegion" label="Geltungsbereich *">
+        <InputField
+          id="legalForceRegion"
+          v-slot="slotProps"
+          label="Geltungsbereich *"
+          :validation-error="legalForceValidationStore.getByField('region')"
+        >
           <ComboboxInput
             id="legalForceRegion"
             v-model="legalForceRegion"
             aria-label="Gesetzeskraft Geltungsbereich"
             data-testid="legal-force-region-combobox"
+            :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getLegalForceRegions"
+            @click="legalForceValidationStore.remove('region')"
           ></ComboboxInput>
         </InputField>
       </div>

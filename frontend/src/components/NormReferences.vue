@@ -20,6 +20,7 @@ const emit = defineEmits<{
 }>()
 
 const ambiguousNormReferenceError = "Mehrdeutiger Verweis"
+const missingDataError = "Fehlende Daten"
 
 const norms = computed({
   get: () => {
@@ -54,18 +55,22 @@ function legalForceSummarizer(singleNorm: SingleNorm) {
     h("div", {}, "|"),
     h(IconBreakingNews, { class: ["mr-8 ml-8"] }),
     h("div", { class: ["link-01-reg mr-8"] }, singleNorm.renderLegalForce),
+    singleNorm.legalForce?.hasMissingRequiredFields
+      ? errorBadgeSummarizer(missingDataError)
+      : null,
   ])
 }
 
 /**
  * Returns a render function with an error icon badge
+ @param errorLabel error message to be displayed in the badge.
  */
-function errorBadgeSummarizer() {
+function errorBadgeSummarizer(errorLabel: string) {
   return h(IconBadge, {
     backgroundColor: "bg-red-300",
     color: "text-red-900",
     icon: IconError,
-    label: ambiguousNormReferenceError,
+    label: errorLabel,
   })
 }
 
@@ -86,10 +91,12 @@ function decisionSummarizer(normEntry: NormReference) {
             ", " +
             normEntry.singleNorms[0].renderDecision,
         ),
-        normEntry.singleNorms[0].hasLegalForce
+        normEntry.singleNorms[0].legalForce
           ? legalForceSummarizer(normEntry.singleNorms[0])
           : null,
-        normEntry.hasAmbiguousNormReference ? errorBadgeSummarizer() : null,
+        normEntry.hasAmbiguousNormReference
+          ? errorBadgeSummarizer(ambiguousNormReferenceError)
+          : null,
       ]),
     ])
   } else {
@@ -97,7 +104,9 @@ function decisionSummarizer(normEntry: NormReference) {
       h("div", { class: ["flex flex-row items-center"] }, [
         h(IconBook, { class: ["mr-8"] }),
         h("div", { class: ["link-01-reg mr-8"] }, normEntry.renderDecision),
-        normEntry.hasAmbiguousNormReference ? errorBadgeSummarizer() : null,
+        normEntry.hasAmbiguousNormReference
+          ? errorBadgeSummarizer(ambiguousNormReferenceError)
+          : null,
       ]),
       hasSingleNorms(normEntry)
         ? h(
@@ -114,7 +123,7 @@ function decisionSummarizer(normEntry: NormReference) {
                         ", " +
                         singleNorm.renderDecision,
                     ),
-                    singleNorm.hasLegalForce
+                    singleNorm.legalForce
                       ? legalForceSummarizer(singleNorm)
                       : null,
                   ])

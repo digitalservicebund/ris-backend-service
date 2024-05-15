@@ -368,5 +368,77 @@ test.describe("norm", () => {
       await page.getByText("Speichern").click()
       await expect(page.locator("text=Vereinbar (Berlin (Ost))")).toBeHidden()
     })
+
+    test("legal force field validation", async ({ page, documentNumber }) => {
+      await navigateToCategories(page, documentNumber)
+      const normContainer = page.getByLabel("Norm")
+
+      await page.locator("[aria-label='Gericht']").fill("VerfG")
+      await page.locator("text=VerfG Dessau").last().click()
+
+      await fillNormInputs(page, {
+        normAbbreviation: "PBefG",
+        singleNorms: [{ singleNorm: "§ 123" } as SingleNorm],
+      })
+
+      const checkbox = normContainer.getByTestId("legal-force-checkbox")
+      await expect(checkbox).toBeVisible()
+
+      const legalForceTypeCombobox = normContainer.getByTestId(
+        "legal-force-type-combobox",
+      )
+      const legalForceRegionCombobox = normContainer.getByTestId(
+        "legal-force-region-combobox",
+      )
+
+      await checkbox.click()
+
+      await expect(legalForceTypeCombobox).toBeVisible()
+      await expect(legalForceRegionCombobox).toBeVisible()
+
+      // add empty legal force
+      const saveNormButton = normContainer.getByLabel("Norm speichern")
+      await saveNormButton.click()
+
+      await page.getByText("Speichern").click()
+      await expect(page.locator("text=Fehlende Daten")).toBeVisible()
+
+      // enter edit mode
+      const listEntries = normContainer.getByLabel("Listen Eintrag")
+      await expect(listEntries).toHaveCount(2)
+      await listEntries.first().click()
+
+      // check that both fields display error message
+      await expect(page.locator("text=Pflichtfeld nicht befüllt")).toHaveCount(
+        2,
+      )
+      await expect(
+        page.locator("text=Pflichtfeld nicht befüllt").first(),
+      ).toBeVisible()
+      await expect(
+        page.locator("text=Pflichtfeld nicht befüllt").last(),
+      ).toBeVisible()
+
+      await page.locator(`[aria-label='Gesetzeskraft Typ']`).fill("Vereinbar")
+      await page.getByText("Vereinbar").click()
+
+      // check that only one field displays error message
+      await expect(page.locator("text=Pflichtfeld nicht befüllt")).toBeVisible()
+
+      await page
+        .locator(`[aria-label='Gesetzeskraft Geltungsbereich']`)
+        .fill("Berlin")
+      await page.getByText("Berlin (Ost)").click()
+
+      await expect(page.locator("text=Pflichtfeld nicht befüllt")).toHaveCount(
+        0,
+      )
+      await expect(page.locator("text=Pflichtfeld nicht befüllt.")).toBeHidden()
+
+      await saveNormButton.click()
+
+      await page.getByText("Speichern").click()
+      await expect(page.locator("text=Vereinbar (Berlin (Ost))")).toBeVisible()
+    })
   })
 })

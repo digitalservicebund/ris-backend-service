@@ -3,6 +3,9 @@ import { render, fireEvent, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import PublicationDocument from "@/components/PublicationDocument.vue"
 import DocumentUnit from "@/domain/documentUnit"
+import LegalForce from "@/domain/legalForce"
+import NormReference from "@/domain/normReference"
+import SingleNorm from "@/domain/singleNorm"
 import publishService from "@/services/publishService"
 
 const router = createRouter({
@@ -123,6 +126,19 @@ describe("PublicationDocument:", () => {
         props: {
           documentUnit: new DocumentUnit("123", {
             documentNumber: "foo",
+            contentRelatedIndexing: {
+              norms: [
+                new NormReference({
+                  normAbbreviationRawValue: "ABC",
+                  singleNorms: [
+                    new SingleNorm({
+                      singleNorm: "§ 1",
+                      legalForce: new LegalForce(),
+                    }),
+                  ],
+                }),
+              ],
+            },
           }),
           preview: undefined,
         },
@@ -141,6 +157,9 @@ describe("PublicationDocument:", () => {
       expect(screen.getByText("Entscheidungsdatum")).toBeInTheDocument()
       expect(screen.getByText("Rechtskraft")).toBeInTheDocument()
       expect(screen.getByText("Dokumenttyp")).toBeInTheDocument()
+      expect(screen.getByText("Normen")).toBeInTheDocument()
+      expect(screen.getByText("ABC")).toBeInTheDocument()
+      expect(screen.getByText("Gesetzeskraft")).toBeInTheDocument()
 
       expect(
         screen.queryByText("XML Vorschau der Veröffentlichung"),
