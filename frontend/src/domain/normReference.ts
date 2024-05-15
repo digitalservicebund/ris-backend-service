@@ -58,9 +58,9 @@ export default class NormReference implements EditableListItem {
   private hasMissingFieldsInLegalForce() {
     if (this.singleNorms) {
       return (
-        this.singleNorms.filter(
-          (singleNorm) => singleNorm.legalForce?.missingRequiredFields,
-        ).length > 0
+        this.singleNorms.filter((singleNorm) => {
+          return singleNorm.legalForce?.hasMissingRequiredFields
+        }).length > 0
       )
     }
     return false
