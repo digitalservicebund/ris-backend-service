@@ -212,7 +212,7 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.12.0")
     implementation("org.jsoup:jsoup:1.17.2")
 
-    var flywayCore = "org.flywaydb:flyway-core:10.12.0"
+    var flywayCore = "org.flywaydb:flyway-core:10.13.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
     runtimeOnly("org.flywaydb:flyway-database-postgresql:10.12.0")
