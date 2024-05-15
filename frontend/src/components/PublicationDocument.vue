@@ -124,7 +124,7 @@ function getMissingEnsuingDecisionFields(ensuingDecision: EnsuingDecision) {
 const missingNormsFields = ref(
   props.documentUnit.contentRelatedIndexing?.norms
     ?.filter((normReference) => {
-      return normReference.hasMissingRequiredFields
+      return normReference.hasMissingFieldsInLegalForce
     })
     .map((normReference) => {
       return {

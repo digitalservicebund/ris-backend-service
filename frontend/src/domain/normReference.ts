@@ -34,10 +34,6 @@ export default class NormReference implements EditableListItem {
     return [...result].join(", ")
   }
 
-  get hasMissingRequiredFields(): boolean {
-    return this.hasMissingFieldsInLegalForce()
-  }
-
   get isEmpty(): boolean {
     let isEmpty = true
 
@@ -49,13 +45,7 @@ export default class NormReference implements EditableListItem {
     return isEmpty
   }
 
-  private fieldIsEmpty(
-    value: NormReference[(typeof NormReference.fields)[number]],
-  ) {
-    return value === undefined || !value || Object.keys(value).length === 0
-  }
-
-  private hasMissingFieldsInLegalForce() {
+  get hasMissingFieldsInLegalForce() {
     if (this.singleNorms) {
       return (
         this.singleNorms.filter((singleNorm) => {
@@ -64,5 +54,11 @@ export default class NormReference implements EditableListItem {
       )
     }
     return false
+  }
+
+  private fieldIsEmpty(
+    value: NormReference[(typeof NormReference.fields)[number]],
+  ) {
+    return value === undefined || !value || Object.keys(value).length === 0
   }
 }
