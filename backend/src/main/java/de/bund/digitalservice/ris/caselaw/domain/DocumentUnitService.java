@@ -61,19 +61,12 @@ public class DocumentUnitService {
     this.featureService = featureService;
   }
 
-  public DocumentUnit generateNewDocumentUnit(DocumentationOffice documentationOffice) {
+  public DocumentUnit generateNewDocumentUnit(DocumentationOffice documentationOffice)
+      throws DocumentationUnitNotExistsException, DocumentationUnitException {
+
     var documentNumber = generateDocumentNumber(documentationOffice);
     var documentUnit = repository.createNewDocumentUnit(documentNumber, documentationOffice);
-
-    try {
-      documentUnitStatusService.setInitialStatus(documentUnit);
-    } catch (DocumentationUnitNotExistsException e) {
-      // TODO handle exception
-      throw new RuntimeException(e);
-    }
-    // TODO retryWhen(Retry.backoff(5, Duration.ofSeconds(2)).jitter(0.75))
-    // TODO .doOnError(ex -> log.error("Couldn't create empty doc unit", ex));
-    return documentUnit;
+    return documentUnitStatusService.setInitialStatus(documentUnit);
   }
 
   private String generateDocumentNumber(DocumentationOffice documentationOffice) {
@@ -143,60 +136,50 @@ public class DocumentUnitService {
     return repository.findByUuid(documentUnitUuid).orElseThrow();
   }
 
-  public String deleteByUuid(UUID documentUnitUuid) {
-    try {
+  public String deleteByUuid(UUID documentUnitUuid) throws DocumentationUnitNotExistsException {
 
-      Map<RelatedDocumentationType, Long> relatedEntities =
-          repository.getAllDocumentationUnitWhichLink(documentUnitUuid);
+    Map<RelatedDocumentationType, Long> relatedEntities =
+        repository.getAllDocumentationUnitWhichLink(documentUnitUuid);
 
-      if (!(relatedEntities == null
-          || relatedEntities.isEmpty()
-          || relatedEntities.values().stream().mapToLong(Long::longValue).sum() == 0)) {
+    if (!(relatedEntities == null
+        || relatedEntities.isEmpty()
+        || relatedEntities.values().stream().mapToLong(Long::longValue).sum() == 0)) {
 
-        log.debug(
-            "Could not delete document unit {} cause of related entities: {}",
-            documentUnitUuid,
-            relatedEntities);
+      log.debug(
+          "Could not delete document unit {} cause of related entities: {}",
+          documentUnitUuid,
+          relatedEntities);
 
-        throw new DocumentUnitDeletionException(
-            "Die Dokumentationseinheit konnte nicht gelöscht werden, da", relatedEntities);
-      }
-
-      DocumentUnit documentUnit =
-          repository
-              .findByUuid(documentUnitUuid)
-              .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnitUuid));
-
-      log.debug("Deleting DocumentUnitDTO " + documentUnitUuid);
-
-      if (documentUnit.attachments() != null && !documentUnit.attachments().isEmpty())
-        attachmentService.deleteAllObjectsFromBucketForDocumentationUnit(documentUnitUuid);
-
-      saveForRecycling(documentUnit);
-      repository.delete(documentUnit);
-      return "Dokumentationseinheit gelöscht: " + documentUnitUuid;
-    } catch (Exception e) {
-      // TODO
-      return null;
+      throw new DocumentUnitDeletionException(
+          "Die Dokumentationseinheit konnte nicht gelöscht werden, da", relatedEntities);
     }
+
+    DocumentUnit documentUnit =
+        repository
+            .findByUuid(documentUnitUuid)
+            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnitUuid));
+
+    log.debug("Deleting DocumentUnitDTO " + documentUnitUuid);
+
+    if (documentUnit.attachments() != null && !documentUnit.attachments().isEmpty())
+      attachmentService.deleteAllObjectsFromBucketForDocumentationUnit(documentUnitUuid);
+
+    saveForRecycling(documentUnit);
+    repository.delete(documentUnit);
+    return "Dokumentationseinheit gelöscht: " + documentUnitUuid;
   }
 
-  public DocumentUnit updateDocumentUnit(DocumentUnit documentUnit) {
+  public DocumentUnit updateDocumentUnit(DocumentUnit documentUnit)
+      throws DocumentationUnitNotExistsException {
     repository.saveKeywords(documentUnit);
     repository.saveFieldsOfLaw(documentUnit);
     repository.saveProcedures(documentUnit);
 
     repository.save(documentUnit, featureService.isEnabled("neuris.legal-force"));
 
-    try {
-      return repository
-          .findByUuid(documentUnit.uuid())
-          .orElseThrow(
-              () -> new DocumentationUnitNotExistsException(documentUnit.documentNumber()));
-    } catch (DocumentationUnitNotExistsException e) {
-      // TODO
-      return null;
-    }
+    return repository
+        .findByUuid(documentUnit.uuid())
+        .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnit.documentNumber()));
   }
 
   public Publication publishAsEmail(UUID documentUnitUuid, String issuerAddress)
@@ -209,14 +192,9 @@ public class DocumentUnitService {
 
     XmlPublication mailResponse = publicationService.publish(documentUnit, recipientAddress);
     if (mailResponse.getStatusCode().equals(String.valueOf(HttpStatus.OK.value()))) {
-      try {
-        documentUnitStatusService.setToPublishing(
-            documentUnit, mailResponse.getPublishDate(), issuerAddress);
-        return mailResponse;
-      } catch (DocumentationUnitNotExistsException e) {
-        // TODO handle exception
-        throw new RuntimeException(e);
-      }
+      documentUnitStatusService.setToPublishing(
+          documentUnit, mailResponse.getPublishDate(), issuerAddress);
+      return mailResponse;
     } else {
       return mailResponse;
     }

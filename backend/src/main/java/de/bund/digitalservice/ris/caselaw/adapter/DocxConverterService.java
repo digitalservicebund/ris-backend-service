@@ -56,9 +56,6 @@ import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
-import software.amazon.awssdk.services.s3.model.S3Object;
 
 @Service
 @Slf4j
@@ -100,27 +97,14 @@ public class DocxConverterService implements ConverterService {
         sb.append(nodeList.item(i).getTextContent());
       }
       originalText = sb.toString();
-    } catch (ParserConfigurationException
-        | IOException
+    } catch (IOException
         | SAXException
-        | XPathExpressionException e) {
+        | XPathExpressionException
+        | ParserConfigurationException e) {
       throw new DocxConverterException("Couldn't read all text elements of docx xml!", e);
     }
 
     return originalText;
-  }
-
-  public List<String> getDocxFiles() {
-    ListObjectsV2Request request = ListObjectsV2Request.builder().bucket(bucketName).build();
-
-    CompletableFuture<ListObjectsV2Response> futureResponse = client.listObjectsV2(request);
-
-    try {
-      return futureResponse.get().contents().stream().map(S3Object::key).toList();
-    } catch (InterruptedException | ExecutionException e) {
-      // TODO: handle exception
-      throw new RuntimeException(e);
-    }
   }
 
   /**
@@ -141,32 +125,28 @@ public class DocxConverterService implements ConverterService {
     CompletableFuture<ResponseBytes<GetObjectResponse>> futureResponse =
         client.getObject(request, AsyncResponseTransformer.toBytes());
 
+    List<DocumentUnitDocx> documentUnitDocxList;
     try {
-      List<DocumentUnitDocx> documentUnitDocxList =
-          parseAsDocumentUnitDocxList(futureResponse.get().asInputStream());
-      List<DocumentUnitDocx> packedList = DocumentUnitDocxListUtils.packList(documentUnitDocxList);
-
-      List<String> ecliList =
-          packedList.stream()
-              .filter(ECLIElement.class::isInstance)
-              .map(ECLIElement.class::cast)
-              .map(ECLIElement::getText)
-              .toList();
-
-      String content = null;
-      if (!packedList.isEmpty()) {
-        content =
-            packedList.stream().map(DocumentUnitDocx::toHtmlString).collect(Collectors.joining());
-      }
-
-      return new Docx2Html(content, ecliList);
-    } catch (InterruptedException e) {
-      // TODO log.error("Couldn't convert docx", ex));
-      throw new RuntimeException(e);
-    } catch (ExecutionException e) {
-      // TODO log.error("Couldn't convert docx", ex));
-      throw new RuntimeException(e);
+      documentUnitDocxList = parseAsDocumentUnitDocxList(futureResponse.get().asInputStream());
+    } catch (InterruptedException | ExecutionException e) {
+      log.error("Couldn't load the docx file", e);
+      return null;
     }
+    List<DocumentUnitDocx> packedList = DocumentUnitDocxListUtils.packList(documentUnitDocxList);
+    List<String> ecliList =
+        packedList.stream()
+            .filter(ECLIElement.class::isInstance)
+            .map(ECLIElement.class::cast)
+            .map(ECLIElement::getText)
+            .toList();
+
+    String content = null;
+    if (!packedList.isEmpty()) {
+      content =
+          packedList.stream().map(DocumentUnitDocx::toHtmlString).collect(Collectors.joining());
+    }
+
+    return new Docx2Html(content, ecliList);
   }
 
   /**

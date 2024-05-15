@@ -177,9 +177,11 @@ class XmlEMailPublishServiceTest {
     when(xmlExporter.generateXml(any(DocumentUnit.class)))
         .thenThrow(ParserConfigurationException.class);
 
-    // TODO ex.getMessage().equals("Couldn't generate xml."))
-    Assertions.assertThrows(
-        DocumentUnitPublishException.class, () -> service.publish(documentUnit, RECEIVER_ADDRESS));
+    DocumentUnitPublishException ex =
+        Assertions.assertThrows(
+            DocumentUnitPublishException.class,
+            () -> service.publish(documentUnit, RECEIVER_ADDRESS));
+    Assertions.assertEquals("Couldn't generate xml.", ex.getMessage());
 
     verify(repository, times(0)).save(any(XmlPublication.class));
     verify(mailSender, times(0))

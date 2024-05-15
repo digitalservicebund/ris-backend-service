@@ -90,7 +90,7 @@ class DocumentUnitControllerTest {
   }
 
   @Test
-  void testGenerateNewDocumentUnit() {
+  void testGenerateNewDocumentUnit() throws DocumentationUnitNotExistsException {
     // userService.getDocumentationOffice is mocked in @BeforeEach
     when(service.generateNewDocumentUnit(docOffice)).thenReturn(DocumentUnit.builder().build());
 
@@ -140,7 +140,7 @@ class DocumentUnitControllerTest {
   }
 
   @Test
-  void testDeleteByUuid() {
+  void testDeleteByUuid() throws DocumentationUnitNotExistsException {
     when(service.deleteByUuid(TEST_UUID)).thenReturn(null);
 
     risWebClient
@@ -168,7 +168,7 @@ class DocumentUnitControllerTest {
   }
 
   @Test
-  void testUpdateByUuid() {
+  void testUpdateByUuid() throws DocumentationUnitNotExistsException {
     DocumentationUnitDTO documentUnitDTO =
         DocumentationUnitDTO.builder()
             .id(TEST_UUID)

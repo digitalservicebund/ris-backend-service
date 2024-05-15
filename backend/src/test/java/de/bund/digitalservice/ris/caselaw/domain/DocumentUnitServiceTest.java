@@ -70,8 +70,7 @@ class DocumentUnitServiceTest {
     // The chicken-egg-problem is, that we are dictating what happens when
     // repository.save(), so we can't just use a captor at the same time
 
-    service.generateNewDocumentUnit(documentationOffice);
-    // TODO.expectNextCount(1) // That it's a DocumentUnit is given by the generic extension..
+    Assertions.assertNotNull(service.generateNewDocumentUnit(documentationOffice));
 
     verify(documentNumberService).generateDocumentNumber(documentationOffice.abbreviation(), 5);
     verify(repository).createNewDocumentUnit("nextDocumentNumber", documentationOffice);
@@ -88,7 +87,7 @@ class DocumentUnitServiceTest {
   }
 
   @Test
-  void testDeleteByUuid_withoutFileAttached() {
+  void testDeleteByUuid_withoutFileAttached() throws DocumentationUnitNotExistsException {
     // I think I shouldn't have to insert a specific DocumentUnit object here?
     // But if I don't, the test by itself succeeds, but fails if all tests in this class run
     // something flaky with the repository mock? Investigate this later
@@ -104,7 +103,7 @@ class DocumentUnitServiceTest {
   }
 
   @Test
-  void testDeleteByUuid_withFileAttached() {
+  void testDeleteByUuid_withFileAttached() throws DocumentationUnitNotExistsException {
     DocumentUnit documentUnit =
         DocumentUnit.builder()
             .uuid(TEST_UUID)
@@ -128,8 +127,7 @@ class DocumentUnitServiceTest {
         .thenReturn(Optional.ofNullable(DocumentUnit.builder().build()));
     doThrow(new IllegalArgumentException()).when(repository).delete(DocumentUnit.builder().build());
 
-    // TODO .expectError()
-    service.deleteByUuid(TEST_UUID);
+    Assertions.assertThrows(IllegalArgumentException.class, () -> service.deleteByUuid(TEST_UUID));
 
     verify(repository).findByUuid(TEST_UUID);
   }
@@ -140,13 +138,18 @@ class DocumentUnitServiceTest {
         .thenReturn(Optional.ofNullable(DocumentUnit.builder().build()));
     when(repository.getAllDocumentationUnitWhichLink(TEST_UUID))
         .thenReturn(Map.of(ACTIVE_CITATION, 2L));
-    // TODO throwable.getMessage().contains("Die Dokumentationseinheit konnte nicht gelöscht werden,
-    // da (2: Aktivzitierung,)"))
-    Assertions.assertNull(service.deleteByUuid(TEST_UUID));
+    DocumentUnitDeletionException throwable =
+        Assertions.assertThrows(
+            DocumentUnitDeletionException.class, () -> service.deleteByUuid(TEST_UUID));
+    Assertions.assertTrue(
+        throwable
+            .getMessage()
+            .contains(
+                "Die Dokumentationseinheit konnte nicht gelöscht werden, da (2: Aktivzitierung,)"));
   }
 
   @Test
-  void testUpdateDocumentUnit() {
+  void testUpdateDocumentUnit() throws DocumentationUnitNotExistsException {
     DocumentUnit documentUnit =
         DocumentUnit.builder()
             .uuid(UUID.randomUUID())

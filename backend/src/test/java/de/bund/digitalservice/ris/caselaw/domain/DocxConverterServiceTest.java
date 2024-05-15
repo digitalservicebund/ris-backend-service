@@ -83,9 +83,6 @@ import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
-import software.amazon.awssdk.services.s3.model.S3Object;
 
 @ExtendWith(SpringExtension.class)
 @Import({DocxConverterService.class, ConverterConfig.class})
@@ -120,10 +117,9 @@ class DocxConverterServiceTest {
   }
 
   @Test
-  void testGetOriginalText_withNoMlPackage() {
+  void testGetOriginalText_withNoMlPackage() throws ParserConfigurationException {
     mlPackage = null;
     var result = service.getOriginalText(mlPackage);
-
     assertEquals("<no word file selected>", result);
   }
 
@@ -142,22 +138,6 @@ class DocxConverterServiceTest {
             })
         .isInstanceOf(DocxConverterException.class)
         .hasMessageContaining("Couldn't read all text elements of docx xml!");
-  }
-
-  @Test
-  void testGetDocxFiles() {
-    ListObjectsV2Response response =
-        ListObjectsV2Response.builder()
-            .contents(S3Object.builder().key("test.docx").build())
-            .build();
-    when(client.listObjectsV2(any(ListObjectsV2Request.class)))
-        .thenReturn(CompletableFuture.completedFuture(response));
-
-    List<String> stringList = service.getDocxFiles();
-
-    assertNotNull(stringList);
-    assertEquals(1, stringList.size());
-    assertEquals("test.docx", stringList.get(0));
   }
 
   @Test
@@ -191,10 +171,7 @@ class DocxConverterServiceTest {
 
   @Test
   void testGetHtml_WithNoFilename() {
-    String fileName = null;
-
-    // Verify that the Mono completes without emitting any onNext signals
-    service.getConvertedObject(fileName);
+    Assertions.assertNull(service.getConvertedObject(null));
   }
 
   @Test

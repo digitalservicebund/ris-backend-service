@@ -74,8 +74,7 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
                 .withError(state == EmailPublishState.ERROR)
                 .build());
       } catch (DocumentationUnitNotExistsException e) {
-        // TODO: Handle this exception
-        throw new RuntimeException(e);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
       }
     }
     return ResponseEntity.status(HttpStatus.OK).build();

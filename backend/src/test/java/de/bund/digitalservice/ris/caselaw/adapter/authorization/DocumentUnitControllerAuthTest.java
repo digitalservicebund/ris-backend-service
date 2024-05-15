@@ -150,7 +150,7 @@ class DocumentUnitControllerAuthTest {
   }
 
   @Test
-  void testDeleteByUuid() {
+  void testDeleteByUuid() throws DocumentationUnitNotExistsException {
     when(service.deleteByUuid(TEST_UUID)).thenReturn(null);
     mockDocumentUnit(docOffice1, null, null);
 
@@ -168,7 +168,7 @@ class DocumentUnitControllerAuthTest {
   }
 
   @Test
-  void testUpdateByUuid() {
+  void testUpdateByUuid() throws DocumentationUnitNotExistsException {
     DocumentUnit docUnit = mockDocumentUnit(docOffice2, null, null);
     when(service.updateDocumentUnit(docUnit)).thenReturn(null);
     when(service.getByUuid(TEST_UUID)).thenReturn(docUnit);

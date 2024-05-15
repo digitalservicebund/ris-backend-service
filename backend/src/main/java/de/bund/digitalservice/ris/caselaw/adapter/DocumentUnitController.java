@@ -72,9 +72,16 @@ public class DocumentUnitController {
 
     return userService
         .getDocumentationOffice(oidcUser)
-        .flatMap(docOffice -> Mono.just(service.generateNewDocumentUnit(docOffice)))
+        .flatMap(
+            docOffice -> {
+              try {
+                return Mono.just(service.generateNewDocumentUnit(docOffice));
+              } catch (DocumentationUnitNotExistsException | DocumentationUnitException e) {
+                log.error("error in generate new documentation unit", e);
+                return Mono.error(e);
+              }
+            })
         .map(documentUnit -> ResponseEntity.status(HttpStatus.CREATED).body(documentUnit))
-        .doOnError(ex -> log.error("error in generate new documentation unit", ex))
         .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
   }
 
@@ -171,10 +178,12 @@ public class DocumentUnitController {
   @DeleteMapping(value = "/{uuid}")
   @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
   public Mono<ResponseEntity<String>> deleteByUuid(@PathVariable UUID uuid) {
-
-    return Mono.justOrEmpty(service.deleteByUuid(uuid))
-        .map(str -> ResponseEntity.status(HttpStatus.OK).body(str))
-        .onErrorResume(ex -> Mono.just(ResponseEntity.internalServerError().body(ex.getMessage())));
+    try {
+      return Mono.justOrEmpty(service.deleteByUuid(uuid))
+          .map(str -> ResponseEntity.status(HttpStatus.OK).body(str));
+    } catch (DocumentationUnitNotExistsException e) {
+      return Mono.just(ResponseEntity.internalServerError().body(e.getMessage()));
+    }
   }
 
   @PutMapping(value = "/{uuid}", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -188,9 +197,12 @@ public class DocumentUnitController {
       return Mono.just(ResponseEntity.unprocessableEntity().body(DocumentUnit.builder().build()));
     }
 
-    return Mono.justOrEmpty(service.updateDocumentUnit(documentUnit))
-        .map(du -> ResponseEntity.status(HttpStatus.OK).body(du))
-        .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
+    try {
+      return Mono.justOrEmpty(service.updateDocumentUnit(documentUnit))
+          .map(du -> ResponseEntity.status(HttpStatus.OK).body(du));
+    } catch (DocumentationUnitNotExistsException e) {
+      return Mono.just(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
+    }
   }
 
   @PutMapping(value = "/{uuid}/publish", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -203,8 +215,7 @@ public class DocumentUnitController {
           .map(ResponseEntity::ok)
           .doOnError(ex -> ResponseEntity.internalServerError().build());
     } catch (DocumentationUnitNotExistsException e) {
-      // TODO
-      throw new RuntimeException(e);
+      return Mono.just(ResponseEntity.internalServerError().build());
     }
   }
 
@@ -222,7 +233,7 @@ public class DocumentUnitController {
     try {
       return Mono.just(service.previewPublication(uuid));
     } catch (DocumentationUnitNotExistsException e) {
-      throw new RuntimeException(e);
+      return Mono.empty();
     }
   }
 
