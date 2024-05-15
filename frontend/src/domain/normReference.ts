@@ -35,13 +35,7 @@ export default class NormReference implements EditableListItem {
   }
 
   get hasMissingRequiredFields(): boolean {
-    return this.missingRequiredFields.length > 0
-  }
-
-  get missingRequiredFields() {
-    return NormReference.requiredFields.filter((field) =>
-      this.fieldIsEmpty(this[field]),
-    )
+    return this.hasMissingFieldsInLegalForce()
   }
 
   get isEmpty(): boolean {
@@ -58,19 +52,17 @@ export default class NormReference implements EditableListItem {
   private fieldIsEmpty(
     value: NormReference[(typeof NormReference.fields)[number]],
   ) {
-    if (
-      value === undefined ||
-      !value ||
-      value === null ||
-      Object.keys(value).length === 0
-    ) {
-      return true
-    }
+    return value === undefined || !value || Object.keys(value).length === 0
+  }
 
+  private hasMissingFieldsInLegalForce() {
+    if (this.singleNorms) {
+      return (
+        this.singleNorms.filter(
+          (singleNorm) => singleNorm.legalForce?.missingRequiredFields,
+        ).length > 0
+      )
+    }
     return false
   }
-}
-
-export const normFieldLabels: { [name: string]: string } = {
-  normAbbreviation: "RIS-Abkürzung",
 }
