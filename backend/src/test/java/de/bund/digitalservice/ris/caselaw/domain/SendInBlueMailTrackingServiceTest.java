@@ -99,8 +99,7 @@ class SendInBlueMailTrackingServiceTest {
         // unknown event
         "randomEvent"
       })
-  void testUpdatePublishingState_noReactionOnOtherState(String event)
-      throws DocumentationUnitNotExistsException {
+  void testUpdatePublishingState_noReactionOnOtherState(String event) {
     ResponseEntity<String> responseEntity =
         service.updatePublishingState(TEST_UUID.toString(), event);
 
@@ -110,8 +109,7 @@ class SendInBlueMailTrackingServiceTest {
   }
 
   @Test
-  void testUpdatePublishingState_noReactionOnPublishedDocs()
-      throws DocumentationUnitNotExistsException {
+  void testUpdatePublishingState_noReactionOnPublishedDocs() {
     when(documentUnitStatusService.getLatestStatus(TEST_UUID))
         .thenReturn(PublicationStatus.PUBLISHED);
 

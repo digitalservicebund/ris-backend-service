@@ -113,8 +113,7 @@ class DatabaseDocumentUnitStatusServiceTest {
 
   @Test
   void
-      testUpdate_withDocumentNumberAndDocumentationUnitFoundWithoutExistingStatus_shouldNotSaveAStatus()
-          throws DocumentationUnitNotExistsException {
+      testUpdate_withDocumentNumberAndDocumentationUnitFoundWithoutExistingStatus_shouldNotSaveAStatus() {
     String documentNumber = "document number";
     Status status = Status.builder().build();
     DocumentUnit documentationUnit = DocumentUnit.builder().uuid(TEST_UUID).build();

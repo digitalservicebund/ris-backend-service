@@ -106,7 +106,7 @@ class DocxConverterServiceTest {
   @Captor ArgumentCaptor<Map<String, DocxImagePart>> imageMapCaptor;
 
   @Test
-  void testGetOriginalText() throws ParserConfigurationException {
+  void testGetOriginalText() {
     MainDocumentPart mockedMainDocumentPart = mock(MainDocumentPart.class);
     when(mlPackage.getMainDocumentPart()).thenReturn(mockedMainDocumentPart);
     when(mlPackage.getMainDocumentPart().getXML())
@@ -117,7 +117,7 @@ class DocxConverterServiceTest {
   }
 
   @Test
-  void testGetOriginalText_withNoMlPackage() throws ParserConfigurationException {
+  void testGetOriginalText_withNoMlPackage() {
     mlPackage = null;
     var result = service.getOriginalText(mlPackage);
     assertEquals("<no word file selected>", result);

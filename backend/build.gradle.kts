@@ -208,14 +208,14 @@ dependencies {
     // => CVE-2023-2976
     implementation("com.google.guava:guava:33.2.0-jre")
 
+    implementation("io.getunleash:unleash-client-java:9.2.0")
+    implementation("org.apache.commons:commons-text:1.12.0")
+    implementation("org.jsoup:jsoup:1.17.2")
+
     var flywayCore = "org.flywaydb:flyway-core:10.12.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
     runtimeOnly("org.flywaydb:flyway-database-postgresql:10.12.0")
-
-    implementation("io.getunleash:unleash-client-java:9.2.0")
-    implementation("org.apache.commons:commons-text:1.12.0")
-    implementation("org.jsoup:jsoup:1.17.2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
