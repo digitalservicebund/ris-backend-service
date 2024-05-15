@@ -46,6 +46,15 @@ const singleNorm = computed({
   },
 })
 
+/**
+ * Computed property to get or set the presence of a legal force on the model.
+ *
+ * @constant {ComputedRef<boolean>} hasLegalForce
+ * @property {boolean} get - Returns `true` if `modelValue.legalForce` is defined, otherwise `false`.
+ * @property {Function} set - Updates `modelValue.legalForce`.
+ *                            If set to `true` and `modelValue.legalForce` is undefined, a new `LegalForce`
+ *                            instance is created. If set to `false`, `modelValue.legalForce` is set to undefined.
+ */
 const hasLegalForce = computed({
   get: () => !!props.modelValue.legalForce,
   set: (newValue) => {

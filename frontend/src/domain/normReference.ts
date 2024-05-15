@@ -45,6 +45,11 @@ export default class NormReference implements EditableListItem {
     return isEmpty
   }
 
+  /**
+   * Checks if there are any single norms with missing required fields in their legal force.
+   *
+   * @returns `true` if any single norm has missing required fields in its legal force; otherwise, `false`.
+   */
   get hasMissingFieldsInLegalForce() {
     if (this.singleNorms) {
       return (
