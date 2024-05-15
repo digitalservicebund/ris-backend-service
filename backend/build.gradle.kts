@@ -10,15 +10,15 @@ plugins {
     java
     jacoco
     id("org.springframework.boot") version "3.2.5"
-    id("io.spring.dependency-management") version "1.1.4"
+    id("io.spring.dependency-management") version "1.1.5"
     id("com.diffplug.spotless") version "6.25.0"
     id("org.sonarqube") version "5.0.0.4638"
     id("com.github.jk1.dependency-license-report") version "2.7"
-    id("com.gorylenko.gradle-git-properties") version "2.4.1"
+    id("com.gorylenko.gradle-git-properties") version "2.4.2"
     id("com.adarshr.test-logger") version "4.0.0"
     id("com.github.ben-manes.versions") version "0.51.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "10.12.0"
+    id("org.flywaydb.flyway") version "10.13.0"
 }
 
 group = "de.bund.digitalservice"
@@ -135,7 +135,7 @@ sonar {
 }
 
 dependencies {
-    val testContainersVersion = "1.19.7"
+    val testContainersVersion = "1.19.8"
 
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -146,7 +146,7 @@ dependencies {
     implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.2.3")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.2.4")
 
     // CVE-2024-22262
     implementation("org.springframework:spring-web:6.1.6")
@@ -160,7 +160,7 @@ dependencies {
     // CVE-2022-3171
     implementation("com.google.protobuf:protobuf-java:4.26.1")
     // CVE-2023-52428 in spring-boot-starter-oauth2-client:3.2.3
-    implementation("com.nimbusds:nimbus-jose-jwt:9.38")
+    implementation("com.nimbusds:nimbus-jose-jwt:9.39.1")
     // CVE-2023-31582
     implementation("org.bitbucket.b_c:jose4j:0.9.6")
 
@@ -169,11 +169,8 @@ dependencies {
     implementation("com.sendinblue:sib-api-v3-sdk:7.0.0")
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.1")
-    // CVE-2024-29025
-    implementation("io.netty:netty-codec-http:4.1.109.Final")
-    implementation("io.netty:netty-codec-http2:4.1.109.Final")
 
-    implementation(platform("software.amazon.awssdk:bom:2.25.38"))
+    implementation(platform("software.amazon.awssdk:bom:2.25.52"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -195,10 +192,10 @@ dependencies {
     // for local development:
     // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.4.jar"))
 
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.17.0")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.17.1")
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.12.5")
-    implementation("io.micrometer:micrometer-core:1.12.5")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.13.0")
+    implementation("io.micrometer:micrometer-core:1.13.0")
 
     implementation(platform("io.sentry:sentry-bom:7.9.0"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
@@ -208,22 +205,22 @@ dependencies {
     // => CVE-2023-2976
     implementation("com.google.guava:guava:33.2.0-jre")
 
-    implementation("io.getunleash:unleash-client-java:9.2.0")
+    implementation("io.getunleash:unleash-client-java:9.2.2")
     implementation("org.apache.commons:commons-text:1.12.0")
     implementation("org.jsoup:jsoup:1.17.2")
 
-    var flywayCore = "org.flywaydb:flyway-core:10.12.0"
+    var flywayCore = "org.flywaydb:flyway-core:10.13.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.12.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.13.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
     }
-    testImplementation("org.mockito:mockito-junit-jupiter:5.11.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.12.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("io.projectreactor:reactor-test:3.6.5")
+    testImplementation("io.projectreactor:reactor-test:3.6.6")
     testImplementation("org.springframework.security:spring-security-test:6.2.4")
     testImplementation("org.springframework.security:spring-security-test:6.2.4")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.3.0")
