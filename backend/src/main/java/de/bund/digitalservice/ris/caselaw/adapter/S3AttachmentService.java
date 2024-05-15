@@ -141,8 +141,10 @@ public class S3AttachmentService implements AttachmentService {
 
     try {
       return s3AsyncClient.putObject(putObjectRequest, asyncRequestBody).get();
-    } catch (InterruptedException | ExecutionException e) {
+    } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
+      throw new AttachmentException("Could not save object to bucket: " + fileUuid);
+    } catch (ExecutionException e) {
       throw new AttachmentException("Could not save object to bucket: " + fileUuid);
     }
   }

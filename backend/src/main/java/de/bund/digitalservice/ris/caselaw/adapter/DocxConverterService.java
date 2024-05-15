@@ -128,7 +128,11 @@ public class DocxConverterService implements ConverterService {
     List<DocumentUnitDocx> documentUnitDocxList;
     try {
       documentUnitDocxList = parseAsDocumentUnitDocxList(futureResponse.get().asInputStream());
-    } catch (InterruptedException | ExecutionException e) {
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      log.error("Couldn't load the docx file", e);
+      return null;
+    } catch (ExecutionException e) {
       log.error("Couldn't load the docx file", e);
       return null;
     }
