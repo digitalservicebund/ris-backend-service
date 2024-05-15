@@ -5,7 +5,6 @@ import com.github.jk1.license.render.CsvReportRenderer
 import com.github.jk1.license.render.ReportRenderer
 import io.franzbecker.gradle.lombok.task.DelombokTask
 import org.flywaydb.gradle.task.FlywayMigrateTask
-import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 
 plugins {
     java
@@ -186,7 +185,7 @@ dependencies {
     implementation("com.icegreen:greenmail:2.1.0-alpha-4")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.41") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.42") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
