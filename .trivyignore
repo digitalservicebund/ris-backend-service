@@ -1,2 +1,7 @@
 # Analysis upload failed probably because of malformed result entry. Severity is unknown and empty artifact location.
 CVE-2024-24788
+# CVEs in nginx base image of frontend (see frontend/Dockerfile.prod)
+CVE-2024-33599
+CVE-2024-33600
+CVE-2024-33601
+CVE-2024-33602
