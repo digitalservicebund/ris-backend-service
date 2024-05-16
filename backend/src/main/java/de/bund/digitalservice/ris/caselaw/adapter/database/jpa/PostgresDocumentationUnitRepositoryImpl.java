@@ -464,7 +464,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
 
     allResults.addAll(fileNumberResults.getContent());
     allResults.addAll(deviatingFileNumberResults.getContent());
-    log.info("printing" + allResults.stream().toList());
 
     // We can provide entries for a next page if ...
     // A) we already have collected more results than fit on the current page, or
