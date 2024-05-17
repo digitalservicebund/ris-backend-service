@@ -3,6 +3,7 @@ import dayjs from "dayjs"
 import FlexContainer from "@/components/FlexContainer.vue"
 import PreviewContentRelatedIndexing from "@/components/preview/PreviewContentRelatedIndexing.vue"
 import PreviewCoreData from "@/components/preview/PreviewCoreData.vue"
+import PreviewNote from "@/components/preview/PreviewNote.vue"
 import PreviewProceedingDecisions from "@/components/preview/PreviewProceedingDecisions.vue"
 import PreviewTexts from "@/components/preview/PreviewTexts.vue"
 import DocumentUnit from "@/domain/documentUnit"
@@ -22,7 +23,7 @@ defineProps<{
       {{ dayjs(new Date()).format("HH:mm:ss") }}
     </p>
     <PreviewCoreData :core-data="documentUnit.coreData" />
-    <!-- this is where note goes? -->
+    <PreviewNote :note="documentUnit.note" />
     <PreviewProceedingDecisions
       :ensuing-decisions="documentUnit.ensuingDecisions"
       :previous-decisions="documentUnit.previousDecisions"
