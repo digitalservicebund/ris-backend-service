@@ -80,14 +80,10 @@ const legalForceType = computed({
         }
       : undefined,
   set: (newValue) => {
-    if (!newValue && singleNorm.value.legalForce?.type) {
-      delete singleNorm.value.legalForce.type
-    } else {
-      singleNorm.value.legalForce = new LegalForce({
-        ...props.modelValue.legalForce,
-        type: newValue,
-      })
-    }
+    singleNorm.value.legalForce = new LegalForce({
+      ...props.modelValue.legalForce,
+      type: newValue,
+    })
   },
 })
 
@@ -103,14 +99,10 @@ const legalForceRegion = computed({
         }
       : undefined,
   set: (newValue) => {
-    if (!newValue && singleNorm.value.legalForce?.region) {
-      delete singleNorm.value.legalForce.region
-    } else {
-      singleNorm.value.legalForce = new LegalForce({
-        ...props.modelValue.legalForce,
-        region: newValue,
-      })
-    }
+    singleNorm.value.legalForce = new LegalForce({
+      ...props.modelValue.legalForce,
+      region: newValue,
+    })
   },
 })
 
