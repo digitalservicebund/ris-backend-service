@@ -70,7 +70,15 @@ const hasActiveCitations = computed(() => {
         <div v-for="(norm, index) in contentRelatedIndexing.norms" :key="index">
           <div v-if="norm.singleNorms && norm.singleNorms.length > 0">
             <div v-for="(singleNorm, i) in norm.singleNorms" :key="i">
-              {{ norm.renderDecision }} - {{ singleNorm.renderDecision }}
+              {{ norm.renderDecision }}
+              {{
+                singleNorm.renderDecision.length > 0
+                  ? " - " + singleNorm.renderDecision
+                  : ""
+              }}
+              {{
+                singleNorm.legalForce ? " | " + singleNorm.renderLegalForce : ""
+              }}
             </div>
           </div>
           <div v-else>
