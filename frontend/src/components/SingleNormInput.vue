@@ -19,6 +19,7 @@ import IconClear from "~icons/material-symbols/close-small"
 const props = defineProps<{
   modelValue: SingleNorm
   normAbbreviation: string
+  index: number
 }>()
 
 const emit = defineEmits<{
@@ -208,7 +209,7 @@ onMounted(async () => {
       class="flex flex-row justify-between gap-24"
     >
       <InputField
-        id="legalForce"
+        :id="'legalForce' + index"
         v-slot="{ id }"
         label="Mit Gesetzeskraft"
         label-class="ds-label-01-reg"

@@ -222,6 +222,7 @@ onBeforeUnmount(() => {
         :key="index"
         v-model="singleNorms[index] as SingleNorm"
         aria-label="Einzelnorm"
+        :index="index"
         norm-abbreviation="normAbbreviation.abbreviation"
         @remove-entry="removeSingleNormEntry(index)"
         @update:validation-error="
