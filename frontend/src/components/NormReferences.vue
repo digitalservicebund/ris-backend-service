@@ -67,6 +67,7 @@ function legalForceSummarizer(singleNorm: SingleNorm) {
  */
 function errorBadgeSummarizer(errorLabel: string) {
   return h(IconBadge, {
+    class: "mr-8",
     backgroundColor: "bg-red-300",
     color: "text-red-900",
     icon: IconError,
