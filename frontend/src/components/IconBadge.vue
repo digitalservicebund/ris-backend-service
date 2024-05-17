@@ -20,7 +20,7 @@ export interface IconBadgeProps {
 
 <template>
   <div
-    class="ds-label-02-reg flex w-[fit-content] items-center rounded-full py-2 pe-8 ps-4"
+    class="ds-label-02-reg flex w-[fit-content] rounded-full py-2 pe-8 ps-4"
     :class="backgroundColor"
   >
     <component :is="icon" :class="color" />
