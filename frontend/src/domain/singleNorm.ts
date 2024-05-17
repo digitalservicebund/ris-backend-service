@@ -65,12 +65,6 @@ export default class SingleNorm {
   }
 }
 
-export const normFieldLabels: { [name: string]: string } = {
-  singleNorm: "Einzelnorm",
-  dateOfVersion: "Fassungsdatum",
-  dateOfRelevance: "Jahr",
-}
-
 export type SingleNormValidationInfo = {
   singleNorm: string
   normAbbreviation?: string

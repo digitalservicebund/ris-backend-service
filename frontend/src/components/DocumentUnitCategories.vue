@@ -37,6 +37,26 @@ const { pushQueryToRoute } = useQuery<"showAttachmentPanel">()
 const lastUpdatedDocumentUnit = ref()
 const selectedAttachmentIndex: Ref<number> = ref(0)
 
+const courtTypesWithLegalForce = [
+  "BVerfG",
+  "VerfGH",
+  "VerfG",
+  "StGH",
+  "VGH",
+  "OVG",
+]
+
+/**
+ * Determines whether legal forces should be deleted based on the court type and presence of a selected court.
+ * @returns boolean
+ */
+const shouldDeleteLegalForces = computed(() => {
+  return (
+    !courtTypesWithLegalForce.includes(courtTypeRef.value) ||
+    !updatedDocumentUnit.value.coreData.court
+  )
+})
+
 const handleUpdateValueDocumentUnitTexts = async (
   updatedValue: [keyof Texts, string],
 ) => {
@@ -56,12 +76,37 @@ function hasDataChange(): boolean {
   return newValue !== oldValue
 }
 
+/**
+ * Deletes the legal forces from all single norms in the norms of the updated document unit.
+ */
+function deleteLegalForces() {
+  const norms = updatedDocumentUnit.value.contentRelatedIndexing.norms
+  if (norms) {
+    norms.forEach((norm) => {
+      const singleNorms = norm.singleNorms
+
+      if (singleNorms) {
+        singleNorms.forEach((singleNorm) => {
+          if (singleNorm.legalForce) {
+            singleNorm.legalForce = undefined
+          }
+        })
+      }
+    })
+  }
+}
+
 async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
   if (!hasDataChange())
     return {
       status: 304,
       data: undefined,
     } as ServiceResponse<void>
+
+  // When the user changes the court to one that doesn't allow "Gesetzeskraft" all existing legal forces are deleted
+  if (shouldDeleteLegalForces.value) {
+    deleteLegalForces()
+  }
 
   lastUpdatedDocumentUnit.value = JSON.parse(
     JSON.stringify(updatedDocumentUnit.value),

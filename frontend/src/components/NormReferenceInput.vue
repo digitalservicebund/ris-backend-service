@@ -92,12 +92,12 @@ async function addNormReference() {
     const normRef = new NormReference({
       ...norm.value,
       singleNorms: singleNorms.value
-        .map((norm) =>
-          !norm.isEmpty
+        .map((singleNorm) =>
+          !singleNorm.isEmpty
             ? new SingleNorm({
-                ...norm,
-                legalForce: norm.legalForce
-                  ? new LegalForce({ ...norm.legalForce })
+                ...singleNorm,
+                legalForce: singleNorm.legalForce
+                  ? new LegalForce({ ...singleNorm.legalForce })
                   : undefined,
               })
             : null,

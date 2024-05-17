@@ -1,4 +1,4 @@
-import { expect } from "@playwright/test"
+import { expect, Locator, Page } from "@playwright/test"
 import SingleNorm from "@/domain/singleNorm"
 import {
   clearInput,
@@ -297,6 +297,57 @@ test.describe("norm", () => {
       await expect(normContainer.getByText("Mit Gesetzeskraft")).toBeVisible()
     })
 
+    async function addNewLegalForce(page: Page, saveNormButton: Locator) {
+      await fillInput(page, "Gesetzeskraft Typ", "Nichtig")
+      await page.getByText("Nichtig").click()
+
+      await fillInput(page, "Gesetzeskraft Geltungsbereich", "Brandenburg")
+      await page.getByText("Brandenburg").click()
+
+      await saveNormButton.click()
+
+      await page.getByText("Speichern").click()
+      await expect(page.locator("text=Nichtig (Brandenburg)")).toBeVisible()
+    }
+
+    test("legal forces should be deleted when court was changed to court without 'Gesetzeskraft'", async ({
+      page,
+      documentNumber,
+    }) => {
+      await navigateToCategories(page, documentNumber)
+
+      await page.locator("[aria-label='Gericht']").fill("VerfG")
+      await page.locator("text=VerfG Dessau-Roßlau").click()
+      await expect(page.locator("[aria-label='Gericht']")).toHaveValue(
+        "VerfG Dessau-Roßlau",
+      )
+
+      await fillNormInputs(page, {
+        normAbbreviation: "PBefG",
+        singleNorms: [{ singleNorm: "§ 123" } as SingleNorm],
+      })
+
+      const normContainer = page.getByLabel("Norm")
+      const checkbox = normContainer.getByTestId("legal-force-checkbox")
+      await expect(checkbox).toBeVisible()
+      await expect(normContainer.getByText("Mit Gesetzeskraft")).toBeVisible()
+
+      await checkbox.click()
+
+      // add new legal force
+      const saveNormButton = normContainer.getByLabel("Norm speichern")
+      await addNewLegalForce(page, saveNormButton)
+
+      // change court to court without "Gesetzeskraft"
+      await page.locator("[aria-label='Gericht']").fill("BGH")
+      await page.locator("text=BGH").click()
+      await expect(page.locator("[aria-label='Gericht']")).toHaveValue("BGH")
+      await page.getByText("Speichern").click()
+
+      // Gesetzeskraft should be gone
+      await expect(page.locator("text=Nichtig (Brandenburg)")).toBeHidden()
+    })
+
     test("add new legal force, edit and remove it", async ({
       page,
       documentNumber,
@@ -330,17 +381,8 @@ test.describe("norm", () => {
       await expect(legalForceRegionCombobox).toBeVisible()
 
       // add new legal force
-      await fillInput(page, "Gesetzeskraft Typ", "Nichtig")
-      await page.getByText("Nichtig").click()
-
-      await fillInput(page, "Gesetzeskraft Geltungsbereich", "Brandenburg")
-      await page.getByText("Brandenburg").click()
-
       const saveNormButton = normContainer.getByLabel("Norm speichern")
-      await saveNormButton.click()
-
-      await page.getByText("Speichern").click()
-      await expect(page.locator("text=Nichtig (Brandenburg)")).toBeVisible()
+      await addNewLegalForce(page, saveNormButton)
 
       // edit legal force
       const listEntries = normContainer.getByLabel("Listen Eintrag")

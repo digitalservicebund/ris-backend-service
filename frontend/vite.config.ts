@@ -15,6 +15,9 @@ export default defineConfig({
   server: {
     port: 3000, // Required for vite to be accessible when running as part of docker compose setup
   },
+  preview: {
+    port: 3000,
+  },
   plugins: [
     vue(),
     Pages({

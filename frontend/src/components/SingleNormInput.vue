@@ -34,7 +34,14 @@ const legalForceValidationStore =
 const singleNormInput = ref<InstanceType<typeof TextInput> | null>(null)
 
 const courtTypeRef = useInjectCourtType()
-const courtsWithLegalForce = ["BVerfG", "VerfGH", "VerfG", "StGH", "VGH", "OVG"]
+const courtTypesWithLegalForce = [
+  "BVerfG",
+  "VerfGH",
+  "VerfG",
+  "StGH",
+  "VGH",
+  "OVG",
+]
 
 const featureToggle = ref()
 
@@ -108,7 +115,7 @@ const legalForceRegion = computed({
 })
 
 const isCourtWithLegalForce = computed(() => {
-  return courtsWithLegalForce.includes(courtTypeRef.value)
+  return courtTypesWithLegalForce.includes(courtTypeRef.value)
 })
 
 /**

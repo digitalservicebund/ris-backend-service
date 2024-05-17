@@ -61,6 +61,16 @@ export default class NormReference implements EditableListItem {
     return false
   }
 
+  /**
+   * Returns a boolean value, if a given normEntry has single norms and respectively renders the norms' summary in one
+   * compact line or in a sublist, below the norm abbreviation.
+   */
+  get hasSingleNorms() {
+    if (this.singleNorms) {
+      return this.singleNorms?.length > 0 && !this.singleNorms[0].isEmpty
+    } else return false
+  }
+
   private fieldIsEmpty(
     value: NormReference[(typeof NormReference.fields)[number]],
   ) {

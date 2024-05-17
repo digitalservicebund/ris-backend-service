@@ -31,19 +31,6 @@ const norms = computed({
   },
 })
 
-/**
- * Returns a booleand value, if a given normEntry has single norms and resepctively renders the norms' summary in one
- * compact line or in a sublist, below the norm abbreviation.
- * @param normEntry The norm entry to check for single norms
- */
-function hasSingleNorms(normEntry: NormReference) {
-  if (normEntry.singleNorms)
-    return (
-      normEntry.singleNorms?.length > 0 && !normEntry.singleNorms[0].isEmpty
-    )
-  else return false
-}
-
 const defaultValue = new NormReference()
 
 /**
@@ -107,7 +94,7 @@ function decisionSummarizer(normEntry: NormReference) {
           ? errorBadgeSummarizer(ambiguousNormReferenceError)
           : null,
       ]),
-      hasSingleNorms(normEntry)
+      normEntry.hasSingleNorms
         ? h(
             "div",
             { class: ["flex flex-col gap-32"] },
