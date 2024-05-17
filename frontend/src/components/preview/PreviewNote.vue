@@ -10,7 +10,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <PreviewRow v-if="!StringsUtil.isEmpty(props.note)">
+  <PreviewRow v-if="!StringsUtil.isEmpty(props.note)" data-testid="note">
     <PreviewCategory>Notiz</PreviewCategory>
     <PreviewContent>
       {{ props.note }}
