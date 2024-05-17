@@ -19,4 +19,5 @@ public record DocumentUnit(
     Texts texts,
     List<String> borderNumbers,
     Status status,
+    String note,
     ContentRelatedIndexing contentRelatedIndexing) {}

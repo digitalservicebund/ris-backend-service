@@ -194,6 +194,7 @@ class JurisXmlExporterWrapperIntegrationTest {
             .previousDecisions(previousDecisions)
             .ensuingDecisions(new ArrayList<>())
             .texts(texts)
+            .note("note")
             .borderNumbers(Collections.emptyList())
             .contentRelatedIndexing(indexing)
             .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
