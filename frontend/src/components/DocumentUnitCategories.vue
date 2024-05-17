@@ -86,9 +86,15 @@ function deleteLegalForces() {
       const singleNorms = norm.singleNorms
 
       if (singleNorms) {
-        singleNorms.forEach((singleNorm) => {
+        singleNorms.forEach((singleNorm, index) => {
           if (singleNorm.legalForce) {
             singleNorm.legalForce = undefined
+          }
+          if (singleNorm.isEmpty) {
+            norm.singleNorms = [
+              ...singleNorms.slice(0, index),
+              ...singleNorms.slice(index + 1),
+            ]
           }
         })
       }
