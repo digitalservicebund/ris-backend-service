@@ -2,7 +2,7 @@
 
 [![Pipeline](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/pipeline.yml/badge.svg)](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/pipeline.yml)
 [![Scan](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/scan.yml/badge.svg)](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/scan.yml)
-[![Secrets Check](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/secrets-check.yml/badge.svg)](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/secrets-check.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=digitalservicebund_ris-backend-service&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=digitalservicebund_ris-backend-service)
 
 ## Prerequisites
 
@@ -115,7 +115,8 @@ Now you can generate a new `.env` file containig the secrets:
 
 ### Local Migration
 
-The caselaw application requires the initialization of lookup tables by the migration application. Follow the steps in [run_migration_locally.md](run_migration_locally.md)
+The caselaw application requires the initialization of lookup tables by the migration application.
+Follow the steps in [run_migration_locally.md](run_migration_locally.md)
 
 ## Development
 
