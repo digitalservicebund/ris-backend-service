@@ -91,6 +91,7 @@ export default class DocumentUnit {
   public ensuingDecisions?: EnsuingDecision[]
   public contentRelatedIndexing: ContentRelatedIndexing = {}
   public borderNumbers: string[] = []
+  public note: string = ""
 
   static readonly requiredFields = [
     "fileNumbers",

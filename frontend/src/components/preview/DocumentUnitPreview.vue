@@ -22,6 +22,7 @@ defineProps<{
       {{ dayjs(new Date()).format("HH:mm:ss") }}
     </p>
     <PreviewCoreData :core-data="documentUnit.coreData" />
+    <!-- this is where note goes? -->
     <PreviewProceedingDecisions
       :ensuing-decisions="documentUnit.ensuingDecisions"
       :previous-decisions="documentUnit.previousDecisions"

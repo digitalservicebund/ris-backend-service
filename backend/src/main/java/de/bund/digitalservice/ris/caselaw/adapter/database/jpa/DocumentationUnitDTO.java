@@ -247,6 +247,8 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @OrderBy("rank")
   private List<LeadingDecisionNormReferenceDTO> leadingDecisionNormReferences = new ArrayList<>();
 
+  @Column private String note;
+
   // This will be used to send legal periodical references to the exporter and frontend
   //  @OneToMany(
   //      mappedBy = "documentationUnit",
