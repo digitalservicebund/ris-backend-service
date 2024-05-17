@@ -203,7 +203,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="mb-24 flex flex-col gap-24 border-b-1 border-b-blue-300 pb-24">
+  <div class="mb-24 flex flex-col gap-24 pb-24">
     <div
       v-if="featureToggle && isCourtWithLegalForce"
       class="flex flex-row justify-between gap-24"
