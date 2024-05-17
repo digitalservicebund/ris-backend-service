@@ -87,9 +87,7 @@ function decisionSummarizer(normEntry: NormReference) {
         h(
           "div",
           { class: ["link-01-reg mr-8"] },
-          normEntry.renderDecision +
-            ", " +
-            normEntry.singleNorms[0].renderDecision,
+          normEntry.renderDecision + renderSingleNorm(normEntry.singleNorms[0]),
         ),
         normEntry.singleNorms[0].legalForce
           ? legalForceSummarizer(normEntry.singleNorms[0])
@@ -119,9 +117,7 @@ function decisionSummarizer(normEntry: NormReference) {
                     h(
                       "div",
                       { class: ["link-01-reg mr-8"] },
-                      normEntry.renderDecision +
-                        ", " +
-                        singleNorm.renderDecision,
+                      normEntry.renderDecision + renderSingleNorm(singleNorm),
                     ),
                     singleNorm.legalForce
                       ? legalForceSummarizer(singleNorm)
@@ -133,6 +129,12 @@ function decisionSummarizer(normEntry: NormReference) {
         : null,
     ])
   }
+}
+
+function renderSingleNorm(singleNorm: SingleNorm): string {
+  return singleNorm.renderDecision.length > 0
+    ? ", " + singleNorm.renderDecision
+    : "" + singleNorm.renderDecision
 }
 
 const NormsSummary = withSummarizer(decisionSummarizer)
