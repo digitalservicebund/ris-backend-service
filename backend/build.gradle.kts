@@ -149,7 +149,7 @@ dependencies {
     implementation("org.springframework.security:spring-security-oauth2-resource-server:6.2.4")
 
     // CVE-2024-22262
-    implementation("org.springframework:spring-web:6.1.6")
+    implementation("org.springframework:spring-web:6.1.7")
 
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.5.0")
 
@@ -170,7 +170,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.1")
 
-    implementation(platform("software.amazon.awssdk:bom:2.25.52"))
+    implementation(platform("software.amazon.awssdk:bom:2.25.54"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
