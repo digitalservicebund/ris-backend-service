@@ -116,13 +116,14 @@ function decisionSummarizer(normEntry: NormReference) {
               return !singleNorm.isEmpty
                 ? h("div", { class: ["flex flex-row items-center"] }, [
                     h(IconArrowRight, { class: ["mr-8"] }),
-                    h(
-                      "div",
-                      { class: ["link-01-reg mr-8"] },
-                      normEntry.renderDecision +
-                        ", " +
-                        singleNorm.renderDecision,
-                    ),
+                    h("div", { class: ["link-01-reg mr-8"] }, [
+                      h("span", normEntry.renderDecision),
+                      h(
+                        "span",
+                        singleNorm.renderDecision.length > 0 ? ", " : "",
+                      ),
+                      h("span", singleNorm.renderDecision),
+                    ]),
                     singleNorm.legalForce
                       ? legalForceSummarizer(singleNorm)
                       : null,
