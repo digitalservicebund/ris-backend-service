@@ -2,11 +2,19 @@
 import { computed } from "vue"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import { Procedure } from "@/domain/documentUnit"
+import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { ResponseError } from "@/services/httpClient"
 
 const props = defineProps<{
   procedure: Procedure
   responseError?: ResponseError
+}>()
+
+const emit = defineEmits<{
+  deleteDocumentUnit: [
+    documentUnitListEntry: DocumentUnitListEntry,
+    procedure: Procedure,
+  ]
 }>()
 
 /**
@@ -18,13 +26,14 @@ const isLoading = computed(
 </script>
 
 <template>
-  <div v-if="procedure.documentUnits" class="pb-12 pl-24 pr-48 pt-36">
+  <div v-if="procedure.documentUnitCount > 0" class="pb-12 pl-24 pr-48 pt-36">
     <DocumentUnitList
       class="grow"
       :document-unit-list-entries="procedure.documentUnits"
-      :is-deletable="false"
+      is-deletable
       :is-loading="isLoading"
       :search-response-error="responseError"
+      @delete-document-unit="emit('deleteDocumentUnit', $event, procedure)"
     >
     </DocumentUnitList>
   </div>

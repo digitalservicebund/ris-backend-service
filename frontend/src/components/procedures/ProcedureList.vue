@@ -8,6 +8,8 @@ import TextInput from "@/components/input/TextInput.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { Procedure } from "@/domain/documentUnit"
+import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import documentationUnitService from "@/services/documentUnitService"
 import service from "@/services/procedureService"
 import IconBaselineDescription from "~icons/ic/baseline-description"
 import IconExpandLess from "~icons/ic/baseline-expand-less"
@@ -76,6 +78,28 @@ async function handleIsExpanded(
   } else {
     currentlyExpanded.value = currentlyExpanded.value.filter(
       (item) => item !== index,
+    )
+  }
+}
+
+async function handleDeleteDocumentationUnit(
+  deletedDocumentationUnit: DocumentUnitListEntry,
+  updatedProcedure: Procedure,
+) {
+  const { error } = await documentationUnitService.delete(
+    deletedDocumentationUnit.uuid!,
+  )
+  if (!error) {
+    const owningProcedure =
+      currentPage.value!.content[
+        currentPage.value!.content.indexOf(updatedProcedure)
+      ]
+
+    owningProcedure.documentUnitCount -= 1
+
+    owningProcedure.documentUnits = updatedProcedure.documentUnits?.filter(
+      (documentationUnit) =>
+        documentationUnit.uuid != deletedDocumentationUnit.uuid,
     )
   }
 }
@@ -199,6 +223,7 @@ onMounted(() => {
           <ProcedureDetail
             :procedure="procedure"
             :response-error="responseError"
+            @delete-document-unit="handleDeleteDocumentationUnit"
           />
         </ExpandableContent>
       </Pagination>

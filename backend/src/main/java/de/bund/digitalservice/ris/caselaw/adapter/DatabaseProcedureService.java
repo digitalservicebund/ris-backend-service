@@ -68,6 +68,11 @@ public class DatabaseProcedureService implements ProcedureService {
                         })
                     .distinct()
                     .map(DocumentationUnitListItemTransformer::transformToDomain)
+                    .map(
+                        documentationUnitListItem ->
+                            documentationUnitListItem.toBuilder()
+                                .isEditableByCurrentUser(true)
+                                .build())
                     .toList())
         .orElse(null);
   }
