@@ -146,7 +146,7 @@ dependencies {
     implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.2.4")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.3.0")
 
     // CVE-2024-22262
     implementation("org.springframework:spring-web:6.1.7")
