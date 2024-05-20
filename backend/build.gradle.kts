@@ -221,8 +221,8 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.6.6")
-    testImplementation("org.springframework.security:spring-security-test:6.2.4")
-    testImplementation("org.springframework.security:spring-security-test:6.2.4")
+    testImplementation("org.springframework.security:spring-security-test:6.3.0")
+    testImplementation("org.springframework.security:spring-security-test:6.3.0")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.3.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
