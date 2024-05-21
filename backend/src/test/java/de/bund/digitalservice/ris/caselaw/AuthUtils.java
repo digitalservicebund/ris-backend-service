@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Objects;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.OidcLoginMutator;
-import reactor.core.publisher.Mono;
 
 public class AuthUtils {
 
@@ -37,7 +36,7 @@ public class AuthUtils {
       String docOffice1Group,
       DocumentationOffice docOffice2,
       String docOffice2Group) {
-    doReturn(Mono.just(docOffice1))
+    doReturn(docOffice1)
         .when(userService)
         .getDocumentationOffice(
             argThat(
@@ -45,7 +44,7 @@ public class AuthUtils {
                   List<String> groups = user.getAttribute("groups");
                   return Objects.requireNonNull(groups).get(0).equals(docOffice1Group);
                 }));
-    doReturn(Mono.just(docOffice2))
+    doReturn(docOffice2)
         .when(userService)
         .getDocumentationOffice(
             argThat(

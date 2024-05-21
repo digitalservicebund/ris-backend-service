@@ -14,21 +14,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@WebFluxTest(controllers = MailTrackingController.class)
+@WebMvcTest(controllers = MailTrackingController.class)
 @Import({SecurityConfig.class, TestConfig.class, DocumentNumberPatternConfig.class})
 class MailTrackingControllerTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @MockBean private MailTrackingService service;
-  @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private ClientRegistrationRepository clientRegistrationRepository;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
 

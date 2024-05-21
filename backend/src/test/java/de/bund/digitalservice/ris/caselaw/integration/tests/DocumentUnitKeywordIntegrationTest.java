@@ -41,13 +41,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
-import reactor.core.publisher.Mono;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @RISIntegrationTest(
@@ -91,7 +90,7 @@ class DocumentUnitKeywordIntegrationTest {
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DocumentUnitService documentUnitService;
   @MockBean private UserService userService;
-  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
@@ -105,7 +104,7 @@ class DocumentUnitKeywordIntegrationTest {
     DocumentationOfficeDTO docOfficeDTO = documentationOfficeRepository.findByAbbreviation("DS");
 
     when(userService.getDocumentationOffice(any()))
-        .thenReturn(Mono.just(DocumentationOfficeTransformer.transformToDomain(docOfficeDTO)));
+        .thenReturn(DocumentationOfficeTransformer.transformToDomain(docOfficeDTO));
   }
 
   @Test

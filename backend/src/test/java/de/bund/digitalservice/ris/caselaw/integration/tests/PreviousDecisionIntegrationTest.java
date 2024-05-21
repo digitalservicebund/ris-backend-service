@@ -59,7 +59,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -67,7 +67,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
-import reactor.core.publisher.Mono;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @RISIntegrationTest(
@@ -111,7 +110,7 @@ class PreviousDecisionIntegrationTest {
   @Autowired private DatabasePublicationReportRepository databasePublishReportRepository;
 
   @MockBean UserService userService;
-  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean DocxConverterService docxConverterService;
@@ -128,7 +127,7 @@ class PreviousDecisionIntegrationTest {
   void setUp() {
     documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
-    doReturn(Mono.just(docOffice)).when(userService).getDocumentationOffice(any(OidcUser.class));
+    doReturn(docOffice).when(userService).getDocumentationOffice(any(OidcUser.class));
 
     category =
         databaseDocumentCategoryRepository.saveAndFlush(

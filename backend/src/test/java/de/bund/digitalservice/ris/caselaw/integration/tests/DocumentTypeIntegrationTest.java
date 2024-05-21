@@ -21,7 +21,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
@@ -61,7 +61,7 @@ class DocumentTypeIntegrationTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentTypeRepository repository;
   @MockBean private UserService userService;
-  @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private DocumentUnitService service;
 
   @BeforeEach()

@@ -38,19 +38,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
-@WebFluxTest(controllers = DocumentUnitController.class)
+@WebMvcTest(controllers = DocumentUnitController.class)
 @Import({
   SecurityConfig.class,
   AuthService.class,
@@ -62,7 +61,7 @@ class DocumentUnitControllerTest {
   @MockBean private DocumentUnitService service;
   @MockBean private KeycloakUserService userService;
   @MockBean private DocxConverterService docxConverterService;
-  @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private AttachmentService attachmentService;
   @MockBean DatabaseApiKeyRepository apiKeyRepository;
   @MockBean DatabaseDocumentationOfficeRepository officeRepository;
@@ -73,7 +72,7 @@ class DocumentUnitControllerTest {
 
   @BeforeEach
   void setup() {
-    doReturn(Mono.just(docOffice))
+    doReturn(docOffice)
         .when(userService)
         .getDocumentationOffice(
             argThat(

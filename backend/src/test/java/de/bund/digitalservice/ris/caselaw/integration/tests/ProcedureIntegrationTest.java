@@ -57,14 +57,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
-import reactor.core.publisher.Mono;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @RISIntegrationTest(
@@ -105,7 +104,7 @@ class ProcedureIntegrationTest {
   @MockBean private DocumentNumberRecyclingService documentNumberRecyclingService;
   @MockBean private PublicationReportRepository publicationReportRepository;
   @MockBean private UserService userService;
-  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean private DocxConverterService docxConverterService;
@@ -119,7 +118,7 @@ class ProcedureIntegrationTest {
   void setUp() {
     documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
-    doReturn(Mono.just(docOffice)).when(userService).getDocumentationOffice(any(OidcUser.class));
+    doReturn(docOffice).when(userService).getDocumentationOffice(any(OidcUser.class));
   }
 
   @AfterEach

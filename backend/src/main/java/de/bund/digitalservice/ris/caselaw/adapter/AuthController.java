@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -32,9 +31,8 @@ public class AuthController {
 
   @GetMapping(value = "me")
   @PreAuthorize("isAuthenticated()")
-  public Mono<ResponseEntity<User>> getUser(@AuthenticationPrincipal OidcUser oidcUser) {
-
-    return userService.getUser(oidcUser).map(ResponseEntity::ok);
+  public ResponseEntity<User> getUser(@AuthenticationPrincipal OidcUser oidcUser) {
+    return ResponseEntity.ok(userService.getUser(oidcUser));
   }
 
   /**
@@ -45,9 +43,9 @@ public class AuthController {
    */
   @GetMapping(value = "api-key/import")
   @PreAuthorize("isAuthenticated()")
-  public Mono<ResponseEntity<ApiKey>> getImportApiKey(@AuthenticationPrincipal OidcUser oidcUser) {
+  public ResponseEntity<ApiKey> getImportApiKey(@AuthenticationPrincipal OidcUser oidcUser) {
     ApiKey apiKey = authService.getImportApiKey(oidcUser);
-    return Mono.just(ResponseEntity.ok(apiKey));
+    return ResponseEntity.ok(apiKey);
   }
 
   /**
@@ -60,12 +58,11 @@ public class AuthController {
    */
   @PutMapping(value = "api-key/import")
   @PreAuthorize("isAuthenticated()")
-  public Mono<ResponseEntity<ApiKey>> generateImportApiKey(
-      @AuthenticationPrincipal OidcUser oidcUser) {
+  public ResponseEntity<ApiKey> generateImportApiKey(@AuthenticationPrincipal OidcUser oidcUser) {
 
     ApiKey apiKey = authService.generateImportApiKey(oidcUser);
 
-    return Mono.just(ResponseEntity.ok(apiKey));
+    return ResponseEntity.ok(apiKey);
   }
 
   /**
@@ -79,7 +76,7 @@ public class AuthController {
    */
   @PostMapping(value = "api-key/import/invalidate")
   @PreAuthorize("isAuthenticated()")
-  public Mono<ResponseEntity<ApiKey>> invalidateImportApiKey(
+  public ResponseEntity<ApiKey> invalidateImportApiKey(
       @AuthenticationPrincipal OidcUser oidcUser, ServerHttpRequest request) {
     String apiKey = request.getHeaders().getFirst("X-API-KEY");
 
@@ -89,6 +86,6 @@ public class AuthController {
 
     ApiKey lastApiKey = authService.invalidateImportApiKey(oidcUser, apiKey);
 
-    return Mono.just(ResponseEntity.ok(lastApiKey));
+    return ResponseEntity.ok(lastApiKey);
   }
 }

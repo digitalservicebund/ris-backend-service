@@ -22,11 +22,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.RandomStringGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 @Service
 @Slf4j
@@ -50,61 +48,48 @@ public class AuthService {
   }
 
   @Bean
-  public Function<String, Mono<Boolean>> userHasReadAccessByDocumentNumber() {
+  public Function<String, Boolean> userHasReadAccessByDocumentNumber() {
     return documentNumber ->
-        Mono.defer(
-            () ->
-                Mono.justOrEmpty(documentUnitService.getByDocumentNumber(documentNumber))
-                    .flatMap(this::userHasReadAccess)
-                    .switchIfEmpty(Mono.just(false)));
+        Optional.ofNullable(documentUnitService.getByDocumentNumber(documentNumber))
+            .map(this::userHasReadAccess)
+            .orElse(false);
   }
 
   @Bean
-  public Function<UUID, Mono<Boolean>> userHasReadAccessByDocumentUnitUuid() {
+  public Function<UUID, Boolean> userHasReadAccessByDocumentUnitUuid() {
     return uuid ->
-        Mono.defer(
-            () ->
-                Mono.justOrEmpty(documentUnitService.getByUuid(uuid))
-                    .flatMap(this::userHasReadAccess)
-                    .switchIfEmpty(Mono.just(false)));
+        Optional.ofNullable(documentUnitService.getByUuid(uuid))
+            .map(this::userHasReadAccess)
+            .orElse(false);
   }
 
   @Bean
-  public Function<UUID, Mono<Boolean>> userHasWriteAccessByDocumentUnitUuid() {
+  public Function<UUID, Boolean> userHasWriteAccessByDocumentUnitUuid() {
     return uuid ->
-        Mono.defer(
-            () ->
-                Mono.justOrEmpty(documentUnitService.getByUuid(uuid))
-                    .flatMap(this::userHasSameDocOfficeAsDocument)
-                    .defaultIfEmpty(false)
-                    .onErrorReturn(false));
+        Optional.ofNullable(documentUnitService.getByUuid(uuid))
+            .map(this::userHasSameDocOfficeAsDocument)
+            .orElse(false);
   }
 
-  private Mono<Boolean> userHasReadAccess(DocumentUnit documentUnit) {
+  private boolean userHasReadAccess(DocumentUnit documentUnit) {
     List<PublicationStatus> published =
         List.of(PublicationStatus.PUBLISHED, PublicationStatus.PUBLISHING);
     // legacy documents are published
-    return (documentUnit.status() == null
-                || (documentUnit.status().publicationStatus() != null
-                    && published.contains(documentUnit.status().publicationStatus()))
-            ? Mono.just(true)
-            : userHasSameDocOfficeAsDocument(documentUnit))
-        .defaultIfEmpty(false)
-        .onErrorReturn(false);
+    return documentUnit.status() == null
+        || (documentUnit.status().publicationStatus() != null
+            && published.contains(documentUnit.status().publicationStatus()))
+        || userHasSameDocOfficeAsDocument(documentUnit);
   }
 
-  private Mono<Boolean> userHasSameDocOfficeAsDocument(DocumentUnit documentUnit) {
-    return ReactiveSecurityContextHolder.getContext()
-        .map(SecurityContext::getAuthentication)
-        .map(Authentication::getPrincipal)
-        .flatMap(
-            principal ->
-                userService
-                    .getDocumentationOffice((OidcUser) principal)
-                    .map(
-                        userOffice ->
-                            documentUnit.coreData().documentationOffice().equals(userOffice)))
-        .defaultIfEmpty(false);
+  private boolean userHasSameDocOfficeAsDocument(DocumentUnit documentUnit) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication != null && authentication.getPrincipal() instanceof OidcUser) {
+      OidcUser principal = (OidcUser) authentication.getPrincipal();
+      DocumentationOffice documentationOffice = userService.getDocumentationOffice(principal);
+      return documentationOffice != null
+          && documentUnit.coreData().documentationOffice().equals(documentationOffice);
+    }
+    return false;
   }
 
   /**
@@ -133,7 +118,7 @@ public class AuthService {
     RandomStringGenerator rsg =
         RandomStringGenerator.builder().withinRange(allowedCharacters).build();
 
-    DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidcUser).block();
+    DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidcUser);
     DocumentationOfficeDTO documentationOfficeDTO = null;
     if (documentationOffice != null) {
       documentationOfficeDTO =
@@ -163,7 +148,6 @@ public class AuthService {
   public ApiKey getImportApiKey(OidcUser oidcUser) {
     Optional<ApiKeyDTO> apiKeyOptional =
         keyRepository.findFirstByUserAccountOrderByValidUntilDesc(oidcUser.getEmail());
-
     return apiKeyOptional.map(ApiKeyTransformer::transformToDomain).orElse(null);
   }
 
@@ -188,18 +172,15 @@ public class AuthService {
     if (apiKeyOptional.get().getUserAccount() == null
         || !apiKeyOptional.get().getUserAccount().equals(oidcUser.getEmail())) {
 
-      log.error("api key doesn't belongs to user");
-      throw new ImportApiKeyException("Api key doesn't belongs to user");
+      log.error("api key doesn't belong to user");
+      throw new ImportApiKeyException("Api key doesn't belong to user");
     }
 
-    ApiKeyDTO apiKeyDTO = apiKeyOptional.get();
-
-    apiKeyDTO = apiKeyDTO.toBuilder().validUntil(Instant.now()).invalidated(true).build();
-
+    ApiKeyDTO apiKeyDTO =
+        apiKeyOptional.get().toBuilder().validUntil(Instant.now()).invalidated(true).build();
     keyRepository.save(apiKeyDTO);
 
     apiKeyOptional = keyRepository.findFirstByUserAccountOrderByValidUntilDesc(oidcUser.getEmail());
-
     return apiKeyOptional
         .map(ApiKeyTransformer::transformToDomain)
         .orElseThrow(ImportApiKeyException::new);

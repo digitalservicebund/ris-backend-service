@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("admin")
@@ -26,11 +25,11 @@ public class MailTrackingController {
 
   @PostMapping("/webhook")
   @PreAuthorize("permitAll")
-  public Mono<ResponseEntity<String>> setPublishState(
+  public ResponseEntity<String> setPublishState(
       @RequestBody @Valid MailTrackingResponsePayload payload) {
     if (payload != null && payload.tags() != null && !payload.tags().isEmpty()) {
-      return Mono.just(service.updatePublishingState(payload.tags().get(0), payload.event()));
+      return service.updatePublishingState(payload.tags().get(0), payload.event());
     }
-    return Mono.just(ResponseEntity.badRequest().build());
+    return ResponseEntity.badRequest().build();
   }
 }

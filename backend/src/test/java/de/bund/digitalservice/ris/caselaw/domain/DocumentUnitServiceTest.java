@@ -127,7 +127,8 @@ class DocumentUnitServiceTest {
         .thenReturn(Optional.ofNullable(DocumentUnit.builder().build()));
     doThrow(new IllegalArgumentException()).when(repository).delete(DocumentUnit.builder().build());
 
-    Assertions.assertThrows(IllegalArgumentException.class, () -> service.deleteByUuid(TEST_UUID));
+    Assertions.assertThrows(
+        DocumentationUnitNotExistsException.class, () -> service.deleteByUuid(TEST_UUID));
 
     verify(repository).findByUuid(TEST_UUID);
   }

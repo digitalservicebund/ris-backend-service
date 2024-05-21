@@ -51,7 +51,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
@@ -99,7 +99,7 @@ class DocumentUnitControllerAuthIntegrationTest {
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean DocxConverterService docxConverterService;
-  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean AttachmentService attachmentService;
   @MockBean private FeatureToggleService featureService;
 

@@ -2,13 +2,13 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.RegionService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.Region;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
 
 /** Controller class responsible for handling HTTP requests related to regions. */
 @RestController
@@ -31,8 +31,8 @@ public class RegionController {
    */
   @GetMapping("/applicable")
   @PreAuthorize("isAuthenticated()")
-  public Flux<Region> getApplicableRegions(
+  public List<Region> getApplicableRegions(
       @RequestParam(value = "q", required = false) String searchStr) {
-    return Flux.fromIterable(service.getApplicableRegions(searchStr));
+    return service.getApplicableRegions(searchStr);
   }
 }

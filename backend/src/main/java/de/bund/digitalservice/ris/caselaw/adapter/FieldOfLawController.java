@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("api/v1/caselaw/fieldsoflaw")
@@ -24,7 +23,7 @@ public class FieldOfLawController {
 
   @GetMapping
   @PreAuthorize("isAuthenticated()")
-  public Mono<Slice<FieldOfLaw>> getFieldsOfLawBySearchQuery(
+  public Slice<FieldOfLaw> getFieldsOfLawBySearchQuery(
       @RequestParam("q") Optional<String> searchStr,
       @RequestParam("pg") int page,
       @RequestParam("sz") int size) {
@@ -33,20 +32,20 @@ public class FieldOfLawController {
 
   @GetMapping(value = "/search-by-identifier")
   @PreAuthorize("isAuthenticated()")
-  public Mono<List<FieldOfLaw>> getFieldsOfLawByIdentifierSearch(
+  public List<FieldOfLaw> getFieldsOfLawByIdentifierSearch(
       @RequestParam("q") Optional<String> searchStr) {
     return service.getFieldsOfLawByIdentifierSearch(searchStr);
   }
 
   @GetMapping(value = "{identifier}/children")
   @PreAuthorize("isAuthenticated()")
-  public Mono<List<FieldOfLaw>> getChildrenOfFieldOfLaw(@PathVariable String identifier) {
+  public List<FieldOfLaw> getChildrenOfFieldOfLaw(@PathVariable String identifier) {
     return service.getChildrenOfFieldOfLaw(identifier);
   }
 
   @GetMapping(value = "{identifier}/tree")
   @PreAuthorize("isAuthenticated()")
-  public Mono<FieldOfLaw> getTreeForFieldOfLaw(@PathVariable String identifier) {
+  public FieldOfLaw getTreeForFieldOfLaw(@PathVariable String identifier) {
     return service.getTreeForFieldOfLaw(identifier);
   }
 }

@@ -48,13 +48,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
-import reactor.core.publisher.Mono;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @RISIntegrationTest(
@@ -99,7 +98,7 @@ class SaveNormIntegrationTest {
   @MockBean private EmailPublishService publishService;
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private UserService userService;
-  @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private AttachmentService attachmentService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
@@ -113,7 +112,7 @@ class SaveNormIntegrationTest {
     documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
 
-    doReturn(Mono.just(docOffice))
+    doReturn(docOffice)
         .when(userService)
         .getDocumentationOffice(
             argThat(

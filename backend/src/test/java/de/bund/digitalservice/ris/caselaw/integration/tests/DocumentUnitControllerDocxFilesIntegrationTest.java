@@ -56,14 +56,13 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
-import reactor.core.publisher.Mono;
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.async.AsyncResponseTransformer;
@@ -124,7 +123,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean private UserService userService;
-  @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private DocumentBuilderFactory documentBuilderFactory;
   @MockBean private FeatureToggleService featureService;
 
@@ -134,7 +133,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   void setUp() {
     documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()).getId();
 
-    doReturn(Mono.just(docOffice))
+    doReturn(docOffice)
         .when(userService)
         .getDocumentationOffice(
             argThat(
