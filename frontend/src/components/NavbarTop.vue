@@ -3,7 +3,7 @@ import { ref, onMounted } from "vue"
 import { useRoute } from "vue-router"
 import Logo from "@/assets/neuRIS-logo.svg"
 import { User } from "@/domain/user"
-import { getName } from "@/services/authService"
+import authService from "@/services/authService"
 import FeatureToggleService from "@/services/featureToggleService"
 import IconPermIdentity from "~icons/ic/baseline-perm-identity"
 
@@ -12,7 +12,7 @@ const user = ref<User>()
 const fontColor = ref<string>()
 
 onMounted(async () => {
-  const nameResponse = await getName()
+  const nameResponse = await authService.getName()
   if (nameResponse.data) user.value = nameResponse.data
 
   const featureToggle = (

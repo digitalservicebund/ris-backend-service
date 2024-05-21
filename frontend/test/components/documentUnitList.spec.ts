@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import { PublicationState } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import authService from "@/services/authService"
 import { ResponseError } from "@/services/httpClient"
 
 function renderComponent(options?: {
@@ -63,6 +64,20 @@ function renderComponent(options?: {
 }
 
 describe("documentUnit list", () => {
+  const fetchSpy = vi.spyOn(authService, "getName").mockImplementation(() =>
+    Promise.resolve({
+      status: 200,
+      data: [
+        {
+          name: "username",
+          documentationOffice: {
+            abbreviation: "DS",
+          },
+        },
+      ],
+    }),
+  )
+
   test("initial state feedback", async () => {
     renderComponent({})
 
@@ -111,7 +126,7 @@ describe("documentUnit list", () => {
             publicationStatus: PublicationState.PUBLISHED,
             withError: false,
           },
-          isEditableByCurrentUser: false,
+          documentationOffice: { abbreviation: "OTHER" },
         },
         {
           id: "id",
@@ -126,10 +141,12 @@ describe("documentUnit list", () => {
             publicationStatus: PublicationState.PUBLISHED,
             withError: false,
           },
-          isEditableByCurrentUser: true,
+          documentationOffice: { abbreviation: "DS" },
         },
       ],
     })
+
+    expect(fetchSpy).toBeCalledTimes(1)
 
     expect(screen.getAllByTestId("listEntry").length).toBe(2)
 
@@ -167,10 +184,12 @@ describe("documentUnit list", () => {
             publicationStatus: PublicationState.PUBLISHED,
             withError: false,
           },
-          isEditableByCurrentUser: true,
+          documentationOffice: { abbreviation: "DS" },
         },
       ],
     })
+
+    // expect(authServiceMock).toHaveBeenCalledTimes(1)
 
     await screen.findByText("123")
     await user.click(screen.getByLabelText("Dokumentationseinheit löschen"))

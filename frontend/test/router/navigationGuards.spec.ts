@@ -1,5 +1,5 @@
 import router, { beforeEach as routerBeforeEach } from "@/router"
-import { isAuthenticated } from "@/services/authService"
+import authService from "@/services/authService"
 
 vi.mock("@/services/authService")
 
@@ -39,7 +39,7 @@ describe("router's auth navigation guards", () => {
 
   it("does not redirect, if not authenticated", async () => {
     const authServiceMock = vi
-      .mocked(isAuthenticated)
+      .mocked(authService.isAuthenticated)
       .mockResolvedValueOnce(false)
 
     const result = await routerBeforeEach(router.resolve("/caselaw"))
@@ -49,7 +49,7 @@ describe("router's auth navigation guards", () => {
 
   it("does redirect, if authenticated", async () => {
     const authServiceMock = vi
-      .mocked(isAuthenticated)
+      .mocked(authService.isAuthenticated)
       .mockResolvedValueOnce(true)
 
     const result = await routerBeforeEach(router.resolve("/caselaw"))
@@ -58,7 +58,7 @@ describe("router's auth navigation guards", () => {
   })
 
   it("does safe location cookie if not authenticated", async () => {
-    vi.mocked(isAuthenticated).mockResolvedValueOnce(false)
+    vi.mocked(authService.isAuthenticated).mockResolvedValueOnce(false)
 
     await routerBeforeEach(
       router.resolve("/caselaw/documentunit/123456/categories"),
@@ -69,7 +69,7 @@ describe("router's auth navigation guards", () => {
   })
 
   it("does follow location cookie if authenticated", async () => {
-    vi.mocked(isAuthenticated).mockResolvedValueOnce(true)
+    vi.mocked(authService.isAuthenticated).mockResolvedValueOnce(true)
     document.cookie = "location=/norms; path=/;"
 
     await routerBeforeEach(router.resolve("/"))

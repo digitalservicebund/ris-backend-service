@@ -70,7 +70,7 @@ describe("Documentunit Search", () => {
             },
             documentNumber: "documentNumber",
             fileNumber: "fileNumber",
-            isEditableByCurrentUser: true,
+            documentationOffice: { abbreviation: "DS" },
           }),
         ],
         size: 0,

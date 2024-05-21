@@ -1,4 +1,4 @@
-import { isAuthenticated } from "@/services/authService"
+import authService from "@/services/authService"
 import httpClient from "@/services/httpClient"
 
 vi.mock("@/services/httpClient")
@@ -10,7 +10,7 @@ describe("authService", () => {
       error: { title: "Not authenticated" },
     })
 
-    const result = await isAuthenticated()
+    const result = await authService.isAuthenticated()
     expect(result).toEqual(false)
   })
 
@@ -20,7 +20,7 @@ describe("authService", () => {
       error: { title: "Not authorized" },
     })
 
-    const result = await isAuthenticated()
+    const result = await authService.isAuthenticated()
     expect(result).toEqual(false)
   })
 
@@ -30,7 +30,7 @@ describe("authService", () => {
       data: { title: "welcome" },
     })
 
-    const result = await isAuthenticated()
+    const result = await authService.isAuthenticated()
     expect(result).toEqual(true)
   })
 })
