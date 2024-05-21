@@ -62,9 +62,7 @@ const toggleDropdown = async () => {
   focusedItemIndex.value = 0
   showDropdown.value = !showDropdown.value
   if (showDropdown.value) {
-    if (inputText.value) {
-      filter.value = inputText.value
-    }
+    filter.value = inputText.value
     await updateCurrentItems()
     inputFieldRef.value?.focus()
   }
@@ -73,9 +71,7 @@ const toggleDropdown = async () => {
 const showUpdatedDropdown = async () => {
   focusedItemIndex.value = 0
   showDropdown.value = true
-  if (inputText.value) {
-    filter.value = inputText.value
-  }
+  filter.value = inputText.value
   await updateCurrentItems()
 }
 
