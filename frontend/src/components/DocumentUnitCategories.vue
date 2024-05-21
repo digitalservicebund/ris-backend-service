@@ -109,11 +109,6 @@ async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
       data: undefined,
     } as ServiceResponse<void>
 
-  // When the user changes the court to one that doesn't allow "Gesetzeskraft" all existing legal forces are deleted
-  if (shouldDeleteLegalForces.value) {
-    deleteLegalForces()
-  }
-
   lastUpdatedDocumentUnit.value = JSON.parse(
     JSON.stringify(updatedDocumentUnit.value),
   )
@@ -161,6 +156,10 @@ const coreData = computed({
 
     Object.assign(updatedDocumentUnit.value.coreData, newValues)
     courtTypeRef.value = updatedDocumentUnit.value.coreData.court?.type ?? ""
+    // When the user changes the court to one that doesn't allow "Gesetzeskraft" all existing legal forces are deleted
+    if (shouldDeleteLegalForces.value) {
+      deleteLegalForces()
+    }
     if (triggerSaving) {
       handleUpdateDocumentUnit()
     }
