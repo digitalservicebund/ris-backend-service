@@ -188,7 +188,7 @@ dependencies {
     // for local development:
     // implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.8.38.jar"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.7")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.8")
     // for local development:
     // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.4.jar"))
 
