@@ -46,7 +46,8 @@ const isOnlyParentActive = (currentNavItem: MenuItem) => {
 <template>
   <FlexContainer
     aria-labelledby="sidebar navigation"
-    class="w-[16rem] flex-col"
+    class="w-[16rem]"
+    flex-direction="flex-col"
   >
     <div
       v-for="navItem in props.menuItems"

@@ -42,7 +42,8 @@ watch(
     v-if="fileAsHTML?.html"
     v-bind="$attrs"
     id="attachment-view"
-    class="sticky top-0 flex w-full flex-col gap-40 bg-white p-24 pb-0"
+    class="sticky top-0 w-full gap-40 bg-white p-24 pb-0"
+    flex-direction="flex-col"
   >
     <div
       v-if="isLoading"

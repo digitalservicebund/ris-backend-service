@@ -40,7 +40,7 @@ const hasActiveCitations = computed(() => {
 </script>
 
 <template>
-  <FlexContainer class="flex-col">
+  <FlexContainer flex-direction="flex-col">
     <PreviewRow v-if="hasKeywords">
       <PreviewCategory>Schlagwörter</PreviewCategory>
       <PreviewContent>

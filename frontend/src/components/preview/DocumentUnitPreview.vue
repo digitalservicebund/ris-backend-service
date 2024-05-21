@@ -14,7 +14,11 @@ defineProps<{
 </script>
 
 <template>
-  <FlexContainer class="max-w-screen-xl flex-col" data-testid="preview">
+  <FlexContainer
+    class="max-w-screen-xl"
+    data-testid="preview"
+    flex-direction="flex-col"
+  >
     <h1 class="ds-heading-03-bold mt-16 px-16">
       {{ documentUnit.documentNumber }}
     </h1>

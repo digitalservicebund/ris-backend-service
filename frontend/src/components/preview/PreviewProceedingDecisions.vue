@@ -13,7 +13,7 @@ defineProps<{
 </script>
 
 <template>
-  <FlexContainer class="flex-col">
+  <FlexContainer flex-direction="flex-col">
     <PreviewRow v-if="previousDecisions && previousDecisions?.length > 0">
       <PreviewCategory>Vorinstanz</PreviewCategory>
       <PreviewContent>

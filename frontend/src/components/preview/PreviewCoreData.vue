@@ -13,7 +13,7 @@ defineProps<{
 </script>
 
 <template>
-  <FlexContainer class="flex-col">
+  <FlexContainer flex-direction="flex-col">
     <PreviewRow v-if="coreData.court">
       <PreviewCategory>Gericht</PreviewCategory>
       <PreviewContent>
@@ -121,7 +121,7 @@ defineProps<{
             leadingDecisionNormReference, index
           ) in coreData.leadingDecisionNormReferences"
           :key="index"
-          class="flex-col"
+          flex-direction="flex-col"
         >
           <FlexItem> {{ leadingDecisionNormReference }}</FlexItem>
         </FlexContainer>

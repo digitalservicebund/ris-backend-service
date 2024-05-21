@@ -122,10 +122,10 @@ function onDelete() {
         data-testid="listEntry"
       >
         <CellItem>
-          <FlexContainer class="flex-row space-x-8">
-            <FlexItem class="flex-grow">{{
-              listEntry.documentNumber
-            }}</FlexItem>
+          <FlexContainer class="space-x-8">
+            <FlexItem class="flex-grow"
+              >{{ listEntry.documentNumber }}
+            </FlexItem>
             <FlexItem
               v-if="listEntry.hasAttachments"
               class="flex-end text-blue-800"

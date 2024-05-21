@@ -3,7 +3,7 @@ import FlexContainer from "@/components/FlexContainer.vue"
 </script>
 
 <template>
-  <FlexContainer class="flex-row">
+  <FlexContainer>
     <slot></slot>
   </FlexContainer>
 </template>
