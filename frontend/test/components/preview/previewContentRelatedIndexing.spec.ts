@@ -161,10 +161,15 @@ describe("preview content related indexing", () => {
           parent: {
             identifier: "AB-01",
             text: "Text for AB-01",
+            children: [],
+            childrenCount: 0,
+            norms: [],
             parent: {
               identifier: "AB",
               text: "Text for AB",
-              parent: null,
+              children: [],
+              childrenCount: 0,
+              norms: [],
             },
           },
         },
@@ -178,10 +183,15 @@ describe("preview content related indexing", () => {
           parent: {
             identifier: "CD-01",
             text: "Text for CD-01",
+            children: [],
+            childrenCount: 0,
+            norms: [],
             parent: {
               identifier: "CD",
               text: "Text for CD",
-              parent: null,
+              children: [],
+              childrenCount: 0,
+              norms: [],
             },
           },
         },
