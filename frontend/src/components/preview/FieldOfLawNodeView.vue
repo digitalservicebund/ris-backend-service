@@ -8,7 +8,7 @@ defineProps<{
 
 <template>
   <FieldOfLawNodeView v-if="node.parent" :node="node.parent"
-    >→</FieldOfLawNodeView
-  >
-  <span> {{ node.text }}</span> <slot></slot>
+    >→
+  </FieldOfLawNodeView>
+  <span> {{ node.text }} </span> <slot></slot>
 </template>
