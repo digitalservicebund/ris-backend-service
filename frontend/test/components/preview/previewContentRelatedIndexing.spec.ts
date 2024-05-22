@@ -152,27 +152,52 @@ describe("preview content related indexing", () => {
       activeCitations: [],
       fieldsOfLaw: [
         {
-          identifier: "AB-01",
-          text: "Text for AB",
+          identifier: "AB-01-01",
+          text: "Text for AB-01-01",
           children: [],
           childrenCount: 0,
           norms: [],
           isExpanded: false,
+          parent: {
+            identifier: "AB-01",
+            text: "Text for AB-01",
+            parent: {
+              identifier: "AB",
+              text: "Text for AB",
+              parent: null,
+            },
+          },
         },
         {
-          identifier: "CD-01",
-          text: "Text for CD",
+          identifier: "CD-01-05",
+          text: "Text for CD-01-05",
           children: [],
           childrenCount: 0,
           norms: [],
           isExpanded: false,
+          parent: {
+            identifier: "CD-01",
+            text: "Text for CD-01",
+            parent: {
+              identifier: "CD",
+              text: "Text for CD",
+              parent: null,
+            },
+          },
         },
       ],
     })
 
     expect(await screen.findByText("Sachgebiete")).toBeInTheDocument()
-    expect(await screen.findByText("AB-01, Text for AB")).toBeInTheDocument()
-    expect(await screen.findByText("CD-01, Text for CD")).toBeInTheDocument()
+
+    expect(await screen.findByText("Text for AB-01-01")).toBeInTheDocument()
+    expect(await screen.findByText("Text for AB-01")).toBeInTheDocument()
+    expect(await screen.findByText("Text for AB")).toBeInTheDocument()
+
+    expect(await screen.findByText("Text for CD-01-05")).toBeInTheDocument()
+    expect(await screen.findByText("Text for CD-01")).toBeInTheDocument()
+    expect(await screen.findByText("Text for CD")).toBeInTheDocument()
+
     expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
     expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()
