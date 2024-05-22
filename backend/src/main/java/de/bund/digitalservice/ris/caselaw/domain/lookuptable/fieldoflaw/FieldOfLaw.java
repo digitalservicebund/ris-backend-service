@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw;
 
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import lombok.Builder;
 
 @Builder(toBuilder = true)
@@ -11,6 +12,6 @@ public record FieldOfLaw(
     String identifier,
     String text,
     List<String> linkedFields,
-    //    List<Keyword> keywords,
     List<Norm> norms,
-    List<FieldOfLaw> children) {}
+    List<FieldOfLaw> children,
+    @Nullable FieldOfLaw parent) {}
