@@ -31,7 +31,6 @@ import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
-import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.time.LocalDate;
@@ -95,7 +94,6 @@ class DocumentationUnitSearchIntegrationTest {
   @MockBean UserService userService;
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
   @MockBean AttachmentService attachmentService;
-  @MockBean private FeatureToggleService featureService;
 
   private DocumentationOfficeDTO docOfficeDTO;
 

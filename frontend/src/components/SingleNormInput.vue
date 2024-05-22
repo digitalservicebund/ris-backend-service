@@ -13,7 +13,6 @@ import LegalForce from "@/domain/legalForce"
 import SingleNorm, { SingleNormValidationInfo } from "@/domain/singleNorm"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
-import FeatureToggleService from "@/services/featureToggleService"
 import IconClear from "~icons/material-symbols/close-small"
 
 const props = defineProps<{
@@ -42,8 +41,6 @@ const courtTypesWithLegalForce = [
   "VGH",
   "OVG",
 ]
-
-const featureToggle = ref()
 
 const singleNorm = computed({
   get: () => {
@@ -203,16 +200,13 @@ onMounted(async () => {
 
   hasLegalForce.value = !!singleNorm.value?.legalForce
   singleNormInput.value?.focusInput()
-  featureToggle.value = (
-    await FeatureToggleService.isEnabled("neuris.legal-force")
-  ).data
 })
 </script>
 
 <template>
   <div class="mb-24 flex flex-col gap-24 pb-24">
     <div
-      v-if="featureToggle && isCourtWithLegalForce"
+      v-if="isCourtWithLegalForce"
       class="flex flex-row justify-between gap-24"
     >
       <InputField
@@ -242,7 +236,7 @@ onMounted(async () => {
     <div
       class="gap-24"
       :class="
-        featureToggle && isCourtWithLegalForce
+        isCourtWithLegalForce
           ? 'grid grid-cols-3'
           : 'flex flex-row justify-between'
       "
@@ -303,7 +297,7 @@ onMounted(async () => {
         />
       </InputField>
       <button
-        v-if="!featureToggle || !isCourtWithLegalForce"
+        v-if="!isCourtWithLegalForce"
         aria-label="Einzelnorm löschen"
         class="mt-[25px] h-[50px] text-blue-800 focus:shadow-[inset_0_0_0_0.25rem] focus:shadow-blue-800 focus:outline-none"
         tabindex="0"
@@ -313,7 +307,7 @@ onMounted(async () => {
       </button>
     </div>
     <div
-      v-if="featureToggle && hasLegalForce && isCourtWithLegalForce"
+      v-if="hasLegalForce && isCourtWithLegalForce"
       class="grid grid-cols-3 gap-24"
     >
       <div>

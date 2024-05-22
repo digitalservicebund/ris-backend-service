@@ -4,7 +4,6 @@ import static de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
@@ -49,7 +48,6 @@ class DocumentUnitServiceTest {
   @MockBean private DatabaseDocumentUnitStatusService documentUnitStatusService;
   @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @MockBean private AttachmentService attachmentService;
-  @MockBean private FeatureToggleService featureService;
   @MockBean private Validator validator;
 
   @Test
@@ -163,7 +161,7 @@ class DocumentUnitServiceTest {
     var du = service.updateDocumentUnit(documentUnit);
     assertEquals(du, documentUnit);
 
-    verify(repository).save(eq(documentUnit), anyBoolean());
+    verify(repository).save(documentUnit);
   }
 
   @Test
