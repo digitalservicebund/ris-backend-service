@@ -25,11 +25,11 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
   //  }
 
   // TODO
-  //  @Override
-  //  public void configureHttpMessageCodecs(ServerCodecConfigurer configurer) {
-  //    configurer.defaultCodecs().maxInMemorySize(-1);
-  //    configurer.defaultCodecs().jackson2JsonEncoder(new Jackson2JsonEncoder(objectMapper));
-  //    configurer.defaultCodecs().jackson2JsonDecoder(new Jackson2JsonDecoder(objectMapper));
-  //  }
+  //    @Override
+  //    public void configureHttpMessageCodecs(ServerCodecConfigurer configurer) {
+  //      configurer.defaultCodecs().maxInMemorySize(-1);
+  //      configurer.defaultCodecs().jackson2JsonEncoder(new Jackson2JsonEncoder(objectMapper));
+  //      configurer.defaultCodecs().jackson2JsonDecoder(new Jackson2JsonDecoder(objectMapper));
+  //    }
 
 }

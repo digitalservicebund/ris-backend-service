@@ -54,8 +54,6 @@ public class SecurityConfig {
                             referrerPolicyConfig.policy(
                                 ReferrerPolicyHeaderWriter.ReferrerPolicy
                                     .STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
-                    //
-                    // .httpStrictTransportSecurity(HeadersConfigurer.HstsConfig::disable)
                     .permissionsPolicy(
                         permissionsPolicyConfig ->
                             permissionsPolicyConfig.policy(
@@ -67,9 +65,6 @@ public class SecurityConfig {
                                     + "clipboard-read=(self), clipboard-write=(self), gamepad=(), speaker-selection=(), conversion-measurement=(), "
                                     + "focus-without-user-activation=(self), hid=(), idle-detection=(), interest-cohort=(), serial=(), sync-script=(), "
                                     + "trust-token-redemption=(), window-placement=(), vertical-scroll=(self)")));
-    // TODO .disable() // If not using HTTPS
-    // TODO .referrerPolicy(referrerPolicyConfig ->
-    // referrerPolicyConfig.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
 
     return http.build();
   }
