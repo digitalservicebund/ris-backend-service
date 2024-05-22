@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import InlineDecision from "./InlineDecision.vue"
+import FlexContainer from "@/components/FlexContainer.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
+import IconAdd from "~icons/ic/baseline-add"
 
 defineProps<{
   searchResults?: SearchResults<RelatedDocumentation>
@@ -21,41 +23,52 @@ export type SearchResults<Type extends RelatedDocumentation> = {
 </script>
 
 <template>
-  <div v-if="!!isLoading" class="mt-40 text-center">
-    <LoadingSpinner />
-  </div>
-
-  <div
-    v-else-if="searchResults?.length === 0"
-    class="grid justify-items-center"
-  >
-    <span>Keine Ergebnisse gefunden.</span>
-  </div>
-
-  <div v-else-if="searchResults" class="mt-16 table">
-    <div
-      v-for="searchResult in searchResults"
-      :key="searchResult.decision.uuid"
-      class="mb-24 mt-12 table-row"
+  <div class="bg-blue-200">
+    <FlexContainer
+      v-if="isLoading"
+      class="m-24"
+      justify-content="justify-center"
     >
-      <div class="table-cell">
-        <InlineDecision :decision="searchResult.decision" />
-      </div>
-      <div class="table-cell p-8">
-        <TextButton
-          aria-label="Treffer übernehmen"
-          class="ml-24"
-          :disabled="searchResult.isLinked"
-          label="Übernehmen"
-          size="small"
-          @click.stop="emits('linkDecision', searchResult.decision)"
-        />
-      </div>
-      <span
-        v-if="searchResult.isLinked"
-        class="ds-label-03-reg ml-24 rounded-full bg-green-700 px-24 py-4 text-white"
-        >Bereits hinzugefügt</span
-      >
+      <LoadingSpinner />
+    </FlexContainer>
+
+    <div
+      v-else-if="searchResults?.length === 0"
+      class="grid justify-items-center"
+    >
+      <FlexContainer class="m-24" justify-content="justify-center">
+        <p>Keine Ergebnisse gefunden</p>
+      </FlexContainer>
     </div>
+
+    <FlexContainer
+      v-else-if="searchResults"
+      class="p-24"
+      flex-direction="flex-col"
+    >
+      <p class="font-bold">Passende Suchergebnisse:</p>
+      <FlexContainer
+        v-for="searchResult in searchResults"
+        :key="searchResult.decision.uuid"
+        class="mt-16"
+      >
+        <FlexContainer align-items="items-center">
+          <TextButton
+            aria-label="Treffer übernehmen"
+            class="mr-16"
+            :disabled="searchResult.isLinked"
+            :icon="IconAdd"
+            @click.stop="emits('linkDecision', searchResult.decision)"
+          />
+          <InlineDecision :decision="searchResult.decision" />
+
+          <span
+            v-if="searchResult.isLinked"
+            class="ds-label-02-reg ml-8 rounded-full bg-yellow-400 px-8 py-2"
+            >Bereits hinzugefügt</span
+          >
+        </FlexContainer>
+      </FlexContainer>
+    </FlexContainer>
   </div>
 </template>
