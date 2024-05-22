@@ -56,6 +56,7 @@ export type SearchResults<Type extends RelatedDocumentation> = {
           <TextButton
             aria-label="Treffer übernehmen"
             class="mr-16"
+            data-testid="add-decision-button"
             :disabled="searchResult.isLinked"
             :icon="IconAdd"
             @click.stop="emits('linkDecision', searchResult.decision)"
