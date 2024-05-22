@@ -62,7 +62,7 @@ const hasActiveCitations = computed(() => {
           class="flex flex-row"
         >
           <div class="min-w-[150px]">{{ fieldOfLaw.identifier }}</div>
-          <div>( <FieldOfLawNodeView :node="fieldOfLaw" /> )</div>
+          <div><FieldOfLawNodeView :node="fieldOfLaw" /></div>
         </div>
       </PreviewContent>
     </PreviewRow>
