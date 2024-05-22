@@ -261,7 +261,7 @@ onMounted(async () => {
           :has-error="slotProps.hasError"
           size="medium"
           @blur="validateNorm"
-          @input="validationStore.remove('singleNorm')"
+          @focus="validationStore.remove('singleNorm')"
         ></TextInput>
       </InputField>
       <InputField
@@ -280,6 +280,7 @@ onMounted(async () => {
           aria-label="Fassungsdatum der Norm"
           class="ds-input-medium"
           :has-error="slotProps.hasError"
+          @focus="validationStore.remove('dateOfVersion')"
           @update:validation-error="slotProps.updateValidationError"
         />
       </InputField>
@@ -299,6 +300,7 @@ onMounted(async () => {
           aria-label="Jahr der Norm"
           :has-error="slotProps.hasError"
           size="medium"
+          @focus="validationStore.remove('dateOfRelevance')"
           @update:validation-error="slotProps.updateValidationError"
         />
       </InputField>
@@ -318,7 +320,7 @@ onMounted(async () => {
     >
       <div>
         <InputField
-          id="legalForceType"
+          id="type"
           v-slot="slotProps"
           label="Typ der Ges.-Kraft *"
           :validation-error="legalForceValidationStore.getByField('type')"
@@ -331,12 +333,13 @@ onMounted(async () => {
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getLegalForceTypes"
             @click="legalForceValidationStore.remove('type')"
+            @focus="legalForceValidationStore.remove('type')"
           ></ComboboxInput>
         </InputField>
       </div>
       <div class="col-span-2">
         <InputField
-          id="legalForceRegion"
+          id="region"
           v-slot="slotProps"
           label="Geltungsbereich *"
           :validation-error="legalForceValidationStore.getByField('region')"
@@ -349,6 +352,7 @@ onMounted(async () => {
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getLegalForceRegions"
             @click="legalForceValidationStore.remove('region')"
+            @focus="legalForceValidationStore.remove('region')"
           ></ComboboxInput>
         </InputField>
       </div>

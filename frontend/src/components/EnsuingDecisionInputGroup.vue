@@ -205,7 +205,7 @@ onBeforeUnmount(() => {
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getCourts"
             :readonly="ensuingDecision.hasForeignSource"
-            @click="validationStore.remove('court')"
+            @focus="validationStore.remove('court')"
           ></ComboboxInput>
         </InputField>
         <div v-if="!isPending" class="flex w-full justify-between gap-24">
@@ -247,7 +247,7 @@ onBeforeUnmount(() => {
             :has-error="slotProps.hasError"
             :readonly="ensuingDecision.hasForeignSource"
             size="medium"
-            @input="validationStore.remove('fileNumber')"
+            @focus="validationStore.remove('fileNumber')"
           ></TextInput>
         </InputField>
 

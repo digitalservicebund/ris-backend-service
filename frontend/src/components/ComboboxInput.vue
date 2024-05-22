@@ -25,7 +25,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   "update:modelValue": [value?: ComboboxInputModelType]
-  input: [value: Event]
+  focus: [void]
 }>()
 
 const NO_MATCHING_ENTRY = "Kein passender Eintrag"
@@ -69,6 +69,7 @@ const toggleDropdown = async () => {
 }
 
 const showUpdatedDropdown = async () => {
+  emit("focus")
   focusedItemIndex.value = 0
   showDropdown.value = true
   filter.value = inputText.value
