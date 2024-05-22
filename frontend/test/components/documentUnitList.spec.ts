@@ -1,5 +1,5 @@
 import { userEvent } from "@testing-library/user-event"
-import { render, screen } from "@testing-library/vue"
+import { render, screen, waitFor } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import { PublicationState } from "@/domain/documentUnit"
@@ -64,20 +64,17 @@ function renderComponent(options?: {
 }
 
 describe("documentUnit list", () => {
-  const fetchSpy = vi.spyOn(authService, "getName").mockImplementation(() =>
+  vi.spyOn(authService, "getName").mockImplementation(() =>
     Promise.resolve({
       status: 200,
-      data: [
-        {
-          name: "username",
-          documentationOffice: {
-            abbreviation: "DS",
-          },
+      data: {
+        name: "username",
+        documentationOffice: {
+          abbreviation: "DS",
         },
-      ],
+      },
     }),
   )
-
   test("initial state feedback", async () => {
     renderComponent({})
 
@@ -146,7 +143,12 @@ describe("documentUnit list", () => {
       ],
     })
 
-    expect(fetchSpy).toBeCalledTimes(1)
+    // wait for asynchronous authService.getName method to update the UI according to the user
+    await waitFor(() => {
+      expect(
+        screen.getByRole("link", { name: "Dokumentationseinheit bearbeiten" }),
+      ).toBeInTheDocument()
+    })
 
     expect(screen.getAllByTestId("listEntry").length).toBe(2)
 
@@ -189,7 +191,12 @@ describe("documentUnit list", () => {
       ],
     })
 
-    // expect(authServiceMock).toHaveBeenCalledTimes(1)
+    // wait for asynchronous authService.getName method to update the UI according to the user
+    await waitFor(() => {
+      expect(
+        screen.getByRole("link", { name: "Dokumentationseinheit bearbeiten" }),
+      ).toBeInTheDocument()
+    })
 
     await screen.findByText("123")
     await user.click(screen.getByLabelText("Dokumentationseinheit löschen"))
