@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitSearch from "@/components/DocumentUnitSearch.vue"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import authService from "@/services/authService"
 import documentUnitService from "@/services/documentUnitService"
 
 function renderComponent() {
@@ -48,6 +49,18 @@ function renderComponent() {
 }
 
 describe("Documentunit Search", () => {
+  vi.spyOn(authService, "getName").mockImplementation(() =>
+    Promise.resolve({
+      status: 200,
+      data: {
+        name: "username",
+        documentationOffice: {
+          abbreviation: "DS",
+        },
+      },
+    }),
+  )
+
   vi.spyOn(
     documentUnitService,
     "searchByDocumentUnitSearchInput",

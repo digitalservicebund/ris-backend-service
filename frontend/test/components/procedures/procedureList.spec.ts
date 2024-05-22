@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import ProcedureList from "@/components/procedures/ProcedureList.vue"
 import useQuery from "@/composables/useQueryFromRoute"
 import { Procedure } from "@/domain/documentUnit"
+import authService from "@/services/authService"
 import service from "@/services/procedureService"
 
 vi.mock("@/services/procedureService")
@@ -104,6 +105,18 @@ describe("ProcedureList", () => {
   afterEach(() => {
     vi.resetAllMocks()
   })
+
+  vi.spyOn(authService, "getName").mockImplementation(() =>
+    Promise.resolve({
+      status: 200,
+      data: {
+        name: "username",
+        documentationOffice: {
+          abbreviation: "DS",
+        },
+      },
+    }),
+  )
 
   it("fetches docUnits once from BE if expanded", async () => {
     const { mockedGetProcedures, mockedGetDocumentUnits, user } =
