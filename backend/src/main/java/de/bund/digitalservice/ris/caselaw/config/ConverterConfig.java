@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.bund.digitalservice.ris.caselaw.adapter.JurisXmlExporterWrapper;
 import de.bund.digitalservice.ris.caselaw.adapter.MockXmlExporter;
+import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -16,6 +17,10 @@ import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class ConverterConfig {
+  @Bean
+  public DocxConverter docxConverter() {
+    return new DocxConverter();
+  }
 
   @Bean
   public DocumentBuilderFactory documentBuilderFactory() {

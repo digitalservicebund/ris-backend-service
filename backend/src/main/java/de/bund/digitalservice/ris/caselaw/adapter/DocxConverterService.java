@@ -45,7 +45,6 @@ import org.docx4j.openpackaging.parts.WordprocessingML.ImageJpegPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.ImagePngPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.MetafileEmfPart;
 import org.docx4j.wml.Style;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -68,7 +67,6 @@ public class DocxConverterService implements ConverterService {
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
 
-  @Autowired
   public DocxConverterService(
       S3AsyncClient client,
       DocumentBuilderFactory documentBuilderFactory,
