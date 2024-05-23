@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -89,10 +90,10 @@ public class DocumentUnitService {
 
     DocumentationUnitSearchInput searchInput =
         DocumentationUnitSearchInput.builder()
-            .documentNumber(documentNumber.orElse(null))
-            .fileNumber(fileNumber.orElse(null))
-            .courtType(courtType.orElse(null))
-            .courtLocation(courtLocation.orElse(null))
+            .documentNumber(normalizeString(documentNumber.orElse(null)))
+            .fileNumber(normalizeString(fileNumber.orElse(null)))
+            .courtType(normalizeString(courtType.orElse(null)))
+            .courtLocation(normalizeString(courtLocation.orElse(null)))
             .decisionDate(decisionDate.orElse(null))
             .decisionDateEnd(decisionDateEnd.orElse(null))
             .status(
@@ -221,6 +222,10 @@ public class DocumentUnitService {
       String documentNumberToExclude,
       Pageable pageable) {
 
+    if (relatedDocumentationUnit.getFileNumber() != null) {
+      relatedDocumentationUnit.setFileNumber(
+          StringUtils.normalizeSpace(relatedDocumentationUnit.getFileNumber()));
+    }
     return repository.searchLinkableDocumentationUnits(
         relatedDocumentationUnit, documentationOffice, documentNumberToExclude, pageable);
   }
@@ -251,5 +256,12 @@ public class DocumentUnitService {
     } catch (Exception e) {
       log.info("Did not save for recycling", e);
     }
+  }
+
+  private static String normalizeString(String input) {
+    if (input != null) {
+      return StringUtils.normalizeSpace(input);
+    }
+    return null;
   }
 }

@@ -25,11 +25,14 @@ import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -49,6 +52,8 @@ class DocumentUnitServiceTest {
   @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @MockBean private AttachmentService attachmentService;
   @MockBean private Validator validator;
+  @Captor private ArgumentCaptor<DocumentationUnitSearchInput> searchInputCaptor;
+  @Captor private ArgumentCaptor<RelatedDocumentationUnit> relatedDocumentationUnitCaptor;
 
   @Test
   void testGenerateNewDocumentUnit()
@@ -320,6 +325,84 @@ class DocumentUnitServiceTest {
     verify(repository)
         .searchByDocumentationUnitSearchInput(
             pageRequest, documentationOffice, documentationUnitSearchInput);
+  }
+
+  @Test
+  void testSearchByDocumentUnitListEntry_shouldNormalizeSpaces() {
+    DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
+    DocumentationUnitListItem documentationUnitListItem =
+        DocumentationUnitListItem.builder().build();
+    PageRequest pageRequest = PageRequest.of(0, 10);
+
+    when(repository.searchByDocumentationUnitSearchInput(
+            any(PageRequest.class),
+            any(DocumentationOffice.class),
+            any(DocumentationUnitSearchInput.class)))
+        .thenReturn(new PageImpl<>(List.of(documentationUnitListItem)));
+
+    service.searchByDocumentationUnitSearchInput(
+        pageRequest,
+        documentationOffice,
+        Optional.of("DOC\u00A012345"),
+        Optional.of("FILE\u00A012345"),
+        Optional.of("COURT\u00A012345"),
+        Optional.of("COURT LOCATION\u00A012345"),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty());
+
+    // Capture the searchInput argument
+    verify(repository)
+        .searchByDocumentationUnitSearchInput(
+            any(PageRequest.class), any(DocumentationOffice.class), searchInputCaptor.capture());
+
+    DocumentationUnitSearchInput capturedSearchInput = searchInputCaptor.getValue();
+
+    // Verify that the searchInput fields have normalized spaces
+    assertThat(capturedSearchInput.documentNumber()).isEqualTo("DOC 12345");
+    assertThat(capturedSearchInput.fileNumber()).isEqualTo("FILE 12345");
+    assertThat(capturedSearchInput.courtType()).isEqualTo("COURT 12345");
+    assertThat(capturedSearchInput.courtLocation()).isEqualTo("COURT LOCATION 12345");
+  }
+
+  @Test
+  void testSearchLinkableDocumentationUnits_shouldNormalizeSpaces() {
+    DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
+    RelatedDocumentationUnit relatedDocumentationUnit =
+        RelatedDocumentationUnit.builder()
+            .uuid(UUID.randomUUID())
+            .fileNumber("FILE\u00A012345") // String with non-breaking space
+            .build();
+    PageRequest pageRequest = PageRequest.of(0, 10);
+    String documentNumberToExclude = "DOC12345";
+
+    // Configure the mock repository to return a non-null Slice object
+    when(repository.searchLinkableDocumentationUnits(
+            any(RelatedDocumentationUnit.class),
+            any(DocumentationOffice.class),
+            any(String.class),
+            any(Pageable.class)))
+        .thenReturn(new PageImpl<>(List.of(relatedDocumentationUnit)));
+
+    // Call the service method
+    service.searchLinkableDocumentationUnits(
+        relatedDocumentationUnit, documentationOffice, documentNumberToExclude, pageRequest);
+
+    // Capture the relatedDocumentationUnit argument
+    verify(repository)
+        .searchLinkableDocumentationUnits(
+            relatedDocumentationUnitCaptor.capture(),
+            any(DocumentationOffice.class),
+            any(String.class),
+            any(Pageable.class));
+
+    RelatedDocumentationUnit capturedRelatedDocumentationUnit =
+        relatedDocumentationUnitCaptor.getValue();
+
+    // Verify that the fileNumber field has normalized spaces
+    assertThat(capturedRelatedDocumentationUnit.getFileNumber()).isEqualTo("FILE 12345");
   }
 
   @Test
