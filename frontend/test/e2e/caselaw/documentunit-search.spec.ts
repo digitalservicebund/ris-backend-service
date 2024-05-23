@@ -1,7 +1,5 @@
 import { expect } from "@playwright/test"
 import dayjs from "dayjs"
-import errorMessages from "@/i18n/errors.json"
-
 import {
   deleteDocumentUnit,
   fillSearchInput,
@@ -126,9 +124,7 @@ test.describe("search", () => {
     await page.getByLabel("Entscheidungsdatum Suche Ende").fill("25.12.2022")
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
     await expect(page.getByText("Fehler in Suchkriterien")).toBeHidden()
-    await expect(
-      page.getByText(errorMessages.SEARCH_RESULTS_NOT_FOUND.title),
-    ).toBeVisible()
+    await expect(page.getByText("Keine Ergebnisse gefunden.")).toBeVisible()
   })
 
   // Datumskomponente Zeitraum
@@ -410,14 +406,10 @@ test.describe("search", () => {
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
 
     await expect(page.getByLabel("Ladestatus")).toBeHidden()
-    await expect(
-      page.getByText(errorMessages.SEARCH_RESULTS_NOT_FOUND.title),
-    ).toBeVisible()
+    await expect(page.getByText("Keine Ergebnisse")).toBeVisible()
     await resetSearch.click()
     await expect(page.getByText(searchTerm)).toBeHidden()
-    await expect(
-      page.getByText(errorMessages.SEARCH_RESULTS_NOT_FOUND.title),
-    ).toBeHidden()
+    await expect(page.getByText("Keine Ergebnisse")).toBeHidden()
     await expect(
       page.getByText(
         "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit.",

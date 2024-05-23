@@ -91,9 +91,7 @@ const render = () => {
 </script>
 
 <template>
-  <div data-testid>
-    <render />
-  </div>
+  <render />
 </template>
 
 <style lang="scss" scoped>

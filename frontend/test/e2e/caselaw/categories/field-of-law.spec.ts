@@ -1,6 +1,4 @@
 import { expect } from "@playwright/test"
-import errorMessages from "@/i18n/errors.json"
-
 import {
   navigateToCategories,
   toggleFieldOfLawSection,
@@ -267,9 +265,7 @@ test.describe("field of law", () => {
 
     await page.locator("[aria-label='Sachgebiete Suche']").fill("xyz")
     await page.keyboard.press("Enter")
-    await expect(
-      page.getByText(errorMessages.SEARCH_RESULTS_NOT_FOUND.title),
-    ).toBeVisible()
+    await expect(page.getByText("Keine Ergebnisse")).toBeVisible()
   })
 
   test("Search with paginated results - test the pagination navigation", async ({

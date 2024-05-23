@@ -4,7 +4,6 @@ import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import { PublicationState } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
-import errorMessages from "@/i18n/errors.json"
 import { ResponseError } from "@/services/httpClient"
 
 function renderComponent(options?: {
@@ -28,7 +27,7 @@ function renderComponent(options?: {
           options?.emptyState ??
           (!options?.documentUnitListEntries
             ? "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit."
-            : errorMessages.SEARCH_RESULTS_NOT_FOUND.title),
+            : "Keine Ergebnisse gefunden."),
       },
       global: {
         plugins: [
@@ -77,9 +76,7 @@ describe("documentUnit list", () => {
       documentUnitListEntries: [],
     })
 
-    expect(
-      screen.getByText(errorMessages.SEARCH_RESULTS_NOT_FOUND.title),
-    ).toBeVisible()
+    expect(screen.getByText(/Keine Ergebnisse./)).toBeVisible()
   })
 
   test("shows error", () => {
