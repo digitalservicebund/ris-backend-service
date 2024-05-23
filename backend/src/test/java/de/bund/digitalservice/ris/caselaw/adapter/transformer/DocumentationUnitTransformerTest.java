@@ -274,7 +274,7 @@ class DocumentationUnitTransformerTest {
             .build();
 
     DocumentationUnitDTO documentationUnitDTO =
-        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject, true);
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getNormReferences().get(0).getLegalForce()).isNotNull();
     assertThat(
@@ -325,7 +325,7 @@ class DocumentationUnitTransformerTest {
             .build();
 
     DocumentationUnitDTO documentationUnitDTO =
-        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject, true);
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getNormReferences().get(0).getNormAbbreviation().getId())
         .isEqualTo(normReferenceInput.normAbbreviation().id());
@@ -397,7 +397,7 @@ class DocumentationUnitTransformerTest {
             .build();
 
     DocumentationUnitDTO documentationUnitDTO =
-        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject, true);
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getNormReferences().get(0).getNormAbbreviation().getId())
         .isEqualTo(normReferenceInput1.normAbbreviation().id());
@@ -439,7 +439,7 @@ class DocumentationUnitTransformerTest {
         assertThrows(
             DocumentUnitTransformerException.class,
             () -> {
-              DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject, true);
+              DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
             });
 
     String expectedMessage = "Norm reference has no norm abbreviation, but is required.";

@@ -29,7 +29,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicati
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalForceTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.NormAbbreviationTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.RegionTransformer;
-import de.bund.digitalservice.ris.caselaw.config.FeatureToggleConfig;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -77,7 +76,6 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       SecurityConfig.class,
       AuthService.class,
       TestConfig.class,
-      FeatureToggleConfig.class,
       DocumentNumberPatternConfig.class
     },
     controllers = {DocumentUnitController.class},

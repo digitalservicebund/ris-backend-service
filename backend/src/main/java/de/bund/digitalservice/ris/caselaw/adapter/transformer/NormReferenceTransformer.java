@@ -48,11 +48,9 @@ public class NormReferenceTransformer {
    * into its own {@link NormReferenceDTO}.
    *
    * @param normReference The NormReference object to be transformed.
-   * @param featureActive A boolean indicating whether the feature is active or not.
    * @return A list of NormReferenceDTOs representing the transformed NormReference object.
    */
-  public static List<NormReferenceDTO> transformToDTO(
-      NormReference normReference, boolean featureActive) {
+  public static List<NormReferenceDTO> transformToDTO(NormReference normReference) {
     if (normReference == null) {
       return Collections.emptyList();
     }
@@ -93,7 +91,7 @@ public class NormReferenceTransformer {
                       .dateOfVersion(singleNorm.dateOfVersion())
                       .dateOfRelevance(singleNorm.dateOfRelevance());
 
-              if (featureActive && singleNorm.legalForce() != null) {
+              if (singleNorm.legalForce() != null) {
                 builder.legalForce(LegalForceTransformer.transformToDTO(singleNorm.legalForce()));
               }
 

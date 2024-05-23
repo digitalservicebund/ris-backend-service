@@ -118,7 +118,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
 
   @Transactional(transactionManager = "jpaTransactionManager")
   @Override
-  public void save(DocumentUnit documentUnit, boolean featureActive) {
+  public void save(DocumentUnit documentUnit) {
 
     DocumentationUnitDTO documentationUnitDTO =
         repository.findById(documentUnit.uuid()).orElse(null);
@@ -148,8 +148,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
 
     // Transform non-database-related properties
     documentationUnitDTO =
-        DocumentationUnitTransformer.transformToDTO(
-            documentationUnitDTO, documentUnit, featureActive);
+        DocumentationUnitTransformer.transformToDTO(documentationUnitDTO, documentUnit);
     repository.save(documentationUnitDTO);
   }
 
