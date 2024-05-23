@@ -4,6 +4,7 @@ import FlexContainer from "@/components/FlexContainer.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
+import errorMessages from "@/i18n/errors.json"
 import IconAdd from "~icons/ic/baseline-add"
 
 defineProps<{
@@ -37,7 +38,7 @@ export type SearchResults<Type extends RelatedDocumentation> = {
       class="grid justify-items-center"
     >
       <FlexContainer class="m-24" justify-content="justify-center">
-        <p>Keine Ergebnisse gefunden</p>
+        <p>{{ errorMessages.SEARCH_RESULTS_NOT_FOUND.title }}</p>
       </FlexContainer>
     </div>
 
