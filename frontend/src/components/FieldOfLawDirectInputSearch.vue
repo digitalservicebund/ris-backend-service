@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-import { ref } from "vue"
+import { ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import { ComboboxInputModelType } from "@/components/input/types"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import ComboboxItemService from "@/services/comboboxItemService"
 
@@ -10,11 +9,9 @@ const emit = defineEmits<{
 }>()
 const fieldOfLawNode = ref()
 
-function handleUpdateModelValue(item: ComboboxInputModelType | undefined) {
-  if (!item) return
-  fieldOfLawNode.value = item
-  emit("add-to-list", item as FieldOfLawNode)
-}
+watch(fieldOfLawNode, () => {
+  emit("add-to-list", fieldOfLawNode.value as FieldOfLawNode)
+})
 </script>
 
 <template>
@@ -24,12 +21,11 @@ function handleUpdateModelValue(item: ComboboxInputModelType | undefined) {
       <div class="grow">
         <ComboboxInput
           id="directInputCombobox"
+          v-model="fieldOfLawNode"
           aria-label="Direkteingabe-Sachgebietssuche eingeben"
           clear-on-choosing-item
           :item-service="ComboboxItemService.getFieldOfLawSearchByIdentifier"
-          :model-value="fieldOfLawNode"
           placeholder="Sachgebiet"
-          @update:model-value="handleUpdateModelValue"
         >
         </ComboboxInput>
       </div>

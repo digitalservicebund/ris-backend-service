@@ -213,7 +213,7 @@ onBeforeUnmount(() => {
         :item-service="ComboboxItemService.getRisAbbreviations"
         no-clear
         placeholder="Abkürzung, Kurz-oder Langtitel oder Region eingeben..."
-        @input="validationStore.remove('normAbbreviation')"
+        @focus="validationStore.remove('normAbbreviation')"
       ></ComboboxInput>
     </InputField>
     <div v-if="normAbbreviation || norm.normAbbreviationRawValue">

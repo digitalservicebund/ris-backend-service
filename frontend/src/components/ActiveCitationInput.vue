@@ -215,6 +215,7 @@ onBeforeUnmount(() => {
         clear-on-choosing-item
         :has-error="slotProps.hasError"
         :item-service="ComboboxItemService.getCitationTypes"
+        @focus="validationStore.remove('citationType')"
       ></ComboboxInput>
     </InputField>
     <div class="flex flex-col gap-24">
@@ -233,6 +234,7 @@ onBeforeUnmount(() => {
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getCourts"
             :readonly="activeCitation.hasForeignSource"
+            @focus="validationStore.remove('court')"
           >
           </ComboboxInput>
         </InputField>
@@ -252,6 +254,7 @@ onBeforeUnmount(() => {
             class="ds-input-medium"
             :has-error="slotProps.hasError"
             :readonly="activeCitation.hasForeignSource"
+            @focus="validationStore.remove('decisionDate')"
             @update:validation-error="slotProps.updateValidationError"
           ></DateInput>
         </InputField>
@@ -270,6 +273,7 @@ onBeforeUnmount(() => {
             :has-error="slotProps.hasError"
             :readonly="activeCitation.hasForeignSource"
             size="medium"
+            @focus="validationStore.remove('fileNumber')"
           ></TextInput>
         </InputField>
         <InputField id="activeCitationDecisionDocumentType" label="Dokumenttyp">

@@ -43,11 +43,18 @@ test.describe("active citations", () => {
 
     await expect(page.getByText("1 Ergebnis gefunden")).toBeVisible()
 
-    const result = page.getByText(
-      `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
-    )
+    await expect(
+      page.getByText(
+        `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`,
+      ),
+    ).toBeVisible()
 
-    await expect(result).toBeVisible()
+    await expect(
+      page.getByTestId(
+        `decision-summary-${prefilledDocumentUnit.documentNumber}`,
+      ),
+    ).toBeVisible()
+
     await page.getByLabel("Treffer übernehmen").click()
 
     await expect(

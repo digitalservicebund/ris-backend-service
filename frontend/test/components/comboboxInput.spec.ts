@@ -523,4 +523,18 @@ describe("Combobox Element", () => {
       screen.queryByLabelText("Auswahl zurücksetzen"),
     ).not.toBeInTheDocument()
   })
+
+  it("deleting manually updates the filter", async () => {
+    renderComponent()
+
+    const input = screen.getByLabelText("test label")
+    await user.type(input, "b")
+
+    const dropdownItems = screen.getAllByLabelText("dropdown-option")
+    expect(dropdownItems).toHaveLength(1)
+    expect(dropdownItems[0]).toHaveTextContent("Kein passender Eintrag")
+    await user.type(input, "{backspace}")
+    expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(3)
+    expect(dropdownItems[0]).toHaveTextContent("testItem1")
+  })
 })

@@ -13,7 +13,6 @@ import LegalForce from "@/domain/legalForce"
 import SingleNorm, { SingleNormValidationInfo } from "@/domain/singleNorm"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
-import FeatureToggleService from "@/services/featureToggleService"
 import IconClear from "~icons/material-symbols/close-small"
 
 const props = defineProps<{
@@ -42,8 +41,6 @@ const courtTypesWithLegalForce = [
   "VGH",
   "OVG",
 ]
-
-const featureToggle = ref()
 
 const singleNorm = computed({
   get: () => {
@@ -203,16 +200,13 @@ onMounted(async () => {
 
   hasLegalForce.value = !!singleNorm.value?.legalForce
   singleNormInput.value?.focusInput()
-  featureToggle.value = (
-    await FeatureToggleService.isEnabled("neuris.legal-force")
-  ).data
 })
 </script>
 
 <template>
   <div class="mb-24 flex flex-col gap-24 pb-24">
     <div
-      v-if="featureToggle && isCourtWithLegalForce"
+      v-if="isCourtWithLegalForce"
       class="flex flex-row justify-between gap-24"
     >
       <InputField
@@ -242,7 +236,7 @@ onMounted(async () => {
     <div
       class="gap-24"
       :class="
-        featureToggle && isCourtWithLegalForce
+        isCourtWithLegalForce
           ? 'grid grid-cols-3'
           : 'flex flex-row justify-between'
       "
@@ -261,7 +255,7 @@ onMounted(async () => {
           :has-error="slotProps.hasError"
           size="medium"
           @blur="validateNorm"
-          @input="validationStore.remove('singleNorm')"
+          @focus="validationStore.remove('singleNorm')"
         ></TextInput>
       </InputField>
       <InputField
@@ -280,6 +274,7 @@ onMounted(async () => {
           aria-label="Fassungsdatum der Norm"
           class="ds-input-medium"
           :has-error="slotProps.hasError"
+          @focus="validationStore.remove('dateOfVersion')"
           @update:validation-error="slotProps.updateValidationError"
         />
       </InputField>
@@ -299,11 +294,12 @@ onMounted(async () => {
           aria-label="Jahr der Norm"
           :has-error="slotProps.hasError"
           size="medium"
+          @focus="validationStore.remove('dateOfRelevance')"
           @update:validation-error="slotProps.updateValidationError"
         />
       </InputField>
       <button
-        v-if="!featureToggle || !isCourtWithLegalForce"
+        v-if="!isCourtWithLegalForce"
         aria-label="Einzelnorm löschen"
         class="mt-[25px] h-[50px] text-blue-800 focus:shadow-[inset_0_0_0_0.25rem] focus:shadow-blue-800 focus:outline-none"
         tabindex="0"
@@ -313,12 +309,12 @@ onMounted(async () => {
       </button>
     </div>
     <div
-      v-if="featureToggle && hasLegalForce && isCourtWithLegalForce"
+      v-if="hasLegalForce && isCourtWithLegalForce"
       class="grid grid-cols-3 gap-24"
     >
       <div>
         <InputField
-          id="legalForceType"
+          id="type"
           v-slot="slotProps"
           label="Typ der Ges.-Kraft *"
           :validation-error="legalForceValidationStore.getByField('type')"
@@ -331,12 +327,13 @@ onMounted(async () => {
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getLegalForceTypes"
             @click="legalForceValidationStore.remove('type')"
+            @focus="legalForceValidationStore.remove('type')"
           ></ComboboxInput>
         </InputField>
       </div>
       <div class="col-span-2">
         <InputField
-          id="legalForceRegion"
+          id="region"
           v-slot="slotProps"
           label="Geltungsbereich *"
           :validation-error="legalForceValidationStore.getByField('region')"
@@ -349,6 +346,7 @@ onMounted(async () => {
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getLegalForceRegions"
             @click="legalForceValidationStore.remove('region')"
+            @focus="legalForceValidationStore.remove('region')"
           ></ComboboxInput>
         </InputField>
       </div>
