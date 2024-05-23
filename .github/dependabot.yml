@@ -9,17 +9,23 @@ updates:
     # Too much noise with patch releases...
     ignore:
       - dependency-name: "*"
-        update-types: ["version-update:semver-patch"]
+        update-types: [ "version-update:semver-patch" ]
     open-pull-requests-limit: 9999
 
   - package-ecosystem: "npm"
+    groups:
+      frontend-dependencies:
+        applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
     directory: "/frontend"
     schedule:
       interval: "daily"
     # Too much noise with patch releases...
     ignore:
       - dependency-name: "*"
-        update-types: ["version-update:semver-patch"]
+        update-types: [ "version-update:semver-patch" ]
     open-pull-requests-limit: 9999
 
   - package-ecosystem: "github-actions"
@@ -29,7 +35,7 @@ updates:
     # Too much noise with patch releases...
     ignore:
       - dependency-name: "*"
-        update-types: ["version-update:semver-patch"]
+        update-types: [ "version-update:semver-patch" ]
     open-pull-requests-limit: 9999
 
   - package-ecosystem: "docker"
@@ -39,5 +45,5 @@ updates:
     # Too much noise with patch releases...
     ignore:
       - dependency-name: "*"
-        update-types: ["version-update:semver-patch"]
+        update-types: [ "version-update:semver-patch" ]
     open-pull-requests-limit: 9999
