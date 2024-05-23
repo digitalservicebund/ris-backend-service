@@ -11,7 +11,9 @@ const props = defineProps<Props>()
 </script>
 
 <template>
-  <FlexContainer flex-direction="flex-row">
+  <FlexContainer
+    :data-testid="'decision-summary-' + props.decision.documentNumber"
+  >
     {{ decision.renderDecisionWithoutDocumentNumber }}
     <DocumentNumberPreviewLink :decision="props.decision" />
   </FlexContainer>

@@ -12,7 +12,9 @@ const props = defineProps<Props>()
 </script>
 
 <template>
-  <FlexContainer>
+  <FlexContainer
+    :data-testid="'document-number-link-' + props.decision.documentNumber"
+  >
     <span class="ds-label-01-reg ml-8 mr-8">|</span>
     <div v-if="decision.hasForeignSource">
       <RouterLink
