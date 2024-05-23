@@ -1,4 +1,5 @@
 import { expect } from "@playwright/test"
+import errorMessages from "@/i18n/errors.json"
 import {
   fillActiveCitationInputs,
   fillEnsuingDecisionInputs,
@@ -157,7 +158,7 @@ test("search with changed parameters resets the page to 0", async ({
         await container.getByLabel("Nach Entscheidung suchen").click()
 
         await expect(
-          container.getByText("Keine Ergebnisse gefunden."),
+          container.getByText(errorMessages.SEARCH_RESULTS_NOT_FOUND.title),
         ).toBeVisible()
       },
     )
@@ -209,7 +210,7 @@ test("search for documentunits does not return current documentation unit", asyn
 
         await container.getByLabel("Nach Entscheidung suchen").click()
         await expect(
-          container.getByText("Keine Ergebnisse gefunden."),
+          container.getByText(errorMessages.SEARCH_RESULTS_NOT_FOUND.title),
         ).toBeVisible()
       },
     )
