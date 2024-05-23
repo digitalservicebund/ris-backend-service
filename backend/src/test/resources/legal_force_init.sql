@@ -123,17 +123,13 @@ INSERT INTO
   incremental_migration.legal_force (
     id,
     legal_force_type_id,
-    norm_abbreviation_id,
     region_id,
-    documentation_unit_id,
     norm_reference_id
   )
 VALUES
   (
     '33333333-2222-3333-6666-555555555555',
     '11111111-2222-3333-4444-555555555555',
-    '33333333-2222-3333-4444-555555555555',
     '55555555-2222-3333-4444-555555555555',
-    'f13e7fe2-78a5-11ee-b962-0242ac120002',
     'f0232240-7416-11ee-b962-0242ac120002'
   );
