@@ -178,5 +178,8 @@
   "PAGE_NOT_FIND": {
     "title": "Diese Internetseite existiert nicht",
     "description": ""
+  },
+  "SEARCH_RESULTS_NOT_FOUND": {
+    "title": "Keine Suchergebnisse gefunden"
   }
 }

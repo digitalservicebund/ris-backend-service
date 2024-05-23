@@ -19,6 +19,7 @@ const emit = defineEmits<{
   "update:modelValue": [value?: PreviousDecision[]]
 }>()
 
+// vor gehende nach gehede aktiv zityierung => searchresultlist
 const proceedingDecisions = computed({
   get: () => {
     return props.modelValue
