@@ -26,17 +26,20 @@ const props = defineProps<Props>()
           params: { documentNumber: props.decision.documentNumber },
         }"
       >
-        <FlexContainer flex-direction="flex-row">
-          <FlexContainer
-            class="ds-link-03-bold flex flex-row border-b-2 border-blue-800 leading-24 focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
-            flex-direction="flex-row"
-          >
-            <p>{{ props.decision.documentNumber }}</p>
-            <BaselineArrowOutward />
+        <button>
+          <FlexContainer flex-direction="flex-row">
+            <FlexContainer
+              class="ds-link-03-bold flex flex-row border-b-2 border-blue-800 leading-24 focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
+              flex-direction="flex-row"
+            >
+              <p>{{ props.decision.documentNumber }}</p>
+              <BaselineArrowOutward />
+            </FlexContainer>
           </FlexContainer>
-        </FlexContainer>
+        </button>
       </RouterLink>
     </div>
+
     <div v-else>
       <p>
         {{ props.decision.documentNumber }}
