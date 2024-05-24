@@ -104,7 +104,7 @@ const DecisionSummary = withSummarizer(decisionSummarizer)
 </script>
 
 <template>
-  <div class="mb-2 flex flex-col gap-24 bg-white p-32">
+  <div class="flex flex-col gap-24 bg-white p-32">
     <h2 class="ds-heading-03-bold">Rechtszug</h2>
     <div aria-label="Vorgehende Entscheidung">
       <h2 class="ds-heading-03-reg mb-24">Vorgehende Entscheidungen</h2>
