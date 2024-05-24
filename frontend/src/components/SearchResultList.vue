@@ -24,7 +24,7 @@ export type SearchResults<Type extends RelatedDocumentation> = {
 </script>
 
 <template>
-  <div class="bg-blue-200">
+  <div class="bg-blue-100">
     <FlexContainer
       v-if="isLoading"
       class="m-24"
