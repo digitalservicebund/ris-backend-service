@@ -1,5 +1,6 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { expect } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitSearchEntryForm from "@/components/DocumentUnitSearchEntryForm.vue"
 
@@ -65,6 +66,25 @@ describe("Documentunit search form", () => {
     )
 
     expect(emitted().search).toBeTruthy()
+  })
+
+  test("click on 'Ergebnisse anzeigen' with the same search entry, emits search event again", async () => {
+    const { emitted, user } = await renderComponent()
+
+    await user.type(
+      screen.getByLabelText("Entscheidungsdatum Suche"),
+      "23.03.2003",
+    )
+    await user.click(
+      screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
+    )
+    expect(emitted().search.length).toBe(2)
+
+    await user.click(
+      screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
+    )
+
+    expect(emitted().search.length).toBe(3)
   })
 
   test("click on 'Nur meine Dokstelle' renders 'Nur fehlerhafte Dokumentationseinheiten' checkbox", async () => {

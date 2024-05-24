@@ -28,7 +28,7 @@ const isLoading = ref(false)
 const searchQuery = ref<Query<DocumentUnitSearchParameter>>()
 const pageNumber = ref<number>(0)
 
-const emptyStatus = computed(() => {
+const emptyStateLabel = computed(() => {
   if (!documentUnitListEntries.value) {
     return "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit."
   } else if (documentUnitListEntries.value.length === 0) {
@@ -241,7 +241,7 @@ const showDefaultLink = computed(() => {
       <DocumentUnitList
         class="grow"
         :document-unit-list-entries="documentUnitListEntries"
-        :empty-state="emptyStatus"
+        :empty-state="emptyStateLabel"
         is-deletable
         :is-loading="isLoading"
         :search-response-error="searchResponseError"

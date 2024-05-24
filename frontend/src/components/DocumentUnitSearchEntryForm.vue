@@ -25,9 +25,20 @@ const { route, getQueryFromRoute, pushQueryToRoute } =
   useQuery<DocumentUnitSearchParameter>()
 const query = ref(getQueryFromRoute())
 
-const searchEntryEmpty = computed(() => {
+const isEmptySearch = computed(() => {
   return Object.keys(query.value).length === 0
 })
+
+/**
+ * Computed property that determines whether the current search query is identical to the previous search query.
+ * @returns {ComputedRef<boolean>} - Returns `true` if the queries are identical, otherwise `false`.
+ */
+const isIdenticalSearch = computed(() => {
+  const previousQuery = getQueryFromRoute()
+  const newQuery = query.value
+  return JSON.stringify(previousQuery) === JSON.stringify(newQuery)
+})
+
 const submitButtonError = ref()
 
 const dropdownItems: DropdownItem[] = [
@@ -92,7 +103,7 @@ async function validateSearchInput() {
     validationStore.remove("decisionDate")
   }
 
-  //Enddatum darf nich vor Startdatum liegen
+  //Enddatum darf nicht vor Startdatum liegen
   if (
     query.value?.decisionDateEnd &&
     query.value?.decisionDate &&
@@ -123,10 +134,15 @@ function handleLocalInputError(error: ValidationError | undefined, id: string) {
 
 function handleSearchButtonClicked() {
   validateSearchInput()
-  if (searchEntryEmpty.value) {
+  if (isEmptySearch.value) {
     submitButtonError.value = "Geben Sie mindestens ein Suchkriterium ein"
   } else if (validationStore.getAll().length > 0) {
     submitButtonError.value = "Fehler in Suchkriterien"
+  } else if (isIdenticalSearch.value && !isEmptySearch.value) {
+    // Emit the search event to allow repeating the same search and therefore update the search results.
+    // This is necessary because the route remains unchanged in a repeated search,
+    // so the watcher on the route is not triggered and no search event is emitted.
+    emit("search", getQueryFromRoute())
   } else {
     pushQueryToRoute(query.value)
   }
@@ -141,7 +157,7 @@ watch(
   route,
   () => {
     query.value = getQueryFromRoute()
-    if (!searchEntryEmpty.value) emit("search", getQueryFromRoute())
+    if (!isEmptySearch.value) emit("search", getQueryFromRoute())
     else resetSearch()
   },
   { deep: true },
@@ -156,7 +172,7 @@ watch(
 )
 
 onMounted(async () => {
-  if (!searchEntryEmpty.value) emit("search", getQueryFromRoute())
+  if (!isEmptySearch.value) emit("search", getQueryFromRoute())
   window.addEventListener("keydown", handleSearchShortcut)
 })
 
@@ -359,7 +375,7 @@ export type DocumentUnitSearchParameter =
         </div>
 
         <TextButton
-          v-if="!searchEntryEmpty"
+          v-if="!isEmptySearch"
           aria-label="Suche zurücksetzen"
           button-type="ghost"
           class="ml-8 self-start"
