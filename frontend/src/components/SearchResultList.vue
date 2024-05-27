@@ -60,6 +60,7 @@ export type SearchResults<Type extends RelatedDocumentation> = {
             data-testid="add-decision-button"
             :disabled="searchResult.isLinked"
             :icon="IconAdd"
+            size="small"
             @click.stop="emits('linkDecision', searchResult.decision)"
           />
           <InlineDecision :decision="searchResult.decision" />
