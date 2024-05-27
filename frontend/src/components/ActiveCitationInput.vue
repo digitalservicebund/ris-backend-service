@@ -156,6 +156,7 @@ function scrollToTop() {
     })
   }
 }
+
 function updateDateFormatValidation(
   validationError: ValidationError | undefined,
 ) {
@@ -326,16 +327,18 @@ onBeforeUnmount(() => {
       />
     </div>
 
-    <Pagination
-      navigation-position="bottom"
-      :page="searchResultsCurrentPage"
-      @update-page="updatePage"
-    >
-      <SearchResultList
-        :is-loading="isLoading"
-        :search-results="searchResults"
-        @link-decision="addActiveCitationFromSearch"
-      />
-    </Pagination>
+    <div class="bg-blue-200">
+      <Pagination
+        navigation-position="bottom"
+        :page="searchResultsCurrentPage"
+        @update-page="updatePage"
+      >
+        <SearchResultList
+          :is-loading="isLoading"
+          :search-results="searchResults"
+          @link-decision="addActiveCitationFromSearch"
+        />
+      </Pagination>
+    </div>
   </div>
 </template>
