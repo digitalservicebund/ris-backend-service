@@ -21,7 +21,7 @@
       ],
       "timezone": "Europe/Berlin",
       "schedule": [
-        "every weekday before 5:30am and after 6:30am"
+        "every weekday"
       ],
       // branch creation only on weekdays
       "automerge": true,
