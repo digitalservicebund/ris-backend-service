@@ -1,3 +1,4 @@
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
@@ -43,7 +44,7 @@ function renderComponent() {
   return {
     user,
     ...render(DocumentUnitSearch, {
-      global: { plugins: [router] },
+      global: { plugins: [router, createTestingPinia()] },
     }),
   }
 }

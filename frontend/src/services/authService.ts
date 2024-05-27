@@ -20,10 +20,7 @@ interface AuthService {
 const service: AuthService = {
   async isAuthenticated(): Promise<boolean> {
     const response = await httpClient.get("auth/me")
-    if (response.status > 400) {
-      return false
-    }
-    return true
+    return response.status > 400 ? false : true
   },
 
   async getName(): Promise<ServiceResponse<User>> {

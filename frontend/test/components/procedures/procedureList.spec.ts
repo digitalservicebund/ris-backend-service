@@ -1,3 +1,4 @@
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
@@ -102,7 +103,7 @@ async function renderComponent(options?: { procedures: Procedure[][] }) {
     ...render(ProcedureList, {
       global: {
         stubs: { routerLink: { template: "<a><slot /></a>" } },
-        plugins: [router],
+        plugins: [router, createTestingPinia()],
       },
     }),
     // eslint-disable-next-line testing-library/await-async-events

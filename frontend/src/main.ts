@@ -1,6 +1,7 @@
 import { captureConsoleIntegration } from "@sentry/integrations"
 import * as Sentry from "@sentry/vue"
 import { createHead } from "@unhead/vue"
+import { createPinia } from "pinia"
 import { createApp } from "vue"
 import "@/styles/global.scss"
 import App from "./App.vue"
@@ -33,4 +34,4 @@ if (import.meta.env.PROD) {
   })
 }
 
-app.use(router).mount("#app")
+app.use(router).use(createPinia()).mount("#app")

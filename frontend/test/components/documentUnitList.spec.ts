@@ -1,3 +1,4 @@
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen, waitFor } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
@@ -32,6 +33,7 @@ function renderComponent(options?: {
       },
       global: {
         plugins: [
+          createTestingPinia(),
           createRouter({
             history: createWebHistory(),
             routes: [

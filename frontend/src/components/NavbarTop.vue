@@ -2,19 +2,15 @@
 import { ref, onMounted } from "vue"
 import { useRoute } from "vue-router"
 import Logo from "@/assets/neuRIS-logo.svg"
-import { User } from "@/domain/user"
-import authService from "@/services/authService"
 import FeatureToggleService from "@/services/featureToggleService"
+import useSessionStore from "@/stores/sessionStore"
 import IconPermIdentity from "~icons/ic/baseline-perm-identity"
 
 const route = useRoute()
-const user = ref<User>()
+const session = useSessionStore()
 const fontColor = ref<string>()
 
 onMounted(async () => {
-  const nameResponse = await authService.getName()
-  if (nameResponse.data) user.value = nameResponse.data
-
   const featureToggle = (
     await FeatureToggleService.isEnabled("neuris.environment-test")
   ).data
@@ -64,14 +60,16 @@ onMounted(async () => {
       </router-link>
     </div>
 
-    <div v-if="user" class="grid grid-cols-[auto,1fr] gap-10">
+    <div v-if="session.user" class="grid grid-cols-[auto,1fr] gap-10">
       <IconPermIdentity />
       <div>
         <div class="ds-label-01-bold">
-          <router-link :to="{ name: 'settings' }">{{ user.name }}</router-link>
+          <router-link :to="{ name: 'settings' }">{{
+            session.user.name
+          }}</router-link>
         </div>
-        <div v-if="user.documentationOffice" class="ds-label-03-reg">
-          {{ user.documentationOffice.abbreviation }}
+        <div v-if="session.user.documentationOffice" class="ds-label-03-reg">
+          {{ session.user.documentationOffice.abbreviation }}
         </div>
       </div>
     </div>

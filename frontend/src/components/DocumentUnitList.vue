@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
-import { computed, ref, onMounted } from "vue"
+import { computed, ref } from "vue"
 import DocumentUnitListEntry from "../domain/documentUnitListEntry"
 import CellHeaderItem from "@/components/CellHeaderItem.vue"
 import CellItem from "@/components/CellItem.vue"
@@ -14,9 +14,8 @@ import TableHeader from "@/components/TableHeader.vue"
 import TableRow from "@/components/TableRow.vue"
 import TableView from "@/components/TableView.vue"
 import { useStatusBadge } from "@/composables/useStatusBadge"
-import { User } from "@/domain/user"
-import authService from "@/services/authService"
 import { ResponseError } from "@/services/httpClient"
+import useSessionStore from "@/stores/sessionStore"
 import IconAttachedFile from "~icons/ic/baseline-attach-file"
 import IconDelete from "~icons/ic/baseline-close"
 import IconError from "~icons/ic/baseline-error"
@@ -36,7 +35,7 @@ const emit = defineEmits<{
   deleteDocumentUnit: [documentUnitListEntry: DocumentUnitListEntry]
 }>()
 
-const user = ref<User>()
+const session = useSessionStore()
 
 const emptyStatus = computed(() => props.emptyState)
 
@@ -52,11 +51,6 @@ const popupModalText = computed(
   () =>
     `Möchten Sie die Dokumentationseinheit ${selectedDocumentUnitListEntry?.value?.documentNumber} wirklich dauerhaft löschen?`,
 )
-
-onMounted(async () => {
-  const nameResponse = await authService.getName()
-  if (nameResponse.data) user.value = nameResponse.data
-})
 
 /**
  * Stops propagation of scrolling event, and toggles the showModal value
@@ -201,7 +195,7 @@ function onDelete() {
             <router-link
               v-if="
                 listEntry.documentationOffice?.abbreviation ===
-                user?.documentationOffice?.abbreviation
+                session.user?.documentationOffice?.abbreviation
               "
               aria-label="Dokumentationseinheit bearbeiten"
               class="cursor-pointer border-2 border-r-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
@@ -236,7 +230,7 @@ function onDelete() {
               v-if="
                 isDeletable &&
                 listEntry.documentationOffice?.abbreviation ===
-                  user?.documentationOffice?.abbreviation
+                  session.user?.documentationOffice?.abbreviation
               "
               aria-label="Dokumentationseinheit löschen"
               class="cursor-pointer border-2 border-l-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
