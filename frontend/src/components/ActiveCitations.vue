@@ -107,7 +107,7 @@ const CitationsSummary = withSummarizer(decisionSummarizer)
 </script>
 
 <template>
-  <div aria-label="Aktivzitierung" class="bg-white p-32">
+  <div aria-label="Aktivzitierung" class="bg-white px-32">
     <h2 class="ds-heading-03-reg">Aktivzitierung</h2>
     <div class="flex flex-row">
       <div class="flex-1">
