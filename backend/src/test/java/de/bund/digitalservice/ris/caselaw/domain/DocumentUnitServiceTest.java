@@ -343,10 +343,10 @@ class DocumentUnitServiceTest {
     service.searchByDocumentationUnitSearchInput(
         pageRequest,
         documentationOffice,
-        Optional.of("DOC\u00A012345"),
-        Optional.of("FILE\u00A012345"),
-        Optional.of("COURT\u00A012345"),
-        Optional.of("COURT LOCATION\u00A012345"),
+        Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007docnumber\u180Ewith\u2060spaces"),
+        Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007filenumber\u180Ewith\u2060spaces"),
+        Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007courttype\u180Ewith\u2060spaces"),
+        Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007courtlocation\u180Ewith\u2060spaces"),
         Optional.empty(),
         Optional.empty(),
         Optional.empty(),
@@ -361,10 +361,12 @@ class DocumentUnitServiceTest {
     DocumentationUnitSearchInput capturedSearchInput = searchInputCaptor.getValue();
 
     // Verify that the searchInput fields have normalized spaces
-    assertThat(capturedSearchInput.documentNumber()).isEqualTo("DOC 12345");
-    assertThat(capturedSearchInput.fileNumber()).isEqualTo("FILE 12345");
-    assertThat(capturedSearchInput.courtType()).isEqualTo("COURT 12345");
-    assertThat(capturedSearchInput.courtLocation()).isEqualTo("COURT LOCATION 12345");
+    assertThat(capturedSearchInput.documentNumber())
+        .isEqualTo("This is a test docnumber with spaces");
+    assertThat(capturedSearchInput.fileNumber()).isEqualTo("This is a test filenumber with spaces");
+    assertThat(capturedSearchInput.courtType()).isEqualTo("This is a test courttype with spaces");
+    assertThat(capturedSearchInput.courtLocation())
+        .isEqualTo("This is a test courtlocation with spaces");
   }
 
   @Test
@@ -373,7 +375,10 @@ class DocumentUnitServiceTest {
     RelatedDocumentationUnit relatedDocumentationUnit =
         RelatedDocumentationUnit.builder()
             .uuid(UUID.randomUUID())
-            .fileNumber("FILE\u00A012345") // String with non-breaking space
+            .fileNumber(
+                "This\u00A0is\u202Fa\uFEFFtest\u2007filenumber\u180Ewith\u2060spaces.") // String
+            // with
+            // non-breaking space
             .build();
     PageRequest pageRequest = PageRequest.of(0, 10);
     String documentNumberToExclude = "DOC12345";
@@ -402,7 +407,8 @@ class DocumentUnitServiceTest {
         relatedDocumentationUnitCaptor.getValue();
 
     // Verify that the fileNumber field has normalized spaces
-    assertThat(capturedRelatedDocumentationUnit.getFileNumber()).isEqualTo("FILE 12345");
+    assertThat(capturedRelatedDocumentationUnit.getFileNumber())
+        .isEqualTo("This is a test filenumber with spaces.");
   }
 
   @Test
