@@ -116,13 +116,12 @@ async function addPreviousDecision() {
 }
 
 async function addPreviousDecisionFromSearch(decision: RelatedDocumentation) {
-  const newPreviousDecision = new PreviousDecision({
+  previousDecision.value = new PreviousDecision({
     ...decision,
     referenceFound: true,
     deviatingFileNumber: previousDecision.value.deviatingFileNumber,
   })
-
-  emit("update:modelValue", newPreviousDecision)
+  emit("update:modelValue", previousDecision.value as PreviousDecision)
   emit("addEntry")
   scrollToTop()
 }

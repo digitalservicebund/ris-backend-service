@@ -133,12 +133,12 @@ async function addActiveCitationFromSearch(decision: RelatedDocumentation) {
   const newActiveCitationType = {
     ...activeCitationType.value?.value,
   } as CitationType
-  const decisionWithCitationType = new ActiveCitation({
+  activeCitation.value = new ActiveCitation({
     ...decision,
     referenceFound: true,
     citationType: newActiveCitationType,
   })
-  emit("update:modelValue", decisionWithCitationType)
+  emit("update:modelValue", activeCitation.value as ActiveCitation)
   emit("addEntry")
   scrollToTop()
 }

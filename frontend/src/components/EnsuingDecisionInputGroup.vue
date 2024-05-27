@@ -113,13 +113,13 @@ async function addEnsuingDecision() {
 }
 
 async function addEnsuingDecisionFromSearch(decision: RelatedDocumentation) {
-  const decisionWithNote = new EnsuingDecision({
+  ensuingDecision.value = new EnsuingDecision({
     ...decision,
     pending: ensuingDecision.value?.pending,
     referenceFound: true,
     note: ensuingDecision.value?.note,
   })
-  emit("update:modelValue", decisionWithNote)
+  emit("update:modelValue", ensuingDecision.value as EnsuingDecision)
   emit("addEntry")
   scrollToTop()
 }
