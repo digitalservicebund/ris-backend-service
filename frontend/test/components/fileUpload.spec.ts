@@ -3,11 +3,10 @@ import { flushPromises } from "@vue/test-utils"
 import FileUpload from "@/components/FileUpload.vue"
 
 describe("FileUpload", () => {
+  // TODO: more test needed because of new props
   test("renders file upload with default props", async () => {
     render(FileUpload, {
-      props: {
-        error: undefined,
-      },
+      props: {},
     })
 
     screen.getByText("Ziehen Sie Ihre Dateien in diesem Bereich.")

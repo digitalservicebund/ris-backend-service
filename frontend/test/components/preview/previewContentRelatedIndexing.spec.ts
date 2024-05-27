@@ -5,7 +5,7 @@ import { ContentRelatedIndexing } from "@/domain/documentUnit"
 import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
 
-function renderComponent(contentRelatedIndexing?: ContentRelatedIndexing) {
+function renderComponent(contentRelatedIndexing: ContentRelatedIndexing) {
   return render(PreviewContentRelatedIndexing, {
     props: {
       contentRelatedIndexing: contentRelatedIndexing,
