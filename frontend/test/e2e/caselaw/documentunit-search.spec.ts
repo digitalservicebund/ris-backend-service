@@ -351,6 +351,7 @@ test.describe("search", () => {
     ).toBeVisible()
 
     await page.getByLabel("Entscheidungsdatum Suche", { exact: true }).clear()
+    await page.getByLabel("Entscheidungsdatum Suche", { exact: true }).blur()
     await expect(page.getByText("Startdatum fehlt")).toBeVisible()
     await expect(
       page.getByText("Enddatum darf nich vor Startdatum liegen"),
@@ -360,6 +361,9 @@ test.describe("search", () => {
     await page
       .getByLabel("Entscheidungsdatum Suche Ende", { exact: true })
       .clear()
+    await page
+      .getByLabel("Entscheidungsdatum Suche Ende", { exact: true })
+      .blur()
     await expect(page.getByText("Startdatum fehlt")).toBeHidden()
   })
 

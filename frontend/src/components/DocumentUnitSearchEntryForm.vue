@@ -29,16 +29,6 @@ const isEmptySearch = computed(() => {
   return Object.keys(query.value).length === 0
 })
 
-/**
- * Computed property that determines whether the current search query is identical to the previous search query.
- * @returns {ComputedRef<boolean>} - Returns `true` if the queries are identical, otherwise `false`.
- */
-const isIdenticalSearch = computed(() => {
-  const previousQuery = getQueryFromRoute()
-  const newQuery = query.value
-  return JSON.stringify(previousQuery) === JSON.stringify(newQuery)
-})
-
 const submitButtonError = ref()
 
 const dropdownItems: DropdownItem[] = [
@@ -88,6 +78,24 @@ function resetErrors(id?: DocumentUnitSearchParameter) {
   submitButtonError.value = undefined
 }
 
+function isSearchInputInvalid() {
+  if (isEmptySearch.value) {
+    submitButtonError.value = "Geben Sie mindestens ein Suchkriterium ein"
+    return true
+  }
+
+  if (hasValidationErrors()) {
+    submitButtonError.value = "Fehler in Suchkriterien"
+    return true
+  }
+
+  return false
+}
+
+function hasValidationErrors() {
+  return validationStore.getAll().length > 0
+}
+
 async function validateSearchInput() {
   //Startdatum fehlt
   if (
@@ -134,18 +142,13 @@ function handleLocalInputError(error: ValidationError | undefined, id: string) {
 
 function handleSearchButtonClicked() {
   validateSearchInput()
-  if (isEmptySearch.value) {
-    submitButtonError.value = "Geben Sie mindestens ein Suchkriterium ein"
-  } else if (validationStore.getAll().length > 0) {
-    submitButtonError.value = "Fehler in Suchkriterien"
-  } else if (isIdenticalSearch.value && !isEmptySearch.value) {
-    // Emit the search event to allow repeating the same search and therefore update the search results.
-    // This is necessary because the route remains unchanged in a repeated search,
-    // so the watcher on the route is not triggered and no search event is emitted.
-    emit("search", getQueryFromRoute())
-  } else {
-    pushQueryToRoute(query.value)
+
+  if (isSearchInputInvalid()) {
+    return
   }
+
+  handleSearch()
+  pushQueryToRoute(query.value)
 }
 
 function handleSearchShortcut(event: KeyboardEvent) {
@@ -153,26 +156,24 @@ function handleSearchShortcut(event: KeyboardEvent) {
     handleSearchButtonClicked()
 }
 
+function handleSearch() {
+  if (!isEmptySearch.value) {
+    emit("search", getQueryFromRoute())
+  } else {
+    resetSearch()
+  }
+}
+
 watch(
   route,
   () => {
-    query.value = getQueryFromRoute()
-    if (!isEmptySearch.value) emit("search", getQueryFromRoute())
-    else resetSearch()
-  },
-  { deep: true },
-)
-
-watch(
-  query,
-  () => {
-    validateSearchInput()
+    handleSearch()
   },
   { deep: true },
 )
 
 onMounted(async () => {
-  if (!isEmptySearch.value) emit("search", getQueryFromRoute())
+  handleSearch()
   window.addEventListener("keydown", handleSearchShortcut)
 })
 
