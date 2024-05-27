@@ -48,7 +48,7 @@ export type PageableService<TResult, TQuery = TResult> = (
   <slot v-if="props.navigationPosition == 'bottom'"></slot>
   <div
     v-if="page?.content && !page?.empty && !isLoading"
-    class="my-32 mb-10 mt-20 flex flex-col items-center"
+    class="my-32 mb-24 mt-20 flex flex-col items-center"
   >
     <div class="flex w-full items-center">
       <div class="relative flex flex-grow items-center justify-between">
@@ -56,6 +56,7 @@ export type PageableService<TResult, TQuery = TResult> = (
           v-if="!(page.first && page.last)"
           aria-label="vorherige Ergebnisse"
           button-type="tertiary"
+          class="pl-24"
           :disabled="page?.first"
           :icon="IconArrowBack"
           icon-position="left"
@@ -80,6 +81,7 @@ export type PageableService<TResult, TQuery = TResult> = (
           v-if="!(page.first && page.last)"
           aria-label="nächste Ergebnisse"
           button-type="tertiary"
+          class="pr-24"
           :disabled="page?.last"
           :icon="IconArrowForward"
           icon-position="right"

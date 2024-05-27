@@ -322,16 +322,18 @@ onBeforeUnmount(() => {
       />
     </div>
 
-    <Pagination
-      navigation-position="bottom"
-      :page="searchResultsCurrentPage"
-      @update-page="updatePage"
-    >
-      <SearchResultList
-        :is-loading="isLoading"
-        :search-results="searchResults"
-        @link-decision="addEnsuingDecisionFromSearch"
-      />
-    </Pagination>
+    <div class="bg-blue-200">
+      <Pagination
+        navigation-position="bottom"
+        :page="searchResultsCurrentPage"
+        @update-page="updatePage"
+      >
+        <SearchResultList
+          :is-loading="isLoading"
+          :search-results="searchResults"
+          @link-decision="addEnsuingDecisionFromSearch"
+        />
+      </Pagination>
+    </div>
   </div>
 </template>
