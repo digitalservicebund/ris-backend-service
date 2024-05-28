@@ -133,12 +133,12 @@ async function addActiveCitationFromSearch(decision: RelatedDocumentation) {
   const newActiveCitationType = {
     ...activeCitationType.value?.value,
   } as CitationType
-  const decisionWithCitationType = new ActiveCitation({
+  activeCitation.value = new ActiveCitation({
     ...decision,
     referenceFound: true,
     citationType: newActiveCitationType,
   })
-  emit("update:modelValue", decisionWithCitationType)
+  emit("update:modelValue", activeCitation.value as ActiveCitation)
   emit("addEntry")
   scrollToTop()
 }
@@ -156,6 +156,7 @@ function scrollToTop() {
     })
   }
 }
+
 function updateDateFormatValidation(
   validationError: ValidationError | undefined,
 ) {
@@ -326,16 +327,18 @@ onBeforeUnmount(() => {
       />
     </div>
 
-    <Pagination
-      navigation-position="bottom"
-      :page="searchResultsCurrentPage"
-      @update-page="updatePage"
-    >
-      <SearchResultList
-        :is-loading="isLoading"
-        :search-results="searchResults"
-        @link-decision="addActiveCitationFromSearch"
-      />
-    </Pagination>
+    <div class="bg-blue-200">
+      <Pagination
+        navigation-position="bottom"
+        :page="searchResultsCurrentPage"
+        @update-page="updatePage"
+      >
+        <SearchResultList
+          :is-loading="isLoading"
+          :search-results="searchResults"
+          @link-decision="addActiveCitationFromSearch"
+        />
+      </Pagination>
+    </div>
   </div>
 </template>

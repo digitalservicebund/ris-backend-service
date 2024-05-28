@@ -43,15 +43,8 @@ const onMaska = (event: CustomEvent<MaskaDetail>) => {
   inputCompleted.value = event.detail.completed
 }
 
-const effectiveHasError = computed(
-  () =>
-    props.hasError ||
-    (inputCompleted.value && !isInPast.value && !props.isFutureDate) ||
-    (inputCompleted.value && !isValidDate.value),
-)
-
 const conditionalClasses = computed(() => ({
-  "has-error": effectiveHasError.value,
+  "has-error": props.hasError,
   "ds-input-medium": props.size === "medium",
   "ds-input-small": props.size === "small",
 }))
@@ -126,6 +119,7 @@ watch(inputCompleted, (is) => {
     data-maska="##.##.####"
     placeholder="TT.MM.JJJJ"
     @blur="onBlur"
+    @focus="emit('update:validationError', undefined)"
     @keydown.delete="backspaceDelete"
     @maska="onMaska"
   />

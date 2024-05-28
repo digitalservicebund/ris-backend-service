@@ -113,13 +113,13 @@ async function addEnsuingDecision() {
 }
 
 async function addEnsuingDecisionFromSearch(decision: RelatedDocumentation) {
-  const decisionWithNote = new EnsuingDecision({
+  ensuingDecision.value = new EnsuingDecision({
     ...decision,
     pending: ensuingDecision.value?.pending,
     referenceFound: true,
     note: ensuingDecision.value?.note,
   })
-  emit("update:modelValue", decisionWithNote)
+  emit("update:modelValue", ensuingDecision.value as EnsuingDecision)
   emit("addEntry")
   scrollToTop()
 }
@@ -322,16 +322,18 @@ onBeforeUnmount(() => {
       />
     </div>
 
-    <Pagination
-      navigation-position="bottom"
-      :page="searchResultsCurrentPage"
-      @update-page="updatePage"
-    >
-      <SearchResultList
-        :is-loading="isLoading"
-        :search-results="searchResults"
-        @link-decision="addEnsuingDecisionFromSearch"
-      />
-    </Pagination>
+    <div class="bg-blue-200">
+      <Pagination
+        navigation-position="bottom"
+        :page="searchResultsCurrentPage"
+        @update-page="updatePage"
+      >
+        <SearchResultList
+          :is-loading="isLoading"
+          :search-results="searchResults"
+          @link-decision="addEnsuingDecisionFromSearch"
+        />
+      </Pagination>
+    </div>
   </div>
 </template>

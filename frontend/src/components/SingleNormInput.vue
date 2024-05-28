@@ -326,7 +326,6 @@ onMounted(async () => {
             data-testid="legal-force-type-combobox"
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getLegalForceTypes"
-            @click="legalForceValidationStore.remove('type')"
             @focus="legalForceValidationStore.remove('type')"
           ></ComboboxInput>
         </InputField>
@@ -345,7 +344,6 @@ onMounted(async () => {
             data-testid="legal-force-region-combobox"
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getLegalForceRegions"
-            @click="legalForceValidationStore.remove('region')"
             @focus="legalForceValidationStore.remove('region')"
           ></ComboboxInput>
         </InputField>

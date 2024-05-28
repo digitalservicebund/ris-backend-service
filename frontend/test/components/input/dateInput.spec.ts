@@ -169,13 +169,12 @@ describe("DateInput", () => {
     await nextTick()
 
     expect(emitted()["update:modelValue"]).not.toBeTruthy()
-    expect(emitted()["update:validationError"]).toEqual([
-      [
-        {
-          message: "Unvollständiges Datum",
-          instance: "identifier",
-        },
-      ],
+    const emittedEvents = emitted()["update:validationError"]
+    expect(emittedEvents[emittedEvents.length - 1]).toEqual([
+      {
+        message: "Unvollständiges Datum",
+        instance: "identifier",
+      },
     ])
   })
 })
