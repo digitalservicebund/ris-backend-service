@@ -140,6 +140,16 @@ function handleLocalInputError(error: ValidationError | undefined, id: string) {
   validateSearchInput()
 }
 
+/**
+ * Computed property that determines whether the current search query is identical to the previous search query.
+ * @returns {ComputedRef<boolean>} - Returns `true` if the queries are identical, otherwise `false`.
+ */
+const isIdenticalSearch = (): boolean => {
+  const previousQuery = getQueryFromRoute()
+  const newQuery = query.value
+  return JSON.stringify(previousQuery) === JSON.stringify(newQuery)
+}
+
 function handleSearchButtonClicked() {
   validateSearchInput()
 
@@ -147,7 +157,9 @@ function handleSearchButtonClicked() {
     return
   }
 
-  handleSearch()
+  if (isIdenticalSearch()) {
+    handleSearch()
+  }
   pushQueryToRoute(query.value)
 }
 

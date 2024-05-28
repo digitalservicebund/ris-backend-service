@@ -78,13 +78,13 @@ describe("Documentunit search form", () => {
     await user.click(
       screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
     )
-    expect(emitted().search.length).toBe(2)
+    expect(emitted().search.length).toBe(1)
 
     await user.click(
       screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
     )
 
-    expect(emitted().search.length).toBe(3)
+    expect(emitted().search.length).toBe(2)
   })
 
   test("click on 'Nur meine Dokstelle' renders 'Nur fehlerhafte Dokumentationseinheiten' checkbox", async () => {
