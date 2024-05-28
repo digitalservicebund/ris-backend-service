@@ -7,7 +7,8 @@
   ],
   "lockFileMaintenance": {
     "enabled": true,
-    "automerge": true
+    "automerge": true,
+    "automergeType": "pr",
   },
   "packageRules": [
     {
@@ -27,7 +28,7 @@
       "automerge": true,
       "platformAutomerge": false,
       // this would require more repository setup
-      "automergeType": "branch"
+      "automergeType": "pr"
       // only create PRs if tests fail (or stall)
     }
   ]
