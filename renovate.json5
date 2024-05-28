@@ -10,6 +10,20 @@
     "automerge": true,
     "automergeType": "pr",
   },
+  "gradle": {
+    "enabled": true,
+    "fileMatch": [
+      "^build\\.gradle\\.kts$",
+      "^settings\\.gradle\\.kts$"
+    ],
+    "repositories": [
+      {
+        "url": "https://maven.pkg.github.com/digitalservicebund/neuris-juris-xml-export",
+        "username": "${{ GH_PACKAGES_REPOSITORY_USER }}",
+        "password": "${{ GH_PACKAGES_REPOSITORY_TOKEN }}"
+      }
+    ]
+  },
   "packageRules": [
     {
       "matchUpdateTypes": [
