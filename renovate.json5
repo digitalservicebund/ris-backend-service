@@ -20,6 +20,20 @@
         "pinDigest",
         "digest"
       ],
+      "gradle": {
+        "enabled": true,
+        "fileMatch": [
+          "^build\\.gradle\\.kts$",
+          "^settings\\.gradle\\.kts$"
+        ],
+        "repositories": [
+          {
+            "url": "https://maven.pkg.github.com/digitalservicebund/neuris-juris-xml-export",
+            "username": "${{ GH_PACKAGES_REPOSITORY_USER }}",
+            "password": "${{ GH_PACKAGES_REPOSITORY_TOKEN }}"
+          }
+        ]
+      },
       "timezone": "Europe/Berlin",
       "schedule": [
         "every weekday"
