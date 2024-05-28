@@ -9,6 +9,10 @@
     "automerge": true,
     "automergeType": "pr"
   },
+  "timezone": "Europe/Berlin",
+  "automergeSchedule": [
+    "every weekday"
+  ],
   "packageRules": [
     {
       "matchUpdateTypes": [
@@ -17,10 +21,6 @@
         "pin",
         "pinDigest",
         "digest"
-      ],
-      "timezone": "Europe/Berlin",
-      "schedule": [
-        "every weekday"
       ],
       "automerge": true,
       "platformAutomerge": false,
