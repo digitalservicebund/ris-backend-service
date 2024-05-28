@@ -50,7 +50,7 @@ function formatDropdownItems(
       return (responseData as NormAbbreviation[]).map((item) => ({
         label: item.abbreviation,
         value: item,
-        additionalInformation: item.officialLongTitle,
+        additionalInformation: `${item.officialLongTitle || ""} ${item.officialLongTitle && item.documentNumber ? " | " : ""} ${item.documentNumber || ""}`,
       }))
     }
     case Endpoint.citationTypes: {
