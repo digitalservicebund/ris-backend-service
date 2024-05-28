@@ -3,18 +3,16 @@
   "extends": [
     "config:recommended",
     ":disableDependencyDashboard"
-    // not have a GitHub issue listing the open updates
   ],
   "lockFileMaintenance": {
     "enabled": true,
     "automerge": true,
-    "automergeType": "pr",
+    "automergeType": "pr"
   },
   "packageRules": [
     {
       "matchUpdateTypes": [
         "minor",
-        "patch",
         "patch",
         "pin",
         "pinDigest",
@@ -24,12 +22,9 @@
       "schedule": [
         "every weekday"
       ],
-      // branch creation only on weekdays
       "automerge": true,
       "platformAutomerge": false,
-      // this would require more repository setup
       "automergeType": "pr"
-      // only create PRs if tests fail (or stall)
     }
   ]
 }
