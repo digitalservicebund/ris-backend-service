@@ -12,18 +12,22 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO, UUID> {
 
-  //  ProcedureDTO findByLabelAndDocumentationOffice(
-  //      String label, DocumentationOfficeDTO documentationOfficeDTO);
-
   @Query(
-      "SELECT p FROM ProcedureDTO p WHERE (:label IS NULL OR p.label LIKE %:label%) AND p.documentationOffice = :documentationOffice ORDER BY createdAt DESC NULLS LAST")
+      "SELECT p FROM ProcedureDTO p "
+          + "WHERE (:label IS NULL OR p.label LIKE %:label%) "
+          + "AND p.documentationOffice = :documentationOffice "
+          + "AND (SELECT COUNT(du) FROM p.documentationUnits du) > 0 "
+          + "ORDER BY p.createdAt DESC NULLS LAST")
   Page<ProcedureDTO> findAllByLabelContainingAndDocumentationOfficeOrderByCreatedAtDesc(
       @Param("label") String label,
       @Param("documentationOffice") DocumentationOfficeDTO documentationOfficeDTO,
       Pageable pageable);
 
   @Query(
-      "SELECT p FROM ProcedureDTO p WHERE p.documentationOffice = :documentationOffice ORDER BY createdAt DESC NULLS LAST")
+      "SELECT p FROM ProcedureDTO p "
+          + "WHERE p.documentationOffice = :documentationOffice "
+          + "AND (SELECT COUNT(du) FROM p.documentationUnits du) > 0 "
+          + "ORDER BY p.createdAt DESC NULLS LAST")
   Page<ProcedureDTO> findAllByDocumentationOfficeOrderByCreatedAtDesc(
       @Param("documentationOffice") DocumentationOfficeDTO documentationOfficeDTO,
       Pageable pageable);
