@@ -39,6 +39,8 @@ describe("ExpandableDataSet", () => {
     global.ResizeObserver = require("resize-observer-polyfill")
   })
 
+  vi.spyOn(window, "scrollTo").mockImplementation(() => vi.fn())
+
   it("shows the given title", () => {
     renderComponent({ title: "test title" })
 
