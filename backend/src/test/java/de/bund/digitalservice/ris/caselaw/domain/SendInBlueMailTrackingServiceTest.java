@@ -91,6 +91,16 @@ class SendInBlueMailTrackingServiceTest {
                 .build());
   }
 
+  @Test
+  void testUpdatePublishingState_withNoLatestError_throwsError()
+      throws DocumentationUnitNotExistsException {
+    when(documentUnitStatusService.getLatestStatus(TEST_UUID)).thenReturn(null);
+
+    ResponseEntity<String> responseEntity =
+        service.updatePublishingState("88888888-4444-4444-4444-121212121212", "delivered");
+    assertThat(responseEntity.getStatusCode().is4xxClientError()).isTrue();
+  }
+
   @ParameterizedTest
   @ValueSource(
       strings = {
