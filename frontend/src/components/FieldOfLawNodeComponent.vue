@@ -2,7 +2,7 @@
 import { computed, onMounted, toRaw } from "vue"
 import Checkbox from "@/components/input/CheckboxInput.vue"
 import TokenizeText from "@/components/TokenizeText.vue"
-import { ROOT_ID, FieldOfLawNode } from "@/domain/fieldOfLaw"
+import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
 import IconAdd from "~icons/ic/baseline-add"
 import IconHorizontalRule from "~icons/ic/baseline-horizontal-rule"
@@ -12,6 +12,7 @@ interface Props {
   node: FieldOfLawNode
   selected: boolean
   showNorms: boolean
+  isRoot?: boolean
 }
 
 const props = defineProps<Props>()
@@ -78,10 +79,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div
-    class="flex flex-col"
-    :class="node.identifier !== ROOT_ID ? 'pl-36' : ''"
-  >
+  <div class="flex flex-col" :class="!props.isRoot ? 'pl-36' : ''">
     <div class="flex flex-row">
       <div v-if="!node.hasChildren" class="pl-24"></div>
       <div v-else>
@@ -101,7 +99,7 @@ onMounted(async () => {
           </slot>
         </button>
       </div>
-      <div v-if="node.identifier !== ROOT_ID">
+      <div v-if="!props.isRoot">
         <Checkbox
           id="fieldOfLawSelected"
           v-model="fieldOfLawSelected"
@@ -117,7 +115,7 @@ onMounted(async () => {
       <div>
         <div class="flex flex-col">
           <div class="flex flex-row">
-            <div v-if="node.identifier !== ROOT_ID" class="identifier pl-8">
+            <div v-if="!props.isRoot" class="identifier pl-8">
               {{ node.identifier }}
             </div>
             <div class="font-size-14px pl-6 pt-2 text-blue-800">

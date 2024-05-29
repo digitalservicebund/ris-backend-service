@@ -21,11 +21,9 @@ export type FieldOfLawComboboxItem = {
   text: string
 }
 
-export const ROOT_ID = "root"
-
 export function buildRoot(): FieldOfLawNode {
   return {
-    identifier: ROOT_ID,
+    identifier: "root",
     text: "Alle Sachgebiete",
     children: [],
     childrenCount: -1,
