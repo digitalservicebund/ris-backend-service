@@ -83,7 +83,7 @@ onMounted(async () => {
     :class="node.identifier !== ROOT_ID ? 'pl-36' : ''"
   >
     <div class="flex flex-row">
-      <div v-if="node.childrenCount === 0" class="pl-24"></div>
+      <div v-if="!node.hasChildren" class="pl-24"></div>
       <div v-else>
         <button
           :aria-label="

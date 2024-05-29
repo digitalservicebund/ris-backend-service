@@ -43,6 +43,10 @@ public class FieldOfLawTransformer {
       builder.linkedFields(linkedFields);
     }
 
+    if (fieldOfLawDTO.getChildren() != null) {
+      builder.hasChildren(!fieldOfLawDTO.getChildren().isEmpty());
+    }
+
     if (withChildren && fieldOfLawDTO.getChildren() != null) {
       List<FieldOfLaw> children =
           fieldOfLawDTO.getChildren().stream()
@@ -51,6 +55,7 @@ public class FieldOfLawTransformer {
       if (!children.isEmpty()) {
         builder.children(children);
         builder.childrenCount(children.size());
+        builder.hasChildren(true);
       }
     } else {
       builder.children(Collections.emptyList());

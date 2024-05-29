@@ -11,6 +11,7 @@ export type FieldOfLawNode = {
   children: FieldOfLawNode[]
   parent?: FieldOfLawNode
   childrenCount: number
+  readonly hasChildren: boolean
   isExpanded?: boolean
   inDirectPathMode?: boolean
 }
@@ -30,6 +31,9 @@ export function buildRoot(): FieldOfLawNode {
     childrenCount: -1,
     norms: [],
     isExpanded: false,
+    get hasChildren() {
+      return this.children.length > 0
+    },
   }
 }
 
