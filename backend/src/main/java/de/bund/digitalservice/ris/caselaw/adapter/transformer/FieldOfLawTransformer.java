@@ -54,16 +54,10 @@ public class FieldOfLawTransformer {
               .toList();
       if (!children.isEmpty()) {
         builder.children(children);
-        builder.childrenCount(children.size());
         builder.hasChildren(true);
       }
     } else {
       builder.children(Collections.emptyList());
-      builder.childrenCount(-1);
-      // TODO
-      //      if (fieldOfLawDTO.getChildren() != null) {
-      //        builder.childrenCount(fieldOfLawDTO.getChildren().size());
-      //      }
     }
 
     return builder.build();
