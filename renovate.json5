@@ -9,9 +9,7 @@
     "de.bund.digitalservice:neuris-caselaw-migration-schema"
   ],
   "lockFileMaintenance": {
-    "enabled": true,
-    "automerge": true,
-    "automergeType": "pr"
+    "enabled": false
   },
   "timezone": "Europe/Berlin",
   "automergeSchedule": [
