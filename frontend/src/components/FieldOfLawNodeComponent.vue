@@ -35,10 +35,6 @@ function handleTokenClick(tokenContent: string) {
   emit("linkedField:clicked", tokenContent)
 }
 
-function canLoadMoreChildren() {
-  return node.value.childrenCount <= 0
-}
-
 async function handleToggle() {
   await getChildren()
   if (node.value.inDirectPathMode) {
@@ -49,7 +45,7 @@ async function handleToggle() {
 }
 
 async function getChildren() {
-  if (canLoadMoreChildren()) {
+  if (props.node.hasChildren) {
     let childToReattach: FieldOfLawNode
     if (node.value.children.length > 0) {
       // can only happen if inDirectPathMode
@@ -59,14 +55,14 @@ async function getChildren() {
       (response) => {
         if (!response.data) return
         node.value.children = response.data
-        node.value.childrenCount = node.value.children.length
+
         if (!childToReattach) return
         const parentToReattachTo = node.value.children.find(
           (node) => node.identifier === childToReattach.identifier,
         )
         if (!parentToReattachTo) return
         parentToReattachTo.children = childToReattach.children
-        parentToReattachTo.isExpanded = true
+        parentToReattachTo.isExpanded = false
         parentToReattachTo.inDirectPathMode = true
       },
     )

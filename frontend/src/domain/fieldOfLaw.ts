@@ -10,8 +10,7 @@ export type FieldOfLawNode = {
   norms: Norm[]
   children: FieldOfLawNode[]
   parent?: FieldOfLawNode
-  childrenCount: number
-  readonly hasChildren: boolean
+  hasChildren: boolean
   isExpanded?: boolean
   inDirectPathMode?: boolean
 }
@@ -26,12 +25,9 @@ export function buildRoot(): FieldOfLawNode {
     identifier: "root",
     text: "Alle Sachgebiete",
     children: [],
-    childrenCount: -1,
     norms: [],
+    hasChildren: true,
     isExpanded: false,
-    get hasChildren() {
-      return this.children.length > 0
-    },
   }
 }
 
