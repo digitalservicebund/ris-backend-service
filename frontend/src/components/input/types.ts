@@ -2,7 +2,7 @@ import { LabelPosition } from "@/components/input/InputField.vue"
 import { CitationType } from "@/domain/citationType"
 import DocumentationOffice from "@/domain/documentationOffice"
 import { Court, DocumentType, Procedure } from "@/domain/documentUnit"
-import { FieldOfLawNode } from "@/domain/fieldOfLaw"
+import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import { ResponseError } from "@/services/httpClient"
@@ -127,7 +127,7 @@ export type ComboboxInputModelType =
   | DocumentType
   | Court
   | NormAbbreviation
-  | FieldOfLawNode
+  | FieldOfLaw
   | CitationType
   | Procedure
   | LegalForceRegion

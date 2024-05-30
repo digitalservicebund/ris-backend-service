@@ -6,17 +6,17 @@ import { withSummarizer } from "@/components/DataSetSummary.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import FieldOfLawDirectInputSearch from "@/components/FieldOfLawDirectInputSearch.vue"
 import FieldOfLawSearch from "@/components/FieldOfLawSearch.vue"
-import { FieldOfLawNode } from "@/domain/fieldOfLaw"
+import { FieldOfLaw } from "@/domain/fieldOfLaw"
 
 const props = defineProps<{
-  modelValue: FieldOfLawNode[] | undefined
+  modelValue: FieldOfLaw[] | undefined
 }>()
 
-const emit = defineEmits<{ "update:modelValue": [value?: FieldOfLawNode[]] }>()
+const emit = defineEmits<{ "update:modelValue": [value?: FieldOfLaw[]] }>()
 
-const clickedIdentifier = ref("")
 const showNorms = ref(false)
-const localModelValue = ref<FieldOfLawNode[]>(props.modelValue ?? [])
+const localModelValue = ref<FieldOfLaw[]>(props.modelValue ?? [])
+const selectedNode = ref<FieldOfLaw | undefined>(undefined)
 
 watch(
   props,
@@ -30,7 +30,7 @@ watch(localModelValue, () => {
   emit("update:modelValue", localModelValue.value)
 })
 
-const handleAdd = async (fieldOfLaw: FieldOfLawNode) => {
+const addFeldOfLaw = (fieldOfLaw: FieldOfLaw) => {
   if (
     !localModelValue.value?.find(
       (entry) => entry.identifier === fieldOfLaw.identifier,
@@ -40,22 +40,20 @@ const handleAdd = async (fieldOfLaw: FieldOfLawNode) => {
   }
 }
 
-function handleNodeClicked(identifier: string) {
-  clickedIdentifier.value = identifier
+const removeFieldOfLaw = (fieldOfLaw: FieldOfLaw) => {
+  localModelValue.value =
+    localModelValue.value?.filter(
+      (entry) => entry.identifier !== fieldOfLaw.identifier,
+    ) ?? []
 }
 
-function handleResetClickedNode() {
-  clickedIdentifier.value = ""
+function setSelectedNode(node: FieldOfLaw) {
+  selectedNode.value = node
+  console.log("updated")
 }
 
-function handleLinkedFieldClicked(identifier: string) {
-  clickedIdentifier.value = identifier
-}
-
-function handleIdentifierClickInSummary(identifier: string) {
-  setTimeout(() => {
-    clickedIdentifier.value = identifier
-  }, 20)
+function removeSelectedNode() {
+  selectedNode.value = undefined
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -65,7 +63,6 @@ function selectedFieldsOfLawSummarizer(dataEntry: any) {
       "span",
       {
         class: "text-blue-800",
-        onClick: () => handleIdentifierClickInSummary(dataEntry.identifier),
       },
       dataEntry.identifier,
     ),
@@ -87,16 +84,19 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
         <div class="flex flex-1 flex-col bg-white p-32">
           <FieldOfLawSearch
             @do-show-norms="showNorms = true"
-            @node-clicked="handleNodeClicked"
+            @linked-field:select="setSelectedNode"
+            @node:select="setSelectedNode"
+            @node:unselect="removeSelectedNode"
           />
         </div>
         <div class="flex-1 bg-white p-32">
           <FieldOfLawTree
             v-model="localModelValue"
-            :clicked-identifier="clickedIdentifier"
+            :selected-node="selectedNode"
             :show-norms="showNorms"
-            @linked-field:clicked="handleLinkedFieldClicked"
-            @reset-clicked-node="handleResetClickedNode"
+            @linked-field:select="setSelectedNode"
+            @node:select="addFeldOfLaw"
+            @node:unselect="removeFieldOfLaw"
             @toggle-show-norms="showNorms = !showNorms"
           ></FieldOfLawTree>
         </div>
@@ -104,20 +104,13 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
       <hr class="w-full border-blue-700" />
       <div class="bg-white p-20">
         <h1 class="ds-heading-03-reg pb-8">Ausgewählte Sachgebiete</h1>
-        <FieldOfLawDirectInputSearch @add-to-list="handleAdd" />
+        <FieldOfLawDirectInputSearch @add-to-list="addFeldOfLaw" />
         <FieldOfLawSelectionList
           v-model="localModelValue"
-          @linked-field:clicked="handleLinkedFieldClicked"
-          @node-clicked="handleNodeClicked"
+          @node:remove="removeFieldOfLaw"
+          @node:select="setSelectedNode"
         ></FieldOfLawSelectionList>
       </div>
     </div>
   </ExpandableDataSet>
 </template>
-
-<style scoped>
-/* stylelint-disable */
-::v-deep(li:first-of-type) {
-  margin-top: 32px;
-}
-</style>

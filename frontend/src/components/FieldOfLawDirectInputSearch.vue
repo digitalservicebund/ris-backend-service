@@ -1,16 +1,16 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import { FieldOfLawNode } from "@/domain/fieldOfLaw"
+import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import ComboboxItemService from "@/services/comboboxItemService"
 
 const emit = defineEmits<{
-  "add-to-list": [item: FieldOfLawNode]
+  "add-to-list": [item: FieldOfLaw]
 }>()
 const fieldOfLawNode = ref()
 
 watch(fieldOfLawNode, () => {
-  emit("add-to-list", fieldOfLawNode.value as FieldOfLawNode)
+  emit("add-to-list", fieldOfLawNode.value as FieldOfLaw)
 })
 </script>
 
