@@ -8,7 +8,7 @@ import lombok.Builder;
 @Builder(toBuilder = true)
 public record FieldOfLaw(
     UUID id,
-    boolean hasChildren,
+    Integer childrenCount,
     String identifier,
     String text,
     List<String> linkedFields,
