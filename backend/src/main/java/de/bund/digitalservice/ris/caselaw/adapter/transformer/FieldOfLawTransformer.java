@@ -43,10 +43,6 @@ public class FieldOfLawTransformer {
       builder.linkedFields(linkedFields);
     }
 
-    if (fieldOfLawDTO.getChildren() != null) {
-      builder.hasChildren(!fieldOfLawDTO.getChildren().isEmpty());
-    }
-
     if (withChildren && fieldOfLawDTO.getChildren() != null) {
       List<FieldOfLaw> children =
           fieldOfLawDTO.getChildren().stream()
@@ -54,10 +50,15 @@ public class FieldOfLawTransformer {
               .toList();
       if (!children.isEmpty()) {
         builder.children(children);
-        builder.hasChildren(true);
+        builder.childrenCount(children.size());
       }
     } else {
       builder.children(Collections.emptyList());
+      builder.childrenCount(-1);
+      // TODO
+      //      if (fieldOfLawDTO.getChildren() != null) {
+      //        builder.childrenCount(fieldOfLawDTO.getChildren().size());
+      //      }
     }
 
     return builder.build();
