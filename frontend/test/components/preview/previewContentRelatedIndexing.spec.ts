@@ -157,7 +157,6 @@ describe("preview content related indexing", () => {
           text: "Text for AB-01-01",
           children: [],
           hasChildren: false,
-          hasChildren: false,
           norms: [],
           isExpanded: false,
           parent: {
