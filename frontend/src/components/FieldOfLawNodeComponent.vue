@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, onMounted, toRaw } from "vue"
+import FlexContainer from "@/components/FlexContainer.vue"
 import Checkbox from "@/components/input/CheckboxInput.vue"
 import TokenizeText from "@/components/TokenizeText.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
@@ -75,8 +76,11 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex flex-col" :class="!props.isRoot ? 'pl-36' : ''">
-    <div class="flex flex-row">
+  <FlexContainer
+    :class="!props.isRoot ? 'pl-36' : ''"
+    flex-direction="flex-col"
+  >
+    <FlexContainer flex-direction="flex-row">
       <div v-if="!node.hasChildren" class="pl-24"></div>
       <div v-else>
         <button
@@ -111,10 +115,13 @@ onMounted(async () => {
       <div>
         <div class="flex flex-col">
           <div class="flex flex-row">
-            <div v-if="!props.isRoot" class="identifier pl-8">
+            <div
+              v-if="!props.isRoot"
+              class="whitespace-nowrap pl-8 text-[16px]"
+            >
               {{ node.identifier }}
             </div>
-            <div class="font-size-14px pl-6 pt-2 text-blue-800">
+            <div class="pl-6 pt-2 text-[14px] text-blue-800">
               <TokenizeText
                 :keywords="props.node.linkedFields ?? []"
                 :text="props.node.text"
@@ -123,17 +130,21 @@ onMounted(async () => {
             </div>
           </div>
         </div>
-        <div v-if="showNorms" class="flex flex-col pb-6 pl-8">
-          <div class="font-size-14px norms-font-color flex flex-row flex-wrap">
+        <FlexContainer
+          v-if="showNorms"
+          class="pb-6 pl-8"
+          flex-direction="flex-col"
+        >
+          <FlexContainer class="flex-wrap text-[14px] text-[#66522e]">
             <span v-for="(norm, idx) in node.norms" :key="idx">
               <strong>{{ norm.singleNormDescription }}</strong>
               {{ norm.abbreviation
               }}{{ idx < node.norms.length - 1 ? ",&nbsp;" : "" }}
             </span>
-          </div>
-        </div>
+          </FlexContainer>
+        </FlexContainer>
       </div>
-    </div>
+    </FlexContainer>
     <div v-if="node.isExpanded && node.children?.length">
       <FieldOfLawNodeComponent
         v-for="child in node.children"
@@ -151,22 +162,5 @@ onMounted(async () => {
         @node:unselect="emit('node:unselect', $event)"
       />
     </div>
-  </div>
+  </FlexContainer>
 </template>
-
-<style lang="scss" scoped>
-.identifier {
-  font-size: 16px;
-  white-space: nowrap;
-}
-
-// TODO use tailwind instead
-.font-size-14px {
-  font-size: 14px;
-}
-
-// will be integrated into the styleguide
-.norms-font-color {
-  color: #66522e;
-}
-</style>
