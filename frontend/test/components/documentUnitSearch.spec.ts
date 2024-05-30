@@ -1,8 +1,10 @@
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitSearch from "@/components/DocumentUnitSearch.vue"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import authService from "@/services/authService"
 import documentUnitService from "@/services/documentUnitService"
 
 function renderComponent() {
@@ -42,12 +44,24 @@ function renderComponent() {
   return {
     user,
     ...render(DocumentUnitSearch, {
-      global: { plugins: [router] },
+      global: { plugins: [router, createTestingPinia()] },
     }),
   }
 }
 
 describe("Documentunit Search", () => {
+  vi.spyOn(authService, "getName").mockImplementation(() =>
+    Promise.resolve({
+      status: 200,
+      data: {
+        name: "username",
+        documentationOffice: {
+          abbreviation: "DS",
+        },
+      },
+    }),
+  )
+
   vi.spyOn(
     documentUnitService,
     "searchByDocumentUnitSearchInput",
@@ -70,7 +84,7 @@ describe("Documentunit Search", () => {
             },
             documentNumber: "documentNumber",
             fileNumber: "fileNumber",
-            isEditableByCurrentUser: true,
+            documentationOffice: { abbreviation: "DS" },
           }),
         ],
         size: 0,

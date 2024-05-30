@@ -1,3 +1,4 @@
+import DocumentationOffice from "./documentationOffice"
 import DocumentUnit, { Court, DocumentType } from "./documentUnit"
 
 export default class DocumentUnitListEntry {
@@ -12,7 +13,7 @@ export default class DocumentUnitListEntry {
   appraisalBody?: string
   hasHeadnoteOrPrinciple?: boolean
   hasAttachments?: boolean
-  isEditableByCurrentUser?: boolean
+  documentationOffice?: DocumentationOffice
 
   constructor(data: Partial<DocumentUnitListEntry> = {}) {
     Object.assign(this, data)

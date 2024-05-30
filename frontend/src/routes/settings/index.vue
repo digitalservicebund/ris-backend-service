@@ -3,11 +3,7 @@ import dayjs from "dayjs"
 import { ref, onMounted } from "vue"
 import TextButton from "@/components/input/TextButton.vue"
 import { ApiKey } from "@/domain/apiKey"
-import {
-  getImportApiKey,
-  generateImportApiKey,
-  invalidateImportApiKey,
-} from "@/services/authService"
+import authService from "@/services/authService"
 
 const apiKey = ref<ApiKey>()
 const copyText = ref("Kopieren")
@@ -15,7 +11,7 @@ const copied = ref(false)
 const copyButtonEnabled = ref(true)
 
 async function generateApiKey() {
-  const response = await generateImportApiKey()
+  const response = await authService.generateImportApiKey()
 
   if (response.data) apiKey.value = response.data
 
@@ -26,7 +22,9 @@ async function generateApiKey() {
 
 async function invalidateApiKey() {
   if (apiKey.value?.apiKey) {
-    const response = await invalidateImportApiKey(apiKey.value?.apiKey)
+    const response = await authService.invalidateImportApiKey(
+      apiKey.value?.apiKey,
+    )
 
     if (response.data) apiKey.value = response.data
 
@@ -47,7 +45,7 @@ function copyKey() {
 }
 
 onMounted(async () => {
-  const response = await getImportApiKey()
+  const response = await authService.getImportApiKey()
   if (response.data) apiKey.value = response.data
 
   copyText.value = "Kopieren"

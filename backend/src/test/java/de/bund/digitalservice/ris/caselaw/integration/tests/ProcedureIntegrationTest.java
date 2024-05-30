@@ -821,7 +821,6 @@ class ProcedureIntegrationTest {
             response -> {
               assertThat(Objects.requireNonNull(response.getResponseBody()).get(0).documentNumber())
                   .isEqualTo("1234567890123");
-              assertThat(response.getResponseBody().get(0).isEditableByCurrentUser()).isNotNull();
             });
   }
 
