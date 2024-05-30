@@ -1,23 +1,32 @@
 import { defineStore } from "pinia"
-import { ref } from "vue"
+import { Ref, ref } from "vue"
 import { User } from "@/domain/user"
 import authService from "@/services/authService"
 
-const useSessionStore = defineStore("session", () => {
+type SessionStore = {
+  user: Ref<User | undefined>
+  isAuthenticated: () => Promise<boolean>
+}
+
+const useSessionStore = defineStore("session", (): SessionStore => {
   const user = ref<User>()
 
-  async function fetchUser() {
-    const authResponse = await authService.getName()
-    if (authResponse.data) {
-      user.value = authResponse.data
-    } else {
-      console.error("failed to load user")
-    }
+  async function fetchUser(): Promise<User | undefined> {
+    return (await authService.getName()).data ?? undefined
   }
 
-  void fetchUser()
+  /**
+   * Checks with the backend if the user has a valid session and updates the user
+   * in store.
+   *
+   * @returns A promise with a boolean indicating if the user is authenticated.
+   */
+  async function isAuthenticated(): Promise<boolean> {
+    user.value = await fetchUser()
+    return !!user.value?.name
+  }
 
-  return { user, fetchUser }
+  return { user, isAuthenticated }
 })
 
 export default useSessionStore

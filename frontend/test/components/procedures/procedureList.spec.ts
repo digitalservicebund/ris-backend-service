@@ -5,7 +5,6 @@ import { createRouter, createWebHistory } from "vue-router"
 import ProcedureList from "@/components/procedures/ProcedureList.vue"
 import useQuery from "@/composables/useQueryFromRoute"
 import { Procedure } from "@/domain/documentUnit"
-import authService from "@/services/authService"
 import service from "@/services/procedureService"
 
 vi.mock("@/services/procedureService")
@@ -82,16 +81,6 @@ async function renderComponent(options?: { procedures: Procedure[][] }) {
       },
     })
 
-  const mockedGetUser = vi.mocked(authService.getName).mockResolvedValueOnce({
-    status: 200,
-    data: {
-      name: "username",
-      documentationOffice: {
-        abbreviation: "DS",
-      },
-    },
-  })
-
   const mockedGetDocumentUnits = vi
     .mocked(service.getDocumentUnits)
     .mockResolvedValue({
@@ -110,7 +99,6 @@ async function renderComponent(options?: { procedures: Procedure[][] }) {
     user: userEvent.setup(),
     mockedGetProcedures,
     mockedGetDocumentUnits,
-    mockedGetUser,
   }
 }
 
@@ -120,14 +108,13 @@ describe("ProcedureList", () => {
   })
 
   it("fetches docUnits once from BE if expanded", async () => {
-    const { mockedGetUser, mockedGetProcedures, mockedGetDocumentUnits, user } =
+    const { mockedGetProcedures, mockedGetDocumentUnits, user } =
       await renderComponent()
     expect(mockedGetProcedures).toHaveBeenCalledOnce()
     expect(mockedGetDocumentUnits).not.toHaveBeenCalled()
 
     await user.click(await screen.findByTestId("icons-open-close"))
     expect(mockedGetDocumentUnits).toHaveBeenCalledOnce()
-    expect(mockedGetUser).toHaveBeenCalled()
 
     // do not fetch again
     await user.click(await screen.findByTestId("icons-open-close"))

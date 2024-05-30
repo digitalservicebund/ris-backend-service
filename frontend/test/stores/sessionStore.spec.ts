@@ -10,12 +10,13 @@ describe("Session store", () => {
   beforeEach(() => void setActivePinia(createPinia()))
   afterEach(() => void vi.resetAllMocks())
 
-  it("calls the authService upon initialization", async () => {
+  it("calls the authService upon authentication check", async () => {
     const authServiceMock = vi
       .spyOn(authService, "getName")
       .mockResolvedValueOnce({ status: 200, data: { name: "fooUser" } })
 
-    useSessionStore()
+    const { isAuthenticated } = useSessionStore()
+    await isAuthenticated()
 
     expect(authServiceMock).toHaveBeenCalledOnce()
   })
@@ -24,14 +25,14 @@ describe("Session store", () => {
     { name: "fooUser" },
     { name: "fooUser", documentationOffice: { abbreviation: "DS" } },
     { name: "fooUser", email: "foo@mail.de" },
-  ])("set's the correct user", async (user: User) => {
+  ])("set's and returns the correct user", async (user: User) => {
     vi.mocked(authService).getName.mockResolvedValue({
       status: 200,
       data: user,
     })
 
     const session = useSessionStore()
-    await session.fetchUser()
+    await session.isAuthenticated()
 
     expect(session.user).toEqual(user)
   })
@@ -40,14 +41,14 @@ describe("Session store", () => {
     { status: 400, error: { title: "could not get user" } },
     { status: 200, error: { title: "ignore my status" } },
   ])(
-    "logs errors if user cannot be loaded",
+    "is not authenticated without user",
     async (serviceResponse: ServiceResponse<User>) => {
       vi.mocked(authService).getName.mockResolvedValue(serviceResponse)
-      const consoleMock = vi.spyOn(console, "error").mockImplementation(vi.fn())
 
-      const session = useSessionStore()
-      await session.fetchUser()
-      expect(consoleMock).toHaveBeenNthCalledWith(2, "failed to load user")
+      const { user, isAuthenticated } = useSessionStore()
+
+      expect(await isAuthenticated()).toBeFalsy()
+      expect(user).toBeUndefined()
     },
   )
 })

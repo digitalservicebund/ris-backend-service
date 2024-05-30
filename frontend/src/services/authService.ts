@@ -4,25 +4,14 @@ import { User } from "@/domain/user"
 import errorMessages from "@/i18n/errors.json"
 
 interface AuthService {
-  isAuthenticated(): Promise<boolean>
-
   getName(): Promise<ServiceResponse<User>>
-
   getImportApiKey(): Promise<ServiceResponse<ApiKey>>
-
   generateImportApiKey(): Promise<ServiceResponse<ApiKey>>
-
   invalidateImportApiKey(apiKey?: string): Promise<ServiceResponse<ApiKey>>
-
   getLoginEndpoint(): string
 }
 
 const service: AuthService = {
-  async isAuthenticated(): Promise<boolean> {
-    const response = await httpClient.get("auth/me")
-    return response.status > 400 ? false : true
-  },
-
   async getName(): Promise<ServiceResponse<User>> {
     const response = await httpClient.get<User>("auth/me")
     if (response.status != 200) {

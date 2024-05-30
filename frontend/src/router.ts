@@ -4,6 +4,7 @@ import {
   RouteLocationNormalized,
 } from "vue-router"
 import authService from "./services/authService"
+import useSessionStore from "./stores/sessionStore"
 import routes from "~pages"
 
 const router = createRouter({
@@ -34,7 +35,8 @@ function followLocationCookie() {
 }
 
 export async function beforeEach(to: RouteLocationNormalized) {
-  if (await authService.isAuthenticated()) {
+  const session = useSessionStore()
+  if (await session.isAuthenticated()) {
     followLocationCookie()
     return true
   } else {

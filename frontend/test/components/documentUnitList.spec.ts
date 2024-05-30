@@ -1,11 +1,11 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
-import { render, screen, waitFor } from "@testing-library/vue"
+import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import { PublicationState } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
-import authService from "@/services/authService"
+import { User } from "@/domain/user"
 import { ResponseError } from "@/services/httpClient"
 
 function renderComponent(options?: {
@@ -14,9 +14,11 @@ function renderComponent(options?: {
   isLoading?: boolean
   isDeletable?: boolean
   emptyState?: string
+  activeUser?: User
 }) {
   // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
+
   return {
     user,
     ...render(DocumentUnitList, {
@@ -33,7 +35,16 @@ function renderComponent(options?: {
       },
       global: {
         plugins: [
-          createTestingPinia(),
+          createTestingPinia({
+            initialState: {
+              session: {
+                user: options?.activeUser || {
+                  name: "user",
+                  documentationOffice: { abbreviation: "DS" },
+                },
+              },
+            },
+          }),
           createRouter({
             history: createWebHistory(),
             routes: [
@@ -66,17 +77,6 @@ function renderComponent(options?: {
 }
 
 describe("documentUnit list", () => {
-  vi.spyOn(authService, "getName").mockImplementation(() =>
-    Promise.resolve({
-      status: 200,
-      data: {
-        name: "username",
-        documentationOffice: {
-          abbreviation: "DS",
-        },
-      },
-    }),
-  )
   test("initial state feedback", async () => {
     renderComponent({})
 
@@ -146,11 +146,9 @@ describe("documentUnit list", () => {
     })
 
     // wait for asynchronous authService.getName method to update the UI according to the user
-    await waitFor(() => {
-      expect(
-        screen.getByRole("link", { name: "Dokumentationseinheit bearbeiten" }),
-      ).toBeInTheDocument()
-    })
+    expect(
+      screen.getByRole("link", { name: "Dokumentationseinheit bearbeiten" }),
+    ).toBeInTheDocument()
 
     expect(screen.getAllByTestId("listEntry").length).toBe(2)
 
@@ -193,12 +191,9 @@ describe("documentUnit list", () => {
       ],
     })
 
-    // wait for asynchronous authService.getName method to update the UI according to the user
-    await waitFor(() => {
-      expect(
-        screen.getByRole("link", { name: "Dokumentationseinheit bearbeiten" }),
-      ).toBeInTheDocument()
-    })
+    expect(
+      screen.getByRole("link", { name: "Dokumentationseinheit bearbeiten" }),
+    ).toBeInTheDocument()
 
     await screen.findByText("123")
     await user.click(screen.getByLabelText("Dokumentationseinheit löschen"))
@@ -206,5 +201,37 @@ describe("documentUnit list", () => {
     expect(confirmButton).toBeInTheDocument()
     await user.click(confirmButton)
     expect(emitted().deleteDocumentUnit).toBeTruthy()
+  })
+
+  test("disables edit and delete buttons if foreign documentation office", async () => {
+    renderComponent({
+      documentUnitListEntries: [
+        {
+          id: "id",
+          uuid: "1",
+          documentNumber: "123",
+          decisionDate: "2022-02-10",
+          fileNumber: "",
+          documentType: { label: "Test", jurisShortcut: "T" },
+          court: { type: "typeA", location: "locB", label: "typeA locB" },
+          status: {
+            publicationStatus: PublicationState.PUBLISHED,
+            withError: false,
+          },
+          documentationOffice: { abbreviation: "DS" },
+        },
+      ],
+      activeUser: {
+        name: "fooUser",
+        documentationOffice: { abbreviation: "fooDocumentationOffice" },
+      },
+    })
+
+    expect(
+      screen.queryByRole("link", { name: "Dokumentationseinheit bearbeiten" }),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole("button", { name: "Dokumentationseinheit löschen" }),
+    ).not.toBeInTheDocument()
   })
 })
