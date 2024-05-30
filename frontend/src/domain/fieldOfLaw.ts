@@ -10,7 +10,7 @@ export type FieldOfLawNode = {
   norms: Norm[]
   children: FieldOfLawNode[]
   parent?: FieldOfLawNode
-  childrenCount: number
+  hasChildren: boolean
   isExpanded?: boolean
   inDirectPathMode?: boolean
 }
@@ -20,15 +20,13 @@ export type FieldOfLawComboboxItem = {
   text: string
 }
 
-export const ROOT_ID = "root"
-
 export function buildRoot(): FieldOfLawNode {
   return {
-    identifier: ROOT_ID,
+    identifier: "root",
     text: "Alle Sachgebiete",
     children: [],
-    childrenCount: -1,
     norms: [],
+    hasChildren: true,
     isExpanded: false,
   }
 }

@@ -102,6 +102,7 @@ const showNormsModelValue = computed({
   </div>
   <FieldOfLawNodeComponent
     :key="root.identifier"
+    is-root
     :node="root"
     :selected="
       localModelValue.some(({ identifier }) => identifier === root.identifier)
