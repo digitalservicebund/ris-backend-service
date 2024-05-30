@@ -24,7 +24,7 @@ describe("FieldOfLawSelectionList", () => {
         text: "Steuerrecht 1-2-3",
         norms: [],
         children: [],
-        hasChildren: false,
+        childrenCount: 0,
       },
     ])
 
@@ -52,7 +52,7 @@ describe("FieldOfLawSelectionList", () => {
         text: "Steuerrecht 1-2-3",
         norms: [],
         children: [],
-        hasChildren: false,
+        childrenCount: 0,
       },
     ])
 
@@ -72,7 +72,7 @@ describe("FieldOfLawSelectionList", () => {
         text: "Steuerrecht 1-2-3",
         norms: [],
         children: [],
-        hasChildren: false,
+        childrenCount: 0,
       },
     ])
 
