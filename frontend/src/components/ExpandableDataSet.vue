@@ -4,6 +4,7 @@ import { ref } from "vue"
 import DataSetSummary from "@/components/DataSetSummary.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import TextButton from "@/components/input/TextButton.vue"
+import values from "@/data/values.json"
 import IconExpandLess from "~icons/ic/baseline-expand-less"
 import IconExpandMore from "~icons/ic/baseline-expand-more"
 
@@ -25,6 +26,21 @@ const isExpanded = ref(false)
 
 function collapse(): void {
   isExpanded.value = false
+  scrollToTop()
+}
+
+function scrollToTop() {
+  const element = document.getElementById("expandableHeader")
+  if (element) {
+    const headerOffset = values.headerOffset
+    const elementPosition = element?.getBoundingClientRect().top
+    const offsetPosition = elementPosition + window.scrollY - headerOffset
+
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: "smooth",
+    })
+  }
 }
 </script>
 
@@ -46,7 +62,7 @@ function collapse(): void {
     </template>
 
     <template #header>
-      <div class="flex w-full flex-col gap-24">
+      <div id="expandableHeader" class="flex w-full flex-col gap-24">
         <h2 class="ds-heading-03-reg">
           {{ title }}
         </h2>

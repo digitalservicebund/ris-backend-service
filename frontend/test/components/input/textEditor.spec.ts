@@ -61,7 +61,7 @@ describe("text editor", async () => {
     ["medium", "h-160"],
     ["small", "h-96"],
     [undefined, "h-160"],
-  ])("renders %s field with correct class", async (a, expected) => {
+  ] as const)("renders %s field with correct class", async (a, expected) => {
     render(TextEditor, {
       props: { fieldSize: a },
       global: { plugins: [router] },

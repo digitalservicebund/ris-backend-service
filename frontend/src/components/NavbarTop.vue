@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import { ref, onMounted } from "vue"
 import { useRoute } from "vue-router"
-import Logo from "@/assets/neuRIS-logo.svg"
+import FlexContainer from "@/components/FlexContainer.vue"
+import FlexItem from "@/components/FlexItem.vue"
+import IconBadge from "@/components/IconBadge.vue"
 import { User } from "@/domain/user"
 import { getName } from "@/services/authService"
 import FeatureToggleService from "@/services/featureToggleService"
@@ -28,17 +30,12 @@ onMounted(async () => {
 
 <template>
   <nav
-    class="flex items-center justify-between border-y border-gray-400 px-16 py-24 print:hidden"
+    class="flex items-center justify-between border-y border-gray-400 py-16 pe-32 ps-16 print:hidden"
   >
     <div class="flex items-center gap-44">
       <div class="flex items-center">
-        <img alt="Neuris Logo" :src="Logo" />
-        <span class="px-[1rem] text-16 leading-20">
-          <span
-            aria-hidden="true"
-            class="font-bold"
-            :style="{ color: fontColor }"
-          >
+        <span class="px-[1rem] text-14 font-bold leading-16">
+          <span aria-hidden="true" :style="{ color: fontColor }">
             Rechtsinformationen</span
           >
           <br />
@@ -47,17 +44,17 @@ onMounted(async () => {
       </div>
 
       <router-link
-        class="p-8 hover:bg-yellow-500 hover:underline"
+        class="ds-label-01-reg p-8 hover:bg-yellow-500 hover:underline"
         :class="{
           underline:
             route.path.includes('caselaw') &&
             !route.path.includes('procedures'),
         }"
         :to="{ name: 'caselaw' }"
-        >Rechtsprechung
+        >Suche
       </router-link>
       <router-link
-        class="p-8 hover:bg-yellow-500 hover:underline"
+        class="ds-label-01-reg p-8 hover:bg-yellow-500 hover:underline"
         :class="{ underline: route.path.includes('procedures') }"
         :to="{ name: 'caselaw-procedures' }"
         >Vorgänge
@@ -67,12 +64,22 @@ onMounted(async () => {
     <div v-if="user" class="grid grid-cols-[auto,1fr] gap-10">
       <IconPermIdentity />
       <div>
-        <div class="ds-label-01-bold">
-          <router-link :to="{ name: 'settings' }">{{ user.name }}</router-link>
+        <div class="ds-label-01-reg">
+          <router-link :to="{ name: 'settings' }">
+            <FlexContainer>
+              <FlexItem class="pe-8">{{ user.name }}</FlexItem>
+              <FlexItem>
+                <IconBadge
+                  v-if="user.documentationOffice"
+                  background-color="bg-blue-300"
+                  color="text-black"
+                  :label="user.documentationOffice.abbreviation"
+                />
+              </FlexItem>
+            </FlexContainer>
+          </router-link>
         </div>
-        <div v-if="user.documentationOffice" class="ds-label-03-reg">
-          {{ user.documentationOffice.abbreviation }}
-        </div>
+        <div v-if="user.documentationOffice" class="ds-label-03-reg"></div>
       </div>
     </div>
   </nav>

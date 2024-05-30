@@ -6,6 +6,7 @@ import DocumentUnit from "@/domain/documentUnit"
 import LegalForce from "@/domain/legalForce"
 import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
+import { PublicationHistoryRecordType } from "@/domain/xmlMail"
 import publishService from "@/services/publishService"
 
 const router = createRouter({
@@ -30,9 +31,9 @@ const setupWithPublishedDocument = () =>
       documentUnit: new DocumentUnit("123", { documentNumber: "foo" }),
       publicationLog: [
         {
-          type: "PUBLICATION",
+          type: PublicationHistoryRecordType.PUBLICATION,
           xml: '<?xml version="1.0"?>\n<!DOCTYPE juris-r SYSTEM "juris-r.dtd">\n<xml>content</xml>',
-          statusMessages: "success",
+          statusMessages: ["success"],
           statusCode: "200",
           receiverAddress: "receiver address",
           mailSubject: "mail subject",
@@ -140,7 +141,6 @@ describe("PublicationDocument:", () => {
               ],
             },
           }),
-          preview: undefined,
         },
         global: {
           plugins: [router],
@@ -335,9 +335,9 @@ describe("PublicationDocument:", () => {
         }),
         publicationLog: [
           {
-            type: "PUBLICATION",
+            type: PublicationHistoryRecordType.PUBLICATION,
             xml: "xml content",
-            statusMessages: "success",
+            statusMessages: ["success"],
             statusCode: "200",
             receiverAddress: "receiver address",
             mailSubject: "mail subject",

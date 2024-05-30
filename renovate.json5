@@ -4,10 +4,12 @@
     "config:recommended",
     ":disableDependencyDashboard"
   ],
+  "ignoreDeps": [
+    "de.bund.digitalservice:neuris-juris-xml-export",
+    "de.bund.digitalservice:neuris-caselaw-migration-schema"
+  ],
   "lockFileMaintenance": {
-    "enabled": true,
-    "automerge": true,
-    "automergeType": "pr"
+    "enabled": false
   },
   "timezone": "Europe/Berlin",
   "automergeSchedule": [
