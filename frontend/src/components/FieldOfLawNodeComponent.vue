@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { computed, onMounted, toRaw } from "vue"
+import FlexContainer from "@/components/FlexContainer.vue"
 import Checkbox from "@/components/input/CheckboxInput.vue"
 import TokenizeText from "@/components/TokenizeText.vue"
-import { ROOT_ID, FieldOfLawNode } from "@/domain/fieldOfLaw"
+import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
 import IconAdd from "~icons/ic/baseline-add"
 import IconHorizontalRule from "~icons/ic/baseline-horizontal-rule"
@@ -12,6 +13,7 @@ interface Props {
   node: FieldOfLawNode
   selected: boolean
   showNorms: boolean
+  isRoot?: boolean
 }
 
 const props = defineProps<Props>()
@@ -34,10 +36,6 @@ function handleTokenClick(tokenContent: string) {
   emit("linkedField:clicked", tokenContent)
 }
 
-function canLoadMoreChildren() {
-  return node.value.childrenCount <= 0
-}
-
 async function handleToggle() {
   await getChildren()
   if (node.value.inDirectPathMode) {
@@ -48,7 +46,7 @@ async function handleToggle() {
 }
 
 async function getChildren() {
-  if (canLoadMoreChildren()) {
+  if (props.node.hasChildren) {
     let childToReattach: FieldOfLawNode
     if (node.value.children.length > 0) {
       // can only happen if inDirectPathMode
@@ -58,14 +56,14 @@ async function getChildren() {
       (response) => {
         if (!response.data) return
         node.value.children = response.data
-        node.value.childrenCount = node.value.children.length
+
         if (!childToReattach) return
         const parentToReattachTo = node.value.children.find(
           (node) => node.identifier === childToReattach.identifier,
         )
         if (!parentToReattachTo) return
         parentToReattachTo.children = childToReattach.children
-        parentToReattachTo.isExpanded = true
+        parentToReattachTo.isExpanded = false
         parentToReattachTo.inDirectPathMode = true
       },
     )
@@ -78,12 +76,12 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div
-    class="flex flex-col"
-    :class="node.identifier !== ROOT_ID ? 'pl-36' : ''"
+  <FlexContainer
+    :class="!props.isRoot ? 'pl-36' : ''"
+    flex-direction="flex-col"
   >
-    <div class="flex flex-row">
-      <div v-if="node.childrenCount === 0" class="pl-24"></div>
+    <FlexContainer flex-direction="flex-row">
+      <div v-if="!node.hasChildren" class="pl-24"></div>
       <div v-else>
         <button
           :aria-label="
@@ -101,7 +99,7 @@ onMounted(async () => {
           </slot>
         </button>
       </div>
-      <div v-if="node.identifier !== ROOT_ID">
+      <div v-if="!props.isRoot">
         <Checkbox
           id="fieldOfLawSelected"
           v-model="fieldOfLawSelected"
@@ -117,10 +115,13 @@ onMounted(async () => {
       <div>
         <div class="flex flex-col">
           <div class="flex flex-row">
-            <div v-if="node.identifier !== ROOT_ID" class="identifier pl-8">
+            <div
+              v-if="!props.isRoot"
+              class="whitespace-nowrap pl-8 text-[16px]"
+            >
               {{ node.identifier }}
             </div>
-            <div class="font-size-14px pl-6 pt-2 text-blue-800">
+            <div class="pl-6 pt-2 text-[14px] text-blue-800">
               <TokenizeText
                 :keywords="props.node.linkedFields ?? []"
                 :text="props.node.text"
@@ -129,17 +130,21 @@ onMounted(async () => {
             </div>
           </div>
         </div>
-        <div v-if="showNorms" class="flex flex-col pb-6 pl-8">
-          <div class="font-size-14px norms-font-color flex flex-row flex-wrap">
+        <FlexContainer
+          v-if="showNorms"
+          class="pb-6 pl-8"
+          flex-direction="flex-col"
+        >
+          <FlexContainer class="flex-wrap text-[14px] text-[#66522e]">
             <span v-for="(norm, idx) in node.norms" :key="idx">
               <strong>{{ norm.singleNormDescription }}</strong>
               {{ norm.abbreviation
               }}{{ idx < node.norms.length - 1 ? ",&nbsp;" : "" }}
             </span>
-          </div>
-        </div>
+          </FlexContainer>
+        </FlexContainer>
       </div>
-    </div>
+    </FlexContainer>
     <div v-if="node.isExpanded && node.children?.length">
       <FieldOfLawNodeComponent
         v-for="child in node.children"
@@ -157,22 +162,5 @@ onMounted(async () => {
         @node:unselect="emit('node:unselect', $event)"
       />
     </div>
-  </div>
+  </FlexContainer>
 </template>
-
-<style lang="scss" scoped>
-.identifier {
-  font-size: 16px;
-  white-space: nowrap;
-}
-
-// TODO use tailwind instead
-.font-size-14px {
-  font-size: 14px;
-}
-
-// will be integrated into the styleguide
-.norms-font-color {
-  color: #66522e;
-}
-</style>
