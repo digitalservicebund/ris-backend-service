@@ -47,15 +47,17 @@ describe("Search result list", () => {
   it("renders correctly", async () => {
     renderSearchResults()
 
-    expect(await screen.findByText("fooLabel, fooDocumentNumber")).toBeVisible()
-    expect(await screen.findByText("Übernehmen")).toBeVisible()
+    expect(await screen.findByText("fooLabel")).toBeVisible()
+    expect(await screen.findByText("fooDocumentNumber")).toBeVisible()
+
+    expect(await screen.findByTestId("add-decision-button")).toBeVisible()
     expect(screen.queryByText(/Bereits hinzugefügt/)).not.toBeInTheDocument()
   })
 
   it("indicates not yet added previous decisions", async () => {
     renderSearchResults()
 
-    expect(await screen.findByText("Übernehmen")).toBeVisible()
+    expect(await screen.findByTestId("add-decision-button")).toBeVisible()
     expect(screen.queryByText(/Bereits hinzugefügt/)).not.toBeInTheDocument()
   })
 
@@ -76,18 +78,20 @@ describe("Search result list", () => {
       },
     ])
 
-    expect(await screen.findByText("Übernehmen")).toBeVisible()
+    expect(await screen.findByTestId("add-decision-button")).toBeVisible()
     expect(await screen.findByText(/Bereits hinzugefügt/)).toBeVisible()
   })
 
   it("clicking on 'Übernehmen' emits link decision event", async () => {
     const { user, emitted } = renderSearchResults()
 
-    expect(await screen.findByText("fooLabel, fooDocumentNumber")).toBeVisible()
-    expect(await screen.findByText("Übernehmen")).toBeVisible()
+    expect(await screen.findByText("fooLabel")).toBeVisible()
+    expect(await screen.findByText("fooDocumentNumber")).toBeVisible()
+
+    expect(await screen.findByTestId("add-decision-button")).toBeVisible()
     expect(screen.queryByText(/Bereits hinzugefügt/)).not.toBeInTheDocument()
 
-    const button = await screen.findByText("Übernehmen")
+    const button = await screen.findByTestId("add-decision-button")
     await user.click(button)
 
     expect(emitted().linkDecision).toBeTruthy()
@@ -110,7 +114,7 @@ describe("Search result list", () => {
       },
     ])
 
-    expect(await screen.findByText("Übernehmen")).toBeVisible()
+    expect(await screen.findByTestId("add-decision-button")).toBeVisible()
     expect(await screen.findByText(/Bereits hinzugefügt/)).toBeVisible()
   })
 

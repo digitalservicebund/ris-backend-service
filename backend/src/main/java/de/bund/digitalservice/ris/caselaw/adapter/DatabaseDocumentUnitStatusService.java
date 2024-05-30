@@ -104,10 +104,15 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
 
   @Override
   public PublicationStatus getLatestStatus(UUID documentUuid) {
-    return repository
-        .findFirstByDocumentationUnitDTOOrderByCreatedAtDesc(
-            databaseDocumentationUnitRepository.getReferenceById(documentUuid))
-        .getPublicationStatus();
+    StatusDTO entity =
+        repository.findFirstByDocumentationUnitDTOOrderByCreatedAtDesc(
+            databaseDocumentationUnitRepository.getReferenceById(documentUuid));
+
+    if (entity == null) {
+      return null;
+    }
+
+    return entity.getPublicationStatus();
   }
 
   private StatusDTO getLatestPublishing(String documentNumber)

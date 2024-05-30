@@ -29,6 +29,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
@@ -39,7 +40,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
-import de.bund.digitalservice.ris.caselaw.config.FeatureToggleConfig;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -101,7 +101,6 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       SecurityConfig.class,
       AuthService.class,
       TestConfig.class,
-      FeatureToggleConfig.class,
       DocumentNumberPatternConfig.class
     },
     controllers = {DocumentUnitController.class})
@@ -887,6 +886,42 @@ class DocumentationUnitIntegrationTest {
             .build();
 
     assertThat(extractDocumentNumbersFromSearchCall(searchInput)).contains("ABCD202300007");
+  }
+
+  @Test
+  void testSearchByFileNumber_withFileNumberAndDeviatingFileNumber_shouldOnlyReturnOneResult() {
+    DocumentationUnitDTO dto =
+        repository.save(
+            DocumentationUnitDTO.builder()
+                .id(UUID.randomUUID())
+                .documentNumber("documentNumber")
+                .decisionDate(LocalDate.parse("2021-01-02"))
+                .documentationOffice(
+                    DocumentationOfficeDTO.builder().id(documentationOfficeUuid).build())
+                .build());
+
+    repository.save(
+        dto.toBuilder()
+            .fileNumbers(
+                List.of(
+                    FileNumberDTO.builder()
+                        .documentationUnit(dto)
+                        .value("Vf. 19-VIII-22 (e.A.)")
+                        .rank(1L)
+                        .build()))
+            .deviatingFileNumbers(
+                List.of(
+                    DeviatingFileNumberDTO.builder()
+                        .documentationUnit(dto)
+                        .value("Vf.19-VIII-22 ea")
+                        .rank(1L)
+                        .build()))
+            .build());
+
+    DocumentationUnitSearchInput searchInput =
+        DocumentationUnitSearchInput.builder().fileNumber("Vf.").build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).hasSize(1);
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput).get(0)).contains("documentNumber");
   }
 
   private List<String> extractDocumentNumbersFromSearchCall(

@@ -22,9 +22,11 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfL
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -118,7 +120,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
 
   @Transactional(transactionManager = "jpaTransactionManager")
   @Override
-  public void save(DocumentUnit documentUnit, boolean featureActive) {
+  public void save(DocumentUnit documentUnit) {
 
     DocumentationUnitDTO documentationUnitDTO =
         repository.findById(documentUnit.uuid()).orElse(null);
@@ -148,8 +150,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
 
     // Transform non-database-related properties
     documentationUnitDTO =
-        DocumentationUnitTransformer.transformToDTO(
-            documentationUnitDTO, documentUnit, featureActive);
+        DocumentationUnitTransformer.transformToDTO(documentationUnitDTO, documentUnit);
     repository.save(documentationUnitDTO);
   }
 
@@ -460,7 +461,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
               fixedPageRequest);
     }
 
-    List<DocumentationUnitListItemDTO> allResults = new ArrayList<>();
+    Set<DocumentationUnitListItemDTO> allResults = new HashSet<>();
 
     allResults.addAll(fileNumberResults.getContent());
     allResults.addAll(deviatingFileNumberResults.getContent());

@@ -1,14 +1,15 @@
 import { render, screen } from "@testing-library/vue"
-import type { VNode } from "vue"
 import { h } from "vue"
-
+import { ComponentExposed } from "vue-component-type-helpers"
 import DataSetSummary from "@/components/DataSetSummary.vue"
 
-function renderComponent<T>(options?: {
-  data?: T | T[]
-  summarizer?: (dataEntry: T) => string | VNode
-}) {
-  const props = {
+type DataSetSummaryProps<T> = ComponentExposed<
+  typeof DataSetSummary<T>
+  // @ts-expect-error("wrong type")
+>["$props"]
+
+function renderComponent<T>(options?: Partial<DataSetSummaryProps<T>>) {
+  const props: DataSetSummaryProps<T> = {
     data: options?.data ?? ["foo", "bar"],
     summarizer: options?.summarizer,
   }

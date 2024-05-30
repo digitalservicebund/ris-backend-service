@@ -1,6 +1,7 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { Component, markRaw, ref, h } from "vue"
+import { ComponentExposed } from "vue-component-type-helpers"
 import { withSummarizer } from "@/components/DataSetSummary.vue"
 import EditableList from "@/components/EditableList.vue"
 import EditableListItem from "@/domain/editableListItem"
@@ -18,14 +19,19 @@ function summerizer(dataEntry: EditableListItem) {
 
 const SummaryComponent = withSummarizer(summerizer)
 
-async function renderComponent(options?: {
+type EditableListProps<T extends EditableListItem> = ComponentExposed<
+  typeof EditableList<T>
+  //@ts-expect-error("wrong type")
+>["$props"]
+
+async function renderComponent<T>(options?: {
   editComponent?: Component
   summaryComponent?: Component
-  modelValue?: unknown[]
-  defaultValue?: unknown
+  modelValue?: T[]
+  defaultValue?: T
   disableMultiEntry?: boolean
 }) {
-  const props = {
+  const props: EditableListProps<T> = {
     editComponent: markRaw(options?.editComponent ?? DummyInputGroupVue),
     summaryComponent: markRaw(options?.summaryComponent ?? SummaryComponent),
     modelValue: options?.modelValue ?? listWithEntries.value,

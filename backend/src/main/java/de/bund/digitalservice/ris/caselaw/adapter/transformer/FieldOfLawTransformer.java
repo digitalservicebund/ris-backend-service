@@ -18,6 +18,10 @@ public class FieldOfLawTransformer {
             .identifier(fieldOfLawDTO.getIdentifier())
             .text(fieldOfLawDTO.getText());
 
+    if (fieldOfLawDTO.getParent() != null) {
+      builder.parent(transformToDomain(fieldOfLawDTO.getParent(), false, false));
+    }
+
     if (withNorms && fieldOfLawDTO.getNorms() != null) {
       List<Norm> norms =
           fieldOfLawDTO.getNorms().stream()

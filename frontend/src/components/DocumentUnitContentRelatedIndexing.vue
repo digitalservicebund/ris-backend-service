@@ -25,7 +25,7 @@ const contentRelatedIndexing = computed({
 </script>
 
 <template>
-  <div class="flex flex-col gap-2">
+  <div class="flex flex-col">
     <KeyWords v-model="contentRelatedIndexing.keywords" />
     <FieldOfLawMain v-model="contentRelatedIndexing.fieldsOfLaw" />
     <Norms v-model="contentRelatedIndexing.norms" />

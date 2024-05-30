@@ -9,13 +9,14 @@ import org.flywaydb.gradle.task.FlywayMigrateTask
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.2.5"
+    id("org.springframework.boot") version "3.3.0"
     id("io.spring.dependency-management") version "1.1.5"
     id("com.diffplug.spotless") version "6.25.0"
     id("org.sonarqube") version "5.0.0.4638"
-    id("com.github.jk1.dependency-license-report") version "2.7"
+    id("com.github.jk1.dependency-license-report") version "2.8"
     id("com.gorylenko.gradle-git-properties") version "2.4.2"
     id("com.adarshr.test-logger") version "4.0.0"
+    id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.51.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
     id("org.flywaydb.flyway") version "10.13.0"
@@ -47,7 +48,7 @@ sourceSets {
 }
 
 jacoco {
-    toolVersion = "0.8.8"
+    toolVersion = "0.8.12"
 }
 
 lombok {
@@ -114,12 +115,7 @@ spotless {
 licenseReport {
     allowedLicensesFile = File("$projectDir/../allowed-licenses.json")
     renderers = arrayOf<ReportRenderer>(CsvReportRenderer("backend-licence-report.csv"))
-    filters = arrayOf<DependencyFilter>(
-        LicenseBundleNormalizer(
-            "$projectDir/license-normalizer-bundle.json",
-            true
-        )
-    )
+    filters = arrayOf<DependencyFilter>(LicenseBundleNormalizer())
 }
 
 sonar {
@@ -146,21 +142,21 @@ dependencies {
     implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.2.4")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.3.0")
 
     // CVE-2024-22262
-    implementation("org.springframework:spring-web:6.1.7")
+    implementation("org.springframework:spring-web:6.1.8")
 
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.5.0")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.1")
 
     // CVE-2024-26308
-    implementation("org.apache.commons:commons-compress:1.26.1")
+    implementation("org.apache.commons:commons-compress:1.26.2")
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:4.26.1")
+    implementation("com.google.protobuf:protobuf-java:4.27.0")
     // CVE-2023-52428 in spring-boot-starter-oauth2-client:3.2.3
-    implementation("com.nimbusds:nimbus-jose-jwt:9.39.1")
+    implementation("com.nimbusds:nimbus-jose-jwt:9.39.3")
     // CVE-2023-31582
     implementation("org.bitbucket.b_c:jose4j:0.9.6")
 
@@ -170,7 +166,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.1")
 
-    implementation(platform("software.amazon.awssdk:bom:2.25.54"))
+    implementation(platform("software.amazon.awssdk:bom:2.25.59"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -187,17 +183,19 @@ dependencies {
     }
     // for local development:
     // implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.8.38.jar"))
+    // or with local gradle project (look also into settings.gradle.kts)
+    // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.7")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.8")
     // for local development:
-    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.4.jar"))
+    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.8.jar"))
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.17.1")
 
     implementation("io.micrometer:micrometer-registry-prometheus:1.13.0")
     implementation("io.micrometer:micrometer-core:1.13.0")
 
-    implementation(platform("io.sentry:sentry-bom:7.9.0"))
+    implementation(platform("io.sentry:sentry-bom:8.0.0-alpha.1"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
     implementation("io.sentry:sentry-logback")
 

@@ -2,13 +2,9 @@ import { render, screen } from "@testing-library/vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 import DocumentUnit, { CoreData } from "@/domain/documentUnit"
 
-function renderComponent(options?: {
-  modelValue?: CoreData
-  updateStatus?: number
-}) {
+function renderComponent(options?: { modelValue: CoreData }) {
   const props = {
-    modelValue: options?.modelValue,
-    updateStatus: options?.updateStatus ?? 0,
+    modelValue: options?.modelValue ?? {},
   }
   const utils = render(DocumentUnitCoreData, { props })
   return { screen, props, ...utils }

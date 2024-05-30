@@ -12,6 +12,7 @@ import Pagination, { Page } from "@/components/Pagination.vue"
 import { Query } from "@/composables/useQueryFromRoute"
 import { Court } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import errorMessages from "@/i18n/errors.json"
 import ComboboxItemService from "@/services/comboboxItemService"
 import service from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
@@ -27,11 +28,11 @@ const isLoading = ref(false)
 const searchQuery = ref<Query<DocumentUnitSearchParameter>>()
 const pageNumber = ref<number>(0)
 
-const emptyStatus = computed(() => {
+const emptyStateLabel = computed(() => {
   if (!documentUnitListEntries.value) {
     return "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit."
   } else if (documentUnitListEntries.value.length === 0) {
-    return "Keine Ergebnisse gefunden."
+    return errorMessages.SEARCH_RESULTS_NOT_FOUND.title
   }
   return undefined
 })
@@ -240,7 +241,7 @@ const showDefaultLink = computed(() => {
       <DocumentUnitList
         class="grow"
         :document-unit-list-entries="documentUnitListEntries"
-        :empty-state="emptyStatus"
+        :empty-state="emptyStateLabel"
         is-deletable
         :is-loading="isLoading"
         :search-response-error="searchResponseError"

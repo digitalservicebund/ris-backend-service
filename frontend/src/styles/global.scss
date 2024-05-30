@@ -19,8 +19,8 @@
   }
 
   .ds-input,
-  .ds-input input,
   .ds-select,
+  .ds-input input,
   .ds-select select {
     &::placeholder {
       color: theme("colors.gray.800");

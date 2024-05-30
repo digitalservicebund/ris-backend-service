@@ -5,6 +5,7 @@ import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
+import errorMessages from "@/i18n/errors.json"
 import service from "@/services/fieldOfLawService"
 
 const emit = defineEmits<{
@@ -78,7 +79,7 @@ async function submitSearch(page: number) {
       />
     </Pagination>
     <div v-if="!currentPage?.content || currentPage?.content?.length == 0">
-      Keine Ergebnisse
+      {{ errorMessages.SEARCH_RESULTS_NOT_FOUND.title }}
     </div>
   </div>
 </template>

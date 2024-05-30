@@ -3,7 +3,7 @@ import FieldOfLawListEntry from "@/components/FieldOfLawListEntry.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
 function renderComponent(
-  fieldOfLaw: Partial<FieldOfLawNode>,
+  fieldOfLaw: FieldOfLawNode,
   showBin: boolean,
 ): RenderResult {
   const props = {
@@ -20,6 +20,9 @@ describe("FieldOfLawListEntry", () => {
       {
         identifier: "ST-01-02-03",
         text: "Steuerrecht 1-2-3",
+        norms: [],
+        children: [],
+        childrenCount: 0,
       },
       true,
     )
@@ -43,6 +46,9 @@ describe("FieldOfLawListEntry", () => {
       {
         identifier: "ST-01-02-03",
         text: "Steuerrecht 1-2-3",
+        norms: [],
+        children: [],
+        childrenCount: 0,
       },
       true,
     )
@@ -61,6 +67,9 @@ describe("FieldOfLawListEntry", () => {
       {
         identifier: "ST-01-02-03",
         text: "Steuerrecht 1-2-3",
+        norms: [],
+        children: [],
+        childrenCount: 0,
       },
       false,
     )

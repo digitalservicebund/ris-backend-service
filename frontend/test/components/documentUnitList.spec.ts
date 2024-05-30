@@ -6,6 +6,7 @@ import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import { PublicationState } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { User } from "@/domain/user"
+import errorMessages from "@/i18n/errors.json"
 import { ResponseError } from "@/services/httpClient"
 
 function renderComponent(options?: {
@@ -31,7 +32,7 @@ function renderComponent(options?: {
           options?.emptyState ??
           (!options?.documentUnitListEntries
             ? "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit."
-            : "Keine Ergebnisse gefunden."),
+            : errorMessages.SEARCH_RESULTS_NOT_FOUND.title),
       },
       global: {
         plugins: [
@@ -90,7 +91,9 @@ describe("documentUnit list", () => {
       documentUnitListEntries: [],
     })
 
-    expect(screen.getByText(/Keine Ergebnisse./)).toBeVisible()
+    expect(
+      screen.getByText(errorMessages.SEARCH_RESULTS_NOT_FOUND.title),
+    ).toBeVisible()
   })
 
   test("shows error", () => {

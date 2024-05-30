@@ -2,7 +2,7 @@ import { fireEvent, render, RenderResult, screen } from "@testing-library/vue"
 import FieldOfLawSelectionList from "@/components/FieldOfLawSelectionList.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
-function renderComponent(modelValue: Partial<FieldOfLawNode>[]): RenderResult {
+function renderComponent(modelValue: FieldOfLawNode[]): RenderResult {
   const props = {
     modelValue,
   }
@@ -22,6 +22,9 @@ describe("FieldOfLawSelectionList", () => {
       {
         identifier: "ST-01-02-03",
         text: "Steuerrecht 1-2-3",
+        norms: [],
+        children: [],
+        childrenCount: 0,
       },
     ])
 
@@ -47,6 +50,9 @@ describe("FieldOfLawSelectionList", () => {
       {
         identifier: "ST-01-02-03",
         text: "Steuerrecht 1-2-3",
+        norms: [],
+        children: [],
+        childrenCount: 0,
       },
     ])
 
@@ -64,6 +70,9 @@ describe("FieldOfLawSelectionList", () => {
       {
         identifier: "ST-01-02-03",
         text: "Steuerrecht 1-2-3",
+        norms: [],
+        children: [],
+        childrenCount: 0,
       },
     ])
 
