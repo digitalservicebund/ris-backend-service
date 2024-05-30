@@ -42,8 +42,24 @@
     {
       "moduleLicense": "Creative Commons Legal Code"
     },
+
     {
-      "moduleLicense": "CDDL + GPLv2 with classpath exception"
+      "moduleLicense": "MIT"
+    },
+    {
+      "moduleLicense": "Apache-2.0"
+    },
+    {
+      "moduleLicense": "BSD-3-Clause"
+    },
+    {
+      "moduleLicense": "BSD-2-Clause"
+    },
+    {
+      "moduleLicense": "Python-2.0"
+    },
+    {
+      "moduleLicense": "ISC"
     },
 
     {
