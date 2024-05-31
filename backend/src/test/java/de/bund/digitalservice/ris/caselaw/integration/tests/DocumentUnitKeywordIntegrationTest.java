@@ -33,7 +33,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
-import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.List;
 import java.util.UUID;
@@ -95,7 +94,6 @@ class DocumentUnitKeywordIntegrationTest {
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean private AttachmentService attachmentService;
-  @MockBean private FeatureToggleService featureService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
 

@@ -25,7 +25,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationD
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.config.FeatureToggleConfig;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -69,7 +68,6 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       SecurityConfig.class,
       AuthService.class,
       TestConfig.class,
-      FeatureToggleConfig.class,
       DocumentNumberPatternConfig.class
     },
     controllers = {DocumentUnitController.class},

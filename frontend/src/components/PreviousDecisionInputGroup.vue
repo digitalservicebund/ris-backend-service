@@ -116,13 +116,12 @@ async function addPreviousDecision() {
 }
 
 async function addPreviousDecisionFromSearch(decision: RelatedDocumentation) {
-  const newPreviousDecision = new PreviousDecision({
+  previousDecision.value = new PreviousDecision({
     ...decision,
     referenceFound: true,
     deviatingFileNumber: previousDecision.value.deviatingFileNumber,
   })
-
-  emit("update:modelValue", newPreviousDecision)
+  emit("update:modelValue", previousDecision.value as PreviousDecision)
   emit("addEntry")
   scrollToTop()
 }
@@ -203,7 +202,7 @@ onBeforeUnmount(() => {
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getCourts"
             :readonly="previousDecision.hasForeignSource"
-            @click="validationStore.remove('court')"
+            @focus="validationStore.remove('court')"
           ></ComboboxInput>
         </InputField>
         <div v-if="!dateUnknown" class="flex w-full justify-between gap-24">
@@ -251,7 +250,7 @@ onBeforeUnmount(() => {
               :has-error="slotProps.hasError"
               :readonly="previousDecision.hasForeignSource"
               size="medium"
-              @input="validationStore.remove('fileNumber')"
+              @focus="validationStore.remove('fileNumber')"
             ></TextInput>
           </InputField>
           <!-- Child  -->
@@ -328,16 +327,18 @@ onBeforeUnmount(() => {
       />
     </div>
 
-    <Pagination
-      navigation-position="bottom"
-      :page="searchResultsCurrentPage"
-      @update-page="updatePage"
-    >
-      <SearchResultList
-        :is-loading="isLoading"
-        :search-results="searchResults"
-        @link-decision="addPreviousDecisionFromSearch"
-      />
-    </Pagination>
+    <div class="bg-blue-200">
+      <Pagination
+        navigation-position="bottom"
+        :page="searchResultsCurrentPage"
+        @update-page="updatePage"
+      >
+        <SearchResultList
+          :is-loading="isLoading"
+          :search-results="searchResults"
+          @link-decision="addPreviousDecisionFromSearch"
+        />
+      </Pagination>
+    </div>
   </div>
 </template>

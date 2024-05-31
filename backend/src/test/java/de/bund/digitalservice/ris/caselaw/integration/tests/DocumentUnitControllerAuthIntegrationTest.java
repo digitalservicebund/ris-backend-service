@@ -30,7 +30,6 @@ import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
-import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import java.time.Instant;
@@ -101,7 +100,6 @@ class DocumentUnitControllerAuthIntegrationTest {
   @MockBean DocxConverterService docxConverterService;
   @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean AttachmentService attachmentService;
-  @MockBean private FeatureToggleService featureService;
 
   static Stream<Arguments> getUnauthorizedCases() {
     return Stream.of(

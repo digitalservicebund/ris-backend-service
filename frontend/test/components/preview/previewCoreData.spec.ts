@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/vue"
 import PreviewCoreData from "@/components/preview/PreviewCoreData.vue"
 import { CoreData } from "@/domain/documentUnit"
 
-function renderComponent(coreData?: CoreData) {
+function renderComponent(coreData: CoreData) {
   return render(PreviewCoreData, {
     props: {
       coreData: coreData,

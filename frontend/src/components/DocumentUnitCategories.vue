@@ -81,25 +81,15 @@ function hasDataChange(): boolean {
  */
 function deleteLegalForces() {
   const norms = updatedDocumentUnit.value.contentRelatedIndexing.norms
-  if (norms) {
-    norms.forEach((norm) => {
-      const singleNorms = norm.singleNorms
 
-      if (singleNorms) {
-        singleNorms.forEach((singleNorm, index) => {
-          if (singleNorm.legalForce) {
-            singleNorm.legalForce = undefined
-          }
-          if (singleNorm.isEmpty) {
-            norm.singleNorms = [
-              ...singleNorms.slice(0, index),
-              ...singleNorms.slice(index + 1),
-            ]
-          }
-        })
+  norms?.forEach((norm) => {
+    norm.singleNorms = norm.singleNorms?.filter((singleNorm) => {
+      if (singleNorm.legalForce) {
+        singleNorm.legalForce = undefined
       }
+      return !singleNorm.isEmpty
     })
-  }
+  })
 }
 
 async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {

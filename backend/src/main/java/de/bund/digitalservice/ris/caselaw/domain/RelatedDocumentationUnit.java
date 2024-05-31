@@ -9,11 +9,13 @@ import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @SuperBuilder(toBuilder = true)
 @Getter
+@Setter
 @NoArgsConstructor
 @EqualsAndHashCode
 @ToString

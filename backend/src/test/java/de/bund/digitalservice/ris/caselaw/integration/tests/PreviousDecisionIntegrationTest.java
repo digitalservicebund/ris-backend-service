@@ -40,7 +40,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
-import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
@@ -115,7 +114,6 @@ class PreviousDecisionIntegrationTest {
   @MockBean private EmailPublishService publishService;
   @MockBean DocxConverterService docxConverterService;
   @MockBean AttachmentService attachmentService;
-  @MockBean private FeatureToggleService featureService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private DocumentationOfficeDTO documentationOfficeDTO;

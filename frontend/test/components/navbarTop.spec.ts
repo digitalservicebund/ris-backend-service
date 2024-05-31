@@ -1,3 +1,4 @@
+import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import NavbarTop from "@/components/NavbarTop.vue"
@@ -27,7 +28,7 @@ describe("navbar top", () => {
   test("navbar top should be rendered without error", async () => {
     render(NavbarTop, {
       props: {},
-      global: { plugins: [router] },
+      global: { plugins: [[router], createTestingPinia()] },
     })
 
     expect(screen.getByText("Rechtsinformationen")).toBeInTheDocument()

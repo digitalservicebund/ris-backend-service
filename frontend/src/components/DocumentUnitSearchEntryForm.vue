@@ -25,9 +25,10 @@ const { route, getQueryFromRoute, pushQueryToRoute } =
   useQuery<DocumentUnitSearchParameter>()
 const query = ref(getQueryFromRoute())
 
-const searchEntryEmpty = computed(() => {
+const isEmptySearch = computed(() => {
   return Object.keys(query.value).length === 0
 })
+
 const submitButtonError = ref()
 
 const dropdownItems: DropdownItem[] = [
@@ -77,6 +78,24 @@ function resetErrors(id?: DocumentUnitSearchParameter) {
   submitButtonError.value = undefined
 }
 
+function isSearchInputInvalid() {
+  if (isEmptySearch.value) {
+    submitButtonError.value = "Geben Sie mindestens ein Suchkriterium ein"
+    return true
+  }
+
+  if (hasValidationErrors()) {
+    submitButtonError.value = "Fehler in Suchkriterien"
+    return true
+  }
+
+  return false
+}
+
+function hasValidationErrors() {
+  return validationStore.getAll().length > 0
+}
+
 async function validateSearchInput() {
   //Startdatum fehlt
   if (
@@ -92,7 +111,7 @@ async function validateSearchInput() {
     validationStore.remove("decisionDate")
   }
 
-  //Enddatum darf nich vor Startdatum liegen
+  //Enddatum darf nicht vor Startdatum liegen
   if (
     query.value?.decisionDateEnd &&
     query.value?.decisionDate &&
@@ -121,15 +140,27 @@ function handleLocalInputError(error: ValidationError | undefined, id: string) {
   validateSearchInput()
 }
 
+/**
+ * Checks if the current search query is identical to the previous query.
+ * @returns {boolean} - `true` if the current query matches the previous query, otherwise `false`.
+ */
+function isIdenticalSearch(): boolean {
+  const previousQuery = getQueryFromRoute()
+  const newQuery = query.value
+  return JSON.stringify(previousQuery) === JSON.stringify(newQuery)
+}
+
 function handleSearchButtonClicked() {
   validateSearchInput()
-  if (searchEntryEmpty.value) {
-    submitButtonError.value = "Geben Sie mindestens ein Suchkriterium ein"
-  } else if (validationStore.getAll().length > 0) {
-    submitButtonError.value = "Fehler in Suchkriterien"
-  } else {
-    pushQueryToRoute(query.value)
+
+  if (isSearchInputInvalid()) {
+    return
   }
+
+  if (isIdenticalSearch()) {
+    handleSearch()
+  }
+  pushQueryToRoute(query.value)
 }
 
 function handleSearchShortcut(event: KeyboardEvent) {
@@ -137,26 +168,24 @@ function handleSearchShortcut(event: KeyboardEvent) {
     handleSearchButtonClicked()
 }
 
+function handleSearch() {
+  if (!isEmptySearch.value) {
+    emit("search", getQueryFromRoute())
+  } else {
+    resetSearch()
+  }
+}
+
 watch(
   route,
   () => {
-    query.value = getQueryFromRoute()
-    if (!searchEntryEmpty.value) emit("search", getQueryFromRoute())
-    else resetSearch()
-  },
-  { deep: true },
-)
-
-watch(
-  query,
-  () => {
-    validateSearchInput()
+    handleSearch()
   },
   { deep: true },
 )
 
 onMounted(async () => {
-  if (!searchEntryEmpty.value) emit("search", getQueryFromRoute())
+  handleSearch()
   window.addEventListener("keydown", handleSearchShortcut)
 })
 
@@ -359,7 +388,7 @@ export type DocumentUnitSearchParameter =
         </div>
 
         <TextButton
-          v-if="!searchEntryEmpty"
+          v-if="!isEmptySearch"
           aria-label="Suche zurücksetzen"
           button-type="ghost"
           class="ml-8 self-start"

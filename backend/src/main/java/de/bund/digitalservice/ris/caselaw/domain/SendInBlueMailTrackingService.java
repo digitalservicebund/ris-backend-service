@@ -65,6 +65,10 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
     }
 
     PublicationStatus latestStatus = statusService.getLatestStatus(documentUnitUuid);
+    if (latestStatus == null) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
     if (latestStatus != PublicationStatus.PUBLISHED) {
       try {
         statusService.update(

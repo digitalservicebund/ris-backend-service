@@ -35,7 +35,7 @@ jobs:
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/actions/setup-gradle@6cec5d49d4d6d4bb982fbed7047db31ea6d38f11
+      - uses: gradle/actions/setup-gradle@af6e5767241073b8ab20cc8cf7e95ec63fadc160
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: build --profile -x integrationTest -x test
@@ -66,7 +66,7 @@ jobs:
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/actions/setup-gradle@6cec5d49d4d6d4bb982fbed7047db31ea6d38f11
+      - uses: gradle/actions/setup-gradle@af6e5767241073b8ab20cc8cf7e95ec63fadc160
         with:
           gradle-version: ${{ env.GRADLE_VERSION}}
           arguments: test -x integrationTest
@@ -92,7 +92,7 @@ jobs:
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/actions/setup-gradle@6cec5d49d4d6d4bb982fbed7047db31ea6d38f11
+      - uses: gradle/actions/setup-gradle@af6e5767241073b8ab20cc8cf7e95ec63fadc160
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: integrationTest -x test
@@ -117,13 +117,13 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Validate gradle wrapper
-        uses: gradle/actions/wrapper-validation@6cec5d49d4d6d4bb982fbed7047db31ea6d38f11
+        uses: gradle/actions/wrapper-validation@af6e5767241073b8ab20cc8cf7e95ec63fadc160
       - name: Set up JDK
         uses: actions/setup-java@v4.2.1
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/actions/setup-gradle@6cec5d49d4d6d4bb982fbed7047db31ea6d38f11
+      - uses: gradle/actions/setup-gradle@af6e5767241073b8ab20cc8cf7e95ec63fadc160
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: bootBuildImage
@@ -131,7 +131,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@d710430a6722f083d3b36b8339ff66b32f22ee55
+        uses: aquasecurity/trivy-action@841fb371db7b5cd339e5b2d55c92f5dbd730ac9f
         with:
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
           format: "sarif"
@@ -153,7 +153,7 @@ jobs:
       - name: Generate cosign vulnerability scan record
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@d710430a6722f083d3b36b8339ff66b32f22ee55
+        uses: aquasecurity/trivy-action@841fb371db7b5cd339e5b2d55c92f5dbd730ac9f
         with:
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
           format: "cosign-vuln"
@@ -320,7 +320,7 @@ jobs:
       - name: Run Trivy vulnerability image scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@d710430a6722f083d3b36b8339ff66b32f22ee55
+        uses: aquasecurity/trivy-action@841fb371db7b5cd339e5b2d55c92f5dbd730ac9f
         with:
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
           format: "sarif"
@@ -343,7 +343,7 @@ jobs:
       - name: Run Trivy vulnerability file scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@d710430a6722f083d3b36b8339ff66b32f22ee55
+        uses: aquasecurity/trivy-action@841fb371db7b5cd339e5b2d55c92f5dbd730ac9f
         with:
           scan-type: "fs"
           scan-ref: "./frontend"
@@ -368,7 +368,7 @@ jobs:
       - name: Generate cosign vulnerability scan record
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@d710430a6722f083d3b36b8339ff66b32f22ee55
+        uses: aquasecurity/trivy-action@841fb371db7b5cd339e5b2d55c92f5dbd730ac9f
         with:
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
           format: "cosign-vuln"
@@ -414,7 +414,7 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
       - name: Scan with SonarQube
-        uses: gradle/actions/setup-gradle@6cec5d49d4d6d4bb982fbed7047db31ea6d38f11
+        uses: gradle/actions/setup-gradle@af6e5767241073b8ab20cc8cf7e95ec63fadc160
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: sonar --info
@@ -425,7 +425,7 @@ jobs:
       - name: Check SonarQube Quality Gate
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sonarsource/sonarqube-quality-gate-action@d304d050d930b02a896b0f85935344f023928496
+        uses: sonarsource/sonarqube-quality-gate-action@72f24ebf1f81eda168a979ce14b8203273b7c3ad
         with:
           scanMetadataReportFile: backend/build/sonar/report-task.txt
         timeout-minutes: 3 # Force to fail step after specific time
@@ -464,7 +464,7 @@ jobs:
           sonar-scanner
         working-directory: ./frontend
       - name: Check SonarQube Quality Gate
-        uses: sonarsource/sonarqube-quality-gate-action@d304d050d930b02a896b0f85935344f023928496
+        uses: sonarsource/sonarqube-quality-gate-action@72f24ebf1f81eda168a979ce14b8203273b7c3ad
         with:
           scanMetadataReportFile: frontend/.scannerwork/report-task.txt
         timeout-minutes: 3
@@ -505,7 +505,7 @@ jobs:
       - name: Log into container registry
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: docker/login-action@e92390c5fb421da1463c202d546fed0ec5c39f20
+        uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
@@ -515,7 +515,7 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20
+        uses: sigstore/cosign-installer@b49ef6b125b98c2708965eeb167d89e86aa73ef6
       - name: Sign the published Docker image
         run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
       - name: Download cosign vulnerability scan record
@@ -560,7 +560,7 @@ jobs:
       - name: Log into container registry
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: docker/login-action@e92390c5fb421da1463c202d546fed0ec5c39f20
+        uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
@@ -570,7 +570,7 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20
+        uses: sigstore/cosign-installer@b49ef6b125b98c2708965eeb167d89e86aa73ef6
       - name: Sign the published Docker image
         run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
       - name: Download cosign vulnerability scan record
@@ -600,7 +600,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@ac42db4c9c2e2bd9f66aadf3290c5995891d91a3
+      - uses: chainguard-dev/actions/setup-gitsign@e82b4e5ae10182af72972addcb3fedf7454621c8
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -734,7 +734,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@ac42db4c9c2e2bd9f66aadf3290c5995891d91a3
+      - uses: chainguard-dev/actions/setup-gitsign@e82b4e5ae10182af72972addcb3fedf7454621c8
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -792,7 +792,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@ac42db4c9c2e2bd9f66aadf3290c5995891d91a3
+      - uses: chainguard-dev/actions/setup-gitsign@e82b4e5ae10182af72972addcb3fedf7454621c8
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -850,7 +850,7 @@ jobs:
           java-version: "17.0"
           distribution: "temurin"
           cache: gradle
-      - uses: gradle/actions/setup-gradle@6cec5d49d4d6d4bb982fbed7047db31ea6d38f11
+      - uses: gradle/actions/setup-gradle@af6e5767241073b8ab20cc8cf7e95ec63fadc160
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: migrateDatabaseForERD

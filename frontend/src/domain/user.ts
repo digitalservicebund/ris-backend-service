@@ -3,4 +3,5 @@ export type User = {
   documentationOffice?: {
     abbreviation: string
   }
+  email?: string
 }

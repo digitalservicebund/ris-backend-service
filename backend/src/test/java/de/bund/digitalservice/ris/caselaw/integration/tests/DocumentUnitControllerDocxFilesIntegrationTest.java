@@ -37,7 +37,6 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
-import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import java.io.IOException;
@@ -125,7 +124,6 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   @MockBean private UserService userService;
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private DocumentBuilderFactory documentBuilderFactory;
-  @MockBean private FeatureToggleService featureService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
 

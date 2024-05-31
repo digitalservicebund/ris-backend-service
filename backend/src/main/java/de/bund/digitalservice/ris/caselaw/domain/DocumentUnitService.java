@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,7 +31,6 @@ public class DocumentUnitService {
   private final DocumentUnitStatusService documentUnitStatusService;
   private final AttachmentService attachmentService;
   private final DocumentNumberRecyclingService documentNumberRecyclingService;
-  private final FeatureToggleService featureService;
   private final Validator validator;
 
   @Value("${otc.obs.bucket-name}")
@@ -47,8 +47,7 @@ public class DocumentUnitService {
       PublicationReportRepository publicationReportRepository,
       DocumentNumberRecyclingService documentNumberRecyclingService,
       Validator validator,
-      AttachmentService attachmentService,
-      FeatureToggleService featureService) {
+      AttachmentService attachmentService) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
@@ -58,7 +57,6 @@ public class DocumentUnitService {
     this.documentNumberRecyclingService = documentNumberRecyclingService;
     this.validator = validator;
     this.attachmentService = attachmentService;
-    this.featureService = featureService;
   }
 
   public DocumentUnit generateNewDocumentUnit(DocumentationOffice documentationOffice)
@@ -91,10 +89,10 @@ public class DocumentUnitService {
 
     DocumentationUnitSearchInput searchInput =
         DocumentationUnitSearchInput.builder()
-            .documentNumber(documentNumber.orElse(null))
-            .fileNumber(fileNumber.orElse(null))
-            .courtType(courtType.orElse(null))
-            .courtLocation(courtLocation.orElse(null))
+            .documentNumber(normalizeSpace(documentNumber.orElse(null)))
+            .fileNumber(normalizeSpace(fileNumber.orElse(null)))
+            .courtType(normalizeSpace(courtType.orElse(null)))
+            .courtLocation(normalizeSpace(courtLocation.orElse(null)))
             .decisionDate(decisionDate.orElse(null))
             .decisionDateEnd(decisionDateEnd.orElse(null))
             .status(
@@ -108,18 +106,10 @@ public class DocumentUnitService {
             .myDocOfficeOnly(myDocOfficeOnly.orElse(false))
             .build();
 
-    return repository
-        .searchByDocumentationUnitSearchInput(
-            PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()),
-            documentationOffice,
-            searchInput)
-        .map(
-            listItem ->
-                listItem.toBuilder()
-                    .isEditableByCurrentUser(
-                        listItem.documentationOffice() != null
-                            && listItem.documentationOffice().equals(documentationOffice))
-                    .build());
+    return repository.searchByDocumentationUnitSearchInput(
+        PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()),
+        documentationOffice,
+        searchInput);
   }
 
   public DocumentUnit getByDocumentNumber(String documentNumber) {
@@ -174,7 +164,7 @@ public class DocumentUnitService {
     repository.saveFieldsOfLaw(documentUnit);
     repository.saveProcedures(documentUnit);
 
-    repository.save(documentUnit, featureService.isEnabled("neuris.legal-force"));
+    repository.save(documentUnit);
 
     return repository
         .findByUuid(documentUnit.uuid())
@@ -223,8 +213,36 @@ public class DocumentUnitService {
       String documentNumberToExclude,
       Pageable pageable) {
 
+    if (relatedDocumentationUnit.getFileNumber() != null) {
+      relatedDocumentationUnit.setFileNumber(
+          normalizeSpace(relatedDocumentationUnit.getFileNumber()));
+    }
     return repository.searchLinkableDocumentationUnits(
         relatedDocumentationUnit, documentationOffice, documentNumberToExclude, pageable);
+  }
+
+  public static String normalizeSpace(String input) {
+    if (input == null) {
+      return null;
+    }
+
+    // List of Unicode spaces to replace with a normal space
+    String[] unicodeSpaces = {
+      "\u00A0", // NO-BREAK SPACE
+      "\u202F", // NARROW NO-BREAK SPACE
+      "\uFEFF", // ZERO WIDTH NO-BREAK SPACE
+      "\u2007", // FIGURE SPACE
+      "\u180E", // MONGOLIAN VOWEL SEPARATOR
+      "\u2060" // WORD JOINER
+    };
+
+    String normalized = input;
+    for (String unicodeSpace : unicodeSpaces) {
+      normalized = normalized.replace(unicodeSpace, " ");
+    }
+
+    // Use StringUtils.normalizeSpace to handle additional normalization
+    return StringUtils.normalizeSpace(normalized);
   }
 
   public String validateSingleNorm(SingleNormValidationInfo singleNormValidationInfo) {

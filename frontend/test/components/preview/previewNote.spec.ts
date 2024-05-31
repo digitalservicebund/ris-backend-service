@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/vue"
 import PreviewNote from "@/components/preview/PreviewNote.vue"
 
-function renderComponent(note: string | null) {
+function renderComponent(note?: string) {
   return render(PreviewNote, {
     props: {
       note: note,
@@ -10,9 +10,9 @@ function renderComponent(note: string | null) {
 }
 
 describe("preview note", () => {
-  test.each([null, ""])(
+  test.each([undefined, ""])(
     "exclude note if null or empty",
-    async (noteContent: string | null) => {
+    async (noteContent?: string) => {
       renderComponent(noteContent)
       expect(screen.queryByTestId("note")).not.toBeInTheDocument()
     },

@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/vue"
 import PreviewTexts from "@/components/preview/PreviewTexts.vue"
 import { Texts } from "@/domain/documentUnit"
 
-function renderComponent(texts?: Texts) {
+function renderComponent(texts: Texts) {
   return render(PreviewTexts, {
     props: {
       texts: texts,

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":disableDependencyDashboard"
+  ],
+  "ignoreDeps": [
+    "de.bund.digitalservice:neuris-juris-xml-export",
+    "de.bund.digitalservice:neuris-caselaw-migration-schema"
+  ],
+  "lockFileMaintenance": {
+    "enabled": false
+  },
+  "timezone": "Europe/Berlin",
+  "automergeSchedule": [
+    "every weekday"
+  ],
+  "packageRules": [
+    {
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "pinDigest",
+        "digest"
+      ],
+      "automerge": true,
+      "platformAutomerge": false,
+      "automergeType": "pr"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
-import { captureConsoleIntegration } from "@sentry/integrations"
 import * as Sentry from "@sentry/vue"
 import { createHead } from "@unhead/vue"
+import { createPinia } from "pinia"
 import { createApp } from "vue"
 import "@/styles/global.scss"
 import App from "./App.vue"
@@ -21,11 +21,11 @@ if (import.meta.env.PROD) {
     integrations: [
       Sentry.browserTracingIntegration({
         // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
-        tracePropagationTargets: targets(),
         router,
       }),
-      captureConsoleIntegration(),
+      Sentry.captureConsoleIntegration(),
     ],
+    tracePropagationTargets: targets(),
     // Performance Monitoring
     tracesSampleRate: 0.1, // Capture 100% of the transactions, reduce in production!
     attachProps: true,
@@ -33,4 +33,4 @@ if (import.meta.env.PROD) {
   })
 }
 
-app.use(router).mount("#app")
+app.use(router).use(createPinia()).mount("#app")

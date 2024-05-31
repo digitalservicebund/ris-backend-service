@@ -33,7 +33,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
-import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.util.Collections;
@@ -99,7 +98,6 @@ class DocumentUnitFieldOfLawIntegrationTest {
   @MockBean private UserService userService;
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private AttachmentService attachmentService;
-  @MockBean private FeatureToggleService featureService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private DocumentationOfficeDTO documentationOfficeDTO;

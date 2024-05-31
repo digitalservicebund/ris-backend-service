@@ -133,12 +133,12 @@ async function addActiveCitationFromSearch(decision: RelatedDocumentation) {
   const newActiveCitationType = {
     ...activeCitationType.value?.value,
   } as CitationType
-  const decisionWithCitationType = new ActiveCitation({
+  activeCitation.value = new ActiveCitation({
     ...decision,
     referenceFound: true,
     citationType: newActiveCitationType,
   })
-  emit("update:modelValue", decisionWithCitationType)
+  emit("update:modelValue", activeCitation.value as ActiveCitation)
   emit("addEntry")
   scrollToTop()
 }
@@ -156,6 +156,7 @@ function scrollToTop() {
     })
   }
 }
+
 function updateDateFormatValidation(
   validationError: ValidationError | undefined,
 ) {
@@ -215,6 +216,7 @@ onBeforeUnmount(() => {
         clear-on-choosing-item
         :has-error="slotProps.hasError"
         :item-service="ComboboxItemService.getCitationTypes"
+        @focus="validationStore.remove('citationType')"
       ></ComboboxInput>
     </InputField>
     <div class="flex flex-col gap-24">
@@ -233,6 +235,7 @@ onBeforeUnmount(() => {
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getCourts"
             :readonly="activeCitation.hasForeignSource"
+            @focus="validationStore.remove('court')"
           >
           </ComboboxInput>
         </InputField>
@@ -252,6 +255,7 @@ onBeforeUnmount(() => {
             class="ds-input-medium"
             :has-error="slotProps.hasError"
             :readonly="activeCitation.hasForeignSource"
+            @focus="validationStore.remove('decisionDate')"
             @update:validation-error="slotProps.updateValidationError"
           ></DateInput>
         </InputField>
@@ -270,6 +274,7 @@ onBeforeUnmount(() => {
             :has-error="slotProps.hasError"
             :readonly="activeCitation.hasForeignSource"
             size="medium"
+            @focus="validationStore.remove('fileNumber')"
           ></TextInput>
         </InputField>
         <InputField id="activeCitationDecisionDocumentType" label="Dokumenttyp">
@@ -322,16 +327,18 @@ onBeforeUnmount(() => {
       />
     </div>
 
-    <Pagination
-      navigation-position="bottom"
-      :page="searchResultsCurrentPage"
-      @update-page="updatePage"
-    >
-      <SearchResultList
-        :is-loading="isLoading"
-        :search-results="searchResults"
-        @link-decision="addActiveCitationFromSearch"
-      />
-    </Pagination>
+    <div class="bg-blue-200">
+      <Pagination
+        navigation-position="bottom"
+        :page="searchResultsCurrentPage"
+        @update-page="updatePage"
+      >
+        <SearchResultList
+          :is-loading="isLoading"
+          :search-results="searchResults"
+          @link-decision="addActiveCitationFromSearch"
+        />
+      </Pagination>
+    </div>
   </div>
 </template>
