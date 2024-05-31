@@ -113,12 +113,14 @@ jobs:
         with:
           name: test-results-${{ inputs.mode }}-${{ inputs.subproject }}-${{ inputs.browser }}
           path: ./frontend/test-results.json
+          retention-days: 1
       - name: Upload test result blobs reports
         uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
           name: test-results-blob-${{ inputs.mode }}-${{ inputs.subproject }}-${{ inputs.browser }}
           path: ./frontend/blob-report/test-report.zip
+          retention-days: 1
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions

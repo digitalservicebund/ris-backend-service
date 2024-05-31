@@ -711,7 +711,7 @@ jobs:
       - name: Download blob reports from artifacts
         uses: actions/download-artifact@v4
         with:
-          path: all-blob-reports
+          path: ./frontend/all-blob-reports
           pattern: test-results-blob-*
           merge-multiple: true
       - name: Merge into html report
