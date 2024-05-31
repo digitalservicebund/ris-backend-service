@@ -473,8 +473,8 @@ class ProcedureIntegrationTest {
 
   @Test
   void testAddProcedureWhichIsInHistoryAgain() {
-    UUID procedureId = addProcedureToDocUnit("foo");
-    addProcedureToDocUnit("bar");
+    UUID procedureId = addProcedureToDocUnit("foo", docUnitDTO);
+    addProcedureToDocUnit("bar", docUnitDTO);
 
     DocumentUnit documentUnitFromFrontend1 =
         DocumentUnit.builder()
@@ -538,41 +538,42 @@ class ProcedureIntegrationTest {
   }
 
   @Test
-  void testProcedureControllerReturnsList() {
-    addProcedureToDocUnit("procedure1");
-    addProcedureToDocUnit("procedure2");
-    addProcedureToDocUnit("procedure3");
+  void testSearch_withoutQuery_shouldReturnLatestProcedureUsedInDocumentationUnit() {
+    addProcedureToDocUnit("procedure1", docUnitDTO);
+    addProcedureToDocUnit("procedure2", docUnitDTO);
+    addProcedureToDocUnit("procedure3", docUnitDTO);
 
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/procedure?sz=20&pg=0")
+        .uri("/api/v1/caselaw/procedure?withDocUnits=true&sz=20&pg=0")
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
         .expectBody(new ParameterizedTypeReference<RestPageImpl<Procedure>>() {})
         .consumeWith(
             response -> {
-              assertThat(response.getResponseBody()).hasSize(3);
+              assertThat(response.getResponseBody()).hasSize(1);
               assertThat(response.getResponseBody().getContent().get(0).label())
-                  .isEqualTo("procedure1");
-              assertThat(response.getResponseBody().getContent().get(1).label())
-                  .isEqualTo("procedure2");
-              assertThat(response.getResponseBody().getContent().get(2).label())
                   .isEqualTo("procedure3");
             });
   }
 
   @Test
   void testProcedureControllerReturnsProceduresWithDateFirst() {
-    addProcedureToDocUnit("with date");
-    addProcedureToDocUnit("with date in past");
-    addProcedureToDocUnit("without date");
+    DocumentationUnitDTO documentationUnitDTO2 =
+        documentUnitRepository.findByDocumentNumber("documentNumber2").get();
+    DocumentationUnitDTO documentationUnitDTO3 =
+        documentUnitRepository.findByDocumentNumber("documentNumber3").get();
+
+    addProcedureToDocUnit("with date", docUnitDTO);
+    //    addProcedureToDocUnit("with date in past", documentationUnitDTO2);
+    //    addProcedureToDocUnit("without date", documentationUnitDTO3);
 
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/procedure?q=date&sz=20&pg=0")
+        .uri("/api/v1/caselaw/procedure?withDocUnits=true&q=date&sz=20&pg=0")
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
@@ -590,36 +591,17 @@ class ProcedureIntegrationTest {
   }
 
   @Test
-  void testProcedureControllerReturnsFilteredList() {
-    addProcedureToDocUnit("procedure1");
-    addProcedureToDocUnit("procedure2");
-    addProcedureToDocUnit("procedure3");
+  void testSearch_withQuery_shouldOnlyReturnLatestProcedureUsedInDocumentationUnit() {
+    addProcedureToDocUnit("procedure1", docUnitDTO);
+    addProcedureToDocUnit("procedure2", docUnitDTO);
+    addProcedureToDocUnit("procedure3", docUnitDTO);
 
     assertThat(repository.findAll()).hasSize(7);
 
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/procedure?q=procedure&sz=20&pg=0")
-        .exchange()
-        .expectStatus()
-        .is2xxSuccessful()
-        .expectBody(new ParameterizedTypeReference<RestPageImpl<Procedure>>() {})
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).hasSize(3);
-              assertThat(response.getResponseBody().getContent().get(0).label())
-                  .isEqualTo("procedure1");
-              assertThat(response.getResponseBody().getContent().get(1).label())
-                  .isEqualTo("procedure2");
-              assertThat(response.getResponseBody().getContent().get(2).label())
-                  .isEqualTo("procedure3");
-            });
-
-    risWebTestClient
-        .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/procedure?q=procedure2&pg=0&sz=10")
+        .uri("/api/v1/caselaw/procedure?withDocUnits=true&q=procedure&sz=20&pg=0")
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
@@ -628,18 +610,31 @@ class ProcedureIntegrationTest {
             response -> {
               assertThat(response.getResponseBody()).hasSize(1);
               assertThat(response.getResponseBody().getContent().get(0).label())
-                  .isEqualTo("procedure2");
+                  .isEqualTo("procedure3");
             });
-  }
-
-  @Test
-  void testSearch_withQueryWithTrailingSpaces_shouldReturnResultsWithoutTrailingSpaces() {
-    addProcedureToDocUnit("procedure1");
 
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/procedure?q= procedure1 &sz=20&pg=0")
+        .uri("/api/v1/caselaw/procedure?withDocUnits=true&q=procedure2&pg=0&sz=10")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBody(new ParameterizedTypeReference<RestPageImpl<Procedure>>() {})
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isEmpty();
+            });
+  }
+
+  @Test
+  void testSearch_withQueryWithTrailingSpaces_shouldReturnResultWithoutTrailingSpaces() {
+    addProcedureToDocUnit("procedure1", docUnitDTO);
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/procedure?withDocUnits=true&q= procedure1 &sz=20&pg=0")
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
@@ -657,7 +652,7 @@ class ProcedureIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/procedure?sz=10&pg=0")
+        .uri("/api/v1/caselaw/procedure?withDocUnits=true&sz=10&pg=0")
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
@@ -737,67 +732,34 @@ class ProcedureIntegrationTest {
             });
   }
 
-  private UUID addProcedureToDocUnit(String procedureValue) {
-    DocumentUnit documentUnitFromFrontend1 =
-        DocumentUnit.builder()
-            .uuid(docUnitDTO.getId())
-            .documentNumber(docUnitDTO.getDocumentNumber())
-            .coreData(
-                CoreData.builder()
-                    .procedure(Procedure.builder().label(procedureValue).build())
-                    .documentationOffice(docOffice)
-                    .build())
-            .build();
-
-    AtomicReference<UUID> procedureId = new AtomicReference<>();
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
-        .bodyValue(documentUnitFromFrontend1)
-        .exchange()
-        .expectStatus()
-        .is2xxSuccessful()
-        .expectBody(DocumentUnit.class)
-        .consumeWith(
-            response -> {
-              CoreData coreData = response.getResponseBody().coreData();
-              assertThat(coreData.procedure().label()).isEqualTo(procedureValue);
-              procedureId.set(coreData.procedure().id());
-            });
-
-    return procedureId.get();
-  }
-
   @Test
-  void testSearch_withQuery_shouldOnlyReturnResultsWithDocumentationUnits() {
-    addProcedureToDocUnit("procedure1");
-    addProcedureToDocUnit("procedure2");
+  void testSearch_withQuery_shouldReturnLatestProcedureUsedInDocumentationUnit() {
+    addProcedureToDocUnit("procedure1", docUnitDTO);
+    addProcedureToDocUnit("procedure2", docUnitDTO);
 
     assertThat(repository.findAll()).hasSize(7);
 
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/procedure?q=procedure&sz=20&pg=0")
+        .uri("/api/v1/caselaw/procedure?withDocUnits=true&q=procedure&sz=20&pg=0")
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
         .expectBody(new ParameterizedTypeReference<RestPageImpl<Procedure>>() {})
         .consumeWith(
             response -> {
-              assertThat(response.getResponseBody()).hasSize(2);
+              assertThat(response.getResponseBody()).hasSize(1);
               assertThat(response.getResponseBody().getContent().get(0).label())
-                  .isEqualTo("procedure1");
-              assertThat(response.getResponseBody().getContent().get(1).label())
                   .isEqualTo("procedure2");
             });
   }
 
   @Test
-  void testSearch_withoutQuery_shouldOnlyReturnResultsWithDocumentationUnits() {
-    addProcedureToDocUnit("procedure1");
-    addProcedureToDocUnit("procedure2");
+  void
+      testSearch_withoutQueryAndWithDocumentationUnits_shouldReturnLatestProcedureOfEachDocumentationUnit() {
+    addProcedureToDocUnit("procedure1", docUnitDTO);
+    addProcedureToDocUnit("procedure2", docUnitDTO);
 
     assertThat(repository.findAll()).hasSize(7);
 
@@ -817,6 +779,39 @@ class ProcedureIntegrationTest {
               assertThat(response.getResponseBody().getContent().get(1).label())
                   .isEqualTo("procedure2");
             });
+  }
+
+  private UUID addProcedureToDocUnit(
+      String procedureValue, DocumentationUnitDTO documentationUnitDTO) {
+    DocumentUnit documentUnitFromFrontend1 =
+        DocumentUnit.builder()
+            .uuid(documentationUnitDTO.getId())
+            .documentNumber(documentationUnitDTO.getDocumentNumber())
+            .coreData(
+                CoreData.builder()
+                    .procedure(Procedure.builder().label(procedureValue).build())
+                    .documentationOffice(docOffice)
+                    .build())
+            .build();
+
+    AtomicReference<UUID> procedureId = new AtomicReference<>();
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + documentationUnitDTO.getId())
+        .bodyValue(documentUnitFromFrontend1)
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              CoreData coreData = response.getResponseBody().coreData();
+              assertThat(coreData.procedure().label()).isEqualTo(procedureValue);
+              procedureId.set(coreData.procedure().id());
+            });
+
+    return procedureId.get();
   }
 
   public static class RestPageImpl<T> extends PageImpl<T> {

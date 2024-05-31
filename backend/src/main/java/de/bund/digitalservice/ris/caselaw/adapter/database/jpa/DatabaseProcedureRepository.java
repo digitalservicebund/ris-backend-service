@@ -26,11 +26,7 @@ public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO,
    * @return a page of ProcedureDTOs matching the criteria
    */
   @Query(
-      "SELECT p FROM ProcedureDTO p "
-          + "WHERE (:label IS NULL OR p.label LIKE %:label%) "
-          + "AND p.documentationOffice = :documentationOffice "
-          + "AND (SELECT COUNT(du) FROM p.documentationUnits du) > 0 "
-          + "ORDER BY p.createdAt DESC NULLS LAST")
+      "SELECT p FROM ProcedureDTO p WHERE (:label IS NULL OR p.label LIKE %:label%) AND p.documentationOffice = :documentationOffice ORDER BY createdAt DESC NULLS LAST")
   Page<ProcedureDTO> findAllByLabelContainingAndDocumentationOfficeOrderByCreatedAtDesc(
       @Param("label") String label,
       @Param("documentationOffice") DocumentationOfficeDTO documentationOfficeDTO,
@@ -44,10 +40,7 @@ public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO,
    * @return a page of ProcedureDTOs matching the criteria
    */
   @Query(
-      "SELECT p FROM ProcedureDTO p "
-          + "WHERE p.documentationOffice = :documentationOffice "
-          + "AND (SELECT COUNT(du) FROM p.documentationUnits du) > 0 "
-          + "ORDER BY p.createdAt DESC NULLS LAST")
+      "SELECT p FROM ProcedureDTO p WHERE p.documentationOffice = :documentationOffice ORDER BY createdAt DESC NULLS LAST")
   Page<ProcedureDTO> findAllByDocumentationOfficeOrderByCreatedAtDesc(
       @Param("documentationOffice") DocumentationOfficeDTO documentationOfficeDTO,
       Pageable pageable);
@@ -61,4 +54,49 @@ public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO,
    */
   Optional<ProcedureDTO> findAllByLabelAndDocumentationOffice(
       String label, DocumentationOfficeDTO documentationUnitDTO);
+
+  /**
+   * Retrieves a paginated list of distinct ProcedureDTO entities filtered by label and
+   * documentation office, ensuring that only the procedure which is used in a documentation unit
+   * and has the highest rank is selected.
+   *
+   * @param label The label to filter procedures by, nullable.
+   * @param documentationOfficeDTO The documentation office to filter procedures by.
+   * @param pageable Pagination information.
+   * @return A paginated list of filtered ProcedureDTO entities.
+   */
+  @Query(
+      "SELECT DISTINCT p FROM ProcedureDTO p "
+          + "JOIN DocumentationUnitProcedureDTO dup ON p.id = dup.procedure.id "
+          + "WHERE (:label IS NULL OR p.label LIKE %:label%) "
+          + "AND p.documentationOffice = :documentationOffice "
+          + "AND ( dup.documentationUnit, dup.rank) IN ("
+          + "    SELECT  dupMax.documentationUnit.id, MAX( dupMax.rank) "
+          + "    FROM DocumentationUnitProcedureDTO dupMax "
+          + "    GROUP BY  dupMax.documentationUnit.id)"
+          + "    ORDER BY  p.createdAt DESC NULLS LAST")
+  Page<ProcedureDTO> findLatestUsedProceduresByLabelAndDocumentationOffice(
+      @Param("label") String label,
+      @Param("documentationOffice") DocumentationOfficeDTO documentationOfficeDTO,
+      Pageable pageable);
+
+  /**
+   * Retrieves a paginated list of distinct ProcedureDTO entities filtered by documentation office,
+   * ensuring that only the procedure with the highest rank for each documentation unit is selected.
+   *
+   * @param documentationOffice The documentation office to filter procedures by.
+   * @param pageable Pagination information.
+   * @return A paginated list of filtered ProcedureDTO entities.
+   */
+  @Query(
+      "SELECT DISTINCT p FROM ProcedureDTO p "
+          + "JOIN DocumentationUnitProcedureDTO dup ON p.id = dup.procedure.id "
+          + "WHERE p.documentationOffice = :documentationOffice "
+          + "AND ( dup.documentationUnit, dup.rank) IN ("
+          + "    SELECT  dupMax.documentationUnit.id, MAX( dupMax.rank) "
+          + "    FROM DocumentationUnitProcedureDTO dupMax "
+          + "    GROUP BY  dupMax.documentationUnit.id)"
+          + "    ORDER BY  p.createdAt DESC NULLS LAST")
+  Page<ProcedureDTO> findLatestUsedProceduresByDocumentationOffice(
+      @Param("documentationOffice") DocumentationOfficeDTO documentationOffice, Pageable pageable);
 }
