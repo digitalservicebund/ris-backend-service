@@ -684,6 +684,45 @@ jobs:
       workers: 1
     secrets: inherit
 
+  publish-test-reports:
+    if: ${{ !cancelled() }}
+    needs: [e2e-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ./frontend/package.json
+          cache: npm
+          cache-dependency-path: ./frontend/package-lock.json
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: node-modules-cache
+        with:
+          path: |
+            ./frontend/node_modules
+          key: modules-${{ hashFiles('./frontend/package-lock.json') }}
+      - name: Install dependencies
+        if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        run: |
+          npm ci
+        working-directory: ./frontend
+      - name: Download blob reports from artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-blob-reports
+          pattern: test-results-blob-*
+          merge-multiple: true
+      - name: Merge into html report
+        run: npx playwright merge-reports --reporter html ./all-blob-reports
+        working-directory: ./frontend
+      - name: Upload html report to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-report-${{ github.run_attempt }}
+          path: ./frontend/playwright-report
+
   check-latest-deploy-tag:
     if: ${{ github.ref == 'refs/heads/main' }}
     needs:
