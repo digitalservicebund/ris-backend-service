@@ -22,7 +22,6 @@ dist
 # playwright
 test-results
 test-results.json
-test-report/
 storageState.json
 .auth/
 

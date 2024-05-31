@@ -8,11 +8,7 @@ const config: PlaywrightTestConfig = {
   timeout: 120000,
   expect: { timeout: 5000 },
   reporter: process.env.CI
-    ? [
-        ["dot"],
-        ["json", { outputFile: "test-results.json" }],
-        ["html", { outputFolder: "test-report", open: "never" }],
-      ]
+    ? [["dot"], ["json", { outputFile: "test-results.json" }]]
     : "list",
   use: {
     viewport: { width: 1280, height: 720 },
