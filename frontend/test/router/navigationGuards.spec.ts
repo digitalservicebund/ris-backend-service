@@ -36,6 +36,8 @@ describe("router's auth navigation guards", () => {
     }))
 
     setActivePinia(createTestingPinia())
+
+    afterEach(() => void vi.resetAllMocks())
   })
 
   const assignMock = vi.fn()
