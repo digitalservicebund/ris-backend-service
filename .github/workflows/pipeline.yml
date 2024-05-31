@@ -684,7 +684,7 @@ jobs:
       workers: 1
     secrets: inherit
 
-  publish-test-reports:
+  generate-test-reports:
     if: ${{ !cancelled() }}
     needs: [e2e-tests]
     runs-on: ubuntu-latest
@@ -952,6 +952,7 @@ jobs:
       - audit-licenses-frontend
       - e2e-tests
       - generate-backend-code-documentation
+      - generate-test-reports
     if: ${{ github.ref == 'refs/heads/main' }}
     steps:
       # Setup
@@ -1015,6 +1016,18 @@ jobs:
         with:
           filePath: tmp/backend-code-documentation
           destinationDir: backend-code-documentation/java
+          reportIsDirectory: true
+      # e2e test report
+      - name: E2E test reports - Download
+        uses: actions/download-artifact@v4
+        with:
+          name: html-report-${{ github.run_attempt }}
+          path: tmp/html-test-report/
+      - name: E2E test reports - git add report
+        uses: digitalservicebund/add-ris-report@32770d369cf00a8154bb6a17005d11cf781bfba3
+        with:
+          filePath: tmp/html-test-report/
+          destinationDir: test-reports/ris-backend-service
           reportIsDirectory: true
       # Push reports
       - name: Push reports
