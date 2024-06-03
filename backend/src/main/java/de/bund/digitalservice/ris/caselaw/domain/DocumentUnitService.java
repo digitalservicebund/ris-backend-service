@@ -107,18 +107,10 @@ public class DocumentUnitService {
             .myDocOfficeOnly(myDocOfficeOnly.orElse(false))
             .build();
 
-    return repository
-        .searchByDocumentationUnitSearchInput(
-            PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()),
-            documentationOffice,
-            searchInput)
-        .map(
-            listItem ->
-                listItem.toBuilder()
-                    .isEditableByCurrentUser(
-                        listItem.documentationOffice() != null
-                            && listItem.documentationOffice().equals(documentationOffice))
-                    .build());
+    return repository.searchByDocumentationUnitSearchInput(
+        PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()),
+        documentationOffice,
+        searchInput);
   }
 
   public DocumentUnit getByDocumentNumber(String documentNumber) {

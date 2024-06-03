@@ -23,6 +23,7 @@ dist
 test-results
 test-results.json
 storageState.json
+blob-report/
 .auth/
 
 frontend-licence-report.csv

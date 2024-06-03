@@ -13,7 +13,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.5"
     id("com.diffplug.spotless") version "6.25.0"
     id("org.sonarqube") version "5.0.0.4638"
-    id("com.github.jk1.dependency-license-report") version "2.7"
+    id("com.github.jk1.dependency-license-report") version "2.8"
     id("com.gorylenko.gradle-git-properties") version "2.4.2"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
@@ -48,7 +48,7 @@ sourceSets {
 }
 
 jacoco {
-    toolVersion = "0.8.8"
+    toolVersion = "0.8.12"
 }
 
 lombok {
@@ -115,12 +115,7 @@ spotless {
 licenseReport {
     allowedLicensesFile = File("$projectDir/../allowed-licenses.json")
     renderers = arrayOf<ReportRenderer>(CsvReportRenderer("backend-licence-report.csv"))
-    filters = arrayOf<DependencyFilter>(
-        LicenseBundleNormalizer(
-            "$projectDir/license-normalizer-bundle.json",
-            true
-        )
-    )
+    filters = arrayOf<DependencyFilter>(LicenseBundleNormalizer())
 }
 
 sonar {
@@ -154,14 +149,14 @@ dependencies {
 
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.5.0")
 
-    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.1")
+    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.2")
 
     // CVE-2024-26308
     implementation("org.apache.commons:commons-compress:1.26.2")
     // CVE-2022-3171
     implementation("com.google.protobuf:protobuf-java:4.27.0")
     // CVE-2023-52428 in spring-boot-starter-oauth2-client:3.2.3
-    implementation("com.nimbusds:nimbus-jose-jwt:9.39.1")
+    implementation("com.nimbusds:nimbus-jose-jwt:9.39.3")
     // CVE-2023-31582
     implementation("org.bitbucket.b_c:jose4j:0.9.6")
 
@@ -171,7 +166,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.1")
 
-    implementation(platform("software.amazon.awssdk:bom:2.25.59"))
+    implementation(platform("software.amazon.awssdk:bom:2.25.63"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 

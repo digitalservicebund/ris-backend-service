@@ -1,7 +1,16 @@
+import { createTestingPinia } from "@pinia/testing"
+import { setActivePinia } from "pinia"
 import router, { beforeEach as routerBeforeEach } from "@/router"
-import { isAuthenticated } from "@/services/authService"
+import useSessionStore from "@/stores/sessionStore"
 
-vi.mock("@/services/authService")
+function mockSessionStore(userAuthenticated = true) {
+  const mockedSessionStore = useSessionStore()
+  mockedSessionStore.isAuthenticated = vi.fn(() =>
+    Promise.resolve(userAuthenticated),
+  )
+
+  return mockedSessionStore
+}
 
 describe("router's auth navigation guards", () => {
   beforeEach(() => {
@@ -25,6 +34,10 @@ describe("router's auth navigation guards", () => {
         },
       ],
     }))
+
+    setActivePinia(createTestingPinia())
+
+    afterEach(() => void vi.resetAllMocks())
   })
 
   const assignMock = vi.fn()
@@ -38,27 +51,28 @@ describe("router's auth navigation guards", () => {
   })
 
   it("does not redirect, if not authenticated", async () => {
-    const authServiceMock = vi
-      .mocked(isAuthenticated)
-      .mockResolvedValueOnce(false)
+    mockSessionStore(false)
 
     const result = await routerBeforeEach(router.resolve("/caselaw"))
-    expect(authServiceMock).toHaveBeenCalledTimes(1)
     expect(result).toEqual(false)
   })
 
   it("does redirect, if authenticated", async () => {
-    const authServiceMock = vi
-      .mocked(isAuthenticated)
-      .mockResolvedValueOnce(true)
+    mockSessionStore(true)
 
     const result = await routerBeforeEach(router.resolve("/caselaw"))
-    expect(authServiceMock).toHaveBeenCalledTimes(1)
     expect(result).toEqual(true)
   })
 
+  it("calls the store for authentication", async () => {
+    const sessionStore = mockSessionStore()
+
+    await routerBeforeEach(router.resolve("/caselaw"))
+    expect(sessionStore.isAuthenticated).toHaveBeenCalledOnce()
+  })
+
   it("does safe location cookie if not authenticated", async () => {
-    vi.mocked(isAuthenticated).mockResolvedValueOnce(false)
+    mockSessionStore(false)
 
     await routerBeforeEach(
       router.resolve("/caselaw/documentunit/123456/categories"),
@@ -69,7 +83,7 @@ describe("router's auth navigation guards", () => {
   })
 
   it("does follow location cookie if authenticated", async () => {
-    vi.mocked(isAuthenticated).mockResolvedValueOnce(true)
+    mockSessionStore(true)
     document.cookie = "location=/norms; path=/;"
 
     await routerBeforeEach(router.resolve("/"))

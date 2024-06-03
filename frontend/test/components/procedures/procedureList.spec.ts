@@ -1,3 +1,4 @@
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
@@ -7,6 +8,7 @@ import { Procedure } from "@/domain/documentUnit"
 import service from "@/services/procedureService"
 
 vi.mock("@/services/procedureService")
+vi.mock("@/services/authService")
 
 const mocks = vi.hoisted(() => ({
   mockedPushQuery: vi.fn(),
@@ -90,7 +92,7 @@ async function renderComponent(options?: { procedures: Procedure[][] }) {
     ...render(ProcedureList, {
       global: {
         stubs: { routerLink: { template: "<a><slot /></a>" } },
-        plugins: [router],
+        plugins: [router, createTestingPinia()],
       },
     }),
     // eslint-disable-next-line testing-library/await-async-events

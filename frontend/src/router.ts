@@ -3,7 +3,8 @@ import {
   createWebHistory,
   RouteLocationNormalized,
 } from "vue-router"
-import { isAuthenticated, loginEndpoint } from "./services/authService"
+import authService from "./services/authService"
+import useSessionStore from "./stores/sessionStore"
 import routes from "~pages"
 
 const router = createRouter({
@@ -14,7 +15,7 @@ const router = createRouter({
 router.beforeEach((to) => beforeEach(to))
 
 function redirectToLogin() {
-  location.href = loginEndpoint
+  location.href = authService.getLoginEndpoint()
 }
 
 function setLocationCookie(path?: string) {
@@ -34,7 +35,8 @@ function followLocationCookie() {
 }
 
 export async function beforeEach(to: RouteLocationNormalized) {
-  if (await isAuthenticated()) {
+  const session = useSessionStore()
+  if (await session.isAuthenticated()) {
     followLocationCookie()
     return true
   } else {

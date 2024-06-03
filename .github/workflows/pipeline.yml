@@ -684,6 +684,45 @@ jobs:
       workers: 1
     secrets: inherit
 
+  generate-test-reports:
+    if: ${{ !cancelled() }}
+    needs: [e2e-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ./frontend/package.json
+          cache: npm
+          cache-dependency-path: ./frontend/package-lock.json
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: node-modules-cache
+        with:
+          path: |
+            ./frontend/node_modules
+          key: modules-${{ hashFiles('./frontend/package-lock.json') }}
+      - name: Install dependencies
+        if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        run: |
+          npm ci
+        working-directory: ./frontend
+      - name: Download blob reports from artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./frontend/all-blob-reports
+          pattern: test-results-blob-*
+          merge-multiple: true
+      - name: Merge into html report
+        run: npx playwright merge-reports --reporter html ./all-blob-reports
+        working-directory: ./frontend
+      - name: Upload html report to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-test-report
+          path: ./frontend/playwright-report
+
   check-latest-deploy-tag:
     if: ${{ github.ref == 'refs/heads/main' }}
     needs:
@@ -913,6 +952,7 @@ jobs:
       - audit-licenses-frontend
       - e2e-tests
       - generate-backend-code-documentation
+      - generate-test-reports
     if: ${{ github.ref == 'refs/heads/main' }}
     steps:
       # Setup
@@ -976,6 +1016,18 @@ jobs:
         with:
           filePath: tmp/backend-code-documentation
           destinationDir: backend-code-documentation/java
+          reportIsDirectory: true
+      # e2e test report
+      - name: E2E test reports - Download
+        uses: actions/download-artifact@v4
+        with:
+          name: html-test-report
+          path: tmp/html-test-report/
+      - name: E2E test reports - git add report
+        uses: digitalservicebund/add-ris-report@32770d369cf00a8154bb6a17005d11cf781bfba3
+        with:
+          filePath: tmp/html-test-report/
+          destinationDir: test-reports/ris-backend-service
           reportIsDirectory: true
       # Push reports
       - name: Push reports
