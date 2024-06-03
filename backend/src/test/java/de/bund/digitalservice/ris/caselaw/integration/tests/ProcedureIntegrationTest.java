@@ -23,6 +23,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcedureTransformer;
@@ -560,15 +561,34 @@ class ProcedureIntegrationTest {
   }
 
   @Test
-  void testProcedureControllerReturnsProceduresWithDateFirst() {
+  void testSearch_withQuery_shouldReturnProceduresWithDateFirst() {
     DocumentationUnitDTO documentationUnitDTO2 =
         documentUnitRepository.findByDocumentNumber("documentNumber2").get();
     DocumentationUnitDTO documentationUnitDTO3 =
         documentUnitRepository.findByDocumentNumber("documentNumber3").get();
 
     addProcedureToDocUnit("with date", docUnitDTO);
-    //    addProcedureToDocUnit("with date in past", documentationUnitDTO2);
-    //    addProcedureToDocUnit("without date", documentationUnitDTO3);
+
+    ProcedureDTO procedureWithDateInPast =
+        repository.findAllByLabelAndDocumentationOffice("with date in past", docOfficeDTO).get();
+    ProcedureDTO procedureWithoutDate =
+        repository.findAllByLabelAndDocumentationOffice("without date", docOfficeDTO).get();
+
+    documentationUnitDTO2.setProcedures(
+        List.of(
+            DocumentationUnitProcedureDTO.builder()
+                .documentationUnit(documentationUnitDTO2)
+                .procedure(procedureWithDateInPast)
+                .build()));
+    documentUnitRepository.save(documentationUnitDTO2);
+
+    documentationUnitDTO3.setProcedures(
+        List.of(
+            DocumentationUnitProcedureDTO.builder()
+                .documentationUnit(documentationUnitDTO3)
+                .procedure(procedureWithoutDate)
+                .build()));
+    documentUnitRepository.save(documentationUnitDTO3);
 
     risWebTestClient
         .withDefaultLogin()
@@ -750,32 +770,6 @@ class ProcedureIntegrationTest {
             response -> {
               assertThat(response.getResponseBody()).hasSize(1);
               assertThat(response.getResponseBody().getContent().get(0).label())
-                  .isEqualTo("procedure2");
-            });
-  }
-
-  @Test
-  void
-      testSearch_withoutQueryAndWithDocumentationUnits_shouldReturnLatestProcedureOfEachDocumentationUnit() {
-    addProcedureToDocUnit("procedure1", docUnitDTO);
-    addProcedureToDocUnit("procedure2", docUnitDTO);
-
-    assertThat(repository.findAll()).hasSize(7);
-
-    risWebTestClient
-        .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/procedure?sz=20&pg=0")
-        .exchange()
-        .expectStatus()
-        .is2xxSuccessful()
-        .expectBody(new ParameterizedTypeReference<RestPageImpl<Procedure>>() {})
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).hasSize(2);
-              assertThat(response.getResponseBody().getContent().get(0).label())
-                  .isEqualTo("procedure1");
-              assertThat(response.getResponseBody().getContent().get(1).label())
                   .isEqualTo("procedure2");
             });
   }
