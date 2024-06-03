@@ -1,7 +1,15 @@
+/*.invisible {*/
+/*  font-size: x-large;*/
+/*}*/
 .invisible--soft-hyphen:before {
   content: "-";
 }
-
 .invisible--tab:before {
   content: "→";
+}
+.invisible--nb-space:before {
+  content: "°";
+}
+.invisible:before {
+  color: #dce8ef;
 }

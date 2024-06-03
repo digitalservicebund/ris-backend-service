@@ -318,12 +318,24 @@ watch(
 
 const showButtons = computed(() => props.editable && hasFocus.value)
 
+watch(
+  () => hasFocus.value,
+  () => {
+    // When the TextEditor is editable and has focus, the invisibleCharacters should be displayed
+    commands.toggleActiveState()(editor.state, editor.view.dispatch)
+  },
+)
+
 const ariaLabel = props.ariaLabel ? props.ariaLabel : null
 
 onMounted(() => {
   const editorContainer = document.querySelector(".editor")
   if (editorContainer != null) resizeObserver.observe(editorContainer)
-  commands.setActiveState(props.editable)(editor.state, editor.view.dispatch)
+  // When the TextEditor is editable and has no focus, the invisibleCharacters should be hidden
+  commands.setActiveState(props.editable && hasFocus.value)(
+    editor.state,
+    editor.view.dispatch,
+  )
 })
 
 const resizeObserver = new ResizeObserver((entries) => {
@@ -334,7 +346,7 @@ const resizeObserver = new ResizeObserver((entries) => {
 </script>
 
 <template>
-  <div id="text-editor" class="editor bg-white" fluid>
+  <div id="text-editor" class="editor bg-white text-24" fluid>
     <div v-if="showButtons">
       <div
         :aria-label="ariaLabel + ' Button Leiste'"
