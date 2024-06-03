@@ -685,7 +685,7 @@ jobs:
     secrets: inherit
 
   generate-test-reports:
-    if: ${{ !cancelled() }}
+    if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
     needs: [e2e-tests]
     runs-on: ubuntu-latest
     steps:
