@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: traefik:v2.9
+    image: traefik:v2.11
     extra_hosts:
       - localhost:host-gateway
     container_name: traefik
