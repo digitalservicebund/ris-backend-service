@@ -120,7 +120,7 @@ function focusNext() {
         v-for="(chip, i) in modelValue"
         :key="i"
         class="group ds-body-01-reg relative -mt-1 flex cursor-pointer items-center break-words rounded-full bg-blue-500 outline-none"
-        :class="{ 'pr-32 ': !readOnly }"
+        :class="{ 'pr-32': !readOnly }"
         data-testid="chip"
         tabindex="0"
         @click.stop="localFocusedItem = i"
