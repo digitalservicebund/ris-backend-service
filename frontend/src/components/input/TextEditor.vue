@@ -321,8 +321,10 @@ const showButtons = computed(() => props.editable && hasFocus.value)
 watch(
   () => hasFocus.value,
   () => {
-    // When the TextEditor is editable and has focus, the invisibleCharacters should be displayed
-    commands.toggleActiveState()(editor.state, editor.view.dispatch)
+    if (props.editable) {
+      // When the TextEditor is editable and has focus, the invisibleCharacters should be displayed
+      commands.toggleActiveState()(editor.state, editor.view.dispatch)
+    }
   },
 )
 
