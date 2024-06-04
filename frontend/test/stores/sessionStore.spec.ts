@@ -55,23 +55,23 @@ describe("Session store", () => {
   )
 
   it.each(["staging", "uat", "production"])(
-    "set's and returns the correct env",
-    async (env: string) => {
-      const realAnchorElement = document.createElement("link")
-      realAnchorElement.href = ""
-      realAnchorElement.rel = "icon"
-      realAnchorElement.id = "favicon"
-      // @ts-expect-error It's not a proper HTML element but good enough for testing
-      vi.spyOn(document, "getElementById").mockReturnValue(realAnchorElement)
+    "sets and returns the correct env",
+    async (environment: string) => {
+      //
+      const faviconMock = document.createElement("link")
+      faviconMock.href = ""
+      faviconMock.id = "favicon"
 
+      vi.spyOn(document, "getElementById").mockReturnValue(faviconMock)
       vi.mocked(adminService).getEnv.mockResolvedValue({
         status: 200,
-        data: env,
+        data: environment,
       })
 
       const session = useSessionStore()
+      await session.fetchEnv()
 
-      expect(session.env).toEqual(env)
+      expect(session.env).toEqual(environment)
     },
   )
 })
