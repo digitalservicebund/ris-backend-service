@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted } from "vue"
+import { ref, onMounted, computed } from "vue"
 import { useRoute } from "vue-router"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
@@ -11,6 +11,32 @@ import IconPermIdentity from "~icons/ic/baseline-perm-identity"
 const route = useRoute()
 const session = useSessionStore()
 const fontColor = ref<string>()
+
+const badge = computed(() => {
+  if (session.env == "staging") {
+    return {
+      color: "bg-red-300",
+      label: session.user
+        ? `${session.user.documentationOffice?.abbreviation} | Staging`
+        : "",
+    }
+  } else if (session.env == "uat") {
+    return {
+      color: "bg-yellow-300",
+      label: session.user
+        ? `${session.user.documentationOffice?.abbreviation} | UAT`
+        : "",
+    }
+  } else {
+    return {
+      color: "bg-blue-300",
+      label:
+        session.user && session.user.documentationOffice
+          ? session.user.documentationOffice.abbreviation
+          : "",
+    }
+  }
+})
 
 onMounted(async () => {
   const featureToggle = (
@@ -63,22 +89,18 @@ onMounted(async () => {
         <div class="ds-label-01-reg">
           <router-link :to="{ name: 'settings' }">
             <FlexContainer>
-              <FlexItem class="pe-8">{{ session.user.name }}</FlexItem>
+              <FlexItem class="pe-8">{{ session.user?.name }}</FlexItem>
               <FlexItem>
                 <IconBadge
                   v-if="session.user.documentationOffice"
-                  background-color="bg-blue-300"
+                  :background-color="badge.color"
                   color="text-black"
-                  :label="session.user.documentationOffice.abbreviation"
+                  :label="badge.label"
                 />
               </FlexItem>
             </FlexContainer>
           </router-link>
         </div>
-        <div
-          v-if="session.user.documentationOffice"
-          class="ds-label-03-reg"
-        ></div>
       </div>
     </div>
   </nav>

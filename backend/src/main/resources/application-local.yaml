@@ -31,3 +31,5 @@ mail:
 
 database:
   seed: true
+neuris:
+  environment: staging

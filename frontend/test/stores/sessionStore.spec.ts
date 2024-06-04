@@ -1,10 +1,12 @@
 import { setActivePinia, createPinia } from "pinia"
 import { User } from "@/domain/user"
+import adminService from "@/services/adminService"
 import authService from "@/services/authService"
 import { ServiceResponse } from "@/services/httpClient"
 import useSessionStore from "@/stores/sessionStore"
 
 vi.mock("@/services/authService")
+vi.mock("@/services/adminService")
 
 describe("Session store", () => {
   beforeEach(() => void setActivePinia(createPinia()))
@@ -49,6 +51,27 @@ describe("Session store", () => {
 
       expect(await isAuthenticated()).toBeFalsy()
       expect(user).toBeUndefined()
+    },
+  )
+
+  it.each(["staging", "uat", "production"])(
+    "set's and returns the correct env",
+    async (env: string) => {
+      const realAnchorElement = document.createElement("link")
+      realAnchorElement.href = ""
+      realAnchorElement.rel = "icon"
+      realAnchorElement.id = "favicon"
+      // @ts-expect-error It's not a proper HTML element but good enough for testing
+      vi.spyOn(document, "getElementById").mockReturnValue(realAnchorElement)
+
+      vi.mocked(adminService).getEnv.mockResolvedValue({
+        status: 200,
+        data: env,
+      })
+
+      const session = useSessionStore()
+
+      expect(session.env).toEqual(env)
     },
   )
 })

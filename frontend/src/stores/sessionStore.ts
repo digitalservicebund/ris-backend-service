@@ -1,18 +1,29 @@
 import { defineStore } from "pinia"
 import { Ref, ref } from "vue"
+import { useFavicon } from "@/composables/useFavicon"
 import { User } from "@/domain/user"
+import envService from "@/services/adminService"
 import authService from "@/services/authService"
 
 type SessionStore = {
   user: Ref<User | undefined>
+  env: Ref<string | undefined>
   isAuthenticated: () => Promise<boolean>
 }
 
 const useSessionStore = defineStore("session", (): SessionStore => {
   const user = ref<User>()
+  const env = ref()
 
   async function fetchUser(): Promise<User | undefined> {
     return (await authService.getName()).data ?? undefined
+  }
+
+  async function fetchEnv() {
+    env.value = (await envService.getEnv()).data
+    const favicon = document.getElementById("favicon") as HTMLAnchorElement
+    console.log(favicon)
+    favicon.href = useFavicon(env.value).value
   }
 
   /**
@@ -26,7 +37,9 @@ const useSessionStore = defineStore("session", (): SessionStore => {
     return !!user.value?.name
   }
 
-  return { user, isAuthenticated }
+  void fetchEnv()
+
+  return { user, env, isAuthenticated }
 })
 
 export default useSessionStore

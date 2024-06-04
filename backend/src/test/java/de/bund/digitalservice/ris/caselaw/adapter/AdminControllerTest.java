@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -21,13 +22,15 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
-@WebFluxTest(controllers = MailTrackingController.class)
+@WebFluxTest(controllers = AdminController.class)
 @Import({SecurityConfig.class, TestConfig.class, DocumentNumberPatternConfig.class})
-class MailTrackingControllerTest {
+class AdminControllerTest {
   @Autowired private RisWebTestClient risWebTestClient;
-  @MockBean private MailTrackingService service;
+  @MockBean private MailTrackingService mailTrackingService;
+  @MockBean private EnvService envService;
   @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
@@ -46,21 +49,22 @@ class MailTrackingControllerTest {
                                 }""",
             mailTrackingEvent, TEST_UUID);
 
-    when(service.getMappedPublishState(mailTrackingEvent)).thenReturn(expectedEmailPublishState);
-    when(service.updatePublishingState(TEST_UUID.toString(), mailTrackingEvent))
+    when(mailTrackingService.getMappedPublishState(mailTrackingEvent))
+        .thenReturn(expectedEmailPublishState);
+    when(mailTrackingService.updatePublishingState(TEST_UUID.toString(), mailTrackingEvent))
         .thenReturn(ResponseEntity.ok().build());
 
     risWebTestClient
         .withDefaultLogin()
         .post()
-        .uri("/admin/webhook")
+        .uri("/api/v1/admin/webhook")
         .contentType(MediaType.APPLICATION_JSON)
         .bodyValue(sendInBlueResponse)
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service).updatePublishingState(TEST_UUID.toString(), mailTrackingEvent);
+    verify(mailTrackingService).updatePublishingState(TEST_UUID.toString(), mailTrackingEvent);
   }
 
   @ParameterizedTest
@@ -82,7 +86,7 @@ class MailTrackingControllerTest {
     risWebTestClient
         .withDefaultLogin()
         .post()
-        .uri("/admin/webhook")
+        .uri("/api/v1/admin/webhook")
         .contentType(MediaType.APPLICATION_JSON)
         .bodyValue(sendInBlueResponse)
         .exchange()
@@ -113,20 +117,39 @@ class MailTrackingControllerTest {
                           "ignoredKey": 123
                         }""";
 
-    when(service.updatePublishingState("no-uuid", "delivered"))
+    when(mailTrackingService.updatePublishingState("no-uuid", "delivered"))
         .thenReturn(ResponseEntity.noContent().build());
-    when(service.getMappedPublishState("delivered")).thenReturn(EmailPublishState.SUCCESS);
+    when(mailTrackingService.getMappedPublishState("delivered"))
+        .thenReturn(EmailPublishState.SUCCESS);
 
     risWebTestClient
         .withDefaultLogin()
         .post()
-        .uri("/admin/webhook")
+        .uri("/api/v1/admin/webhook")
         .contentType(MediaType.APPLICATION_JSON)
         .bodyValue(sendInBlueResponse)
         .exchange()
         .expectStatus()
         .isNoContent();
 
-    verify(service).updatePublishingState("no-uuid", "delivered");
+    verify(mailTrackingService).updatePublishingState("no-uuid", "delivered");
+  }
+
+  @Test
+  void testGetEnv() {
+    when(envService.getEnv()).thenReturn(Mono.just("staging"));
+
+    var result =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/admin/env")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    assertThat(result.getResponseBody()).isEqualTo("staging");
   }
 }

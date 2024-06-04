@@ -13,6 +13,7 @@ sentry:
   traces-sample-rate: 0.01
 
 neuris:
+  environment: production
   document-number-patterns:
     BVerfG: KVRE*****YY42 # results in e.g. KVRE 00001 24 42
     BVerwG: WBRE60******* # TODO where put user und year?

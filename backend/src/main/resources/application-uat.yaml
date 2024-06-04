@@ -13,5 +13,6 @@ sentry:
   traces-sample-rate: 0.01
 
 neuris:
+  environment: uat
   document-number-patterns:
     BGH: KORE7****1YYY
