@@ -21,8 +21,6 @@ const useSessionStore = defineStore("session", (): SessionStore => {
   }
 
   async function fetchEnv(): Promise<string | undefined> {
-    const favicon = document.getElementById("favicon") as HTMLAnchorElement
-    favicon.href = useFavicon(env.value).value
     return (await envService.getEnv()).data
   }
 
@@ -39,6 +37,8 @@ const useSessionStore = defineStore("session", (): SessionStore => {
 
   async function initSession(): Promise<void> {
     env.value = await fetchEnv()
+    const favicon = document.getElementById("favicon") as HTMLAnchorElement
+    favicon.href = useFavicon(env.value).value
   }
 
   return { user, env, isAuthenticated, initSession }
