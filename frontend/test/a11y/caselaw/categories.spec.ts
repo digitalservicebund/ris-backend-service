@@ -109,6 +109,25 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
+  test("vorgang", async ({ page, documentNumber }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await page.locator("[aria-label='Vorgang']").fill("test Vorgang")
+    await page.keyboard.down("ArrowDown")
+    await page.keyboard.press("Enter")
+
+    await page.getByText("Speichern").click()
+
+    await page.locator("[aria-label='Vorgang']").click()
+
+    await expect(page.getByText("test Vorgang")).toBeVisible()
+
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .disableRules(["duplicate-id-aria"])
+      .analyze()
+    expect(accessibilityScanResults.violations).toEqual([])
+  })
+
   test("rechtskraft", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
     await page.locator("[aria-label='Rechtskraft']").click()
