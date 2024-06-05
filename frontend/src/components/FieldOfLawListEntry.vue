@@ -25,7 +25,7 @@ function handleTokenClick(tokenContent: string) {
   <div
     class="flex w-full grow items-center border-b-1 border-blue-500 py-20 first:border-t-1"
   >
-    <div class="ds-label-02-reg flex flex w-full flex-col text-blue-800">
+    <div class="ds-label-02-reg flex w-full flex-col text-blue-800">
       <button
         :aria-label="
           fieldOfLaw.identifier +
