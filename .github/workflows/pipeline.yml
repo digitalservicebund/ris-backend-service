@@ -859,7 +859,7 @@ jobs:
       POSTGRES_USER: postgres
     services:
       postgres:
-        image: postgres:16-alpine
+        image: postgres:14-alpine
         env:
           POSTGRES_DB: ris-erd
           POSTGRES_PASSWORD: postgres
