@@ -9,7 +9,7 @@ type SessionStore = {
   user: Ref<User | undefined>
   env: Ref<string | undefined>
   isAuthenticated: () => Promise<boolean>
-  fetchEnv: () => Promise<void>
+  initSession: () => Promise<void>
 }
 
 const useSessionStore = defineStore("session", (): SessionStore => {
@@ -20,10 +20,10 @@ const useSessionStore = defineStore("session", (): SessionStore => {
     return (await authService.getName()).data ?? undefined
   }
 
-  async function fetchEnv(): Promise<void> {
-    env.value = (await envService.getEnv()).data
+  async function fetchEnv(): Promise<string | undefined> {
     const favicon = document.getElementById("favicon") as HTMLAnchorElement
     favicon.href = useFavicon(env.value).value
+    return (await envService.getEnv()).data
   }
 
   /**
@@ -37,9 +37,11 @@ const useSessionStore = defineStore("session", (): SessionStore => {
     return !!user.value?.name
   }
 
-  void fetchEnv()
+  async function initSession(): Promise<void> {
+    env.value = await fetchEnv()
+  }
 
-  return { user, env, isAuthenticated, fetchEnv }
+  return { user, env, isAuthenticated, initSession }
 })
 
 export default useSessionStore

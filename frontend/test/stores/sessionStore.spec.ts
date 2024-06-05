@@ -9,8 +9,12 @@ vi.mock("@/services/authService")
 vi.mock("@/services/adminService")
 
 describe("Session store", () => {
-  beforeEach(() => void setActivePinia(createPinia()))
-  afterEach(() => void vi.resetAllMocks())
+  beforeEach(() => {
+    setActivePinia(createPinia())
+  })
+  afterEach(() => {
+    vi.resetAllMocks()
+  })
 
   it("calls the authService upon authentication check", async () => {
     const authServiceMock = vi
@@ -69,7 +73,7 @@ describe("Session store", () => {
       })
 
       const session = useSessionStore()
-      await session.fetchEnv()
+      await session.initSession()
 
       expect(session.env).toEqual(environment)
     },
