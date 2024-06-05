@@ -113,19 +113,33 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     await navigateToCategories(page, documentNumber)
 
     await page.locator("[aria-label='Vorgang']").fill("test Vorgang")
-    await page.keyboard.down("ArrowDown")
-    await page.keyboard.press("Enter")
+    await page.getByLabel("Vorgang", { exact: true }).press("ArrowDown")
+    await page.getByLabel("dropdown-option").press("Enter")
 
-    await page.getByText("Speichern").click()
+    await page.getByLabel("Speichern Button").click()
+    await page.waitForEvent("requestfinished")
 
     await page.locator("[aria-label='Vorgang']").click()
-
-    await expect(page.getByText("test Vorgang")).toBeVisible()
+    await expect(
+      page.locator("[aria-label='additional-dropdown-info']"),
+    ).toBeVisible()
+    await expect(page.getByText("1 Dokumentationseinheiten")).toBeVisible()
 
     const accessibilityScanResults = await new AxeBuilder({ page })
       .disableRules(["duplicate-id-aria"])
       .analyze()
     expect(accessibilityScanResults.violations).toEqual([])
+
+    // cleanup Vorgang again
+    const response = await page.request.get(
+      `/api/v1/caselaw/procedure?sz=10&pg=0&q=${"test Vorgang"}`,
+    )
+    const responseBody = await response.json()
+    const uuid = responseBody.content[0].id
+    const deleteResponse = await page.request.delete(
+      `/api/v1/caselaw/procedure/${uuid}`,
+    )
+    expect(deleteResponse.ok()).toBeTruthy()
   })
 
   test("rechtskraft", async ({ page, documentNumber }) => {
