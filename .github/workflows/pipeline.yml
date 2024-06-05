@@ -128,7 +128,7 @@ jobs:
           gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: bootBuildImage
           build-root-directory: ./backend
-      - name: Run Trivy vulnerability scanner
+      - name: Run Trivy vulnerability image scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
         uses: aquasecurity/trivy-action@c7c12f8f2a6ef83606221ec7f2be72316f631b3e
@@ -145,6 +145,12 @@ jobs:
             echo "No significant vulnerabilities found"
             exit 0
           fi
+      - name: Upload Trivy scan results
+        uses: actions/upload-artifact@v4
+        with:
+          name: "trivy-results.sarif"
+          path: "trivy-results.sarif"
+          if-no-files-found: error
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         if: ${{ always() && github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
@@ -336,6 +342,7 @@ jobs:
           fi
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
+        if: ${{ always() && github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
         with:
           sarif_file: "trivy-results.sarif"
       - name: Run Trivy vulnerability file scanner
