@@ -193,7 +193,7 @@ class FieldOfLawServiceTest {
     FieldOfLaw expectedFieldOfLaw =
         FieldOfLaw.builder()
             .id(UUID.randomUUID())
-            .childrenCount(0)
+            .hasChildren(false)
             .identifier("TS-01-01")
             .text("stext 2")
             .linkedFields(Collections.emptyList())
@@ -218,7 +218,7 @@ class FieldOfLawServiceTest {
     FieldOfLaw expectedFieldOfLaw =
         FieldOfLaw.builder()
             .id(UUID.randomUUID())
-            .childrenCount(1)
+            .hasChildren(true)
             .identifier("TS-01-01")
             .text("stext 2")
             .linkedFields(Collections.emptyList())
