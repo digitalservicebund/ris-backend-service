@@ -15,6 +15,7 @@ interface Props {
   nodeHelper: NodeHelperInterface
   expandValues: FieldOfLaw[]
   isRoot?: boolean
+  rootChild?: boolean
   selectedNode?: FieldOfLaw
 }
 
@@ -26,6 +27,7 @@ const emit = defineEmits<{
   "node:expand": [node: FieldOfLaw]
   "node:collapse": [node: FieldOfLaw]
   "linked-field:select": [node: FieldOfLaw]
+  "selected-node:reset": []
 }>()
 
 const isExpanded = ref(false)
@@ -46,6 +48,9 @@ function toggleExpanded() {
     emit("node:expand", props.node)
   } else {
     emit("node:collapse", props.node)
+    if (props.selectedNode && props.rootChild) {
+      emit("selected-node:reset")
+    }
   }
 }
 
@@ -173,6 +178,7 @@ watch(
         :model-value="modelValue"
         :node="child"
         :node-helper="nodeHelper"
+        :root-child="props.isRoot"
         :selected-node="selectedNode"
         :show-norms="showNorms"
         @linked-field:select="emit('linked-field:select', $event)"
@@ -180,6 +186,7 @@ watch(
         @node:expand="emit('node:expand', $event)"
         @node:select="emit('node:select', $event)"
         @node:unselect="emit('node:unselect', $event)"
+        @selected-node:reset="emit('selected-node:reset')"
       />
     </div>
   </FlexContainer>
