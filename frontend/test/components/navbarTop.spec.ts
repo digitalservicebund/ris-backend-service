@@ -1,15 +1,26 @@
-import { createTestingPinia, TestingPinia } from "@pinia/testing"
+import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import NavbarTop from "@/components/NavbarTop.vue"
+import { User } from "@/domain/user"
 import useSessionStore from "@/stores/sessionStore"
 
-function renderComponent(pinia: TestingPinia = createTestingPinia()) {
+function renderComponent(options?: { env?: string; activeUser?: User }) {
   render(NavbarTop, {
     props: {},
     global: {
       plugins: [
-        pinia,
+        createTestingPinia({
+          initialState: {
+            session: {
+              env: options?.env ?? "uat",
+              user: options?.activeUser || {
+                name: "user",
+                documentationOffice: { abbreviation: "DS" },
+              },
+            },
+          },
+        }),
         createRouter({
           history: createWebHistory(),
           routes: [
@@ -28,6 +39,11 @@ function renderComponent(pinia: TestingPinia = createTestingPinia()) {
               name: "search",
               component: {},
             },
+            {
+              path: "",
+              name: "settings",
+              component: {},
+            },
           ],
         }),
       ],
@@ -44,31 +60,22 @@ describe("navbar top", () => {
   })
 
   test("navbar top should be rendered with user and doc office badge", async () => {
-    renderComponent(
-      createTestingPinia({
-        initialState: {
-          session: {
-            env: "staging",
-            // user: { name: "user" },
-            // user: {},
-            // user: undefined,
-          },
-        },
-      }),
-    )
+    renderComponent({
+      env: "staging",
+      activeUser: {
+        name: "fooUser",
+        documentationOffice: { abbreviation: "fooDocumentationOffice" },
+      },
+    })
 
     const sessionStore = useSessionStore()
     await sessionStore.initSession()
-    // sessionStore.user = {
-    //   name: "user",
-    //   documentationOffice: { abbreviation: "DS"}
-    // }
 
     expect(sessionStore.env).toBe("staging")
     expect(screen.getByText("Rechtsinformationen")).toBeInTheDocument()
     expect(screen.getByText("Vorgänge")).toBeInTheDocument()
     expect(screen.getByText("des Bundes")).toBeInTheDocument()
-    expect(screen.getByText("user"))
-    expect(screen.getByText("Staging"))
+    expect(screen.getByText("fooUser"))
+    expect(screen.getByText("fooDocumentationOffice | Staging"))
   })
 })
