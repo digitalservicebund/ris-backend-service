@@ -1,6 +1,7 @@
 import { defineStore } from "pinia"
 import { Ref, ref } from "vue"
 import { useFavicon } from "@/composables/useFavicon"
+import { Env } from "@/domain/env"
 import { User } from "@/domain/user"
 import envService from "@/services/adminService"
 import authService from "@/services/authService"
@@ -20,7 +21,7 @@ const useSessionStore = defineStore("session", (): SessionStore => {
     return (await authService.getName()).data ?? undefined
   }
 
-  async function fetchEnv(): Promise<string | undefined> {
+  async function fetchEnv(): Promise<Env | undefined> {
     return (await envService.getEnv()).data
   }
 

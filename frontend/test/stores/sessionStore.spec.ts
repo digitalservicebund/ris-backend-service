@@ -1,4 +1,5 @@
 import { setActivePinia, createPinia } from "pinia"
+import { Env } from "@/domain/env"
 import { User } from "@/domain/user"
 import adminService from "@/services/adminService"
 import authService from "@/services/authService"
@@ -58,9 +59,9 @@ describe("Session store", () => {
     },
   )
 
-  it.each(["staging", "uat", "production"])(
+  it.each(["staging", "uat", "production"] as Env[])(
     "sets and returns the correct env",
-    async (environment: string) => {
+    async (environment: Env) => {
       //
       const faviconMock = document.createElement("link")
       faviconMock.href = ""

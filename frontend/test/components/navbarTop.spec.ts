@@ -2,10 +2,11 @@ import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import NavbarTop from "@/components/NavbarTop.vue"
+import { Env } from "@/domain/env"
 import { User } from "@/domain/user"
 import useSessionStore from "@/stores/sessionStore"
 
-function renderComponent(options?: { env?: string; activeUser?: User }) {
+function renderComponent(options?: { env?: Env; activeUser?: User }) {
   render(NavbarTop, {
     props: {},
     global: {
