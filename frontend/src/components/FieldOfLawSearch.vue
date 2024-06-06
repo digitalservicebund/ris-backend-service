@@ -23,8 +23,9 @@ const itemsPerPage = 10
 
 async function submitSearch(page: number) {
   if (StringsUtil.isEmpty(searchStr.value)) {
-    removeSelectedNode()
+    return removeSelectedNode()
   }
+
   const response = await service.searchForFieldsOfLaw(
     page,
     itemsPerPage,
@@ -33,6 +34,7 @@ async function submitSearch(page: number) {
   if (response.data) {
     currentPage.value = response.data
     results.value = response.data.content
+    results.value?.[0] && emit("node:select", results.value[0] as FieldOfLaw)
     searchStr.value.includes("norm:") && emit("do-show-norms")
   } else {
     currentPage.value = undefined
