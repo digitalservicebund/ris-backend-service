@@ -1,88 +1,93 @@
 <script lang="ts" setup>
-import { computed, watch, ref } from "vue"
+import { computed, ref, watch } from "vue"
 import FieldOfLawNodeComponent from "./FieldOfLawNodeComponent.vue"
+import { NodeHelper, NodeHelperInterface } from "@/components/fieldOfLawNode"
+import FlexContainer from "@/components/FlexContainer.vue"
 import CheckboxInput from "@/components/input/CheckboxInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
-import { buildRoot, getDescendants, FieldOfLawNode } from "@/domain/fieldOfLaw"
-import FieldOfLawService from "@/services/fieldOfLawService"
+import { buildRoot, FieldOfLaw } from "@/domain/fieldOfLaw"
 
 const props = defineProps<{
-  modelValue: FieldOfLawNode[]
-  clickedIdentifier: string
+  modelValue: FieldOfLaw[]
+  selectedNode?: FieldOfLaw
   showNorms: boolean
 }>()
 
 const emit = defineEmits<{
-  "update:modelValue": [value: FieldOfLawNode[]]
-  "reset-clicked-node": []
+  "node:select": [node: FieldOfLaw]
+  "node:unselect": [node: FieldOfLaw]
+  "linked-field:select": [node: FieldOfLaw]
   "toggle-show-norms": []
-  "linkedField:clicked": [identifier: string]
 }>()
 
-const localModelValue = ref<FieldOfLawNode[]>(props.modelValue)
 const root = ref(buildRoot())
-
-const clicked = computed(() => props.clickedIdentifier)
-watch(clicked, () => buildDirectPathTreeTo(clicked.value))
-watch(
-  props,
-  () => {
-    localModelValue.value = props.modelValue
-  },
-  { immediate: true },
-)
-
-watch(localModelValue, () => {
-  emit("update:modelValue", localModelValue.value)
-})
-
-function handleSelect(node: FieldOfLawNode) {
-  if (
-    !localModelValue.value?.find(
-      (entry) => entry.identifier === node.identifier,
-    )
-  ) {
-    if (node.isExpanded) delete node.isExpanded
-    if (node.inDirectPathMode) delete node.inDirectPathMode
-    localModelValue.value?.push(node)
-  }
-}
-
-function handleUnselect(node: FieldOfLawNode) {
-  localModelValue.value = localModelValue.value?.filter(
-    (entry) => entry.identifier !== node.identifier,
-  )
-  emit("update:modelValue", localModelValue.value)
-}
-
-function handleLinkedFieldClicked(identifier: string) {
-  emit("linkedField:clicked", identifier)
-}
-
-const buildDirectPathTreeTo = async (clickedIdentifier: string) => {
-  if (!clickedIdentifier) return
-
-  const response =
-    await FieldOfLawService.getTreeForIdentifier(clickedIdentifier)
-  if (!response.data) return
-
-  root.value.children = [response.data]
-  getDescendants(root.value).forEach((node) => {
-    node.isExpanded = true
-    node.inDirectPathMode = true
-  })
-
-  emit("reset-clicked-node")
-}
-
+const nodeHelper = ref<NodeHelperInterface>(new NodeHelper())
+const expandedNodes = ref<FieldOfLaw[]>([])
 const showNormsModelValue = computed({
   get: () => props.showNorms,
   set: () => emit("toggle-show-norms"),
 })
+
+async function expandSelectedNode(node: FieldOfLaw) {
+  const itemsToReturn = new Map<string, FieldOfLaw>()
+  if (props.selectedNode) {
+    itemsToReturn.set(node.identifier, node)
+    const response = await nodeHelper.value.getAncestors(
+      props.selectedNode.identifier,
+    )
+    for (const node of response) {
+      itemsToReturn.set(node.identifier, node)
+    }
+    itemsToReturn.set(root.value.identifier, root.value)
+  }
+  expandedNodes.value = Array.from(itemsToReturn.values())
+}
+
+async function expandSelectedNodes(node: FieldOfLaw) {
+  const itemsToReturn = new Map<string, FieldOfLaw>()
+
+  if (node.identifier == "root") {
+    itemsToReturn.set(node.identifier, node)
+    for (const selected of props.modelValue) {
+      const response = await nodeHelper.value.getAncestors(selected.identifier)
+      for (const node of response) {
+        itemsToReturn.set(node.identifier, node)
+      }
+    }
+    expandedNodes.value = Array.from(addExpandedNodes(itemsToReturn).values())
+  } else {
+    expandedNodes.value.push(node)
+  }
+}
+
+function collapseNode(collapsedNode: FieldOfLaw) {
+  expandedNodes.value = expandedNodes.value.filter(
+    (node) => node.identifier !== collapsedNode.identifier,
+  )
+}
+
+function addExpandedNodes(
+  map: Map<string, FieldOfLaw>,
+): Map<string, FieldOfLaw> {
+  expandedNodes.value.forEach((node) => {
+    map.set(node.identifier, node)
+  })
+  return map
+}
+
+watch(
+  () => props.selectedNode,
+  async (newSelectedNode, oldSelectedNode) => {
+    if (newSelectedNode !== oldSelectedNode) {
+      if (props.selectedNode) await expandSelectedNode(props.selectedNode)
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
-  <div class="flex flex-col justify-between">
+  <FlexContainer flex-direction="flex-col" justify-content="justify-between">
     <h1 class="ds-heading-03-reg pb-10">Sachgebietsbaum</h1>
     <div class="my-14">
       <InputField
@@ -99,17 +104,20 @@ const showNormsModelValue = computed({
         />
       </InputField>
     </div>
-  </div>
+  </FlexContainer>
   <FieldOfLawNodeComponent
     :key="root.identifier"
+    :expand-values="expandedNodes"
+    is-root
+    :model-value="modelValue"
     :node="root"
-    :selected="
-      localModelValue.some(({ identifier }) => identifier === root.identifier)
-    "
-    :selected-nodes="localModelValue"
+    :node-helper="nodeHelper"
+    :selected-node="selectedNode"
     :show-norms="showNorms"
-    @linked-field:clicked="handleLinkedFieldClicked"
-    @node:select="handleSelect"
-    @node:unselect="handleUnselect"
+    @linked-field:select="emit('linked-field:select', $event)"
+    @node:collapse="collapseNode"
+    @node:expand="expandSelectedNodes"
+    @node:select="emit('node:select', $event)"
+    @node:unselect="emit('node:unselect', $event)"
   />
 </template>

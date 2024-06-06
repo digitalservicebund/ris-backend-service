@@ -1,178 +1,186 @@
 <script lang="ts" setup>
-import { computed, onMounted, toRaw } from "vue"
+import { computed, ref, watch } from "vue"
+import { NodeHelperInterface } from "@/components/fieldOfLawNode"
+import FlexContainer from "@/components/FlexContainer.vue"
 import Checkbox from "@/components/input/CheckboxInput.vue"
 import TokenizeText from "@/components/TokenizeText.vue"
-import { ROOT_ID, FieldOfLawNode } from "@/domain/fieldOfLaw"
-import FieldOfLawService from "@/services/fieldOfLawService"
+import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import IconAdd from "~icons/ic/baseline-add"
 import IconHorizontalRule from "~icons/ic/baseline-horizontal-rule"
 
 interface Props {
-  selectedNodes: FieldOfLawNode[]
-  node: FieldOfLawNode
-  selected: boolean
+  node: FieldOfLaw
+  modelValue: FieldOfLaw[]
   showNorms: boolean
+  nodeHelper: NodeHelperInterface
+  expandValues: FieldOfLaw[]
+  isRoot?: boolean
+  selectedNode?: FieldOfLaw
 }
 
 const props = defineProps<Props>()
+
 const emit = defineEmits<{
-  "node:select": [node: FieldOfLawNode]
-  "node:unselect": [node: FieldOfLawNode]
-  "linkedField:clicked": [identifier: string]
+  "node:select": [node: FieldOfLaw]
+  "node:unselect": [node: FieldOfLaw]
+  "node:expand": [node: FieldOfLaw]
+  "node:collapse": [node: FieldOfLaw]
+  "linked-field:select": [node: FieldOfLaw]
 }>()
 
-const node = computed(() => props.node)
-
-const fieldOfLawSelected = computed({
-  get: () => props.selected,
+const isExpanded = ref(false)
+const children = ref<FieldOfLaw[]>([])
+const isSelected = computed({
+  get: () =>
+    props.modelValue.some(
+      ({ identifier }) => identifier === props.node.identifier,
+    ),
   set: (value) => {
-    value ? emit("node:select", node.value) : emit("node:unselect", node.value)
+    value ? emit("node:select", props.node) : emit("node:unselect", props.node)
   },
 })
 
-function handleTokenClick(tokenContent: string) {
-  emit("linkedField:clicked", tokenContent)
-}
-
-function canLoadMoreChildren() {
-  return node.value.childrenCount <= 0
-}
-
-async function handleToggle() {
-  await getChildren()
-  if (node.value.inDirectPathMode) {
-    node.value.inDirectPathMode = false
+function toggleExpanded() {
+  isExpanded.value = !isExpanded.value
+  if (isExpanded.value) {
+    emit("node:expand", props.node)
   } else {
-    node.value.isExpanded = !node.value.isExpanded
+    emit("node:collapse", props.node)
   }
 }
 
-async function getChildren() {
-  if (canLoadMoreChildren()) {
-    let childToReattach: FieldOfLawNode
-    if (node.value.children.length > 0) {
-      // can only happen if inDirectPathMode
-      childToReattach = toRaw(node.value.children[0])
+watch(
+  props,
+  () => {
+    if (props.expandValues.length > 0) {
+      isExpanded.value = props.expandValues.some(
+        (expandedNode) => expandedNode.identifier == props.node.identifier,
+      )
     }
-    await FieldOfLawService.getChildrenOf(node.value.identifier).then(
-      (response) => {
-        if (!response.data) return
-        node.value.children = response.data
-        node.value.childrenCount = node.value.children.length
-        if (!childToReattach) return
-        const parentToReattachTo = node.value.children.find(
-          (node) => node.identifier === childToReattach.identifier,
-        )
-        if (!parentToReattachTo) return
-        parentToReattachTo.children = childToReattach.children
-        parentToReattachTo.isExpanded = true
-        parentToReattachTo.inDirectPathMode = true
-      },
-    )
-  }
-}
+  },
+  { immediate: true },
+)
 
-onMounted(async () => {
-  await getChildren()
-})
+watch(
+  props,
+  async () => {
+    if (props.selectedNode && props.isRoot) {
+      children.value = await props.nodeHelper.getFilteredChildren(
+        props.node,
+        props.expandValues,
+      )
+    } else if (props.isRoot) {
+      children.value = await props.nodeHelper.getChildren(props.node)
+    }
+  },
+  { immediate: true },
+)
+watch(
+  isExpanded,
+  async () => {
+    if (isExpanded.value) {
+      children.value = await props.nodeHelper.getChildren(props.node)
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
-  <div
-    class="flex flex-col"
-    :class="node.identifier !== ROOT_ID ? 'pl-36' : ''"
-  >
-    <div class="flex flex-row">
-      <div v-if="node.childrenCount === 0" class="pl-24"></div>
-      <div v-else>
-        <button
-          :aria-label="
-            node.text +
-            `${props.node.isExpanded ? ' einklappen' : ' aufklappen'}`
-          "
-          class="w-icon rounded-full bg-blue-200 text-blue-800"
-          @click="handleToggle"
-        >
-          <slot v-if="props.node.isExpanded" name="close-icon">
+  <FlexContainer flex-direction="flex-col">
+    <FlexContainer class="min-h-[32px]" flex-direction="flex-row">
+      <div v-if="node.hasChildren">
+        <div v-if="isExpanded" class="w-[1.3333em] min-w-[1.3333em]">
+          <button
+            id="minus-button"
+            :aria-label="node.text + ' einklappen'"
+            class="w-icon rounded-full bg-blue-200 text-blue-800"
+            @click="toggleExpanded"
+          >
             <IconHorizontalRule />
-          </slot>
-          <slot v-else name="open-icon">
+          </button>
+        </div>
+        <div v-else>
+          <button
+            id="plus-button"
+            :aria-label="node.text + ' aufklappen'"
+            class="w-icon rounded-full bg-blue-200 text-blue-800"
+            @click="toggleExpanded"
+          >
             <IconAdd />
-          </slot>
-        </button>
+          </button>
+        </div>
       </div>
-      <div v-if="node.identifier !== ROOT_ID">
+      <span v-else class="pl-[1.3333em]" />
+      <div v-if="!props.isRoot" data-testid>
         <Checkbox
-          id="fieldOfLawSelected"
-          v-model="fieldOfLawSelected"
+          :id="`field-of-law-node-${node.identifier}`"
+          v-model="isSelected"
           :aria-label="
             node.identifier +
             ' ' +
             node.text +
-            (selected ? ' entfernen' : ' hinzufügen')
+            (isSelected ? ' entfernen' : ' hinzufügen')
           "
           class="ds-checkbox-mini ml-8 bg-white"
+          :data-testid="`field-of-law-node-${node.identifier}`"
         />
       </div>
+
       <div>
         <div class="flex flex-col">
           <div class="flex flex-row">
-            <div v-if="node.identifier !== ROOT_ID" class="identifier pl-8">
+            <div
+              v-if="!props.isRoot"
+              class="whitespace-nowrap pl-8 text-[16px]"
+            >
               {{ node.identifier }}
             </div>
-            <div class="font-size-14px pl-6 pt-2 text-blue-800">
+            <div class="pl-6 pt-2 text-[14px] text-blue-800">
               <TokenizeText
                 :keywords="props.node.linkedFields ?? []"
                 :text="props.node.text"
-                @link-token:clicked="handleTokenClick"
+                @linked-field:select="emit('linked-field:select', $event)"
               />
             </div>
           </div>
         </div>
-        <div v-if="showNorms" class="flex flex-col pb-6 pl-8">
-          <div class="font-size-14px norms-font-color flex flex-row flex-wrap">
+        <FlexContainer
+          v-if="showNorms"
+          class="pb-6 pl-8"
+          flex-direction="flex-col"
+        >
+          <FlexContainer
+            class="text-[14px] text-[#66522e]"
+            flex-wrap="flex-wrap"
+          >
             <span v-for="(norm, idx) in node.norms" :key="idx">
               <strong>{{ norm.singleNormDescription }}</strong>
               {{ norm.abbreviation
               }}{{ idx < node.norms.length - 1 ? ",&nbsp;" : "" }}
             </span>
-          </div>
-        </div>
+          </FlexContainer>
+        </FlexContainer>
       </div>
-    </div>
-    <div v-if="node.isExpanded && node.children?.length">
+    </FlexContainer>
+    <div v-if="isExpanded">
       <FieldOfLawNodeComponent
-        v-for="child in node.children"
+        v-for="child in children"
         :key="child.identifier"
+        class="pl-36"
+        expand-if-selected
+        :expand-values="expandValues"
+        :model-value="modelValue"
         :node="child"
-        :selected="
-          props.selectedNodes.some(
-            ({ identifier }) => identifier === child.identifier,
-          )
-        "
-        :selected-nodes="selectedNodes"
+        :node-helper="nodeHelper"
+        :selected-node="selectedNode"
         :show-norms="showNorms"
-        @linked-field:clicked="emit('linkedField:clicked', $event)"
+        @linked-field:select="emit('linked-field:select', $event)"
+        @node:collapse="emit('node:collapse', $event)"
+        @node:expand="emit('node:expand', $event)"
         @node:select="emit('node:select', $event)"
         @node:unselect="emit('node:unselect', $event)"
       />
     </div>
-  </div>
+  </FlexContainer>
 </template>
-
-<style lang="scss" scoped>
-.identifier {
-  font-size: 16px;
-  white-space: nowrap;
-}
-
-// TODO use tailwind instead
-.font-size-14px {
-  font-size: 14px;
-}
-
-// will be integrated into the styleguide
-.norms-font-color {
-  color: #66522e;
-}
-</style>

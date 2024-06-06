@@ -1,31 +1,30 @@
 <script lang="ts" setup>
+import FlexContainer from "@/components/FlexContainer.vue"
 import TokenizeText from "@/components/TokenizeText.vue"
-import { FieldOfLawNode } from "@/domain/fieldOfLaw"
+import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import IconDelete from "~icons/ic/outline-delete"
 
 interface Props {
-  fieldOfLaw: FieldOfLawNode
+  fieldOfLaw: FieldOfLaw
   showBin?: boolean
 }
 
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  "remove-from-list": []
-  "node-clicked": []
-  "linkedField:clicked": [identifier: string]
+  "node:remove": [node: FieldOfLaw]
+  "node:select": [node: FieldOfLaw]
+  "linked-field:select": [node: FieldOfLaw]
 }>()
-
-function handleTokenClick(tokenContent: string) {
-  emit("linkedField:clicked", tokenContent)
-}
 </script>
 
 <template>
-  <div
-    class="flex w-full grow items-center border-b-1 border-blue-500 py-20 first:border-t-1"
+  <FlexContainer
+    class="ds-label-02-reg border-b-1 border-blue-500 py-20 text-blue-800 first:border-t-1"
+    flex-direction="flex-row"
+    justify-content="justify-start"
   >
-    <div class="ds-label-02-reg flex w-full flex-col text-blue-800">
+    <FlexContainer flex-direction="flex-col">
       <button
         :aria-label="
           fieldOfLaw.identifier +
@@ -33,10 +32,10 @@ function handleTokenClick(tokenContent: string) {
           fieldOfLaw.text +
           ' im Sachgebietsbaum anzeigen'
         "
-        class="mr-12 w-44 whitespace-nowrap underline"
+        class="mr-12 whitespace-nowrap text-left underline"
         tabindex="0"
-        @click="emit('node-clicked')"
-        @keyup.enter="emit('node-clicked')"
+        @click="emit('node:select', fieldOfLaw)"
+        @keyup.enter="emit('node:select', fieldOfLaw)"
       >
         {{ fieldOfLaw.identifier }}
       </button>
@@ -44,20 +43,25 @@ function handleTokenClick(tokenContent: string) {
         <TokenizeText
           :keywords="fieldOfLaw.linkedFields ?? []"
           :text="fieldOfLaw.text"
-          @link-token:clicked="handleTokenClick"
+          @linked-field:select="emit('linked-field:select', $event)"
         />
       </button>
-    </div>
-    <div v-if="props.showBin">
+    </FlexContainer>
+
+    <FlexContainer
+      v-if="props.showBin"
+      class="flex-grow"
+      justify-content="justify-end"
+    >
       <button
         :aria-label="
           fieldOfLaw.identifier + ' ' + fieldOfLaw.text + ' aus Liste entfernen'
         "
         class="align-middle text-blue-800"
-        @click="emit('remove-from-list')"
+        @click="emit('node:remove', fieldOfLaw)"
       >
         <IconDelete />
       </button>
-    </div>
-  </div>
+    </FlexContainer>
+  </FlexContainer>
 </template>

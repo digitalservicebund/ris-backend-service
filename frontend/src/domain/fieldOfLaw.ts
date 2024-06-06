@@ -3,45 +3,32 @@ export type Norm = {
   singleNormDescription: string
 }
 
-export type FieldOfLawNode = {
+export type FieldOfLaw = {
   identifier: string
   text: string
   linkedFields?: string[]
   norms: Norm[]
-  children: FieldOfLawNode[]
-  parent?: FieldOfLawNode
-  childrenCount: number
-  isExpanded?: boolean
-  inDirectPathMode?: boolean
+  children: FieldOfLaw[]
+  parent?: FieldOfLaw
+  hasChildren: boolean
 }
 
-export type FieldOfLawComboboxItem = {
-  label: string
-  text: string
-}
-
-export const ROOT_ID = "root"
-
-export function buildRoot(): FieldOfLawNode {
+export function buildRoot(): FieldOfLaw {
   return {
-    identifier: ROOT_ID,
+    identifier: "root",
     text: "Alle Sachgebiete",
     children: [],
-    childrenCount: -1,
     norms: [],
-    isExpanded: false,
+    hasChildren: true,
   }
 }
 
-export function getDescendants(node: FieldOfLawNode) {
-  const collect: FieldOfLawNode[] = []
-  const collectRecursively = (
-    node: FieldOfLawNode,
-    collect: FieldOfLawNode[],
-  ) => {
-    collect.push(node)
-    node.children.forEach((child) => collectRecursively(child, collect))
+export function createNode(identifier: string): FieldOfLaw {
+  return {
+    identifier: identifier,
+    text: "",
+    children: [],
+    norms: [],
+    hasChildren: false,
   }
-  collectRecursively(node, collect)
-  return collect
 }

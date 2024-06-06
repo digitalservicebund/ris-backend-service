@@ -12,6 +12,7 @@ function renderComponent(contentRelatedIndexing: ContentRelatedIndexing) {
     },
   })
 }
+
 describe("preview content related indexing", () => {
   test("renders all content related indexing", async () => {
     renderComponent({
@@ -40,9 +41,8 @@ describe("preview content related indexing", () => {
           identifier: "AB-01",
           text: "Text for AB",
           children: [],
-          childrenCount: 0,
+          hasChildren: false,
           norms: [],
-          isExpanded: false,
         },
       ],
     })
@@ -155,20 +155,19 @@ describe("preview content related indexing", () => {
           identifier: "AB-01-01",
           text: "Text for AB-01-01",
           children: [],
-          childrenCount: 0,
+          hasChildren: false,
           norms: [],
-          isExpanded: false,
           parent: {
             identifier: "AB-01",
             text: "Text for AB-01",
             children: [],
-            childrenCount: 0,
+            hasChildren: false,
             norms: [],
             parent: {
               identifier: "AB",
               text: "Text for AB",
               children: [],
-              childrenCount: 0,
+              hasChildren: false,
               norms: [],
             },
           },
@@ -177,20 +176,19 @@ describe("preview content related indexing", () => {
           identifier: "CD-01-05",
           text: "Text for CD-01-05",
           children: [],
-          childrenCount: 0,
+          hasChildren: false,
           norms: [],
-          isExpanded: false,
           parent: {
             identifier: "CD-01",
             text: "Text for CD-01",
             children: [],
-            childrenCount: 0,
+            hasChildren: false,
             norms: [],
             parent: {
               identifier: "CD",
               text: "Text for CD",
               children: [],
-              childrenCount: 0,
+              hasChildren: false,
               norms: [],
             },
           },
