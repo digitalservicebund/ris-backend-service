@@ -67,6 +67,7 @@ export type PageableService<TResult, TQuery = TResult> = (
     >
     </TextButton>
     <FlexContainer
+      class="w-full"
       flex-direction="flex-row"
       flex-wrap="flex-wrap"
       justify-content="justify-center"
