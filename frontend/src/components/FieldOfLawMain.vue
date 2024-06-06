@@ -49,7 +49,6 @@ const removeFieldOfLaw = (fieldOfLaw: FieldOfLaw) => {
 
 function setSelectedNode(node: FieldOfLaw) {
   selectedNode.value = node
-  console.log("updated")
 }
 
 function removeSelectedNode() {

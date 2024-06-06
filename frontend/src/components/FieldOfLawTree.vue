@@ -54,8 +54,25 @@ async function expandSelectedNodes(node: FieldOfLaw) {
         itemsToReturn.set(node.identifier, node)
       }
     }
+    expandedNodes.value = Array.from(addExpandedNodes(itemsToReturn).values())
+  } else {
+    expandedNodes.value.push(node)
   }
-  expandedNodes.value = Array.from(itemsToReturn.values())
+}
+
+function collapseNode(collapsedNode: FieldOfLaw) {
+  expandedNodes.value = expandedNodes.value.filter(
+    (node) => node.identifier !== collapsedNode.identifier,
+  )
+}
+
+function addExpandedNodes(
+  map: Map<string, FieldOfLaw>,
+): Map<string, FieldOfLaw> {
+  expandedNodes.value.forEach((node) => {
+    map.set(node.identifier, node)
+  })
+  return map
 }
 
 watch(
@@ -98,7 +115,8 @@ watch(
     :selected-node="selectedNode"
     :show-norms="showNorms"
     @linked-field:select="emit('linked-field:select', $event)"
-    @node:expanded="expandSelectedNodes"
+    @node:collapse="collapseNode"
+    @node:expand="expandSelectedNodes"
     @node:select="emit('node:select', $event)"
     @node:unselect="emit('node:unselect', $event)"
   />

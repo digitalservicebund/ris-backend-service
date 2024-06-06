@@ -23,7 +23,8 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   "node:select": [node: FieldOfLaw]
   "node:unselect": [node: FieldOfLaw]
-  "node:expanded": [node: FieldOfLaw]
+  "node:expand": [node: FieldOfLaw]
+  "node:collapse": [node: FieldOfLaw]
   "linked-field:select": [node: FieldOfLaw]
 }>()
 
@@ -42,7 +43,9 @@ const isSelected = computed({
 function toggleExpanded() {
   isExpanded.value = !isExpanded.value
   if (isExpanded.value) {
-    emit("node:expanded", props.node)
+    emit("node:expand", props.node)
+  } else {
+    emit("node:collapse", props.node)
   }
 }
 
@@ -173,7 +176,8 @@ watch(
         :selected-node="selectedNode"
         :show-norms="showNorms"
         @linked-field:select="emit('linked-field:select', $event)"
-        @node:expanded="emit('node:expanded', $event)"
+        @node:collapse="emit('node:collapse', $event)"
+        @node:expand="emit('node:expand', $event)"
         @node:select="emit('node:select', $event)"
         @node:unselect="emit('node:unselect', $event)"
       />
