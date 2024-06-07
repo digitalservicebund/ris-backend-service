@@ -2,7 +2,7 @@ import ActiveCitation from "./activeCitation"
 import DocumentationOffice from "./documentationOffice"
 import DocumentUnitListEntry from "./documentUnitListEntry"
 import EnsuingDecision from "./ensuingDecision"
-import { FieldOfLawNode } from "./fieldOfLaw"
+import { FieldOfLaw } from "./fieldOfLaw"
 import NormReference from "./normReference"
 import PreviousDecision from "./previousDecision"
 import SingleNorm from "./singleNorm"
@@ -33,7 +33,7 @@ export type ContentRelatedIndexing = {
   keywords?: string[]
   norms?: NormReference[]
   activeCitations?: ActiveCitation[]
-  fieldsOfLaw?: FieldOfLawNode[]
+  fieldsOfLaw?: FieldOfLaw[]
 }
 
 export type DocumentType = {
