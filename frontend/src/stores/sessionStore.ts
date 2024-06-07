@@ -3,7 +3,7 @@ import { Ref, ref } from "vue"
 import { useFavicon } from "@/composables/useFavicon"
 import { Env } from "@/domain/env"
 import { User } from "@/domain/user"
-import envService from "@/services/adminService"
+import adminService from "@/services/adminService"
 import authService from "@/services/authService"
 
 type SessionStore = {
@@ -22,7 +22,7 @@ const useSessionStore = defineStore("session", (): SessionStore => {
   }
 
   async function fetchEnv(): Promise<Env | undefined> {
-    return (await envService.getEnv()).data
+    return (await adminService.getEnv()).data
   }
 
   /**
