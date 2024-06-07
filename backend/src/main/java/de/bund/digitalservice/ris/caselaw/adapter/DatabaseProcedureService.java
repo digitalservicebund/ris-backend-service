@@ -47,9 +47,10 @@ public class DatabaseProcedureService implements ProcedureService {
               queryString ->
                   repository.findLatestUsedProceduresByLabelAndDocumentationOffice(
                       queryString.trim(), documentationOfficeDTO, pageable))
-          .orElse(
-              repository.findLatestUsedProceduresByDocumentationOffice(
-                  documentationOfficeDTO, pageable))
+          .orElseGet(
+              () ->
+                  repository.findLatestUsedProceduresByDocumentationOffice(
+                      documentationOfficeDTO, pageable))
           .map(ProcedureTransformer::transformToDomain);
     }
     return query
@@ -57,9 +58,10 @@ public class DatabaseProcedureService implements ProcedureService {
             queryString ->
                 repository.findAllByLabelContainingAndDocumentationOfficeOrderByCreatedAtDesc(
                     queryString.trim(), documentationOfficeDTO, pageable))
-        .orElse(
-            repository.findAllByDocumentationOfficeOrderByCreatedAtDesc(
-                documentationOfficeDTO, pageable))
+        .orElseGet(
+            () ->
+                repository.findAllByDocumentationOfficeOrderByCreatedAtDesc(
+                    documentationOfficeDTO, pageable))
         .map(ProcedureTransformer::transformToDomain);
   }
 
