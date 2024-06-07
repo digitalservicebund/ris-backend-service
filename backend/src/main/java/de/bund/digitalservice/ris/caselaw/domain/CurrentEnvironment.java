@@ -1,3 +1,3 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-public record CurrentEnv(String name) {}
+public record CurrentEnvironment(String name) {}

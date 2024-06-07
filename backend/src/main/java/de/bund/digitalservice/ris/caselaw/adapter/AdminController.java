@@ -19,12 +19,13 @@ import reactor.core.publisher.Mono;
 public class AdminController {
 
   private final MailTrackingService mailTrackingService;
-  private final EnvService envService;
+  private final EnvironmentService environmentService;
 
   @Autowired
-  public AdminController(MailTrackingService mailTrackingService, EnvService envService) {
+  public AdminController(
+      MailTrackingService mailTrackingService, EnvironmentService environmentService) {
     this.mailTrackingService = mailTrackingService;
-    this.envService = envService;
+    this.environmentService = environmentService;
   }
 
   @PostMapping("/webhook")
@@ -40,7 +41,7 @@ public class AdminController {
 
   @GetMapping("/env")
   @PreAuthorize("isAuthenticated()")
-  public Mono<ResponseEntity<String>> getEnv() {
-    return envService.getEnv().map(ResponseEntity::ok);
+  public Mono<ResponseEntity<String>> getEnvironment() {
+    return environmentService.getEnvironment().map(ResponseEntity::ok);
   }
 }

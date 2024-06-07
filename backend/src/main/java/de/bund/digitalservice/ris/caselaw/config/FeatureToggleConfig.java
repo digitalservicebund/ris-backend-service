@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.config;
 
 import de.bund.digitalservice.ris.caselaw.adapter.UnleashService;
-import de.bund.digitalservice.ris.caselaw.domain.CurrentEnv;
+import de.bund.digitalservice.ris.caselaw.domain.CurrentEnvironment;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import io.getunleash.DefaultUnleash;
 import io.getunleash.Unleash;
@@ -33,8 +33,14 @@ public class FeatureToggleConfig {
 
   @Bean
   @Profile({"production", "uat", "staging"})
-  public FeatureToggleService featureToggleService(CurrentEnv env) {
-    return new UnleashService(unleash(), env.name());
+  public FeatureToggleService featureToggleService(CurrentEnvironment currentEnvironment) {
+    String unleashEnvironment =
+        switch (currentEnvironment.name()) {
+          case "production" -> "prod";
+          case "uat" -> "uat";
+          default -> "dev";
+        };
+    return new UnleashService(unleash(), unleashEnvironment);
   }
 
   @Bean

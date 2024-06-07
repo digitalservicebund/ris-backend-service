@@ -30,7 +30,7 @@ import reactor.core.publisher.Mono;
 class AdminControllerTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @MockBean private MailTrackingService mailTrackingService;
-  @MockBean private EnvService envService;
+  @MockBean private EnvironmentService environmentService;
   @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
@@ -137,7 +137,7 @@ class AdminControllerTest {
 
   @Test
   void testGetEnv() {
-    when(envService.getEnv()).thenReturn(Mono.just("staging"));
+    when(environmentService.getEnvironment()).thenReturn(Mono.just("staging"));
 
     var result =
         risWebTestClient
