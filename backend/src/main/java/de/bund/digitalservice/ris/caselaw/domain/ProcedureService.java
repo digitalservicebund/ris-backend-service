@@ -8,7 +8,10 @@ import org.springframework.data.domain.Pageable;
 
 public interface ProcedureService {
   Page<Procedure> search(
-      Optional<String> query, DocumentationOffice documentationOffice, Pageable pageable);
+      Optional<String> query,
+      DocumentationOffice documentationOffice,
+      Pageable pageable,
+      Optional<Boolean> withDocUnits);
 
   List<DocumentationUnitListItem> getDocumentUnits(UUID procedureid);
 
