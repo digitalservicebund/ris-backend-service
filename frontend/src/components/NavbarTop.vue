@@ -13,27 +13,23 @@ const session = useSessionStore()
 const fontColor = ref<string>()
 
 const badge = computed(() => {
+  const docOffice = session.user?.documentationOffice
+    ? session.user.documentationOffice.abbreviation
+    : undefined
   if (session.env == "staging") {
     return {
       color: "bg-red-300",
-      label: session.user
-        ? `${session.user.documentationOffice?.abbreviation} | Staging`
-        : "",
+      label: docOffice ? `${docOffice} | Staging` : "",
     }
   } else if (session.env == "uat") {
     return {
       color: "bg-yellow-300",
-      label: session.user
-        ? `${session.user.documentationOffice?.abbreviation} | UAT`
-        : "",
+      label: docOffice ? `${docOffice} | UAT` : "",
     }
   } else {
     return {
       color: "bg-blue-300",
-      label:
-        session.user && session.user.documentationOffice
-          ? session.user.documentationOffice.abbreviation
-          : "",
+      label: docOffice ? docOffice : "",
     }
   }
 })
