@@ -47,7 +47,7 @@ const hasToUpdate = ref(false)
 const ariaLabelDropdownIcon = computed(() =>
   showDropdown.value ? "Dropdown schließen" : "Dropdown öffnen",
 )
-const noCurrentlyDisplayeditems = computed(
+const noCurrentlyDisplayedItems = computed(
   () =>
     !currentlyDisplayedItems.value ||
     currentlyDisplayedItems.value.length === 0,
@@ -131,6 +131,9 @@ const keydown = () => {
     focusedItemIndex.value < currentlyDisplayedItems.value.length
   ) {
     focusedItemIndex.value += 1
+  } else if (createNewItem.value) {
+    // In case we create a new item we need to focus on the child as it contains the button
+    focusedItemIndex.value += 2
   }
   updateFocusedItem()
 }
@@ -175,7 +178,7 @@ const updateCurrentItems = async () => {
   currentlyDisplayedItems.value = response.data
 
   if (
-    noCurrentlyDisplayeditems.value ||
+    noCurrentlyDisplayedItems.value ||
     //no exact match found when add manual entry option set
     (props.manualEntry &&
       filter.value &&

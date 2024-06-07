@@ -2,18 +2,17 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import FieldOfLawTreeVue from "@/components/FieldOfLawTree.vue"
-import { FieldOfLawNode } from "@/domain/fieldOfLaw"
+import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
 
 function renderComponent(
   options: {
-    modelValue?: FieldOfLawNode[]
+    modelValue?: FieldOfLaw[]
   } = {},
 ) {
   return render(FieldOfLawTreeVue, {
     props: {
       modelValue: options.modelValue ?? [],
-      clickedIdentifier: "",
       showNorms: false,
     },
   })
@@ -32,18 +31,18 @@ describe("FieldOfLawTree", () => {
             identifier: "AB-01",
             text: "Text for AB",
             children: [],
-            childrenCount: 0,
             norms: [],
             isExpanded: false,
+            hasChildren: false,
           },
           {
             identifier: "CD-02",
             text: "And text for CD with link to AB-01",
             children: [],
-            childrenCount: 1,
             norms: [],
             linkedFields: ["AB-01"],
             isExpanded: false,
+            hasChildren: false,
           },
         ],
       }),
@@ -65,14 +64,14 @@ describe("FieldOfLawTree", () => {
 
     await user.click(screen.getByLabelText("Alle Sachgebiete aufklappen"))
 
-    expect(fetchSpy).toBeCalledTimes(3)
+    expect(fetchSpy).toBeCalledTimes(4)
     expect(screen.getByText("Text for AB")).toBeInTheDocument()
     expect(screen.getByText("And text for CD with link to")).toBeInTheDocument()
     expect(screen.getByText("Alle Sachgebiete")).toBeInTheDocument()
   })
 
-  it("Linked node gets displayed as link in stext", async () => {
-    const { emitted } = renderComponent()
+  it("Linked node gets displayed as link in text", async () => {
+    renderComponent()
     await user.click(screen.getByLabelText("Alle Sachgebiete aufklappen"))
     const node1ids = screen.getAllByText("AB-01")
     const nonLinkText = screen.getByText("And text for CD with link to")
@@ -81,6 +80,8 @@ describe("FieldOfLawTree", () => {
     expect(node1ids[1] as HTMLElement).toHaveClass("linked-field")
     expect(nonLinkText as HTMLElement).not.toHaveClass("linked-field")
     await user.click(node1ids[1] as HTMLElement)
-    expect(emitted()["linkedField:clicked"]).toBeTruthy()
+    await user.click(node1ids[1] as HTMLElement)
+
+    expect(screen.getByTestId("field-of-law-node-AB-01")).toBeInTheDocument()
   })
 })

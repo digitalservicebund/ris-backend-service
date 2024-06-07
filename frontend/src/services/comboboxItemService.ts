@@ -4,7 +4,7 @@ import { ComboboxInputModelType, ComboboxItem } from "@/components/input/types"
 import { Page } from "@/components/Pagination.vue"
 import { CitationType } from "@/domain/citationType"
 import { Court, Procedure, DocumentType } from "@/domain/documentUnit"
-import { FieldOfLawNode } from "@/domain/fieldOfLaw"
+import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import { LegalForceType, LegalForceRegion } from "@/domain/legalForce"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import errorMessages from "@/i18n/errors.json"
@@ -40,7 +40,7 @@ function formatDropdownItems(
       }))
     }
     case Endpoint.fieldOfLawSearchByIdentifier: {
-      return (responseData as FieldOfLawNode[]).map((item) => ({
+      return (responseData as FieldOfLaw[]).map((item) => ({
         label: item.identifier,
         value: item,
         additionalInformation: item.text,

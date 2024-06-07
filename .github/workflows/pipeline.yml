@@ -128,10 +128,10 @@ jobs:
           gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: bootBuildImage
           build-root-directory: ./backend
-      - name: Run Trivy vulnerability scanner
+      - name: Run Trivy vulnerability image scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@841fb371db7b5cd339e5b2d55c92f5dbd730ac9f
+        uses: aquasecurity/trivy-action@595be6a0f6560a0a8fc419ddf630567fc623531d
         with:
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
           format: "sarif"
@@ -145,6 +145,13 @@ jobs:
             echo "No significant vulnerabilities found"
             exit 0
           fi
+      # Todo: Remove this step
+      - name: Upload Trivy scan results
+        uses: actions/upload-artifact@v4
+        with:
+          name: "trivy-results-backend.sarif"
+          path: "trivy-results.sarif"
+          if-no-files-found: error
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         if: ${{ always() && github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
@@ -153,7 +160,7 @@ jobs:
       - name: Generate cosign vulnerability scan record
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@841fb371db7b5cd339e5b2d55c92f5dbd730ac9f
+        uses: aquasecurity/trivy-action@595be6a0f6560a0a8fc419ddf630567fc623531d
         with:
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
           format: "cosign-vuln"
@@ -320,7 +327,7 @@ jobs:
       - name: Run Trivy vulnerability image scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@841fb371db7b5cd339e5b2d55c92f5dbd730ac9f
+        uses: aquasecurity/trivy-action@595be6a0f6560a0a8fc419ddf630567fc623531d
         with:
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
           format: "sarif"
@@ -334,16 +341,22 @@ jobs:
             echo "No significant vulnerabilities found"
             exit 0
           fi
-      - name: Upload Trivy image scan results to GitHub Security tab
+      # Todo: Remove this step
+      - name: Upload Trivy scan results
+        uses: actions/upload-artifact@v4
+        with:
+          name: "trivy-results-frontend.sarif"
+          path: "trivy-results.sarif"
+          if-no-files-found: error
+      - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         if: ${{ always() && github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
         with:
           sarif_file: "trivy-results.sarif"
-          category: trivy-image-scan
       - name: Run Trivy vulnerability file scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@841fb371db7b5cd339e5b2d55c92f5dbd730ac9f
+        uses: aquasecurity/trivy-action@595be6a0f6560a0a8fc419ddf630567fc623531d
         with:
           scan-type: "fs"
           scan-ref: "./frontend"
@@ -368,7 +381,7 @@ jobs:
       - name: Generate cosign vulnerability scan record
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@841fb371db7b5cd339e5b2d55c92f5dbd730ac9f
+        uses: aquasecurity/trivy-action@595be6a0f6560a0a8fc419ddf630567fc623531d
         with:
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
           format: "cosign-vuln"
@@ -860,7 +873,7 @@ jobs:
       POSTGRES_USER: postgres
     services:
       postgres:
-        image: postgres:16-alpine
+        image: postgres:14-alpine
         env:
           POSTGRES_DB: ris-erd
           POSTGRES_PASSWORD: postgres

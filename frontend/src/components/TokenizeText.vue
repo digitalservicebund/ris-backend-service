@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { createNode, FieldOfLaw } from "@/domain/fieldOfLaw"
+
 interface Props {
   text: string
   keywords: string[]
@@ -7,7 +9,7 @@ interface Props {
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  "linkToken:clicked": [content: string]
+  "linked-field:select": [node: FieldOfLaw]
 }>()
 
 type Token = {
@@ -29,7 +31,8 @@ function tokenizeText(): Token[] {
 
 function handleTokenClick(token: Token) {
   if (!token.isLink) return
-  emit("linkToken:clicked", token.content)
+  const toNode = createNode(token.content)
+  emit("linked-field:select", toNode)
 }
 </script>
 
