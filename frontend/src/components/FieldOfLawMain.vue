@@ -96,6 +96,7 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
             @linked-field:select="setSelectedNode"
             @node:select="addFeldOfLaw"
             @node:unselect="removeFieldOfLaw"
+            @selected-node:reset="removeSelectedNode"
             @toggle-show-norms="showNorms = !showNorms"
           ></FieldOfLawTree>
         </div>

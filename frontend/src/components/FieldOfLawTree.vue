@@ -16,6 +16,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   "node:select": [node: FieldOfLaw]
   "node:unselect": [node: FieldOfLaw]
+  "selected-node:reset": []
   "linked-field:select": [node: FieldOfLaw]
   "toggle-show-norms": []
 }>()
@@ -119,5 +120,6 @@ watch(
     @node:expand="expandSelectedNodes"
     @node:select="emit('node:select', $event)"
     @node:unselect="emit('node:unselect', $event)"
+    @selected-node:reset="emit('selected-node:reset')"
   />
 </template>
