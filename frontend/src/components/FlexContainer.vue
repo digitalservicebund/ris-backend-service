@@ -11,6 +11,8 @@ interface Props {
     | "items-center"
     | "items-baseline"
     | "items-stretch"
+  flexWrap?: "flex-wrap" | "flex-wrap-reverse" | "flex-nowrap"
+
   justifyContent?:
     | "justify-start"
     | "justify-end"
@@ -24,13 +26,19 @@ const props = withDefaults(defineProps<Props>(), {
   flexDirection: "flex-row",
   alignItems: "items-stretch",
   justifyContent: "justify-start",
+  flexWrap: "flex-nowrap",
 })
 </script>
 
 <template>
   <div
     class="flex"
-    :class="[props.flexDirection, props.alignItems, props.justifyContent]"
+    :class="[
+      props.flexDirection,
+      props.alignItems,
+      props.justifyContent,
+      props.flexWrap,
+    ]"
   >
     <slot></slot>
   </div>

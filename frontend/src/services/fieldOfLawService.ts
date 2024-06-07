@@ -1,30 +1,31 @@
 import httpClient, { ServiceResponse } from "./httpClient"
 import { Page, PageableService } from "@/components/Pagination.vue"
-import { FieldOfLawNode } from "@/domain/fieldOfLaw"
+import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import errorMessages from "@/i18n/errors.json"
 
 interface FieldOfLawService {
-  getSelectedFieldsOfLaw(
-    uuid: string,
-  ): Promise<ServiceResponse<FieldOfLawNode[]>>
+  getSelectedFieldsOfLaw(uuid: string): Promise<ServiceResponse<FieldOfLaw[]>>
+
   addFieldOfLaw(
     uuid: string,
     identifier: string,
-  ): Promise<ServiceResponse<FieldOfLawNode[]>>
+  ): Promise<ServiceResponse<FieldOfLaw[]>>
+
   removeFieldOfLaw(
     uuid: string,
     identifier: string,
-  ): Promise<ServiceResponse<FieldOfLawNode[]>>
-  getChildrenOf(identifier: string): Promise<ServiceResponse<FieldOfLawNode[]>>
-  getTreeForIdentifier(
-    identifier: string,
-  ): Promise<ServiceResponse<FieldOfLawNode>>
-  searchForFieldsOfLaw: PageableService<FieldOfLawNode, string>
+  ): Promise<ServiceResponse<FieldOfLaw[]>>
+
+  getChildrenOf(identifier: string): Promise<ServiceResponse<FieldOfLaw[]>>
+
+  getTreeForIdentifier(identifier: string): Promise<ServiceResponse<FieldOfLaw>>
+
+  searchForFieldsOfLaw: PageableService<FieldOfLaw, string>
 }
 
 const service: FieldOfLawService = {
   async getSelectedFieldsOfLaw(uuid: string) {
-    const response = await httpClient.get<FieldOfLawNode[]>(
+    const response = await httpClient.get<FieldOfLaw[]>(
       `caselaw/documentunits/${uuid}/contentrelatedindexing/fieldsoflaw`,
     )
     if (response.status >= 300) {
@@ -39,7 +40,7 @@ const service: FieldOfLawService = {
     return response
   },
   async addFieldOfLaw(uuid: string, identifier: string) {
-    const response = await httpClient.put<undefined, FieldOfLawNode[]>(
+    const response = await httpClient.put<undefined, FieldOfLaw[]>(
       `caselaw/documentunits/${uuid}/contentrelatedindexing/fieldsoflaw/${identifier}`,
     )
     if (response.status >= 300) {
@@ -53,7 +54,7 @@ const service: FieldOfLawService = {
     return response
   },
   async removeFieldOfLaw(uuid: string, identifier: string) {
-    const response = await httpClient.delete<FieldOfLawNode[]>(
+    const response = await httpClient.delete<FieldOfLaw[]>(
       `caselaw/documentunits/${uuid}/contentrelatedindexing/fieldsoflaw/${identifier}`,
     )
     if (response.status >= 300) {
@@ -67,7 +68,7 @@ const service: FieldOfLawService = {
     return response
   },
   async getChildrenOf(identifier: string) {
-    const response = await httpClient.get<FieldOfLawNode[]>(
+    const response = await httpClient.get<FieldOfLaw[]>(
       `caselaw/fieldsoflaw/${identifier}/children`,
     )
     if (response.status >= 300) {
@@ -81,7 +82,7 @@ const service: FieldOfLawService = {
     return response
   },
   async getTreeForIdentifier(identifier: string) {
-    const response = await httpClient.get<FieldOfLawNode>(
+    const response = await httpClient.get<FieldOfLaw>(
       `caselaw/fieldsoflaw/${identifier}/tree`,
     )
     if (response.status >= 300) {
@@ -92,7 +93,7 @@ const service: FieldOfLawService = {
     return response
   },
   async searchForFieldsOfLaw(page: number, size: number, query?: string) {
-    const response = await httpClient.get<Page<FieldOfLawNode>>(
+    const response = await httpClient.get<Page<FieldOfLaw>>(
       `caselaw/fieldsoflaw?pg=${page}&sz=${size}`,
       { params: { q: query ?? "" } },
     )

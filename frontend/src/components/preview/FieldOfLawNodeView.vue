@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { FieldOfLawNode } from "@/domain/fieldOfLaw"
+import { FieldOfLaw } from "@/domain/fieldOfLaw"
 
 defineProps<{
-  node: FieldOfLawNode
+  node: FieldOfLaw
 }>()
 </script>
 
@@ -10,5 +10,6 @@ defineProps<{
   <FieldOfLawNodeView v-if="node.parent" :node="node.parent"
     >→
   </FieldOfLawNodeView>
-  <span> {{ node.text }} </span> <slot></slot>
+  <span> {{ node.text }} </span>
+  <slot></slot>
 </template>
