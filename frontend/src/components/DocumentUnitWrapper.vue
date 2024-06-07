@@ -64,8 +64,8 @@ watchEffect(() => {
   statusBadge.value = useStatusBadge(props.documentUnit.status).value
 })
 
-const toggleNavigationPanel = (state?: boolean) => {
-  showNavigationPanelRef.value = state || !showNavigationPanelRef.value
+const toggleNavigationPanel = () => {
+  showNavigationPanelRef.value = !props.showNavigationPanel
   pushQueryToRoute({
     showNavigationPanel: showNavigationPanelRef.value.toString(),
   })
@@ -82,6 +82,8 @@ const toggleNavigationPanel = (state?: boolean) => {
         :is-expanded="showNavigationPanelRef"
         label="Navigation"
         size="small"
+        tabindex="0"
+        @keydown.enter="toggleNavigationPanel"
         @update:is-expanded="toggleNavigationPanel"
       >
         <NavbarSide :is-child="false" :menu-items="menuItems" :route="route" />
