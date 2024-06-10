@@ -39,7 +39,7 @@ const filter = ref<string>()
 const dropdownContainerRef = ref<HTMLElement>()
 const dropdownItemsRef = ref<HTMLElement>()
 const inputFieldRef = ref<HTMLInputElement>()
-const focusedItemIndex = ref<number>(0)
+const focusedItemIndex = ref<number>(-1)
 
 const isUpdating = ref(false)
 const hasToUpdate = ref(false)
@@ -59,7 +59,7 @@ const conditionalClasses = computed(() => ({
 }))
 
 const toggleDropdown = async () => {
-  focusedItemIndex.value = 0
+  focusedItemIndex.value = -1
   showDropdown.value = !showDropdown.value
   if (showDropdown.value) {
     filter.value = inputText.value
@@ -70,7 +70,7 @@ const toggleDropdown = async () => {
 
 const showUpdatedDropdown = async () => {
   emit("focus")
-  focusedItemIndex.value = 0
+  focusedItemIndex.value = -1
   showDropdown.value = true
   filter.value = inputText.value
   await updateCurrentItems()
@@ -82,7 +82,7 @@ const clearDropdown = async () => {
   emit("update:modelValue", undefined)
   filter.value = ""
   inputText.value = ""
-  focusedItemIndex.value = 0
+  focusedItemIndex.value = -1
   if (showDropdown.value) {
     await updateCurrentItems()
   }
@@ -118,31 +118,31 @@ const onInput = async () => {
   await showUpdatedDropdown()
 }
 
-const keyup = () => {
-  if (focusedItemIndex.value > 1) {
+const HTMLNodes = computed(() =>
+  dropdownItemsRef.value?.childNodes
+    ? Array.from(dropdownItemsRef.value.childNodes).filter(
+        (n) => n.nodeType !== Node.TEXT_NODE,
+      )
+    : [],
+)
+
+const keyArrowUp = () => {
+  if (focusedItemIndex.value > 0) {
     focusedItemIndex.value -= 1
   }
   updateFocusedItem()
 }
 
-const keydown = () => {
-  if (
-    currentlyDisplayedItems.value &&
-    focusedItemIndex.value < currentlyDisplayedItems.value.length
-  ) {
+const keyArrowDown = () => {
+  if (focusedItemIndex.value < HTMLNodes.value.length - 1) {
     focusedItemIndex.value += 1
-  } else if (createNewItem.value) {
-    // In case we create a new item we need to focus on the child as it contains the button
-    focusedItemIndex.value += 2
   }
   updateFocusedItem()
 }
 
 const updateFocusedItem = () => {
   candidateForSelection.value = undefined
-  const item = dropdownItemsRef.value?.childNodes[
-    focusedItemIndex.value
-  ] as HTMLElement
+  const item = HTMLNodes.value[focusedItemIndex.value] as HTMLElement
   if (item && item.innerText !== NO_MATCHING_ENTRY) item.focus()
 }
 
@@ -271,10 +271,10 @@ export type InputModelProps =
         @click="selectAllText"
         @focus="showUpdatedDropdown"
         @input="onInput"
+        @keydown.down.prevent="keyArrowDown"
         @keydown.enter="onEnter"
         @keydown.esc="closeDropdownAndRevertToLastSavedValue"
         @keydown.tab="closeDropdownAndRevertToLastSavedValue"
-        @keyup.down="keydown"
       />
       <div v-if="!readonly" class="flex flex-row">
         <button
@@ -315,10 +315,10 @@ export type InputModelProps =
         }"
         tabindex="0"
         @click="setChosenItem(item)"
+        @keydown.down.prevent="keyArrowDown"
+        @keydown.enter="setChosenItem(item)"
         @keydown.tab="closeDropdownAndRevertToLastSavedValue"
-        @keyup.down="keydown"
-        @keyup.enter="setChosenItem(item)"
-        @keyup.up="keyup"
+        @keydown.up.prevent="keyArrowUp"
       >
         <span>
           <span>{{ item.label }}</span>
@@ -338,10 +338,11 @@ export type InputModelProps =
         class="cursor-pointer px-16 py-12 text-left hover:bg-blue-100 focus:border-l-4 focus:border-solid focus:border-l-blue-800 focus:bg-blue-200 focus:outline-none"
         tabindex="0"
         @click="setChosenItem(createNewItem)"
+        @keydown.down.stop.prevent="keyArrowDown"
+        @keydown.enter="setChosenItem(createNewItem)"
+        @keydown.prevent
         @keydown.tab="closeDropdownAndRevertToLastSavedValue"
-        @keyup.down="keydown"
-        @keyup.enter="setChosenItem(createNewItem)"
-        @keyup.up="keyup"
+        @keydown.up.stop.prevent="keyArrowUp"
       >
         <span>
           <span class="ds-label-01-bold text-blue-800 underline">{{
