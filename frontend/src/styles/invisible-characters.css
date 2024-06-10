@@ -1,6 +1,3 @@
-/*.invisible {*/
-/*  font-size: x-large;*/
-/*}*/
 .invisible--soft-hyphen:before {
   content: "-";
 }
@@ -9,7 +6,12 @@
 }
 .invisible--nb-space:before {
   content: "°";
+  line-height: 0;
+  top: 4px;
+}
+.invisible--nb-space {
+  vertical-align: text-top;
 }
 .invisible:before {
-  color: #dce8ef;
+  color: #4466FF;
 }
