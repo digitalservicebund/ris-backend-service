@@ -70,7 +70,7 @@
     "resize-observer-polyfill": "^1.5.1",
     "tippy.js": "^6.3.7",
     "vue": "^3.4.27",
-    "vue-router": "4.3.2",
+    "vue-router": "4.3.3",
     "vue-tsc": "^2.0.19"
   },
   "devDependencies": {
