@@ -202,7 +202,16 @@ const handleOnSelect = (index: number) => {
     :show-navigation-panel="showNavigationPanel"
   >
     <template #default="{ classes }">
-      <FlexContainer class="w-full flex-grow">
+      <FlexContainer class="w-full flex-grow flex-row-reverse">
+        <AttachmentViewSidePanel
+          v-if="props.documentUnit.attachments"
+          :attachments="documentUnit.attachments"
+          :current-index="selectedAttachmentIndex"
+          :document-unit-uuid="props.documentUnit.uuid"
+          :is-expanded="showAttachmentPanelRef"
+          @select="handleOnSelect"
+          @update="toggleAttachmentPanel"
+        ></AttachmentViewSidePanel>
         <FlexItem class="flex-1 flex-col bg-gray-100" :class="classes">
           <DocumentUnitCoreData
             id="coreData"
@@ -233,16 +242,6 @@ const handleOnSelect = (index: number) => {
             @update-value="handleUpdateValueDocumentUnitTexts"
           />
         </FlexItem>
-
-        <AttachmentViewSidePanel
-          v-if="props.documentUnit.attachments"
-          :attachments="documentUnit.attachments"
-          :current-index="selectedAttachmentIndex"
-          :document-unit-uuid="props.documentUnit.uuid"
-          :is-expanded="showAttachmentPanelRef"
-          @select="handleOnSelect"
-          @update="toggleAttachmentPanel"
-        ></AttachmentViewSidePanel>
       </FlexContainer>
     </template>
   </DocumentUnitWrapper>
