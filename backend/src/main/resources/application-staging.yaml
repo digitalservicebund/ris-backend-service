@@ -17,7 +17,7 @@ database:
 
 sentry:
   environment: staging
-  traces-sample-rate: 0.1
+  traces-sample-rate: 0.01
 
 neuris:
   environment: staging
