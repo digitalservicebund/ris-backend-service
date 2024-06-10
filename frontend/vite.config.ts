@@ -12,6 +12,11 @@ export default defineConfig({
   build: {
     sourcemap: true, // Source map generation must be turned on
   },
+  esbuild: {
+    supported: {
+      "top-level-await": true,
+    },
+  },
   server: {
     port: 3000, // Required for vite to be accessible when running as part of docker compose setup
   },
