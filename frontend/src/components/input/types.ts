@@ -137,7 +137,6 @@ export type ComboboxItem = {
   label: string
   value?: ComboboxInputModelType
   additionalInformation?: string
-  isCreateNew?: boolean
 }
 
 export interface ComboboxAttributes extends BaseInputAttributes {
