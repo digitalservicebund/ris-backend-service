@@ -190,7 +190,7 @@ const updateCurrentItems = async () => {
   } else {
     createNewItem.value = undefined
     candidateForSelection.value = currentlyDisplayedItems.value[0]
-    focusedItemIndex.value = 1
+    focusedItemIndex.value = 0
   }
 }
 
