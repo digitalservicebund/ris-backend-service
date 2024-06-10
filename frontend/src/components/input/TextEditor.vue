@@ -318,12 +318,23 @@ watch(
 
 const showButtons = computed(() => props.editable && hasFocus.value)
 
+watch(
+  () => hasFocus.value,
+  () => {
+    // When the TextEditor is editable and has focus, the invisibleCharacters should be visible
+    commands.setActiveState(props.editable && hasFocus.value)(
+      editor.state,
+      editor.view.dispatch,
+    )
+  },
+  { immediate: true },
+)
+
 const ariaLabel = props.ariaLabel ? props.ariaLabel : null
 
 onMounted(() => {
   const editorContainer = document.querySelector(".editor")
   if (editorContainer != null) resizeObserver.observe(editorContainer)
-  commands.setActiveState(props.editable)(editor.state, editor.view.dispatch)
 })
 
 const resizeObserver = new ResizeObserver((entries) => {

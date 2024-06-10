@@ -10,7 +10,7 @@ import {
 import { Extension } from "@tiptap/core"
 import { Node } from "prosemirror-model"
 import "@guardian/prosemirror-invisibles/dist/style.css"
-import "./invisible-characters.css"
+import "../styles/invisible-characters.css"
 
 // Can be removed (along with the css file and the createInvisibleDecosForCharacter("soft-hyphen", isSoftHyphen) below) as soon as prosemirror-invisibles is updated (latest version includes soft-hyphen)
 const isSoftHyphen = (char: string) => char === "\u00ad"
@@ -32,5 +32,13 @@ export const InvisibleCharacters = Extension.create({
         createInvisibleDecosForNode("break", (_, pos) => pos, isHardbreak),
       ]),
     ]
+  },
+  addKeyboardShortcuts() {
+    return {
+      // ↓ Windows/Linux (English):   Ctrl + ⇧ Shift + Space
+      // ↓ Windows/Linux (Deutsch):   Strg + ⇧ Shift + Leertaste
+      // ↓ MacOS:                     ⌘ Cmd + ⇧ Shift + Space
+      "Mod-Shift-Space": () => this.editor.commands.insertContent(" "),
+    }
   },
 })
