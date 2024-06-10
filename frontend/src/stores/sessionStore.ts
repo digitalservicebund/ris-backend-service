@@ -8,14 +8,14 @@ import authService from "@/services/authService"
 
 type SessionStore = {
   user: Ref<User | undefined>
-  env: Ref<string | undefined>
+  env: Ref<Env | undefined>
   isAuthenticated: () => Promise<boolean>
   initSession: () => Promise<void>
 }
 
 const useSessionStore = defineStore("session", (): SessionStore => {
   const user = ref<User>()
-  const env = ref()
+  const env = ref<Env>()
 
   async function fetchUser(): Promise<User | undefined> {
     return (await authService.getName()).data ?? undefined
