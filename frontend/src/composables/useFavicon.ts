@@ -1,6 +1,6 @@
 import { computed, ref } from "vue"
 
-export function useFavicon(env: string) {
+export function useFavicon(env: string | undefined) {
   const favicon = ref()
 
   return computed(() => {
