@@ -193,7 +193,7 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.17.1")
 
     implementation("io.micrometer:micrometer-registry-prometheus:1.13.0")
-    implementation("io.micrometer:micrometer-core:1.13.0")
+    implementation("io.micrometer:micrometer-core:1.13.1")
 
     implementation(platform("io.sentry:sentry-bom:8.0.0-alpha.1"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
