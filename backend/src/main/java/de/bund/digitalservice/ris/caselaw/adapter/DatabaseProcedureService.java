@@ -33,35 +33,19 @@ public class DatabaseProcedureService implements ProcedureService {
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
   public Page<Procedure> search(
-      Optional<String> query,
-      DocumentationOffice documentationOffice,
-      Pageable pageable,
-      Optional<Boolean> withDocUnits) {
+      Optional<String> query, DocumentationOffice documentationOffice, Pageable pageable) {
 
     DocumentationOfficeDTO documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
 
-    if (withDocUnits.isPresent() && Boolean.TRUE.equals(withDocUnits.get())) {
-      return query
-          .map(
-              queryString ->
-                  repository.findLatestUsedProceduresByLabelAndDocumentationOffice(
-                      queryString.trim(), documentationOfficeDTO, pageable))
-          .orElseGet(
-              () ->
-                  repository.findLatestUsedProceduresByDocumentationOffice(
-                      documentationOfficeDTO, pageable))
-          .map(ProcedureTransformer::transformToDomain);
-    }
     return query
         .map(
             queryString ->
                 repository.findAllByLabelContainingAndDocumentationOfficeOrderByCreatedAtDesc(
                     queryString.trim(), documentationOfficeDTO, pageable))
-        .orElseGet(
-            () ->
-                repository.findAllByDocumentationOfficeOrderByCreatedAtDesc(
-                    documentationOfficeDTO, pageable))
+        .orElse(
+            repository.findAllByDocumentationOfficeOrderByCreatedAtDesc(
+                documentationOfficeDTO, pageable))
         .map(ProcedureTransformer::transformToDomain);
   }
 

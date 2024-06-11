@@ -39,14 +39,12 @@ public class ProcedureController {
       @AuthenticationPrincipal OidcUser oidcUser,
       @RequestParam(value = "q") Optional<String> query,
       @RequestParam(value = "pg") Optional<Integer> page,
-      @RequestParam(value = "sz") Integer size,
-      @RequestParam(value = "withDocUnits") Optional<Boolean> withDocUnits) {
+      @RequestParam(value = "sz") Integer size) {
     return Mono.just(
         service.search(
             query,
             userService.getDocumentationOffice(oidcUser).block(),
-            PageRequest.of(page.orElse(0), size),
-            withDocUnits));
+            PageRequest.of(page.orElse(0), size)));
   }
 
   @GetMapping(value = "/{procedureUUID}/documentunits")
