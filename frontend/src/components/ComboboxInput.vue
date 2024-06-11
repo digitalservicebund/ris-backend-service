@@ -37,7 +37,8 @@ const createNewItem = ref<ComboboxItem>()
 const showDropdown = ref(false)
 const filter = ref<string>()
 const dropdownContainerRef = ref<HTMLElement>()
-const dropdownItemsRef = ref<HTMLElement>()
+const dropdownItemsRef = ref<HTMLElement[]>()
+const createNewItemRef = ref<HTMLElement>()
 const inputFieldRef = ref<HTMLInputElement>()
 const focusedItemIndex = ref<number>(-1)
 
@@ -119,11 +120,9 @@ const onInput = async () => {
 }
 
 const dropDownItems = computed(() =>
-  dropdownItemsRef.value?.childNodes
-    ? Array.from(dropdownItemsRef.value.childNodes).filter(
-        (n) => n.nodeType !== Node.TEXT_NODE,
-      )
-    : [],
+  [...(dropdownItemsRef?.value ?? []), createNewItemRef.value].filter(
+    (i) => !!i,
+  ),
 )
 
 const keyArrowUp = () => {
@@ -142,7 +141,7 @@ const keyArrowDown = () => {
 
 const updateFocusedItem = () => {
   candidateForSelection.value = undefined
-  const item = dropDownItems.value[focusedItemIndex.value] as HTMLElement
+  const item = dropDownItems.value[focusedItemIndex.value]
   if (item && item.innerText !== NO_MATCHING_ENTRY) item.focus()
 }
 
@@ -300,13 +299,13 @@ export type InputModelProps =
     </div>
     <div
       v-if="showDropdown && !readonly"
-      ref="dropdownItemsRef"
       class="absolute left-0 right-0 top-[100%] z-20 flex max-h-[300px] flex-col overflow-y-scroll bg-white px-8 py-12 drop-shadow-md"
       tabindex="-1"
     >
       <button
         v-for="(item, index) in currentlyDisplayedItems"
         :key="index"
+        ref="dropdownItemsRef"
         aria-label="dropdown-option"
         class="cursor-pointer px-16 py-12 text-left hover:bg-blue-100 focus:border-l-4 focus:border-solid focus:border-l-blue-800 focus:bg-blue-200 focus:outline-none"
         :class="{
@@ -334,6 +333,7 @@ export type InputModelProps =
       <button
         v-if="createNewItem"
         key="createNewItem"
+        ref="createNewItemRef"
         aria-label="dropdown-option"
         class="cursor-pointer px-16 py-12 text-left hover:bg-blue-100 focus:border-l-4 focus:border-solid focus:border-l-blue-800 focus:bg-blue-200 focus:outline-none"
         tabindex="0"
