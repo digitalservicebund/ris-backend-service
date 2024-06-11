@@ -118,7 +118,7 @@ const onInput = async () => {
   await showUpdatedDropdown()
 }
 
-const HTMLNodes = computed(() =>
+const dropDownItems = computed(() =>
   dropdownItemsRef.value?.childNodes
     ? Array.from(dropdownItemsRef.value.childNodes).filter(
         (n) => n.nodeType !== Node.TEXT_NODE,
@@ -134,7 +134,7 @@ const keyArrowUp = () => {
 }
 
 const keyArrowDown = () => {
-  if (focusedItemIndex.value < HTMLNodes.value.length - 1) {
+  if (focusedItemIndex.value < dropDownItems.value.length - 1) {
     focusedItemIndex.value += 1
   }
   updateFocusedItem()
@@ -142,7 +142,7 @@ const keyArrowDown = () => {
 
 const updateFocusedItem = () => {
   candidateForSelection.value = undefined
-  const item = HTMLNodes.value[focusedItemIndex.value] as HTMLElement
+  const item = dropDownItems.value[focusedItemIndex.value] as HTMLElement
   if (item && item.innerText !== NO_MATCHING_ENTRY) item.focus()
 }
 
@@ -340,7 +340,6 @@ export type InputModelProps =
         @click="setChosenItem(createNewItem)"
         @keydown.down.stop.prevent="keyArrowDown"
         @keydown.enter="setChosenItem(createNewItem)"
-        @keydown.prevent
         @keydown.tab="closeDropdownAndRevertToLastSavedValue"
         @keydown.up.stop.prevent="keyArrowUp"
       >
