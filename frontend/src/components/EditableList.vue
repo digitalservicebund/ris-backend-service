@@ -125,27 +125,28 @@ watch(
       v-for="(entry, index) in modelValueList"
       :key="index"
       aria-label="Listen Eintrag"
-      class="border-b-1 border-blue-300 focus:outline-none"
+      class="border-b-1 border-blue-300"
       :class="
         index !== editIndex
-          ? 'first:border-t-1 hover:bg-blue-100 focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800'
+          ? 'first:border-t-1'
           : 'first:border-t-0 last:border-b-0'
       "
-      role="presentation"
-      tabindex="0"
-      @click="setEditIndex(index)"
-      @keypress.enter="setEditIndex(index)"
     >
       <div
         v-if="index !== editIndex"
         :key="index"
-        class="group flex cursor-pointer gap-8 px-2 py-16"
+        class="group flex cursor-pointer gap-8 py-16"
       >
         <component :is="summaryComponent" :data="entry" />
 
-        <div class="flex gap-8 text-blue-800">
+        <button
+          class="text-blue-800 hover:bg-blue-100 focus:shadow-[inset_0_0_0_0.125rem] focus:shadow-blue-800 focus:outline-none"
+          :data-testid="`listEntry-${index}`"
+          @click="setEditIndex(index)"
+          @keypress.enter="setEditIndex(index)"
+        >
           <IconArrowDown />
-        </div>
+        </button>
       </div>
 
       <component
