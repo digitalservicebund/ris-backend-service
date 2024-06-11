@@ -537,4 +537,96 @@ describe("Combobox Element", () => {
     expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(3)
     expect(dropdownItems[0]).toHaveTextContent("testItem1")
   })
+
+  describe("keyboard navigation", () => {
+    it("should select next value on arrow down", async () => {
+      renderComponent()
+      const input = screen.getByLabelText("test label")
+      await fireEvent.focus(input)
+      const items = screen.getAllByLabelText("dropdown-option")
+
+      input.focus()
+      expect(input).toHaveFocus()
+
+      await fireEvent.keyDown(input, { key: "ArrowDown" })
+      expect(items[0]).toHaveFocus()
+
+      await fireEvent.keyDown(items[0], { key: "ArrowDown" })
+      expect(items[1]).toHaveFocus()
+
+      await fireEvent.keyDown(items[1], { key: "ArrowDown" })
+      expect(items[2]).toHaveFocus()
+
+      // Focus does not change on last element
+      await fireEvent.keyDown(items[2], { key: "ArrowDown" })
+      expect(items[2]).toHaveFocus()
+
+      // Check that I can immediately move up even when pressing arrow-down multiple times before -> index in bounds
+      await fireEvent.keyDown(items[2], { key: "ArrowUp" })
+      expect(items[1]).toHaveFocus()
+    })
+
+    it("should select previous value on arrow up", async () => {
+      renderComponent()
+      const input = screen.getByLabelText("test label")
+      await fireEvent.focus(input)
+      const items = screen.getAllByLabelText("dropdown-option")
+
+      input.focus()
+      await fireEvent.keyDown(input, { key: "ArrowDown" })
+      expect(items[0]).toHaveFocus()
+
+      await fireEvent.keyDown(input, { key: "ArrowDown" })
+      expect(items[1]).toHaveFocus()
+
+      await fireEvent.keyDown(items[1], { key: "ArrowUp" })
+      expect(items[0]).toHaveFocus()
+
+      // Focus does not change when pressing arrow-up on first element
+      await fireEvent.keyDown(items[0], { key: "ArrowUp" })
+      expect(items[0]).toHaveFocus()
+
+      // Make sure index is in bounds (not smaller than 0)
+      await fireEvent.keyDown(input, { key: "ArrowDown" })
+      expect(items[1]).toHaveFocus()
+    })
+
+    it("should work with createNewItem link without any items", async () => {
+      renderComponent({
+        manualEntry: true,
+        itemService: service.filterItems([]),
+      })
+      const input = screen.getByLabelText("test label")
+      await fireEvent.focus(input)
+      await user.type(input, "testItem")
+      const items = screen.getAllByLabelText("dropdown-option")
+
+      expect(items[0]).not.toHaveFocus()
+      await fireEvent.keyDown(input, { key: "ArrowDown" })
+      expect(items[0]).toHaveFocus()
+    })
+
+    it("should work with only createNewItem link with items", async () => {
+      renderComponent({ manualEntry: true })
+      const input = screen.getByLabelText("test label")
+      await fireEvent.focus(input)
+      await user.type(input, "testItem")
+      const items = screen.getAllByLabelText("dropdown-option")
+
+      // Move to createNewItem link
+      await fireEvent.keyDown(input, { key: "ArrowDown" })
+      await fireEvent.keyDown(input, { key: "ArrowDown" })
+      await fireEvent.keyDown(input, { key: "ArrowDown" })
+      await fireEvent.keyDown(input, { key: "ArrowDown" })
+      expect(items[3]).toHaveFocus()
+
+      // Focus stays the same on last element
+      await fireEvent.keyDown(items[3], { key: "ArrowDown" })
+      expect(items[3]).toHaveFocus()
+
+      // You can move up again from the focused create link element
+      await fireEvent.keyDown(items[3], { key: "ArrowUp" })
+      expect(items[2]).toHaveFocus()
+    })
+  })
 })
