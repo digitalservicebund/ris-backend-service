@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
-import InlineDecision from "@/components/InlineDecision.vue"
+import DecisionSummary from "@/components/DecisionSummary.vue"
 import { Court, DocumentType } from "@/domain/documentUnit"
 import PreviousDecision from "@/domain/previousDecision"
 
@@ -47,7 +47,7 @@ function renderComponent(options?: {
     ],
   })
 
-  return render(InlineDecision, {
+  return render(DecisionSummary, {
     props,
     global: { plugins: [router] },
   })
