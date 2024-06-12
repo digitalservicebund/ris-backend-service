@@ -9,7 +9,7 @@ useHead({
 useSeoMeta({
   charset: "utf-8",
   ogTitle: "NeuRIS Rechtsinformationssystem",
-  ogImage: "/favicon.svg",
+  ogImage: "src/assets/favicon-production.svg",
   ogLocale: "de",
 })
 </script>

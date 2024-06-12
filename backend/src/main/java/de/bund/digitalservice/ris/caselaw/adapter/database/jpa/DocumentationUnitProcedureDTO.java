@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -39,9 +38,6 @@ public class DocumentationUnitProcedureDTO {
   @MapsId("procedureId")
   @JoinColumn(name = "procedure_id")
   private ProcedureDTO procedure;
-
-  @Column(insertable = false, updatable = false)
-  private int rank;
 
   @Transient
   public int getRank() {

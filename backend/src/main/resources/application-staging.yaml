@@ -17,9 +17,10 @@ database:
 
 sentry:
   environment: staging
-  traces-sample-rate: 0.1
+  traces-sample-rate: 0.01
 
 neuris:
+  environment: staging
   document-number-patterns:
     DS: XXRE0******YY
     CC-RIS: XXRE1******YY

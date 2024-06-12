@@ -18,7 +18,7 @@ interface ProcedureService {
 const service: ProcedureService = {
   async get(size: number, page: number, filter?: string) {
     const response = await httpClient.get<Page<Procedure>>(
-      `caselaw/procedure?withDocUnits=true`,
+      `caselaw/procedure`,
       {
         params: {
           sz: size.toString(),
