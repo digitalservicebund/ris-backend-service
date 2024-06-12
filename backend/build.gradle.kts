@@ -284,8 +284,14 @@ tasks {
         // Jacoco hooks into all tasks of type: Test automatically, but results for each of these
         // tasks are kept separately and are not combined out of the box. we want to gather
         // coverage of our unit and integration tests as a single report!
+        executionData.setFrom(
+            files(
+                fileTree(project.layout.buildDirectory) {
+                    include("jacoco/*.exec")
+                },
+            ),
+        )
         dependsOn("integrationTest")
-        executionData(fileTree(project.buildDir.absolutePath).include("jacoco/*.exec"))
         reports {
             xml.required.set(true)
             html.required.set(true)
