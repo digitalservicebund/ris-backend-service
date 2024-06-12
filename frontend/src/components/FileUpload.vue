@@ -63,7 +63,7 @@ function onFileSelect(event: Event) {
     id="upload-drop-area"
     class="upload-drop-area flex w-full flex-grow flex-col items-center justify-center border-1 border-dashed border-blue-300 bg-white text-center"
     :class="{
-      'upload-drop-area__in-drag': status.inDrag,
+      'bg-blue-200': status.inDrag,
     }"
     @dragleave="dragleave"
     @dragover="dragover"
@@ -97,11 +97,3 @@ function onFileSelect(event: Event) {
     </span>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.upload-drop-area {
-  &__in-drag {
-    @apply bg-blue-200;
-  }
-}
-</style>
