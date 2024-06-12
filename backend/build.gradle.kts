@@ -19,7 +19,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.51.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "10.14.0"
+    id("org.flywaydb.flyway") version "10.15.0"
 }
 
 group = "de.bund.digitalservice"
