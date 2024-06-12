@@ -6,8 +6,8 @@ import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,7 +35,7 @@ public class ProcedureController {
 
   @GetMapping()
   @PreAuthorize("isAuthenticated()")
-  public Mono<Page<Procedure>> search(
+  public Mono<Slice<Procedure>> search(
       @AuthenticationPrincipal OidcUser oidcUser,
       @RequestParam(value = "q") Optional<String> query,
       @RequestParam(value = "pg") Optional<Integer> page,

@@ -13,8 +13,8 @@ import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +32,7 @@ public class DatabaseProcedureService implements ProcedureService {
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public Page<Procedure> search(
+  public Slice<Procedure> search(
       Optional<String> query, DocumentationOffice documentationOffice, Pageable pageable) {
 
     DocumentationOfficeDTO documentationOfficeDTO =
