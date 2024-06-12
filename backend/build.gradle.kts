@@ -328,7 +328,7 @@ tasks {
     val delombok by registering(DelombokTask::class) {
         dependsOn(compileJava)
         mainClass.set("lombok.launch.Main")
-        val outputDir by extra { file("$buildDir/delombok") }
+        val outputDir by extra { file("${project.layout.buildDirectory}/delombok") }
         outputs.dir(outputDir)
         sourceSets["main"].java.srcDirs.forEach {
             inputs.dir(it)
