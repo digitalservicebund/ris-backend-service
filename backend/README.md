@@ -101,7 +101,9 @@ characteristics, for instance making sure that there are no cyclic dependencies.
 
 ## Formatting & Styleguide
 
-Check our [Java Styleguides](JAVA_STYLEGUIDES.md) document. To set up IntelliJ IDEA
+Check
+our [Java Styleguides](https://digitalservicebund.atlassian.net/wiki/spaces/VER/pages/1088913456/Backend+Conventions)
+document. To set up IntelliJ IDEA
 follow [these instructions](https://github.com/google/google-java-format#intellij-android-studio-and-other-jetbrains-ides).
 Consistent formatting, for Java as well as various other types of source code, is being enforced
 via [Spotless](https://github.com/diffplug/spotless).
