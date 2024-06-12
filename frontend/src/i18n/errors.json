@@ -19,6 +19,10 @@
     "title": "Feature toggle konnten nicht geladen werden.",
     "description": ""
   },
+  "ENV_COULD_NOT_BE_LOADED": {
+    "title": "Umgebung konnte nicht geladen werden.",
+    "description": ""
+  },
   "WRONG_MEDIA_TYPE_DOCX_REQUIRED": {
     "title": "hat ein falsches Format.",
     "description": "Laden Sie eine .docx-Version hoch."

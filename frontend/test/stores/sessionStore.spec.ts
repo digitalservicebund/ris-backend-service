@@ -1,14 +1,21 @@
 import { setActivePinia, createPinia } from "pinia"
+import { Env } from "@/domain/env"
 import { User } from "@/domain/user"
+import adminService from "@/services/adminService"
 import authService from "@/services/authService"
 import { ServiceResponse } from "@/services/httpClient"
 import useSessionStore from "@/stores/sessionStore"
 
 vi.mock("@/services/authService")
+vi.mock("@/services/adminService")
 
 describe("Session store", () => {
-  beforeEach(() => void setActivePinia(createPinia()))
-  afterEach(() => void vi.resetAllMocks())
+  beforeEach(() => {
+    setActivePinia(createPinia())
+  })
+  afterEach(() => {
+    vi.resetAllMocks()
+  })
 
   it("calls the authService upon authentication check", async () => {
     const authServiceMock = vi
@@ -49,6 +56,27 @@ describe("Session store", () => {
 
       expect(await isAuthenticated()).toBeFalsy()
       expect(user).toBeUndefined()
+    },
+  )
+
+  it.each(["staging", "uat", "production"] as Env[])(
+    "sets and returns the correct env",
+    async (environment: Env) => {
+      //
+      const faviconMock = document.createElement("link")
+      faviconMock.href = ""
+      faviconMock.id = "favicon"
+
+      vi.spyOn(document, "getElementById").mockReturnValue(faviconMock)
+      vi.mocked(adminService).getEnv.mockResolvedValue({
+        status: 200,
+        data: environment,
+      })
+
+      const session = useSessionStore()
+      await session.initSession()
+
+      expect(session.env).toEqual(environment)
     },
   )
 })

@@ -28,8 +28,8 @@ const handleOnSelect = (index: number) => {
   emit("select", index)
 }
 
-const handlePanelExpanded = (isExpanded: boolean) => {
-  emit("update", isExpanded)
+const handlePanelExpanded = () => {
+  emit("update", !props.isExpanded)
 }
 </script>
 
@@ -46,6 +46,8 @@ const handlePanelExpanded = (isExpanded: boolean) => {
       label="Dokumentansicht"
       :opening-direction="OpeningDirection.LEFT"
       size="medium"
+      tabindex="0"
+      @keydown.enter="handlePanelExpanded"
       @update:is-expanded="handlePanelExpanded"
     >
       <FileNavigator

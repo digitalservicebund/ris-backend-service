@@ -166,7 +166,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.1")
 
-    implementation(platform("software.amazon.awssdk:bom:2.25.68"))
+    implementation(platform("software.amazon.awssdk:bom:2.25.70"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -192,8 +192,8 @@ dependencies {
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.17.1")
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.13.0")
-    implementation("io.micrometer:micrometer-core:1.13.0")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.13.1")
+    implementation("io.micrometer:micrometer-core:1.13.1")
 
     implementation(platform("io.sentry:sentry-bom:8.0.0-alpha.1"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
@@ -207,7 +207,7 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.12.0")
     implementation("org.jsoup:jsoup:1.17.2")
 
-    var flywayCore = "org.flywaydb:flyway-core:10.14.0"
+    var flywayCore = "org.flywaydb:flyway-core:10.15.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
     runtimeOnly("org.flywaydb:flyway-database-postgresql:10.14.0")
@@ -218,7 +218,7 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:5.12.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("io.projectreactor:reactor-test:3.6.6")
+    testImplementation("io.projectreactor:reactor-test:3.6.7")
     testImplementation("org.springframework.security:spring-security-test:6.3.0")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.3.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")

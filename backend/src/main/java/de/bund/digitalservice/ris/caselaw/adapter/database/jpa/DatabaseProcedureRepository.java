@@ -2,8 +2,8 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,8 +26,8 @@ public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO,
    * @return a page of {@link ProcedureDTO}s matching the criteria
    */
   @Query(
-      "SELECT p FROM ProcedureDTO p WHERE (:label IS NULL OR p.label LIKE %:label%) AND p.documentationOffice = :documentationOffice ORDER BY createdAt DESC NULLS LAST")
-  Page<ProcedureDTO> findAllByLabelContainingAndDocumentationOfficeOrderByCreatedAtDesc(
+      "SELECT p FROM ProcedureDTO p WHERE p.label LIKE %:label% AND p.documentationOffice = :documentationOffice ORDER BY createdAt DESC NULLS LAST")
+  Slice<ProcedureDTO> findAllByLabelContainingAndDocumentationOfficeOrderByCreatedAtDesc(
       @Param("label") String label,
       @Param("documentationOffice") DocumentationOfficeDTO documentationOfficeDTO,
       Pageable pageable);
@@ -42,7 +42,7 @@ public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO,
    */
   @Query(
       "SELECT p FROM ProcedureDTO p WHERE p.documentationOffice = :documentationOffice ORDER BY createdAt DESC NULLS LAST")
-  Page<ProcedureDTO> findAllByDocumentationOfficeOrderByCreatedAtDesc(
+  Slice<ProcedureDTO> findAllByDocumentationOfficeOrderByCreatedAtDesc(
       @Param("documentationOffice") DocumentationOfficeDTO documentationOfficeDTO,
       Pageable pageable);
 
@@ -76,7 +76,7 @@ public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO,
           + "    FROM DocumentationUnitProcedureDTO dupMax "
           + "    GROUP BY  dupMax.documentationUnit.id)"
           + "    ORDER BY  p.createdAt DESC NULLS LAST")
-  Page<ProcedureDTO> findLatestUsedProceduresByLabelAndDocumentationOffice(
+  Slice<ProcedureDTO> findLatestUsedProceduresByLabelAndDocumentationOffice(
       @Param("label") String label,
       @Param("documentationOffice") DocumentationOfficeDTO documentationOfficeDTO,
       Pageable pageable);
@@ -99,6 +99,6 @@ public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO,
           + "    FROM DocumentationUnitProcedureDTO dupMax "
           + "    GROUP BY  dupMax.documentationUnit.id)"
           + "    ORDER BY  p.createdAt DESC NULLS LAST")
-  Page<ProcedureDTO> findLatestUsedProceduresByDocumentationOffice(
+  Slice<ProcedureDTO> findLatestUsedProceduresByDocumentationOffice(
       @Param("documentationOffice") DocumentationOfficeDTO documentationOffice, Pageable pageable);
 }

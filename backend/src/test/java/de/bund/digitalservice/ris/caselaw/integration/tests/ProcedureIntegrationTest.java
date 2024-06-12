@@ -56,8 +56,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -409,7 +409,7 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new ParameterizedTypeReference<RestPageImpl<Procedure>>() {})
+        .expectBody(new ParameterizedTypeReference<RestSliceImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(
@@ -443,7 +443,7 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new ParameterizedTypeReference<RestPageImpl<Procedure>>() {})
+        .expectBody(new ParameterizedTypeReference<RestSliceImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(
@@ -551,7 +551,7 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new ParameterizedTypeReference<RestPageImpl<Procedure>>() {})
+        .expectBody(new ParameterizedTypeReference<RestSliceImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).hasSize(1);
@@ -597,7 +597,7 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new ParameterizedTypeReference<RestPageImpl<Procedure>>() {})
+        .expectBody(new ParameterizedTypeReference<RestSliceImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).hasSize(3);
@@ -625,7 +625,7 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new ParameterizedTypeReference<RestPageImpl<Procedure>>() {})
+        .expectBody(new ParameterizedTypeReference<RestSliceImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).hasSize(1);
@@ -640,7 +640,7 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new ParameterizedTypeReference<RestPageImpl<Procedure>>() {})
+        .expectBody(new ParameterizedTypeReference<RestSliceImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isEmpty();
@@ -658,7 +658,7 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new ParameterizedTypeReference<RestPageImpl<Procedure>>() {})
+        .expectBody(new ParameterizedTypeReference<RestSliceImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).hasSize(1);
@@ -676,7 +676,7 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new ParameterizedTypeReference<RestPageImpl<Procedure>>() {})
+        .expectBody(new ParameterizedTypeReference<RestSliceImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(Objects.requireNonNull(response.getResponseBody()).getContent()).isEmpty();
@@ -765,7 +765,7 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new ParameterizedTypeReference<RestPageImpl<Procedure>>() {})
+        .expectBody(new ParameterizedTypeReference<RestSliceImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).hasSize(1);
@@ -807,10 +807,10 @@ class ProcedureIntegrationTest {
     return procedureId.get();
   }
 
-  public static class RestPageImpl<T> extends PageImpl<T> {
+  public static class RestSliceImpl<T> extends SliceImpl<T> {
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-    public RestPageImpl(
+    public RestSliceImpl(
         @JsonProperty("content") List<T> content,
         @JsonProperty("totalElements") Long totalElements,
         @JsonProperty("pageable") JsonNode pageable,
@@ -820,7 +820,7 @@ class ProcedureIntegrationTest {
         @JsonProperty("first") boolean first,
         @JsonProperty("numberOfElements") int numberOfElements) {
 
-      super(content, Pageable.unpaged(), totalElements);
+      super(content, Pageable.unpaged(), !last);
     }
   }
 }

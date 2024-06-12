@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted } from "vue"
+import { ref, onMounted, computed } from "vue"
 import { useRoute } from "vue-router"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
@@ -11,6 +11,28 @@ import IconPermIdentity from "~icons/ic/baseline-perm-identity"
 const route = useRoute()
 const session = useSessionStore()
 const fontColor = ref<string>()
+
+const badge = computed(() => {
+  const docOffice = session.user?.documentationOffice
+    ? session.user.documentationOffice.abbreviation
+    : undefined
+  if (session.env == "staging") {
+    return {
+      color: "bg-red-300",
+      label: docOffice ? `${docOffice} | Staging` : "",
+    }
+  } else if (session.env == "uat") {
+    return {
+      color: "bg-yellow-300",
+      label: docOffice ? `${docOffice} | UAT` : "",
+    }
+  } else {
+    return {
+      color: "bg-blue-300",
+      label: docOffice ? docOffice : "",
+    }
+  }
+})
 
 onMounted(async () => {
   const featureToggle = (
@@ -26,11 +48,11 @@ onMounted(async () => {
 
 <template>
   <nav
-    class="flex items-center justify-between border-y border-gray-400 py-16 pe-32 ps-16 print:hidden"
+    class="flex items-center justify-between border-y border-gray-400 py-16 pe-16 print:hidden"
   >
     <div class="flex items-center gap-44">
       <div class="flex items-center">
-        <span class="px-[1rem] text-14 font-bold leading-16">
+        <span class="px-[1rem] text-14 font-bold uppercase leading-16">
           <span aria-hidden="true" :style="{ color: fontColor }">
             Rechtsinformationen</span
           >
@@ -63,22 +85,18 @@ onMounted(async () => {
         <div class="ds-label-01-reg">
           <router-link :to="{ name: 'settings' }">
             <FlexContainer>
-              <FlexItem class="pe-8">{{ session.user.name }}</FlexItem>
+              <FlexItem class="pe-8">{{ session.user?.name }}</FlexItem>
               <FlexItem>
                 <IconBadge
                   v-if="session.user.documentationOffice"
-                  background-color="bg-blue-300"
+                  :background-color="badge.color"
                   color="text-black"
-                  :label="session.user.documentationOffice.abbreviation"
+                  :label="badge.label"
                 />
               </FlexItem>
             </FlexContainer>
           </router-link>
         </div>
-        <div
-          v-if="session.user.documentationOffice"
-          class="ds-label-03-reg"
-        ></div>
       </div>
     </div>
   </nav>
