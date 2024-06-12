@@ -1,5 +1,5 @@
 import { userEvent } from "@testing-library/user-event"
-import { render, screen } from "@testing-library/vue"
+import { fireEvent, render, screen } from "@testing-library/vue"
 import ActiveCitations from "@/components/ActiveCitations.vue"
 import { ComboboxItem } from "@/components/input/types"
 import ActiveCitation from "@/domain/activeCitation"
@@ -516,5 +516,38 @@ describe("active citations", () => {
     await screen.findByText(/Das Datum darf nicht in der Zukunft liegen/)
     screen.getByLabelText("Aktivzitierung speichern").click()
     expect(dateInput).toBeVisible()
+  })
+
+  it("should copy text of active citation summary", async () => {
+    const { user } = renderComponent({
+      modelValue: [generateActiveCitation()],
+    })
+    const copyButton = screen.getByTestId("copySummary")
+    await user.click(copyButton)
+
+    // Read from the stub clipboard
+    const clipboardText = await navigator.clipboard.readText()
+
+    expect(clipboardText).toBe(
+      "Änderungen, label1, 01.02.2022, test fileNumber, documentType1",
+    )
+  })
+
+  describe("keyboard navigation", () => {
+    it("should copy text of active citation summary", async () => {
+      const { user } = renderComponent({
+        modelValue: [generateActiveCitation()],
+      })
+      const copyButton = screen.getByTestId("copySummary")
+      await fireEvent.focus(copyButton)
+      await user.type(copyButton, "{enter}")
+
+      // Read from the stub clipboard
+      const clipboardText = await navigator.clipboard.readText()
+
+      expect(clipboardText).toBe(
+        "Änderungen, label1, 01.02.2022, test fileNumber, documentType1",
+      )
+    })
   })
 })
