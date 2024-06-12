@@ -136,6 +136,7 @@ export type ComboboxInputModelType =
 export type ComboboxItem = {
   label: string
   value?: ComboboxInputModelType
+  labelCssClasses?: string
   additionalInformation?: string
 }
 
