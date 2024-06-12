@@ -8,7 +8,10 @@ import org.springframework.data.domain.Slice;
 
 public interface ProcedureService {
   Slice<Procedure> search(
-      Optional<String> query, DocumentationOffice documentationOffice, Pageable pageable);
+      Optional<String> query,
+      DocumentationOffice documentationOffice,
+      Pageable pageable,
+      Optional<Boolean> withDocUnits);
 
   List<DocumentationUnitListItem> getDocumentUnits(UUID procedureid);
 
