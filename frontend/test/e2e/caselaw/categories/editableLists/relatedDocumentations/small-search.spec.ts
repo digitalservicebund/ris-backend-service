@@ -92,22 +92,13 @@ test("search for documentunits and link decision", async ({
 
   // Clean up:
   // We need to unlink the document units in order to be allowed to delete them in the fixtures
-  await activeCitationContainer
-    .getByText("AG Aachen, 31.12.2019")
-    .first()
-    .click()
+  await activeCitationContainer.getByTestId("listEntry-0").click()
   await activeCitationContainer.getByLabel("Eintrag löschen").click()
 
-  await ensuingDecisionContainer
-    .getByText("AG Aachen, 31.12.2019")
-    .first()
-    .click()
+  await ensuingDecisionContainer.getByTestId("listEntry-0").click()
   await ensuingDecisionContainer.getByLabel("Eintrag löschen").click()
 
-  await previousDecisionContainer
-    .getByText("AG Aachen, 31.12.2019")
-    .first()
-    .click()
+  await previousDecisionContainer.getByTestId("listEntry-0").click()
   await previousDecisionContainer.getByLabel("Eintrag löschen").click()
 
   await page.getByText("Speichern").click()
@@ -298,7 +289,7 @@ test("clicking on link of referenced documentation unit added by search opens ne
             await newTab.close()
 
             // Clean up: We need to unlink the document units in order to be allowed to delete them in the fixtures
-            await container.getByText("AG Aachen, 31.12.2019").first().click()
+            await container.getByTestId("listEntry-0").click()
             await expect(container.getByLabel("Eintrag löschen")).toBeVisible()
             await container.getByLabel("Eintrag löschen").click()
           },

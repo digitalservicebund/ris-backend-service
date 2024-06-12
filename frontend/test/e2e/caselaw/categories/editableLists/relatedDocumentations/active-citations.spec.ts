@@ -65,11 +65,7 @@ test.describe("active citations", () => {
 
     await expect(page.getByText("Fehlende Daten")).toBeVisible()
 
-    await page
-      .getByText(
-        `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`,
-      )
-      .click()
+    await page.getByTestId("listEntry-0").click()
     await expect(page.getByLabel("Gericht Aktivzitierung")).not.toBeEditable()
     await expect(
       page.getByLabel("Entscheidungsdatum Aktivzitierung"),

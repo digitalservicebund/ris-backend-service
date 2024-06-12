@@ -134,8 +134,7 @@ test.describe("ensuing decisions", () => {
     ).toBeVisible()
     await page
       .getByLabel("Nachgehende Entscheidung", { exact: true })
-      .getByLabel("Listen Eintrag")
-      .first()
+      .getByTestId("listEntry-0")
       .click()
     await expect(
       page.getByLabel("Gericht Nachgehende Entscheidung"),

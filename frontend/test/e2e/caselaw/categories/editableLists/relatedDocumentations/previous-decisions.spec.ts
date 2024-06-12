@@ -98,9 +98,9 @@ test.describe("previous decisions", () => {
 
     await page
       .getByLabel("Vorgehende Entscheidung", { exact: true })
-      .getByLabel("Listen Eintrag")
-      .first()
+      .getByTestId("listEntry-0")
       .click()
+    page.getByLabel("Nachgehende Entscheidung", { exact: true })
     await page
       .locator(
         "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung anzeigen']",
@@ -128,8 +128,7 @@ test.describe("previous decisions", () => {
 
     await page
       .getByLabel("Vorgehende Entscheidung", { exact: true })
-      .getByLabel("Listen Eintrag")
-      .first()
+      .getByTestId("listEntry-0")
       .click()
     // if 'Abweichendes Aktenzeichen' input filled, the nested input is expanded
     await page
@@ -188,11 +187,7 @@ test.describe("previous decisions", () => {
       ),
     ).toBeVisible()
 
-    await page
-      .getByText(
-        `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`,
-      )
-      .click()
+    await page.getByTestId("listEntry-0").click()
     await expect(
       page.getByLabel("Gericht Vorgehende Entscheidung"),
     ).not.toBeEditable()
@@ -229,7 +224,8 @@ test.describe("previous decisions", () => {
 
     // Clean up:
     // We need to unlink the document units in order to be allowed to delete them in the fixtures
-    await previousDecisionContainer.getByLabel("Listen Eintrag").first().click()
+    await previousDecisionContainer.getByTestId("listEntry-0").click()
+
     await previousDecisionContainer.getByLabel("Eintrag löschen").click()
 
     await page.getByText("Speichern").click()
