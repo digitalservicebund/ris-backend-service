@@ -726,20 +726,22 @@ jobs:
         with:
           path: ./frontend/all-blob-reports
           pattern: test-results-blob-*
+          merge-multiple: true
       - name: Prepare test reports for merge
         working-directory: ./frontend/all-blob-reports
         run: |
           set -e
           set -x
-          for DIR in test-results-blob-*; do
-            if [ -d "$DIR" ]; then
-            BASE_NAME=$(basename "$DIR")
-            echo "$BASE_NAME"
-            ls -l "$DIR"
-            (cd "$DIR" && zip -r "../$BASE_NAME.zip" ./*.jsonl)
-            rm -rf "$DIR"
-            fi
-          done
+          unzip -o test-report.zip
+          ls -l
+#          for DIR in test-results-blob-*; do
+#            if [ -d "$DIR" ]; then
+#            BASE_NAME=$(basename "$DIR")
+#            ls -l "$DIR"
+#            (cd "$DIR" && zip -r "../$BASE_NAME.zip" ./*.jsonl)
+#            rm -rf "$DIR"
+#            fi
+#          done
         shell: bash
       - name: Merge into html report
         run: npx playwright merge-reports --reporter html ./all-blob-reports
