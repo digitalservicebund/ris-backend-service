@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue"
+import { computed, ref, watch } from "vue"
 import AttachmentView from "@/components/AttachmentView.vue"
 import FileNavigator from "@/components/FileNavigator.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
@@ -49,6 +49,7 @@ const hasAttachments = computed(() => {
     props.documentUnit.attachments && props.documentUnit.attachments.length > 0
   )
 })
+
 function selectNotes() {
   notesSelected.value = true
   attachmentsSelected.value = false
@@ -58,6 +59,15 @@ function selectAttachments() {
   notesSelected.value = false
   attachmentsSelected.value = true
 }
+
+watch(
+  () => props.documentUnit,
+  (newValue, oldValue) => {
+    if (newValue.attachments.length > oldValue.attachments.length) {
+      selectAttachments()
+    }
+  },
+)
 </script>
 
 <template>
