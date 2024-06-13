@@ -726,24 +726,15 @@ jobs:
         with:
           path: ./frontend/all-blob-reports
           pattern: test-results-blob-*
-      - name: Prepare test report zips for merge
+      - name: Prepare test reports for merge
         working-directory: ./frontend/all-blob-reports
         run: |
-          pwd
-          ls -l
-          for ZIP_FILE in test-results-blob-*.zip; do
-            ORI_FILE_NAME=$(basename "$ZIP_FILE" .zip)
-            NEW_DIR="$ORI_FILE_NAME"
-            mkdir -p "$NEW_DIR"
-            TMP_DIR="tmp"
-            unzip -o "$ZIP_FILE" -d "$TMP_DIR"
-            unzip -o "$TMP_DIR/*.zip" -d "$NEW_DIR"
-            rm "$ZIP_FILE"
-            rm -rf "$TMP_DIR"
-            cd "$NEW_DIR"
-            zip -r "../$ORI_FILE_NAME.zip" ./*.jsonl
-            cd ..
-            rm -rf "$NEW_DIR"
+          for DIR in test-results-blob-*; do
+            if [ -d "$DIR" ]; then
+            BASE_NAME=$(basename "$DIR")
+            (cd "$DIR" && zip -r "../$BASE_NAME.zip" ./*.jsonl)
+            rm -rf "$DIR"
+            fi
           done
         shell: bash
       - name: Merge into html report
