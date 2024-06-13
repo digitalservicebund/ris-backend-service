@@ -728,14 +728,13 @@ jobs:
           pattern: test-results-blob-*
           merge-multiple: true
       - name: Prepare test report zips for merge
-        working-directory: ./frontend
+        working-directory: ./frontend/all-blob-reports
         run: |
-          ZIP_DIR="./all-blob-reports"
-          for ZIP_FILE in "$ZIP_DIR"/test-results-blob-*.zip; do
+          for ZIP_FILE in "test-results-blob-*.zip; do
             ORI_FILE_NAME=$(basename "$ZIP_FILE" .zip)
-            NEW_DIR="$ZIP_DIR/$ORI_FILE_NAME"
+            NEW_DIR="$ORI_FILE_NAME"
             mkdir -p "$NEW_DIR"
-            TMP_DIR="$ZIP_DIR/tmp"
+            TMP_DIR="tmp"
             unzip -o "$ZIP_FILE" -d "$TMP_DIR"
             unzip -o "$TMP_DIR/*.zip" -d "$NEW_DIR"
             rm "$ZIP_FILE"
