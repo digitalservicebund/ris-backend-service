@@ -732,6 +732,8 @@ jobs:
           for DIR in test-results-blob-*; do
             if [ -d "$DIR" ]; then
             BASE_NAME=$(basename "$DIR")
+            echo "$BASE_NAME"
+            ls -l "$DIR"
             (cd "$DIR" && zip -r "../$BASE_NAME.zip" ./*.jsonl)
             rm -rf "$DIR"
             fi
