@@ -79,14 +79,14 @@ test.describe("upload an original document to a doc unit", () => {
       await expect(page.getByLabel("Datei löschen")).toHaveCount(2)
 
       const deleteFirstDocument = page
-        .getByTestId("listEntry-0")
+        .getByTestId("list-entry-0")
         .getByLabel("Datei löschen")
       await deleteFirstDocument.click()
       await page.getByLabel("Löschen", { exact: true }).click() // confirm
       await expect(page.getByLabel("Datei löschen")).toHaveCount(1)
 
       const deleteSecondDocument = page
-        .getByTestId("listEntry-0")
+        .getByTestId("list-entry-0")
         .getByLabel("Datei löschen")
       await expect(deleteSecondDocument).toBeVisible()
       await deleteSecondDocument.click()

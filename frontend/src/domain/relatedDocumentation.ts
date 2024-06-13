@@ -39,20 +39,6 @@ export default class RelatedDocumentation {
       ...(this.documentType && this.documentType.label
         ? [this.documentType.label]
         : []),
-      ...(this.documentNumber ? [this.documentNumber] : []),
-    ].join(", ")
-  }
-
-  get renderDecisionWithoutDocumentNumber(): string {
-    return [
-      ...(this.court ? [`${this.court?.label}`] : []),
-      ...(this.decisionDate
-        ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
-        : []),
-      ...(this.fileNumber ? [this.fileNumber] : []),
-      ...(this.documentType && this.documentType.label
-        ? [this.documentType.label]
-        : []),
     ].join(", ")
   }
 }

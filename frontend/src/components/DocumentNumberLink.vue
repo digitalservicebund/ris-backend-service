@@ -16,7 +16,7 @@ const props = defineProps<Props>()
     :data-testid="'document-number-link-' + props.decision.documentNumber"
   >
     <span class="ds-label-01-reg ml-8 mr-8">|</span>
-    <div v-if="decision.hasForeignSource">
+    <div v-if="decision.hasForeignSource" class="pt-3">
       <RouterLink
         v-if="props.decision.documentNumber"
         tabindex="-1"
