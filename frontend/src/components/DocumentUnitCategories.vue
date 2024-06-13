@@ -192,7 +192,7 @@ const toggleExtraContentPanel = () => {
   })
 }
 
-const handleOnSelect = (index: number) => {
+const handleOnSelectAttachment = (index: number) => {
   selectedAttachmentIndex.value = index
 }
 
@@ -222,7 +222,7 @@ onMounted(async () => {
           :document-unit="documentUnit"
           :document-unit-uuid="documentUnit.uuid"
           :is-expanded="showExtraContentPanelRef"
-          @select="handleOnSelect"
+          @select="handleOnSelectAttachment"
           @toggle="toggleExtraContentPanel"
         ></ExtraContentSidePanel>
         <AttachmentViewSidePanel
@@ -231,7 +231,7 @@ onMounted(async () => {
           :current-index="selectedAttachmentIndex"
           :document-unit-uuid="props.documentUnit.uuid"
           :is-expanded="showExtraContentPanelRef"
-          @select="handleOnSelect"
+          @select="handleOnSelectAttachment"
           @update="toggleExtraContentPanel"
         ></AttachmentViewSidePanel>
         <FlexItem class="flex-1 flex-col bg-gray-100" :class="classes">
