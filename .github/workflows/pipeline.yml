@@ -727,6 +727,25 @@ jobs:
           path: ./frontend/all-blob-reports
           pattern: test-results-blob-*
           merge-multiple: true
+      - name: Prepare test report zips for merge
+        run: |
+          cd ./frontend
+          ZIP_DIR="./all-blob-reports"
+          for ZIP_FILE in "$ZIP_DIR"/test-results-blob-*.zip; do
+            ORI_FILE_NAME=$(basename "$ZIP_FILE" .zip)
+            NEW_DIR="$ZIP_DIR/$ORI_FILE_NAME"
+            mkdir -p "$NEW_DIR"
+            TMP_DIR="$ZIP_DIR/tmp"
+            unzip -o "$ZIP_FILE" -d "$TMP_DIR"
+            unzip -o "$TMP_DIR/*.zip" -d "$NEW_DIR"
+            rm "$ZIP_FILE"
+            rm -rf "$TMP_DIR"
+            cd "$NEW_DIR"
+            zip -r "../$ORI_FILE_NAME.zip" ./*.jsonl
+            cd ../..
+            rm -rf "$NEW_DIR"
+          done
+        shell: bash
       - name: Merge into html report
         run: npx playwright merge-reports --reporter html ./all-blob-reports
         working-directory: ./frontend
