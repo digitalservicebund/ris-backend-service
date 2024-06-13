@@ -730,7 +730,7 @@ jobs:
       - name: Prepare test report zips for merge
         working-directory: ./frontend/all-blob-reports
         run: |
-          for ZIP_FILE in "test-results-blob-*.zip; do
+          for ZIP_FILE in test-results-blob-*.zip; do
             ORI_FILE_NAME=$(basename "$ZIP_FILE" .zip)
             NEW_DIR="$ORI_FILE_NAME"
             mkdir -p "$NEW_DIR"
@@ -741,7 +741,7 @@ jobs:
             rm -rf "$TMP_DIR"
             cd "$NEW_DIR"
             zip -r "../$ORI_FILE_NAME.zip" ./*.jsonl
-            cd ../..
+            cd ..
             rm -rf "$NEW_DIR"
           done
         shell: bash
