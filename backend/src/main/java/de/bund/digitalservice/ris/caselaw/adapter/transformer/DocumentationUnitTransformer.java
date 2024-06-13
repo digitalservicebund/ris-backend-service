@@ -27,6 +27,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
+import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.LocalDate;
@@ -38,7 +39,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -67,14 +67,14 @@ public class DocumentationUnitTransformer {
         currentDto.toBuilder()
             .id(updatedDomainObject.uuid())
             .documentNumber(updatedDomainObject.documentNumber())
-            .note(updatedDomainObject.note());
+            .note(StringUtils.normalizeSpace(updatedDomainObject.note()));
 
     if (updatedDomainObject.coreData() != null) {
       var coreData = updatedDomainObject.coreData();
 
       builder
-          .ecli(coreData.ecli())
-          .judicialBody(coreData.appraisalBody())
+          .ecli(StringUtils.normalizeSpace(coreData.ecli()))
+          .judicialBody(StringUtils.normalizeSpace(coreData.appraisalBody()))
           .decisionDate(coreData.decisionDate())
           .documentType(
               coreData.documentType() != null
@@ -307,7 +307,7 @@ public class DocumentationUnitTransformer {
               .map(
                   normReference ->
                       LeadingDecisionNormReferenceDTO.builder()
-                          .normReference(normReference)
+                          .normReference(StringUtils.normalizeSpace(normReference))
                           .rank(i.getAndIncrement())
                           .build())
               .toList());
@@ -326,7 +326,10 @@ public class DocumentationUnitTransformer {
 
     for (int i = 0; i < deviatingEclis.size(); i++) {
       deviatingEcliDTOs.add(
-          DeviatingEcliDTO.builder().value(deviatingEclis.get(i)).rank(i + 1L).build());
+          DeviatingEcliDTO.builder()
+              .value(StringUtils.normalizeSpace(deviatingEclis.get(i)))
+              .rank(i + 1L)
+              .build());
     }
 
     builder.deviatingEclis(deviatingEcliDTOs);
@@ -344,7 +347,7 @@ public class DocumentationUnitTransformer {
     for (int i = 0; i < deviatingFileNumbers.size(); i++) {
       deviatingFileNumberDTOs.add(
           DeviatingFileNumberDTO.builder()
-              .value(deviatingFileNumbers.get(i))
+              .value(StringUtils.normalizeSpace(deviatingFileNumbers.get(i)))
               .rank(i + 1L)
               .documentationUnit(currentDto)
               .build());
@@ -380,7 +383,10 @@ public class DocumentationUnitTransformer {
 
     for (int i = 0; i < deviatingCourts.size(); i++) {
       deviatingCourtDTOs.add(
-          DeviatingCourtDTO.builder().value(deviatingCourts.get(i)).rank(i + 1L).build());
+          DeviatingCourtDTO.builder()
+              .value(StringUtils.normalizeSpace(deviatingCourts.get(i)))
+              .rank(i + 1L)
+              .build());
     }
 
     builder.deviatingCourts(deviatingCourtDTOs);
@@ -395,7 +401,11 @@ public class DocumentationUnitTransformer {
     List<String> inputTypes = coreData.inputTypes();
 
     for (int i = 0; i < inputTypes.size(); i++) {
-      inputTypeDTOs.add(InputTypeDTO.builder().value(inputTypes.get(i)).rank(i + 1L).build());
+      inputTypeDTOs.add(
+          InputTypeDTO.builder()
+              .value(StringUtils.normalizeSpace(inputTypes.get(i)))
+              .rank(i + 1L)
+              .build());
     }
 
     builder.inputTypes(inputTypeDTOs);
@@ -413,7 +423,7 @@ public class DocumentationUnitTransformer {
     for (int i = 0; i < fileNumbers.size(); i++) {
       fileNumberDTOs.add(
           FileNumberDTO.builder()
-              .value(fileNumbers.get(i))
+              .value(StringUtils.normalizeSpace(fileNumbers.get(i)))
               .rank(i + 1L)
               .documentationUnit(currentDto)
               .build());
@@ -861,7 +871,7 @@ public class DocumentationUnitTransformer {
                     var numberElement = element.getElementsByTag("number");
                     if (numberElement.size() == 1) {
                       var number = numberElement.get(0).text();
-                      if (StringUtils.isNotBlank(number)) {
+                      if (org.apache.commons.lang3.StringUtils.isNotBlank(number)) {
                         borderNumbers.add(numberElement.text());
                       }
                     }

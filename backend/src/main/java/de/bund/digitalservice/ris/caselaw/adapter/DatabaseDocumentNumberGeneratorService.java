@@ -11,7 +11,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitExistsException;
-import de.bund.digitalservice.ris.caselaw.domain.StringsUtil;
+import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import jakarta.validation.constraints.NotEmpty;
 import java.time.Year;
 import java.util.Optional;
@@ -80,7 +80,7 @@ public class DatabaseDocumentNumberGeneratorService implements DocumentNumberSer
       throws DocumentNumberPatternException,
           DocumentationUnitExistsException,
           DocumentNumberFormatterException {
-    if (StringsUtil.returnTrueIfNullOrBlank(documentationOfficeAbbreviation)) {
+    if (StringUtils.returnTrueIfNullOrBlank(documentationOfficeAbbreviation)) {
       throw new DocumentNumberPatternException(
           "Documentation Office abbreviation can not be empty");
     }

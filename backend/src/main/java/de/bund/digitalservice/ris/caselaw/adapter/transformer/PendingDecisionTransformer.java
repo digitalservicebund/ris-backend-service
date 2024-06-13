@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import java.util.Optional;
 
 public class PendingDecisionTransformer extends RelatedDocumentationUnitTransformer {
@@ -33,8 +34,8 @@ public class PendingDecisionTransformer extends RelatedDocumentationUnitTransfor
         .date(ensuingDecision.getDecisionDate())
         .documentNumber(ensuingDecision.getDocumentNumber())
         .documentType(getDocumentTypeFromDomain(ensuingDecision.getDocumentType()))
-        .fileNumber(ensuingDecision.getFileNumber())
-        .note(ensuingDecision.getNote())
+        .fileNumber(StringUtils.normalizeSpace(ensuingDecision.getFileNumber()))
+        .note(StringUtils.normalizeSpace(ensuingDecision.getNote()))
         .build();
   }
 }

@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationD
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
+import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -86,9 +87,11 @@ public class NormReferenceTransformer {
                   NormReferenceDTO.builder()
                       .id(singleNorm.id())
                       .normAbbreviation(normAbbreviationDTO)
-                      .normAbbreviationRawValue(normAbbreviationRawValue)
-                      .singleNorm(singleNorm.singleNorm())
+                      .normAbbreviationRawValue(
+                          StringUtils.normalizeSpace(normAbbreviationRawValue))
+                      .singleNorm(StringUtils.normalizeSpace(singleNorm.singleNorm()))
                       .dateOfVersion(singleNorm.dateOfVersion())
+                      // dateOfRelevance should LocalDate?
                       .dateOfRelevance(singleNorm.dateOfRelevance());
 
               if (singleNorm.legalForce() != null) {

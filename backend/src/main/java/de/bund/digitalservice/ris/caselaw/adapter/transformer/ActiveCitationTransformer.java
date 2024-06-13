@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CitationTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
+import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +51,7 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
             .date(activeCitation.getDecisionDate())
             .documentNumber(activeCitation.getDocumentNumber())
             .documentType(getDocumentTypeFromDomain(activeCitation.getDocumentType()))
-            .fileNumber(activeCitation.getFileNumber());
+            .fileNumber(StringUtils.normalizeSpace(activeCitation.getFileNumber()));
 
     CitationType citationType = activeCitation.getCitationType();
 
