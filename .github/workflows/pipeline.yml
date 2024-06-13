@@ -729,6 +729,8 @@ jobs:
       - name: Prepare test reports for merge
         working-directory: ./frontend/all-blob-reports
         run: |
+          set -e
+          set -x
           for DIR in test-results-blob-*; do
             if [ -d "$DIR" ]; then
             BASE_NAME=$(basename "$DIR")
