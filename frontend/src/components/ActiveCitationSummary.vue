@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue"
+import DecisionSummary from "@/components/DecisionSummary.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import ActiveCitation from "@/domain/activeCitation"
 import IconBaselineContentCopy from "~icons/ic/baseline-content-copy"
@@ -33,23 +34,9 @@ function copyActiveCitationSummary() {
     <div class="flex flex-row items-center">
       <component :is="iconComponent" class="mr-8" />
       <div v-if="data?.hasForeignSource" class="flex flex-row items-baseline">
-        <!-- Use DecisionSummary here? right now, not possible because the renderDecision method of the relatedDocumentation is missing the citationType -->
-        <div class="ds-label-01-reg">{{ data?.renderDecision }}</div>
-        <span class="ds-label-01-reg ml-8">|</span>
-        <RouterLink
-          class="ds-link-03-bold ml-8 mr-8 flex flex-row border-b-2 border-blue-800 leading-24 focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
-          tabindex="0"
-          target="_blank"
-          :to="{
-            name: 'caselaw-documentUnit-documentNumber-preview',
-            params: { documentNumber: data?.documentNumber },
-          }"
-        >
-          <div class="flex flex-row items-center" @click.stop>
-            {{ data?.documentNumber }}
-            <BaselineArrowOutward />
-          </div>
-        </RouterLink>
+        <div v-if="data?.hasForeignSource" class="flex flex-row items-baseline">
+          <DecisionSummary class="mr-8" :decision="data"></DecisionSummary>
+        </div>
       </div>
       <div v-else class="ds-label-01-reg mr-8">{{ data?.renderDecision }}</div>
       <IconBadge
