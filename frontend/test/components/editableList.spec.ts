@@ -68,7 +68,7 @@ describe("EditableList", () => {
   it("shows edit component when list item is clicked", async () => {
     const { user } = await renderComponent()
 
-    await user.click(screen.getByTestId("listEntry-0"))
+    await user.click(screen.getByTestId("list-entry-0"))
 
     expect(screen.getByLabelText("Editier Input")).toHaveValue("foo")
     expect(screen.getByLabelText("Listeneintrag speichern")).toBeVisible()
@@ -79,7 +79,7 @@ describe("EditableList", () => {
   it("deletes correct entry when delete button is clicked", async () => {
     const { user } = await renderComponent()
 
-    await user.click(screen.getByTestId("listEntry-0"))
+    await user.click(screen.getByTestId("list-entry-0"))
     await user.click(screen.getByLabelText("Eintrag löschen"))
     expect(screen.queryByText("foo")).not.toBeInTheDocument()
     expect(screen.getByText("bar")).toBeVisible()
@@ -107,11 +107,11 @@ describe("EditableList", () => {
     })
 
     //delete first
-    await user.click(screen.getByTestId("listEntry-0"))
+    await user.click(screen.getByTestId("list-entry-0"))
     await user.click(screen.getByLabelText("Eintrag löschen"))
 
     //delete second
-    await user.click(screen.getByTestId("listEntry-0"))
+    await user.click(screen.getByTestId("list-entry-0"))
     await user.click(screen.getByLabelText("Eintrag löschen"))
 
     expect(screen.getByLabelText("Editier Input")).toHaveValue("default entry")
@@ -120,7 +120,7 @@ describe("EditableList", () => {
   it("updates the model value entry on editing it", async () => {
     const { emitted, user } = await renderComponent()
 
-    await user.click(screen.getByTestId("listEntry-0"))
+    await user.click(screen.getByTestId("list-entry-0"))
     await user.type(screen.getByLabelText("Editier Input"), "1")
     await user.click(screen.getByLabelText("Listeneintrag speichern"))
 
@@ -141,7 +141,7 @@ describe("EditableList", () => {
   it("closes the editing component if user clicks cancel button, changes not saved", async () => {
     const { user } = await renderComponent()
 
-    await user.click(screen.getByTestId("listEntry-0"))
+    await user.click(screen.getByTestId("list-entry-0"))
 
     expect(screen.getByLabelText("Editier Input")).toBeVisible()
     await user.type(screen.getByLabelText("Editier Input"), "1")
@@ -157,7 +157,7 @@ describe("EditableList", () => {
     await user.click(screen.getByLabelText("Weitere Angabe"))
 
     //no inputs made, click in other entry
-    await user.click(screen.getByTestId("listEntry-0"))
+    await user.click(screen.getByTestId("list-entry-0"))
 
     expect(screen.getAllByLabelText("Listen Eintrag").length).toEqual(2)
   })

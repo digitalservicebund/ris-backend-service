@@ -98,7 +98,7 @@ test.describe("previous decisions", () => {
 
     await page
       .getByLabel("Vorgehende Entscheidung", { exact: true })
-      .getByTestId("listEntry-0")
+      .getByTestId("list-entry-0")
       .click()
     page.getByLabel("Nachgehende Entscheidung", { exact: true })
     await page
@@ -128,7 +128,7 @@ test.describe("previous decisions", () => {
 
     await page
       .getByLabel("Vorgehende Entscheidung", { exact: true })
-      .getByTestId("listEntry-0")
+      .getByTestId("list-entry-0")
       .click()
     // if 'Abweichendes Aktenzeichen' input filled, the nested input is expanded
     await page
@@ -187,7 +187,7 @@ test.describe("previous decisions", () => {
       ),
     ).toBeVisible()
 
-    await page.getByTestId("listEntry-0").click()
+    await page.getByTestId("list-entry-0").click()
     await expect(
       page.getByLabel("Gericht Vorgehende Entscheidung"),
     ).not.toBeEditable()
@@ -224,7 +224,7 @@ test.describe("previous decisions", () => {
 
     // Clean up:
     // We need to unlink the document units in order to be allowed to delete them in the fixtures
-    await previousDecisionContainer.getByTestId("listEntry-0").click()
+    await previousDecisionContainer.getByTestId("list-entry-0").click()
 
     await previousDecisionContainer.getByLabel("Eintrag löschen").click()
 

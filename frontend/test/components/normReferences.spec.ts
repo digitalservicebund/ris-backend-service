@@ -87,7 +87,7 @@ describe("Norm references", () => {
         }),
       ],
     })
-    await user.click(screen.getByTestId("listEntry-0"))
+    await user.click(screen.getByTestId("list-entry-0"))
 
     expect(screen.getByLabelText("RIS-Abkürzung")).toBeInTheDocument()
     expect(screen.getByLabelText("Einzelnorm der Norm")).toBeInTheDocument()
@@ -130,7 +130,7 @@ describe("Norm references", () => {
         generateNormReference(),
       ],
     })
-    await user.click(screen.getByTestId("listEntry-1"))
+    await user.click(screen.getByTestId("list-entry-1"))
 
     const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
     await user.type(abbreviationField, "1000g-BefV")
@@ -152,7 +152,7 @@ describe("Norm references", () => {
 
     const norms = screen.getAllByLabelText("Listen Eintrag")
     expect(norms.length).toBe(1)
-    await user.click(screen.getByTestId("listEntry-0"))
+    await user.click(screen.getByTestId("list-entry-0"))
     const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
     await user.type(abbreviationField, "1000")
     const dropdownItems = screen.getAllByLabelText(
@@ -186,7 +186,7 @@ describe("Norm references", () => {
 
     const norms = screen.getAllByLabelText("Listen Eintrag")
     expect(norms.length).toBe(2)
-    await user.click(screen.getByTestId("listEntry-0"))
+    await user.click(screen.getByTestId("list-entry-0"))
     await user.click(screen.getByLabelText("Eintrag löschen"))
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
   })

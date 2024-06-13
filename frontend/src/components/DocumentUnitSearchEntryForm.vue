@@ -256,7 +256,7 @@ export type DocumentUnitSearchParameter =
         <InputField
           id="decisionDate"
           v-slot="{ id, hasError }"
-          data-testid="decisionDateInput"
+          data-testid="decision-date-input"
           label="Entscheidungsdatum"
           :validation-error="validationStore.getByField('decisionDate')"
           visually-hide-label
@@ -278,7 +278,7 @@ export type DocumentUnitSearchParameter =
         <InputField
           id="decisionDateEnd"
           v-slot="{ id, hasError }"
-          data-testid="decisionDateEndInput"
+          data-testid="decision-date-end-input"
           label="Entscheidungsdatum Ende"
           :validation-error="validationStore.getByField('decisionDateEnd')"
           visually-hide-label

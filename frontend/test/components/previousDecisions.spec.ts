@@ -184,7 +184,7 @@ describe("PreviousDecisions", () => {
         }),
       ],
     })
-    await user.click(screen.getByTestId("listEntry-0"))
+    await user.click(screen.getByTestId("list-entry-0"))
 
     expect(
       screen.getByLabelText("Gericht Vorgehende Entscheidung"),
@@ -217,7 +217,7 @@ describe("PreviousDecisions", () => {
 
     expect(screen.queryByText(/AG Test/)).not.toBeInTheDocument()
 
-    await user.click(screen.getByTestId("listEntry-0"))
+    await user.click(screen.getByTestId("list-entry-0"))
 
     await user.type(
       await screen.findByLabelText("Gericht Vorgehende Entscheidung"),
@@ -238,7 +238,7 @@ describe("PreviousDecisions", () => {
     })
 
     expect(screen.queryByText(/new fileNumber/)).not.toBeInTheDocument()
-    await user.click(screen.getByTestId("listEntry-0"))
+    await user.click(screen.getByTestId("list-entry-0"))
 
     const fileNumberInput = await screen.findByLabelText(
       "Aktenzeichen Vorgehende Entscheidung",
@@ -257,7 +257,7 @@ describe("PreviousDecisions", () => {
       modelValue: [generatePreviousDecision()],
     })
 
-    await user.click(screen.getByTestId("listEntry-0"))
+    await user.click(screen.getByTestId("list-entry-0"))
 
     const checkbox = await screen.findByLabelText(
       "Datum Unbekannt Vorgehende Entscheidung",
@@ -275,7 +275,7 @@ describe("PreviousDecisions", () => {
     })
 
     expect(screen.queryByText(/02.02.2022/)).not.toBeInTheDocument()
-    await user.click(screen.getByTestId("listEntry-0"))
+    await user.click(screen.getByTestId("list-entry-0"))
 
     const fileNumberInput = await screen.findByLabelText(
       "Entscheidungsdatum Vorgehende Entscheidung",
@@ -295,7 +295,7 @@ describe("PreviousDecisions", () => {
     })
     const previousDecisions = screen.getAllByLabelText("Listen Eintrag")
     expect(previousDecisions.length).toBe(2)
-    await user.click(screen.getByTestId("listEntry-0"))
+    await user.click(screen.getByTestId("list-entry-0"))
     await user.click(screen.getByLabelText("Eintrag löschen"))
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
   })
@@ -308,7 +308,7 @@ describe("PreviousDecisions", () => {
     const { user } = renderComponent({ modelValue })
     const previousDecisions = screen.getAllByLabelText("Listen Eintrag")
     expect(previousDecisions.length).toBe(2)
-    await user.click(screen.getByTestId("listEntry-0"))
+    await user.click(screen.getByTestId("list-entry-0"))
     await user.click(screen.getByLabelText("Eintrag löschen"))
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
   })
@@ -321,7 +321,7 @@ describe("PreviousDecisions", () => {
     expect(
       screen.getByText("label1, 01.02.2022, test fileNumber, documentType1"),
     ).toBeInTheDocument()
-    await user.click(screen.getByTestId("listEntry-0"))
+    await user.click(screen.getByTestId("list-entry-0"))
 
     const fileNumberInput = await screen.findByLabelText(
       "Aktenzeichen Vorgehende Entscheidung",
@@ -380,7 +380,7 @@ describe("PreviousDecisions", () => {
   it("displays error in list and edit component when fields missing", async () => {
     const modelValue: PreviousDecision[] = [generatePreviousDecision()]
     const { user } = renderComponent({ modelValue })
-    await user.click(screen.getByTestId("listEntry-0"))
+    await user.click(screen.getByTestId("list-entry-0"))
 
     const fileInput = await screen.findByLabelText(
       "Aktenzeichen Vorgehende Entscheidung",
@@ -388,7 +388,7 @@ describe("PreviousDecisions", () => {
     await user.clear(fileInput)
     await user.click(screen.getByLabelText("Vorgehende Entscheidung speichern"))
     expect(screen.getByText(/Fehlende Daten/)).toBeInTheDocument()
-    await user.click(screen.getByTestId("listEntry-0"))
+    await user.click(screen.getByTestId("list-entry-0"))
     expect(screen.getAllByText(/Pflichtfeld nicht befüllt/).length).toBe(1)
   })
 

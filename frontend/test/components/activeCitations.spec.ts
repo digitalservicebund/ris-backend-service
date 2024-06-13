@@ -197,7 +197,7 @@ describe("active citations", () => {
         }),
       ],
     })
-    const itemHeader = screen.getByTestId("listEntry-0")
+    const itemHeader = screen.getByTestId("list-entry-0")
     await user.click(itemHeader)
 
     expect(screen.getByLabelText("Art der Zitierung")).toBeVisible()
@@ -219,7 +219,7 @@ describe("active citations", () => {
     renderComponent({
       modelValue: [generateActiveCitation()],
     })
-    expect(screen.getByTestId("listEntry-0")).toBeInTheDocument()
+    expect(screen.getByTestId("list-entry-0")).toBeInTheDocument()
   })
 
   it("correctly updates value citation style input", async () => {
@@ -237,7 +237,7 @@ describe("active citations", () => {
 
     expect(screen.queryByText(/Änderungen/)).not.toBeInTheDocument()
 
-    const itemHeader = screen.getByTestId("listEntry-0")
+    const itemHeader = screen.getByTestId("list-entry-0")
     await user.click(itemHeader)
 
     await user.type(
@@ -260,7 +260,7 @@ describe("active citations", () => {
 
     expect(screen.queryByText(/EuGH-Vorlage/)).not.toBeInTheDocument()
 
-    const itemHeader = screen.getByTestId("listEntry-0")
+    const itemHeader = screen.getByTestId("list-entry-0")
     await user.click(itemHeader)
 
     await user.type(
@@ -283,7 +283,7 @@ describe("active citations", () => {
 
     expect(screen.queryByText(/AG Test/)).not.toBeInTheDocument()
 
-    const itemHeader = screen.getByTestId("listEntry-0")
+    const itemHeader = screen.getByTestId("list-entry-0")
     await user.click(itemHeader)
 
     await user.type(
@@ -305,7 +305,7 @@ describe("active citations", () => {
     })
 
     expect(screen.queryByText(/new fileNumber/)).not.toBeInTheDocument()
-    const itemHeader = screen.getByTestId("listEntry-0")
+    const itemHeader = screen.getByTestId("list-entry-0")
     await user.click(itemHeader)
 
     const fileNumberInput = await screen.findByLabelText(
@@ -326,7 +326,7 @@ describe("active citations", () => {
     })
 
     expect(screen.queryByText(/02.02.2022/)).not.toBeInTheDocument()
-    const itemHeader = screen.getByTestId("listEntry-0")
+    const itemHeader = screen.getByTestId("list-entry-0")
     await user.click(itemHeader)
 
     const fileNumberInput = await screen.findByLabelText(
@@ -347,7 +347,7 @@ describe("active citations", () => {
     })
     const activeCitations = screen.getAllByLabelText("Listen Eintrag")
     expect(activeCitations.length).toBe(2)
-    await user.click(screen.getByTestId("listEntry-0"))
+    await user.click(screen.getByTestId("list-entry-0"))
     await user.click(screen.getByLabelText("Eintrag löschen"))
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
   })
@@ -360,7 +360,7 @@ describe("active citations", () => {
     const { user } = renderComponent({ modelValue })
     const activeCitations = screen.getAllByLabelText("Listen Eintrag")
     expect(activeCitations.length).toBe(2)
-    await user.click(screen.getByTestId("listEntry-0"))
+    await user.click(screen.getByTestId("list-entry-0"))
     await user.click(screen.getByLabelText("Eintrag löschen"))
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
   })
@@ -375,7 +375,7 @@ describe("active citations", () => {
         "Änderungen, label1, 01.02.2022, test fileNumber, documentType1",
       ),
     ).toBeInTheDocument()
-    const itemHeader = screen.getByTestId("listEntry-0")
+    const itemHeader = screen.getByTestId("list-entry-0")
     await user.click(itemHeader)
 
     const fileNumberInput = await screen.findByLabelText(
@@ -423,7 +423,7 @@ describe("active citations", () => {
   it("displays error in list and edit component when fields missing", async () => {
     const modelValue: ActiveCitation[] = [generateActiveCitation()]
     const { user } = renderComponent({ modelValue })
-    const itemHeader = screen.getByTestId("listEntry-0")
+    const itemHeader = screen.getByTestId("list-entry-0")
     await user.click(itemHeader)
 
     const fileInput = await screen.findByLabelText(
@@ -464,7 +464,7 @@ describe("active citations", () => {
         }),
       ],
     })
-    const itemHeader = screen.getByTestId("listEntry-0")
+    const itemHeader = screen.getByTestId("list-entry-0")
     await user.click(itemHeader)
 
     expect(screen.getByText("Art der Zitierung *")).toBeVisible()
@@ -522,7 +522,7 @@ describe("active citations", () => {
     const { user } = renderComponent({
       modelValue: [generateActiveCitation()],
     })
-    const copyButton = screen.getByTestId("copySummary")
+    const copyButton = screen.getByTestId("copy-summary")
     await user.click(copyButton)
 
     // Read from the stub clipboard
@@ -538,7 +538,7 @@ describe("active citations", () => {
       const { user } = renderComponent({
         modelValue: [generateActiveCitation()],
       })
-      const copyButton = screen.getByTestId("copySummary")
+      const copyButton = screen.getByTestId("copy-summary")
       await fireEvent.focus(copyButton)
       await user.type(copyButton, "{enter}")
 

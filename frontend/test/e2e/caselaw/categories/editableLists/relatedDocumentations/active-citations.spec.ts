@@ -65,7 +65,7 @@ test.describe("active citations", () => {
 
     await expect(page.getByText("Fehlende Daten")).toBeVisible()
 
-    await page.getByTestId("listEntry-0").click()
+    await page.getByTestId("list-entry-0").click()
     await expect(page.getByLabel("Gericht Aktivzitierung")).not.toBeEditable()
     await expect(
       page.getByLabel("Entscheidungsdatum Aktivzitierung"),
