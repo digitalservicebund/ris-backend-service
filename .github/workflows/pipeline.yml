@@ -728,8 +728,8 @@ jobs:
           pattern: test-results-blob-*
           merge-multiple: true
       - name: Prepare test report zips for merge
+        working-directory: ./frontend
         run: |
-          cd ./frontend
           ZIP_DIR="./all-blob-reports"
           for ZIP_FILE in "$ZIP_DIR"/test-results-blob-*.zip; do
             ORI_FILE_NAME=$(basename "$ZIP_FILE" .zip)
