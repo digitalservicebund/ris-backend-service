@@ -726,7 +726,6 @@ jobs:
         with:
           path: ./frontend/all-blob-reports
           pattern: test-results-blob-*
-          merge-multiple: true
       - name: Prepare test report zips for merge
         working-directory: ./frontend/all-blob-reports
         run: |
