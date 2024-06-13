@@ -28,17 +28,21 @@ const emit = defineEmits<{
   focus: [void]
 }>()
 
+const isDefined = <A,>(item: A | undefined): item is A => !!item
+
 const NO_MATCHING_ENTRY = "Kein passender Eintrag"
 
 const candidateForSelection = ref<ComboboxItem>() // <-- the top search result
 const inputText = ref<string>()
-const currentlyDisplayedItems = ref<ComboboxItem[]>()
+const existingItems = ref<ComboboxItem[]>()
+const currentlyDisplayedItems = computed(() =>
+  [...(existingItems.value ?? []), createNewItem.value].filter(isDefined),
+)
 const createNewItem = ref<ComboboxItem>()
 const showDropdown = ref(false)
 const filter = ref<string>()
 const dropdownContainerRef = ref<HTMLElement>()
-const dropdownItemsRef = ref<HTMLElement[]>()
-const createNewItemRef = ref<HTMLElement>()
+const dropdownItemsRef = ref<HTMLElement[]>([])
 const inputFieldRef = ref<HTMLInputElement>()
 const focusedItemIndex = ref<number>(-1)
 
@@ -48,10 +52,8 @@ const hasToUpdate = ref(false)
 const ariaLabelDropdownIcon = computed(() =>
   showDropdown.value ? "Dropdown schließen" : "Dropdown öffnen",
 )
-const noCurrentlyDisplayedItems = computed(
-  () =>
-    !currentlyDisplayedItems.value ||
-    currentlyDisplayedItems.value.length === 0,
+const noMatchingExistingItems = computed(
+  () => !existingItems.value || existingItems.value.length === 0,
 )
 
 const conditionalClasses = computed(() => ({
@@ -119,12 +121,6 @@ const onInput = async () => {
   await showUpdatedDropdown()
 }
 
-const dropDownItems = computed(() =>
-  [...(dropdownItemsRef?.value ?? []), createNewItemRef.value].filter(
-    (i) => !!i,
-  ),
-)
-
 const keyArrowUp = () => {
   if (focusedItemIndex.value > 0) {
     focusedItemIndex.value -= 1
@@ -133,7 +129,7 @@ const keyArrowUp = () => {
 }
 
 const keyArrowDown = () => {
-  if (focusedItemIndex.value < dropDownItems.value.length - 1) {
+  if (focusedItemIndex.value < dropdownItemsRef.value.length - 1) {
     focusedItemIndex.value += 1
   }
   updateFocusedItem()
@@ -141,7 +137,7 @@ const keyArrowDown = () => {
 
 const updateFocusedItem = () => {
   candidateForSelection.value = undefined
-  const item = dropDownItems.value[focusedItemIndex.value]
+  const item = dropdownItemsRef.value[focusedItemIndex.value]
   if (item && item.innerText !== NO_MATCHING_ENTRY) item.focus()
 }
 
@@ -174,21 +170,19 @@ const updateCurrentItems = async () => {
     return
   }
 
-  currentlyDisplayedItems.value = response.data
+  existingItems.value = response.data
 
   if (
-    noCurrentlyDisplayedItems.value ||
+    noMatchingExistingItems.value ||
     //no exact match found when add manual entry option set
     (props.manualEntry &&
       filter.value &&
-      !currentlyDisplayedItems.value.find(
-        (item) => item.label === filter.value?.trim(),
-      ))
+      !existingItems.value.find((item) => item.label === filter.value?.trim()))
   ) {
     handleNoSearchResults(filter.value)
   } else {
     createNewItem.value = undefined
-    candidateForSelection.value = currentlyDisplayedItems.value[0]
+    candidateForSelection.value = existingItems.value[0]
     focusedItemIndex.value = 0
   }
 }
@@ -198,10 +192,11 @@ function handleNoSearchResults(searchStr?: string) {
     createNewItem.value = {
       label: `${searchStr} neu erstellen`,
       value: { label: searchStr },
+      labelCssClasses: "ds-label-01-bold text-blue-800 underline",
     }
     candidateForSelection.value = { label: searchStr }
   } else {
-    currentlyDisplayedItems.value = [{ label: NO_MATCHING_ENTRY }]
+    existingItems.value = [{ label: NO_MATCHING_ENTRY }]
     candidateForSelection.value = undefined
   }
 }
@@ -320,7 +315,7 @@ export type InputModelProps =
         @keydown.up.prevent="keyArrowUp"
       >
         <span>
-          <span>{{ item.label }}</span>
+          <span :class="item.labelCssClasses">{{ item.label }}</span>
           <div
             v-if="item.additionalInformation"
             aria-label="additional-dropdown-info"
@@ -328,25 +323,6 @@ export type InputModelProps =
           >
             {{ item.additionalInformation }}
           </div>
-        </span>
-      </button>
-      <button
-        v-if="createNewItem"
-        key="createNewItem"
-        ref="createNewItemRef"
-        aria-label="dropdown-option"
-        class="cursor-pointer px-16 py-12 text-left hover:bg-blue-100 focus:border-l-4 focus:border-solid focus:border-l-blue-800 focus:bg-blue-200 focus:outline-none"
-        tabindex="0"
-        @click="setChosenItem(createNewItem)"
-        @keydown.down.stop.prevent="keyArrowDown"
-        @keydown.enter="setChosenItem(createNewItem)"
-        @keydown.tab="closeDropdownAndRevertToLastSavedValue"
-        @keydown.up.stop.prevent="keyArrowUp"
-      >
-        <span>
-          <span class="ds-label-01-bold text-blue-800 underline">{{
-            createNewItem?.label
-          }}</span>
         </span>
       </button>
     </div>
