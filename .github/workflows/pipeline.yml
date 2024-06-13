@@ -730,6 +730,8 @@ jobs:
       - name: Prepare test report zips for merge
         working-directory: ./frontend/all-blob-reports
         run: |
+          pwd
+          ls -l
           for ZIP_FILE in test-results-blob-*.zip; do
             ORI_FILE_NAME=$(basename "$ZIP_FILE" .zip)
             NEW_DIR="$ORI_FILE_NAME"
