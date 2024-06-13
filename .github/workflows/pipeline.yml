@@ -732,12 +732,11 @@ jobs:
           set -e
           set -x
           for DIR in test-results-blob-*; do
-            if [ -d "$DIR" ]; then
-            BASE_NAME=$(basename "$DIR")
-            ls -l "$DIR"
-            unzip -o "$DIR/test-report.zip"
-            ls -l "$DIR"
-            fi
+            unzip -o "$DIR/test-report.zip" -d "$DIR"
+            rm "$DIR/test-report.zip"
+            ZIP_FILE="../$(basename "$DIR").zip"
+            (cd "$DIR" && zip -r "$ZIP_FILE" ./*.jsonl)
+            rm -rf "$DIR"
           done
         shell: bash
       - name: Merge into html report
