@@ -738,6 +738,7 @@ jobs:
             (cd "$DIR" && zip -r "$ZIP_FILE" ./*.jsonl)
             rm -rf "$DIR"
           done
+          ls -l "$DIR"
         shell: bash
       - name: Merge into html report
         run: npx playwright merge-reports --reporter html ./all-blob-reports
