@@ -729,8 +729,6 @@ jobs:
       - name: Prepare test reports for merge
         working-directory: ./frontend/all-blob-reports
         run: |
-          set -e
-          set -x
           for DIR in test-results-blob-*; do
             unzip -o "$DIR/test-report.zip" -d "$DIR"
             rm "$DIR/test-report.zip"
@@ -738,7 +736,6 @@ jobs:
             (cd "$DIR" && zip -r "$ZIP_FILE" ./*.jsonl)
             rm -rf "$DIR"
           done
-          ls -l
         shell: bash
       - name: Merge into html report
         run: npx playwright merge-reports --reporter html ./all-blob-reports
