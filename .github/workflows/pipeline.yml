@@ -737,8 +737,6 @@ jobs:
             ls -l "$DIR"
             unzip -o "$DIR/test-report.zip"
             ls -l "$DIR"
-#            (cd "$DIR" && zip -r "../$BASE_NAME.zip" ./*.jsonl)
-#            rm -rf "$DIR"
             fi
           done
         shell: bash
