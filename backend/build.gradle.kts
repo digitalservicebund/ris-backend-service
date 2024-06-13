@@ -145,7 +145,7 @@ dependencies {
     implementation("org.springframework.security:spring-security-oauth2-resource-server:6.3.0")
 
     // CVE-2024-22262
-    implementation("org.springframework:spring-web:6.1.8")
+    implementation("org.springframework:spring-web:6.1.9")
 
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.5.0")
 
