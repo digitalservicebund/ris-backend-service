@@ -24,7 +24,6 @@ import { ServiceResponse } from "@/services/httpClient"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
-  showExtraContentPanel?: boolean
   showNavigationPanel: boolean
 }>()
 const updatedDocumentUnit = ref<DocumentUnit>(props.documentUnit)
@@ -33,7 +32,7 @@ const route = useRoute()
 const courtTypeRef = ref<string>(props.documentUnit.coreData.court?.type ?? "")
 const notesFeatureToggle = ref(false)
 
-const showExtraContentPanelRef: Ref<boolean> = ref(props.showExtraContentPanel)
+const showExtraContentPanelRef: Ref<boolean> = ref(false)
 
 const { pushQueryToRoute } = useQuery<"showAttachmentPanel">()
 
@@ -200,6 +199,12 @@ const handleOnSelect = (index: number) => {
 onMounted(async () => {
   notesFeatureToggle.value =
     (await FeatureToggleService.isEnabled("neuris.note")).data ?? false
+  if (route.query.showAttachmentPanel) {
+    showExtraContentPanelRef.value = route.query.showAttachmentPanel === "true"
+  } else if (notesFeatureToggle.value) {
+    showExtraContentPanelRef.value =
+      !!props.documentUnit.note || props.documentUnit.hasAttachments
+  }
 })
 </script>
 

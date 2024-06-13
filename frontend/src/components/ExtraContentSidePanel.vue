@@ -80,7 +80,7 @@ function selectAttachments() {
         <TextButton
           id="note"
           aria-label="Notiz anzeigen"
-          button-type="tertiary"
+          :button-type="notesSelected ? 'primary' : 'tertiary'"
           :disabled="!hasNote"
           :icon="IconStickyNote"
           size="small"
@@ -90,7 +90,7 @@ function selectAttachments() {
         <TextButton
           id="attachments"
           aria-label="Dokumente anzeigen"
-          button-type="tertiary"
+          :button-type="attachmentsSelected ? 'primary' : 'tertiary'"
           :disabled="!hasAttachments"
           :icon="IconAttachFile"
           size="small"
