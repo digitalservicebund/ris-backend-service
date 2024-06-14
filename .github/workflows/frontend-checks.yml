@@ -16,6 +16,8 @@ jobs:
               - 'frontend/**'
 
   frontend-tests:
+    needs: scan-frontend-changes
+    if: ${{ needs.scan-frontend-changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -50,6 +52,8 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   frontend-style:
+    needs: scan-frontend-changes
+    if: ${{ needs.scan-frontend-changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
