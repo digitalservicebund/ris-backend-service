@@ -2,9 +2,9 @@ name: Pipeline
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
   schedule:
     - cron: "0 18 * * *" # Every day at 8pm
   # Allow to run this workflow manually
@@ -31,15 +31,17 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@v4.2.1
+        uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/actions/setup-gradle@d9336dac04dea2507a617466bc058a3def92b18b
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@d9336dac04dea2507a617466bc058a3def92b18b
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
-          arguments: build --profile -x integrationTest -x test
-          build-root-directory: ./backend
+      - name: Run backend tests
+        working-directory: ./backend
+        run: ./gradlew build --profile -x integrationTest -x test
       - name: Upload build performance report
         uses: actions/upload-artifact@v4
         with:
@@ -62,15 +64,17 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@v4.2.1
+        uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/actions/setup-gradle@d9336dac04dea2507a617466bc058a3def92b18b
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@d9336dac04dea2507a617466bc058a3def92b18b
         with:
           gradle-version: ${{ env.GRADLE_VERSION}}
-          arguments: test -x integrationTest
-          build-root-directory: ./backend
+      - name: Run backend tests
+        working-directory: ./backend
+        run: ./gradlew test -x integrationTest
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -88,15 +92,17 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@v4.2.1
+        uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/actions/setup-gradle@d9336dac04dea2507a617466bc058a3def92b18b
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@d9336dac04dea2507a617466bc058a3def92b18b
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
-          arguments: integrationTest -x test
-          build-root-directory: ./backend
+      - name: Run backend tests
+        working-directory: ./backend
+        run: ./gradlew integrationTest -x test
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -119,15 +125,17 @@ jobs:
       - name: Validate gradle wrapper
         uses: gradle/actions/wrapper-validation@d9336dac04dea2507a617466bc058a3def92b18b
       - name: Set up JDK
-        uses: actions/setup-java@v4.2.1
+        uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/actions/setup-gradle@d9336dac04dea2507a617466bc058a3def92b18b
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@d9336dac04dea2507a617466bc058a3def92b18b
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
-          arguments: bootBuildImage
-          build-root-directory: ./backend
+      - name: Build backend image
+        working-directory: ./backend
+        run: ./gradlew bootBuildImage
       - name: Run Trivy vulnerability image scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -260,7 +268,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK
-        uses: actions/setup-java@v4.2.1
+        uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9
         with:
           java-version: "17.0"
           distribution: "temurin"
@@ -417,7 +425,7 @@ jobs:
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
       - name: Set up JDK
-        uses: actions/setup-java@v4.2.1
+        uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9
         with:
           java-version: "17.0"
           distribution: "temurin"
@@ -668,13 +676,13 @@ jobs:
 
   e2e-tests:
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [deploy-staging, prep-playwright-tests]
+    needs: [ deploy-staging, prep-playwright-tests ]
     strategy:
       fail-fast: false
       matrix:
-        subproject: [caselaw, shared]
-        browser: [chromium, firefox]
-        mode: [e2e]
+        subproject: [ caselaw, shared ]
+        browser: [ chromium, firefox ]
+        mode: [ e2e ]
         include:
           - mode: a11y
             browser: a11y
@@ -687,7 +695,7 @@ jobs:
 
   query-performance-tests:
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [e2e-tests, prep-playwright-tests]
+    needs: [ e2e-tests, prep-playwright-tests ]
     uses: ./.github/workflows/_playwright-test.yml
     with:
       subproject: "all"
@@ -699,7 +707,7 @@ jobs:
 
   generate-test-reports:
     if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
-    needs: [e2e-tests]
+    needs: [ e2e-tests ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -907,16 +915,18 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4.2.1
+        uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9
         with:
           java-version: "17.0"
           distribution: "temurin"
           cache: gradle
-      - uses: gradle/actions/setup-gradle@d9336dac04dea2507a617466bc058a3def92b18b
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@d9336dac04dea2507a617466bc058a3def92b18b
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
-          arguments: migrateDatabaseForERD
-          build-root-directory: ./backend
+      - name: Migrate database for Entity–relationship model
+        working-directory: ./backend
+        run: ./gradlew migrateDatabaseForERD
         env:
           DB_URL: jdbc:postgresql://localhost:5432/${{ env.POSTGRES_DB }}
           DB_USER: ${{ env.POSTGRES_USER }}
@@ -941,7 +951,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK
-        uses: actions/setup-java@v4.2.1
+        uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9
         with:
           java-version: "17.0"
           distribution: "temurin"
