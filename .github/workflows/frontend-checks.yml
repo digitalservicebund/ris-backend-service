@@ -1,5 +1,7 @@
 on:
-  workflow_call:
+  push:
+    paths:
+      - 'frontend/**'
 
 jobs:
   frontend-tests:
