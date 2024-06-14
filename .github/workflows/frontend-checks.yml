@@ -1,8 +1,6 @@
 on:
-  push:
-    paths:
-      - 'frontend/**'
-
+  workflow_call:
+    
 jobs:
   frontend-tests:
     runs-on: ubuntu-latest
