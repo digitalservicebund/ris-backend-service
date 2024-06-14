@@ -40,8 +40,7 @@ jobs:
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
       - name: Run backend tests
-        with:
-          build-root-directory: ./backend
+        working-directory: ./backend
         run: ./gradlew build --profile -x integrationTest -x test
       - name: Upload build performance report
         uses: actions/upload-artifact@v4
