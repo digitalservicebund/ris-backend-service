@@ -6,6 +6,7 @@ import { ComboboxItem } from "@/components/input/types"
 import DocumentUnit, { Court } from "@/domain/documentUnit"
 import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
+import featureToggleService from "@/services/featureToggleService"
 
 function renderComponent() {
   // eslint-disable-next-line testing-library/await-async-events
@@ -79,6 +80,13 @@ describe("Document Unit Categories", () => {
       }),
     }),
   )
+
+  // Enable feature flag "neuris.note"
+  vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+    status: 200,
+    data: true,
+  })
+
   test("renders correctly", async () => {
     renderComponent()
 
