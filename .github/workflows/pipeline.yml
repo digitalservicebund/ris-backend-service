@@ -496,7 +496,6 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' || contains(github.event.pull_request.labels.*.name, 'dev-env') || contains(github.event.labeled.labels.*.name, 'dev-env') }}
     needs:
       - frontend-tests
-      - frontend-style
       - frontend-build-image-and-scan
       - audit-licenses-frontend
     permissions:
