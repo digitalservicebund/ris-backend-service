@@ -2,6 +2,19 @@ on:
   workflow_call:
 
 jobs:
+  scan-frontend-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+
   frontend-tests:
     runs-on: ubuntu-latest
     steps:
