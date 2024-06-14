@@ -17,7 +17,6 @@ useSeoMeta({
 <template>
   <div class="flex min-h-screen flex-col">
     <Navbar />
-
     <Suspense>
       <main class="flex grow">
         <router-view class="grow" />
