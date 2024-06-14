@@ -1,5 +1,8 @@
 on:
   workflow_call:
+    secrets:
+      SLACK_WEBHOOK_URL:
+        required: false
 
 jobs:
   scan-frontend-changes:
