@@ -34,7 +34,6 @@ onMounted(() => loadDocumentUnit())
   <DocumentUnitAttachments
     v-if="documentUnit"
     :document-unit="documentUnit as DocumentUnit"
-    :show-attachment-panel="route.query.showAttachmentPanel === 'true'"
     :show-navigation-panel="
       route.query.showNavigationPanel
         ? route.query.showNavigationPanel === 'true'
