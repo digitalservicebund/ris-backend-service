@@ -1,7 +1,4 @@
 on:
-  push:
-    paths:
-      - './frontend/**'
   workflow_call:
 
 jobs:
