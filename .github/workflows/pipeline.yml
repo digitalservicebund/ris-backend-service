@@ -198,7 +198,7 @@ jobs:
         with:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-  frontend-tests:
+  frontend-checks:
     uses: ./.github/workflows/frontend-checks.yml
 
   audit-licenses-backend:
@@ -497,7 +497,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' || contains(github.event.pull_request.labels.*.name, 'dev-env') || contains(github.event.labeled.labels.*.name, 'dev-env') }}
     needs:
-      - frontend-tests
+      - frontend-checks
       - frontend-build-image-and-scan
       - audit-licenses-frontend
     permissions:
