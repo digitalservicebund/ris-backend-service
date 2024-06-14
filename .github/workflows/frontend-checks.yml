@@ -4,8 +4,6 @@ on:
 jobs:
   changes:
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: read
     outputs:
       frontend: ${{ steps.filter.outputs.frontend }}
     steps:
