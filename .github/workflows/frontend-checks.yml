@@ -5,8 +5,7 @@ on:
         required: false
       SONAR_TOKEN:
         required: true
-      GITHUB_TOKEN:
-        required: true
+
 
 jobs:
   scan-frontend-changes:
