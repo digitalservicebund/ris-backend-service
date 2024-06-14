@@ -69,6 +69,7 @@ configurations {
     }
 }
 
+
 spotless {
     java {
         removeUnusedImports()

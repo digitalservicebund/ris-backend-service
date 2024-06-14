@@ -41,6 +41,7 @@ function errorBadgeSummarizer() {
   })
 }
 
+// TODO: Remove render link
 function renderLink(dataEntry: EnsuingDecision) {
   return h(
     RouterLink,
