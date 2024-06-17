@@ -305,7 +305,7 @@ tasks {
         )
     }
 
-    
+
     bootBuildImage {
         val containerRegistry = System.getenv("CONTAINER_REGISTRY") ?: "ghcr.io"
         val containerImageName =
@@ -340,6 +340,7 @@ tasks {
         }
     }
 
+    
     javadoc {
         dependsOn(delombok)
         val outputDir: File by delombok.get().extra
