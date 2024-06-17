@@ -15,7 +15,7 @@ import useQuery from "@/composables/useQueryFromRoute"
 import Attachment from "@/domain/attachment"
 import DocumentUnit from "@/domain/documentUnit"
 import attachmentService from "@/services/attachmentService"
-import FeatureToggleService from "@/services/featureToggleService"
+import useSessionStore from "@/stores/sessionStore"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
@@ -34,7 +34,10 @@ const errors = ref<string[]>([])
 const isLoading = ref(false)
 const acceptedFileFormats = [".docx"]
 const selectedAttachmentIndex: Ref<number> = ref(0)
-const notesFeatureToggle = ref(false)
+const { featureToggles } = useSessionStore()
+const notesFeatureToggle = computed(
+  () => featureToggles["neuris.note"] ?? false,
+)
 
 const showDeleteModal = ref(false)
 const deleteModalHeaderText = "Anhang löschen"
@@ -155,8 +158,6 @@ function toggleDeleteModal() {
 }
 
 onMounted(async () => {
-  notesFeatureToggle.value =
-    (await FeatureToggleService.isEnabled("neuris.note")).data ?? false
   if (route.query.showAttachmentPanel) {
     showExtraContentPanelRef.value = route.query.showAttachmentPanel === "true"
   } else if (notesFeatureToggle.value) {

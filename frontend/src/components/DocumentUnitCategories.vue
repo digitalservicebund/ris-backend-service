@@ -19,8 +19,8 @@ import DocumentUnit, { Texts, CoreData } from "@/domain/documentUnit"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import PreviousDecision from "@/domain/previousDecision"
 import documentUnitService from "@/services/documentUnitService"
-import FeatureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
+import useSessionStore from "@/stores/sessionStore"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
@@ -30,7 +30,10 @@ const updatedDocumentUnit = ref<DocumentUnit>(props.documentUnit)
 const validationErrors = ref<ValidationError[]>([])
 const route = useRoute()
 const courtTypeRef = ref<string>(props.documentUnit.coreData.court?.type ?? "")
-const notesFeatureToggle = ref(false)
+const { featureToggles } = useSessionStore()
+const notesFeatureToggle = computed(
+  () => featureToggles["neuris.note"] ?? false,
+)
 
 const showExtraContentPanelRef: Ref<boolean> = ref(false)
 
@@ -197,8 +200,6 @@ const handleOnSelectAttachment = (index: number) => {
 }
 
 onMounted(async () => {
-  notesFeatureToggle.value =
-    (await FeatureToggleService.isEnabled("neuris.note")).data ?? false
   if (route.query.showAttachmentPanel) {
     showExtraContentPanelRef.value = route.query.showAttachmentPanel === "true"
   } else if (notesFeatureToggle.value) {
