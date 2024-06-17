@@ -2,9 +2,11 @@ name: Pipeline
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
+    paths-ignore:
+      - '**/README.md'
   pull_request:
-    branches: [main]
+    branches: [ main ]
   schedule:
     - cron: "0 18 * * *" # Every day at 8pm
   # Allow to run this workflow manually
@@ -15,7 +17,7 @@ env:
   CONTAINER_REGISTRY: ghcr.io
   CONTAINER_IMAGE_NAME: ${{ github.repository }}
   CONTAINER_IMAGE_VERSION: ${{ github.event.pull_request.head.sha || github.sha }} # Use PR head SHA if available
-  GH_PACKAGES_REPOSITORY_USER: ${{ secrets.GH_PACKAGES_REPOSITORY_USER }} # Secrets must not start with "GITHUB_"..
+  GH_PACKAGES_REPOSITORY_USER: ${{ secrets.GH_PACKAGES_REPOSITORY_USER }} # Secrets must not start with "GITHUB_".
   GH_PACKAGES_REPOSITORY_TOKEN: ${{ secrets.GH_PACKAGES_REPOSITORY_TOKEN }}
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
@@ -31,15 +33,17 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@v4.2.1
+        uses: actions/setup-java@2e74cbce18569d23ca8b812590dbb83f13ac7c5a
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/actions/setup-gradle@af6e5767241073b8ab20cc8cf7e95ec63fadc160
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@31ae3562f68c96d481c31bc1a8a55cc1be162f83
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
-          arguments: build --profile -x integrationTest -x test
-          build-root-directory: ./backend
+      - name: Run backend tests
+        working-directory: ./backend
+        run: ./gradlew build --profile -x integrationTest -x test
       - name: Upload build performance report
         uses: actions/upload-artifact@v4
         with:
@@ -53,57 +57,9 @@ jobs:
         with:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-  backend-unit-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Get Gradle version
-        working-directory: ./backend
-        run: |
-          echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
-      - name: Set up JDK
-        uses: actions/setup-java@v4.2.1
-        with:
-          java-version: "17.0"
-          distribution: "temurin"
-      - uses: gradle/actions/setup-gradle@af6e5767241073b8ab20cc8cf7e95ec63fadc160
-        with:
-          gradle-version: ${{ env.GRADLE_VERSION}}
-          arguments: test -x integrationTest
-          build-root-directory: ./backend
-      - name: Send status to Slack
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/notify-on-failure-gha@814d0c4b2ad6a3443e89c991f8657b10126510bf # v1.5.0
-        if: ${{ failure() && github.ref == 'refs/heads/main' }}
-        with:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-  backend-integration-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Get Gradle version
-        working-directory: ./backend
-        run: |
-          echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
-      - name: Set up JDK
-        uses: actions/setup-java@v4.2.1
-        with:
-          java-version: "17.0"
-          distribution: "temurin"
-      - uses: gradle/actions/setup-gradle@af6e5767241073b8ab20cc8cf7e95ec63fadc160
-        with:
-          gradle-version: ${{ env.GRADLE_VERSION }}
-          arguments: integrationTest -x test
-          build-root-directory: ./backend
-      - name: Send status to Slack
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/notify-on-failure-gha@814d0c4b2ad6a3443e89c991f8657b10126510bf # v1.5.0
-        if: ${{ failure() && github.ref == 'refs/heads/main' }}
-        with:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  backend-checks:
+    uses: ./.github/workflows/backend-checks.yml
+    secrets: inherit
 
   backend-build-image-and-scan:
     runs-on: ubuntu-latest
@@ -117,17 +73,19 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Validate gradle wrapper
-        uses: gradle/actions/wrapper-validation@af6e5767241073b8ab20cc8cf7e95ec63fadc160
+        uses: gradle/actions/wrapper-validation@31ae3562f68c96d481c31bc1a8a55cc1be162f83
       - name: Set up JDK
-        uses: actions/setup-java@v4.2.1
+        uses: actions/setup-java@2e74cbce18569d23ca8b812590dbb83f13ac7c5a
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/actions/setup-gradle@af6e5767241073b8ab20cc8cf7e95ec63fadc160
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@31ae3562f68c96d481c31bc1a8a55cc1be162f83
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
-          arguments: bootBuildImage
-          build-root-directory: ./backend
+      - name: Build backend image
+        working-directory: ./backend
+        run: ./gradlew bootBuildImage
       - name: Run Trivy vulnerability image scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -188,79 +146,16 @@ jobs:
         with:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-  frontend-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: ./frontend/package.json
-          cache: npm
-          cache-dependency-path: ./frontend/package-lock.json
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        id: node-modules-cache
-        with:
-          path: |
-            ./frontend/node_modules
-          key: modules-${{ hashFiles('./frontend/package-lock.json') }}
-      - name: Install dependencies
-        if: steps.node-modules-cache.outputs.cache-hit != 'true'
-        run: |
-          npm ci
-        working-directory: ./frontend
-      - name: Run tests
-        run: |
-          npm test
-        working-directory: ./frontend
-      - name: Send status to Slack
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/notify-on-failure-gha@814d0c4b2ad6a3443e89c991f8657b10126510bf # v1.5.0
-        if: ${{ failure() && github.ref == 'refs/heads/main' }}
-        with:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-  frontend-style:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: ./frontend/package.json
-          cache: npm
-          cache-dependency-path: ./frontend/package-lock.json
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        id: node-modules-cache
-        with:
-          path: |
-            ./frontend/node_modules
-          key: modules-${{ hashFiles('./frontend/package-lock.json') }}
-      - name: Install dependencies
-        if: steps.node-modules-cache.outputs.cache-hit != 'true'
-        run: |
-          npm ci
-        working-directory: ./frontend
-      - name: Check style
-        run: npm run style:check
-        working-directory: ./frontend
-      - name: Send status to Slack
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/notify-on-failure-gha@814d0c4b2ad6a3443e89c991f8657b10126510bf # v1.5.0
-        if: ${{ failure() && github.ref == 'refs/heads/main' }}
-        with:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  frontend-checks:
+    uses: ./.github/workflows/frontend-checks.yml
+    secrets: inherit
 
   audit-licenses-backend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK
-        uses: actions/setup-java@v4.2.1
+        uses: actions/setup-java@2e74cbce18569d23ca8b812590dbb83f13ac7c5a
         with:
           java-version: "17.0"
           distribution: "temurin"
@@ -409,95 +304,13 @@ jobs:
         with:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-  analyze-backend:
-    runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
-      - name: Set up JDK
-        uses: actions/setup-java@v4.2.1
-        with:
-          java-version: "17.0"
-          distribution: "temurin"
-      - name: Cache SonarQube packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-      - name: Scan with SonarQube
-        uses: gradle/actions/setup-gradle@af6e5767241073b8ab20cc8cf7e95ec63fadc160
-        with:
-          gradle-version: ${{ env.GRADLE_VERSION }}
-          arguments: sonar --info
-          build-root-directory: ./backend
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      - name: Check SonarQube Quality Gate
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sonarsource/sonarqube-quality-gate-action@72f24ebf1f81eda168a979ce14b8203273b7c3ad
-        with:
-          scanMetadataReportFile: backend/build/sonar/report-task.txt
-        timeout-minutes: 3 # Force to fail step after specific time
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      - name: Send status to Slack
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/notify-on-failure-gha@814d0c4b2ad6a3443e89c991f8657b10126510bf # v1.5.0
-        if: ${{ failure() }}
-        with:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-  analyze-frontend:
-    runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: ./frontend/package.json
-          cache: npm
-          cache-dependency-path: ./frontend/package-lock.json
-      - name: Install SonarScanner
-        uses: digitalservicebund/setup-sonarscanner@3ade23691f865c02dce6b46452947a0e7944196e # v1.0.0
-      - name: Scan with SonarQube
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          npm install
-          npm run coverage
-          sonar-scanner
-        working-directory: ./frontend
-      - name: Check SonarQube Quality Gate
-        uses: sonarsource/sonarqube-quality-gate-action@72f24ebf1f81eda168a979ce14b8203273b7c3ad
-        with:
-          scanMetadataReportFile: frontend/.scannerwork/report-task.txt
-        timeout-minutes: 3
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      - name: Send status to Slack
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/notify-on-failure-gha@814d0c4b2ad6a3443e89c991f8657b10126510bf # v1.5.0
-        if: ${{ failure() }}
-        with:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   push-backend-image-to-registry:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' || contains(github.event.pull_request.labels.*.name, 'dev-env') || contains(github.event.labeled.labels.*.name, 'dev-env') }}
     needs:
       - backend-build
-      - backend-unit-tests
-      - backend-integration-tests
+      - backend-checks
       - backend-build-image-and-scan
       - audit-licenses-backend
     permissions:
@@ -528,7 +341,7 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@b49ef6b125b98c2708965eeb167d89e86aa73ef6
+        uses: sigstore/cosign-installer@b235ed95bef2a3cf9f8641bc537bc22c7cb9a3a8
       - name: Sign the published Docker image
         run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
       - name: Download cosign vulnerability scan record
@@ -551,8 +364,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' || contains(github.event.pull_request.labels.*.name, 'dev-env') || contains(github.event.labeled.labels.*.name, 'dev-env') }}
     needs:
-      - frontend-tests
-      - frontend-style
+      - frontend-checks
       - frontend-build-image-and-scan
       - audit-licenses-frontend
     permissions:
@@ -583,7 +395,7 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@b49ef6b125b98c2708965eeb167d89e86aa73ef6
+        uses: sigstore/cosign-installer@b235ed95bef2a3cf9f8641bc537bc22c7cb9a3a8
       - name: Sign the published Docker image
         run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
       - name: Download cosign vulnerability scan record
@@ -613,7 +425,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@e82b4e5ae10182af72972addcb3fedf7454621c8
+      - uses: chainguard-dev/actions/setup-gitsign@f94883c3bd16936401291899070258f855b5d849
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -668,13 +480,13 @@ jobs:
 
   e2e-tests:
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [deploy-staging, prep-playwright-tests]
+    needs: [ deploy-staging, prep-playwright-tests ]
     strategy:
       fail-fast: false
       matrix:
-        subproject: [caselaw, shared]
-        browser: [chromium, firefox]
-        mode: [e2e]
+        subproject: [ caselaw, shared ]
+        browser: [ chromium, firefox ]
+        mode: [ e2e ]
         include:
           - mode: a11y
             browser: a11y
@@ -687,7 +499,7 @@ jobs:
 
   query-performance-tests:
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [e2e-tests, prep-playwright-tests]
+    needs: [ e2e-tests, prep-playwright-tests ]
     uses: ./.github/workflows/_playwright-test.yml
     with:
       subproject: "all"
@@ -699,7 +511,7 @@ jobs:
 
   generate-test-reports:
     if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
-    needs: [e2e-tests]
+    needs: [ e2e-tests ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -791,12 +603,12 @@ jobs:
       - push-backend-image-to-registry
       - e2e-tests
       - check-latest-deploy-tag
-      - analyze-backend
-      - analyze-frontend
+      - backend-checks
+      - frontend-checks
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@e82b4e5ae10182af72972addcb3fedf7454621c8
+      - uses: chainguard-dev/actions/setup-gitsign@f94883c3bd16936401291899070258f855b5d849
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -854,7 +666,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@e82b4e5ae10182af72972addcb3fedf7454621c8
+      - uses: chainguard-dev/actions/setup-gitsign@f94883c3bd16936401291899070258f855b5d849
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -907,16 +719,18 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4.2.1
+        uses: actions/setup-java@2e74cbce18569d23ca8b812590dbb83f13ac7c5a
         with:
           java-version: "17.0"
           distribution: "temurin"
           cache: gradle
-      - uses: gradle/actions/setup-gradle@af6e5767241073b8ab20cc8cf7e95ec63fadc160
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@31ae3562f68c96d481c31bc1a8a55cc1be162f83
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
-          arguments: migrateDatabaseForERD
-          build-root-directory: ./backend
+      - name: Migrate database for Entity–relationship model
+        working-directory: ./backend
+        run: ./gradlew migrateDatabaseForERD
         env:
           DB_URL: jdbc:postgresql://localhost:5432/${{ env.POSTGRES_DB }}
           DB_USER: ${{ env.POSTGRES_USER }}
@@ -941,7 +755,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK
-        uses: actions/setup-java@v4.2.1
+        uses: actions/setup-java@2e74cbce18569d23ca8b812590dbb83f13ac7c5a
         with:
           java-version: "17.0"
           distribution: "temurin"

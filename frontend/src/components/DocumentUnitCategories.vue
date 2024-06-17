@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, toRefs, Ref } from "vue"
+import { computed, ref, toRefs, Ref, onMounted } from "vue"
 import { useRoute } from "vue-router"
 import AttachmentViewSidePanel from "@/components/AttachmentViewSidePanel.vue"
 import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContentRelatedIndexing.vue"
@@ -7,6 +7,7 @@ import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 import DocumentUnitTexts from "@/components/DocumentUnitTexts.vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import EnsuingDecisions from "@/components/EnsuingDecisions.vue"
+import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import { ValidationError } from "@/components/input/types"
@@ -18,19 +19,20 @@ import DocumentUnit, { Texts, CoreData } from "@/domain/documentUnit"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import PreviousDecision from "@/domain/previousDecision"
 import documentUnitService from "@/services/documentUnitService"
+import FeatureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
-  showAttachmentPanel?: boolean
   showNavigationPanel: boolean
 }>()
 const updatedDocumentUnit = ref<DocumentUnit>(props.documentUnit)
 const validationErrors = ref<ValidationError[]>([])
 const route = useRoute()
 const courtTypeRef = ref<string>(props.documentUnit.coreData.court?.type ?? "")
+const notesFeatureToggle = ref(false)
 
-const showAttachmentPanelRef: Ref<boolean> = ref(props.showAttachmentPanel)
+const showExtraContentPanelRef: Ref<boolean> = ref(false)
 
 const { pushQueryToRoute } = useQuery<"showAttachmentPanel">()
 
@@ -183,16 +185,27 @@ useScrollToHash(routeHash, headerOffset)
 
 useProvideCourtType(courtTypeRef)
 
-const toggleAttachmentPanel = () => {
-  showAttachmentPanelRef.value = !showAttachmentPanelRef.value
+const toggleExtraContentPanel = () => {
+  showExtraContentPanelRef.value = !showExtraContentPanelRef.value
   pushQueryToRoute({
-    showAttachmentPanel: showAttachmentPanelRef.value.toString(),
+    showAttachmentPanel: showExtraContentPanelRef.value.toString(),
   })
 }
 
-const handleOnSelect = (index: number) => {
+const handleOnSelectAttachment = (index: number) => {
   selectedAttachmentIndex.value = index
 }
+
+onMounted(async () => {
+  notesFeatureToggle.value =
+    (await FeatureToggleService.isEnabled("neuris.note")).data ?? false
+  if (route.query.showAttachmentPanel) {
+    showExtraContentPanelRef.value = route.query.showAttachmentPanel === "true"
+  } else if (notesFeatureToggle.value) {
+    showExtraContentPanelRef.value =
+      !!props.documentUnit.note || props.documentUnit.hasAttachments
+  }
+})
 </script>
 
 <template>
@@ -203,14 +216,23 @@ const handleOnSelect = (index: number) => {
   >
     <template #default="{ classes }">
       <FlexContainer class="w-full flex-grow flex-row-reverse">
+        <ExtraContentSidePanel
+          v-if="notesFeatureToggle"
+          :current-index="selectedAttachmentIndex"
+          :document-unit="documentUnit"
+          :document-unit-uuid="documentUnit.uuid"
+          :is-expanded="showExtraContentPanelRef"
+          @select="handleOnSelectAttachment"
+          @toggle="toggleExtraContentPanel"
+        ></ExtraContentSidePanel>
         <AttachmentViewSidePanel
-          v-if="props.documentUnit.attachments"
+          v-if="props.documentUnit.attachments && !notesFeatureToggle"
           :attachments="documentUnit.attachments"
           :current-index="selectedAttachmentIndex"
           :document-unit-uuid="props.documentUnit.uuid"
-          :is-expanded="showAttachmentPanelRef"
-          @select="handleOnSelect"
-          @update="toggleAttachmentPanel"
+          :is-expanded="showExtraContentPanelRef"
+          @select="handleOnSelectAttachment"
+          @update="toggleExtraContentPanel"
         ></AttachmentViewSidePanel>
         <FlexItem class="flex-1 flex-col bg-gray-100" :class="classes">
           <DocumentUnitCoreData
