@@ -5,6 +5,10 @@ on:
         required: false
       SONAR_TOKEN:
         required: true
+      GH_PACKAGES_REPOSITORY_USER:
+        required: true
+      GH_PACKAGES_REPOSITORY_TOKEN:
+        required: true
 jobs:
   scan-backend-changes:
     runs-on: ubuntu-latest
