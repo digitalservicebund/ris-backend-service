@@ -305,6 +305,7 @@ tasks {
         )
     }
 
+    
     bootBuildImage {
         val containerRegistry = System.getenv("CONTAINER_REGISTRY") ?: "ghcr.io"
         val containerImageName =
