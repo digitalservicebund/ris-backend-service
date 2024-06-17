@@ -135,7 +135,7 @@ watch(
       <div
         v-if="index !== editIndex"
         :key="index"
-        class="group flex cursor-pointer gap-8 py-16"
+        class="group flex gap-8 py-16"
       >
         <component :is="summaryComponent" :data="entry" />
 
