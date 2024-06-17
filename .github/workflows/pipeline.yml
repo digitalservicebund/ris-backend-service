@@ -17,7 +17,7 @@ env:
   CONTAINER_REGISTRY: ghcr.io
   CONTAINER_IMAGE_NAME: ${{ github.repository }}
   CONTAINER_IMAGE_VERSION: ${{ github.event.pull_request.head.sha || github.sha }} # Use PR head SHA if available
-  GH_PACKAGES_REPOSITORY_USER: ${{ secrets.GH_PACKAGES_REPOSITORY_USER }} # Secrets must not start with "GITHUB_"..
+  GH_PACKAGES_REPOSITORY_USER: ${{ secrets.GH_PACKAGES_REPOSITORY_USER }} # Secrets must not start with "GITHUB_".
   GH_PACKAGES_REPOSITORY_TOKEN: ${{ secrets.GH_PACKAGES_REPOSITORY_TOKEN }}
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
@@ -57,7 +57,7 @@ jobs:
         with:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-  backend-tests:
+  backend-checks:
     uses: ./.github/workflows/backend-tests.yml
     secrets: inherit
 
@@ -310,7 +310,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' || contains(github.event.pull_request.labels.*.name, 'dev-env') || contains(github.event.labeled.labels.*.name, 'dev-env') }}
     needs:
       - backend-build
-      - backend-tests
+      - backend-checks
       - backend-build-image-and-scan
       - audit-licenses-backend
     permissions:
@@ -603,7 +603,7 @@ jobs:
       - push-backend-image-to-registry
       - e2e-tests
       - check-latest-deploy-tag
-      - backend-tests
+      - backend-checks
       - frontend-checks
     permissions:
       id-token: write # Enable OIDC for gitsign
