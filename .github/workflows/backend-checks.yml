@@ -44,6 +44,9 @@ jobs:
           gradle-version: ${{ env.GRADLE_VERSION}}
       - name: Run backend tests
         working-directory: ./backend
+        env:
+          GH_PACKAGES_REPOSITORY_USER: ${{ secrets.GH_PACKAGES_REPOSITORY_USER }}
+          GH_PACKAGES_REPOSITORY_TOKEN: ${{ secrets.GH_PACKAGES_REPOSITORY_TOKEN }}
         run: ./gradlew test -x integrationTest
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
