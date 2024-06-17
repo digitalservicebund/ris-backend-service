@@ -241,8 +241,7 @@ tasks {
         user = System.getenv("DB_USER")
         password = System.getenv("DB_PASSWORD")
         locations = arrayOf(
-            "filesystem:src/main/resources/db/migration/",
-            "classpath:db/migration"
+            "filesystem:src/main/resources/db/migration/", "classpath:db/migration"
         )
         dependsOn("compileMigrationJava")
     }
@@ -309,8 +308,7 @@ tasks {
     bootBuildImage {
         val containerRegistry = System.getenv("CONTAINER_REGISTRY") ?: "ghcr.io"
         val containerImageName =
-            System.getenv("CONTAINER_IMAGE_NAME")
-                ?: "digitalservicebund/${rootProject.name}"
+            System.getenv("CONTAINER_IMAGE_NAME") ?: "digitalservicebund/${rootProject.name}"
         val containerImageVersion = System.getenv("CONTAINER_IMAGE_VERSION") ?: "latest"
 
         imageName.set("$containerRegistry/$containerImageName:$containerImageVersion")
@@ -340,7 +338,7 @@ tasks {
         }
     }
 
-    
+
     javadoc {
         dependsOn(delombok)
         val outputDir: File by delombok.get().extra
