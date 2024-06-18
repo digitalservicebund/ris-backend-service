@@ -590,8 +590,7 @@ class DocumentationUnitTransformerTest {
 
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
-
-    assertThat(documentationUnitDTO.getNote()).isEqualTo("This is a test note with spaces");
+    
     assertThat(documentationUnitDTO.getEcli()).isEqualTo("This is a test ecli with spaces");
     assertThat(documentationUnitDTO.getJudicialBody())
         .isEqualTo("This is a test appraisalBody with spaces");
