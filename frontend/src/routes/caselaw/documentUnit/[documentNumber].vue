@@ -1,21 +1,50 @@
 <script lang="ts" setup>
-import { ref, Ref } from "vue"
+import dayjs from "dayjs"
+import { computed, onMounted, ref, Ref, watchEffect } from "vue"
 import { useRoute } from "vue-router"
+import AttachmentViewSidePanel from "@/components/AttachmentViewSidePanel.vue"
+import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
+import ErrorPage from "@/components/ErrorPage.vue"
+import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
+import FlexContainer from "@/components/FlexContainer.vue"
 import NavbarSide from "@/components/NavbarSide.vue"
 import SideToggle from "@/components/SideToggle.vue"
 import { useCaseLawMenuItems } from "@/composables/useCaseLawMenuItems"
 import useQuery from "@/composables/useQueryFromRoute"
+import { useStatusBadge } from "@/composables/useStatusBadge"
+import DocumentUnit from "@/domain/documentUnit"
+import documentUnitService from "@/services/documentUnitService"
+import { ResponseError } from "@/services/httpClient"
+import useSessionStore from "@/stores/sessionStore"
 
 const props = defineProps<{
   documentNumber: string
 }>()
 
 const route = useRoute()
+const { featureToggles } = useSessionStore()
+const selectedAttachmentIndex: Ref<number> = ref(0)
+const notesFeatureToggle = ref(featureToggles["neuris.note"] ?? false)
 
+const showExtraContentPanelRef: Ref<boolean> = ref(false)
+
+const { pushQueryToRoute } = useQuery()
+
+const documentUnit = ref<DocumentUnit>()
+const error = ref<ResponseError>()
 const toggleNavigationPanel = () => {
   showNavigationPanelRef.value = !showNavigationPanelRef.value
   pushQueryToRoute({
+    ...route.query,
     showNavigationPanel: showNavigationPanelRef.value.toString(),
+  })
+}
+
+const toggleExtraContentPanel = () => {
+  showExtraContentPanelRef.value = !showExtraContentPanelRef.value
+  pushQueryToRoute({
+    ...route.query,
+    showAttachmentPanel: showExtraContentPanelRef.value.toString(),
   })
 }
 
@@ -23,9 +52,34 @@ const showNavigationPanelRef: Ref<boolean> = ref(
   route.query.showNavigationPanel !== "false",
 )
 
-const { pushQueryToRoute } = useQuery<"showNavigationPanel">()
-
 const menuItems = useCaseLawMenuItems(props.documentNumber, route.query)
+
+const handleOnSelectAttachment = (index: number) => {
+  selectedAttachmentIndex.value = index
+}
+
+onMounted(async () => {
+  loadDocumentUnit()
+  if (route.query.showAttachmentPanel) {
+    showExtraContentPanelRef.value = route.query.showAttachmentPanel === "true"
+  } else if (notesFeatureToggle.value) {
+    showExtraContentPanelRef.value = documentUnit.value
+      ? !!documentUnit.value.note || documentUnit.value.hasAttachments
+      : false
+  }
+})
+
+async function loadDocumentUnit() {
+  const response = await documentUnitService.getByDocumentNumber(
+    props.documentNumber,
+  )
+
+  if (response.data) {
+    documentUnit.value = response.data
+  } else {
+    error.value = response.error
+  }
+}
 </script>
 
 <template>
@@ -44,6 +98,44 @@ const menuItems = useCaseLawMenuItems(props.documentNumber, route.query)
       <NavbarSide :is-child="false" :menu-items="menuItems" :route="route" />
     </SideToggle>
   </div>
-  <router-view />
-  <!--  side panel-->
+  <div v-if="documentUnit" class="flex w-full flex-col bg-gray-100">
+    <DocumentUnitInfoPanel
+      v-if="documentUnit"
+      :document-unit="documentUnit"
+      :heading="documentUnit?.documentNumber ?? ''"
+      :save-callback="loadDocumentUnit"
+    />
+    <div class="flex grow flex-col items-start">
+      <FlexContainer
+        v-if="documentUnit"
+        class="w-full flex-grow flex-row-reverse"
+      >
+        <ExtraContentSidePanel
+          v-if="notesFeatureToggle && !route.path.includes('publication')"
+          :current-index="selectedAttachmentIndex"
+          :document-unit="documentUnit"
+          :document-unit-uuid="documentUnit.uuid"
+          :is-expanded="showExtraContentPanelRef"
+          @select="handleOnSelectAttachment"
+          @toggle="toggleExtraContentPanel"
+        ></ExtraContentSidePanel>
+        <AttachmentViewSidePanel
+          v-if="
+            documentUnit.attachments &&
+            !notesFeatureToggle &&
+            !route.path.includes('publication')
+          "
+          :attachments="documentUnit.attachments"
+          :current-index="selectedAttachmentIndex"
+          :document-unit-uuid="documentUnit.uuid"
+          :is-expanded="showExtraContentPanelRef"
+          @select="handleOnSelectAttachment"
+          @update="toggleExtraContentPanel"
+        ></AttachmentViewSidePanel>
+
+        <router-view :document-unit="documentUnit" />
+      </FlexContainer>
+      <ErrorPage v-else :error="error" :title="error?.title" />
+    </div>
+  </div>
 </template>

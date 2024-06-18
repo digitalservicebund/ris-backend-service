@@ -5,26 +5,23 @@ import { useRoute } from "vue-router"
 import DocumentUnitAttachments from "@/components/DocumentUnitAttachments.vue"
 import RouteErrorDisplay from "@/components/RouteErrorDisplay.vue"
 import DocumentUnit from "@/domain/documentUnit"
-import documentUnitService from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
 
-const props = defineProps<{ documentNumber: string }>()
+const props = defineProps<{ documentUnit: DocumentUnit }>()
 
-const documentUnit = ref<DocumentUnit>()
-
+const emit = defineEmits<{
+  updateDocumentUnit: [void]
+}>()
 useHead({
-  title: props.documentNumber + " · NeuRIS Rechtsinformationssystem",
+  title:
+    props.documentUnit.documentNumber + " · NeuRIS Rechtsinformationssystem",
 })
 const route = useRoute()
 
 const error = ref<ResponseError>()
 
 async function loadDocumentUnit() {
-  const response = await documentUnitService.getByDocumentNumber(
-    props.documentNumber,
-  )
-  documentUnit.value = response.data
-  error.value = response.error
+  emit("updateDocumentUnit")
 }
 
 onMounted(() => loadDocumentUnit())

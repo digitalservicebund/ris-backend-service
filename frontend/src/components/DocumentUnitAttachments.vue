@@ -168,82 +168,54 @@ onMounted(async () => {
 </script>
 
 <template>
-  <DocumentUnitWrapper
-    :document-unit="documentUnit"
-    :show-navigation-panel="props.showNavigationPanel"
-  >
-    <template #default="{ classes }">
-      <FlexContainer class="h-full w-full">
-        <PopupModal
-          v-if="
-            showDeleteModal &&
-            props.documentUnit.attachments[selectedAttachmentIndex] !==
-              undefined &&
-            props.documentUnit.attachments[selectedAttachmentIndex] !== null &&
-            props.documentUnit.attachments[selectedAttachmentIndex].name != null
-          "
-          :aria-label="deleteModalHeaderText"
-          cancel-button-type="tertiary"
-          confirm-button-type="destructive"
-          confirm-text="Löschen"
-          :content-text="`Möchten Sie den Anhang ${getAttachment(selectedAttachmentIndex).name} wirklich dauerhaft löschen?`"
-          :header-text="deleteModalHeaderText"
-          @close-modal="toggleDeleteModal"
-          @confirm-action="deleteFile(selectedAttachmentIndex)"
+  <FlexItem class="w-full flex-1 grow space-y-20 p-24">
+    <PopupModal
+      v-if="
+        showDeleteModal &&
+        props.documentUnit.attachments[selectedAttachmentIndex] !== undefined &&
+        props.documentUnit.attachments[selectedAttachmentIndex] !== null &&
+        props.documentUnit.attachments[selectedAttachmentIndex].name != null
+      "
+      :aria-label="deleteModalHeaderText"
+      cancel-button-type="tertiary"
+      confirm-button-type="destructive"
+      confirm-text="Löschen"
+      :content-text="`Möchten Sie den Anhang ${getAttachment(selectedAttachmentIndex).name} wirklich dauerhaft löschen?`"
+      :header-text="deleteModalHeaderText"
+      @close-modal="toggleDeleteModal"
+      @confirm-action="deleteFile(selectedAttachmentIndex)"
+    />
+    <TitleElement class="mb-0">Dokumente</TitleElement>
+    <AttachmentList
+      v-if="props.documentUnit.hasAttachments"
+      id="file-table"
+      :files="getAttachments()"
+      @delete="handleOnDelete"
+      @select="handleOnSelect"
+    />
+    <InfoModal
+      v-if="errors.length > 0 && isLoading === false"
+      class="mt-8"
+      :description="errors"
+      :title="errorTitle"
+    />
+    <div class="flex-grow">
+      <div class="flex h-full flex-col items-start">
+        <FileUpload
+          :accept="acceptedFileFormats.toString()"
+          :is-loading="isLoading"
+          @files-selected="(files) => upload(files)"
         />
-        <FlexItem class="flex-1 space-y-20" :class="classes">
-          <TitleElement class="mb-0">Dokumente</TitleElement>
-          <AttachmentList
-            v-if="props.documentUnit.hasAttachments"
-            id="file-table"
-            :files="getAttachments()"
-            @delete="handleOnDelete"
-            @select="handleOnSelect"
-          />
-          <InfoModal
-            v-if="errors.length > 0 && isLoading === false"
-            class="mt-8"
-            :description="errors"
-            :title="errorTitle"
-          />
-          <div class="flex-grow">
-            <div class="flex h-full flex-col items-start">
-              <FileUpload
-                :accept="acceptedFileFormats.toString()"
-                :is-loading="isLoading"
-                @files-selected="(files) => upload(files)"
-              />
-            </div>
-          </div>
-          <div class="flex flex-row justify-between">
-            <div class="ds-label-02-reg text-gray-900">
-              Zulässige Dateiformate:
-              {{ acceptedFileFormats.toString().replace(/\./g, " ") }}
-            </div>
-            <div class="ds-label-02-reg text-gray-900">
-              Maximale Dateigröße: 20 MB
-            </div>
-          </div>
-        </FlexItem>
-        <ExtraContentSidePanel
-          v-if="notesFeatureToggle"
-          :current-index="selectedAttachmentIndex"
-          :document-unit="documentUnit"
-          :document-unit-uuid="documentUnit.uuid"
-          :is-expanded="showExtraContentPanelRef"
-          @select="handleOnSelect"
-          @toggle="toggleExtraContentPanel"
-        ></ExtraContentSidePanel>
-        <AttachmentViewSidePanel
-          v-if="props.documentUnit.attachments && !notesFeatureToggle"
-          :attachments="documentUnit.attachments"
-          :current-index="selectedAttachmentIndex"
-          :document-unit-uuid="props.documentUnit.uuid"
-          :is-expanded="showExtraContentPanelRef"
-          @select="handleOnSelect"
-          @update="toggleExtraContentPanel"
-        ></AttachmentViewSidePanel>
-      </FlexContainer>
-    </template>
-  </DocumentUnitWrapper>
+      </div>
+    </div>
+    <div class="flex flex-row justify-between">
+      <div class="ds-label-02-reg text-gray-900">
+        Zulässige Dateiformate:
+        {{ acceptedFileFormats.toString().replace(/\./g, " ") }}
+      </div>
+      <div class="ds-label-02-reg text-gray-900">
+        Maximale Dateigröße: 20 MB
+      </div>
+    </div>
+  </FlexItem>
 </template>
