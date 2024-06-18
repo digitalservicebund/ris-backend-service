@@ -1,5 +1,5 @@
-import { FunctionalComponent, SVGAttributes, computed } from "vue"
-import DocumentUnit from "@/domain/documentUnit"
+import { computed, FunctionalComponent, SVGAttributes } from "vue"
+import DocumentUnit, { PublicationState } from "@/domain/documentUnit"
 
 export interface Badge {
   label: string
@@ -17,21 +17,36 @@ export function useStatusBadge(status: DocumentUnit["status"]) {
   }
 
   return computed(() => {
-    if (status?.publicationStatus == "PUBLISHED") {
-      badge.label = "Veröffentlicht"
-      badge.backgroundColor = "bg-green-300"
-    }
-    if (status?.publicationStatus == "UNPUBLISHED") {
-      badge.label = status?.withError
-        ? "Nicht veröffentlicht"
-        : "Unveröffentlicht"
-      badge.backgroundColor = "bg-blue-300"
-    }
-    if (status?.publicationStatus == "PUBLISHING") {
-      badge.label = "In Veröffentlichung"
-      badge.backgroundColor = "bg-orange-300"
-    }
+    if (!status) return badge
 
+    switch (status.publicationStatus) {
+      case PublicationState.PUBLISHED:
+        badge.label = "Veröffentlicht"
+        badge.backgroundColor = "bg-green-300"
+        break
+      case PublicationState.UNPUBLISHED:
+        badge.label = status.withError
+          ? "Nicht veröffentlicht"
+          : "Unveröffentlicht"
+        badge.backgroundColor = "bg-blue-300"
+        break
+      case PublicationState.PUBLISHING:
+        badge.label = "In Veröffentlichung"
+        badge.backgroundColor = "bg-orange-300"
+        break
+      case PublicationState.DUPLICATED:
+        badge.label = "Dublette"
+        badge.backgroundColor = "bg-blue-300"
+        break
+      case PublicationState.LOCKED:
+        badge.label = "Gesperrt"
+        badge.backgroundColor = "bg-blue-300"
+        break
+      case PublicationState.DELETING:
+        badge.label = "Löschen"
+        badge.backgroundColor = "bg-blue-300"
+        break
+    }
     return badge
   })
 }

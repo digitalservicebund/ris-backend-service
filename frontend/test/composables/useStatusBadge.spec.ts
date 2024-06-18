@@ -1,102 +1,90 @@
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { PublicationState } from "@/domain/documentUnit"
 
-describe("useStatusBadge", () => {
-  it("unpublished with undefined error", () => {
-    const status = {
-      publicationStatus: PublicationState.UNPUBLISHED,
-      withError: undefined,
+describe.each([
+  {
+    status: PublicationState.UNPUBLISHED,
+    withError: undefined,
+    expected: "Unveröffentlicht",
+  },
+  {
+    status: PublicationState.UNPUBLISHED,
+    withError: false,
+    expected: "Unveröffentlicht",
+  },
+  {
+    status: PublicationState.UNPUBLISHED,
+    withError: true,
+    expected: "Nicht veröffentlicht",
+  },
+  {
+    status: PublicationState.PUBLISHING,
+    withError: undefined,
+    expected: "In Veröffentlichung",
+  },
+  {
+    status: PublicationState.PUBLISHING,
+    withError: false,
+    expected: "In Veröffentlichung",
+  },
+  {
+    status: PublicationState.PUBLISHING,
+    withError: true,
+    expected: "In Veröffentlichung",
+  },
+  {
+    status: PublicationState.PUBLISHED,
+    withError: undefined,
+    expected: "Veröffentlicht",
+  },
+  {
+    status: PublicationState.PUBLISHED,
+    withError: false,
+    expected: "Veröffentlicht",
+  },
+  {
+    status: PublicationState.PUBLISHED,
+    withError: true,
+    expected: "Veröffentlicht",
+  },
+  {
+    status: PublicationState.DUPLICATED,
+    withError: undefined,
+    expected: "Dublette",
+  },
+  {
+    status: PublicationState.DUPLICATED,
+    withError: false,
+    expected: "Dublette",
+  },
+  {
+    status: PublicationState.DUPLICATED,
+    withError: true,
+    expected: "Dublette",
+  },
+  {
+    status: PublicationState.LOCKED,
+    withError: undefined,
+    expected: "Gesperrt",
+  },
+  { status: PublicationState.LOCKED, withError: false, expected: "Gesperrt" },
+  { status: PublicationState.LOCKED, withError: true, expected: "Gesperrt" },
+  {
+    status: PublicationState.DELETING,
+    withError: undefined,
+    expected: "Löschen",
+  },
+  { status: PublicationState.DELETING, withError: false, expected: "Löschen" },
+  { status: PublicationState.DELETING, withError: true, expected: "Löschen" },
+])("useStatusBadge", ({ status, withError, expected }) => {
+  test(`'${status}' with ${withError} error should return '${expected}'`, () => {
+    const publicationStatus = {
+      publicationStatus: status,
+      withError: withError,
     }
 
-    const statusBadge = useStatusBadge(status)
+    const statusBadge = useStatusBadge(publicationStatus)
 
-    expect(statusBadge.value.label).toBe("Unveröffentlicht")
-  })
-
-  it("unpublished without error", () => {
-    const status = {
-      publicationStatus: PublicationState.UNPUBLISHED,
-      withError: false,
-    }
-
-    const statusBadge = useStatusBadge(status)
-
-    expect(statusBadge.value.label).toBe("Unveröffentlicht")
-  })
-
-  it("unpublished with errors", () => {
-    const status = {
-      publicationStatus: PublicationState.UNPUBLISHED,
-      withError: true,
-    }
-
-    const statusBadge = useStatusBadge(status)
-
-    expect(statusBadge.value.label).toBe("Nicht veröffentlicht")
-  })
-
-  it("publishing with undefined error", () => {
-    const status = {
-      publicationStatus: PublicationState.PUBLISHING,
-    }
-
-    const statusBadge = useStatusBadge(status)
-
-    expect(statusBadge.value.label).toBe("In Veröffentlichung")
-  })
-
-  it("publishing without errors", () => {
-    const status = {
-      publicationStatus: PublicationState.PUBLISHING,
-      withError: false,
-    }
-
-    const statusBadge = useStatusBadge(status)
-
-    expect(statusBadge.value.label).toBe("In Veröffentlichung")
-  })
-
-  it("publishing with errors", () => {
-    const status = {
-      publicationStatus: PublicationState.PUBLISHING,
-      withError: true,
-    }
-
-    const statusBadge = useStatusBadge(status)
-
-    expect(statusBadge.value.label).toBe("In Veröffentlichung")
-  })
-
-  it("published with undefined error", () => {
-    const status = {
-      publicationStatus: PublicationState.PUBLISHED,
-      withError: undefined,
-    }
-
-    const statusBadge = useStatusBadge(status)
-
-    expect(statusBadge.value.label).toBe("Veröffentlicht")
-  })
-
-  it("published without errors", () => {
-    const status = {
-      publicationStatus: PublicationState.PUBLISHED,
-      withError: false,
-    }
-
-    const statusBadge = useStatusBadge(status)
-
-    expect(statusBadge.value.label).toBe("Veröffentlicht")
-  })
-
-  it("published with errors", () => {
-    const status = {
-      publicationStatus: PublicationState.PUBLISHED,
-      withError: true,
-    }
-
-    const statusBadge = useStatusBadge(status)
-
-    expect(statusBadge.value.label).toBe("Veröffentlicht")
+    expect(statusBadge.value.label).toBe(expected)
   })
 })

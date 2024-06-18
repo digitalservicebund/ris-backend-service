@@ -73,6 +73,9 @@ export enum PublicationState {
   PUBLISHED = "PUBLISHED",
   UNPUBLISHED = "UNPUBLISHED",
   PUBLISHING = "PUBLISHING",
+  DUPLICATED = "DUPLICATED",
+  LOCKED = "LOCKED",
+  DELETING = "DELETING",
 }
 
 export type PublicationStatus = {
