@@ -527,7 +527,6 @@ class DocumentationUnitTransformerTest {
 
     DocumentUnit updatedDomainObject =
         DocumentUnit.builder()
-            .note("This\u00A0is\u202Fa\uFEFFtest\u2007note\u180Ewith\u2060spaces")
             .coreData(
                 CoreData.builder()
                     .ecli("This\u00A0is\u202Fa\uFEFFtest\u2007ecli\u180Ewith\u2060spaces")

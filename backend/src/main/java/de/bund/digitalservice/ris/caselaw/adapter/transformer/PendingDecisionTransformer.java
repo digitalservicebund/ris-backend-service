@@ -35,7 +35,7 @@ public class PendingDecisionTransformer extends RelatedDocumentationUnitTransfor
         .documentNumber(ensuingDecision.getDocumentNumber())
         .documentType(getDocumentTypeFromDomain(ensuingDecision.getDocumentType()))
         .fileNumber(StringUtils.normalizeSpace(ensuingDecision.getFileNumber()))
-        .note(StringUtils.normalizeSpace(ensuingDecision.getNote()))
+        .note(ensuingDecision.getNote())
         .build();
   }
 }
