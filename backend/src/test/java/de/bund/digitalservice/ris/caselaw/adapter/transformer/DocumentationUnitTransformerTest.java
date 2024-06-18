@@ -810,6 +810,47 @@ class DocumentationUnitTransformerTest {
         .isEqualTo("single norm 2");
   }
 
+  @Test
+  void testTransformToDomain_withNote_shouldAddNote() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder().note("Beispiel Notiz").build();
+
+    DocumentUnit documentUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentUnit.note()).isEqualTo("Beispiel Notiz");
+  }
+
+  @Test
+  void testTransformToDomain_withEmptyNote_shouldAddEmptyNote() {
+    DocumentationUnitDTO documentationUnitDTO = generateSimpleDTOBuilder().note("").build();
+
+    DocumentUnit documentUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentUnit.note()).isEmpty();
+  }
+
+  @Test
+  void testTransformToDomain_withNullNote_shouldAddNullNote() {
+    DocumentationUnitDTO documentationUnitDTO = generateSimpleDTOBuilder().note(null).build();
+
+    DocumentUnit documentUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentUnit.note()).isNull();
+  }
+
+  @Test
+  void testTransformToDomain_withoutNote_shouldAddNoNote() {
+    DocumentationUnitDTO documentationUnitDTO = generateSimpleDTOBuilder().build();
+
+    DocumentUnit documentUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentUnit.note()).isNull();
+  }
+
   private DocumentationUnitDTOBuilder generateSimpleDTOBuilder() {
     return DocumentationUnitDTO.builder()
         .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("doc office").build());
