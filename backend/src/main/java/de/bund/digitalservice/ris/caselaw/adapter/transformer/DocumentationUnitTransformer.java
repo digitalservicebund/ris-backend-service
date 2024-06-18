@@ -67,7 +67,7 @@ public class DocumentationUnitTransformer {
         currentDto.toBuilder()
             .id(updatedDomainObject.uuid())
             .documentNumber(updatedDomainObject.documentNumber())
-            .note(StringUtils.normalizeSpace(updatedDomainObject.note()));
+            .note(updatedDomainObject.note());
 
     if (updatedDomainObject.coreData() != null) {
       var coreData = updatedDomainObject.coreData();

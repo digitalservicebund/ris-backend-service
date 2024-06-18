@@ -91,7 +91,6 @@ public class NormReferenceTransformer {
                           StringUtils.normalizeSpace(normAbbreviationRawValue))
                       .singleNorm(StringUtils.normalizeSpace(singleNorm.singleNorm()))
                       .dateOfVersion(singleNorm.dateOfVersion())
-                      // dateOfRelevance should LocalDate?
                       .dateOfRelevance(singleNorm.dateOfRelevance());
 
               if (singleNorm.legalForce() != null) {
