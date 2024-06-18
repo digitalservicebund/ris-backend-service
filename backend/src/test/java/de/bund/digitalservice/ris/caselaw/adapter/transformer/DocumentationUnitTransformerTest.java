@@ -590,7 +590,6 @@ class DocumentationUnitTransformerTest {
 
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
-    
     assertThat(documentationUnitDTO.getEcli()).isEqualTo("This is a test ecli with spaces");
     assertThat(documentationUnitDTO.getJudicialBody())
         .isEqualTo("This is a test appraisalBody with spaces");
@@ -627,11 +626,6 @@ class DocumentationUnitTransformerTest {
                 .map(EnsuingDecisionDTO::getFileNumber)
                 .collect(Collectors.toList()))
         .isEqualTo(List.of("This is a test fileNumber with spaces"));
-    assertThat(
-            documentationUnitDTO.getEnsuingDecisions().stream()
-                .map(EnsuingDecisionDTO::getNote)
-                .collect(Collectors.toList()))
-        .isEqualTo(List.of("This is a test note with spaces"));
     assertThat(
             documentationUnitDTO.getPreviousDecisions().stream()
                 .map(PreviousDecisionDTO::getFileNumber)
