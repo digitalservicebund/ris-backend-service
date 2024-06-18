@@ -482,7 +482,7 @@ public class DocumentationUnitTransformer {
     addDeviatingEclisToDomain(documentationUnitDTO, coreDataBuilder);
     addDeviatingDecisionDatesToDomain(documentationUnitDTO, coreDataBuilder);
     addLeadingDecisionNormReferencesToDomain(documentationUnitDTO, coreDataBuilder);
-
+    addYearsOfDisputeToDomain(documentationUnitDTO, coreDataBuilder);
     DocumentTypeDTO documentTypeDTO = documentationUnitDTO.getDocumentType();
     if (documentTypeDTO != null) {
       coreDataBuilder.documentType(DocumentTypeTransformer.transformToDomain(documentTypeDTO));
@@ -878,5 +878,18 @@ public class DocumentationUnitTransformer {
                   });
             });
     return borderNumbers;
+  }
+
+  private static void addYearsOfDispute(
+      DocumentUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
+
+    YearOfDisputeTransformer.transformToDTO(updatedDomainObject.coreData().yearsOfDispute());
+  }
+
+  private static void addYearsOfDisputeToDomain(
+      DocumentationUnitDTO currentDto, CoreData.CoreDataBuilder coreDataBuilder) {
+
+    coreDataBuilder.yearsOfDispute(
+        YearOfDisputeTransformer.transformToDomain(currentDto.getYearsOfDispute()));
   }
 }

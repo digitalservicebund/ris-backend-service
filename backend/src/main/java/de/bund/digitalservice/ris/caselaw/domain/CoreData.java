@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.Docume
 import jakarta.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import lombok.Builder;
 import org.hibernate.validator.constraints.UniqueElements;
 
@@ -26,4 +27,5 @@ public record CoreData(
     List<String> inputTypes,
     DocumentationOffice documentationOffice,
     String region,
-    @UniqueElements List<String> leadingDecisionNormReferences) {}
+    @UniqueElements List<String> leadingDecisionNormReferences,
+    Set<YearOfDispute> yearsOfDispute) {}

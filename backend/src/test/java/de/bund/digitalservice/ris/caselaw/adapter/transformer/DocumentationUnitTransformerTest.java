@@ -1017,6 +1017,7 @@ class DocumentationUnitTransformerTest {
         .deviatingEclis(Collections.emptyList())
         .deviatingDecisionDates(Collections.emptyList())
         .inputTypes(Collections.emptyList())
-        .leadingDecisionNormReferences(Collections.emptyList());
+        .leadingDecisionNormReferences(Collections.emptyList())
+        .yearsOfDispute(Collections.emptySet());
   }
 }
