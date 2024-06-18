@@ -142,7 +142,7 @@ dependencies {
     implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.3.0")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.3.1")
 
     // CVE-2024-22262
     implementation("org.springframework:spring-web:6.1.9")
@@ -166,7 +166,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.1")
 
-    implementation(platform("software.amazon.awssdk:bom:2.26.3"))
+    implementation(platform("software.amazon.awssdk:bom:2.26.4"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -219,7 +219,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.6.7")
-    testImplementation("org.springframework.security:spring-security-test:6.3.0")
+    testImplementation("org.springframework.security:spring-security-test:6.3.1")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.3.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
