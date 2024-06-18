@@ -92,8 +92,7 @@ class SendInBlueMailTrackingServiceTest {
   }
 
   @Test
-  void testUpdatePublishingState_withNoLatestError_throwsError()
-      throws DocumentationUnitNotExistsException {
+  void testUpdatePublishingState_withNoLatestError_throwsError() {
     when(documentUnitStatusService.getLatestStatus(TEST_UUID)).thenReturn(null);
 
     ResponseEntity<String> responseEntity =

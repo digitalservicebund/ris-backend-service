@@ -880,12 +880,6 @@ public class DocumentationUnitTransformer {
     return borderNumbers;
   }
 
-  private static void addYearsOfDispute(
-      DocumentUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
-
-    YearOfDisputeTransformer.transformToDTO(updatedDomainObject.coreData().yearsOfDispute());
-  }
-
   private static void addYearsOfDisputeToDomain(
       DocumentationUnitDTO currentDto, CoreData.CoreDataBuilder coreDataBuilder) {
 

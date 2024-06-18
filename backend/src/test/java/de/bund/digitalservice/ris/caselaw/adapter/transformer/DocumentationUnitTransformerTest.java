@@ -44,7 +44,6 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -603,48 +602,45 @@ class DocumentationUnitTransformerTest {
     assertThat(
             documentationUnitDTO.getDeviatingEclis().stream()
                 .map(DeviatingEcliDTO::getValue)
-                .collect(Collectors.toList()))
+                .toList())
         .isEqualTo(List.of("This is a test deviatingEcli with spaces"));
     assertThat(
             documentationUnitDTO.getDeviatingFileNumbers().stream()
                 .map(DeviatingFileNumberDTO::getValue)
-                .collect(Collectors.toList()))
+                .toList())
         .isEqualTo(List.of("This is a test deviatingFileNumber with spaces"));
     assertThat(
             documentationUnitDTO.getDeviatingCourts().stream()
                 .map(DeviatingCourtDTO::getValue)
-                .collect(Collectors.toList()))
+                .toList())
         .isEqualTo(List.of("This is a test deviatingCourt with spaces"));
-    assertThat(
-            documentationUnitDTO.getInputTypes().stream()
-                .map(InputTypeDTO::getValue)
-                .collect(Collectors.toList()))
+    assertThat(documentationUnitDTO.getInputTypes().stream().map(InputTypeDTO::getValue).toList())
         .isEqualTo(List.of("This is a test inputType with spaces"));
 
     assertThat(
             documentationUnitDTO.getEnsuingDecisions().stream()
                 .map(EnsuingDecisionDTO::getFileNumber)
-                .collect(Collectors.toList()))
+                .toList())
         .isEqualTo(List.of("This is a test fileNumber with spaces"));
     assertThat(
             documentationUnitDTO.getPreviousDecisions().stream()
                 .map(PreviousDecisionDTO::getFileNumber)
-                .collect(Collectors.toList()))
+                .toList())
         .isEqualTo(List.of("This is a test fileNumber with spaces"));
     assertThat(
             documentationUnitDTO.getPreviousDecisions().stream()
                 .map(PreviousDecisionDTO::getDeviatingFileNumber)
-                .collect(Collectors.toList()))
+                .toList())
         .isEqualTo(List.of("This is a test deviatingFileNumber with spaces"));
     assertThat(
             documentationUnitDTO.getActiveCitations().stream()
                 .map(ActiveCitationDTO::getFileNumber)
-                .collect(Collectors.toList()))
+                .toList())
         .isEqualTo(List.of("This is a test fileNumber with spaces"));
     assertThat(
             documentationUnitDTO.getNormReferences().stream()
                 .map(NormReferenceDTO::getSingleNorm)
-                .collect(Collectors.toList()))
+                .toList())
         .isEqualTo(List.of("This is a test singlenorm with spaces"));
   }
 
