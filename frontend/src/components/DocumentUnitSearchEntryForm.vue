@@ -36,6 +36,9 @@ const dropdownItems: DropdownItem[] = [
   { label: "Veröffentlicht", value: PublicationState.PUBLISHED },
   { label: "Unveröffentlicht", value: PublicationState.UNPUBLISHED },
   { label: "In Veröffentlichung", value: PublicationState.PUBLISHING },
+  { label: "Dublette", value: PublicationState.DUPLICATED },
+  { label: "Gesperrt", value: PublicationState.LOCKED },
+  { label: "Löschen", value: PublicationState.DELETING },
 ]
 
 const myDocOfficeOnly = computed({
