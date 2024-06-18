@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import java.util.Optional;
 
 public class EnsuingDecisionTransformer extends RelatedDocumentationUnitTransformer {
@@ -32,7 +33,7 @@ public class EnsuingDecisionTransformer extends RelatedDocumentationUnitTransfor
         .date(ensuingDecision.getDecisionDate())
         .documentNumber(ensuingDecision.getDocumentNumber())
         .documentType(getDocumentTypeFromDomain(ensuingDecision.getDocumentType()))
-        .fileNumber(ensuingDecision.getFileNumber())
+        .fileNumber(StringUtils.normalizeSpace(ensuingDecision.getFileNumber()))
         .note(ensuingDecision.getNote())
         .build();
   }
