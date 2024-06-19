@@ -31,7 +31,8 @@ public class YearOfDisputeTransformer {
     Set<YearOfDisputeDTO> yearOfDisputeDTOS = new HashSet<>();
 
     for (int i = 0; i < uniqueYears.size(); i++) {
-      yearOfDisputeDTOS.add(YearOfDisputeDTO.builder().value(uniqueYears.get(i)).rank(i).build());
+      yearOfDisputeDTOS.add(
+          YearOfDisputeDTO.builder().value(uniqueYears.get(i)).rank(i + 1).build());
     }
     return yearOfDisputeDTOS;
   }

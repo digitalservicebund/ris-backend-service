@@ -1014,6 +1014,6 @@ class DocumentationUnitTransformerTest {
         .deviatingDecisionDates(Collections.emptyList())
         .inputTypes(Collections.emptyList())
         .leadingDecisionNormReferences(Collections.emptyList())
-        .yearsOfDispute(Collections.emptySet());
+        .yearsOfDispute(Collections.emptyList());
   }
 }
