@@ -72,6 +72,6 @@ describe("Core Data", () => {
 
     await screen.findByText("Streitjahr")
     await user.type(screen.getByLabelText("Streitjahr"), "2023{enter}")
-    expect(onUpdate).toHaveBeenCalledWith({ yearOfDispute: ["2023"] })
+    expect(onUpdate).toHaveBeenCalledWith({ yearsOfDispute: ["2023"] })
   })
 })
