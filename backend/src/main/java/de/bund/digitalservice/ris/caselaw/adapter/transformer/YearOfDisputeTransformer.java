@@ -20,13 +20,19 @@ public class YearOfDisputeTransformer {
         .map(YearOfDisputeDTO::getValue)
         .distinct()
         .map(Year::parse)
+        .filter(year -> year.isBefore(Year.now().plusYears(1)))
         .toList();
   }
 
   private static Set<YearOfDisputeDTO> transformToDTO(List<Year> yearsOfDispute) {
     if (yearsOfDispute == null || yearsOfDispute.isEmpty()) return Collections.emptySet();
 
-    var uniqueYears = yearsOfDispute.stream().map(Year::toString).distinct().toList();
+    var uniqueYears =
+        yearsOfDispute.stream()
+            .filter(year -> year.isBefore(Year.now().plusYears(1)))
+            .map(Year::toString)
+            .distinct()
+            .toList();
 
     Set<YearOfDisputeDTO> yearOfDisputeDTOS = new HashSet<>();
 
