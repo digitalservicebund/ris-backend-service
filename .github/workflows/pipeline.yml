@@ -815,12 +815,12 @@ jobs:
           path: tmp/licence-reports/
           merge-multiple: true
       - name: Frontend licence report - git add report
-        uses: digitalservicebund/add-ris-report@32770d369cf00a8154bb6a17005d11cf781bfba3
+        uses: digitalservicebund/add-ris-report@995843ff1c3482949c7f8097aa5f287acf1506da
         with:
           filePath: tmp/licence-reports/frontend-licence-report.csv
           destinationDir: licence-reports/frontend/ris-backend-service
       - name: Backend licence report - git add report
-        uses: digitalservicebund/add-ris-report@32770d369cf00a8154bb6a17005d11cf781bfba3
+        uses: digitalservicebund/add-ris-report@995843ff1c3482949c7f8097aa5f287acf1506da
         with:
           filePath: tmp/licence-reports/backend-licence-report.csv
           destinationDir: licence-reports/backend/ris-backend-service
@@ -832,7 +832,7 @@ jobs:
           path: tmp/performance-reports/
       - run: mv tmp/performance-reports/profile*.html tmp/performance-reports/profile-report.html
       - name: Performance report - git add report
-        uses: digitalservicebund/add-ris-report@32770d369cf00a8154bb6a17005d11cf781bfba3
+        uses: digitalservicebund/add-ris-report@995843ff1c3482949c7f8097aa5f287acf1506da
         with:
           filePath: tmp/performance-reports/profile-report.html
           destinationDir: performance-reports/ris-backend-service
@@ -843,7 +843,7 @@ jobs:
           name: backend-code-documentation
           path: tmp/backend-code-documentation/
       - name: Java - git add report
-        uses: digitalservicebund/add-ris-report@32770d369cf00a8154bb6a17005d11cf781bfba3
+        uses: digitalservicebund/add-ris-report@995843ff1c3482949c7f8097aa5f287acf1506da
         with:
           filePath: tmp/backend-code-documentation
           destinationDir: backend-code-documentation/java
@@ -855,7 +855,7 @@ jobs:
           name: html-test-report
           path: tmp/html-test-report/
       - name: E2E test reports - git add report
-        uses: digitalservicebund/add-ris-report@32770d369cf00a8154bb6a17005d11cf781bfba3
+        uses: digitalservicebund/add-ris-report@995843ff1c3482949c7f8097aa5f287acf1506da
         with:
           filePath: tmp/html-test-report/
           destinationDir: test-reports/ris-backend-service
