@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import java.util.Optional;
 
 public class PreviousDecisionTransformer extends RelatedDocumentationUnitTransformer {
@@ -33,8 +34,8 @@ public class PreviousDecisionTransformer extends RelatedDocumentationUnitTransfo
         .date(previousDecision.getDecisionDate())
         .documentNumber(previousDecision.getDocumentNumber())
         .documentType(getDocumentTypeFromDomain(previousDecision.getDocumentType()))
-        .fileNumber(previousDecision.getFileNumber())
-        .deviatingFileNumber(previousDecision.getDeviatingFileNumber())
+        .fileNumber(StringUtils.normalizeSpace(previousDecision.getFileNumber()))
+        .deviatingFileNumber(StringUtils.normalizeSpace(previousDecision.getDeviatingFileNumber()))
         .dateKnown(previousDecision.isDateKnown())
         .build();
   }

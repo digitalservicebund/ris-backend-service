@@ -26,6 +26,7 @@ export type CoreData = {
   inputTypes?: string[]
   documentationOffice?: DocumentationOffice
   region?: string
+  yearsOfDispute?: string[]
   leadingDecisionNormReferences?: string[]
 }
 
@@ -72,6 +73,9 @@ export enum PublicationState {
   PUBLISHED = "PUBLISHED",
   UNPUBLISHED = "UNPUBLISHED",
   PUBLISHING = "PUBLISHING",
+  DUPLICATED = "DUPLICATED",
+  LOCKED = "LOCKED",
+  DELETING = "DELETING",
 }
 
 export type PublicationStatus = {

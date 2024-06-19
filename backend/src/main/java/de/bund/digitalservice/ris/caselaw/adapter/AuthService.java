@@ -131,7 +131,7 @@ public class AuthService {
     char[][] allowedCharacters = {{'a', 'z'}, {'A', 'Z'}, {'0', '9'}};
     // " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
     RandomStringGenerator rsg =
-        RandomStringGenerator.builder().withinRange(allowedCharacters).build();
+        RandomStringGenerator.builder().withinRange(allowedCharacters).get();
 
     DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidcUser).block();
     DocumentationOfficeDTO documentationOfficeDTO = null;

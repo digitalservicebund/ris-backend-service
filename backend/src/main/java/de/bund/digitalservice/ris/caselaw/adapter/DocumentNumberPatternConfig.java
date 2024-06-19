@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberFormatter;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberPatternException;
-import de.bund.digitalservice.ris.caselaw.domain.StringsUtil;
+import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import java.util.Map;
 import lombok.Data;
 import org.springframework.beans.factory.InitializingBean;
@@ -49,7 +49,7 @@ public class DocumentNumberPatternConfig implements InitializingBean {
   public boolean hasValidPattern(
       String documentationOfficeAbbreviation, String documentationUnitNumber) {
     try {
-      if (StringsUtil.returnTrueIfNullOrBlank(documentationUnitNumber)) {
+      if (StringUtils.returnTrueIfNullOrBlank(documentationUnitNumber)) {
         throw new DocumentNumberPatternException("Document unit number is null or blank");
       }
 

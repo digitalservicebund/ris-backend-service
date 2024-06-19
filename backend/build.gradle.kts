@@ -142,10 +142,10 @@ dependencies {
     implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.3.0")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.3.1")
 
     // CVE-2024-22262
-    implementation("org.springframework:spring-web:6.1.8")
+    implementation("org.springframework:spring-web:6.1.9")
 
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.5.0")
 
@@ -166,7 +166,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.1")
 
-    implementation(platform("software.amazon.awssdk:bom:2.26.1"))
+    implementation(platform("software.amazon.awssdk:bom:2.26.5"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -178,7 +178,7 @@ dependencies {
     implementation("com.icegreen:greenmail:2.1.0-rc-1")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.42") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.43") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
@@ -207,7 +207,7 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.12.0")
     implementation("org.jsoup:jsoup:1.17.2")
 
-    var flywayCore = "org.flywaydb:flyway-core:10.15.0"
+    val flywayCore = "org.flywaydb:flyway-core:10.15.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
     runtimeOnly("org.flywaydb:flyway-database-postgresql:10.15.0")
@@ -219,7 +219,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.6.7")
-    testImplementation("org.springframework.security:spring-security-test:6.3.0")
+    testImplementation("org.springframework.security:spring-security-test:6.3.1")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.3.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
@@ -241,8 +241,7 @@ tasks {
         user = System.getenv("DB_USER")
         password = System.getenv("DB_PASSWORD")
         locations = arrayOf(
-            "filesystem:src/main/resources/db/migration/",
-            "classpath:db/migration"
+            "filesystem:src/main/resources/db/migration/", "classpath:db/migration"
         )
         dependsOn("compileMigrationJava")
     }
@@ -305,11 +304,11 @@ tasks {
         )
     }
 
+
     bootBuildImage {
         val containerRegistry = System.getenv("CONTAINER_REGISTRY") ?: "ghcr.io"
         val containerImageName =
-            System.getenv("CONTAINER_IMAGE_NAME")
-                ?: "digitalservicebund/${rootProject.name}"
+            System.getenv("CONTAINER_IMAGE_NAME") ?: "digitalservicebund/${rootProject.name}"
         val containerImageVersion = System.getenv("CONTAINER_IMAGE_VERSION") ?: "latest"
 
         imageName.set("$containerRegistry/$containerImageName:$containerImageVersion")
@@ -338,6 +337,7 @@ tasks {
             outputDir.delete()
         }
     }
+
 
     javadoc {
         dependsOn(delombok)

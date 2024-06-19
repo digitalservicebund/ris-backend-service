@@ -376,8 +376,8 @@ test.describe("search", () => {
       exact: true,
     })
     const secondDate = page.getByLabel("Entscheidungsdatum Suche Ende")
-    const firstDateInput = page.getByTestId("decisionDateInput")
-    const secondDateInput = page.getByTestId("decisionDateEndInput")
+    const firstDateInput = page.getByTestId("decision-date-input")
+    const secondDateInput = page.getByTestId("decision-date-end-input")
 
     await firstDate.fill("29.02.2022")
     await expect(firstDateInput.getByText("Kein valides Datum")).toBeVisible()

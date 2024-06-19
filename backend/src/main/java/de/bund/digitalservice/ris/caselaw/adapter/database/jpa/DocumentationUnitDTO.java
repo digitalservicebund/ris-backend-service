@@ -19,7 +19,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -248,6 +250,13 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   private List<LeadingDecisionNormReferenceDTO> leadingDecisionNormReferences = new ArrayList<>();
 
   @Column private String note;
+
+  // Streitjahr
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id", nullable = false)
+  @Builder.Default
+  @OrderBy("rank")
+  private Set<YearOfDisputeDTO> yearsOfDispute = new HashSet<>();
 
   // This will be used to send legal periodical references to the exporter and frontend
   //  @OneToMany(

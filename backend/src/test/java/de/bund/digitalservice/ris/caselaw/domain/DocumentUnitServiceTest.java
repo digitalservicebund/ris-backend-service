@@ -33,7 +33,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -306,19 +305,18 @@ class DocumentUnitServiceTest {
             pageRequest, documentationOffice, documentationUnitSearchInput))
         .thenReturn(new PageImpl<>(List.of(documentationUnitListItem)));
 
-    Slice<DocumentationUnitListItem> documentationUnitSearchEntries =
-        service.searchByDocumentationUnitSearchInput(
-            pageRequest,
-            documentationOffice,
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty());
+    service.searchByDocumentationUnitSearchInput(
+        pageRequest,
+        documentationOffice,
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty());
     verify(repository)
         .searchByDocumentationUnitSearchInput(
             pageRequest, documentationOffice, documentationUnitSearchInput);

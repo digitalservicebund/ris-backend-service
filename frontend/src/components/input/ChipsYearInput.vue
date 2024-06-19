@@ -19,11 +19,7 @@ const emit = defineEmits<{
 
 const chips = computed<string[]>({
   get: () => {
-    return props.modelValue
-      ? props.modelValue.map((value) =>
-          dayjs(value, "YYYY-MM-DD", true).format("DD.MM.YYYY"),
-        )
-      : []
+    return props.modelValue ? props.modelValue : []
   },
 
   set: (newValue: string[]) => {
@@ -33,18 +29,20 @@ const chips = computed<string[]>({
     }
 
     const lastValue = newValue.at(-1)
-    const lastDate = dayjs(lastValue, "DD.MM.YYYY", true)
+    const lastYear = dayjs(lastValue, "YYYY", true)
+    const validYear =
+      lastYear.isValid() && lastYear.year() >= 1000 && lastYear.year() <= 9999
 
-    if (!lastDate.isValid()) {
+    if (!validYear) {
       emit("update:validationError", {
-        message: "Kein valides Datum",
+        message: "Kein valides Jahr",
         instance: props.id,
       })
       return
     }
 
     // if valid date, check for future dates
-    const isInFuture = lastDate.isAfter(dayjs())
+    const isInFuture = dayjs(lastValue, "YYYY", true).isAfter(dayjs())
     if (isInFuture) {
       emit("update:validationError", {
         message: props.ariaLabel + " darf nicht in der Zukunft liegen",
@@ -53,13 +51,7 @@ const chips = computed<string[]>({
       return
     }
     emit("update:validationError", undefined)
-
-    emit(
-      "update:modelValue",
-      newValue.map((value) =>
-        dayjs(value, "DD.MM.YYYY", true).format("YYYY-MM-DD"),
-      ),
-    )
+    emit("update:modelValue", newValue)
   },
 })
 
@@ -71,7 +63,7 @@ dayjs.extend(customParseFormat)
     :id="id"
     v-model="chips"
     :aria-label="ariaLabel"
-    maska="##.##.####"
+    maska="####"
     @update:validation-error="$emit('update:validationError', $event)"
   />
 </template>

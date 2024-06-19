@@ -129,7 +129,7 @@ from https://sonarcloud.io.
 **To run the analysis locally:**
 
 ```bash
-SONAR_TOKEN=[sonar-token] ./gradlew sonarqube
+SONAR_TOKEN=[sonar-token] ./gradlew sonar
 ```
 
 Go

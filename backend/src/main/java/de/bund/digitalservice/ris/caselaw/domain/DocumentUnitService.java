@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import static de.bund.digitalservice.ris.caselaw.domain.StringUtils.normalizeSpace;
+
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -12,7 +14,6 @@ import java.util.Set;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -220,30 +221,6 @@ public class DocumentUnitService {
     }
     return repository.searchLinkableDocumentationUnits(
         relatedDocumentationUnit, documentationOffice, documentNumberToExclude, pageable);
-  }
-
-  public static String normalizeSpace(String input) {
-    if (input == null) {
-      return null;
-    }
-
-    // List of Unicode spaces to replace with a normal space
-    String[] unicodeSpaces = {
-      "\u00A0", // NO-BREAK SPACE
-      "\u202F", // NARROW NO-BREAK SPACE
-      "\uFEFF", // ZERO WIDTH NO-BREAK SPACE
-      "\u2007", // FIGURE SPACE
-      "\u180E", // MONGOLIAN VOWEL SEPARATOR
-      "\u2060" // WORD JOINER
-    };
-
-    String normalized = input;
-    for (String unicodeSpace : unicodeSpaces) {
-      normalized = normalized.replace(unicodeSpace, " ");
-    }
-
-    // Use StringUtils.normalizeSpace to handle additional normalization
-    return StringUtils.normalizeSpace(normalized);
   }
 
   public String validateSingleNorm(SingleNormValidationInfo singleNormValidationInfo) {

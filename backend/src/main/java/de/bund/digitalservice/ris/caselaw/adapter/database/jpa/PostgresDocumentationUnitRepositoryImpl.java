@@ -16,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
+import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
@@ -171,7 +172,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
 
                 List<String> keywords = contentRelatedIndexing.keywords();
                 for (int i = 0; i < keywords.size(); i++) {
-                  String value = keywords.get(i);
+                  String value = StringUtils.normalizeSpace(keywords.get(i));
 
                   KeywordDTO keywordDTO =
                       keywordRepository
@@ -321,13 +322,13 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     if (procedure.id() == null) {
       Optional<ProcedureDTO> existingProcedure =
           procedureRepository.findAllByLabelAndDocumentationOffice(
-              procedure.label().trim(), documentationOfficeDTO);
+              StringUtils.normalizeSpace(procedure.label()), documentationOfficeDTO);
 
       return existingProcedure.orElseGet(
           () ->
               procedureRepository.save(
                   ProcedureDTO.builder()
-                      .label(procedure.label().trim())
+                      .label(StringUtils.normalizeSpace(procedure.label()))
                       .createdAt(Instant.now())
                       .documentationOffice(documentationOfficeDTO)
                       .build()));
