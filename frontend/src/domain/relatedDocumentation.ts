@@ -1,9 +1,15 @@
 import dayjs from "dayjs"
 import { Court, DocumentType } from "./documentUnit"
+import {
+  Label,
+  PublicationState,
+  PublicationStatus,
+} from "@/domain/publicationStatus"
 
 export default class RelatedDocumentation {
   public uuid?: string
   public documentNumber?: string
+  public status?: PublicationStatus
   public deviatingFileNumber?: string
   public court?: Court
   public decisionDate?: string
@@ -29,6 +35,27 @@ export default class RelatedDocumentation {
     )
   }
 
+  private getStatusLabel(status: PublicationStatus) {
+    if (!status) return ""
+
+    switch (status.publicationStatus) {
+      case PublicationState.PUBLISHED:
+        return Label.PUBLISHED
+      case PublicationState.UNPUBLISHED:
+        return status.withError ? "Nicht veröffentlicht" : Label.UNPUBLISHED
+      case PublicationState.PUBLISHING:
+        return Label.PUBLISHING
+      case PublicationState.DUPLICATED:
+        return Label.DUPLICATED
+      case PublicationState.LOCKED:
+        return Label.LOCKED
+      case PublicationState.DELETING:
+        return Label.DELETING
+      default:
+        return ""
+    }
+  }
+
   get renderDecision(): string {
     return [
       ...(this.court ? [`${this.court?.label}`] : []),
@@ -39,6 +66,7 @@ export default class RelatedDocumentation {
       ...(this.documentType && this.documentType.label
         ? [this.documentType.label]
         : []),
+      ...(this.status ? [this.getStatusLabel(this.status)] : []),
     ].join(", ")
   }
 }

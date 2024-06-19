@@ -1,5 +1,6 @@
 import { computed, FunctionalComponent, SVGAttributes } from "vue"
-import DocumentUnit, { PublicationState } from "@/domain/documentUnit"
+import DocumentUnit from "@/domain/documentUnit"
+import { Label, PublicationState } from "@/domain/publicationStatus"
 
 export interface Badge {
   label: string
@@ -21,29 +22,29 @@ export function useStatusBadge(status: DocumentUnit["status"]) {
 
     switch (status.publicationStatus) {
       case PublicationState.PUBLISHED:
-        badge.label = "Veröffentlicht"
+        badge.label = Label.PUBLISHED
         badge.backgroundColor = "bg-green-300"
         break
       case PublicationState.UNPUBLISHED:
         badge.label = status.withError
           ? "Nicht veröffentlicht"
-          : "Unveröffentlicht"
+          : Label.UNPUBLISHED
         badge.backgroundColor = "bg-blue-300"
         break
       case PublicationState.PUBLISHING:
-        badge.label = "In Veröffentlichung"
+        badge.label = Label.PUBLISHING
         badge.backgroundColor = "bg-orange-300"
         break
       case PublicationState.DUPLICATED:
-        badge.label = "Dublette"
+        badge.label = Label.DUPLICATED
         badge.backgroundColor = "bg-blue-300"
         break
       case PublicationState.LOCKED:
-        badge.label = "Gesperrt"
+        badge.label = Label.LOCKED
         badge.backgroundColor = "bg-blue-300"
         break
       case PublicationState.DELETING:
-        badge.label = "Löschen"
+        badge.label = Label.DELETING
         badge.backgroundColor = "bg-blue-300"
         break
     }
