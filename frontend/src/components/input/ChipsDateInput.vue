@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
-import { computed } from "vue"
+import { computed, ref } from "vue"
 import ChipsInput from "@/components/input/ChipsInput.vue"
 import { ValidationError } from "@/components/input/types"
 
@@ -16,6 +16,14 @@ const emit = defineEmits<{
   "update:modelValue": [value?: string[]]
   "update:validationError": [value?: ValidationError]
 }>()
+
+const lastChipValue = ref<string | undefined>("")
+const isValidDate = computed(() =>
+  dayjs(lastChipValue.value, "DD.MM.YYYY", true).isValid(),
+)
+const isInFuture = computed(() =>
+  dayjs(lastChipValue.value, "DD.MM.YYYY", true).isAfter(dayjs()),
+)
 
 const chips = computed<string[]>({
   get: () => {
@@ -32,36 +40,40 @@ const chips = computed<string[]>({
       return
     }
 
-    const lastValue = newValue.at(-1)
-    const lastDate = dayjs(lastValue, "DD.MM.YYYY", true)
+    lastChipValue.value = newValue.at(-1)
+    validateInput()
 
-    if (!lastDate.isValid()) {
-      emit("update:validationError", {
-        message: "Kein valides Datum",
-        instance: props.id,
-      })
-      return
-    }
-
-    // if valid date, check for future dates
-    const isInFuture = lastDate.isAfter(dayjs())
-    if (isInFuture) {
-      emit("update:validationError", {
-        message: props.ariaLabel + " darf nicht in der Zukunft liegen",
-        instance: props.id,
-      })
-      return
-    }
-    emit("update:validationError", undefined)
-
-    emit(
-      "update:modelValue",
-      newValue.map((value) =>
-        dayjs(value, "DD.MM.YYYY", true).format("YYYY-MM-DD"),
-      ),
-    )
+    if (isValidDate.value && !isInFuture.value)
+      emit(
+        "update:modelValue",
+        newValue.map((value) =>
+          dayjs(value, "DD.MM.YYYY", true).format("YYYY-MM-DD"),
+        ),
+      )
   },
 })
+
+function validateInput(event?: ValidationError) {
+  if (event) {
+    emit("update:validationError", event)
+    return
+  }
+  if (!isValidDate.value && lastChipValue.value) {
+    emit("update:validationError", {
+      message: "Kein valides Datum",
+      instance: props.id,
+    })
+    return
+  } else if (isInFuture.value) {
+    emit("update:validationError", {
+      message: props.ariaLabel + " darf nicht in der Zukunft liegen",
+      instance: props.id,
+    })
+    return
+  } else {
+    emit("update:validationError", undefined)
+  }
+}
 
 dayjs.extend(customParseFormat)
 </script>

@@ -20,8 +20,8 @@ const emit = defineEmits<{
 }>()
 
 const lastChipValue = ref<string | undefined>("")
-const isValid = computed(() => validateYear(lastChipValue.value))
-const isValidYear = computed(() =>
+const isValidYear = computed(() => validateYear(lastChipValue.value))
+const isInFuture = computed(() =>
   dayjs(lastChipValue.value, "YYYY", true).isAfter(dayjs()),
 )
 
@@ -40,7 +40,8 @@ const chips = computed<string[]>({
 
     validateInput()
 
-    if (isValid.value && !isValidYear.value) emit("update:modelValue", newValue)
+    if (isValidYear.value && !isInFuture.value)
+      emit("update:modelValue", newValue)
   },
 })
 
@@ -49,13 +50,13 @@ function validateInput(event?: ValidationError) {
     emit("update:validationError", event)
     return
   }
-  if (!isValid.value && lastChipValue.value) {
+  if (!isValidYear.value && lastChipValue.value) {
     emit("update:validationError", {
       message: "Kein valides Jahr",
       instance: props.id,
     })
     return
-  } else if (isValidYear.value) {
+  } else if (isInFuture.value) {
     emit("update:validationError", {
       message: props.ariaLabel + " darf nicht in der Zukunft liegen",
       instance: props.id,
