@@ -24,7 +24,8 @@ const emit = defineEmits<{
   "update:modelValue": [value: CoreData]
 }>()
 const { modelValue } = toRefs(props)
-const validationStore = useValidationStore<["decisionDate"][number]>()
+const validationStore =
+  useValidationStore<["decisionDate", "yearsOfDispute"][number]>()
 
 /**
  * Our UI turns the chronological order of the list, so the latest previous precedure is first.
@@ -234,12 +235,20 @@ onMounted(async () => {
       </InputField>
     </div>
     <div v-if="featureToggle">
-      <InputField id="yearOfDispute" label="Streitjahr">
+      <InputField
+        id="yearsOfDispute"
+        v-slot="slotProps"
+        label="Streitjahr"
+        :validation-error="validationStore.getByField('yearsOfDispute')"
+      >
         <ChipsYearInput
           id="yearOfDispute"
           v-model="modelValue.yearsOfDispute"
           aria-label="Streitjahr"
           data-testid="year-of-dispute"
+          :has-error="slotProps.hasError"
+          @focus="validationStore.remove('yearsOfDispute')"
+          @update:validation-error="slotProps.updateValidationError"
         ></ChipsYearInput>
       </InputField>
     </div>

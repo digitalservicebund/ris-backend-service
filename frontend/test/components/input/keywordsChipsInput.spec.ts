@@ -179,7 +179,7 @@ describe("Keywords Chips Input", () => {
   it("shows an error message when adding a chip that already exists", async () => {
     const onUpdate = vi.fn()
     const value = "one"
-    const errorMessage = value + " bereits vorhanden."
+    const errorMessage = value + " bereits vorhanden"
 
     const { user } = renderComponent({
       modelValue: [value],
@@ -195,7 +195,7 @@ describe("Keywords Chips Input", () => {
   it("clears the error message on blur", async () => {
     const onUpdate = vi.fn()
     const value = "one"
-    const errorMessage = value + " bereits vorhanden."
+    const errorMessage = value + " bereits vorhanden"
 
     const { user } = renderComponent({
       modelValue: [value],
@@ -212,7 +212,7 @@ describe("Keywords Chips Input", () => {
   it("clears the error message on input", async () => {
     const onUpdate = vi.fn()
     const value = "one"
-    const errorMessage = value + " bereits vorhanden."
+    const errorMessage = value + " bereits vorhanden"
     const { user } = renderComponent({
       modelValue: [value],
       "onUpdate:modelValue": onUpdate,

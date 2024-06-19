@@ -20,7 +20,7 @@ const props = defineProps<{
   manualEntry?: boolean
   noClear?: boolean
   hasError?: boolean
-  readonly?: boolean
+  readOnly?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -58,7 +58,7 @@ const noMatchingExistingItems = computed(
 
 const conditionalClasses = computed(() => ({
   "!shadow-red-900 !bg-red-200": props.hasError,
-  "!shadow-none !bg-blue-300": props.readonly,
+  "!shadow-none !bg-blue-300": props.readOnly,
 }))
 
 const toggleDropdown = async () => {
@@ -213,7 +213,7 @@ const handleClickOutside = (event: MouseEvent) => {
 }
 
 const selectAllText = () => {
-  if (!props.readonly) inputFieldRef.value?.select()
+  if (!props.readOnly) inputFieldRef.value?.select()
 }
 
 const closeDropdownAndRevertToLastSavedValue = () => {
@@ -260,7 +260,7 @@ export type InputModelProps =
         autocomplete="off"
         class="w-full bg-transparent placeholder:font-font-family-sans placeholder:not-italic placeholder:text-gray-800 focus:outline-none"
         :placeholder="placeholder"
-        :readonly="readonly"
+        :readonly="readOnly"
         tabindex="0"
         @click="selectAllText"
         @focus="showUpdatedDropdown"
@@ -270,7 +270,7 @@ export type InputModelProps =
         @keydown.esc="closeDropdownAndRevertToLastSavedValue"
         @keydown.tab="closeDropdownAndRevertToLastSavedValue"
       />
-      <div v-if="!readonly" class="flex flex-row">
+      <div v-if="!readOnly" class="flex flex-row">
         <button
           v-if="inputText && !noClear"
           aria-label="Auswahl zurücksetzen"
@@ -293,7 +293,7 @@ export type InputModelProps =
       </div>
     </div>
     <div
-      v-if="showDropdown && !readonly"
+      v-if="showDropdown && !readOnly"
       class="absolute left-0 right-0 top-[100%] z-20 flex max-h-[300px] flex-col overflow-y-scroll bg-white px-8 py-12 drop-shadow-md"
       tabindex="-1"
     >
