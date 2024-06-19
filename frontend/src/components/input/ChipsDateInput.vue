@@ -63,7 +63,6 @@ function validateInput(event?: ValidationError) {
       message: "Kein valides Datum",
       instance: props.id,
     })
-    return
   } else if (isInFuture.value) {
     emit("update:validationError", {
       message: props.ariaLabel + " darf nicht in der Zukunft liegen",
