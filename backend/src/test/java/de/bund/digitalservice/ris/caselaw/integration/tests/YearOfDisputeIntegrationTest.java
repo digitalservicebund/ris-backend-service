@@ -146,7 +146,7 @@ class YearOfDisputeIntegrationTest {
               assertThat(response.getResponseBody().documentNumber()).isEqualTo(documentNumber);
               assertThat(response.getResponseBody().coreData().yearsOfDispute()).hasSize(1);
               assertThat(response.getResponseBody().coreData().yearsOfDispute().get(0).toString())
-                  .isEqualTo(Year.now().toString());
+                  .hasToString(Year.now().toString());
             });
   }
 
@@ -188,11 +188,11 @@ class YearOfDisputeIntegrationTest {
               assertThat(response.getResponseBody().documentNumber()).isEqualTo(documentNumber);
               assertThat(response.getResponseBody().coreData().yearsOfDispute()).hasSize(3);
               assertThat(response.getResponseBody().coreData().yearsOfDispute().get(0).toString())
-                  .isEqualTo(firstYear.toString());
+                  .hasToString(firstYear.toString());
               assertThat(response.getResponseBody().coreData().yearsOfDispute().get(1).toString())
-                  .isEqualTo(secondYear.toString());
+                  .hasToString(secondYear.toString());
               assertThat(response.getResponseBody().coreData().yearsOfDispute().get(2).toString())
-                  .isEqualTo(lastYear.toString());
+                  .hasToString(lastYear.toString());
             });
   }
 
@@ -234,11 +234,11 @@ class YearOfDisputeIntegrationTest {
               assertThat(response.getResponseBody().documentNumber()).isEqualTo(documentNumber);
               assertThat(response.getResponseBody().coreData().yearsOfDispute()).hasSize(3);
               assertThat(response.getResponseBody().coreData().yearsOfDispute().get(0).toString())
-                  .isEqualTo(firstYear.toString());
+                  .hasToString(firstYear.toString());
               assertThat(response.getResponseBody().coreData().yearsOfDispute().get(1).toString())
-                  .isEqualTo(secondYear.toString());
+                  .hasToString(secondYear.toString());
               assertThat(response.getResponseBody().coreData().yearsOfDispute().get(2).toString())
-                  .isEqualTo(lastYear.toString());
+                  .hasToString(lastYear.toString());
             });
   }
 
@@ -281,7 +281,7 @@ class YearOfDisputeIntegrationTest {
               assertThat(response.getResponseBody().coreData().yearsOfDispute().get(0).toString())
                   .hasToString(currentYear.toString());
               assertThat(response.getResponseBody().coreData().yearsOfDispute().get(0).toString())
-                  .isNotEqualTo(futureYear.toString());
+                  .doesNotHaveToString(futureYear.toString());
             });
   }
 }
