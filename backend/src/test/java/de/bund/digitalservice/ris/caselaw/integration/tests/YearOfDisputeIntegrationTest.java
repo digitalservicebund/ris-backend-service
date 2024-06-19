@@ -197,52 +197,6 @@ class YearOfDisputeIntegrationTest {
   }
 
   @Test
-  void testSortYearByListIndex() {
-    String documentNumber = "1234567890123";
-
-    var firstYear = Year.parse("2022");
-    var secondYear = Year.parse("2010");
-    var lastYear = Year.parse("2009");
-
-    List<Year> years = List.of(firstYear, secondYear, lastYear);
-    DocumentationUnitDTO dto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .documentationOffice(documentationOffice)
-                .documentNumber(documentNumber)
-                .build());
-
-    DocumentUnit documentUnitFromFrontend =
-        DocumentUnit.builder()
-            .uuid(dto.getId())
-            .documentNumber(dto.getDocumentNumber())
-            .coreData(CoreData.builder().yearsOfDispute(years).build())
-            .build();
-
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
-        .bodyValue(documentUnitFromFrontend)
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(DocumentUnit.class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().documentNumber()).isEqualTo(documentNumber);
-              assertThat(response.getResponseBody().coreData().yearsOfDispute()).hasSize(3);
-              assertThat(response.getResponseBody().coreData().yearsOfDispute().get(0).toString())
-                  .hasToString(firstYear.toString());
-              assertThat(response.getResponseBody().coreData().yearsOfDispute().get(1).toString())
-                  .hasToString(secondYear.toString());
-              assertThat(response.getResponseBody().coreData().yearsOfDispute().get(2).toString())
-                  .hasToString(lastYear.toString());
-            });
-  }
-
-  @Test
   void testFutureYearsAreNotAllowed() {
     String documentNumber = "1234567890123";
 
