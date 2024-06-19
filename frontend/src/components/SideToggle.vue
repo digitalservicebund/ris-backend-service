@@ -64,6 +64,7 @@ export enum OpeningDirection {
       :aria-label="props.label + ' ' + postFix"
       class="absolute top-28 z-20 flex items-center"
       :class="classes"
+      @click="toggle"
     >
       <span :class="iconClasses">
         <IconChevronLeft
@@ -72,7 +73,6 @@ export enum OpeningDirection {
               ? !isExpanded
               : isExpanded
           "
-          @click="toggle"
         />
         <IconChevronRight v-else @click="toggle" />
       </span>
