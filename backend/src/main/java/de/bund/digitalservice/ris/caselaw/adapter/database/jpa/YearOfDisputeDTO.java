@@ -11,7 +11,6 @@ import jakarta.validation.constraints.Size;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,16 +22,14 @@ import lombok.Setter;
 @Builder
 @Entity
 @Table(schema = "incremental_migration", name = "year_of_dispute")
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class YearOfDisputeDTO {
 
   @Id @GeneratedValue private UUID id;
 
   @Column @NotNull private Integer rank;
 
-  @Column(nullable = false)
+  @Column
   @Size(min = 4, max = 4)
   @NotBlank
-  @EqualsAndHashCode.Include
   private String value;
 }
