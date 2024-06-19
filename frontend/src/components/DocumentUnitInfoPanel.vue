@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
-import { an } from "vitest/dist/reporters-yx5ZTtEV"
 import { computed, ref, toRaw, watchEffect } from "vue"
 import IconBadge, { IconBadgeProps } from "@/components/IconBadge.vue"
 import PropertyInfo from "@/components/PropertyInfo.vue"

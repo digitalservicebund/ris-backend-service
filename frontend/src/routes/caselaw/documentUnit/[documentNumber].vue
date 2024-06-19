@@ -1,20 +1,19 @@
 <script lang="ts" setup>
-import dayjs from "dayjs"
-import { computed, onMounted, ref, Ref, watchEffect } from "vue"
+import { onMounted, ref, Ref } from "vue"
 import { useRoute } from "vue-router"
 import AttachmentViewSidePanel from "@/components/AttachmentViewSidePanel.vue"
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import ErrorPage from "@/components/ErrorPage.vue"
 import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
+import { ValidationError } from "@/components/input/types"
 import NavbarSide from "@/components/NavbarSide.vue"
 import SideToggle from "@/components/SideToggle.vue"
 import { useCaseLawMenuItems } from "@/composables/useCaseLawMenuItems"
 import useQuery from "@/composables/useQueryFromRoute"
-import { useStatusBadge } from "@/composables/useStatusBadge"
 import DocumentUnit from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
-import { ResponseError } from "@/services/httpClient"
+import { ResponseError, ServiceResponse } from "@/services/httpClient"
 import useSessionStore from "@/stores/sessionStore"
 
 const props = defineProps<{
@@ -31,6 +30,10 @@ const showExtraContentPanelRef: Ref<boolean> = ref(false)
 const { pushQueryToRoute } = useQuery()
 
 const documentUnit = ref<DocumentUnit>()
+const updatedDocumentUnit = ref()
+const lastUpdatedDocumentUnit = ref()
+const validationErrors = ref<ValidationError[]>([])
+
 const error = ref<ResponseError>()
 const toggleNavigationPanel = () => {
   showNavigationPanelRef.value = !showNavigationPanelRef.value
@@ -40,12 +43,50 @@ const toggleNavigationPanel = () => {
   })
 }
 
+function hasDataChange(): boolean {
+  const newValue = JSON.stringify(updatedDocumentUnit.value)
+  const oldValue = JSON.stringify(lastUpdatedDocumentUnit.value)
+
+  return newValue !== oldValue
+}
+
+async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
+  if (!hasDataChange())
+    return {
+      status: 304,
+      data: undefined,
+    } as ServiceResponse<void>
+
+  lastUpdatedDocumentUnit.value = JSON.parse(
+    JSON.stringify(updatedDocumentUnit.value),
+  )
+  const response = await documentUnitService.update(
+    lastUpdatedDocumentUnit.value,
+  )
+
+  if (response?.error?.validationErrors) {
+    validationErrors.value = response.error.validationErrors
+  } else {
+    validationErrors.value = []
+  }
+
+  if (!hasDataChange() && response.data) {
+    updatedDocumentUnit.value = response.data as DocumentUnit
+  }
+
+  return response as ServiceResponse<void>
+}
+
 const toggleExtraContentPanel = () => {
   showExtraContentPanelRef.value = !showExtraContentPanelRef.value
   pushQueryToRoute({
     ...route.query,
     showAttachmentPanel: showExtraContentPanelRef.value.toString(),
   })
+}
+
+function updateDocumentUnit(updatedDocumentUnitFromChild: DocumentUnit) {
+  updatedDocumentUnit.value = updatedDocumentUnitFromChild
 }
 
 const showNavigationPanelRef: Ref<boolean> = ref(
@@ -103,7 +144,9 @@ async function loadDocumentUnit() {
       v-if="documentUnit"
       :document-unit="documentUnit"
       :heading="documentUnit?.documentNumber ?? ''"
-      :save-callback="loadDocumentUnit"
+      :save-callback="
+        route.path.includes('categories') ? handleUpdateDocumentUnit : undefined
+      "
     />
     <div class="flex grow flex-col items-start">
       <FlexContainer
@@ -132,8 +175,14 @@ async function loadDocumentUnit() {
           @select="handleOnSelectAttachment"
           @update="toggleExtraContentPanel"
         ></AttachmentViewSidePanel>
-
-        <router-view :document-unit="documentUnit" />
+        <!-- TODO: Find better event names: load=loadFromServer, save=saveToServer, update=changesToLocalVersion  -->
+        <router-view
+          :document-unit="documentUnit"
+          :validation-errors="validationErrors"
+          @documenet-unit-save="handleUpdateDocumentUnit"
+          @document-unit-update="updateDocumentUnit"
+          @load-document-unit="loadDocumentUnit"
+        />
       </FlexContainer>
       <ErrorPage v-else :error="error" :title="error?.title" />
     </div>

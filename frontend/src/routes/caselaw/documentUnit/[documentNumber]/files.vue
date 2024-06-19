@@ -10,7 +10,7 @@ import { ResponseError } from "@/services/httpClient"
 const props = defineProps<{ documentUnit: DocumentUnit }>()
 
 const emit = defineEmits<{
-  updateDocumentUnit: [void]
+  loadDocumentUnit: [void]
 }>()
 useHead({
   title:
@@ -21,7 +21,7 @@ const route = useRoute()
 const error = ref<ResponseError>()
 
 async function loadDocumentUnit() {
-  emit("updateDocumentUnit")
+  emit("loadDocumentUnit")
 }
 
 onMounted(() => loadDocumentUnit())

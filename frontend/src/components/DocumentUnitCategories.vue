@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, toRefs } from "vue"
+import { computed, ref, toRefs, watch } from "vue"
 import { useRoute } from "vue-router"
 import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContentRelatedIndexing.vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
@@ -13,18 +13,28 @@ import { useScrollToHash } from "@/composables/useScrollToHash"
 import DocumentUnit, { Texts, CoreData } from "@/domain/documentUnit"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import PreviousDecision from "@/domain/previousDecision"
-import documentUnitService from "@/services/documentUnitService"
-import { ServiceResponse } from "@/services/httpClient"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
+  validationErrors: ValidationError[]
 }>()
+
+const emits = defineEmits<{
+  documentUnitUpdate: [DocumentUnit]
+  documentUnitSave: []
+}>()
+
 const updatedDocumentUnit = ref<DocumentUnit>(props.documentUnit)
-const validationErrors = ref<ValidationError[]>([])
 const route = useRoute()
 const courtTypeRef = ref<string>(props.documentUnit.coreData.court?.type ?? "")
 
-const lastUpdatedDocumentUnit = ref()
+watch(
+  updatedDocumentUnit,
+  () => {
+    emits("documentUnitUpdate", updatedDocumentUnit.value as DocumentUnit)
+  },
+  { deep: true },
+)
 
 const courtTypesWithLegalForce = [
   "BVerfG",
@@ -58,13 +68,6 @@ const handleUpdateValueDocumentUnitTexts = async (
     hasInnerText || hasImgElem || hasTable ? updatedValue[1] : ""
 }
 
-function hasDataChange(): boolean {
-  const newValue = JSON.stringify(updatedDocumentUnit.value)
-  const oldValue = JSON.stringify(lastUpdatedDocumentUnit.value)
-
-  return newValue !== oldValue
-}
-
 /**
  * Deletes the legal forces from all single norms in the norms of the updated document unit.
  */
@@ -79,33 +82,6 @@ function deleteLegalForces() {
       return !singleNorm.isEmpty
     })
   })
-}
-
-async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
-  if (!hasDataChange())
-    return {
-      status: 304,
-      data: undefined,
-    } as ServiceResponse<void>
-
-  lastUpdatedDocumentUnit.value = JSON.parse(
-    JSON.stringify(updatedDocumentUnit.value),
-  )
-  const response = await documentUnitService.update(
-    lastUpdatedDocumentUnit.value,
-  )
-
-  if (response?.error?.validationErrors) {
-    validationErrors.value = response.error.validationErrors
-  } else {
-    validationErrors.value = []
-  }
-
-  if (!hasDataChange() && response.data) {
-    updatedDocumentUnit.value = response.data as DocumentUnit
-  }
-
-  return response as ServiceResponse<void>
 }
 
 const coreData = computed({
@@ -140,7 +116,7 @@ const coreData = computed({
       deleteLegalForces()
     }
     if (triggerSaving) {
-      handleUpdateDocumentUnit()
+      emits("documentUnitSave")
     }
   },
 })
