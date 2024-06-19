@@ -20,7 +20,7 @@ useSeoMeta({
 
     <Suspense>
       <main class="flex grow">
-        <router-view />
+        <router-view class="grow" />
       </main>
     </Suspense>
   </div>
