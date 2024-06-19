@@ -74,7 +74,7 @@ export enum OpeningDirection {
               : isExpanded
           "
         />
-        <IconChevronRight v-else @click="toggle" />
+        <IconChevronRight v-else />
       </span>
     </button>
     <div v-show="isExpanded" class="-mr-[1.25rem]">
