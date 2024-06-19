@@ -49,7 +49,7 @@ describe("Core Data", () => {
   test("renders year of dispute", async () => {
     const documentUnit = new DocumentUnit("1", {
       coreData: {
-        yearOfDispute: ["2021", "2022"],
+        yearsOfDispute: ["2021", "2022"],
       },
       documentNumber: "ABCD2022000001",
     })

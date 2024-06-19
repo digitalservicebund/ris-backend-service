@@ -237,7 +237,7 @@ onMounted(async () => {
       <InputField id="yearOfDispute" label="Streitjahr">
         <ChipsYearInput
           id="yearOfDispute"
-          v-model="modelValue.yearOfDispute"
+          v-model="modelValue.yearsOfDispute"
           aria-label="Streitjahr"
           data-testid="year-of-dispute"
         ></ChipsYearInput>
