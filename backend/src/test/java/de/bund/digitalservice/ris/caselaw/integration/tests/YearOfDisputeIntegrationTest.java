@@ -156,7 +156,7 @@ class YearOfDisputeIntegrationTest {
 
     var firstYear = Year.parse("2022");
     var secondYear = Year.parse("2010");
-    var lastYear = Year.parse("2030");
+    var lastYear = Year.parse("2009");
 
     List<Year> years = List.of(firstYear, secondYear, lastYear);
     DocumentationUnitDTO dto =
