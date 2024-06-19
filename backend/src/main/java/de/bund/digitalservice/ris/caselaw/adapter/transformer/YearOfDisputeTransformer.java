@@ -45,8 +45,7 @@ public class YearOfDisputeTransformer {
 
   static void addYearsOfDisputeToDTO(
       DocumentationUnitDTO.DocumentationUnitDTOBuilder builder, CoreData coreData) {
-    var yearsOfDisputeDTOs = transformToDTO(coreData.yearsOfDispute());
-    builder.yearsOfDispute(yearsOfDisputeDTOs);
+    builder.yearsOfDispute(transformToDTO(coreData.yearsOfDispute()));
   }
 
   static void addYearsOfDisputeToDomain(

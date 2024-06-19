@@ -162,7 +162,7 @@ class YearOfDisputeIntegrationTest {
     DocumentationUnitDTO dto =
         repository.save(
             DocumentationUnitDTO.builder()
-                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .documentationOffice(documentationOffice)
                 .documentNumber(documentNumber)
                 .build());
 
@@ -208,7 +208,7 @@ class YearOfDisputeIntegrationTest {
     DocumentationUnitDTO dto =
         repository.save(
             DocumentationUnitDTO.builder()
-                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .documentationOffice(documentationOffice)
                 .documentNumber(documentNumber)
                 .build());
 
@@ -253,7 +253,7 @@ class YearOfDisputeIntegrationTest {
     DocumentationUnitDTO dto =
         repository.save(
             DocumentationUnitDTO.builder()
-                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .documentationOffice(documentationOffice)
                 .documentNumber(documentNumber)
                 .build());
 
@@ -279,7 +279,7 @@ class YearOfDisputeIntegrationTest {
               assertThat(response.getResponseBody().documentNumber()).isEqualTo(documentNumber);
               assertThat(response.getResponseBody().coreData().yearsOfDispute()).hasSize(1);
               assertThat(response.getResponseBody().coreData().yearsOfDispute().get(0).toString())
-                  .isEqualTo(currentYear.toString());
+                  .hasToString(currentYear.toString());
               assertThat(response.getResponseBody().coreData().yearsOfDispute().get(0).toString())
                   .isNotEqualTo(futureYear.toString());
             });
