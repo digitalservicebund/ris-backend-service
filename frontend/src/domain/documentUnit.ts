@@ -26,7 +26,7 @@ export type CoreData = {
   inputTypes?: string[]
   documentationOffice?: DocumentationOffice
   region?: string
-  yearOfDispute?: string[]
+  yearsOfDispute?: string[]
   leadingDecisionNormReferences?: string[]
 }
 

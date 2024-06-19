@@ -1,42 +1,51 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
-import de.bund.digitalservice.ris.caselaw.domain.YearOfDispute;
+import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import java.time.Year;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class YearOfDisputeTransformer {
 
   private YearOfDisputeTransformer() {}
 
-  public static Set<YearOfDispute> transformToDomain(Set<YearOfDisputeDTO> yearOfDisputeDTOs) {
+  private static List<Year> transformToDomain(Set<YearOfDisputeDTO> yearOfDisputeDTOs) {
     return yearOfDisputeDTOs.stream()
         .sorted(Comparator.comparing(YearOfDisputeDTO::getRank))
-        .map(
-            yearOfDisputeDTo ->
-                YearOfDispute.builder()
-                    .id(yearOfDisputeDTo.getId())
-                    .year(Year.parse(yearOfDisputeDTo.getValue()))
-                    .build())
-        .collect(Collectors.toCollection(TreeSet::new));
+        .map(YearOfDisputeDTO::getValue)
+        .distinct()
+        .map(Year::parse)
+        .toList();
   }
 
-  public static Set<YearOfDisputeDTO> transformToDTO(Set<YearOfDispute> yearOfDisputeList) {
+  private static Set<YearOfDisputeDTO> transformToDTO(List<Year> yearsOfDispute) {
+    if (yearsOfDispute == null || yearsOfDispute.isEmpty()) return Collections.emptySet();
 
-    return IntStream.range(0, yearOfDisputeList.size())
-        .mapToObj(
-            index -> {
-              var yearsOfDispute = yearOfDisputeList.iterator().next();
-              return YearOfDisputeDTO.builder()
-                  .id(yearsOfDispute.id())
-                  .value(yearsOfDispute.year().toString())
-                  .rank(index)
-                  .build();
-            })
-        .collect(Collectors.toSet());
+    var uniqueYears = yearsOfDispute.stream().map(Year::toString).distinct().toList();
+
+    Set<YearOfDisputeDTO> yearOfDisputeDTOS = new HashSet<>();
+
+    for (int i = 0; i < uniqueYears.size(); i++) {
+      yearOfDisputeDTOS.add(YearOfDisputeDTO.builder().value(uniqueYears.get(i)).rank(i).build());
+    }
+    return yearOfDisputeDTOS;
+  }
+
+  static void addYearsOfDisputeToDTO(
+      DocumentationUnitDTO.DocumentationUnitDTOBuilder builder, CoreData coreData) {
+    var yearsOfDisputeDTOs = transformToDTO(coreData.yearsOfDispute());
+    builder.yearsOfDispute(yearsOfDisputeDTOs);
+  }
+
+  static void addYearsOfDisputeToDomain(
+      DocumentationUnitDTO currentDto, CoreData.CoreDataBuilder coreDataBuilder) {
+
+    coreDataBuilder.yearsOfDispute(
+        YearOfDisputeTransformer.transformToDomain(currentDto.getYearsOfDispute()));
   }
 }

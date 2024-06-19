@@ -1,5 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import static de.bund.digitalservice.ris.caselaw.adapter.transformer.YearOfDisputeTransformer.addYearsOfDisputeToDTO;
+import static de.bund.digitalservice.ris.caselaw.adapter.transformer.YearOfDisputeTransformer.addYearsOfDisputeToDomain;
+
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionNameDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
@@ -90,6 +93,7 @@ public class DocumentationUnitTransformer {
       addDeviatingEclis(builder, coreData);
       addLegalEffect(currentDto, updatedDomainObject, builder);
       addLeadingDecisionNormReferences(updatedDomainObject, builder);
+      addYearsOfDisputeToDTO(builder, coreData);
 
     } else {
       builder
@@ -99,7 +103,8 @@ public class DocumentationUnitTransformer {
           .decisionDate(null)
           .court(null)
           .documentType(null)
-          .documentationOffice(null);
+          .documentationOffice(null)
+          .yearsOfDispute(null);
     }
 
     addPreviousDecisions(updatedDomainObject, builder);
@@ -878,12 +883,5 @@ public class DocumentationUnitTransformer {
                   });
             });
     return borderNumbers;
-  }
-
-  private static void addYearsOfDisputeToDomain(
-      DocumentationUnitDTO currentDto, CoreData.CoreDataBuilder coreDataBuilder) {
-
-    coreDataBuilder.yearsOfDispute(
-        YearOfDisputeTransformer.transformToDomain(currentDto.getYearsOfDispute()));
   }
 }

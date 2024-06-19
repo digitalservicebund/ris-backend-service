@@ -15,7 +15,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -256,7 +255,7 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
-  @Valid
+  @OrderBy("rank")
   private Set<YearOfDisputeDTO> yearsOfDispute = new HashSet<>();
 
   // This will be used to send legal periodical references to the exporter and frontend
