@@ -24,7 +24,7 @@ const service: FeatureToggleService = {
    * Workaround as long as we don't get a project-specific set of feature flags from the backend resp. Unleash.
    */
   async getEnabledToggles(): Promise<Record<string, boolean>> {
-    const TOGGLE_NAMES = ["neuris.note"]
+    const TOGGLE_NAMES: string[] = []
 
     const featureFlagsList = await Promise.all(
       TOGGLE_NAMES.map(async (name) => [
