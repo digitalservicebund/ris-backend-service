@@ -132,8 +132,6 @@ const editor = new Editor({
     Blockquote,
     Indent.configure({
       names: ["listItem", "paragraph"],
-      minIndentLevel: 0,
-      maxIndentLevel: 8,
     }),
   ],
   onUpdate: () => {

@@ -49,8 +49,8 @@ const updateIndentLevel = (
         tr,
         pos,
         options.indentRange * (type === "indent" ? 1 : -1),
-        options.minIndentLevel,
-        options.maxIndentLevel,
+        options.minIndentLevel * options.indentRange,
+        options.maxIndentLevel * options.indentRange,
       )
       return false
     }
@@ -84,9 +84,9 @@ export const Indent = Extension.create<IndentOptions, never>({
   addOptions() {
     return {
       names: ["heading", "paragraph"],
-      indentRange: 24,
+      indentRange: 40,
       minIndentLevel: 0,
-      maxIndentLevel: 24 * 10,
+      maxIndentLevel: 10,
       defaultIndentLevel: 0,
       HTMLAttributes: {},
     }
@@ -161,7 +161,6 @@ export const Indent = Extension.create<IndentOptions, never>({
   },
   onUpdate() {
     const { editor } = this
-    // インデントされたparagraphがlistItemに変更されたらindentをリセット
     if (editor.isActive("listItem")) {
       const node = editor.state.selection.$head.node()
       if (node.attrs.indent) {
@@ -198,14 +197,6 @@ export const getOutdent: (
       return false
     }
     if (
-      /**
-       * editor.state.selection.$head.parentOffset > 0があるのは
-       * ```
-       * - Hello
-       * |<<ここにカーソル
-       * ```
-       * この状態でBackSpaceを繰り返すとlistItemのtoggleが繰り返されるのを防ぐため
-       */
       (!outdentOnlyAtHead || editor.state.selection.$head.parentOffset > 0) &&
       editor.can().liftListItem("listItem")
     ) {
