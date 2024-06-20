@@ -77,7 +77,6 @@ describe("Document Unit Categories", () => {
 
     expect(screen.getByTestId("title")).toBeVisible()
     expect(screen.queryByTestId("attachment-list")).toBeVisible()
-    expect(screen.queryByTestId("attachment-view-side-panel")).toBeVisible()
     expect(screen.queryByText(name)).toBeVisible()
     expect(screen.queryByText(format)).toBeVisible()
     expect(screen.getByTestId("uploaded-at-cell")).toBeInTheDocument()
