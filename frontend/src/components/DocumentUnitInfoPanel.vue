@@ -42,7 +42,7 @@ const courtInfo = computed(() => props.documentUnit?.coreData.court?.label)
 
 const statusBadge = ref(useStatusBadge(props.documentUnit?.status).value)
 
-const firstRow = computed(() => [
+const firstRow = computed<(PropertyInfoType | IconBadgeProps)[]>(() => [
   ...(statusBadge.value ? [statusBadge.value] : []),
   {
     label: "Dokumentationsstelle",
