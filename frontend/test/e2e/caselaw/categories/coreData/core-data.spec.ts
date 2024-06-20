@@ -336,149 +336,189 @@ test.describe("core data", () => {
     ).toBeHidden()
   })
 
-  //RISDEV-3918
-  test.describe("years of dispute", () => {
-    //RISDEV-4197
-    test("adding, navigating, deleting multiple years of dispute", async ({
-      page,
-      documentNumber,
-    }) => {
-      await navigateToCategories(page, documentNumber)
+  test.describe(
+    "years of dispute",
+    {
+      annotation: {
+        type: "epic",
+        description:
+          "https://digitalservicebund.atlassian.net/browse/RISDEV-3918",
+      },
+    },
+    () => {
+      test(
+        "display, adding, navigating, deleting multiple years of dispute",
+        {
+          annotation: {
+            type: "story",
+            description:
+              "https://digitalservicebund.atlassian.net/browse/RISDEV-4197",
+          },
+        },
+        async ({ page, documentNumber }) => {
+          await navigateToCategories(page, documentNumber)
 
-      await waitForSaving(
-        async () => {
-          await page.locator("[aria-label='Streitjahr']").fill("2020")
-          await page.keyboard.press("Enter")
-          await page.locator("[aria-label='Streitjahr']").fill("2021")
-          await page.keyboard.press("Enter")
+          await waitForSaving(
+            async () => {
+              await page.locator("[aria-label='Streitjahr']").fill("2020")
+              await page.keyboard.press("Enter")
+              await page.locator("[aria-label='Streitjahr']").fill("2021")
+              await page.keyboard.press("Enter")
 
-          await page.locator("[aria-label='Streitjahr']").fill("2022")
-          await page.keyboard.press("Enter")
+              await page.locator("[aria-label='Streitjahr']").fill("2022")
+              await page.keyboard.press("Enter")
 
+              await expect(page.getByText("2020")).toBeVisible()
+              await expect(page.getByText("2021")).toBeVisible()
+              await expect(page.getByText("2022")).toBeVisible()
+
+              // Navigate back and delete on enter
+              await page.keyboard.press("ArrowLeft")
+              await page.keyboard.press("Enter")
+
+              await expect(page.getByText("2022")).toBeHidden()
+
+              // Tab out and in
+              await page.keyboard.press("Tab")
+              await page.keyboard.press("Tab")
+              await page.keyboard.down("Shift")
+              await page.keyboard.press("Tab")
+
+              await page.keyboard.press("ArrowLeft")
+
+              //Navigate back and delete on backspace
+              await page.keyboard.press("Enter")
+
+              await expect(page.getByText("2021")).toBeHidden()
+            },
+            page,
+            { clickSaveButton: true },
+          )
+
+          await page.reload()
+          await expect(page.getByText("2020")).toBeVisible()
+        },
+      )
+
+      test(
+        "years of dispute visible in preview",
+        {
+          annotation: {
+            type: "story",
+            description:
+              "https://digitalservicebund.atlassian.net/browse/RISDEV-4198",
+          },
+        },
+        async ({ page, documentNumber }) => {
+          await navigateToCategories(page, documentNumber)
+
+          await waitForSaving(
+            async () => {
+              await page.locator("[aria-label='Streitjahr']").fill("2020")
+              await page.keyboard.press("Enter")
+              await page.locator("[aria-label='Streitjahr']").fill("2021")
+              await page.keyboard.press("Enter")
+
+              await expect(page.getByText("2020")).toBeVisible()
+              await expect(page.getByText("2021")).toBeVisible()
+            },
+            page,
+            { clickSaveButton: true },
+          )
+
+          await navigateToPreview(page, documentNumber)
           await expect(page.getByText("2020")).toBeVisible()
           await expect(page.getByText("2021")).toBeVisible()
+        },
+      )
+
+      test(
+        "years of dispute are exported",
+        {
+          annotation: {
+            type: "story",
+            description:
+              "https://digitalservicebund.atlassian.net/browse/RISDEV-4199",
+          },
+        },
+        async ({ page, documentNumber }) => {
+          await navigateToCategories(page, documentNumber)
+
+          await waitForSaving(
+            async () => {
+              await page.locator("[aria-label='Streitjahr']").fill("2020")
+              await page.keyboard.press("Enter")
+              await page.locator("[aria-label='Streitjahr']").fill("2021")
+              await page.keyboard.press("Enter")
+
+              await expect(page.getByText("2020")).toBeVisible()
+              await expect(page.getByText("2021")).toBeVisible()
+            },
+            page,
+            { clickSaveButton: true },
+          )
+          await expect(page.getByText("2020")).toBeVisible()
+          //Todo: test that year of dispute visible in xml preview
+        },
+      )
+
+      test(
+        "validating years of dispute input",
+        {
+          annotation: {
+            type: "story",
+            description:
+              "https://digitalservicebund.atlassian.net/browse/RISDEV-4200",
+          },
+        },
+        async ({ page, documentNumber }) => {
+          await navigateToCategories(page, documentNumber)
+
+          await waitForSaving(
+            async () => {
+              //Only unique values
+              await page.locator("[aria-label='Streitjahr']").fill("2022")
+              await page.keyboard.press("Enter")
+              await expect(page.getByText("2022")).toBeVisible()
+
+              await page.locator("[aria-label='Streitjahr']").fill("2022")
+              await page.keyboard.press("Enter")
+              await expect(
+                page.getByText("2022 bereits vorhanden"),
+              ).toBeVisible()
+
+              //Only valid year
+              await page.locator("[aria-label='Streitjahr']").fill("999")
+              await page.keyboard.press("Enter")
+              await expect(
+                page.getByText("2022 bereits vorhanden"),
+              ).toBeHidden()
+              await expect(page.getByText("Kein valides Jahr")).toBeVisible()
+
+              //Only years in past
+              await page.locator("[aria-label='Streitjahr']").fill("2030")
+              await page.keyboard.press("Enter")
+              await expect(page.getByText("Kein valides Jahr")).toBeHidden()
+              await expect(
+                page.getByText("Streitjahr darf nicht in der Zukunft liegen"),
+              ).toBeVisible()
+
+              //On blur
+              await page.locator("[aria-label='Streitjahr']").fill("20")
+              await page.keyboard.press("Tab")
+              await expect(
+                page.getByText("Streitjahr darf nicht in der Zukunft liegen"),
+              ).toBeHidden()
+              await expect(page.getByText("Kein valides Jahr")).toBeVisible()
+            },
+            page,
+            { clickSaveButton: true },
+          )
+
+          await page.reload()
           await expect(page.getByText("2022")).toBeVisible()
-
-          // Navigate back and delete on enter
-          await page.keyboard.press("ArrowLeft")
-          await page.keyboard.press("Enter")
-
-          await expect(page.getByText("2022")).toBeHidden()
-
-          // Tab out and in
-          await page.keyboard.press("Tab")
-          await page.keyboard.press("Tab")
-          await page.keyboard.down("Shift")
-          await page.keyboard.press("Tab")
-
-          await page.keyboard.press("ArrowLeft")
-
-          //Navigate back and delete on backspace
-          await page.keyboard.press("Enter")
-
-          await expect(page.getByText("2021")).toBeHidden()
         },
-        page,
-        { clickSaveButton: true },
       )
-
-      await page.reload()
-      await expect(page.getByText("2020")).toBeVisible()
-    })
-
-    //RISDEV-4198
-    test("years of dispute visible in preview", async ({
-      page,
-      documentNumber,
-    }) => {
-      await navigateToCategories(page, documentNumber)
-
-      await waitForSaving(
-        async () => {
-          await page.locator("[aria-label='Streitjahr']").fill("2020")
-          await page.keyboard.press("Enter")
-          await page.locator("[aria-label='Streitjahr']").fill("2021")
-          await page.keyboard.press("Enter")
-
-          await expect(page.getByText("2020")).toBeVisible()
-          await expect(page.getByText("2021")).toBeVisible()
-        },
-        page,
-        { clickSaveButton: true },
-      )
-
-      await navigateToPreview(page, documentNumber)
-      await expect(page.getByText("2020")).toBeVisible()
-      await expect(page.getByText("2021")).toBeVisible()
-    })
-
-    //RISDEV-4199
-    test("years of dispute are exported", async ({ page, documentNumber }) => {
-      await navigateToCategories(page, documentNumber)
-
-      await waitForSaving(
-        async () => {
-          await page.locator("[aria-label='Streitjahr']").fill("2020")
-          await page.keyboard.press("Enter")
-          await page.locator("[aria-label='Streitjahr']").fill("2021")
-          await page.keyboard.press("Enter")
-
-          await expect(page.getByText("2020")).toBeVisible()
-          await expect(page.getByText("2021")).toBeVisible()
-        },
-        page,
-        { clickSaveButton: true },
-      )
-      await expect(page.getByText("2020")).toBeVisible()
-      //Todo: test that year of dispute visible in xml preview
-    })
-
-    //RISDEV-4200
-    test("validating years of dispute input", async ({
-      page,
-      documentNumber,
-    }) => {
-      await navigateToCategories(page, documentNumber)
-
-      await waitForSaving(
-        async () => {
-          //Only unique values
-          await page.locator("[aria-label='Streitjahr']").fill("2022")
-          await page.keyboard.press("Enter")
-          await expect(page.getByText("2022")).toBeVisible()
-
-          await page.locator("[aria-label='Streitjahr']").fill("2022")
-          await page.keyboard.press("Enter")
-          await expect(page.getByText("2022 bereits vorhanden")).toBeVisible()
-
-          //Only valid year
-          await page.locator("[aria-label='Streitjahr']").fill("999")
-          await page.keyboard.press("Enter")
-          await expect(page.getByText("2022 bereits vorhanden")).toBeHidden()
-          await expect(page.getByText("Kein valides Jahr")).toBeVisible()
-
-          //Only years in past
-          await page.locator("[aria-label='Streitjahr']").fill("2030")
-          await page.keyboard.press("Enter")
-          await expect(page.getByText("Kein valides Jahr")).toBeHidden()
-          await expect(
-            page.getByText("Streitjahr darf nicht in der Zukunft liegen"),
-          ).toBeVisible()
-
-          //On blur
-          await page.locator("[aria-label='Streitjahr']").fill("20")
-          await page.keyboard.press("Tab")
-          await expect(
-            page.getByText("Streitjahr darf nicht in der Zukunft liegen"),
-          ).toBeHidden()
-          await expect(page.getByText("Kein valides Jahr")).toBeVisible()
-        },
-        page,
-        { clickSaveButton: true },
-      )
-
-      await page.reload()
-      await expect(page.getByText("2022")).toBeVisible()
-    })
-  })
+    },
+  )
 })
