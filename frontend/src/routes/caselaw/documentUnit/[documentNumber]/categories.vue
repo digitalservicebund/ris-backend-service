@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { useHead } from "@unhead/vue"
 import DocumentUnitCategories from "@/components/DocumentUnitCategories.vue"
 import { ValidationError } from "@/components/input/types"
 import DocumentUnit from "@/domain/documentUnit"
 
-const props = defineProps<{
+defineProps<{
   documentUnit: DocumentUnit
   validationErrors: ValidationError[]
 }>()
@@ -21,11 +20,6 @@ function updateDocumentUnit(updatedDocumentUnit: DocumentUnit) {
 function documentUnitSave() {
   emits("documentUnitSave")
 }
-
-useHead({
-  title:
-    props.documentUnit.documentNumber + " · NeuRIS Rechtsinformationssystem",
-})
 </script>
 
 <template>
@@ -33,7 +27,7 @@ useHead({
     v-if="documentUnit"
     :document-unit="documentUnit"
     :validation-errors="validationErrors"
-    @documenet-unit-save="documentUnitSave"
+    @document-unit-save="documentUnitSave"
     @document-unit-update="updateDocumentUnit"
   />
 </template>

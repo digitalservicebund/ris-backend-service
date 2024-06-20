@@ -1,39 +1,29 @@
 <script lang="ts" setup>
-import { computed, onMounted, Ref, ref } from "vue"
-import { useRoute } from "vue-router"
+import { computed, Ref, ref } from "vue"
 import AttachmentList from "@/components/AttachmentList.vue"
 import FileUpload from "@/components/FileUpload.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import TitleElement from "@/components/TitleElement.vue"
-import useQuery from "@/composables/useQueryFromRoute"
 import Attachment from "@/domain/attachment"
 import DocumentUnit from "@/domain/documentUnit"
 import attachmentService from "@/services/attachmentService"
-import useSessionStore from "@/stores/sessionStore"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
   showNavigationPanel?: boolean
 }>()
 const emit = defineEmits<{
-  updateDocumentUnit: [void]
+  attachmentsUploaded: [boolean]
+  attachmentIndexSelected: [number]
+  attachmentIndexDeleted: [number]
 }>()
-
-const { pushQueryToRoute } = useQuery<"showAttachmentPanel">()
-const route = useRoute()
-
-const showExtraContentPanelRef: Ref<boolean> = ref(false)
 
 const errors = ref<string[]>([])
 const isLoading = ref(false)
 const acceptedFileFormats = [".docx"]
-const selectedAttachmentIndex: Ref<number> = ref(0)
-const { featureToggles } = useSessionStore()
-const notesFeatureToggle = computed(
-  () => featureToggles["neuris.note"] ?? false,
-)
+const deletingAttachmentIndex: Ref<number> = ref(0)
 
 const showDeleteModal = ref(false)
 const deleteModalHeaderText = "Anhang löschen"
@@ -69,29 +59,19 @@ const handleDeleteAttachment = async (index: number) => {
       )
     ).status < 300
   ) {
-    if (getAttachments().length > 1) {
-      selectedAttachmentIndex.value = index == 0 ? 0 : index - 1
-    } else {
-      toggleExtraContentPanel(false)
-    }
-    emit("updateDocumentUnit")
+    emit("attachmentIndexDeleted", index)
   }
 }
 
 const handleOnSelect = (index: number) => {
   if (index >= 0 && index < getAttachments().length) {
-    if (selectedAttachmentIndex.value == index) {
-      toggleExtraContentPanel()
-    } else {
-      selectedAttachmentIndex.value = index
-      toggleExtraContentPanel(true)
-    }
+    emit("attachmentIndexSelected", index)
   }
 }
 
 const handleOnDelete = (index: number) => {
   errors.value = []
-  selectedAttachmentIndex.value = index
+  deletingAttachmentIndex.value = index
   toggleDeleteModal()
 }
 
@@ -124,18 +104,8 @@ async function upload(files: FileList) {
     }
   } finally {
     isLoading.value = false
-    emit("updateDocumentUnit")
-    if (!showExtraContentPanelRef.value && anySuccessful) {
-      toggleExtraContentPanel(true)
-    }
+    emit("attachmentsUploaded", anySuccessful)
   }
-}
-
-const toggleExtraContentPanel = (state?: boolean) => {
-  showExtraContentPanelRef.value = state || !showExtraContentPanelRef.value
-  pushQueryToRoute({
-    showAttachmentPanel: showExtraContentPanelRef.value.toString(),
-  })
 }
 
 function toggleDeleteModal() {
@@ -152,15 +122,6 @@ function toggleDeleteModal() {
     }
   }
 }
-
-onMounted(async () => {
-  if (route.query.showAttachmentPanel) {
-    showExtraContentPanelRef.value = route.query.showAttachmentPanel === "true"
-  } else if (notesFeatureToggle.value) {
-    showExtraContentPanelRef.value =
-      !!props.documentUnit.note || props.documentUnit.hasAttachments
-  }
-})
 </script>
 
 <template>
@@ -168,18 +129,18 @@ onMounted(async () => {
     <PopupModal
       v-if="
         showDeleteModal &&
-        props.documentUnit.attachments[selectedAttachmentIndex] !== undefined &&
-        props.documentUnit.attachments[selectedAttachmentIndex] !== null &&
-        props.documentUnit.attachments[selectedAttachmentIndex].name != null
+        props.documentUnit.attachments[deletingAttachmentIndex] !== undefined &&
+        props.documentUnit.attachments[deletingAttachmentIndex] !== null &&
+        props.documentUnit.attachments[deletingAttachmentIndex].name != null
       "
       :aria-label="deleteModalHeaderText"
       cancel-button-type="tertiary"
       confirm-button-type="destructive"
       confirm-text="Löschen"
-      :content-text="`Möchten Sie den Anhang ${getAttachment(selectedAttachmentIndex).name} wirklich dauerhaft löschen?`"
+      :content-text="`Möchten Sie den Anhang ${getAttachment(deletingAttachmentIndex).name} wirklich dauerhaft löschen?`"
       :header-text="deleteModalHeaderText"
       @close-modal="toggleDeleteModal"
-      @confirm-action="deleteFile(selectedAttachmentIndex)"
+      @confirm-action="deleteFile(deletingAttachmentIndex)"
     />
     <TitleElement class="mb-0">Dokumente</TitleElement>
     <AttachmentList
@@ -190,7 +151,7 @@ onMounted(async () => {
       @select="handleOnSelect"
     />
     <InfoModal
-      v-if="errors.length > 0 && isLoading === false"
+      v-if="errors.length > 0 && !isLoading"
       class="mt-8"
       :description="errors"
       :title="errorTitle"
