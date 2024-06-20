@@ -37,6 +37,7 @@ describe("preview core data", () => {
       previousProcedures: ["vorgang-0"],
       legalEffect: "Ja",
       region: "gfs",
+      yearsOfDispute: ["2023"],
     })
 
     expect(await screen.findByText("Gericht")).toBeInTheDocument()
@@ -58,6 +59,7 @@ describe("preview core data", () => {
     expect(await screen.findByText("Rechtskraft")).toBeInTheDocument()
     expect(await screen.findByText("Region")).toBeInTheDocument()
     expect(await screen.findByText("BGH Nachschlagewerk")).toBeInTheDocument()
+    expect(await screen.findByText("Streitjahr")).toBeInTheDocument()
   })
 
   test("do not render empty list", async () => {
@@ -69,6 +71,7 @@ describe("preview core data", () => {
       deviatingEclis: [],
       previousProcedures: [],
       leadingDecisionNormReferences: [],
+      yearsOfDispute: [],
     })
 
     expect(screen.queryByText("Fehlerhaftes Gericht")).not.toBeInTheDocument()
@@ -82,6 +85,7 @@ describe("preview core data", () => {
     expect(screen.queryByText("Abweichender ECLI")).not.toBeInTheDocument()
     expect(screen.queryByText("Vorgangshistorie")).not.toBeInTheDocument()
     expect(screen.queryByText("BGH Nachschlagewerk")).not.toBeInTheDocument()
+    expect(screen.queryByText("Streitjahr")).not.toBeInTheDocument()
   })
 
   it.each([
@@ -359,12 +363,30 @@ describe("preview core data", () => {
         "Rechtskraft",
       ],
     ],
+    [
+      "Region",
+      { region: "BRD" },
+      [
+        "Gericht",
+        "Fehlerhaftes Gericht",
+        "Aktenzeichen",
+        "Abweichendes Aktenzeichen",
+        "Entscheidungsdatum",
+        "Abweichendes Entscheidungsdatum",
+        "Spruchkörper",
+        "Dokumenttyp",
+        "ECLI",
+        "Abweichender ECLI",
+        "Vorgang",
+        "Vorgangshistorie",
+        "Rechtskraft",
+      ],
+    ],
   ])(
     `renders only %s`,
     async (expected: string, coreData: CoreData, notExpected: string[]) => {
       renderComponent(coreData)
       expect(await screen.findByText(expected)).toBeInTheDocument()
-
       notExpected.forEach((it) => {
         expect(screen.queryByText(it)).not.toBeInTheDocument()
       })

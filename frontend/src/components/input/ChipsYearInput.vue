@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
-import { computed } from "vue"
+import { computed, ref } from "vue"
 import ChipsInput from "@/components/input/ChipsInput.vue"
 import { ValidationError } from "@/components/input/types"
 
@@ -9,13 +9,21 @@ interface Props {
   id: string
   modelValue?: string[]
   ariaLabel: string
+  hasError?: boolean
 }
+
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
   "update:modelValue": [value?: string[]]
   "update:validationError": [value?: ValidationError]
 }>()
+
+const lastChipValue = ref<string | undefined>("")
+const isValidYear = computed(() => validateYear(lastChipValue.value))
+const isInFuture = computed(() =>
+  dayjs(lastChipValue.value, "YYYY", true).isAfter(dayjs()),
+)
 
 const chips = computed<string[]>({
   get: () => {
@@ -28,32 +36,42 @@ const chips = computed<string[]>({
       return
     }
 
-    const lastValue = newValue.at(-1)
-    const lastYear = dayjs(lastValue, "YYYY", true)
-    const validYear =
-      lastYear.isValid() && lastYear.year() >= 1000 && lastYear.year() <= 9999
+    lastChipValue.value = newValue.at(-1)
 
-    if (!validYear) {
-      emit("update:validationError", {
-        message: "Kein valides Jahr",
-        instance: props.id,
-      })
-      return
-    }
+    validateInput()
 
-    // if valid date, check for future dates
-    const isInFuture = dayjs(lastValue, "YYYY", true).isAfter(dayjs())
-    if (isInFuture) {
-      emit("update:validationError", {
-        message: props.ariaLabel + " darf nicht in der Zukunft liegen",
-        instance: props.id,
-      })
-      return
-    }
-    emit("update:validationError", undefined)
-    emit("update:modelValue", newValue)
+    if (isValidYear.value && !isInFuture.value)
+      emit("update:modelValue", newValue)
   },
 })
+
+function validateInput(event?: ValidationError) {
+  if (event) {
+    emit("update:validationError", event)
+    return
+  }
+  if (!isValidYear.value && lastChipValue.value) {
+    emit("update:validationError", {
+      message: "Kein valides Jahr",
+      instance: props.id,
+    })
+  } else if (isInFuture.value) {
+    emit("update:validationError", {
+      message: props.ariaLabel + " darf nicht in der Zukunft liegen",
+      instance: props.id,
+    })
+    return
+  } else {
+    emit("update:validationError", undefined)
+  }
+}
+
+function validateYear(input: string | undefined): boolean {
+  if (!input || input.length < 4) return false
+
+  const date = dayjs(input, "YYYY", true)
+  return date.isValid() && date.year() >= 1000 && date.year() <= 9999
+}
 
 dayjs.extend(customParseFormat)
 </script>
@@ -63,7 +81,8 @@ dayjs.extend(customParseFormat)
     :id="id"
     v-model="chips"
     :aria-label="ariaLabel"
+    :has-error="hasError"
     maska="####"
-    @update:validation-error="$emit('update:validationError', $event)"
+    @update:validation-error="validateInput($event)"
   />
 </template>

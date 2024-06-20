@@ -142,7 +142,7 @@ describe("Chips Input", () => {
 
     expect(onUpdate).not.toHaveBeenCalled()
     expect(onError).toHaveBeenCalledWith({
-      message: "Eintrag bereits vorhanden",
+      message: "foo bereits vorhanden",
       instance: id,
     })
   })
