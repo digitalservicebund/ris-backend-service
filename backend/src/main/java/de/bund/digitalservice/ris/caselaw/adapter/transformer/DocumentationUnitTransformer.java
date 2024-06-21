@@ -1,8 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import static de.bund.digitalservice.ris.caselaw.adapter.transformer.YearOfDisputeTransformer.addYearsOfDisputeToDTO;
-import static de.bund.digitalservice.ris.caselaw.adapter.transformer.YearOfDisputeTransformer.addYearsOfDisputeToDomain;
-
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionNameDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
@@ -19,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
@@ -38,8 +36,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -883,5 +883,28 @@ public class DocumentationUnitTransformer {
                   });
             });
     return borderNumbers;
+  }
+
+  private static void addYearsOfDisputeToDTO(
+      DocumentationUnitDTO.DocumentationUnitDTOBuilder builder, CoreData coreData) {
+
+    if (coreData.yearsOfDispute() == null || coreData.yearsOfDispute().isEmpty()) return;
+
+    Set<YearOfDisputeDTO> yearOfDisputeDTOS = new LinkedHashSet<>();
+
+    for (int i = 0; i < coreData.yearsOfDispute().size(); i++) {
+      yearOfDisputeDTOS.add(
+          YearOfDisputeTransformer.transformToDTO(coreData.yearsOfDispute().get(i), i + 1));
+    }
+    builder.yearsOfDispute(yearOfDisputeDTOS);
+  }
+
+  static void addYearsOfDisputeToDomain(
+      DocumentationUnitDTO currentDto, CoreData.CoreDataBuilder coreDataBuilder) {
+
+    coreDataBuilder.yearsOfDispute(
+        currentDto.getYearsOfDispute().stream()
+            .map(YearOfDisputeTransformer::transformToDomain)
+            .toList());
   }
 }
