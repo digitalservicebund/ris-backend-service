@@ -24,6 +24,12 @@ const emit = defineEmits<{
 const postFix = computed(() => (props.isExpanded ? "schließen" : "öffnen"))
 
 const classes = computed(() => ({
+  "pr-[1.25rem]": props.openingDirection == OpeningDirection.RIGHT,
+  "pr-[2.25rem]":
+    props.openingDirection == OpeningDirection.LEFT && !props.isExpanded,
+}))
+
+const buttonClasses = computed(() => ({
   "right-0": props.openingDirection == OpeningDirection.RIGHT,
   "left-0": props.openingDirection == OpeningDirection.LEFT,
   "-mr-12":
@@ -43,6 +49,10 @@ const iconClasses = computed(() => ({
     props.size === "medium",
 }))
 
+const contentClasses = computed(() => ({
+  "-mr-[1.25rem]": props.openingDirection == OpeningDirection.RIGHT,
+}))
+
 const toggle = () => {
   emit("update:isExpanded", !props.isExpanded)
 }
@@ -56,14 +66,11 @@ export enum OpeningDirection {
 </script>
 
 <template>
-  <div
-    class="relative bg-white"
-    :class="[props.size === 'small' ? 'pr-[1.25rem]' : 'pr-[2.25rem]']"
-  >
+  <div class="relative bg-white" :class="classes">
     <button
       :aria-label="props.label + ' ' + postFix"
       class="absolute top-28 z-20 flex items-center"
-      :class="classes"
+      :class="buttonClasses"
       @click="toggle"
     >
       <span :class="iconClasses">
@@ -77,7 +84,7 @@ export enum OpeningDirection {
         <IconChevronRight v-else />
       </span>
     </button>
-    <div v-show="isExpanded" class="-mr-[1.25rem]">
+    <div v-show="isExpanded" :class="contentClasses">
       <slot />
     </div>
   </div>

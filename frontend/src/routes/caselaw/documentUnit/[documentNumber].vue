@@ -14,7 +14,6 @@ import useQuery from "@/composables/useQueryFromRoute"
 import DocumentUnit from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
 import { ResponseError, ServiceResponse } from "@/services/httpClient"
-import useSessionStore from "@/stores/sessionStore"
 
 const props = defineProps<{
   documentNumber: string
@@ -25,8 +24,6 @@ useHead({
 })
 
 const route = useRoute()
-const { featureToggles } = useSessionStore()
-const notesFeatureToggle = ref(featureToggles["neuris.note"] ?? false)
 const menuItems = useCaseLawMenuItems(props.documentNumber, route.query)
 const { pushQueryToRoute } = useQuery()
 
@@ -161,7 +158,7 @@ onMounted(async () => {
           class="w-full flex-grow flex-row-reverse"
         >
           <ExtraContentSidePanel
-            v-if="notesFeatureToggle && !route.path.includes('publication')"
+            v-if="!route.path.includes('publication')"
             ref="extraContentSidePanel"
             :document-unit="documentUnit"
           ></ExtraContentSidePanel>

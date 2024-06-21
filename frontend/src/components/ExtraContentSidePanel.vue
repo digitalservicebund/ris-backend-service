@@ -98,11 +98,11 @@ onMounted(() => {
       @keydown.enter="togglePanel"
       @update:is-expanded="togglePanel"
     >
-      <FlexContainer class="m-16 ml-20 items-center space-x-8 px-8">
+      <FlexContainer class="m-16 ml-20 items-center -space-x-2 px-8">
         <TextButton
           id="note"
           aria-label="Notiz anzeigen"
-          :button-type="notesSelected ? 'primary' : 'tertiary'"
+          button-type="tertiary"
           :disabled="!hasNote"
           :icon="IconStickyNote"
           size="small"
@@ -112,12 +112,20 @@ onMounted(() => {
         <TextButton
           id="attachments"
           aria-label="Dokumente anzeigen"
-          :button-type="attachmentsSelected ? 'primary' : 'tertiary'"
+          button-type="tertiary"
           :disabled="!hasAttachments"
           :icon="IconAttachFile"
           size="small"
           @click="() => selectAttachments()"
         />
+
+        <div class="flex-grow" />
+
+        <FileNavigator
+          :attachments="documentUnit.attachments"
+          :current-index="currentAttachmentIndex"
+          @select="handleOnSelect"
+        ></FileNavigator>
       </FlexContainer>
 
       <div class="p-16">
@@ -131,11 +139,6 @@ onMounted(() => {
           />
         </div>
         <div v-if="attachmentsSelected">
-          <FileNavigator
-            :attachments="documentUnit.attachments"
-            :current-index="currentAttachmentIndex"
-            @select="handleOnSelect"
-          ></FileNavigator>
           <AttachmentView
             v-if="
               documentUnit.uuid &&

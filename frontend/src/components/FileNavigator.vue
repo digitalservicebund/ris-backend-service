@@ -37,15 +37,15 @@ const hasPrevious = computed(() => {
 <template>
   <FlexContainer
     v-if="attachments.length > 1"
-    class="float-end m-16 ml-20 items-center space-x-8 px-8"
+    class="float-end items-center space-x-8"
   >
-    <FlexItem class="ds-label-01-bold">
+    <FlexItem class="ds-label-01-bold self-center">
       {{ props.attachments[currentIndex].name }}
     </FlexItem>
     <TextButton
       id="decrease"
       aria-label="Vorheriges Dokument anzeigen"
-      button-type="tertiary"
+      button-type="ghost"
       :disabled="!hasPrevious.valueOf()"
       :icon="IcOutlineArrowBack"
       size="small"
@@ -55,7 +55,7 @@ const hasPrevious = computed(() => {
     <TextButton
       id="increase"
       aria-label="Nächstes Dokument anzeigen"
-      button-type="tertiary"
+      button-type="ghost"
       :disabled="!hasNext.valueOf()"
       :icon="IcOutlineArrowForward"
       size="small"
