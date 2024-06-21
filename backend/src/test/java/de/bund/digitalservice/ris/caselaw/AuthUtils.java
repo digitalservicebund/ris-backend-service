@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.caselaw;
 
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockOidcLogin;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
 
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -10,16 +10,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.OidcLoginMutator;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor;
 
 public class AuthUtils {
 
-  public static OidcLoginMutator getMockLogin() {
+  public static OidcLoginRequestPostProcessor getMockLogin() {
     return getMockLoginWithDocOffice("/DS");
   }
 
-  public static OidcLoginMutator getMockLoginWithDocOffice(String docOfficeGroup) {
-    return mockOidcLogin()
+  public static OidcLoginRequestPostProcessor getMockLoginWithDocOffice(String docOfficeGroup) {
+    return oidcLogin()
         .idToken(
             token ->
                 token.claims(

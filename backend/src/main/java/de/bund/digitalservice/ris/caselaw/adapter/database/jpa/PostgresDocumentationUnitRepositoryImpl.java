@@ -108,13 +108,24 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     var documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
     var documentationUnitDTO =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .id(UUID.randomUUID())
-                .documentNumber(documentNumber)
-                .documentationOffice(documentationOfficeDTO)
-                .legalEffect(LegalEffectDTO.KEINE_ANGABE)
+        DocumentationUnitDTO.builder()
+            .documentNumber(documentNumber)
+            .documentationOffice(documentationOfficeDTO)
+            .legalEffect(LegalEffectDTO.KEINE_ANGABE)
+            .build();
+
+    documentationUnitDTO
+        .getStatus()
+        .add(
+            StatusDTO.builder()
+                .createdAt(Instant.now())
+                .documentationUnitDTO(documentationUnitDTO)
+                .publicationStatus(PublicationStatus.UNPUBLISHED)
+                .withError(false)
                 .build());
+
+    documentationUnitDTO = repository.save(documentationUnitDTO);
+
     return DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
   }
 

@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ImportApiKeyException;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,7 +30,7 @@ public class AuthController {
     this.authService = authService;
   }
 
-  @GetMapping(value = "me")
+  @GetMapping(value = "me", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<User> getUser(@AuthenticationPrincipal OidcUser oidcUser) {
     return ResponseEntity.ok(userService.getUser(oidcUser));
@@ -41,7 +42,7 @@ public class AuthController {
    * @param oidcUser current user via openid connect system
    * @return the last/current api key for the user or null if no api key exist
    */
-  @GetMapping(value = "api-key/import")
+  @GetMapping(value = "api-key/import", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<ApiKey> getImportApiKey(@AuthenticationPrincipal OidcUser oidcUser) {
     ApiKey apiKey = authService.getImportApiKey(oidcUser);
@@ -56,7 +57,7 @@ public class AuthController {
    * @param oidcUser current user via openid connect system
    * @return the new generated api key
    */
-  @PutMapping(value = "api-key/import")
+  @PutMapping(value = "api-key/import", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<ApiKey> generateImportApiKey(@AuthenticationPrincipal OidcUser oidcUser) {
 
@@ -74,7 +75,7 @@ public class AuthController {
    * @param request http request to get the header information
    * @return the last/current api key for the user
    */
-  @PostMapping(value = "api-key/import/invalidate")
+  @PostMapping(value = "api-key/import/invalidate", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<ApiKey> invalidateImportApiKey(
       @AuthenticationPrincipal OidcUser oidcUser, ServerHttpRequest request) {

@@ -1,19 +1,21 @@
 package de.bund.digitalservice.ris.caselaw;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.MockMvc;
 
 @TestConfiguration
-@ComponentScan
 public class TestConfig {
-
-  @Autowired private WebTestClient webTestClient;
-
   @Bean
-  public RisWebTestClient risWebTestClient() {
-    return new RisWebTestClient(webTestClient);
+  public RisWebTestClient risWebTestClient(MockMvc mockMvc) {
+    var objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule());
+    objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+    return new RisWebTestClient(mockMvc, objectMapper);
   }
 }

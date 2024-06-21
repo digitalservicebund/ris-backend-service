@@ -31,7 +31,7 @@ public class DatabaseProcedureService implements ProcedureService {
   }
 
   @Override
-  @Transactional(transactionManager = "jpaTransactionManager")
+  @Transactional
   public Page<Procedure> search(
       Optional<String> query, DocumentationOffice documentationOffice, Pageable pageable) {
 
@@ -50,7 +50,7 @@ public class DatabaseProcedureService implements ProcedureService {
   }
 
   @Override
-  @Transactional(transactionManager = "jpaTransactionManager")
+  @Transactional
   public List<DocumentationUnitListItem> getDocumentUnits(UUID procedureId) {
     return repository
         .findById(procedureId)

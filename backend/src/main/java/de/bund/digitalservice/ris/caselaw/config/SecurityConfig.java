@@ -6,10 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
@@ -17,9 +17,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableWebMvc
 @EnableWebSecurity
 @EnableMethodSecurity
-// @EnableRedisWebSession(maxInactiveIntervalInSeconds = 12 * 60 * 60)
 public class SecurityConfig {
-
   @Bean
   SecurityFilterChain web(HttpSecurity http) throws Exception {
     http.authorizeHttpRequests(
@@ -33,13 +31,9 @@ public class SecurityConfig {
         .oauth2Login(oauth2 -> oauth2.failureHandler(new RedirectingAuthenticationFailureHandler()))
         .exceptionHandling(
             httpSecurityExceptionHandlingConfigurer ->
-                httpSecurityExceptionHandlingConfigurer
-                    .accessDeniedPage("/error")
-                    .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-        .csrf(
-            httpSecurityCsrfConfigurer ->
-                httpSecurityCsrfConfigurer.csrfTokenRepository(
-                    CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(
+                    new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+        .csrf(AbstractHttpConfigurer::disable)
         .headers(
             httpSecurityHeadersConfigurer ->
                 httpSecurityHeadersConfigurer

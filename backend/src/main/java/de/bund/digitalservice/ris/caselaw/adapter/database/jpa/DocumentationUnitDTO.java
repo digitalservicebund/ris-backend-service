@@ -162,9 +162,10 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @JoinColumn(name = "documentation_office_id", referencedColumnName = "id")
   private DocumentationOfficeDTO documentationOffice;
 
-  @OneToMany(mappedBy = "documentationUnitDTO", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "documentationUnitDTO", cascade = CascadeType.ALL)
+  @Builder.Default
   @OrderBy("createdAt desc")
-  private List<StatusDTO> status;
+  private List<StatusDTO> status = new ArrayList<>();
 
   // Gericht
   @ManyToOne

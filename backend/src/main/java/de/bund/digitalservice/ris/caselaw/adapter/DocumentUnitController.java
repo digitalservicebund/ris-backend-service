@@ -1,8 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformerException;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
@@ -64,7 +66,7 @@ public class DocumentUnitController {
     this.converterService = converterService;
   }
 
-  @GetMapping(value = "new")
+  @GetMapping(value = "new", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<DocumentUnit> generateNewDocumentUnit(
       @AuthenticationPrincipal OidcUser oidcUser) {
@@ -85,20 +87,21 @@ public class DocumentUnitController {
    * <p>Do a conversion into html and parse the footer for ECLI information.
    *
    * @param uuid UUID of the documentation unit
-   * @param byteBuffer bytes of the content file
+   * @param bytes bytes of the content file
    * @param httpHeaders http headers with the X-Filename information
    * @return the into html converted content of the file with some additional metadata (ECLI)
    */
-  @PutMapping(value = "/{uuid}/file")
+  @PutMapping(
+      value = "/{uuid}/file",
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      consumes = "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
   @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
   public ResponseEntity<Docx2Html> attachFileToDocumentUnit(
-      @PathVariable UUID uuid,
-      @RequestBody ByteBuffer byteBuffer,
-      @RequestHeader HttpHeaders httpHeaders) {
+      @PathVariable UUID uuid, @RequestBody byte[] bytes, @RequestHeader HttpHeaders httpHeaders) {
     var docx2html =
         converterService.getConvertedObject(
             attachmentService
-                .attachFileToDocumentationUnit(uuid, byteBuffer, httpHeaders)
+                .attachFileToDocumentationUnit(uuid, ByteBuffer.wrap(bytes), httpHeaders)
                 .s3path());
     service.updateECLI(uuid, docx2html);
     if (docx2html == null) {
@@ -116,12 +119,12 @@ public class DocumentUnitController {
       attachmentService.deleteByS3Path(s3Path);
       return ResponseEntity.noContent().build();
     } catch (Exception e) {
-      // TODO
+      log.error("Error by deleting attachment '{}' for documentation unit {}", s3Path, uuid, e);
       return ResponseEntity.internalServerError().build();
     }
   }
 
-  @GetMapping(value = "/search")
+  @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   // Access rights are being enforced through SQL filtering
   public Slice<DocumentationUnitListItem> searchByDocumentUnitListEntry(
@@ -153,7 +156,7 @@ public class DocumentUnitController {
         myDocOfficeOnly);
   }
 
-  @GetMapping(value = "/{documentNumber}")
+  @GetMapping(value = "/{documentNumber}", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentNumber.apply(#documentNumber)")
   public ResponseEntity<DocumentUnit> getByDocumentNumber(
       @NonNull @PathVariable String documentNumber) {
@@ -177,7 +180,10 @@ public class DocumentUnitController {
     }
   }
 
-  @PutMapping(value = "/{uuid}", consumes = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping(
+      value = "/{uuid}",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
   public ResponseEntity<DocumentUnit> updateByUuid(
       @PathVariable UUID uuid,
@@ -190,7 +196,10 @@ public class DocumentUnitController {
     try {
       var du = service.updateDocumentUnit(documentUnit);
       return ResponseEntity.status(HttpStatus.OK).body(du);
-    } catch (DocumentationUnitNotExistsException e) {
+    } catch (DocumentationUnitNotExistsException
+        | DocumentationUnitException
+        | DocumentUnitTransformerException e) {
+      log.error("Error by updating documentation unit '{}'", documentUnit.documentNumber(), e);
       return ResponseEntity.internalServerError().body(DocumentUnit.builder().build());
     }
   }
@@ -203,7 +212,8 @@ public class DocumentUnitController {
     try {
       var publication = service.publishAsEmail(uuid, userService.getEmail(oidcUser));
       return ResponseEntity.ok(publication);
-    } catch (DocumentationUnitNotExistsException e) {
+    } catch (DocumentationUnitNotExistsException | DocumentUnitPublishException e) {
+      log.error("Error by publishing the documentation unit '{}' as email", uuid, e);
       return ResponseEntity.internalServerError().build();
     }
   }
@@ -226,7 +236,9 @@ public class DocumentUnitController {
     }
   }
 
-  @PutMapping(value = "/{documentNumberToExclude}/search-linkable-documentation-units")
+  @PutMapping(
+      value = "/{documentNumberToExclude}/search-linkable-documentation-units",
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public Slice<RelatedDocumentationUnit> searchLinkableDocumentationUnits(
       @PathVariable("documentNumberToExclude") String documentNumberToExclude,
@@ -246,23 +258,34 @@ public class DocumentUnitController {
   @GetMapping(value = "/{uuid}/docx/{s3Path}", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
   public ResponseEntity<Docx2Html> getHtml(@PathVariable UUID uuid, @PathVariable String s3Path) {
-    var du = service.getByUuid(uuid);
-    if (du == null) {
+    if (service.getByUuid(uuid) == null) {
       return ResponseEntity.notFound().build();
     }
-    var docx2Html = converterService.getConvertedObject(s3Path);
-    return ResponseEntity.ok()
-        .cacheControl(CacheControl.maxAge(Duration.ofDays(1))) // Set cache duration
-        .body(docx2Html);
-    // TODO onErrorReturn(ResponseEntity.internalServerError().build());
+
+    try {
+      var docx2Html = converterService.getConvertedObject(s3Path);
+      return ResponseEntity.ok()
+          .cacheControl(CacheControl.maxAge(Duration.ofDays(1))) // Set cache duration
+          .body(docx2Html);
+    } catch (Exception ex) {
+      log.error("Error by getting docx for documentation unit {}", uuid, ex);
+      return ResponseEntity.internalServerError().build();
+    }
   }
 
   @PostMapping(value = "/validateSingleNorm")
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<String> validateSingleNorm(
       @RequestBody SingleNormValidationInfo singleNormValidationInfo) {
-    return ResponseEntity.ok(service.validateSingleNorm(singleNormValidationInfo));
-    // TODO        .onErrorReturn(ResponseEntity.internalServerError().build());
-
+    try {
+      return ResponseEntity.ok(service.validateSingleNorm(singleNormValidationInfo));
+    } catch (Exception ex) {
+      log.error(
+          "Error by validation of single norm '{} - {}'",
+          singleNormValidationInfo.normAbbreviation(),
+          singleNormValidationInfo.singleNorm(),
+          ex);
+      return ResponseEntity.internalServerError().build();
+    }
   }
 }

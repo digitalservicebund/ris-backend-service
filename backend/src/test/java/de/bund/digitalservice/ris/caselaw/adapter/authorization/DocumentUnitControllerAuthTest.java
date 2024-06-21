@@ -9,7 +9,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
@@ -28,6 +27,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
+import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.List;
@@ -40,10 +40,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.web.reactive.function.BodyInserters;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = DocumentUnitController.class)
@@ -112,7 +112,10 @@ class DocumentUnitControllerAuthTest {
         .withLogin(docOffice1Group)
         .put()
         .uri(uri)
-        .body(BodyInserters.fromValue(new byte[] {}))
+        .contentType(
+            MediaType.parseMediaType(
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+        .bodyValue(new byte[] {})
         .exchange()
         .expectStatus()
         .isOk();
@@ -121,7 +124,10 @@ class DocumentUnitControllerAuthTest {
         .withLogin(docOffice2Group)
         .put()
         .uri(uri)
-        .body(BodyInserters.fromValue(new byte[] {}))
+        .contentType(
+            MediaType.parseMediaType(
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+        .bodyValue(new byte[] {})
         .exchange()
         .expectStatus()
         .isForbidden();
@@ -179,7 +185,7 @@ class DocumentUnitControllerAuthTest {
         .withLogin(docOffice1Group)
         .put()
         .uri(uri)
-        .header(HttpHeaders.CONTENT_TYPE, "application/json")
+        .contentType(MediaType.APPLICATION_JSON)
         .bodyValue(docUnit)
         .exchange()
         .expectStatus()
@@ -189,7 +195,7 @@ class DocumentUnitControllerAuthTest {
         .withLogin(docOffice2Group)
         .put()
         .uri(uri)
-        .header(HttpHeaders.CONTENT_TYPE, "application/json")
+        .contentType(MediaType.APPLICATION_JSON)
         .bodyValue(docUnit)
         .exchange()
         .expectStatus()
@@ -203,7 +209,7 @@ class DocumentUnitControllerAuthTest {
         .withLogin(docOffice1Group)
         .put()
         .uri(uri)
-        .header(HttpHeaders.CONTENT_TYPE, "application/json")
+        .contentType(MediaType.APPLICATION_JSON)
         .bodyValue(docUnit)
         .exchange()
         .expectStatus()
@@ -213,7 +219,7 @@ class DocumentUnitControllerAuthTest {
         .withLogin(docOffice2Group)
         .put()
         .uri(uri)
-        .header(HttpHeaders.CONTENT_TYPE, "application/json")
+        .contentType(MediaType.APPLICATION_JSON)
         .bodyValue(docUnit)
         .exchange()
         .expectStatus()

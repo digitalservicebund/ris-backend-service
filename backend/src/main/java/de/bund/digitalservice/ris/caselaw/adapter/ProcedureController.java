@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,7 +33,7 @@ public class ProcedureController {
     this.userService = userService;
   }
 
-  @GetMapping()
+  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public Page<Procedure> search(
       @AuthenticationPrincipal OidcUser oidcUser,
@@ -43,7 +44,7 @@ public class ProcedureController {
         query, userService.getDocumentationOffice(oidcUser), PageRequest.of(page.orElse(0), size));
   }
 
-  @GetMapping(value = "/{procedureUUID}/documentunits")
+  @GetMapping(value = "/{procedureUUID}/documentunits", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public List<DocumentationUnitListItem> getDocumentUnits(
       @AuthenticationPrincipal OidcUser oidcUser, @NonNull @PathVariable UUID procedureUUID) {

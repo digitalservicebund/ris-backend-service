@@ -5,7 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
-import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
+import com.fasterxml.jackson.core.type.TypeReference;
+import de.bund.digitalservice.ris.caselaw.SliceTestImpl;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
@@ -42,10 +43,13 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import de.bund.digitalservice.ris.caselaw.webtestclient.RisBodySpec;
+import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -62,7 +66,6 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
@@ -365,56 +368,63 @@ class PreviousDecisionIntegrationTest {
   @Test
   void testSearchForDocumentUnitsByPreviousDecisionInput_noSearchCriteria_shouldMatchAll() {
     prepareDocumentUnitDTOs();
-    simulateAPICall(PreviousDecision.builder().build())
-        .jsonPath("$.content")
-        .isNotEmpty()
-        .jsonPath("$.content.length()")
-        .isEqualTo(3);
+    List<PreviousDecision> content =
+        simulateAPICall(PreviousDecision.builder().build())
+            .returnResult()
+            .getResponseBody()
+            .getContent();
+    assertThat(content).hasSize(3);
   }
 
   @Test
   void testSearchForDocumentUnitsByPreviousDecisionInput_onlyDate_shouldMatchOne() {
     LocalDate date1 = prepareDocumentUnitDTOs();
-    simulateAPICall(PreviousDecision.builder().decisionDate(date1).build())
-        .jsonPath("$.content")
-        .isNotEmpty()
-        .jsonPath("$.content.length()")
-        .isEqualTo(1)
-        .jsonPath("$.content[0].decisionDate")
-        .isEqualTo(date1.toString());
+    List<PreviousDecision> content =
+        simulateAPICall(PreviousDecision.builder().decisionDate(date1).build())
+            .returnResult()
+            .getResponseBody()
+            .getContent();
+    assertThat(content).hasSize(1);
+    PreviousDecision documentUnit = (PreviousDecision) content.get(0);
+    assertThat(documentUnit.getDecisionDate()).isEqualTo(date1);
   }
 
   @Test
   void testSearchForDocumentUnitsByPreviousDecisionInput_onlyCourt_shouldMatchThree() {
     prepareDocumentUnitDTOs();
-    simulateAPICall(
-            PreviousDecision.builder().court(Court.builder().type("Court1").build()).build())
-        .jsonPath("$.content")
-        .isNotEmpty()
-        .jsonPath("$.content.length()")
-        .isEqualTo(3)
-        .jsonPath("$.content[0].court.type")
-        .isEqualTo("Court1");
+    List<PreviousDecision> content =
+        simulateAPICall(
+                PreviousDecision.builder().court(Court.builder().type("Court1").build()).build())
+            .returnResult()
+            .getResponseBody()
+            .getContent();
+    assertThat(content).hasSize(3);
+    PreviousDecision documentUnit = (PreviousDecision) content.get(0);
+    assertThat(documentUnit.getCourt()).extracting("type").isEqualTo("Court1");
   }
 
   @Test
   void testSearchForDocumentUnitsByPreviousDecisionInput_onlyFileNumber_shouldMatchTwo() {
     prepareDocumentUnitDTOs();
-    simulateAPICall(PreviousDecision.builder().fileNumber("AkteX").build())
-        .jsonPath("$.content")
-        .isNotEmpty()
-        .jsonPath("$.content.length()")
-        .isEqualTo(2)
-        .jsonPath("$.content[0].fileNumber")
-        .isEqualTo("AkteX");
+    List<PreviousDecision> content =
+        simulateAPICall(PreviousDecision.builder().fileNumber("AkteX").build())
+            .returnResult()
+            .getResponseBody()
+            .getContent();
+    assertThat(content).hasSize(2);
+    PreviousDecision documentUnit = (PreviousDecision) content.get(0);
+    assertThat(documentUnit.getFileNumber()).isEqualTo("AkteX");
   }
 
   @Test
   void testSearchForDocumentUnitsByPreviousDecisionInput_onlyFileNumber_shouldNotMatchDocNumber() {
     prepareDocumentUnitDTOs();
-    simulateAPICall(PreviousDecision.builder().fileNumber("XX").build())
-        .jsonPath("$.content")
-        .isEmpty();
+    List<PreviousDecision> content =
+        simulateAPICall(PreviousDecision.builder().fileNumber("XX").build())
+            .returnResult()
+            .getResponseBody()
+            .getContent();
+    assertThat(content).isEmpty();
   }
 
   @Test
@@ -423,39 +433,44 @@ class PreviousDecisionIntegrationTest {
     DocumentType documentType =
         DocumentTypeTransformer.transformToDomain(
             databaseDocumentTypeRepository.findFirstByAbbreviationAndCategory("GH", category));
-    simulateAPICall(PreviousDecision.builder().documentType(documentType).build())
-        .jsonPath("$.content")
-        .isArray()
-        .jsonPath("$.content.length()")
-        .isEqualTo(1)
-        .jsonPath("$.content[0].documentType.jurisShortcut")
-        .isEqualTo("GH");
+    List<PreviousDecision> content =
+        simulateAPICall(PreviousDecision.builder().documentType(documentType).build())
+            .returnResult()
+            .getResponseBody()
+            .getContent();
+    assertThat(content).hasSize(1);
+    PreviousDecision documentUnit = (PreviousDecision) content.get(0);
+    assertThat(documentUnit.getDocumentType().jurisShortcut()).isEqualTo("GH");
   }
 
   @Test
   void testSearchForDocumentUnitsByPreviousDecisionInput_nullDocumentType_shouldAll() {
     prepareDocumentUnitDTOs();
-    simulateAPICall(PreviousDecision.builder().documentType(null).build())
-        .jsonPath("$.content")
-        .isArray()
-        .jsonPath("$.content.length()")
-        .isEqualTo(3);
+    List<PreviousDecision> content =
+        simulateAPICall(PreviousDecision.builder().documentType(null).build())
+            .returnResult()
+            .getResponseBody()
+            .getContent();
+    assertThat(content).hasSize(3);
   }
 
   @Test
   void
       testSearchForDocumentUnitsByPreviousDecisionInput_threeMatchingOneDoesNot_shouldMatchNothing() {
     LocalDate date1 = prepareDocumentUnitDTOs();
-    simulateAPICall(
-            PreviousDecision.builder()
-                .decisionDate(date1)
-                .court(Court.builder().type("Court1").build())
-                .fileNumber("AkteX")
-                .documentType(
-                    DocumentType.builder().uuid(UUID.randomUUID()).jurisShortcut("XY").build())
-                .build())
-        .jsonPath("$.content.length()")
-        .isEqualTo(0);
+    List<PreviousDecision> content =
+        simulateAPICall(
+                PreviousDecision.builder()
+                    .decisionDate(date1)
+                    .court(Court.builder().type("Court1").build())
+                    .fileNumber("AkteX")
+                    .documentType(
+                        DocumentType.builder().uuid(UUID.randomUUID()).jurisShortcut("XY").build())
+                    .build())
+            .returnResult()
+            .getResponseBody()
+            .getContent();
+    assertThat(content).isEmpty();
   }
 
   @Test
@@ -493,17 +508,15 @@ class PreviousDecisionIntegrationTest {
             "CC-RIS",
             Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
 
-    simulateAPICall(PreviousDecision.builder().fileNumber("AkteZ").build())
-        .jsonPath("$.content.length()")
-        .isEqualTo(3)
-        .jsonPath("$.content[?(@.uuid=='" + du1.getId() + "')]")
-        .isArray()
-        .jsonPath("$.content[?(@.uuid=='" + du2.getId() + "')]")
-        .isArray()
-        .jsonPath("$.content[?(@.uuid=='" + du4.getId() + "')]")
-        .isEmpty()
-        .jsonPath("$.content[?(@.uuid=='" + du5.getId() + "')]")
-        .isArray();
+    List<PreviousDecision> content =
+        simulateAPICall(PreviousDecision.builder().fileNumber("AkteZ").build())
+            .returnResult()
+            .getResponseBody()
+            .getContent();
+    assertThat(content).hasSize(3);
+    assertThat(content)
+        .extracting(RelatedDocumentationUnit::getUuid)
+        .containsExactlyInAnyOrder(du1.getId(), du2.getId(), du5.getId());
   }
 
   private LocalDate prepareDocumentUnitDTOs() {
@@ -536,7 +549,7 @@ class PreviousDecisionIntegrationTest {
     return date1;
   }
 
-  private WebTestClient.BodyContentSpec simulateAPICall(
+  private RisBodySpec<SliceTestImpl<PreviousDecision>> simulateAPICall(
       PreviousDecision PreviousDecisionSearchInput) {
     return risWebTestClient
         .withDefaultLogin()
@@ -547,7 +560,7 @@ class PreviousDecisionIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody();
+        .expectBody(new TypeReference<>() {});
   }
 
   private DocumentationUnitDTO createDocumentUnit(
