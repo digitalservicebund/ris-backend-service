@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
@@ -22,6 +23,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -41,6 +43,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.Region;
 import java.time.Instant;
+import java.time.Year;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -985,6 +988,23 @@ class DocumentationUnitTransformerTest {
   private DocumentationUnitDTOBuilder generateSimpleDTOBuilder() {
     return DocumentationUnitDTO.builder()
         .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("doc office").build());
+  }
+
+  @Test
+  void testAddYearsOfDisputeToDTORanking() {
+    DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
+
+    CoreData.CoreDataBuilder coreDataBuilder = generateSimpleCoreDataBuilder();
+    coreDataBuilder.yearsOfDispute(
+        List.of(Year.now().minusYears(2), Year.now(), Year.now().minusYears(4)));
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(
+            currentDto,
+            generateSimpleDocumentUnitBuilder().coreData(coreDataBuilder.build()).build());
+
+    assertEquals(
+        documentationUnitDTO.getYearsOfDispute().stream().map(YearOfDisputeDTO::getRank).toList(),
+        List.of(1, 2, 3));
   }
 
   private DocumentUnitBuilder generateSimpleDocumentUnitBuilder() {

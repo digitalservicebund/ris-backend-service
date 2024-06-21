@@ -63,9 +63,7 @@ export default class RelatedDocumentation {
         ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
         : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
-      ...(this.documentType && this.documentType.label
-        ? [this.documentType.label]
-        : []),
+      ...(this.documentType?.label ? [this.documentType.label] : []),
       ...(this.status ? [this.getStatusLabel(this.status)] : []),
     ].join(", ")
   }

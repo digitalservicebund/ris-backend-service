@@ -100,6 +100,30 @@ describe("ChipsYearInput", () => {
     })
   })
 
+  it("does not accept existing dates", async () => {
+    const id = "id"
+    const ariaLabel = "chip"
+
+    const onError = vi.fn()
+    const onUpdate = vi.fn()
+    const { user } = renderComponent({
+      id: id,
+      ariaLabel: ariaLabel,
+      "onUpdate:modelValue": onUpdate,
+      "onUpdate:validationError": onError,
+      modelValue: ["2020", "2021"],
+    })
+
+    const input = screen.getByRole("textbox")
+    await user.type(input, "2021{enter}")
+
+    expect(onUpdate).not.toHaveBeenCalled()
+    expect(onError).toHaveBeenCalledWith({
+      message: "2021 bereits vorhanden",
+      instance: id,
+    })
+  })
+
   it("deletes the focused chip on enter", async () => {
     const onUpdate = vi.fn()
     const { user } = renderComponent({

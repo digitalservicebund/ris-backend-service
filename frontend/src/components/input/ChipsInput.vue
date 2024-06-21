@@ -1,16 +1,16 @@
 <script lang="ts" setup>
 import { produce } from "immer"
 import { vMaska } from "maska"
-import { nextTick, ref, watch, watchEffect } from "vue"
+import { nextTick, ref, watch, watchEffect, computed } from "vue"
 import ChipsList from "@/components/input/ChipsList.vue"
 import { ValidationError } from "@/components/input/types"
-import InputErrorMessages from "@/components/InputErrorMessages.vue"
 import IconSubdirectoryArrowLeft from "~icons/ic/baseline-subdirectory-arrow-left"
 
 interface Props {
   id: string
   modelValue?: string[]
   ariaLabel?: string
+  hasError?: boolean
   readOnly?: boolean
   maska?: string
 }
@@ -22,36 +22,23 @@ const emit = defineEmits<{
   "update:validationError": [value?: ValidationError]
 }>()
 
-const errorMessage = ref()
-
 /* -------------------------------------------------- *
  * Data handling                                      *
  * -------------------------------------------------- */
 
 const newChipText = ref<string>("")
 
-const handleOnBlur = () => {
-  errorMessage.value = undefined
-}
-
 const addChip = () => {
-  handleOnBlur()
-
   if (props.readOnly) return
 
   const chip = newChipText.value.trim()
   if (!chip) return
 
-  if (props.modelValue?.includes(chip)) {
-    errorMessage.value = { title: chip + " bereits vorhanden." }
-    newChipText.value = ""
-  }
-
   const current = props.modelValue ?? []
 
   if (current.includes(chip)) {
     emit("update:validationError", {
-      message: "Eintrag bereits vorhanden",
+      message: chip + " bereits vorhanden",
       instance: props.id,
     })
   } else {
@@ -78,6 +65,11 @@ function onDeleteChip() {
 const chipsInput = ref<HTMLInputElement | null>(null)
 
 const focusedChip = ref<number | undefined>(undefined)
+
+const conditionalClasses = computed(() => ({
+  "!shadow-red-800 !bg-red-200": props.hasError,
+  "!shadow-none !bg-blue-300": props.readOnly,
+}))
 
 function maybeFocusPrevious() {
   if (chipsInput.value?.selectionStart === 0) {
@@ -145,10 +137,6 @@ watchEffect(() => {
 watch(newChipText, async () => {
   await determineInputWidth()
 })
-
-watch(newChipText, (is) => {
-  if (errorMessage.value && is !== "") errorMessage.value = undefined
-})
 </script>
 
 <template>
@@ -160,12 +148,8 @@ watch(newChipText, (is) => {
     <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
     <div
       ref="wrapperEl"
-      class="flex min-h-48 w-full cursor-text flex-wrap items-center overflow-hidden bg-white px-16 py-8 outline-2 -outline-offset-4 autofill:text-inherit autofill:shadow-white autofill:focus:text-inherit autofill:focus:shadow-white"
-      :class="[
-        readOnly
-          ? '!bg-blue-300 hover:outline-none'
-          : 'border-2 border-solid border-blue-800 outline-blue-800 hover:outline [&:has(:focus)]:outline',
-      ]"
+      class="space-between flex h-48 flex-row whitespace-nowrap bg-white px-8 shadow-button shadow-blue-800"
+      :class="conditionalClasses"
       :data-testid="`chips-input_${id}`"
       @click="focusInput"
     >
@@ -206,7 +190,5 @@ watch(newChipText, (is) => {
         </span>
       </span>
     </div>
-
-    <InputErrorMessages :error-message="errorMessage?.title" />
   </div>
 </template>

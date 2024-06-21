@@ -38,7 +38,7 @@ jobs:
           java-version: "17.0"
           distribution: "temurin"
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@dbbdc275be76ac10734476cc723d82dfe7ec6eda
+        uses: gradle/actions/setup-gradle@2cd2a6e951bd0b53f55a08e4e4c6f2586f3a36b9
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
       - name: Run backend tests
@@ -73,14 +73,14 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Validate gradle wrapper
-        uses: gradle/actions/wrapper-validation@dbbdc275be76ac10734476cc723d82dfe7ec6eda
+        uses: gradle/actions/wrapper-validation@2cd2a6e951bd0b53f55a08e4e4c6f2586f3a36b9
       - name: Set up JDK
         uses: actions/setup-java@2e74cbce18569d23ca8b812590dbb83f13ac7c5a
         with:
           java-version: "17.0"
           distribution: "temurin"
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@dbbdc275be76ac10734476cc723d82dfe7ec6eda
+        uses: gradle/actions/setup-gradle@2cd2a6e951bd0b53f55a08e4e4c6f2586f3a36b9
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
       - name: Build backend image
@@ -719,7 +719,7 @@ jobs:
           distribution: "temurin"
           cache: gradle
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@31ae3562f68c96d481c31bc1a8a55cc1be162f83
+        uses: gradle/actions/setup-gradle@2cd2a6e951bd0b53f55a08e4e4c6f2586f3a36b9
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
       - name: Migrate database for Entity–relationship model
@@ -815,12 +815,12 @@ jobs:
           path: tmp/licence-reports/
           merge-multiple: true
       - name: Frontend licence report - git add report
-        uses: digitalservicebund/add-ris-report@32770d369cf00a8154bb6a17005d11cf781bfba3
+        uses: digitalservicebund/add-ris-report@c6c8735d23295c36a271c75e7dedc9b6b9a9ef5e
         with:
           filePath: tmp/licence-reports/frontend-licence-report.csv
           destinationDir: licence-reports/frontend/ris-backend-service
       - name: Backend licence report - git add report
-        uses: digitalservicebund/add-ris-report@32770d369cf00a8154bb6a17005d11cf781bfba3
+        uses: digitalservicebund/add-ris-report@c6c8735d23295c36a271c75e7dedc9b6b9a9ef5e
         with:
           filePath: tmp/licence-reports/backend-licence-report.csv
           destinationDir: licence-reports/backend/ris-backend-service
@@ -832,7 +832,7 @@ jobs:
           path: tmp/performance-reports/
       - run: mv tmp/performance-reports/profile*.html tmp/performance-reports/profile-report.html
       - name: Performance report - git add report
-        uses: digitalservicebund/add-ris-report@32770d369cf00a8154bb6a17005d11cf781bfba3
+        uses: digitalservicebund/add-ris-report@c6c8735d23295c36a271c75e7dedc9b6b9a9ef5e
         with:
           filePath: tmp/performance-reports/profile-report.html
           destinationDir: performance-reports/ris-backend-service
@@ -843,7 +843,7 @@ jobs:
           name: backend-code-documentation
           path: tmp/backend-code-documentation/
       - name: Java - git add report
-        uses: digitalservicebund/add-ris-report@32770d369cf00a8154bb6a17005d11cf781bfba3
+        uses: digitalservicebund/add-ris-report@c6c8735d23295c36a271c75e7dedc9b6b9a9ef5e
         with:
           filePath: tmp/backend-code-documentation
           destinationDir: backend-code-documentation/java
@@ -855,7 +855,7 @@ jobs:
           name: html-test-report
           path: tmp/html-test-report/
       - name: E2E test reports - git add report
-        uses: digitalservicebund/add-ris-report@32770d369cf00a8154bb6a17005d11cf781bfba3
+        uses: digitalservicebund/add-ris-report@c6c8735d23295c36a271c75e7dedc9b6b9a9ef5e
         with:
           filePath: tmp/html-test-report/
           destinationDir: test-reports/ris-backend-service

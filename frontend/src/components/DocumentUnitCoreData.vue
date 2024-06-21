@@ -24,7 +24,10 @@ const emit = defineEmits<{
   "update:modelValue": [value: CoreData]
 }>()
 const { modelValue } = toRefs(props)
-const validationStore = useValidationStore<["decisionDate"][number]>()
+const validationStore =
+  useValidationStore<
+    ["decisionDate", "yearsOfDispute", "deviatingDecisionDates"][number]
+  >()
 
 /**
  * Our UI turns the chronological order of the list, so the latest previous precedure is first.
@@ -125,12 +128,19 @@ onMounted(async () => {
         <template #children>
           <InputField
             id="deviatingDecisionDates"
+            v-slot="slotProps"
             label="Abweichendes Entscheidungsdatum"
+            :validation-error="
+              validationStore.getByField('deviatingDecisionDates')
+            "
           >
             <ChipsDateInput
               id="deviatingDecisionDates"
               v-model="modelValue.deviatingDecisionDates"
               aria-label="Abweichendes Entscheidungsdatum"
+              :has-error="slotProps.hasError"
+              @focus="validationStore.remove('deviatingDecisionDates')"
+              @update:validation-error="slotProps.updateValidationError"
             />
           </InputField>
         </template>
@@ -234,12 +244,20 @@ onMounted(async () => {
       </InputField>
     </div>
     <div v-if="featureToggle">
-      <InputField id="yearOfDispute" label="Streitjahr">
+      <InputField
+        id="yearsOfDispute"
+        v-slot="slotProps"
+        label="Streitjahr"
+        :validation-error="validationStore.getByField('yearsOfDispute')"
+      >
         <ChipsYearInput
           id="yearOfDispute"
           v-model="modelValue.yearsOfDispute"
           aria-label="Streitjahr"
           data-testid="year-of-dispute"
+          :has-error="slotProps.hasError"
+          @focus="validationStore.remove('yearsOfDispute')"
+          @update:validation-error="slotProps.updateValidationError"
         ></ChipsYearInput>
       </InputField>
     </div>
