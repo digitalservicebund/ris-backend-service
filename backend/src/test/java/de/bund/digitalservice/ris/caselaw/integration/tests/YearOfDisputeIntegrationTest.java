@@ -91,6 +91,7 @@ class YearOfDisputeIntegrationTest {
   @MockBean private AttachmentService attachmentService;
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private DocumentationOfficeDTO documentationOffice;
+  private static final String DEFAULT_DOCUMENT_NUMBER = "1234567890123";
 
   @BeforeEach
   void setUp() {
@@ -115,13 +116,12 @@ class YearOfDisputeIntegrationTest {
   @Test
   void testDuplicatedYearsAreNotAllowed() {
 
-    String documentNumber = "1234567890123";
     List<Year> years = List.of(Year.now(), Year.now());
     DocumentationUnitDTO dto =
         repository.save(
             DocumentationUnitDTO.builder()
                 .documentationOffice(documentationOffice)
-                .documentNumber(documentNumber)
+                .documentNumber(DEFAULT_DOCUMENT_NUMBER)
                 .build());
 
     DocumentUnit documentUnitFromFrontend =
@@ -143,7 +143,8 @@ class YearOfDisputeIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().documentNumber()).isEqualTo(documentNumber);
+              assertThat(response.getResponseBody().documentNumber())
+                  .isEqualTo(DEFAULT_DOCUMENT_NUMBER);
               assertThat(response.getResponseBody().coreData().yearsOfDispute()).hasSize(1);
               assertThat(response.getResponseBody().coreData().yearsOfDispute().get(0).toString())
                   .hasToString(Year.now().toString());
@@ -152,8 +153,6 @@ class YearOfDisputeIntegrationTest {
 
   @Test
   void testYearsSorting() {
-    String documentNumber = "1234567890123";
-
     var firstYear = Year.parse("2022");
     var secondYear = Year.parse("2010");
     var lastYear = Year.parse("2009");
@@ -162,8 +161,8 @@ class YearOfDisputeIntegrationTest {
     DocumentationUnitDTO dto =
         repository.save(
             DocumentationUnitDTO.builder()
+                .documentNumber(DEFAULT_DOCUMENT_NUMBER)
                 .documentationOffice(documentationOffice)
-                .documentNumber(documentNumber)
                 .build());
 
     DocumentUnit documentUnitFromFrontend =
@@ -185,7 +184,8 @@ class YearOfDisputeIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().documentNumber()).isEqualTo(documentNumber);
+              assertThat(response.getResponseBody().documentNumber())
+                  .isEqualTo(DEFAULT_DOCUMENT_NUMBER);
               assertThat(response.getResponseBody().coreData().yearsOfDispute()).hasSize(3);
               assertThat(response.getResponseBody().coreData().yearsOfDispute().get(0).toString())
                   .hasToString(firstYear.toString());
@@ -198,24 +198,20 @@ class YearOfDisputeIntegrationTest {
 
   @Test
   void testFutureYearsAreNotAllowed() {
-    String documentNumber = "1234567890123";
+    var futureYear = Year.now().plusYears(1);
 
-    var currentYear = Year.now();
-    var futureYear = (currentYear.plusYears(1));
-
-    List<Year> years = List.of(currentYear, futureYear);
     DocumentationUnitDTO dto =
         repository.save(
             DocumentationUnitDTO.builder()
+                .documentNumber(DEFAULT_DOCUMENT_NUMBER)
                 .documentationOffice(documentationOffice)
-                .documentNumber(documentNumber)
                 .build());
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getId())
             .documentNumber(dto.getDocumentNumber())
-            .coreData(CoreData.builder().yearsOfDispute(years).build())
+            .coreData(CoreData.builder().yearsOfDispute(List.of(futureYear)).build())
             .build();
 
     risWebTestClient
@@ -225,17 +221,6 @@ class YearOfDisputeIntegrationTest {
         .bodyValue(documentUnitFromFrontend)
         .exchange()
         .expectStatus()
-        .isOk()
-        .expectBody(DocumentUnit.class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().documentNumber()).isEqualTo(documentNumber);
-              assertThat(response.getResponseBody().coreData().yearsOfDispute()).hasSize(1);
-              assertThat(response.getResponseBody().coreData().yearsOfDispute().get(0).toString())
-                  .hasToString(currentYear.toString());
-              assertThat(response.getResponseBody().coreData().yearsOfDispute().get(0).toString())
-                  .doesNotHaveToString(futureYear.toString());
-            });
+        .isBadRequest();
   }
 }
