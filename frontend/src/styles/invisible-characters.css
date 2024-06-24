@@ -8,7 +8,7 @@
   content: "→";
 }
 .invisible--nb-space {
-  vertical-align: text-before-edge;
+  vertical-align: text-top;
 }
 .invisible--nb-space:before {
   content: "°";
