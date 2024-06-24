@@ -36,15 +36,15 @@ export function useStatusBadge(status: DocumentUnit["status"]) {
         break
       case PublicationState.DUPLICATED:
         badge.label = "Dublette"
-        badge.backgroundColor = "bg-blue-300"
+        badge.backgroundColor = "bg-red-300"
         break
       case PublicationState.LOCKED:
         badge.label = "Gesperrt"
-        badge.backgroundColor = "bg-blue-300"
+        badge.backgroundColor = "bg-red-300"
         break
       case PublicationState.DELETING:
         badge.label = "Löschen"
-        badge.backgroundColor = "bg-blue-300"
+        badge.backgroundColor = "bg-red-300"
         break
     }
     return badge
