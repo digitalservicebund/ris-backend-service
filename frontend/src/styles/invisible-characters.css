@@ -1,17 +1,23 @@
+.invisible:before {
+  color: #4466ff;
+}
 .invisible--soft-hyphen:before {
   content: "-";
 }
 .invisible--tab:before {
   content: "→";
 }
+.invisible--nb-space {
+  vertical-align: text-before-edge;
+}
 .invisible--nb-space:before {
   content: "°";
   line-height: 0;
   top: 4px;
 }
-.invisible--nb-space {
-  vertical-align: text-top;
-}
-.invisible:before {
-  color: #4466ff;
+.invisible--blockquote:before {
+  content: "“";
+  font-weight: bold;
+  font-size: x-large;
+  position: absolute;
 }

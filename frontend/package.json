@@ -37,6 +37,7 @@
     "@guardian/prosemirror-invisibles": "^3.0.3",
     "@sentry/integrations": "^7.114.0",
     "@sentry/vue": "^8.9.2",
+    "@tiptap/extension-blockquote": "^2.4.0",
     "@tiptap/extension-bold": "^2.4.0",
     "@tiptap/extension-bullet-list": "^2.4.0",
     "@tiptap/extension-color": "^2.4.0",

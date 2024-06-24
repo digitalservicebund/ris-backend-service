@@ -17,6 +17,7 @@ const isSoftHyphen = (char: string) => char === "\u00ad"
 // Necessary as TipTap overrides the hardbreak node type name from hard_break to hardBreak
 const isHardbreak = (node: Node): boolean => node.type.name === "hardBreak"
 const isTab = (char: string) => char === "\t"
+const isBlockquote = (node: Node) => node.type.name === "blockquote"
 
 export const InvisibleCharacters = Extension.create({
   name: "invisible-characters",
@@ -30,6 +31,11 @@ export const InvisibleCharacters = Extension.create({
         createInvisibleDecosForCharacter("soft-hyphen", isSoftHyphen),
         createInvisibleDecosForCharacter("tab", isTab),
         createInvisibleDecosForNode("break", (_, pos) => pos, isHardbreak),
+        createInvisibleDecosForNode(
+          "blockquote",
+          (_, pos) => pos,
+          isBlockquote,
+        ),
       ]),
     ]
   },
