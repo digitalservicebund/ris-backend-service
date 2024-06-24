@@ -133,7 +133,6 @@ onMounted(async () => {
         class="sticky top-0 z-20"
         :is-expanded="showNavigationPanelRef"
         label="Navigation"
-        size="small"
         tabindex="0"
         @keydown.enter="toggleNavigationPanel"
         @update:is-expanded="toggleNavigationPanel"

@@ -5,8 +5,9 @@ import AttachmentView from "@/components/AttachmentView.vue"
 import FileNavigator from "@/components/FileNavigator.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
+import InputField from "@/components/input/InputField.vue"
+import TextAreaInput from "@/components/input/TextAreaInput.vue"
 import TextButton from "@/components/input/TextButton.vue"
-import TextEditor from "@/components/input/TextEditor.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
 import useQuery from "@/composables/useQueryFromRoute"
 import DocumentUnit from "@/domain/documentUnit"
@@ -19,6 +20,8 @@ interface Props {
 
 const props = defineProps<Props>()
 
+const note = ref(props.documentUnit.note)
+
 const notesSelected = ref<boolean>(!!props.documentUnit.note)
 const attachmentsSelected = ref<boolean>(
   !props.documentUnit.note && props.documentUnit.hasAttachments,
@@ -30,12 +33,13 @@ const route = useRoute()
 const { pushQueryToRoute } = useQuery()
 
 const hasNote = computed(() => {
-  return props.documentUnit.note && props.documentUnit.note.length > 0
+  return !!props.documentUnit.note && props.documentUnit.note.length > 0
 })
 
 const hasAttachments = computed(() => {
   return (
-    props.documentUnit.attachments && props.documentUnit.attachments.length > 0
+    !!props.documentUnit.attachments &&
+    props.documentUnit.attachments.length > 0
   )
 })
 
@@ -93,9 +97,7 @@ onMounted(() => {
       :is-expanded="isExpanded"
       label="Dokumentansicht"
       :opening-direction="OpeningDirection.LEFT"
-      size="medium"
       tabindex="0"
-      @keydown.enter="togglePanel"
       @update:is-expanded="togglePanel"
     >
       <FlexContainer class="m-24 ml-20 items-center -space-x-2 px-8">
@@ -128,13 +130,15 @@ onMounted(() => {
 
       <div class="m-24">
         <div v-if="notesSelected">
-          <label class="ds-label-02-reg mb-4">{{ "Notiz" }}</label>
-
-          <TextEditor
-            class="ml-2 pl-2 outline outline-2 outline-blue-900"
-            field-size="big"
-            :value="documentUnit.note"
-          />
+          <InputField id="notesInput" v-slot="{ id }" label="Notiz">
+            <TextAreaInput
+              :id="id"
+              v-model="note"
+              aria-label="Notiz Eingabefeld"
+              autosize
+              custom-classes="max-h-[65vh]"
+            />
+          </InputField>
         </div>
         <div v-if="attachmentsSelected">
           <AttachmentView
@@ -149,7 +153,7 @@ onMounted(() => {
             :s3-path="documentUnit.attachments[currentAttachmentIndex].s3path"
           />
           <div v-else class="ds-label-01-reg">
-            Wenn sie eine Datei hochladen, können Sie die Datei hier sehen.
+            Wenn Sie eine Datei hochladen, können Sie die Datei hier sehen.
           </div>
         </div>
       </div>

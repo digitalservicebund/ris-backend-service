@@ -13,6 +13,7 @@ type Props = {
   rows?: number
   size?: "regular" | "medium" | "small"
   hasError?: boolean
+  customClasses: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -23,6 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
   resize: "none",
   rows: 2,
   size: "regular",
+  customClasses: "",
 })
 
 const emit = defineEmits<{
@@ -98,10 +100,10 @@ defineExpose({ focus })
     class="ds-input h-unset py-12"
     :class="{
       'has-error': hasError,
-      'overflow-hidden': autosize,
       'px-16': size === 'small',
       'px-20': size === 'medium',
       'px-24': size === 'regular',
+      [customClasses]: true,
       [$style.textarea]: true,
     }"
     :placeholder="placeholder"
