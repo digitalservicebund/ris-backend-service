@@ -3,6 +3,8 @@ import {
   deleteDocumentUnit,
   navigateToCategories,
   navigateToPreview,
+  navigateToPublication,
+  publishDocumentationUnit,
   waitForSaving,
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
@@ -441,8 +443,16 @@ test.describe("core data", () => {
               "https://digitalservicebund.atlassian.net/browse/RISDEV-4199",
           },
         },
-        async ({ page, documentNumber }) => {
-          await navigateToCategories(page, documentNumber)
+        async ({ page, prefilledDocumentUnit }) => {
+          await publishDocumentationUnit(
+            page,
+            prefilledDocumentUnit.documentNumber || "",
+          )
+
+          await navigateToCategories(
+            page,
+            prefilledDocumentUnit.documentNumber || "",
+          )
 
           await waitForSaving(
             async () => {
@@ -458,7 +468,24 @@ test.describe("core data", () => {
             { clickSaveButton: true },
           )
           await expect(page.getByText("2020")).toBeVisible()
-          //Todo: test that year of dispute visible in xml preview
+
+          await navigateToPublication(
+            page,
+            prefilledDocumentUnit.documentNumber!,
+          )
+
+          await expect(
+            page.getByText("XML Vorschau der Veröffentlichung"),
+          ).toBeVisible()
+
+          await page.getByText("XML Vorschau der Veröffentlichung").click()
+
+          await expect(
+            page.getByText("<streitjahr>2020</streitjahr>"),
+          ).toBeVisible()
+          await expect(
+            page.getByText("<streitjahr>2021</streitjahr>"),
+          ).toBeVisible()
         },
       )
 
