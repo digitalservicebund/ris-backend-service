@@ -49,7 +49,7 @@ const textareaRef = ref<HTMLTextAreaElement | null>(null)
 
 const height = ref("auto")
 
-async function datermineTextareHeight() {
+async function determineTextareaHeight() {
   if (!props.autosize || !textareaRef.value) return
 
   // We first need to reset the height to auto, so that the scrollHeight
@@ -65,19 +65,21 @@ async function datermineTextareHeight() {
   const borderTop = parseInt(borderTopWidth)
   const borderBottom = parseInt(borderBottomWidth)
 
-  height.value = `${
+  const calculatedHeight =
     textareaRef.value.scrollHeight + borderTop + borderBottom
-  }px`
+  if (calculatedHeight > 0) {
+    height.value = `${calculatedHeight}px`
+  }
 }
 
 watchEffect(() => {
-  datermineTextareHeight().catch(() => {
+  determineTextareaHeight().catch(() => {
     // left blank intentionally
   })
 })
 
 watch(localValue, async () => {
-  await datermineTextareHeight()
+  await determineTextareaHeight()
 })
 
 /* -------------------------------------------------- *

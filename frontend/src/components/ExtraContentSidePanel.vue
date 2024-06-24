@@ -22,7 +22,9 @@ const props = defineProps<Props>()
 
 const note = ref(props.documentUnit.note)
 
-const notesSelected = ref<boolean>(!!props.documentUnit.note)
+const notesSelected = ref<boolean>(
+  !!props.documentUnit.note || !props.documentUnit.hasAttachments,
+)
 const attachmentsSelected = ref<boolean>(
   !props.documentUnit.note && props.documentUnit.hasAttachments,
 )
@@ -105,6 +107,7 @@ onMounted(() => {
           id="note"
           aria-label="Notiz anzeigen"
           button-type="tertiary"
+          :class="notesSelected ? 'bg-blue-200' : ''"
           :icon="IconStickyNote"
           size="small"
           @click="selectNotes"
@@ -114,6 +117,7 @@ onMounted(() => {
           id="attachments"
           aria-label="Dokumente anzeigen"
           button-type="tertiary"
+          :class="attachmentsSelected ? 'bg-blue-200' : ''"
           :icon="IconAttachFile"
           size="small"
           @click="() => selectAttachments()"
