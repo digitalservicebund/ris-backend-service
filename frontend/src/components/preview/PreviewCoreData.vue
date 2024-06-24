@@ -127,5 +127,19 @@ defineProps<{
         </FlexContainer>
       </PreviewContent>
     </PreviewRow>
+    <PreviewRow
+      v-if="coreData.yearsOfDispute && coreData.yearsOfDispute.length > 0"
+    >
+      <PreviewCategory>Streitjahr</PreviewCategory>
+      <PreviewContent>
+        <FlexContainer
+          v-for="(yearOfDispute, index) in coreData.yearsOfDispute"
+          :key="index"
+          flex-direction="flex-col"
+        >
+          <FlexItem> {{ yearOfDispute }}</FlexItem>
+        </FlexContainer>
+      </PreviewContent>
+    </PreviewRow>
   </FlexContainer>
 </template>

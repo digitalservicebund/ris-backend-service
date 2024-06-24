@@ -360,7 +360,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
         .is4xxClientError();
   }
 
-  private void mockS3AsyncClientToReturnFile(byte[] file) throws IOException {
+  private void mockS3AsyncClientToReturnFile(byte[] file) {
     when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
         .thenReturn(CompletableFuture.completedFuture(PutObjectResponse.builder().build()));
 

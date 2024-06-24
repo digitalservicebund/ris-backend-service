@@ -19,7 +19,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.51.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "10.13.0"
+    id("org.flywaydb.flyway") version "10.15.0"
 }
 
 group = "de.bund.digitalservice"
@@ -142,10 +142,10 @@ dependencies {
     implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.3.0")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.3.1")
 
     // CVE-2024-22262
-    implementation("org.springframework:spring-web:6.1.8")
+    implementation("org.springframework:spring-web:6.1.9")
 
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.5.0")
 
@@ -154,9 +154,9 @@ dependencies {
     // CVE-2024-26308
     implementation("org.apache.commons:commons-compress:1.26.2")
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:4.27.0")
+    implementation("com.google.protobuf:protobuf-java:4.27.1")
     // CVE-2023-52428 in spring-boot-starter-oauth2-client:3.2.3
-    implementation("com.nimbusds:nimbus-jose-jwt:9.39.3")
+    implementation("com.nimbusds:nimbus-jose-jwt:9.40")
     // CVE-2023-31582
     implementation("org.bitbucket.b_c:jose4j:0.9.6")
 
@@ -166,7 +166,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.1")
 
-    implementation(platform("software.amazon.awssdk:bom:2.25.62"))
+    implementation(platform("software.amazon.awssdk:bom:2.26.5"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -175,10 +175,10 @@ dependencies {
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
     implementation("org.eclipse.angus:angus-mail:2.0.3")
-    implementation("com.icegreen:greenmail:2.1.0-alpha-4")
+    implementation("com.icegreen:greenmail:2.1.0-rc-1")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.42") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.44") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
@@ -194,8 +194,8 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.17.1")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.17.1")
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.13.0")
-    implementation("io.micrometer:micrometer-core:1.13.0")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.13.1")
+    implementation("io.micrometer:micrometer-core:1.13.1")
 
     implementation(platform("io.sentry:sentry-bom:8.0.0-alpha.1"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
@@ -203,16 +203,16 @@ dependencies {
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
     // => CVE-2023-2976
-    implementation("com.google.guava:guava:33.2.0-jre")
+    implementation("com.google.guava:guava:33.2.1-jre")
 
     implementation("io.getunleash:unleash-client-java:9.2.2")
     implementation("org.apache.commons:commons-text:1.12.0")
     implementation("org.jsoup:jsoup:1.17.2")
 
-    var flywayCore = "org.flywaydb:flyway-core:10.13.0"
+    val flywayCore = "org.flywaydb:flyway-core:10.15.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.13.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.15.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -220,7 +220,8 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:5.12.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("org.springframework.security:spring-security-test:6.3.0")
+    testImplementation("io.projectreactor:reactor-test:3.6.7")
+    testImplementation("org.springframework.security:spring-security-test:6.3.1")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.3.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
@@ -242,8 +243,7 @@ tasks {
         user = System.getenv("DB_USER")
         password = System.getenv("DB_PASSWORD")
         locations = arrayOf(
-            "filesystem:src/main/resources/db/migration/",
-            "classpath:db/migration"
+            "filesystem:src/main/resources/db/migration/", "classpath:db/migration"
         )
         dependsOn("compileMigrationJava")
     }
@@ -285,8 +285,14 @@ tasks {
         // Jacoco hooks into all tasks of type: Test automatically, but results for each of these
         // tasks are kept separately and are not combined out of the box. we want to gather
         // coverage of our unit and integration tests as a single report!
+        executionData.setFrom(
+            files(
+                fileTree(project.layout.buildDirectory) {
+                    include("jacoco/*.exec")
+                },
+            ),
+        )
         dependsOn("integrationTest")
-        executionData(fileTree(project.buildDir.absolutePath).include("jacoco/*.exec"))
         reports {
             xml.required.set(true)
             html.required.set(true)
@@ -303,8 +309,7 @@ tasks {
     bootBuildImage {
         val containerRegistry = System.getenv("CONTAINER_REGISTRY") ?: "ghcr.io"
         val containerImageName =
-            System.getenv("CONTAINER_IMAGE_NAME")
-                ?: "digitalservicebund/${rootProject.name}"
+            System.getenv("CONTAINER_IMAGE_NAME") ?: "digitalservicebund/${rootProject.name}"
         val containerImageVersion = System.getenv("CONTAINER_IMAGE_VERSION") ?: "latest"
 
         imageName.set("$containerRegistry/$containerImageName:$containerImageVersion")
@@ -323,7 +328,7 @@ tasks {
     val delombok by registering(DelombokTask::class) {
         dependsOn(compileJava)
         mainClass.set("lombok.launch.Main")
-        val outputDir by extra { file("$buildDir/delombok") }
+        val outputDir by extra { file("${project.layout.buildDirectory}/delombok") }
         outputs.dir(outputDir)
         sourceSets["main"].java.srcDirs.forEach {
             inputs.dir(it)

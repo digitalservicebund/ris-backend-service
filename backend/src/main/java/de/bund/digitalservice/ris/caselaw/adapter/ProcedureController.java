@@ -7,8 +7,8 @@ import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
@@ -35,13 +35,17 @@ public class ProcedureController {
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public Page<Procedure> search(
+  public Slice<Procedure> search(
       @AuthenticationPrincipal OidcUser oidcUser,
       @RequestParam(value = "q") Optional<String> query,
       @RequestParam(value = "pg") Optional<Integer> page,
-      @RequestParam(value = "sz") Integer size) {
+      @RequestParam(value = "sz") Integer size,
+      @RequestParam(value = "withDocUnits") Optional<Boolean> withDocUnits) {
     return service.search(
-        query, userService.getDocumentationOffice(oidcUser), PageRequest.of(page.orElse(0), size));
+        query,
+        userService.getDocumentationOffice(oidcUser),
+        PageRequest.of(page.orElse(0), size),
+        withDocUnits);
   }
 
   @GetMapping(value = "/{procedureUUID}/documentunits", produces = MediaType.APPLICATION_JSON_VALUE)

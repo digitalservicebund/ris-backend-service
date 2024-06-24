@@ -136,12 +136,12 @@ class DocumentationUnitIntegrationTest {
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private AttachmentService attachmentService;
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
-  private UUID documentationOfficeUuid;
+  private DocumentationOfficeDTO documentationOffice;
 
   @BeforeEach
   void setUp() {
-    documentationOfficeUuid =
-        documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()).getId();
+    documentationOffice =
+        documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
 
     doReturn(docOffice)
         .when(userService)
@@ -243,7 +243,7 @@ class DocumentationUnitIntegrationTest {
         repository.save(
             DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
-                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .documentationOffice(documentationOffice)
                 .build());
 
     DocumentUnit documentUnitFromFrontend =
@@ -315,7 +315,7 @@ class DocumentationUnitIntegrationTest {
                             .rank(1)
                             .build()))
                 .court(bghCourt)
-                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .documentationOffice(documentationOffice)
                 .build());
 
     DocumentUnit documentUnitFromFrontend =
@@ -358,7 +358,7 @@ class DocumentationUnitIntegrationTest {
         repository.save(
             DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
-                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .documentationOffice(documentationOffice)
                 .build());
 
     List<SingleNorm> singleNorms = List.of(SingleNorm.builder().singleNorm("Art 7 S 1").build());
@@ -445,7 +445,7 @@ class DocumentationUnitIntegrationTest {
         repository.save(
             DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
-                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .documentationOffice(documentationOffice)
                 .build());
 
     DocumentUnit documentUnitFromFrontend =
@@ -518,7 +518,7 @@ class DocumentationUnitIntegrationTest {
         repository.save(
             DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
-                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .documentationOffice(documentationOffice)
                 .build());
 
     DocumentUnit documentUnitFromFrontend =
@@ -572,7 +572,7 @@ class DocumentationUnitIntegrationTest {
             DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentType(docType)
-                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .documentationOffice(documentationOffice)
                 .build());
 
     assertThat(repository.findAll()).hasSize(1);
@@ -607,7 +607,7 @@ class DocumentationUnitIntegrationTest {
 
   @Test
   void testSearchResultsAreDeterministic() {
-    var office = documentationOfficeRepository.findByAbbreviation("DS");
+    var office = documentationOffice;
 
     var documentNumberToExclude = "KORE000000000";
 
@@ -709,10 +709,10 @@ class DocumentationUnitIntegrationTest {
 
     List<UUID> docOfficeIds =
         List.of(
-            documentationOfficeUuid,
-            documentationOfficeUuid,
-            documentationOfficeUuid,
-            documentationOfficeUuid,
+            documentationOffice.getId(),
+            documentationOffice.getId(),
+            documentationOffice.getId(),
+            documentationOffice.getId(),
             otherDocOfficeUuid,
             otherDocOfficeUuid);
     List<String> documentNumbers =
@@ -880,8 +880,7 @@ class DocumentationUnitIntegrationTest {
                 .id(UUID.randomUUID())
                 .documentNumber("documentNumber")
                 .decisionDate(LocalDate.parse("2021-01-02"))
-                .documentationOffice(
-                    DocumentationOfficeDTO.builder().id(documentationOfficeUuid).build())
+                .documentationOffice(documentationOffice)
                 .build());
 
     repository.save(

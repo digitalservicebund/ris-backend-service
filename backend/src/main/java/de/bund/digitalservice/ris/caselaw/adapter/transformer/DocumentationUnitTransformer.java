@@ -16,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
@@ -27,6 +28,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
+import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.LocalDate;
@@ -34,11 +36,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -73,8 +76,8 @@ public class DocumentationUnitTransformer {
       var coreData = updatedDomainObject.coreData();
 
       builder
-          .ecli(coreData.ecli())
-          .judicialBody(coreData.appraisalBody())
+          .ecli(StringUtils.normalizeSpace(coreData.ecli()))
+          .judicialBody(StringUtils.normalizeSpace(coreData.appraisalBody()))
           .decisionDate(coreData.decisionDate())
           .documentType(
               coreData.documentType() != null
@@ -90,6 +93,7 @@ public class DocumentationUnitTransformer {
       addDeviatingEclis(builder, coreData);
       addLegalEffect(currentDto, updatedDomainObject, builder);
       addLeadingDecisionNormReferences(updatedDomainObject, builder);
+      addYearsOfDisputeToDTO(builder, coreData);
 
     } else {
       builder
@@ -99,7 +103,8 @@ public class DocumentationUnitTransformer {
           .decisionDate(null)
           .court(null)
           .documentType(null)
-          .documentationOffice(null);
+          .documentationOffice(null)
+          .yearsOfDispute(null);
     }
 
     addPreviousDecisions(updatedDomainObject, builder);
@@ -307,7 +312,7 @@ public class DocumentationUnitTransformer {
               .map(
                   normReference ->
                       LeadingDecisionNormReferenceDTO.builder()
-                          .normReference(normReference)
+                          .normReference(StringUtils.normalizeSpace(normReference))
                           .rank(i.getAndIncrement())
                           .build())
               .toList());
@@ -326,7 +331,10 @@ public class DocumentationUnitTransformer {
 
     for (int i = 0; i < deviatingEclis.size(); i++) {
       deviatingEcliDTOs.add(
-          DeviatingEcliDTO.builder().value(deviatingEclis.get(i)).rank(i + 1L).build());
+          DeviatingEcliDTO.builder()
+              .value(StringUtils.normalizeSpace(deviatingEclis.get(i)))
+              .rank(i + 1L)
+              .build());
     }
 
     builder.deviatingEclis(deviatingEcliDTOs);
@@ -344,7 +352,7 @@ public class DocumentationUnitTransformer {
     for (int i = 0; i < deviatingFileNumbers.size(); i++) {
       deviatingFileNumberDTOs.add(
           DeviatingFileNumberDTO.builder()
-              .value(deviatingFileNumbers.get(i))
+              .value(StringUtils.normalizeSpace(deviatingFileNumbers.get(i)))
               .rank(i + 1L)
               .documentationUnit(currentDto)
               .build());
@@ -380,7 +388,10 @@ public class DocumentationUnitTransformer {
 
     for (int i = 0; i < deviatingCourts.size(); i++) {
       deviatingCourtDTOs.add(
-          DeviatingCourtDTO.builder().value(deviatingCourts.get(i)).rank(i + 1L).build());
+          DeviatingCourtDTO.builder()
+              .value(StringUtils.normalizeSpace(deviatingCourts.get(i)))
+              .rank(i + 1L)
+              .build());
     }
 
     builder.deviatingCourts(deviatingCourtDTOs);
@@ -395,7 +406,11 @@ public class DocumentationUnitTransformer {
     List<String> inputTypes = coreData.inputTypes();
 
     for (int i = 0; i < inputTypes.size(); i++) {
-      inputTypeDTOs.add(InputTypeDTO.builder().value(inputTypes.get(i)).rank(i + 1L).build());
+      inputTypeDTOs.add(
+          InputTypeDTO.builder()
+              .value(StringUtils.normalizeSpace(inputTypes.get(i)))
+              .rank(i + 1L)
+              .build());
     }
 
     builder.inputTypes(inputTypeDTOs);
@@ -413,7 +428,7 @@ public class DocumentationUnitTransformer {
     for (int i = 0; i < fileNumbers.size(); i++) {
       fileNumberDTOs.add(
           FileNumberDTO.builder()
-              .value(fileNumbers.get(i))
+              .value(StringUtils.normalizeSpace(fileNumbers.get(i)))
               .rank(i + 1L)
               .documentationUnit(currentDto)
               .build());
@@ -472,7 +487,7 @@ public class DocumentationUnitTransformer {
     addDeviatingEclisToDomain(documentationUnitDTO, coreDataBuilder);
     addDeviatingDecisionDatesToDomain(documentationUnitDTO, coreDataBuilder);
     addLeadingDecisionNormReferencesToDomain(documentationUnitDTO, coreDataBuilder);
-
+    addYearsOfDisputeToDomain(documentationUnitDTO, coreDataBuilder);
     DocumentTypeDTO documentTypeDTO = documentationUnitDTO.getDocumentType();
     if (documentTypeDTO != null) {
       coreDataBuilder.documentType(DocumentTypeTransformer.transformToDomain(documentTypeDTO));
@@ -861,12 +876,35 @@ public class DocumentationUnitTransformer {
                     var numberElement = element.getElementsByTag("number");
                     if (numberElement.size() == 1) {
                       var number = numberElement.get(0).text();
-                      if (StringUtils.isNotBlank(number)) {
+                      if (org.apache.commons.lang3.StringUtils.isNotBlank(number)) {
                         borderNumbers.add(numberElement.text());
                       }
                     }
                   });
             });
     return borderNumbers;
+  }
+
+  private static void addYearsOfDisputeToDTO(
+      DocumentationUnitDTO.DocumentationUnitDTOBuilder builder, CoreData coreData) {
+
+    if (coreData.yearsOfDispute() == null || coreData.yearsOfDispute().isEmpty()) return;
+
+    Set<YearOfDisputeDTO> yearOfDisputeDTOS = new LinkedHashSet<>();
+
+    for (int i = 0; i < coreData.yearsOfDispute().size(); i++) {
+      yearOfDisputeDTOS.add(
+          YearOfDisputeTransformer.transformToDTO(coreData.yearsOfDispute().get(i), i + 1));
+    }
+    builder.yearsOfDispute(yearOfDisputeDTOS);
+  }
+
+  static void addYearsOfDisputeToDomain(
+      DocumentationUnitDTO currentDto, CoreData.CoreDataBuilder coreDataBuilder) {
+
+    coreDataBuilder.yearsOfDispute(
+        currentDto.getYearsOfDispute().stream()
+            .map(YearOfDisputeTransformer::transformToDomain)
+            .toList());
   }
 }

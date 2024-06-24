@@ -7,7 +7,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import de.bund.digitalservice.ris.caselaw.PageTestImpl;
+import de.bund.digitalservice.ris.caselaw.SliceTestImpl;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
@@ -21,6 +21,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcedureTransformer;
@@ -43,6 +44,7 @@ import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
@@ -74,6 +76,10 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseProcedureService.class
     },
     controllers = {DocumentUnitController.class, ProcedureController.class})
+@Sql(scripts = {"classpath:doc_office_init.sql", "classpath:procedures_init.sql"})
+@Sql(
+    scripts = {"classpath:procedures_cleanup.sql"},
+    executionPhase = AFTER_TEST_METHOD)
 class ProcedureIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
@@ -106,12 +112,13 @@ class ProcedureIntegrationTest {
   @MockBean private AttachmentService attachmentService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
-  private DocumentationOfficeDTO documentationOfficeDTO;
+  private DocumentationOfficeDTO docOfficeDTO;
+  private DocumentationUnitDTO docUnitDTO;
 
   @BeforeEach
   void setUp() {
-    documentationOfficeDTO =
-        documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
+    docOfficeDTO = documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
+    docUnitDTO = documentUnitRepository.findByDocumentNumber("1234567890123").get();
     doReturn(docOffice).when(userService).getDocumentationOffice(any(OidcUser.class));
   }
 
@@ -131,19 +138,12 @@ class ProcedureIntegrationTest {
         "thisIsALongLongLongLongLongLongLongProcedureName"
       })
   void testAddingNewProcedure(String label) {
-    DocumentationUnitDTO dto =
-        documentUnitRepository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(documentationOfficeDTO)
-                .build());
-
     Procedure procedure = Procedure.builder().label(label).build();
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
-            .uuid(dto.getId())
-            .documentNumber(dto.getDocumentNumber())
+            .uuid(docUnitDTO.getId())
+            .documentNumber(docUnitDTO.getDocumentNumber())
             .coreData(
                 CoreData.builder().procedure(procedure).documentationOffice(docOffice).build())
             .build();
@@ -151,7 +151,7 @@ class ProcedureIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
+        .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
         .bodyValue(documentUnitFromFrontend)
         .exchange()
         .expectStatus()
@@ -164,81 +164,25 @@ class ProcedureIntegrationTest {
               assertThat(response.getResponseBody().coreData().procedure().createdAt()).isNotNull();
             });
 
-    assertThat(repository.findAll()).hasSize(1);
-    assertThat(repository.findAll().get(0).getLabel()).isEqualTo(label);
-    assertThat(repository.findAll().get(0).getDocumentationOffice().getAbbreviation())
+    Optional<ProcedureDTO> resultProcedure =
+        repository.findAllByLabelAndDocumentationOffice(label, docOfficeDTO);
+    assertThat(resultProcedure).isPresent();
+    assertThat(resultProcedure.get().getLabel()).isEqualTo(label);
+    assertThat(resultProcedure.get().getDocumentationOffice().getAbbreviation())
         .isEqualTo(docOffice.abbreviation());
   }
 
   @Test
-  void testAddSameProcedure() {
-    ProcedureDTO procedureDTO = createProcedure("testProcedure", documentationOfficeDTO);
-    assertThat(repository.findAll()).hasSize(1);
-
-    DocumentationUnitDTO dto =
-        documentUnitRepository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(documentationOfficeDTO)
-                .build());
-
-    Procedure procedure =
-        Procedure.builder().id(procedureDTO.getId()).label("testProcedure").build();
-
-    DocumentUnit documentUnitFromFrontend =
-        DocumentUnit.builder()
-            .uuid(dto.getId())
-            .documentNumber(dto.getDocumentNumber())
-            .coreData(
-                CoreData.builder().procedure(procedure).documentationOffice(docOffice).build())
-            .build();
-
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
-        .bodyValue(documentUnitFromFrontend)
-        .exchange()
-        .expectStatus()
-        .is2xxSuccessful()
-        .expectBody(DocumentUnit.class)
-        .consumeWith(
-            response ->
-                assertThat(response.getResponseBody().coreData().procedure())
-                    .extracting("id", "label")
-                    .containsExactly(procedure.id(), procedure.label()));
-
-    assertThat(repository.findAll()).hasSize(1);
-    ProcedureDTO firstProcedure =
-        linkRepository.findFirstByDocumentationUnitOrderByRankDesc(dto).getProcedure();
-    assertThat(firstProcedure)
-        .extracting("id", "label")
-        .containsExactly(procedureDTO.getId(), procedureDTO.getLabel());
-    assertThat(firstProcedure.getDocumentationUnits()).hasSize(1);
-    assertThat(firstProcedure.getDocumentationUnits().get(0))
-        .extracting("id", "documentNumber")
-        .containsExactly(dto.getId(), dto.getDocumentNumber());
-    assertThat(linkRepository.findAll()).hasSize(1);
-  }
-
-  @Test
   void testAddSameProcedureLabel_shouldReturnTheExistingProcedure() {
-    ProcedureDTO procedureDTO = createProcedure("testProcedure", documentationOfficeDTO);
-    assertThat(repository.findAll()).hasSize(1);
+    ProcedureDTO procedureDTO =
+        repository.findAllByLabelAndDocumentationOffice("procedure1", docOfficeDTO).get();
 
-    DocumentationUnitDTO dto =
-        documentUnitRepository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(documentationOfficeDTO)
-                .build());
-
-    Procedure procedure = Procedure.builder().label("testProcedure").build();
+    Procedure procedure = Procedure.builder().label("procedure1").build();
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
-            .uuid(dto.getId())
-            .documentNumber(dto.getDocumentNumber())
+            .uuid(docUnitDTO.getId())
+            .documentNumber(docUnitDTO.getDocumentNumber())
             .coreData(
                 CoreData.builder().procedure(procedure).documentationOffice(docOffice).build())
             .build();
@@ -246,7 +190,7 @@ class ProcedureIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
+        .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
         .bodyValue(documentUnitFromFrontend)
         .exchange()
         .expectStatus()
@@ -258,37 +202,33 @@ class ProcedureIntegrationTest {
                     .extracting("id", "label")
                     .containsExactly(procedureDTO.getId(), procedure.label()));
 
-    assertThat(repository.findAll()).hasSize(1);
+    Optional<ProcedureDTO> resultProcedure =
+        repository.findAllByLabelAndDocumentationOffice("procedure1", docOfficeDTO);
+
+    assertThat(resultProcedure).isPresent();
     ProcedureDTO firstProcedure =
-        linkRepository.findFirstByDocumentationUnitOrderByRankDesc(dto).getProcedure();
+        linkRepository.findFirstByDocumentationUnitOrderByRankDesc(docUnitDTO).getProcedure();
     assertThat(firstProcedure)
         .extracting("id", "label")
         .containsExactly(procedureDTO.getId(), procedureDTO.getLabel());
     assertThat(firstProcedure.getDocumentationUnits()).hasSize(1);
     assertThat(firstProcedure.getDocumentationUnits().get(0))
         .extracting("id", "documentNumber")
-        .containsExactly(dto.getId(), dto.getDocumentNumber());
+        .containsExactly(docUnitDTO.getId(), docUnitDTO.getDocumentNumber());
     assertThat(linkRepository.findAll()).hasSize(1);
   }
 
   @Test
   void testAddSameProcedureLabelWithTrailingSpaces_shouldReturnTheExistingProcedure() {
-    ProcedureDTO procedureDTO = createProcedure("testProcedure", documentationOfficeDTO);
-    assertThat(repository.findAll()).hasSize(1);
+    ProcedureDTO procedureDTO =
+        repository.findAllByLabelAndDocumentationOffice("procedure1", docOfficeDTO).get();
 
-    DocumentationUnitDTO dto =
-        documentUnitRepository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(documentationOfficeDTO)
-                .build());
-
-    Procedure procedure = Procedure.builder().label("  testProcedure  ").build();
+    Procedure procedure = Procedure.builder().label("  procedure1  ").build();
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
-            .uuid(dto.getId())
-            .documentNumber(dto.getDocumentNumber())
+            .uuid(docUnitDTO.getId())
+            .documentNumber(docUnitDTO.getDocumentNumber())
             .coreData(
                 CoreData.builder().procedure(procedure).documentationOffice(docOffice).build())
             .build();
@@ -296,7 +236,7 @@ class ProcedureIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
+        .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
         .bodyValue(documentUnitFromFrontend)
         .exchange()
         .expectStatus()
@@ -308,34 +248,30 @@ class ProcedureIntegrationTest {
                     .extracting("id", "label")
                     .containsExactly(procedureDTO.getId(), procedure.label().trim()));
 
-    assertThat(repository.findAll()).hasSize(1);
+    Optional<ProcedureDTO> resultProcedure =
+        repository.findAllByLabelAndDocumentationOffice("procedure1", docOfficeDTO);
+
+    assertThat(resultProcedure).isPresent();
     ProcedureDTO firstProcedure =
-        linkRepository.findFirstByDocumentationUnitOrderByRankDesc(dto).getProcedure();
+        linkRepository.findFirstByDocumentationUnitOrderByRankDesc(docUnitDTO).getProcedure();
     assertThat(firstProcedure)
         .extracting("id", "label")
         .containsExactly(procedureDTO.getId(), procedureDTO.getLabel());
     assertThat(firstProcedure.getDocumentationUnits()).hasSize(1);
     assertThat(firstProcedure.getDocumentationUnits().get(0))
         .extracting("id", "documentNumber")
-        .containsExactly(dto.getId(), dto.getDocumentNumber());
+        .containsExactly(docUnitDTO.getId(), docUnitDTO.getDocumentNumber());
     assertThat(linkRepository.findAll()).hasSize(1);
   }
 
   @Test
   void testProcedureLabelWithTrailingSpaces_shouldSaveProcedureWithoutTrailingSpaces() {
-    DocumentationUnitDTO dto =
-        documentUnitRepository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(documentationOfficeDTO)
-                .build());
-
-    Procedure procedure = Procedure.builder().label("  testProcedure  ").build();
+    Procedure procedure = Procedure.builder().label("  procedure1  ").build();
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
-            .uuid(dto.getId())
-            .documentNumber(dto.getDocumentNumber())
+            .uuid(docUnitDTO.getId())
+            .documentNumber(docUnitDTO.getDocumentNumber())
             .coreData(
                 CoreData.builder().procedure(procedure).documentationOffice(docOffice).build())
             .build();
@@ -343,7 +279,7 @@ class ProcedureIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
+        .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
         .bodyValue(documentUnitFromFrontend)
         .exchange()
         .expectStatus()
@@ -353,29 +289,24 @@ class ProcedureIntegrationTest {
             response ->
                 assertThat(response.getResponseBody().coreData().procedure())
                     .extracting("label")
-                    .isEqualTo("testProcedure"));
+                    .isEqualTo("procedure1"));
 
-    assertThat(repository.findAll()).hasSize(1);
+    Optional<ProcedureDTO> resultProcedure =
+        repository.findAllByLabelAndDocumentationOffice("procedure1", docOfficeDTO);
+    assertThat(resultProcedure).isPresent();
     ProcedureDTO firstProcedure =
-        linkRepository.findFirstByDocumentationUnitOrderByRankDesc(dto).getProcedure();
-    assertThat(firstProcedure).extracting("label").isEqualTo("testProcedure");
+        linkRepository.findFirstByDocumentationUnitOrderByRankDesc(docUnitDTO).getProcedure();
+    assertThat(firstProcedure).extracting("label").isEqualTo("procedure1");
     assertThat(firstProcedure.getDocumentationUnits()).hasSize(1);
     assertThat(firstProcedure.getDocumentationUnits().get(0))
         .extracting("id", "documentNumber")
-        .containsExactly(dto.getId(), dto.getDocumentNumber());
+        .containsExactly(docUnitDTO.getId(), docUnitDTO.getDocumentNumber());
     assertThat(linkRepository.findAll()).hasSize(1);
   }
 
   @Test
   @SuppressWarnings("java:S5961")
   void testAddingProcedureToPreviousProcedures() {
-    DocumentationUnitDTO dto =
-        documentUnitRepository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(documentationOfficeDTO)
-                .build());
-
     Procedure procedure1 = Procedure.builder().label("foo").build();
     Procedure procedure2 = Procedure.builder().label("bar").build();
     Procedure procedure3 = Procedure.builder().label("baz").build();
@@ -383,8 +314,8 @@ class ProcedureIntegrationTest {
     // add first procedure
     DocumentUnit documentUnitFromFrontend1 =
         DocumentUnit.builder()
-            .uuid(dto.getId())
-            .documentNumber(dto.getDocumentNumber())
+            .uuid(docUnitDTO.getId())
+            .documentNumber(docUnitDTO.getDocumentNumber())
             .coreData(
                 CoreData.builder().procedure(procedure1).documentationOffice(docOffice).build())
             .build();
@@ -392,7 +323,7 @@ class ProcedureIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
+        .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
         .bodyValue(documentUnitFromFrontend1)
         .exchange()
         .expectStatus()
@@ -405,14 +336,14 @@ class ProcedureIntegrationTest {
               assertThat(response.getResponseBody().coreData().previousProcedures()).isEmpty();
             });
 
-    assertThat(repository.findAll()).hasSize(1);
-    assertThat(repository.findAll().get(0).getLabel()).isEqualTo("foo");
+    assertThat(repository.findAllByLabelAndDocumentationOffice("foo", docOfficeDTO).get())
+        .isNotNull();
 
     // add second procedure
     DocumentUnit documentUnitFromFrontend2 =
         DocumentUnit.builder()
-            .uuid(dto.getId())
-            .documentNumber(dto.getDocumentNumber())
+            .uuid(docUnitDTO.getId())
+            .documentNumber(docUnitDTO.getDocumentNumber())
             .coreData(
                 CoreData.builder().procedure(procedure2).documentationOffice(docOffice).build())
             .build();
@@ -420,7 +351,7 @@ class ProcedureIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
+        .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
         .bodyValue(documentUnitFromFrontend2)
         .exchange()
         .expectStatus()
@@ -434,14 +365,14 @@ class ProcedureIntegrationTest {
                   .isEqualTo(List.of("foo"));
             });
 
-    assertThat(repository.findAll()).hasSize(2);
-    assertThat(repository.findAll().get(1).getLabel()).isEqualTo("bar");
+    assertThat(repository.findAllByLabelAndDocumentationOffice("bar", docOfficeDTO).get())
+        .isNotNull();
 
     // add third procedure
     DocumentUnit documentUnitFromFrontend3 =
         DocumentUnit.builder()
-            .uuid(dto.getId())
-            .documentNumber(dto.getDocumentNumber())
+            .uuid(docUnitDTO.getId())
+            .documentNumber(docUnitDTO.getDocumentNumber())
             .coreData(
                 CoreData.builder().procedure(procedure3).documentationOffice(docOffice).build())
             .build();
@@ -449,7 +380,7 @@ class ProcedureIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
+        .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
         .bodyValue(documentUnitFromFrontend3)
         .exchange()
         .expectStatus()
@@ -463,8 +394,8 @@ class ProcedureIntegrationTest {
                   .containsExactly("foo", "bar");
             });
 
-    assertThat(repository.findAll()).hasSize(3);
-    assertThat(repository.findAll().get(2).getLabel()).isEqualTo("baz");
+    assertThat(repository.findAllByLabelAndDocumentationOffice("baz", docOfficeDTO).get())
+        .isNotNull();
 
     risWebTestClient
         .withDefaultLogin()
@@ -473,7 +404,7 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new TypeReference<PageTestImpl<Procedure>>() {})
+        .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(
@@ -484,7 +415,8 @@ class ProcedureIntegrationTest {
                   .isZero();
             });
 
-    var procedure1Id = repository.findAll().get(0).getId();
+    var procedure1Id =
+        repository.findAllByLabelAndDocumentationOffice("foo", docOfficeDTO).get().getId();
 
     risWebTestClient
         .withDefaultLogin()
@@ -506,7 +438,7 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new TypeReference<PageTestImpl<Procedure>>() {})
+        .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(
@@ -517,7 +449,8 @@ class ProcedureIntegrationTest {
                   .isEqualTo(1);
             });
 
-    var procedure3Id = repository.findAll().get(2).getId();
+    var procedure3Id =
+        repository.findAllByLabelAndDocumentationOffice("baz", docOfficeDTO).get().getId();
 
     risWebTestClient
         .withDefaultLogin()
@@ -536,20 +469,13 @@ class ProcedureIntegrationTest {
 
   @Test
   void testAddProcedureWhichIsInHistoryAgain() {
-    DocumentationUnitDTO dto =
-        documentUnitRepository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(documentationOfficeDTO)
-                .build());
-
-    UUID procedureId = addProcedure(dto, "foo");
-    addProcedure(dto, "bar");
+    UUID procedureId = addProcedureToDocUnit("foo", docUnitDTO);
+    addProcedureToDocUnit("bar", docUnitDTO);
 
     DocumentUnit documentUnitFromFrontend1 =
         DocumentUnit.builder()
-            .uuid(dto.getId())
-            .documentNumber(dto.getDocumentNumber())
+            .uuid(docUnitDTO.getId())
+            .documentNumber(docUnitDTO.getDocumentNumber())
             .coreData(
                 CoreData.builder()
                     .procedure(Procedure.builder().id(procedureId).build())
@@ -560,7 +486,7 @@ class ProcedureIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
+        .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
         .bodyValue(documentUnitFromFrontend1)
         .exchange()
         .expectStatus()
@@ -576,24 +502,12 @@ class ProcedureIntegrationTest {
 
   @Test
   void testAddProcedureWithSameNameToDifferentOffice() {
-    DocumentationOfficeDTO bghDocOfficeDTO =
-        documentationOfficeRepository.findByAbbreviation("BGH");
-    createProcedure("testProcedure", bghDocOfficeDTO);
-    assertThat(repository.findAll()).hasSize(1);
-
-    DocumentationUnitDTO dto =
-        documentUnitRepository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(documentationOfficeDTO)
-                .build());
-
     Procedure procedure = Procedure.builder().label("testProcedure").build();
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
-            .uuid(dto.getId())
-            .documentNumber(dto.getDocumentNumber())
+            .uuid(docUnitDTO.getId())
+            .documentNumber(docUnitDTO.getDocumentNumber())
             .coreData(
                 CoreData.builder().procedure(procedure).documentationOffice(docOffice).build())
             .build();
@@ -601,7 +515,7 @@ class ProcedureIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
+        .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
         .bodyValue(documentUnitFromFrontend)
         .exchange()
         .expectStatus()
@@ -612,47 +526,73 @@ class ProcedureIntegrationTest {
                 assertThat(response.getResponseBody().coreData().procedure().label())
                     .isEqualTo(procedure.label()));
 
-    assertThat(repository.findAll()).hasSize(2);
+    DocumentationOfficeDTO dsOffice = documentationOfficeRepository.findByAbbreviation("DS");
+    assertThat(repository.findAllByLabelAndDocumentationOffice("testProcedure", dsOffice))
+        .isNotNull();
+    assertThat(repository.findAllByLabelAndDocumentationOffice("testProcedure", docOfficeDTO))
+        .isNotNull();
   }
 
   @Test
-  void testProcedureControllerReturnsList() {
-    createProcedures(
-        List.of("testProcedure1", "testProcedure2", "testProcedure3"), documentationOfficeDTO);
-    assertThat(repository.findAll()).hasSize(3);
+  void testSearch_withoutQuery_shouldReturnLatestProcedureUsedInDocumentationUnit() {
+    addProcedureToDocUnit("procedure1", docUnitDTO);
+    addProcedureToDocUnit("procedure2", docUnitDTO);
+    addProcedureToDocUnit("procedure3", docUnitDTO);
 
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/procedure?sz=20&pg=0")
+        .uri("/api/v1/caselaw/procedure?withDocUnits=true&sz=20&pg=0")
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new TypeReference<PageTestImpl<Procedure>>() {})
+        .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
         .consumeWith(
             response -> {
-              assertThat(response.getResponseBody()).hasSize(3);
+              assertThat(response.getResponseBody()).hasSize(1);
               assertThat(response.getResponseBody().getContent().get(0).label())
-                  .isEqualTo("testProcedure3");
+                  .isEqualTo("procedure3");
             });
   }
 
   @Test
-  @Sql(scripts = {"classpath:procedures_init.sql"})
-  @Sql(
-      scripts = {"classpath:procedures_cleanup.sql"},
-      executionPhase = AFTER_TEST_METHOD)
-  void testProcedureControllerReturnsProceduresWithDateFirst() {
-    assertThat(repository.findAll()).hasSize(3);
+  void testSearch_withQuery_shouldReturnProceduresWithDateFirst() {
+    DocumentationUnitDTO documentationUnitDTO2 =
+        documentUnitRepository.findByDocumentNumber("documentNumber2").get();
+    DocumentationUnitDTO documentationUnitDTO3 =
+        documentUnitRepository.findByDocumentNumber("documentNumber3").get();
+
+    addProcedureToDocUnit("with date", docUnitDTO);
+
+    ProcedureDTO procedureWithDateInPast =
+        repository.findAllByLabelAndDocumentationOffice("with date in past", docOfficeDTO).get();
+    ProcedureDTO procedureWithoutDate =
+        repository.findAllByLabelAndDocumentationOffice("without date", docOfficeDTO).get();
+
+    documentationUnitDTO2.setProcedures(
+        List.of(
+            DocumentationUnitProcedureDTO.builder()
+                .documentationUnit(documentationUnitDTO2)
+                .procedure(procedureWithDateInPast)
+                .build()));
+    documentUnitRepository.save(documentationUnitDTO2);
+
+    documentationUnitDTO3.setProcedures(
+        List.of(
+            DocumentationUnitProcedureDTO.builder()
+                .documentationUnit(documentationUnitDTO3)
+                .procedure(procedureWithoutDate)
+                .build()));
+    documentUnitRepository.save(documentationUnitDTO3);
 
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/procedure?sz=20&pg=0")
+        .uri("/api/v1/caselaw/procedure?withDocUnits=true&q=date&sz=20&pg=0")
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new TypeReference<PageTestImpl<Procedure>>() {})
+        .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).hasSize(3);
@@ -666,77 +606,72 @@ class ProcedureIntegrationTest {
   }
 
   @Test
-  void testProcedureControllerReturnsFilteredList() {
-    createProcedures(List.of("aaabbb", "aaaccc", "dddfff"), documentationOfficeDTO);
-    assertThat(repository.findAll()).hasSize(3);
+  void testSearch_withQuery_shouldOnlyReturnLatestProcedureUsedInDocumentationUnit() {
+    addProcedureToDocUnit("procedure1", docUnitDTO);
+    addProcedureToDocUnit("procedure2", docUnitDTO);
+    addProcedureToDocUnit("procedure3", docUnitDTO);
+
+    assertThat(repository.findAll()).hasSize(7);
 
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/procedure?q=aaa&sz=20&pg=0")
+        .uri("/api/v1/caselaw/procedure?withDocUnits=true&q=procedure&sz=20&pg=0")
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new TypeReference<PageTestImpl<Procedure>>() {})
+        .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
         .consumeWith(
             response -> {
-              assertThat(response.getResponseBody()).hasSize(2);
+              assertThat(response.getResponseBody()).hasSize(1);
               assertThat(response.getResponseBody().getContent().get(0).label())
-                  .isEqualTo("aaaccc");
+                  .isEqualTo("procedure3");
             });
 
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/procedure?q=aaac&pg=0&sz=10")
+        .uri("/api/v1/caselaw/procedure?withDocUnits=true&q=procedure2&pg=0&sz=10")
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new TypeReference<PageTestImpl<Procedure>>() {})
+        .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
         .consumeWith(
             response -> {
-              assertThat(response.getResponseBody()).hasSize(1);
-              assertThat(response.getResponseBody().getContent().get(0).label())
-                  .isEqualTo("aaaccc");
+              assertThat(response.getResponseBody()).isEmpty();
             });
   }
 
   @Test
-  void testSearch_withQueryWithTrailingSpaces_shouldReturnResultsWithoutTrailingSpaces() {
-    createProcedures(List.of("aaabbb", "aaaccc", "dddfff"), documentationOfficeDTO);
-    assertThat(repository.findAll()).hasSize(3);
+  void testSearch_withQueryWithTrailingSpaces_shouldReturnResultWithoutTrailingSpaces() {
+    addProcedureToDocUnit("procedure1", docUnitDTO);
 
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/procedure?q= aaabbb &sz=20&pg=0")
+        .uri("/api/v1/caselaw/procedure?withDocUnits=true&q= procedure1 &sz=20&pg=0")
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new TypeReference<PageTestImpl<Procedure>>() {})
+        .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).hasSize(1);
               assertThat(response.getResponseBody().getContent().get(0).label())
-                  .isEqualTo("aaabbb");
+                  .isEqualTo("procedure1");
             });
   }
 
   @Test
   void testProcedureControllerReturnsPerDocOffice() {
-    DocumentationOfficeDTO bghDocOfficeDTO =
-        documentationOfficeRepository.findByAbbreviation("BGH");
-    createProcedures(List.of("procedure1", "procedure2", "procedure3"), bghDocOfficeDTO);
-    assertThat(repository.findAll()).hasSize(3);
-
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/procedure?sz=10&pg=0")
+        .uri("/api/v1/caselaw/procedure?withDocUnits=true&sz=10&pg=0")
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new TypeReference<PageTestImpl<Procedure>>() {})
+        .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(Objects.requireNonNull(response.getResponseBody()).getContent()).isEmpty();
@@ -747,8 +682,9 @@ class ProcedureIntegrationTest {
   // only needed for e2e test
   // TODO remove controller endpoint. check how to handle cleanup after e2e tests
   void testDeleteProcedure() {
-    ProcedureDTO procedureDTO = createProcedure("fooProcedure", documentationOfficeDTO);
-    assertThat(repository.findAll()).hasSize(1);
+    ProcedureDTO procedureDTO =
+        repository.findAllByLabelAndDocumentationOffice("procedure1", docOfficeDTO).get();
+    assertThat(repository.findAll()).hasSize(7);
 
     risWebTestClient
         .withDefaultLogin()
@@ -758,29 +694,20 @@ class ProcedureIntegrationTest {
         .expectStatus()
         .is2xxSuccessful();
 
-    assertThat(repository.findAll()).isEmpty();
+    assertThat(repository.findAll()).hasSize(6);
   }
 
   @Test
   void testProcedureControllerReturnsDocUnitsPerProcedure() {
     DocumentationOfficeDTO bghDocOfficeDTO =
         documentationOfficeRepository.findByAbbreviation("BGH");
-
-    DocumentationUnitDTO dto =
-        documentUnitRepository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(documentationOfficeDTO)
-                .build());
-
-    ProcedureDTO procedure = createProcedure("testProcedure", bghDocOfficeDTO);
-
-    assertThat(repository.findAll()).hasSize(1);
+    ProcedureDTO procedure =
+        repository.findAllByLabelAndDocumentationOffice("testProcedure BGH", bghDocOfficeDTO).get();
 
     DocumentUnit documentUnitFromFrontend1 =
         DocumentUnit.builder()
-            .uuid(dto.getId())
-            .documentNumber(dto.getDocumentNumber())
+            .uuid(docUnitDTO.getId())
+            .documentNumber(docUnitDTO.getDocumentNumber())
             .coreData(
                 CoreData.builder()
                     .procedure(ProcedureTransformer.transformToDomain(procedure))
@@ -791,7 +718,7 @@ class ProcedureIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
+        .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
         .bodyValue(documentUnitFromFrontend1)
         .exchange()
         .expectStatus()
@@ -819,28 +746,35 @@ class ProcedureIntegrationTest {
             });
   }
 
-  private List<ProcedureDTO> createProcedures(
-      List<String> labels, DocumentationOfficeDTO documentationOffice) {
-    return labels.stream()
-        .map(
-            label ->
-                repository.save(
-                    ProcedureDTO.builder()
-                        .documentationOffice(documentationOffice)
-                        .label(label)
-                        .build()))
-        .toList();
+  @Test
+  void testSearch_withQuery_shouldReturnLatestProcedureUsedInDocumentationUnit() {
+    addProcedureToDocUnit("procedure1", docUnitDTO);
+    addProcedureToDocUnit("procedure2", docUnitDTO);
+
+    assertThat(repository.findAll()).hasSize(7);
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/procedure?withDocUnits=true&q=procedure&sz=20&pg=0")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).hasSize(1);
+              assertThat(response.getResponseBody().getContent().get(0).label())
+                  .isEqualTo("procedure2");
+            });
   }
 
-  private ProcedureDTO createProcedure(String label, DocumentationOfficeDTO documentationOffice) {
-    return createProcedures(List.of(label), documentationOffice).get(0);
-  }
-
-  private UUID addProcedure(DocumentationUnitDTO dto, String procedureValue) {
+  private UUID addProcedureToDocUnit(
+      String procedureValue, DocumentationUnitDTO documentationUnitDTO) {
     DocumentUnit documentUnitFromFrontend1 =
         DocumentUnit.builder()
-            .uuid(dto.getId())
-            .documentNumber(dto.getDocumentNumber())
+            .uuid(documentationUnitDTO.getId())
+            .documentNumber(documentationUnitDTO.getDocumentNumber())
             .coreData(
                 CoreData.builder()
                     .procedure(Procedure.builder().label(procedureValue).build())
@@ -852,7 +786,7 @@ class ProcedureIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
+        .uri("/api/v1/caselaw/documentunits/" + documentationUnitDTO.getId())
         .bodyValue(documentUnitFromFrontend1)
         .exchange()
         .expectStatus()

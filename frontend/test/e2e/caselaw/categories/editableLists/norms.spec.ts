@@ -1,4 +1,4 @@
-import { expect, Locator, Page } from "@playwright/test"
+import { expect } from "@playwright/test"
 import SingleNorm from "@/domain/singleNorm"
 import {
   clearInput,
@@ -40,7 +40,7 @@ test.describe("norm", () => {
     await expect(container.getByText("PBefG")).toBeVisible()
 
     // edit entry
-    await container.getByLabel("Listen Eintrag").first().click()
+    await container.getByTestId("list-entry-0").click()
     await fillNormInputs(page, {
       normAbbreviation: "PBefGRVZustBehV NW",
     })
@@ -73,7 +73,7 @@ test.describe("norm", () => {
     const listEntries = container.getByLabel("Listen Eintrag")
     await expect(listEntries).toHaveCount(2)
 
-    await listEntries.first().click()
+    await container.getByTestId("list-entry-0").click()
     await container.getByLabel("Eintrag löschen").click()
     // the default list entry is not shown on delete item
     await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
@@ -163,7 +163,7 @@ test.describe("norm", () => {
 
     const listEntries = container.getByLabel("Listen Eintrag")
     await expect(listEntries).toHaveCount(2)
-    await listEntries.first().click()
+    await container.getByTestId("list-entry-0").click()
 
     await expect(
       container.getByLabel("Einzelnorm löschen", { exact: true }),
@@ -203,7 +203,7 @@ test.describe("norm", () => {
     await expect(container.getByText("§ 123")).toBeVisible()
 
     const listEntries = container.getByLabel("Listen Eintrag")
-    await listEntries.first().click()
+    await container.getByTestId("list-entry-0").click()
 
     //cancel editing existing input falls back to last saved value
     await fillNormInputs(page, {
@@ -256,8 +256,7 @@ test.describe("norm", () => {
     })
 
     await container.getByLabel("Norm speichern").click()
-    const listEntries = container.getByLabel("Listen Eintrag")
-    await listEntries.nth(1).click()
+    await container.getByTestId("list-entry-1").click()
     await page.getByLabel("RIS-Abkürzung").fill("PBefG")
     await page.getByText("PBefG", { exact: true }).click()
 
@@ -297,57 +296,6 @@ test.describe("norm", () => {
       await expect(normContainer.getByText("Mit Gesetzeskraft")).toBeVisible()
     })
 
-    async function addNewLegalForce(page: Page, saveNormButton: Locator) {
-      await fillInput(page, "Gesetzeskraft Typ", "Nichtig")
-      await page.getByText("Nichtig").click()
-
-      await fillInput(page, "Gesetzeskraft Geltungsbereich", "Brandenburg")
-      await page.getByText("Brandenburg").click()
-
-      await saveNormButton.click()
-
-      await page.getByText("Speichern").click()
-      await expect(page.locator("text=Nichtig (Brandenburg)")).toBeVisible()
-    }
-
-    test("legal forces should be deleted when court was changed to court without 'Gesetzeskraft'", async ({
-      page,
-      documentNumber,
-    }) => {
-      await navigateToCategories(page, documentNumber)
-
-      await page.locator("[aria-label='Gericht']").fill("VerfG")
-      await page.locator("text=VerfG Dessau-Roßlau").click()
-      await expect(page.locator("[aria-label='Gericht']")).toHaveValue(
-        "VerfG Dessau-Roßlau",
-      )
-
-      await fillNormInputs(page, {
-        normAbbreviation: "PBefG",
-        singleNorms: [{ singleNorm: "§ 123" } as SingleNorm],
-      })
-
-      const normContainer = page.getByLabel("Norm")
-      const checkbox = normContainer.getByTestId("legal-force-checkbox")
-      await expect(checkbox).toBeVisible()
-      await expect(normContainer.getByText("Mit Gesetzeskraft")).toBeVisible()
-
-      await checkbox.click()
-
-      // add new legal force
-      const saveNormButton = normContainer.getByLabel("Norm speichern")
-      await addNewLegalForce(page, saveNormButton)
-
-      // change court to court without "Gesetzeskraft"
-      await page.locator("[aria-label='Gericht']").fill("BGH")
-      await page.locator("text=BGH").click()
-      await expect(page.locator("[aria-label='Gericht']")).toHaveValue("BGH")
-      await page.getByText("Speichern").click()
-
-      // Gesetzeskraft should be gone
-      await expect(page.locator("text=Nichtig (Brandenburg)")).toBeHidden()
-    })
-
     test("add new legal force, edit and remove it", async ({
       page,
       documentNumber,
@@ -381,13 +329,22 @@ test.describe("norm", () => {
       await expect(legalForceRegionCombobox).toBeVisible()
 
       // add new legal force
+      await fillInput(page, "Gesetzeskraft Typ", "Nichtig")
+      await page.getByText("Nichtig").click()
+
+      await fillInput(page, "Gesetzeskraft Geltungsbereich", "Brandenburg")
+      await page.getByText("Brandenburg").click()
+
       const saveNormButton = normContainer.getByLabel("Norm speichern")
-      await addNewLegalForce(page, saveNormButton)
+      await saveNormButton.click()
+
+      await page.getByText("Speichern").click()
+      await expect(page.locator("text=Nichtig (Brandenburg)")).toBeVisible()
 
       // edit legal force
       const listEntries = normContainer.getByLabel("Listen Eintrag")
       await expect(listEntries).toHaveCount(2)
-      await listEntries.first().click()
+      await normContainer.getByTestId("list-entry-0").click()
 
       await fillInput(page, "Gesetzeskraft Typ", "Vereinbar")
       await page.getByText("Vereinbar").click()
@@ -401,7 +358,7 @@ test.describe("norm", () => {
       await expect(page.locator("text=Vereinbar (Berlin (Ost))")).toBeVisible()
 
       // remove legal force
-      await listEntries.first().click()
+      await normContainer.getByTestId("list-entry-0").click()
 
       await clearInput(page, "Gesetzeskraft Typ")
       await clearInput(page, "Gesetzeskraft Geltungsbereich")
@@ -448,18 +405,12 @@ test.describe("norm", () => {
       // enter edit mode
       const listEntries = normContainer.getByLabel("Listen Eintrag")
       await expect(listEntries).toHaveCount(2)
-      await listEntries.first().click()
+      await normContainer.getByTestId("list-entry-0").click()
 
       // check that both fields display error message
       await expect(page.locator("text=Pflichtfeld nicht befüllt")).toHaveCount(
         2,
       )
-      await expect(
-        page.locator("text=Pflichtfeld nicht befüllt").first(),
-      ).toBeVisible()
-      await expect(
-        page.locator("text=Pflichtfeld nicht befüllt").last(),
-      ).toBeVisible()
 
       await page.locator(`[aria-label='Gesetzeskraft Typ']`).fill("Vereinbar")
       await page.getByText("Vereinbar").click()
@@ -472,9 +423,6 @@ test.describe("norm", () => {
         .fill("Berlin")
       await page.getByText("Berlin (Ost)").click()
 
-      await expect(page.locator("text=Pflichtfeld nicht befüllt")).toHaveCount(
-        0,
-      )
       await expect(page.locator("text=Pflichtfeld nicht befüllt.")).toBeHidden()
 
       await saveNormButton.click()

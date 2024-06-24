@@ -2,7 +2,7 @@ import ActiveCitation from "./activeCitation"
 import DocumentationOffice from "./documentationOffice"
 import DocumentUnitListEntry from "./documentUnitListEntry"
 import EnsuingDecision from "./ensuingDecision"
-import { FieldOfLawNode } from "./fieldOfLaw"
+import { FieldOfLaw } from "./fieldOfLaw"
 import NormReference from "./normReference"
 import PreviousDecision from "./previousDecision"
 import SingleNorm from "./singleNorm"
@@ -26,6 +26,7 @@ export type CoreData = {
   inputTypes?: string[]
   documentationOffice?: DocumentationOffice
   region?: string
+  yearsOfDispute?: string[]
   leadingDecisionNormReferences?: string[]
 }
 
@@ -33,7 +34,7 @@ export type ContentRelatedIndexing = {
   keywords?: string[]
   norms?: NormReference[]
   activeCitations?: ActiveCitation[]
-  fieldsOfLaw?: FieldOfLawNode[]
+  fieldsOfLaw?: FieldOfLaw[]
 }
 
 export type DocumentType = {
@@ -72,6 +73,9 @@ export enum PublicationState {
   PUBLISHED = "PUBLISHED",
   UNPUBLISHED = "UNPUBLISHED",
   PUBLISHING = "PUBLISHING",
+  DUPLICATED = "DUPLICATED",
+  LOCKED = "LOCKED",
+  DELETING = "DELETING",
 }
 
 export type PublicationStatus = {

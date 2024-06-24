@@ -5,6 +5,7 @@ import { createApp } from "vue"
 import "@/styles/global.scss"
 import App from "./App.vue"
 import router from "./router"
+import useSessionStore from "./stores/sessionStore"
 
 const app = createApp(App)
 app.use(createHead())
@@ -33,4 +34,10 @@ if (import.meta.env.PROD) {
   })
 }
 
-app.use(router).use(createPinia()).mount("#app")
+app.use(createPinia())
+const store = useSessionStore()
+
+// Fetch env and wait for it to complete before mounting the app
+await store.initSession().then(() => {
+  app.use(router).mount("#app")
+})

@@ -13,8 +13,8 @@ import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,20 +32,36 @@ public class DatabaseProcedureService implements ProcedureService {
 
   @Override
   @Transactional
-  public Page<Procedure> search(
-      Optional<String> query, DocumentationOffice documentationOffice, Pageable pageable) {
+  public Slice<Procedure> search(
+      Optional<String> query,
+      DocumentationOffice documentationOffice,
+      Pageable pageable,
+      Optional<Boolean> withDocUnits) {
 
     DocumentationOfficeDTO documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
 
+    if (withDocUnits.isPresent() && Boolean.TRUE.equals(withDocUnits.get())) {
+      return query
+          .map(
+              queryString ->
+                  repository.findLatestUsedProceduresByLabelAndDocumentationOffice(
+                      queryString.trim(), documentationOfficeDTO, pageable))
+          .orElseGet(
+              () ->
+                  repository.findLatestUsedProceduresByDocumentationOffice(
+                      documentationOfficeDTO, pageable))
+          .map(ProcedureTransformer::transformToDomain);
+    }
     return query
         .map(
             queryString ->
                 repository.findAllByLabelContainingAndDocumentationOfficeOrderByCreatedAtDesc(
                     queryString.trim(), documentationOfficeDTO, pageable))
-        .orElse(
-            repository.findAllByDocumentationOfficeOrderByCreatedAtDesc(
-                documentationOfficeDTO, pageable))
+        .orElseGet(
+            () ->
+                repository.findAllByDocumentationOfficeOrderByCreatedAtDesc(
+                    documentationOfficeDTO, pageable))
         .map(ProcedureTransformer::transformToDomain);
   }
 

@@ -201,7 +201,7 @@ onBeforeUnmount(() => {
             clear-on-choosing-item
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getCourts"
-            :readonly="previousDecision.hasForeignSource"
+            :read-only="previousDecision.hasForeignSource"
             @focus="validationStore.remove('court')"
           ></ComboboxInput>
         </InputField>
@@ -283,7 +283,7 @@ onBeforeUnmount(() => {
             v-model="previousDecision.documentType"
             aria-label="Dokumenttyp Vorgehende Entscheidung"
             :item-service="ComboboxItemService.getDocumentTypes"
-            :readonly="previousDecision.hasForeignSource"
+            :read-only="previousDecision.hasForeignSource"
           ></ComboboxInput>
         </InputField>
       </div>

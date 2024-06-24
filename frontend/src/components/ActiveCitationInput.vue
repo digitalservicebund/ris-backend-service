@@ -234,7 +234,7 @@ onBeforeUnmount(() => {
             clear-on-choosing-item
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getCourts"
-            :readonly="activeCitation.hasForeignSource"
+            :read-only="activeCitation.hasForeignSource"
             @focus="validationStore.remove('court')"
           >
           </ComboboxInput>
@@ -283,7 +283,7 @@ onBeforeUnmount(() => {
             v-model="activeCitation.documentType"
             aria-label="Dokumenttyp Aktivzitierung"
             :item-service="ComboboxItemService.getDocumentTypes"
-            :readonly="activeCitation.hasForeignSource"
+            :read-only="activeCitation.hasForeignSource"
           ></ComboboxInput>
         </InputField>
       </div>

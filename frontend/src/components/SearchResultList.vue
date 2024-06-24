@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import InlineDecision from "./InlineDecision.vue"
+import DecisionSummary from "@/components/DecisionSummary.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
@@ -63,8 +63,7 @@ export type SearchResults<Type extends RelatedDocumentation> = {
             size="small"
             @click.stop="emits('linkDecision', searchResult.decision)"
           />
-          <InlineDecision :decision="searchResult.decision" />
-
+          <DecisionSummary :decision="searchResult.decision"></DecisionSummary>
           <span
             v-if="searchResult.isLinked"
             class="ds-label-02-reg ml-8 rounded-full bg-yellow-400 px-8 py-2"

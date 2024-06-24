@@ -7,7 +7,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.AttachmentTransfor
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentException;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
-import de.bund.digitalservice.ris.caselaw.domain.StringsUtil;
+import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -149,7 +149,7 @@ public class S3AttachmentService implements AttachmentService {
   }
 
   private void deleteObjectFromBucket(String s3Path) {
-    if (StringsUtil.returnTrueIfNullOrBlank(s3Path)) {
+    if (StringUtils.returnTrueIfNullOrBlank(s3Path)) {
       throw new AttachmentException("s3Path cant be null");
     }
 

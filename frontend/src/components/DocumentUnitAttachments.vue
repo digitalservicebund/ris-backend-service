@@ -1,8 +1,10 @@
 <script lang="ts" setup>
-import { computed, Ref, ref } from "vue"
+import { computed, onMounted, Ref, ref } from "vue"
+import { useRoute } from "vue-router"
 import AttachmentList from "@/components/AttachmentList.vue"
 import AttachmentViewSidePanel from "@/components/AttachmentViewSidePanel.vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
+import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
 import FileUpload from "@/components/FileUpload.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
@@ -13,10 +15,10 @@ import useQuery from "@/composables/useQueryFromRoute"
 import Attachment from "@/domain/attachment"
 import DocumentUnit from "@/domain/documentUnit"
 import attachmentService from "@/services/attachmentService"
+import FeatureToggleService from "@/services/featureToggleService"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
-  showAttachmentPanel?: boolean
   showNavigationPanel?: boolean
 }>()
 const emit = defineEmits<{
@@ -24,15 +26,15 @@ const emit = defineEmits<{
 }>()
 
 const { pushQueryToRoute } = useQuery<"showAttachmentPanel">()
+const route = useRoute()
 
-const showAttachmentPanelRef: Ref<boolean> = ref(
-  props.showAttachmentPanel ? props.showAttachmentPanel : false,
-)
+const showExtraContentPanelRef: Ref<boolean> = ref(false)
 
 const errors = ref<string[]>([])
 const isLoading = ref(false)
 const acceptedFileFormats = [".docx"]
 const selectedAttachmentIndex: Ref<number> = ref(0)
+const notesFeatureToggle = ref(false)
 
 const showDeleteModal = ref(false)
 const deleteModalHeaderText = "Anhang löschen"
@@ -71,7 +73,7 @@ const handleDeleteAttachment = async (index: number) => {
     if (getAttachments().length > 1) {
       selectedAttachmentIndex.value = index == 0 ? 0 : index - 1
     } else {
-      toggleAttachmentPanel(false)
+      toggleExtraContentPanel(false)
     }
     emit("updateDocumentUnit")
   }
@@ -80,10 +82,10 @@ const handleDeleteAttachment = async (index: number) => {
 const handleOnSelect = (index: number) => {
   if (index >= 0 && index < getAttachments().length) {
     if (selectedAttachmentIndex.value == index) {
-      toggleAttachmentPanel()
+      toggleExtraContentPanel()
     } else {
       selectedAttachmentIndex.value = index
-      toggleAttachmentPanel(true)
+      toggleExtraContentPanel(true)
     }
   }
 }
@@ -124,16 +126,16 @@ async function upload(files: FileList) {
   } finally {
     isLoading.value = false
     emit("updateDocumentUnit")
-    if (!showAttachmentPanelRef.value && anySuccessful) {
-      toggleAttachmentPanel(true)
+    if (!showExtraContentPanelRef.value && anySuccessful) {
+      toggleExtraContentPanel(true)
     }
   }
 }
 
-const toggleAttachmentPanel = (state?: boolean) => {
-  showAttachmentPanelRef.value = state || !showAttachmentPanelRef.value
+const toggleExtraContentPanel = (state?: boolean) => {
+  showExtraContentPanelRef.value = state || !showExtraContentPanelRef.value
   pushQueryToRoute({
-    showAttachmentPanel: showAttachmentPanelRef.value.toString(),
+    showAttachmentPanel: showExtraContentPanelRef.value.toString(),
   })
 }
 
@@ -151,6 +153,17 @@ function toggleDeleteModal() {
     }
   }
 }
+
+onMounted(async () => {
+  notesFeatureToggle.value =
+    (await FeatureToggleService.isEnabled("neuris.note")).data ?? false
+  if (route.query.showAttachmentPanel) {
+    showExtraContentPanelRef.value = route.query.showAttachmentPanel === "true"
+  } else if (notesFeatureToggle.value) {
+    showExtraContentPanelRef.value =
+      !!props.documentUnit.note || props.documentUnit.hasAttachments
+  }
+})
 </script>
 
 <template>
@@ -211,14 +224,23 @@ function toggleDeleteModal() {
             </div>
           </div>
         </FlexItem>
+        <ExtraContentSidePanel
+          v-if="notesFeatureToggle"
+          :current-index="selectedAttachmentIndex"
+          :document-unit="documentUnit"
+          :document-unit-uuid="documentUnit.uuid"
+          :is-expanded="showExtraContentPanelRef"
+          @select="handleOnSelect"
+          @toggle="toggleExtraContentPanel"
+        ></ExtraContentSidePanel>
         <AttachmentViewSidePanel
-          v-if="props.documentUnit.attachments"
+          v-if="props.documentUnit.attachments && !notesFeatureToggle"
           :attachments="documentUnit.attachments"
           :current-index="selectedAttachmentIndex"
           :document-unit-uuid="props.documentUnit.uuid"
-          :is-expanded="showAttachmentPanelRef"
+          :is-expanded="showExtraContentPanelRef"
           @select="handleOnSelect"
-          @update="toggleAttachmentPanel"
+          @update="toggleExtraContentPanel"
         ></AttachmentViewSidePanel>
       </FlexContainer>
     </template>

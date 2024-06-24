@@ -2,9 +2,14 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingEcliDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO.DocumentationUnitDTOBuilder;
@@ -15,8 +20,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
+import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
@@ -26,6 +34,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
+import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
@@ -34,6 +43,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.Region;
 import java.time.Instant;
+import java.time.Year;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -514,6 +524,130 @@ class DocumentationUnitTransformerTest {
   }
 
   @Test
+  void testTransformToDTO_normalizesNonBreakingSpaces() {
+    DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
+
+    DocumentUnit updatedDomainObject =
+        DocumentUnit.builder()
+            .coreData(
+                CoreData.builder()
+                    .ecli("This\u00A0is\u202Fa\uFEFFtest\u2007ecli\u180Ewith\u2060spaces")
+                    .appraisalBody(
+                        "This\u00A0is\u202Fa\uFEFFtest\u2007appraisalBody\u180Ewith\u2060spaces")
+                    .leadingDecisionNormReferences(
+                        List.of(
+                            "This\u00A0is\u202Fa\uFEFFtest\u2007reference\u180Ewith\u2060spaces"))
+                    .deviatingEclis(
+                        List.of(
+                            "This\u00A0is\u202Fa\uFEFFtest\u2007deviatingEcli\u180Ewith\u2060spaces"))
+                    .deviatingFileNumbers(
+                        List.of(
+                            "This\u00A0is\u202Fa\uFEFFtest\u2007deviatingFileNumber\u180Ewith\u2060spaces"))
+                    .deviatingCourts(
+                        List.of(
+                            "This\u00A0is\u202Fa\uFEFFtest\u2007deviatingCourt\u180Ewith\u2060spaces"))
+                    .inputTypes(
+                        List.of(
+                            "This\u00A0is\u202Fa\uFEFFtest\u2007inputType\u180Ewith\u2060spaces"))
+                    .build())
+            .ensuingDecisions(
+                List.of(
+                    EnsuingDecision.builder()
+                        .fileNumber(
+                            "This\u00A0is\u202Fa\uFEFFtest\u2007fileNumber\u180Ewith\u2060spaces")
+                        .note("This\u00A0is\u202Fa\uFEFFtest\u2007note\u180Ewith\u2060spaces")
+                        .build()))
+            .previousDecisions(
+                List.of(
+                    PreviousDecision.builder()
+                        .fileNumber(
+                            "This\u00A0is\u202Fa\uFEFFtest\u2007fileNumber\u180Ewith\u2060spaces")
+                        .deviatingFileNumber(
+                            "This\u00A0is\u202Fa\uFEFFtest\u2007deviatingFileNumber\u180Ewith\u2060spaces")
+                        .build()))
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .activeCitations(
+                        List.of(
+                            ActiveCitation.builder()
+                                .fileNumber(
+                                    "This\u00A0is\u202Fa\uFEFFtest\u2007fileNumber\u180Ewith\u2060spaces")
+                                .build()))
+                    .norms(
+                        List.of(
+                            NormReference.builder()
+                                .normAbbreviation(
+                                    NormAbbreviation.builder()
+                                        .id(UUID.fromString("33333333-2222-3333-4444-555555555555"))
+                                        .build())
+                                .singleNorms(
+                                    List.of(
+                                        SingleNorm.builder()
+                                            .singleNorm(
+                                                "This\u00A0is\u202Fa\uFEFFtest\u2007singlenorm\u180Ewith\u2060spaces")
+                                            .build()))
+                                .build()))
+                    .build())
+            .build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+    assertThat(documentationUnitDTO.getEcli()).isEqualTo("This is a test ecli with spaces");
+    assertThat(documentationUnitDTO.getJudicialBody())
+        .isEqualTo("This is a test appraisalBody with spaces");
+    assertThat(documentationUnitDTO.getLeadingDecisionNormReferences())
+        .usingRecursiveFieldByFieldElementComparator()
+        .containsExactly(
+            LeadingDecisionNormReferenceDTO.builder()
+                .normReference("This is a test reference with spaces")
+                .rank(1)
+                .build());
+    assertThat(
+            documentationUnitDTO.getDeviatingEclis().stream()
+                .map(DeviatingEcliDTO::getValue)
+                .toList())
+        .isEqualTo(List.of("This is a test deviatingEcli with spaces"));
+    assertThat(
+            documentationUnitDTO.getDeviatingFileNumbers().stream()
+                .map(DeviatingFileNumberDTO::getValue)
+                .toList())
+        .isEqualTo(List.of("This is a test deviatingFileNumber with spaces"));
+    assertThat(
+            documentationUnitDTO.getDeviatingCourts().stream()
+                .map(DeviatingCourtDTO::getValue)
+                .toList())
+        .isEqualTo(List.of("This is a test deviatingCourt with spaces"));
+    assertThat(documentationUnitDTO.getInputTypes().stream().map(InputTypeDTO::getValue).toList())
+        .isEqualTo(List.of("This is a test inputType with spaces"));
+
+    assertThat(
+            documentationUnitDTO.getEnsuingDecisions().stream()
+                .map(EnsuingDecisionDTO::getFileNumber)
+                .toList())
+        .isEqualTo(List.of("This is a test fileNumber with spaces"));
+    assertThat(
+            documentationUnitDTO.getPreviousDecisions().stream()
+                .map(PreviousDecisionDTO::getFileNumber)
+                .toList())
+        .isEqualTo(List.of("This is a test fileNumber with spaces"));
+    assertThat(
+            documentationUnitDTO.getPreviousDecisions().stream()
+                .map(PreviousDecisionDTO::getDeviatingFileNumber)
+                .toList())
+        .isEqualTo(List.of("This is a test deviatingFileNumber with spaces"));
+    assertThat(
+            documentationUnitDTO.getActiveCitations().stream()
+                .map(ActiveCitationDTO::getFileNumber)
+                .toList())
+        .isEqualTo(List.of("This is a test fileNumber with spaces"));
+    assertThat(
+            documentationUnitDTO.getNormReferences().stream()
+                .map(NormReferenceDTO::getSingleNorm)
+                .toList())
+        .isEqualTo(List.of("This is a test singlenorm with spaces"));
+  }
+
+  @Test
   void testTransformToDomain_withDocumentationUnitDTOIsNull_shouldReturnEmptyDocumentUnit() {
 
     assertThatThrownBy(() -> DocumentationUnitTransformer.transformToDomain(null))
@@ -810,9 +944,67 @@ class DocumentationUnitTransformerTest {
         .isEqualTo("single norm 2");
   }
 
+  @Test
+  void testTransformToDomain_withNote_shouldAddNote() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder().note("Beispiel Notiz").build();
+
+    DocumentUnit documentUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentUnit.note()).isEqualTo("Beispiel Notiz");
+  }
+
+  @Test
+  void testTransformToDomain_withEmptyNote_shouldAddEmptyNote() {
+    DocumentationUnitDTO documentationUnitDTO = generateSimpleDTOBuilder().note("").build();
+
+    DocumentUnit documentUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentUnit.note()).isEmpty();
+  }
+
+  @Test
+  void testTransformToDomain_withNullNote_shouldAddNullNote() {
+    DocumentationUnitDTO documentationUnitDTO = generateSimpleDTOBuilder().note(null).build();
+
+    DocumentUnit documentUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentUnit.note()).isNull();
+  }
+
+  @Test
+  void testTransformToDomain_withoutNote_shouldAddNoNote() {
+    DocumentationUnitDTO documentationUnitDTO = generateSimpleDTOBuilder().build();
+
+    DocumentUnit documentUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentUnit.note()).isNull();
+  }
+
   private DocumentationUnitDTOBuilder generateSimpleDTOBuilder() {
     return DocumentationUnitDTO.builder()
         .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("doc office").build());
+  }
+
+  @Test
+  void testAddYearsOfDisputeToDTORanking() {
+    DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
+
+    CoreData.CoreDataBuilder coreDataBuilder = generateSimpleCoreDataBuilder();
+    coreDataBuilder.yearsOfDispute(
+        List.of(Year.now().minusYears(2), Year.now(), Year.now().minusYears(4)));
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(
+            currentDto,
+            generateSimpleDocumentUnitBuilder().coreData(coreDataBuilder.build()).build());
+
+    assertEquals(
+        documentationUnitDTO.getYearsOfDispute().stream().map(YearOfDisputeDTO::getRank).toList(),
+        List.of(1, 2, 3));
   }
 
   private DocumentUnitBuilder generateSimpleDocumentUnitBuilder() {
@@ -841,6 +1033,7 @@ class DocumentationUnitTransformerTest {
         .deviatingEclis(Collections.emptyList())
         .deviatingDecisionDates(Collections.emptyList())
         .inputTypes(Collections.emptyList())
-        .leadingDecisionNormReferences(Collections.emptyList());
+        .leadingDecisionNormReferences(Collections.emptyList())
+        .yearsOfDispute(Collections.emptyList());
   }
 }

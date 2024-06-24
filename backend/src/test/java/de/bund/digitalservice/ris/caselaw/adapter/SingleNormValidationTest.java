@@ -18,7 +18,6 @@ import de.bund.digitalservice.ris.caselaw.domain.validator.SingleNormValidator;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -117,26 +116,15 @@ class SingleNormValidationTest {
     Assertions.assertEquals("Validation error", message);
   }
 
-  @Test
-  void testValidate_withSingleNormIsNull() {
+  @ParameterizedTest
+  @CsvSource({"null, 'norm abbreviation'", "'AB 1', null", "null, null"})
+  void testValidate_withVariousInputs(String singleNorm, String normAbbreviation) {
+    // Handle the 'null' string to be converted to actual null values
+    singleNorm = "null".equals(singleNorm) ? null : singleNorm;
+    normAbbreviation = "null".equals(normAbbreviation) ? null : normAbbreviation;
+
     SingleNormValidationInfo singleNormValidationInfo =
-        new SingleNormValidationInfo(null, "norm abbreviation");
-
-    var message = service.validateSingleNorm(singleNormValidationInfo);
-    Assertions.assertEquals("Ok", message);
-  }
-
-  @Test
-  void testValidate_withNormAbbreviationIsNull() {
-    SingleNormValidationInfo singleNormValidationInfo = new SingleNormValidationInfo("AB 1", null);
-
-    var message = service.validateSingleNorm(singleNormValidationInfo);
-    Assertions.assertEquals("Ok", message);
-  }
-
-  @Test
-  void testValidate_withSingleNormAndNormAbbreviationAreNull() {
-    SingleNormValidationInfo singleNormValidationInfo = new SingleNormValidationInfo(null, null);
+        new SingleNormValidationInfo(singleNorm, normAbbreviation);
 
     var message = service.validateSingleNorm(singleNormValidationInfo);
     Assertions.assertEquals("Ok", message);

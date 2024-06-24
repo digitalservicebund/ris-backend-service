@@ -9,7 +9,7 @@ useHead({
 useSeoMeta({
   charset: "utf-8",
   ogTitle: "NeuRIS Rechtsinformationssystem",
-  ogImage: "/favicon.svg",
+  ogImage: "src/assets/favicon-production.svg",
   ogLocale: "de",
 })
 </script>
@@ -17,7 +17,6 @@ useSeoMeta({
 <template>
   <div class="flex min-h-screen flex-col">
     <Navbar />
-
     <Suspense>
       <main class="flex grow">
         <router-view class="grow" />

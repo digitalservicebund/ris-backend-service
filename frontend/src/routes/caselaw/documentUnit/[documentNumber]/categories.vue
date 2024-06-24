@@ -23,7 +23,6 @@ const { data: documentUnit, error } =
   <DocumentUnitCategories
     v-if="documentUnit"
     :document-unit="documentUnit"
-    :show-attachment-panel="route.query.showAttachmentPanel === 'true'"
     :show-navigation-panel="
       route.query.showNavigationPanel
         ? route.query.showNavigationPanel === 'true'
