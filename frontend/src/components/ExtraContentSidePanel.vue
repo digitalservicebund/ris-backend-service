@@ -98,12 +98,11 @@ onMounted(() => {
       @keydown.enter="togglePanel"
       @update:is-expanded="togglePanel"
     >
-      <FlexContainer class="m-16 ml-20 items-center -space-x-2 px-8">
+      <FlexContainer class="m-24 ml-20 items-center -space-x-2 px-8">
         <TextButton
           id="note"
           aria-label="Notiz anzeigen"
           button-type="tertiary"
-          :disabled="!hasNote"
           :icon="IconStickyNote"
           size="small"
           @click="selectNotes"
@@ -113,7 +112,6 @@ onMounted(() => {
           id="attachments"
           aria-label="Dokumente anzeigen"
           button-type="tertiary"
-          :disabled="!hasAttachments"
           :icon="IconAttachFile"
           size="small"
           @click="() => selectAttachments()"
@@ -128,7 +126,7 @@ onMounted(() => {
         ></FileNavigator>
       </FlexContainer>
 
-      <div class="p-16">
+      <div class="m-24">
         <div v-if="notesSelected">
           <label class="ds-label-02-reg mb-4">{{ "Notiz" }}</label>
 
@@ -150,6 +148,9 @@ onMounted(() => {
             :document-unit-uuid="documentUnit.uuid"
             :s3-path="documentUnit.attachments[currentAttachmentIndex].s3path"
           />
+          <div v-else class="ds-label-01-reg">
+            Wenn sie eine Datei hochladen, können Sie die Datei hier sehen.
+          </div>
         </div>
       </div>
     </SideToggle>

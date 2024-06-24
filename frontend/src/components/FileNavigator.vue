@@ -35,10 +35,7 @@ const hasPrevious = computed(() => {
 </script>
 
 <template>
-  <FlexContainer
-    v-if="attachments.length > 1"
-    class="float-end items-center space-x-8"
-  >
+  <FlexContainer v-if="attachments.length > 1" class="float-end items-center">
     <FlexItem class="ds-label-01-bold self-center">
       {{ props.attachments[currentIndex].name }}
     </FlexItem>
