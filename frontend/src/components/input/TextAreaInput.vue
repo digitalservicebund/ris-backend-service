@@ -13,7 +13,7 @@ type Props = {
   rows?: number
   size?: "regular" | "medium" | "small"
   hasError?: boolean
-  customClasses: string
+  customClasses?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
