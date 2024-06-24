@@ -6,8 +6,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import de.bund.digitalservice.ris.caselaw.SliceTestImpl;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
+import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
@@ -41,7 +43,6 @@ import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
-import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -54,13 +55,17 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.SliceImpl;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
+import reactor.core.publisher.Mono;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @RISIntegrationTest(
@@ -105,7 +110,7 @@ class ProcedureIntegrationTest {
   @MockBean private DocumentNumberRecyclingService documentNumberRecyclingService;
   @MockBean private PublicationReportRepository publicationReportRepository;
   @MockBean private UserService userService;
-  @MockBean ClientRegistrationRepository clientRegistrationRepository;
+  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean private DocxConverterService docxConverterService;
@@ -119,7 +124,7 @@ class ProcedureIntegrationTest {
   void setUp() {
     docOfficeDTO = documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
     docUnitDTO = documentUnitRepository.findByDocumentNumber("1234567890123").get();
-    doReturn(docOffice).when(userService).getDocumentationOffice(any(OidcUser.class));
+    doReturn(Mono.just(docOffice)).when(userService).getDocumentationOffice(any(OidcUser.class));
   }
 
   @AfterEach
@@ -404,7 +409,7 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
+        .expectBody(new ParameterizedTypeReference<RestSliceImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(
@@ -425,7 +430,7 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new TypeReference<List<DocumentationUnitListItem>>() {})
+        .expectBody(new ParameterizedTypeReference<List<DocumentationUnitListItem>>() {})
         .consumeWith(
             response -> {
               assertThat(Objects.requireNonNull(response.getResponseBody())).isEmpty();
@@ -438,7 +443,7 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
+        .expectBody(new ParameterizedTypeReference<RestSliceImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(
@@ -459,7 +464,7 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new TypeReference<List<DocumentationUnitListItem>>() {})
+        .expectBody(new ParameterizedTypeReference<List<DocumentationUnitListItem>>() {})
         .consumeWith(
             response -> {
               assertThat(Objects.requireNonNull(response.getResponseBody()).get(0).documentNumber())
@@ -546,7 +551,7 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
+        .expectBody(new ParameterizedTypeReference<RestSliceImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).hasSize(1);
@@ -592,7 +597,7 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
+        .expectBody(new ParameterizedTypeReference<RestSliceImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).hasSize(3);
@@ -620,7 +625,7 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
+        .expectBody(new ParameterizedTypeReference<RestSliceImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).hasSize(1);
@@ -635,7 +640,7 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
+        .expectBody(new ParameterizedTypeReference<RestSliceImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isEmpty();
@@ -653,7 +658,7 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
+        .expectBody(new ParameterizedTypeReference<RestSliceImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).hasSize(1);
@@ -671,7 +676,7 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
+        .expectBody(new ParameterizedTypeReference<RestSliceImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(Objects.requireNonNull(response.getResponseBody()).getContent()).isEmpty();
@@ -738,7 +743,7 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new TypeReference<List<DocumentationUnitListItem>>() {})
+        .expectBody(new ParameterizedTypeReference<List<DocumentationUnitListItem>>() {})
         .consumeWith(
             response -> {
               assertThat(Objects.requireNonNull(response.getResponseBody()).get(0).documentNumber())
@@ -760,7 +765,7 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
+        .expectBody(new ParameterizedTypeReference<RestSliceImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).hasSize(1);
@@ -800,5 +805,22 @@ class ProcedureIntegrationTest {
             });
 
     return procedureId.get();
+  }
+
+  public static class RestSliceImpl<T> extends SliceImpl<T> {
+
+    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+    public RestSliceImpl(
+        @JsonProperty("content") List<T> content,
+        @JsonProperty("totalElements") Long totalElements,
+        @JsonProperty("pageable") JsonNode pageable,
+        @JsonProperty("last") boolean last,
+        @JsonProperty("totalPages") int totalPages,
+        @JsonProperty("sort") JsonNode sort,
+        @JsonProperty("first") boolean first,
+        @JsonProperty("numberOfElements") int numberOfElements) {
+
+      super(content, Pageable.unpaged(), !last);
+    }
   }
 }

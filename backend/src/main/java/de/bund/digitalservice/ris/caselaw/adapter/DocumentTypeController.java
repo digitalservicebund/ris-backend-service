@@ -2,15 +2,14 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
-import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 
 @RestController
 @RequestMapping("api/v1/caselaw/documenttypes")
@@ -22,10 +21,10 @@ public class DocumentTypeController {
     this.service = service;
   }
 
-  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping
   @PreAuthorize("isAuthenticated()")
-  public List<DocumentType> getDocumentTypes(
+  public Flux<DocumentType> getDocumentTypes(
       @RequestParam(value = "q") Optional<String> searchStr) {
-    return service.getDocumentTypes(searchStr);
+    return Flux.fromIterable(service.getDocumentTypes(searchStr));
   }
 }

@@ -26,6 +26,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Mono;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
@@ -124,7 +125,7 @@ public class S3AttachmentService implements AttachmentService {
 
     log.debug("upload header information: mediaType{}, contentLength={}", mediaType, contentLength);
 
-    var asyncRequestBody = AsyncRequestBody.fromByteBuffer(byteBuffer);
+    var asyncRequestBody = AsyncRequestBody.fromPublisher(Mono.just(byteBuffer));
     var putObjectRequestBuilder =
         PutObjectRequest.builder()
             .bucket(bucketName)

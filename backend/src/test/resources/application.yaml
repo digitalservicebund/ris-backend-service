@@ -10,8 +10,6 @@ spring:
   sql:
     init:
       mode: always
-  jpa:
-    open-in-view: false
 
 mail:
   exporter:

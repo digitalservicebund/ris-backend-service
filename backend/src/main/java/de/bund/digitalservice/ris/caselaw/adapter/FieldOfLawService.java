@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Service
 @Slf4j
@@ -30,14 +31,14 @@ public class FieldOfLawService {
     this.repository = repository;
   }
 
-  public Slice<FieldOfLaw> getFieldsOfLawBySearchQuery(
+  public Mono<Slice<FieldOfLaw>> getFieldsOfLawBySearchQuery(
       Optional<String> optionalSearchStr, Pageable pageable) {
 
     if (optionalSearchStr.isEmpty() || optionalSearchStr.get().isBlank()) {
-      return repository.findAllByOrderByIdentifierAsc(pageable);
+      return Mono.just(repository.findAllByOrderByIdentifierAsc(pageable));
     }
 
-    return searchAndOrderByScore(optionalSearchStr.get().trim(), pageable);
+    return Mono.just(searchAndOrderByScore(optionalSearchStr.get().trim(), pageable));
   }
 
   private String[] splitSearchTerms(String searchStr) {
@@ -163,22 +164,30 @@ public class FieldOfLawService {
     return score;
   }
 
-  public List<FieldOfLaw> getFieldsOfLawByIdentifierSearch(Optional<String> optionalSearchStr) {
+  public Mono<List<FieldOfLaw>> getFieldsOfLawByIdentifierSearch(
+      Optional<String> optionalSearchStr) {
     if (optionalSearchStr.isEmpty() || optionalSearchStr.get().isBlank()) {
-      return repository.findAllByOrderByIdentifierAsc(PageRequest.of(0, 30)).stream().toList();
+      return Mono.just(
+          repository.findAllByOrderByIdentifierAsc(PageRequest.of(0, 30)).stream().toList());
     }
-    return repository.findByIdentifierSearch(optionalSearchStr.get().trim());
+    return Mono.just(repository.findByIdentifierSearch(optionalSearchStr.get().trim()));
   }
 
-  public List<FieldOfLaw> getChildrenOfFieldOfLaw(String identifier) {
+  public Mono<List<FieldOfLaw>> getChildrenOfFieldOfLaw(String identifier) {
     if (identifier.equalsIgnoreCase(ROOT_ID)) {
-      return repository.getTopLevelNodes();
+      return Mono.just(repository.getTopLevelNodes());
     }
 
-    return repository.findAllByParentIdentifierOrderByIdentifierAsc(identifier);
+    return Mono.just(repository.findAllByParentIdentifierOrderByIdentifierAsc(identifier));
   }
 
-  public FieldOfLaw getTreeForFieldOfLaw(String identifier) {
-    return repository.findTreeByIdentifier(identifier);
+  public Mono<FieldOfLaw> getTreeForFieldOfLaw(String identifier) {
+    FieldOfLaw fieldOfLaw = repository.findTreeByIdentifier(identifier);
+
+    if (fieldOfLaw == null) {
+      return Mono.empty();
+    }
+
+    return Mono.just(fieldOfLaw);
   }
 }

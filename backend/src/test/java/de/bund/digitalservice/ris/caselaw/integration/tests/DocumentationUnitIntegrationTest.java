@@ -9,8 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import de.bund.digitalservice.ris.caselaw.SliceTestImpl;
+import com.jayway.jsonpath.JsonPath;
+import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
@@ -49,21 +49,18 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
-import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
-import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
-import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -76,16 +73,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.reactive.server.EntityExchangeResult;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
+import reactor.core.publisher.Mono;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @RISIntegrationTest(
@@ -133,7 +132,7 @@ class DocumentationUnitIntegrationTest {
   @MockBean private EmailPublishService publishService;
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private UserService userService;
-  @MockBean private ClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
   @MockBean private AttachmentService attachmentService;
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private DocumentationOfficeDTO documentationOffice;
@@ -143,7 +142,7 @@ class DocumentationUnitIntegrationTest {
     documentationOffice =
         documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
 
-    doReturn(docOffice)
+    doReturn(Mono.just(docOffice))
         .when(userService)
         .getDocumentationOffice(
             argThat(
@@ -161,6 +160,7 @@ class DocumentationUnitIntegrationTest {
   }
 
   @Test
+  @Transactional(transactionManager = "jpaTransactionManager")
   void testForCorrectDbEntryAfterNewDocumentUnitCreation() {
 
     risWebTestClient
@@ -175,16 +175,22 @@ class DocumentationUnitIntegrationTest {
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
               assertThat(response.getResponseBody().documentNumber()).startsWith("XXRE0");
-              assertThat(response.getResponseBody().status())
-                  .isEqualTo(
-                      Status.builder().publicationStatus(UNPUBLISHED).withError(false).build());
             });
 
     List<DocumentationUnitDTO> list = repository.findAll();
     assertThat(list).hasSize(1);
+    DocumentationUnitDTO documentUnitDTO = list.get(0);
+    assertThat(documentUnitDTO.getDocumentNumber()).startsWith("XXRE0");
+    assertThat(documentUnitDTO.getDecisionDate()).isNull();
+
+    assertThat(documentUnitDTO.getStatus()).hasSize(1);
+
+    assertThat(documentUnitDTO.getStatus().get(0).getPublicationStatus()).isEqualTo(UNPUBLISHED);
+    assertThat(documentUnitDTO.getStatus().get(0).isWithError()).isFalse();
   }
 
   @Test
+  @Transactional(transactionManager = "jpaTransactionManager")
   void testDocumentUnitDeletionAndRecyclingOfDocumentNumber() {
 
     risWebTestClient
@@ -662,18 +668,25 @@ class DocumentationUnitIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(new TypeReference<SliceTestImpl<RelatedDocumentationUnit>>() {})
+        .expectBody()
+        .jsonPath("$.content")
+        .isArray()
+        .jsonPath("$.content.length()")
+        .isEqualTo(20)
         .consumeWith(
             response -> {
-              List<RelatedDocumentationUnit> content = response.getResponseBody().getContent();
-              assertThat(content).isNotNull();
-              assertThat(content).hasSize(20);
-              assertThat(content)
-                  .extracting("documentNumber")
-                  .doesNotContain(documentNumberToExclude);
+              String responseBody = new String(response.getResponseBody(), StandardCharsets.UTF_8);
+              assertThat(responseBody).isNotNull();
 
-              responseUUIDs.addAll(
-                  content.stream().map(RelatedDocumentationUnit::getUuid).toList());
+              List<String> uuids = JsonPath.read(responseBody, "$.content[*].uuid");
+              assertThat(uuids).hasSize(20);
+              responseUUIDs.addAll(uuids.stream().map(UUID::fromString).toList());
+
+              // make sure the documentNumber originating the search is not in the result
+              List<String> documentNumbers =
+                  JsonPath.read(responseBody, "$.content[*].documentNumber");
+              assertThat(documentNumbers).isNotEmpty();
+              assertThat(documentNumbers).doesNotContain(documentNumberToExclude);
             });
 
     risWebTestClient
@@ -687,16 +700,19 @@ class DocumentationUnitIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(new TypeReference<SliceTestImpl<RelatedDocumentationUnit>>() {})
+        .expectBody()
+        .jsonPath("$.content")
+        .isArray()
+        .jsonPath("$.content.length()")
+        .isEqualTo(20)
         .consumeWith(
             response -> {
-              List<RelatedDocumentationUnit> content = response.getResponseBody().getContent();
-              assertThat(content).isNotNull();
+              String responseBody = new String(response.getResponseBody(), StandardCharsets.UTF_8);
+              assertThat(responseBody).isNotNull();
 
-              List<UUID> responseUUIDs2 =
-                  content.stream().map(RelatedDocumentationUnit::getUuid).toList();
+              List<String> uuids = JsonPath.read(responseBody, "$.content[*].uuid");
+              List<UUID> responseUUIDs2 = uuids.stream().map(UUID::fromString).toList();
 
-              assertThat(responseUUIDs2).hasSize(20);
               assertThat(responseUUIDs2).isEqualTo(responseUUIDs);
             });
   }
@@ -946,26 +962,24 @@ class DocumentationUnitIntegrationTest {
     }
 
     queryParams.add("myDocOfficeOnly", String.valueOf(searchInput.myDocOfficeOnly()));
-    URI uri =
-        new DefaultUriBuilderFactory()
-            .builder()
-            .path("/api/v1/caselaw/documentunits/search")
-            .queryParams(queryParams)
-            .build();
 
-    List<DocumentationUnitListItem> content =
+    EntityExchangeResult<String> result;
+    result =
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri(uri)
+            .uri(
+                uriBuilder ->
+                    uriBuilder
+                        .path("/api/v1/caselaw/documentunits/search")
+                        .queryParams(queryParams)
+                        .build())
             .exchange()
             .expectStatus()
             .isOk()
-            .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
-            .returnResult()
-            .getResponseBody()
-            .getContent();
-
-    return content.stream().map(DocumentationUnitListItem::documentNumber).toList();
+            .expectBody(String.class)
+            .returnResult();
+    System.out.println(JsonPath.read(result.getResponseBody(), "$.content[*]").toString());
+    return JsonPath.read(result.getResponseBody(), "$.content[*].documentNumber");
   }
 }

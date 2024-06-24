@@ -2,14 +2,13 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.LegalForceTypeService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 
 @RestController
 @RequestMapping("api/v1/caselaw/legalforcetype")
@@ -21,10 +20,10 @@ public class LegalForceTypeController {
     this.service = service;
   }
 
-  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping
   @PreAuthorize("isAuthenticated()")
-  public List<LegalForceType> getLegalForceTypes(
+  public Flux<LegalForceType> getLegalForceTypes(
       @RequestParam(value = "q", required = false) String searchStr) {
-    return service.getLegalForceTypes(searchStr);
+    return Flux.fromIterable(service.getLegalForceTypes(searchStr));
   }
 }

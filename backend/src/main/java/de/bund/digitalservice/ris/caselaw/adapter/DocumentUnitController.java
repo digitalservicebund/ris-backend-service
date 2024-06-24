@@ -1,10 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformerException;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
@@ -20,7 +18,6 @@ import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +42,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("api/v1/caselaw/documentunits")
@@ -66,18 +65,24 @@ public class DocumentUnitController {
     this.converterService = converterService;
   }
 
-  @GetMapping(value = "new", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "new")
   @PreAuthorize("isAuthenticated()")
-  public ResponseEntity<DocumentUnit> generateNewDocumentUnit(
+  public Mono<ResponseEntity<DocumentUnit>> generateNewDocumentUnit(
       @AuthenticationPrincipal OidcUser oidcUser) {
-    var docOffice = userService.getDocumentationOffice(oidcUser);
-    try {
-      var documentUnit = service.generateNewDocumentUnit(docOffice);
-      return ResponseEntity.status(HttpStatus.CREATED).body(documentUnit);
-    } catch (DocumentationUnitNotExistsException | DocumentationUnitException e) {
-      log.error("error in generate new documentation unit", e);
-      return ResponseEntity.internalServerError().body(DocumentUnit.builder().build());
-    }
+
+    return userService
+        .getDocumentationOffice(oidcUser)
+        .flatMap(
+            docOffice -> {
+              try {
+                return Mono.just(service.generateNewDocumentUnit(docOffice));
+              } catch (DocumentationUnitNotExistsException | DocumentationUnitException e) {
+                log.error("error in generate new documentation unit", e);
+                return Mono.error(e);
+              }
+            })
+        .map(documentUnit -> ResponseEntity.status(HttpStatus.CREATED).body(documentUnit))
+        .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
   }
 
   /**
@@ -87,47 +92,44 @@ public class DocumentUnitController {
    * <p>Do a conversion into html and parse the footer for ECLI information.
    *
    * @param uuid UUID of the documentation unit
-   * @param bytes bytes of the content file
+   * @param byteBuffer bytes of the content file
    * @param httpHeaders http headers with the X-Filename information
    * @return the into html converted content of the file with some additional metadata (ECLI)
    */
-  @PutMapping(
-      value = "/{uuid}/file",
-      produces = MediaType.APPLICATION_JSON_VALUE,
-      consumes = "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+  @PutMapping(value = "/{uuid}/file")
   @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
-  public ResponseEntity<Docx2Html> attachFileToDocumentUnit(
-      @PathVariable UUID uuid, @RequestBody byte[] bytes, @RequestHeader HttpHeaders httpHeaders) {
-    var docx2html =
-        converterService.getConvertedObject(
-            attachmentService
-                .attachFileToDocumentationUnit(uuid, ByteBuffer.wrap(bytes), httpHeaders)
-                .s3path());
-    service.updateECLI(uuid, docx2html);
-    if (docx2html == null) {
-      return ResponseEntity.unprocessableEntity().build();
-    }
-    return ResponseEntity.status(HttpStatus.OK).body(docx2html);
+  public Mono<ResponseEntity<Docx2Html>> attachFileToDocumentUnit(
+      @PathVariable UUID uuid,
+      @RequestBody ByteBuffer byteBuffer,
+      @RequestHeader HttpHeaders httpHeaders) {
+
+    return Mono.just(
+            converterService.getConvertedObject(
+                attachmentService
+                    .attachFileToDocumentationUnit(uuid, byteBuffer, httpHeaders)
+                    .s3path()))
+        .doOnNext(docx2html -> service.updateECLI(uuid, docx2html))
+        .map(docx2Html -> ResponseEntity.status(HttpStatus.OK).body(docx2Html))
+        .onErrorReturn(ResponseEntity.unprocessableEntity().build());
   }
 
   @DeleteMapping(value = "/{uuid}/file/{s3Path}")
   @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
-  public ResponseEntity<Object> removeAttachmentFromDocumentationUnit(
+  public Mono<ResponseEntity<Object>> removeAttachmentFromDocumentationUnit(
       @PathVariable UUID uuid, @PathVariable String s3Path) {
 
     try {
       attachmentService.deleteByS3Path(s3Path);
-      return ResponseEntity.noContent().build();
+      return Mono.just(ResponseEntity.noContent().build());
     } catch (Exception e) {
-      log.error("Error by deleting attachment '{}' for documentation unit {}", s3Path, uuid, e);
-      return ResponseEntity.internalServerError().build();
+      return Mono.error(e);
     }
   }
 
-  @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/search")
   @PreAuthorize("isAuthenticated()")
   // Access rights are being enforced through SQL filtering
-  public Slice<DocumentationUnitListItem> searchByDocumentUnitListEntry(
+  public Mono<Slice<DocumentationUnitListItem>> searchByDocumentUnitListEntry(
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
       @RequestParam(value = "documentNumber") Optional<String> documentNumber,
@@ -141,151 +143,142 @@ public class DocumentUnitController {
       @RequestParam(value = "myDocOfficeOnly") Optional<Boolean> myDocOfficeOnly,
       @AuthenticationPrincipal OidcUser oidcUser) {
 
-    var documentationOffice = userService.getDocumentationOffice(oidcUser);
-    return service.searchByDocumentationUnitSearchInput(
-        PageRequest.of(page, size),
-        documentationOffice,
-        documentNumber,
-        fileNumber,
-        courtType,
-        courtLocation,
-        decisionDate,
-        decisionDateEnd,
-        publicationStatus,
-        withError,
-        myDocOfficeOnly);
+    return userService
+        .getDocumentationOffice(oidcUser)
+        .flatMap(
+            documentationOffice ->
+                Mono.just(
+                    service.searchByDocumentationUnitSearchInput(
+                        PageRequest.of(page, size),
+                        documentationOffice,
+                        documentNumber,
+                        fileNumber,
+                        courtType,
+                        courtLocation,
+                        decisionDate,
+                        decisionDateEnd,
+                        publicationStatus,
+                        withError,
+                        myDocOfficeOnly)));
   }
 
-  @GetMapping(value = "/{documentNumber}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/{documentNumber}")
   @PreAuthorize("@userHasReadAccessByDocumentNumber.apply(#documentNumber)")
-  public ResponseEntity<DocumentUnit> getByDocumentNumber(
+  public Mono<ResponseEntity<DocumentUnit>> getByDocumentNumber(
       @NonNull @PathVariable String documentNumber) {
 
     if (documentNumber.length() != 13 && documentNumber.length() != 14) {
-      throw new DocumentationUnitException("Die Dokumentennummer unterstützt nur 13-14 Zeichen");
+      return Mono.error(
+          new DocumentationUnitException("Die Dokumentennummer unterstützt nur 13-14 Zeichen"));
     }
 
-    return ResponseEntity.ok(service.getByDocumentNumber(documentNumber));
+    return Mono.justOrEmpty(service.getByDocumentNumber(documentNumber)).map(ResponseEntity::ok);
   }
 
   @DeleteMapping(value = "/{uuid}")
   @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
-  public ResponseEntity<String> deleteByUuid(@PathVariable UUID uuid) {
-
+  public Mono<ResponseEntity<String>> deleteByUuid(@PathVariable UUID uuid) {
     try {
-      var str = service.deleteByUuid(uuid);
-      return ResponseEntity.status(HttpStatus.OK).body(str);
-    } catch (DocumentationUnitNotExistsException ex) {
-      return ResponseEntity.internalServerError().body(ex.getMessage());
+      return Mono.justOrEmpty(service.deleteByUuid(uuid))
+          .map(str -> ResponseEntity.status(HttpStatus.OK).body(str));
+    } catch (DocumentationUnitNotExistsException e) {
+      return Mono.just(ResponseEntity.internalServerError().body(e.getMessage()));
     }
   }
 
-  @PutMapping(
-      value = "/{uuid}",
-      consumes = MediaType.APPLICATION_JSON_VALUE,
-      produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping(value = "/{uuid}", consumes = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
-  public ResponseEntity<DocumentUnit> updateByUuid(
+  public Mono<ResponseEntity<DocumentUnit>> updateByUuid(
       @PathVariable UUID uuid,
       @Valid @RequestBody DocumentUnit documentUnit,
       @AuthenticationPrincipal OidcUser oidcUser) {
 
     if (!uuid.equals(documentUnit.uuid())) {
-      return ResponseEntity.unprocessableEntity().body(DocumentUnit.builder().build());
+      return Mono.just(ResponseEntity.unprocessableEntity().body(DocumentUnit.builder().build()));
     }
+
     try {
-      var du = service.updateDocumentUnit(documentUnit);
-      return ResponseEntity.status(HttpStatus.OK).body(du);
-    } catch (DocumentationUnitNotExistsException
-        | DocumentationUnitException
-        | DocumentUnitTransformerException e) {
-      log.error("Error by updating documentation unit '{}'", documentUnit.documentNumber(), e);
-      return ResponseEntity.internalServerError().body(DocumentUnit.builder().build());
+      return Mono.justOrEmpty(service.updateDocumentUnit(documentUnit))
+          .map(du -> ResponseEntity.status(HttpStatus.OK).body(du));
+    } catch (DocumentationUnitNotExistsException e) {
+      return Mono.just(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
     }
   }
 
   @PutMapping(value = "/{uuid}/publish", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
-  public ResponseEntity<Publication> publishDocumentUnitAsEmail(
+  public Mono<ResponseEntity<Publication>> publishDocumentUnitAsEmail(
       @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
 
     try {
-      var publication = service.publishAsEmail(uuid, userService.getEmail(oidcUser));
-      return ResponseEntity.ok(publication);
-    } catch (DocumentationUnitNotExistsException | DocumentUnitPublishException e) {
-      log.error("Error by publishing the documentation unit '{}' as email", uuid, e);
-      return ResponseEntity.internalServerError().build();
+      return Mono.justOrEmpty(service.publishAsEmail(uuid, userService.getEmail(oidcUser)))
+          .map(ResponseEntity::ok)
+          .doOnError(ex -> ResponseEntity.internalServerError().build());
+    } catch (DocumentationUnitNotExistsException e) {
+      return Mono.just(ResponseEntity.internalServerError().build());
     }
   }
 
   @GetMapping(value = "/{uuid}/publish", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
-  public List<PublicationHistoryRecord> getPublicationHistory(@PathVariable UUID uuid) {
-    return service.getPublicationHistory(uuid);
+  public Flux<PublicationHistoryRecord> getPublicationHistory(@PathVariable UUID uuid) {
+    return Flux.fromIterable(service.getPublicationHistory(uuid));
   }
 
   @GetMapping(
       value = "/{uuid}/preview-publication-xml",
       produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
-  public XmlResultObject getPublicationPreview(@PathVariable UUID uuid) {
+  public Mono<XmlResultObject> getPublicationPreview(@PathVariable UUID uuid) {
     try {
-      return service.previewPublication(uuid);
+      return Mono.just(service.previewPublication(uuid));
     } catch (DocumentationUnitNotExistsException e) {
-      return null;
+      return Mono.empty();
     }
   }
 
-  @PutMapping(
-      value = "/{documentNumberToExclude}/search-linkable-documentation-units",
-      produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping(value = "/{documentNumberToExclude}/search-linkable-documentation-units")
   @PreAuthorize("isAuthenticated()")
-  public Slice<RelatedDocumentationUnit> searchLinkableDocumentationUnits(
+  public Mono<Slice<RelatedDocumentationUnit>> searchLinkableDocumentationUnits(
       @PathVariable("documentNumberToExclude") String documentNumberToExclude,
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
       @RequestBody RelatedDocumentationUnit relatedDocumentationUnit,
       @AuthenticationPrincipal OidcUser oidcUser) {
 
-    var documentationOffice = userService.getDocumentationOffice(oidcUser);
-    return service.searchLinkableDocumentationUnits(
-        relatedDocumentationUnit,
-        documentationOffice,
-        documentNumberToExclude,
-        PageRequest.of(page, size));
+    return userService
+        .getDocumentationOffice(oidcUser)
+        .flatMap(
+            documentationOffice ->
+                Mono.just(
+                    service.searchLinkableDocumentationUnits(
+                        relatedDocumentationUnit,
+                        documentationOffice,
+                        documentNumberToExclude,
+                        PageRequest.of(page, size))));
   }
 
   @GetMapping(value = "/{uuid}/docx/{s3Path}", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
-  public ResponseEntity<Docx2Html> getHtml(@PathVariable UUID uuid, @PathVariable String s3Path) {
-    if (service.getByUuid(uuid) == null) {
-      return ResponseEntity.notFound().build();
-    }
+  public Mono<ResponseEntity<Docx2Html>> getHtml(
+      @PathVariable UUID uuid, @PathVariable String s3Path) {
 
-    try {
-      var docx2Html = converterService.getConvertedObject(s3Path);
-      return ResponseEntity.ok()
-          .cacheControl(CacheControl.maxAge(Duration.ofDays(1))) // Set cache duration
-          .body(docx2Html);
-    } catch (Exception ex) {
-      log.error("Error by getting docx for documentation unit {}", uuid, ex);
-      return ResponseEntity.internalServerError().build();
-    }
+    return Mono.just(service.getByUuid(uuid))
+        .flatMap(documentUnit -> Mono.justOrEmpty(converterService.getConvertedObject(s3Path)))
+        .map(
+            docx2Html ->
+                ResponseEntity.ok()
+                    .cacheControl(CacheControl.maxAge(Duration.ofDays(1))) // Set cache duration
+                    .body(docx2Html))
+        .onErrorReturn(ResponseEntity.internalServerError().build());
   }
 
   @PostMapping(value = "/validateSingleNorm")
   @PreAuthorize("isAuthenticated()")
-  public ResponseEntity<String> validateSingleNorm(
+  public Mono<ResponseEntity<String>> validateSingleNorm(
       @RequestBody SingleNormValidationInfo singleNormValidationInfo) {
-    try {
-      return ResponseEntity.ok(service.validateSingleNorm(singleNormValidationInfo));
-    } catch (Exception ex) {
-      log.error(
-          "Error by validation of single norm '{} - {}'",
-          singleNormValidationInfo.normAbbreviation(),
-          singleNormValidationInfo.singleNorm(),
-          ex);
-      return ResponseEntity.internalServerError().build();
-    }
+    return Mono.just(service.validateSingleNorm(singleNormValidationInfo))
+        .map(ResponseEntity::ok)
+        .onErrorReturn(ResponseEntity.internalServerError().build());
   }
 }

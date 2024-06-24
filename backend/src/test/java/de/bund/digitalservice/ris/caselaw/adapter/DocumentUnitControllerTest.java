@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDefaultDocOffice;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
@@ -9,7 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
@@ -21,16 +20,14 @@ import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
-import de.bund.digitalservice.ris.caselaw.domain.Publication;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecord;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
 import de.bund.digitalservice.ris.caselaw.domain.XmlResultObject;
-import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -41,18 +38,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.MediaType;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.http.HttpHeaders;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = DocumentUnitController.class)
+@WebFluxTest(controllers = DocumentUnitController.class)
 @Import({
   SecurityConfig.class,
   AuthService.class,
@@ -64,7 +62,7 @@ class DocumentUnitControllerTest {
   @MockBean private DocumentUnitService service;
   @MockBean private KeycloakUserService userService;
   @MockBean private DocxConverterService docxConverterService;
-  @MockBean private ClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
   @MockBean private AttachmentService attachmentService;
   @MockBean DatabaseApiKeyRepository apiKeyRepository;
   @MockBean DatabaseDocumentationOfficeRepository officeRepository;
@@ -75,7 +73,7 @@ class DocumentUnitControllerTest {
 
   @BeforeEach
   void setup() {
-    doReturn(docOffice)
+    doReturn(Mono.just(docOffice))
         .when(userService)
         .getDocumentationOffice(
             argThat(
@@ -185,7 +183,7 @@ class DocumentUnitControllerTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
-        .contentType(MediaType.APPLICATION_JSON)
+        .header(HttpHeaders.CONTENT_TYPE, "application/json")
         .bodyValue(documentUnit)
         .exchange()
         .expectStatus()
@@ -202,7 +200,7 @@ class DocumentUnitControllerTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/abc")
-        .contentType(MediaType.APPLICATION_JSON)
+        .header(HttpHeaders.CONTENT_TYPE, "application/json")
         .bodyValue(documentUnitDTO)
         .exchange()
         .expectStatus()
@@ -225,32 +223,30 @@ class DocumentUnitControllerTest {
                 .publishDate(Instant.parse("2020-01-01T01:01:01.00Z"))
                 .build());
 
-    Publication responseBody =
-        risWebClient
-            .withDefaultLogin()
-            .put()
-            .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
-            .exchange()
-            .expectHeader()
-            .contentType(MediaType.APPLICATION_JSON)
-            .expectStatus()
-            .isOk()
-            .expectBody(XmlPublication.class)
-            .returnResult()
-            .getResponseBody();
-
-    assertThat(responseBody)
-        .isEqualTo(
-            XmlPublication.builder()
-                .documentUnitUuid(TEST_UUID)
-                .receiverAddress("receiver address")
-                .mailSubject("mailSubject")
-                .xml("xml")
-                .statusCode("status-code")
-                .fileName("test.xml")
-                .statusMessages(List.of("status-messages"))
-                .publishDate(Instant.parse("2020-01-01T01:01:01Z"))
-                .build());
+    risWebClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
+        .exchange()
+        .expectHeader()
+        .valueEquals("Content-Type", "application/json")
+        .expectStatus()
+        .isOk()
+        .expectBody()
+        .jsonPath("documentUnitUuid")
+        .isEqualTo(TEST_UUID.toString())
+        .jsonPath("receiverAddress")
+        .isEqualTo("receiver address")
+        .jsonPath("mailSubject")
+        .isEqualTo("mailSubject")
+        .jsonPath("xml")
+        .isEqualTo("xml")
+        .jsonPath("statusCode")
+        .isEqualTo("status-code")
+        .jsonPath("statusMessages")
+        .isEqualTo("status-messages")
+        .jsonPath("date")
+        .isEqualTo("2020-01-01T01:01:01Z");
 
     verify(service).publishAsEmail(TEST_UUID, ISSUER_ADDRESS);
   }
@@ -259,7 +255,7 @@ class DocumentUnitControllerTest {
   void testPublishAsEmail_withServiceThrowsException() throws DocumentationUnitNotExistsException {
     when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
     when(service.publishAsEmail(TEST_UUID, ISSUER_ADDRESS))
-        .thenThrow(DocumentationUnitNotExistsException.class);
+        .thenThrow(DocumentUnitPublishException.class);
 
     risWebClient
         .withDefaultLogin()
@@ -297,39 +293,63 @@ class DocumentUnitControllerTest {
                     .receivedDate(Instant.parse("2019-01-01T01:01:01.00Z"))
                     .build()));
 
-    List<PublicationHistoryRecord> responseBody =
-        risWebClient
-            .withDefaultLogin()
-            .get()
-            .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(new TypeReference<List<PublicationHistoryRecord>>() {})
-            .returnResult()
-            .getResponseBody();
+    risWebClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody()
+        .jsonPath("[0].type")
+        .isEqualTo("PUBLICATION_REPORT")
+        .jsonPath("[0].content")
+        .isEqualTo("<html>2021 Report</html>")
+        .jsonPath("[0].date")
+        .isEqualTo("2021-01-01T01:01:01Z")
+        .jsonPath("[1].receivedDate")
+        .doesNotExist()
+        .jsonPath("[1].type")
+        .isEqualTo("PUBLICATION")
+        .jsonPath("[1].documentUnitUuid")
+        .isEqualTo(TEST_UUID.toString())
+        .jsonPath("[1].receiverAddress")
+        .isEqualTo("receiver address")
+        .jsonPath("[1].mailSubject")
+        .isEqualTo("mailSubject")
+        .jsonPath("[1].xml")
+        .isEqualTo("xml")
+        .jsonPath("[1].statusCode")
+        .isEqualTo("status-code")
+        .jsonPath("[1].statusMessages")
+        .isEqualTo("status-messages")
+        .jsonPath("[1].date")
+        .isEqualTo("2020-01-01T01:01:01Z")
+        .jsonPath("[1].publishDate")
+        .doesNotExist()
+        .jsonPath("[2].type")
+        .isEqualTo("PUBLICATION_REPORT")
+        .jsonPath("[2].content")
+        .isEqualTo("<html>2019 Report</html>")
+        .jsonPath("[2].date")
+        .isEqualTo("2019-01-01T01:01:01Z");
 
-    assertThat(responseBody)
-        .containsExactly(
-            PublicationReport.builder()
-                .content("<html>2021 Report</html>")
-                .receivedDate(Instant.parse("2021-01-01T01:01:01Z"))
-                .build(),
-            XmlPublication.builder()
-                .documentUnitUuid(TEST_UUID)
-                .receiverAddress("receiver address")
-                .mailSubject("mailSubject")
-                .xml("xml")
-                .statusCode("status-code")
-                .statusMessages(List.of("status-messages"))
-                .publishDate(Instant.parse("2020-01-01T01:01:01Z"))
-                .fileName("test.xml")
-                .build(),
-            PublicationReport.builder()
-                .content("<html>2019 Report</html>")
-                .receivedDate(Instant.parse("2019-01-01T01:01:01Z"))
-                .build());
+    verify(service).getPublicationHistory(TEST_UUID);
+  }
 
+  @Test
+  void testGetLastPublishedXml_withServiceThrowsException() {
+    when(service.getPublicationHistory(TEST_UUID)).thenThrow(DocumentUnitPublishException.class);
+
+    risWebClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
+        .exchange()
+        .expectStatus()
+        .is5xxServerError();
+
+    verify(service).getByUuid(TEST_UUID);
     verify(service).getPublicationHistory(TEST_UUID);
   }
 
@@ -345,28 +365,24 @@ class DocumentUnitControllerTest {
                 "test.xml",
                 Instant.parse("2020-01-01T01:01:01.00Z")));
 
-    XmlResultObject responseBody =
-        risWebClient
-            .withDefaultLogin()
-            .get()
-            .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/preview-publication-xml")
-            .exchange()
-            .expectHeader()
-            .contentType(MediaType.APPLICATION_JSON)
-            .expectStatus()
-            .isOk()
-            .expectBody(XmlResultObject.class)
-            .returnResult()
-            .getResponseBody();
-    assertThat(responseBody)
-        .isEqualTo(
-            XmlResultObject.builder()
-                .xml("xml")
-                .statusCode("200")
-                .statusMessages(List.of("status-messages"))
-                .publishDate(Instant.parse("2020-01-01T01:01:01Z"))
-                .fileName("test.xml")
-                .build());
+    risWebClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/preview-publication-xml")
+        .exchange()
+        .expectHeader()
+        .valueEquals("Content-Type", "application/json")
+        .expectStatus()
+        .isOk()
+        .expectBody()
+        .jsonPath("xml")
+        .isEqualTo("xml")
+        .jsonPath("statusCode")
+        .isEqualTo("200")
+        .jsonPath("statusMessages")
+        .isEqualTo("status-messages")
+        .jsonPath("publishDate")
+        .isEqualTo("2020-01-01T01:01:01Z");
 
     verify(service).previewPublication(TEST_UUID);
   }
@@ -385,7 +401,7 @@ class DocumentUnitControllerTest {
         .put()
         .uri(
             "/api/v1/caselaw/documentunits/KORE0000000000/search-linkable-documentation-units?pg=0&sz=10")
-        .contentType(MediaType.APPLICATION_JSON)
+        .header(HttpHeaders.CONTENT_TYPE, "application/json")
         .bodyValue(linkedDocumentationUnit)
         .exchange()
         .expectStatus()

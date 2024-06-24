@@ -27,7 +27,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   }
 
   @Override
-  @Transactional
+  @Transactional(transactionManager = "jpaTransactionManager")
   public List<FieldOfLaw> getTopLevelNodes() {
     return repository.findAllByParentIsNullAndNotationOrderByIdentifier().stream()
         .map(PostgresFieldOfLawRepositoryImpl::getWithNormsWithoutChildren)
@@ -35,7 +35,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   }
 
   @Override
-  @Transactional
+  @Transactional(transactionManager = "jpaTransactionManager")
   public List<FieldOfLaw> findAllByParentIdentifierOrderByIdentifierAsc(String identifier) {
     return repository.findByIdentifier(identifier).getChildren().stream()
         .map(PostgresFieldOfLawRepositoryImpl::getWithNormsWithoutChildren)
@@ -43,7 +43,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   }
 
   @Override
-  @Transactional
+  @Transactional(transactionManager = "jpaTransactionManager")
   public FieldOfLaw findTreeByIdentifier(String identifier) {
     FieldOfLawDTO childDTO = repository.findByIdentifier(identifier);
     FieldOfLaw child = FieldOfLawTransformer.transformToDomain(childDTO, false, true);
@@ -63,7 +63,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   }
 
   @Override
-  @Transactional
+  @Transactional(transactionManager = "jpaTransactionManager")
   public Slice<FieldOfLaw> findAllByOrderByIdentifierAsc(Pageable pageable) {
     return repository
         .findAllByOrderByIdentifierAsc(pageable)
@@ -71,7 +71,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   }
 
   @Override
-  @Transactional
+  @Transactional(transactionManager = "jpaTransactionManager")
   public List<FieldOfLaw> findBySearchTerms(String[] searchTerms) {
     if (searchTerms == null || searchTerms.length == 0) {
       return Collections.emptyList();
@@ -94,7 +94,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   }
 
   @Override
-  @Transactional
+  @Transactional(transactionManager = "jpaTransactionManager")
   public List<FieldOfLaw> findByNormStr(String normStr) {
     List<FieldOfLawNormDTO> list = getNormDTOs(normStr);
     return list.stream()
@@ -116,7 +116,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   }
 
   @Override
-  @Transactional
+  @Transactional(transactionManager = "jpaTransactionManager")
   public List<FieldOfLaw> findByNormStrAndSearchTerms(String normStr, String[] searchTerms) {
     List<FieldOfLawNormDTO> listWithNormStr = getNormDTOs(normStr);
 
@@ -142,7 +142,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   }
 
   @Override
-  @Transactional
+  @Transactional(transactionManager = "jpaTransactionManager")
   public List<FieldOfLaw> findByIdentifierSearch(String searchStr) {
     return repository
         .findAllByIdentifierStartsWithIgnoreCaseOrderByIdentifier(searchStr, PageRequest.of(0, 30))

@@ -40,7 +40,7 @@ public class StatusDTO {
   private boolean withError;
 
   @ManyToOne
-  @JoinColumn(name = "documentation_unit_id", nullable = false)
+  @JoinColumn(name = "documentation_unit_id")
   DocumentationUnitDTO documentationUnitDTO;
 
   @Column(name = "issuer_address")

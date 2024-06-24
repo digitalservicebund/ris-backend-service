@@ -27,6 +27,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
 @Import({FieldOfLawService.class})
@@ -41,9 +42,13 @@ class FieldOfLawServiceTest {
     when(repository.findAllByOrderByIdentifierAsc(pageable))
         .thenReturn(new PageImpl<>(List.of(), pageable, 0));
 
-    var page = service.getFieldsOfLawBySearchQuery(Optional.empty(), pageable);
-    assertThat(page.getContent()).isEmpty();
-    assertThat(page.isEmpty()).isTrue();
+    StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.empty(), pageable))
+        .consumeNextWith(
+            page -> {
+              assertThat(page.getContent()).isEmpty();
+              assertThat(page.isEmpty()).isTrue();
+            })
+        .verifyComplete();
 
     verify(repository, times(1)).findAllByOrderByIdentifierAsc(pageable);
   }
@@ -54,9 +59,13 @@ class FieldOfLawServiceTest {
     when(repository.findAllByOrderByIdentifierAsc(pageable))
         .thenReturn(new PageImpl<>(List.of(), pageable, 0));
 
-    var page = service.getFieldsOfLawBySearchQuery(Optional.of(""), pageable);
-    assertThat(page.getContent()).isEmpty();
-    assertThat(page.isEmpty()).isTrue();
+    StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.of(""), pageable))
+        .consumeNextWith(
+            page -> {
+              assertThat(page.getContent()).isEmpty();
+              assertThat(page.isEmpty()).isTrue();
+            })
+        .verifyComplete();
 
     verify(repository, times(1)).findAllByOrderByIdentifierAsc(pageable);
   }
@@ -75,9 +84,13 @@ class FieldOfLawServiceTest {
     String[] searchTerms = new String[] {"test"};
     when(repository.findBySearchTerms(searchTerms)).thenReturn(Collections.emptyList());
 
-    var page = service.getFieldsOfLawBySearchQuery(Optional.of("test"), pageable);
-    assertThat(page.getContent()).isEmpty();
-    assertThat(page.isEmpty()).isTrue();
+    StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.of("test"), pageable))
+        .consumeNextWith(
+            page -> {
+              assertThat(page.getContent()).isEmpty();
+              assertThat(page.isEmpty()).isTrue();
+            })
+        .verifyComplete();
 
     verify(repository, times(1)).findBySearchTerms(searchTerms);
     verify(repository, never()).findAllByOrderByIdentifierAsc(pageable);
@@ -89,9 +102,13 @@ class FieldOfLawServiceTest {
     String[] searchTerms = new String[] {"test", "multiple"};
     when(repository.findBySearchTerms(searchTerms)).thenReturn(Collections.emptyList());
 
-    var page = service.getFieldsOfLawBySearchQuery(Optional.of("test multiple"), pageable);
-    assertThat(page.getContent()).isEmpty();
-    assertThat(page.isEmpty()).isTrue();
+    StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.of("test multiple"), pageable))
+        .consumeNextWith(
+            page -> {
+              assertThat(page.getContent()).isEmpty();
+              assertThat(page.isEmpty()).isTrue();
+            })
+        .verifyComplete();
 
     verify(repository, times(1)).findBySearchTerms(searchTerms);
     verify(repository, never()).findAllByOrderByIdentifierAsc(pageable);
@@ -104,9 +121,13 @@ class FieldOfLawServiceTest {
     String[] searchTerms = new String[] {"test"};
     when(repository.findBySearchTerms(searchTerms)).thenReturn(Collections.emptyList());
 
-    var page = service.getFieldsOfLawBySearchQuery(Optional.of(" test  \t"), pageable);
-    assertThat(page.getContent()).isEmpty();
-    assertThat(page.isEmpty()).isTrue();
+    StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.of(" test  \t"), pageable))
+        .consumeNextWith(
+            page -> {
+              assertThat(page.getContent()).isEmpty();
+              assertThat(page.isEmpty()).isTrue();
+            })
+        .verifyComplete();
 
     verify(repository, times(1)).findBySearchTerms(searchTerms);
     verify(repository, never()).findAllByOrderByIdentifierAsc(pageable);
@@ -117,7 +138,7 @@ class FieldOfLawServiceTest {
     when(repository.findAllByParentIdentifierOrderByIdentifierAsc(""))
         .thenReturn(Collections.emptyList());
 
-    Assertions.assertTrue(service.getChildrenOfFieldOfLaw("").isEmpty());
+    StepVerifier.create(service.getChildrenOfFieldOfLaw("")).expectNext(Collections.emptyList());
 
     verify(repository, times(1)).findAllByParentIdentifierOrderByIdentifierAsc("");
     verify(repository, never()).getTopLevelNodes();
@@ -127,7 +148,8 @@ class FieldOfLawServiceTest {
   void testGetChildrenOfFieldOfLaw_withNumberIsRoot_shouldCallRepository() {
     when(repository.getTopLevelNodes()).thenReturn(Collections.emptyList());
 
-    Assertions.assertTrue(service.getChildrenOfFieldOfLaw("root").isEmpty());
+    StepVerifier.create(service.getChildrenOfFieldOfLaw("root"))
+        .expectNext(Collections.emptyList());
 
     verify(repository, times(1)).getTopLevelNodes();
     verify(repository, never()).findAllByParentIdentifierOrderByIdentifierAsc(anyString());
@@ -138,7 +160,8 @@ class FieldOfLawServiceTest {
     when(repository.findAllByParentIdentifierOrderByIdentifierAsc("test"))
         .thenReturn(Collections.emptyList());
 
-    Assertions.assertTrue(service.getChildrenOfFieldOfLaw("test").isEmpty());
+    StepVerifier.create(service.getChildrenOfFieldOfLaw("test"))
+        .expectNext(Collections.emptyList());
 
     verify(repository, times(1)).findAllByParentIdentifierOrderByIdentifierAsc("test");
     verify(repository, never()).getTopLevelNodes();
@@ -147,7 +170,9 @@ class FieldOfLawServiceTest {
   @Test
   void testGetTreeForFieldOfLaw_withFieldNumberDoesntExist() {
     when(repository.findTreeByIdentifier("test")).thenReturn(null);
-    service.getTreeForFieldOfLaw("test");
+
+    StepVerifier.create(service.getTreeForFieldOfLaw("test")).verifyComplete();
+
     verify(repository, times(1)).findTreeByIdentifier("test");
   }
 
@@ -156,8 +181,7 @@ class FieldOfLawServiceTest {
     FieldOfLaw child = FieldOfLaw.builder().identifier("test").build();
     when(repository.findTreeByIdentifier("test")).thenReturn(child);
 
-    var folTree = service.getTreeForFieldOfLaw("test");
-    Assertions.assertNotNull(folTree);
+    StepVerifier.create(service.getTreeForFieldOfLaw("test")).expectNext(child).verifyComplete();
 
     verify(repository, times(1)).findTreeByIdentifier("test");
   }
@@ -182,9 +206,9 @@ class FieldOfLawServiceTest {
 
     when(repository.findBySearchTerms(searchTerms)).thenReturn(List.of(expectedFieldOfLaw));
 
-    Slice<FieldOfLaw> fieldOfLawPage =
-        service.getFieldsOfLawBySearchQuery(Optional.of(searchString), pageable);
-    assertThat(fieldOfLawPage).isEqualTo(page);
+    StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.of(searchString), pageable))
+        .consumeNextWith(fieldOfLawPage -> assertThat(fieldOfLawPage).isEqualTo(page))
+        .verifyComplete();
 
     verify(repository).findBySearchTerms(searchTerms);
   }
@@ -205,10 +229,13 @@ class FieldOfLawServiceTest {
     when(repository.findAllByParentIdentifierOrderByIdentifierAsc("TS-01-01"))
         .thenReturn(List.of(expectedFieldOfLaw));
 
-    var response = service.getChildrenOfFieldOfLaw("TS-01-01");
-
-    assertThat(response).hasSize(1);
-    assertThat(response).extracting("identifier").containsExactly("TS-01" + "-01");
+    StepVerifier.create(service.getChildrenOfFieldOfLaw("TS-01-01"))
+        .consumeNextWith(
+            response -> {
+              assertThat(response).hasSize(1);
+              assertThat(response).extracting("identifier").containsExactly("TS-01" + "-01");
+            })
+        .verifyComplete();
 
     verify(repository).findAllByParentIdentifierOrderByIdentifierAsc("TS-01-01");
   }

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
 
+import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
@@ -37,7 +38,6 @@ import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
-import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -47,12 +47,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
+import reactor.core.publisher.Mono;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @RISIntegrationTest(
@@ -96,7 +97,7 @@ class SaveNormIntegrationTest {
   @MockBean private EmailPublishService publishService;
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private UserService userService;
-  @MockBean private ClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
   @MockBean private AttachmentService attachmentService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
@@ -110,7 +111,7 @@ class SaveNormIntegrationTest {
     documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
 
-    doReturn(docOffice)
+    doReturn(Mono.just(docOffice))
         .when(userService)
         .getDocumentationOffice(
             argThat(

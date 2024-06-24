@@ -6,6 +6,7 @@ import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBL
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.jayway.jsonpath.JsonPath;
+import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
@@ -31,7 +32,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
-import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
@@ -50,9 +50,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -97,7 +98,7 @@ class DocumentUnitControllerAuthIntegrationTest {
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean DocxConverterService docxConverterService;
-  @MockBean ClientRegistrationRepository clientRegistrationRepository;
+  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
   @MockBean AttachmentService attachmentService;
 
   static Stream<Arguments> getUnauthorizedCases() {
@@ -164,7 +165,7 @@ class DocumentUnitControllerAuthIntegrationTest {
           Status.builder().publicationStatus(publicationStatus.get(i)).build());
     }
 
-    RisEntityExchangeResult<String> result =
+    EntityExchangeResult<String> result =
         risWebTestClient
             .withLogin(userOfficeId)
             .get()
@@ -209,7 +210,7 @@ class DocumentUnitControllerAuthIntegrationTest {
           Status.builder().publicationStatus(publicationStatus.get(i)).build());
     }
 
-    RisEntityExchangeResult<String> result =
+    EntityExchangeResult<String> result =
         risWebTestClient
             .withLogin(userOfficeId)
             .get()
@@ -242,7 +243,7 @@ class DocumentUnitControllerAuthIntegrationTest {
         Status.builder().publicationStatus(UNPUBLISHED).build());
 
     // Documentation Office 1
-    RisEntityExchangeResult<String> result =
+    EntityExchangeResult<String> result =
         risWebTestClient
             .withLogin(officeGroupMap.get("CC-RIS"))
             .get()

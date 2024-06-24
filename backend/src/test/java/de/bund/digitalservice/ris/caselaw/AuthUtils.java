@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.caselaw;
 
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockOidcLogin;
 
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -10,16 +10,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor;
+import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.OidcLoginMutator;
+import reactor.core.publisher.Mono;
 
 public class AuthUtils {
 
-  public static OidcLoginRequestPostProcessor getMockLogin() {
+  public static OidcLoginMutator getMockLogin() {
     return getMockLoginWithDocOffice("/DS");
   }
 
-  public static OidcLoginRequestPostProcessor getMockLoginWithDocOffice(String docOfficeGroup) {
-    return oidcLogin()
+  public static OidcLoginMutator getMockLoginWithDocOffice(String docOfficeGroup) {
+    return mockOidcLogin()
         .idToken(
             token ->
                 token.claims(
@@ -36,7 +37,7 @@ public class AuthUtils {
       String docOffice1Group,
       DocumentationOffice docOffice2,
       String docOffice2Group) {
-    doReturn(docOffice1)
+    doReturn(Mono.just(docOffice1))
         .when(userService)
         .getDocumentationOffice(
             argThat(
@@ -44,7 +45,7 @@ public class AuthUtils {
                   List<String> groups = user.getAttribute("groups");
                   return Objects.requireNonNull(groups).get(0).equals(docOffice1Group);
                 }));
-    doReturn(docOffice2)
+    doReturn(Mono.just(docOffice2))
         .when(userService)
         .getDocumentationOffice(
             argThat(

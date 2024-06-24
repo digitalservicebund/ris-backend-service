@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.transaction.TransactionManager;
 
 @Configuration
 @EnableJpaRepositories(
@@ -42,7 +41,7 @@ public class PostgresJPAConfig {
   }
 
   @Bean
-  public TransactionManager jpaTransactionManager() {
+  public JpaTransactionManager jpaTransactionManager() {
     JpaTransactionManager transactionManager = new JpaTransactionManager();
     transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
     return transactionManager;

@@ -133,7 +133,7 @@ sonar {
 dependencies {
     val testContainersVersion = "1.19.8"
 
-    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -190,8 +190,6 @@ dependencies {
     // for local development:
     // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.8.jar"))
 
-    implementation("com.fasterxml.jackson.core:jackson-core:2.17.1")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.1")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.17.1")
 
     implementation("io.micrometer:micrometer-registry-prometheus:1.13.1")
@@ -306,6 +304,7 @@ tasks {
         )
     }
 
+
     bootBuildImage {
         val containerRegistry = System.getenv("CONTAINER_REGISTRY") ?: "ghcr.io"
         val containerImageName =
@@ -338,6 +337,7 @@ tasks {
             outputDir.delete()
         }
     }
+
 
     javadoc {
         dependsOn(delombok)

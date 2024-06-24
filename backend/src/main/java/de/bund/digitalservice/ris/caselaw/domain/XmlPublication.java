@@ -15,7 +15,7 @@ public record XmlPublication(
     String statusCode,
     List<String> statusMessages,
     String fileName,
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY, value = "date") Instant publishDate,
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) Instant publishDate,
     String publishStateDisplayText)
     implements Publication {
   @Override

@@ -36,12 +36,11 @@ sentry:
 
 server:
   shutdown: graceful
-  servlet:
+  reactive:
     session:
       cookie:
         max-age: 43200 # 12*60*60
         http-only: false
-      timeout: 43200 # 12*60*60
 #logging:
 #  level:
 #    org.springframework: DEBUG
@@ -51,8 +50,6 @@ spring:
   sql:
     init:
       mode: always
-  jpa:
-    open-in-view: false
   security:
     oauth2:
       client:

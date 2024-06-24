@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthController;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
@@ -11,11 +12,10 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.User;
-import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -48,7 +48,7 @@ class AuthIntegrationTest {
   }
 
   @Autowired private RisWebTestClient risWebTestClient;
-  @MockBean ClientRegistrationRepository clientRegistrationRepository;
+  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
   @MockBean DocumentUnitService documentUnitService;
 
   @Test

@@ -2,15 +2,14 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.CitationTypeService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
-import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 
 @RestController
 @RequestMapping("api/v1/caselaw/citationtypes")
@@ -22,10 +21,10 @@ public class CitationTypeController {
     this.service = service;
   }
 
-  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping
   @PreAuthorize("isAuthenticated()")
-  public List<CitationType> getCitationTypes(
+  public Flux<CitationType> getCitationTypes(
       @RequestParam(value = "q") Optional<String> searchStr) {
-    return service.getCitationStyles(searchStr);
+    return Flux.fromIterable(service.getCitationStyles(searchStr));
   }
 }

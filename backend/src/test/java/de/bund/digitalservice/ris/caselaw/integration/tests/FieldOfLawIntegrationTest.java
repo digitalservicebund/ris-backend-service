@@ -2,8 +2,8 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import de.bund.digitalservice.ris.caselaw.SliceTestImpl;
+import com.jayway.jsonpath.JsonPath;
+import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawController;
@@ -16,19 +16,22 @@ import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
-import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
+import java.util.Arrays;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Slice;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
+import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 
@@ -67,12 +70,18 @@ class FieldOfLawIntegrationTest {
   @Autowired private DatabaseFieldOfLawRepository repository;
 
   @MockBean private UserService userService;
-  @MockBean ClientRegistrationRepository clientRegistrationRepository;
+  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
   @MockBean private DocumentUnitService service;
+
+  @BeforeEach()
+  void init() {}
+
+  @AfterEach
+  void cleanUp() {}
 
   @Test
   void testGetAllFieldsOfLaw() {
-    Slice<FieldOfLaw> responseBody =
+    EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
             .get()
@@ -80,12 +89,12 @@ class FieldOfLawIntegrationTest {
             .exchange()
             .expectStatus()
             .isOk()
-            .expectBody(new TypeReference<SliceTestImpl<FieldOfLaw>>() {})
-            .returnResult()
-            .getResponseBody();
+            .expectBody(String.class)
+            .returnResult();
 
-    assertThat(responseBody)
-        .extracting("identifier")
+    List<String> identifiers =
+        JsonPath.read(result.getResponseBody(), "$.content[*]" + ".identifier");
+    assertThat(identifiers)
         .containsExactly(
             "AB-01",
             "AB-01-01",
@@ -103,7 +112,7 @@ class FieldOfLawIntegrationTest {
 
   @Test
   void testGetFieldsOfLawBySearchQuery() {
-    Slice<FieldOfLaw> responseBody =
+    EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
             .get()
@@ -111,16 +120,84 @@ class FieldOfLawIntegrationTest {
             .exchange()
             .expectStatus()
             .isOk()
-            .expectBody(new TypeReference<SliceTestImpl<FieldOfLaw>>() {})
-            .returnResult()
-            .getResponseBody();
+            .expectBody(String.class)
+            .returnResult();
 
-    assertThat(responseBody).extracting("identifier").containsExactly("FL-01", "FL-01-01");
+    List<String> identifiers =
+        JsonPath.read(result.getResponseBody(), "$.content[*]" + ".identifier");
+    assertThat(identifiers).containsExactly("FL-01", "FL-01-01");
+  }
+
+  // TODO: Do we integrate rank or this test is not relevant?
+  @Test
+  @Disabled("enable it after order by rank")
+  void testPaginationInGetFieldsOfLawBySearchQuery() {
+    EntityExchangeResult<String> result =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/fieldsoflaw?q=FL-&pg=0&sz=10")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+    String str = result.getResponseBody();
+
+    assertThat((Integer) JsonPath.read(str, "$.pageable.pageNumber")).isZero();
+    assertThat((Integer) JsonPath.read(str, "$.pageable.pageSize")).isEqualTo(3);
+    assertThat((Integer) JsonPath.read(str, "$.totalPages")).isEqualTo(2);
+    assertThat((Integer) JsonPath.read(str, "$.totalElements")).isEqualTo(5);
+    assertThat((Integer) JsonPath.read(str, "$.numberOfElements")).isEqualTo(3);
+    assertThat((Boolean) JsonPath.read(str, "$.first")).isTrue();
+    assertThat((Boolean) JsonPath.read(str, "$.last")).isFalse();
+    List<String> identifiers = JsonPath.read(str, "$.content[*].identifier");
+    // TODO: order by rank
+    assertThat(identifiers).containsExactlyInAnyOrder("FL-01-01", "FL-04", "FL-02");
+
+    result =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/fieldsoflaw?q=FL-&pg=1&sz=3")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+    str = result.getResponseBody();
+
+    assertThat((Integer) JsonPath.read(str, "$.pageable.pageNumber")).isEqualTo(1);
+    assertThat((Integer) JsonPath.read(str, "$.pageable.pageSize")).isEqualTo(3);
+    assertThat((Integer) JsonPath.read(str, "$.totalPages")).isEqualTo(2);
+    assertThat((Integer) JsonPath.read(str, "$.totalElements")).isEqualTo(5);
+    assertThat((Integer) JsonPath.read(str, "$.numberOfElements")).isEqualTo(2);
+    assertThat((Boolean) JsonPath.read(str, "$.first")).isFalse();
+    assertThat((Boolean) JsonPath.read(str, "$.last")).isTrue();
+    identifiers = JsonPath.read(str, "$.content[*].identifier");
+    assertThat(identifiers).containsExactly("FL-01", "FL-03");
+
+    result =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/fieldsoflaw?q=FL-&pg=2&sz=3")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+    str = result.getResponseBody();
+
+    assertThat((Integer) JsonPath.read(str, "$.pageable.pageNumber")).isEqualTo(2);
+    assertThat((Integer) JsonPath.read(str, "$.numberOfElements")).isZero();
+    identifiers = JsonPath.read(str, "$.content[*].identifier");
+    assertThat(identifiers).isEmpty();
   }
 
   @Test
   void testGetFieldsOfLawByNormsQuery_OnlyNormText() {
-    Slice<FieldOfLaw> responseBody =
+    EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
             .get()
@@ -128,11 +205,12 @@ class FieldOfLawIntegrationTest {
             .exchange()
             .expectStatus()
             .isOk()
-            .expectBody(new TypeReference<SliceTestImpl<FieldOfLaw>>() {})
-            .returnResult()
-            .getResponseBody();
+            .expectBody(String.class)
+            .returnResult();
 
-    assertThat(responseBody).extracting("identifier").containsExactlyInAnyOrder("FL", "AB-01");
+    List<String> identifiers =
+        JsonPath.read(result.getResponseBody(), "$.content[*]" + ".identifier");
+    assertThat(identifiers).containsExactlyInAnyOrder("FL", "AB-01");
   }
 
   @ParameterizedTest
@@ -142,7 +220,7 @@ class FieldOfLawIntegrationTest {
         "§123", // paragraph without whitespace
       })
   void testGetFieldsOfLawByNormsQuery_withoutAbbreviation(String query) {
-    Slice<FieldOfLaw> responseBody =
+    EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
             .get()
@@ -150,11 +228,12 @@ class FieldOfLawIntegrationTest {
             .exchange()
             .expectStatus()
             .isOk()
-            .expectBody(new TypeReference<SliceTestImpl<FieldOfLaw>>() {})
-            .returnResult()
-            .getResponseBody();
+            .expectBody(String.class)
+            .returnResult();
 
-    assertThat(responseBody).extracting("identifier").containsExactly("AB-01", "AB-01-01", "CD-02");
+    List<String> identifiers =
+        JsonPath.read(result.getResponseBody(), "$.content[*]" + ".identifier");
+    assertThat(identifiers).containsExactly("AB-01", "AB-01-01", "CD-02");
   }
 
   @ParameterizedTest
@@ -164,7 +243,7 @@ class FieldOfLawIntegrationTest {
         "abc", // norm
       })
   void testGetFieldsOfLawByNormsQuery_withAbbreviation(String query) {
-    Slice<FieldOfLaw> responseBody =
+    EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
             .get()
@@ -172,11 +251,12 @@ class FieldOfLawIntegrationTest {
             .exchange()
             .expectStatus()
             .isOk()
-            .expectBody(new TypeReference<SliceTestImpl<FieldOfLaw>>() {})
-            .returnResult()
-            .getResponseBody();
+            .expectBody(String.class)
+            .returnResult();
 
-    assertThat(responseBody).extracting("identifier").containsExactly("AB-01", "FL");
+    List<String> identifiers =
+        JsonPath.read(result.getResponseBody(), "$.content[*]" + ".identifier");
+    assertThat(identifiers).containsExactly("AB-01", "FL");
   }
 
   @ParameterizedTest
@@ -187,7 +267,7 @@ class FieldOfLawIntegrationTest {
         "abc § 12", // norm followed by incomplete paragraph
       })
   void testGetFieldsOfLawByNormsQuery_withStartingAbbreviation(String query) {
-    Slice<FieldOfLaw> responseBody =
+    EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
             .get()
@@ -195,16 +275,17 @@ class FieldOfLawIntegrationTest {
             .exchange()
             .expectStatus()
             .isOk()
-            .expectBody(new TypeReference<SliceTestImpl<FieldOfLaw>>() {})
-            .returnResult()
-            .getResponseBody();
+            .expectBody(String.class)
+            .returnResult();
 
-    assertThat(responseBody).extracting("identifier").containsExactly("FL");
+    List<String> identifiers =
+        JsonPath.read(result.getResponseBody(), "$.content[*]" + ".identifier");
+    assertThat(identifiers).containsExactly("FL");
   }
 
   @Test
   void testGetFieldsOfLawByNormsAndSearchQuery() {
-    Slice<FieldOfLaw> responseBody =
+    EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
             .get()
@@ -212,16 +293,17 @@ class FieldOfLawIntegrationTest {
             .exchange()
             .expectStatus()
             .isOk()
-            .expectBody(new TypeReference<SliceTestImpl<FieldOfLaw>>() {})
-            .returnResult()
-            .getResponseBody();
+            .expectBody(String.class)
+            .returnResult();
 
-    assertThat(responseBody).extracting("identifier").containsExactly("FL-01");
+    List<String> identifiers =
+        JsonPath.read(result.getResponseBody(), "$.content[*]" + ".identifier");
+    assertThat(identifiers).containsExactly("FL-01");
   }
 
   @Test
   void testGetFieldsOfLawByIdentifierSearch() {
-    List<FieldOfLaw> responseBody =
+    EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
             .get()
@@ -229,11 +311,11 @@ class FieldOfLawIntegrationTest {
             .exchange()
             .expectStatus()
             .isOk()
-            .expectBody(new TypeReference<List<FieldOfLaw>>() {})
-            .returnResult()
-            .getResponseBody();
+            .expectBody(String.class)
+            .returnResult();
 
-    assertThat(responseBody).extracting("identifier").containsExactly("FL-01", "FL-01-01");
+    List<String> identifiers = JsonPath.read(result.getResponseBody(), "$[*].identifier");
+    assertThat(identifiers).containsExactly("FL-01", "FL-01-01");
   }
 
   @Test
@@ -245,7 +327,7 @@ class FieldOfLawIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(new TypeReference<List<FieldOfLaw>>() {})
+        .expectBody(FieldOfLaw[].class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody())
@@ -263,7 +345,7 @@ class FieldOfLawIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(new TypeReference<List<FieldOfLaw>>() {})
+        .expectBody(FieldOfLaw[].class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody())
@@ -296,9 +378,39 @@ class FieldOfLawIntegrationTest {
             });
   }
 
+  // TODO: Is this test still relevant? It is disabled.
+  @Test
+  @Disabled(
+      "wrong test, syntax incorrect, logic replaced in refactoring, have to redesign in a "
+          + "later iteration")
+  void testOrderingOfGetFieldsOfLawByNormsAndSearchQuery() {
+    String searchStr = "norm:\"§ 123 ab\" AB here text";
+
+    List<String> expectedIdentifiers = Arrays.asList("CD-02", "AB-01", "AB-01-01");
+    List<Integer> expectedScores = Arrays.asList(38, 28, 28);
+
+    EntityExchangeResult<String> result =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/fieldsoflaw?q=" + searchStr + "&pg=0&sz=10")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    String str = result.getResponseBody();
+    List<String> actualIdentifiers = JsonPath.read(str, "$.content[*].identifier");
+    List<Integer> actualScores = JsonPath.read(str, "$.content[*].score");
+
+    assertThat(actualIdentifiers).isEqualTo(expectedIdentifiers);
+    assertThat(actualScores).isEqualTo(expectedScores);
+  }
+
   @Test
   void testOrderingOfGetFieldsOfLawByIdentifierSearch() {
-    List<FieldOfLaw> responseBody =
+    EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
             .get()
@@ -306,35 +418,36 @@ class FieldOfLawIntegrationTest {
             .exchange()
             .expectStatus()
             .isOk()
-            .expectBody(new TypeReference<List<FieldOfLaw>>() {})
-            .returnResult()
-            .getResponseBody();
+            .expectBody(String.class)
+            .returnResult();
 
-    assertThat(responseBody)
-        .extracting("identifier")
-        .containsExactly("FL", "FL-01", "FL-01-01", "FL-02", "FL-03", "FL-04");
+    List<String> actualIdentifiers = JsonPath.read(result.getResponseBody(), "$[*].identifier");
+    // TODO: test order by score
+    assertThat(actualIdentifiers)
+        .containsExactlyInAnyOrder("FL", "FL-01", "FL-01-01", "FL-02", "FL-03", "FL-04");
   }
 
   @Test
   void testFindByMultipleSearchTerms() {
-    SliceTestImpl<FieldOfLaw> responseBody =
+    EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/fieldsoflaw?q=FL multiple&pg=0&sz=10")
+            .uri("/api/v1/caselaw/fieldsoflaw?q=FL+multiple&pg=0&sz=10")
             .exchange()
             .expectStatus()
             .isOk()
-            .expectBody(new TypeReference<SliceTestImpl<FieldOfLaw>>() {})
-            .returnResult()
-            .getResponseBody();
+            .expectBody(String.class)
+            .returnResult();
 
-    assertThat(responseBody).extracting("identifier").containsExactly("FL-01-01");
+    List<String> identifiers =
+        JsonPath.read(result.getResponseBody(), "$.content[*]" + ".identifier");
+    assertThat(identifiers).containsExactly("FL-01-01");
   }
 
   @Test
   void testFindByEmptySearchTerms() {
-    SliceTestImpl<FieldOfLaw> responseBody =
+    EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
             .get()
@@ -342,12 +455,12 @@ class FieldOfLawIntegrationTest {
             .exchange()
             .expectStatus()
             .isOk()
-            .expectBody(new TypeReference<SliceTestImpl<FieldOfLaw>>() {})
-            .returnResult()
-            .getResponseBody();
+            .expectBody(String.class)
+            .returnResult();
 
-    assertThat(responseBody)
-        .extracting("identifier")
+    List<String> identifiers =
+        JsonPath.read(result.getResponseBody(), "$.content[*]" + ".identifier");
+    assertThat(identifiers)
         .containsExactly(
             "AB-01",
             "AB-01-01",
