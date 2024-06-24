@@ -83,6 +83,7 @@ dayjs.extend(customParseFormat)
     :id="id"
     v-model="chips"
     :aria-label="ariaLabel"
+    data-testid="deviating-decision-dates"
     :has-error="hasError"
     maska="##.##.####"
     @update:validation-error="validateInput($event)"
