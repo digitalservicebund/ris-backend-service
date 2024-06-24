@@ -42,7 +42,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.server.ResponseStatusException;
-import reactor.test.StepVerifier;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -94,9 +93,10 @@ class S3AttachmentServiceTest {
         .putObject(putObjectRequestCaptor.capture(), asyncRequestBodyCaptor.capture());
     assertEquals("testBucket", putObjectRequestCaptor.getValue().bucket());
     assertEquals("content/extension", putObjectRequestCaptor.getValue().contentType());
-    StepVerifier.create(asyncRequestBodyCaptor.getValue())
-        .expectNext(ByteBuffer.wrap(new byte[] {}))
-        .verifyComplete();
+    var value = asyncRequestBodyCaptor.getValue();
+    var expected = AsyncRequestBody.fromByteBuffer(ByteBuffer.wrap(new byte[] {}));
+    assertEquals(expected.contentLength(), value.contentLength());
+    assertEquals(expected.contentType(), value.contentType());
 
     // repo interaction
     var attachmentDtoCaptor = ArgumentCaptor.forClass(AttachmentDTO.class);

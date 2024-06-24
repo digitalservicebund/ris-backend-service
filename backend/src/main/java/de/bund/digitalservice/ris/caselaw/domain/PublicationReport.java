@@ -8,7 +8,7 @@ import lombok.Builder;
 public record PublicationReport(
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) String documentNumber,
     String content,
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) Instant receivedDate)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY, value = "date") Instant receivedDate)
     implements PublicationHistoryRecord {
   @Override
   public PublicationHistoryRecordType getType() {

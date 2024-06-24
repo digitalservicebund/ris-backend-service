@@ -10,7 +10,6 @@ import java.util.Objects;
 import java.util.Optional;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 @Service
 public class KeycloakUserService implements UserService {
@@ -34,14 +33,14 @@ public class KeycloakUserService implements UserService {
     this.documentationOfficeRepository = documentationOfficeRepository;
   }
 
-  public Mono<User> getUser(OidcUser oidcUser) {
+  public User getUser(OidcUser oidcUser) {
     return extractDocumentationOffice(oidcUser)
         .map(documentationOffice -> createUser(oidcUser, documentationOffice))
-        .switchIfEmpty(Mono.defer(() -> Mono.just(createUser(oidcUser, null))));
+        .orElse(createUser(oidcUser, null));
   }
 
-  public Mono<DocumentationOffice> getDocumentationOffice(OidcUser oidcUser) {
-    return getUser(oidcUser).map(User::documentationOffice);
+  public DocumentationOffice getDocumentationOffice(OidcUser oidcUser) {
+    return getUser(oidcUser).documentationOffice();
   }
 
   public String getEmail(OidcUser oidcUser) {
@@ -56,7 +55,7 @@ public class KeycloakUserService implements UserService {
         .build();
   }
 
-  private Mono<DocumentationOffice> extractDocumentationOffice(OidcUser oidcUser) {
+  private Optional<DocumentationOffice> extractDocumentationOffice(OidcUser oidcUser) {
     List<String> groups = Objects.requireNonNull(oidcUser.getAttribute("groups"));
     String documentationOfficeKey =
         groups.stream()
@@ -71,8 +70,6 @@ public class KeycloakUserService implements UserService {
             documentationOfficeDTO ->
                 DocumentationOffice.builder()
                     .abbreviation(documentationOfficeDTO.getAbbreviation())
-                    .build())
-        .map(Mono::just)
-        .orElse(Mono.empty());
+                    .build());
   }
 }

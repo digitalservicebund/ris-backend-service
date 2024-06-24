@@ -4,7 +4,6 @@ import de.bund.digitalservice.ris.caselaw.domain.CurrentEnvironment;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 @Service
 @Slf4j
@@ -17,7 +16,7 @@ public class EnvironmentService {
   }
 
   @Bean
-  public Mono<String> getEnvironment() {
-    return Mono.just(currentEnvironment.name());
+  public String getEnvironment() {
+    return currentEnvironment.name();
   }
 }
