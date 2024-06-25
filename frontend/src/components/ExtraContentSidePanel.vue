@@ -141,7 +141,6 @@ onMounted(() => {
               aria-label="Notiz Eingabefeld"
               autosize
               custom-classes="max-h-[65vh]"
-              read-only
             />
           </InputField>
         </div>
