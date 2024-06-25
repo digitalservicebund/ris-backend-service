@@ -16,6 +16,9 @@ interface DocumentUnitService {
   ): Promise<ServiceResponse<DocumentUnit>>
   createNew(): Promise<ServiceResponse<DocumentUnit>>
   update(documentUnit: DocumentUnit): Promise<ServiceResponse<unknown>>
+  updatePartial(
+    documentUnit: Partial<DocumentUnit>,
+  ): Promise<ServiceResponse<unknown>>
   delete(documentUnitUuid: string): Promise<ServiceResponse<unknown>>
   searchByRelatedDocumentation: PageableService<
     RelatedDocumentation,
@@ -101,6 +104,23 @@ const service: DocumentUnitService = {
         ...(response.data as DocumentUnit),
       })
     }
+    return response
+  },
+
+  async updatePartial(partialDocumentUnit: Partial<DocumentUnit>) {
+    const response = await httpClient.patch<
+      Partial<DocumentUnit>,
+      Partial<DocumentUnit> | FailedValidationServerResponse
+    >(
+      `caselaw/documentunits/${partialDocumentUnit.uuid}`,
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      },
+      partialDocumentUnit,
+    )
     return response
   },
 
