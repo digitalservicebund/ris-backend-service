@@ -19,5 +19,6 @@
   content: "“";
   font-weight: bold;
   font-size: x-large;
+  margin-left: 30px;
   position: absolute;
 }

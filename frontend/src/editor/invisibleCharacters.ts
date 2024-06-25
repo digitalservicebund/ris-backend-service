@@ -19,6 +19,18 @@ const isHardbreak = (node: Node): boolean => node.type.name === "hardBreak"
 const isTab = (char: string) => char === "\t"
 const isBlockquote = (node: Node) => node.type.name === "blockquote"
 
+const countNestedBlockquotes = (startNode: Node): number => {
+  let count = 0
+  let currentNode: Node | null = startNode
+
+  while (currentNode && currentNode.type.name === "blockquote") {
+    count++
+    currentNode = currentNode.firstChild
+  }
+
+  return count
+}
+
 export const InvisibleCharacters = Extension.create({
   name: "invisible-characters",
   addProseMirrorPlugins() {
@@ -33,7 +45,7 @@ export const InvisibleCharacters = Extension.create({
         createInvisibleDecosForNode("break", (_, pos) => pos, isHardbreak),
         createInvisibleDecosForNode(
           "blockquote",
-          (_, pos) => pos,
+          (node, pos) => pos + countNestedBlockquotes(node) - 1,
           isBlockquote,
         ),
       ]),
