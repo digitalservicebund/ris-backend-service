@@ -157,6 +157,7 @@ class JurisXmlExporterWrapperIntegrationTest {
             PreviousDecision.builder()
                 .uuid(UUID.randomUUID())
                 .documentNumber("documentNumber")
+                .status(Status.builder().build())
                 .uuid(UUID.randomUUID())
                 .court(new Court(UUID.randomUUID(), "courtType", "courtPlace", "courtLabel", null))
                 .decisionDate(LocalDate.parse("2020-04-05"))
