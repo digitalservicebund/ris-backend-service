@@ -34,8 +34,11 @@ const validationErrors = ref<ValidationError[]>([])
 const showNavigationPanelRef: Ref<boolean> = ref(
   route.query.showNavigationPanel !== "false",
 )
+const showsPreview = ref(route.path.includes("preview"))
+const showsCategories = ref(route.path.includes("categories"))
+const showsPublication = ref(route.path.includes("publication"))
 
-const error = ref<ResponseError>()
+const responseError = ref<ResponseError>()
 
 const extraContentSidePanel = ref<InstanceType<
   typeof ExtraContentSidePanel
@@ -95,7 +98,7 @@ async function loadDocumentUnit() {
   if (response.data) {
     documentUnit.value = response.data
   } else {
-    error.value = response.error
+    responseError.value = response.error
   }
 }
 
@@ -127,6 +130,7 @@ onMounted(async () => {
 <template>
   <div class="flex w-screen grow">
     <div
+      v-if="!showsPreview"
       class="sticky top-0 z-50 flex flex-col border-r-1 border-solid border-gray-400 bg-white"
     >
       <SideToggle
@@ -142,22 +146,19 @@ onMounted(async () => {
     </div>
     <div v-if="documentUnit" class="flex w-full flex-col bg-gray-100">
       <DocumentUnitInfoPanel
-        v-if="documentUnit"
+        v-if="documentUnit && !showsPreview"
         :document-unit="documentUnit"
         :heading="documentUnit?.documentNumber ?? ''"
-        :save-callback="
-          route.path.includes('categories')
-            ? handleUpdateDocumentUnit
-            : undefined
-        "
+        :save-callback="showsCategories ? handleUpdateDocumentUnit : undefined"
       />
       <div class="flex grow flex-col items-start">
         <FlexContainer
           v-if="documentUnit"
-          class="w-full flex-grow flex-row-reverse"
+          class="w-full flex-grow"
+          :class="showsPreview ? 'flex-row bg-white' : 'flex-row-reverse'"
         >
           <ExtraContentSidePanel
-            v-if="!route.path.includes('publication')"
+            v-if="!showsPublication && !showsPreview"
             ref="extraContentSidePanel"
             :document-unit="documentUnit"
           ></ExtraContentSidePanel>
@@ -173,7 +174,11 @@ onMounted(async () => {
             @load-document-unit="loadDocumentUnit"
           />
         </FlexContainer>
-        <ErrorPage v-else :error="error" :title="error?.title" />
+        <ErrorPage
+          v-else
+          :error="responseError"
+          :title="responseError?.title"
+        />
       </div>
     </div>
   </div>
