@@ -34,9 +34,6 @@ const validationErrors = ref<ValidationError[]>([])
 const showNavigationPanelRef: Ref<boolean> = ref(
   route.query.showNavigationPanel !== "false",
 )
-const showsPreview = ref(route.path.includes("preview"))
-const showsCategories = ref(route.path.includes("categories"))
-const showsPublication = ref(route.path.includes("publication"))
 
 const responseError = ref<ResponseError>()
 
@@ -130,7 +127,7 @@ onMounted(async () => {
 <template>
   <div class="flex w-screen grow">
     <div
-      v-if="!showsPreview"
+      v-if="!route.path.includes('preview')"
       class="sticky top-0 z-50 flex flex-col border-r-1 border-solid border-gray-400 bg-white"
     >
       <SideToggle
@@ -146,19 +143,32 @@ onMounted(async () => {
     </div>
     <div v-if="documentUnit" class="flex w-full flex-col bg-gray-100">
       <DocumentUnitInfoPanel
-        v-if="documentUnit && !showsPreview"
+        v-if="documentUnit && !route.path.includes('preview')"
         :document-unit="documentUnit"
         :heading="documentUnit?.documentNumber ?? ''"
-        :save-callback="showsCategories ? saveDocumentUnitToServer : undefined"
+        :save-callback="
+          route.path.includes('categories')
+            ? saveDocumentUnitToServer
+            : undefined
+        "
       />
       <div class="flex grow flex-col items-start">
         <FlexContainer
           v-if="documentUnit"
           class="w-full flex-grow"
-          :class="showsPreview ? 'flex-row bg-white' : 'flex-row-reverse'"
+          :class="
+            route.path.includes('preview')
+              ? 'flex-row bg-white'
+              : 'flex-row-reverse'
+          "
         >
           <ExtraContentSidePanel
-            v-if="!(showsPublication || showsPreview)"
+            v-if="
+              !(
+                route.path.includes('publication') ||
+                route.path.includes('preview')
+              )
+            "
             ref="extraContentSidePanel"
             :document-unit="documentUnit"
           ></ExtraContentSidePanel>
