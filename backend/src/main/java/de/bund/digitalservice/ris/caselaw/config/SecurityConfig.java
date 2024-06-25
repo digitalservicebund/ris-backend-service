@@ -42,7 +42,11 @@ public class SecurityConfig {
             customizer ->
                 customizer
                     .requestMatchers(
-                        "/actuator/**", "/admin/webhook", "/api/webjars/**", "/api/docs.*/**")
+                        "/actuator/**",
+                        "/admin/webhook",
+                        "/api/webjars/**",
+                        "/api/docs.*/**",
+                        "/csrf")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
