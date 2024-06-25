@@ -52,7 +52,7 @@ const toggleNavigationPanel = () => {
   })
 }
 
-async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
+async function saveDocumentUnitToServer(): Promise<ServiceResponse<void>> {
   if (!hasDataChange())
     return {
       status: 304,
@@ -86,11 +86,11 @@ function hasDataChange(): boolean {
   return newValue !== oldValue
 }
 
-function updateDocumentUnit(updatedDocumentUnitFromChild: DocumentUnit) {
+function updateLocalDocumentUnit(updatedDocumentUnitFromChild: DocumentUnit) {
   updatedDocumentUnit.value = updatedDocumentUnitFromChild
 }
 
-async function loadDocumentUnit() {
+async function requestDocumentUnitFromServer() {
   const response = await documentUnitService.getByDocumentNumber(
     props.documentNumber,
   )
@@ -108,13 +108,13 @@ async function attachmentIndexSelected(index: number) {
 }
 
 async function attachmentIndexDeleted(index: number) {
-  await loadDocumentUnit()
+  await requestDocumentUnitFromServer()
   extraContentSidePanel.value?.onAttachmentDeleted(index)
 }
 
 async function attachmentsUploaded(anySuccessful: boolean) {
   if (anySuccessful) {
-    await loadDocumentUnit()
+    await requestDocumentUnitFromServer()
     extraContentSidePanel.value?.togglePanel(true)
     extraContentSidePanel.value?.selectAttachments(
       documentUnit.value ? documentUnit.value.attachments.length - 1 : 0,
@@ -123,7 +123,7 @@ async function attachmentsUploaded(anySuccessful: boolean) {
 }
 
 onMounted(async () => {
-  await loadDocumentUnit()
+  await requestDocumentUnitFromServer()
 })
 </script>
 
@@ -149,7 +149,7 @@ onMounted(async () => {
         v-if="documentUnit && !showsPreview"
         :document-unit="documentUnit"
         :heading="documentUnit?.documentNumber ?? ''"
-        :save-callback="showsCategories ? handleUpdateDocumentUnit : undefined"
+        :save-callback="showsCategories ? saveDocumentUnitToServer : undefined"
       />
       <div class="flex grow flex-col items-start">
         <FlexContainer
@@ -162,16 +162,15 @@ onMounted(async () => {
             ref="extraContentSidePanel"
             :document-unit="documentUnit"
           ></ExtraContentSidePanel>
-          <!-- TODO: Find better event names: load=loadFromServer, save=saveToServer, update=changesToLocalVersion  -->
           <router-view
             :document-unit="documentUnit"
             :validation-errors="validationErrors"
             @attachment-index-deleted="attachmentIndexDeleted"
             @attachment-index-selected="attachmentIndexSelected"
             @attachments-uploaded="attachmentsUploaded"
-            @document-unit-save="handleUpdateDocumentUnit"
-            @document-unit-update="updateDocumentUnit"
-            @load-document-unit="loadDocumentUnit"
+            @document-unit-updated-locally="updateLocalDocumentUnit"
+            @request-document-unit-from-server="requestDocumentUnitFromServer"
+            @save-document-unit-to-server="saveDocumentUnitToServer"
           />
         </FlexContainer>
         <ErrorPage

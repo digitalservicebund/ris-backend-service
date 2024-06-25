@@ -11,7 +11,7 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits<{
-  updateDocumentUnit: []
+  requestDocumentUnitFromServer: []
 }>()
 
 const loadDone = ref(false)
@@ -40,7 +40,7 @@ async function publishDocument() {
   } else {
     errorMessage.value = response.error
   }
-  emits("updateDocumentUnit")
+  emits("requestDocumentUnitFromServer")
 }
 
 function formatDate(date?: string): string {

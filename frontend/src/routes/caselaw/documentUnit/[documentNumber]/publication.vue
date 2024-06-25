@@ -7,11 +7,11 @@ defineProps<{
   showNavigationPanel?: boolean
 }>()
 const emit = defineEmits<{
-  updateDocumentUnit: [void]
+  requestDocumentUnitFromServer: [void]
 }>()
 
-async function loadDocumentUnit() {
-  emit("updateDocumentUnit")
+async function requestDocumentUnitFromServer() {
+  emit("requestDocumentUnitFromServer")
 }
 </script>
 
@@ -19,6 +19,6 @@ async function loadDocumentUnit() {
   <DocumentUnitPublication
     v-if="documentUnit"
     :document-unit="documentUnit as DocumentUnit"
-    @update-document-unit="loadDocumentUnit"
+    @request-document-unit-from-server="requestDocumentUnitFromServer"
   />
 </template>

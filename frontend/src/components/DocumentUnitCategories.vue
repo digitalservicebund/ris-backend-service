@@ -20,8 +20,8 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits<{
-  documentUnitUpdate: [DocumentUnit]
-  documentUnitSave: []
+  documentUnitUpdatedLocally: [DocumentUnit]
+  saveDocumentUnitToServer: []
 }>()
 
 const updatedDocumentUnit = ref<DocumentUnit>(props.documentUnit)
@@ -31,7 +31,10 @@ const courtTypeRef = ref<string>(props.documentUnit.coreData.court?.type ?? "")
 watch(
   updatedDocumentUnit,
   () => {
-    emits("documentUnitUpdate", updatedDocumentUnit.value as DocumentUnit)
+    emits(
+      "documentUnitUpdatedLocally",
+      updatedDocumentUnit.value as DocumentUnit,
+    )
   },
   { deep: true },
 )
@@ -116,7 +119,7 @@ const coreData = computed({
       deleteLegalForces()
     }
     if (triggerSaving) {
-      emits("documentUnitSave")
+      emits("saveDocumentUnitToServer")
     }
   },
 })

@@ -9,16 +9,16 @@ defineProps<{
 }>()
 
 const emits = defineEmits<{
-  documentUnitUpdate: [DocumentUnit]
-  documentUnitSave: []
+  documentUnitUpdatedLocally: [DocumentUnit]
+  saveDocumentUnitToServer: []
 }>()
 
-function updateDocumentUnit(updatedDocumentUnit: DocumentUnit) {
-  emits("documentUnitUpdate", updatedDocumentUnit)
+function documentUnitUpdatedLocally(updatedDocumentUnit: DocumentUnit) {
+  emits("documentUnitUpdatedLocally", updatedDocumentUnit)
 }
 
-function documentUnitSave() {
-  emits("documentUnitSave")
+function saveDocumentUnitToServer() {
+  emits("saveDocumentUnitToServer")
 }
 </script>
 
@@ -27,7 +27,7 @@ function documentUnitSave() {
     v-if="documentUnit"
     :document-unit="documentUnit"
     :validation-errors="validationErrors"
-    @document-unit-save="documentUnitSave"
-    @document-unit-update="updateDocumentUnit"
+    @document-unit-updated-locally="documentUnitUpdatedLocally"
+    @save-document-unit-to-server="saveDocumentUnitToServer"
   />
 </template>

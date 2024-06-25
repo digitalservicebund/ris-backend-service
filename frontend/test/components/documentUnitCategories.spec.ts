@@ -135,7 +135,9 @@ describe("Document Unit Categories", () => {
     await user.click(dropdownItems[0])
 
     // Event is emitted for saving the DocUnit with updated properties
-    const [updatedDocUnit] = emitted().documentUnitUpdate[0] as [DocumentUnit]
+    const [updatedDocUnit] = emitted().documentUnitUpdatedLocally[0] as [
+      DocumentUnit,
+    ]
     expect(updatedDocUnit.coreData.court).toEqual({
       label: "AG Test",
       location: "Test",
