@@ -23,6 +23,7 @@ import lombok.experimental.SuperBuilder;
 public class RelatedDocumentationUnit {
   protected UUID uuid;
   protected String documentNumber;
+  protected Status status;
   protected Court court;
   protected LocalDate decisionDate;
   protected String fileNumber;
@@ -33,6 +34,7 @@ public class RelatedDocumentationUnit {
   public boolean isEmpty() {
     return uuid == null
         && documentNumber == null
+        && status == null
         && court == null
         && decisionDate == null
         && fileNumber == null
