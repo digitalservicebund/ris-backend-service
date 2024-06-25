@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 // Sources:
 // https://github.com/ueberdosis/tiptap/issues/1036#issuecomment-1000983233
 // https://github.com/ueberdosis/tiptap/issues/1036#issuecomment-981094752
@@ -37,19 +36,20 @@ const clamp = (val: number, min: number, max: number): number =>
   Math.min(Math.max(val, min), max)
 
 const updateIndentLevel = (
-  tr: Transaction,
+  transaction: Transaction,
   options: IndentOptions,
   extensions: Extensions,
   type: IndentType,
 ): Transaction => {
-  const { doc, selection } = tr
-  if (!doc || !selection || !(selection instanceof TextSelection)) return tr
+  const { doc, selection } = transaction
+  if (!doc || !selection || !(selection instanceof TextSelection))
+    return transaction
 
   const { from, to } = selection
   doc.nodesBetween(from, to, (node, pos) => {
     if (options.names.includes(node.type.name)) {
-      tr = setNodeIndentMarkup(
-        tr,
+      transaction = setNodeIndentMarkup(
+        transaction,
         pos,
         options.indentRange * (type === "indent" ? 1 : -1),
         options,
@@ -58,26 +58,31 @@ const updateIndentLevel = (
     }
     return !isList(node.type.name, extensions)
   })
-  return tr
+  return transaction
 }
 
 const setNodeIndentMarkup = (
-  tr: Transaction,
+  transaction: Transaction,
   pos: number,
   delta: number,
   options: IndentOptions,
 ): Transaction => {
-  const node = tr.doc?.nodeAt(pos)
-  if (!node) return tr
+  const node = transaction.doc?.nodeAt(pos)
+  if (!node) return transaction
 
   const indent = clamp(
     (node.attrs.indent || 0) + delta,
     options.minIndentLevel * options.indentRange,
     options.maxIndentLevel * options.indentRange,
   )
-  if (indent === node.attrs.indent) return tr
+  if (indent === node.attrs.indent) return transaction
 
-  return tr.setNodeMarkup(pos, node.type, { ...node.attrs, indent }, node.marks)
+  return transaction.setNodeMarkup(
+    pos,
+    node.type,
+    { ...node.attrs, indent },
+    node.marks,
+  )
 }
 
 const getIndent =
@@ -169,11 +174,9 @@ export const Indent = Extension.create<IndentOptions, never>({
 
   addKeyboardShortcuts() {
     return {
-      Tab: getIndent(),
-      "Shift-Tab": getOutdent(false),
+      "Alt-Tab": getIndent(),
       Backspace: getOutdent(true),
-      "Mod-]": getIndent(),
-      "Mod-[": getOutdent(false),
+      "Shift-Alt-Tab": getOutdent(false),
     }
   },
 
