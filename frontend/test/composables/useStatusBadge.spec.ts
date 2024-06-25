@@ -1,5 +1,5 @@
 import { useStatusBadge } from "@/composables/useStatusBadge"
-import { PublicationState } from "@/domain/documentUnit"
+import { PublicationState } from "@/domain/publicationStatus"
 
 describe.each([
   {
@@ -77,7 +77,7 @@ describe.each([
   { status: PublicationState.DELETING, withError: false, expected: "Löschen" },
   { status: PublicationState.DELETING, withError: true, expected: "Löschen" },
 ])("useStatusBadge", ({ status, withError, expected }) => {
-  test(`'${status}' with ${withError} error should return '${expected}'`, () => {
+  test(`'${status}' with error '${withError}' should return '${expected}'`, () => {
     const publicationStatus = {
       publicationStatus: status,
       withError: withError,

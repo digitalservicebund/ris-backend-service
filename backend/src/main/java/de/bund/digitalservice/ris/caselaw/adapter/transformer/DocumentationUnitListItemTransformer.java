@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit.RelatedDocumentationUnitBuilder;
+import de.bund.digitalservice.ris.caselaw.domain.Status;
 import java.util.Comparator;
 import lombok.extern.slf4j.Slf4j;
 
@@ -99,6 +100,7 @@ public class DocumentationUnitListItemTransformer {
             .uuid(documentationUnitListItemDTO.getId())
             .documentNumber(documentationUnitListItemDTO.getDocumentNumber())
             .court(CourtTransformer.transformToDomain(documentationUnitListItemDTO.getCourt()))
+            .status(getStatus(documentationUnitListItemDTO))
             .decisionDate(documentationUnitListItemDTO.getDecisionDate())
             .documentType(
                 DocumentTypeTransformer.transformToDomain(
@@ -112,5 +114,12 @@ public class DocumentationUnitListItemTransformer {
     }
 
     return builder.build();
+  }
+
+  private static Status getStatus(DocumentationUnitListItemDTO documentationUnitListItemDTO) {
+    return StatusTransformer.transformToDomain(
+        documentationUnitListItemDTO.getStatus().stream()
+            .max(Comparator.comparing(StatusDTO::getCreatedAt))
+            .orElse(null));
   }
 }

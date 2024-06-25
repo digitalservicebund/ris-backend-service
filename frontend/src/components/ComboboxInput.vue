@@ -1,6 +1,13 @@
 <script setup lang="ts" generic="T extends InputModelProps">
 import * as Sentry from "@sentry/vue"
-import { onBeforeUnmount, onMounted, ref, watch, computed } from "vue"
+import {
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+  computed,
+  shallowRef,
+} from "vue"
 import {
   ComboboxAttributes,
   ComboboxInputModelType,
@@ -42,7 +49,7 @@ const createNewItem = ref<ComboboxItem>()
 const showDropdown = ref(false)
 const filter = ref<string>()
 const dropdownContainerRef = ref<HTMLElement>()
-const dropdownItemsRef = ref<HTMLElement[]>([])
+const dropdownItemsRef = shallowRef<HTMLElement[]>([])
 const inputFieldRef = ref<HTMLInputElement>()
 const focusedItemIndex = ref<number>(-1)
 

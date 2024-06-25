@@ -24,6 +24,7 @@ public class PreviousDecision extends RelatedDocumentationUnit {
         && fileNumber == null
         && documentType == null
         && documentNumber == null
+        && status == null
         && deviatingFileNumber == null;
   }
 }

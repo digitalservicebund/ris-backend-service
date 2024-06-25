@@ -46,6 +46,42 @@ describe("Core Data", () => {
     expect(screen.getByLabelText("ECLI")).toHaveValue("abc123")
   })
 
+  test("renders deviating decision date", async () => {
+    const documentUnit = new DocumentUnit("1", {
+      coreData: {
+        deviatingDecisionDates: ["2021-02-01", "2022-02-01"],
+      },
+      documentNumber: "ABCD2022000001",
+    })
+
+    renderComponent({ modelValue: documentUnit.coreData })
+    await screen.findByLabelText("Abweichendes Entscheidungsdatum anzeigen")
+    screen.getByLabelText("Abweichendes Entscheidungsdatum anzeigen").click()
+    expect(await screen.findByTestId("deviating-decision-dates")).toBeVisible()
+
+    const chipList = screen.getAllByRole("listitem")
+    expect(chipList.length).toBe(2)
+    expect(chipList[0]).toHaveTextContent("01.02.2021")
+    expect(chipList[1]).toHaveTextContent("01.02.2022")
+  })
+
+  test("updates deviating decision date", async () => {
+    const onUpdate = vi.fn()
+    const { user } = renderComponent({
+      "onUpdate:modelValue": onUpdate,
+    })
+
+    await screen.findByLabelText("Abweichendes Entscheidungsdatum anzeigen")
+    screen.getByLabelText("Abweichendes Entscheidungsdatum anzeigen").click()
+    await user.type(
+      screen.getByLabelText("Abweichendes Entscheidungsdatum"),
+      "02.02.2022{enter}",
+    )
+    expect(onUpdate).toHaveBeenCalledWith({
+      deviatingDecisionDates: ["2022-02-02"],
+    })
+  })
+
   test("renders year of dispute", async () => {
     const documentUnit = new DocumentUnit("1", {
       coreData: {
