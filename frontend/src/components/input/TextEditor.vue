@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { commands, selectActiveState } from "@guardian/prosemirror-invisibles"
+import { Blockquote } from "@tiptap/extension-blockquote"
 import { Bold } from "@tiptap/extension-bold"
 import { Color } from "@tiptap/extension-color"
 import { Document } from "@tiptap/extension-document"
@@ -50,6 +51,7 @@ import IconSuperscript from "~icons/ic/baseline-superscript"
 import IconUndo from "~icons/ic/baseline-undo"
 import IconAlignCenter from "~icons/ic/outline-format-align-center"
 import IconAlignLeft from "~icons/ic/outline-format-align-left"
+import IconBlockquote from "~icons/ic/sharp-format-quote"
 import IconParagraph from "~icons/material-symbols/format-paragraph"
 
 interface Props {
@@ -124,6 +126,7 @@ const editor = new Editor({
     History.configure({
       depth: 100,
     }),
+    Blockquote,
   ],
   onUpdate: () => {
     emit("updateValue", editor.getHTML())
@@ -241,6 +244,14 @@ const buttons = computed(() => [
     isCollapsable: false,
     callback: () =>
       commands.toggleActiveState()(editor.state, editor.view.dispatch),
+  },
+  {
+    type: "blockquote",
+    icon: IconBlockquote,
+    ariaLabel: "blockquote",
+    group: "format",
+    isCollapsable: false,
+    callback: () => editor.chain().focus().toggleBlockquote().run(),
   },
 ])
 
