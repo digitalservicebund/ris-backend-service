@@ -56,20 +56,23 @@ test("search for documentunits and link decision", async ({
 
         await expect(container.getByText("1 Ergebnis gefunden")).toBeVisible()
 
-        let summary = `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`
+        let listItemSummary = `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`
+        const searchSummary = `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, In Veröffentlichung`
 
-        const result = container.getByText(summary)
+        const result = container.getByText(searchSummary)
         await expect(result).toBeVisible()
         await container.getByLabel("Treffer übernehmen").click()
 
         //make sure to have type in list
         if (container === ensuingDecisionContainer) {
-          summary = `nachgehend, ` + summary
+          listItemSummary = `nachgehend, ` + listItemSummary
         }
 
         const listItem = container.getByLabel("Listen Eintrag").first()
         await expect(listItem).toBeVisible()
-        await expect(listItem).toContainText(summary, { useInnerText: true })
+        await expect(listItem).toContainText(listItemSummary, {
+          useInnerText: true,
+        })
 
         // search for same parameters gives same result, indication that decision is already added
         if (container === activeCitationContainer) {
@@ -262,7 +265,7 @@ test("clicking on link of referenced documentation unit added by search opens ne
               container.getByText("1 Ergebnis gefunden"),
             ).toBeVisible()
 
-            const summary = `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`
+            const summary = `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, In Veröffentlichung`
 
             const result = container.getByText(summary)
             await expect(result).toBeVisible()
