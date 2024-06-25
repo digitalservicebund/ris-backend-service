@@ -158,7 +158,7 @@ onMounted(async () => {
           :class="showsPreview ? 'flex-row bg-white' : 'flex-row-reverse'"
         >
           <ExtraContentSidePanel
-            v-if="!showsPublication && !showsPreview"
+            v-if="!(showsPublication || showsPreview)"
             ref="extraContentSidePanel"
             :document-unit="documentUnit"
           ></ExtraContentSidePanel>
