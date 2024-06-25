@@ -127,7 +127,7 @@ onMounted(async () => {
 <template>
   <div class="flex w-screen grow">
     <div
-      v-if="!route.path.includes('preview')"
+      v-if="!route.path.includes('preview') && documentUnit"
       class="sticky top-0 z-50 flex flex-col border-r-1 border-solid border-gray-400 bg-white"
     >
       <SideToggle
@@ -183,12 +183,12 @@ onMounted(async () => {
             @save-document-unit-to-server="saveDocumentUnitToServer"
           />
         </FlexContainer>
-        <ErrorPage
-          v-else
-          :error="responseError"
-          :title="responseError?.title"
-        />
       </div>
     </div>
+    <ErrorPage
+      v-if="responseError"
+      :error="responseError"
+      :title="responseError?.title"
+    />
   </div>
 </template>
