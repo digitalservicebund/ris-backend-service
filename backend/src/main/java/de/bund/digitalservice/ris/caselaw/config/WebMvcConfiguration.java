@@ -1,33 +1,38 @@
 package de.bund.digitalservice.ris.caselaw.config;
 
-import org.springframework.context.annotation.Profile;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@Profile("local")
+@Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
-  //  private final ObjectMapper objectMapper;
+  private final ObjectMapper objectMapper;
 
-  //  public WebMvcConfiguration(ObjectMapper objectMapper) {
-  //    this.objectMapper = objectMapper;
-  //  }
-
-  @Override
-  public void addCorsMappings(CorsRegistry corsRegistry) {
-    corsRegistry.addMapping("/**").allowedOrigins("*").allowedMethods("*");
+  public WebMvcConfiguration(ObjectMapper objectMapper) {
+    this.objectMapper = objectMapper;
   }
 
-  //  @Bean
-  //  SecurityFilterChain web(HttpSecurity http) throws Exception {
-  //    http.authorizeHttpRequests(
-  //        customizer -> customizer.anyRequest().permitAll().anyRequest().authenticated());
-  //    return http.build();
-  //  }
+  @Override
+  public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+    converters.add(byteArrayHttpMessageConverter());
+    converters.add(new StringHttpMessageConverter());
+    converters.add(new MappingJackson2HttpMessageConverter(objectMapper));
+  }
 
-  //  @Override
-  //  public void configureHttpMessageCodecs(ServerCodecConfigurer configurer) {
-  //    configurer.defaultCodecs().maxInMemorySize(-1);
-  //    configurer.defaultCodecs().jackson2JsonEncoder(new Jackson2JsonEncoder(objectMapper));
-  //    configurer.defaultCodecs().jackson2JsonDecoder(new Jackson2JsonDecoder(objectMapper));
-  //  }
+  private ByteArrayHttpMessageConverter byteArrayHttpMessageConverter() {
+    ByteArrayHttpMessageConverter arrayHttpMessageConverter = new ByteArrayHttpMessageConverter();
+    List<MediaType> supportedMediaType =
+        new ArrayList<>(
+            MediaType.parseMediaTypes(
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
+    arrayHttpMessageConverter.setSupportedMediaTypes(supportedMediaType);
+    return arrayHttpMessageConverter;
+  }
 }

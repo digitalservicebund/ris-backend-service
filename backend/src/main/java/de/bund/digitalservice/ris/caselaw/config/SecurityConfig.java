@@ -1,16 +1,26 @@
 package de.bund.digitalservice.ris.caselaw.config;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
+import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
+import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @Configuration
@@ -20,6 +30,14 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 public class SecurityConfig {
   @Bean
   SecurityFilterChain web(HttpSecurity http) throws Exception {
+    CookieCsrfTokenRepository tokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+    XorCsrfTokenRequestAttributeHandler delegate = new XorCsrfTokenRequestAttributeHandler();
+    // set the name of the attribute the CsrfToken will be populated on
+    delegate.setCsrfRequestAttributeName("_csrf");
+    // Use only the handle() method of XorCsrfTokenRequestAttributeHandler and the
+    // default implementation of resolveCsrfTokenValue() from CsrfTokenRequestHandler
+    CsrfTokenRequestHandler requestHandler = delegate::handle;
+
     http.authorizeHttpRequests(
             customizer ->
                 customizer
@@ -33,7 +51,10 @@ public class SecurityConfig {
             httpSecurityExceptionHandlingConfigurer ->
                 httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(
                     new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-        .csrf(AbstractHttpConfigurer::disable)
+        .csrf(
+            csrf ->
+                csrf.csrfTokenRepository(tokenRepository).csrfTokenRequestHandler(requestHandler))
+        .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
         .headers(
             httpSecurityHeadersConfigurer ->
                 httpSecurityHeadersConfigurer
@@ -61,5 +82,19 @@ public class SecurityConfig {
                                     + "trust-token-redemption=(), window-placement=(), vertical-scroll=(self)")));
 
     return http.build();
+  }
+
+  final class CsrfCookieFilter extends OncePerRequestFilter {
+
+    @Override
+    protected void doFilterInternal(
+        HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+        throws ServletException, IOException {
+      CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
+      // Render the token value to a cookie by causing the deferred token to be loaded
+      csrfToken.getToken();
+
+      filterChain.doFilter(request, response);
+    }
   }
 }
