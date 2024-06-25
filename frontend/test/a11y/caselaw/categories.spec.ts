@@ -136,8 +136,12 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     )
     const responseBody = await response.json()
     const uuid = responseBody.content[0].id
+
+    const cookies = await page.context().cookies()
+    const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
     const deleteResponse = await page.request.delete(
       `/api/v1/caselaw/procedure/${uuid}`,
+      { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
     )
     expect(deleteResponse.ok()).toBeTruthy()
   })
