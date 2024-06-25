@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("api/v1/admin")
@@ -30,18 +29,17 @@ public class AdminController {
 
   @PostMapping("/webhook")
   @PreAuthorize("permitAll")
-  public Mono<ResponseEntity<String>> setPublishState(
+  public ResponseEntity<String> setPublishState(
       @RequestBody @Valid MailTrackingResponsePayload payload) {
     if (payload != null && payload.tags() != null && !payload.tags().isEmpty()) {
-      return Mono.just(
-          mailTrackingService.updatePublishingState(payload.tags().get(0), payload.event()));
+      return mailTrackingService.updatePublishingState(payload.tags().get(0), payload.event());
     }
-    return Mono.just(ResponseEntity.badRequest().build());
+    return ResponseEntity.badRequest().build();
   }
 
   @GetMapping("/env")
   @PreAuthorize("isAuthenticated()")
-  public Mono<ResponseEntity<String>> getEnvironment() {
-    return environmentService.getEnvironment().map(ResponseEntity::ok);
+  public ResponseEntity<String> getEnvironment() {
+    return ResponseEntity.ok(environmentService.getEnvironment());
   }
 }

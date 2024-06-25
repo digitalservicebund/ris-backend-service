@@ -1,11 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.groups.Tuple.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
-import com.jayway.jsonpath.JsonPath;
-import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
+import com.fasterxml.jackson.core.type.TypeReference;
+import de.bund.digitalservice.ris.caselaw.SliceTestImpl;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
@@ -30,9 +31,12 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -42,15 +46,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.data.domain.Slice;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
-import reactor.core.publisher.Mono;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @RISIntegrationTest(
@@ -92,7 +95,7 @@ class DocumentationUnitSearchIntegrationTest {
   @MockBean EmailPublishService publishService;
   @MockBean DocxConverterService docxConverterService;
   @MockBean UserService userService;
-  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean AttachmentService attachmentService;
 
   private DocumentationOfficeDTO docOfficeDTO;
@@ -101,7 +104,7 @@ class DocumentationUnitSearchIntegrationTest {
   void setUp() {
     docOfficeDTO = documentationOfficeRepository.findByAbbreviation("DS");
 
-    doReturn(Mono.just(DocumentationOfficeTransformer.transformToDomain(docOfficeDTO)))
+    doReturn(DocumentationOfficeTransformer.transformToDomain(docOfficeDTO))
         .when(userService)
         .getDocumentationOffice(any(OidcUser.class));
   }
@@ -161,30 +164,29 @@ class DocumentationUnitSearchIntegrationTest {
             .publicationStatus(PublicationStatus.PUBLISHED)
             .build());
 
-    risWebTestClient
-        .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=3")
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody()
-        .jsonPath("$.content")
-        .isArray()
-        .jsonPath("$.content[0].documentNumber")
-        .isEqualTo("MIGR202200012")
-        .jsonPath("$.content[1].documentNumber")
-        .isEqualTo("NEUR202300008")
-        .jsonPath("$.content[0].fileNumber")
-        .isEqualTo("AkteM")
-        .jsonPath("$.content[1].fileNumber")
-        .isEqualTo("AkteY")
-        .jsonPath("$.content[0].status.publicationStatus")
-        .isEqualTo("PUBLISHED")
-        .jsonPath("$.content[1].status.publicationStatus")
-        .isEqualTo("PUBLISHED")
-        .jsonPath("$.numberOfElements")
-        .isEqualTo(2);
+    Slice<DocumentationUnitListItem> responseBody =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=3")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+            .returnResult()
+            .getResponseBody();
+    assertThat(responseBody)
+        .extracting("documentNumber", "fileNumber", "status")
+        .containsExactly(
+            tuple(
+                "MIGR202200012",
+                "AkteM",
+                Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build()),
+            tuple(
+                "NEUR202300008",
+                "AkteY",
+                Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build()));
+    assertThat(responseBody.getNumberOfElements()).isEqualTo(2);
   }
 
   @Test
@@ -206,7 +208,7 @@ class DocumentationUnitSearchIntegrationTest {
               .build());
     }
 
-    EntityExchangeResult<String> result =
+    Slice<DocumentationUnitListItem> responseBody =
         risWebTestClient
             .withDefaultLogin()
             .get()
@@ -214,13 +216,18 @@ class DocumentationUnitSearchIntegrationTest {
             .exchange()
             .expectStatus()
             .isOk()
-            .expectBody(String.class)
-            .returnResult();
+            .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+            .returnResult()
+            .getResponseBody();
 
-    List<String> datesActual = JsonPath.read(result.getResponseBody(), "$.content[*].decisionDate");
-    assertThat(datesActual)
-        .hasSize(dates.size())
-        .containsExactly("2023-06-07", "2023-03-15", "2022-01-23", "2022-01-23", null);
+    assertThat(responseBody)
+        .extracting("decisionDate")
+        .containsExactly(
+            LocalDate.of(2023, 06, 07),
+            LocalDate.of(2023, 03, 15),
+            LocalDate.of(2022, 01, 23),
+            LocalDate.of(2022, 01, 23),
+            null);
   }
 
   @Test
@@ -236,19 +243,18 @@ class DocumentationUnitSearchIntegrationTest {
             .documentationOffice(docOfficeDTO)
             .build());
 
-    EntityExchangeResult<String> result =
-        risWebTestClient
-            .withDefaultLogin()
-            .get()
-            .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=1")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(String.class)
-            .returnResult();
-
-    boolean last = JsonPath.read(result.getResponseBody(), "$.last");
-    assertThat(last).isFalse();
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=1")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(new TypeReference<SliceTestImpl<?>>() {})
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().isLast()).isFalse();
+            });
   }
 
   @Test
@@ -287,81 +293,72 @@ class DocumentationUnitSearchIntegrationTest {
               .build());
     }
 
-    EntityExchangeResult<String> resultPage1 =
-        risWebTestClient
-            .withDefaultLogin()
-            .get()
-            .uri(
-                "/api/v1/caselaw/documentunits/search?pg=0&sz=4&documentNumberOrFileNumber=" + "AB")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(String.class)
-            .returnResult();
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=4&documentNumberOrFileNumber=" + "AB")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+        .consumeWith(
+            response -> {
+              Slice<DocumentationUnitListItem> responseBodyFirstPage = response.getResponseBody();
+              assertThat(responseBodyFirstPage.getNumberOfElements()).isEqualTo(4);
+              // not to be the last page
+              assertThat(responseBodyFirstPage.isFirst()).isTrue();
+              assertThat(responseBodyFirstPage.isLast()).isFalse();
+              // to have docNumbers "AB1234567800", "AB1234567801", "AB1234567802", "AB1234567803"
+              assertThat(responseBodyFirstPage.getContent())
+                  .extracting("documentNumber")
+                  .containsExactly("AB1234567800", "AB1234567801", "AB1234567802", "AB1234567803");
+            });
 
-    EntityExchangeResult<String> resultPage2 =
-        risWebTestClient
-            .withDefaultLogin()
-            .get()
-            .uri(
-                "/api/v1/caselaw/documentunits/search?pg=1&sz=4&documentNumberOrFileNumber=" + "AB")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(String.class)
-            .returnResult();
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/search?pg=1&sz=4&documentNumberOrFileNumber=" + "AB")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+        .consumeWith(
+            response -> {
+              // expect second page...
+              Slice<DocumentationUnitListItem> responseBodySecondPage = response.getResponseBody();
+              // to have 4 results
+              assertThat(responseBodySecondPage.getNumberOfElements()).isEqualTo(4);
+              // not to be the last or first page
+              assertThat(responseBodySecondPage.isFirst()).isFalse();
+              assertThat(responseBodySecondPage.isLast()).isFalse();
+              // to have docNumbers "AB1234567804", "GE1234567805", "GE1234567806", "GE1234567807"
+              assertThat(responseBodySecondPage.getContent())
+                  .extracting("documentNumber")
+                  .containsExactly("AB1234567804", "GE1234567805", "GE1234567806", "GE1234567807");
+            });
 
-    EntityExchangeResult<String> resultPage3 =
-        risWebTestClient
-            .withDefaultLogin()
-            .get()
-            .uri(
-                "/api/v1/caselaw/documentunits/search?pg=2&sz=4&documentNumberOrFileNumber=" + "AB")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(String.class)
-            .returnResult();
-
-    // expect first page...
-    // to have 4 results
-    String responseBodyFirstPage = resultPage1.getResponseBody();
-    assertThat((int) JsonPath.read(responseBodyFirstPage, "$.numberOfElements")).isEqualTo(4);
-    // not to be the last page
-    assertThat((boolean) JsonPath.read(responseBodyFirstPage, "$.first")).isTrue();
-    assertThat((boolean) JsonPath.read(responseBodyFirstPage, "$.last")).isFalse();
-    // to have docNumbers "AB1234567800", "AB1234567801", "AB1234567802", "AB1234567803"
-    List<String> documentNumbers1Actual =
-        JsonPath.read(responseBodyFirstPage, "$.content[*].documentNumber");
-    assertThat(documentNumbers1Actual)
-        .hasSize(4)
-        .containsExactly("AB1234567800", "AB1234567801", "AB1234567802", "AB1234567803");
-
-    // expect second page...
-    String responseBodySecondPage = resultPage2.getResponseBody();
-    // to have 4 results
-    assertThat((int) JsonPath.read(responseBodySecondPage, "$.numberOfElements")).isEqualTo(4);
-    // not to be the last or first page
-    assertThat((boolean) JsonPath.read(responseBodySecondPage, "$.first")).isFalse();
-    assertThat((boolean) JsonPath.read(responseBodySecondPage, "$.last")).isFalse();
-    // to have docNumbers "AB1234567804", "GE1234567805", "GE1234567806", "GE1234567807"
-    List<String> documentNumbers2Actual =
-        JsonPath.read(responseBodySecondPage, "$.content[*].documentNumber");
-    assertThat(documentNumbers2Actual)
-        .hasSize(4)
-        .containsExactly("AB1234567804", "GE1234567805", "GE1234567806", "GE1234567807");
-
-    // expect third page...
-    String responseBodyThirdPage = resultPage3.getResponseBody();
-    // to have 2 results
-    assertThat((int) JsonPath.read(responseBodyThirdPage, "$.numberOfElements")).isEqualTo(2);
-    // not to be the first but to be the last page
-    assertThat((boolean) JsonPath.read(responseBodyThirdPage, "$.first")).isFalse();
-    assertThat((boolean) JsonPath.read(responseBodyThirdPage, "$.last")).isTrue();
-    // to have docNumbers "GE1234567808", "GE1234567809"
-    List<String> documentNumbers3Actual =
-        JsonPath.read(responseBodyThirdPage, "$.content[*].documentNumber");
-    assertThat(documentNumbers3Actual).hasSize(2).containsExactly("GE1234567808", "GE1234567809");
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/search?pg=2&sz=4&documentNumberOrFileNumber=" + "AB")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+        .consumeWith(
+            response -> {
+              // expect third page...
+              Slice<DocumentationUnitListItem> responseBodyThirdPage = response.getResponseBody();
+              // to have 2 results
+              assertThat(responseBodyThirdPage.getNumberOfElements()).isEqualTo(2);
+              // not to be the first but to be the last page
+              assertThat(responseBodyThirdPage.isFirst()).isFalse();
+              assertThat(responseBodyThirdPage.isLast()).isTrue();
+              // to have docNumbers "GE1234567808", "GE1234567809"
+              assertThat(responseBodyThirdPage.getContent())
+                  .extracting("documentNumber")
+                  .containsExactly("GE1234567808", "GE1234567809");
+            });
   }
 
   @Test
@@ -372,20 +369,19 @@ class DocumentationUnitSearchIntegrationTest {
             .documentationOffice(docOfficeDTO)
             .build());
 
-    EntityExchangeResult<String> result =
-        risWebTestClient
-            .withDefaultLogin()
-            .get()
-            .uri(
-                "/api/v1/caselaw/documentunits/search?pg=0&sz=10&documentNumberOrFileNumber=+++AB++")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(String.class)
-            .returnResult();
-
-    List<String> documentNumbersActual =
-        JsonPath.read(result.getResponseBody(), "$.content[*].documentNumber");
-    assertThat(documentNumbersActual).hasSize(1).containsExactly("AB1234567802");
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10&documentNumberOrFileNumber=+++AB++")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().getContent())
+                  .extracting("documentNumber")
+                  .containsExactly("AB1234567802");
+            });
   }
 }

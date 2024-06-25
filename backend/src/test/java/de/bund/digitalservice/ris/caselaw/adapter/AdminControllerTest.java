@@ -4,34 +4,33 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishState;
 import de.bund.digitalservice.ris.caselaw.domain.MailTrackingService;
+import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
-@WebFluxTest(controllers = AdminController.class)
+@WebMvcTest(controllers = AdminController.class)
 @Import({SecurityConfig.class, TestConfig.class, DocumentNumberPatternConfig.class})
 class AdminControllerTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @MockBean private MailTrackingService mailTrackingService;
   @MockBean private EnvironmentService environmentService;
-  @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private ClientRegistrationRepository clientRegistrationRepository;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
 
@@ -59,7 +58,7 @@ class AdminControllerTest {
         .post()
         .uri("/api/v1/admin/webhook")
         .contentType(MediaType.APPLICATION_JSON)
-        .bodyValue(sendInBlueResponse)
+        .bodyJsonString(sendInBlueResponse)
         .exchange()
         .expectStatus()
         .isOk();
@@ -88,7 +87,7 @@ class AdminControllerTest {
         .post()
         .uri("/api/v1/admin/webhook")
         .contentType(MediaType.APPLICATION_JSON)
-        .bodyValue(sendInBlueResponse)
+        .bodyJsonString(sendInBlueResponse)
         .exchange()
         .expectStatus()
         .isBadRequest();
@@ -127,7 +126,7 @@ class AdminControllerTest {
         .post()
         .uri("/api/v1/admin/webhook")
         .contentType(MediaType.APPLICATION_JSON)
-        .bodyValue(sendInBlueResponse)
+        .bodyJsonString(sendInBlueResponse)
         .exchange()
         .expectStatus()
         .isNoContent();
@@ -137,7 +136,7 @@ class AdminControllerTest {
 
   @Test
   void testGetEnv() {
-    when(environmentService.getEnvironment()).thenReturn(Mono.just("staging"));
+    when(environmentService.getEnvironment()).thenReturn("staging");
 
     var result =
         risWebTestClient

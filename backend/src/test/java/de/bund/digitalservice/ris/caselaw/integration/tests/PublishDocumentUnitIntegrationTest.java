@@ -2,8 +2,9 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
-import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
+import com.fasterxml.jackson.core.type.TypeReference;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
@@ -34,9 +35,12 @@ import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecord;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecordType;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
+import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -49,13 +53,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.shaded.org.hamcrest.Matchers;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @RISIntegrationTest(
@@ -108,7 +111,7 @@ class PublishDocumentUnitIntegrationTest {
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabasePublicationReportRepository databasePublishReportRepository;
 
-  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private HttpMailSender mailSender;
   @MockBean DocxConverterService docxConverterService;
@@ -330,28 +333,28 @@ class PublishDocumentUnitIntegrationTest {
             .receivedDate(receivedDate)
             .build());
 
-    risWebTestClient
-        .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/documentunits/" + savedDocumentUnitDTO.getId() + "/publish")
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody()
-        .jsonPath("$")
-        .isArray()
-        .jsonPath("$[0].content")
-        .isEqualTo("<HTML>success!</HTML>")
-        .jsonPath("$[0].date")
-        .value(o -> Matchers.containsString(receivedDate.toString().substring(0, 20)).matches(o))
-        .jsonPath("$[0].type")
-        .isEqualTo(PublicationHistoryRecordType.PUBLICATION_REPORT.name())
-        .jsonPath("$[1].xml")
-        .isEqualTo("xml")
-        .jsonPath("$[1].date")
-        .value(o -> Matchers.containsString(publishDate.toString().substring(0, 20)).matches(o))
-        .jsonPath("$[1].type")
-        .isEqualTo(PublicationHistoryRecordType.PUBLICATION.name())
-        .consumeWith(System.out::println);
+    List<? extends PublicationHistoryRecord> responseBody =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/documentunits/" + savedDocumentUnitDTO.getId() + "/publish")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<List<? extends PublicationHistoryRecord>>() {})
+            .returnResult()
+            .getResponseBody();
+    assertThat(responseBody).hasSize(2);
+    assertThat(responseBody.get(0)).isInstanceOf(PublicationReport.class);
+    PublicationReport publicationReport = (PublicationReport) responseBody.get(0);
+    assertThat(publicationReport.content()).isEqualTo("<HTML>success!</HTML>");
+    assertThat(publicationReport.getDate()).isCloseTo(receivedDate, within(1, ChronoUnit.MILLIS));
+    assertThat(publicationReport.getType())
+        .isEqualTo(PublicationHistoryRecordType.PUBLICATION_REPORT);
+    assertThat(responseBody.get(1)).isInstanceOf(XmlPublication.class);
+    XmlPublication xmlPublication = (XmlPublication) responseBody.get(1);
+    assertThat(xmlPublication.xml()).isEqualTo("xml");
+    assertThat(xmlPublication.getDate()).isCloseTo(publishDate, within(1, ChronoUnit.MILLIS));
+    assertThat(xmlPublication.getType()).isEqualTo(PublicationHistoryRecordType.PUBLICATION);
   }
 }
