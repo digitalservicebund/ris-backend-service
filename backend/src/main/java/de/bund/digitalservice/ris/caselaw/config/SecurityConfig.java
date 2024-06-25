@@ -29,6 +29,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableMethodSecurity
 public class SecurityConfig {
   @Bean
+  @SuppressWarnings("java:S3330")
   SecurityFilterChain web(HttpSecurity http) throws Exception {
     CookieCsrfTokenRepository tokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
     XorCsrfTokenRequestAttributeHandler delegate = new XorCsrfTokenRequestAttributeHandler();
