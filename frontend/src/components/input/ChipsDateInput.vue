@@ -9,6 +9,7 @@ interface Props {
   id: string
   modelValue?: string[]
   ariaLabel: string
+  hasError?: boolean
 }
 const props = defineProps<Props>()
 
@@ -82,7 +83,9 @@ dayjs.extend(customParseFormat)
     :id="id"
     v-model="chips"
     :aria-label="ariaLabel"
+    data-testid="deviating-decision-dates"
+    :has-error="hasError"
     maska="##.##.####"
-    @update:validation-error="$emit('update:validationError', $event)"
+    @update:validation-error="validateInput($event)"
   />
 </template>

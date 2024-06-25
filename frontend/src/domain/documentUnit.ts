@@ -8,6 +8,7 @@ import PreviousDecision from "./previousDecision"
 import SingleNorm from "./singleNorm"
 import Attachment from "@/domain/attachment"
 import LegalForce from "@/domain/legalForce"
+import { PublicationStatus } from "@/domain/publicationStatus"
 
 export type CoreData = {
   fileNumbers?: string[]
@@ -67,20 +68,6 @@ export type Texts = {
   reasons?: string
   caseFacts?: string
   decisionReasons?: string
-}
-
-export enum PublicationState {
-  PUBLISHED = "PUBLISHED",
-  UNPUBLISHED = "UNPUBLISHED",
-  PUBLISHING = "PUBLISHING",
-  DUPLICATED = "DUPLICATED",
-  LOCKED = "LOCKED",
-  DELETING = "DELETING",
-}
-
-export type PublicationStatus = {
-  publicationStatus?: PublicationState
-  withError?: boolean
 }
 
 export default class DocumentUnit {

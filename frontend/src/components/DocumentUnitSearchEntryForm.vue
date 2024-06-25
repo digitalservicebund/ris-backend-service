@@ -9,7 +9,7 @@ import TextInput from "@/components/input/TextInput.vue"
 import { DropdownItem, ValidationError } from "@/components/input/types"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { useValidationStore } from "@/composables/useValidationStore"
-import { PublicationState } from "@/domain/documentUnit"
+import { PublicationState } from "@/domain/publicationStatus"
 
 defineProps<{
   isLoading?: boolean
