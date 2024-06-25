@@ -33,14 +33,20 @@ public class ParagraphConverter {
 
     var paragraphElement = new ParagraphElement();
 
-    if (paragraph.getPPr() != null && paragraph.getPPr().getPStyle() != null) {
-      paragraphElement.setStyleReference(paragraph.getPPr().getPStyle().getVal());
-    }
+    PPr paragraphProperties = paragraph.getPPr();
+    if (paragraphProperties != null) {
+      if (paragraphProperties.getPStyle() != null) {
+        paragraphElement.setStyleReference(paragraphProperties.getPStyle().getVal());
+      }
+      // TODO identify multiple levels of indentation
+      if (paragraphProperties.getInd() != null && paragraphProperties.getInd().getLeft() != null) {
+        paragraphElement.addStyle("margin-left", "40px");
+      }
 
-    var pPr = paragraph.getPPr();
-    String alignment = getAlignment(pPr, converter);
-    if (alignment != null) {
-      paragraphElement.setAlignment(alignment);
+      String alignment = getAlignment(paragraphProperties, converter);
+      if (alignment != null) {
+        paragraphElement.setAlignment(alignment);
+      }
     }
 
     paragraph.getContent().stream()
