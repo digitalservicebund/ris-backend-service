@@ -174,9 +174,10 @@ export const Indent = Extension.create<IndentOptions, never>({
 
   addKeyboardShortcuts() {
     return {
-      "Alt-Tab": getIndent(),
+      Tab: getIndent(),
       Backspace: getOutdent(true),
-      "Shift-Alt-Tab": getOutdent(false),
+      "Shift-Tab": getOutdent(false),
+      Escape: () => this.editor.commands.blur(),
     }
   },
 
