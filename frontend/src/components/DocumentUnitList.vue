@@ -131,46 +131,41 @@ function onDelete() {
             </FlexItem>
             <FlexItem
               v-if="listEntry.hasAttachments"
-              aria-label="Anhang vorhanden"
               class="flex-end text-blue-800"
               data-testid="file-attached-icon"
             >
-              <IconAttachedFile class="h-20 w-20" />
+              <IconAttachedFile
+                aria-label="Anhang vorhanden"
+                class="h-20 w-20"
+              />
             </FlexItem>
-            <FlexItem
-              v-else
-              aria-label="Kein Anhang vorhanden"
-              class="flex-end text-gray-500"
-            >
-              <IconAttachedFile class="h-20 w-20" />
+            <FlexItem v-else class="flex-end text-gray-500">
+              <IconAttachedFile
+                aria-label="Kein Anhang vorhanden"
+                class="h-20 w-20"
+              />
             </FlexItem>
             <FlexItem
               v-if="listEntry.hasHeadnoteOrPrinciple"
-              aria-label="Langtext vorhanden"
               class="flex-end text-blue-800"
               data-testid="headnote-principle-icon"
             >
-              <IconSubject class="h-20 w-20" />
+              <IconSubject aria-label="Langtext vorhanden" class="h-20 w-20" />
             </FlexItem>
-            <span
-              v-else
-              aria-label="Kein Langtext vorhanden"
-              class="text-gray-500"
-              ><IconSubject class="h-20 w-20"
+            <span v-else class="text-gray-500"
+              ><IconSubject
+                aria-label="Kein Langtext vorhanden"
+                class="h-20 w-20"
             /></span>
             <FlexItem
               v-if="listEntry.hasNote"
-              aria-label="Notiz vorhanden"
               class="flex-end text-blue-800"
               data-testid="note-icon"
             >
-              <IconNote class="h-20 w-20" />
+              <IconNote aria-label="Notiz vorhanden" class="h-20 w-20" />
             </FlexItem>
-            <span
-              v-else
-              aria-label="Keine Notiz vorhanden"
-              class="text-gray-500"
-              ><IconNote class="h-20 w-20"
+            <span v-else class="text-gray-500"
+              ><IconNote aria-label="Keine Notiz vorhanden" class="h-20 w-20"
             /></span>
           </FlexContainer>
         </CellItem>
