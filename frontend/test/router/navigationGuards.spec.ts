@@ -63,7 +63,9 @@ describe("router's auth navigation guards", () => {
   it("does redirect, if authenticated", async () => {
     mockSessionStore(true)
 
-    const result = await routerBeforeEach(router.currentRoute.value)
+    const result = await routerBeforeEach(
+      router.resolve("/caselaw") as RouteLocationNormalizedGeneric,
+    )
     expect(result).toEqual(true)
   })
 
