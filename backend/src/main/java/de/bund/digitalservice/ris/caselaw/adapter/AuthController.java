@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ImportApiKeyException;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -30,11 +30,10 @@ public class AuthController {
     this.authService = authService;
   }
 
-  @GetMapping(value = "me")
+  @GetMapping(value = "me", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public Mono<ResponseEntity<User>> getUser(@AuthenticationPrincipal OidcUser oidcUser) {
-
-    return userService.getUser(oidcUser).map(ResponseEntity::ok);
+  public ResponseEntity<User> getUser(@AuthenticationPrincipal OidcUser oidcUser) {
+    return ResponseEntity.ok(userService.getUser(oidcUser));
   }
 
   /**
@@ -43,11 +42,11 @@ public class AuthController {
    * @param oidcUser current user via openid connect system
    * @return the last/current api key for the user or null if no api key exist
    */
-  @GetMapping(value = "api-key/import")
+  @GetMapping(value = "api-key/import", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public Mono<ResponseEntity<ApiKey>> getImportApiKey(@AuthenticationPrincipal OidcUser oidcUser) {
+  public ResponseEntity<ApiKey> getImportApiKey(@AuthenticationPrincipal OidcUser oidcUser) {
     ApiKey apiKey = authService.getImportApiKey(oidcUser);
-    return Mono.just(ResponseEntity.ok(apiKey));
+    return ResponseEntity.ok(apiKey);
   }
 
   /**
@@ -58,14 +57,13 @@ public class AuthController {
    * @param oidcUser current user via openid connect system
    * @return the new generated api key
    */
-  @PutMapping(value = "api-key/import")
+  @PutMapping(value = "api-key/import", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public Mono<ResponseEntity<ApiKey>> generateImportApiKey(
-      @AuthenticationPrincipal OidcUser oidcUser) {
+  public ResponseEntity<ApiKey> generateImportApiKey(@AuthenticationPrincipal OidcUser oidcUser) {
 
     ApiKey apiKey = authService.generateImportApiKey(oidcUser);
 
-    return Mono.just(ResponseEntity.ok(apiKey));
+    return ResponseEntity.ok(apiKey);
   }
 
   /**
@@ -77,9 +75,9 @@ public class AuthController {
    * @param request http request to get the header information
    * @return the last/current api key for the user
    */
-  @PostMapping(value = "api-key/import/invalidate")
+  @PostMapping(value = "api-key/import/invalidate", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public Mono<ResponseEntity<ApiKey>> invalidateImportApiKey(
+  public ResponseEntity<ApiKey> invalidateImportApiKey(
       @AuthenticationPrincipal OidcUser oidcUser, ServerHttpRequest request) {
     String apiKey = request.getHeaders().getFirst("X-API-KEY");
 
@@ -89,6 +87,6 @@ public class AuthController {
 
     ApiKey lastApiKey = authService.invalidateImportApiKey(oidcUser, apiKey);
 
-    return Mono.just(ResponseEntity.ok(lastApiKey));
+    return ResponseEntity.ok(lastApiKey);
   }
 }

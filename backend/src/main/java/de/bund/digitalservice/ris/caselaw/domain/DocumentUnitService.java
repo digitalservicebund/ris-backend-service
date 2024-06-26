@@ -62,10 +62,8 @@ public class DocumentUnitService {
 
   public DocumentUnit generateNewDocumentUnit(DocumentationOffice documentationOffice)
       throws DocumentationUnitNotExistsException, DocumentationUnitException {
-
     var documentNumber = generateDocumentNumber(documentationOffice);
-    var documentUnit = repository.createNewDocumentUnit(documentNumber, documentationOffice);
-    return documentUnitStatusService.setInitialStatus(documentUnit);
+    return repository.createNewDocumentUnit(documentNumber, documentationOffice);
   }
 
   private String generateDocumentNumber(DocumentationOffice documentationOffice) {

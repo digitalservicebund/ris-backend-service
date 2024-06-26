@@ -16,7 +16,20 @@ import "../styles/invisible-characters.css"
 const isSoftHyphen = (char: string) => char === "\u00ad"
 // Necessary as TipTap overrides the hardbreak node type name from hard_break to hardBreak
 const isHardbreak = (node: Node): boolean => node.type.name === "hardBreak"
-const isTab = (char: string) => char === "\t"
+const isTab = (node: Node): boolean => node.attrs.indent >= 40
+const isBlockquote = (node: Node) => node.type.name === "blockquote"
+
+const countNestedBlockquotes = (startNode: Node): number => {
+  let count = 0
+  let currentNode: Node | null = startNode
+
+  while (currentNode && currentNode.type.name === "blockquote") {
+    count++
+    currentNode = currentNode.firstChild
+  }
+
+  return count
+}
 
 export const InvisibleCharacters = Extension.create({
   name: "invisible-characters",
@@ -28,8 +41,13 @@ export const InvisibleCharacters = Extension.create({
         nbSpace,
         heading,
         createInvisibleDecosForCharacter("soft-hyphen", isSoftHyphen),
-        createInvisibleDecosForCharacter("tab", isTab),
+        createInvisibleDecosForNode("tab", (_, pos) => pos, isTab),
         createInvisibleDecosForNode("break", (_, pos) => pos, isHardbreak),
+        createInvisibleDecosForNode(
+          "blockquote",
+          (node, pos) => pos + countNestedBlockquotes(node) - 1,
+          isBlockquote,
+        ),
       ]),
     ]
   },

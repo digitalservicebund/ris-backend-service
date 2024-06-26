@@ -135,8 +135,11 @@ export async function toggleFieldOfLawSection(page: Page): Promise<void> {
 }
 
 export async function deleteDocumentUnit(page: Page, documentNumber: string) {
+  const cookies = await page.context().cookies()
+  const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
   const getResponse = await page.request.get(
     `/api/v1/caselaw/documentunits/${documentNumber}`,
+    { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
   )
   expect(getResponse.ok()).toBeTruthy()
 
@@ -144,13 +147,17 @@ export async function deleteDocumentUnit(page: Page, documentNumber: string) {
 
   const deleteResponse = await page.request.delete(
     `/api/v1/caselaw/documentunits/${uuid}`,
+    { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
   )
   expect(deleteResponse.ok()).toBeTruthy()
 }
 
 export async function deleteProcedure(page: Page, uuid: string) {
+  const cookies = await page.context().cookies()
+  const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
   const response = await page.request.delete(
     `/api/v1/caselaw/procedure/${uuid}`,
+    { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
   )
   expect(response.ok()).toBeTruthy()
 }

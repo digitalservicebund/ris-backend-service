@@ -31,7 +31,7 @@ public class DatabaseProcedureService implements ProcedureService {
   }
 
   @Override
-  @Transactional(transactionManager = "jpaTransactionManager")
+  @Transactional
   public Slice<Procedure> search(
       Optional<String> query,
       DocumentationOffice documentationOffice,
@@ -66,7 +66,7 @@ public class DatabaseProcedureService implements ProcedureService {
   }
 
   @Override
-  @Transactional(transactionManager = "jpaTransactionManager")
+  @Transactional
   public List<DocumentationUnitListItem> getDocumentUnits(UUID procedureId) {
     return repository
         .findById(procedureId)

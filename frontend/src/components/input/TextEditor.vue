@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { commands, selectActiveState } from "@guardian/prosemirror-invisibles"
+import { Blockquote } from "@tiptap/extension-blockquote"
 import { Bold } from "@tiptap/extension-bold"
 import { Color } from "@tiptap/extension-color"
 import { Document } from "@tiptap/extension-document"
@@ -31,6 +32,7 @@ import { BorderNumberLink } from "@/editor/borderNumberLink"
 import { CustomBulletList } from "@/editor/bulletList"
 import { FontSize } from "@/editor/fontSize"
 import { CustomImage } from "@/editor/image"
+import { Indent } from "@/editor/indent"
 import { InvisibleCharacters } from "@/editor/invisibleCharacters"
 import { CustomListItem } from "@/editor/listItem"
 import { CustomOrderedList } from "@/editor/orderedList"
@@ -50,6 +52,9 @@ import IconSuperscript from "~icons/ic/baseline-superscript"
 import IconUndo from "~icons/ic/baseline-undo"
 import IconAlignCenter from "~icons/ic/outline-format-align-center"
 import IconAlignLeft from "~icons/ic/outline-format-align-left"
+import IconBlockquote from "~icons/ic/sharp-format-quote"
+import IndentDecrease from "~icons/material-symbols/format-indent-decrease"
+import IndentIncrease from "~icons/material-symbols/format-indent-increase"
 import IconParagraph from "~icons/material-symbols/format-paragraph"
 
 interface Props {
@@ -123,6 +128,10 @@ const editor = new Editor({
     }),
     History.configure({
       depth: 100,
+    }),
+    Blockquote,
+    Indent.configure({
+      names: ["listItem", "paragraph"],
     }),
   ],
   onUpdate: () => {
@@ -234,6 +243,22 @@ const buttons = computed(() => [
     callback: () => editor.chain().focus().toggleMark("subscript").run(),
   },
   {
+    type: "indent",
+    icon: IndentIncrease,
+    ariaLabel: "indent",
+    group: "indent",
+    isCollapsable: false,
+    callback: () => editor.chain().focus().indent().run(),
+  },
+  {
+    type: "outdent",
+    icon: IndentDecrease,
+    ariaLabel: "outdent",
+    group: "indent",
+    isCollapsable: false,
+    callback: () => editor.chain().focus().outdent().run(),
+  },
+  {
     type: "invisible-characters",
     icon: IconParagraph,
     ariaLabel: "invisible-characters",
@@ -241,6 +266,14 @@ const buttons = computed(() => [
     isCollapsable: false,
     callback: () =>
       commands.toggleActiveState()(editor.state, editor.view.dispatch),
+  },
+  {
+    type: "blockquote",
+    icon: IconBlockquote,
+    ariaLabel: "blockquote",
+    group: "format",
+    isCollapsable: false,
+    callback: () => editor.chain().focus().toggleBlockquote().run(),
   },
 ])
 

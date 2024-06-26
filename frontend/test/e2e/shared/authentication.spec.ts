@@ -22,7 +22,10 @@ test.describe("authentication", () => {
       }),
     ).toBeVisible()
 
+    const cookies = await page.context().cookies()
+    const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
     await page.context().clearCookies()
+    await page.context().addCookies(csrfToken ? [csrfToken] : [])
 
     await page.goto(`/caselaw/documentunit/${documentNumber}/categories`)
     await expect(page.getByText("Spruchkörper")).toBeHidden()
@@ -41,7 +44,10 @@ test.describe("authentication", () => {
       }),
     ).toBeVisible()
 
+    const cookies = await page.context().cookies()
+    const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
     await page.context().clearCookies()
+    await page.context().addCookies(csrfToken ? [csrfToken] : [])
 
     await page.goto(`/caselaw/documentunit/${documentNumber}/categories`)
     await expect(page.getByText("Spruchkörper")).toBeHidden()

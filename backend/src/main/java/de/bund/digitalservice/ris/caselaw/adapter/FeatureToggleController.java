@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("api/v1/feature-toggles")
@@ -19,7 +18,7 @@ public class FeatureToggleController {
 
   @GetMapping("/{toggleName}")
   @PreAuthorize("isAuthenticated()")
-  public Mono<Boolean> isEnabled(@PathVariable String toggleName) {
-    return Mono.just(service.isEnabled(toggleName));
+  public Boolean isEnabled(@PathVariable String toggleName) {
+    return service.isEnabled(toggleName);
   }
 }
