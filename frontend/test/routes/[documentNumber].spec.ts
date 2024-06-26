@@ -7,6 +7,7 @@ import DocumentUnit from "@/domain/documentUnit"
 import categories from "@/routes/caselaw/documentUnit/[documentNumber]/categories.vue"
 import DocumentNumber from "@/routes/caselaw/documentUnit/[documentNumber].vue"
 import documentUnitService from "@/services/documentUnitService"
+import featureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
 
 function renderComponent() {
@@ -102,6 +103,10 @@ describe("Document Number Route", () => {
           data: mockDocumentUnit(),
         }),
     )
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
   })
 
   describe("Conditional rendering", () => {
