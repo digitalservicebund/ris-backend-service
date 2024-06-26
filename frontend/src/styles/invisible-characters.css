@@ -6,6 +6,8 @@
 }
 .invisible--tab:before {
   content: "→";
+  display: inline;
+  position: absolute;
 }
 .invisible--nb-space {
   vertical-align: text-top;

@@ -32,6 +32,7 @@ import { BorderNumberLink } from "@/editor/borderNumberLink"
 import { CustomBulletList } from "@/editor/bulletList"
 import { FontSize } from "@/editor/fontSize"
 import { CustomImage } from "@/editor/image"
+import { Indent } from "@/editor/indent"
 import { InvisibleCharacters } from "@/editor/invisibleCharacters"
 import { CustomListItem } from "@/editor/listItem"
 import { CustomOrderedList } from "@/editor/orderedList"
@@ -52,6 +53,8 @@ import IconUndo from "~icons/ic/baseline-undo"
 import IconAlignCenter from "~icons/ic/outline-format-align-center"
 import IconAlignLeft from "~icons/ic/outline-format-align-left"
 import IconBlockquote from "~icons/ic/sharp-format-quote"
+import IndentDecrease from "~icons/material-symbols/format-indent-decrease"
+import IndentIncrease from "~icons/material-symbols/format-indent-increase"
 import IconParagraph from "~icons/material-symbols/format-paragraph"
 
 interface Props {
@@ -127,6 +130,9 @@ const editor = new Editor({
       depth: 100,
     }),
     Blockquote,
+    Indent.configure({
+      names: ["listItem", "paragraph"],
+    }),
   ],
   onUpdate: () => {
     emit("updateValue", editor.getHTML())
@@ -235,6 +241,22 @@ const buttons = computed(() => [
     group: "vertical-alignment",
     isCollapsable: false,
     callback: () => editor.chain().focus().toggleMark("subscript").run(),
+  },
+  {
+    type: "indent",
+    icon: IndentIncrease,
+    ariaLabel: "indent",
+    group: "indent",
+    isCollapsable: false,
+    callback: () => editor.chain().focus().indent().run(),
+  },
+  {
+    type: "outdent",
+    icon: IndentDecrease,
+    ariaLabel: "outdent",
+    group: "indent",
+    isCollapsable: false,
+    callback: () => editor.chain().focus().outdent().run(),
   },
   {
     type: "invisible-characters",
