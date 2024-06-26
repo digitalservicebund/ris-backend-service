@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
-import de.bund.digitalservice.ris.caselaw.adapter.mapper.DocumentUnitPatchMapper;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformerException;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
@@ -20,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlResultObject;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
+import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
 import java.time.Duration;
@@ -59,19 +59,19 @@ public class DocumentUnitController {
   private final UserService userService;
   private final AttachmentService attachmentService;
   private final ConverterService converterService;
-  private final DocumentUnitPatchMapper documentUnitPatchMapper;
+  private final PatchMapperService patchMapperService;
 
   public DocumentUnitController(
       DocumentUnitService service,
       UserService userService,
       AttachmentService attachmentService,
       ConverterService converterService,
-      DocumentUnitPatchMapper documentUnitPatchMapper) {
+      PatchMapperService patchMapperService) {
     this.service = service;
     this.userService = userService;
     this.attachmentService = attachmentService;
     this.converterService = converterService;
-    this.documentUnitPatchMapper = documentUnitPatchMapper;
+    this.patchMapperService = patchMapperService;
   }
 
   @GetMapping(value = "new", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -217,12 +217,12 @@ public class DocumentUnitController {
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
-  public ResponseEntity<DocumentUnit> updateCustomer(
+  public ResponseEntity<DocumentUnit> partialUpdateByUuid(
       @PathVariable UUID uuid, @RequestBody JsonPatch patch) {
     try {
       DocumentUnit documentUnit = service.getByUuid(uuid);
       DocumentUnit customerPatched =
-          documentUnitPatchMapper.applyPatchToDocumentUnit(patch, documentUnit);
+          patchMapperService.applyPatchToEntity(patch, documentUnit, DocumentUnit.class);
       return ResponseEntity.ok(customerPatched);
     } catch (JsonPatchException | JsonProcessingException e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

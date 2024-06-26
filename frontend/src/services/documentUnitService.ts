@@ -15,20 +15,27 @@ interface DocumentUnitService {
   getByDocumentNumber(
     documentNumber: string,
   ): Promise<ServiceResponse<DocumentUnit>>
+
   createNew(): Promise<ServiceResponse<DocumentUnit>>
+
   update(documentUnit: DocumentUnit): Promise<ServiceResponse<unknown>>
+
   updatePartial(
     documentUnitUuid: string,
     patch: Operation[],
   ): Promise<ServiceResponse<unknown>>
+
   delete(documentUnitUuid: string): Promise<ServiceResponse<unknown>>
+
   searchByRelatedDocumentation: PageableService<
     RelatedDocumentation,
     RelatedDocumentation
   >
+
   searchByDocumentUnitSearchInput(
     requestParams?: { [key: string]: string } | undefined,
   ): Promise<ServiceResponse<Page<DocumentUnitListEntry>>>
+
   validateSingleNorm(
     singleNormValidationInfo: SingleNormValidationInfo,
   ): Promise<ServiceResponse<unknown>>
@@ -114,10 +121,11 @@ const service: DocumentUnitService = {
       Operation[],
       DocumentUnit | FailedValidationServerResponse
     >(
-      `/api/document-unit/${documentUnitUuid}`,
+      `caselaw/documentunits/${documentUnitUuid}`,
       {
         headers: {
-          "Content-Type": "application/json-patch+json",
+          Accept: "application/json",
+          "Content-Type": "application/json",
         },
       },
       patch,
