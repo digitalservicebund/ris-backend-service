@@ -9,14 +9,20 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import de.bund.digitalservice.ris.caselaw.TestConfig;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jackson.jsonpointer.JsonPointer;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchOperation;
+import com.github.fge.jsonpatch.ReplaceOperation;
+import de.bund.digitalservice.ris.caselaw.DocumentUnitControllerTestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
-import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -53,12 +59,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = DocumentUnitController.class)
-@Import({
-  SecurityConfig.class,
-  AuthService.class,
-  TestConfig.class,
-  DocumentNumberPatternConfig.class
-})
+@Import({DocumentUnitControllerTestConfig.class})
 class DocumentUnitControllerTest {
   @Autowired private RisWebTestClient risWebClient;
   @MockBean private DocumentUnitService service;
@@ -72,6 +73,7 @@ class DocumentUnitControllerTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final String ISSUER_ADDRESS = "test-issuer@exporter.neuris";
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
+  private final ObjectMapper mapper = new ObjectMapper();
 
   @BeforeEach
   void setup() {
@@ -195,7 +197,7 @@ class DocumentUnitControllerTest {
   }
 
   @Test
-  void testPatchUpdateByUuid() throws DocumentationUnitNotExistsException {
+  void testPatchUpdateByUuid() throws DocumentationUnitNotExistsException, JsonProcessingException {
     DocumentationUnitDTO documentUnitDTO =
         DocumentationUnitDTO.builder()
             .id(TEST_UUID)
@@ -204,20 +206,20 @@ class DocumentUnitControllerTest {
             .build();
     DocumentUnit documentUnit = DocumentationUnitTransformer.transformToDomain(documentUnitDTO);
 
-    when(service.updateDocumentUnit(documentUnit)).thenReturn(null);
+    when(service.updateDocumentUnit(documentUnit)).thenReturn(documentUnit);
     when(service.getByUuid(TEST_UUID)).thenReturn(documentUnit);
 
-    String body =
-        "[{\"op\":\"replace\",\"path\":\"/coreData\",\"value\":\""
-            + documentUnit.coreData()
-            + "\"}]";
+    JsonNode valueToReplace = mapper.readTree("\"newValue\"");
+    JsonPatchOperation replaceOp =
+        new ReplaceOperation(JsonPointer.of("coreData", "appraisalBody"), valueToReplace);
+    JsonPatch patch = new JsonPatch(List.of(replaceOp));
 
     risWebClient
         .withDefaultLogin()
         .patch()
         .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
         .contentType(MediaType.APPLICATION_JSON)
-        .bodyValue(body)
+        .bodyValue(patch)
         .exchange()
         .expectStatus()
         .isOk();
