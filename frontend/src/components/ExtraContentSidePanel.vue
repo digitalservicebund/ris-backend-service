@@ -126,6 +126,7 @@ onMounted(() => {
         <div class="flex-grow" />
 
         <FileNavigator
+          v-if="attachmentsSelected"
           :attachments="documentUnit.attachments"
           :current-index="currentAttachmentIndex"
           @select="handleOnSelect"
