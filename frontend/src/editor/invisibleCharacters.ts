@@ -31,7 +31,6 @@ const countNestedBlockquotes = (startNode: Node): number => {
   return count
 }
 
-
 export const InvisibleCharacters = Extension.create({
   name: "invisible-characters",
   addProseMirrorPlugins() {
