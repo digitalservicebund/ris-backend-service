@@ -29,4 +29,6 @@ public interface DocumentationUnitListItemDTO {
   List<StatusDTO> getStatus();
 
   DocumentationOfficeDTO getDocumentationOffice();
+
+  String getNote();
 }

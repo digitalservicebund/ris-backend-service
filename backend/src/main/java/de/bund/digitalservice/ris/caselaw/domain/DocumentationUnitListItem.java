@@ -36,4 +36,5 @@ public record DocumentationUnitListItem(
     DocumentType documentType,
     UUID referencedDocumentationUnitId,
     Status status,
-    DocumentationOffice documentationOffice) {}
+    DocumentationOffice documentationOffice,
+    Boolean hasNote) {}
