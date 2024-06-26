@@ -129,9 +129,11 @@ onMounted(async () => {
     >
       <SideToggle
         class="sticky top-0 z-20"
+        data-testid="side-toggle-navigation"
         :is-expanded="showNavigationPanelRef"
         label="Navigation"
         tabindex="0"
+        test-id="side-toggle-navigation"
         @keydown.enter="toggleNavigationPanel"
         @update:is-expanded="toggleNavigationPanel"
       >
@@ -141,6 +143,7 @@ onMounted(async () => {
     <div v-if="documentUnit" class="flex w-full flex-col bg-gray-100">
       <DocumentUnitInfoPanel
         v-if="documentUnit && !route.path.includes('preview')"
+        data-testid="document-unit-info-panel"
         :document-unit="documentUnit"
         :heading="documentUnit?.documentNumber ?? ''"
         :save-callback="
