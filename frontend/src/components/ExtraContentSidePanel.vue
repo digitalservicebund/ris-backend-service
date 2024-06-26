@@ -102,7 +102,7 @@ onMounted(() => {
       tabindex="0"
       @update:is-expanded="togglePanel"
     >
-      <FlexContainer class="m-24 ml-20 items-center -space-x-2 px-8">
+      <FlexContainer class="m-24 ml-16 items-center -space-x-2 px-8">
         <TextButton
           id="note"
           aria-label="Notiz anzeigen"
