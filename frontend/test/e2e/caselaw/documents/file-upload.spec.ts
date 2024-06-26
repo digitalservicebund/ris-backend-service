@@ -68,7 +68,7 @@ test.describe("upload an original document to a doc unit", () => {
         .getByText(previewIdentifier)
         .innerText()
 
-      await page.getByLabel("Nächstes Dokument anzeigen").click()
+      await page.getByLabel("Vorheriges Dokument anzeigen").click()
       await expect(page.getByText(previewIdentifier)).toBeVisible()
       await expect(page.getByText(previewIdentifier)).not.toContainText(
         initialPreviewContent,
