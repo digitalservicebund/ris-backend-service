@@ -16,6 +16,9 @@ import org.docx4j.wml.Style;
  * ParagraphElement}
  */
 public class ParagraphConverter {
+
+  public static final int HTML_INDENT_SIZE_IN_PX = 40;
+
   private ParagraphConverter() {}
 
   /**
@@ -38,9 +41,14 @@ public class ParagraphConverter {
       if (paragraphProperties.getPStyle() != null) {
         paragraphElement.setStyleReference(paragraphProperties.getPStyle().getVal());
       }
-      // TODO identify multiple levels of indentation
       if (paragraphProperties.getInd() != null && paragraphProperties.getInd().getLeft() != null) {
-        paragraphElement.addStyle("margin-left", "40px");
+        // Default Tab Size in Docx = 1.27cm = 48px = 720 twips
+        int baseIndentTwips = 720;
+        int indentInTwips = paragraphProperties.getInd().getLeft().intValue();
+        double numberOfEstimatedIndentations = Math.ceil((double) indentInTwips / baseIndentTwips);
+        // We use 40px as the default indentation size
+        paragraphElement.addStyle(
+            "margin-left", HTML_INDENT_SIZE_IN_PX * numberOfEstimatedIndentations + "px");
       }
 
       String alignment = getAlignment(paragraphProperties, converter);
