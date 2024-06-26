@@ -1,21 +1,18 @@
 package de.bund.digitalservice.ris.caselaw.adapter.converter.docx;
 
-import static de.bund.digitalservice.ris.caselaw.adapter.converter.docx.ParagraphConverter.HTML_INDENT_SIZE_IN_PX;
-
 import de.bund.digitalservice.ris.caselaw.domain.docx.AnchorImageElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocxImagePart;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ErrorRunElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.InlineImageElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ParagraphElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.RunElement;
+import de.bund.digitalservice.ris.caselaw.domain.docx.RunTabElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.RunTextElement;
 import jakarta.xml.bind.JAXBElement;
 import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Base64;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.docx4j.dml.CTNonVisualDrawingProps;
 import org.docx4j.dml.CTPositiveSize2D;
@@ -78,16 +75,7 @@ public class RunElementConverter {
             parseDrawing(paragraphElement, (Drawing) jaxbElement.getValue(), converter);
         paragraphElement.addRunElement(imageElement);
       } else if (declaredType == R.Tab.class) {
-        // indentation with tabs should be transformed into a margin-left style attribute
-        // each tab adds 40px to the margin-left, and therefore we have to read the current value
-        int extistingMarginLeft = 0;
-        Pattern pattern = Pattern.compile("margin-left:\\s*(\\d+)px");
-        Matcher matcher = pattern.matcher(paragraphElement.getStyleString());
-        if (matcher.find()) {
-          extistingMarginLeft = Integer.parseInt(matcher.group(1));
-        }
-        paragraphElement.addStyle(
-            "margin-left", extistingMarginLeft + HTML_INDENT_SIZE_IN_PX + "px");
+        paragraphElement.addRunElement(new RunTabElement());
       } else if (declaredType == Pict.class) {
         parsePict(paragraphElement, (Pict) jaxbElement.getValue(), converter);
       } else if (declaredType == LastRenderedPageBreak.class) {
