@@ -22,18 +22,14 @@ const emit = defineEmits<{
 const postFix = computed(() => (props.isExpanded ? "schließen" : "öffnen"))
 
 const classes = computed(() => ({
-  "pr-[1.25rem]": props.openingDirection == OpeningDirection.RIGHT,
-  "pr-[2.25rem]":
-    props.openingDirection == OpeningDirection.LEFT && !props.isExpanded,
+  "pl-24":
+    props.openingDirection == OpeningDirection.RIGHT && !props.isExpanded,
+  "pr-24": props.openingDirection == OpeningDirection.LEFT && !props.isExpanded,
 }))
 
 const buttonClasses = computed(() => ({
   "right-0 -mr-16": props.openingDirection == OpeningDirection.RIGHT,
   "left-0 -ml-16": props.openingDirection == OpeningDirection.LEFT,
-}))
-
-const contentClasses = computed(() => ({
-  "-mr-[1.25rem]": props.openingDirection == OpeningDirection.RIGHT,
 }))
 
 const toggle = () => {
@@ -66,7 +62,7 @@ export enum OpeningDirection {
       />
       <IconChevronRight v-else />
     </button>
-    <div v-show="isExpanded" :class="contentClasses">
+    <div v-show="isExpanded">
       <slot />
     </div>
   </div>
