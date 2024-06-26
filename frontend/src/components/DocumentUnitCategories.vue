@@ -21,6 +21,7 @@ import PreviousDecision from "@/domain/previousDecision"
 import documentUnitService from "@/services/documentUnitService"
 import FeatureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
@@ -31,6 +32,7 @@ const validationErrors = ref<ValidationError[]>([])
 const route = useRoute()
 const courtTypeRef = ref<string>(props.documentUnit.coreData.court?.type ?? "")
 const notesFeatureToggle = ref(false)
+const store = useDocumentUnitStore()
 
 const showExtraContentPanelRef: Ref<boolean> = ref(false)
 
@@ -123,7 +125,9 @@ async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
 
 const coreData = computed({
   get: () => updatedDocumentUnit.value.coreData,
-  set: (newValues) => {
+  set: async (newValues) => {
+    if (store.documentUnit) store.documentUnit.coreData = newValues
+    await store.updateDocumentUnit()
     let triggerSaving = false
     if (
       (["court", "procedure"] as (keyof CoreData)[]).some(

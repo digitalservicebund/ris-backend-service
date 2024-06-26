@@ -1,3 +1,4 @@
+import type { Operation } from "fast-json-patch"
 import httpClient, {
   ServiceResponse,
   FailedValidationServerResponse,
@@ -17,7 +18,8 @@ interface DocumentUnitService {
   createNew(): Promise<ServiceResponse<DocumentUnit>>
   update(documentUnit: DocumentUnit): Promise<ServiceResponse<unknown>>
   updatePartial(
-    documentUnit: Partial<DocumentUnit>,
+    documentUnitUuid: string,
+    patch: Operation[],
   ): Promise<ServiceResponse<unknown>>
   delete(documentUnitUuid: string): Promise<ServiceResponse<unknown>>
   searchByRelatedDocumentation: PageableService<
@@ -107,21 +109,19 @@ const service: DocumentUnitService = {
     return response
   },
 
-  async updatePartial(partialDocumentUnit: Partial<DocumentUnit>) {
-    const response = await httpClient.patch<
-      Partial<DocumentUnit>,
-      Partial<DocumentUnit> | FailedValidationServerResponse
+  async updatePartial(documentUnitUuid: string, patch: Operation[]) {
+    return httpClient.patch<
+      Operation[],
+      DocumentUnit | FailedValidationServerResponse
     >(
-      `caselaw/documentunits/${partialDocumentUnit.uuid}`,
+      `/api/document-unit/${documentUnitUuid}`,
       {
         headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
+          "Content-Type": "application/json-patch+json",
         },
       },
-      partialDocumentUnit,
+      patch,
     )
-    return response
   },
 
   async delete(documentUnitUuid: string) {
