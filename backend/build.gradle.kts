@@ -208,6 +208,7 @@ dependencies {
     implementation("io.getunleash:unleash-client-java:9.2.2")
     implementation("org.apache.commons:commons-text:1.12.0")
     implementation("org.jsoup:jsoup:1.17.2")
+    implementation("com.github.java-json-tools:json-patch:1.12")
 
     val flywayCore = "org.flywaydb:flyway-core:10.15.0"
     implementation(flywayCore)

@@ -1,5 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
+import de.bund.digitalservice.ris.caselaw.adapter.mapper.DocumentUnitPatchMapper;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformerException;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
@@ -37,6 +41,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -54,16 +59,19 @@ public class DocumentUnitController {
   private final UserService userService;
   private final AttachmentService attachmentService;
   private final ConverterService converterService;
+  private final DocumentUnitPatchMapper documentUnitPatchMapper;
 
   public DocumentUnitController(
       DocumentUnitService service,
       UserService userService,
       AttachmentService attachmentService,
-      ConverterService converterService) {
+      ConverterService converterService,
+      DocumentUnitPatchMapper documentUnitPatchMapper) {
     this.service = service;
     this.userService = userService;
     this.attachmentService = attachmentService;
     this.converterService = converterService;
+    this.documentUnitPatchMapper = documentUnitPatchMapper;
   }
 
   @GetMapping(value = "new", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -201,6 +209,23 @@ public class DocumentUnitController {
         | DocumentUnitTransformerException e) {
       log.error("Error by updating documentation unit '{}'", documentUnit.documentNumber(), e);
       return ResponseEntity.internalServerError().body(DocumentUnit.builder().build());
+    }
+  }
+
+  @PatchMapping(
+      value = "/{uuid}",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
+  public ResponseEntity<DocumentUnit> updateCustomer(
+      @PathVariable UUID uuid, @RequestBody JsonPatch patch) {
+    try {
+      DocumentUnit documentUnit = service.getByUuid(uuid);
+      DocumentUnit customerPatched =
+          documentUnitPatchMapper.applyPatchToDocumentUnit(patch, documentUnit);
+      return ResponseEntity.ok(customerPatched);
+    } catch (JsonPatchException | JsonProcessingException e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
   }
 

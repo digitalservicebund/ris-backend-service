@@ -195,6 +195,35 @@ class DocumentUnitControllerTest {
   }
 
   @Test
+  void testPatchUpdateByUuid() throws DocumentationUnitNotExistsException {
+    DocumentationUnitDTO documentUnitDTO =
+        DocumentationUnitDTO.builder()
+            .id(TEST_UUID)
+            .documentNumber("ABCD202200001")
+            .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("DS").build())
+            .build();
+    DocumentUnit documentUnit = DocumentationUnitTransformer.transformToDomain(documentUnitDTO);
+
+    when(service.updateDocumentUnit(documentUnit)).thenReturn(null);
+    when(service.getByUuid(TEST_UUID)).thenReturn(documentUnit);
+
+    String body =
+        "[{\"op\":\"replace\",\"path\":\"/coreData\",\"value\":\""
+            + documentUnit.coreData()
+            + "\"}]";
+
+    risWebClient
+        .withDefaultLogin()
+        .patch()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue(body)
+        .exchange()
+        .expectStatus()
+        .isOk();
+  }
+
+  @Test
   void testUpdateByUuid_withInvalidUuid() {
     DocumentUnit documentUnitDTO = DocumentUnit.builder().uuid(TEST_UUID).build();
 
