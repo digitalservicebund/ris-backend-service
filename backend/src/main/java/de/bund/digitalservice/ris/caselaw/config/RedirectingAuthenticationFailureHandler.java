@@ -14,6 +14,6 @@ public class RedirectingAuthenticationFailureHandler implements AuthenticationFa
       jakarta.servlet.http.HttpServletResponse response,
       AuthenticationException exception)
       throws IOException, ServletException {
-    response.sendRedirect("/customError");
+    response.sendRedirect("/error");
   }
 }
