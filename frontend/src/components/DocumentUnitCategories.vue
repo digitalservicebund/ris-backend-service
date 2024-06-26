@@ -39,6 +39,13 @@ watch(
   { deep: true },
 )
 
+watch(
+  () => props.documentUnit,
+  (newValue) => {
+    updatedDocumentUnit.value = newValue
+  },
+)
+
 const courtTypesWithLegalForce = [
   "BVerfG",
   "VerfGH",

@@ -28,7 +28,6 @@ const menuItems = useCaseLawMenuItems(props.documentNumber, route.query)
 const { pushQueryToRoute } = useQuery()
 
 const documentUnit = ref<DocumentUnit>()
-const updatedDocumentUnit = ref()
 const lastUpdatedDocumentUnit = ref()
 const validationErrors = ref<ValidationError[]>([])
 const showNavigationPanelRef: Ref<boolean> = ref(
@@ -56,9 +55,7 @@ async function saveDocumentUnitToServer(): Promise<ServiceResponse<void>> {
       data: undefined,
     } as ServiceResponse<void>
 
-  lastUpdatedDocumentUnit.value = JSON.parse(
-    JSON.stringify(updatedDocumentUnit.value),
-  )
+  lastUpdatedDocumentUnit.value = JSON.parse(JSON.stringify(documentUnit.value))
   const response = await documentUnitService.update(
     lastUpdatedDocumentUnit.value,
   )
@@ -70,21 +67,21 @@ async function saveDocumentUnitToServer(): Promise<ServiceResponse<void>> {
   }
 
   if (!hasDataChange() && response.data) {
-    updatedDocumentUnit.value = response.data as DocumentUnit
+    documentUnit.value = response.data as DocumentUnit
   }
 
   return response as ServiceResponse<void>
 }
 
 function hasDataChange(): boolean {
-  const newValue = JSON.stringify(updatedDocumentUnit.value)
+  const newValue = JSON.stringify(documentUnit.value)
   const oldValue = JSON.stringify(lastUpdatedDocumentUnit.value)
 
   return newValue !== oldValue
 }
 
 function updateLocalDocumentUnit(updatedDocumentUnitFromChild: DocumentUnit) {
-  updatedDocumentUnit.value = updatedDocumentUnitFromChild
+  documentUnit.value = updatedDocumentUnitFromChild
 }
 
 async function requestDocumentUnitFromServer() {
