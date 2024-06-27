@@ -220,12 +220,15 @@ public class DocumentUnitController {
   public ResponseEntity<DocumentUnit> partialUpdateByUuid(
       @PathVariable UUID uuid, @RequestBody JsonPatch patch) {
     try {
-      DocumentUnit documentUnit = service.getByUuid(uuid);
-      DocumentUnit customerPatched =
-          patchMapperService.applyPatchToEntity(patch, documentUnit, DocumentUnit.class);
-      return ResponseEntity.ok(customerPatched);
+      DocumentUnit documentUnit =
+          patchMapperService.applyPatchToEntity(patch, service.getByUuid(uuid), DocumentUnit.class);
+      var updateDocumentUnit = service.updateDocumentUnit(documentUnit);
+      return ResponseEntity.ok().body(updateDocumentUnit);
     } catch (JsonPatchException | JsonProcessingException e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    } catch (DocumentationUnitNotExistsException e) {
+      log.error("Error by updating documentation unit '{}'", uuid, e);
+      return ResponseEntity.internalServerError().body(DocumentUnit.builder().build());
     }
   }
 
