@@ -4,6 +4,9 @@
     "config:recommended",
     ":disableDependencyDashboard"
   ],
+  "labels": [
+    "renovate"
+  ],
   "ignoreDeps": [
     "de.bund.digitalservice:neuris-juris-xml-export",
     "de.bund.digitalservice:neuris-caselaw-migration-schema"
