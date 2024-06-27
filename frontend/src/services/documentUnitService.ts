@@ -18,9 +18,7 @@ interface DocumentUnitService {
 
   createNew(): Promise<ServiceResponse<DocumentUnit>>
 
-  update(documentUnit: DocumentUnit): Promise<ServiceResponse<unknown>>
-
-  updatePartial(
+  update(
     documentUnitUuid: string,
     patch: Operation[],
   ): Promise<ServiceResponse<unknown>>
@@ -76,20 +74,21 @@ const service: DocumentUnitService = {
     return response
   },
 
-  async update(documentUnit: DocumentUnit) {
-    const response = await httpClient.put<
-      DocumentUnit,
+  async update(documentUnitUuid: string, patch: Operation[]) {
+    const response = await httpClient.patch<
+      Operation[],
       DocumentUnit | FailedValidationServerResponse
     >(
-      `caselaw/documentunits/${documentUnit.uuid}`,
+      `caselaw/documentunits/${documentUnitUuid}`,
       {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
       },
-      documentUnit,
+      patch,
     )
+
     if (response.status >= 300) {
       response.error = {
         title:
@@ -114,22 +113,6 @@ const service: DocumentUnitService = {
       })
     }
     return response
-  },
-
-  async updatePartial(documentUnitUuid: string, patch: Operation[]) {
-    return httpClient.patch<
-      Operation[],
-      DocumentUnit | FailedValidationServerResponse
-    >(
-      `caselaw/documentunits/${documentUnitUuid}`,
-      {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      },
-      patch,
-    )
   },
 
   async delete(documentUnitUuid: string) {

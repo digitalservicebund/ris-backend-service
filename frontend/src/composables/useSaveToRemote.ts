@@ -1,4 +1,4 @@
-import { computed, onUnmounted, ref } from "vue"
+import { computed, ref } from "vue"
 import { ServiceResponse, ResponseError } from "@/services/httpClient"
 
 function getCurrentTime(dateSaved: Date) {
@@ -9,7 +9,7 @@ function getCurrentTime(dateSaved: Date) {
 
 export function useSaveToRemote(
   saveCallback: () => Promise<ServiceResponse<void>>,
-  autoSaveInterval = 0,
+  // autoSaveInterval = 0,
 ) {
   const saveIsInProgress = ref(false)
   const lastSaveError = ref<ResponseError | undefined>(undefined)
@@ -40,11 +40,11 @@ export function useSaveToRemote(
       saveIsInProgress.value = false
     }
   }
-  const timer = setInterval(triggerSave, autoSaveInterval)
+  // const timer = setInterval(triggerSave, autoSaveInterval)
 
-  onUnmounted(() => {
-    clearInterval(timer)
-  })
+  // onUnmounted(() => {
+  //   clearInterval(timer)
+  // })
 
   return {
     saveIsInProgress,
