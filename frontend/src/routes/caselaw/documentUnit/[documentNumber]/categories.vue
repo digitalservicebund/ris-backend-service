@@ -23,6 +23,7 @@ const store = useDocumentUnitStore()
 const { documentUnit } = storeToRefs(store)
 
 onMounted(async () => {
+  // In the future, this get request will happen one layer above, so all routes can share the same docunit ref
   const { error } = await store.loadDocumentUnit(props.documentNumber)
   responseError.value = error
 })

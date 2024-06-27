@@ -140,22 +140,23 @@ describe("useSaveToRemote", () => {
     expect(formattedLastSavedOn.value).toBe("00:03")
   })
 
-  it("automatically triggers the callback once per set interval", async () => {
-    const callback = vi.fn()
-    useSaveToRemote(callback, 30000)
+  // Todo: uncomment, when we want autosave again
+  // it("automatically triggers the callback once per set interval", async () => {
+  //   const callback = vi.fn()
+  //   useSaveToRemote(callback, 30000)
 
-    vi.advanceTimersToNextTimer()
-    await flushPromises()
-    expect(callback).toHaveBeenCalledTimes(1)
+  //   vi.advanceTimersToNextTimer()
+  //   await flushPromises()
+  //   expect(callback).toHaveBeenCalledTimes(1)
 
-    vi.advanceTimersToNextTimer()
-    await flushPromises()
-    expect(callback).toHaveBeenCalledTimes(2)
+  //   vi.advanceTimersToNextTimer()
+  //   await flushPromises()
+  //   expect(callback).toHaveBeenCalledTimes(2)
 
-    vi.advanceTimersToNextTimer()
-    await flushPromises()
-    expect(callback).toHaveBeenCalledTimes(3)
-  })
+  //   vi.advanceTimersToNextTimer()
+  //   await flushPromises()
+  //   expect(callback).toHaveBeenCalledTimes(3)
+  // })
 
   it("does not reset error if callback did not change anything", async () => {
     const callback = vi.fn()

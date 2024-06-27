@@ -5,13 +5,11 @@ import DocumentUnit from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
 import { ServiceResponse } from "@/services/httpClient"
 
-export const useDocumentUnitStore = defineStore("document-unit", () => {
+export const useDocumentUnitStore = defineStore("docunitStore", () => {
   const documentUnit = ref<DocumentUnit | undefined>(undefined)
   const originalDocumentUnit = ref<DocumentUnit | undefined>(undefined)
 
-  async function loadDocumentUnit(
-    documentNumber: string,
-  ): Promise<ServiceResponse<void>> {
+  async function loadDocumentUnit(documentNumber: string) {
     const response =
       await documentUnitService.getByDocumentNumber(documentNumber)
     documentUnit.value = response.data
@@ -19,7 +17,7 @@ export const useDocumentUnitStore = defineStore("document-unit", () => {
     return response as ServiceResponse<void>
   }
 
-  async function updateDocumentUnit(): Promise<ServiceResponse<void>> {
+  async function updateDocumentUnit(): Promise<ServiceResponse<unknown>> {
     if (!documentUnit.value || !originalDocumentUnit.value) {
       return { status: 404, data: undefined }
     }
@@ -30,13 +28,11 @@ export const useDocumentUnitStore = defineStore("document-unit", () => {
       documentUnit.value,
     )
 
-    // console.log("patch", patch)
-
     if (patch.length === 0) {
       return { status: 304, data: undefined } // No changes to update
     }
 
-    const response = await documentUnitService.updatePartial(
+    const response = await documentUnitService.update(
       documentUnit.value.uuid,
       patch,
     )
@@ -47,7 +43,7 @@ export const useDocumentUnitStore = defineStore("document-unit", () => {
       ) // Update the original copy
     }
 
-    return response as ServiceResponse<void>
+    return response as ServiceResponse<unknown>
   }
 
   return { documentUnit, loadDocumentUnit, updateDocumentUnit }
