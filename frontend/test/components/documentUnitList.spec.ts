@@ -129,6 +129,9 @@ describe("documentUnit list", () => {
             withError: false,
           },
           documentationOffice: { abbreviation: "OTHER" },
+          hasAttachments: true,
+          hasHeadnoteOrPrinciple: true,
+          hasNote: true,
         },
         {
           id: "id",
@@ -144,6 +147,9 @@ describe("documentUnit list", () => {
             withError: false,
           },
           documentationOffice: { abbreviation: "DS" },
+          hasAttachments: false,
+          hasHeadnoteOrPrinciple: false,
+          hasNote: false,
         },
       ],
     })
@@ -167,6 +173,18 @@ describe("documentUnit list", () => {
     expect(
       screen.getByRole("button", { name: "Dokumentationseinheit löschen" }),
     ).toBeVisible()
+
+    // expect Notes
+    expect(screen.getByLabelText("Notiz vorhanden")).toBeVisible()
+    expect(screen.getByLabelText("Keine Notiz vorhanden")).toBeVisible()
+
+    // expect Headnote or Principal
+    expect(screen.getByLabelText("Langtext vorhanden")).toBeVisible()
+    expect(screen.getByLabelText("Kein Langtext vorhanden")).toBeVisible()
+
+    // expect Attachment
+    expect(screen.getByLabelText("Anhang vorhanden")).toBeVisible()
+    expect(screen.getByLabelText("Kein Anhang vorhanden")).toBeVisible()
 
     // expect two view links
     expect(

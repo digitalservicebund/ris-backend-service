@@ -16,6 +16,9 @@ import org.docx4j.wml.Style;
  * ParagraphElement}
  */
 public class ParagraphConverter {
+
+  public static final int HTML_INDENT_SIZE_IN_PX = 40;
+
   private ParagraphConverter() {}
 
   /**
@@ -33,14 +36,25 @@ public class ParagraphConverter {
 
     var paragraphElement = new ParagraphElement();
 
-    if (paragraph.getPPr() != null && paragraph.getPPr().getPStyle() != null) {
-      paragraphElement.setStyleReference(paragraph.getPPr().getPStyle().getVal());
-    }
+    PPr paragraphProperties = paragraph.getPPr();
+    if (paragraphProperties != null) {
+      if (paragraphProperties.getPStyle() != null) {
+        paragraphElement.setStyleReference(paragraphProperties.getPStyle().getVal());
+      }
+      if (paragraphProperties.getInd() != null && paragraphProperties.getInd().getLeft() != null) {
+        // Default Tab Size in Docx = 1.27cm = 48px = 720 twips
+        int baseIndentTwips = 720;
+        int indentInTwips = paragraphProperties.getInd().getLeft().intValue();
+        double numberOfEstimatedIndentations = Math.ceil((double) indentInTwips / baseIndentTwips);
+        // We use 40px as the default indentation size
+        paragraphElement.addStyle(
+            "margin-left", HTML_INDENT_SIZE_IN_PX * numberOfEstimatedIndentations + "px");
+      }
 
-    var pPr = paragraph.getPPr();
-    String alignment = getAlignment(pPr, converter);
-    if (alignment != null) {
-      paragraphElement.setAlignment(alignment);
+      String alignment = getAlignment(paragraphProperties, converter);
+      if (alignment != null) {
+        paragraphElement.setAlignment(alignment);
+      }
     }
 
     paragraph.getContent().stream()

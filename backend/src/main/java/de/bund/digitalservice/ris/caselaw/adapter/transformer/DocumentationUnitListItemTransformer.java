@@ -61,7 +61,10 @@ public class DocumentationUnitListItemTransformer {
                         .orElse(null)))
         .documentationOffice(
             DocumentationOfficeTransformer.transformToDomain(
-                documentationUnitListItemDTO.getDocumentationOffice()));
+                documentationUnitListItemDTO.getDocumentationOffice()))
+        .hasNote(
+            documentationUnitListItemDTO.getNote() != null
+                && !documentationUnitListItemDTO.getNote().isEmpty());
     return builder.build();
   }
 

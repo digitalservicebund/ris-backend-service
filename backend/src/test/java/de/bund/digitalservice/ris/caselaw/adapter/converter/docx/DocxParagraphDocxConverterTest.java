@@ -6,13 +6,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.bund.digitalservice.ris.caselaw.domain.docx.TableElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.TextElement;
 import jakarta.xml.bind.JAXBElement;
+import java.math.BigInteger;
 import javax.xml.namespace.QName;
 import org.docx4j.wml.P;
+import org.docx4j.wml.PPr;
+import org.docx4j.wml.PPrBase;
 import org.docx4j.wml.R;
 import org.docx4j.wml.Tbl;
 import org.docx4j.wml.Text;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 class DocxParagraphDocxConverterTest {
   private DocxConverter converter;
@@ -45,6 +50,21 @@ class DocxParagraphDocxConverterTest {
     var result = converter.convert(paragraph);
 
     assertTrue(result instanceof TextElement);
+  }
+
+  @ParameterizedTest
+  @CsvSource({"0, 0", "1, 40", "720, 40", "721, 80", "1440, 80", "1441, 120"})
+  void testConvert_withIndentedP(BigInteger indentationInTwips, int expectedMarginLeft) {
+    P paragraph = new P();
+    PPr pPr = new PPr();
+    PPrBase.Ind ind = new PPrBase.Ind();
+    ind.setLeft(indentationInTwips);
+    pPr.setInd(ind);
+    paragraph.setPPr(pPr);
+
+    var result = converter.convert(paragraph);
+
+    assertTrue(result.toHtmlString().contains("margin-left: " + expectedMarginLeft + ".0px"));
   }
 
   @Test
