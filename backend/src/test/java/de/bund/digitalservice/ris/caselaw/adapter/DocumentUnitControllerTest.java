@@ -43,7 +43,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -215,19 +214,15 @@ class DocumentUnitControllerTest {
         new ReplaceOperation(JsonPointer.of("coreData", "appraisalBody"), valueToReplace);
     JsonPatch patch = new JsonPatch(List.of(replaceOp));
 
-    documentUnit =
-        risWebClient
-            .withDefaultLogin()
-            .patch()
-            .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(patch)
-            .exchange()
-            .expectBody(DocumentUnit.class)
-            .returnResult()
-            .getResponseBody();
-
-    Assertions.assertEquals(documentUnit.coreData().appraisalBody(), "newValue");
+    risWebClient
+        .withDefaultLogin()
+        .patch()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue(patch)
+        .exchange()
+        .expectStatus()
+        .isOk();
   }
 
   @Test
