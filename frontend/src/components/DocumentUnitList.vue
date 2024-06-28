@@ -210,7 +210,7 @@ function onDelete() {
           <span v-else>-</span>
         </CellItem>
         <CellItem class="flex">
-          <div class="flex">
+          <div class="float-end flex">
             <router-link
               v-if="
                 listEntry.documentationOffice?.abbreviation ===
