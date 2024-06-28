@@ -9,7 +9,7 @@ describe("FileUpload", () => {
       props: {},
     })
 
-    screen.getByText("Ziehen Sie Ihre Dateien in diesem Bereich.")
+    screen.getByText("Ziehen Sie Ihre Dateien in diesen Bereich.")
   })
 
   test.each([

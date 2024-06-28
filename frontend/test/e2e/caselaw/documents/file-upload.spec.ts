@@ -31,7 +31,7 @@ test.describe("upload an original document to a doc unit", () => {
 
     await page.reload()
     await expect(
-      page.getByText("Ziehen Sie Ihre Dateien in diesem Bereich."),
+      page.getByText("Ziehen Sie Ihre Dateien in diesen Bereich."),
     ).toBeVisible()
     await expect(tableView).toBeHidden()
     await expect(attachmentView).toBeHidden()
@@ -68,7 +68,7 @@ test.describe("upload an original document to a doc unit", () => {
         .getByText(previewIdentifier)
         .innerText()
 
-      await page.getByLabel("Nächstes Dokument anzeigen").click()
+      await page.getByLabel("Vorheriges Dokument anzeigen").click()
       await expect(page.getByText(previewIdentifier)).toBeVisible()
       await expect(page.getByText(previewIdentifier)).not.toContainText(
         initialPreviewContent,
@@ -95,7 +95,7 @@ test.describe("upload an original document to a doc unit", () => {
 
       await page.reload()
       await expect(
-        page.getByText("Ziehen Sie Ihre Dateien in diesem Bereich."),
+        page.getByText("Ziehen Sie Ihre Dateien in diesen Bereich."),
       ).toBeVisible()
       await expect(
         page.getByRole("cell", {
@@ -128,7 +128,7 @@ test.describe("upload an original document to a doc unit", () => {
 
     await page.dispatchEvent(".upload-drop-area", "dragover", { dataTransfer })
     await expect(
-      page.getByText("Ziehen Sie Ihre Dateien in diesem Bereich."),
+      page.getByText("Ziehen Sie Ihre Dateien in diesen Bereich."),
     ).toBeVisible()
   })
 

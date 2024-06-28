@@ -1,8 +1,11 @@
 <script lang="ts" setup>
-import { toRaw } from "vue"
+import dayjs from "dayjs"
+import { computed, ref, toRaw, watchEffect } from "vue"
 import IconBadge, { IconBadgeProps } from "@/components/IconBadge.vue"
 import PropertyInfo from "@/components/PropertyInfo.vue"
 import SaveButton from "@/components/SaveDocumentUnitButton.vue"
+import { useStatusBadge } from "@/composables/useStatusBadge"
+import DocumentUnit from "@/domain/documentUnit"
 import { ServiceResponse } from "@/services/httpClient"
 
 interface PropertyInfoType {
@@ -11,17 +14,50 @@ interface PropertyInfoType {
 }
 
 interface Props {
+  documentUnit: DocumentUnit
   heading?: string
-  firstRow?: (PropertyInfoType | IconBadgeProps)[]
-  secondRow?: (PropertyInfoType | IconBadgeProps)[]
   saveCallback?: () => Promise<ServiceResponse<void>>
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   heading: "",
-  firstRow: () => [],
-  secondRow: () => [],
   saveCallback: undefined,
+})
+
+const fileNumberInfo = computed(
+  () => props.documentUnit?.coreData.fileNumbers?.[0],
+)
+
+const decisionDateInfo = computed(() =>
+  props.documentUnit?.coreData.decisionDate
+    ? dayjs(props.documentUnit?.coreData.decisionDate).format("DD.MM.YYYY")
+    : undefined,
+)
+
+const documentationOffice = computed(
+  () => props.documentUnit?.coreData.documentationOffice?.abbreviation,
+)
+
+const courtInfo = computed(() => props.documentUnit?.coreData.court?.label)
+
+const statusBadge = ref(useStatusBadge(props.documentUnit?.status).value)
+
+const firstRow = computed<(PropertyInfoType | IconBadgeProps)[]>(() => [
+  ...(statusBadge.value ? [statusBadge.value] : []),
+  {
+    label: "Dokumentationsstelle",
+    value: documentationOffice.value,
+  },
+])
+
+const secondRow = computed(() => [
+  { label: "Aktenzeichen", value: fileNumberInfo.value },
+  { label: "Entscheidungsdatum", value: decisionDateInfo.value },
+  { label: "Gericht", value: courtInfo.value },
+])
+
+watchEffect(() => {
+  statusBadge.value = useStatusBadge(props.documentUnit?.status).value
 })
 
 function isBadge(

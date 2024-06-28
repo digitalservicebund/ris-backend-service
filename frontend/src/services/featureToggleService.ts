@@ -3,6 +3,7 @@ import errorMessages from "@/i18n/errors.json"
 
 interface FeatureToggleService {
   isEnabled(toggleName: string): Promise<ServiceResponse<boolean>>
+  getEnabledToggles(): Promise<Record<string, boolean>>
 }
 
 const service: FeatureToggleService = {
@@ -16,6 +17,23 @@ const service: FeatureToggleService = {
       }
     }
     return response
+  },
+
+  /**
+   * For a list of feature flags, fetch each enabled status from the backend and build a map.
+   * Workaround as long as we don't get a project-specific set of feature flags from the backend resp. Unleash.
+   */
+  async getEnabledToggles(): Promise<Record<string, boolean>> {
+    const TOGGLE_NAMES: string[] = []
+
+    const featureFlagsList = await Promise.all(
+      TOGGLE_NAMES.map(async (name) => [
+        [name],
+        (await this.isEnabled(name))?.data ?? false,
+      ]),
+    )
+
+    return Object.fromEntries(featureFlagsList)
   },
 }
 

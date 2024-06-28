@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
-import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import PublicationDocument from "@/components/PublicationDocument.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import XmlMail from "@/domain/xmlMail"
@@ -12,7 +11,7 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits<{
-  updateDocumentUnit: []
+  requestDocumentUnitFromServer: []
 }>()
 
 const loadDone = ref(false)
@@ -41,7 +40,7 @@ async function publishDocument() {
   } else {
     errorMessage.value = response.error
   }
-  emits("updateDocumentUnit")
+  emits("requestDocumentUnitFromServer")
 }
 
 function formatDate(date?: string): string {
@@ -78,25 +77,21 @@ onMounted(async () => {
 </script>
 
 <template>
-  <DocumentUnitWrapper :document-unit="documentUnit" show-navigation-panel>
-    <template #default="{ classes }">
-      <div :class="classes">
-        <PublicationDocument
-          v-if="loadDone"
-          :document-unit="documentUnit"
-          :error-message="errorMessage"
-          :publication-log="publicationLog"
-          :publish-result="publishResult"
-          :succeed-message="succeedMessage"
-          @publish-document="publishDocument"
-        />
+  <div class="w-full grow p-24">
+    <PublicationDocument
+      v-if="loadDone"
+      :document-unit="documentUnit"
+      :error-message="errorMessage"
+      :publication-log="publicationLog"
+      :publish-result="publishResult"
+      :succeed-message="succeedMessage"
+      @publish-document="publishDocument"
+    />
 
-        <div v-else class="spinner">
-          <h2>Überprüfung der Daten ...</h2>
-        </div>
-      </div>
-    </template>
-  </DocumentUnitWrapper>
+    <div v-else class="spinner">
+      <h2>Überprüfung der Daten ...</h2>
+    </div>
+  </div>
 </template>
 
 <style lang="scss" scoped>

@@ -13,6 +13,7 @@ type Props = {
   rows?: number
   size?: "regular" | "medium" | "small"
   hasError?: boolean
+  customClasses?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -23,6 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
   resize: "none",
   rows: 2,
   size: "regular",
+  customClasses: "",
 })
 
 const emit = defineEmits<{
@@ -47,7 +49,7 @@ const textareaRef = ref<HTMLTextAreaElement | null>(null)
 
 const height = ref("auto")
 
-async function datermineTextareHeight() {
+async function determineTextareaHeight() {
   if (!props.autosize || !textareaRef.value) return
 
   // We first need to reset the height to auto, so that the scrollHeight
@@ -63,19 +65,21 @@ async function datermineTextareHeight() {
   const borderTop = parseInt(borderTopWidth)
   const borderBottom = parseInt(borderBottomWidth)
 
-  height.value = `${
+  const calculatedHeight =
     textareaRef.value.scrollHeight + borderTop + borderBottom
-  }px`
+  if (calculatedHeight > 0) {
+    height.value = `${calculatedHeight}px`
+  }
 }
 
 watchEffect(() => {
-  datermineTextareHeight().catch(() => {
+  determineTextareaHeight().catch(() => {
     // left blank intentionally
   })
 })
 
 watch(localValue, async () => {
-  await datermineTextareHeight()
+  await determineTextareaHeight()
 })
 
 /* -------------------------------------------------- *
@@ -98,10 +102,10 @@ defineExpose({ focus })
     class="ds-input h-unset py-12"
     :class="{
       'has-error': hasError,
-      'overflow-hidden': autosize,
       'px-16': size === 'small',
       'px-20': size === 'medium',
       'px-24': size === 'regular',
+      [customClasses]: true,
       [$style.textarea]: true,
     }"
     :placeholder="placeholder"

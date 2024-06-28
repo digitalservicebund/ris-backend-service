@@ -1,33 +1,34 @@
 <script lang="ts" setup>
-import { useHead } from "@unhead/vue"
-import { onMounted, ref } from "vue"
+import { ref } from "vue"
 import { useRoute } from "vue-router"
 import DocumentUnitAttachments from "@/components/DocumentUnitAttachments.vue"
 import RouteErrorDisplay from "@/components/RouteErrorDisplay.vue"
 import DocumentUnit from "@/domain/documentUnit"
-import documentUnitService from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
 
-const props = defineProps<{ documentNumber: string }>()
+defineProps<{ documentUnit: DocumentUnit }>()
 
-const documentUnit = ref<DocumentUnit>()
-
-useHead({
-  title: props.documentNumber + " · NeuRIS Rechtsinformationssystem",
-})
+const emit = defineEmits<{
+  attachmentsUploaded: [boolean]
+  attachmentIndexSelected: [number]
+  attachmentIndexDeleted: [number]
+}>()
 const route = useRoute()
 
 const error = ref<ResponseError>()
 
-async function loadDocumentUnit() {
-  const response = await documentUnitService.getByDocumentNumber(
-    props.documentNumber,
-  )
-  documentUnit.value = response.data
-  error.value = response.error
+async function attachmentsUploaded(anySuccessful: boolean) {
+  emit("attachmentsUploaded", anySuccessful)
 }
 
-onMounted(() => loadDocumentUnit())
+async function attachmentIndexSelected(index: number) {
+  console.log("emit from files")
+  emit("attachmentIndexSelected", index)
+}
+
+async function attachmentIndexDeleted(index: number) {
+  emit("attachmentIndexDeleted", index)
+}
 </script>
 
 <template>
@@ -39,7 +40,9 @@ onMounted(() => loadDocumentUnit())
         ? route.query.showNavigationPanel === 'true'
         : true
     "
-    @update-document-unit="loadDocumentUnit"
+    @attachment-index-deleted="attachmentIndexDeleted"
+    @attachment-index-selected="attachmentIndexSelected"
+    @attachments-uploaded="attachmentsUploaded"
   />
   <RouteErrorDisplay v-else :error="error" />
 </template>

@@ -1,33 +1,33 @@
 <script setup lang="ts">
-import { useHead } from "@unhead/vue"
-import { useRoute } from "vue-router"
 import DocumentUnitCategories from "@/components/DocumentUnitCategories.vue"
-import ErrorPage from "@/components/ErrorPage.vue"
-import documentUnitService from "@/services/documentUnitService"
+import { ValidationError } from "@/components/input/types"
+import DocumentUnit from "@/domain/documentUnit"
 
-const props = defineProps<{
-  documentNumber: string
+defineProps<{
+  documentUnit: DocumentUnit
+  validationErrors: ValidationError[]
 }>()
 
-useHead({
-  title: props.documentNumber + " · NeuRIS Rechtsinformationssystem",
-})
+const emits = defineEmits<{
+  documentUnitUpdatedLocally: [DocumentUnit]
+  saveDocumentUnitToServer: []
+}>()
 
-const route = useRoute()
+function documentUnitUpdatedLocally(updatedDocumentUnit: DocumentUnit) {
+  emits("documentUnitUpdatedLocally", updatedDocumentUnit)
+}
 
-const { data: documentUnit, error } =
-  await documentUnitService.getByDocumentNumber(props.documentNumber)
+function saveDocumentUnitToServer() {
+  emits("saveDocumentUnitToServer")
+}
 </script>
 
 <template>
   <DocumentUnitCategories
     v-if="documentUnit"
     :document-unit="documentUnit"
-    :show-navigation-panel="
-      route.query.showNavigationPanel
-        ? route.query.showNavigationPanel === 'true'
-        : true
-    "
+    :validation-errors="validationErrors"
+    @document-unit-updated-locally="documentUnitUpdatedLocally"
+    @save-document-unit-to-server="saveDocumentUnitToServer"
   />
-  <ErrorPage v-else :error="error" :title="error?.title" />
 </template>
