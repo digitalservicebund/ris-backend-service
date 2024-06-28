@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, toRefs, Ref, onMounted } from "vue"
+import { computed, ref, toRefs, Ref, onMounted, watch } from "vue"
 import { useRoute } from "vue-router"
 import AttachmentViewSidePanel from "@/components/AttachmentViewSidePanel.vue"
 import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContentRelatedIndexing.vue"
@@ -15,12 +15,15 @@ import PreviousDecisions from "@/components/PreviousDecisions.vue"
 import { useProvideCourtType } from "@/composables/useCourtType"
 import useQuery from "@/composables/useQueryFromRoute"
 import { useScrollToHash } from "@/composables/useScrollToHash"
-import DocumentUnit, { Texts, CoreData } from "@/domain/documentUnit"
+import DocumentUnit, {
+  ContentRelatedIndexing,
+  Texts,
+} from "@/domain/documentUnit"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import PreviousDecision from "@/domain/previousDecision"
-import documentUnitService from "@/services/documentUnitService"
 import FeatureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
@@ -31,12 +34,12 @@ const validationErrors = ref<ValidationError[]>([])
 const route = useRoute()
 const courtTypeRef = ref<string>(props.documentUnit.coreData.court?.type ?? "")
 const notesFeatureToggle = ref(false)
+const store = useDocumentUnitStore()
 
 const showExtraContentPanelRef: Ref<boolean> = ref(false)
 
 const { pushQueryToRoute } = useQuery<"showAttachmentPanel">()
 
-const lastUpdatedDocumentUnit = ref()
 const selectedAttachmentIndex: Ref<number> = ref(0)
 
 const courtTypesWithLegalForce = [
@@ -59,25 +62,6 @@ const shouldDeleteLegalForces = computed(() => {
   )
 })
 
-const handleUpdateValueDocumentUnitTexts = async (
-  updatedValue: [keyof Texts, string],
-) => {
-  const divElem = document.createElement("div")
-  divElem.innerHTML = updatedValue[1]
-  const hasImgElem = divElem.getElementsByTagName("img").length > 0
-  const hasTable = divElem.getElementsByTagName("table").length > 0
-  const hasInnerText = divElem.innerText.length > 0
-  updatedDocumentUnit.value.texts[updatedValue[0]] =
-    hasInnerText || hasImgElem || hasTable ? updatedValue[1] : ""
-}
-
-function hasDataChange(): boolean {
-  const newValue = JSON.stringify(updatedDocumentUnit.value)
-  const oldValue = JSON.stringify(lastUpdatedDocumentUnit.value)
-
-  return newValue !== oldValue
-}
-
 /**
  * Deletes the legal forces from all single norms in the norms of the updated document unit.
  */
@@ -95,18 +79,8 @@ function deleteLegalForces() {
 }
 
 async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
-  if (!hasDataChange())
-    return {
-      status: 304,
-      data: undefined,
-    } as ServiceResponse<void>
-
-  lastUpdatedDocumentUnit.value = JSON.parse(
-    JSON.stringify(updatedDocumentUnit.value),
-  )
-  const response = await documentUnitService.update(
-    lastUpdatedDocumentUnit.value,
-  )
+  // Create patch and update
+  const response = await store.updateDocumentUnit()
 
   if (response?.error?.validationErrors) {
     validationErrors.value = response.error.validationErrors
@@ -114,68 +88,57 @@ async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
     validationErrors.value = []
   }
 
-  if (!hasDataChange() && response.data) {
-    updatedDocumentUnit.value = response.data as DocumentUnit
+  if (response.data) {
+    // Update store with current backend version
+    store.documentUnit = response.data as DocumentUnit
   }
 
   return response as ServiceResponse<void>
 }
 
+const handleUpdateValueDocumentUnitTexts = async (
+  updatedValue: [keyof Texts, string],
+) => {
+  const divElem = document.createElement("div")
+  divElem.innerHTML = updatedValue[1]
+  const hasImgElem = divElem.getElementsByTagName("img").length > 0
+  const hasTable = divElem.getElementsByTagName("table").length > 0
+  const hasInnerText = divElem.innerText.length > 0
+  store.documentUnit!.texts[updatedValue[0]] =
+    hasInnerText || hasImgElem || hasTable ? updatedValue[1] : ""
+}
+
 const coreData = computed({
-  get: () => updatedDocumentUnit.value.coreData,
-  set: (newValues) => {
-    let triggerSaving = false
-    if (
-      (["court", "procedure"] as (keyof CoreData)[]).some(
-        (property) =>
-          updatedDocumentUnit.value.coreData[property] !== newValues[property],
-      )
-    ) {
-      triggerSaving = true
-    }
-
-    // --- TRANSFORMATION OF DATA
-
-    newValues.fileNumbers = newValues.fileNumbers ?? []
-    newValues.deviatingFileNumbers = newValues.deviatingFileNumbers ?? []
-    newValues.deviatingCourts = newValues.deviatingCourts ?? []
-    newValues.deviatingEclis = newValues.deviatingEclis ?? []
-    newValues.deviatingDecisionDates = newValues.deviatingDecisionDates ?? []
-    newValues.leadingDecisionNormReferences =
-      newValues.leadingDecisionNormReferences ?? []
-
-    // ---
-
-    Object.assign(updatedDocumentUnit.value.coreData, newValues)
+  get: () => store.documentUnit!.coreData,
+  set: async (newValues) => {
+    store.documentUnit!.coreData = newValues
     courtTypeRef.value = updatedDocumentUnit.value.coreData.court?.type ?? ""
     // When the user changes the court to one that doesn't allow "Gesetzeskraft" all existing legal forces are deleted
     if (shouldDeleteLegalForces.value) {
       deleteLegalForces()
     }
-    if (triggerSaving) {
-      handleUpdateDocumentUnit()
-    }
   },
 })
 
 const previousDecisions = computed({
-  get: () => updatedDocumentUnit.value.previousDecisions as PreviousDecision[],
+  get: () => store.documentUnit!.previousDecisions as PreviousDecision[],
   set: (newValues) => {
-    updatedDocumentUnit.value.previousDecisions = newValues
+    store.documentUnit!.previousDecisions = newValues
   },
 })
 
 const ensuingDecisions = computed({
-  get: () => updatedDocumentUnit.value.ensuingDecisions as EnsuingDecision[],
+  get: () => store.documentUnit!.ensuingDecisions as EnsuingDecision[],
   set: (newValues) => {
-    updatedDocumentUnit.value.ensuingDecisions = newValues
+    store.documentUnit!.ensuingDecisions = newValues
   },
 })
 
 const contentRelatedIndexing = computed({
-  get: () => (updatedDocumentUnit.value as DocumentUnit).contentRelatedIndexing,
+  get: () =>
+    store.documentUnit!.contentRelatedIndexing as ContentRelatedIndexing,
   set: (newValues) => {
-    Object.assign(updatedDocumentUnit.value.contentRelatedIndexing, newValues)
+    store.documentUnit!.contentRelatedIndexing = newValues
   },
 })
 
@@ -206,11 +169,21 @@ onMounted(async () => {
       !!props.documentUnit.note || props.documentUnit.hasAttachments
   }
 })
+
+watch(
+  () => props.documentUnit,
+  () => {
+    setTimeout(() => {
+      handleUpdateDocumentUnit()
+    }, 5000)
+  },
+  { deep: true },
+)
 </script>
 
 <template>
   <DocumentUnitWrapper
-    :document-unit="updatedDocumentUnit as DocumentUnit"
+    :document-unit="props.documentUnit as DocumentUnit"
     :save-callback="handleUpdateDocumentUnit"
     :show-navigation-panel="showNavigationPanel"
   >

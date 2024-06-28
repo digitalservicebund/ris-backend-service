@@ -65,6 +65,7 @@
     "@unleash/proxy-client-vue": "^0.1.2",
     "axios": "^1.7.2",
     "dayjs": "^1.11.11",
+    "fast-json-patch": "^3.1.1",
     "immer": "^10.1.1",
     "maska": "^2.1.11",
     "pinia": "^2.1.7",
