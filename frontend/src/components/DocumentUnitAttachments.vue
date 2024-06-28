@@ -72,12 +72,12 @@ const handleOnSelect = (index: number) => {
 const handleOnDelete = (index: number) => {
   errors.value = []
   deletingAttachmentIndex.value = index
-  toggleDeleteModal()
+  openDeleteModal()
 }
 
 const deleteFile = (index: number) => {
   handleDeleteAttachment(index)
-  toggleDeleteModal()
+  closeDeleteModal()
 }
 
 async function upload(files: FileList) {
@@ -108,18 +108,23 @@ async function upload(files: FileList) {
   }
 }
 
-function toggleDeleteModal() {
-  showDeleteModal.value = !showDeleteModal.value
-  if (showDeleteModal.value) {
+function openDeleteModal() {
+  const attachmentToBeDeleted =
+    props.documentUnit.attachments?.[deletingAttachmentIndex.value]?.name
+  if (attachmentToBeDeleted != null) {
+    showDeleteModal.value = true
     const scrollLeft = document.documentElement.scrollLeft
     const scrollTop = document.documentElement.scrollTop
     window.onscroll = () => {
       window.scrollTo(scrollLeft, scrollTop)
     }
-  } else {
-    window.onscroll = () => {
-      return
-    }
+  }
+}
+
+function closeDeleteModal() {
+  showDeleteModal.value = false
+  window.onscroll = () => {
+    return
   }
 }
 </script>
@@ -127,19 +132,14 @@ function toggleDeleteModal() {
 <template>
   <FlexItem class="w-full flex-1 grow space-y-20 p-24">
     <PopupModal
-      v-if="
-        showDeleteModal &&
-        props.documentUnit.attachments[deletingAttachmentIndex] !== undefined &&
-        props.documentUnit.attachments[deletingAttachmentIndex] !== null &&
-        props.documentUnit.attachments[deletingAttachmentIndex].name != null
-      "
+      v-if="showDeleteModal"
       :aria-label="deleteModalHeaderText"
       cancel-button-type="tertiary"
       confirm-button-type="destructive"
       confirm-text="Löschen"
       :content-text="`Möchten Sie den Anhang ${getAttachment(deletingAttachmentIndex).name} wirklich dauerhaft löschen?`"
       :header-text="deleteModalHeaderText"
-      @close-modal="toggleDeleteModal"
+      @close-modal="closeDeleteModal"
       @confirm-action="deleteFile(deletingAttachmentIndex)"
     />
     <TitleElement class="mb-0">Dokumente</TitleElement>
