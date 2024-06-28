@@ -52,7 +52,7 @@ jacoco {
 }
 
 lombok {
-    version = "1.18.32"
+    version = "1.18.34"
 }
 
 springBoot {
