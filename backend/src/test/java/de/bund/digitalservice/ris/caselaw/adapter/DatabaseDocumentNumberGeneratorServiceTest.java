@@ -10,7 +10,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DateUtil;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberFormatterException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberPatternException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitExistsException;
 import java.util.Optional;
 import java.util.UUID;
@@ -77,7 +76,7 @@ class DatabaseDocumentNumberGeneratorServiceTest {
   }
 
   @Test
-  void shouldKeepTrying_ifDocumentNumberExists() {
+  void shouldThrowException_ifDocumentNumberExists() {
     var nextDocumentNumber = generateDefaultDocumentNumber();
 
     DocumentationUnitDTO documentationUnitDTO =
@@ -90,8 +89,8 @@ class DatabaseDocumentNumberGeneratorServiceTest {
         .thenReturn(Optional.of(documentationUnitDTO));
 
     assertThatThrownBy(() -> service.generateDocumentNumber(DEFAULT_ABBREVIATION))
-        .isInstanceOf(DocumentationUnitException.class)
-        .hasMessageContaining("Could not generate Document number");
+        .isInstanceOf(DocumentationUnitExistsException.class)
+        .hasMessageContaining("Document number already exists: " + nextDocumentNumber);
   }
 
   @Test
