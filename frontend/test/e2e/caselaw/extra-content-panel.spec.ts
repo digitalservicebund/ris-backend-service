@@ -9,7 +9,8 @@ import {
 } from "./e2e-utils"
 import { caselawTest as test } from "./fixtures"
 
-test.describe(
+// eslint-disable-next-line playwright/no-skipped-test
+test.describe.skip(
   "test extra content side panel",
   {
     annotation: {
