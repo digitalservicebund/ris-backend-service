@@ -35,9 +35,6 @@ public class DocumentUnitService {
   private final DocumentNumberRecyclingService documentNumberRecyclingService;
   private final Validator validator;
 
-  @Value("${otc.obs.bucket-name}")
-  private String bucketName;
-
   @Value("${mail.exporter.recipientAddress:neuris@example.com}")
   private String recipientAddress;
 
@@ -63,7 +60,7 @@ public class DocumentUnitService {
 
   @Transactional(transactionManager = "jpaTransactionManager")
   public DocumentUnit generateNewDocumentUnit(DocumentationOffice documentationOffice)
-      throws DocumentationUnitNotExistsException, DocumentationUnitException {
+      throws DocumentationUnitException {
     var documentNumber = generateDocumentNumber(documentationOffice);
     return repository.createNewDocumentUnit(documentNumber, documentationOffice);
   }

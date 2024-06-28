@@ -79,7 +79,6 @@ class NormAbbreviationIntegrationTest {
           .officialShortTitle("official short title 2")
           .source("T")
           .build();
-  ;
   private NormAbbreviationDTO abbreviation3 =
       NormAbbreviationDTO.builder()
           .abbreviation("in the middle the query search is located")
@@ -217,7 +216,7 @@ class NormAbbreviationIntegrationTest {
     NormAbbreviation expectedNormAbbreviation =
         new NormAbbreviationTestBuilder()
             .getExpectedNormAbbreviation()
-            .addDocumentType(documentType1.getId(), "L")
+            .addDocumentType(documentType1.getId())
             .setRegion(region2.getId())
             .build();
 
@@ -272,7 +271,7 @@ class NormAbbreviationIntegrationTest {
     NormAbbreviation expectedNormAbbreviation =
         new NormAbbreviationTestBuilder()
             .getExpectedNormAbbreviation()
-            .addDocumentType(documentType1.getId(), "L")
+            .addDocumentType(documentType1.getId())
             .build();
 
     risWebTestClient
@@ -325,8 +324,8 @@ class NormAbbreviationIntegrationTest {
     NormAbbreviation expectedNormAbbreviation =
         new NormAbbreviationTestBuilder()
             .getExpectedNormAbbreviation()
-            .addDocumentType(documentType1.getId(), "L")
-            .addDocumentType(documentType2.getId(), "M")
+            .addDocumentType(documentType1.getId())
+            .addDocumentType(documentType2.getId())
             .build();
 
     risWebTestClient
@@ -599,8 +598,7 @@ class NormAbbreviationIntegrationTest {
       return this;
     }
 
-    private NormAbbreviationTestBuilder addDocumentType(
-        UUID documentTypeUuid, String categoryLabel) {
+    private NormAbbreviationTestBuilder addDocumentType(UUID documentTypeUuid) {
       DocumentTypeDTO documentTypeNewDTO =
           documentTypeRepository.findById(documentTypeUuid).orElse(null);
       if (documentTypeNewDTO == null) {

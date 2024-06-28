@@ -74,7 +74,7 @@ public class DocumentUnitController {
     try {
       var documentUnit = service.generateNewDocumentUnit(docOffice);
       return ResponseEntity.status(HttpStatus.CREATED).body(documentUnit);
-    } catch (DocumentationUnitNotExistsException | DocumentationUnitException e) {
+    } catch (DocumentationUnitException e) {
       log.error("error in generate new documentation unit", e);
       return ResponseEntity.internalServerError().body(DocumentUnit.builder().build());
     }

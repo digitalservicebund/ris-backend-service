@@ -36,8 +36,6 @@ class AuthIntegrationTest {
   static PostgreSQLContainer<?> postgreSQLContainer =
       new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
 
-  ;
-
   @DynamicPropertySource
   static void registerDynamicProperties(DynamicPropertyRegistry registry) {
     registry.add("database.user", () -> postgreSQLContainer.getUsername());

@@ -83,11 +83,9 @@ public class AuthService {
 
   private boolean userHasSameDocOfficeAsDocument(DocumentUnit documentUnit) {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (authentication != null && authentication.getPrincipal() instanceof OidcUser) {
-      OidcUser principal = (OidcUser) authentication.getPrincipal();
+    if (authentication != null && authentication.getPrincipal() instanceof OidcUser principal) {
       DocumentationOffice documentationOffice = userService.getDocumentationOffice(principal);
-      return documentationOffice != null
-          && documentUnit.coreData().documentationOffice().equals(documentationOffice);
+      return documentUnit.coreData().documentationOffice().equals(documentationOffice);
     }
     return false;
   }

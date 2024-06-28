@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.jayway.jsonpath.JsonPath;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentTypeController;
@@ -19,8 +18,6 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.Docume
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
 import org.assertj.core.groups.Tuple;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -66,12 +63,6 @@ class DocumentTypeIntegrationTest {
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private DocumentUnitService service;
 
-  @BeforeEach()
-  void init() {}
-
-  @AfterEach
-  void cleanUp() {}
-
   @Test
   void testGetAllDocumentTypes() {
     risWebTestClient
@@ -84,7 +75,6 @@ class DocumentTypeIntegrationTest {
         .expectBody(new TypeReference<List<DocumentType>>() {})
         .consumeWith(
             response -> {
-              List<String> labels = JsonPath.read(response.getResponseBody(), "$[*].jurisShortcut");
               assertThat(response.getResponseBody())
                   .extracting("jurisShortcut", "label")
                   .containsExactly(
@@ -107,7 +97,6 @@ class DocumentTypeIntegrationTest {
         .expectBody(new TypeReference<List<DocumentType>>() {})
         .consumeWith(
             response -> {
-              List<String> labels = JsonPath.read(response.getResponseBody(), "$[*].jurisShortcut");
               assertThat(response.getResponseBody())
                   .extracting("jurisShortcut", "label")
                   .containsExactly(

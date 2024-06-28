@@ -492,14 +492,6 @@ class PreviousDecisionIntegrationTest {
             "DS",
             Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
 
-    var du4 =
-        createDocumentUnit(
-            date,
-            List.of("AkteZ"),
-            "EF",
-            "CC-RIS",
-            Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build());
-
     var du5 =
         createDocumentUnit(
             date,
@@ -550,13 +542,13 @@ class PreviousDecisionIntegrationTest {
   }
 
   private RisBodySpec<SliceTestImpl<PreviousDecision>> simulateAPICall(
-      PreviousDecision PreviousDecisionSearchInput) {
+      PreviousDecision previousDecision) {
     return risWebTestClient
         .withDefaultLogin()
         .put()
         .uri(
             "/api/v1/caselaw/documentunits/KORE000000000/search-linkable-documentation-units?pg=0&sz=30")
-        .bodyValue(PreviousDecisionSearchInput)
+        .bodyValue(previousDecision)
         .exchange()
         .expectStatus()
         .isOk()
