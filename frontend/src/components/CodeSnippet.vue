@@ -25,7 +25,7 @@ watch(
 <template>
   <div class="xml-container flex flex-col gap-24 text-base">
     <p class="ds-label-01-bold">{{ title }}</p>
-    <div class="code-lines border-1 border-solid border-white">
+    <div class="border-1 border-solid border-white">
       <div v-for="(line, index) in codeLines" :key="index" class="code-line">
         <code
           class="line-number"
@@ -44,12 +44,6 @@ watch(
 
 <style lang="scss" scoped>
 .xml-container {
-  .code-lines {
-    overflow: auto;
-    width: 65vw;
-    white-space: nowrap;
-  }
-
   .code-line {
     display: flex;
     box-sizing: border-box;
@@ -67,7 +61,8 @@ watch(
 
     .line {
       padding-left: 20px;
-      white-space: pre;
+      overflow-wrap: break-word;
+      white-space: pre-wrap;
     }
   }
 }
