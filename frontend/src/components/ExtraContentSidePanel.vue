@@ -151,8 +151,6 @@ onMounted(() => {
             v-if="
               documentUnit.uuid &&
               documentUnit.attachments &&
-              currentAttachmentIndex != null &&
-              documentUnit.attachments[currentAttachmentIndex] &&
               documentUnit.attachments[currentAttachmentIndex]?.s3path
             "
             :document-unit-uuid="documentUnit.uuid"
