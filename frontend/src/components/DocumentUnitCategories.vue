@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, toRefs, Ref, onMounted } from "vue"
+import { computed, ref, toRefs, Ref, onMounted, watch } from "vue"
 import { useRoute } from "vue-router"
 import AttachmentViewSidePanel from "@/components/AttachmentViewSidePanel.vue"
 import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContentRelatedIndexing.vue"
@@ -169,6 +169,16 @@ onMounted(async () => {
       !!props.documentUnit.note || props.documentUnit.hasAttachments
   }
 })
+
+watch(
+  () => props.documentUnit,
+  () => {
+    setTimeout(() => {
+      handleUpdateDocumentUnit()
+    }, 5000)
+  },
+  { deep: true },
+)
 </script>
 
 <template>
