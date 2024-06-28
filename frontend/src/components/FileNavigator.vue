@@ -34,7 +34,10 @@ const decreaseFileIndex = () => {
 </script>
 
 <template>
-  <FlexContainer v-if="attachments.length > 1" class="float-end items-center">
+  <FlexContainer
+    v-if="attachments.length > 1"
+    class="float-end items-center gap-4"
+  >
     <FlexItem class="ds-label-01-bold self-center">
       {{ props.attachments[currentIndex].name }}
     </FlexItem>
