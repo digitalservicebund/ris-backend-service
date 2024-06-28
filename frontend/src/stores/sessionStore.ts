@@ -5,12 +5,10 @@ import { Env } from "@/domain/env"
 import { User } from "@/domain/user"
 import adminService from "@/services/adminService"
 import authService from "@/services/authService"
-import featureToggleService from "@/services/featureToggleService"
 
 type SessionStore = {
   user: Ref<User | undefined>
   env: Ref<Env | undefined>
-  featureToggles: Ref<Record<string, boolean>>
   isAuthenticated: () => Promise<boolean>
   initSession: () => Promise<void>
 }
@@ -18,7 +16,6 @@ type SessionStore = {
 const useSessionStore = defineStore("session", (): SessionStore => {
   const user = ref<User>()
   const env = ref<Env>()
-  const featureToggles = ref<Record<string, boolean>>({})
 
   async function fetchUser(): Promise<User | undefined> {
     return (await authService.getName()).data ?? undefined
@@ -26,10 +23,6 @@ const useSessionStore = defineStore("session", (): SessionStore => {
 
   async function fetchEnv(): Promise<Env | undefined> {
     return (await adminService.getEnv()).data
-  }
-
-  async function fetchFeatureToggles(): Promise<Record<string, boolean>> {
-    return featureToggleService.getEnabledToggles()
   }
 
   /**
@@ -47,10 +40,9 @@ const useSessionStore = defineStore("session", (): SessionStore => {
     env.value = await fetchEnv()
     const favicon = document.getElementById("favicon") as HTMLAnchorElement
     favicon.href = useFavicon(env.value).value
-    featureToggles.value = await fetchFeatureToggles()
   }
 
-  return { user, env, featureToggles, isAuthenticated, initSession }
+  return { user, env, isAuthenticated, initSession }
 })
 
 export default useSessionStore
