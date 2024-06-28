@@ -125,7 +125,7 @@ function onDelete() {
         data-testid="listEntry"
       >
         <CellItem>
-          <FlexContainer class="space-x-8">
+          <FlexContainer align-items="items-center" class="space-x-8">
             <FlexItem class="flex-grow"
               >{{ listEntry.documentNumber }}
             </FlexItem>
