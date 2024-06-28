@@ -51,7 +51,6 @@ export enum OpeningDirection {
       class="w-icon absolute top-28 z-20 flex min-h-32 min-w-32 items-center justify-center rounded-full border-1 border-solid border-gray-400 bg-white text-gray-900"
       :class="buttonClasses"
       @click="toggle"
-      @keydown.enter="toggle"
     >
       <IconChevronLeft
         v-if="

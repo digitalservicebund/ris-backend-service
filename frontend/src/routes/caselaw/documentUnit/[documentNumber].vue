@@ -134,7 +134,6 @@ onMounted(async () => {
         label="Navigation"
         tabindex="0"
         test-id="side-toggle-navigation"
-        @keydown.enter="toggleNavigationPanel"
         @update:is-expanded="toggleNavigationPanel"
       >
         <NavbarSide :is-child="false" :menu-items="menuItems" :route="route" />
