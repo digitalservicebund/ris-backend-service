@@ -29,4 +29,50 @@ test.describe("test navigation panel", () => {
     await expect(page.locator("aside", { hasText: "Rubriken" })).toBeHidden()
     await expect(page).toHaveURL(/showNavigationPanel=false/)
   })
+
+  test("keyboard accessibility", async ({ page, documentNumber }) => {
+    await navigateToCategories(page, documentNumber)
+    await page.getByRole("button", { name: "Navigation schließen" }).click()
+    await expect(
+      page.getByRole("button", { name: "Navigation öffnen" }),
+    ).toBeFocused()
+    await page.keyboard.press("Enter")
+    await expect(
+      page.getByRole("button", { name: "Navigation schließen" }),
+    ).toBeFocused()
+    await page.keyboard.press("Enter")
+    await expect(
+      page.getByRole("button", { name: "Navigation öffnen" }),
+    ).toBeFocused()
+    await page.keyboard.press("Enter")
+    await expect(
+      page.getByRole("button", { name: "Navigation schließen" }),
+    ).toBeFocused()
+    await page.keyboard.press("Tab")
+    await expect(page.getByRole("link", { name: "Rubriken" })).toBeFocused()
+    await page.keyboard.press("Tab")
+    await expect(page.getByRole("link", { name: "Stammdaten" })).toBeFocused()
+    await page.keyboard.press("Tab")
+    await expect(page.getByRole("link", { name: "Rechtszug" })).toBeFocused()
+    await page.keyboard.press("Tab")
+    await expect(
+      page.getByRole("link", { name: "Inhaltliche Erschließung" }),
+    ).toBeFocused()
+    await page.keyboard.press("Tab")
+    await expect(
+      page.getByRole("link", { name: "Kurz- & Langtexte" }),
+    ).toBeFocused()
+    await page.keyboard.press("Tab")
+    await expect(page.getByRole("link", { name: "Dokumente" })).toBeFocused()
+    await page.keyboard.press("Enter")
+    await expect(
+      page.getByText("Ziehen Sie Ihre Dateien in diesen Bereich."),
+    ).toBeVisible()
+    await page.keyboard.press("Tab")
+    await expect(
+      page.getByRole("link", { name: "Veröffentlichen" }),
+    ).toBeFocused()
+    await page.keyboard.press("Enter")
+    await expect(page.getByText("Plausibilitätsprüfung")).toBeVisible()
+  })
 })

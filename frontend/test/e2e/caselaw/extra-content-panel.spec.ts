@@ -165,5 +165,66 @@ test.describe(
         })
       },
     )
+
+    test("keyboard accessibility", async ({ page, documentNumber }) => {
+      await test.step("prepare doc unit with attachments", async () => {
+        await navigateToFiles(page, documentNumber)
+        await uploadTestfile(page, "sample.docx")
+        await uploadTestfile(page, "some-formatting.docx")
+      })
+
+      await test.step("test opening and closing panel with keyboard", async () => {
+        await navigateToCategories(page, documentNumber)
+        await page
+          .getByRole("button", { name: "Dokumentansicht schließen" })
+          .click()
+        await expect(
+          page.getByRole("button", { name: "Dokumentansicht öffnen" }),
+        ).toBeFocused()
+        await page.keyboard.press("Enter")
+        await expect(
+          page.getByRole("button", { name: "Dokumentansicht schließen" }),
+        ).toBeFocused()
+      })
+
+      await test.step("test content selection with keyboard", async () => {
+        await page.keyboard.press("Tab")
+        await expect(
+          page.getByRole("button", { name: "Notiz anzeigen" }),
+        ).toBeFocused()
+        await page.keyboard.press("Enter")
+        await expect(page.getByText("Notiz")).toBeVisible()
+        await page.keyboard.press("Tab")
+        await expect(
+          page.getByRole("button", { name: "Dokumente anzeigen" }),
+        ).toBeFocused()
+        await page.keyboard.press("Enter")
+        await expect(page.getByText("sample.docx")).toBeVisible()
+      })
+
+      await test.step("test document selection with keyboard", async () => {
+        await page.keyboard.press("Tab")
+        await expect(
+          page.getByRole("button", { name: "Vorheriges Dokument anzeigen" }),
+        ).toBeFocused()
+        await page.keyboard.press("Tab")
+        await expect(
+          page.getByRole("button", { name: "Nächstes Dokument anzeigen" }),
+        ).toBeFocused()
+        await expect(page.getByText("sample.docx")).toBeVisible()
+        await page.keyboard.press("Enter")
+        await expect(page.getByText("some-formatting.docx")).toBeVisible()
+        await page.keyboard.press("Enter")
+        await expect(page.getByText("sample.docx")).toBeVisible()
+        await page.keyboard.press("Shift+Tab")
+        await expect(
+          page.getByRole("button", { name: "Vorheriges Dokument anzeigen" }),
+        ).toBeFocused()
+        await page.keyboard.press("Enter")
+        await expect(page.getByText("some-formatting.docx")).toBeVisible()
+        await page.keyboard.press("Enter")
+        await expect(page.getByText("sample.docx")).toBeVisible()
+      })
+    })
   },
 )
