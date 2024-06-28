@@ -80,8 +80,6 @@ class DatabaseDocumentNumberGeneratorServiceTest {
   void shouldKeepTrying_ifDocumentNumberExists() {
     var nextDocumentNumber = generateDefaultDocumentNumber();
 
-    int attempts = 3;
-
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitDTO.builder()
             .id(UUID.randomUUID())
@@ -91,7 +89,7 @@ class DatabaseDocumentNumberGeneratorServiceTest {
     when(databaseDocumentationUnitRepository.findByDocumentNumber(nextDocumentNumber))
         .thenReturn(Optional.of(documentationUnitDTO));
 
-    assertThatThrownBy(() -> service.generateDocumentNumber(DEFAULT_ABBREVIATION, attempts))
+    assertThatThrownBy(() -> service.generateDocumentNumber(DEFAULT_ABBREVIATION))
         .isInstanceOf(DocumentationUnitException.class)
         .hasMessageContaining("Could not generate Document number");
   }
@@ -99,9 +97,8 @@ class DatabaseDocumentNumberGeneratorServiceTest {
   @Test
   void shouldStopTrying_ifPatternIsInvalid() {
     var docOfficeAbbreviation = "NOT_IN_NUMBER_PATTERN_PROPERTIES";
-    int attempts = 3;
 
-    assertThatThrownBy(() -> service.generateDocumentNumber(docOfficeAbbreviation, attempts))
+    assertThatThrownBy(() -> service.generateDocumentNumber(docOfficeAbbreviation))
         .isInstanceOf(DocumentNumberPatternException.class)
         .hasMessageContaining(
             "Could not " + "find pattern for abbreviation " + docOfficeAbbreviation);

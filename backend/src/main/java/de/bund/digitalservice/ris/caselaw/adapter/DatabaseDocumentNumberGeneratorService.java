@@ -9,13 +9,13 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberFormatterExceptio
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberPatternException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import jakarta.validation.constraints.NotEmpty;
 import java.time.Year;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /** Service to generate the next available doc unit number based on documentation office */
 @Service
@@ -38,32 +38,6 @@ public class DatabaseDocumentNumberGeneratorService implements DocumentNumberSer
   }
 
   /**
-   * A recursive function to attempt generating a document office identifier by incrementing the
-   * sequence up to a maximum number of tries. If the pattern is incorrect or there are no available
-   * document numbers left, the function will terminate with an error.
-   *
-   * @param documentationOfficeAbbreviation The abbreviation of the documentation office.
-   * @param attempts The maximum number of attempts to generate the document number.
-   * @return The generated next available document number to use.
-   * @throws DocumentNumberPatternException If the pattern for generating document numbers is
-   *     invalid.
-   * @throws DocumentNumberFormatterException If there is an issue with formatting the document
-   *     number.
-   */
-  @Override
-  public String generateDocumentNumber(String documentationOfficeAbbreviation, int attempts)
-      throws DocumentNumberPatternException, DocumentNumberFormatterException {
-    try {
-      return generateDocumentNumber(documentationOfficeAbbreviation);
-    } catch (DocumentationUnitExistsException e) {
-      if (attempts <= 0) {
-        throw new DocumentationUnitException("Could not generate Document number", e);
-      }
-      return generateDocumentNumber(documentationOfficeAbbreviation, attempts - 1);
-    }
-  }
-
-  /**
    * Executes the generation of a document number for the provided documentation office.
    *
    * @param documentationOfficeAbbreviation The abbreviation of the documentation office. Must not
@@ -76,6 +50,7 @@ public class DatabaseDocumentNumberGeneratorService implements DocumentNumberSer
    *     number.
    */
   @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
   public String generateDocumentNumber(@NotEmpty String documentationOfficeAbbreviation)
       throws DocumentNumberPatternException,
           DocumentationUnitExistsException,
@@ -136,6 +111,7 @@ public class DatabaseDocumentNumberGeneratorService implements DocumentNumberSer
     }
   }
 
+  @Transactional(transactionManager = "jpaTransactionManager")
   public Optional<String> recycle(String documentationOfficeAbbreviation) {
     var optionalDeletedDocumentationUnitID =
         documentNumberRecyclingService.findDeletedDocumentNumber(

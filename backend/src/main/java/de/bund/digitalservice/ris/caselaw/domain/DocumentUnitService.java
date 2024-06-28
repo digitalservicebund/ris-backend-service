@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -60,6 +61,7 @@ public class DocumentUnitService {
     this.attachmentService = attachmentService;
   }
 
+  @Transactional(transactionManager = "jpaTransactionManager")
   public DocumentUnit generateNewDocumentUnit(DocumentationOffice documentationOffice)
       throws DocumentationUnitNotExistsException, DocumentationUnitException {
     var documentNumber = generateDocumentNumber(documentationOffice);
@@ -68,7 +70,7 @@ public class DocumentUnitService {
 
   private String generateDocumentNumber(DocumentationOffice documentationOffice) {
     try {
-      return documentNumberService.generateDocumentNumber(documentationOffice.abbreviation(), 5);
+      return documentNumberService.generateDocumentNumber(documentationOffice.abbreviation());
     } catch (Exception e) {
       throw new DocumentationUnitException("Could not generate document number", e);
     }
@@ -125,6 +127,7 @@ public class DocumentUnitService {
     return repository.findByUuid(documentUnitUuid).orElseThrow();
   }
 
+  @Transactional(transactionManager = "jpaTransactionManager")
   public String deleteByUuid(UUID documentUnitUuid) throws DocumentationUnitNotExistsException {
 
     Map<RelatedDocumentationType, Long> relatedEntities =

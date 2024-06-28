@@ -65,7 +65,7 @@ class DocumentUnitServiceTest {
 
     when(repository.createNewDocumentUnit("nextDocumentNumber", documentationOffice))
         .thenReturn(documentUnit);
-    when(documentNumberService.generateDocumentNumber(documentationOffice.abbreviation(), 5))
+    when(documentNumberService.generateDocumentNumber(documentationOffice.abbreviation()))
         .thenReturn("nextDocumentNumber");
     when(documentUnitStatusService.setInitialStatus(documentUnit)).thenReturn(documentUnit);
     // Can we use a captor to check if the document number was correctly created?
@@ -74,7 +74,7 @@ class DocumentUnitServiceTest {
 
     Assertions.assertNotNull(service.generateNewDocumentUnit(documentationOffice));
 
-    verify(documentNumberService).generateDocumentNumber(documentationOffice.abbreviation(), 5);
+    verify(documentNumberService).generateDocumentNumber(documentationOffice.abbreviation());
     verify(repository).createNewDocumentUnit("nextDocumentNumber", documentationOffice);
   }
 
