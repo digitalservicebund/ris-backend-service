@@ -140,9 +140,7 @@ describe("ExtraContentSidePanel", () => {
           })
 
           await screen.findByLabelText(
-            expectedIsOpen
-              ? "Dokumentansicht schließen"
-              : "Dokumentansicht öffnen",
+            expectedIsOpen ? "Seitenpanel schließen" : "Seitenpanel öffnen",
           )
 
           if (expectedIsOpen) {
@@ -161,13 +159,11 @@ describe("ExtraContentSidePanel", () => {
   test("toggle panel open and closed", async () => {
     renderComponent()
 
-    expect(await screen.findByLabelText("Dokumentansicht öffnen")).toBeVisible()
-    screen.getByLabelText("Dokumentansicht öffnen").click()
-    expect(
-      await screen.findByLabelText("Dokumentansicht schließen"),
-    ).toBeVisible()
-    screen.getByLabelText("Dokumentansicht schließen").click()
-    expect(await screen.findByLabelText("Dokumentansicht öffnen")).toBeVisible()
+    expect(await screen.findByLabelText("Seitenpanel öffnen")).toBeVisible()
+    screen.getByLabelText("Seitenpanel öffnen").click()
+    expect(await screen.findByLabelText("Seitenpanel schließen")).toBeVisible()
+    screen.getByLabelText("Seitenpanel schließen").click()
+    expect(await screen.findByLabelText("Seitenpanel öffnen")).toBeVisible()
   })
 
   describe("Select panel content", () => {
@@ -180,7 +176,7 @@ describe("ExtraContentSidePanel", () => {
     test("initially open attachments without note and with attachment", async () => {
       renderComponent({ attachments: [mockAttachment("foo.docx")] })
 
-      await screen.findByLabelText("Dokumentansicht schließen")
+      await screen.findByLabelText("Seitenpanel schließen")
       expect(screen.queryByLabelText("Notiz")).not.toBeInTheDocument()
     })
 

@@ -125,7 +125,7 @@ describe("Document Number Route", () => {
 
       // ExtraContentSidePanel
       expect(
-        screen.getByRole("button", { name: "Dokumentansicht öffnen" }),
+        screen.getByRole("button", { name: "Seitenpanel öffnen" }),
       ).toBeInTheDocument()
 
       // Main route is rendered
@@ -147,7 +147,7 @@ describe("Document Number Route", () => {
 
       // ExtraContentSidePanel
       expect(
-        screen.getByRole("button", { name: "Dokumentansicht öffnen" }),
+        screen.getByRole("button", { name: "Seitenpanel öffnen" }),
       ).toBeInTheDocument()
 
       // Main route is rendered
@@ -169,7 +169,7 @@ describe("Document Number Route", () => {
 
       // ExtraContentSidePanel
       expect(
-        screen.queryByRole("button", { name: "Dokumentansicht öffnen" }),
+        screen.queryByRole("button", { name: "Seitenpanel öffnen" }),
       ).not.toBeInTheDocument()
 
       // Main route is rendered
@@ -194,7 +194,7 @@ describe("Document Number Route", () => {
 
       // ExtraContentSidePanel
       expect(
-        screen.queryByRole("button", { name: "Dokumentansicht öffnen" }),
+        screen.queryByRole("button", { name: "Seitenpanel öffnen" }),
       ).not.toBeInTheDocument()
 
       // Main route is rendered
@@ -229,7 +229,7 @@ describe("Document Number Route", () => {
 
       // ExtraContentSidePanel
       expect(
-        screen.queryByRole("button", { name: "Dokumentansicht öffnen" }),
+        screen.queryByRole("button", { name: "Seitenpanel öffnen" }),
       ).not.toBeInTheDocument()
 
       // Error page is rendered

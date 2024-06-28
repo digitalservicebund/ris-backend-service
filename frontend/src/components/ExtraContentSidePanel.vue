@@ -97,7 +97,7 @@ onMounted(() => {
     <SideToggle
       class="sticky top-[8rem] z-20"
       :is-expanded="isExpanded"
-      label="Dokumentansicht"
+      label="Seitenpanel"
       :opening-direction="OpeningDirection.LEFT"
       tabindex="0"
       @update:is-expanded="togglePanel"

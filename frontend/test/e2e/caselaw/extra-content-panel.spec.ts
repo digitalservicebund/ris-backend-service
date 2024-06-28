@@ -31,7 +31,7 @@ test.describe(
         await test.step("open panel, check empty states", async () => {
           await navigateToCategories(page, documentNumber)
 
-          await page.getByLabel("Dokumentansicht öffnen").click()
+          await page.getByLabel("Seitenpanel öffnen").click()
           await expect(page.getByText("Notiz")).toBeVisible()
           await expect(page.getByLabel("Notiz anzeigen")).toBeVisible()
           await page.getByLabel("Dokumente anzeigen").click()
@@ -44,16 +44,12 @@ test.describe(
 
         await test.step("reload page, check that panel stays open", async () => {
           await page.reload()
-          await expect(
-            page.getByLabel("Dokumentansicht schließen"),
-          ).toBeVisible()
+          await expect(page.getByLabel("Seitenpanel schließen")).toBeVisible()
         })
 
         await test.step("navigate to file upload, check that panel stays open", async () => {
           await navigateToFiles(page, documentNumber)
-          await expect(
-            page.getByLabel("Dokumentansicht schließen"),
-          ).toBeVisible()
+          await expect(page.getByLabel("Seitenpanel schließen")).toBeVisible()
         })
 
         await test.step("upload file, check that is it displayed in the panel", async () => {
@@ -68,18 +64,14 @@ test.describe(
 
         await test.step("navigate to publication, check that panel is not displayed", async () => {
           await navigateToPublication(page, documentNumber)
-          await expect(
-            page.getByLabel("Dokumentansicht schließen"),
-          ).toBeHidden()
-          await expect(page.getByLabel("Dokumentansicht öffnen")).toBeHidden()
+          await expect(page.getByLabel("Seitenpanel schließen")).toBeHidden()
+          await expect(page.getByLabel("Seitenpanel öffnen")).toBeHidden()
         })
 
         await test.step("navigate to preview, check that side panels and info panel are not displayed", async () => {
           await navigateToPreview(page, documentNumber)
-          await expect(
-            page.getByLabel("Dokumentansicht schließen"),
-          ).toBeHidden()
-          await expect(page.getByLabel("Dokumentansicht öffnen")).toBeHidden()
+          await expect(page.getByLabel("Seitenpanel schließen")).toBeHidden()
+          await expect(page.getByLabel("Seitenpanel öffnen")).toBeHidden()
           await expect(
             page.getByTestId("document-unit-info-panel"),
           ).toBeHidden()
@@ -176,14 +168,14 @@ test.describe(
       await test.step("test opening and closing panel with keyboard", async () => {
         await navigateToCategories(page, documentNumber)
         await page
-          .getByRole("button", { name: "Dokumentansicht schließen" })
+          .getByRole("button", { name: "Seitenpanel schließen" })
           .click()
         await expect(
-          page.getByRole("button", { name: "Dokumentansicht öffnen" }),
+          page.getByRole("button", { name: "Seitenpanel öffnen" }),
         ).toBeFocused()
         await page.keyboard.press("Enter")
         await expect(
-          page.getByRole("button", { name: "Dokumentansicht schließen" }),
+          page.getByRole("button", { name: "Seitenpanel schließen" }),
         ).toBeFocused()
       })
 
