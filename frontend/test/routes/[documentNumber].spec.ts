@@ -263,7 +263,7 @@ describe("Document Number Route", () => {
         }),
       )
 
-      // Clicking save again should without changing data should not make a request
+      // Clicking save again without changing data should not make a request
       await userEvent.click(saveButton!)
       expect(updateDocUnitMock).toHaveBeenCalledOnce()
     })

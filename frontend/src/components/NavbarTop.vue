@@ -29,7 +29,7 @@ const badge = computed(() => {
   } else {
     return {
       color: "bg-blue-300",
-      label: docOffice ? docOffice : "",
+      label: docOffice ?? "",
     }
   }
 })
