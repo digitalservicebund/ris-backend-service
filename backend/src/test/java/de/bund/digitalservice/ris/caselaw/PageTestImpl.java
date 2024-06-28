@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+@SuppressWarnings("java:S1068")
 public class PageTestImpl<T> implements Page<T> {
 
   private int number;
