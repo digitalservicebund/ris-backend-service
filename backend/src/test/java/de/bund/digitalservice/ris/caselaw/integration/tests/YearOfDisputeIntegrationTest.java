@@ -30,6 +30,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Year;
 import java.util.List;
@@ -88,6 +89,8 @@ class YearOfDisputeIntegrationTest {
   @MockBean private UserService userService;
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private AttachmentService attachmentService;
+  @MockBean private PatchMapperService patchMapperService;
+
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private DocumentationOfficeDTO documentationOffice;
   private static final String DEFAULT_DOCUMENT_NUMBER = "1234567890123";
