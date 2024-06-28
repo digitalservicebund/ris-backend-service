@@ -82,7 +82,7 @@ function onFileSelect(event: Event) {
       </span>
 
       <div class="ds-label-01-bold mt-[0.5rem] pt-6">
-        Ziehen Sie Ihre Dateien in diesem Bereich.
+        Ziehen Sie Ihre Dateien in diesen Bereich.
       </div>
       <FileInput
         id="file-upload"

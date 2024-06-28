@@ -141,6 +141,28 @@ test.describe(
 
           await expect(page.getByText("Die ist ein Test")).toBeVisible()
         })
+
+        await test.step("clean up documents", async () => {
+          await navigateToFiles(page, documentNumberWithoutNote)
+          await page.getByLabel("Datei löschen").click()
+          await page
+            .getByRole("button", {
+              name: "Löschen",
+              exact: true,
+            })
+            .click()
+          await expect(page.getByText("Dateiname")).toBeHidden()
+
+          await navigateToFiles(page, documentNumberWithNote)
+          await page.getByLabel("Datei löschen").click()
+          await page
+            .getByRole("button", {
+              name: "Löschen",
+              exact: true,
+            })
+            .click()
+          await expect(page.getByText("Dateiname")).toBeHidden()
+        })
       },
     )
   },
