@@ -62,7 +62,7 @@ onMounted(async () => {
   const response = await publishService.getPublicationLog(
     props.documentUnit.uuid,
   )
-  if (response.data) {
+  if (!response.error && response.data) {
     publicationLog.value = response.data
     for (const item of publicationLog.value) {
       item.date = formatDate(item.date)

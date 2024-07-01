@@ -219,7 +219,7 @@ public class DocumentUnitController {
   }
 
   @GetMapping(value = "/{uuid}/publish", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
+  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
   public List<PublicationHistoryRecord> getPublicationHistory(@PathVariable UUID uuid) {
     return service.getPublicationHistory(uuid);
   }
