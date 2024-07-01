@@ -47,6 +47,7 @@ class DocumentUnitServiceTest {
   @MockBean private DocumentNumberRecyclingService documentNumberRecyclingService;
   @MockBean private EmailPublishService publishService;
   @MockBean private PublicationReportRepository publicationReportRepository;
+  @MockBean private MigrationRepository migrationRepository;
   @MockBean private DatabaseDocumentUnitStatusService documentUnitStatusService;
   @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @MockBean private AttachmentService attachmentService;
@@ -218,15 +219,49 @@ class DocumentUnitServiceTest {
             .statusCode("200")
             .statusMessages(List.of("message"))
             .fileName("filename")
+            .publishDate(Instant.now().minus(2, java.time.temporal.ChronoUnit.DAYS))
             .build();
     when(publishService.getPublications(TEST_UUID)).thenReturn(List.of(xmlPublication));
     when(publicationReportRepository.getAllByDocumentUnitUuid(TEST_UUID))
         .thenReturn(Collections.emptyList());
+    Migration migration =
+        Migration.builder()
+            .migratedDate(Instant.now().minus(1, java.time.temporal.ChronoUnit.DAYS))
+            .xml("<test><element></element></test>")
+            .build();
+    when(migrationRepository.getLatestMigration(TEST_UUID)).thenReturn(migration);
 
     var actual = service.getPublicationHistory(TEST_UUID);
-    assertThat(actual.get(0)).usingRecursiveComparison().isEqualTo(xmlPublication);
+    assertThat(actual.get(1)).usingRecursiveComparison().isEqualTo(xmlPublication);
+    assertThat(actual.get(0))
+        .usingRecursiveComparison()
+        .isEqualTo(
+            migration.toBuilder()
+                .xml("<?xml version=\"1.0\" encoding=\"UTF-8\"?><test>\n  <element/>\n</test>\n")
+                .build());
 
     verify(publishService).getPublications(TEST_UUID);
+    verify(migrationRepository).getLatestMigration(TEST_UUID);
+  }
+
+  @Test
+  void testGetLastMigrated() {
+    Migration migration =
+        Migration.builder()
+            .migratedDate(Instant.now().minus(1, java.time.temporal.ChronoUnit.DAYS))
+            .xml("<test><element></element></test>")
+            .build();
+    when(migrationRepository.getLatestMigration(TEST_UUID)).thenReturn(migration);
+
+    var actual = service.getPublicationHistory(TEST_UUID);
+    assertThat(actual.get(0))
+        .usingRecursiveComparison()
+        .isEqualTo(
+            migration.toBuilder()
+                .xml("<?xml version=\"1.0\" encoding=\"UTF-8\"?><test>\n  <element/>\n</test>\n")
+                .build());
+
+    verify(migrationRepository).getLatestMigration(TEST_UUID);
   }
 
   @Test
@@ -236,6 +271,7 @@ class DocumentUnitServiceTest {
     when(publicationReportRepository.getAllByDocumentUnitUuid(TEST_UUID))
         .thenReturn(List.of(report));
     when(publishService.getPublications(TEST_UUID)).thenReturn(List.of());
+    when(migrationRepository.getLatestMigration(TEST_UUID)).thenReturn(null);
 
     var publications = service.getPublicationHistory(TEST_UUID);
     assertThat(publications.get(0)).usingRecursiveComparison().isEqualTo(report);
@@ -249,6 +285,7 @@ class DocumentUnitServiceTest {
     Instant secondNewest = newest.minusSeconds(61);
     Instant thirdNewest = secondNewest.minusSeconds(61);
     Instant fourthNewest = thirdNewest.minusSeconds(61);
+    Instant fifthNewest = fourthNewest.minusSeconds(61);
 
     PublicationReport report1 = new PublicationReport("documentNumber", "<html></html>", newest);
 
@@ -279,16 +316,20 @@ class DocumentUnitServiceTest {
             .publishDate(fourthNewest)
             .build();
 
+    Migration migration = Migration.builder().migratedDate(fifthNewest).build();
+
     when(publicationReportRepository.getAllByDocumentUnitUuid(TEST_UUID))
         .thenReturn(List.of(report2, report1));
     when(publishService.getPublications(TEST_UUID)).thenReturn(List.of(xml2, xml1));
+    when(migrationRepository.getLatestMigration(TEST_UUID)).thenReturn(migration);
 
     List<PublicationHistoryRecord> list = service.getPublicationHistory(TEST_UUID);
-    assertThat(list).hasSize(4);
+    assertThat(list).hasSize(5);
     assertThat(list.get(0)).usingRecursiveComparison().isEqualTo(report1);
     assertThat(list.get(1)).usingRecursiveComparison().isEqualTo(xml1);
     assertThat(list.get(2)).usingRecursiveComparison().isEqualTo(report2);
     assertThat(list.get(3)).usingRecursiveComparison().isEqualTo(xml2);
+    assertThat(list.get(4)).usingRecursiveComparison().isEqualTo(migration);
     verify(publishService).getPublications(TEST_UUID);
   }
 
@@ -415,5 +456,14 @@ class DocumentUnitServiceTest {
     when(publishService.getPublicationPreview(testDocumentUnit)).thenReturn(mockXmlResultObject);
 
     Assertions.assertEquals(mockXmlResultObject, service.previewPublication(TEST_UUID));
+  }
+
+  @Test
+  void testPrettifyXml() {
+    String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root><child>value</child></root>";
+    String prettyXml = DocumentUnitService.prettifyXml(xml);
+    assertThat(prettyXml)
+        .isEqualTo(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root>\n  <child>value</child>\n</root>\n");
   }
 }
