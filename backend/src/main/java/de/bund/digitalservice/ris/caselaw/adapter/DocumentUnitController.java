@@ -221,7 +221,7 @@ public class DocumentUnitController {
       @PathVariable UUID uuid, @RequestBody JsonPatch patch) {
     try {
       if (patch == null) {
-        return ResponseEntity.internalServerError().body(DocumentUnit.builder().build());
+        return ResponseEntity.internalServerError().body(service.getByUuid(uuid));
       }
 
       DocumentUnit documentUnit =
