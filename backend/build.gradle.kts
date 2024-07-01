@@ -209,7 +209,7 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.12.0")
     implementation("org.jsoup:jsoup:1.17.2")
 
-    val flywayCore = "org.flywaydb:flyway-core:10.15.0"
+    val flywayCore = "org.flywaydb:flyway-core:10.15.2"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
     runtimeOnly("org.flywaydb:flyway-database-postgresql:10.15.0")
