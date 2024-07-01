@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test"
 import {
+  fillInput,
   navigateToCategories,
   navigateToFiles,
   navigateToPreview,
@@ -9,8 +10,7 @@ import {
 } from "./e2e-utils"
 import { caselawTest as test } from "./fixtures"
 
-// eslint-disable-next-line playwright/no-skipped-test
-test.describe.skip(
+test.describe(
   "test extra content side panel",
   {
     annotation: {
@@ -89,19 +89,36 @@ test.describe.skip(
     test(
       "panel auto-opening and display logic",
       {
-        annotation: {
-          type: "story",
-          description:
-            "https://digitalservicebund.atlassian.net/browse/RISDEV-4173",
-        },
+        annotation: [
+          {
+            type: "story",
+            description:
+              "https://digitalservicebund.atlassian.net/browse/RISDEV-4173",
+          },
+          {
+            type: "story",
+            description:
+              "https://digitalservicebund.atlassian.net/browse/RISDEV-4174",
+          },
+        ],
       },
-      async ({ page }) => {
-        const documentNumberWithNote = "YYTestDoc0015"
-        const documentNumberWithoutNote = "YYTestDoc0014"
+      async ({ page, documentNumber }) => {
+        await test.step("prepare document with note", async () => {
+          await navigateToCategories(page, documentNumber)
+          await page.getByLabel("Seitenpanel öffnen").click()
+          await fillInput(page, "Notiz Eingabefeld", "some text")
+          await page.getByLabel("Speichern Button").click()
+          await page.waitForEvent("requestfinished")
+          await navigateToSearch(page)
+        })
+
         await test.step("open document with note and no attachment, check that note is displayed in open panel", async () => {
-          await navigateToCategories(page, documentNumberWithNote)
+          await navigateToCategories(page, documentNumber)
 
           await expect(page.getByText("Notiz")).toBeVisible()
+          await expect(page.getByLabel("Notiz Eingabefeld")).toHaveValue(
+            "some text",
+          )
 
           await page.getByLabel("Dokumente anzeigen").click()
           await expect(
@@ -112,12 +129,12 @@ test.describe.skip(
         })
 
         await test.step("open document with note and attachment, check that note is displayed in open panel", async () => {
-          await navigateToFiles(page, documentNumberWithNote)
+          await navigateToFiles(page, documentNumber)
           await uploadTestfile(page, "sample.docx")
 
           await navigateToSearch(page)
 
-          await navigateToCategories(page, documentNumberWithNote)
+          await navigateToCategories(page, documentNumber)
 
           await expect(page.getByText("Notiz")).toBeVisible()
 
@@ -126,36 +143,21 @@ test.describe.skip(
         })
 
         await test.step("open document with attachment and no note, check that attachment is displayed in open panel", async () => {
-          await navigateToFiles(page, documentNumberWithoutNote)
+          await navigateToCategories(page, documentNumber)
+          await page.getByLabel("Notiz anzeigen").click()
+          await fillInput(page, "Notiz Eingabefeld", "")
+          await page.getByLabel("Speichern Button").click()
+          await page.waitForEvent("requestfinished")
+          await navigateToFiles(page, documentNumber)
           await uploadTestfile(page, "sample.docx")
 
           await navigateToSearch(page)
 
-          await navigateToCategories(page, documentNumberWithoutNote)
+          await navigateToCategories(page, documentNumber)
 
           await expect(page.getByText("Die ist ein Test")).toBeVisible()
-        })
-
-        await test.step("clean up documents", async () => {
-          await navigateToFiles(page, documentNumberWithoutNote)
-          await page.getByLabel("Datei löschen").click()
-          await page
-            .getByRole("button", {
-              name: "Löschen",
-              exact: true,
-            })
-            .click()
-          await expect(page.getByText("Dateiname")).toBeHidden()
-
-          await navigateToFiles(page, documentNumberWithNote)
-          await page.getByLabel("Datei löschen").click()
-          await page
-            .getByRole("button", {
-              name: "Löschen",
-              exact: true,
-            })
-            .click()
-          await expect(page.getByText("Dateiname")).toBeHidden()
+          await page.getByLabel("Notiz anzeigen").click()
+          await expect(page.getByLabel("Notiz Eingabefeld")).toHaveValue("")
         })
       },
     )

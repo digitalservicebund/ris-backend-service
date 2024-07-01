@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue"
+import { computed, onMounted, ref, watch } from "vue"
 import { useRoute } from "vue-router"
 import AttachmentView from "@/components/AttachmentView.vue"
 import FileNavigator from "@/components/FileNavigator.vue"
@@ -20,7 +20,22 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const note = ref(props.documentUnit.note)
+const emits = defineEmits<{
+  documentUnitUpdatedLocally: [DocumentUnit]
+}>()
+
+const updatedDocumentUnit = ref(props.documentUnit)
+
+watch(
+  updatedDocumentUnit,
+  () => {
+    emits(
+      "documentUnitUpdatedLocally",
+      updatedDocumentUnit.value as DocumentUnit,
+    )
+  },
+  { deep: true },
+)
 
 const notesSelected = ref<boolean>(
   !!props.documentUnit.note || !props.documentUnit.hasAttachments,
@@ -138,11 +153,10 @@ onMounted(() => {
           <InputField id="notesInput" v-slot="{ id }" label="Notiz">
             <TextAreaInput
               :id="id"
-              v-model="note"
+              v-model="updatedDocumentUnit.note"
               aria-label="Notiz Eingabefeld"
               autosize
               custom-classes="max-h-[65vh]"
-              read-only
             />
           </InputField>
         </div>
