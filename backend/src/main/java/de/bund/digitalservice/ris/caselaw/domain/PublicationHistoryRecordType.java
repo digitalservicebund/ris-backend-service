@@ -5,5 +5,6 @@ import lombok.Getter;
 @Getter
 public enum PublicationHistoryRecordType {
   PUBLICATION,
-  PUBLICATION_REPORT
+  PUBLICATION_REPORT,
+  MIGRATION
 }

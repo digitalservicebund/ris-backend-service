@@ -1,6 +1,7 @@
 export enum PublicationHistoryRecordType {
   PUBLICATION = "PUBLICATION",
   PUBLICATION_REPORT = "PUBLICATION_REPORT",
+  MIGRATION = "MIGRATION",
 }
 
 export default class PublicationHistoryRecord {

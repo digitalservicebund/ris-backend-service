@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
+import de.bund.digitalservice.ris.caselaw.domain.MigrationRepository;
 import de.bund.digitalservice.ris.caselaw.domain.NormElement;
 import de.bund.digitalservice.ris.caselaw.domain.NormElementRepository;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
@@ -46,6 +47,7 @@ class SingleNormValidationTest {
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean private DocumentUnitStatusService statusService;
+  @MockBean private MigrationRepository migrationRepository;
   @MockBean private PublicationReportRepository publicationReportRepository;
   @MockBean AttachmentService attachmentService;
 

@@ -120,6 +120,19 @@ function getMissingEnsuingDecisionFields(ensuingDecision: EnsuingDecision) {
   )
 }
 
+function getHeader(item: XmlMail) {
+  switch (item.type) {
+    case PublicationHistoryRecordType.PUBLICATION_REPORT:
+      return "Juris Protokoll - " + item.date
+    case PublicationHistoryRecordType.PUBLICATION:
+      return "Xml Email Abgabe - " + item.date
+    case PublicationHistoryRecordType.MIGRATION:
+      return "Letzte Delta Migration - " + item.date
+    default:
+      return "Unknown Type - " + item.date
+  }
+}
+
 //Required Norms fields
 const missingNormsFields = ref(
   props.documentUnit.contentRelatedIndexing?.norms
@@ -346,11 +359,7 @@ const fieldsMissing = computed(() => {
             as-column
             class="border-b-1 border-r-1 border-gray-400 bg-white p-10"
             :data-set="item"
-            :header="
-              item.type == PublicationHistoryRecordType.PUBLICATION_REPORT
-                ? 'Juris Protokoll - ' + item.date
-                : 'Xml Email Abgabe - ' + item.date
-            "
+            :header="getHeader(item)"
             header-class="font-bold"
             :is-expanded="index == 0"
             :title="item.type"
@@ -386,6 +395,12 @@ const fieldsMissing = computed(() => {
                 </div>
               </div>
               <div class="ds-label-section text-gray-900">ALS</div>
+              <CodeSnippet v-if="!!item?.xml" title="XML" :xml="item.xml" />
+            </div>
+            <div
+              v-if="item.type == PublicationHistoryRecordType.MIGRATION"
+              class="p-20"
+            >
               <CodeSnippet v-if="!!item?.xml" title="XML" :xml="item.xml" />
             </div>
           </ExpandableContent>
