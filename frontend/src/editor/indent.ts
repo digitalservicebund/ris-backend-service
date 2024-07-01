@@ -88,6 +88,8 @@ const setNodeIndentMarkup = (
 const getIndent =
   (): KeyboardShortcutCommand =>
   ({ editor }) => {
+    // If the cursor is not at the start of the node, don't indent
+    if (editor.state.selection.$head.parentOffset > 0) return false
     return editor.can().sinkListItem("listItem")
       ? editor.chain().focus().sinkListItem("listItem").run()
       : editor.chain().focus().indent().run()
@@ -96,6 +98,7 @@ const getIndent =
 const getOutdent =
   (outdentOnlyAtHead: boolean): KeyboardShortcutCommand =>
   ({ editor }) => {
+    // If the cursor is not at the start of the node, don't unindent
     if (outdentOnlyAtHead && editor.state.selection.$head.parentOffset > 0)
       return false
 
