@@ -11,6 +11,7 @@ const props = defineProps<{
 
 const { triggerSave, lastSaveError, formattedLastSavedOn } = useSaveToRemote(
   props.serviceCallback,
+  10000,
 )
 
 const getErrorDetails = () => {
