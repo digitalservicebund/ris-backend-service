@@ -1,27 +1,27 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import de.bund.digitalservice.ris.caselaw.domain.Migration;
-import de.bund.digitalservice.ris.caselaw.domain.MigrationRepository;
+import de.bund.digitalservice.ris.caselaw.domain.DeltaMigration;
+import de.bund.digitalservice.ris.caselaw.domain.DeltaMigrationRepository;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class PostgresMigrationRepositoryImpl implements MigrationRepository {
+public class PostgresDeltaMigrationRepositoryImpl implements DeltaMigrationRepository {
 
-  private final DatabaseMigrationRepository dbRepository;
+  private final OriginalXmlRepository dbRepository;
 
-  public PostgresMigrationRepositoryImpl(DatabaseMigrationRepository dbRepository) {
+  public PostgresDeltaMigrationRepositoryImpl(OriginalXmlRepository dbRepository) {
     this.dbRepository = dbRepository;
   }
 
   @Override
-  public Migration getLatestMigration(UUID documentUnitUuid) {
+  public DeltaMigration getLatestMigration(UUID documentUnitUuid) {
 
     return dbRepository
         .findByDocumentationUnitId(documentUnitUuid)
         .map(
             originalXmlDTO ->
-                Migration.builder()
+                DeltaMigration.builder()
                     .xml(originalXmlDTO.getContent())
                     .migratedDate(originalXmlDTO.getUpdatedAt())
                     .build())

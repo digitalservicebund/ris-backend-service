@@ -3,13 +3,13 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.DeltaMigrationRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
-import de.bund.digitalservice.ris.caselaw.domain.MigrationRepository;
 import de.bund.digitalservice.ris.caselaw.domain.NormElement;
 import de.bund.digitalservice.ris.caselaw.domain.NormElementRepository;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
@@ -47,7 +47,7 @@ class SingleNormValidationTest {
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean private DocumentUnitStatusService statusService;
-  @MockBean private MigrationRepository migrationRepository;
+  @MockBean private DeltaMigrationRepository deltaMigrationRepository;
   @MockBean private PublicationReportRepository publicationReportRepository;
   @MockBean AttachmentService attachmentService;
 

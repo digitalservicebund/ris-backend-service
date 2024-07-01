@@ -26,6 +26,9 @@ public class DatabaseDocumentNumberGeneratorService implements DocumentNumberSer
 
   private final DocumentNumberRecyclingService documentNumberRecyclingService;
 
+  // because of java:S6809 - Methods with Spring proxy should not be called via "this"
+  private final DatabaseDocumentNumberGeneratorService documentNumberGeneratorService = this;
+
   public DatabaseDocumentNumberGeneratorService(
       DatabaseDocumentNumberRepository repository,
       DocumentNumberPatternConfig documentNumberPatternConfig,
@@ -70,7 +73,8 @@ public class DatabaseDocumentNumberGeneratorService implements DocumentNumberSer
           "Could not find pattern for abbreviation " + documentationOfficeAbbreviation);
     }
 
-    String recycledId = recycle(documentationOfficeAbbreviation).orElse(null);
+    String recycledId =
+        documentNumberGeneratorService.recycle(documentationOfficeAbbreviation).orElse(null);
 
     if (recycledId != null) return recycledId;
 
