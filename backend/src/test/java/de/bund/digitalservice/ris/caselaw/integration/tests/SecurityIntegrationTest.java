@@ -1,28 +1,30 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
-import org.junit.jupiter.api.Tag;
+import de.bund.digitalservice.ris.caselaw.TestConfig;
+import de.bund.digitalservice.ris.caselaw.adapter.AdminController;
+import de.bund.digitalservice.ris.caselaw.adapter.EnvironmentService;
+import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
+import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
+import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.MailTrackingService;
+import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
-@Testcontainers(disabledWithoutDocker = true)
-@SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    properties = {
-      "otc.obs.bucket-name=testBucket",
-      "otc.obs.endpoint=testUrl",
-      "local.file-storage=.local-storage",
-      "mail.from.address=test@test.com"
-    })
-@Tag("integration")
+@RISIntegrationTest(
+    imports = {
+      PostgresJPAConfig.class,
+      FlywayConfig.class,
+      SecurityConfig.class,
+      TestConfig.class,
+    },
+    controllers = {AdminController.class})
 class SecurityIntegrationTest {
 
   @Container
@@ -38,12 +40,15 @@ class SecurityIntegrationTest {
     registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
   }
 
-  @Autowired WebTestClient webTestClient;
+  @Autowired RisWebTestClient webTestClient;
   @MockBean ClientRegistrationRepository clientRegistrationRepository;
+  @MockBean MailTrackingService mailTrackingService;
+  @MockBean EnvironmentService environmentService;
 
   @Test
   void shouldHaveEnabledCSPHeader() {
     webTestClient
+        .withDefaultLogin()
         .get()
         .uri("/")
         .exchange()
@@ -56,6 +61,7 @@ class SecurityIntegrationTest {
   @Test
   void shouldHaveEnabledXFrameOptionsHeader() {
     webTestClient
+        .withDefaultLogin()
         .get()
         .uri("/")
         .exchange()
@@ -66,6 +72,7 @@ class SecurityIntegrationTest {
   @Test
   void shouldHaveEnabledXContentTypeOptionsHeader() {
     webTestClient
+        .withDefaultLogin()
         .get()
         .uri("/")
         .exchange()
@@ -76,6 +83,7 @@ class SecurityIntegrationTest {
   @Test
   void shouldHaveEnabledReferrerPolicyHeader() {
     webTestClient
+        .withDefaultLogin()
         .get()
         .uri("/")
         .exchange()
@@ -86,6 +94,7 @@ class SecurityIntegrationTest {
   @Test
   void shouldHaveEnabledPermissionsPolicyHeader() {
     webTestClient
+        .withDefaultLogin()
         .get()
         .uri("/")
         .exchange()
