@@ -42,9 +42,8 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
     }
 
     if (response.status === 200) {
-      originalDocumentUnit.value = JSON.parse(
-        JSON.stringify(documentUnit.value),
-      ) // Update the original copy
+      originalDocumentUnit.value = JSON.parse(JSON.stringify(response.data)) // Update the
+      // original copy
     }
 
     return response as ServiceResponse<unknown>
