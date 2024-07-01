@@ -27,8 +27,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -76,7 +76,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 @RISIntegrationTest(
     imports = {
       DocumentUnitService.class,
-      PostgresMigrationRepositoryImpl.class,
+      PostgresDeltaMigrationRepositoryImpl.class,
       DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentNumberRecyclingService.class,
       DatabaseDocumentUnitStatusService.class,

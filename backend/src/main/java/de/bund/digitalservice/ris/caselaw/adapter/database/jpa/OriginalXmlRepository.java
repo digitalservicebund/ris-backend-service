@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface DatabaseMigrationRepository extends JpaRepository<OriginalXmlDTO, UUID> {
+public interface OriginalXmlRepository extends JpaRepository<OriginalXmlDTO, UUID> {
 
   Optional<OriginalXmlDTO> findByDocumentationUnitId(UUID documentationUnitId);
 }

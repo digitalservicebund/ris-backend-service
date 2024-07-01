@@ -43,7 +43,7 @@ public class DocumentUnitService {
   private final PublicationReportRepository publicationReportRepository;
   private final DocumentNumberService documentNumberService;
   private final EmailPublishService publicationService;
-  private final MigrationRepository migrationRepository;
+  private final DeltaMigrationRepository deltaMigrationRepository;
   private final DocumentUnitStatusService documentUnitStatusService;
   private final AttachmentService attachmentService;
   private final DocumentNumberRecyclingService documentNumberRecyclingService;
@@ -56,7 +56,7 @@ public class DocumentUnitService {
       DocumentUnitRepository repository,
       DocumentNumberService documentNumberService,
       EmailPublishService publicationService,
-      MigrationRepository migrationService,
+      DeltaMigrationRepository migrationService,
       DocumentUnitStatusService documentUnitStatusService,
       PublicationReportRepository publicationReportRepository,
       DocumentNumberRecyclingService documentNumberRecyclingService,
@@ -66,7 +66,7 @@ public class DocumentUnitService {
     this.repository = repository;
     this.documentNumberService = documentNumberService;
     this.publicationService = publicationService;
-    this.migrationRepository = migrationService;
+    this.deltaMigrationRepository = migrationService;
     this.documentUnitStatusService = documentUnitStatusService;
     this.publicationReportRepository = publicationReportRepository;
     this.documentNumberRecyclingService = documentNumberRecyclingService;
@@ -219,7 +219,7 @@ public class DocumentUnitService {
         ListUtils.union(
             publicationService.getPublications(documentUuid),
             publicationReportRepository.getAllByDocumentUnitUuid(documentUuid));
-    var migration = migrationRepository.getLatestMigration(documentUuid);
+    var migration = deltaMigrationRepository.getLatestMigration(documentUuid);
     if (migration != null) {
       list.add(
           migration.xml() != null
@@ -232,12 +232,12 @@ public class DocumentUnitService {
 
   public static String prettifyXml(String xml) {
     try {
-      Transformer transformer = TransformerFactory.newInstance().newTransformer();
+      Transformer transformer = TransformerFactory.newDefaultInstance().newTransformer();
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
       transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 
       Node node =
-          DocumentBuilderFactory.newInstance()
+          DocumentBuilderFactory.newDefaultInstance()
               .newDocumentBuilder()
               .parse(new ByteArrayInputStream(xml.getBytes()))
               .getDocumentElement();
