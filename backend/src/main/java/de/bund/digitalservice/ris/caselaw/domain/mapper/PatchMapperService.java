@@ -30,7 +30,10 @@ public class PatchMapperService {
    */
   public <T> T applyPatchToEntity(JsonPatch patch, T targetEntity, Class<T> entityType)
       throws JsonProcessingException, JsonPatchException {
-    JsonNode patched = patch.apply(objectMapper.convertValue(targetEntity, JsonNode.class));
-    return objectMapper.treeToValue(patched, entityType);
+    return objectMapper.treeToValue(applyPatch(patch, targetEntity), entityType);
+  }
+
+  public <T> JsonNode applyPatch(JsonPatch patch, T targetEntity) throws JsonPatchException {
+    return patch.apply(objectMapper.convertValue(targetEntity, JsonNode.class));
   }
 }
