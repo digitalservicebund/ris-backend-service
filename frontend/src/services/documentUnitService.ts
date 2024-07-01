@@ -20,7 +20,7 @@ interface DocumentUnitService {
 
   update(
     documentUnitUuid: string,
-    patch: Operation[] | null,
+    patch: Operation[],
   ): Promise<ServiceResponse<DocumentUnit | FailedValidationServerResponse>>
 
   delete(documentUnitUuid: string): Promise<ServiceResponse<unknown>>
