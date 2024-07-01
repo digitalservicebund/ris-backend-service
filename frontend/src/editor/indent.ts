@@ -85,22 +85,11 @@ const setNodeIndentMarkup = (
   )
 }
 
-const getIndent =
+const getOutdent =
   (): KeyboardShortcutCommand =>
   ({ editor }) => {
-    // If the cursor is not at the start of the node, don't indent
-    if (editor.state.selection.$head.parentOffset > 0) return false
-    return editor.can().sinkListItem("listItem")
-      ? editor.chain().focus().sinkListItem("listItem").run()
-      : editor.chain().focus().indent().run()
-  }
-
-const getOutdent =
-  (outdentOnlyAtHead: boolean): KeyboardShortcutCommand =>
-  ({ editor }) => {
     // If the cursor is not at the start of the node, don't unindent
-    if (outdentOnlyAtHead && editor.state.selection.$head.parentOffset > 0)
-      return false
+    if (editor.state.selection.$head.parentOffset > 0) return false
 
     return editor.can().liftListItem("listItem")
       ? editor.chain().focus().liftListItem("listItem").run()
@@ -178,10 +167,7 @@ export const Indent = Extension.create<IndentOptions, never>({
 
   addKeyboardShortcuts() {
     return {
-      Tab: getIndent(),
-      Backspace: getOutdent(true),
-      "Shift-Tab": getOutdent(false),
-      Escape: () => this.editor.commands.blur(),
+      Backspace: getOutdent(),
     }
   },
 
