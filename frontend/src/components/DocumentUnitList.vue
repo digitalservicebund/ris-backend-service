@@ -193,7 +193,7 @@ function onDelete() {
             listEntry.documentType ? listEntry.documentType.jurisShortcut : "-"
           }}
         </CellItem>
-        <CellItem>
+        <CellItem class="min-w-176">
           <IconBadge
             v-if="listEntry.status?.publicationStatus"
             v-bind="useStatusBadge(listEntry.status).value"
