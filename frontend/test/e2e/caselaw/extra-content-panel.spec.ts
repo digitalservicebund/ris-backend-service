@@ -167,6 +167,7 @@ test.describe(
         await navigateToFiles(page, documentNumber)
         await uploadTestfile(page, "sample.docx")
         await uploadTestfile(page, "some-formatting.docx")
+        await expect(page.getByText("Subheadline")).toBeVisible()
       })
 
       await test.step("test opening and closing panel with keyboard", async () => {
