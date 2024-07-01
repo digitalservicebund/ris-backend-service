@@ -220,10 +220,6 @@ public class DocumentUnitController {
   public ResponseEntity<DocumentUnit> partialUpdateByUuid(
       @PathVariable UUID uuid, @RequestBody JsonPatch patch) {
     try {
-      if (patch == null) {
-        return ResponseEntity.internalServerError().body(service.getByUuid(uuid));
-      }
-
       DocumentUnit documentUnit =
           patchMapperService.applyPatchToEntity(patch, service.getByUuid(uuid), DocumentUnit.class);
       var updateDocumentUnit = service.updateDocumentUnit(documentUnit);
