@@ -32,6 +32,7 @@ test.describe(
           await navigateToCategories(page, documentNumber)
 
           await page.getByLabel("Seitenpanel öffnen").click()
+          await expect(page).toHaveURL(/showAttachmentPanel=true/)
           await expect(page.getByText("Notiz")).toBeVisible()
           await expect(page.getByLabel("Notiz anzeigen")).toBeVisible()
           await page.getByLabel("Dokumente anzeigen").click()
