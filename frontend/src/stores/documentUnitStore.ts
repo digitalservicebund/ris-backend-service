@@ -28,14 +28,18 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
       documentUnit.value,
     )
 
+    let response
     if (patch.length === 0) {
-      return { status: 304, data: undefined } // No changes to update
+      // Todo: do not use important ! here for documentNumber
+      response = await documentUnitService.getByDocumentNumber(
+        documentUnit.value.documentNumber!,
+      )
+    } else {
+      response = await documentUnitService.update(
+        documentUnit.value.uuid,
+        patch,
+      )
     }
-
-    const response = await documentUnitService.update(
-      documentUnit.value.uuid,
-      patch,
-    )
 
     if (response.status === 200) {
       originalDocumentUnit.value = JSON.parse(
