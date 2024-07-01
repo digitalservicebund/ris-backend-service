@@ -212,7 +212,7 @@ dependencies {
     val flywayCore = "org.flywaydb:flyway-core:10.15.2"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.15.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.15.2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
