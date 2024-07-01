@@ -154,7 +154,7 @@ onMounted(async () => {
       <div class="flex grow flex-col items-start">
         <FlexContainer
           v-if="documentUnit"
-          class="w-full flex-grow"
+          class="h-full w-full flex-grow"
           :class="
             route.path.includes('preview')
               ? 'flex-row bg-white'
