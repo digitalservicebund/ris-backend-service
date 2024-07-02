@@ -39,7 +39,7 @@ const decreaseFileIndex = () => {
     class="float-end items-center gap-4"
   >
     <FlexItem class="ds-label-01-bold self-center">
-      {{ props.attachments[currentIndex].name }}
+      {{ props.attachments[currentIndex]?.name }}
     </FlexItem>
     <TextButton
       id="decrease"

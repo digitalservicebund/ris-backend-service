@@ -22,7 +22,6 @@ async function attachmentsUploaded(anySuccessful: boolean) {
 }
 
 async function attachmentIndexSelected(index: number) {
-  console.log("emit from files")
   emit("attachmentIndexSelected", index)
 }
 

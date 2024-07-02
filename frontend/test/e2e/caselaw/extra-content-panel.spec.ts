@@ -167,13 +167,15 @@ test.describe(
     test("keyboard accessibility", async ({ page, documentNumber }) => {
       await test.step("prepare doc unit with attachments", async () => {
         await navigateToFiles(page, documentNumber)
-        await uploadTestfile(page, "sample.docx")
-        await uploadTestfile(page, "some-formatting.docx")
+        await uploadTestfile(page, ["sample.docx", "some-formatting.docx"])
         await expect(page.getByText("Subheadline")).toBeVisible()
       })
 
       await test.step("test opening and closing panel with keyboard", async () => {
-        await navigateToCategories(page, documentNumber)
+        await page.getByTestId("Rubriken").click()
+        await expect(
+          page.getByRole("heading", { name: "Stammdaten" }),
+        ).toBeVisible()
         await page
           .getByRole("button", { name: "Seitenpanel schließen" })
           .click()
@@ -198,7 +200,7 @@ test.describe(
           page.getByRole("button", { name: "Dokumente anzeigen" }),
         ).toBeFocused()
         await page.keyboard.press("Enter")
-        await expect(page.getByText("sample.docx")).toBeVisible()
+        await expect(page.getByText("some-formatting.docx")).toBeVisible()
       })
 
       await test.step("test document selection with keyboard", async () => {
@@ -210,19 +212,19 @@ test.describe(
         await expect(
           page.getByRole("button", { name: "Nächstes Dokument anzeigen" }),
         ).toBeFocused()
-        await expect(page.getByText("sample.docx")).toBeVisible()
-        await page.keyboard.press("Enter")
         await expect(page.getByText("some-formatting.docx")).toBeVisible()
         await page.keyboard.press("Enter")
         await expect(page.getByText("sample.docx")).toBeVisible()
+        await page.keyboard.press("Enter")
+        await expect(page.getByText("some-formatting.docx")).toBeVisible()
         await page.keyboard.press("Shift+Tab")
         await expect(
           page.getByRole("button", { name: "Vorheriges Dokument anzeigen" }),
         ).toBeFocused()
         await page.keyboard.press("Enter")
-        await expect(page.getByText("some-formatting.docx")).toBeVisible()
-        await page.keyboard.press("Enter")
         await expect(page.getByText("sample.docx")).toBeVisible()
+        await page.keyboard.press("Enter")
+        await expect(page.getByText("some-formatting.docx")).toBeVisible()
       })
     })
   },
