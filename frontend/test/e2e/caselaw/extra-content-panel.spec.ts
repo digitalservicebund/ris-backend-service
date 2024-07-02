@@ -11,7 +11,7 @@ import {
 import { caselawTest as test } from "./fixtures"
 
 test.describe(
-  "test extra content side panel",
+  "extra content side panel",
   {
     annotation: {
       type: "epic",
@@ -87,7 +87,7 @@ test.describe(
       },
     )
     test(
-      "panel auto-opening and display logic",
+      "auto-opening and display logic",
       {
         annotation: [
           {
@@ -161,6 +161,32 @@ test.describe(
           await page.getByLabel("Notiz anzeigen").click()
           await expect(page.getByLabel("Notiz Eingabefeld")).toHaveValue("")
         })
+      },
+    )
+
+    test(
+      "export note",
+      {
+        annotation: {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-4173",
+        },
+      },
+      async ({ pageWithBghUser, prefilledDocumentUnitBgh }) => {
+        const documentNumber = prefilledDocumentUnitBgh.documentNumber!
+        await navigateToPublication(pageWithBghUser, documentNumber)
+        await expect(
+          pageWithBghUser.getByText("XML Vorschau der Veröffentlichung"),
+        ).toBeVisible()
+
+        await pageWithBghUser
+          .getByText("XML Vorschau der Veröffentlichung")
+          .click()
+
+        await expect(
+          pageWithBghUser.locator("text='        <notiz>some text</notiz>'"),
+        ).toBeVisible()
       },
     )
 
