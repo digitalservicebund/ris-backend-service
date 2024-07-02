@@ -51,7 +51,7 @@ watchEffect(() => {
 
 <template>
   <div
-    class="sticky top-0 z-30 flex flex-row items-center justify-between border-b border-solid border-gray-400 bg-blue-200 px-24 py-12"
+    class="sticky top-0 z-30 flex flex-row items-center justify-between border-b border-solid border-gray-400 bg-blue-100 px-24 py-12"
   >
     <div class="-mt-1 flex flex-col justify-center">
       <div

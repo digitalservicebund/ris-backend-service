@@ -37,23 +37,26 @@ window.onbeforeunload = function () {
 <template>
   <div class="flex items-center space-x-[12px]">
     <div>
-      <div v-if="lastSaveError !== undefined">
-        <p class="text-red-800">Fehler beim Speichern{{ getErrorDetails() }}</p>
-      </div>
-
-      <div
-        v-if="formattedLastSavedOn !== undefined && lastSaveError === undefined"
+      <p
+        v-if="lastSaveError !== undefined"
+        class="ds-label-01-reg text-red-800"
       >
-        <p>
-          Zuletzt
-          <span>{{ formattedLastSavedOn }}</span>
-          Uhr
-        </p>
-      </div>
+        Fehler beim Speichern{{ getErrorDetails() }}
+      </p>
+
+      <p
+        v-if="formattedLastSavedOn !== undefined && lastSaveError === undefined"
+        class="ds-label-01-reg"
+      >
+        Zuletzt
+        <span>{{ formattedLastSavedOn }}</span>
+        Uhr
+      </p>
     </div>
     <TextButton
       :aria-label="ariaLabel"
       label="Speichern"
+      size="small"
       @click="triggerSave"
     />
   </div>
