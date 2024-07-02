@@ -10,7 +10,7 @@ import { ValidationError } from "@/components/input/types"
 import PreviousDecisions from "@/components/PreviousDecisions.vue"
 import { useProvideCourtType } from "@/composables/useCourtType"
 import { useScrollToHash } from "@/composables/useScrollToHash"
-import DocumentUnit, { Texts, CoreData } from "@/domain/documentUnit"
+import DocumentUnit, { Texts } from "@/domain/documentUnit"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import PreviousDecision from "@/domain/previousDecision"
 
@@ -97,16 +97,6 @@ function deleteLegalForces() {
 const coreData = computed({
   get: () => updatedDocumentUnit.value.coreData,
   set: (newValues) => {
-    let triggerSaving = false
-    if (
-      (["court", "procedure"] as (keyof CoreData)[]).some(
-        (property) =>
-          updatedDocumentUnit.value.coreData[property] !== newValues[property],
-      )
-    ) {
-      triggerSaving = true
-    }
-
     // --- TRANSFORMATION OF DATA
 
     newValues.fileNumbers = newValues.fileNumbers ?? []
@@ -125,9 +115,7 @@ const coreData = computed({
     if (shouldDeleteLegalForces.value) {
       deleteLegalForces()
     }
-    if (triggerSaving) {
-      emits("saveDocumentUnitToServer")
-    }
+    //TODO: save doc unit if court or procedure was changed so that for region or procedure history are updated immediately
   },
 })
 
