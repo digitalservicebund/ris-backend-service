@@ -146,7 +146,7 @@ onMounted(async () => {
         :document-unit="documentUnit"
         :heading="documentUnit?.documentNumber ?? ''"
         :save-callback="
-          route.path.includes('categories')
+          route.path.includes('categories') || route.path.includes('files')
             ? saveDocumentUnitToServer
             : undefined
         "
@@ -170,6 +170,7 @@ onMounted(async () => {
             "
             ref="extraContentSidePanel"
             :document-unit="documentUnit"
+            @document-unit-updated-locally="updateLocalDocumentUnit"
           ></ExtraContentSidePanel>
           <router-view
             :document-unit="documentUnit"

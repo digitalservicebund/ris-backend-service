@@ -139,11 +139,11 @@ describe("Document Number Route", () => {
 
       expect(screen.getByTestId("side-toggle-navigation")).toBeInTheDocument()
 
-      // Header without save button
+      // Header with save button
       expect(screen.getByTestId("document-unit-info-panel")).toBeInTheDocument()
       expect(
         screen.queryByRole("button", { name: "Speichern Button" }),
-      ).not.toBeInTheDocument()
+      ).toBeInTheDocument()
 
       // ExtraContentSidePanel
       expect(
