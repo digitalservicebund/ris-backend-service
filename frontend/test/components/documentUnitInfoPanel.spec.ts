@@ -49,15 +49,12 @@ describe("documentUnit InfoPanel", () => {
       },
     })
 
-    expect(await screen.findByText("Aktenzeichen")).toBeInTheDocument()
-    expect(await screen.findByText("AZ123")).toBeInTheDocument()
-    expect(await screen.findByText("Entscheidungsdatum")).toBeInTheDocument()
-    expect(await screen.findByText("01.01.2024")).toBeInTheDocument()
-    expect(await screen.findByText("Gericht")).toBeInTheDocument()
-    expect(await screen.findByText("AG Test")).toBeInTheDocument()
+    expect(
+      await screen.findByText("AG Test, AZ123, 01.01.2024"),
+    ).toBeInTheDocument()
   })
 
-  it("renders a placeholder for an undefined property info value", async () => {
+  it("omits incomplete coredata fields from rendering", async () => {
     render(DocumentUnitInfoPanel, {
       props: {
         documentUnit: new DocumentUnit("foo", {
@@ -77,12 +74,6 @@ describe("documentUnit InfoPanel", () => {
       },
     })
 
-    const label = screen.getByText("Dokumentationsstelle")
-    const [value] = await screen.findAllByText("-")
-
-    expect(value).toBeInTheDocument()
-    expect(value.compareDocumentPosition(label)).toBe(
-      Node.DOCUMENT_POSITION_PRECEDING,
-    )
+    expect(await screen.findByText("AG Test")).toBeInTheDocument()
   })
 })
