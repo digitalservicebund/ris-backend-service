@@ -131,6 +131,7 @@ test.describe(
         await test.step("open document with note and attachment, check that note is displayed in open panel", async () => {
           await navigateToFiles(page, documentNumber)
           await uploadTestfile(page, "sample.docx")
+          await expect(page.getByText("Die ist ein Test")).toBeVisible()
 
           await navigateToSearch(page)
 
@@ -150,6 +151,7 @@ test.describe(
           await page.waitForEvent("requestfinished")
           await navigateToFiles(page, documentNumber)
           await uploadTestfile(page, "sample.docx")
+          await expect(page.getByText("Die ist ein Test")).toBeVisible()
 
           await navigateToSearch(page)
 
