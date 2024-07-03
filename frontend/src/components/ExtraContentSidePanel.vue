@@ -37,11 +37,13 @@ watch(
   { deep: true },
 )
 
-const notesSelected = ref<boolean>(
-  !!props.documentUnit.note || !props.documentUnit.hasAttachments,
-)
-const attachmentsSelected = ref<boolean>(
-  !props.documentUnit.note && props.documentUnit.hasAttachments,
+type SelectablePanelContent = "note" | "attachments" | "preview"
+const selectedPanelContent = ref<SelectablePanelContent>(
+  !!props.documentUnit.note
+    ? "note"
+    : props.documentUnit.hasAttachments
+      ? "attachments"
+      : "preview",
 )
 const currentAttachmentIndex = ref(0)
 const isExpanded = ref(false)
@@ -65,14 +67,12 @@ const handleOnSelect = (index: number) => {
 }
 
 function selectNotes() {
-  notesSelected.value = true
-  attachmentsSelected.value = false
+  selectedPanelContent.value = "note"
 }
 
 function selectAttachments(selectedIndex?: number) {
   if (selectedIndex !== undefined) currentAttachmentIndex.value = selectedIndex
-  notesSelected.value = false
-  attachmentsSelected.value = true
+  selectedPanelContent.value = "attachments"
 }
 
 function togglePanel(expand?: boolean) {
@@ -122,7 +122,7 @@ onMounted(() => {
           id="note"
           aria-label="Notiz anzeigen"
           button-type="tertiary"
-          :class="notesSelected ? 'bg-blue-200' : ''"
+          :class="selectedPanelContent === 'note' ? 'bg-blue-200' : ''"
           :icon="IconStickyNote"
           size="small"
           @click="selectNotes"
@@ -132,7 +132,7 @@ onMounted(() => {
           id="attachments"
           aria-label="Dokumente anzeigen"
           button-type="tertiary"
-          :class="attachmentsSelected ? 'bg-blue-200' : ''"
+          :class="selectedPanelContent === 'attachments' ? 'bg-blue-200' : ''"
           :icon="IconAttachFile"
           size="small"
           @click="() => selectAttachments()"
@@ -141,7 +141,7 @@ onMounted(() => {
         <div class="flex-grow" />
 
         <FileNavigator
-          v-if="attachmentsSelected"
+          v-if="selectedPanelContent === 'attachments'"
           :attachments="documentUnit.attachments"
           :current-index="currentAttachmentIndex"
           @select="handleOnSelect"
@@ -149,7 +149,7 @@ onMounted(() => {
       </FlexContainer>
 
       <div class="m-24">
-        <div v-if="notesSelected">
+        <div v-if="selectedPanelContent === 'note'">
           <InputField id="notesInput" v-slot="{ id }" label="Notiz">
             <TextAreaInput
               :id="id"
@@ -160,7 +160,7 @@ onMounted(() => {
             />
           </InputField>
         </div>
-        <div v-if="attachmentsSelected">
+        <div v-if="selectedPanelContent === 'attachments'">
           <AttachmentView
             v-if="
               documentUnit.uuid &&
