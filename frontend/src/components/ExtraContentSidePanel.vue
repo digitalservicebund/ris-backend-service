@@ -42,11 +42,9 @@ watch(
 
 type SelectablePanelContent = "note" | "attachments" | "preview"
 const selectedPanelContent = ref<SelectablePanelContent>(
-  !!props.documentUnit.note
-    ? "note"
-    : props.documentUnit.hasAttachments
-      ? "attachments"
-      : "note",
+  !props.documentUnit.note && props.documentUnit.hasAttachments
+    ? "attachments"
+    : "note",
 )
 const currentAttachmentIndex = ref(0)
 const isExpanded = ref(false)
