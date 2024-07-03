@@ -110,7 +110,7 @@ onMounted(() => {
     data-testid="attachment-view-side-panel"
   >
     <SideToggle
-      class="sticky top-[8rem] z-20"
+      class="sticky top-[4rem] z-20 max-h-fit"
       :is-expanded="isExpanded"
       label="Seitenpanel"
       :opening-direction="OpeningDirection.LEFT"
