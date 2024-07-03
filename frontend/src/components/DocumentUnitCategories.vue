@@ -147,7 +147,7 @@ useScrollToHash(routeHash, headerOffset)
 useProvideCourtType(courtTypeRef)
 </script>
 <template>
-  <FlexItem class="w-full flex-1 grow flex-col bg-gray-100 p-24">
+  <FlexItem class="w-full flex-1 grow flex-col p-24">
     <DocumentUnitCoreData
       id="coreData"
       v-model="coreData"
