@@ -13,6 +13,7 @@ import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
 import useQuery from "@/composables/useQueryFromRoute"
 import DocumentUnit from "@/domain/documentUnit"
 import IconAttachFile from "~icons/ic/baseline-attach-file"
+import IconOpenInNewTab from "~icons/ic/outline-open-in-new"
 import IconPreview from "~icons/ic/outline-remove-red-eye"
 import IconStickyNote from "~icons/ic/outline-sticky-note-2"
 
@@ -45,7 +46,7 @@ const selectedPanelContent = ref<SelectablePanelContent>(
     ? "note"
     : props.documentUnit.hasAttachments
       ? "attachments"
-      : "preview",
+      : "note",
 )
 const currentAttachmentIndex = ref(0)
 const isExpanded = ref(false)
@@ -131,7 +132,7 @@ onMounted(() => {
           :class="selectedPanelContent === 'note' ? 'bg-blue-200' : ''"
           :icon="IconStickyNote"
           size="small"
-          @click="selectNotes"
+          @click="() => selectNotes()"
         />
 
         <TextButton
@@ -162,6 +163,21 @@ onMounted(() => {
           :current-index="currentAttachmentIndex"
           @select="handleOnSelect"
         ></FileNavigator>
+        <router-link
+          v-if="selectedPanelContent === 'preview'"
+          aria-label="Vorschau in neuem Tab öffnen"
+          target="_blank"
+          :to="{
+            name: 'caselaw-documentUnit-documentNumber-preview',
+            params: { documentNumber: documentUnit.documentNumber },
+          }"
+        >
+          <TextButton
+            button-type="ghost"
+            :icon="IconOpenInNewTab"
+            size="small"
+          />
+        </router-link>
       </FlexContainer>
 
       <div class="m-24">
