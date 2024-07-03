@@ -648,20 +648,15 @@ test.describe("search", () => {
       .url()
       .match(/documentunit\/([A-Z0-9]{13})\/categories/)![1]
 
-    const infoPanel = page.getByText(
-      new RegExp(
-        `${documentNumber}.*Aktenzeichen.*Entscheidungsdatum.*Gericht.*`,
-      ),
-    )
-    await expect(infoPanel.getByText(`Aktenzeichen${fileNumber}`)).toBeVisible()
+    const infoPanel = page.getByText(new RegExp(`${documentNumber}|.*`))
+
     await expect(page.locator("[aria-label='Gericht']")).toHaveValue(
       `${courtType} ${courtLocation}`,
     )
     await expect(
-      infoPanel.getByText(`Gericht${courtType} ${courtLocation}`),
-    ).toBeVisible()
-    await expect(
-      infoPanel.getByText(`Entscheidungsdatum${decisionDate}`),
+      infoPanel.getByText(
+        `${courtType} ${courtLocation}, ${fileNumber}, ${decisionDate}`,
+      ),
     ).toBeVisible()
 
     await deleteDocumentUnit(page, documentNumber)

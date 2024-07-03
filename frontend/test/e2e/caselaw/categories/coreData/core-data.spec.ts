@@ -227,7 +227,9 @@ test.describe("core data", () => {
     await expect(page.locator("[aria-label='Dokumenttyp']")).toHaveValue("")
   })
 
-  test("ensure new docUnit has correct documentationOffice for DS user", async ({
+  // skipped as we don't show the Dokstelle anymore as of RISDEV-4177
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("ensure new docUnit has correct documentationOffice for DS user", async ({
     page,
   }) => {
     await test.step("create new docUnit with logged in user", async () => {
@@ -257,7 +259,9 @@ test.describe("core data", () => {
     })
   })
 
-  test("ensure new docUnit has correct documentationOffice for BGH user", async ({
+  // skipped as we don't show the Dokstelle anymore as of RISDEV-4177
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("ensure new docUnit has correct documentationOffice for BGH user", async ({
     pageWithBghUser,
   }) => {
     await test.step("create new docUnit with logged in user", async () => {

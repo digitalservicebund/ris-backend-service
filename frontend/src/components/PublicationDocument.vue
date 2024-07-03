@@ -129,7 +129,7 @@ function getHeader(item: XmlMail) {
     case PublicationHistoryRecordType.MIGRATION:
       return "Letzte Delta Migration - " + item.date
     default:
-      return "Unknown Type - " + item.date
+      return "Unbekanntes Ereignis - " + item.date
   }
 }
 
@@ -398,7 +398,7 @@ const fieldsMissing = computed(() => {
               <CodeSnippet v-if="!!item?.xml" title="XML" :xml="item.xml" />
             </div>
             <div
-              v-if="item.type == PublicationHistoryRecordType.MIGRATION"
+              v-else-if="item.type == PublicationHistoryRecordType.MIGRATION"
               class="p-20"
             >
               <CodeSnippet v-if="!!item?.xml" title="XML" :xml="item.xml" />

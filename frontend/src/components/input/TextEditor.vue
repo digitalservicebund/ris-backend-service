@@ -243,20 +243,20 @@ const buttons = computed(() => [
     callback: () => editor.chain().focus().toggleMark("subscript").run(),
   },
   {
-    type: "indent",
-    icon: IndentIncrease,
-    ariaLabel: "indent",
-    group: "indent",
-    isCollapsable: false,
-    callback: () => editor.chain().focus().indent().run(),
-  },
-  {
     type: "outdent",
     icon: IndentDecrease,
     ariaLabel: "outdent",
     group: "indent",
     isCollapsable: false,
     callback: () => editor.chain().focus().outdent().run(),
+  },
+  {
+    type: "indent",
+    icon: IndentIncrease,
+    ariaLabel: "indent",
+    group: "indent",
+    isCollapsable: false,
+    callback: () => editor.chain().focus().indent().run(),
   },
   {
     type: "invisible-characters",
