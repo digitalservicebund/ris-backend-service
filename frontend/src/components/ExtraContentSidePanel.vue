@@ -8,10 +8,12 @@ import FlexItem from "@/components/FlexItem.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextAreaInput from "@/components/input/TextAreaInput.vue"
 import TextButton from "@/components/input/TextButton.vue"
+import DocumentUnitPreview from "@/components/preview/DocumentUnitPreview.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
 import useQuery from "@/composables/useQueryFromRoute"
 import DocumentUnit from "@/domain/documentUnit"
 import IconAttachFile from "~icons/ic/baseline-attach-file"
+import IconPreview from "~icons/ic/outline-remove-red-eye"
 import IconStickyNote from "~icons/ic/outline-sticky-note-2"
 
 interface Props {
@@ -73,6 +75,10 @@ function selectNotes() {
 function selectAttachments(selectedIndex?: number) {
   if (selectedIndex !== undefined) currentAttachmentIndex.value = selectedIndex
   selectedPanelContent.value = "attachments"
+}
+
+function selectPreview() {
+  selectedPanelContent.value = "preview"
 }
 
 function togglePanel(expand?: boolean) {
@@ -138,6 +144,16 @@ onMounted(() => {
           @click="() => selectAttachments()"
         />
 
+        <TextButton
+          id="preview"
+          aria-label="Vorschau anzeigen"
+          button-type="tertiary"
+          :class="selectedPanelContent === 'preview' ? 'bg-blue-200' : ''"
+          :icon="IconPreview"
+          size="small"
+          @click="() => selectPreview()"
+        />
+
         <div class="flex-grow" />
 
         <FileNavigator
@@ -174,6 +190,12 @@ onMounted(() => {
             Wenn Sie eine Datei hochladen, können Sie die Datei hier sehen.
           </div>
         </div>
+        <FlexContainer
+          v-if="selectedPanelContent === 'preview'"
+          class="max-h-[70vh] overflow-auto"
+        >
+          <DocumentUnitPreview :document-unit="documentUnit" />
+        </FlexContainer>
       </div>
     </SideToggle>
   </FlexItem>
