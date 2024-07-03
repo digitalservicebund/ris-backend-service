@@ -53,6 +53,7 @@ import IconUndo from "~icons/ic/baseline-undo"
 import IconAlignCenter from "~icons/ic/outline-format-align-center"
 import IconAlignLeft from "~icons/ic/outline-format-align-left"
 import IconBlockquote from "~icons/ic/sharp-format-quote"
+import MaterialSymbolsDeleteSweepOutline from "~icons/material-symbols/delete-sweep-outline"
 import IndentDecrease from "~icons/material-symbols/format-indent-decrease"
 import IndentIncrease from "~icons/material-symbols/format-indent-increase"
 import IconParagraph from "~icons/material-symbols/format-paragraph"
@@ -271,9 +272,17 @@ const buttons = computed(() => [
     type: "blockquote",
     icon: IconBlockquote,
     ariaLabel: "blockquote",
-    group: "format",
+    group: "blockquote",
     isCollapsable: false,
     callback: () => editor.chain().focus().toggleBlockquote().run(),
+  },
+  {
+    type: "borderNumber",
+    icon: MaterialSymbolsDeleteSweepOutline,
+    ariaLabel: "borderNumber",
+    group: "borderNumber",
+    isCollapsable: false,
+    onClick: () => editor.chain().focus().removeBorderNumbers().run(),
   },
 ])
 

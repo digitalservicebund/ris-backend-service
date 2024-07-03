@@ -42,7 +42,7 @@ watch(
     v-if="fileAsHTML?.html"
     v-bind="$attrs"
     id="attachment-view"
-    class="sticky top-0 w-full gap-40 bg-white p-24 pb-0"
+    class="sticky top-0 w-full gap-40 bg-white pb-0"
     flex-direction="flex-col"
   >
     <div
@@ -51,7 +51,7 @@ watch(
     >
       <LoadingSpinner />
     </div>
-    <FlexItem v-else class="max-h-[65vh] min-h-[63vh] overflow-scroll">
+    <FlexItem v-else class="max-h-[70vh] min-h-[63vh] overflow-scroll">
       <TextEditor
         data-testid="text-editor"
         element-id="text-editor"
