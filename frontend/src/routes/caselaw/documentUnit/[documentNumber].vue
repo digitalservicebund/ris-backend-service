@@ -139,7 +139,7 @@ onMounted(async () => {
         <NavbarSide :is-child="false" :menu-items="menuItems" :route="route" />
       </SideToggle>
     </div>
-    <div v-if="documentUnit" class="flex w-full flex-col bg-gray-100">
+    <div v-if="documentUnit" class="flex w-full min-w-0 flex-col bg-gray-100">
       <DocumentUnitInfoPanel
         v-if="documentUnit && !route.path.includes('preview')"
         data-testid="document-unit-info-panel"
