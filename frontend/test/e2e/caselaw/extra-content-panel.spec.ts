@@ -11,7 +11,7 @@ import {
 import { caselawTest as test } from "./fixtures"
 
 test.describe(
-  "test extra content side panel",
+  "extra content side panel",
   {
     annotation: {
       type: "epic",
@@ -87,7 +87,7 @@ test.describe(
       },
     )
     test(
-      "panel auto-opening and display logic",
+      "auto-opening and display logic",
       {
         annotation: [
           {
@@ -160,6 +160,59 @@ test.describe(
           await expect(page.getByText("Die ist ein Test")).toBeVisible()
           await page.getByLabel("Notiz anzeigen").click()
           await expect(page.getByLabel("Notiz Eingabefeld")).toHaveValue("")
+        })
+      },
+    )
+
+    test(
+      "export note",
+      {
+        annotation: {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-4175",
+        },
+      },
+      // DS does not export note field, that's why we need BGH user here
+      async ({ pageWithBghUser, prefilledDocumentUnitBgh }) => {
+        const documentNumber = prefilledDocumentUnitBgh.documentNumber!
+        await test.step("Confirm note is exported in XML on publish page", async () => {
+          await navigateToPublication(pageWithBghUser, documentNumber)
+          await expect(
+            pageWithBghUser.getByText("XML Vorschau der Veröffentlichung"),
+          ).toBeVisible()
+
+          await pageWithBghUser
+            .getByText("XML Vorschau der Veröffentlichung")
+            .click()
+
+          await expect(
+            pageWithBghUser.locator("span", {
+              hasText: "<notiz>example note</notiz>",
+            }),
+          ).toBeVisible()
+        })
+
+        await test.step("Delete note from doc unit", async () => {
+          await navigateToCategories(pageWithBghUser, documentNumber)
+          await fillInput(pageWithBghUser, "Notiz Eingabefeld", "")
+          await pageWithBghUser.getByLabel("Speichern Button").click()
+          await pageWithBghUser.waitForEvent("requestfinished")
+        })
+
+        await test.step("Confirm note is not exported in XML on publish page", async () => {
+          await navigateToPublication(pageWithBghUser, documentNumber)
+          await expect(
+            pageWithBghUser.getByText("XML Vorschau der Veröffentlichung"),
+          ).toBeVisible()
+
+          await pageWithBghUser
+            .getByText("XML Vorschau der Veröffentlichung")
+            .click()
+
+          await expect(
+            pageWithBghUser.locator("span", { hasText: "<notiz>" }),
+          ).toBeHidden()
         })
       },
     )

@@ -14,6 +14,7 @@ type MyFixtures = {
   secondPrefilledDocumentUnit: DocumentUnit
   editorField: Locator
   pageWithBghUser: Page
+  prefilledDocumentUnitBgh: DocumentUnit
 }
 
 export const caselawTest = test.extend<MyFixtures>({
@@ -148,5 +149,59 @@ export const caselawTest = test.extend<MyFixtures>({
 
     await pageWithBghUser.close()
     await bghContext.close()
+  },
+
+  prefilledDocumentUnitBgh: async ({ request, browser }, use) => {
+    const context = await browser.newContext({
+      storageState: `test/e2e/shared/.auth/user_bgh.json`,
+    })
+    const cookies = await context.cookies()
+    const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+    const response = await context.request.get(
+      `/api/v1/caselaw/documentunits/new`,
+    )
+    const prefilledDocumentUnit = await response.json()
+
+    const courtResponse = await request.get(`api/v1/caselaw/courts?q=AG+Aachen`)
+    const court = await courtResponse.json()
+
+    const documentTypeResponse = await request.get(
+      `api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`,
+    )
+    const documentType = await documentTypeResponse.json()
+
+    const updateResponse = await context.request.put(
+      `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
+      {
+        data: {
+          ...prefilledDocumentUnit,
+          coreData: {
+            ...prefilledDocumentUnit.coreData,
+            court: court?.[0],
+            documentType: documentType?.[0],
+            fileNumbers: [generateString()],
+            decisionDate: "2019-12-31",
+            appraisalBody: "1. Senat, 2. Kammer",
+          },
+          texts: {
+            headnote: "testHeadnote",
+            guidingPrinciple: "guidingPrinciple",
+          },
+          note: "example note",
+        },
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
+
+    await use(await updateResponse.json())
+
+    const deleteResponse = await context.request.delete(
+      `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
+      { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
+    )
+    if (!deleteResponse.ok()) {
+      throw Error(`DocumentUnit with number ${prefilledDocumentUnit.documentNumber} couldn't be deleted:
+      ${deleteResponse.status()} ${deleteResponse.statusText()}`)
+    }
   },
 })
