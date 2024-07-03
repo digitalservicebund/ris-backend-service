@@ -77,6 +77,11 @@ describe("ExtraContentSidePanel", () => {
           name: "caselaw-documentUnit-documentNumber-publication",
           component: {},
         },
+        {
+          path: "/caselaw/documentUnit/:documentNumber/preview",
+          name: "caselaw-documentUnit-documentNumber-preview",
+          component: {},
+        },
       ],
     })
   })
@@ -167,6 +172,13 @@ describe("ExtraContentSidePanel", () => {
   })
 
   describe("Select panel content", () => {
+    test("initially open note without note and no attachments", async () => {
+      renderComponent()
+      screen.getByLabelText("Seitenpanel öffnen").click()
+
+      expect(await screen.findByLabelText("Notiz Eingabefeld")).toBeVisible()
+    })
+
     test("initially open note with note and no attachments", async () => {
       renderComponent({ note: "some note" })
 
@@ -222,6 +234,13 @@ describe("ExtraContentSidePanel", () => {
           "Wenn Sie eine Datei hochladen, können Sie die Datei hier sehen.",
         ),
       ).toBeVisible()
+
+      screen.getByLabelText("Vorschau anzeigen").click()
+      expect(await screen.findByTestId("preview")).toBeVisible()
+      expect(
+        await screen.findByLabelText("Vorschau in neuem Tab öffnen"),
+      ).toBeVisible()
+
       screen.getByLabelText("Notiz anzeigen").click()
       expect(await screen.findByDisplayValue("some note")).toBeVisible()
     })
