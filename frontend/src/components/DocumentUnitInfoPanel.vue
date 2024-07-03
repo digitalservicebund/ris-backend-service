@@ -51,33 +51,33 @@ watchEffect(() => {
 
 <template>
   <div
-    class="sticky top-0 z-30 flex flex-row items-center justify-between border-b border-solid border-gray-400 bg-blue-100 px-24 py-12"
+    class="sticky top-0 z-30 flex flex-row items-center border-b border-solid border-gray-400 bg-blue-100 px-24 py-12"
   >
-    <div class="-mt-1 flex flex-col justify-center">
-      <div
-        class="flex items-center"
-        data-testid="document-unit-info-panel-items"
-      >
-        <h1 class="text font-bold">{{ heading }}</h1>
-        <span class="m-4"> | </span>
-        <span> {{ formattedInfo }}</span>
-        <IconBadge
-          :background-color="statusBadge.backgroundColor"
-          class="ml-12"
-          :color="statusBadge.color"
-          :icon="toRaw(statusBadge.icon)"
-          :label="statusBadge.label"
-        />
-        <IconBadge
-          v-if="props.documentUnit?.status?.withError"
-          background-color="bg-red-300"
-          class="ml-12"
-          color="text-red-900"
-          :icon="IconError"
-          label="Fehler"
-        />
-      </div>
-    </div>
+    <h1 class="text font-bold">{{ heading }}</h1>
+    <span class="m-4"> | </span>
+    <span
+      class="overflow-hidden text-ellipsis whitespace-nowrap"
+      data-testid="document-unit-info-panel-items"
+    >
+      {{ formattedInfo }}</span
+    >
+    <IconBadge
+      :background-color="statusBadge.backgroundColor"
+      class="ml-12"
+      :color="statusBadge.color"
+      :icon="toRaw(statusBadge.icon)"
+      :label="statusBadge.label"
+    />
+    <IconBadge
+      v-if="props.documentUnit?.status?.withError"
+      background-color="bg-red-300"
+      class="ml-12"
+      color="text-red-900"
+      :icon="IconError"
+      label="Fehler"
+    />
+
+    <span class="flex-grow"></span>
     <SaveButton
       v-if="saveCallback"
       aria-label="Speichern Button"
