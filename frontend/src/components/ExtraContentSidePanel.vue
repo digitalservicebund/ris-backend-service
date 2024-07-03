@@ -40,6 +40,13 @@ watch(
   { deep: true },
 )
 
+watch(
+  () => props.documentUnit,
+  (newValue) => {
+    updatedDocumentUnit.value = newValue
+  },
+)
+
 type SelectablePanelContent = "note" | "attachments" | "preview"
 const selectedPanelContent = ref<SelectablePanelContent>(
   !props.documentUnit.note && props.documentUnit.hasAttachments
