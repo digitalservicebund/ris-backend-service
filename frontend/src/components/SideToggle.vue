@@ -48,7 +48,7 @@ export enum OpeningDirection {
   <div class="relative bg-white" :class="classes">
     <button
       :aria-label="props.label + ' ' + postFix"
-      class="w-icon absolute top-28 z-20 flex min-h-32 min-w-32 items-center justify-center rounded-full border-1 border-solid border-gray-400 bg-white text-gray-900"
+      class="w-icon absolute top-16 z-20 flex min-h-32 min-w-32 items-center justify-center rounded-full border-1 border-solid border-gray-400 bg-white text-gray-900"
       :class="buttonClasses"
       @click="toggle"
     >
