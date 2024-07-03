@@ -8,10 +8,13 @@ import FlexItem from "@/components/FlexItem.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextAreaInput from "@/components/input/TextAreaInput.vue"
 import TextButton from "@/components/input/TextButton.vue"
+import DocumentUnitPreview from "@/components/preview/DocumentUnitPreview.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
 import useQuery from "@/composables/useQueryFromRoute"
 import DocumentUnit from "@/domain/documentUnit"
 import IconAttachFile from "~icons/ic/baseline-attach-file"
+import IconOpenInNewTab from "~icons/ic/outline-open-in-new"
+import IconPreview from "~icons/ic/outline-remove-red-eye"
 import IconStickyNote from "~icons/ic/outline-sticky-note-2"
 
 interface Props {
@@ -37,11 +40,11 @@ watch(
   { deep: true },
 )
 
-const notesSelected = ref<boolean>(
-  !!props.documentUnit.note || !props.documentUnit.hasAttachments,
-)
-const attachmentsSelected = ref<boolean>(
-  !props.documentUnit.note && props.documentUnit.hasAttachments,
+type SelectablePanelContent = "note" | "attachments" | "preview"
+const selectedPanelContent = ref<SelectablePanelContent>(
+  !props.documentUnit.note && props.documentUnit.hasAttachments
+    ? "attachments"
+    : "note",
 )
 const currentAttachmentIndex = ref(0)
 const isExpanded = ref(false)
@@ -65,14 +68,16 @@ const handleOnSelect = (index: number) => {
 }
 
 function selectNotes() {
-  notesSelected.value = true
-  attachmentsSelected.value = false
+  selectedPanelContent.value = "note"
 }
 
 function selectAttachments(selectedIndex?: number) {
   if (selectedIndex !== undefined) currentAttachmentIndex.value = selectedIndex
-  notesSelected.value = false
-  attachmentsSelected.value = true
+  selectedPanelContent.value = "attachments"
+}
+
+function selectPreview() {
+  selectedPanelContent.value = "preview"
 }
 
 function togglePanel(expand?: boolean) {
@@ -122,34 +127,59 @@ onMounted(() => {
           id="note"
           aria-label="Notiz anzeigen"
           button-type="tertiary"
-          :class="notesSelected ? 'bg-blue-200' : ''"
+          :class="selectedPanelContent === 'note' ? 'bg-blue-200' : ''"
           :icon="IconStickyNote"
           size="small"
-          @click="selectNotes"
+          @click="() => selectNotes()"
         />
 
         <TextButton
           id="attachments"
           aria-label="Dokumente anzeigen"
           button-type="tertiary"
-          :class="attachmentsSelected ? 'bg-blue-200' : ''"
+          :class="selectedPanelContent === 'attachments' ? 'bg-blue-200' : ''"
           :icon="IconAttachFile"
           size="small"
           @click="() => selectAttachments()"
         />
 
+        <TextButton
+          id="preview"
+          aria-label="Vorschau anzeigen"
+          button-type="tertiary"
+          :class="selectedPanelContent === 'preview' ? 'bg-blue-200' : ''"
+          :icon="IconPreview"
+          size="small"
+          @click="() => selectPreview()"
+        />
+
         <div class="flex-grow" />
 
         <FileNavigator
-          v-if="attachmentsSelected"
+          v-if="selectedPanelContent === 'attachments'"
           :attachments="documentUnit.attachments"
           :current-index="currentAttachmentIndex"
           @select="handleOnSelect"
         ></FileNavigator>
+        <router-link
+          v-if="selectedPanelContent === 'preview'"
+          aria-label="Vorschau in neuem Tab öffnen"
+          target="_blank"
+          :to="{
+            name: 'caselaw-documentUnit-documentNumber-preview',
+            params: { documentNumber: documentUnit.documentNumber },
+          }"
+        >
+          <TextButton
+            button-type="ghost"
+            :icon="IconOpenInNewTab"
+            size="small"
+          />
+        </router-link>
       </FlexContainer>
 
       <div class="m-24">
-        <div v-if="notesSelected">
+        <div v-if="selectedPanelContent === 'note'">
           <InputField id="notesInput" v-slot="{ id }" label="Notiz">
             <TextAreaInput
               :id="id"
@@ -160,7 +190,7 @@ onMounted(() => {
             />
           </InputField>
         </div>
-        <div v-if="attachmentsSelected">
+        <div v-if="selectedPanelContent === 'attachments'">
           <AttachmentView
             v-if="
               documentUnit.uuid &&
@@ -174,6 +204,12 @@ onMounted(() => {
             Wenn Sie eine Datei hochladen, können Sie die Datei hier sehen.
           </div>
         </div>
+        <FlexContainer
+          v-if="selectedPanelContent === 'preview'"
+          class="max-h-[70vh] overflow-auto"
+        >
+          <DocumentUnitPreview :document-unit="documentUnit" />
+        </FlexContainer>
       </div>
     </SideToggle>
   </FlexItem>

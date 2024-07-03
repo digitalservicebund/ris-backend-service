@@ -126,6 +126,14 @@ test.describe(
               "Wenn Sie eine Datei hochladen, können Sie die Datei hier sehen.",
             ),
           ).toBeVisible()
+
+          await page.getByLabel("Vorschau anzeigen").click()
+          // Note is displayed in preview tab
+          await expect(
+            page.locator("div[data-testid='preview']", {
+              hasText: "some text",
+            }),
+          ).toBeVisible()
         })
 
         await test.step("open document with note and attachment, check that note is displayed in open panel", async () => {
@@ -257,6 +265,8 @@ test.describe(
       })
 
       await test.step("test document selection with keyboard", async () => {
+        // skip preview button
+        await page.keyboard.press("Tab")
         await page.keyboard.press("Tab")
         await expect(
           page.getByRole("button", { name: "Vorheriges Dokument anzeigen" }),
@@ -278,6 +288,30 @@ test.describe(
         await expect(page.getByText("sample.docx")).toBeVisible()
         await page.keyboard.press("Enter")
         await expect(page.getByText("some-formatting.docx")).toBeVisible()
+      })
+
+      await test.step("select preview with keyboard", async () => {
+        await page.keyboard.press("Shift+Tab")
+        await expect(
+          page.getByRole("button", { name: "Vorschau anzeigen" }),
+        ).toBeFocused()
+        await page.keyboard.press("Enter")
+        await expect(
+          page.locator("p", { hasText: "Vorschau erstellt am" }),
+        ).toBeVisible()
+      })
+
+      await test.step("open preview in new tab with keyboard", async () => {
+        await page.keyboard.press("Tab")
+        await expect(
+          page.getByRole("link", { name: "Vorschau in neuem Tab öffnen" }),
+        ).toBeFocused()
+
+        const newTabPromise = page.context().waitForEvent("page")
+        await page.keyboard.press("Enter")
+        const newTab = await newTabPromise
+        expect(newTab.url()).toContain("/preview")
+        await newTab.close()
       })
     })
   },
