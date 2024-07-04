@@ -225,94 +225,104 @@ test.describe(
       },
     )
 
-    test("keyboard accessibility", async ({ page, documentNumber }) => {
-      await test.step("prepare doc unit with attachments", async () => {
-        await navigateToFiles(page, documentNumber)
-        await uploadTestfile(page, ["sample.docx", "some-formatting.docx"])
-        await expect(page.getByText("Subheadline")).toBeVisible()
-      })
+    test(
+      "keyboard accessibility",
+      {
+        annotation: {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-4254",
+        },
+      },
+      async ({ page, documentNumber }) => {
+        await test.step("prepare doc unit with attachments", async () => {
+          await navigateToFiles(page, documentNumber)
+          await uploadTestfile(page, ["sample.docx", "some-formatting.docx"])
+          await expect(page.getByText("Subheadline")).toBeVisible()
+        })
 
-      await test.step("test opening and closing panel with keyboard", async () => {
-        await page.getByTestId("Rubriken").click()
-        await expect(
-          page.getByRole("heading", { name: "Stammdaten" }),
-        ).toBeVisible()
-        await page
-          .getByRole("button", { name: "Seitenpanel schließen" })
-          .click()
-        await expect(
-          page.getByRole("button", { name: "Seitenpanel öffnen" }),
-        ).toBeFocused()
-        await page.keyboard.press("Enter")
-        await expect(
-          page.getByRole("button", { name: "Seitenpanel schließen" }),
-        ).toBeFocused()
-      })
+        await test.step("test opening and closing panel with keyboard", async () => {
+          await page.getByTestId("Rubriken").click()
+          await expect(
+            page.getByRole("heading", { name: "Stammdaten" }),
+          ).toBeVisible()
+          await page
+            .getByRole("button", { name: "Seitenpanel schließen" })
+            .click()
+          await expect(
+            page.getByRole("button", { name: "Seitenpanel öffnen" }),
+          ).toBeFocused()
+          await page.keyboard.press("Enter")
+          await expect(
+            page.getByRole("button", { name: "Seitenpanel schließen" }),
+          ).toBeFocused()
+        })
 
-      await test.step("test content selection with keyboard", async () => {
-        await page.keyboard.press("Tab")
-        await expect(
-          page.getByRole("button", { name: "Notiz anzeigen" }),
-        ).toBeFocused()
-        await page.keyboard.press("Enter")
-        await expect(page.getByText("Notiz")).toBeVisible()
-        await page.keyboard.press("Tab")
-        await expect(
-          page.getByRole("button", { name: "Dokumente anzeigen" }),
-        ).toBeFocused()
-        await page.keyboard.press("Enter")
-        await expect(page.getByText("some-formatting.docx")).toBeVisible()
-      })
+        await test.step("test content selection with keyboard", async () => {
+          await page.keyboard.press("Tab")
+          await expect(
+            page.getByRole("button", { name: "Notiz anzeigen" }),
+          ).toBeFocused()
+          await page.keyboard.press("Enter")
+          await expect(page.getByText("Notiz")).toBeVisible()
+          await page.keyboard.press("Tab")
+          await expect(
+            page.getByRole("button", { name: "Dokumente anzeigen" }),
+          ).toBeFocused()
+          await page.keyboard.press("Enter")
+          await expect(page.getByText("some-formatting.docx")).toBeVisible()
+        })
 
-      await test.step("test document selection with keyboard", async () => {
-        // skip preview button
-        await page.keyboard.press("Tab")
-        await page.keyboard.press("Tab")
-        await expect(
-          page.getByRole("button", { name: "Vorheriges Dokument anzeigen" }),
-        ).toBeFocused()
-        await page.keyboard.press("Tab")
-        await expect(
-          page.getByRole("button", { name: "Nächstes Dokument anzeigen" }),
-        ).toBeFocused()
-        await expect(page.getByText("some-formatting.docx")).toBeVisible()
-        await page.keyboard.press("Enter")
-        await expect(page.getByText("sample.docx")).toBeVisible()
-        await page.keyboard.press("Enter")
-        await expect(page.getByText("some-formatting.docx")).toBeVisible()
-        await page.keyboard.press("Shift+Tab")
-        await expect(
-          page.getByRole("button", { name: "Vorheriges Dokument anzeigen" }),
-        ).toBeFocused()
-        await page.keyboard.press("Enter")
-        await expect(page.getByText("sample.docx")).toBeVisible()
-        await page.keyboard.press("Enter")
-        await expect(page.getByText("some-formatting.docx")).toBeVisible()
-      })
+        await test.step("test document selection with keyboard", async () => {
+          // skip preview button
+          await page.keyboard.press("Tab")
+          await page.keyboard.press("Tab")
+          await expect(
+            page.getByRole("button", { name: "Vorheriges Dokument anzeigen" }),
+          ).toBeFocused()
+          await page.keyboard.press("Tab")
+          await expect(
+            page.getByRole("button", { name: "Nächstes Dokument anzeigen" }),
+          ).toBeFocused()
+          await expect(page.getByText("some-formatting.docx")).toBeVisible()
+          await page.keyboard.press("Enter")
+          await expect(page.getByText("sample.docx")).toBeVisible()
+          await page.keyboard.press("Enter")
+          await expect(page.getByText("some-formatting.docx")).toBeVisible()
+          await page.keyboard.press("Shift+Tab")
+          await expect(
+            page.getByRole("button", { name: "Vorheriges Dokument anzeigen" }),
+          ).toBeFocused()
+          await page.keyboard.press("Enter")
+          await expect(page.getByText("sample.docx")).toBeVisible()
+          await page.keyboard.press("Enter")
+          await expect(page.getByText("some-formatting.docx")).toBeVisible()
+        })
 
-      await test.step("select preview with keyboard", async () => {
-        await page.keyboard.press("Shift+Tab")
-        await expect(
-          page.getByRole("button", { name: "Vorschau anzeigen" }),
-        ).toBeFocused()
-        await page.keyboard.press("Enter")
-        await expect(
-          page.locator("p", { hasText: "Vorschau erstellt am" }),
-        ).toBeVisible()
-      })
+        await test.step("select preview with keyboard", async () => {
+          await page.keyboard.press("Shift+Tab")
+          await expect(
+            page.getByRole("button", { name: "Vorschau anzeigen" }),
+          ).toBeFocused()
+          await page.keyboard.press("Enter")
+          await expect(
+            page.locator("p", { hasText: "Vorschau erstellt am" }),
+          ).toBeVisible()
+        })
 
-      await test.step("open preview in new tab with keyboard", async () => {
-        await page.keyboard.press("Tab")
-        await expect(
-          page.getByRole("link", { name: "Vorschau in neuem Tab öffnen" }),
-        ).toBeFocused()
+        await test.step("open preview in new tab with keyboard", async () => {
+          await page.keyboard.press("Tab")
+          await expect(
+            page.getByRole("link", { name: "Vorschau in neuem Tab öffnen" }),
+          ).toBeFocused()
 
-        const newTabPromise = page.context().waitForEvent("page")
-        await page.keyboard.press("Enter")
-        const newTab = await newTabPromise
-        expect(newTab.url()).toContain("/preview")
-        await newTab.close()
-      })
-    })
+          const newTabPromise = page.context().waitForEvent("page")
+          await page.keyboard.press("Enter")
+          const newTab = await newTabPromise
+          expect(newTab.url()).toContain("/preview")
+          await newTab.close()
+        })
+      },
+    )
   },
 )
