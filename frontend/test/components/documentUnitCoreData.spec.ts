@@ -2,7 +2,6 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 import DocumentUnit, { CoreData } from "@/domain/documentUnit"
-import featureToggleService from "@/services/featureToggleService"
 
 type CoreDataProps = InstanceType<typeof DocumentUnitCoreData>["$props"]
 
@@ -22,11 +21,6 @@ function renderComponent(props?: Partial<CoreDataProps>) {
 }
 
 describe("Core Data", () => {
-  // Enable feature flag "neuris.dispute-year"
-  vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
-    status: 200,
-    data: true,
-  })
   test("renders correctly with given documentUnitId", async () => {
     const documentUnit = new DocumentUnit("1", {
       coreData: {

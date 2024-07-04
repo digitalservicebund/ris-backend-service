@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, toRefs, watch, ref, onMounted } from "vue"
+import { computed, toRefs, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import ChipsDateInput from "@/components/input/ChipsDateInput.vue"
 import ChipsInput from "@/components/input/ChipsInput.vue"
@@ -13,7 +13,6 @@ import { useValidationStore } from "@/composables/useValidationStore"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
 import { CoreData } from "@/domain/documentUnit"
 import ComboboxItemService from "@/services/comboboxItemService"
-import FeatureToggleService from "@/services/featureToggleService"
 
 interface Props {
   modelValue: CoreData
@@ -35,7 +34,6 @@ const validationStore =
 const descendingPreviousProcedures = computed(() =>
   modelValue.value.previousProcedures?.toReversed(),
 )
-const featureToggle = ref()
 
 watch(
   modelValue,
@@ -44,12 +42,6 @@ watch(
   },
   { deep: true },
 )
-
-onMounted(async () => {
-  featureToggle.value = (
-    await FeatureToggleService.isEnabled("neuris.dispute-year")
-  ).data
-})
 </script>
 
 <template>
@@ -246,7 +238,7 @@ onMounted(async () => {
         ></TextInput>
       </InputField>
     </div>
-    <div v-if="featureToggle">
+    <div>
       <InputField
         id="yearsOfDispute"
         v-slot="slotProps"
