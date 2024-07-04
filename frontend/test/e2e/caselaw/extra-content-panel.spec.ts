@@ -128,11 +128,11 @@ test.describe(
           ).toBeVisible()
 
           await page.getByLabel("Vorschau anzeigen").click()
-          // Note is displayed in preview tab
+          // Note is displayed in preview tab, label is above value
           await expect(
-            page.locator("div[data-testid='preview']", {
-              hasText: "some text",
-            }),
+            page.locator(
+              "div[data-testid='preview'] div:text('some text'):below(div:text('Notiz'))",
+            ),
           ).toBeVisible()
         })
 

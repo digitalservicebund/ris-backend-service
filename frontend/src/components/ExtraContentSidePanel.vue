@@ -215,7 +215,7 @@ onMounted(() => {
           v-if="selectedPanelContent === 'preview'"
           class="max-h-[70vh] overflow-auto"
         >
-          <DocumentUnitPreview :document-unit="documentUnit" />
+          <DocumentUnitPreview :document-unit="documentUnit" layout="narrow" />
         </FlexContainer>
       </div>
     </SideToggle>
