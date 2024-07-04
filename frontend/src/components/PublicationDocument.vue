@@ -127,7 +127,7 @@ function getHeader(item: XmlMail) {
     case PublicationHistoryRecordType.PUBLICATION:
       return "Xml Email Abgabe - " + item.date
     case PublicationHistoryRecordType.MIGRATION:
-      return "Letzte Delta Migration - " + item.date
+      return "Letzter Import/Delta Migration - " + item.date
     default:
       return "Unbekanntes Ereignis - " + item.date
   }
