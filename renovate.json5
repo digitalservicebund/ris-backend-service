@@ -4,6 +4,7 @@
     "config:recommended",
     ":disableDependencyDashboard"
   ],
+  "rangeStrategy": "bump",
   "labels": [
     "renovate"
   ],
