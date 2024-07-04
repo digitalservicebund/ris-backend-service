@@ -130,7 +130,7 @@ function focusNext() {
         @keydown.right.stop.prevent="focusNext"
       >
         <span
-          class="ds-label-03-reg flex overflow-hidden text-ellipsis whitespace-nowrap py-6 pl-8 text-14"
+          class="ds-label-03-reg inline overflow-hidden text-ellipsis whitespace-nowrap py-6 pl-8 text-14"
           :class="{ 'pr-12': readOnly }"
           data-testid="chip-value"
           >{{ chip }}
