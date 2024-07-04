@@ -18,7 +18,7 @@ onMounted(() => {
 </script>
 <template>
   <div class="flex flex-col">
-    <div class="relative flex flex-row">
+    <div class="relative flex">
       <!-- Parent component-->
       <slot />
       <!-- Toggle Button-->

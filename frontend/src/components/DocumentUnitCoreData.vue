@@ -82,7 +82,10 @@ onMounted(async () => {
     </NestedComponent>
 
     <div class="flex flex-row gap-24">
-      <NestedComponent aria-label="Abweichendes Aktenzeichen" class="w-full">
+      <NestedComponent
+        aria-label="Abweichendes Aktenzeichen"
+        class="w-full min-w-0"
+      >
         <InputField id="fileNumber" label="Aktenzeichen *">
           <ChipsInput
             id="fileNumber"
