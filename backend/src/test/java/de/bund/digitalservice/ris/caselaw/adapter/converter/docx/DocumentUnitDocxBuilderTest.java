@@ -1241,23 +1241,31 @@ class DocumentUnitDocxBuilderTest {
 
   public static Stream<Arguments> nodesThatShouldTurnIntoAHyphen() {
     return Stream.of(
-        Arguments.of(List.of(SOFT_HYPHEN + NON_BREAKING_SPACE), List.of("- ")),
-        Arguments.of(List.of(NON_BREAKING_SPACE + SOFT_HYPHEN), List.of(" -")),
-        Arguments.of(List.of(NON_BREAKING_SPACE, SOFT_HYPHEN), List.of(" -")),
-        Arguments.of(List.of(SOFT_HYPHEN, NON_BREAKING_SPACE), List.of("- ")),
-        Arguments.of(List.of("131/16" + NON_BREAKING_SPACE + SOFT_HYPHEN), List.of("131/16 -")),
-        Arguments.of(List.of("131/16" + NON_BREAKING_SPACE, SOFT_HYPHEN), List.of("131/16", " -")),
-        Arguments.of(List.of(NON_BREAKING_SPACE, SOFT_HYPHEN + " ABC"), List.of(" - ABC")));
+        Arguments.of(List.of(SOFT_HYPHEN + NON_BREAKING_SPACE), false, List.of("- ")),
+        Arguments.of(List.of(NON_BREAKING_SPACE + SOFT_HYPHEN), false, List.of(" -")),
+        Arguments.of(List.of(NON_BREAKING_SPACE, SOFT_HYPHEN), false, List.of(" -")),
+        Arguments.of(List.of(SOFT_HYPHEN, NON_BREAKING_SPACE), false, List.of("- ")),
+        Arguments.of(
+            List.of("131/16" + NON_BREAKING_SPACE + SOFT_HYPHEN), false, List.of("131/16 -")),
+        Arguments.of(
+            List.of("131/16" + NON_BREAKING_SPACE, SOFT_HYPHEN), false, List.of("131/16", " -")),
+        Arguments.of(List.of(NON_BREAKING_SPACE, SOFT_HYPHEN + " ABC"), false, List.of(" - ABC")),
+
+        // with whitespace: preserve
+        Arguments.of(List.of(SOFT_HYPHEN + " "), true, List.of("- ")),
+        Arguments.of(List.of(" " + SOFT_HYPHEN), true, List.of(" -")));
   }
 
   public static Stream<Arguments> nodesThatShouldNotTurnIntoHyphen() {
     return Stream.of(
-        Arguments.of(List.of(SOFT_HYPHEN), null), // only soft hyphen
-        Arguments.of(List.of(NON_BREAKING_SPACE), null), // only non-breaking space
+        Arguments.of(List.of(SOFT_HYPHEN), false, null), // only soft hyphen
+        Arguments.of(List.of(NON_BREAKING_SPACE), false, null), // only non-breaking space
         Arguments.of(
-            List.of(NON_BREAKING_SPACE, " ", SOFT_HYPHEN), null), // space text node in between
+            List.of(NON_BREAKING_SPACE, " ", SOFT_HYPHEN),
+            false,
+            null), // space text node in between
         Arguments.of(
-            List.of(NON_BREAKING_SPACE + " " + SOFT_HYPHEN), null)); // space char in between
+            List.of(NON_BREAKING_SPACE + " " + SOFT_HYPHEN), false, null)); // space char in between
   }
 
   /**
@@ -1268,7 +1276,7 @@ class DocumentUnitDocxBuilderTest {
   @ParameterizedTest
   @MethodSource({"nodesThatShouldTurnIntoAHyphen", "nodesThatShouldNotTurnIntoHyphen"})
   void testBuild_paragraphWithNBSPAndSHYCombination_shouldBeTransformedIntoHyphen(
-      List<String> inputTextNodes, List<String> expectedValues) {
+      List<String> inputTextNodes, Boolean preserveWhitespace, List<String> expectedValues) {
     if (expectedValues == null) {
       expectedValues = inputTextNodes;
     }
@@ -1279,6 +1287,7 @@ class DocumentUnitDocxBuilderTest {
       R run = new R();
       Text textNode = new Text();
       textNode.setValue(textNodeValue);
+      textNode.setSpace(preserveWhitespace != null && preserveWhitespace ? "preserve" : null);
       JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, textNode);
       run.getContent().add(element);
       parentParagraph.getContent().add(run);

@@ -68,6 +68,11 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
         Text currentText = (Text) element.getValue();
         String updatedTextValue = currentText.getValue();
 
+        // white-space preserve = NBSP
+        if (currentText.getSpace() != null && currentText.getSpace().equals("preserve")) {
+          updatedTextValue = updatedTextValue.replace(SOFT_HYPHEN + " ", "- ");
+          updatedTextValue = updatedTextValue.replace(" " + SOFT_HYPHEN, " -");
+        }
         // soft hyphen node + non-breaking space node = hyphen
         if (previousSoftHyphenText != null
             && currentText.getValue().startsWith(NON_BREAKING_SPACE)) {
