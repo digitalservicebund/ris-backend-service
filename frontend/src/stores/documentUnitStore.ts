@@ -4,7 +4,10 @@ import { ref } from "vue"
 import DocumentUnit from "@/domain/documentUnit"
 import { RisJsonPatch } from "@/domain/risJsonPatch"
 import documentUnitService from "@/services/documentUnitService"
-import { ServiceResponse } from "@/services/httpClient"
+import {
+  FailedValidationServerResponse,
+  ServiceResponse,
+} from "@/services/httpClient"
 
 export const useDocumentUnitStore = defineStore("docunitStore", () => {
   const documentUnit = ref<DocumentUnit | undefined>(undefined)
@@ -18,7 +21,9 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
     return response as ServiceResponse<void>
   }
 
-  async function updateDocumentUnit(): Promise<ServiceResponse<unknown>> {
+  async function updateDocumentUnit(): Promise<
+    ServiceResponse<RisJsonPatch | FailedValidationServerResponse | undefined>
+  > {
     if (!documentUnit.value || !originalDocumentUnit.value) {
       return { status: 404, data: undefined }
     }
@@ -43,16 +48,20 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
       const newPatch = response.data as RisJsonPatch
       jsonpatch.applyPatch(documentUnit.value, newPatch.patch)
       documentUnit.value.version = newPatch.documentationUnitVersion
-      response.error = {
-        title: "Fehler beim Patchen",
-        description: newPatch.errorPaths,
+
+      if (newPatch.errorPaths.length > 0) {
+        response.error = {
+          title: "Fehler beim Patchen",
+          description: newPatch.errorPaths,
+        }
       }
+
       originalDocumentUnit.value = JSON.parse(
         JSON.stringify(documentUnit.value),
       ) // Update the original copy
     }
 
-    return response as ServiceResponse<unknown>
+    return response
   }
 
   return { documentUnit, loadDocumentUnit, updateDocumentUnit }
