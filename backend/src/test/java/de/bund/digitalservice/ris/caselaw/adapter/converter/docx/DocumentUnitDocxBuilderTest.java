@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.converter.docx;
 
+import static de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocumentUnitDocxBuilder.NON_BREAKING_SPACE;
+import static de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocumentUnitDocxBuilder.SOFT_HYPHEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -19,12 +21,15 @@ import de.bund.digitalservice.ris.caselaw.domain.docx.InlineImageElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingList;
 import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ParagraphElement;
+import de.bund.digitalservice.ris.caselaw.domain.docx.RunElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.RunTextElement;
 import jakarta.xml.bind.JAXBElement;
 import java.awt.Dimension;
 import java.math.BigInteger;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 import javax.xml.namespace.QName;
 import org.docx4j.dml.CTBlip;
 import org.docx4j.dml.CTBlipFillProperties;
@@ -63,8 +68,12 @@ import org.docx4j.wml.Text;
 import org.docx4j.wml.U;
 import org.docx4j.wml.UnderlineEnumeration;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class DocumentUnitDocxBuilderTest {
+
   @Test
   void test_withoutConvertableElements() {
     DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
@@ -1228,6 +1237,63 @@ class DocumentUnitDocxBuilderTest {
         memoryAppender.getMessage(Level.ERROR, 0));
 
     memoryAppender.detachLoggingTestAppender();
+  }
+
+  public static Stream<Arguments> nodesThatShouldTurnIntoAHyphen() {
+    return Stream.of(
+        Arguments.of(List.of(SOFT_HYPHEN + NON_BREAKING_SPACE), List.of("- ")),
+        Arguments.of(List.of(NON_BREAKING_SPACE + SOFT_HYPHEN), List.of(" -")),
+        Arguments.of(List.of(NON_BREAKING_SPACE, SOFT_HYPHEN), List.of(" -")),
+        Arguments.of(List.of(SOFT_HYPHEN, NON_BREAKING_SPACE), List.of("- ")),
+        Arguments.of(List.of("131/16" + NON_BREAKING_SPACE + SOFT_HYPHEN), List.of("131/16 -")),
+        Arguments.of(List.of("131/16" + NON_BREAKING_SPACE, SOFT_HYPHEN), List.of("131/16", " -")),
+        Arguments.of(List.of(NON_BREAKING_SPACE, SOFT_HYPHEN + " ABC"), List.of(" - ABC")));
+  }
+
+  public static Stream<Arguments> nodesThatShouldNotTurnIntoHyphen() {
+    return Stream.of(
+        Arguments.of(List.of(SOFT_HYPHEN), null), // only soft hyphen
+        Arguments.of(List.of(NON_BREAKING_SPACE), null), // only non-breaking space
+        Arguments.of(
+            List.of(NON_BREAKING_SPACE, " ", SOFT_HYPHEN), null), // space text node in between
+        Arguments.of(
+            List.of(NON_BREAKING_SPACE + " " + SOFT_HYPHEN), null)); // space char in between
+  }
+
+  /**
+   * @param inputTextNodes the list of text nodes to be transformed into a paragraph element
+   * @param expectedValues the list of expected HTML String values. If null, we expect the same as
+   *     the input inputTextNodes
+   */
+  @ParameterizedTest
+  @MethodSource({"nodesThatShouldTurnIntoAHyphen", "nodesThatShouldNotTurnIntoHyphen"})
+  void testBuild_paragraphWithNBSPAndSHYCombination_shouldBeTransformedIntoHyphen(
+      List<String> inputTextNodes, List<String> expectedValues) {
+    if (expectedValues == null) {
+      expectedValues = inputTextNodes;
+    }
+
+    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    P parentParagraph = new P();
+    for (String textNodeValue : inputTextNodes) {
+      R run = new R();
+      Text textNode = new Text();
+      textNode.setValue(textNodeValue);
+      JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, textNode);
+      run.getContent().add(element);
+      parentParagraph.getContent().add(run);
+    }
+    var result = builder.setParagraph(parentParagraph).build();
+    assertTrue(result instanceof ParagraphElement);
+
+    ParagraphElement paragraphElement = (ParagraphElement) result;
+    assertEquals(expectedValues.size(), paragraphElement.getRunElements().size());
+
+    for (int i = 0; i < expectedValues.size(); i++) {
+      RunElement runElement = paragraphElement.getRunElements().get(i);
+      assertEquals(RunTextElement.class, runElement.getClass());
+      assertEquals(expectedValues.get(i), runElement.toHtmlString());
+    }
   }
 
   private Inline generateInline(String name, String description, Dimension size) {
