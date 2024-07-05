@@ -40,7 +40,9 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     ).toBeVisible()
   })
 
-  test("expect write access from a user of a different documentationOffice to be restricted for a published documentunit", async ({
+  // We can't test this as NeuRIS doesn't publish documentUnits anymore
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("expect write access from a user of a different documentationOffice to be restricted for a published documentunit", async ({
     page,
     prefilledDocumentUnit,
     pageWithBghUser,

@@ -303,7 +303,5 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await expect(page.getByText("Email wurde versendet")).toBeVisible()
 
     await expect(page.getByText("Xml Email Abgabe -")).toBeVisible()
-
-    await expect(page.getByText("In Veröffentlichung")).toBeVisible()
   })
 })
