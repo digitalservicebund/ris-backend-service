@@ -1,6 +1,7 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createHead } from "@unhead/vue"
+import { createPinia, setActivePinia } from "pinia"
 import { MockInstance } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnit from "@/domain/documentUnit"
@@ -88,6 +89,7 @@ describe("Document Number Route", () => {
   let updateDocUnitMock: MockInstance
 
   beforeEach(() => {
+    setActivePinia(createPinia())
     updateDocUnitMock = vi
       .spyOn(documentUnitService, "update")
       .mockImplementation(() =>
