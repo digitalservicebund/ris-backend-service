@@ -12,14 +12,14 @@ import sibModel.GetEmailEventReportEvents.EventEnum;
 @Slf4j
 public class SendInBlueMailTrackingService implements MailTrackingService {
 
-  private final DocumentUnitStatusService statusService;
+  private final DocumentUnitService documentUnitService;
 
-  public SendInBlueMailTrackingService(DocumentUnitStatusService statusService) {
-    this.statusService = statusService;
+  public SendInBlueMailTrackingService(DocumentUnitService documentUnitService) {
+    this.documentUnitService = documentUnitService;
   }
 
   @Override
-  public EmailPublishState getMappedPublishState(String mailTrackingEvent) {
+  public EmailPublishState mapEventToPublishState(String mailTrackingEvent) {
     var event = EventEnum.fromValue(mailTrackingEvent);
     if (event == null) {
       return EmailPublishState.UNKNOWN;
@@ -42,45 +42,24 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
   }
 
   @Override
-  public ResponseEntity<String> updatePublishingState(String payloadTag, String event) {
+  // TODO alert on the errors
+  public ResponseEntity<String> processMailSendingState(String payloadTag, String event) {
 
-    final UUID documentUnitUuid = parseDocUnitUUID(payloadTag);
-
-    if (documentUnitUuid == null) {
-      // No UUID in tag == it's about a forwarded report mail and not the mail to juris
-      if (getMappedPublishState(event) == EmailPublishState.ERROR) {
-        log.error("Received Mail sending error {} with tag {}", event, payloadTag);
-      }
-      return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
-
-    EmailPublishState state = getMappedPublishState(event);
-
+    EmailPublishState state = mapEventToPublishState(event);
     if (state == EmailPublishState.UNKNOWN) {
       return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     if (state == EmailPublishState.ERROR) {
-      log.error("Failed to send Mail for {} because of event {}", documentUnitUuid, event);
+      DocumentUnit documentUnit = documentUnitService.getByUuid(parseDocUnitUUID(payloadTag));
+      log.error(
+          documentUnit == null
+              ? "Received Mail sending error for forwarded email. Event: {}, Tag {}"
+              : "Failed to send Mail for documentation unit {} because of event {}",
+          payloadTag,
+          event);
     }
 
-    PublicationStatus latestStatus = statusService.getLatestStatus(documentUnitUuid);
-    if (latestStatus == null) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-
-    if (latestStatus != PublicationStatus.PUBLISHED) {
-      try {
-        statusService.update(
-            documentUnitUuid,
-            Status.builder()
-                .publicationStatus(latestStatus)
-                .withError(state == EmailPublishState.ERROR)
-                .build());
-      } catch (DocumentationUnitNotExistsException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-      }
-    }
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 

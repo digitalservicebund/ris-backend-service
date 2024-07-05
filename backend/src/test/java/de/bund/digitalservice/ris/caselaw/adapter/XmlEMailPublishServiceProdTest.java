@@ -46,6 +46,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ActiveProfiles(profiles = {"production"})
 class XmlEMailPublishServiceProdTest {
   private static final String RECEIVER_ADDRESS = "test-to@mail.com";
+
+  private static final String ISSUER_ADDRESS = "neuris-user@example.com";
   private static final String SENDER_ADDRESS = "export@neuris";
   private static final Instant PUBLISH_DATE = Instant.parse("2020-05-05T10:21:35.00Z");
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -64,6 +66,7 @@ class XmlEMailPublishServiceProdTest {
           .statusMessages(List.of("succeed"))
           .fileName("test.xml")
           .publishDate(PUBLISH_DATE)
+          .issuerAddress(ISSUER_ADDRESS)
           .build();
 
   private static final XmlPublication SAVED_XML_MAIL_PROD =
@@ -76,6 +79,7 @@ class XmlEMailPublishServiceProdTest {
           .statusMessages(List.of("succeed"))
           .fileName("test.xml")
           .publishDate(PUBLISH_DATE)
+          .issuerAddress(ISSUER_ADDRESS)
           .build();
   private static final XmlResultObject FORMATTED_XML =
       new XmlResultObject("xml", "200", List.of("succeed"), "test.xml", PUBLISH_DATE);
@@ -113,7 +117,7 @@ class XmlEMailPublishServiceProdTest {
   void testPublishWithProdSubjectAndOriginalCourtAndFileNumber()
       throws ParserConfigurationException, TransformerException {
 
-    var response = service.publish(documentUnit, RECEIVER_ADDRESS);
+    var response = service.publish(documentUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS);
 
     assertThat(response.mailSubject()).isEqualTo(PROD_MAIL_SUBJECT);
 

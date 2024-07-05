@@ -57,7 +57,8 @@ public class XmlEMailPublishService implements EmailPublishService {
   }
 
   @Override
-  public XmlPublication publish(DocumentUnit documentUnit, String receiverAddress) {
+  public XmlPublication publish(
+      DocumentUnit documentUnit, String receiverAddress, String issuerAddress) {
     XmlResultObject xml;
     try {
       xml = xmlExporter.generateXml(getTestDocumentUnit(documentUnit));
@@ -68,7 +69,8 @@ public class XmlEMailPublishService implements EmailPublishService {
     String mailSubject = generateMailSubject(documentUnit);
 
     XmlPublication xmlPublication =
-        generateXmlPublication(documentUnit.uuid(), receiverAddress, mailSubject, xml);
+        generateXmlPublication(
+            documentUnit.uuid(), receiverAddress, mailSubject, xml, issuerAddress);
     generateAndSendMail(xmlPublication);
     return savePublishInformation(xmlPublication);
   }
@@ -76,6 +78,10 @@ public class XmlEMailPublishService implements EmailPublishService {
   @Override
   public List<Publication> getPublications(UUID documentUnitUuid) {
     return repository.getPublicationsByDocumentUnitUuid(documentUnitUuid);
+  }
+
+  public String getLatestIssuerAddress(UUID documentUnitUuid) {
+    return repository.getLastXmlPublication(documentUnitUuid).getIssuerAddress();
   }
 
   @Override
@@ -136,7 +142,11 @@ public class XmlEMailPublishService implements EmailPublishService {
   }
 
   private XmlPublication generateXmlPublication(
-      UUID documentUnitUuid, String receiverAddress, String mailSubject, XmlResultObject xml) {
+      UUID documentUnitUuid,
+      String receiverAddress,
+      String mailSubject,
+      XmlResultObject xml,
+      String issuerAddress) {
     var publicationBuilder =
         XmlPublication.builder()
             .documentUnitUuid(documentUnitUuid)
@@ -153,6 +163,7 @@ public class XmlEMailPublishService implements EmailPublishService {
         .xml(xml.xml())
         .fileName(xml.fileName())
         .publishDate(xml.publishDate())
+        .issuerAddress(issuerAddress)
         .build();
   }
 

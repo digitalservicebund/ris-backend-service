@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
-import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING;
+import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
@@ -146,6 +146,13 @@ class PublishDocumentUnitIntegrationTest {
 
     assertThat(repository.findAll()).hasSize(1);
 
+    var initialStatus =
+        documentUnitStatusRepository.save(
+            StatusDTO.builder()
+                .publicationStatus(UNPUBLISHED)
+                .documentationUnitDTO(documentUnitDTO)
+                .build());
+
     XmlPublicationDTO expectedXmlPublicationDTO =
         XmlPublicationDTO.builder()
             .documentUnitId(savedDocumentUnitDTO.getId())
@@ -159,6 +166,7 @@ class PublishDocumentUnitIntegrationTest {
             .statusCode("200")
             .statusMessages("message 1|message 2")
             .fileName("test.xml")
+            .issuerAddress("test@test.com")
             .build();
 
     XmlPublication expectedXmlResultObject =
@@ -174,6 +182,7 @@ class PublishDocumentUnitIntegrationTest {
             .statusCode("200")
             .statusMessages(List.of("message 1", "message 2"))
             .fileName("test.xml")
+            .issuerAddress("test@test.com") // set by AuthUtils
             .build();
     risWebTestClient
         .withDefaultLogin()
@@ -198,13 +207,13 @@ class PublishDocumentUnitIntegrationTest {
         .ignoringFields("publishDate", "id")
         .isEqualTo(expectedXmlPublicationDTO);
 
-    StatusDTO statusList =
+    StatusDTO lastStatus =
         documentUnitStatusRepository.findFirstByDocumentationUnitDTOOrderByCreatedAtDesc(
             savedDocumentUnitDTO);
 
-    assertThat(statusList.getPublicationStatus()).isEqualTo(PUBLISHING);
-    assertThat(statusList.getCreatedAt()).isEqualTo(xmlPublicationDTO.getPublishDate());
-    assertThat(statusList.getIssuerAddress()).isEqualTo("test@test.com");
+    // publication status should not change because publishing here means handover
+    assertThat(lastStatus.getPublicationStatus()).isEqualTo(initialStatus.getPublicationStatus());
+    assertThat(lastStatus.getCreatedAt()).isEqualTo(initialStatus.getCreatedAt());
   }
 
   @Test
@@ -220,7 +229,6 @@ class PublishDocumentUnitIntegrationTest {
     documentUnitStatusRepository.save(
         StatusDTO.builder()
             .documentationUnitDTO(savedDocumentUnitDTO)
-            .issuerAddress("test1@test.com")
             .publicationStatus(PublicationStatus.UNPUBLISHED)
             .build());
     assertThat(documentUnitStatusRepository.findAll()).hasSize(1);

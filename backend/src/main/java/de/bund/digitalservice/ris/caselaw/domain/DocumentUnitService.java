@@ -44,7 +44,6 @@ public class DocumentUnitService {
   private final DocumentNumberService documentNumberService;
   private final EmailPublishService publicationService;
   private final DeltaMigrationRepository deltaMigrationRepository;
-  private final DocumentUnitStatusService documentUnitStatusService;
   private final AttachmentService attachmentService;
   private final DocumentNumberRecyclingService documentNumberRecyclingService;
   private final Validator validator;
@@ -57,7 +56,6 @@ public class DocumentUnitService {
       DocumentNumberService documentNumberService,
       EmailPublishService publicationService,
       DeltaMigrationRepository migrationService,
-      DocumentUnitStatusService documentUnitStatusService,
       PublicationReportRepository publicationReportRepository,
       DocumentNumberRecyclingService documentNumberRecyclingService,
       Validator validator,
@@ -67,7 +65,6 @@ public class DocumentUnitService {
     this.documentNumberService = documentNumberService;
     this.publicationService = publicationService;
     this.deltaMigrationRepository = migrationService;
-    this.documentUnitStatusService = documentUnitStatusService;
     this.publicationReportRepository = publicationReportRepository;
     this.documentNumberRecyclingService = documentNumberRecyclingService;
     this.validator = validator;
@@ -195,14 +192,13 @@ public class DocumentUnitService {
             .findByUuid(documentUnitUuid)
             .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnitUuid));
 
-    XmlPublication mailResponse = publicationService.publish(documentUnit, recipientAddress);
-    if (mailResponse.getStatusCode().equals(String.valueOf(HttpStatus.OK.value()))) {
-      documentUnitStatusService.setToPublishing(
-          documentUnit, mailResponse.getPublishDate(), issuerAddress);
-      return mailResponse;
-    } else {
-      return mailResponse;
+    XmlPublication mailResponse =
+        publicationService.publish(documentUnit, recipientAddress, issuerAddress);
+    if (!mailResponse.getStatusCode().equals(String.valueOf(HttpStatus.OK.value()))) {
+      log.warn("Failed to send mail for documentation unit {}", documentUnitUuid);
     }
+
+    return mailResponse;
   }
 
   public XmlResultObject previewPublication(UUID documentUuid)

@@ -42,7 +42,4 @@ public class StatusDTO {
   @ManyToOne
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   DocumentationUnitDTO documentationUnitDTO;
-
-  @Column(name = "issuer_address")
-  private String issuerAddress;
 }

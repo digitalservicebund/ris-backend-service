@@ -16,7 +16,8 @@ public record XmlPublication(
     List<String> statusMessages,
     String fileName,
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY, value = "date") Instant publishDate,
-    String publishStateDisplayText)
+    String publishStateDisplayText,
+    String issuerAddress)
     implements Publication {
   @Override
   public PublicationHistoryRecordType getType() {
@@ -36,5 +37,9 @@ public record XmlPublication(
   @Override
   public String getStatusCode() {
     return statusCode;
+  }
+
+  public String getIssuerAddress() {
+    return issuerAddress;
   }
 }

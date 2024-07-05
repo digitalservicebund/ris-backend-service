@@ -48,9 +48,9 @@ class AdminControllerTest {
                                 }""",
             mailTrackingEvent, TEST_UUID);
 
-    when(mailTrackingService.getMappedPublishState(mailTrackingEvent))
+    when(mailTrackingService.mapEventToPublishState(mailTrackingEvent))
         .thenReturn(expectedEmailPublishState);
-    when(mailTrackingService.updatePublishingState(TEST_UUID.toString(), mailTrackingEvent))
+    when(mailTrackingService.processMailSendingState(TEST_UUID.toString(), mailTrackingEvent))
         .thenReturn(ResponseEntity.ok().build());
 
     risWebTestClient
@@ -63,7 +63,7 @@ class AdminControllerTest {
         .expectStatus()
         .isOk();
 
-    verify(mailTrackingService).updatePublishingState(TEST_UUID.toString(), mailTrackingEvent);
+    verify(mailTrackingService).processMailSendingState(TEST_UUID.toString(), mailTrackingEvent);
   }
 
   @ParameterizedTest
@@ -116,9 +116,9 @@ class AdminControllerTest {
                           "ignoredKey": 123
                         }""";
 
-    when(mailTrackingService.updatePublishingState("no-uuid", "delivered"))
+    when(mailTrackingService.processMailSendingState("no-uuid", "delivered"))
         .thenReturn(ResponseEntity.noContent().build());
-    when(mailTrackingService.getMappedPublishState("delivered"))
+    when(mailTrackingService.mapEventToPublishState("delivered"))
         .thenReturn(EmailPublishState.SUCCESS);
 
     risWebTestClient
@@ -131,7 +131,7 @@ class AdminControllerTest {
         .expectStatus()
         .isNoContent();
 
-    verify(mailTrackingService).updatePublishingState("no-uuid", "delivered");
+    verify(mailTrackingService).processMailSendingState("no-uuid", "delivered");
   }
 
   @Test

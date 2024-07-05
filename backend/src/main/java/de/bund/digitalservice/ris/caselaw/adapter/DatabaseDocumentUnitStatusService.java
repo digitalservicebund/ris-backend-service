@@ -3,8 +3,6 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
@@ -20,55 +18,13 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
 
   private final DatabaseStatusRepository repository;
 
-  private final DocumentUnitRepository documentUnitRepository;
-
   private final DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
 
   public DatabaseDocumentUnitStatusService(
       DatabaseStatusRepository repository,
-      DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository,
-      DocumentUnitRepository documentUnitRepository) {
+      DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository) {
     this.repository = repository;
-    this.documentUnitRepository = documentUnitRepository;
     this.databaseDocumentationUnitRepository = databaseDocumentationUnitRepository;
-  }
-
-  @Override
-  public DocumentUnit setInitialStatus(DocumentUnit documentUnit)
-      throws DocumentationUnitNotExistsException {
-
-    repository.save(
-        StatusDTO.builder()
-            .createdAt(Instant.now())
-            .documentationUnitDTO(
-                databaseDocumentationUnitRepository.getReferenceById(documentUnit.uuid()))
-            .publicationStatus(PublicationStatus.UNPUBLISHED)
-            .withError(false)
-            .build());
-
-    return documentUnitRepository
-        .findByUuid(documentUnit.uuid())
-        .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnit.uuid()));
-  }
-
-  @Override
-  public DocumentUnit setToPublishing(
-      DocumentUnit documentUnit, Instant publishDate, String issuerAddress)
-      throws DocumentationUnitNotExistsException {
-
-    repository.save(
-        StatusDTO.builder()
-            .createdAt(publishDate)
-            .documentationUnitDTO(
-                databaseDocumentationUnitRepository.getReferenceById(documentUnit.uuid()))
-            .publicationStatus(PublicationStatus.PUBLISHING)
-            .withError(false)
-            .issuerAddress(issuerAddress)
-            .build());
-
-    return documentUnitRepository
-        .findByUuid(documentUnit.uuid())
-        .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnit.uuid()));
   }
 
   @Override
@@ -83,23 +39,13 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
   }
 
   private void saveStatus(Status status, StatusDTO previousStatusDTO) {
-
     repository.save(
         StatusDTO.builder()
             .createdAt(Instant.now())
             .documentationUnitDTO(previousStatusDTO.getDocumentationUnitDTO())
-            .issuerAddress(previousStatusDTO.getIssuerAddress())
             .publicationStatus(status.publicationStatus())
             .withError(status.withError())
             .build());
-  }
-
-  public String getLatestIssuerAddress(String documentNumber) {
-    try {
-      return getLatestPublishing(documentNumber).getIssuerAddress();
-    } catch (Exception e) {
-      return null;
-    }
   }
 
   @Override
@@ -108,6 +54,21 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
         repository.findFirstByDocumentationUnitDTOOrderByCreatedAtDesc(
             databaseDocumentationUnitRepository.getReferenceById(documentUuid));
 
+    if (entity == null) {
+      return null;
+    }
+
+    return entity.getPublicationStatus();
+  }
+
+  @Override
+  public PublicationStatus getLatestStatus(String documentNumber) {
+    var docUnit = databaseDocumentationUnitRepository.findByDocumentNumber(documentNumber);
+    if (docUnit.isEmpty()) {
+      return null;
+    }
+    StatusDTO entity =
+        repository.findFirstByDocumentationUnitDTOOrderByCreatedAtDesc(docUnit.get());
     if (entity == null) {
       return null;
     }
@@ -127,8 +88,7 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
   private StatusDTO getLatestPublishing(UUID documentUuid)
       throws DocumentationUnitNotExistsException {
     return repository
-        .findFirstByDocumentationUnitDTO_IdAndPublicationStatusOrderByCreatedAtDesc(
-            documentUuid, PublicationStatus.PUBLISHING)
+        .findFirstByDocumentationUnitDTO_IdOrderByCreatedAtDesc(documentUuid)
         .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUuid));
   }
 }

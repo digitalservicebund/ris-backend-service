@@ -15,6 +15,8 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseStatusRepository;
 import jakarta.validation.Validator;
 import java.time.Instant;
 import java.util.Collections;
@@ -42,13 +44,14 @@ class DocumentUnitServiceTest {
   private static final String ISSUER_ADDRESS = "test-issuer@exporter.neuris";
   @SpyBean private DocumentUnitService service;
 
+  @MockBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
+  @MockBean private DatabaseStatusRepository statusRepository;
   @MockBean private DocumentUnitRepository repository;
   @MockBean private DocumentNumberService documentNumberService;
   @MockBean private DocumentNumberRecyclingService documentNumberRecyclingService;
   @MockBean private EmailPublishService publishService;
   @MockBean private PublicationReportRepository publicationReportRepository;
   @MockBean private DeltaMigrationRepository deltaMigrationRepository;
-  @MockBean private DatabaseDocumentUnitStatusService documentUnitStatusService;
   @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @MockBean private AttachmentService attachmentService;
   @MockBean private Validator validator;
@@ -59,8 +62,7 @@ class DocumentUnitServiceTest {
   void testGenerateNewDocumentUnit()
       throws DocumentationUnitExistsException,
           DocumentNumberPatternException,
-          DocumentNumberFormatterException,
-          DocumentationUnitNotExistsException {
+          DocumentNumberFormatterException {
     DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
     DocumentUnit documentUnit = DocumentUnit.builder().build();
 
@@ -68,7 +70,6 @@ class DocumentUnitServiceTest {
         .thenReturn(documentUnit);
     when(documentNumberService.generateDocumentNumber(documentationOffice.abbreviation()))
         .thenReturn("nextDocumentNumber");
-    when(documentUnitStatusService.setInitialStatus(documentUnit)).thenReturn(documentUnit);
     // Can we use a captor to check if the document number was correctly created?
     // The chicken-egg-problem is, that we are dictating what happens when
     // repository.save(), so we can't just use a captor at the same time
@@ -184,17 +185,12 @@ class DocumentUnitServiceTest {
             .fileName("filename")
             .publishDate(Instant.now())
             .build();
-    when(publishService.publish(eq(DocumentUnit.builder().build()), anyString()))
+    when(publishService.publish(eq(DocumentUnit.builder().build()), anyString(), anyString()))
         .thenReturn(xmlPublication);
-    when(documentUnitStatusService.setToPublishing(
-            any(DocumentUnit.class), any(Instant.class), anyString()))
-        .thenReturn(DocumentUnit.builder().build());
     var mailResponse = service.publishAsEmail(TEST_UUID, ISSUER_ADDRESS);
     assertThat(mailResponse).usingRecursiveComparison().isEqualTo(xmlPublication);
     verify(repository).findByUuid(TEST_UUID);
-    verify(publishService).publish(eq(DocumentUnit.builder().build()), anyString());
-    verify(documentUnitStatusService)
-        .setToPublishing(any(DocumentUnit.class), any(Instant.class), anyString());
+    verify(publishService).publish(eq(DocumentUnit.builder().build()), anyString(), anyString());
   }
 
   @Test
@@ -205,7 +201,8 @@ class DocumentUnitServiceTest {
         DocumentationUnitNotExistsException.class,
         () -> service.publishAsEmail(TEST_UUID, ISSUER_ADDRESS));
     verify(repository).findByUuid(TEST_UUID);
-    verify(publishService, never()).publish(eq(DocumentUnit.builder().build()), anyString());
+    verify(publishService, never())
+        .publish(eq(DocumentUnit.builder().build()), anyString(), anyString());
   }
 
   @Test

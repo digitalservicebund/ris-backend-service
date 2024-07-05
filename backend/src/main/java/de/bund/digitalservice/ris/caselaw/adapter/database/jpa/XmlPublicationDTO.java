@@ -43,4 +43,7 @@ public class XmlPublicationDTO {
 
   @Column(name = "publish_date")
   Instant publishDate;
+
+  @Column(name = "issuer_address")
+  private String issuerAddress;
 }

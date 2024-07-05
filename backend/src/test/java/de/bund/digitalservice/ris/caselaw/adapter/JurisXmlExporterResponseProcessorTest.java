@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -15,6 +16,8 @@ import static org.mockito.Mockito.when;
 
 import ch.qos.logback.classic.Level;
 import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
@@ -23,6 +26,8 @@ import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
+import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
+import de.bund.digitalservice.ris.caselaw.domain.XmlPublicationRepository;
 import de.bund.digitalservice.ris.domain.export.juris.response.ImportMessageWrapper;
 import de.bund.digitalservice.ris.domain.export.juris.response.MessageAttachment;
 import de.bund.digitalservice.ris.domain.export.juris.response.ProcessMessageWrapper;
@@ -43,10 +48,13 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -58,10 +66,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @Import({JurisXmlExporterResponseProcessor.class, JurisMessageWrapperFactory.class})
 class JurisXmlExporterResponseProcessorTest {
   private static final String DOCUMENT_NUMBER = "KORE123456789";
+  private static final UUID DOCUMENT_UUID = UUID.randomUUID();
   @MockBean private DocumentUnitStatusService statusService;
   @MockBean private HttpMailSender mailSender;
   @MockBean private ImapStoreFactory storeFactory;
   @MockBean private PublicationReportRepository reportRepository;
+  @MockBean private DocumentUnitRepository documentUnitRepository;
+  @MockBean private XmlPublicationRepository xmlPublicationRepository;
   @Mock private Store store;
   @Mock private Folder inbox;
   @Mock private Folder processed;
@@ -71,6 +82,7 @@ class JurisXmlExporterResponseProcessorTest {
   @Mock private Message processMessage;
   @Mock private ProcessMessageWrapper processMessageWrapper;
   @Mock private JurisMessageWrapperFactory wrapperFactory;
+
   private JurisXmlExporterResponseProcessor responseProcessor;
 
   @BeforeEach
@@ -92,12 +104,23 @@ class JurisXmlExporterResponseProcessorTest {
 
     when(reportRepository.saveAll(any())).thenReturn(Collections.emptyList());
 
-    when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER))
-        .thenReturn("test@digitalservice.bund.de");
+    when(documentUnitRepository.findByDocumentNumber(DOCUMENT_NUMBER))
+        .thenReturn(Optional.of(DocumentUnit.builder().uuid(DOCUMENT_UUID).build()));
+
+    when(xmlPublicationRepository.getLastXmlPublication(DOCUMENT_UUID))
+        .thenReturn(XmlPublication.builder().issuerAddress("test@digitalservice.bund.de").build());
+
+    when(statusService.getLatestStatus(anyString())).thenReturn(PublicationStatus.UNPUBLISHED);
 
     responseProcessor =
         new JurisXmlExporterResponseProcessor(
-            mailSender, statusService, storeFactory, reportRepository, wrapperFactory);
+            mailSender,
+            statusService,
+            storeFactory,
+            reportRepository,
+            wrapperFactory,
+            documentUnitRepository,
+            xmlPublicationRepository);
   }
 
   @Test
@@ -107,7 +130,7 @@ class JurisXmlExporterResponseProcessorTest {
     responseProcessor.readEmails();
 
     verify(storeFactory, times(1)).createStore();
-    verify(statusService, times(1)).getLatestIssuerAddress(DOCUMENT_NUMBER);
+    verify(xmlPublicationRepository, times(1)).getLastXmlPublication(DOCUMENT_UUID);
     verify(mailSender, times(1))
         .sendMail(any(), any(), any(), any(), any(), eq("report-" + DOCUMENT_NUMBER));
     verify(inbox, times(1)).copyMessages(new Message[] {importMessage}, processed);
@@ -133,10 +156,9 @@ class JurisXmlExporterResponseProcessorTest {
   }
 
   @Test
-  void testMessageGetsNotMovedIfDocumentNumberNotFound()
-      throws MessagingException, DocumentationUnitNotExistsException {
+  void testMessageGetsNotMovedIfDocumentNumberNotFound() throws MessagingException {
     when(inbox.getMessages()).thenReturn(new Message[] {importMessage});
-    when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER)).thenReturn(null);
+    when(xmlPublicationRepository.getLastXmlPublication(DOCUMENT_UUID)).thenReturn(null);
     TestMemoryAppender memoryAppender =
         new TestMemoryAppender(JurisXmlExporterResponseProcessor.class);
 
@@ -157,8 +179,6 @@ class JurisXmlExporterResponseProcessorTest {
   @Test
   void testMessageEncoding() throws MessagingException, IOException {
     when(inbox.getMessages()).thenReturn(new Message[] {importMessage});
-    when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER))
-        .thenReturn("test@digitalservice.bund.de");
 
     Multipart multipart = new MimeMultipart();
     BodyPart bodyPart = new MimeBodyPart();
@@ -193,8 +213,6 @@ class JurisXmlExporterResponseProcessorTest {
     when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
 
     Date now = new Date();
-    when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER))
-        .thenReturn("test@digitalservice.bund.de");
     when(processMessageWrapper.getAttachments())
         .thenReturn(
             List.of(
@@ -226,8 +244,6 @@ class JurisXmlExporterResponseProcessorTest {
   void testAttachmentsGetSanitized() throws MessagingException, IOException {
     when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
     Date now = new Date();
-    when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER))
-        .thenReturn("test@digitalservice.bund.de");
     String providedHtml =
         """
                     <html>
@@ -311,32 +327,13 @@ class JurisXmlExporterResponseProcessorTest {
   }
 
   @Test
-  void testProcessMessageSetsPublishingStatus()
-      throws MessagingException, DocumentationUnitNotExistsException {
-    when(inbox.getMessages()).thenReturn(new Message[] {importMessage});
-
-    when(processMessageWrapper.isPublished()).thenReturn(Optional.empty());
-    when(processMessageWrapper.hasErrors()).thenReturn(false);
-
-    responseProcessor.readEmails();
-
-    verify(statusService, times(1))
-        .update(
-            anyString(),
-            eq(
-                Status.builder()
-                    .publicationStatus(PublicationStatus.PUBLISHING)
-                    .withError(false)
-                    .build()));
-  }
-
-  @Test
-  void testProcessMessageSetsUnpublishedStatus()
+  void testProcessMessageKeepsStatus()
       throws MessagingException, DocumentationUnitNotExistsException {
     when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
 
     when(processMessageWrapper.isPublished()).thenReturn(Optional.of(false));
     when(processMessageWrapper.hasErrors()).thenReturn(true);
+    when(statusService.getLatestStatus(anyString())).thenReturn(PublicationStatus.UNPUBLISHED);
 
     responseProcessor.readEmails();
 
@@ -350,53 +347,16 @@ class JurisXmlExporterResponseProcessorTest {
                     .build()));
   }
 
-  @Test
-  void testImportMessageSetsPublishedStatus()
+  @ParameterizedTest
+  // only if is published and no errors, the resulting error state is false
+  @CsvSource({"true, false, false", "true, true, true", "false, false, true", "false, true, true"})
+  void testImportMessageSetsErrorOnError(
+      boolean isPublished, boolean hasError, boolean resultingErrorState)
       throws MessagingException, DocumentationUnitNotExistsException {
     when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
 
-    when(processMessageWrapper.isPublished()).thenReturn(Optional.of(true));
-    when(processMessageWrapper.hasErrors()).thenReturn(false);
-
-    responseProcessor.readEmails();
-
-    verify(statusService, times(1))
-        .update(
-            anyString(),
-            eq(
-                Status.builder()
-                    .publicationStatus(PublicationStatus.PUBLISHED)
-                    .withError(false)
-                    .build()));
-  }
-
-  @Test
-  void testImportMessageSetsPublishedWithErrorsStatus()
-      throws MessagingException, DocumentationUnitNotExistsException {
-    when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
-
-    when(processMessageWrapper.isPublished()).thenReturn(Optional.of(true));
-    when(processMessageWrapper.hasErrors()).thenReturn(true);
-
-    responseProcessor.readEmails();
-
-    verify(statusService, times(1))
-        .update(
-            anyString(),
-            eq(
-                Status.builder()
-                    .publicationStatus(PublicationStatus.PUBLISHED)
-                    .withError(true)
-                    .build()));
-  }
-
-  @Test
-  void testImportMessageSetsUnpublishedStatus()
-      throws MessagingException, DocumentationUnitNotExistsException {
-    when(inbox.getMessages()).thenReturn(new Message[] {importMessage});
-
-    when(importMessageWrapper.isPublished()).thenReturn(Optional.of(false));
-    when(importMessageWrapper.hasErrors()).thenReturn(true);
+    when(processMessageWrapper.isPublished()).thenReturn(Optional.of(isPublished));
+    when(processMessageWrapper.hasErrors()).thenReturn(hasError);
 
     responseProcessor.readEmails();
 
@@ -406,7 +366,7 @@ class JurisXmlExporterResponseProcessorTest {
             eq(
                 Status.builder()
                     .publicationStatus(PublicationStatus.UNPUBLISHED)
-                    .withError(true)
+                    .withError(resultingErrorState)
                     .build()));
   }
 
@@ -418,22 +378,14 @@ class JurisXmlExporterResponseProcessorTest {
     when(processMessageWrapper.hasErrors()).thenReturn(false);
     when(processMessageWrapper.isPublished()).thenReturn(Optional.of(true));
 
-    when(importMessageWrapper.hasErrors()).thenReturn(false);
-    when(importMessageWrapper.isPublished()).thenReturn(Optional.empty());
+    when(importMessageWrapper.hasErrors()).thenReturn(true);
+    when(importMessageWrapper.isPublished()).thenReturn(Optional.of(false));
 
     responseProcessor.readEmails();
 
     InOrder inOrder = Mockito.inOrder(statusService);
 
-    inOrder
-        .verify(statusService, times(1))
-        .update(
-            anyString(),
-            eq(
-                Status.builder()
-                    .publicationStatus(PublicationStatus.PUBLISHING)
-                    .withError(false)
-                    .build()));
+    inOrder.verify(statusService, times(1)).getLatestStatus(DOCUMENT_NUMBER);
 
     inOrder
         .verify(statusService, times(1))
@@ -441,7 +393,19 @@ class JurisXmlExporterResponseProcessorTest {
             anyString(),
             eq(
                 Status.builder()
-                    .publicationStatus(PublicationStatus.PUBLISHED)
+                    .publicationStatus(PublicationStatus.UNPUBLISHED)
+                    .withError(true)
+                    .build()));
+
+    inOrder.verify(statusService, times(1)).getLatestStatus(DOCUMENT_NUMBER);
+
+    inOrder
+        .verify(statusService, times(1))
+        .update(
+            anyString(),
+            eq(
+                Status.builder()
+                    .publicationStatus(PublicationStatus.UNPUBLISHED)
                     .withError(false)
                     .build()));
 
@@ -449,10 +413,10 @@ class JurisXmlExporterResponseProcessorTest {
   }
 
   @Test
-  void testLoggingForUnknownDocumentNumber()
-      throws MessagingException, DocumentationUnitNotExistsException {
+  void testLoggingForUnknownDocumentNumber() throws MessagingException {
     when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
-    when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER)).thenReturn(null);
+    when(xmlPublicationRepository.getLastXmlPublication(DOCUMENT_UUID))
+        .thenReturn(XmlPublication.builder().issuerAddress(null).build());
 
     assertThatCode(responseProcessor::readEmails).doesNotThrowAnyException();
   }

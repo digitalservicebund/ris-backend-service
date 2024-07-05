@@ -19,6 +19,7 @@ public class XmlPublicationTransformer {
         .publishDate(xmlPublication.getPublishDate())
         .mailSubject(xmlPublication.mailSubject())
         .fileName(xmlPublication.fileName())
+        .issuerAddress(xmlPublication.issuerAddress())
         .build();
   }
 
@@ -33,6 +34,7 @@ public class XmlPublicationTransformer {
         .publishDate(xmlPublicationDTO.getPublishDate())
         .mailSubject(xmlPublicationDTO.getMailSubject())
         .fileName(xmlPublicationDTO.getFileName())
+        .issuerAddress(xmlPublicationDTO.getIssuerAddress())
         .build();
   }
 }

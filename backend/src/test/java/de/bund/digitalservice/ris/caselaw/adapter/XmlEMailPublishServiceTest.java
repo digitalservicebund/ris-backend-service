@@ -52,6 +52,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ActiveProfiles(profiles = {"uat"})
 class XmlEMailPublishServiceTest {
   private static final String RECEIVER_ADDRESS = "test-to@mail.com";
+  private static final String ISSUER_ADDRESS = "neuris-user@example.com";
   private static final String SENDER_ADDRESS = "export@neuris";
   private static final String JURIS_USERNAME = "test-user";
   private static final Instant PUBLISH_DATE = Instant.parse("2020-05-05T10:21:35.00Z");
@@ -76,6 +77,7 @@ class XmlEMailPublishServiceTest {
           .statusMessages(List.of("succeed"))
           .fileName("test.xml")
           .publishDate(PUBLISH_DATE)
+          .issuerAddress(ISSUER_ADDRESS)
           .build();
 
   private static final XmlPublication SAVED_XML_MAIL =
@@ -88,6 +90,7 @@ class XmlEMailPublishServiceTest {
           .statusMessages(List.of("succeed"))
           .fileName("test.xml")
           .publishDate(PUBLISH_DATE)
+          .issuerAddress(ISSUER_ADDRESS)
           .build();
 
   private static final XmlPublication EXPECTED_RESPONSE = SAVED_XML_MAIL;
@@ -117,7 +120,7 @@ class XmlEMailPublishServiceTest {
 
   @Test
   void testPublish() throws ParserConfigurationException, TransformerException {
-    var response = service.publish(documentUnit, RECEIVER_ADDRESS);
+    var response = service.publish(documentUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS);
 
     assertThat(response).usingRecursiveComparison().isEqualTo(EXPECTED_RESPONSE);
 
@@ -163,7 +166,7 @@ class XmlEMailPublishServiceTest {
 
     when(xmlExporter.generateXml(any(DocumentUnit.class))).thenReturn(xmlWithValidationError);
 
-    var response = service.publish(documentUnit, RECEIVER_ADDRESS);
+    var response = service.publish(documentUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS);
     assertThat(response).usingRecursiveComparison().isEqualTo(expected);
 
     verify(repository, times(0)).save(any(XmlPublication.class));
@@ -180,7 +183,7 @@ class XmlEMailPublishServiceTest {
     DocumentUnitPublishException ex =
         Assertions.assertThrows(
             DocumentUnitPublishException.class,
-            () -> service.publish(documentUnit, RECEIVER_ADDRESS));
+            () -> service.publish(documentUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
     Assertions.assertEquals("Couldn't generate xml.", ex.getMessage());
 
     verify(repository, times(0)).save(any(XmlPublication.class));
@@ -196,7 +199,7 @@ class XmlEMailPublishServiceTest {
     Throwable throwable =
         Assert.assertThrows(
             DocumentUnitPublishException.class,
-            () -> service.publish(documentUnit, RECEIVER_ADDRESS));
+            () -> service.publish(documentUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
 
     assertThat(throwable.getMessage())
         .isEqualTo("No document number has set in the document unit.");
@@ -212,7 +215,8 @@ class XmlEMailPublishServiceTest {
     when(repository.save(EXPECTED_BEFORE_SAVE)).thenThrow(IllegalArgumentException.class);
 
     Assert.assertThrows(
-        IllegalArgumentException.class, () -> service.publish(documentUnit, RECEIVER_ADDRESS));
+        IllegalArgumentException.class,
+        () -> service.publish(documentUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
 
     verify(repository).save(any(XmlPublication.class));
     verify(mailSender)
@@ -223,7 +227,7 @@ class XmlEMailPublishServiceTest {
   void testPublish_withoutToReceiverAddressSet() {
     Throwable throwable =
         Assert.assertThrows(
-            DocumentUnitPublishException.class, () -> service.publish(documentUnit, null));
+            DocumentUnitPublishException.class, () -> service.publish(documentUnit, null, null));
 
     assertThat(throwable.getMessage()).isEqualTo("No receiver mail address is set");
 
@@ -246,7 +250,8 @@ class XmlEMailPublishServiceTest {
             TEST_UUID.toString());
 
     Assert.assertThrows(
-        DocumentUnitPublishException.class, () -> service.publish(documentUnit, RECEIVER_ADDRESS));
+        DocumentUnitPublishException.class,
+        () -> service.publish(documentUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
 
     verify(repository, times(0)).save(any(XmlPublication.class));
     verify(mailSender)
