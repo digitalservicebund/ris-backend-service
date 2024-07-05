@@ -84,20 +84,12 @@ describe("Document Unit Categories", () => {
   vi.spyOn(documentUnitService, "update").mockImplementation(() =>
     Promise.resolve({
       status: 200,
-      data: new DocumentUnit("foo", {
-        documentNumber: "1234567891234",
-        coreData: {
-          court: {
-            type: "AG",
-            location: "Test",
-            label: "AG Test",
-          },
-        },
-        texts: {},
-        previousDecisions: undefined,
-        ensuingDecisions: undefined,
-        contentRelatedIndexing: {},
-      }),
+      data: {
+        patch: "",
+        errorPaths: [],
+        documentationUnitVersion: 0,
+        errors: [],
+      },
     }),
   )
 
