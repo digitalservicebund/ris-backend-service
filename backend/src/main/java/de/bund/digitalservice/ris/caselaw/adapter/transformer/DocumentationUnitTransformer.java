@@ -70,7 +70,8 @@ public class DocumentationUnitTransformer {
         currentDto.toBuilder()
             .id(updatedDomainObject.uuid())
             .documentNumber(updatedDomainObject.documentNumber())
-            .note(updatedDomainObject.note());
+            .note(updatedDomainObject.note())
+            .version(updatedDomainObject.version());
 
     if (updatedDomainObject.coreData() != null) {
       var coreData = updatedDomainObject.coreData();
@@ -455,7 +456,9 @@ public class DocumentationUnitTransformer {
     LegalEffect legalEffect = getLegalEffectForDomain(documentationUnitDTO);
 
     DocumentUnit.DocumentUnitBuilder builder =
-        DocumentUnit.builder().note(documentationUnitDTO.getNote());
+        DocumentUnit.builder()
+            .note(documentationUnitDTO.getNote())
+            .version(documentationUnitDTO.getVersion());
     CoreDataBuilder coreDataBuilder =
         CoreData.builder()
             .court(CourtTransformer.transformToDomain((documentationUnitDTO.getCourt())))

@@ -9,6 +9,7 @@ import lombok.Builder;
 @Builder(toBuilder = true)
 public record DocumentUnit(
     UUID uuid,
+    Long version,
     @Size(min = 13, max = 14, message = "documentNumber has to be 13 or 14 characters long")
         String documentNumber,
     DataSource dataSource,

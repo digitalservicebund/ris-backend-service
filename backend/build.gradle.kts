@@ -186,13 +186,15 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.8")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.12")
     // for local development:
     // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.8.jar"))
 
     implementation("com.fasterxml.jackson.core:jackson-core:2.17.1")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.17.1")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.17.1")
+
+    implementation("com.github.java-json-tools:json-patch:1.12")
 
     implementation("io.micrometer:micrometer-registry-prometheus:1.13.1")
     implementation("io.micrometer:micrometer-core:1.13.1")
@@ -208,7 +210,6 @@ dependencies {
     implementation("io.getunleash:unleash-client-java:9.2.2")
     implementation("org.apache.commons:commons-text:1.12.0")
     implementation("org.jsoup:jsoup:1.17.2")
-    implementation("com.github.java-json-tools:json-patch:1.12")
 
     val flywayCore = "org.flywaydb:flyway-core:10.15.0"
     implementation(flywayCore)

@@ -2,7 +2,14 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import static de.bund.digitalservice.ris.caselaw.domain.StringUtils.normalizeSpace;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.github.fge.jsonpatch.JsonPatchException;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentUnitDeletionException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.PatchForSamePathException;
+import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.time.LocalDate;
@@ -32,6 +39,7 @@ public class DocumentUnitService {
   private final DocumentUnitStatusService documentUnitStatusService;
   private final AttachmentService attachmentService;
   private final DocumentNumberRecyclingService documentNumberRecyclingService;
+  private final PatchMapperService patchMapperService;
   private final Validator validator;
 
   @Value("${otc.obs.bucket-name}")
@@ -48,7 +56,8 @@ public class DocumentUnitService {
       PublicationReportRepository publicationReportRepository,
       DocumentNumberRecyclingService documentNumberRecyclingService,
       Validator validator,
-      AttachmentService attachmentService) {
+      AttachmentService attachmentService,
+      PatchMapperService patchMapperService) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
@@ -58,6 +67,7 @@ public class DocumentUnitService {
     this.documentNumberRecyclingService = documentNumberRecyclingService;
     this.validator = validator;
     this.attachmentService = attachmentService;
+    this.patchMapperService = patchMapperService;
   }
 
   public DocumentUnit generateNewDocumentUnit(DocumentationOffice documentationOffice)
@@ -156,6 +166,36 @@ public class DocumentUnitService {
     saveForRecycling(documentUnit);
     repository.delete(documentUnit);
     return "Dokumentationseinheit gelöscht: " + documentUnitUuid;
+  }
+
+  public RisJsonPatch updateDocumentUnit(UUID documentationUnitId, RisJsonPatch patch)
+      throws JsonPatchException,
+          JsonProcessingException,
+          DocumentationUnitNotExistsException,
+          PatchForSamePathException {
+
+    DocumentUnit existingDocumentationUnit = getByUuid(documentationUnitId);
+
+    long newVersion = 1L;
+    if (existingDocumentationUnit.version() != null) {
+      newVersion = existingDocumentationUnit.version() + 1;
+    }
+
+    RisJsonPatch newPatch =
+        patchMapperService.calculatePatch(
+            existingDocumentationUnit.uuid(), patch.documentationUnitVersion(), newVersion);
+    List<String> errorPaths =
+        patchMapperService.removePatchForSamePath(patch.patch(), newPatch.patch());
+    patchMapperService.savePatch(
+        patch, existingDocumentationUnit.uuid(), existingDocumentationUnit.version());
+
+    DocumentUnit documentationUnit =
+        patchMapperService.applyPatchToEntity(
+            patch.patch(), existingDocumentationUnit, DocumentUnit.class);
+    documentationUnit = documentationUnit.toBuilder().version(newVersion).build();
+    updateDocumentUnit(documentationUnit);
+
+    return newPatch.toBuilder().errorPaths(errorPaths).build();
   }
 
   public DocumentUnit updateDocumentUnit(DocumentUnit documentUnit)

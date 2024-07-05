@@ -7,11 +7,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentN
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DateUtil;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberFormatterException;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberPatternException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberFormatterException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberPatternException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitExistsException;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;

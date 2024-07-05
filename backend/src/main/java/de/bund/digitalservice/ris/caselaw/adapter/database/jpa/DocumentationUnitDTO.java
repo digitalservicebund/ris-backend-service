@@ -48,6 +48,8 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
 
   @Id @GeneratedValue @Include private UUID id;
 
+  private Long version;
+
   @Column(name = "case_facts")
   private String caseFacts;
 

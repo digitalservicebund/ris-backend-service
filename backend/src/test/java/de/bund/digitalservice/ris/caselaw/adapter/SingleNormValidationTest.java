@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.domain.NormElementRepository;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormCode;
+import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.domain.validator.SingleNormValidator;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -48,6 +49,7 @@ class SingleNormValidationTest {
   @MockBean private DocumentUnitStatusService statusService;
   @MockBean private PublicationReportRepository publicationReportRepository;
   @MockBean AttachmentService attachmentService;
+  @MockBean PatchMapperService patchMapperService;
 
   @BeforeEach
   void setUp() {

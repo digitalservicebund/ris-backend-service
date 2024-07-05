@@ -1,4 +1,3 @@
-import type { Operation } from "fast-json-patch"
 import httpClient, {
   ServiceResponse,
   FailedValidationServerResponse,
@@ -8,6 +7,7 @@ import { PageableService, Page } from "@/components/Pagination.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
+import { RisJsonPatch } from "@/domain/risJsonPatch"
 import { SingleNormValidationInfo } from "@/domain/singleNorm"
 import errorMessages from "@/i18n/errors.json"
 
@@ -20,8 +20,8 @@ interface DocumentUnitService {
 
   update(
     documentUnitUuid: string,
-    patch: Operation[],
-  ): Promise<ServiceResponse<DocumentUnit | FailedValidationServerResponse>>
+    patch: RisJsonPatch,
+  ): Promise<ServiceResponse<RisJsonPatch | FailedValidationServerResponse>>
 
   delete(documentUnitUuid: string): Promise<ServiceResponse<unknown>>
 
@@ -74,10 +74,10 @@ const service: DocumentUnitService = {
     return response
   },
 
-  async update(documentUnitUuid: string, patch: Operation[]) {
+  async update(documentUnitUuid: string, patch: RisJsonPatch) {
     const response = await httpClient.patch<
-      Operation[],
-      DocumentUnit | FailedValidationServerResponse
+      RisJsonPatch,
+      RisJsonPatch | FailedValidationServerResponse
     >(
       `caselaw/documentunits/${documentUnitUuid}`,
       {
@@ -107,10 +107,6 @@ const service: DocumentUnitService = {
       } else {
         response.data = undefined
       }
-    } else {
-      response.data = new DocumentUnit((response.data as DocumentUnit).uuid, {
-        ...(response.data as DocumentUnit),
-      })
     }
     return response
   },

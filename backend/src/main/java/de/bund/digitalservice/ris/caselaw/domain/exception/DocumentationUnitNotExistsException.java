@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.domain;
+package de.bund.digitalservice.ris.caselaw.domain.exception;
 
 import java.io.IOException;
 import java.util.UUID;

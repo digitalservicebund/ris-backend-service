@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
@@ -12,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublicationRepository;
 import de.bund.digitalservice.ris.caselaw.domain.XmlResultObject;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentUnitPublishException;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.ZoneId;

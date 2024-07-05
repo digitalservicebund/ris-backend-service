@@ -88,10 +88,10 @@ async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
     validationErrors.value = []
   }
 
-  if (response.data) {
-    // Update store with current backend version
-    store.documentUnit = response.data as DocumentUnit
-  }
+  // if (response.data) {
+  //   // Update store with current backend version
+  //   store.documentUnit = response.data as DocumentUnit
+  // }
 
   return response as ServiceResponse<void>
 }

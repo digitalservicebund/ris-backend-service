@@ -15,6 +15,12 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberFormatterException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberPatternException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentUnitDeletionException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import jakarta.validation.Validator;
 import java.time.Instant;
 import java.util.Collections;
@@ -50,6 +56,7 @@ class DocumentUnitServiceTest {
   @MockBean private DatabaseDocumentUnitStatusService documentUnitStatusService;
   @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @MockBean private AttachmentService attachmentService;
+  @MockBean private PatchMapperService patchMapperService;
   @MockBean private Validator validator;
   @Captor private ArgumentCaptor<DocumentationUnitSearchInput> searchInputCaptor;
   @Captor private ArgumentCaptor<RelatedDocumentationUnit> relatedDocumentationUnitCaptor;

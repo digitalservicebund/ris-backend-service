@@ -1,8 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentUnitPublishException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;

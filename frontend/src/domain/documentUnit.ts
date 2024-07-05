@@ -75,6 +75,7 @@ export default class DocumentUnit {
   readonly id?: string
   readonly documentNumber?: string
   readonly status?: PublicationStatus
+  public version: number = 0
   public attachments: Attachment[] = []
   public coreData: CoreData = {}
   public texts: Texts = {}

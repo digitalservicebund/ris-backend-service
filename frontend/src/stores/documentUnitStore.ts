@@ -2,6 +2,7 @@ import * as jsonpatch from "fast-json-patch"
 import { defineStore } from "pinia"
 import { ref } from "vue"
 import DocumentUnit from "@/domain/documentUnit"
+import { RisJsonPatch } from "@/domain/risJsonPatch"
 import documentUnitService from "@/services/documentUnitService"
 import { ServiceResponse } from "@/services/httpClient"
 
@@ -28,22 +29,27 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
       documentUnit.value,
     )
 
-    let response
     if (patch.length === 0) {
-      // Todo: do not use important ! here for documentNumber
-      response = await documentUnitService.getByDocumentNumber(
-        documentUnit.value.documentNumber!,
-      )
-    } else {
-      response = await documentUnitService.update(
-        documentUnit.value.uuid,
-        patch,
-      )
+      return { status: 304, data: undefined } // No changes to update
     }
 
+    const response = await documentUnitService.update(documentUnit.value.uuid, {
+      documentationUnitVersion: documentUnit.value.version,
+      patch,
+      errorPaths: [],
+    })
+
     if (response.status === 200) {
-      originalDocumentUnit.value = JSON.parse(JSON.stringify(response.data)) // Update the
-      // original copy
+      const newPatch = response.data as RisJsonPatch
+      jsonpatch.applyPatch(documentUnit.value, newPatch.patch)
+      documentUnit.value.version = newPatch.documentationUnitVersion
+      response.error = {
+        title: "Fehler beim Patchen",
+        description: newPatch.errorPaths,
+      }
+      originalDocumentUnit.value = JSON.parse(
+        JSON.stringify(documentUnit.value),
+      ) // Update the original copy
     }
 
     return response as ServiceResponse<unknown>

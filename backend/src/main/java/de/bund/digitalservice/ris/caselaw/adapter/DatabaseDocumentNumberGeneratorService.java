@@ -5,13 +5,13 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentNumberDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DateUtil;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberFormatter;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberFormatterException;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberPatternException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberFormatterException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberPatternException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitExistsException;
 import jakarta.validation.constraints.NotEmpty;
 import java.time.Year;
 import java.util.Optional;

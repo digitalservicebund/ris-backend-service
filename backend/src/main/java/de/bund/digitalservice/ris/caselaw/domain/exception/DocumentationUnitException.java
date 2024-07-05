@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.domain;
+package de.bund.digitalservice.ris.caselaw.domain.exception;
 
 public class DocumentationUnitException extends RuntimeException {
   public DocumentationUnitException(String message) {
