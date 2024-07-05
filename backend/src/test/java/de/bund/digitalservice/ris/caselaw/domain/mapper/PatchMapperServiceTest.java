@@ -12,6 +12,7 @@ import com.github.fge.jsonpatch.AddOperation;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.github.fge.jsonpatch.JsonPatchOperation;
 import com.github.fge.jsonpatch.ReplaceOperation;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabasePatchMapperService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitPatchRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitPatchDTO;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -30,8 +31,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@Import({PatchMapperService.class, ObjectMapper.class})
 @ExtendWith(SpringExtension.class)
+@Import({DatabasePatchMapperService.class, ObjectMapper.class})
 class PatchMapperServiceTest {
 
   @Autowired private PatchMapperService service;
