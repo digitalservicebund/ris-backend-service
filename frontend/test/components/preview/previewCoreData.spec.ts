@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/vue"
+import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewCoreData from "@/components/preview/PreviewCoreData.vue"
 import { CoreData } from "@/domain/documentUnit"
 
@@ -6,6 +7,11 @@ function renderComponent(coreData: CoreData) {
   return render(PreviewCoreData, {
     props: {
       coreData: coreData,
+    },
+    global: {
+      provide: {
+        [previewLayoutInjectionKey as symbol]: "wide",
+      },
     },
   })
 }

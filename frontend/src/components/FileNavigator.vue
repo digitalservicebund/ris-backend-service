@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed } from "vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import TextButton from "@/components/input/TextButton.vue"
@@ -15,38 +14,37 @@ const props = defineProps<{
 const emit = defineEmits<(event: "select", index: number) => void>()
 
 const incrementFileIndex = () => {
-  if (hasNext.value) {
-    emit("select", props.currentIndex.valueOf() + 1)
+  let nextIndex: number
+  if (props.currentIndex === props.attachments.length - 1) {
+    nextIndex = 0
+  } else {
+    nextIndex = props.currentIndex + 1
   }
+  emit("select", nextIndex)
 }
 const decreaseFileIndex = () => {
-  if (hasPrevious.value) {
-    emit("select", props.currentIndex.valueOf() - 1)
+  let nextIndex: number
+  if (props.currentIndex === 0) {
+    nextIndex = props.attachments.length - 1
+  } else {
+    nextIndex = props.currentIndex - 1
   }
+  emit("select", nextIndex)
 }
-
-const hasNext = computed(() => {
-  return props.currentIndex.valueOf() < props.attachments.length - 1
-})
-
-const hasPrevious = computed(() => {
-  return props.currentIndex.valueOf() > 0
-})
 </script>
 
 <template>
   <FlexContainer
     v-if="attachments.length > 1"
-    class="float-end m-16 ml-20 items-center space-x-8 px-8"
+    class="float-end items-center gap-4"
   >
-    <FlexItem class="ds-label-01-bold">
-      {{ props.attachments[currentIndex].name }}
+    <FlexItem class="ds-label-01-bold self-center">
+      {{ props.attachments[currentIndex]?.name }}
     </FlexItem>
     <TextButton
       id="decrease"
       aria-label="Vorheriges Dokument anzeigen"
-      button-type="tertiary"
-      :disabled="!hasPrevious.valueOf()"
+      button-type="ghost"
       :icon="IcOutlineArrowBack"
       size="small"
       @click="decreaseFileIndex"
@@ -55,8 +53,7 @@ const hasPrevious = computed(() => {
     <TextButton
       id="increase"
       aria-label="Nächstes Dokument anzeigen"
-      button-type="tertiary"
-      :disabled="!hasNext.valueOf()"
+      button-type="ghost"
       :icon="IcOutlineArrowForward"
       size="small"
       @click="incrementFileIndex"

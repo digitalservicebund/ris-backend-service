@@ -8,7 +8,6 @@ import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
 
 function renderComponent() {
-  // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
 
   const router = createRouter({
@@ -45,7 +44,7 @@ function renderComponent() {
     user,
     ...render(DocumentUnitCategories, {
       props: {
-        showNavigationPanel: true,
+        validationErrors: [],
         documentUnit: new DocumentUnit("foo", {
           documentNumber: "1234567891234",
           coreData: {},
@@ -93,7 +92,6 @@ describe("Document Unit Categories", () => {
     }),
   )
 
-  // Enable feature flag "neuris.note"
   vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
     status: 200,
     data: true,
@@ -135,10 +133,13 @@ describe("Document Unit Categories", () => {
   //     },
   //   ]
 
-  //   vi.spyOn(comboboxItemService, "getCourts").mockImplementation(() =>
-  //     Promise.resolve({ status: 200, data: dropdownCourtItems }),
-  //   )
-  //   const { user } = renderComponent()
+  /*
+        vi.spyOn(comboboxItemService, "getCourts").mockImplementation(() =>
+      Promise.resolve({ status: 200, data: dropdownCourtItems }),
+    )
+    const { user, emitted } = renderComponent()
+
+     */
 
   //   const coreDataCourt = within(
   //     screen.getByLabelText("Stammdaten", { selector: "div" }),
@@ -149,6 +150,16 @@ describe("Document Unit Categories", () => {
   //   expect(dropdownItems[0]).toHaveTextContent("AG Test")
   //   await user.click(dropdownItems[0])
 
-  //   expect(screen.getByText(/AG Test/)).toBeVisible()
-  // })
+  // Event is emitted for saving the DocUnit with updated properties
+  /*
+        const [updatedDocUnit] = emitted().documentUnitUpdatedLocally[0] as [
+      DocumentUnit,
+    ]
+    expect(updatedDocUnit.coreData.court).toEqual({
+      label: "AG Test",
+      location: "Test",
+      type: "AG",
+    })
+  })
+     */
 })

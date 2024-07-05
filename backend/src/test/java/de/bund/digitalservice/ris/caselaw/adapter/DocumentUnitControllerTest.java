@@ -99,7 +99,7 @@ class DocumentUnitControllerTest {
   }
 
   @Test
-  void testGenerateNewDocumentUnit() throws DocumentationUnitNotExistsException {
+  void testGenerateNewDocumentUnit() {
     // userService.getDocumentationOffice is mocked in @BeforeEach
     when(service.generateNewDocumentUnit(docOffice)).thenReturn(DocumentUnit.builder().build());
 

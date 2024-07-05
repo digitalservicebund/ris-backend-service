@@ -1,48 +1,24 @@
 <script lang="ts" setup>
-import { useHead } from "@unhead/vue"
-import { onMounted, ref } from "vue"
-import { useRoute } from "vue-router"
 import DocumentUnitPublication from "@/components/DocumentUnitPublication.vue"
-import RouteErrorDisplay from "@/components/RouteErrorDisplay.vue"
 import DocumentUnit from "@/domain/documentUnit"
-import documentUnitService from "@/services/documentUnitService"
-import { ResponseError } from "@/services/httpClient"
 
-const props = defineProps<{
-  documentNumber: string
+defineProps<{
+  documentUnit: DocumentUnit
   showNavigationPanel?: boolean
 }>()
+const emit = defineEmits<{
+  requestDocumentUnitFromServer: [void]
+}>()
 
-useHead({
-  title: props.documentNumber + " · NeuRIS Rechtsinformationssystem",
-})
-
-const documentUnit = ref<DocumentUnit>()
-const error = ref<ResponseError>()
-const route = useRoute()
-
-async function loadDocumentUnit() {
-  const response = await documentUnitService.getByDocumentNumber(
-    props.documentNumber,
-  )
-
-  documentUnit.value = response.data
-  error.value = response.error
+async function requestDocumentUnitFromServer() {
+  emit("requestDocumentUnitFromServer")
 }
-
-onMounted(() => loadDocumentUnit())
 </script>
 
 <template>
   <DocumentUnitPublication
     v-if="documentUnit"
     :document-unit="documentUnit as DocumentUnit"
-    :show-navigation-panel="
-      route.query.showNavigationPanel
-        ? route.query.showNavigationPanel === 'true'
-        : true
-    "
-    @update-document-unit="loadDocumentUnit"
+    @request-document-unit-from-server="requestDocumentUnitFromServer"
   />
-  <RouteErrorDisplay v-else :error="error" />
 </template>

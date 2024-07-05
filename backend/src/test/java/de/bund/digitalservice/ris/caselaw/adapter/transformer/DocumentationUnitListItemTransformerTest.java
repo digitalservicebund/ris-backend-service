@@ -76,4 +76,43 @@ class DocumentationUnitListItemTransformerTest {
     assertThat(documentationUnitListItem.referencedDocumentationUnitId()).isEqualTo(id);
     assertThat(documentationUnitListItem.status()).isNull();
   }
+
+  @Test
+  void testTransformToDomain_withNote_shouldHaveNote() {
+    UUID id = UUID.randomUUID();
+    DocumentationUnitListItemDTO currentDto =
+        DocumentationUnitDTO.builder().id(id).note("a note").build();
+
+    DocumentationUnitListItem documentationUnitListItem =
+        DocumentationUnitListItemTransformer.transformToDomain(currentDto);
+
+    assertThat(documentationUnitListItem.referencedDocumentationUnitId()).isEqualTo(id);
+    assertThat(documentationUnitListItem.hasNote()).isTrue();
+  }
+
+  @Test
+  void testTransformToDomain_withoutNote_shouldHaveNoNote() {
+    UUID id = UUID.randomUUID();
+    DocumentationUnitListItemDTO currentDto =
+        DocumentationUnitDTO.builder().id(id).note(null).build();
+
+    DocumentationUnitListItem documentationUnitListItem =
+        DocumentationUnitListItemTransformer.transformToDomain(currentDto);
+
+    assertThat(documentationUnitListItem.referencedDocumentationUnitId()).isEqualTo(id);
+    assertThat(documentationUnitListItem.hasNote()).isFalse();
+  }
+
+  @Test
+  void testTransformToDomain_withoutEmptyNote_shouldHaveNoNote() {
+    UUID id = UUID.randomUUID();
+    DocumentationUnitListItemDTO currentDto =
+        DocumentationUnitDTO.builder().id(id).note("").build();
+
+    DocumentationUnitListItem documentationUnitListItem =
+        DocumentationUnitListItemTransformer.transformToDomain(currentDto);
+
+    assertThat(documentationUnitListItem.referencedDocumentationUnitId()).isEqualTo(id);
+    assertThat(documentationUnitListItem.hasNote()).isFalse();
+  }
 }

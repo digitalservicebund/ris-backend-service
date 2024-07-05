@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from "vue"
 import TextEditor from "@/components/input/TextEditor.vue"
 import PreviewCategory from "@/components/preview/PreviewCategory.vue"
 import PreviewContent from "@/components/preview/PreviewContent.vue"
@@ -11,10 +12,11 @@ const props = defineProps<{
   validBorderNumbers: string[]
 }>()
 
-const data = useValidBorderNumbers(
-  props.texts,
-  props.validBorderNumbers,
-).filter((it) => it.value)
+const data = computed(() =>
+  useValidBorderNumbers(props.texts, props.validBorderNumbers).filter(
+    (it) => it.value,
+  ),
+)
 </script>
 
 <template>

@@ -1,5 +1,6 @@
 import { createTestingPinia } from "@pinia/testing"
 import { setActivePinia } from "pinia"
+import { RouteLocationNormalizedGeneric } from "vue-router"
 import router, { beforeEach as routerBeforeEach } from "@/router"
 import useSessionStore from "@/stores/sessionStore"
 
@@ -53,21 +54,27 @@ describe("router's auth navigation guards", () => {
   it("does not redirect, if not authenticated", async () => {
     mockSessionStore(false)
 
-    const result = await routerBeforeEach(router.resolve("/caselaw"))
+    const result = await routerBeforeEach(
+      router.resolve("/caselaw") as RouteLocationNormalizedGeneric,
+    )
     expect(result).toEqual(false)
   })
 
   it("does redirect, if authenticated", async () => {
     mockSessionStore(true)
 
-    const result = await routerBeforeEach(router.resolve("/caselaw"))
+    const result = await routerBeforeEach(
+      router.resolve("/caselaw") as RouteLocationNormalizedGeneric,
+    )
     expect(result).toEqual(true)
   })
 
   it("calls the store for authentication", async () => {
     const sessionStore = mockSessionStore()
 
-    await routerBeforeEach(router.resolve("/caselaw"))
+    await routerBeforeEach(
+      router.resolve("/caselaw") as RouteLocationNormalizedGeneric,
+    )
     expect(sessionStore.isAuthenticated).toHaveBeenCalledOnce()
   })
 
@@ -75,7 +82,9 @@ describe("router's auth navigation guards", () => {
     mockSessionStore(false)
 
     await routerBeforeEach(
-      router.resolve("/caselaw/documentunit/123456/categories"),
+      router.resolve(
+        "/caselaw/documentunit/123456/categories",
+      ) as RouteLocationNormalizedGeneric,
     )
     expect(document.cookie).toEqual(
       "location=/caselaw/documentunit/123456/categories",
@@ -86,7 +95,9 @@ describe("router's auth navigation guards", () => {
     mockSessionStore(true)
     document.cookie = "location=/norms; path=/;"
 
-    await routerBeforeEach(router.resolve("/"))
+    await routerBeforeEach(
+      router.resolve("/") as RouteLocationNormalizedGeneric,
+    )
     expect(document.cookie).toEqual("")
     expect(window.location.href).toEqual("/norms")
   })

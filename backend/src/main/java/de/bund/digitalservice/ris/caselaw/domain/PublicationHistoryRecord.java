@@ -9,7 +9,8 @@ import java.time.Instant;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
   @Type(value = PublicationReport.class, name = "PUBLICATION_REPORT"),
-  @Type(value = XmlPublication.class, name = "PUBLICATION")
+  @Type(value = XmlPublication.class, name = "PUBLICATION"),
+  @Type(value = DeltaMigration.class, name = "MIGRATION")
 })
 @JsonIgnoreProperties({"type"})
 public interface PublicationHistoryRecord {

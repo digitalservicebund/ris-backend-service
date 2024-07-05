@@ -1,10 +1,9 @@
 <script lang="ts" setup>
-import { ref, onMounted, computed } from "vue"
+import { ref, computed } from "vue"
 import { useRoute } from "vue-router"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import IconBadge from "@/components/IconBadge.vue"
-import FeatureToggleService from "@/services/featureToggleService"
 import useSessionStore from "@/stores/sessionStore"
 import IconPermIdentity from "~icons/ic/baseline-perm-identity"
 
@@ -29,19 +28,8 @@ const badge = computed(() => {
   } else {
     return {
       color: "bg-blue-300",
-      label: docOffice ? docOffice : "",
+      label: docOffice ?? "",
     }
-  }
-})
-
-onMounted(async () => {
-  const featureToggle = (
-    await FeatureToggleService.isEnabled("neuris.environment-test")
-  ).data
-  if (featureToggle) {
-    fontColor.value = "green"
-  } else {
-    fontColor.value = "black"
   }
 })
 </script>

@@ -79,7 +79,7 @@ public class DocumentUnitController {
     try {
       var documentUnit = service.generateNewDocumentUnit(docOffice);
       return ResponseEntity.status(HttpStatus.CREATED).body(documentUnit);
-    } catch (DocumentationUnitNotExistsException | DocumentationUnitException e) {
+    } catch (DocumentationUnitException e) {
       log.error("error in generate new documentation unit", e);
       return ResponseEntity.internalServerError().body(DocumentUnit.builder().build());
     }
@@ -248,7 +248,7 @@ public class DocumentUnitController {
   }
 
   @GetMapping(value = "/{uuid}/publish", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
+  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
   public List<PublicationHistoryRecord> getPublicationHistory(@PathVariable UUID uuid) {
     return service.getPublicationHistory(uuid);
   }

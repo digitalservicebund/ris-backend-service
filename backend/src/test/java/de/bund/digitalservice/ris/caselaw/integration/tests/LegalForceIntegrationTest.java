@@ -21,8 +21,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalForc
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseNormAbbreviationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseNormReferenceRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalForceTypeTransformer;
@@ -66,6 +66,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 @RISIntegrationTest(
     imports = {
       DocumentUnitService.class,
+      PostgresDeltaMigrationRepositoryImpl.class,
       DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentNumberRecyclingService.class,
       DatabaseDocumentUnitStatusService.class,
@@ -115,16 +116,12 @@ class LegalForceIntegrationTest {
   @MockBean private PatchMapperService patchMapperService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
-  private DocumentationOfficeDTO documentationOfficeDTO;
 
   @Autowired
   private DatabaseDocumentationUnitSearchRepository databaseDocumentationUnitSearchRepository;
 
   @BeforeEach
   void setUp() {
-    documentationOfficeDTO =
-        documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
-
     doReturn(docOffice).when(userService).getDocumentationOffice(any(OidcUser.class));
   }
 

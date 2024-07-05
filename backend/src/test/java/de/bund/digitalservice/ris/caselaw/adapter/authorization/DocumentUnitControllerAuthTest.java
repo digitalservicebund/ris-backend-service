@@ -270,7 +270,13 @@ class DocumentUnitControllerAuthTest {
 
     risWebTestClient.withLogin(docOffice1Group).get().uri(uri).exchange().expectStatus().isOk();
 
-    risWebTestClient.withLogin(docOffice2Group).get().uri(uri).exchange().expectStatus().isOk();
+    risWebTestClient
+        .withLogin(docOffice2Group)
+        .get()
+        .uri(uri)
+        .exchange()
+        .expectStatus()
+        .isForbidden();
 
     mockDocumentUnit(docOffice1, null, Status.builder().publicationStatus(UNPUBLISHED).build());
 

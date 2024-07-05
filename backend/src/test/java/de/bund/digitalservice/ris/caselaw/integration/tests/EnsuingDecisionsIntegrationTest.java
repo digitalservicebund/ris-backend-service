@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDefaultDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -14,13 +13,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusServ
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabasePublicationReportRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
@@ -31,7 +29,6 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
@@ -58,6 +55,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 @RISIntegrationTest(
     imports = {
       DocumentUnitService.class,
+      PostgresDeltaMigrationRepositoryImpl.class,
       DatabaseDocumentUnitStatusService.class,
       DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentNumberRecyclingService.class,
@@ -79,8 +77,6 @@ class EnsuingDecisionsIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
       new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
-
-  private DocumentCategoryDTO category;
 
   @DynamicPropertySource
   static void registerDynamicProperties(DynamicPropertyRegistry registry) {
@@ -105,15 +101,9 @@ class EnsuingDecisionsIntegrationTest {
   @MockBean AttachmentService attachmentService;
   @MockBean private PatchMapperService patchMapperService;
 
-  private final DocumentationOffice docOffice = buildDefaultDocOffice();
-  private DocumentationOfficeDTO documentationOfficeDTO;
-  @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
-
-  private DocumentationOfficeDTO docOfficeDTO;
-
   @BeforeEach
   void setUp() {
-    docOfficeDTO = documentationOfficeRepository.findByAbbreviation("DS");
+    DocumentationOfficeDTO docOfficeDTO = documentationOfficeRepository.findByAbbreviation("DS");
 
     doReturn(DocumentationOfficeTransformer.transformToDomain(docOfficeDTO))
         .when(userService)

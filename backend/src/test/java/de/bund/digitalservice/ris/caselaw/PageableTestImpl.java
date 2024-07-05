@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+@SuppressWarnings("java:S1068")
 public class PageableTestImpl implements Pageable {
   private int pageNumber;
   private int pageSize;

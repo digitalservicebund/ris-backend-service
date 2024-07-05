@@ -12,6 +12,9 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.PatchForSamePathExcep
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -19,6 +22,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +38,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 @Service
 @Slf4j
@@ -36,14 +50,12 @@ public class DocumentUnitService {
   private final PublicationReportRepository publicationReportRepository;
   private final DocumentNumberService documentNumberService;
   private final EmailPublishService publicationService;
+  private final DeltaMigrationRepository deltaMigrationRepository;
   private final DocumentUnitStatusService documentUnitStatusService;
   private final AttachmentService attachmentService;
   private final DocumentNumberRecyclingService documentNumberRecyclingService;
   private final PatchMapperService patchMapperService;
   private final Validator validator;
-
-  @Value("${otc.obs.bucket-name}")
-  private String bucketName;
 
   @Value("${mail.exporter.recipientAddress:neuris@example.com}")
   private String recipientAddress;
@@ -52,6 +64,7 @@ public class DocumentUnitService {
       DocumentUnitRepository repository,
       DocumentNumberService documentNumberService,
       EmailPublishService publicationService,
+      DeltaMigrationRepository migrationService,
       DocumentUnitStatusService documentUnitStatusService,
       PublicationReportRepository publicationReportRepository,
       DocumentNumberRecyclingService documentNumberRecyclingService,
@@ -62,6 +75,7 @@ public class DocumentUnitService {
     this.repository = repository;
     this.documentNumberService = documentNumberService;
     this.publicationService = publicationService;
+    this.deltaMigrationRepository = migrationService;
     this.documentUnitStatusService = documentUnitStatusService;
     this.publicationReportRepository = publicationReportRepository;
     this.documentNumberRecyclingService = documentNumberRecyclingService;
@@ -70,15 +84,16 @@ public class DocumentUnitService {
     this.patchMapperService = patchMapperService;
   }
 
+  @Transactional(transactionManager = "jpaTransactionManager")
   public DocumentUnit generateNewDocumentUnit(DocumentationOffice documentationOffice)
-      throws DocumentationUnitNotExistsException, DocumentationUnitException {
+      throws DocumentationUnitException {
     var documentNumber = generateDocumentNumber(documentationOffice);
     return repository.createNewDocumentUnit(documentNumber, documentationOffice);
   }
 
   private String generateDocumentNumber(DocumentationOffice documentationOffice) {
     try {
-      return documentNumberService.generateDocumentNumber(documentationOffice.abbreviation(), 5);
+      return documentNumberService.generateDocumentNumber(documentationOffice.abbreviation());
     } catch (Exception e) {
       throw new DocumentationUnitException("Could not generate document number", e);
     }
@@ -135,6 +150,7 @@ public class DocumentUnitService {
     return repository.findByUuid(documentUnitUuid).orElseThrow();
   }
 
+  @Transactional(transactionManager = "jpaTransactionManager")
   public String deleteByUuid(UUID documentUnitUuid) throws DocumentationUnitNotExistsException {
 
     Map<RelatedDocumentationType, Long> relatedEntities =
@@ -243,8 +259,36 @@ public class DocumentUnitService {
         ListUtils.union(
             publicationService.getPublications(documentUuid),
             publicationReportRepository.getAllByDocumentUnitUuid(documentUuid));
+    var migration = deltaMigrationRepository.getLatestMigration(documentUuid);
+    if (migration != null) {
+      list.add(
+          migration.xml() != null
+              ? migration.toBuilder().xml(prettifyXml(migration.xml())).build()
+              : migration);
+    }
     list.sort(Comparator.comparing(PublicationHistoryRecord::getDate).reversed());
     return list;
+  }
+
+  public static String prettifyXml(String xml) {
+    try {
+      Transformer transformer = TransformerFactory.newDefaultInstance().newTransformer();
+      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+      transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+
+      Node node =
+          DocumentBuilderFactory.newDefaultInstance()
+              .newDocumentBuilder()
+              .parse(new ByteArrayInputStream(xml.getBytes()))
+              .getDocumentElement();
+
+      StreamResult result = new StreamResult(new StringWriter());
+      transformer.transform(new DOMSource(node), result);
+      return result.getWriter().toString();
+
+    } catch (TransformerException | IOException | ParserConfigurationException | SAXException e) {
+      return "Could not prettify XML";
+    }
   }
 
   public Slice<RelatedDocumentationUnit> searchLinkableDocumentationUnits(

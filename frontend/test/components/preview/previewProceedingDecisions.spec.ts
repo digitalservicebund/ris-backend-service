@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/vue"
+import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewProceedingDecisions from "@/components/preview/PreviewProceedingDecisions.vue"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import PreviousDecision from "@/domain/previousDecision"
@@ -11,6 +12,11 @@ function renderComponent(
     props: {
       previousDecisions: previousDecisions,
       ensuingDecisions: ensuingDecisions,
+    },
+    global: {
+      provide: {
+        [previewLayoutInjectionKey as symbol]: "wide",
+      },
     },
   })
 }

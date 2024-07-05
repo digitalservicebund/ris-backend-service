@@ -1,19 +1,14 @@
 <script setup lang="ts">
-import { computed, ref, toRefs, Ref, onMounted } from "vue"
+import { computed, ref, toRefs } from "vue"
 import { useRoute } from "vue-router"
-import AttachmentViewSidePanel from "@/components/AttachmentViewSidePanel.vue"
 import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContentRelatedIndexing.vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 import DocumentUnitTexts from "@/components/DocumentUnitTexts.vue"
-import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import EnsuingDecisions from "@/components/EnsuingDecisions.vue"
-import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
-import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import { ValidationError } from "@/components/input/types"
 import PreviousDecisions from "@/components/PreviousDecisions.vue"
 import { useProvideCourtType } from "@/composables/useCourtType"
-import useQuery from "@/composables/useQueryFromRoute"
 import { useScrollToHash } from "@/composables/useScrollToHash"
 import DocumentUnit, {
   ContentRelatedIndexing,
@@ -21,27 +16,18 @@ import DocumentUnit, {
 } from "@/domain/documentUnit"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import PreviousDecision from "@/domain/previousDecision"
-import FeatureToggleService from "@/services/featureToggleService"
-import { ServiceResponse } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
-  showNavigationPanel: boolean
+  validationErrors: ValidationError[]
 }>()
 const updatedDocumentUnit = ref<DocumentUnit>(props.documentUnit)
-const validationErrors = ref<ValidationError[]>([])
 const route = useRoute()
 const courtTypeRef = ref<string>(props.documentUnit.coreData.court?.type ?? "")
-const notesFeatureToggle = ref(false)
 const store = useDocumentUnitStore()
-
-const showExtraContentPanelRef: Ref<boolean> = ref(false)
-
-const { pushQueryToRoute } = useQuery<"showAttachmentPanel">()
-
-const selectedAttachmentIndex: Ref<number> = ref(0)
-
+ref(false)
+ref(0)
 const courtTypesWithLegalForce = [
   "BVerfG",
   "VerfGH",
@@ -76,24 +62,6 @@ function deleteLegalForces() {
       return !singleNorm.isEmpty
     })
   })
-}
-
-async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
-  // Create patch and update
-  const response = await store.updateDocumentUnit()
-
-  if (response?.error?.validationErrors) {
-    validationErrors.value = response.error.validationErrors
-  } else {
-    validationErrors.value = []
-  }
-
-  // if (response.data) {
-  //   // Update store with current backend version
-  //   store.documentUnit = response.data as DocumentUnit
-  // }
-
-  return response as ServiceResponse<void>
 }
 
 const handleUpdateValueDocumentUnitTexts = async (
@@ -147,87 +115,34 @@ const headerOffset = 145
 useScrollToHash(routeHash, headerOffset)
 
 useProvideCourtType(courtTypeRef)
-
-const toggleExtraContentPanel = () => {
-  showExtraContentPanelRef.value = !showExtraContentPanelRef.value
-  pushQueryToRoute({
-    showAttachmentPanel: showExtraContentPanelRef.value.toString(),
-  })
-}
-
-const handleOnSelectAttachment = (index: number) => {
-  selectedAttachmentIndex.value = index
-}
-
-onMounted(async () => {
-  notesFeatureToggle.value =
-    (await FeatureToggleService.isEnabled("neuris.note")).data ?? false
-  if (route.query.showAttachmentPanel) {
-    showExtraContentPanelRef.value = route.query.showAttachmentPanel === "true"
-  } else if (notesFeatureToggle.value) {
-    showExtraContentPanelRef.value =
-      !!props.documentUnit.note || props.documentUnit.hasAttachments
-  }
-})
 </script>
 
 <template>
-  <DocumentUnitWrapper
-    :document-unit="props.documentUnit as DocumentUnit"
-    :save-callback="handleUpdateDocumentUnit"
-    :show-navigation-panel="showNavigationPanel"
-  >
-    <template #default="{ classes }">
-      <FlexContainer class="w-full flex-grow flex-row-reverse">
-        <ExtraContentSidePanel
-          v-if="notesFeatureToggle"
-          :current-index="selectedAttachmentIndex"
-          :document-unit="documentUnit"
-          :document-unit-uuid="documentUnit.uuid"
-          :is-expanded="showExtraContentPanelRef"
-          @select="handleOnSelectAttachment"
-          @toggle="toggleExtraContentPanel"
-        ></ExtraContentSidePanel>
-        <AttachmentViewSidePanel
-          v-if="props.documentUnit.attachments && !notesFeatureToggle"
-          :attachments="documentUnit.attachments"
-          :current-index="selectedAttachmentIndex"
-          :document-unit-uuid="props.documentUnit.uuid"
-          :is-expanded="showExtraContentPanelRef"
-          @select="handleOnSelectAttachment"
-          @update="toggleExtraContentPanel"
-        ></AttachmentViewSidePanel>
-        <FlexItem class="flex-1 flex-col bg-gray-100" :class="classes">
-          <DocumentUnitCoreData
-            id="coreData"
-            v-model="coreData"
-            class="mb-24"
-            :validation-errors="
-              validationErrors.filter(
-                (err) => err.instance.split('\.')[0] === 'coreData',
-              )
-            "
-          />
-          <PreviousDecisions
-            id="proceedingDecisions"
-            v-model="previousDecisions"
-          />
-          <EnsuingDecisions v-model="ensuingDecisions" class="mb-24" />
+  <FlexItem class="w-full flex-1 grow flex-col p-24">
+    <DocumentUnitCoreData
+      id="coreData"
+      v-model="coreData"
+      class="mb-24"
+      :validation-errors="
+        validationErrors.filter(
+          (err) => err.instance.split('\.')[0] === 'coreData',
+        )
+      "
+    />
+    <PreviousDecisions id="proceedingDecisions" v-model="previousDecisions" />
+    <EnsuingDecisions v-model="ensuingDecisions" class="mb-24" />
 
-          <DocumentUnitContentRelatedIndexing
-            id="contentRelatedIndexing"
-            v-model="contentRelatedIndexing"
-            class="mb-24"
-          />
+    <DocumentUnitContentRelatedIndexing
+      id="contentRelatedIndexing"
+      v-model="contentRelatedIndexing"
+      class="mb-24"
+    />
 
-          <DocumentUnitTexts
-            id="texts"
-            :texts="updatedDocumentUnit.texts"
-            :valid-border-numbers="updatedDocumentUnit.borderNumbers"
-            @update-value="handleUpdateValueDocumentUnitTexts"
-          />
-        </FlexItem>
-      </FlexContainer>
-    </template>
-  </DocumentUnitWrapper>
+    <DocumentUnitTexts
+      id="texts"
+      :texts="updatedDocumentUnit.texts"
+      :valid-border-numbers="updatedDocumentUnit.borderNumbers"
+      @update-value="handleUpdateValueDocumentUnitTexts"
+    />
+  </FlexItem>
 </template>

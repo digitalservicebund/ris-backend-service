@@ -20,6 +20,7 @@ import IconAttachedFile from "~icons/ic/baseline-attach-file"
 import IconDelete from "~icons/ic/baseline-close"
 import IconError from "~icons/ic/baseline-error"
 import IconSubject from "~icons/ic/baseline-subject"
+import IconNote from "~icons/ic/outline-comment-bank"
 import IconEdit from "~icons/ic/outline-edit"
 import IconView from "~icons/ic/outline-remove-red-eye"
 
@@ -124,7 +125,7 @@ function onDelete() {
         data-testid="listEntry"
       >
         <CellItem>
-          <FlexContainer class="space-x-8">
+          <FlexContainer align-items="items-center" class="space-x-8">
             <FlexItem class="flex-grow"
               >{{ listEntry.documentNumber }}
             </FlexItem>
@@ -133,20 +134,38 @@ function onDelete() {
               class="flex-end text-blue-800"
               data-testid="file-attached-icon"
             >
-              <IconAttachedFile class="h-20 w-20" />
+              <IconAttachedFile
+                aria-label="Anhang vorhanden"
+                class="h-20 w-20"
+              />
             </FlexItem>
             <FlexItem v-else class="flex-end text-gray-500">
-              <IconAttachedFile class="h-20 w-20" />
+              <IconAttachedFile
+                aria-label="Kein Anhang vorhanden"
+                class="h-20 w-20"
+              />
             </FlexItem>
             <FlexItem
               v-if="listEntry.hasHeadnoteOrPrinciple"
               class="flex-end text-blue-800"
               data-testid="headnote-principle-icon"
             >
-              <IconSubject class="h-20 w-20" />
+              <IconSubject aria-label="Langtext vorhanden" class="h-20 w-20" />
             </FlexItem>
             <span v-else class="text-gray-500"
-              ><IconSubject class="h-20 w-20"
+              ><IconSubject
+                aria-label="Kein Langtext vorhanden"
+                class="h-20 w-20"
+            /></span>
+            <FlexItem
+              v-if="listEntry.hasNote"
+              class="flex-end text-blue-800"
+              data-testid="note-icon"
+            >
+              <IconNote aria-label="Notiz vorhanden" class="h-20 w-20" />
+            </FlexItem>
+            <span v-else class="text-gray-500"
+              ><IconNote aria-label="Keine Notiz vorhanden" class="h-20 w-20"
             /></span>
           </FlexContainer>
         </CellItem>
@@ -174,7 +193,7 @@ function onDelete() {
             listEntry.documentType ? listEntry.documentType.jurisShortcut : "-"
           }}
         </CellItem>
-        <CellItem>
+        <CellItem class="min-w-176">
           <IconBadge
             v-if="listEntry.status?.publicationStatus"
             v-bind="useStatusBadge(listEntry.status).value"
@@ -191,7 +210,7 @@ function onDelete() {
           <span v-else>-</span>
         </CellItem>
         <CellItem class="flex">
-          <div class="flex">
+          <div class="float-end flex">
             <router-link
               v-if="
                 listEntry.documentationOffice?.abbreviation ===

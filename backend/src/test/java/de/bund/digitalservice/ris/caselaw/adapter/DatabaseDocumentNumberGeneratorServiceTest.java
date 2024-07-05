@@ -10,7 +10,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DateUtil;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberFormatterException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberPatternException;
-import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitExistsException;
 import java.util.Optional;
 import java.util.UUID;
@@ -77,10 +76,8 @@ class DatabaseDocumentNumberGeneratorServiceTest {
   }
 
   @Test
-  void shouldKeepTrying_ifDocumentNumberExists() {
+  void shouldThrowException_ifDocumentNumberExists() {
     var nextDocumentNumber = generateDefaultDocumentNumber();
-
-    int attempts = 3;
 
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitDTO.builder()
@@ -91,17 +88,16 @@ class DatabaseDocumentNumberGeneratorServiceTest {
     when(databaseDocumentationUnitRepository.findByDocumentNumber(nextDocumentNumber))
         .thenReturn(Optional.of(documentationUnitDTO));
 
-    assertThatThrownBy(() -> service.generateDocumentNumber(DEFAULT_ABBREVIATION, attempts))
-        .isInstanceOf(DocumentationUnitException.class)
-        .hasMessageContaining("Could not generate Document number");
+    assertThatThrownBy(() -> service.generateDocumentNumber(DEFAULT_ABBREVIATION))
+        .isInstanceOf(DocumentationUnitExistsException.class)
+        .hasMessageContaining("Document number already exists: " + nextDocumentNumber);
   }
 
   @Test
   void shouldStopTrying_ifPatternIsInvalid() {
     var docOfficeAbbreviation = "NOT_IN_NUMBER_PATTERN_PROPERTIES";
-    int attempts = 3;
 
-    assertThatThrownBy(() -> service.generateDocumentNumber(docOfficeAbbreviation, attempts))
+    assertThatThrownBy(() -> service.generateDocumentNumber(docOfficeAbbreviation))
         .isInstanceOf(DocumentNumberPatternException.class)
         .hasMessageContaining(
             "Could not " + "find pattern for abbreviation " + docOfficeAbbreviation);

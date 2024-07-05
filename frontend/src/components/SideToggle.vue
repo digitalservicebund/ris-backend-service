@@ -7,14 +7,12 @@ interface Props {
   isExpanded?: boolean
   openingDirection?: OpeningDirection
   label?: string
-  size?: "small" | "medium"
 }
 
 const props = withDefaults(defineProps<Props>(), {
   isExpanded: false,
   openingDirection: OpeningDirection.RIGHT,
   label: "side toggle",
-  size: "medium",
 })
 
 const emit = defineEmits<{
@@ -24,23 +22,14 @@ const emit = defineEmits<{
 const postFix = computed(() => (props.isExpanded ? "schließen" : "öffnen"))
 
 const classes = computed(() => ({
-  "right-0": props.openingDirection == OpeningDirection.RIGHT,
-  "left-0": props.openingDirection == OpeningDirection.LEFT,
-  "-mr-12":
-    props.openingDirection == OpeningDirection.RIGHT && props.size === "small",
-  "-ml-12":
-    props.openingDirection == OpeningDirection.LEFT && props.size === "small",
-  "-mr-20":
-    props.openingDirection == OpeningDirection.RIGHT && props.size === "medium",
-  "-ml-20":
-    props.openingDirection == OpeningDirection.LEFT && props.size === "medium",
+  "pl-24":
+    props.openingDirection == OpeningDirection.RIGHT && !props.isExpanded,
+  "pr-24": props.openingDirection == OpeningDirection.LEFT && !props.isExpanded,
 }))
 
-const iconClasses = computed(() => ({
-  "w-icon rounded-full border-1 border-solid border-gray-400 bg-white text-gray-900 text-16":
-    props.size === "small",
-  "w-icon rounded-full border-1 border-solid border-gray-400 bg-white text-gray-900 p-6 text-20":
-    props.size === "medium",
+const buttonClasses = computed(() => ({
+  "right-0 -mr-16": props.openingDirection == OpeningDirection.RIGHT,
+  "left-0 -ml-16": props.openingDirection == OpeningDirection.LEFT,
 }))
 
 const toggle = () => {
@@ -56,28 +45,23 @@ export enum OpeningDirection {
 </script>
 
 <template>
-  <div
-    class="relative bg-white"
-    :class="[props.size === 'small' ? 'pr-[1.25rem]' : 'pr-[2.25rem]']"
-  >
+  <div class="relative bg-white" :class="classes">
     <button
       :aria-label="props.label + ' ' + postFix"
-      class="absolute top-28 z-20 flex items-center"
-      :class="classes"
+      class="w-icon absolute top-16 z-20 flex min-h-32 min-w-32 items-center justify-center rounded-full border-1 border-solid border-gray-400 bg-white text-gray-900"
+      :class="buttonClasses"
+      @click="toggle"
     >
-      <span :class="iconClasses">
-        <IconChevronLeft
-          v-if="
-            props.openingDirection === OpeningDirection.LEFT
-              ? !isExpanded
-              : isExpanded
-          "
-          @click="toggle"
-        />
-        <IconChevronRight v-else @click="toggle" />
-      </span>
+      <IconChevronLeft
+        v-if="
+          props.openingDirection === OpeningDirection.LEFT
+            ? !isExpanded
+            : isExpanded
+        "
+      />
+      <IconChevronRight v-else />
     </button>
-    <div v-show="isExpanded" class="-mr-[1.25rem]">
+    <div v-show="isExpanded">
       <slot />
     </div>
   </div>

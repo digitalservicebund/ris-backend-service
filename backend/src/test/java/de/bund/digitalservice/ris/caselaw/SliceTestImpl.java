@@ -9,6 +9,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 
+@SuppressWarnings("java:S1068")
 public class SliceTestImpl<T> implements Slice<T> {
 
   private int number;

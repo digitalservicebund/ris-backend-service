@@ -1,31 +1,27 @@
 <script setup lang="ts">
 import { useHead } from "@unhead/vue"
 import { storeToRefs } from "pinia"
-import { onMounted, ref } from "vue"
-import { useRoute } from "vue-router"
+import { onMounted } from "vue"
 import DocumentUnitCategories from "@/components/DocumentUnitCategories.vue"
-import ErrorPage from "@/components/ErrorPage.vue"
+import { ValidationError } from "@/components/input/types"
 import DocumentUnit from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const props = defineProps<{
   documentNumber: string
+  validationErrors: ValidationError[]
 }>()
 
 useHead({
   title: props.documentNumber + " · NeuRIS Rechtsinformationssystem",
 })
 
-const route = useRoute()
-const responseError = ref()
-
 const store = useDocumentUnitStore()
 const { documentUnit } = storeToRefs(store)
 
 onMounted(async () => {
   // In the future, this get request will happen one layer above, so all routes can share the same docunit ref
-  const { error } = await store.loadDocumentUnit(props.documentNumber)
-  responseError.value = error
+  await store.loadDocumentUnit(props.documentNumber)
 })
 </script>
 
@@ -33,11 +29,6 @@ onMounted(async () => {
   <DocumentUnitCategories
     v-if="documentUnit"
     :document-unit="documentUnit as DocumentUnit"
-    :show-navigation-panel="
-      route.query.showNavigationPanel
-        ? route.query.showNavigationPanel === 'true'
-        : true
-    "
+    :validation-errors="validationErrors"
   />
-  <ErrorPage v-else :error="responseError" :title="responseError?.title" />
 </template>

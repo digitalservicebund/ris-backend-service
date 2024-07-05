@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import dayjs from "dayjs"
+import { provide } from "vue"
 import FlexContainer from "@/components/FlexContainer.vue"
+import {
+  PreviewLayout,
+  previewLayoutInjectionKey,
+} from "@/components/preview/constants"
 import PreviewContentRelatedIndexing from "@/components/preview/PreviewContentRelatedIndexing.vue"
 import PreviewCoreData from "@/components/preview/PreviewCoreData.vue"
 import PreviewNote from "@/components/preview/PreviewNote.vue"
@@ -8,9 +13,11 @@ import PreviewProceedingDecisions from "@/components/preview/PreviewProceedingDe
 import PreviewTexts from "@/components/preview/PreviewTexts.vue"
 import DocumentUnit from "@/domain/documentUnit"
 
-defineProps<{
+const props = defineProps<{
   documentUnit: DocumentUnit
+  layout?: PreviewLayout
 }>()
+provide(previewLayoutInjectionKey, props.layout || "wide")
 </script>
 
 <template>

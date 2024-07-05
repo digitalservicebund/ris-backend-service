@@ -15,4 +15,7 @@ export const CustomOrderedList = OrderedList.extend({
       },
     }
   },
+  addInputRules() {
+    return []
+  },
 })

@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/vue"
+import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewTexts from "@/components/preview/PreviewTexts.vue"
 import { Texts } from "@/domain/documentUnit"
 
@@ -7,6 +8,11 @@ function renderComponent(texts: Texts) {
     props: {
       texts: texts,
       validBorderNumbers: [],
+    },
+    global: {
+      provide: {
+        [previewLayoutInjectionKey as symbol]: "wide",
+      },
     },
   })
 }

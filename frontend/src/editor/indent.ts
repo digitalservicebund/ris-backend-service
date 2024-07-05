@@ -3,13 +3,7 @@
 // https://github.com/ueberdosis/tiptap/issues/1036#issuecomment-981094752
 // https://github.com/django-tiptap/django_tiptap/blob/main/django_tiptap/templates/forms/tiptap_textarea.html#L453-L602
 
-import {
-  CommandProps,
-  Extension,
-  Extensions,
-  isList,
-  KeyboardShortcutCommand,
-} from "@tiptap/core"
+import { CommandProps, Extension, KeyboardShortcutCommand } from "@tiptap/core"
 import { TextSelection, Transaction } from "prosemirror-state"
 
 declare module "@tiptap/core" {
@@ -38,7 +32,6 @@ const clamp = (val: number, min: number, max: number): number =>
 const updateIndentLevel = (
   transaction: Transaction,
   options: IndentOptions,
-  extensions: Extensions,
   type: IndentType,
 ): Transaction => {
   const { doc, selection } = transaction
@@ -56,7 +49,7 @@ const updateIndentLevel = (
       )
       return false
     }
-    return !isList(node.type.name, extensions)
+    return true
   })
   return transaction
 }
@@ -85,19 +78,11 @@ const setNodeIndentMarkup = (
   )
 }
 
-const getIndent =
+const getOutdent =
   (): KeyboardShortcutCommand =>
   ({ editor }) => {
-    return editor.can().sinkListItem("listItem")
-      ? editor.chain().focus().sinkListItem("listItem").run()
-      : editor.chain().focus().indent().run()
-  }
-
-const getOutdent =
-  (outdentOnlyAtHead: boolean): KeyboardShortcutCommand =>
-  ({ editor }) => {
-    if (outdentOnlyAtHead && editor.state.selection.$head.parentOffset > 0)
-      return false
+    // If the cursor is not at the start of the node, don't unindent
+    if (editor.state.selection.$head.parentOffset > 0) return false
 
     return editor.can().liftListItem("listItem")
       ? editor.chain().focus().liftListItem("listItem").run()
@@ -142,11 +127,10 @@ export const Indent = Extension.create<IndentOptions, never>({
     return {
       indent:
         () =>
-        ({ tr, state, dispatch, editor }: CommandProps) => {
+        ({ tr, state, dispatch }: CommandProps) => {
           tr = updateIndentLevel(
             tr.setSelection(state.selection),
             this.options,
-            editor.extensionManager.extensions,
             "indent",
           )
           if (tr.docChanged && dispatch) {
@@ -157,11 +141,10 @@ export const Indent = Extension.create<IndentOptions, never>({
         },
       outdent:
         () =>
-        ({ tr, state, dispatch, editor }: CommandProps) => {
+        ({ tr, state, dispatch }: CommandProps) => {
           tr = updateIndentLevel(
             tr.setSelection(state.selection),
             this.options,
-            editor.extensionManager.extensions,
             "outdent",
           )
           if (tr.docChanged && dispatch) {
@@ -175,10 +158,7 @@ export const Indent = Extension.create<IndentOptions, never>({
 
   addKeyboardShortcuts() {
     return {
-      Tab: getIndent(),
-      Backspace: getOutdent(true),
-      "Shift-Tab": getOutdent(false),
-      Escape: () => this.editor.commands.blur(),
+      Backspace: getOutdent(),
     }
   },
 

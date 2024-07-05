@@ -19,7 +19,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.51.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "10.15.0"
+    id("org.flywaydb.flyway") version "10.15.2"
 }
 
 group = "de.bund.digitalservice"
@@ -52,7 +52,7 @@ jacoco {
 }
 
 lombok {
-    version = "1.18.32"
+    version = "1.18.34"
 }
 
 springBoot {
@@ -147,7 +147,7 @@ dependencies {
     // CVE-2024-22262
     implementation("org.springframework:spring-web:6.1.10")
 
-    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.5.0")
+    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.6.0")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.2")
 
@@ -166,7 +166,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.1")
 
-    implementation(platform("software.amazon.awssdk:bom:2.26.9"))
+    implementation(platform("software.amazon.awssdk:bom:2.26.15"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -199,7 +199,7 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus:1.13.1")
     implementation("io.micrometer:micrometer-core:1.13.1")
 
-    implementation(platform("io.sentry:sentry-bom:8.0.0-alpha.1"))
+    implementation(platform("io.sentry:sentry-bom:8.0.0-alpha.3"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
     implementation("io.sentry:sentry-logback")
 
@@ -211,10 +211,10 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.12.0")
     implementation("org.jsoup:jsoup:1.17.2")
 
-    val flywayCore = "org.flywaydb:flyway-core:10.15.0"
+    val flywayCore = "org.flywaydb:flyway-core:10.15.2"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.15.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.15.2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")

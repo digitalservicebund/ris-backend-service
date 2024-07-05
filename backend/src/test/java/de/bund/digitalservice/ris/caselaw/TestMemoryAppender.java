@@ -9,9 +9,7 @@ import ch.qos.logback.core.read.ListAppender;
 import org.slf4j.LoggerFactory;
 
 public class TestMemoryAppender extends ListAppender<ILoggingEvent> {
-  private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(TestMemoryAppender.class);
-
-  private Logger logger;
+  private final Logger logger;
 
   public TestMemoryAppender(Class<?> clazz) {
     super();

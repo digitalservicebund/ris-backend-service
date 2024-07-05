@@ -57,7 +57,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @Import({JurisXmlExporterResponseProcessor.class, JurisMessageWrapperFactory.class})
 class JurisXmlExporterResponseProcessorTest {
-  private final String DOCUMENT_NUMBER = "KORE123456789";
+  private static final String DOCUMENT_NUMBER = "KORE123456789";
   @MockBean private DocumentUnitStatusService statusService;
   @MockBean private HttpMailSender mailSender;
   @MockBean private ImapStoreFactory storeFactory;

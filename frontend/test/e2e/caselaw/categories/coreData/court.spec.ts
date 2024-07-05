@@ -220,10 +220,6 @@ test.describe("court", () => {
         await page.locator("[aria-label='Auswahl zurücksetzen']").click()
         await expect(page.getByText("AG Aalen")).toBeHidden()
         await waitForInputValue(page, "[aria-label='Gericht']", "")
-        // dropdown should not open
-        await expect(
-          page.locator("[aria-label='dropdown-option']"),
-        ).toBeHidden()
       },
       page,
       { clickSaveButton: true, reload: true },

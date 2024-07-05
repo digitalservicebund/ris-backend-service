@@ -701,6 +701,13 @@ VALUES
     )
   );
 
+UPDATE
+  incremental_migration.documentation_unit
+SET
+  note = 'dies ist eine test notiz'
+WHERE
+  incremental_migration.documentation_unit.document_number = 'YYTestDoc0015';
+
 INSERT INTO
   incremental_migration.file_number (id, value, documentation_unit_id, rank)
 VALUES

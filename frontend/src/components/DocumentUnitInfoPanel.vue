@@ -1,82 +1,83 @@
 <script lang="ts" setup>
-import { toRaw } from "vue"
-import IconBadge, { IconBadgeProps } from "@/components/IconBadge.vue"
-import PropertyInfo from "@/components/PropertyInfo.vue"
+import dayjs from "dayjs"
+import { computed, ref, toRaw, watchEffect } from "vue"
+import IconBadge from "@/components/IconBadge.vue"
 import SaveButton from "@/components/SaveDocumentUnitButton.vue"
+import { useStatusBadge } from "@/composables/useStatusBadge"
+import DocumentUnit from "@/domain/documentUnit"
 import { ServiceResponse } from "@/services/httpClient"
-
-interface PropertyInfoType {
-  label: string
-  value?: string
-}
+import IconError from "~icons/ic/baseline-error"
 
 interface Props {
+  documentUnit: DocumentUnit
   heading?: string
-  firstRow?: (PropertyInfoType | IconBadgeProps)[]
-  secondRow?: (PropertyInfoType | IconBadgeProps)[]
   saveCallback?: () => Promise<ServiceResponse<void>>
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   heading: "",
-  firstRow: () => [],
-  secondRow: () => [],
   saveCallback: undefined,
 })
 
-function isBadge(
-  entry: PropertyInfoType | IconBadgeProps,
-): entry is IconBadgeProps {
-  return "icon" in entry
-}
+const fileNumberInfo = computed(
+  () => props.documentUnit?.coreData.fileNumbers?.[0] || "",
+)
+
+const decisionDateInfo = computed(() =>
+  props.documentUnit?.coreData.decisionDate
+    ? dayjs(props.documentUnit.coreData.decisionDate).format("DD.MM.YYYY")
+    : "",
+)
+
+const courtInfo = computed(
+  () => props.documentUnit?.coreData.court?.label || "",
+)
+
+const formattedInfo = computed(() => {
+  const parts = [
+    courtInfo.value,
+    fileNumberInfo.value,
+    decisionDateInfo.value,
+  ].filter((part) => part.trim() !== "")
+  return parts.join(", ")
+})
+
+const statusBadge = ref(useStatusBadge(props.documentUnit?.status).value)
+
+watchEffect(() => {
+  statusBadge.value = useStatusBadge(props.documentUnit?.status).value
+})
 </script>
 
 <template>
   <div
-    class="sticky top-0 z-30 flex flex-row items-center justify-between border-b border-solid border-gray-400 bg-blue-200 px-[2rem]"
-    :class="{ 'h-[8rem]': secondRow.length }"
+    class="sticky top-0 z-30 flex h-[64px] flex-row items-center border-b border-solid border-gray-400 bg-blue-100 px-24 py-12"
   >
-    <div class="-mt-1 flex h-80 flex-col justify-center gap-24">
-      <div
-        class="flex items-center space-x-[2rem]"
-        data-testid="document-unit-info-panel-items"
-      >
-        <h1 class="text-30">{{ heading }}</h1>
-        <div v-for="entry in firstRow" :key="entry.label">
-          <IconBadge
-            v-if="isBadge(entry)"
-            :background-color="entry.backgroundColor"
-            :color="entry.color"
-            :icon="toRaw(entry.icon)"
-            :label="entry.label"
-          />
-          <PropertyInfo
-            v-else
-            direction="row"
-            :label="entry.label"
-            :value="entry.value || ' - '"
-          ></PropertyInfo>
-        </div>
-      </div>
+    <h1 class="text font-bold">{{ heading }}</h1>
+    <span v-if="formattedInfo.length > 0" class="m-4"> | </span>
+    <span
+      class="overflow-hidden text-ellipsis whitespace-nowrap"
+      data-testid="document-unit-info-panel-items"
+    >
+      {{ formattedInfo }}</span
+    >
+    <IconBadge
+      :background-color="statusBadge.backgroundColor"
+      class="ml-12"
+      :color="statusBadge.color"
+      :icon="toRaw(statusBadge.icon)"
+      :label="statusBadge.label"
+    />
+    <IconBadge
+      v-if="props.documentUnit?.status?.withError"
+      background-color="bg-red-300"
+      class="ml-12"
+      color="text-red-900"
+      :icon="IconError"
+      label="Fehler"
+    />
 
-      <div v-if="secondRow.length" class="flex space-x-[2rem]">
-        <div v-for="entry in secondRow" :key="entry.label" class="-mt-20">
-          <IconBadge
-            v-if="isBadge(entry)"
-            :background-color="entry.backgroundColor"
-            :color="entry.color"
-            :icon="entry.icon"
-            :label="entry.label"
-          />
-          <PropertyInfo
-            v-else
-            direction="row"
-            :label="entry.label"
-            :value="entry.value || ' - '"
-          ></PropertyInfo>
-        </div>
-      </div>
-    </div>
+    <span class="flex-grow"></span>
     <SaveButton
       v-if="saveCallback"
       aria-label="Speichern Button"

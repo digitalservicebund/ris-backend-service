@@ -1,40 +1,29 @@
 <script lang="ts" setup>
-import { computed, onMounted, Ref, ref } from "vue"
-import { useRoute } from "vue-router"
+import { computed, Ref, ref } from "vue"
 import AttachmentList from "@/components/AttachmentList.vue"
-import AttachmentViewSidePanel from "@/components/AttachmentViewSidePanel.vue"
-import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
-import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
 import FileUpload from "@/components/FileUpload.vue"
-import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import TitleElement from "@/components/TitleElement.vue"
-import useQuery from "@/composables/useQueryFromRoute"
 import Attachment from "@/domain/attachment"
 import DocumentUnit from "@/domain/documentUnit"
 import attachmentService from "@/services/attachmentService"
-import FeatureToggleService from "@/services/featureToggleService"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
   showNavigationPanel?: boolean
 }>()
 const emit = defineEmits<{
-  updateDocumentUnit: [void]
+  attachmentsUploaded: [boolean]
+  attachmentIndexSelected: [number]
+  attachmentIndexDeleted: [number]
 }>()
-
-const { pushQueryToRoute } = useQuery<"showAttachmentPanel">()
-const route = useRoute()
-
-const showExtraContentPanelRef: Ref<boolean> = ref(false)
 
 const errors = ref<string[]>([])
 const isLoading = ref(false)
 const acceptedFileFormats = [".docx"]
-const selectedAttachmentIndex: Ref<number> = ref(0)
-const notesFeatureToggle = ref(false)
+const deletingAttachmentIndex: Ref<number> = ref(0)
 
 const showDeleteModal = ref(false)
 const deleteModalHeaderText = "Anhang löschen"
@@ -70,35 +59,25 @@ const handleDeleteAttachment = async (index: number) => {
       )
     ).status < 300
   ) {
-    if (getAttachments().length > 1) {
-      selectedAttachmentIndex.value = index == 0 ? 0 : index - 1
-    } else {
-      toggleExtraContentPanel(false)
-    }
-    emit("updateDocumentUnit")
+    emit("attachmentIndexDeleted", index)
   }
 }
 
 const handleOnSelect = (index: number) => {
   if (index >= 0 && index < getAttachments().length) {
-    if (selectedAttachmentIndex.value == index) {
-      toggleExtraContentPanel()
-    } else {
-      selectedAttachmentIndex.value = index
-      toggleExtraContentPanel(true)
-    }
+    emit("attachmentIndexSelected", index)
   }
 }
 
 const handleOnDelete = (index: number) => {
   errors.value = []
-  selectedAttachmentIndex.value = index
-  toggleDeleteModal()
+  deletingAttachmentIndex.value = index
+  openDeleteModal()
 }
 
 const deleteFile = (index: number) => {
   handleDeleteAttachment(index)
-  toggleDeleteModal()
+  closeDeleteModal()
 }
 
 async function upload(files: FileList) {
@@ -125,124 +104,75 @@ async function upload(files: FileList) {
     }
   } finally {
     isLoading.value = false
-    emit("updateDocumentUnit")
-    if (!showExtraContentPanelRef.value && anySuccessful) {
-      toggleExtraContentPanel(true)
-    }
+    emit("attachmentsUploaded", anySuccessful)
   }
 }
 
-const toggleExtraContentPanel = (state?: boolean) => {
-  showExtraContentPanelRef.value = state || !showExtraContentPanelRef.value
-  pushQueryToRoute({
-    showAttachmentPanel: showExtraContentPanelRef.value.toString(),
-  })
-}
-
-function toggleDeleteModal() {
-  showDeleteModal.value = !showDeleteModal.value
-  if (showDeleteModal.value) {
+function openDeleteModal() {
+  const attachmentToBeDeleted =
+    props.documentUnit.attachments?.[deletingAttachmentIndex.value]?.name
+  if (attachmentToBeDeleted != null) {
+    showDeleteModal.value = true
     const scrollLeft = document.documentElement.scrollLeft
     const scrollTop = document.documentElement.scrollTop
     window.onscroll = () => {
       window.scrollTo(scrollLeft, scrollTop)
     }
-  } else {
-    window.onscroll = () => {
-      return
-    }
   }
 }
 
-onMounted(async () => {
-  notesFeatureToggle.value =
-    (await FeatureToggleService.isEnabled("neuris.note")).data ?? false
-  if (route.query.showAttachmentPanel) {
-    showExtraContentPanelRef.value = route.query.showAttachmentPanel === "true"
-  } else if (notesFeatureToggle.value) {
-    showExtraContentPanelRef.value =
-      !!props.documentUnit.note || props.documentUnit.hasAttachments
+function closeDeleteModal() {
+  showDeleteModal.value = false
+  window.onscroll = () => {
+    return
   }
-})
+}
 </script>
 
 <template>
-  <DocumentUnitWrapper
-    :document-unit="documentUnit"
-    :show-navigation-panel="props.showNavigationPanel"
-  >
-    <template #default="{ classes }">
-      <FlexContainer class="h-full w-full">
-        <PopupModal
-          v-if="
-            showDeleteModal &&
-            props.documentUnit.attachments[selectedAttachmentIndex] !==
-              undefined &&
-            props.documentUnit.attachments[selectedAttachmentIndex] !== null &&
-            props.documentUnit.attachments[selectedAttachmentIndex].name != null
-          "
-          :aria-label="deleteModalHeaderText"
-          cancel-button-type="tertiary"
-          confirm-button-type="destructive"
-          confirm-text="Löschen"
-          :content-text="`Möchten Sie den Anhang ${getAttachment(selectedAttachmentIndex).name} wirklich dauerhaft löschen?`"
-          :header-text="deleteModalHeaderText"
-          @close-modal="toggleDeleteModal"
-          @confirm-action="deleteFile(selectedAttachmentIndex)"
+  <FlexItem class="w-full flex-1 grow space-y-20 p-24">
+    <PopupModal
+      v-if="showDeleteModal"
+      :aria-label="deleteModalHeaderText"
+      cancel-button-type="tertiary"
+      confirm-button-type="destructive"
+      confirm-text="Löschen"
+      :content-text="`Möchten Sie den Anhang ${getAttachment(deletingAttachmentIndex).name} wirklich dauerhaft löschen?`"
+      :header-text="deleteModalHeaderText"
+      @close-modal="closeDeleteModal"
+      @confirm-action="deleteFile(deletingAttachmentIndex)"
+    />
+    <TitleElement class="mb-0">Dokumente</TitleElement>
+    <AttachmentList
+      v-if="props.documentUnit.hasAttachments"
+      id="file-table"
+      :files="getAttachments()"
+      @delete="handleOnDelete"
+      @select="handleOnSelect"
+    />
+    <InfoModal
+      v-if="errors.length > 0 && !isLoading"
+      class="mt-8"
+      :description="errors"
+      :title="errorTitle"
+    />
+    <div class="flex-grow">
+      <div class="flex h-full flex-col items-start">
+        <FileUpload
+          :accept="acceptedFileFormats.toString()"
+          :is-loading="isLoading"
+          @files-selected="(files) => upload(files)"
         />
-        <FlexItem class="flex-1 space-y-20" :class="classes">
-          <TitleElement class="mb-0">Dokumente</TitleElement>
-          <AttachmentList
-            v-if="props.documentUnit.hasAttachments"
-            id="file-table"
-            :files="getAttachments()"
-            @delete="handleOnDelete"
-            @select="handleOnSelect"
-          />
-          <InfoModal
-            v-if="errors.length > 0 && isLoading === false"
-            class="mt-8"
-            :description="errors"
-            :title="errorTitle"
-          />
-          <div class="flex-grow">
-            <div class="flex h-full flex-col items-start">
-              <FileUpload
-                :accept="acceptedFileFormats.toString()"
-                :is-loading="isLoading"
-                @files-selected="(files) => upload(files)"
-              />
-            </div>
-          </div>
-          <div class="flex flex-row justify-between">
-            <div class="ds-label-02-reg text-gray-900">
-              Zulässige Dateiformate:
-              {{ acceptedFileFormats.toString().replace(/\./g, " ") }}
-            </div>
-            <div class="ds-label-02-reg text-gray-900">
-              Maximale Dateigröße: 20 MB
-            </div>
-          </div>
-        </FlexItem>
-        <ExtraContentSidePanel
-          v-if="notesFeatureToggle"
-          :current-index="selectedAttachmentIndex"
-          :document-unit="documentUnit"
-          :document-unit-uuid="documentUnit.uuid"
-          :is-expanded="showExtraContentPanelRef"
-          @select="handleOnSelect"
-          @toggle="toggleExtraContentPanel"
-        ></ExtraContentSidePanel>
-        <AttachmentViewSidePanel
-          v-if="props.documentUnit.attachments && !notesFeatureToggle"
-          :attachments="documentUnit.attachments"
-          :current-index="selectedAttachmentIndex"
-          :document-unit-uuid="props.documentUnit.uuid"
-          :is-expanded="showExtraContentPanelRef"
-          @select="handleOnSelect"
-          @update="toggleExtraContentPanel"
-        ></AttachmentViewSidePanel>
-      </FlexContainer>
-    </template>
-  </DocumentUnitWrapper>
+      </div>
+    </div>
+    <div class="flex flex-row justify-between">
+      <div class="ds-label-02-reg text-gray-900">
+        Zulässige Dateiformate:
+        {{ acceptedFileFormats.toString().replace(/\./g, " ") }}
+      </div>
+      <div class="ds-label-02-reg text-gray-900">
+        Maximale Dateigröße: 20 MB
+      </div>
+    </div>
+  </FlexItem>
 </template>

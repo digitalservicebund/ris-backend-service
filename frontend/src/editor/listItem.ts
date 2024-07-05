@@ -15,4 +15,7 @@ export const CustomListItem = ListItem.extend({
       },
     }
   },
+  addInputRules() {
+    return []
+  },
 })

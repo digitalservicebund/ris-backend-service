@@ -15,4 +15,7 @@ export const CustomBulletList = BulletList.extend({
       },
     }
   },
+  addInputRules() {
+    return []
+  },
 })

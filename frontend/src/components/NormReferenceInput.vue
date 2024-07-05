@@ -226,7 +226,7 @@ onBeforeUnmount(() => {
         norm-abbreviation="normAbbreviation.abbreviation"
         @remove-entry="removeSingleNormEntry(index)"
         @update:validation-error="
-          (validationError, field) =>
+          (validationError: ValidationError | undefined, field: string) =>
             updateFormatValidation(validationError, field)
         "
       />

@@ -18,6 +18,8 @@ import org.docx4j.wml.R;
 import org.docx4j.wml.Text;
 
 public class DocumentUnitDocxBuilder extends DocxBuilder {
+  public static final String SOFT_HYPHEN = "\u00AD";
+  public static final String NON_BREAKING_SPACE = "\u00A0";
   P paragraph;
 
   private DocumentUnitDocxBuilder() {}
@@ -28,7 +30,7 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
 
   public DocumentUnitDocxBuilder setParagraph(P paragraph) {
     this.paragraph = paragraph;
-
+    replaceSoftHyphenNonBreakingSpaceCombination();
     return this;
   }
 
@@ -42,6 +44,61 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
     }
 
     return null;
+  }
+
+  /**
+   * We have cases where a combination of soft hyphen (SHY) and non-breaking space (NBSP) should be
+   * (and in word is) rendered as a regular hyphen. The docx XML looks e.g. like this:
+   * <w:r><w:t> </w:t></w:r><w:r><w:rPr></w:rPr><w:t>­</w:t></w:r>
+   */
+  private void replaceSoftHyphenNonBreakingSpaceCombination() {
+    Text previousSoftHyphenText = null;
+    Text previousNonBreakingSpaceText = null;
+
+    for (Object paragraphContent : paragraph.getContent()) {
+      if (!(paragraphContent instanceof R run)) {
+        continue;
+      }
+
+      for (Object runContent : run.getContent()) {
+        if (!(runContent instanceof JAXBElement<?> element)
+            || element.getDeclaredType() != Text.class) {
+          continue;
+        }
+        Text currentText = (Text) element.getValue();
+        String updatedTextValue = currentText.getValue();
+
+        // white-space preserve = NBSP
+        if (currentText.getSpace() != null && currentText.getSpace().equals("preserve")) {
+          updatedTextValue = updatedTextValue.replace(SOFT_HYPHEN + " ", "- ");
+          updatedTextValue = updatedTextValue.replace(" " + SOFT_HYPHEN, " -");
+        }
+        // soft hyphen node + non-breaking space node = hyphen
+        if (previousSoftHyphenText != null
+            && currentText.getValue().startsWith(NON_BREAKING_SPACE)) {
+          previousSoftHyphenText.setValue(
+              previousSoftHyphenText.getValue().replace(SOFT_HYPHEN, ""));
+          updatedTextValue = currentText.getValue().replace(NON_BREAKING_SPACE, "- ");
+          // non-breaking space node + soft hyphen node = hyphen
+        } else if (previousNonBreakingSpaceText != null
+            && currentText.getValue().startsWith(SOFT_HYPHEN)) {
+          previousNonBreakingSpaceText.setValue(
+              previousNonBreakingSpaceText.getValue().replace(NON_BREAKING_SPACE, ""));
+          updatedTextValue = currentText.getValue().replace(SOFT_HYPHEN, " -");
+        } else {
+          // soft hyphen node + non-breaking space in either order in same node = hyphen
+          updatedTextValue = updatedTextValue.replace(SOFT_HYPHEN + NON_BREAKING_SPACE, "- ");
+          updatedTextValue = updatedTextValue.replace(NON_BREAKING_SPACE + SOFT_HYPHEN, " -");
+        }
+
+        currentText.setValue(updatedTextValue);
+
+        // Remember is the direct previous element has been a soft hyphen or non-breaking space
+        previousSoftHyphenText = currentText.getValue().endsWith(SOFT_HYPHEN) ? currentText : null;
+        previousNonBreakingSpaceText =
+            currentText.getValue().endsWith(NON_BREAKING_SPACE) ? currentText : null;
+      }
+    }
   }
 
   private boolean isText() {

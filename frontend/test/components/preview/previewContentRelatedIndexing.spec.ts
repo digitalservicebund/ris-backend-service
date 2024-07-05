@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/vue"
+import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewContentRelatedIndexing from "@/components/preview/PreviewContentRelatedIndexing.vue"
 import ActiveCitation from "@/domain/activeCitation"
 import { ContentRelatedIndexing } from "@/domain/documentUnit"
@@ -9,6 +10,11 @@ function renderComponent(contentRelatedIndexing: ContentRelatedIndexing) {
   return render(PreviewContentRelatedIndexing, {
     props: {
       contentRelatedIndexing: contentRelatedIndexing,
+    },
+    global: {
+      provide: {
+        [previewLayoutInjectionKey as symbol]: "wide",
+      },
     },
   })
 }

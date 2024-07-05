@@ -5,11 +5,6 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberPattern
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitExistsException;
 
 public interface DocumentNumberService {
-  String generateDocumentNumber(String documentationOfficeAbbreviation, int attempts)
-      throws DocumentationUnitExistsException,
-          DocumentNumberPatternException,
-          DocumentNumberFormatterException;
-
   String generateDocumentNumber(String documentationOfficeAbbreviation)
       throws DocumentNumberPatternException,
           DocumentationUnitExistsException,

@@ -1,10 +1,16 @@
 import { render, screen } from "@testing-library/vue"
+import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewNote from "@/components/preview/PreviewNote.vue"
 
 function renderComponent(note?: string) {
   return render(PreviewNote, {
     props: {
       note: note,
+    },
+    global: {
+      provide: {
+        [previewLayoutInjectionKey as symbol]: "wide",
+      },
     },
   })
 }
