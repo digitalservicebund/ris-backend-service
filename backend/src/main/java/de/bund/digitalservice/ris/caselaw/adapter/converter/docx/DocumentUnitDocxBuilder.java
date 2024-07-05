@@ -30,7 +30,7 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
 
   public DocumentUnitDocxBuilder setParagraph(P paragraph) {
     this.paragraph = paragraph;
-    replaceSoftHyphenWithNonBreakingSpace();
+    replaceSoftHyphenNonBreakingSpaceCombination();
     return this;
   }
 
@@ -51,7 +51,7 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
    * (and in word is) rendered as a regular hyphen. The docx XML looks e.g. like this:
    * <w:r><w:t> </w:t></w:r><w:r><w:rPr></w:rPr><w:t>­</w:t></w:r>
    */
-  private void replaceSoftHyphenWithNonBreakingSpace() {
+  private void replaceSoftHyphenNonBreakingSpaceCombination() {
     Text previousSoftHyphenText = null;
     Text previousNonBreakingSpaceText = null;
 
