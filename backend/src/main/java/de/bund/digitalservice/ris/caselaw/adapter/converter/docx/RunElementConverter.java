@@ -26,6 +26,7 @@ import org.docx4j.dml.wordprocessingDrawing.STWrapText;
 import org.docx4j.vml.CTImageData;
 import org.docx4j.vml.CTShape;
 import org.docx4j.wml.Drawing;
+import org.docx4j.wml.FldChar;
 import org.docx4j.wml.Pict;
 import org.docx4j.wml.R;
 import org.docx4j.wml.R.LastRenderedPageBreak;
@@ -80,6 +81,8 @@ public class RunElementConverter {
         parsePict(paragraphElement, (Pict) jaxbElement.getValue(), converter);
       } else if (declaredType == LastRenderedPageBreak.class) {
         // ignored because in our web presentation of the docx file there are no page breaks
+      } else if (declaredType == FldChar.class) {
+        // used for field calculations. don't allow calculation at the moment.
       } else {
         LOGGER.error("unknown run element: {}", declaredType.getName());
         paragraphElement.addRunElement(new ErrorRunElement(declaredType.getName()));
