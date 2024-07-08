@@ -192,7 +192,7 @@ dependencies {
 
     implementation("com.fasterxml.jackson.core:jackson-core:2.17.2")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.17.1")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.17.2")
 
     implementation("io.micrometer:micrometer-registry-prometheus:1.13.1")
     implementation("io.micrometer:micrometer-core:1.13.1")
