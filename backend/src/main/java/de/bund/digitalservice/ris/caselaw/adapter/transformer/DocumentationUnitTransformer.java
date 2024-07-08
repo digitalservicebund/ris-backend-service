@@ -888,7 +888,10 @@ public class DocumentationUnitTransformer {
   private static void addYearsOfDisputeToDTO(
       DocumentationUnitDTO.DocumentationUnitDTOBuilder builder, CoreData coreData) {
 
-    if (coreData.yearsOfDispute() == null || coreData.yearsOfDispute().isEmpty()) return;
+    if (coreData.yearsOfDispute() == null || coreData.yearsOfDispute().isEmpty()) {
+      builder.yearsOfDispute(new LinkedHashSet<>());
+      return;
+    }
 
     Set<YearOfDisputeDTO> yearOfDisputeDTOS = new LinkedHashSet<>();
 
