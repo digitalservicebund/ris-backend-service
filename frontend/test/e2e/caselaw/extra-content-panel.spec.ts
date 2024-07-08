@@ -295,7 +295,9 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
       async ({ page, documentNumber }) => {
         await test.step("prepare doc unit with attachments", async () => {
           await navigateToFiles(page, documentNumber)
-          await uploadTestfile(page, ["sample.docx", "some-formatting.docx"])
+          await uploadTestfile(page, "sample.docx")
+          await expect(page.getByText("Die ist ein Test")).toBeVisible()
+          await uploadTestfile(page, "some-formatting.docx")
           await expect(page.getByText("Subheadline")).toBeVisible()
         })
 
