@@ -141,6 +141,7 @@ test.describe(
           await uploadTestfile(page, "sample.docx")
           await expect(page.getByText("Die ist ein Test")).toBeVisible()
 
+          await page.waitForEvent("requestfinished")
           await navigateToSearch(page)
 
           await navigateToCategories(page, documentNumber)
@@ -221,6 +222,7 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
           await uploadTestfile(page, "sample.docx")
           await expect(page.getByText("Die ist ein Test")).toBeVisible()
 
+          await page.waitForEvent("requestfinished")
           await navigateToSearch(page)
 
           await navigateToCategories(page, documentNumber)
