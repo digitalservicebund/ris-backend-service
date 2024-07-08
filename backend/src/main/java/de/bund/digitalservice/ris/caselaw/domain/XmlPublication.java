@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
+import lombok.Getter;
 
 @Builder(toBuilder = true)
 public record XmlPublication(
@@ -12,12 +13,13 @@ public record XmlPublication(
     String receiverAddress,
     String mailSubject,
     String xml,
-    String statusCode,
+    @Getter String statusCode,
     List<String> statusMessages,
     String fileName,
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY, value = "date") Instant publishDate,
+    @Getter @JsonProperty(access = JsonProperty.Access.WRITE_ONLY, value = "date")
+        Instant publishDate,
     String publishStateDisplayText,
-    String issuerAddress)
+    @Getter String issuerAddress)
     implements Publication {
   @Override
   public PublicationHistoryRecordType getType() {
@@ -27,19 +29,5 @@ public record XmlPublication(
   @Override
   public Instant getDate() {
     return getPublishDate();
-  }
-
-  @Override
-  public Instant getPublishDate() {
-    return publishDate;
-  }
-
-  @Override
-  public String getStatusCode() {
-    return statusCode;
-  }
-
-  public String getIssuerAddress() {
-    return issuerAddress;
   }
 }

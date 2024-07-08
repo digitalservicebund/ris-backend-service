@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -350,8 +349,8 @@ class JurisXmlExporterResponseProcessorTest {
   @ParameterizedTest
   // only if is published and no errors, the resulting error state is false
   @CsvSource({"true, false, false", "true, true, true", "false, false, true", "false, true, true"})
-  void testImportMessageSetsErrorOnError(
-      boolean isPublished, boolean hasError, boolean resultingErrorState)
+  void testImportMessageSetsErrorOnFailedPublicationOrError(
+      boolean isPublished, boolean hasError, boolean hasResultingError)
       throws MessagingException, DocumentationUnitNotExistsException {
     when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
 
@@ -366,7 +365,7 @@ class JurisXmlExporterResponseProcessorTest {
             eq(
                 Status.builder()
                     .publicationStatus(PublicationStatus.UNPUBLISHED)
-                    .withError(resultingErrorState)
+                    .withError(hasResultingError)
                     .build()));
   }
 
