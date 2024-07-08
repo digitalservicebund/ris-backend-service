@@ -102,7 +102,7 @@ public class JurisXmlExporterResponseProcessor {
                 subject = messageWrapper.getSubject();
 
                 forwardMessage(messageWrapper);
-                setPublicationStatus(messageWrapper);
+                updateDocUnitErrorStatusBasedOnJurisMessage(messageWrapper);
                 saveAttachments(messageWrapper);
 
                 successfulProcessedMessages.add(messageWrapper);
@@ -176,7 +176,13 @@ public class JurisXmlExporterResponseProcessor {
         .toList();
   }
 
-  private void setPublicationStatus(MessageWrapper messageWrapper) {
+  /**
+   * Sets the error state for documentation unit based on the jDV response mail. If the message has
+   * errors or couldn't be published, the error state is set to true.
+   *
+   * @param messageWrapper the wrapped message from jDV
+   */
+  private void updateDocUnitErrorStatusBasedOnJurisMessage(MessageWrapper messageWrapper) {
     try {
       var lastStatus = statusService.getLatestStatus(messageWrapper.getDocumentNumber());
       if (lastStatus == null) {

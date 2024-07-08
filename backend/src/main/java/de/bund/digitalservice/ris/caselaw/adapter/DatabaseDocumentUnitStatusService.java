@@ -33,11 +33,6 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
     saveStatus(status, getLatestPublishing(documentNumber));
   }
 
-  @Override
-  public void update(UUID documentUuid, Status status) throws DocumentationUnitNotExistsException {
-    saveStatus(status, getLatestPublishing(documentUuid));
-  }
-
   private void saveStatus(Status status, StatusDTO previousStatusDTO) {
     repository.save(
         StatusDTO.builder()
@@ -46,19 +41,6 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
             .publicationStatus(status.publicationStatus())
             .withError(status.withError())
             .build());
-  }
-
-  @Override
-  public PublicationStatus getLatestStatus(UUID documentUuid) {
-    StatusDTO entity =
-        repository.findFirstByDocumentationUnitDTOOrderByCreatedAtDesc(
-            databaseDocumentationUnitRepository.getReferenceById(documentUuid));
-
-    if (entity == null) {
-      return null;
-    }
-
-    return entity.getPublicationStatus();
   }
 
   @Override

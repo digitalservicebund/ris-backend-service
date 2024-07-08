@@ -41,8 +41,18 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
     return EmailPublishState.UNKNOWN;
   }
 
+  /**
+   * Process updates on the email sending status reported by the email service and log errors if
+   * necessary
+   *
+   * @param payloadTag a tag provided by the email service that helps us to categorize the mail: If
+   *     the tag is a valid documentation unit UUID, the email was exporting this documentation
+   *     unit. Otherwise, the email was forwarding the process result of a documentation unit export
+   * @param event the event that occurred during the mail sending process, e.g. "delivered",
+   * @return a response entity with status 200 if the event was processed successfully, 204 if the
+   *     event could not be mapped
+   */
   @Override
-  // TODO alert on the errors
   public ResponseEntity<String> processMailSendingState(String payloadTag, String event) {
 
     EmailPublishState state = mapEventToPublishState(event);

@@ -80,10 +80,6 @@ public class XmlEMailPublishService implements EmailPublishService {
     return repository.getPublicationsByDocumentUnitUuid(documentUnitUuid);
   }
 
-  public String getLatestIssuerAddress(UUID documentUnitUuid) {
-    return repository.getLastXmlPublication(documentUnitUuid).getIssuerAddress();
-  }
-
   @Override
   public XmlResultObject getPublicationPreview(DocumentUnit documentUnit) {
     try {
