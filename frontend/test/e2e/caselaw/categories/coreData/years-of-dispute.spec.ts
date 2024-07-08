@@ -30,30 +30,57 @@ test.describe(
       async ({ page, documentNumber }) => {
         await navigateToCategories(page, documentNumber)
 
+        const testData = [
+          "1850",
+          "1950",
+          "1989",
+          "1990",
+          "1995",
+          "2000",
+          "2005",
+          "2010",
+          "2011",
+          "2015",
+          "2018",
+          "2020",
+          "2021",
+          "2023",
+          "2024",
+        ]
+
         await waitForSaving(
           async () => {
-            await test.step("Add three years of dispute, check they are visible", async () => {
-              await page.locator("[aria-label='Streitjahr']").fill("2020")
-              await page.keyboard.press("Enter")
-              await page.locator("[aria-label='Streitjahr']").fill("2021")
-              await page.keyboard.press("Enter")
+            for (const year of testData) {
+              await test.step(
+                "Add year " + year + ", press enter, check for visibility",
+                async () => {
+                  await page.locator("[aria-label='Streitjahr']").fill(year)
+                  await page.keyboard.press("Enter")
 
-              await page.locator("[aria-label='Streitjahr']").fill("2022")
-              await page.keyboard.press("Enter")
+                  await expect(page.getByText(year)).toBeVisible()
+                },
+              )
+            }
 
-              await expect(page.getByText("2020")).toBeVisible()
-              await expect(page.getByText("2021")).toBeVisible()
-              await expect(page.getByText("2022")).toBeVisible()
+            await test.step("Expect 15 years of dispute to be visible in same order", async () => {
+              const chips = await page.getByTestId("chip").all()
+              expect(chips.length).toBe(15)
+              for (let i = 0; i < chips.length; i++) {
+                const chipValue = chips[i].getByTestId("chip-value")
+                await expect(chipValue).toHaveText(testData[i])
+              }
             })
 
             await test.step("Navigate back by arrow left, delete last chip on enter", async () => {
+              await expect(page.getByText("2024")).toBeVisible()
               await page.keyboard.press("ArrowLeft")
               await page.keyboard.press("Enter")
 
-              await expect(page.getByText("2022")).toBeHidden()
+              await expect(page.getByText("2024")).toBeHidden()
             })
 
             await test.step("Tab out, tab in, navigate back by arrow left, delete last chip on enter", async () => {
+              await expect(page.getByText("2023")).toBeVisible()
               await page.keyboard.press("Tab")
               await page.keyboard.press("Tab")
               await page.keyboard.down("Shift")
@@ -61,16 +88,30 @@ test.describe(
 
               await page.keyboard.press("ArrowLeft")
               await page.keyboard.press("Enter")
-              await expect(page.getByText("2021")).toBeHidden()
+              await expect(page.getByText("2023")).toBeHidden()
             })
           },
           page,
           { clickSaveButton: true },
         )
 
-        await test.step("Check if years of dispute are persisted in reload", async () => {
+        await test.step("Add deleted years again, check if testdata persists on reload", async () => {
+          await waitForSaving(
+            async () => {
+              await page.locator("[aria-label='Streitjahr']").fill("2023")
+              await page.keyboard.press("Enter")
+
+              await page.locator("[aria-label='Streitjahr']").fill("2024")
+              await page.keyboard.press("Enter")
+            },
+            page,
+            { clickSaveButton: true },
+          )
+
           await page.reload()
-          await expect(page.getByText("2020")).toBeVisible()
+          for (const year of testData) {
+            await expect(page.getByText(year)).toBeVisible()
+          }
         })
       },
     )
@@ -86,27 +127,45 @@ test.describe(
       },
       async ({ page, documentNumber }) => {
         await navigateToCategories(page, documentNumber)
+        const testData = ["2020", "2021", "2022"]
 
         await waitForSaving(
           async () => {
-            await test.step("Add two years of dispute, check they are visible", async () => {
-              await page.locator("[aria-label='Streitjahr']").fill("2020")
-              await page.keyboard.press("Enter")
-              await page.locator("[aria-label='Streitjahr']").fill("2021")
-              await page.keyboard.press("Enter")
+            for (const year of testData) {
+              await test.step(
+                "Add year " + year + ", press enter, check for visibility",
+                async () => {
+                  await page.locator("[aria-label='Streitjahr']").fill(year)
+                  await page.keyboard.press("Enter")
 
-              await expect(page.getByText("2020")).toBeVisible()
-              await expect(page.getByText("2021")).toBeVisible()
-            })
+                  await expect(page.getByText(year)).toBeVisible()
+                },
+              )
+            }
           },
           page,
           { clickSaveButton: true },
         )
-
-        await test.step("Navigate to preview, check they are visible", async () => {
+        await test.step("Expect all three years to be visible in preview", async () => {
           await navigateToPreview(page, documentNumber)
-          await expect(page.getByText("2020")).toBeVisible()
-          await expect(page.getByText("2021")).toBeVisible()
+          for (const year of testData) {
+            await expect(page.getByText(year)).toBeVisible()
+          }
+        })
+
+        await test.step("Remove all years of input, check that category in preview is not visible anymore", async () => {
+          await navigateToCategories(page, documentNumber)
+          await waitForSaving(
+            async () => {
+              for (let i = 0; i < testData.length; i++) {
+                await page.getByLabel("Löschen").first().click()
+              }
+            },
+            page,
+            { clickSaveButton: true },
+          )
+          await navigateToPreview(page, documentNumber)
+          await expect(page.getByText("Streitjahr")).toBeHidden()
         })
       },
     )
@@ -123,25 +182,29 @@ test.describe(
       async ({ page, prefilledDocumentUnit }) => {
         await publishDocumentationUnit(
           page,
-          prefilledDocumentUnit.documentNumber || "",
+          prefilledDocumentUnit.documentNumber ?? "",
         )
 
         await navigateToCategories(
           page,
-          prefilledDocumentUnit.documentNumber || "",
+          prefilledDocumentUnit.documentNumber ?? "",
         )
+
+        const testData = ["2020", "2021"]
 
         await waitForSaving(
           async () => {
-            await test.step("Add two years of dispute, check they are visible", async () => {
-              await page.locator("[aria-label='Streitjahr']").fill("2020")
-              await page.keyboard.press("Enter")
-              await page.locator("[aria-label='Streitjahr']").fill("2021")
-              await page.keyboard.press("Enter")
+            for (const year of testData) {
+              await test.step(
+                "Add year " + year + ", press enter, check for visibility",
+                async () => {
+                  await page.locator("[aria-label='Streitjahr']").fill(year)
+                  await page.keyboard.press("Enter")
 
-              await expect(page.getByText("2020")).toBeVisible()
-              await expect(page.getByText("2021")).toBeVisible()
-            })
+                  await expect(page.getByText(year)).toBeVisible()
+                },
+              )
+            }
           },
           page,
           { clickSaveButton: true },
@@ -162,6 +225,18 @@ test.describe(
           await expect(
             page.getByText("<streitjahr>2021</streitjahr>"),
           ).toBeVisible()
+
+          const nodes = await page
+            .locator('code:has-text("<streitjahr>")')
+            .all()
+
+          for (let i = 0; i < nodes.length; i++) {
+            const nodeText = await nodes[i].textContent()
+            const match = nodeText?.match(/<streitjahr>(.*?)<\/streitjahr>/)
+            // eslint-disable-next-line playwright/no-conditional-in-test
+            const extractedValue = match ? match[1] : null
+            expect(extractedValue).toBe(testData[i])
+          }
         })
       },
     )
@@ -199,6 +274,18 @@ test.describe(
                 page.getByText("2022 bereits vorhanden"),
               ).toBeHidden()
               await expect(page.getByText("Kein valides Jahr")).toBeVisible()
+            })
+
+            await test.step("Add more then 4 numbers not possible", async () => {
+              await page.locator("[aria-label='Streitjahr']").fill("20202")
+              await page.keyboard.press("Enter")
+              await expect(page.getByText("2020")).toBeVisible()
+            })
+
+            await test.step("Add characters not possible", async () => {
+              await page.locator("[aria-label='Streitjahr']").fill("abcd")
+              await page.keyboard.press("Enter")
+              await expect(page.getByText("abcd")).toBeHidden()
             })
 
             await test.step("Add years of dispute in future not possible, former error replaced by new one", async () => {

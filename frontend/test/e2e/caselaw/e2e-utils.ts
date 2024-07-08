@@ -1,5 +1,6 @@
 import { expect, Page } from "@playwright/test"
 import { generateString } from "../../test-helper/dataGenerators"
+import { caselawTest as test } from "./fixtures"
 import SingleNorm from "@/domain/singleNorm"
 
 const getAllQueryParamsFromUrl = (page: Page): string => {
@@ -21,32 +22,40 @@ export const navigateToCategories = async (
   page: Page,
   documentNumber: string,
 ) => {
-  const queryParams = getAllQueryParamsFromUrl(page)
-  const baseUrl = `/caselaw/documentunit/${documentNumber}/categories${queryParams}`
+  await test.step("Navigate to 'Rubriken'", async () => {
+    const queryParams = getAllQueryParamsFromUrl(page)
+    const baseUrl = `/caselaw/documentunit/${documentNumber}/categories${queryParams}`
 
-  await page.goto(baseUrl)
-  await expect(page.getByText("Spruchkörper")).toBeVisible({
-    timeout: 15000, // for backend warm up
+    await page.goto(baseUrl)
+    await expect(page.getByText("Spruchkörper")).toBeVisible({
+      timeout: 15000, // for backend warm up
+    })
+    await expect(page.getByText(documentNumber)).toBeVisible()
   })
-  await expect(page.getByText(documentNumber)).toBeVisible()
 }
 
 export const navigateToPreview = async (page: Page, documentNumber: string) => {
-  const queryParams = getAllQueryParamsFromUrl(page)
-  const baseUrl = `/caselaw/documentunit/${documentNumber}/preview${queryParams}`
+  await test.step("Navigate to 'Vorschau'", async () => {
+    const queryParams = getAllQueryParamsFromUrl(page)
+    const baseUrl = `/caselaw/documentunit/${documentNumber}/preview${queryParams}`
 
-  await page.goto(baseUrl)
-  await expect(page.getByTestId("preview")).toBeVisible({
-    timeout: 15000, // for backend warm up
+    await page.goto(baseUrl)
+    await expect(page.getByTestId("preview")).toBeVisible({
+      timeout: 15000, // for backend warm up
+    })
+    await expect(page.getByText(documentNumber)).toBeVisible()
   })
-  await expect(page.getByText(documentNumber)).toBeVisible()
 }
 
 export const navigateToFiles = async (page: Page, documentNumber: string) => {
-  const queryParams = getAllQueryParamsFromUrl(page)
-  await page.goto(`/caselaw/documentunit/${documentNumber}/files${queryParams}`)
-  await expect(page.locator("h1:has-text('Dokumente')")).toBeVisible({
-    timeout: 15000, // for backend warm up
+  await test.step("Navigate to 'Dokumente'", async () => {
+    const queryParams = getAllQueryParamsFromUrl(page)
+    await page.goto(
+      `/caselaw/documentunit/${documentNumber}/files${queryParams}`,
+    )
+    await expect(page.locator("h1:has-text('Dokumente')")).toBeVisible({
+      timeout: 15000, // for backend warm up
+    })
   })
 }
 
@@ -54,9 +63,11 @@ export const navigateToPublication = async (
   page: Page,
   documentNumber: string,
 ) => {
-  await page.goto(`/caselaw/documentunit/${documentNumber}/publication`)
-  await expect(page.locator("h1:has-text('Veröffentlichen')")).toBeVisible({
-    timeout: 15000, // for backend warm up
+  await test.step("Navigate to 'Veröffentlichen'", async () => {
+    await page.goto(`/caselaw/documentunit/${documentNumber}/publication`)
+    await expect(page.locator("h1:has-text('Veröffentlichen')")).toBeVisible({
+      timeout: 15000, // for backend warm up
+    })
   })
 }
 
