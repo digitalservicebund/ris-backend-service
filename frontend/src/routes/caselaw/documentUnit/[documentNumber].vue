@@ -92,6 +92,7 @@ async function attachmentsUploaded(anySuccessful: boolean) {
 }
 
 onMounted(async () => {
+  await store.loadDocumentUnit(props.documentNumber)
   await requestDocumentUnitFromServer()
 })
 </script>
@@ -148,7 +149,6 @@ onMounted(async () => {
             @document-unit-updated-locally="updateLocalDocumentUnit"
           ></ExtraContentSidePanel>
           <router-view
-            :document-unit="documentUnit"
             :validation-errors="validationErrors"
             @attachment-index-deleted="attachmentIndexDeleted"
             @attachment-index-selected="attachmentIndexSelected"

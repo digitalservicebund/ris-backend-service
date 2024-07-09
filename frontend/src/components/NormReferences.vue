@@ -6,30 +6,23 @@ import IconBadge from "@/components/IconBadge.vue"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
 import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import IconError from "~icons/ic/baseline-error"
 import IconBook from "~icons/material-symbols/book-2"
 import IconBreakingNews from "~icons/material-symbols/breaking-news"
 import IconArrowRight from "~icons/material-symbols/subdirectory-arrow-right"
 
-const props = defineProps<{
-  modelValue: NormReference[] | undefined
-}>()
+const store = useDocumentUnitStore()
 
-const emit = defineEmits<{
-  "update:modelValue": [value?: NormReference[]]
-}>()
+const norms = computed({
+  get: () => store.documentUnit!.contentRelatedIndexing.norms,
+  set: (newValues) => {
+    store.documentUnit!.contentRelatedIndexing.norms = newValues
+  },
+})
 
 const ambiguousNormReferenceError = "Mehrdeutiger Verweis"
 const missingDataError = "Fehlende Daten"
-
-const norms = computed({
-  get: () => {
-    return props.modelValue
-  },
-  set: (value) => {
-    if (value) emit("update:modelValue", value)
-  },
-})
 
 const defaultValue = new NormReference()
 

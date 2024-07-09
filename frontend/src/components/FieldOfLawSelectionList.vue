@@ -3,7 +3,7 @@ import FieldOfLawListEntry from "./FieldOfLawListEntry.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 
 const props = defineProps<{
-  modelValue: FieldOfLaw[]
+  modelValue: FieldOfLaw[] | undefined
 }>()
 
 const emit = defineEmits<{
@@ -15,7 +15,9 @@ const emit = defineEmits<{
 
 <template>
   <div class="pt-20">
-    <div v-if="!props.modelValue.length">Die Liste ist aktuell leer</div>
+    <div v-if="props.modelValue && !props.modelValue.length">
+      Die Liste ist aktuell leer
+    </div>
     <div v-else>
       <FieldOfLawListEntry
         v-for="fieldOfLaw in props.modelValue"

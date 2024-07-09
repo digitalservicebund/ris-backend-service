@@ -1,18 +1,12 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
 import PublicationDocument from "@/components/PublicationDocument.vue"
-import DocumentUnit from "@/domain/documentUnit"
 import XmlMail from "@/domain/xmlMail"
 import { ResponseError } from "@/services/httpClient"
 import publishService from "@/services/publishService"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
-const props = defineProps<{
-  documentUnit: DocumentUnit
-}>()
-
-const emits = defineEmits<{
-  requestDocumentUnitFromServer: []
-}>()
+const store = useDocumentUnitStore()
 
 const loadDone = ref(false)
 const publicationLog = ref<XmlMail[]>()
@@ -21,7 +15,9 @@ const errorMessage = ref<ResponseError>()
 const succeedMessage = ref<{ title: string; description: string }>()
 
 async function publishDocument() {
-  const response = await publishService.publishDocument(props.documentUnit.uuid)
+  const response = await publishService.publishDocument(
+    store.documentUnit!.uuid,
+  )
   publishResult.value = response.data
   if (!publicationLog.value) publicationLog.value = []
   if (response.data && Number(response.data?.statusCode) < 300) {
@@ -37,10 +33,10 @@ async function publishDocument() {
       title: "Email wurde versendet",
       description: "",
     }
+    await store.reloadDocumentUnit()
   } else {
     errorMessage.value = response.error
   }
-  emits("requestDocumentUnitFromServer")
 }
 
 function formatDate(date?: string): string {
@@ -60,7 +56,7 @@ function formatDate(date?: string): string {
 
 onMounted(async () => {
   const response = await publishService.getPublicationLog(
-    props.documentUnit.uuid,
+    store.documentUnit!.uuid,
   )
   if (!response.error && response.data) {
     publicationLog.value = response.data
@@ -80,7 +76,6 @@ onMounted(async () => {
   <div class="w-full grow p-24">
     <PublicationDocument
       v-if="loadDone"
-      :document-unit="documentUnit"
       :error-message="errorMessage"
       :publication-log="publicationLog"
       :publish-result="publishResult"

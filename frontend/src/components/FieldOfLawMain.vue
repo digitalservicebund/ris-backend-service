@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { h, ref, watch } from "vue"
+import { computed, h, ref } from "vue"
 import FieldOfLawSelectionList from "./FieldOfLawSelectionList.vue"
 import FieldOfLawTree from "./FieldOfLawTree.vue"
 import { withSummarizer } from "@/components/DataSetSummary.vue"
@@ -7,27 +7,17 @@ import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import FieldOfLawDirectInputSearch from "@/components/FieldOfLawDirectInputSearch.vue"
 import FieldOfLawSearch from "@/components/FieldOfLawSearch.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
-
-const props = defineProps<{
-  modelValue: FieldOfLaw[] | undefined
-}>()
-
-const emit = defineEmits<{ "update:modelValue": [value?: FieldOfLaw[]] }>()
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const showNorms = ref(false)
-const localModelValue = ref<FieldOfLaw[]>(props.modelValue ?? [])
 const selectedNode = ref<FieldOfLaw | undefined>(undefined)
 
-watch(
-  props,
-  () => {
-    localModelValue.value = props.modelValue ?? []
+const store = useDocumentUnitStore()
+const localModelValue = computed({
+  get: () => store.documentUnit!.contentRelatedIndexing.fieldsOfLaw,
+  set: (newValues) => {
+    store.documentUnit!.contentRelatedIndexing.fieldsOfLaw = newValues
   },
-  { immediate: true },
-)
-
-watch(localModelValue, () => {
-  emit("update:modelValue", localModelValue.value)
 })
 
 const addFeldOfLaw = (fieldOfLaw: FieldOfLaw) => {
@@ -90,6 +80,7 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
         </div>
         <div class="flex-1 bg-white p-32">
           <FieldOfLawTree
+            v-if="localModelValue"
             v-model="localModelValue"
             :selected-node="selectedNode"
             :show-norms="showNorms"
