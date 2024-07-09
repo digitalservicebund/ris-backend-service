@@ -16,8 +16,12 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
   async function loadDocumentUnit(documentNumber: string) {
     const response =
       await documentUnitService.getByDocumentNumber(documentNumber)
-    documentUnit.value = response.data
-    originalDocumentUnit.value = JSON.parse(JSON.stringify(response.data)) // Deep copy for tracking changes
+    if (response.data) {
+      documentUnit.value = response.data
+      originalDocumentUnit.value = JSON.parse(JSON.stringify(response.data)) // Deep copy for tracking changes
+    } else {
+      documentUnit.value = undefined
+    }
     return response as ServiceResponse<void>
   }
 
