@@ -112,6 +112,7 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
       cascade = CascadeType.ALL,
       orphanRemoval = true,
       mappedBy = "documentationUnit")
+  @OrderBy("uploadTimestamp asc")
   private List<AttachmentDTO> attachments = new ArrayList<>();
 
   @Column(name = "other_long_text")
