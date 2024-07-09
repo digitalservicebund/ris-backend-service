@@ -26,9 +26,7 @@ export function useStatusBadge(status: DocumentUnit["status"]) {
         badge.backgroundColor = "bg-green-300"
         break
       case PublicationState.UNPUBLISHED:
-        badge.label = status.withError
-          ? "Nicht veröffentlicht"
-          : Label.UNPUBLISHED
+        badge.label = Label.UNPUBLISHED
         badge.backgroundColor = "bg-blue-300"
         break
       case PublicationState.PUBLISHING:

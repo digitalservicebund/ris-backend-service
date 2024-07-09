@@ -15,7 +15,7 @@ describe.each([
   {
     status: PublicationState.UNPUBLISHED,
     withError: true,
-    expected: "Nicht veröffentlicht",
+    expected: "Unveröffentlicht",
   },
   {
     status: PublicationState.PUBLISHING,

@@ -46,7 +46,7 @@ describe("RelatedDocumentation", () => {
     })
     const decision = relatedDocumentation.renderDecision
     expect(decision).toEqual(
-      "courtLabel, 01.01.1998, fileNumber, Beschluss, Nicht veröffentlicht",
+      "courtLabel, 01.01.1998, fileNumber, Beschluss, Unveröffentlicht",
     )
   })
 
