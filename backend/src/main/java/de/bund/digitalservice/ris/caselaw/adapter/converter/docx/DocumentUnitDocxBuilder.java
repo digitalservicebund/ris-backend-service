@@ -70,25 +70,29 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
 
         // white-space preserve = NBSP
         if (currentText.getSpace() != null && currentText.getSpace().equals("preserve")) {
-          updatedTextValue = updatedTextValue.replace(SOFT_HYPHEN + " ", "- ");
-          updatedTextValue = updatedTextValue.replace(" " + SOFT_HYPHEN, " -");
+          updatedTextValue = updatedTextValue.replace(SOFT_HYPHEN + " ", "-" + NON_BREAKING_SPACE);
+          updatedTextValue = updatedTextValue.replace(" " + SOFT_HYPHEN, NON_BREAKING_SPACE + "-");
         }
         // soft hyphen node + non-breaking space node = hyphen
         if (previousSoftHyphenText != null
             && currentText.getValue().startsWith(NON_BREAKING_SPACE)) {
           previousSoftHyphenText.setValue(
-              previousSoftHyphenText.getValue().replace(SOFT_HYPHEN, ""));
-          updatedTextValue = currentText.getValue().replace(NON_BREAKING_SPACE, "- ");
+              // strip last chat because we know it ends with soft hyphen
+              previousSoftHyphenText
+                      .getValue()
+                      .substring(0, previousSoftHyphenText.getValue().length() - 1)
+                  // append normal hyphen
+                  + "-");
           // non-breaking space node + soft hyphen node = hyphen
         } else if (previousNonBreakingSpaceText != null
             && currentText.getValue().startsWith(SOFT_HYPHEN)) {
-          previousNonBreakingSpaceText.setValue(
-              previousNonBreakingSpaceText.getValue().replace(NON_BREAKING_SPACE, ""));
-          updatedTextValue = currentText.getValue().replace(SOFT_HYPHEN, " -");
+          updatedTextValue = currentText.getValue().replaceFirst(SOFT_HYPHEN, "-");
         } else {
           // soft hyphen node + non-breaking space in either order in same node = hyphen
-          updatedTextValue = updatedTextValue.replace(SOFT_HYPHEN + NON_BREAKING_SPACE, "- ");
-          updatedTextValue = updatedTextValue.replace(NON_BREAKING_SPACE + SOFT_HYPHEN, " -");
+          updatedTextValue =
+              updatedTextValue.replace(SOFT_HYPHEN + NON_BREAKING_SPACE, "-" + NON_BREAKING_SPACE);
+          updatedTextValue =
+              updatedTextValue.replace(NON_BREAKING_SPACE + SOFT_HYPHEN, NON_BREAKING_SPACE + "-");
         }
 
         currentText.setValue(updatedTextValue);

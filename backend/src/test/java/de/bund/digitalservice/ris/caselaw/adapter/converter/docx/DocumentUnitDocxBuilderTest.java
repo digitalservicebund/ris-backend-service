@@ -1242,19 +1242,30 @@ class DocumentUnitDocxBuilderTest {
 
   public static Stream<Arguments> nodesThatShouldTurnIntoAHyphen() {
     return Stream.of(
-        Arguments.of(List.of(SOFT_HYPHEN + NON_BREAKING_SPACE), false, List.of("- ")),
-        Arguments.of(List.of(NON_BREAKING_SPACE + SOFT_HYPHEN), false, List.of(" -")),
-        Arguments.of(List.of(NON_BREAKING_SPACE, SOFT_HYPHEN), false, List.of(" -")),
-        Arguments.of(List.of(SOFT_HYPHEN, NON_BREAKING_SPACE), false, List.of("- ")),
         Arguments.of(
-            List.of("131/16" + NON_BREAKING_SPACE + SOFT_HYPHEN), false, List.of("131/16 -")),
+            List.of(SOFT_HYPHEN + NON_BREAKING_SPACE), false, List.of("-" + NON_BREAKING_SPACE)),
         Arguments.of(
-            List.of("131/16" + NON_BREAKING_SPACE, SOFT_HYPHEN), false, List.of("131/16", " -")),
-        Arguments.of(List.of(NON_BREAKING_SPACE, SOFT_HYPHEN + " ABC"), false, List.of(" - ABC")),
+            List.of(NON_BREAKING_SPACE + SOFT_HYPHEN), false, List.of(NON_BREAKING_SPACE + "-")),
+        Arguments.of(
+            List.of(NON_BREAKING_SPACE, SOFT_HYPHEN), false, List.of(NON_BREAKING_SPACE, "-")),
+        Arguments.of(
+            List.of(SOFT_HYPHEN, NON_BREAKING_SPACE), false, List.of("-", NON_BREAKING_SPACE)),
+        Arguments.of(
+            List.of("131/16" + NON_BREAKING_SPACE + SOFT_HYPHEN),
+            false,
+            List.of("131/16" + NON_BREAKING_SPACE + "-")),
+        Arguments.of(
+            List.of("131/16", NON_BREAKING_SPACE, SOFT_HYPHEN),
+            false,
+            List.of("131/16", NON_BREAKING_SPACE, "-")),
+        Arguments.of(
+            List.of(NON_BREAKING_SPACE, SOFT_HYPHEN + " ABC"),
+            false,
+            List.of(NON_BREAKING_SPACE, "- ABC")),
 
         // with whitespace: preserve
-        Arguments.of(List.of(SOFT_HYPHEN + " "), true, List.of("- ")),
-        Arguments.of(List.of(" " + SOFT_HYPHEN), true, List.of(" -")));
+        Arguments.of(List.of(SOFT_HYPHEN + " "), true, List.of("-" + NON_BREAKING_SPACE)),
+        Arguments.of(List.of(" " + SOFT_HYPHEN), true, List.of(NON_BREAKING_SPACE + "-")));
   }
 
   public static Stream<Arguments> nodesThatShouldNotTurnIntoHyphen() {
