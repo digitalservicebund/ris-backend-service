@@ -189,7 +189,7 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
           const scrollTopBeforeScrolling = await page
             .locator("#notesInput")
             .evaluate((el) => el.scrollTop)
-          await page.locator("#notesInput").click()
+          await page.locator("#notesInput").focus()
           await page.keyboard.press("Home")
 
           await page.waitForFunction(
