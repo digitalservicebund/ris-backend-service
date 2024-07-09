@@ -109,7 +109,7 @@ test.describe(
           await fillInput(page, "Notiz Eingabefeld", "some text")
           await page.getByLabel("Speichern Button").click()
           await page.waitForEvent("requestfinished")
-          await navigateToSearch(page)
+          await navigateToSearch(page, { navigationBy: "click" })
         })
 
         await test.step("open document with note and no attachment, check that note is displayed in open panel", async () => {
@@ -142,7 +142,7 @@ test.describe(
           await expect(page.getByText("Die ist ein Test")).toBeVisible()
 
           await page.waitForEvent("requestfinished")
-          await navigateToSearch(page)
+          await navigateToSearch(page, { navigationBy: "click" })
 
           await navigateToCategories(page, documentNumber)
 
@@ -223,7 +223,7 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
           await expect(page.getByText("Die ist ein Test")).toBeVisible()
 
           await page.waitForEvent("requestfinished")
-          await navigateToSearch(page)
+          await navigateToSearch(page, { navigationBy: "click" })
 
           await navigateToCategories(page, documentNumber)
 

@@ -3,18 +3,29 @@ import { generateString } from "../../test-helper/dataGenerators"
 import { caselawTest as test } from "./fixtures"
 import SingleNorm from "@/domain/singleNorm"
 
+/* eslint-disable playwright/no-conditional-in-test */
+
 const getAllQueryParamsFromUrl = (page: Page): string => {
   const url = new URL(page.url())
   const params = url.searchParams.toString()
   return params ? `?${params}` : ""
 }
 
-export const navigateToSearch = async (page: Page) => {
-  await page.goto(`/caselaw`)
-  await page.waitForURL("/caselaw")
+export const navigateToSearch = async (
+  page: Page,
+  { navigationBy }: { navigationBy: "click" | "url" } = { navigationBy: "url" },
+) => {
+  await test.step("Navigate to 'Suche'", async () => {
+    if (navigationBy === "url") {
+      await page.goto(`/caselaw`)
+    } else {
+      await page.getByRole("link", { name: "Suche" }).click()
+    }
+    await page.waitForURL("/caselaw")
 
-  await expect(page.getByText("Übersicht Rechtsprechung")).toBeVisible({
-    timeout: 15000, // for backend warm up
+    await expect(page.getByText("Übersicht Rechtsprechung")).toBeVisible({
+      timeout: 15000, // for backend warm up
+    })
   })
 }
 
