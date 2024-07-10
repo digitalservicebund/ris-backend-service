@@ -47,7 +47,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -64,10 +63,11 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import software.amazon.awssdk.core.ResponseBytes;
-import software.amazon.awssdk.core.async.AsyncRequestBody;
-import software.amazon.awssdk.core.async.AsyncResponseTransformer;
-import software.amazon.awssdk.services.s3.S3AsyncClient;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.core.sync.ResponseTransformer;
+import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -121,7 +121,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
 
   @SpyBean private DocumentUnitService service;
 
-  @MockBean private S3AsyncClient s3AsyncClient;
+  @MockBean private S3Client s3Client;
   @MockBean private EmailPublishService publishService;
   @MockBean private UserService userService;
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
@@ -152,7 +152,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   @Test
   void testAttachDocxToDocumentationUnit() throws IOException {
     var attachment = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
-    mockS3AsyncClientToReturnFile(attachment);
+    mockS3ClientToReturnFile(attachment);
 
     DocumentationUnitDTO dto =
         repository.save(
@@ -181,7 +181,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   @Test
   void testAttachMultipleDocxToDocumentationUnitSequentially() throws IOException {
     var attachment = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
-    mockS3AsyncClientToReturnFile(attachment);
+    mockS3ClientToReturnFile(attachment);
 
     DocumentationUnitDTO documentationUnitDto =
         repository.save(
@@ -246,7 +246,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
       throws IOException {
     var attachmentWithEcli =
         Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment_ecli.docx"));
-    mockS3AsyncClientToReturnFile(attachmentWithEcli);
+    mockS3ClientToReturnFile(attachmentWithEcli);
 
     DocumentationUnitDTO dto =
         repository.save(
@@ -284,7 +284,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
           throws IOException {
     var attachmentWithEcli =
         Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment_ecli.docx"));
-    mockS3AsyncClientToReturnFile(attachmentWithEcli);
+    mockS3ClientToReturnFile(attachmentWithEcli);
 
     DocumentationUnitDTO dto =
         repository.save(
@@ -319,8 +319,8 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
 
   @Test
   void testRemoveFileFromDocumentUnit() {
-    when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
-        .thenReturn(new CompletableFuture<>());
+    when(s3Client.deleteObject(any(DeleteObjectRequest.class)))
+        .thenReturn(DeleteObjectResponse.builder().build());
 
     DocumentationUnitDTO dto =
         repository.save(
@@ -362,17 +362,14 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
         .is4xxClientError();
   }
 
-  private void mockS3AsyncClientToReturnFile(byte[] file) {
-    when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
-        .thenReturn(CompletableFuture.completedFuture(PutObjectResponse.builder().build()));
+  private void mockS3ClientToReturnFile(byte[] file) {
+    when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
+        .thenReturn(PutObjectResponse.builder().build());
 
-    when(s3AsyncClient.getObject(
+    when(s3Client.getObject(
             any(GetObjectRequest.class),
             Mockito
-                .<AsyncResponseTransformer<GetObjectResponse, ResponseBytes<GetObjectResponse>>>
-                    any()))
-        .thenReturn(
-            CompletableFuture.completedFuture(
-                ResponseBytes.fromByteArray(GetObjectResponse.builder().build(), file)));
+                .<ResponseTransformer<GetObjectResponse, ResponseBytes<GetObjectResponse>>>any()))
+        .thenReturn(ResponseBytes.fromByteArray(GetObjectResponse.builder().build(), file));
   }
 }

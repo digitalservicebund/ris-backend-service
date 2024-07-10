@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,9 +41,9 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.server.ResponseStatusException;
-import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.exception.SdkException;
-import software.amazon.awssdk.services.s3.S3AsyncClient;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
@@ -57,7 +56,7 @@ class S3AttachmentServiceTest {
   @SpyBean S3AttachmentService service;
 
   @MockBean AttachmentRepository repository;
-  @MockBean S3AsyncClient s3AsyncClient;
+  @MockBean S3Client s3Client;
   @MockBean DatabaseDocumentationUnitRepository documentationUnitRepository;
 
   private DocumentationUnitDTO documentationUnitDTO;
@@ -68,8 +67,8 @@ class S3AttachmentServiceTest {
     when(documentationUnitRepository.findById(documentationUnitDTO.getId()))
         .thenReturn(Optional.of(documentationUnitDTO));
 
-    when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
-        .thenReturn(CompletableFuture.completedFuture(PutObjectResponse.builder().build()));
+    when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
+        .thenReturn(PutObjectResponse.builder().build());
 
     when(repository.save(any(AttachmentDTO.class)))
         .thenAnswer(invocation -> invocation.getArgument(0));
@@ -88,13 +87,12 @@ class S3AttachmentServiceTest {
 
     // s3 interaction
     var putObjectRequestCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
-    var asyncRequestBodyCaptor = ArgumentCaptor.forClass(AsyncRequestBody.class);
-    verify(s3AsyncClient)
-        .putObject(putObjectRequestCaptor.capture(), asyncRequestBodyCaptor.capture());
+    var requestBodyCaptor = ArgumentCaptor.forClass(RequestBody.class);
+    verify(s3Client).putObject(putObjectRequestCaptor.capture(), requestBodyCaptor.capture());
     assertEquals("testBucket", putObjectRequestCaptor.getValue().bucket());
     assertEquals("content/extension", putObjectRequestCaptor.getValue().contentType());
-    var value = asyncRequestBodyCaptor.getValue();
-    var expected = AsyncRequestBody.fromByteBuffer(ByteBuffer.wrap(new byte[] {}));
+    var value = requestBodyCaptor.getValue();
+    var expected = RequestBody.fromByteBuffer(ByteBuffer.wrap(new byte[] {}));
     assertEquals(expected.contentLength(), value.contentLength());
     assertEquals(expected.contentType(), value.contentType());
 
@@ -127,7 +125,7 @@ class S3AttachmentServiceTest {
 
     // bucket interaction
     var deleteObjectRequestCaptor = ArgumentCaptor.forClass(DeleteObjectRequest.class);
-    verify(s3AsyncClient).deleteObject(deleteObjectRequestCaptor.capture());
+    verify(s3Client).deleteObject(deleteObjectRequestCaptor.capture());
     assertEquals("testBucket", deleteObjectRequestCaptor.getValue().bucket());
     assertEquals(testS3Path, deleteObjectRequestCaptor.getValue().key());
 
@@ -141,7 +139,7 @@ class S3AttachmentServiceTest {
   void testDeleteByS3Path_withoutS3Path(String s3Path) {
     assertThrows(AttachmentException.class, () -> service.deleteByS3Path(s3Path));
 
-    verifyNoInteractions(s3AsyncClient);
+    verifyNoInteractions(s3Client);
     verifyNoInteractions(repository);
   }
 
@@ -161,7 +159,7 @@ class S3AttachmentServiceTest {
 
     // bucket interaction
     var deleteObjectRequestCaptor = ArgumentCaptor.forClass(DeleteObjectRequest.class);
-    verify(s3AsyncClient, times(2)).deleteObject(deleteObjectRequestCaptor.capture());
+    verify(s3Client, times(2)).deleteObject(deleteObjectRequestCaptor.capture());
     List<DeleteObjectRequest> capturedRequests = deleteObjectRequestCaptor.getAllValues();
     assertTrue(capturedRequests.stream().anyMatch(request -> request.key().equals("fooS3Path")));
     assertTrue(capturedRequests.stream().anyMatch(request -> request.key().equals("barS3Path")));
@@ -201,7 +199,7 @@ class S3AttachmentServiceTest {
     var byteBuffer = ByteBuffer.wrap(new byte[] {});
 
     doNothing().when(service).checkDocx(any(ByteBuffer.class));
-    when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
+    when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
         .thenThrow(SdkException.create("exception", null));
     var documentationUnitDTOId = documentationUnitDTO.getId();
 
@@ -211,7 +209,7 @@ class S3AttachmentServiceTest {
             service.attachFileToDocumentationUnit(
                 documentationUnitDTOId, byteBuffer, HttpHeaders.EMPTY));
 
-    verify(s3AsyncClient).putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class));
+    verify(s3Client).putObject(any(PutObjectRequest.class), any(RequestBody.class));
   }
 
   private ByteBuffer buildBuffer(String entry) {
