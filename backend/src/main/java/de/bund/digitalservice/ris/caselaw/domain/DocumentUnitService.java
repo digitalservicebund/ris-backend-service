@@ -16,6 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -222,6 +223,7 @@ public class DocumentUnitService {
     return RisJsonPatch.builder()
         .documentationUnitVersion(newVersion)
         .patch(mergeableJsonPatch)
+        .errorPaths(Collections.emptyList()) // TODO: Rehandle how we want to collect errors.
         .build();
   }
 

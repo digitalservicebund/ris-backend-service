@@ -39,7 +39,9 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
   }
 
   async function updateDocumentUnit(): Promise<
-    ServiceResponse<RisJsonPatch | FailedValidationServerResponse | undefined>
+    ServiceResponse<
+      RisJsonPatch | FailedValidationServerResponse | DocumentUnit | undefined
+    >
   > {
     if (!documentUnit.value || !originalDocumentUnit.value) {
       return {
@@ -56,8 +58,7 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
     )
 
     if (patch.length === 0) {
-      const response = await reloadDocumentUnit()
-      return { status: response.status, data: undefined } //  No changes to update
+      return await reloadDocumentUnit()
     }
     console.log("not skipping update document unit")
 
@@ -75,14 +76,13 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
         JSON.stringify(originalDocumentUnit.value),
       ) // Update the original copy
 
-      if (newPatch.errorPaths.length > 0) {
+      if (newPatch.errorPaths != undefined && newPatch.errorPaths.length > 0) {
         response.error = {
           title: "Fehler beim Patchen",
           description: newPatch.errorPaths,
         }
       }
     }
-
     return response
   }
 
