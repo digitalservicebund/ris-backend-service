@@ -147,7 +147,7 @@ dependencies {
     // CVE-2024-22262
     implementation("org.springframework:spring-web:6.1.10")
 
-    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.2")
+    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.3")
 
     // CVE-2024-26308
     implementation("org.apache.commons:commons-compress:1.26.2")
