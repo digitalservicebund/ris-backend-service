@@ -13,7 +13,6 @@ import SideToggle from "@/components/SideToggle.vue"
 import { useCaseLawMenuItems } from "@/composables/useCaseLawMenuItems"
 import useQuery from "@/composables/useQueryFromRoute"
 import DocumentUnit from "@/domain/documentUnit"
-import documentUnitService from "@/services/documentUnitService"
 import { ResponseError, ServiceResponse } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
@@ -61,13 +60,9 @@ function updateLocalDocumentUnit(updatedDocumentUnitFromChild: DocumentUnit) {
 }
 
 async function requestDocumentUnitFromServer() {
-  const response = await documentUnitService.getByDocumentNumber(
-    props.documentNumber,
-  )
+  const response = await store.loadDocumentUnit(props.documentNumber)
 
-  if (response.data) {
-    documentUnit.value = response.data
-  } else {
+  if (!response.data) {
     responseError.value = response.error
   }
 }
@@ -93,8 +88,7 @@ async function attachmentsUploaded(anySuccessful: boolean) {
 }
 
 onMounted(async () => {
-  await store.loadDocumentUnit(props.documentNumber)
-  // await requestDocumentUnitFromServer()
+  await requestDocumentUnitFromServer()
 })
 </script>
 
