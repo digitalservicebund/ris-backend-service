@@ -197,7 +197,9 @@ public class DocumentUnitService {
       newVersion = existingDocumentationUnit.version() + 1;
     }
 
-    RisJsonPatch newPatch =
+    /*
+
+       RisJsonPatch newPatch =
         patchMapperService.calculatePatch(
             existingDocumentationUnit.uuid(), patch.documentationUnitVersion(), newVersion);
     List<String> errorPaths =
@@ -205,13 +207,22 @@ public class DocumentUnitService {
     patchMapperService.savePatch(
         patch, existingDocumentationUnit.uuid(), existingDocumentationUnit.version());
 
-    DocumentUnit documentationUnit =
-        patchMapperService.applyPatchToEntity(
-            patch.patch(), existingDocumentationUnit, DocumentUnit.class);
-    documentationUnit = documentationUnit.toBuilder().version(newVersion).build();
-    updateDocumentUnit(documentationUnit);
 
-    return newPatch.toBuilder().errorPaths(errorPaths).build();
+     */
+
+    DocumentUnit updatedDocumentUnit =
+        updateDocumentUnit(
+            patchMapperService.applyPatchToEntity(
+                patch.patch(), existingDocumentationUnit, DocumentUnit.class));
+
+    MergeableJsonPatch mergeableJsonPatch =
+        patchMapperService.getDiffPatch(existingDocumentationUnit, updatedDocumentUnit);
+    log.info(mergeableJsonPatch.toString());
+
+    return RisJsonPatch.builder()
+        .documentationUnitVersion(newVersion)
+        .patch(mergeableJsonPatch)
+        .build();
   }
 
   public DocumentUnit updateDocumentUnit(DocumentUnit documentUnit)

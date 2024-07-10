@@ -3,6 +3,8 @@ import { defineStore } from "pinia"
 import { ref } from "vue"
 import DocumentUnit from "@/domain/documentUnit"
 import { RisJsonPatch } from "@/domain/risJsonPatch"
+import errorMessages from "@/i18n/errors.json"
+
 import documentUnitService from "@/services/documentUnitService"
 import {
   FailedValidationServerResponse,
@@ -13,7 +15,9 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
   const documentUnit = ref<DocumentUnit | undefined>(undefined)
   const originalDocumentUnit = ref<DocumentUnit | undefined>(undefined)
 
-  async function loadDocumentUnit(documentNumber: string) {
+  async function loadDocumentUnit(
+    documentNumber: string,
+  ): Promise<ServiceResponse<DocumentUnit>> {
     const response =
       await documentUnitService.getByDocumentNumber(documentNumber)
     if (response.data) {
@@ -22,18 +26,27 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
     } else {
       documentUnit.value = undefined
     }
-    return response as ServiceResponse<void>
+    return response as ServiceResponse<DocumentUnit>
   }
 
-  async function reloadDocumentUnit(): Promise<ServiceResponse<void>> {
-    return loadDocumentUnit(documentUnit.value?.documentNumber)
+  async function reloadDocumentUnit(): Promise<
+    ServiceResponse<DocumentUnit | undefined>
+  > {
+    if (documentUnit.value && documentUnit.value.documentNumber) {
+      return loadDocumentUnit(documentUnit.value.documentNumber)
+    }
+    return Promise.reject("Could not load empty document unit")
   }
 
   async function updateDocumentUnit(): Promise<
     ServiceResponse<RisJsonPatch | FailedValidationServerResponse | undefined>
   > {
     if (!documentUnit.value || !originalDocumentUnit.value) {
-      return { status: 404, data: undefined }
+      return {
+        status: 404,
+        data: undefined,
+        error: errorMessages.DOCUMENT_UNIT_COULD_NOT_BE_LOADED,
+      }
     }
 
     // Generate the JSON Patch document
@@ -43,8 +56,10 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
     )
 
     if (patch.length === 0) {
-      return { status: 304, data: undefined } // No changes to update
+      const response = await reloadDocumentUnit()
+      return { status: response.status, data: undefined } //  No changes to update
     }
+    console.log("not skipping update document unit")
 
     const response = await documentUnitService.update(documentUnit.value.uuid, {
       documentationUnitVersion: documentUnit.value.version,
@@ -54,8 +69,11 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
 
     if (response.status === 200) {
       const newPatch = response.data as RisJsonPatch
-      jsonpatch.applyPatch(documentUnit.value, newPatch.patch)
-      documentUnit.value.version = newPatch.documentationUnitVersion
+      jsonpatch.applyPatch(originalDocumentUnit.value, newPatch.patch)
+
+      documentUnit.value = JSON.parse(
+        JSON.stringify(originalDocumentUnit.value),
+      ) // Update the original copy
 
       if (newPatch.errorPaths.length > 0) {
         response.error = {
@@ -63,10 +81,6 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
           description: newPatch.errorPaths,
         }
       }
-
-      originalDocumentUnit.value = JSON.parse(
-        JSON.stringify(documentUnit.value),
-      ) // Update the original copy
     }
 
     return response

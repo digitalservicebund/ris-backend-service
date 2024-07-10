@@ -3,10 +3,13 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.github.fge.jsonpatch.JsonPatchOperation;
+import com.github.fge.jsonpatch.diff.JsonDiff;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitPatchRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitPatchDTO;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.MergeableJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
@@ -17,9 +20,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class DatabasePatchMapperService implements PatchMapperService {
   private final ObjectMapper objectMapper;
   private final DatabaseDocumentationUnitPatchRepository repository;
@@ -43,6 +48,19 @@ public class DatabasePatchMapperService implements PatchMapperService {
   public <T> T applyPatchToEntity(MergeableJsonPatch patch, T targetEntity, Class<T> entityType)
       throws JsonProcessingException, JsonPatchException {
     return objectMapper.treeToValue(applyPatch(patch, targetEntity), entityType);
+  }
+
+  @Override
+  public JsonPatch findDiff(DocumentUnit source, DocumentUnit target) {
+
+    return JsonDiff.asJsonPatch(
+        objectMapper.convertValue(source, JsonNode.class),
+        objectMapper.convertValue(target, JsonNode.class));
+  }
+
+  @Override
+  public MergeableJsonPatch getDiffPatch(DocumentUnit existed, DocumentUnit updated) {
+    return objectMapper.convertValue(findDiff(existed, updated), MergeableJsonPatch.class);
   }
 
   private <T> JsonNode applyPatch(MergeableJsonPatch patch, T targetEntity)

@@ -1,7 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.domain.mapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.MergeableJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import java.util.List;
@@ -18,4 +20,8 @@ public interface PatchMapperService {
   <T> T applyPatchToEntity(
       MergeableJsonPatch patch, T existingDocumentationUnit, Class<T> documentUnitClass)
       throws JsonProcessingException, JsonPatchException;
+
+  JsonPatch findDiff(DocumentUnit existed, DocumentUnit updated);
+
+  MergeableJsonPatch getDiffPatch(DocumentUnit existed, DocumentUnit updated);
 }
