@@ -186,25 +186,25 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
             longNoteText,
           )
 
-          // TODO: Re-enable when pipeline error is resolved. (Scrolling works only locally.)
+          const scrollTopBeforeScrolling = await page
+            .locator("#notesInput")
+            .evaluate((el) => el.scrollTop)
+          await page.locator("#notesInput").focus()
+          await page.keyboard.press("Home")
 
-          // const scrollTopBeforeScrolling = await page
-          //   .locator("#notesInput")
-          //   .evaluate((el) => el.scrollTop)
-          // await page.locator("#notesInput").focus()
-          // await page.keyboard.press("Home")
-          //
           // await page.waitForFunction(
           //   () => document.getElementById("notesInput")?.scrollTop === 0,
           //   undefined,
           //   { timeout: 1_000 },
           // )
-          //
-          // const scrollTopAfterScrolling = await page
-          //   .locator("#notesInput")
-          //   .evaluate((el) => el.scrollTop)
-          // expect(scrollTopBeforeScrolling).toBeGreaterThan(0)
-          // expect(scrollTopAfterScrolling).toBe(0)
+          // eslint-disable-next-line playwright/no-wait-for-timeout
+          await page.waitForTimeout(1_000)
+
+          const scrollTopAfterScrolling = await page
+            .locator("#notesInput")
+            .evaluate((el) => el.scrollTop)
+          expect(scrollTopBeforeScrolling).toBeGreaterThan(0)
+          expect(scrollTopAfterScrolling).toBe(0)
 
           await page.reload()
           await expect(page.getByLabel("Notiz Eingabefeld")).toHaveValue(
