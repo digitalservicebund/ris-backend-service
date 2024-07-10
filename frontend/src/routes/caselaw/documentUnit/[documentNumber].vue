@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useHead } from "@unhead/vue"
+import { storeToRefs } from "pinia"
 import { onMounted, ref, Ref } from "vue"
 import { useRoute } from "vue-router"
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
@@ -30,7 +31,7 @@ const route = useRoute()
 const menuItems = useCaseLawMenuItems(props.documentNumber, route.query)
 const { pushQueryToRoute } = useQuery()
 
-const documentUnit = ref<DocumentUnit>()
+const { documentUnit } = storeToRefs(store)
 
 const validationErrors = ref<ValidationError[]>([])
 const showNavigationPanelRef: Ref<boolean> = ref(
@@ -93,7 +94,7 @@ async function attachmentsUploaded(anySuccessful: boolean) {
 
 onMounted(async () => {
   await store.loadDocumentUnit(props.documentNumber)
-  await requestDocumentUnitFromServer()
+  // await requestDocumentUnitFromServer()
 })
 </script>
 
@@ -153,8 +154,6 @@ onMounted(async () => {
             @attachment-index-deleted="attachmentIndexDeleted"
             @attachment-index-selected="attachmentIndexSelected"
             @attachments-uploaded="attachmentsUploaded"
-            @document-unit-updated-locally="updateLocalDocumentUnit"
-            @request-document-unit-from-server="requestDocumentUnitFromServer"
             @save-document-unit-to-server="saveDocumentUnitToServer"
           />
         </FlexContainer>
