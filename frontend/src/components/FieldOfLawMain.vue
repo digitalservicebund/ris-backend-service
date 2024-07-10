@@ -64,6 +64,7 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
 
 <template>
   <ExpandableDataSet
+    v-if="localModelValue"
     :data-set="localModelValue"
     :summary-component="SelectedFieldsOfLawSummary"
     title="Sachgebiete"

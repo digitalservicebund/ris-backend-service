@@ -4,8 +4,6 @@ import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitCategories from "@/components/DocumentUnitCategories.vue"
 import DocumentUnit from "@/domain/documentUnit"
-import documentUnitService from "@/services/documentUnitService"
-import featureToggleService from "@/services/featureToggleService"
 
 function renderComponent() {
   const user = userEvent.setup()
@@ -43,66 +41,29 @@ function renderComponent() {
   return {
     user,
     ...render(DocumentUnitCategories, {
-      props: {
-        validationErrors: [],
-        documentUnit: new DocumentUnit("foo", {
-          documentNumber: "1234567891234",
-          coreData: {},
-          texts: {},
-          previousDecisions: undefined,
-          ensuingDecisions: undefined,
-          contentRelatedIndexing: {},
-        }),
-      },
       global: {
         plugins: [
-          [router],
-
-          [
-            createTestingPinia({
-              initialState: {
-                docunitStore: {
-                  documentUnit: new DocumentUnit("foo", {
-                    documentNumber: "1234567891234",
-                    coreData: {},
-                    texts: {},
-                    previousDecisions: undefined,
-                    ensuingDecisions: undefined,
-                    contentRelatedIndexing: {},
-                  }),
-                },
+          createTestingPinia({
+            initialState: {
+              docunitStore: {
+                documentUnit: new DocumentUnit("foo", {
+                  documentNumber: "1234567891234",
+                }),
               },
-            }),
-          ],
+            },
+          }),
+          [router],
         ],
       },
     }),
   }
 }
+
 describe("Document Unit Categories", () => {
-  vi.spyOn(documentUnitService, "update").mockImplementation(() =>
-    Promise.resolve({
-      status: 200,
-      data: {
-        patch: "",
-        errorPaths: [],
-        documentationUnitVersion: 0,
-        errors: [],
-      },
-    }),
-  )
-
-  vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
-    status: 200,
-    data: true,
-  })
-
-  test("renders correctly", async () => {
+  test("renders all categories", async () => {
     renderComponent()
 
-    expect(
-      screen.getByRole("heading", { name: "Stammdaten" }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "Stammdaten" })).toBeVisible()
 
     expect(
       screen.getByRole("heading", { name: "Rechtszug" }),
@@ -116,50 +77,4 @@ describe("Document Unit Categories", () => {
       screen.getByRole("heading", { name: "Kurz- & Langtexte" }),
     ).toBeInTheDocument()
   })
-
-  // Todo repair this test
-  // test("updates core data", async () => {
-  //   const court: Court = {
-  //     type: "AG",
-  //     location: "Test",
-  //     label: "AG Test",
-  //   }
-
-  //   const dropdownCourtItems: ComboboxItem[] = [
-  //     {
-  //       label: court.label,
-  //       value: court,
-  //       additionalInformation: court.revoked,
-  //     },
-  //   ]
-
-  /*
-        vi.spyOn(comboboxItemService, "getCourts").mockImplementation(() =>
-      Promise.resolve({ status: 200, data: dropdownCourtItems }),
-    )
-    const { user, emitted } = renderComponent()
-
-     */
-
-  //   const coreDataCourt = within(
-  //     screen.getByLabelText("Stammdaten", { selector: "div" }),
-  //   ).getByLabelText("Gericht")
-  //   await user.type(coreDataCourt, "AG")
-
-  //   const dropdownItems = screen.getAllByLabelText("dropdown-option")
-  //   expect(dropdownItems[0]).toHaveTextContent("AG Test")
-  //   await user.click(dropdownItems[0])
-
-  // Event is emitted for saving the DocUnit with updated properties
-  /*
-        const [updatedDocUnit] = emitted().documentUnitUpdatedLocally[0] as [
-      DocumentUnit,
-    ]
-    expect(updatedDocUnit.coreData.court).toEqual({
-      label: "AG Test",
-      location: "Test",
-      type: "AG",
-    })
-  })
-     */
 })

@@ -1,6 +1,6 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
-import { cleanup, fireEvent, render, screen } from "@testing-library/vue"
+import { fireEvent, render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
 import ActiveCitations from "@/components/ActiveCitations.vue"
 import { ComboboxItem } from "@/components/input/types"
@@ -127,7 +127,6 @@ describe("active citations", () => {
   })
   afterEach(() => {
     vi.resetAllMocks()
-    cleanup()
   })
 
   const court: Court = {
