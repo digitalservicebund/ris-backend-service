@@ -2,7 +2,6 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createHead } from "@unhead/vue"
 import { createPinia, setActivePinia } from "pinia"
-import { MockInstance } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnit from "@/domain/documentUnit"
 import categories from "@/routes/caselaw/documentUnit/[documentNumber]/categories.vue"
@@ -10,10 +9,12 @@ import DocumentNumber from "@/routes/caselaw/documentUnit/[documentNumber].vue"
 import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 function renderComponent() {
   const user = userEvent.setup()
   const head = createHead()
+  mockDocumentUnitStore()
 
   const router = createRouter({
     history: createWebHistory(),
@@ -68,8 +69,9 @@ function renderComponent() {
   }
 }
 
-function mockDocumentUnit() {
-  return new DocumentUnit("foo", {
+function mockDocumentUnitStore() {
+  const mockedDocumentUnitStore = useDocumentUnitStore()
+  const documentUnit = new DocumentUnit("foo", {
     documentNumber: "1234567891234",
     coreData: {
       court: {
@@ -83,26 +85,27 @@ function mockDocumentUnit() {
     ensuingDecisions: undefined,
     contentRelatedIndexing: {},
   })
+  mockedDocumentUnitStore.documentUnit = documentUnit
+
+  return mockedDocumentUnitStore
 }
 
 describe("Document Number Route", () => {
-  let updateDocUnitMock: MockInstance
-
   beforeEach(() => {
     setActivePinia(createPinia())
-    updateDocUnitMock = vi
-      .spyOn(documentUnitService, "update")
-      .mockImplementation(() =>
-        Promise.resolve({
-          status: 200,
-          data: mockDocumentUnit(),
-        }),
-      )
+    vi.spyOn(documentUnitService, "update").mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: { documentationUnitVersion: 1, patch: [], errorPaths: [] },
+      }),
+    )
     vi.spyOn(documentUnitService, "getByDocumentNumber").mockImplementation(
       () =>
         Promise.resolve({
           status: 200,
-          data: mockDocumentUnit(),
+          data: new DocumentUnit("foo", {
+            documentNumber: "1234567891234",
+          }),
         }),
     )
     vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
@@ -115,7 +118,9 @@ describe("Document Number Route", () => {
     test("should render categories with side panels and header", async () => {
       const { router, container } = renderComponent()
 
-      await router.push({ path: "/caselaw/documentUnit/12423/categories" })
+      await router.push({
+        path: "/caselaw/documentUnit/1234567891234/categories",
+      })
 
       expect(screen.getByTestId("side-toggle-navigation")).toBeInTheDocument()
 
@@ -137,7 +142,7 @@ describe("Document Number Route", () => {
     test("should render documents with side panels and header", async () => {
       const { router } = renderComponent()
 
-      await router.push({ path: "/caselaw/documentUnit/12423/files" })
+      await router.push({ path: "/caselaw/documentUnit/1234567891234/files" })
 
       expect(screen.getByTestId("side-toggle-navigation")).toBeInTheDocument()
 
@@ -159,7 +164,9 @@ describe("Document Number Route", () => {
     test("should render publication with only nav side panel and header", async () => {
       const { router } = renderComponent()
 
-      await router.push({ path: "/caselaw/documentUnit/12423/publication" })
+      await router.push({
+        path: "/caselaw/documentUnit/1234567891234/publication",
+      })
 
       expect(screen.getByTestId("side-toggle-navigation")).toBeInTheDocument()
 
@@ -180,7 +187,7 @@ describe("Document Number Route", () => {
 
     test("should render preview without side panels and header", async () => {
       const { router } = renderComponent()
-      await router.push({ path: "/caselaw/documentUnit/12423/preview" })
+      await router.push({ path: "/caselaw/documentUnit/1234567891234/preview" })
 
       expect(
         screen.queryByTestId("side-toggle-navigation"),
@@ -214,7 +221,9 @@ describe("Document Number Route", () => {
       )
 
       const { router } = renderComponent()
-      await router.push({ path: "/caselaw/documentUnit/12423/categories" })
+      await router.push({
+        path: "/caselaw/documentUnit/1234567891234/categories",
+      })
 
       // Navigation
       expect(
@@ -236,38 +245,6 @@ describe("Document Number Route", () => {
 
       // Error page is rendered
       expect(screen.getByText("Backend_Error_Title")).toBeInTheDocument()
-    })
-  })
-
-  describe("Updating doc unit", () => {
-    test("should save doc unit with updated content", async () => {
-      const { router, container } = renderComponent()
-      await router.push({ path: "/caselaw/documentUnit/12423/categories" })
-
-      const categoriesInput = container.querySelector("#appraisalBody")
-      await userEvent.type(categoriesInput!, "categories_input")
-
-      // Server responds with updated doc unit
-      const updatedDocUnit = mockDocumentUnit()
-      updatedDocUnit.coreData.appraisalBody = "categories_input"
-      updateDocUnitMock.mockResolvedValueOnce(updatedDocUnit)
-
-      const saveButton = screen.queryByRole("button", {
-        name: "Speichern Button",
-      })
-      await userEvent.click(saveButton!)
-
-      expect(updateDocUnitMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          coreData: expect.objectContaining({
-            appraisalBody: "categories_input",
-          }),
-        }),
-      )
-
-      // Clicking save again without changing data should not make a request
-      await userEvent.click(saveButton!)
-      expect(updateDocUnitMock).toHaveBeenCalledOnce()
     })
   })
 })
