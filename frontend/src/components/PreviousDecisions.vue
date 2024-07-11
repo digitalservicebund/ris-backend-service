@@ -6,28 +6,21 @@ import { withSummarizer } from "@/components/DataSetSummary.vue"
 import EditableList from "@/components/EditableList.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import PreviousDecision from "@/domain/previousDecision"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import BaselineArrowOutward from "~icons/ic/baseline-arrow-outward"
 import IconBaselineDescription from "~icons/ic/baseline-description"
 import IconError from "~icons/ic/baseline-error"
 import IconOutlineDescription from "~icons/ic/outline-description"
 
-const props = defineProps<{
-  modelValue: PreviousDecision[] | undefined
-}>()
+const store = useDocumentUnitStore()
 
-const emit = defineEmits<{
-  "update:modelValue": [value?: PreviousDecision[]]
-}>()
-
-// vor gehende nach gehede aktiv zityierung => searchresultlist
-const proceedingDecisions = computed({
-  get: () => {
-    return props.modelValue
-  },
-  set: (value) => {
-    if (value) emit("update:modelValue", value)
+const previousDecisions = computed({
+  get: () => store.documentUnit!.previousDecisions as PreviousDecision[],
+  set: (newValues) => {
+    store.documentUnit!.previousDecisions = newValues
   },
 })
+
 const defaultValue = new PreviousDecision()
 
 /**
@@ -111,7 +104,7 @@ const DecisionSummary = withSummarizer(decisionSummarizer)
       <div class="flex flex-row">
         <div class="flex-1">
           <EditableList
-            v-model="proceedingDecisions"
+            v-model="previousDecisions"
             :default-value="defaultValue"
             :edit-component="PreviousDecisionInputGroup"
             :summary-component="DecisionSummary"
