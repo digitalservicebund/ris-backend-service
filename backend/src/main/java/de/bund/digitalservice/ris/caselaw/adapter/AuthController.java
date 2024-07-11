@@ -4,10 +4,10 @@ import de.bund.digitalservice.ris.caselaw.domain.ApiKey;
 import de.bund.digitalservice.ris.caselaw.domain.ImportApiKeyException;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -78,8 +78,8 @@ public class AuthController {
   @PostMapping(value = "api-key/import/invalidate", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<ApiKey> invalidateImportApiKey(
-      @AuthenticationPrincipal OidcUser oidcUser, ServerHttpRequest request) {
-    String apiKey = request.getHeaders().getFirst("X-API-KEY");
+      @AuthenticationPrincipal OidcUser oidcUser, HttpServletRequest request) {
+    String apiKey = request.getHeaders("X-API-KEY").nextElement();
 
     if (apiKey == null) {
       throw new ImportApiKeyException("No api key set.");
