@@ -200,6 +200,7 @@ public class DocumentUnitService {
 
     /*
 
+
        RisJsonPatch newPatch =
         patchMapperService.calculatePatch(
             existingDocumentationUnit.uuid(), patch.documentationUnitVersion(), newVersion);
@@ -216,9 +217,12 @@ public class DocumentUnitService {
             patchMapperService.applyPatchToEntity(
                 patch.patch(), existingDocumentationUnit, DocumentUnit.class));
 
+    MergeableJsonPatch oldChnagesSaved =
+        patchMapperService.getDiffPatch(updatedDocumentUnit, existingDocumentationUnit);
+    log.info("TODO: SAVE THIS PATCH: " + oldChnagesSaved.toString());
+
     MergeableJsonPatch mergeableJsonPatch =
         patchMapperService.getDiffPatch(existingDocumentationUnit, updatedDocumentUnit);
-    log.info(mergeableJsonPatch.toString());
 
     return RisJsonPatch.builder()
         .documentationUnitVersion(newVersion)
