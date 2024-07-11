@@ -1,8 +1,10 @@
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { describe } from "vitest"
 import { ComboboxItem } from "@/components/input/types"
 import NormReferences from "@/components/NormReferences.vue"
+import DocumentUnit from "@/domain/documentUnit"
 import LegalForce from "@/domain/legalForce"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import NormReference from "@/domain/normReference"
@@ -10,19 +12,28 @@ import SingleNorm from "@/domain/singleNorm"
 import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 
-function renderComponent(options?: { modelValue?: NormReference[] }) {
-  const props = {
-    modelValue: options?.modelValue ? options?.modelValue : [],
-  }
-
-  // eslint-disable-next-line testing-library/await-async-events
+function renderComponent(normReferences?: NormReference[]) {
   const user = userEvent.setup()
   return {
     user,
     ...render(NormReferences, {
-      props,
       global: {
-        stubs: { routerLink: { template: "<a><slot/></a>" } },
+        plugins: [
+          [
+            createTestingPinia({
+              initialState: {
+                docunitStore: {
+                  documentUnit: new DocumentUnit("123", {
+                    documentNumber: "foo",
+                    contentRelatedIndexing: {
+                      norms: normReferences ?? undefined,
+                    },
+                  }),
+                },
+              },
+            }),
+          ],
+        ],
       },
     }),
   }
@@ -60,7 +71,7 @@ describe("Norm references", () => {
   })
 
   it("renders norm references as list entries", () => {
-    const modelValue: NormReference[] = [
+    const normReferences: NormReference[] = [
       generateNormReference({
         singleNorms: [new SingleNorm({ singleNorm: "§ 123" })],
       }),
@@ -68,7 +79,7 @@ describe("Norm references", () => {
         singleNorms: [new SingleNorm({ singleNorm: "§ 345" })],
       }),
     ]
-    renderComponent({ modelValue })
+    renderComponent(normReferences)
 
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(2)
     expect(screen.queryByLabelText("RIS-Abkürzung")).not.toBeInTheDocument()
@@ -80,13 +91,11 @@ describe("Norm references", () => {
     vi.spyOn(documentUnitService, "validateSingleNorm").mockImplementation(() =>
       Promise.resolve({ status: 200, data: "Ok" }),
     )
-    const { user } = renderComponent({
-      modelValue: [
-        generateNormReference({
-          singleNorms: [new SingleNorm({ singleNorm: "§ 123" })],
-        }),
-      ],
-    })
+    const { user } = renderComponent([
+      generateNormReference({
+        singleNorms: [new SingleNorm({ singleNorm: "§ 123" })],
+      }),
+    ])
     await user.click(screen.getByTestId("list-entry-0"))
 
     expect(screen.getByLabelText("RIS-Abkürzung")).toBeInTheDocument()
@@ -99,13 +108,11 @@ describe("Norm references", () => {
     vi.spyOn(documentUnitService, "validateSingleNorm").mockImplementation(() =>
       Promise.resolve({ status: 200, data: "Ok" }),
     )
-    const { user } = renderComponent({
-      modelValue: [
-        generateNormReference({
-          normAbbreviation: { abbreviation: "1000g-BefV" },
-        }),
-      ],
-    })
+    const { user } = renderComponent([
+      generateNormReference({
+        normAbbreviation: { abbreviation: "1000g-BefV" },
+      }),
+    ])
     await user.click(screen.getByLabelText("Weitere Angabe"))
 
     const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
@@ -122,14 +129,12 @@ describe("Norm references", () => {
     vi.spyOn(documentUnitService, "validateSingleNorm").mockImplementation(() =>
       Promise.resolve({ status: 200, data: "Ok" }),
     )
-    const { user } = renderComponent({
-      modelValue: [
-        generateNormReference({
-          normAbbreviation: { abbreviation: "1000g-BefV" },
-        }),
-        generateNormReference(),
-      ],
-    })
+    const { user } = renderComponent([
+      generateNormReference({
+        normAbbreviation: { abbreviation: "1000g-BefV" },
+      }),
+      generateNormReference(),
+    ])
     await user.click(screen.getByTestId("list-entry-1"))
 
     const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
@@ -145,44 +150,11 @@ describe("Norm references", () => {
     await screen.findByText(/RIS-Abkürzung bereits eingegeben/)
   })
 
-  it("updates norm reference", async () => {
-    const { user, emitted } = renderComponent({
-      modelValue: [generateNormReference()],
-    })
-
-    const norms = screen.getAllByLabelText("Listen Eintrag")
-    expect(norms.length).toBe(1)
-    await user.click(screen.getByTestId("list-entry-0"))
-    const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
-    await user.type(abbreviationField, "1000")
-    const dropdownItems = screen.getAllByLabelText(
-      "dropdown-option",
-    ) as HTMLElement[]
-    expect(dropdownItems[0]).toHaveTextContent("1000g-BefV")
-    await user.click(dropdownItems[0])
-
-    const button = screen.getByLabelText("Norm speichern")
-    await user.click(button)
-    expect(emitted("update:modelValue")).toEqual([
-      [
-        [
-          {
-            normAbbreviation: {
-              abbreviation: "1000g-BefV",
-            },
-            singleNorms: [],
-            normAbbreviationRawValue: undefined,
-            hasForeignSource: false,
-          },
-        ],
-      ],
-    ])
-  })
-
   it("deletes norm reference", async () => {
-    const { user } = renderComponent({
-      modelValue: [generateNormReference(), generateNormReference()],
-    })
+    const { user } = renderComponent([
+      generateNormReference(),
+      generateNormReference(),
+    ])
 
     const norms = screen.getAllByLabelText("Listen Eintrag")
     expect(norms.length).toBe(2)
@@ -192,11 +164,10 @@ describe("Norm references", () => {
   })
 
   it("click on 'Weitere Angabe' adds new emptry list entry", async () => {
-    const modelValue: NormReference[] = [
+    const { user } = renderComponent([
       generateNormReference(),
       generateNormReference(),
-    ]
-    const { user } = renderComponent({ modelValue })
+    ])
     const normsRefernces = screen.getAllByLabelText("Listen Eintrag")
     expect(normsRefernces.length).toBe(2)
     const button = screen.getByLabelText("Weitere Angabe")
@@ -205,15 +176,14 @@ describe("Norm references", () => {
   })
 
   it("render summary with one single norms", async () => {
-    const modelValue: NormReference[] = [
+    renderComponent([
       generateNormReference({
         normAbbreviation: {
           abbreviation: "1000g-BefV",
         },
         singleNorms: [new SingleNorm({ singleNorm: "§ 123" })],
       }),
-    ]
-    renderComponent({ modelValue })
+    ])
 
     expect(screen.getByLabelText("Listen Eintrag")).toHaveTextContent(
       "1000g-BefV, § 123",
@@ -221,7 +191,7 @@ describe("Norm references", () => {
   })
 
   it("render summary with multiple single norms", async () => {
-    const modelValue: NormReference[] = [
+    renderComponent([
       generateNormReference({
         normAbbreviation: {
           abbreviation: "1000g-BefV",
@@ -235,8 +205,7 @@ describe("Norm references", () => {
           }),
         ],
       }),
-    ]
-    renderComponent({ modelValue })
+    ])
 
     expect(screen.getByLabelText("Listen Eintrag")).toHaveTextContent(
       "1000g-BefV1000g-BefV, § 1231000g-BefV, § 345, 01.01.2022, 02-02-2022",
@@ -244,7 +213,7 @@ describe("Norm references", () => {
   })
 
   it("render summary with no single norms", async () => {
-    const modelValue: NormReference[] = [
+    renderComponent([
       generateNormReference({
         normAbbreviation: {
           abbreviation: "1000g-BefV",
@@ -258,8 +227,7 @@ describe("Norm references", () => {
           }),
         ],
       }),
-    ]
-    renderComponent({ modelValue })
+    ])
 
     expect(screen.getByLabelText("Listen Eintrag")).toHaveTextContent(
       "1000g-BefV1000g-BefV, § 1231000g-BefV, § 345, 01.01.2022, 02-02-2022",
@@ -267,25 +235,21 @@ describe("Norm references", () => {
   })
 
   it("render error badge, when norm reference is ambiguous", async () => {
-    const modelValue: NormReference[] = [
+    renderComponent([
       new NormReference({
         normAbbreviationRawValue: "EWGAssRBes 1/80",
       }),
-    ]
-
-    renderComponent({ modelValue })
+    ])
 
     expect(screen.getByText("Mehrdeutiger Verweis")).toBeInTheDocument()
   })
 
   it("render error badge, when required fields missing", async () => {
-    const modelValue: NormReference[] = [
+    renderComponent([
       new NormReference({
         singleNorms: [new SingleNorm({ singleNorm: "§ 123" })],
       }),
-    ]
-
-    renderComponent({ modelValue })
+    ])
 
     // Todo:
     // add check for error badge when implemented
@@ -293,7 +257,7 @@ describe("Norm references", () => {
 
   describe("legal force", () => {
     it("render summary with legal force type and region", () => {
-      const modelValue: NormReference[] = [
+      renderComponent([
         generateNormReference({
           normAbbreviation: {
             abbreviation: "1000g-BefV",
@@ -310,8 +274,7 @@ describe("Norm references", () => {
             }),
           ],
         }),
-      ]
-      renderComponent({ modelValue })
+      ])
 
       expect(screen.getByLabelText("Listen Eintrag")).toHaveTextContent(
         "1000g-BefV, § 345, 01.01.2022, 02-02-2022|Nichtig (Brandenburg)",
@@ -319,7 +282,7 @@ describe("Norm references", () => {
     })
 
     it("render summary with legal force but without type and region", () => {
-      const modelValue: NormReference[] = [
+      renderComponent([
         generateNormReference({
           normAbbreviation: {
             abbreviation: "1000g-BefV",
@@ -336,8 +299,7 @@ describe("Norm references", () => {
             }),
           ],
         }),
-      ]
-      renderComponent({ modelValue })
+      ])
 
       expect(screen.getByLabelText("Listen Eintrag")).toHaveTextContent(
         "1000g-BefV, § 345, 01.01.2022, 02-02-2022|Fehlende Daten",
