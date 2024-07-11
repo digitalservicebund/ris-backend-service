@@ -72,9 +72,12 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
       const newPatch = response.data as RisJsonPatch
       jsonpatch.applyPatch(originalDocumentUnit.value, newPatch.patch)
 
-      documentUnit.value = JSON.parse(
+      const parsedDocumentUnit = JSON.parse(
         JSON.stringify(originalDocumentUnit.value),
-      ) // Update the original copy
+      )
+      documentUnit.value = new DocumentUnit(originalDocumentUnit.value.uuid, {
+        ...parsedDocumentUnit,
+      })
 
       if (newPatch.errorPaths != undefined && newPatch.errorPaths.length > 0) {
         response.error = {
