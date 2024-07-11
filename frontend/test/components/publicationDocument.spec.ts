@@ -90,9 +90,7 @@ describe("PublicationDocument:", () => {
           "Die folgenden Rubriken-Pflichtfelder sind nicht befüllt:",
         ),
       ).not.toBeInTheDocument()
-      expect(
-        await screen.findByText("XML Vorschau der Veröffentlichung"),
-      ).toBeInTheDocument()
+      expect(await screen.findByText("XML Vorschau")).toBeInTheDocument()
     })
 
     it("render preview error", async () => {
@@ -161,9 +159,7 @@ describe("PublicationDocument:", () => {
       expect(screen.getByText("ABC")).toBeInTheDocument()
       expect(screen.getByText("Gesetzeskraft")).toBeInTheDocument()
 
-      expect(
-        screen.queryByText("XML Vorschau der Veröffentlichung"),
-      ).not.toBeInTheDocument()
+      expect(screen.queryByText("XML Vorschau")).not.toBeInTheDocument()
     })
 
     it("'Rubriken bearbeiten' button links back to categories", async () => {
@@ -186,11 +182,11 @@ describe("PublicationDocument:", () => {
     })
   })
 
-  describe("on press 'Dokumentationseinheit veröffentlichen'", () => {
+  describe("on press 'Dokumentationseinheit an jDV übergeben'", () => {
     it("publishes successfully", async () => {
       const { emitted } = setupWithAllRequiredFields()
       const publishButton = screen.getByRole("button", {
-        name: "Dokumentationseinheit veröffentlichen",
+        name: "Dokumentationseinheit an jDV übergeben",
       })
       await fireEvent.click(publishButton)
 
@@ -220,10 +216,10 @@ describe("PublicationDocument:", () => {
       })
 
       expect(
-        screen.queryByLabelText("Erfolg der Veröffentlichung"),
+        screen.queryByLabelText("Erfolg der jDV Übergabe"),
       ).not.toBeInTheDocument()
       expect(
-        screen.getByLabelText("Fehler bei Veröffentlichung"),
+        screen.getByLabelText("Fehler bei jDV Übergabe"),
       ).toHaveTextContent(`error message titleerror message description`)
     })
 
@@ -238,17 +234,17 @@ describe("PublicationDocument:", () => {
       })
 
       const publishButton = screen.getByRole("button", {
-        name: "Dokumentationseinheit veröffentlichen",
+        name: "Dokumentationseinheit an jDV übergeben",
       })
       await fireEvent.click(publishButton)
 
       expect(
-        screen.queryByLabelText("Erfolg der Veröffentlichung"),
+        screen.queryByLabelText("Erfolg der jDV Übergabe"),
       ).not.toBeInTheDocument()
       expect(
-        screen.getByLabelText("Fehler bei Veröffentlichung"),
+        screen.getByLabelText("Fehler bei jDV Übergabe"),
       ).toHaveTextContent(
-        `Es sind noch nicht alle Pflichtfelder befüllt.Die Dokumentationseinheit kann nicht veröffentlicht werden.`,
+        `Es sind noch nicht alle Pflichtfelder befüllt.Die Dokumentationseinheit kann nicht übergeben werden.`,
       )
     })
   })
@@ -256,10 +252,8 @@ describe("PublicationDocument:", () => {
   describe("last published xml", () => {
     it("with earlier published document unit", async () => {
       setupWithPublishedDocument()
-      expect(
-        screen.getByLabelText("Letzte Veröffentlichungen"),
-      ).toHaveTextContent(
-        `Letzte VeröffentlichungenXml Email Abgabe - 01.02.2000ÜBERE-Mail an: receiver address Betreff: mail subjectALSXML1<?xml version="1.0"?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>`,
+      expect(screen.getByLabelText("Letzte Ereignisse")).toHaveTextContent(
+        `Letzte EreignisseXml Email Abgabe - 01.02.2000ÜBERE-Mail an: receiver address Betreff: mail subjectALSXML1<?xml version="1.0"?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>`,
       )
     })
 
@@ -272,10 +266,8 @@ describe("PublicationDocument:", () => {
           plugins: [router],
         },
       })
-      expect(
-        screen.getByLabelText("Letzte Veröffentlichungen"),
-      ).toHaveTextContent(
-        `Letzte Veröffentlichungen Diese Dokumentationseinheit wurde bisher nicht veröffentlicht`,
+      expect(screen.getByLabelText("Letzte Ereignisse")).toHaveTextContent(
+        `Letzte Ereignisse Diese Dokumentationseinheit wurde bisher nicht an die jDV übergeben`,
       )
     })
   })
@@ -306,11 +298,9 @@ describe("PublicationDocument:", () => {
       },
     })
 
-    expect(
-      await screen.findByText("XML Vorschau der Veröffentlichung"),
-    ).toBeInTheDocument()
+    expect(await screen.findByText("XML Vorschau")).toBeInTheDocument()
 
-    await fireEvent.click(screen.getByText("XML Vorschau der Veröffentlichung"))
+    await fireEvent.click(screen.getByText("XML Vorschau"))
     const codeSnippet = screen.queryByTestId("code-snippet")
 
     expect(codeSnippet).toBeInTheDocument()
@@ -356,7 +346,7 @@ describe("PublicationDocument:", () => {
     })
 
     expect(container).toHaveTextContent(
-      `VeröffentlichenPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltDokumentationseinheit veröffentlichenLetzte VeröffentlichungenXml Email Abgabe - 01.02.2000ÜBERE-Mail an: receiver address Betreff: mail subjectALS`,
+      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltDokumentationseinheit an jDV übergebenLetzte EreignisseXml Email Abgabe - 01.02.2000ÜBERE-Mail an: receiver address Betreff: mail subjectALS`,
     )
 
     const codeSnippet = screen.queryByTestId("code-snippet")

@@ -31,6 +31,6 @@ describe("useCaseLawMenuItems", () => {
     const topLabelNames = menuItems.map((item) => item.label)
     expect(topLabelNames).toContain("Rubriken")
     expect(topLabelNames).toContain("Dokumente")
-    expect(topLabelNames).toContain("Veröffentlichen")
+    expect(topLabelNames).toContain("Übergabe an jDV")
   })
 })

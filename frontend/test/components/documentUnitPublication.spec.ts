@@ -83,10 +83,10 @@ describe("Document Unit Publication", () => {
       screen.getByRole("heading", { name: "Überprüfung der Daten ..." }),
     ).toBeInTheDocument()
     expect(
-      await screen.findByRole("heading", { name: "Veröffentlichen" }),
+      await screen.findByRole("heading", { name: "Übergabe an jDV" }),
     ).toBeInTheDocument()
     expect(
-      await screen.findByRole("heading", { name: "Letzte Veröffentlichungen" }),
+      await screen.findByRole("heading", { name: "Letzte Ereignisse" }),
     ).toBeInTheDocument()
   })
 
@@ -106,7 +106,7 @@ describe("Document Unit Publication", () => {
       screen.getByRole("heading", { name: "Überprüfung der Daten ..." }),
     ).toBeInTheDocument()
     expect(
-      await screen.findByRole("heading", { name: "Veröffentlichen" }),
+      await screen.findByRole("heading", { name: "Übergabe an jDV" }),
     ).toBeInTheDocument()
     expect(
       await screen.findByText("Leider ist ein Fehler aufgetreten"),
@@ -158,14 +158,14 @@ describe("Document Unit Publication", () => {
       screen.getByRole("heading", { name: "Überprüfung der Daten ..." }),
     ).toBeInTheDocument()
     expect(
-      await screen.findByLabelText("Dokumentationseinheit veröffentlichen"),
+      await screen.findByLabelText("Dokumentationseinheit an jDV übergeben"),
     ).toBeInTheDocument()
 
     await user.click(
-      screen.getByLabelText("Dokumentationseinheit veröffentlichen"),
+      screen.getByLabelText("Dokumentationseinheit an jDV übergeben"),
     )
 
-    expect(await screen.findByLabelText("Erfolg der Veröffentlichung"))
+    expect(await screen.findByLabelText("Erfolg der jDV Übergabe"))
       .toBeInTheDocument
   })
 })

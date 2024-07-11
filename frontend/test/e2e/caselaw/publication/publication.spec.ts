@@ -261,7 +261,7 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await navigateToPublication(page, documentNumber)
 
     await page
-      .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
+      .locator("[aria-label='Dokumentationseinheit an jDV übergeben']")
       .click()
     await expect(
       page.getByText("Es sind noch nicht alle Pflichtfelder befüllt."),
@@ -276,11 +276,9 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
   }) => {
     await navigateToPublication(page, prefilledDocumentUnit.documentNumber!)
 
-    await expect(
-      page.getByText("XML Vorschau der Veröffentlichung"),
-    ).toBeVisible()
+    await expect(page.getByText("XML Vorschau")).toBeVisible()
 
-    await page.getByText("XML Vorschau der Veröffentlichung").click()
+    await page.getByText("XML Vorschau").click()
 
     await expect(
       page.locator("text='        <entsch-datum>2019-12-31</entsch-datum>'"),
@@ -292,12 +290,12 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
 
     await expect(
       page.locator(
-        "text=Diese Dokumentationseinheit wurde bisher nicht veröffentlicht",
+        "text=Diese Dokumentationseinheit wurde bisher nicht an die jDV übergeben",
       ),
     ).toBeVisible()
 
     await page
-      .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
+      .locator("[aria-label='Dokumentationseinheit an jDV übergeben']")
       .click()
 
     await expect(page.getByText("Email wurde versendet")).toBeVisible()

@@ -215,10 +215,8 @@ test.describe(
             page,
             prefilledDocumentUnit.documentNumber!,
           )
-          await expect(
-            page.getByText("XML Vorschau der Veröffentlichung"),
-          ).toBeVisible()
-          await page.getByText("XML Vorschau der Veröffentlichung").click()
+          await expect(page.getByText("XML Vorschau")).toBeVisible()
+          await page.getByText("XML Vorschau").click()
           await expect(
             page.getByText("<streitjahr>2020</streitjahr>"),
           ).toBeVisible()

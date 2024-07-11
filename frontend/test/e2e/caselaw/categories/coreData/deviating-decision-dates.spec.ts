@@ -125,11 +125,9 @@ test.describe("deviating decision dates", () => {
     await test.step("Navigate to publication, click in 'XML-Vorschau', check they are visible", async () => {
       await navigateToPublication(page, prefilledDocumentUnit.documentNumber!)
 
-      await expect(
-        page.getByText("XML Vorschau der Veröffentlichung"),
-      ).toBeVisible()
+      await expect(page.getByText("XML Vorschau")).toBeVisible()
 
-      await page.getByText("XML Vorschau der Veröffentlichung").click()
+      await page.getByText("XML Vorschau").click()
 
       await expect(
         page.getByText("<begriff>2021-02-01</begriff>"),

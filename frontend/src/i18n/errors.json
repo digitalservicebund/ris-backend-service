@@ -63,17 +63,17 @@
     "title": "Die Suchergebnisse konnten nicht geladen werden.",
     "description": "Bitte versuchen Sie es später erneut."
   },
-  "DOCUMENT_UNIT_PUBLISH_FAILED": {
+  "DOCUMENT_UNIT_JDV_HANDOVER_FAILED": {
     "title": "Leider ist ein Fehler aufgetreten.",
-    "description": "Die Dokumentationseinheit kann nicht veröffentlicht werden."
+    "description": "Die Dokumentationseinheit kann nicht übergeben werden."
   },
-  "DOCUMENT_UNIT_LOADING_PUBLICATION_FAILED": {
-    "title": "Fehler beim Laden der letzten Veröffentlichung",
-    "description": "Die Daten der letzten Veröffentlichung konnten nicht geladen werden."
+  "DOCUMENT_UNIT_LOADING_JDV_HANDOVER_FAILED": {
+    "title": "Fehler beim Laden der Ereignisse",
+    "description": "Die Ereignisse konnten nicht geladen werden."
   },
-  "DOCUMENT_UNIT_LOADING_PUBLICATION_PREVIEW": {
-    "title": "Fehler beim Laden der Veröffentlichungs-Vorschau",
-    "description": "Die Vorschau konnte nicht geladen werden."
+  "DOCUMENT_UNIT_LOADING_XML_PREVIEW": {
+    "title": "Fehler beim Laden der XML-Vorschau",
+    "description": "Die XML-Vorschau konnte nicht geladen werden."
   },
   "NORM_COULD_NOT_BE_VALIDATED": {
     "title": "Einzelnorm konnte nicht validiert werden.",

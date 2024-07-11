@@ -16,7 +16,7 @@ describe("publishService", () => {
     const result = await service.publishDocument("123")
     expect(result.error?.title).toEqual("Leider ist ein Fehler aufgetreten.")
     expect(result.error?.description).toContain(
-      "Die Dokumentationseinheit kann nicht veröffentlicht werden.",
+      "Die Dokumentationseinheit kann nicht übergeben werden.",
     )
   })
 
@@ -31,9 +31,7 @@ describe("publishService", () => {
     })
 
     const result = await service.getPreview("123")
-    expect(result.error?.title).toEqual(
-      "Fehler beim Laden der Veröffentlichungs-Vorschau",
-    )
+    expect(result.error?.title).toEqual("Fehler beim Laden der XML-Vorschau")
     // expect(result.error?.description).toContain(
     //   "Die Vorschau konnte nicht geladen werden.",
     // )
@@ -62,9 +60,7 @@ describe("publishService", () => {
     })
 
     const result = await service.getPreview("123")
-    expect(result.error?.title).toEqual(
-      "Fehler beim Laden der Veröffentlichungs-Vorschau",
-    )
+    expect(result.error?.title).toEqual("Fehler beim Laden der XML-Vorschau")
     expect(result.error?.description).toContain("Fehler 2")
   })
 })

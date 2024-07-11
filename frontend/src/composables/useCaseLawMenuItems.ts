@@ -61,7 +61,7 @@ export function useCaseLawMenuItems(
       },
     },
     {
-      label: "Veröffentlichen",
+      label: "Übergabe an jDV",
       route: {
         ...baseRoute,
         name: "caselaw-documentUnit-documentNumber-publication",

@@ -28,8 +28,7 @@ const service: PublishService = {
         ? Number(response.data.statusCode)
         : response.status
 
-      let description =
-        "Die Dokumentationseinheit kann nicht veröffentlicht werden."
+      let description = "Die Dokumentationseinheit kann nicht übergeben werden."
       if (
         response.data?.statusMessages &&
         response.data.statusMessages.length > 0
@@ -51,7 +50,7 @@ const service: PublishService = {
       }
 
       response.error = {
-        title: errorMessages.DOCUMENT_UNIT_PUBLISH_FAILED.title,
+        title: errorMessages.DOCUMENT_UNIT_JDV_HANDOVER_FAILED.title,
         description,
       }
     }
@@ -67,9 +66,10 @@ const service: PublishService = {
     response.error =
       response.status >= 300
         ? {
-            title: errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_FAILED.title,
+            title:
+              errorMessages.DOCUMENT_UNIT_LOADING_JDV_HANDOVER_FAILED.title,
             description:
-              errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_FAILED
+              errorMessages.DOCUMENT_UNIT_LOADING_JDV_HANDOVER_FAILED
                 .description,
           }
         : undefined
@@ -88,13 +88,12 @@ const service: PublishService = {
         : response.status
 
       response.error = {
-        title: errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_PREVIEW.title,
+        title: errorMessages.DOCUMENT_UNIT_LOADING_XML_PREVIEW.title,
         description:
           response.data?.statusMessages &&
           response.data.statusMessages.length > 0
             ? response.data?.statusMessages
-            : errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_PREVIEW
-                .description,
+            : errorMessages.DOCUMENT_UNIT_LOADING_XML_PREVIEW.description,
       }
     }
 

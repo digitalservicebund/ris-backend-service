@@ -97,7 +97,7 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
         prefilledDocumentUnit.documentNumber as string,
       )
       await pageWithBghUser
-        .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
+        .locator("[aria-label='Dokumentationseinheit an jDV übergeben']")
         .click()
       await expect(
         pageWithBghUser.getByText("Leider ist ein Fehler aufgetreten."),

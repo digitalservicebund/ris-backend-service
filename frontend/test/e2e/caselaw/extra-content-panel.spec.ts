@@ -233,13 +233,9 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
         const documentNumber = prefilledDocumentUnitBgh.documentNumber!
         await test.step("Confirm note is exported in XML on publish page", async () => {
           await navigateToPublication(pageWithBghUser, documentNumber)
-          await expect(
-            pageWithBghUser.getByText("XML Vorschau der Veröffentlichung"),
-          ).toBeVisible()
+          await expect(pageWithBghUser.getByText("XML Vorschau")).toBeVisible()
 
-          await pageWithBghUser
-            .getByText("XML Vorschau der Veröffentlichung")
-            .click()
+          await pageWithBghUser.getByText("XML Vorschau").click()
 
           await expect(
             pageWithBghUser.locator("span", {
@@ -257,13 +253,9 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
 
         await test.step("Confirm note is not exported in XML on publish page", async () => {
           await navigateToPublication(pageWithBghUser, documentNumber)
-          await expect(
-            pageWithBghUser.getByText("XML Vorschau der Veröffentlichung"),
-          ).toBeVisible()
+          await expect(pageWithBghUser.getByText("XML Vorschau")).toBeVisible()
 
-          await pageWithBghUser
-            .getByText("XML Vorschau der Veröffentlichung")
-            .click()
+          await pageWithBghUser.getByText("XML Vorschau").click()
 
           await expect(
             pageWithBghUser.locator("span", { hasText: "<notiz>" }),

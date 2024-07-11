@@ -67,8 +67,7 @@ function publishDocumentUnit() {
   if (fieldsMissing.value) {
     frontendError.value = {
       title: "Es sind noch nicht alle Pflichtfelder befüllt.",
-      description:
-        "Die Dokumentationseinheit kann nicht veröffentlicht werden.",
+      description: "Die Dokumentationseinheit kann nicht übergeben werden.",
     }
   } else {
     emits("publishDocument")
@@ -180,7 +179,7 @@ const fieldsMissing = computed(() => {
 
 <template>
   <div class="flex-start flex max-w-[80rem] flex-col justify-start gap-40">
-    <h1 class="ds-heading-02-reg">Veröffentlichen</h1>
+    <h1 class="ds-heading-02-reg">Übergabe an jDV</h1>
     <div aria-label="Plausibilitätsprüfung" class="flex flex-row gap-16">
       <div class="w-[15.625rem]">
         <p class="ds-subhead">Plausibilitätsprüfung</p>
@@ -319,39 +318,39 @@ const fieldsMissing = computed(() => {
       as-column
       class="border-b-1 border-r-1 border-gray-400 bg-white p-10"
       :data-set="preview"
-      header="XML Vorschau der Veröffentlichung"
+      header="XML Vorschau"
       header-class="font-bold"
       :is-expanded="false"
-      title="XML Vorschau der Veröffentlichung"
+      title="XML Vorschau"
     >
       <CodeSnippet title="" :xml="preview.xml" />
     </ExpandableContent>
     <InfoModal
       v-if="errorMessage"
-      aria-label="Fehler bei Veröffentlichung"
+      aria-label="Fehler bei jDV Übergabe"
       class="mt-8"
       :description="errorMessage.description"
       :title="errorMessage.title"
     />
     <InfoModal
       v-if="succeedMessage"
-      aria-label="Erfolg der Veröffentlichung"
+      aria-label="Erfolg der jDV Übergabe"
       class="mt-8"
       v-bind="succeedMessage"
       :status="InfoStatus.SUCCEED"
     />
     <TextButton
-      aria-label="Dokumentationseinheit veröffentlichen"
+      aria-label="Dokumentationseinheit an jDV übergeben"
       button-type="secondary"
       class="w-fit"
       :icon="IconPublish"
-      label="Dokumentationseinheit veröffentlichen"
+      label="Dokumentationseinheit an jDV übergeben"
       @click="publishDocumentUnit"
     />
-    <div aria-label="Letzte Veröffentlichungen" class="flex flex-col gap-24">
-      <h2 class="ds-heading-03-reg">Letzte Veröffentlichungen</h2>
+    <div aria-label="Letzte Ereignisse" class="flex flex-col gap-24">
+      <h2 class="ds-heading-03-reg">Letzte Ereignisse</h2>
       <p v-if="isFirstTimePublication">
-        Diese Dokumentationseinheit wurde bisher nicht veröffentlicht
+        Diese Dokumentationseinheit wurde bisher nicht an die jDV übergeben
       </p>
       <div v-else class="flex flex-col gap-24">
         <div v-for="(item, index) in publicationLog" :key="index">

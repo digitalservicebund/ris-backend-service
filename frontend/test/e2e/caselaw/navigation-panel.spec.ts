@@ -70,7 +70,7 @@ test.describe("test navigation panel", () => {
     ).toBeVisible()
     await page.keyboard.press("Tab")
     await expect(
-      page.getByRole("link", { name: "Veröffentlichen" }),
+      page.getByRole("link", { name: "Übergabe an jDV" }),
     ).toBeFocused()
     await page.keyboard.press("Enter")
     await expect(page.getByText("Plausibilitätsprüfung")).toBeVisible()

@@ -74,9 +74,9 @@ export const navigateToPublication = async (
   page: Page,
   documentNumber: string,
 ) => {
-  await test.step("Navigate to 'Veröffentlichen'", async () => {
+  await test.step("Navigate to 'Übergabe an jDV'", async () => {
     await page.goto(`/caselaw/documentunit/${documentNumber}/publication`)
-    await expect(page.locator("h1:has-text('Veröffentlichen')")).toBeVisible({
+    await expect(page.locator("h1:has-text('Übergabe an jDV')")).toBeVisible({
       timeout: 15000, // for backend warm up
     })
   })
@@ -88,7 +88,7 @@ export const publishDocumentationUnit = async (
 ) => {
   await navigateToPublication(page, documentNumber)
   await page
-    .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
+    .locator("[aria-label='Dokumentationseinheit an jDV übergeben']")
     .click()
   await expect(page.getByText("Email wurde versendet")).toBeVisible()
 

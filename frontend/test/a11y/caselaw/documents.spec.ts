@@ -74,7 +74,7 @@ test.describe("a11y of publication page (/caselaw/documentunit/{documentNumber}/
   test("publication not possible", async ({ page, documentNumber }) => {
     await navigateToPublication(page, documentNumber)
     await page
-      .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
+      .locator("[aria-label='Dokumentationseinheit an jDV übergeben']")
       .click()
     await expect(
       page.getByText("Es sind noch nicht alle Pflichtfelder befüllt."),
