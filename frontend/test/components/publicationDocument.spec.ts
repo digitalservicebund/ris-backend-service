@@ -1,5 +1,7 @@
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, fireEvent, screen } from "@testing-library/vue"
+import { Stubs } from "@vue/test-utils/dist/types"
 import { createRouter, createWebHistory } from "vue-router"
 import PublicationDocument from "@/components/PublicationDocument.vue"
 import DocumentUnit from "@/domain/documentUnit"
@@ -25,47 +27,41 @@ const router = createRouter({
   ],
 })
 
-const setupWithPublishedDocument = () =>
-  render(PublicationDocument, {
-    props: {
-      documentUnit: new DocumentUnit("123", { documentNumber: "foo" }),
-      publicationLog: [
-        {
-          type: PublicationHistoryRecordType.PUBLICATION,
-          xml: '<?xml version="1.0"?>\n<!DOCTYPE juris-r SYSTEM "juris-r.dtd">\n<xml>content</xml>',
-          statusMessages: ["success"],
-          statusCode: "200",
-          receiverAddress: "receiver address",
-          mailSubject: "mail subject",
-          date: "01.02.2000",
-        },
-      ],
-    },
-    global: {
-      plugins: [router],
-    },
-  })
+function renderComponent(
+  options: {
+    props?: unknown
+    documentUnit?: DocumentUnit
+    stubs?: Stubs
+  } = {},
+) {
+  const user = userEvent.setup()
 
-const setupWithAllRequiredFields = () =>
-  render(PublicationDocument, {
-    props: {
-      documentUnit: new DocumentUnit("123", {
-        coreData: {
-          fileNumbers: ["foo"],
-          court: { type: "type", location: "location", label: "label" },
-          decisionDate: "2022-02-01",
-          legalEffect: "legalEffect",
-          documentType: {
-            jurisShortcut: "ca",
-            label: "category",
-          },
-        },
-      }),
-    },
-    global: {
-      plugins: [router],
-    },
-  })
+  return {
+    user,
+    ...render(PublicationDocument, {
+      props: options.props ?? {},
+      global: {
+        plugins: [
+          [router],
+          [
+            createTestingPinia({
+              initialState: {
+                docunitStore: {
+                  documentUnit:
+                    options.documentUnit ??
+                    new DocumentUnit("123", {
+                      documentNumber: "foo",
+                    }),
+                },
+              },
+            }),
+          ],
+        ],
+        stubs: options.stubs ?? undefined,
+      },
+    }),
+  }
+}
 
 describe("PublicationDocument:", () => {
   vi.spyOn(publishService, "getPreview").mockImplementation(() =>
@@ -80,7 +76,25 @@ describe("PublicationDocument:", () => {
 
   describe("renders plausibility check", () => {
     it("with all required fields filled", async () => {
-      setupWithAllRequiredFields()
+      renderComponent({
+        documentUnit: new DocumentUnit("123", {
+          documentNumber: "foo",
+          coreData: {
+            fileNumbers: ["foo"],
+            court: {
+              type: "type",
+              location: "location",
+              label: "label",
+            },
+            decisionDate: "2022-02-01",
+            legalEffect: "legalEffect",
+            documentType: {
+              jurisShortcut: "ca",
+              label: "category",
+            },
+          },
+        }),
+      })
 
       expect(
         screen.getByText("Alle Pflichtfelder sind korrekt ausgefüllt"),
@@ -96,55 +110,35 @@ describe("PublicationDocument:", () => {
     })
 
     it("render preview error", async () => {
-      render(PublicationDocument, {
+      renderComponent({
         props: {
-          documentUnit: new DocumentUnit("123", {
-            coreData: {
-              fileNumbers: ["foo"],
-              court: { type: "type", location: "location", label: "label" },
-              decisionDate: "2022-02-01",
-              legalEffect: "legalEffect",
-              documentType: {
-                jurisShortcut: "ca",
-                label: "category",
-              },
-            },
-          }),
           errorMessage: {
             title: "preview error",
             description: "error message description",
           },
-        },
-        global: {
-          plugins: [router],
         },
       })
       expect(await screen.findByText("preview error")).toBeInTheDocument()
     })
 
     it("with required fields missing", async () => {
-      render(PublicationDocument, {
-        props: {
-          documentUnit: new DocumentUnit("123", {
-            documentNumber: "foo",
-            contentRelatedIndexing: {
-              norms: [
-                new NormReference({
-                  normAbbreviationRawValue: "ABC",
-                  singleNorms: [
-                    new SingleNorm({
-                      singleNorm: "§ 1",
-                      legalForce: new LegalForce(),
-                    }),
-                  ],
-                }),
-              ],
-            },
-          }),
-        },
-        global: {
-          plugins: [router],
-        },
+      renderComponent({
+        documentUnit: new DocumentUnit("123", {
+          documentNumber: "foo",
+          contentRelatedIndexing: {
+            norms: [
+              new NormReference({
+                normAbbreviationRawValue: "ABC",
+                singleNorms: [
+                  new SingleNorm({
+                    singleNorm: "§ 1",
+                    legalForce: new LegalForce(),
+                  }),
+                ],
+              }),
+            ],
+          },
+        }),
       })
       expect(
         await screen.findByText(
@@ -168,9 +162,6 @@ describe("PublicationDocument:", () => {
 
     it("'Rubriken bearbeiten' button links back to categories", async () => {
       render(PublicationDocument, {
-        props: {
-          documentUnit: new DocumentUnit("123", { documentNumber: "foo" }),
-        },
         global: {
           plugins: [router],
         },
@@ -188,7 +179,25 @@ describe("PublicationDocument:", () => {
 
   describe("on press 'Dokumentationseinheit veröffentlichen'", () => {
     it("publishes successfully", async () => {
-      const { emitted } = setupWithAllRequiredFields()
+      const { emitted } = renderComponent({
+        documentUnit: new DocumentUnit("123", {
+          documentNumber: "foo",
+          coreData: {
+            fileNumbers: ["foo"],
+            court: {
+              type: "type",
+              location: "location",
+              label: "label",
+            },
+            decisionDate: "2022-02-01",
+            legalEffect: "legalEffect",
+            documentType: {
+              jurisShortcut: "ca",
+              label: "category",
+            },
+          },
+        }),
+      })
       const publishButton = screen.getByRole("button", {
         name: "Dokumentationseinheit veröffentlichen",
       })
@@ -198,9 +207,8 @@ describe("PublicationDocument:", () => {
     })
 
     it("renders error modal from backend", async () => {
-      render(PublicationDocument, {
+      renderComponent({
         props: {
-          documentUnit: new DocumentUnit("123", { documentNumber: "foo" }),
           publishResult: {
             xml: "xml",
             statusMessages: ["error message 1", "error message 2"],
@@ -214,9 +222,6 @@ describe("PublicationDocument:", () => {
             description: "error message description",
           },
         },
-        global: {
-          plugins: [router],
-        },
       })
 
       expect(
@@ -228,14 +233,7 @@ describe("PublicationDocument:", () => {
     })
 
     it("renders error modal from frontend", async () => {
-      render(PublicationDocument, {
-        props: {
-          documentUnit: new DocumentUnit("123", { documentNumber: "foo" }),
-        },
-        global: {
-          plugins: [router],
-        },
-      })
+      renderComponent()
 
       const publishButton = screen.getByRole("button", {
         name: "Dokumentationseinheit veröffentlichen",
@@ -255,7 +253,21 @@ describe("PublicationDocument:", () => {
 
   describe("last published xml", () => {
     it("with earlier published document unit", async () => {
-      setupWithPublishedDocument()
+      renderComponent({
+        props: {
+          publicationLog: [
+            {
+              type: PublicationHistoryRecordType.PUBLICATION,
+              xml: '<?xml version="1.0"?>\n<!DOCTYPE juris-r SYSTEM "juris-r.dtd">\n<xml>content</xml>',
+              statusMessages: ["success"],
+              statusCode: "200",
+              receiverAddress: "receiver address",
+              mailSubject: "mail subject",
+              date: "01.02.2000",
+            },
+          ],
+        },
+      })
       expect(
         screen.getByLabelText("Letzte Veröffentlichungen"),
       ).toHaveTextContent(
@@ -264,14 +276,7 @@ describe("PublicationDocument:", () => {
     })
 
     it("without earlier published document unit", async () => {
-      render(PublicationDocument, {
-        props: {
-          documentUnit: new DocumentUnit("123", { documentNumber: "foo" }),
-        },
-        global: {
-          plugins: [router],
-        },
-      })
+      renderComponent()
       expect(
         screen.getByLabelText("Letzte Veröffentlichungen"),
       ).toHaveTextContent(
@@ -281,27 +286,22 @@ describe("PublicationDocument:", () => {
   })
 
   it("with preview stubbing", async () => {
-    render(PublicationDocument, {
-      props: {
-        documentUnit: new DocumentUnit("123", {
-          coreData: {
-            fileNumbers: ["foo"],
-            court: { type: "type", location: "location", label: "label" },
-            decisionDate: "2022-02-01",
-            legalEffect: "legalEffect",
-            documentType: {
-              jurisShortcut: "ca",
-              label: "category",
-            },
+    renderComponent({
+      documentUnit: new DocumentUnit("123", {
+        coreData: {
+          fileNumbers: ["foo"],
+          court: { type: "type", location: "location", label: "label" },
+          decisionDate: "2022-02-01",
+          legalEffect: "legalEffect",
+          documentType: {
+            jurisShortcut: "ca",
+            label: "category",
           },
-        }),
-      },
-      global: {
-        plugins: [router],
-        stubs: {
-          CodeSnippet: {
-            template: '<div data-testid="code-snippet"/>',
-          },
+        },
+      }),
+      stubs: {
+        CodeSnippet: {
+          template: '<div data-testid="code-snippet"/>',
         },
       },
     })
@@ -319,20 +319,8 @@ describe("PublicationDocument:", () => {
   })
 
   it("with stubbing", () => {
-    const { container } = render(PublicationDocument, {
+    const { container } = renderComponent({
       props: {
-        documentUnit: new DocumentUnit("123", {
-          coreData: {
-            fileNumbers: ["foo"],
-            court: { type: "type", location: "location", label: "label" },
-            decisionDate: "2022-02-01",
-            legalEffect: "legalEffect",
-            documentType: {
-              jurisShortcut: "ca",
-              label: "category",
-            },
-          },
-        }),
         publicationLog: [
           {
             type: PublicationHistoryRecordType.PUBLICATION,
@@ -345,12 +333,21 @@ describe("PublicationDocument:", () => {
           },
         ],
       },
-      global: {
-        plugins: [router],
-        stubs: {
-          CodeSnippet: {
-            template: '<div data-testid="code-snippet"/>',
+      documentUnit: new DocumentUnit("123", {
+        coreData: {
+          fileNumbers: ["foo"],
+          court: { type: "type", location: "location", label: "label" },
+          decisionDate: "2022-02-01",
+          legalEffect: "legalEffect",
+          documentType: {
+            jurisShortcut: "ca",
+            label: "category",
           },
+        },
+      }),
+      stubs: {
+        CodeSnippet: {
+          template: '<div data-testid="code-snippet"/>',
         },
       },
     })
