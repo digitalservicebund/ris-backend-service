@@ -38,7 +38,7 @@ jobs:
           java-version: "17.0"
           distribution: "temurin"
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@87bf5ca2eab41bc2978d93f6cb0603c36a44fd08
+        uses: gradle/actions/setup-gradle@e5bbd4c7421db58aef211e03513bcfe553c6843f
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
       - name: Run backend tests
@@ -73,14 +73,14 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Validate gradle wrapper
-        uses: gradle/actions/wrapper-validation@87bf5ca2eab41bc2978d93f6cb0603c36a44fd08
+        uses: gradle/actions/wrapper-validation@e5bbd4c7421db58aef211e03513bcfe553c6843f
       - name: Set up JDK
         uses: actions/setup-java@fd08b9c8dc6f530393a204a04e1f05101a5d00fd
         with:
           java-version: "17.0"
           distribution: "temurin"
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@87bf5ca2eab41bc2978d93f6cb0603c36a44fd08
+        uses: gradle/actions/setup-gradle@e5bbd4c7421db58aef211e03513bcfe553c6843f
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
       - name: Build backend image
@@ -719,7 +719,7 @@ jobs:
           distribution: "temurin"
           cache: gradle
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@87bf5ca2eab41bc2978d93f6cb0603c36a44fd08
+        uses: gradle/actions/setup-gradle@e5bbd4c7421db58aef211e03513bcfe553c6843f
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
       - name: Migrate database for Entity–relationship model
