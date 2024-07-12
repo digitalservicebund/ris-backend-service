@@ -152,7 +152,7 @@ test.describe(
           await expect(page.getByText("Die ist ein Test")).toBeVisible()
         })
 
-        await test.step("edit and save note with long text and scroll within note", async () => {
+        await test.step("edit and save note with long text", async () => {
           await page.getByLabel("Notiz anzeigen").click()
           const longNoteText = `RISDEV-4230
 
