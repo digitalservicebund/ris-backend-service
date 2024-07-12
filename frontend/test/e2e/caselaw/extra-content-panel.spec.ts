@@ -194,19 +194,22 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
           )
         })
 
-        await test.step("open document with attachment and no note, check that attachment is displayed in open panel", async () => {
+        await test.step("delete note from document and check that it is not displayed", async () => {
           await navigateToCategories(page, documentNumber)
           await page.getByLabel("Notiz anzeigen").click()
           await fillInput(page, "Notiz Eingabefeld", "")
           await page.getByLabel("Speichern Button").click()
-          await page.waitForEvent("requestfinished")
+          await expect(page.getByLabel("Notiz Eingabefeld")).toHaveValue("")
+        })
+
+        await test.step("prepare document with attachment", async () => {
           await navigateToFiles(page, documentNumber)
           await uploadTestfile(page, "sample.docx")
           await expect(page.getByText("Die ist ein Test")).toBeVisible()
+        })
 
-          await page.waitForEvent("requestfinished")
+        await test.step("open document with attachment and no note, check that attachment is displayed in open panel", async () => {
           await navigateToSearch(page, { navigationBy: "click" })
-
           await navigateToCategories(page, documentNumber)
 
           await expect(page.getByText("Die ist ein Test")).toBeVisible()
