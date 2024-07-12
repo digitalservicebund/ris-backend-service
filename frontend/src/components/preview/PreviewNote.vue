@@ -13,7 +13,7 @@ const props = defineProps<{
   <PreviewRow v-if="!StringsUtil.isEmpty(props.note)" data-testid="note">
     <PreviewCategory>Notiz</PreviewCategory>
     <PreviewContent>
-      {{ props.note }}
+      <p class="whitespace-pre-wrap">{{ props.note }}</p>
     </PreviewContent>
   </PreviewRow>
 </template>
