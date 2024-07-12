@@ -34,8 +34,10 @@ test.describe(
 
           await page.getByLabel("Seitenpanel öffnen").click()
           await expect(page).toHaveURL(/showAttachmentPanel=true/)
-          await expect(page.getByText("Notiz")).toBeVisible()
           await expect(page.getByLabel("Notiz anzeigen")).toBeVisible()
+          await expect(page.getByLabel("Dokumente anzeigen")).toBeVisible()
+          await expect(page.getByText("Notiz")).toBeVisible()
+          await expect(page.getByLabel("Notiz Eingabefeld")).toHaveValue("")
           await page.getByLabel("Dokumente anzeigen").click()
           await expect(
             page.getByText(
