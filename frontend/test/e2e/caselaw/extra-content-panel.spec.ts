@@ -131,7 +131,7 @@ test.describe(
           // Note is displayed in preview tab, label is above value
           await expect(
             page.locator(
-              "div[data-testid='preview'] div:text('some text'):below(div:text('Notiz'))",
+              "div[data-testid='preview'] p:text('some text'):below(div:text('Notiz'))",
             ),
           ).toBeVisible()
         })
