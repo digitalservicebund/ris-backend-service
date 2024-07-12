@@ -1,16 +1,18 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.fge.jsonpatch.JsonPatch;
-import com.github.fge.jsonpatch.JsonPatchException;
-import com.github.fge.jsonpatch.JsonPatchOperation;
-import com.github.fge.jsonpatch.diff.JsonDiff;
+import com.gravity9.jsonpatch.AddOperation;
+import com.gravity9.jsonpatch.JsonPatch;
+import com.gravity9.jsonpatch.JsonPatchException;
+import com.gravity9.jsonpatch.JsonPatchOperation;
+import com.gravity9.jsonpatch.RemoveOperation;
+import com.gravity9.jsonpatch.diff.JsonDiff;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitPatchRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitPatchDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.MergeableJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import java.util.ArrayList;
@@ -45,9 +47,13 @@ public class DatabasePatchMapperService implements PatchMapperService {
    * @return the updated entity
    */
   @Override
-  public <T> T applyPatchToEntity(MergeableJsonPatch patch, T targetEntity, Class<T> entityType)
+  public <T> T applyPatchToEntity(JsonPatch patch, T targetEntity, Class<T> entityType)
       throws JsonProcessingException, JsonPatchException {
     return objectMapper.treeToValue(applyPatch(patch, targetEntity), entityType);
+  }
+
+  private <T> JsonNode applyPatch(JsonPatch patch, T targetEntity) throws JsonPatchException {
+    return patch.apply(objectMapper.convertValue(targetEntity, JsonNode.class));
   }
 
   @Override
@@ -59,58 +65,12 @@ public class DatabasePatchMapperService implements PatchMapperService {
   }
 
   @Override
-  public MergeableJsonPatch getDiffPatch(DocumentUnit existed, DocumentUnit updated) {
-    return objectMapper.convertValue(findDiff(existed, updated), MergeableJsonPatch.class);
-  }
-
-  private <T> JsonNode applyPatch(MergeableJsonPatch patch, T targetEntity)
-      throws JsonPatchException {
-    return patch.apply(objectMapper.convertValue(targetEntity, JsonNode.class));
+  public JsonPatch getDiffPatch(DocumentUnit existed, DocumentUnit updated) {
+    return objectMapper.convertValue(findDiff(existed, updated), JsonPatch.class);
   }
 
   @Override
-  public void savePatch(
-      RisJsonPatch patch, UUID documentationUnitId, Long documentationUnitVersion) {
-    try {
-      String patchJson = objectMapper.writeValueAsString(patch.patch());
-      DocumentationUnitPatchDTO dto =
-          DocumentationUnitPatchDTO.builder()
-              .documentationUnitId(documentationUnitId)
-              .documentationUnitVersion(
-                  documentationUnitVersion == null ? 1 : documentationUnitVersion)
-              .patch(patchJson)
-              .build();
-      repository.save(dto);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  @Override
-  public RisJsonPatch calculatePatch(
-      UUID documentationUnitId,
-      Long frontendDocumentationUnitVersion,
-      Long newDocumentationUnitVersion) {
-    MergeableJsonPatch mergedPatch = new MergeableJsonPatch();
-    repository
-        .findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
-            documentationUnitId, frontendDocumentationUnitVersion)
-        .forEach(
-            patch -> {
-              try {
-                MergeableJsonPatch jsonPatch =
-                    objectMapper.readValue(patch.getPatch(), MergeableJsonPatch.class);
-                mergedPatch.addOperations(jsonPatch.getOperations());
-              } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-              }
-            });
-
-    return new RisJsonPatch(newDocumentationUnitVersion, mergedPatch, Collections.emptyList());
-  }
-
-  @Override
-  public List<String> removePatchForSamePath(MergeableJsonPatch patch1, MergeableJsonPatch patch2) {
+  public JsonPatch removePatchForSamePath(JsonPatch patch1, JsonPatch patch2) {
     Map<String, List<JsonPatchOperation>> pathList1 =
         patch1.getOperations().stream()
             .collect(
@@ -129,13 +89,102 @@ public class DatabasePatchMapperService implements PatchMapperService {
                     }));
 
     List<String> errorPaths = new ArrayList<>();
+    List<JsonPatchOperation> operations = new ArrayList<>(patch1.getOperations());
     for (Entry<String, List<JsonPatchOperation>> entry : pathList2.entrySet()) {
       if (pathList1.containsKey(entry.getKey())) {
-        patch1.getOperations().removeAll(pathList1.get(entry.getKey()));
+        List<JsonPatchOperation> toRemove = pathList1.get(entry.getKey());
+        toRemove.forEach(operations::remove);
         errorPaths.add(entry.getKey());
       }
     }
 
-    return errorPaths;
+    return new JsonPatch(operations);
+  }
+
+  @Override
+  public void savePatch(JsonPatch patch, UUID documentationUnitId, Long documentationUnitVersion) {
+    try {
+      String patchJson = objectMapper.writeValueAsString(patch);
+      DocumentationUnitPatchDTO dto =
+          DocumentationUnitPatchDTO.builder()
+              .documentationUnitId(documentationUnitId)
+              .documentationUnitVersion(
+                  documentationUnitVersion == null ? 1 : documentationUnitVersion)
+              .patch(patchJson)
+              .build();
+      repository.save(dto);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public RisJsonPatch calculatePatch(
+      UUID documentationUnitId,
+      Long frontendDocumentationUnitVersion,
+      Long newDocumentationUnitVersion) {
+    List<JsonPatchOperation> operations = new ArrayList<>();
+
+    repository
+        .findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
+            documentationUnitId, frontendDocumentationUnitVersion)
+        .forEach(
+            patch -> {
+              try {
+                JsonPatch jsonPatch = objectMapper.readValue(patch.getPatch(), JsonPatch.class);
+                operations.addAll(jsonPatch.getOperations());
+              } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+              }
+            });
+
+    return new RisJsonPatch(
+        newDocumentationUnitVersion, new JsonPatch(operations), Collections.emptyList());
+  }
+
+  @Override
+  public RisJsonPatch handlePatchForSamePath(
+      DocumentUnit existingDocumentationUnit, JsonPatch patch1, JsonPatch patch2) {
+    Map<String, List<JsonPatchOperation>> pathList1 =
+        patch1.getOperations().stream()
+            .collect(
+                Collectors.groupingBy(
+                    op -> {
+                      JsonNode operation = objectMapper.convertValue(op, JsonNode.class);
+                      return operation.get("path").textValue();
+                    }));
+    Map<String, List<JsonPatchOperation>> pathList2 =
+        patch2.getOperations().stream()
+            .collect(
+                Collectors.groupingBy(
+                    op -> {
+                      JsonNode operation = objectMapper.convertValue(op, JsonNode.class);
+                      return operation.get("path").textValue();
+                    }));
+
+    List<String> errorPaths = new ArrayList<>();
+    List<JsonPatchOperation> operations = new ArrayList<>(patch1.getOperations());
+    for (Entry<String, List<JsonPatchOperation>> entry : pathList2.entrySet()) {
+      if (pathList1.containsKey(entry.getKey())) {
+        List<JsonPatchOperation> toRemove = pathList1.get(entry.getKey());
+        toRemove.forEach(
+            patch -> {
+              if (patch instanceof AddOperation) {
+                operations.add(new RemoveOperation(entry.getKey()));
+              } else if (patch instanceof RemoveOperation) {
+                JsonNode node =
+                    objectMapper.convertValue(existingDocumentationUnit, JsonNode.class);
+                JsonNode value =
+                    node.at(JsonPointer.valueOf(entry.getKey()));
+                operations.add(new AddOperation(entry.getKey(), value));
+              }
+              operations.remove(patch);
+            });
+
+        errorPaths.add(entry.getKey());
+      }
+    }
+
+    return new RisJsonPatch(0L, new JsonPatch(operations), errorPaths);
   }
 }

@@ -1,27 +1,27 @@
 package de.bund.digitalservice.ris.caselaw.domain.mapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.fge.jsonpatch.JsonPatch;
-import com.github.fge.jsonpatch.JsonPatchException;
+import com.gravity9.jsonpatch.JsonPatch;
+import com.gravity9.jsonpatch.JsonPatchException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.MergeableJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
-import java.util.List;
 import java.util.UUID;
 
 /** A service to enable partial updates of object by patch */
 public interface PatchMapperService {
   RisJsonPatch calculatePatch(UUID uuid, Long documentationUnitVersion, Long newVersion);
 
-  List<String> removePatchForSamePath(MergeableJsonPatch patch, MergeableJsonPatch patch1);
+  RisJsonPatch handlePatchForSamePath(
+      DocumentUnit existingDocumentationUnit, JsonPatch patch, JsonPatch patch1);
 
-  void savePatch(RisJsonPatch patch, UUID uuid, Long version);
+  void savePatch(JsonPatch patch, UUID uuid, Long version);
 
-  <T> T applyPatchToEntity(
-      MergeableJsonPatch patch, T existingDocumentationUnit, Class<T> documentUnitClass)
+  <T> T applyPatchToEntity(JsonPatch patch, T existingDocumentationUnit, Class<T> documentUnitClass)
       throws JsonProcessingException, JsonPatchException;
 
   JsonPatch findDiff(DocumentUnit existed, DocumentUnit updated);
 
-  MergeableJsonPatch getDiffPatch(DocumentUnit existed, DocumentUnit updated);
+  JsonPatch getDiffPatch(DocumentUnit existed, DocumentUnit updated);
+
+  JsonPatch removePatchForSamePath(JsonPatch patch1, JsonPatch patch2);
 }

@@ -192,7 +192,7 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.17.2")
 
-    implementation("com.github.java-json-tools:json-patch:1.12")
+    implementation("com.gravity9:json-patch-path:2.0.2");
 
     implementation("io.micrometer:micrometer-registry-prometheus:1.13.2")
     implementation("io.micrometer:micrometer-core:1.13.2")

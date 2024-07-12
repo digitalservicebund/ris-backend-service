@@ -3,17 +3,16 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import static de.bund.digitalservice.ris.caselaw.domain.StringUtils.normalizeSpace;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.fge.jsonpatch.JsonPatchException;
+import com.gravity9.jsonpatch.JsonPatch;
+import com.gravity9.jsonpatch.JsonPatchException;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
-import de.bund.digitalservice.ris.caselaw.domain.exception.PatchForSamePathException;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -153,10 +152,7 @@ public class DocumentUnitService {
   }
 
   public RisJsonPatch updateDocumentUnit(UUID documentationUnitId, RisJsonPatch patch)
-      throws JsonPatchException,
-          JsonProcessingException,
-          DocumentationUnitNotExistsException,
-          PatchForSamePathException {
+      throws JsonPatchException, JsonProcessingException, DocumentationUnitNotExistsException {
 
     DocumentUnit existingDocumentationUnit = getByUuid(documentationUnitId);
 
@@ -165,36 +161,30 @@ public class DocumentUnitService {
       newVersion = existingDocumentationUnit.version() + 1;
     }
 
-    /*
+    RisJsonPatch newPatch = patchMapperService.calculatePatch(
+      existingDocumentationUnit.uuid(), patch.documentationUnitVersion(), newVersion
+    );
 
+    JsonPatch toUpdate = patchMapperService.removePatchForSamePath(patch.patch(), newPatch.patch());
 
-       RisJsonPatch newPatch =
-        patchMapperService.calculatePatch(
-            existingDocumentationUnit.uuid(), patch.documentationUnitVersion(), newVersion);
-    List<String> errorPaths =
-        patchMapperService.removePatchForSamePath(patch.patch(), newPatch.patch());
+    DocumentUnit patchedDocumentationUnit = patchMapperService.applyPatchToEntity(
+      toUpdate, existingDocumentationUnit, DocumentUnit.class
+    );
+
+    DocumentUnit updatedDocumentUnit = updateDocumentUnit(patchedDocumentationUnit);
+
+    JsonPatch diffJsonPatch = patchMapperService.getDiffPatch(existingDocumentationUnit, updatedDocumentUnit);
+
     patchMapperService.savePatch(
-        patch, existingDocumentationUnit.uuid(), existingDocumentationUnit.version());
+        diffJsonPatch, existingDocumentationUnit.uuid(), existingDocumentationUnit.version()
+    );
 
+    RisJsonPatch toFrontend = patchMapperService.handlePatchForSamePath(
+        existingDocumentationUnit, patch.patch(), newPatch.patch()
+    );
 
-     */
-
-    DocumentUnit updatedDocumentUnit =
-        updateDocumentUnit(
-            patchMapperService.applyPatchToEntity(
-                patch.patch(), existingDocumentationUnit, DocumentUnit.class));
-
-    MergeableJsonPatch oldChnagesSaved =
-        patchMapperService.getDiffPatch(updatedDocumentUnit, existingDocumentationUnit);
-    log.info("TODO: SAVE THIS PATCH: " + oldChnagesSaved.toString());
-
-    MergeableJsonPatch mergeableJsonPatch =
-        patchMapperService.getDiffPatch(existingDocumentationUnit, updatedDocumentUnit);
-
-    return RisJsonPatch.builder()
+    return toFrontend.toBuilder()
         .documentationUnitVersion(newVersion)
-        .patch(mergeableJsonPatch)
-        .errorPaths(Collections.emptyList()) // TODO: Rehandle how we want to collect errors.
         .build();
   }
 
