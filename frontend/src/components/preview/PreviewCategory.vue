@@ -10,7 +10,7 @@ const layout = inject(previewLayoutInjectionKey) || "wide"
     class="ds-body-01-reg min-w-[213px] px-16 text-gray-900"
     :class="{
       'w-min py-4': layout === 'wide',
-      'mb-[-2px] pt-4': layout === 'narrow',
+      'mb-[-2px] pt-6': layout === 'narrow',
     }"
   >
     <slot></slot>

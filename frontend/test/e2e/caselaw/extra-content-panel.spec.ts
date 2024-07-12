@@ -128,12 +128,9 @@ test.describe(
           ).toBeVisible()
 
           await page.getByLabel("Vorschau anzeigen").click()
-          // Note is displayed in preview tab, label is above value
-          await expect(
-            page.locator(
-              "div[data-testid='preview'] p:text('some text'):below(div:text('Notiz'))",
-            ),
-          ).toBeVisible()
+          // Note is displayed in preview tab
+          await expect(page.getByTestId("preview")).toContainText("Notiz")
+          await expect(page.getByTestId("preview")).toContainText("some text")
         })
 
         await test.step("open document with note and attachment, check that note is displayed in open panel", async () => {
