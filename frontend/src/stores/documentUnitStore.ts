@@ -48,7 +48,23 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
 
     if (patch.length === 0 && documentUnit.value.documentNumber) {
       // Even though there are no updates in the client, get the current version from backend
-      await loadDocumentUnit(documentUnit.value.documentNumber)
+      const response = await loadDocumentUnit(documentUnit.value.documentNumber)
+      if (response.data) {
+        return {
+          status: response.status,
+          data: {
+            documentationUnitVersion: response.data.version,
+            patch: [],
+            errorPaths: [],
+          },
+        }
+      } else {
+        return {
+          status: 404,
+          data: undefined,
+          error: errorMessages.DOCUMENT_UNIT_COULD_NOT_BE_LOADED,
+        }
+      }
     }
 
     const response = await documentUnitService.update(documentUnit.value.uuid, {
