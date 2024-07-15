@@ -29,15 +29,6 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
     return response as ServiceResponse<DocumentUnit>
   }
 
-  async function reloadDocumentUnit(): Promise<
-    ServiceResponse<DocumentUnit | undefined>
-  > {
-    if (documentUnit.value && documentUnit.value.documentNumber) {
-      return loadDocumentUnit(documentUnit.value.documentNumber)
-    }
-    return Promise.reject("Could not load empty document unit")
-  }
-
   async function updateDocumentUnit(): Promise<
     ServiceResponse<
       RisJsonPatch | FailedValidationServerResponse | DocumentUnit | undefined
@@ -57,10 +48,13 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
       documentUnit.value,
     )
 
-    if (patch.length === 0) {
-      return await reloadDocumentUnit()
+    if (patch.length === 0 && documentUnit.value.documentNumber) {
+      // Even though there are no updates in the client, get the current version from backend
+      const docUnitFromBackend = await loadDocumentUnit(
+        documentUnit.value.documentNumber,
+      )
+      return docUnitFromBackend
     }
-    console.log("not skipping update document unit")
 
     const response = await documentUnitService.update(documentUnit.value.uuid, {
       documentationUnitVersion: documentUnit.value.version,
@@ -93,6 +87,5 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
     documentUnit,
     loadDocumentUnit,
     updateDocumentUnit,
-    reloadDocumentUnit,
   }
 })

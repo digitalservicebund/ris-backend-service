@@ -167,9 +167,11 @@ async function createFromSearchQuery() {
     : []
   docUnit.coreData.decisionDate = dateFromQuery.value
   docUnit.coreData.court = courtFromQuery.value
-
+  await store.loadDocumentUnit(docUnit.documentNumber!)
   store.documentUnit = docUnit
+
   const updateResponse = await store.updateDocumentUnit()
+
   if (updateResponse.error) {
     createFromSearchQueryResponseError.value = updateResponse.error
     if (docUnit?.uuid) await service.delete(docUnit.uuid)

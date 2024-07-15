@@ -33,7 +33,8 @@ async function publishDocument() {
       title: "Email wurde versendet",
       description: "",
     }
-    await store.reloadDocumentUnit()
+    if (store.documentUnit?.documentNumber)
+      await store.loadDocumentUnit(store.documentUnit.documentNumber)
   } else {
     errorMessage.value = response.error
   }
