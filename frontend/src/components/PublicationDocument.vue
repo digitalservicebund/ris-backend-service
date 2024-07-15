@@ -83,16 +83,24 @@ const missingCoreDataFields = ref(
 
 //Required Previous Decision fields
 const missingPreviousDecisionFields = ref(
-  store
-    .documentUnit!.previousDecisions?.filter((previousDecision) => {
-      return getMissingPreviousDecisionFields(previousDecision).length > 0
-    })
-    .map((previousDecision) => {
-      return {
-        identifier: previousDecision.renderDecision,
-        missingFields: getMissingPreviousDecisionFields(previousDecision),
-      }
-    }),
+  store.documentUnit && store.documentUnit.previousDecisions
+    ? store.documentUnit.previousDecisions
+        .filter((previousDecision) => {
+          return (
+            getMissingPreviousDecisionFields(
+              previousDecision as PreviousDecision,
+            ).length > 0
+          )
+        })
+        .map((previousDecision) => {
+          return {
+            identifier: previousDecision.renderDecision,
+            missingFields: getMissingPreviousDecisionFields(
+              previousDecision as PreviousDecision,
+            ),
+          }
+        })
+    : [],
 )
 
 function getMissingPreviousDecisionFields(previousDecision: PreviousDecision) {
@@ -103,16 +111,23 @@ function getMissingPreviousDecisionFields(previousDecision: PreviousDecision) {
 
 //Required Ensuing Decision fields
 const missingEnsuingDecisionFields = ref(
-  store
-    .documentUnit!.ensuingDecisions?.filter((ensuingDecision) => {
-      return getMissingEnsuingDecisionFields(ensuingDecision).length > 0
-    })
-    .map((ensuingDecision) => {
-      return {
-        identifier: ensuingDecision.renderDecision,
-        missingFields: getMissingEnsuingDecisionFields(ensuingDecision),
-      }
-    }),
+  store.documentUnit && store.documentUnit.ensuingDecisions
+    ? store
+        .documentUnit!.ensuingDecisions?.filter((ensuingDecision) => {
+          return (
+            getMissingEnsuingDecisionFields(ensuingDecision as EnsuingDecision)
+              .length > 0
+          )
+        })
+        .map((ensuingDecision) => {
+          return {
+            identifier: ensuingDecision.renderDecision,
+            missingFields: getMissingEnsuingDecisionFields(
+              ensuingDecision as EnsuingDecision,
+            ),
+          }
+        })
+    : [],
 )
 
 function getMissingEnsuingDecisionFields(ensuingDecision: EnsuingDecision) {
@@ -150,18 +165,27 @@ const missingNormsFields = ref(
 
 //Required Active Citation fields
 const missingActiveCitationFields = ref(
-  store
-    .documentUnit!.contentRelatedIndexing?.activeCitations?.filter(
-      (activeCitation) => {
-        return getActiveCitationsFields(activeCitation).length > 0
-      },
-    )
-    .map((activeCitation) => {
-      return {
-        identifier: activeCitation.renderDecision,
-        missingFields: getActiveCitationsFields(activeCitation),
-      }
-    }),
+  store.documentUnit &&
+    store.documentUnit.contentRelatedIndexing &&
+    store.documentUnit.contentRelatedIndexing.activeCitations
+    ? store
+        .documentUnit!.contentRelatedIndexing?.activeCitations?.filter(
+          (activeCitation) => {
+            return (
+              getActiveCitationsFields(activeCitation as ActiveCitation)
+                .length > 0
+            )
+          },
+        )
+        .map((activeCitation) => {
+          return {
+            identifier: activeCitation.renderDecision,
+            missingFields: getActiveCitationsFields(
+              activeCitation as ActiveCitation,
+            ),
+          }
+        })
+    : [],
 )
 
 function getActiveCitationsFields(activeCitation: ActiveCitation) {
