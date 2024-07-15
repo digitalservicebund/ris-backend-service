@@ -17,16 +17,14 @@ const data = computed(() => {
   )
 })
 
-const handleUpdateValueDocumentUnitTexts = async (
-  updatedValue: [keyof Texts, string],
-) => {
+const updateValueByTextId = async (id: keyof Texts, updatedText: string) => {
   const divElem = document.createElement("div")
-  divElem.innerHTML = updatedValue[1]
+  divElem.innerHTML = updatedText
   const hasImgElem = divElem.getElementsByTagName("img").length > 0
   const hasTable = divElem.getElementsByTagName("table").length > 0
   const hasInnerText = divElem.innerText.length > 0
-  store.documentUnit!.texts[updatedValue[0]] =
-    hasInnerText || hasImgElem || hasTable ? updatedValue[1] : ""
+  store.documentUnit!.texts[id] =
+    hasInnerText || hasImgElem || hasTable ? updatedText : ""
 }
 </script>
 
@@ -48,7 +46,7 @@ const handleUpdateValueDocumentUnitTexts = async (
           editable
           :field-size="item.fieldSize"
           :value="item.value"
-          @update-value="handleUpdateValueDocumentUnitTexts"
+          @update-value="updateValueByTextId(item.id, $event)"
         />
 
         <TextInput
@@ -57,7 +55,7 @@ const handleUpdateValueDocumentUnitTexts = async (
           :aria-label="item.aria"
           :model-value="item.value"
           size="medium"
-          @update:model-value="handleUpdateValueDocumentUnitTexts"
+          @update-value="updateValueByTextId(item.id, $event)"
         />
       </div>
     </div>
