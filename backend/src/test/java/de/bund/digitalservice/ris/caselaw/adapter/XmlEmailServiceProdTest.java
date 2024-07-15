@@ -9,12 +9,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExportResult;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
-import de.bund.digitalservice.ris.caselaw.domain.XmlHandoverMail;
-import de.bund.digitalservice.ris.caselaw.domain.XmlHandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import java.time.Clock;
 import java.time.Instant;
@@ -37,7 +37,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@Import({XmlEMailService.class})
+@Import({HandoverMailService.class})
 @TestPropertySource(
     properties = {
       "mail.exporter.senderAddress=export@neuris",
@@ -56,8 +56,8 @@ class XmlEmailServiceProdTest {
   private static final String PROD_MAIL_SUBJECT =
       "id=juris name=NeuRIS da=R df=X dt=N mod=T ld=" + DELIVER_DATE + " vg=test-document-number";
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
-  private static final XmlHandoverMail EXPECTED_BEFORE_SAVE_PROD =
-      XmlHandoverMail.builder()
+  private static final HandoverMail EXPECTED_BEFORE_SAVE_PROD =
+      HandoverMail.builder()
           .documentUnitUuid(TEST_UUID)
           .receiverAddress(RECEIVER_ADDRESS)
           .mailSubject(PROD_MAIL_SUBJECT)
@@ -69,8 +69,8 @@ class XmlEmailServiceProdTest {
           .issuerAddress(ISSUER_ADDRESS)
           .build();
 
-  private static final XmlHandoverMail SAVED_XML_MAIL_PROD =
-      XmlHandoverMail.builder()
+  private static final HandoverMail SAVED_XML_MAIL_PROD =
+      HandoverMail.builder()
           .documentUnitUuid(TEST_UUID)
           .receiverAddress(RECEIVER_ADDRESS)
           .mailSubject(PROD_MAIL_SUBJECT)
@@ -86,11 +86,11 @@ class XmlEmailServiceProdTest {
 
   private DocumentUnit documentUnit;
 
-  @Autowired private XmlEMailService service;
+  @Autowired private HandoverMailService service;
 
   @MockBean private XmlExporter xmlExporter;
 
-  @MockBean private XmlHandoverRepository repository;
+  @MockBean private HandoverRepository repository;
 
   @MockBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
 

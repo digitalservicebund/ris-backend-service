@@ -4,12 +4,12 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.EmailService;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExportResult;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
-import de.bund.digitalservice.ris.caselaw.domain.XmlHandoverMail;
-import de.bund.digitalservice.ris.caselaw.domain.XmlHandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -26,15 +26,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+/** Implementation of the {@link EmailService} interface that sends juris-XML files via email. */
 @Service
-public class XmlEMailService implements EmailService {
+public class HandoverMailService implements EmailService {
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
   private final XmlExporter xmlExporter;
 
   private final HttpMailSender mailSender;
 
-  private final XmlHandoverRepository repository;
+  private final HandoverRepository repository;
 
   private final Environment env;
 
@@ -44,10 +45,10 @@ public class XmlEMailService implements EmailService {
   @Value("${mail.exporter.jurisUsername:invalid-user}")
   private String jurisUsername;
 
-  public XmlEMailService(
+  public HandoverMailService(
       XmlExporter xmlExporter,
       HttpMailSender mailSender,
-      XmlHandoverRepository repository,
+      HandoverRepository repository,
       Environment env) {
     this.xmlExporter = xmlExporter;
     this.mailSender = mailSender;
@@ -55,8 +56,17 @@ public class XmlEMailService implements EmailService {
     this.env = env;
   }
 
+  /**
+   * Hands over a documentation unit as XML to jDV via email.
+   *
+   * @param documentUnit the documentation unit to hand over
+   * @param receiverAddress the email address of the receiver
+   * @param issuerAddress the email address of the issuer
+   * @return the result of the handover
+   * @throws DocumentationUnitHandoverException if the XML export fails
+   */
   @Override
-  public XmlHandoverMail handOver(
+  public HandoverMail handOver(
       DocumentUnit documentUnit, String receiverAddress, String issuerAddress) {
     XmlExportResult xml;
     try {
@@ -67,21 +77,34 @@ public class XmlEMailService implements EmailService {
 
     String mailSubject = generateMailSubject(documentUnit);
 
-    XmlHandoverMail xmlHandoverMail =
+    HandoverMail handoverMail =
         generateXmlHandoverMail(
             documentUnit.uuid(), receiverAddress, mailSubject, xml, issuerAddress);
-    generateAndSendMail(xmlHandoverMail);
-    if (!xmlHandoverMail.success()) {
-      return xmlHandoverMail;
+    generateAndSendMail(handoverMail);
+    if (!handoverMail.success()) {
+      return handoverMail;
     }
-    return repository.save(xmlHandoverMail);
+    return repository.save(handoverMail);
   }
 
+  /**
+   * Returns the results of performed handover operations for a documentation unit.
+   *
+   * @param documentUnitUuid the UUID of the documentation unit
+   * @return a list of results of all handover operations for the documentation unit
+   */
   @Override
-  public List<XmlHandoverMail> getHandoverResult(UUID documentUnitUuid) {
+  public List<HandoverMail> getHandoverResult(UUID documentUnitUuid) {
     return repository.getHandoversByDocumentUnitUuid(documentUnitUuid);
   }
 
+  /**
+   * Generates a preview of the XML that would be sent via email.
+   *
+   * @param documentUnit the documentation unit
+   * @return the XML export result, containing the XML and possibly errors
+   * @throws DocumentationUnitHandoverException if the XML export fails
+   */
   @Override
   public XmlExportResult getXmlPreview(DocumentUnit documentUnit) {
     try {
@@ -113,41 +136,41 @@ public class XmlEMailService implements EmailService {
     return subject;
   }
 
-  private void generateAndSendMail(XmlHandoverMail xmlHandoverMail)
+  private void generateAndSendMail(HandoverMail handoverMail)
       throws DocumentationUnitHandoverException {
-    if (xmlHandoverMail == null) {
+    if (handoverMail == null) {
       throw new DocumentationUnitHandoverException("No xml mail is set");
     }
 
-    if (!xmlHandoverMail.success()) {
+    if (!handoverMail.success()) {
       return;
     }
 
-    if (xmlHandoverMail.receiverAddress() == null) {
+    if (handoverMail.receiverAddress() == null) {
       throw new DocumentationUnitHandoverException("No receiver mail address is set");
     }
 
     mailSender.sendMail(
         senderAddress,
-        xmlHandoverMail.receiverAddress(),
-        xmlHandoverMail.mailSubject(),
+        handoverMail.receiverAddress(),
+        handoverMail.mailSubject(),
         "neuris",
         Collections.singletonList(
             MailAttachment.builder()
-                .fileName(xmlHandoverMail.fileName())
-                .fileContent(xmlHandoverMail.xml())
+                .fileName(handoverMail.fileName())
+                .fileContent(handoverMail.xml())
                 .build()),
-        xmlHandoverMail.documentUnitUuid().toString());
+        handoverMail.documentUnitUuid().toString());
   }
 
-  private XmlHandoverMail generateXmlHandoverMail(
+  private HandoverMail generateXmlHandoverMail(
       UUID documentUnitUuid,
       String receiverAddress,
       String mailSubject,
       XmlExportResult xml,
       String issuerAddress) {
     var xmlHandoverMailBuilder =
-        XmlHandoverMail.builder()
+        HandoverMail.builder()
             .documentUnitUuid(documentUnitUuid)
             .success(xml.success())
             .statusMessages(xml.statusMessages());

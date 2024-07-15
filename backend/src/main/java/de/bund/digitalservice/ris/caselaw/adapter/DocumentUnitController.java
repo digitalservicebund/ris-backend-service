@@ -10,11 +10,12 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHandoverExcept
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExportResult;
-import de.bund.digitalservice.ris.caselaw.domain.XmlHandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
@@ -55,15 +56,19 @@ public class DocumentUnitController {
   private final AttachmentService attachmentService;
   private final ConverterService converterService;
 
+  private final HandoverService handoverService;
+
   public DocumentUnitController(
       DocumentUnitService service,
       UserService userService,
       AttachmentService attachmentService,
-      ConverterService converterService) {
+      ConverterService converterService,
+      HandoverService handoverService) {
     this.service = service;
     this.userService = userService;
     this.attachmentService = attachmentService;
     this.converterService = converterService;
+    this.handoverService = handoverService;
   }
 
   @GetMapping(value = "new", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -204,32 +209,55 @@ public class DocumentUnitController {
     }
   }
 
+  /**
+   * Hands over the documentation unit to jDV as XML via email.
+   *
+   * @param uuid UUID of the documentation unit
+   * @param oidcUser the logged-in user, used to forward the response email
+   * @return the email sent containing the XML or an empty response with status code 400 * if the
+   *     user is not authorized
+   */
   @PutMapping(value = "/{uuid}/handover", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
-  public ResponseEntity<XmlHandoverMail> handoverDocumentUnitAsEmail(
+  public ResponseEntity<HandoverMail> handoverDocumentUnitAsEmail(
       @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
 
     try {
-      XmlHandoverMail xmlHandoverMail =
-          service.handoverAsEmail(uuid, userService.getEmail(oidcUser));
-      return ResponseEntity.ok(xmlHandoverMail);
+      HandoverMail handoverMail =
+          handoverService.handoverAsEmail(uuid, userService.getEmail(oidcUser));
+      return ResponseEntity.ok(handoverMail);
     } catch (DocumentationUnitNotExistsException | DocumentationUnitHandoverException e) {
       log.error("Error handing over documentation unit '{}' as email", uuid, e);
       return ResponseEntity.internalServerError().build();
     }
   }
 
+  /**
+   * Get all events of a documentation unit (can be handover events, received handover reports,
+   * import/migration events)
+   *
+   * @param uuid UUID of the documentation unit
+   * @return ordered list of event records (newest first) or an empty response with status code 400
+   *     if the user is not authorized
+   */
   @GetMapping(value = "/{uuid}/handover", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
   public List<EventRecord> getEventLog(@PathVariable UUID uuid) {
-    return service.getEventLog(uuid);
+    return handoverService.getEventLog(uuid);
   }
 
+  /**
+   * Get the XML preview of a documentation unit.
+   *
+   * @param uuid UUID of the documentation unit
+   * @return the XML preview or an empty response with status code 400 if the user is not authorized
+   *     or an empty response if the documentation unit does not exist
+   */
   @GetMapping(value = "/{uuid}/preview-xml", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
   public XmlExportResult getXmlPreview(@PathVariable UUID uuid) {
     try {
-      return service.createPreviewXml(uuid);
+      return handoverService.createPreviewXml(uuid);
     } catch (DocumentationUnitNotExistsException e) {
       return null;
     }

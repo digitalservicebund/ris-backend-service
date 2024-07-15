@@ -4,11 +4,10 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface DatabaseXmlHandoverMailRepository extends JpaRepository<XmlHandoverMailDTO, Long> {
+/** Repository for performed jDV handover operations. */
+public interface DatabaseXmlHandoverMailRepository extends JpaRepository<HandoverMailDTO, Long> {
 
-  // TODO findTopByDocumentUnitIdOrderByCreatedDateDesc
-  XmlHandoverMailDTO findTopByDocumentUnitIdOrderByCreatedDateDesc(UUID documentUnitId);
+  HandoverMailDTO findTopByDocumentUnitIdOrderBySentDateDesc(UUID documentUnitId);
 
-  // TODO findAllByDocumentUnitIdOrderByCreatedDateDesc
-  List<XmlHandoverMailDTO> findAllByDocumentUnitIdOrderByCreatedDateDesc(UUID documentUnitId);
+  List<HandoverMailDTO> findAllByDocumentUnitIdOrderBySentDateDesc(UUID documentUnitId);
 }

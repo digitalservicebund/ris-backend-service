@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
 import lombok.Builder;
 
-/** Domain object for delta migration runs */
+/** Domain object for delta migration runs or import events */
 @Builder(toBuilder = true)
 public record DeltaMigration(
     String xml,

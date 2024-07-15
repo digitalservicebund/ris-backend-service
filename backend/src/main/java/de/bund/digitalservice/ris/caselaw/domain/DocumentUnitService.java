@@ -5,66 +5,37 @@ import static de.bund.digitalservice.ris.caselaw.domain.StringUtils.normalizeSpa
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.StringWriter;
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.ListUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 @Service
 @Slf4j
 public class DocumentUnitService {
 
   private final DocumentUnitRepository repository;
-  private final HandoverReportRepository handoverReportRepository;
   private final DocumentNumberService documentNumberService;
-  private final EmailService emailService;
-  private final DeltaMigrationRepository deltaMigrationRepository;
   private final AttachmentService attachmentService;
   private final DocumentNumberRecyclingService documentNumberRecyclingService;
   private final Validator validator;
 
-  @Value("${mail.exporter.recipientAddress:neuris@example.com}")
-  private String recipientAddress;
-
   public DocumentUnitService(
       DocumentUnitRepository repository,
       DocumentNumberService documentNumberService,
-      EmailService emailService,
-      DeltaMigrationRepository migrationService,
-      HandoverReportRepository handoverReportRepository,
       DocumentNumberRecyclingService documentNumberRecyclingService,
       Validator validator,
       AttachmentService attachmentService) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
-    this.emailService = emailService;
-    this.deltaMigrationRepository = migrationService;
-    this.handoverReportRepository = handoverReportRepository;
     this.documentNumberRecyclingService = documentNumberRecyclingService;
     this.validator = validator;
     this.attachmentService = attachmentService;
@@ -181,69 +152,6 @@ public class DocumentUnitService {
     return repository
         .findByUuid(documentUnit.uuid())
         .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnit.documentNumber()));
-  }
-
-  public XmlHandoverMail handoverAsEmail(UUID documentUnitUuid, String issuerAddress)
-      throws DocumentationUnitNotExistsException {
-
-    DocumentUnit documentUnit =
-        repository
-            .findByUuid(documentUnitUuid)
-            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnitUuid));
-
-    XmlHandoverMail mailResponse =
-        emailService.handOver(documentUnit, recipientAddress, issuerAddress);
-    if (!mailResponse.success()) {
-      log.warn("Failed to send mail for documentation unit {}", documentUnitUuid);
-    }
-
-    return mailResponse;
-  }
-
-  public XmlExportResult createPreviewXml(UUID documentUuid)
-      throws DocumentationUnitNotExistsException {
-    DocumentUnit documentUnit =
-        repository
-            .findByUuid(documentUuid)
-            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUuid));
-    return emailService.getXmlPreview(documentUnit);
-  }
-
-  public List<EventRecord> getEventLog(UUID documentUuid) {
-    List<EventRecord> list =
-        ListUtils.union(
-            emailService.getHandoverResult(documentUuid),
-            handoverReportRepository.getAllByDocumentUnitUuid(documentUuid));
-    var migration = deltaMigrationRepository.getLatestMigration(documentUuid);
-    if (migration != null) {
-      list.add(
-          migration.xml() != null
-              ? migration.toBuilder().xml(prettifyXml(migration.xml())).build()
-              : migration);
-    }
-    list.sort(Comparator.comparing(EventRecord::getDate).reversed());
-    return list;
-  }
-
-  public static String prettifyXml(String xml) {
-    try {
-      Transformer transformer = TransformerFactory.newDefaultInstance().newTransformer();
-      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-      transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-
-      Node node =
-          DocumentBuilderFactory.newDefaultInstance()
-              .newDocumentBuilder()
-              .parse(new ByteArrayInputStream(xml.getBytes()))
-              .getDocumentElement();
-
-      StreamResult result = new StreamResult(new StringWriter());
-      transformer.transform(new DOMSource(node), result);
-      return result.getWriter().toString();
-
-    } catch (TransformerException | IOException | ParserConfigurationException | SAXException e) {
-      return "Could not prettify XML";
-    }
   }
 
   public Slice<RelatedDocumentationUnit> searchLinkableDocumentationUnits(

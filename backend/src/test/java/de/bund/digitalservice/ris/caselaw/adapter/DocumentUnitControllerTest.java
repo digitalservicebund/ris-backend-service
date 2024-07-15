@@ -25,10 +25,11 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExportResult;
-import de.bund.digitalservice.ris.caselaw.domain.XmlHandoverMail;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Instant;
 import java.util.Collections;
@@ -61,6 +62,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class DocumentUnitControllerTest {
   @Autowired private RisWebTestClient risWebClient;
   @MockBean private DocumentUnitService service;
+
+  @MockBean private HandoverService handoverService;
   @MockBean private KeycloakUserService userService;
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
@@ -211,9 +214,9 @@ class DocumentUnitControllerTest {
   @Test
   void testHandoverAsEmail() throws DocumentationUnitNotExistsException {
     when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
-    when(service.handoverAsEmail(TEST_UUID, ISSUER_ADDRESS))
+    when(handoverService.handoverAsEmail(TEST_UUID, ISSUER_ADDRESS))
         .thenReturn(
-            XmlHandoverMail.builder()
+            HandoverMail.builder()
                 .documentUnitUuid(TEST_UUID)
                 .receiverAddress("receiver address")
                 .mailSubject("mailSubject")
@@ -224,7 +227,7 @@ class DocumentUnitControllerTest {
                 .handoverDate(Instant.parse("2020-01-01T01:01:01.00Z"))
                 .build());
 
-    XmlHandoverMail responseBody =
+    HandoverMail responseBody =
         risWebClient
             .withDefaultLogin()
             .put()
@@ -234,13 +237,13 @@ class DocumentUnitControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .expectStatus()
             .isOk()
-            .expectBody(XmlHandoverMail.class)
+            .expectBody(HandoverMail.class)
             .returnResult()
             .getResponseBody();
 
     assertThat(responseBody)
         .isEqualTo(
-            XmlHandoverMail.builder()
+            HandoverMail.builder()
                 .documentUnitUuid(TEST_UUID)
                 .receiverAddress("receiver address")
                 .mailSubject("mailSubject")
@@ -251,13 +254,13 @@ class DocumentUnitControllerTest {
                 .handoverDate(Instant.parse("2020-01-01T01:01:01Z"))
                 .build());
 
-    verify(service).handoverAsEmail(TEST_UUID, ISSUER_ADDRESS);
+    verify(handoverService).handoverAsEmail(TEST_UUID, ISSUER_ADDRESS);
   }
 
   @Test
   void testHandoverAsEmail_withServiceThrowsException() throws DocumentationUnitNotExistsException {
     when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
-    when(service.handoverAsEmail(TEST_UUID, ISSUER_ADDRESS))
+    when(handoverService.handoverAsEmail(TEST_UUID, ISSUER_ADDRESS))
         .thenThrow(DocumentationUnitNotExistsException.class);
 
     risWebClient
@@ -268,20 +271,20 @@ class DocumentUnitControllerTest {
         .expectStatus()
         .is5xxServerError();
 
-    verify(service).handoverAsEmail(TEST_UUID, ISSUER_ADDRESS);
+    verify(handoverService).handoverAsEmail(TEST_UUID, ISSUER_ADDRESS);
   }
 
   @Test
   void testGetLastHandoverXmlMail() {
 
-    when(service.getEventLog(TEST_UUID))
+    when(handoverService.getEventLog(TEST_UUID))
         .thenReturn(
             List.of(
                 HandoverReport.builder()
                     .content("<html>2021 Report</html>")
                     .receivedDate(Instant.parse("2021-01-01T01:01:01.00Z"))
                     .build(),
-                XmlHandoverMail.builder()
+                HandoverMail.builder()
                     .documentUnitUuid(TEST_UUID)
                     .receiverAddress("receiver address")
                     .mailSubject("mailSubject")
@@ -314,7 +317,7 @@ class DocumentUnitControllerTest {
                 .content("<html>2021 Report</html>")
                 .receivedDate(Instant.parse("2021-01-01T01:01:01Z"))
                 .build(),
-            XmlHandoverMail.builder()
+            HandoverMail.builder()
                 .documentUnitUuid(TEST_UUID)
                 .receiverAddress("receiver address")
                 .mailSubject("mailSubject")
@@ -329,13 +332,13 @@ class DocumentUnitControllerTest {
                 .receivedDate(Instant.parse("2019-01-01T01:01:01Z"))
                 .build());
 
-    verify(service).getEventLog(TEST_UUID);
+    verify(handoverService).getEventLog(TEST_UUID);
   }
 
   @Test
   void testGetXmlPreview() throws DocumentationUnitNotExistsException {
     when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
-    when(service.createPreviewXml(TEST_UUID))
+    when(handoverService.createPreviewXml(TEST_UUID))
         .thenReturn(
             new XmlExportResult(
                 "xml",
@@ -367,7 +370,7 @@ class DocumentUnitControllerTest {
                 .fileName("test.xml")
                 .build());
 
-    verify(service).createPreviewXml(TEST_UUID);
+    verify(handoverService).createPreviewXml(TEST_UUID);
   }
 
   @Test

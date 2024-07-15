@@ -4,6 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
 import lombok.Builder;
 
+/**
+ * Represents a report on a performed handover. It is created from the response mail by the jDV
+ * Email interface.
+ */
 @Builder(toBuilder = true)
 public record HandoverReport(
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) String documentNumber,
@@ -12,7 +16,7 @@ public record HandoverReport(
     implements EventRecord {
   @Override
   public EventType getType() {
-    return EventType.PUBLICATION_REPORT;
+    return EventType.HANDOVER_REPORT;
   }
 
   @Override

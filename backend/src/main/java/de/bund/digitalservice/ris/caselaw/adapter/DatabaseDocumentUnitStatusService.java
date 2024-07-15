@@ -8,10 +8,10 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsExcep
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import java.time.Instant;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+/** Service to handle the status of a document unit in the database. */
 @Service
 @Slf4j
 public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusService {
@@ -27,22 +27,34 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
     this.databaseDocumentationUnitRepository = databaseDocumentationUnitRepository;
   }
 
+  /**
+   * Update the status of a document unit.
+   *
+   * @param documentNumber the document number of the documentation unit
+   * @param status the new status
+   * @throws DocumentationUnitNotExistsException if the documentation unit does not exist
+   */
   @Override
   public void update(String documentNumber, Status status)
       throws DocumentationUnitNotExistsException {
-    saveStatus(status, getLatest(documentNumber));
-  }
-
-  private void saveStatus(Status status, StatusDTO previousStatusDTO) {
     repository.save(
         StatusDTO.builder()
             .createdAt(Instant.now())
-            .documentationUnitDTO(previousStatusDTO.getDocumentationUnitDTO())
+            .documentationUnitDTO(
+                databaseDocumentationUnitRepository
+                    .findByDocumentNumber(documentNumber)
+                    .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber)))
             .publicationStatus(status.publicationStatus())
             .withError(status.withError())
             .build());
   }
 
+  /**
+   * Get the most recent status of a document unit.
+   *
+   * @param documentNumber the document number of the documentation unit
+   * @return the most recent publication status of the documentation unit
+   */
   @Override
   public PublicationStatus getLatestStatus(String documentNumber) {
     var docUnit = databaseDocumentationUnitRepository.findByDocumentNumber(documentNumber);
@@ -56,19 +68,5 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
     }
 
     return entity.getPublicationStatus();
-  }
-
-  private StatusDTO getLatest(String documentNumber) throws DocumentationUnitNotExistsException {
-    var documentUnit =
-        databaseDocumentationUnitRepository
-            .findByDocumentNumber(documentNumber)
-            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
-    return getLatest(documentUnit.getId());
-  }
-
-  private StatusDTO getLatest(UUID documentUuid) throws DocumentationUnitNotExistsException {
-    return repository
-        .findFirstByDocumentationUnitDTO_IdOrderByCreatedAtDesc(documentUuid)
-        .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUuid));
   }
 }

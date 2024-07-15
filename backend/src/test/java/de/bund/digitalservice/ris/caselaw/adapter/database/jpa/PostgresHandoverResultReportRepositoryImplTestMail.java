@@ -17,7 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-class PostgresHandoverResultReportRepositoryImplTest {
+class PostgresHandoverResultReportRepositoryImplTestMail {
 
   PostgresHandoverReportRepositoryImpl reportRepository;
   @MockBean private DatabaseHandoverReportRepository handoverReportRepository;

@@ -12,12 +12,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/** Entity for reports (responses from the mail API) of performed jDV handover operations. */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "publication_report")
+@Table(name = "handover_report")
 public class HandoverReportDTO {
   @Id @GeneratedValue private UUID id;
 

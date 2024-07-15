@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum EventType {
-  PUBLICATION, // TODO
-  PUBLICATION_REPORT, // TODO
+  HANDOVER,
+  HANDOVER_REPORT,
   MIGRATION
 }

@@ -40,39 +40,13 @@ class DocumentUnitStatusServiceTest {
   @Test
   void testUpdate_withDocumentNumberAndDocumentationUnitNotFound_shouldNotSaveAStatus() {
     Status status = Status.builder().build();
-    DocumentationUnitDTO documentUnitDto = DocumentationUnitDTO.builder().build();
 
     when(databaseDocumentationUnitRepository.findByDocumentNumber(DOCUMENT_NUMBER))
-        .thenReturn(Optional.of(documentUnitDto));
+        .thenReturn(Optional.empty());
 
     Assert.assertThrows(
         DocumentationUnitNotExistsException.class,
         () -> statusService.update(DOCUMENT_NUMBER, status));
-
-    verify(databaseDocumentationUnitRepository, times(1)).findByDocumentNumber(DOCUMENT_NUMBER);
-    verify(repository, never())
-        .findFirstByDocumentationUnitDTOOrderByCreatedAtDesc(any(DocumentationUnitDTO.class));
-    verify(repository, never()).save(any(StatusDTO.class));
-  }
-
-  @Test
-  void
-      testUpdate_withDocumentNumberAndDocumentationUnitFoundWithoutExistingStatus_shouldNotSaveAStatus() {
-    Status status = Status.builder().build();
-    DocumentUnit documentationUnit = DocumentUnit.builder().uuid(TEST_UUID).build();
-    DocumentationUnitDTO documentationUnitDTO =
-        DocumentationUnitDTO.builder()
-            .id(TEST_UUID)
-            .documentNumber(documentationUnit.documentNumber())
-            .build();
-    when(databaseDocumentationUnitRepository.findByDocumentNumber(DOCUMENT_NUMBER))
-        .thenReturn(Optional.of(documentationUnitDTO));
-    when(repository.findFirstByDocumentationUnitDTO_IdOrderByCreatedAtDesc(
-            documentationUnitDTO.getId()))
-        .thenReturn(null);
-
-    Assert.assertThrows(
-        NullPointerException.class, () -> statusService.update(DOCUMENT_NUMBER, status));
 
     verify(databaseDocumentationUnitRepository, times(1)).findByDocumentNumber(DOCUMENT_NUMBER);
     verify(repository, never())
@@ -90,12 +64,6 @@ class DocumentUnitStatusServiceTest {
     DocumentUnit.builder().uuid(TEST_UUID).build();
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitDTO.builder().id(TEST_UUID).documentNumber(DOCUMENT_NUMBER).build();
-    StatusDTO statusDTO =
-        StatusDTO.builder()
-            .documentationUnitDTO(documentationUnitDTO)
-            .withError(false)
-            .publicationStatus(PublicationStatus.UNPUBLISHED)
-            .build();
 
     StatusDTO updatedStatus =
         StatusDTO.builder()
@@ -107,15 +75,10 @@ class DocumentUnitStatusServiceTest {
 
     when(databaseDocumentationUnitRepository.findByDocumentNumber(DOCUMENT_NUMBER))
         .thenReturn(Optional.of(documentationUnitDTO));
-    when(repository.findFirstByDocumentationUnitDTO_IdOrderByCreatedAtDesc(
-            documentationUnitDTO.getId()))
-        .thenReturn(Optional.of(statusDTO));
     when(repository.save(any(StatusDTO.class))).thenReturn(updatedStatus);
 
     statusService.update(DOCUMENT_NUMBER, status);
 
-    verify(repository, times(1))
-        .findFirstByDocumentationUnitDTO_IdOrderByCreatedAtDesc(documentationUnitDTO.getId());
     verify(repository, times(1)).save(captor.capture());
     assertThat(captor.getValue())
         .usingRecursiveComparison()

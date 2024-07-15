@@ -25,6 +25,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -57,6 +58,7 @@ class DocumentUnitControllerAuthTest {
   @Autowired private RisWebTestClient risWebTestClient;
 
   @MockBean private DocumentUnitService service;
+  @MockBean private HandoverService handoverService;
   @MockBean private KeycloakUserService userService;
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private AttachmentService attachmentService;
@@ -252,7 +254,7 @@ class DocumentUnitControllerAuthTest {
   void testHandoverDocumentUnitAsEmail() throws DocumentationUnitNotExistsException {
     mockDocumentUnit(docOffice2, null, null);
     when(userService.getEmail(any(OidcUser.class))).thenReturn("abc");
-    when(service.handoverAsEmail(TEST_UUID, "abc")).thenReturn(null);
+    when(handoverService.handoverAsEmail(TEST_UUID, "abc")).thenReturn(null);
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/handover";
 
@@ -270,7 +272,7 @@ class DocumentUnitControllerAuthTest {
   @Test
   void testGetEvents() {
     mockDocumentUnit(docOffice1, null, Status.builder().publicationStatus(PUBLISHED).build());
-    when(service.getEventLog(TEST_UUID)).thenReturn(List.of());
+    when(handoverService.getEventLog(TEST_UUID)).thenReturn(List.of());
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/handover";
 

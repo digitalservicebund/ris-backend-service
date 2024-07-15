@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import lombok.Getter;
 
+/** Enum representing the status of an email. */
 @Getter
 public enum EmailStatus {
   SUCCESS("erfolgreich angekommen"),

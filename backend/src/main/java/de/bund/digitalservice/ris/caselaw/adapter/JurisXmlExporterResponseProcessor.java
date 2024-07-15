@@ -5,11 +5,11 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.MailStoreFactory;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
-import de.bund.digitalservice.ris.caselaw.domain.XmlHandoverRepository;
 import de.bund.digitalservice.ris.domain.export.juris.response.ImportMessageWrapper;
 import de.bund.digitalservice.ris.domain.export.juris.response.MessageWrapper;
 import de.bund.digitalservice.ris.domain.export.juris.response.StatusImporterException;
@@ -33,6 +33,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+/**
+ * Processor for the response mails from jDV. The processor reads the mails from the inbox, saves
+ * them to be displayed in NeuRIS and possibly forwards them to the issuer.
+ */
 @Component
 public class JurisXmlExporterResponseProcessor {
 
@@ -46,7 +50,7 @@ public class JurisXmlExporterResponseProcessor {
   private final JurisMessageWrapperFactory wrapperFactory;
 
   private final DocumentUnitRepository documentUnitRepository;
-  private final XmlHandoverRepository xmlHandoverRepository;
+  private final HandoverRepository xmlHandoverRepository;
 
   public JurisXmlExporterResponseProcessor(
       HttpMailSender mailSender,
@@ -55,7 +59,7 @@ public class JurisXmlExporterResponseProcessor {
       HandoverReportRepository reportRepository,
       JurisMessageWrapperFactory wrapperFactory,
       DocumentUnitRepository documentUnitRepository,
-      XmlHandoverRepository xmlHandoverRepository) {
+      HandoverRepository xmlHandoverRepository) {
     this.mailSender = mailSender;
     this.statusService = statusService;
     this.storeFactory = storeFactory;

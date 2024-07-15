@@ -8,6 +8,10 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
 
+/**
+ * Postgres Repository for reports (responses from the mail API) of performed jDV handover
+ * operations.
+ */
 @Repository
 public class PostgresHandoverReportRepositoryImpl implements HandoverReportRepository {
 
@@ -22,6 +26,12 @@ public class PostgresHandoverReportRepositoryImpl implements HandoverReportRepos
     this.documentUnitRepository = documentUnitRepository;
   }
 
+  /**
+   * Saves all handover reports to the database.
+   *
+   * @param reports the handover reports to save
+   * @return the saved handover reports
+   */
   @Override
   public List<HandoverReport> saveAll(List<HandoverReport> reports) {
     List<HandoverReportDTO> handoverReportDTOS =
@@ -54,6 +64,12 @@ public class PostgresHandoverReportRepositoryImpl implements HandoverReportRepos
         .toList();
   }
 
+  /**
+   * Retrieves all handover reports for a given documentation unit.
+   *
+   * @param documentUnitUuid the document unit UUID
+   * @return the handover reports
+   */
   @Override
   public List<HandoverReport> getAllByDocumentUnitUuid(UUID documentUnitUuid) {
     return repository.findAllByDocumentUnitId(documentUnitUuid).stream()

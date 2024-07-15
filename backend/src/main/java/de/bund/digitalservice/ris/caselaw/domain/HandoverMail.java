@@ -22,7 +22,7 @@ import lombok.Getter;
  *     the mail interface
  */
 @Builder(toBuilder = true)
-public record XmlHandoverMail(
+public record HandoverMail(
     UUID documentUnitUuid,
     String receiverAddress,
     String mailSubject,
@@ -36,7 +36,7 @@ public record XmlHandoverMail(
     implements EventRecord {
   @Override
   public EventType getType() {
-    return EventType.PUBLICATION;
+    return EventType.HANDOVER;
   }
 
   @Override

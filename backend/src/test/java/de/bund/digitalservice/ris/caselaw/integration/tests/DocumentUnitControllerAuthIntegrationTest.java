@@ -30,6 +30,7 @@ import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailService;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -101,6 +102,8 @@ class DocumentUnitControllerAuthIntegrationTest {
   @MockBean DocxConverterService docxConverterService;
   @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean AttachmentService attachmentService;
+
+  @MockBean private HandoverService handoverService;
 
   static Stream<Arguments> getUnauthorizedCases() {
     return Stream.of(

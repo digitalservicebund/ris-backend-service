@@ -12,13 +12,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/** Entity for performed jDV handover operations. */
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Table(name = "xml_publication")
+@Table(name = "handover_mail")
 @Entity
-public class XmlHandoverMailDTO {
+public class HandoverMailDTO {
   @Id @GeneratedValue UUID id;
 
   @Column(name = "documentation_unit_id")
@@ -41,8 +42,8 @@ public class XmlHandoverMailDTO {
   @Column(name = "file_name")
   String fileName;
 
-  @Column(name = "publish_date")
-  Instant createdDate;
+  @Column(name = "sent_date")
+  Instant sentDate;
 
   @Column(name = "issuer_address")
   private String issuerAddress;

@@ -13,9 +13,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusServ
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.HandoverMailService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.MockXmlExporter;
-import de.bund.digitalservice.ris.caselaw.adapter.XmlEMailService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseHandoverReportRepository;
@@ -23,13 +23,13 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseStatusRep
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseXmlHandoverMailRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HandoverMailDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HandoverReportDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresXmlHandoverRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.XmlHandoverMailDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -37,10 +37,10 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
 import de.bund.digitalservice.ris.caselaw.domain.EventType;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
-import de.bund.digitalservice.ris.caselaw.domain.XmlHandoverMail;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Clock;
 import java.time.Instant;
@@ -65,14 +65,15 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 @RISIntegrationTest(
     imports = {
       DocumentUnitService.class,
+      de.bund.digitalservice.ris.caselaw.domain.HandoverService.class,
       PostgresDeltaMigrationRepositoryImpl.class,
       KeycloakUserService.class,
       DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentNumberRecyclingService.class,
       PostgresDocumentationUnitRepositoryImpl.class,
-      PostgresXmlHandoverRepositoryImpl.class,
+      PostgresHandoverRepositoryImpl.class,
       PostgresHandoverReportRepositoryImpl.class,
-      XmlEMailService.class,
+      HandoverMailService.class,
       DatabaseDocumentUnitStatusService.class,
       MockXmlExporter.class,
       PostgresJPAConfig.class,
@@ -88,7 +89,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       "mail.exporter.jurisUsername=test-user",
       "mail.exporter.recipientAddress=neuris@example.com"
     })
-class HandoverDocumentUnitIntegrationTest {
+class HandoverMailDocumentUnitIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
       new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
@@ -153,8 +154,8 @@ class HandoverDocumentUnitIntegrationTest {
                 .documentationUnitDTO(documentUnitDTO)
                 .build());
 
-    XmlHandoverMailDTO expectedXmlHandoverMailDTO =
-        XmlHandoverMailDTO.builder()
+    HandoverMailDTO expectedHandoverMailDTO =
+        HandoverMailDTO.builder()
             .documentUnitId(savedDocumentUnitDTO.getId())
             .receiverAddress("neuris@example.com")
             .mailSubject(
@@ -169,8 +170,8 @@ class HandoverDocumentUnitIntegrationTest {
             .issuerAddress("test@test.com")
             .build();
 
-    XmlHandoverMail expectedXmlResultObject =
-        XmlHandoverMail.builder()
+    HandoverMail expectedXmlResultObject =
+        HandoverMail.builder()
             .documentUnitUuid(savedDocumentUnitDTO.getId())
             .receiverAddress("neuris@example.com")
             .mailSubject(
@@ -191,7 +192,7 @@ class HandoverDocumentUnitIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(XmlHandoverMail.class)
+        .expectBody(HandoverMail.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody())
@@ -199,13 +200,13 @@ class HandoverDocumentUnitIntegrationTest {
                     .ignoringFields("handoverDate")
                     .isEqualTo(expectedXmlResultObject));
 
-    List<XmlHandoverMailDTO> xmlPublicationList = xmlHandoverRepository.findAll();
+    List<HandoverMailDTO> xmlPublicationList = xmlHandoverRepository.findAll();
     assertThat(xmlPublicationList).hasSize(1);
-    XmlHandoverMailDTO xmlHandoverMailDTO = xmlPublicationList.get(0);
-    assertThat(xmlHandoverMailDTO)
+    HandoverMailDTO handoverMailDTO = xmlPublicationList.get(0);
+    assertThat(handoverMailDTO)
         .usingRecursiveComparison()
-        .ignoringFields("createdDate", "id")
-        .isEqualTo(expectedXmlHandoverMailDTO);
+        .ignoringFields("sentDate", "id")
+        .isEqualTo(expectedHandoverMailDTO);
 
     StatusDTO lastStatus =
         documentUnitStatusRepository.findFirstByDocumentationUnitDTOOrderByCreatedAtDesc(
@@ -233,8 +234,8 @@ class HandoverDocumentUnitIntegrationTest {
             .build());
     assertThat(documentUnitStatusRepository.findAll()).hasSize(1);
 
-    XmlHandoverMail xmlPublication =
-        XmlHandoverMail.builder()
+    HandoverMail xmlPublication =
+        HandoverMail.builder()
             .documentUnitUuid(savedDocumentUnitDTO.getId())
             .success(false)
             .statusMessages(List.of("message 1", "message 2"))
@@ -247,7 +248,7 @@ class HandoverDocumentUnitIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(XmlHandoverMail.class)
+        .expectBody(HandoverMail.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody())
@@ -255,7 +256,7 @@ class HandoverDocumentUnitIntegrationTest {
                     .ignoringFields("handoverDate")
                     .isEqualTo(xmlPublication));
 
-    List<XmlHandoverMailDTO> xmlPublicationList = xmlHandoverRepository.findAll();
+    List<HandoverMailDTO> xmlPublicationList = xmlHandoverRepository.findAll();
     assertThat(xmlPublicationList).isEmpty();
 
     List<StatusDTO> statusList = documentUnitStatusRepository.findAll();
@@ -272,8 +273,8 @@ class HandoverDocumentUnitIntegrationTest {
             .build();
     DocumentationUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO);
 
-    XmlHandoverMailDTO xmlHandoverMailDTO =
-        XmlHandoverMailDTO.builder()
+    HandoverMailDTO handoverMailDTO =
+        HandoverMailDTO.builder()
             .documentUnitId(savedDocumentUnitDTO.getId())
             .receiverAddress("exporter@neuris.de")
             .mailSubject("mailSubject")
@@ -281,12 +282,12 @@ class HandoverDocumentUnitIntegrationTest {
             .statusCode("200")
             .statusMessages("message 1|message 2")
             .fileName("test.xml")
-            .createdDate(Instant.now())
+            .sentDate(Instant.now())
             .build();
-    xmlHandoverRepository.save(xmlHandoverMailDTO);
+    xmlHandoverRepository.save(handoverMailDTO);
 
-    XmlHandoverMail expectedXmlPublication =
-        XmlHandoverMail.builder()
+    HandoverMail expectedXmlPublication =
+        HandoverMail.builder()
             .documentUnitUuid(savedDocumentUnitDTO.getId())
             .receiverAddress("exporter@neuris.de")
             .mailSubject("mailSubject")
@@ -303,7 +304,7 @@ class HandoverDocumentUnitIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(XmlHandoverMail[].class)
+        .expectBody(HandoverMail[].class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody())
@@ -324,7 +325,7 @@ class HandoverDocumentUnitIntegrationTest {
 
     Instant creationDate = Instant.now();
     xmlHandoverRepository.save(
-        XmlHandoverMailDTO.builder()
+        HandoverMailDTO.builder()
             .documentUnitId(savedDocumentUnitDTO.getId())
             .receiverAddress("exporter@neuris.de")
             .mailSubject("mailSubject")
@@ -332,7 +333,7 @@ class HandoverDocumentUnitIntegrationTest {
             .statusCode("200")
             .statusMessages("message 1|message 2")
             .fileName("test.xml")
-            .createdDate(creationDate)
+            .sentDate(creationDate)
             .build());
 
     Instant receivedDate = creationDate.plus(1, ChronoUnit.HOURS);
@@ -359,11 +360,11 @@ class HandoverDocumentUnitIntegrationTest {
     HandoverReport handoverReport = (HandoverReport) responseBody.get(0);
     assertThat(handoverReport.content()).isEqualTo("<HTML>success!</HTML>");
     assertThat(handoverReport.getDate()).isCloseTo(receivedDate, within(1, ChronoUnit.MILLIS));
-    assertThat(handoverReport.getType()).isEqualTo(EventType.PUBLICATION_REPORT);
-    assertThat(responseBody.get(1)).isInstanceOf(XmlHandoverMail.class);
-    XmlHandoverMail xmlPublication = (XmlHandoverMail) responseBody.get(1);
+    assertThat(handoverReport.getType()).isEqualTo(EventType.HANDOVER_REPORT);
+    assertThat(responseBody.get(1)).isInstanceOf(HandoverMail.class);
+    HandoverMail xmlPublication = (HandoverMail) responseBody.get(1);
     assertThat(xmlPublication.xml()).isEqualTo("xml");
     assertThat(xmlPublication.getDate()).isCloseTo(creationDate, within(1, ChronoUnit.MILLIS));
-    assertThat(xmlPublication.getType()).isEqualTo(EventType.PUBLICATION);
+    assertThat(xmlPublication.getType()).isEqualTo(EventType.HANDOVER);
   }
 }

@@ -13,12 +13,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHandoverException;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExportResult;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
-import de.bund.digitalservice.ris.caselaw.domain.XmlHandoverMail;
-import de.bund.digitalservice.ris.caselaw.domain.XmlHandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import java.time.Clock;
 import java.time.Instant;
@@ -43,14 +43,14 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@Import({XmlEMailService.class})
+@Import({HandoverMailService.class})
 @TestPropertySource(
     properties = {
       "mail.exporter.jurisUsername=test-user",
       "mail.exporter.senderAddress=export@neuris"
     })
 @ActiveProfiles(profiles = {"uat"})
-class XmlMailServiceTest {
+class HandoverMailServiceTest {
   private static final String RECEIVER_ADDRESS = "test-to@mail.com";
   private static final String ISSUER_ADDRESS = "neuris-user@example.com";
   private static final String SENDER_ADDRESS = "export@neuris";
@@ -67,8 +67,8 @@ class XmlMailServiceTest {
           + " vg=test-document-number";
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
-  private static final XmlHandoverMail EXPECTED_BEFORE_SAVE =
-      XmlHandoverMail.builder()
+  private static final HandoverMail EXPECTED_BEFORE_SAVE =
+      HandoverMail.builder()
           .documentUnitUuid(TEST_UUID)
           .receiverAddress(RECEIVER_ADDRESS)
           .mailSubject(MAIL_SUBJECT)
@@ -80,8 +80,8 @@ class XmlMailServiceTest {
           .issuerAddress(ISSUER_ADDRESS)
           .build();
 
-  private static final XmlHandoverMail SAVED_XML_MAIL =
-      XmlHandoverMail.builder()
+  private static final HandoverMail SAVED_XML_MAIL =
+      HandoverMail.builder()
           .documentUnitUuid(TEST_UUID)
           .receiverAddress(RECEIVER_ADDRESS)
           .mailSubject(MAIL_SUBJECT)
@@ -93,17 +93,17 @@ class XmlMailServiceTest {
           .issuerAddress(ISSUER_ADDRESS)
           .build();
 
-  private static final XmlHandoverMail EXPECTED_RESPONSE = SAVED_XML_MAIL;
+  private static final HandoverMail EXPECTED_RESPONSE = SAVED_XML_MAIL;
   private static final XmlExportResult FORMATTED_XML =
       new XmlExportResult("xml", true, List.of("succeed"), "test.xml", CREATED_DATE);
 
   private DocumentUnit documentUnit;
 
-  @Autowired private XmlEMailService service;
+  @Autowired private HandoverMailService service;
 
   @MockBean private XmlExporter xmlExporter;
 
-  @MockBean private XmlHandoverRepository repository;
+  @MockBean private HandoverRepository repository;
 
   @MockBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
 
@@ -158,7 +158,7 @@ class XmlMailServiceTest {
     var xmlWithValidationError =
         new XmlExportResult("xml", false, List.of("status-message"), "test.xml", CREATED_DATE);
     var expected =
-        XmlHandoverMail.builder()
+        HandoverMail.builder()
             .documentUnitUuid(TEST_UUID)
             .statusMessages(List.of("status-message"))
             .success(false)
@@ -169,7 +169,7 @@ class XmlMailServiceTest {
     var response = service.handOver(documentUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS);
     assertThat(response).usingRecursiveComparison().isEqualTo(expected);
 
-    verify(repository, times(0)).save(any(XmlHandoverMail.class));
+    verify(repository, times(0)).save(any(HandoverMail.class));
     verify(mailSender, times(0))
         .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
   }
@@ -186,7 +186,7 @@ class XmlMailServiceTest {
             () -> service.handOver(documentUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
     Assertions.assertEquals("Couldn't generate xml.", ex.getMessage());
 
-    verify(repository, times(0)).save(any(XmlHandoverMail.class));
+    verify(repository, times(0)).save(any(HandoverMail.class));
     verify(mailSender, times(0))
         .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
   }
@@ -205,7 +205,7 @@ class XmlMailServiceTest {
         .isEqualTo("No document number has set in the document unit.");
 
     // Verify that repository.save and mailSender.sendMail were not called
-    verify(repository, times(0)).save(any(XmlHandoverMail.class));
+    verify(repository, times(0)).save(any(HandoverMail.class));
     verify(mailSender, times(0))
         .sendMail(anyString(), anyString(), anyString(), anyString(), any(List.class), anyString());
   }
@@ -218,7 +218,7 @@ class XmlMailServiceTest {
         IllegalArgumentException.class,
         () -> service.handOver(documentUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
 
-    verify(repository).save(any(XmlHandoverMail.class));
+    verify(repository).save(any(HandoverMail.class));
     verify(mailSender)
         .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
   }
@@ -232,7 +232,7 @@ class XmlMailServiceTest {
 
     assertThat(throwable.getMessage()).isEqualTo("No receiver mail address is set");
 
-    verify(repository, times(0)).save(any(XmlHandoverMail.class));
+    verify(repository, times(0)).save(any(HandoverMail.class));
     verify(mailSender, times(0))
         .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
   }
@@ -254,7 +254,7 @@ class XmlMailServiceTest {
         DocumentationUnitHandoverException.class,
         () -> service.handOver(documentUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
 
-    verify(repository, times(0)).save(any(XmlHandoverMail.class));
+    verify(repository, times(0)).save(any(HandoverMail.class));
     verify(mailSender)
         .sendMail(
             SENDER_ADDRESS,
@@ -268,7 +268,7 @@ class XmlMailServiceTest {
 
   @Test
   void testGetLastHandoverXmlMail() {
-    List<XmlHandoverMail> list = List.of(SAVED_XML_MAIL);
+    List<HandoverMail> list = List.of(SAVED_XML_MAIL);
     when(repository.getHandoversByDocumentUnitUuid(TEST_UUID)).thenReturn((List) list);
 
     var response = service.getHandoverResult(TEST_UUID);

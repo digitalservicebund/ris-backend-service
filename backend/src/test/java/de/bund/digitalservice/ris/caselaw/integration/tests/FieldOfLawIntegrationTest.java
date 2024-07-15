@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -69,6 +70,8 @@ class FieldOfLawIntegrationTest {
   @MockBean private UserService userService;
   @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private DocumentUnitService service;
+
+  @MockBean private HandoverService handoverService;
 
   @Test
   void testGetAllFieldsOfLaw() {

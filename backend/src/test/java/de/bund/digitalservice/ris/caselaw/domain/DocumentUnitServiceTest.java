@@ -4,11 +4,8 @@ import static de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,7 +38,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @Import({DocumentUnitService.class, DatabaseDocumentUnitStatusService.class})
 class DocumentUnitServiceTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
-  private static final String ISSUER_ADDRESS = "test-issuer@exporter.neuris";
   @SpyBean private DocumentUnitService service;
 
   @MockBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
@@ -50,8 +46,6 @@ class DocumentUnitServiceTest {
   @MockBean private DocumentNumberService documentNumberService;
   @MockBean private DocumentNumberRecyclingService documentNumberRecyclingService;
   @MockBean private EmailService emailService;
-  @MockBean private HandoverReportRepository handoverReportRepository;
-  @MockBean private DeltaMigrationRepository deltaMigrationRepository;
   @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @MockBean private AttachmentService attachmentService;
   @MockBean private Validator validator;
@@ -171,163 +165,6 @@ class DocumentUnitServiceTest {
   }
 
   @Test
-  void testHandoverByEmail() throws DocumentationUnitNotExistsException {
-    when(repository.findByUuid(TEST_UUID))
-        .thenReturn(Optional.ofNullable(DocumentUnit.builder().build()));
-    XmlHandoverMail xmlHandoverMail =
-        XmlHandoverMail.builder()
-            .documentUnitUuid(TEST_UUID)
-            .receiverAddress("receiver address")
-            .mailSubject("subject")
-            .xml("xml")
-            .success(true)
-            .statusMessages(List.of("status messages"))
-            .fileName("filename")
-            .handoverDate(Instant.now())
-            .build();
-    when(emailService.handOver(eq(DocumentUnit.builder().build()), anyString(), anyString()))
-        .thenReturn(xmlHandoverMail);
-    var mailResponse = service.handoverAsEmail(TEST_UUID, ISSUER_ADDRESS);
-    assertThat(mailResponse).usingRecursiveComparison().isEqualTo(xmlHandoverMail);
-    verify(repository).findByUuid(TEST_UUID);
-    verify(emailService).handOver(eq(DocumentUnit.builder().build()), anyString(), anyString());
-  }
-
-  @Test
-  void testHandoverByEmail_withoutDocumentUnitForUuid() {
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.empty());
-
-    Assertions.assertThrows(
-        DocumentationUnitNotExistsException.class,
-        () -> service.handoverAsEmail(TEST_UUID, ISSUER_ADDRESS));
-    verify(repository).findByUuid(TEST_UUID);
-    verify(emailService, never())
-        .handOver(eq(DocumentUnit.builder().build()), anyString(), anyString());
-  }
-
-  @Test
-  void testGetLastXmlHandoverMail() {
-    XmlHandoverMail xmlHandoverMail =
-        XmlHandoverMail.builder()
-            .documentUnitUuid(TEST_UUID)
-            .receiverAddress("receiver address")
-            .mailSubject("subject")
-            .xml("xml")
-            .success(true)
-            .statusMessages(List.of("message"))
-            .fileName("filename")
-            .handoverDate(Instant.now().minus(2, java.time.temporal.ChronoUnit.DAYS))
-            .build();
-    when(emailService.getHandoverResult(TEST_UUID)).thenReturn(List.of(xmlHandoverMail));
-    when(handoverReportRepository.getAllByDocumentUnitUuid(TEST_UUID))
-        .thenReturn(Collections.emptyList());
-    DeltaMigration deltaMigration =
-        DeltaMigration.builder()
-            .migratedDate(Instant.now().minus(1, java.time.temporal.ChronoUnit.DAYS))
-            .xml("<test><element></element></test>")
-            .build();
-    when(deltaMigrationRepository.getLatestMigration(TEST_UUID)).thenReturn(deltaMigration);
-
-    var actual = service.getEventLog(TEST_UUID);
-    assertThat(actual.get(1)).usingRecursiveComparison().isEqualTo(xmlHandoverMail);
-    assertThat(actual.get(0))
-        .usingRecursiveComparison()
-        .isEqualTo(
-            deltaMigration.toBuilder()
-                .xml("<?xml version=\"1.0\" encoding=\"UTF-8\"?><test>\n  <element/>\n</test>\n")
-                .build());
-
-    verify(emailService).getHandoverResult(TEST_UUID);
-    verify(deltaMigrationRepository).getLatestMigration(TEST_UUID);
-  }
-
-  @Test
-  void testGetLastMigrated() {
-    DeltaMigration deltaMigration =
-        DeltaMigration.builder()
-            .migratedDate(Instant.now().minus(1, java.time.temporal.ChronoUnit.DAYS))
-            .xml("<test><element></element></test>")
-            .build();
-    when(deltaMigrationRepository.getLatestMigration(TEST_UUID)).thenReturn(deltaMigration);
-
-    var actual = service.getEventLog(TEST_UUID);
-    assertThat(actual.get(0))
-        .usingRecursiveComparison()
-        .isEqualTo(
-            deltaMigration.toBuilder()
-                .xml("<?xml version=\"1.0\" encoding=\"UTF-8\"?><test>\n  <element/>\n</test>\n")
-                .build());
-
-    verify(deltaMigrationRepository).getLatestMigration(TEST_UUID);
-  }
-
-  @Test
-  void testGetLastHandoverReport() {
-    HandoverReport report = new HandoverReport("documentNumber", "<html></html>", Instant.now());
-    when(handoverReportRepository.getAllByDocumentUnitUuid(TEST_UUID)).thenReturn(List.of(report));
-    when(emailService.getHandoverResult(TEST_UUID)).thenReturn(List.of());
-    when(deltaMigrationRepository.getLatestMigration(TEST_UUID)).thenReturn(null);
-
-    var events = service.getEventLog(TEST_UUID);
-    assertThat(events.get(0)).usingRecursiveComparison().isEqualTo(report);
-
-    verify(emailService).getHandoverResult(TEST_UUID);
-  }
-
-  @Test
-  void testGetSortedEventLog() {
-    Instant newest = Instant.now();
-    Instant secondNewest = newest.minusSeconds(61);
-    Instant thirdNewest = secondNewest.minusSeconds(61);
-    Instant fourthNewest = thirdNewest.minusSeconds(61);
-    Instant fifthNewest = fourthNewest.minusSeconds(61);
-
-    HandoverReport report1 = new HandoverReport("documentNumber", "<html></html>", newest);
-
-    XmlHandoverMail xml1 =
-        XmlHandoverMail.builder()
-            .documentUnitUuid(TEST_UUID)
-            .receiverAddress("receiver address")
-            .mailSubject("subject")
-            .xml("xml")
-            .success(true)
-            .statusMessages(List.of("message"))
-            .fileName("filename")
-            .handoverDate(secondNewest)
-            .build();
-
-    HandoverReport report2 = new HandoverReport("documentNumber", "<html></html>", thirdNewest);
-
-    XmlHandoverMail xml2 =
-        XmlHandoverMail.builder()
-            .documentUnitUuid(TEST_UUID)
-            .receiverAddress("receiver address")
-            .mailSubject("subject")
-            .xml("xml")
-            .success(true)
-            .statusMessages(List.of("message"))
-            .fileName("filename")
-            .handoverDate(fourthNewest)
-            .build();
-
-    DeltaMigration deltaMigration = DeltaMigration.builder().migratedDate(fifthNewest).build();
-
-    when(handoverReportRepository.getAllByDocumentUnitUuid(TEST_UUID))
-        .thenReturn(List.of(report2, report1));
-    when(emailService.getHandoverResult(TEST_UUID)).thenReturn(List.of(xml2, xml1));
-    when(deltaMigrationRepository.getLatestMigration(TEST_UUID)).thenReturn(deltaMigration);
-
-    List<EventRecord> list = service.getEventLog(TEST_UUID);
-    assertThat(list).hasSize(5);
-    assertThat(list.get(0)).usingRecursiveComparison().isEqualTo(report1);
-    assertThat(list.get(1)).usingRecursiveComparison().isEqualTo(xml1);
-    assertThat(list.get(2)).usingRecursiveComparison().isEqualTo(report2);
-    assertThat(list.get(3)).usingRecursiveComparison().isEqualTo(xml2);
-    assertThat(list.get(4)).usingRecursiveComparison().isEqualTo(deltaMigration);
-    verify(emailService).getHandoverResult(TEST_UUID);
-  }
-
-  @Test
   void testSearchByDocumentUnitListEntry() {
     DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
     DocumentationUnitSearchInput documentationUnitSearchInput =
@@ -439,25 +276,5 @@ class DocumentUnitServiceTest {
     // Verify that the fileNumber field has normalized spaces
     assertThat(capturedRelatedDocumentationUnit.getFileNumber())
         .isEqualTo("This is a test filenumber with spaces.");
-  }
-
-  @Test
-  void testPreviewXml() throws DocumentationUnitNotExistsException {
-    DocumentUnit testDocumentUnit = DocumentUnit.builder().build();
-    XmlExportResult mockXmlExportResult =
-        new XmlExportResult("some xml", true, List.of("success"), "foo.xml", Instant.now());
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.ofNullable(testDocumentUnit));
-    when(emailService.getXmlPreview(testDocumentUnit)).thenReturn(mockXmlExportResult);
-
-    Assertions.assertEquals(mockXmlExportResult, service.createPreviewXml(TEST_UUID));
-  }
-
-  @Test
-  void testPrettifyXml() {
-    String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root><child>value</child></root>";
-    String prettyXml = DocumentUnitService.prettifyXml(xml);
-    assertThat(prettyXml)
-        .isEqualTo(
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root>\n  <child>value</child>\n</root>\n");
   }
 }

@@ -19,14 +19,14 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
-import de.bund.digitalservice.ris.caselaw.domain.XmlHandoverMail;
-import de.bund.digitalservice.ris.caselaw.domain.XmlHandoverRepository;
 import de.bund.digitalservice.ris.domain.export.juris.response.ImportMessageWrapper;
 import de.bund.digitalservice.ris.domain.export.juris.response.MessageAttachment;
 import de.bund.digitalservice.ris.domain.export.juris.response.ProcessMessageWrapper;
@@ -71,7 +71,7 @@ class JurisXmlExporterResponseProcessorTest {
   @MockBean private ImapStoreFactory storeFactory;
   @MockBean private HandoverReportRepository reportRepository;
   @MockBean private DocumentUnitRepository documentUnitRepository;
-  @MockBean private XmlHandoverRepository xmlHandoverRepository;
+  @MockBean private HandoverRepository xmlHandoverRepository;
   @Mock private Store store;
   @Mock private Folder inbox;
   @Mock private Folder processed;
@@ -107,7 +107,7 @@ class JurisXmlExporterResponseProcessorTest {
         .thenReturn(Optional.of(DocumentUnit.builder().uuid(DOCUMENT_UUID).build()));
 
     when(xmlHandoverRepository.getLastXmlHandoverMail(DOCUMENT_UUID))
-        .thenReturn(XmlHandoverMail.builder().issuerAddress("test@digitalservice.bund.de").build());
+        .thenReturn(HandoverMail.builder().issuerAddress("test@digitalservice.bund.de").build());
 
     when(statusService.getLatestStatus(anyString())).thenReturn(PublicationStatus.UNPUBLISHED);
 
@@ -415,7 +415,7 @@ class JurisXmlExporterResponseProcessorTest {
   void testLoggingForUnknownDocumentNumber() throws MessagingException {
     when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
     when(xmlHandoverRepository.getLastXmlHandoverMail(DOCUMENT_UUID))
-        .thenReturn(XmlHandoverMail.builder().issuerAddress(null).build());
+        .thenReturn(HandoverMail.builder().issuerAddress(null).build());
 
     assertThatCode(responseProcessor::readEmails).doesNotThrowAnyException();
   }
