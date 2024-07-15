@@ -12,7 +12,6 @@ import NavbarSide from "@/components/NavbarSide.vue"
 import SideToggle from "@/components/SideToggle.vue"
 import { useCaseLawMenuItems } from "@/composables/useCaseLawMenuItems"
 import useQuery from "@/composables/useQueryFromRoute"
-import DocumentUnit from "@/domain/documentUnit"
 import { ResponseError, ServiceResponse } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
@@ -53,10 +52,6 @@ const toggleNavigationPanel = () => {
 
 async function saveDocumentUnitToServer(): Promise<ServiceResponse<void>> {
   return store.updateDocumentUnit()
-}
-
-function updateLocalDocumentUnit(updatedDocumentUnitFromChild: DocumentUnit) {
-  documentUnit.value = updatedDocumentUnitFromChild
 }
 
 async function requestDocumentUnitFromServer() {
@@ -140,8 +135,6 @@ onMounted(async () => {
               )
             "
             ref="extraContentSidePanel"
-            :document-unit="documentUnit"
-            @document-unit-updated-locally="updateLocalDocumentUnit"
           ></ExtraContentSidePanel>
           <router-view
             :validation-errors="validationErrors"

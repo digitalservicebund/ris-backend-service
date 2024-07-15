@@ -1,3 +1,4 @@
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { describe } from "vitest"
@@ -7,33 +8,40 @@ import Attachment from "@/domain/attachment"
 import DocumentUnit from "@/domain/documentUnit"
 
 let router: Router
+
 function renderComponent(
-  {
-    note,
-    attachments,
-  }: {
+  options: {
     note?: string
     attachments?: Attachment[]
-  } = { note: "", attachments: [] },
+  } = {},
 ) {
   const user = userEvent.setup()
-
   return {
     user,
     ...render(ExtraContentSidePanel, {
-      props: {
-        documentUnit: new DocumentUnit("foo", {
-          documentNumber: "1234567891234",
-          coreData: {},
-          texts: {},
-          previousDecisions: undefined,
-          ensuingDecisions: undefined,
-          contentRelatedIndexing: {},
-          note,
-          attachments,
-        }),
+      global: {
+        plugins: [
+          [router],
+          [
+            createTestingPinia({
+              initialState: {
+                docunitStore: {
+                  documentUnit: new DocumentUnit("foo", {
+                    documentNumber: "1234567891234",
+                    coreData: {},
+                    texts: {},
+                    previousDecisions: undefined,
+                    ensuingDecisions: undefined,
+                    contentRelatedIndexing: {},
+                    note: options.note ?? "",
+                    attachments: options.attachments ?? [],
+                  }),
+                },
+              },
+            }),
+          ],
+        ],
       },
-      global: { plugins: [router] },
     }),
   }
 }
