@@ -78,13 +78,13 @@ function publishDocumentUnit() {
 
 //Required Core Data fields
 const missingCoreDataFields = ref(
-  store.documentUnit.missingRequiredFields.map((field) => fieldLabels[field]),
+  store.documentUnit!.missingRequiredFields.map((field) => fieldLabels[field]),
 )
 
 //Required Previous Decision fields
 const missingPreviousDecisionFields = ref(
-  store.documentUnit.previousDecisions
-    ?.filter((previousDecision) => {
+  store
+    .documentUnit!.previousDecisions?.filter((previousDecision) => {
       return getMissingPreviousDecisionFields(previousDecision).length > 0
     })
     .map((previousDecision) => {
