@@ -2,17 +2,13 @@
 import { onBeforeUnmount, toRaw } from "vue"
 import TextButton from "@/components/input/TextButton.vue"
 import { useSaveToRemote } from "@/composables/useSaveToRemote"
-import { ServiceResponse } from "@/services/httpClient"
 
 const props = defineProps<{
   ariaLabel: string
-  serviceCallback: () => Promise<ServiceResponse<void>>
 }>()
 
-const { triggerSave, lastSaveError, formattedLastSavedOn } = useSaveToRemote(
-  props.serviceCallback,
-  10000,
-)
+const { triggerSave, lastSaveError, formattedLastSavedOn } =
+  useSaveToRemote(10000)
 
 const getErrorDetails = () => {
   if (
@@ -45,7 +41,7 @@ window.onbeforeunload = function () {
       Uhr
     </p>
     <TextButton
-      :aria-label="ariaLabel"
+      :aria-label="props.ariaLabel"
       label="Speichern"
       size="small"
       @click="triggerSave"

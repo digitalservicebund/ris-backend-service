@@ -12,7 +12,7 @@ import NavbarSide from "@/components/NavbarSide.vue"
 import SideToggle from "@/components/SideToggle.vue"
 import { useCaseLawMenuItems } from "@/composables/useCaseLawMenuItems"
 import useQuery from "@/composables/useQueryFromRoute"
-import { ResponseError, ServiceResponse } from "@/services/httpClient"
+import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const props = defineProps<{
@@ -48,10 +48,6 @@ const toggleNavigationPanel = () => {
     ...route.query,
     showNavigationPanel: showNavigationPanelRef.value.toString(),
   })
-}
-
-async function saveDocumentUnitToServer(): Promise<ServiceResponse<void>> {
-  return store.updateDocumentUnit()
 }
 
 async function requestDocumentUnitFromServer() {
@@ -111,11 +107,6 @@ onMounted(async () => {
         data-testid="document-unit-info-panel"
         :document-unit="documentUnit"
         :heading="documentUnit?.documentNumber ?? ''"
-        :save-callback="
-          route.path.includes('categories') || route.path.includes('files')
-            ? saveDocumentUnitToServer
-            : undefined
-        "
       />
       <div class="flex grow flex-col items-start">
         <FlexContainer
@@ -141,7 +132,6 @@ onMounted(async () => {
             @attachment-index-deleted="attachmentIndexDeleted"
             @attachment-index-selected="attachmentIndexSelected"
             @attachments-uploaded="attachmentsUploaded"
-            @save-document-unit-to-server="saveDocumentUnitToServer"
           />
         </FlexContainer>
       </div>

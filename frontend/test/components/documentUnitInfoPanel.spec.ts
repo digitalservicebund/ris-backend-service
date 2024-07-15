@@ -1,14 +1,59 @@
 import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
+import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import DocumentUnit, { CoreData } from "@/domain/documentUnit"
 
 function renderComponent(options?: { heading?: string; coreData?: CoreData }) {
+  const router = createRouter({
+    history: createWebHistory(),
+    routes: [
+      {
+        path: "/caselaw/documentUnit/new",
+        name: "new",
+        component: {},
+      },
+      {
+        path: "/",
+        name: "home",
+        component: {},
+      },
+      {
+        path: "/caselaw/documentUnit/:documentNumber/categories",
+        name: "caselaw-documentUnit-documentNumber-categories",
+        component: {
+          template: "<div data-testid='files'>Categories</div>",
+        },
+      },
+      {
+        path: "/caselaw/documentUnit/:documentNumber/files",
+        name: "caselaw-documentUnit-documentNumber-files",
+        component: {
+          template: "<div data-testid='files'>Files</div>",
+        },
+      },
+      {
+        path: "/caselaw/documentUnit/:documentNumber/publication",
+        name: "caselaw-documentUnit-documentNumber-publication",
+        component: {
+          template: "<div data-testid='publication'>Publication</div>",
+        },
+      },
+      {
+        path: "/caselaw/documentUnit/:documentNumber/preview",
+        name: "caselaw-documentUnit-documentNumber-preview",
+        component: {
+          template: "<div data-testid='preview'>Preview</div>",
+        },
+      },
+    ],
+  })
   return {
     ...render(DocumentUnitInfoPanel, {
       props: { heading: options?.heading ?? "" },
       global: {
         plugins: [
+          router,
           createTestingPinia({
             initialState: {
               docunitStore: {

@@ -1,22 +1,22 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import { computed, ref, toRaw, watchEffect } from "vue"
+import { useRoute } from "vue-router"
 import IconBadge from "@/components/IconBadge.vue"
 import SaveButton from "@/components/SaveDocumentUnitButton.vue"
 import { useStatusBadge } from "@/composables/useStatusBadge"
-import { ServiceResponse } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import IconError from "~icons/ic/baseline-error"
 
 interface Props {
   heading?: string
-  saveCallback?: () => Promise<ServiceResponse<void>>
 }
 
 const props = withDefaults(defineProps<Props>(), {
   heading: "",
-  saveCallback: undefined,
 })
+
+const route = useRoute()
 
 const documentUnitStore = useDocumentUnitStore()
 
@@ -86,9 +86,8 @@ watchEffect(() => {
 
     <span class="flex-grow"></span>
     <SaveButton
-      v-if="saveCallback"
+      v-if="route.path.includes('categories') || route.path.includes('files')"
       aria-label="Speichern Button"
-      :service-callback="saveCallback"
     />
   </div>
 </template>
