@@ -31,18 +31,20 @@ else
   exit 1
 fi
 
-# If folder not exists, download the files, else skip to database import
+# Remove the juris data folder and recreate and empty one
 if [ -d "$DATA_MIGRATION_IMPORT_PATH" ]; then
-    echo "Folder already exists skipping downloading"
-else
- mkdir "$DATA_MIGRATION_IMPORT_PATH"
-  # Check if you can access the right bucket with
-  aws s3 ls --profile otc --endpoint-url https://obs.eu-de.otc.t-systems.com s3://neuris-migration-juris-data
-  # Download the lookup tables
-  aws s3 cp --profile otc --endpoint-url https://obs.eu-de.otc.t-systems.com --recursive s3://neuris-migration-juris-data/monthly/2024/05/Tabellen ./juris-xml-data/Tabellen
-  # Download BGH DocumentationUnits
-  aws s3 cp --profile otc --endpoint-url https://obs.eu-de.otc.t-systems.com --recursive s3://neuris-migration-juris-data/monthly/2024/05/BGH-juris/RSP/2022/ ./juris-xml-data/BGH-juris/RSP/2022/
+  rm -rf "$DATA_MIGRATION_IMPORT_PATH"
+  mkdir "$DATA_MIGRATION_IMPORT_PATH"
+  echo "Prepaid folder for juris reimport: $DATA_MIGRATION_IMPORT_PATH"
 fi
+
+# Check if you can access the right bucket with
+aws s3 ls --profile otc --endpoint-url https://obs.eu-de.otc.t-systems.com s3://neuris-migration-juris-data
+# Download the lookup tables
+aws s3 cp --profile otc --endpoint-url https://obs.eu-de.otc.t-systems.com --recursive s3://neuris-migration-juris-data/monthly/2024/05/Tabellen ./juris-xml-data/Tabellen
+# Download BGH DocumentationUnits
+aws s3 cp --profile otc --endpoint-url https://obs.eu-de.otc.t-systems.com --recursive s3://neuris-migration-juris-data/monthly/2024/05/BGH-juris/RSP/2022/ ./juris-xml-data/BGH-juris/RSP/2022/
+
 
 #  For console logging
 export SPRING_PROFILES_ACTIVE=dev
