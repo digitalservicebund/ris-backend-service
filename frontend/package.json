@@ -56,7 +56,7 @@
     "@tiptap/extension-table-cell": "^2.4.0",
     "@tiptap/extension-table-header": "^2.4.0",
     "@tiptap/extension-table-row": "^2.4.0",
-    "@tiptap/extension-text": "^2.4.0",
+    "@tiptap/extension-text": "^2.5.1",
     "@tiptap/extension-text-align": "^2.4.0",
     "@tiptap/extension-text-style": "^2.4.0",
     "@tiptap/extension-underline": "^2.4.0",
