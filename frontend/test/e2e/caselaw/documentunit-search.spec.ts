@@ -642,7 +642,7 @@ test.describe("search", () => {
         name: "Übernehmen und fortfahren",
       })
       .click()
-    await expect(page).toHaveURL(/categories$/)
+    await page.waitForURL(/categories$/)
 
     const documentNumber = page
       .url()
