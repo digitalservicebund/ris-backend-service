@@ -30,9 +30,7 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
   }
 
   async function updateDocumentUnit(): Promise<
-    ServiceResponse<
-      RisJsonPatch | FailedValidationServerResponse | DocumentUnit | undefined
-    >
+    ServiceResponse<RisJsonPatch | FailedValidationServerResponse>
   > {
     if (!documentUnit.value || !originalDocumentUnit.value) {
       return {
@@ -50,10 +48,7 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
 
     if (patch.length === 0 && documentUnit.value.documentNumber) {
       // Even though there are no updates in the client, get the current version from backend
-      const docUnitFromBackend = await loadDocumentUnit(
-        documentUnit.value.documentNumber,
-      )
-      return docUnitFromBackend
+      await loadDocumentUnit(documentUnit.value.documentNumber)
     }
 
     const response = await documentUnitService.update(documentUnit.value.uuid, {
