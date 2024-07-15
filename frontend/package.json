@@ -59,7 +59,7 @@
     "@tiptap/extension-text": "^2.4.0",
     "@tiptap/extension-text-align": "^2.4.0",
     "@tiptap/extension-text-style": "^2.4.0",
-    "@tiptap/extension-underline": "^2.4.0",
+    "@tiptap/extension-underline": "^2.5.1",
     "@tiptap/vue-3": "^2.4.0",
     "@unhead/vue": "^1.9.16",
     "@unleash/proxy-client-vue": "^0.1.2",
