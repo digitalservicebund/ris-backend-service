@@ -28,11 +28,6 @@ function renderComponent(
                 docunitStore: {
                   documentUnit: new DocumentUnit("foo", {
                     documentNumber: "1234567891234",
-                    coreData: {},
-                    texts: {},
-                    previousDecisions: undefined,
-                    ensuingDecisions: undefined,
-                    contentRelatedIndexing: {},
                     note: options.note ?? "",
                     attachments: options.attachments ?? [],
                   }),
