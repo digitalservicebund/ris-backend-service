@@ -19,14 +19,14 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
-import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
-import de.bund.digitalservice.ris.caselaw.domain.XmlPublicationRepository;
+import de.bund.digitalservice.ris.caselaw.domain.XmlHandoverMail;
+import de.bund.digitalservice.ris.caselaw.domain.XmlHandoverRepository;
 import de.bund.digitalservice.ris.domain.export.juris.response.ImportMessageWrapper;
 import de.bund.digitalservice.ris.domain.export.juris.response.MessageAttachment;
 import de.bund.digitalservice.ris.domain.export.juris.response.ProcessMessageWrapper;
@@ -69,9 +69,9 @@ class JurisXmlExporterResponseProcessorTest {
   @MockBean private DocumentUnitStatusService statusService;
   @MockBean private HttpMailSender mailSender;
   @MockBean private ImapStoreFactory storeFactory;
-  @MockBean private PublicationReportRepository reportRepository;
+  @MockBean private HandoverReportRepository reportRepository;
   @MockBean private DocumentUnitRepository documentUnitRepository;
-  @MockBean private XmlPublicationRepository xmlPublicationRepository;
+  @MockBean private XmlHandoverRepository xmlHandoverRepository;
   @Mock private Store store;
   @Mock private Folder inbox;
   @Mock private Folder processed;
@@ -106,8 +106,8 @@ class JurisXmlExporterResponseProcessorTest {
     when(documentUnitRepository.findByDocumentNumber(DOCUMENT_NUMBER))
         .thenReturn(Optional.of(DocumentUnit.builder().uuid(DOCUMENT_UUID).build()));
 
-    when(xmlPublicationRepository.getLastXmlPublication(DOCUMENT_UUID))
-        .thenReturn(XmlPublication.builder().issuerAddress("test@digitalservice.bund.de").build());
+    when(xmlHandoverRepository.getLastXmlHandoverMail(DOCUMENT_UUID))
+        .thenReturn(XmlHandoverMail.builder().issuerAddress("test@digitalservice.bund.de").build());
 
     when(statusService.getLatestStatus(anyString())).thenReturn(PublicationStatus.UNPUBLISHED);
 
@@ -119,7 +119,7 @@ class JurisXmlExporterResponseProcessorTest {
             reportRepository,
             wrapperFactory,
             documentUnitRepository,
-            xmlPublicationRepository);
+            xmlHandoverRepository);
   }
 
   @Test
@@ -129,7 +129,7 @@ class JurisXmlExporterResponseProcessorTest {
     responseProcessor.readEmails();
 
     verify(storeFactory, times(1)).createStore();
-    verify(xmlPublicationRepository, times(1)).getLastXmlPublication(DOCUMENT_UUID);
+    verify(xmlHandoverRepository, times(1)).getLastXmlHandoverMail(DOCUMENT_UUID);
     verify(mailSender, times(1))
         .sendMail(any(), any(), any(), any(), any(), eq("report-" + DOCUMENT_NUMBER));
     verify(inbox, times(1)).copyMessages(new Message[] {importMessage}, processed);
@@ -157,7 +157,7 @@ class JurisXmlExporterResponseProcessorTest {
   @Test
   void testMessageGetsNotMovedIfDocumentNumberNotFound() throws MessagingException {
     when(inbox.getMessages()).thenReturn(new Message[] {importMessage});
-    when(xmlPublicationRepository.getLastXmlPublication(DOCUMENT_UUID)).thenReturn(null);
+    when(xmlHandoverRepository.getLastXmlHandoverMail(DOCUMENT_UUID)).thenReturn(null);
     TestMemoryAppender memoryAppender =
         new TestMemoryAppender(JurisXmlExporterResponseProcessor.class);
 
@@ -227,12 +227,12 @@ class JurisXmlExporterResponseProcessorTest {
     verify(reportRepository)
         .saveAll(
             List.of(
-                PublicationReport.builder()
+                HandoverReport.builder()
                     .content("report")
                     .documentNumber(DOCUMENT_NUMBER)
                     .receivedDate(now.toInstant())
                     .build(),
-                PublicationReport.builder()
+                HandoverReport.builder()
                     .content("spellcheck")
                     .documentNumber(DOCUMENT_NUMBER)
                     .receivedDate(now.toInstant())
@@ -313,12 +313,12 @@ class JurisXmlExporterResponseProcessorTest {
     verify(reportRepository)
         .saveAll(
             List.of(
-                PublicationReport.builder()
+                HandoverReport.builder()
                     .content(expectedHtml.replaceAll("\\s+", " ").replaceAll(">\\s+<", "><"))
                     .documentNumber(DOCUMENT_NUMBER)
                     .receivedDate(now.toInstant())
                     .build(),
-                PublicationReport.builder()
+                HandoverReport.builder()
                     .content("<p></p>")
                     .documentNumber(DOCUMENT_NUMBER)
                     .receivedDate(now.toInstant())
@@ -414,8 +414,8 @@ class JurisXmlExporterResponseProcessorTest {
   @Test
   void testLoggingForUnknownDocumentNumber() throws MessagingException {
     when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
-    when(xmlPublicationRepository.getLastXmlPublication(DOCUMENT_UUID))
-        .thenReturn(XmlPublication.builder().issuerAddress(null).build());
+    when(xmlHandoverRepository.getLastXmlHandoverMail(DOCUMENT_UUID))
+        .thenReturn(XmlHandoverMail.builder().issuerAddress(null).build());
 
     assertThatCode(responseProcessor::readEmails).doesNotThrowAnyException();
   }

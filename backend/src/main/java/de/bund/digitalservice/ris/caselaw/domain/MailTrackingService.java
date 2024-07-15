@@ -4,7 +4,7 @@ import org.springframework.http.ResponseEntity;
 
 public interface MailTrackingService {
 
-  EmailPublishState mapEventToPublishState(String mailTrackingEvent);
+  EmailStatus mapEventToStatus(String mailTrackingEvent);
 
   ResponseEntity<String> processMailSendingState(String documentUnitUuid, String event);
 }

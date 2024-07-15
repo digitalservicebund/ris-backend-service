@@ -30,7 +30,7 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
   @Override
   public void update(String documentNumber, Status status)
       throws DocumentationUnitNotExistsException {
-    saveStatus(status, getLatestPublishing(documentNumber));
+    saveStatus(status, getLatest(documentNumber));
   }
 
   private void saveStatus(Status status, StatusDTO previousStatusDTO) {
@@ -58,17 +58,15 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
     return entity.getPublicationStatus();
   }
 
-  private StatusDTO getLatestPublishing(String documentNumber)
-      throws DocumentationUnitNotExistsException {
+  private StatusDTO getLatest(String documentNumber) throws DocumentationUnitNotExistsException {
     var documentUnit =
         databaseDocumentationUnitRepository
             .findByDocumentNumber(documentNumber)
             .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
-    return getLatestPublishing(documentUnit.getId());
+    return getLatest(documentUnit.getId());
   }
 
-  private StatusDTO getLatestPublishing(UUID documentUuid)
-      throws DocumentationUnitNotExistsException {
+  private StatusDTO getLatest(UUID documentUuid) throws DocumentationUnitNotExistsException {
     return repository
         .findFirstByDocumentationUnitDTO_IdOrderByCreatedAtDesc(documentUuid)
         .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUuid));

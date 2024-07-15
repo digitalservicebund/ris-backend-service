@@ -4,17 +4,17 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransf
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
-import de.bund.digitalservice.ris.caselaw.domain.Publication;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecord;
+import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
-import de.bund.digitalservice.ris.caselaw.domain.XmlResultObject;
+import de.bund.digitalservice.ris.caselaw.domain.XmlExportResult;
+import de.bund.digitalservice.ris.caselaw.domain.XmlHandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
@@ -204,33 +204,32 @@ public class DocumentUnitController {
     }
   }
 
-  @PutMapping(value = "/{uuid}/publish", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping(value = "/{uuid}/handover", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
-  public ResponseEntity<Publication> publishDocumentUnitAsEmail(
+  public ResponseEntity<XmlHandoverMail> handoverDocumentUnitAsEmail(
       @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
 
     try {
-      var publication = service.publishAsEmail(uuid, userService.getEmail(oidcUser));
-      return ResponseEntity.ok(publication);
-    } catch (DocumentationUnitNotExistsException | DocumentUnitPublishException e) {
-      log.error("Error by publishing the documentation unit '{}' as email", uuid, e);
+      XmlHandoverMail xmlHandoverMail =
+          service.handoverAsEmail(uuid, userService.getEmail(oidcUser));
+      return ResponseEntity.ok(xmlHandoverMail);
+    } catch (DocumentationUnitNotExistsException | DocumentationUnitHandoverException e) {
+      log.error("Error handing over documentation unit '{}' as email", uuid, e);
       return ResponseEntity.internalServerError().build();
     }
   }
 
-  @GetMapping(value = "/{uuid}/publish", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/{uuid}/handover", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
-  public List<PublicationHistoryRecord> getPublicationHistory(@PathVariable UUID uuid) {
-    return service.getPublicationHistory(uuid);
+  public List<EventRecord> getEventLog(@PathVariable UUID uuid) {
+    return service.getEventLog(uuid);
   }
 
-  @GetMapping(
-      value = "/{uuid}/preview-publication-xml",
-      produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/{uuid}/preview-xml", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
-  public XmlResultObject getPublicationPreview(@PathVariable UUID uuid) {
+  public XmlExportResult getXmlPreview(@PathVariable UUID uuid) {
     try {
-      return service.previewPublication(uuid);
+      return service.createPreviewXml(uuid);
     } catch (DocumentationUnitNotExistsException e) {
       return null;
     }

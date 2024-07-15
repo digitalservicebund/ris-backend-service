@@ -49,8 +49,8 @@ class DocumentUnitServiceTest {
   @MockBean private DocumentUnitRepository repository;
   @MockBean private DocumentNumberService documentNumberService;
   @MockBean private DocumentNumberRecyclingService documentNumberRecyclingService;
-  @MockBean private EmailPublishService publishService;
-  @MockBean private PublicationReportRepository publicationReportRepository;
+  @MockBean private EmailService emailService;
+  @MockBean private HandoverReportRepository handoverReportRepository;
   @MockBean private DeltaMigrationRepository deltaMigrationRepository;
   @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @MockBean private AttachmentService attachmentService;
@@ -171,55 +171,55 @@ class DocumentUnitServiceTest {
   }
 
   @Test
-  void testPublishByEmail() throws DocumentationUnitNotExistsException {
+  void testHandoverByEmail() throws DocumentationUnitNotExistsException {
     when(repository.findByUuid(TEST_UUID))
         .thenReturn(Optional.ofNullable(DocumentUnit.builder().build()));
-    XmlPublication xmlPublication =
-        XmlPublication.builder()
+    XmlHandoverMail xmlHandoverMail =
+        XmlHandoverMail.builder()
             .documentUnitUuid(TEST_UUID)
             .receiverAddress("receiver address")
             .mailSubject("subject")
             .xml("xml")
-            .statusCode("200")
+            .success(true)
             .statusMessages(List.of("status messages"))
             .fileName("filename")
-            .publishDate(Instant.now())
+            .handoverDate(Instant.now())
             .build();
-    when(publishService.publish(eq(DocumentUnit.builder().build()), anyString(), anyString()))
-        .thenReturn(xmlPublication);
-    var mailResponse = service.publishAsEmail(TEST_UUID, ISSUER_ADDRESS);
-    assertThat(mailResponse).usingRecursiveComparison().isEqualTo(xmlPublication);
+    when(emailService.handOver(eq(DocumentUnit.builder().build()), anyString(), anyString()))
+        .thenReturn(xmlHandoverMail);
+    var mailResponse = service.handoverAsEmail(TEST_UUID, ISSUER_ADDRESS);
+    assertThat(mailResponse).usingRecursiveComparison().isEqualTo(xmlHandoverMail);
     verify(repository).findByUuid(TEST_UUID);
-    verify(publishService).publish(eq(DocumentUnit.builder().build()), anyString(), anyString());
+    verify(emailService).handOver(eq(DocumentUnit.builder().build()), anyString(), anyString());
   }
 
   @Test
-  void testPublishByEmail_withoutDocumentUnitForUuid() {
+  void testHandoverByEmail_withoutDocumentUnitForUuid() {
     when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.empty());
 
     Assertions.assertThrows(
         DocumentationUnitNotExistsException.class,
-        () -> service.publishAsEmail(TEST_UUID, ISSUER_ADDRESS));
+        () -> service.handoverAsEmail(TEST_UUID, ISSUER_ADDRESS));
     verify(repository).findByUuid(TEST_UUID);
-    verify(publishService, never())
-        .publish(eq(DocumentUnit.builder().build()), anyString(), anyString());
+    verify(emailService, never())
+        .handOver(eq(DocumentUnit.builder().build()), anyString(), anyString());
   }
 
   @Test
-  void testGetLastXmlPublication() {
-    XmlPublication xmlPublication =
-        XmlPublication.builder()
+  void testGetLastXmlHandoverMail() {
+    XmlHandoverMail xmlHandoverMail =
+        XmlHandoverMail.builder()
             .documentUnitUuid(TEST_UUID)
             .receiverAddress("receiver address")
             .mailSubject("subject")
             .xml("xml")
-            .statusCode("200")
+            .success(true)
             .statusMessages(List.of("message"))
             .fileName("filename")
-            .publishDate(Instant.now().minus(2, java.time.temporal.ChronoUnit.DAYS))
+            .handoverDate(Instant.now().minus(2, java.time.temporal.ChronoUnit.DAYS))
             .build();
-    when(publishService.getPublications(TEST_UUID)).thenReturn(List.of(xmlPublication));
-    when(publicationReportRepository.getAllByDocumentUnitUuid(TEST_UUID))
+    when(emailService.getHandoverResult(TEST_UUID)).thenReturn(List.of(xmlHandoverMail));
+    when(handoverReportRepository.getAllByDocumentUnitUuid(TEST_UUID))
         .thenReturn(Collections.emptyList());
     DeltaMigration deltaMigration =
         DeltaMigration.builder()
@@ -228,8 +228,8 @@ class DocumentUnitServiceTest {
             .build();
     when(deltaMigrationRepository.getLatestMigration(TEST_UUID)).thenReturn(deltaMigration);
 
-    var actual = service.getPublicationHistory(TEST_UUID);
-    assertThat(actual.get(1)).usingRecursiveComparison().isEqualTo(xmlPublication);
+    var actual = service.getEventLog(TEST_UUID);
+    assertThat(actual.get(1)).usingRecursiveComparison().isEqualTo(xmlHandoverMail);
     assertThat(actual.get(0))
         .usingRecursiveComparison()
         .isEqualTo(
@@ -237,7 +237,7 @@ class DocumentUnitServiceTest {
                 .xml("<?xml version=\"1.0\" encoding=\"UTF-8\"?><test>\n  <element/>\n</test>\n")
                 .build());
 
-    verify(publishService).getPublications(TEST_UUID);
+    verify(emailService).getHandoverResult(TEST_UUID);
     verify(deltaMigrationRepository).getLatestMigration(TEST_UUID);
   }
 
@@ -250,7 +250,7 @@ class DocumentUnitServiceTest {
             .build();
     when(deltaMigrationRepository.getLatestMigration(TEST_UUID)).thenReturn(deltaMigration);
 
-    var actual = service.getPublicationHistory(TEST_UUID);
+    var actual = service.getEventLog(TEST_UUID);
     assertThat(actual.get(0))
         .usingRecursiveComparison()
         .isEqualTo(
@@ -262,72 +262,69 @@ class DocumentUnitServiceTest {
   }
 
   @Test
-  void testGetLastPublicationReport() {
-    PublicationReport report =
-        new PublicationReport("documentNumber", "<html></html>", Instant.now());
-    when(publicationReportRepository.getAllByDocumentUnitUuid(TEST_UUID))
-        .thenReturn(List.of(report));
-    when(publishService.getPublications(TEST_UUID)).thenReturn(List.of());
+  void testGetLastHandoverReport() {
+    HandoverReport report = new HandoverReport("documentNumber", "<html></html>", Instant.now());
+    when(handoverReportRepository.getAllByDocumentUnitUuid(TEST_UUID)).thenReturn(List.of(report));
+    when(emailService.getHandoverResult(TEST_UUID)).thenReturn(List.of());
     when(deltaMigrationRepository.getLatestMigration(TEST_UUID)).thenReturn(null);
 
-    var publications = service.getPublicationHistory(TEST_UUID);
-    assertThat(publications.get(0)).usingRecursiveComparison().isEqualTo(report);
+    var events = service.getEventLog(TEST_UUID);
+    assertThat(events.get(0)).usingRecursiveComparison().isEqualTo(report);
 
-    verify(publishService).getPublications(TEST_UUID);
+    verify(emailService).getHandoverResult(TEST_UUID);
   }
 
   @Test
-  void testGetSortedPublicationLog() {
+  void testGetSortedEventLog() {
     Instant newest = Instant.now();
     Instant secondNewest = newest.minusSeconds(61);
     Instant thirdNewest = secondNewest.minusSeconds(61);
     Instant fourthNewest = thirdNewest.minusSeconds(61);
     Instant fifthNewest = fourthNewest.minusSeconds(61);
 
-    PublicationReport report1 = new PublicationReport("documentNumber", "<html></html>", newest);
+    HandoverReport report1 = new HandoverReport("documentNumber", "<html></html>", newest);
 
-    XmlPublication xml1 =
-        XmlPublication.builder()
+    XmlHandoverMail xml1 =
+        XmlHandoverMail.builder()
             .documentUnitUuid(TEST_UUID)
             .receiverAddress("receiver address")
             .mailSubject("subject")
             .xml("xml")
-            .statusCode("200")
+            .success(true)
             .statusMessages(List.of("message"))
             .fileName("filename")
-            .publishDate(secondNewest)
+            .handoverDate(secondNewest)
             .build();
 
-    PublicationReport report2 =
-        new PublicationReport("documentNumber", "<html></html>", thirdNewest);
+    HandoverReport report2 = new HandoverReport("documentNumber", "<html></html>", thirdNewest);
 
-    XmlPublication xml2 =
-        XmlPublication.builder()
+    XmlHandoverMail xml2 =
+        XmlHandoverMail.builder()
             .documentUnitUuid(TEST_UUID)
             .receiverAddress("receiver address")
             .mailSubject("subject")
             .xml("xml")
-            .statusCode("200")
+            .success(true)
             .statusMessages(List.of("message"))
             .fileName("filename")
-            .publishDate(fourthNewest)
+            .handoverDate(fourthNewest)
             .build();
 
     DeltaMigration deltaMigration = DeltaMigration.builder().migratedDate(fifthNewest).build();
 
-    when(publicationReportRepository.getAllByDocumentUnitUuid(TEST_UUID))
+    when(handoverReportRepository.getAllByDocumentUnitUuid(TEST_UUID))
         .thenReturn(List.of(report2, report1));
-    when(publishService.getPublications(TEST_UUID)).thenReturn(List.of(xml2, xml1));
+    when(emailService.getHandoverResult(TEST_UUID)).thenReturn(List.of(xml2, xml1));
     when(deltaMigrationRepository.getLatestMigration(TEST_UUID)).thenReturn(deltaMigration);
 
-    List<PublicationHistoryRecord> list = service.getPublicationHistory(TEST_UUID);
+    List<EventRecord> list = service.getEventLog(TEST_UUID);
     assertThat(list).hasSize(5);
     assertThat(list.get(0)).usingRecursiveComparison().isEqualTo(report1);
     assertThat(list.get(1)).usingRecursiveComparison().isEqualTo(xml1);
     assertThat(list.get(2)).usingRecursiveComparison().isEqualTo(report2);
     assertThat(list.get(3)).usingRecursiveComparison().isEqualTo(xml2);
     assertThat(list.get(4)).usingRecursiveComparison().isEqualTo(deltaMigration);
-    verify(publishService).getPublications(TEST_UUID);
+    verify(emailService).getHandoverResult(TEST_UUID);
   }
 
   @Test
@@ -445,14 +442,14 @@ class DocumentUnitServiceTest {
   }
 
   @Test
-  void testPreviewPublication() throws DocumentationUnitNotExistsException {
+  void testPreviewXml() throws DocumentationUnitNotExistsException {
     DocumentUnit testDocumentUnit = DocumentUnit.builder().build();
-    XmlResultObject mockXmlResultObject =
-        new XmlResultObject("some xml", "200", List.of("success"), "foo.xml", Instant.now());
+    XmlExportResult mockXmlExportResult =
+        new XmlExportResult("some xml", true, List.of("success"), "foo.xml", Instant.now());
     when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.ofNullable(testDocumentUnit));
-    when(publishService.getPublicationPreview(testDocumentUnit)).thenReturn(mockXmlResultObject);
+    when(emailService.getXmlPreview(testDocumentUnit)).thenReturn(mockXmlExportResult);
 
-    Assertions.assertEquals(mockXmlResultObject, service.previewPublication(TEST_UUID));
+    Assertions.assertEquals(mockXmlExportResult, service.createPreviewXml(TEST_UUID));
   }
 
   @Test

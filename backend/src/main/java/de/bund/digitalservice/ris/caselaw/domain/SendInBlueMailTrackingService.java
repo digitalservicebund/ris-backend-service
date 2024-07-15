@@ -19,10 +19,10 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
   }
 
   @Override
-  public EmailPublishState mapEventToPublishState(String mailTrackingEvent) {
+  public EmailStatus mapEventToStatus(String mailTrackingEvent) {
     var event = EventEnum.fromValue(mailTrackingEvent);
     if (event == null) {
-      return EmailPublishState.UNKNOWN;
+      return EmailStatus.UNKNOWN;
     }
     if (List.of(
             EventEnum.BOUNCES,
@@ -33,12 +33,12 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
             EventEnum.BLOCKED,
             EventEnum.ERROR)
         .contains(event)) {
-      return EmailPublishState.ERROR;
+      return EmailStatus.ERROR;
     }
     if (event == EventEnum.DELIVERED) {
-      return EmailPublishState.SUCCESS;
+      return EmailStatus.SUCCESS;
     }
-    return EmailPublishState.UNKNOWN;
+    return EmailStatus.UNKNOWN;
   }
 
   /**
@@ -55,12 +55,12 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
   @Override
   public ResponseEntity<String> processMailSendingState(String payloadTag, String event) {
 
-    EmailPublishState state = mapEventToPublishState(event);
-    if (state == EmailPublishState.UNKNOWN) {
+    EmailStatus state = mapEventToStatus(event);
+    if (state == EmailStatus.UNKNOWN) {
       return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    if (state == EmailPublishState.ERROR) {
+    if (state == EmailStatus.ERROR) {
       DocumentUnit documentUnit = documentUnitService.getByUuid(parseDocUnitUUID(payloadTag));
       log.error(
           documentUnit == null

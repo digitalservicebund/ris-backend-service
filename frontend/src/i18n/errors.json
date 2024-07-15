@@ -63,11 +63,11 @@
     "title": "Die Suchergebnisse konnten nicht geladen werden.",
     "description": "Bitte versuchen Sie es später erneut."
   },
-  "DOCUMENT_UNIT_JDV_HANDOVER_FAILED": {
+  "DOCUMENT_UNIT_HANDOVER_FAILED": {
     "title": "Leider ist ein Fehler aufgetreten.",
     "description": "Die Dokumentationseinheit kann nicht übergeben werden."
   },
-  "DOCUMENT_UNIT_LOADING_JDV_HANDOVER_FAILED": {
+  "DOCUMENT_UNIT_LOADING_HANDOVER_FAILED": {
     "title": "Fehler beim Laden der Ereignisse",
     "description": "Die Ereignisse konnten nicht geladen werden."
   },

@@ -3,13 +3,13 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.MailStoreFactory;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
-import de.bund.digitalservice.ris.caselaw.domain.XmlPublicationRepository;
+import de.bund.digitalservice.ris.caselaw.domain.XmlHandoverRepository;
 import de.bund.digitalservice.ris.domain.export.juris.response.ImportMessageWrapper;
 import de.bund.digitalservice.ris.domain.export.juris.response.MessageWrapper;
 import de.bund.digitalservice.ris.domain.export.juris.response.StatusImporterException;
@@ -41,28 +41,28 @@ public class JurisXmlExporterResponseProcessor {
   private final HttpMailSender mailSender;
   private final DocumentUnitStatusService statusService;
 
-  private final PublicationReportRepository reportRepository;
+  private final HandoverReportRepository reportRepository;
   private final MailStoreFactory storeFactory;
   private final JurisMessageWrapperFactory wrapperFactory;
 
   private final DocumentUnitRepository documentUnitRepository;
-  private final XmlPublicationRepository xmlPublicationRepository;
+  private final XmlHandoverRepository xmlHandoverRepository;
 
   public JurisXmlExporterResponseProcessor(
       HttpMailSender mailSender,
       DocumentUnitStatusService statusService,
       MailStoreFactory storeFactory,
-      PublicationReportRepository reportRepository,
+      HandoverReportRepository reportRepository,
       JurisMessageWrapperFactory wrapperFactory,
       DocumentUnitRepository documentUnitRepository,
-      XmlPublicationRepository xmlPublicationRepository) {
+      XmlHandoverRepository xmlHandoverRepository) {
     this.mailSender = mailSender;
     this.statusService = statusService;
     this.storeFactory = storeFactory;
     this.reportRepository = reportRepository;
     this.wrapperFactory = wrapperFactory;
     this.documentUnitRepository = documentUnitRepository;
-    this.xmlPublicationRepository = xmlPublicationRepository;
+    this.xmlHandoverRepository = xmlHandoverRepository;
   }
 
   @Scheduled(fixedDelay = 60000, initialDelay = 60000)
@@ -141,7 +141,7 @@ public class JurisXmlExporterResponseProcessor {
           mailAttachments.stream()
               .map(
                   attachment ->
-                      PublicationReport.builder()
+                      HandoverReport.builder()
                           .documentNumber(documentNumber)
                           .receivedDate(receivedDate)
                           .content(
@@ -205,16 +205,16 @@ public class JurisXmlExporterResponseProcessor {
       String subject = messageWrapper.getSubject();
       List<MailAttachment> mailAttachments = collectAttachments(messageWrapper);
 
-      var xmlPublication =
-          xmlPublicationRepository.getLastXmlPublication(
+      var xmlHandoverMail =
+          xmlHandoverRepository.getLastXmlHandoverMail(
               documentUnitRepository
                   .findByDocumentNumber(documentNumber)
                   .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber))
                   .uuid());
-      if (xmlPublication != null && xmlPublication.getIssuerAddress() != null) {
+      if (xmlHandoverMail != null && xmlHandoverMail.getIssuerAddress() != null) {
         mailSender.sendMail(
             storeFactory.getUsername(),
-            xmlPublication.getIssuerAddress(),
+            xmlHandoverMail.getIssuerAddress(),
             "FWD: " + subject,
             "Anbei weitergeleitet von der jDV:",
             mailAttachments,

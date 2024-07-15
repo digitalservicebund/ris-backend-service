@@ -249,12 +249,12 @@ class DocumentUnitControllerAuthTest {
   }
 
   @Test
-  void testPublishDocumentUnitAsEmail() throws DocumentationUnitNotExistsException {
+  void testHandoverDocumentUnitAsEmail() throws DocumentationUnitNotExistsException {
     mockDocumentUnit(docOffice2, null, null);
     when(userService.getEmail(any(OidcUser.class))).thenReturn("abc");
-    when(service.publishAsEmail(TEST_UUID, "abc")).thenReturn(null);
+    when(service.handoverAsEmail(TEST_UUID, "abc")).thenReturn(null);
 
-    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish";
+    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/handover";
 
     risWebTestClient
         .withLogin(docOffice1Group)
@@ -268,11 +268,11 @@ class DocumentUnitControllerAuthTest {
   }
 
   @Test
-  void testGetPublishedMails() {
+  void testGetEvents() {
     mockDocumentUnit(docOffice1, null, Status.builder().publicationStatus(PUBLISHED).build());
-    when(service.getPublicationHistory(TEST_UUID)).thenReturn(List.of());
+    when(service.getEventLog(TEST_UUID)).thenReturn(List.of());
 
-    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish";
+    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/handover";
 
     risWebTestClient.withLogin(docOffice1Group).get().uri(uri).exchange().expectStatus().isOk();
 

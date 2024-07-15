@@ -29,7 +29,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Node;
@@ -40,9 +39,9 @@ import org.xml.sax.SAXException;
 public class DocumentUnitService {
 
   private final DocumentUnitRepository repository;
-  private final PublicationReportRepository publicationReportRepository;
+  private final HandoverReportRepository handoverReportRepository;
   private final DocumentNumberService documentNumberService;
-  private final EmailPublishService publicationService;
+  private final EmailService emailService;
   private final DeltaMigrationRepository deltaMigrationRepository;
   private final AttachmentService attachmentService;
   private final DocumentNumberRecyclingService documentNumberRecyclingService;
@@ -54,18 +53,18 @@ public class DocumentUnitService {
   public DocumentUnitService(
       DocumentUnitRepository repository,
       DocumentNumberService documentNumberService,
-      EmailPublishService publicationService,
+      EmailService emailService,
       DeltaMigrationRepository migrationService,
-      PublicationReportRepository publicationReportRepository,
+      HandoverReportRepository handoverReportRepository,
       DocumentNumberRecyclingService documentNumberRecyclingService,
       Validator validator,
       AttachmentService attachmentService) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
-    this.publicationService = publicationService;
+    this.emailService = emailService;
     this.deltaMigrationRepository = migrationService;
-    this.publicationReportRepository = publicationReportRepository;
+    this.handoverReportRepository = handoverReportRepository;
     this.documentNumberRecyclingService = documentNumberRecyclingService;
     this.validator = validator;
     this.attachmentService = attachmentService;
@@ -184,7 +183,7 @@ public class DocumentUnitService {
         .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnit.documentNumber()));
   }
 
-  public Publication publishAsEmail(UUID documentUnitUuid, String issuerAddress)
+  public XmlHandoverMail handoverAsEmail(UUID documentUnitUuid, String issuerAddress)
       throws DocumentationUnitNotExistsException {
 
     DocumentUnit documentUnit =
@@ -192,29 +191,29 @@ public class DocumentUnitService {
             .findByUuid(documentUnitUuid)
             .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnitUuid));
 
-    XmlPublication mailResponse =
-        publicationService.publish(documentUnit, recipientAddress, issuerAddress);
-    if (!mailResponse.getStatusCode().equals(String.valueOf(HttpStatus.OK.value()))) {
+    XmlHandoverMail mailResponse =
+        emailService.handOver(documentUnit, recipientAddress, issuerAddress);
+    if (!mailResponse.success()) {
       log.warn("Failed to send mail for documentation unit {}", documentUnitUuid);
     }
 
     return mailResponse;
   }
 
-  public XmlResultObject previewPublication(UUID documentUuid)
+  public XmlExportResult createPreviewXml(UUID documentUuid)
       throws DocumentationUnitNotExistsException {
     DocumentUnit documentUnit =
         repository
             .findByUuid(documentUuid)
             .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUuid));
-    return publicationService.getPublicationPreview(documentUnit);
+    return emailService.getXmlPreview(documentUnit);
   }
 
-  public List<PublicationHistoryRecord> getPublicationHistory(UUID documentUuid) {
-    List<PublicationHistoryRecord> list =
+  public List<EventRecord> getEventLog(UUID documentUuid) {
+    List<EventRecord> list =
         ListUtils.union(
-            publicationService.getPublications(documentUuid),
-            publicationReportRepository.getAllByDocumentUnitUuid(documentUuid));
+            emailService.getHandoverResult(documentUuid),
+            handoverReportRepository.getAllByDocumentUnitUuid(documentUuid));
     var migration = deltaMigrationRepository.getLatestMigration(documentUuid);
     if (migration != null) {
       list.add(
@@ -222,7 +221,7 @@ public class DocumentUnitService {
               ? migration.toBuilder().xml(prettifyXml(migration.xml())).build()
               : migration);
     }
-    list.sort(Comparator.comparing(PublicationHistoryRecord::getDate).reversed());
+    list.sort(Comparator.comparing(EventRecord::getDate).reversed());
     return list;
   }
 

@@ -6,7 +6,7 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
-import de.bund.digitalservice.ris.caselaw.domain.EmailPublishState;
+import de.bund.digitalservice.ris.caselaw.domain.EmailStatus;
 import de.bund.digitalservice.ris.caselaw.domain.MailTrackingService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.UUID;
@@ -36,7 +36,7 @@ class AdminControllerTest {
 
   @Test
   void testSetPublishState_withValidPayload() {
-    EmailPublishState expectedEmailPublishState = EmailPublishState.SUCCESS;
+    EmailStatus expectedEmailStatus = EmailStatus.SUCCESS;
     String mailTrackingEvent = "delivered";
     String sendInBlueResponse =
         String.format(
@@ -48,8 +48,7 @@ class AdminControllerTest {
                                 }""",
             mailTrackingEvent, TEST_UUID);
 
-    when(mailTrackingService.mapEventToPublishState(mailTrackingEvent))
-        .thenReturn(expectedEmailPublishState);
+    when(mailTrackingService.mapEventToStatus(mailTrackingEvent)).thenReturn(expectedEmailStatus);
     when(mailTrackingService.processMailSendingState(TEST_UUID.toString(), mailTrackingEvent))
         .thenReturn(ResponseEntity.ok().build());
 
@@ -118,8 +117,7 @@ class AdminControllerTest {
 
     when(mailTrackingService.processMailSendingState("no-uuid", "delivered"))
         .thenReturn(ResponseEntity.noContent().build());
-    when(mailTrackingService.mapEventToPublishState("delivered"))
-        .thenReturn(EmailPublishState.SUCCESS);
+    when(mailTrackingService.mapEventToStatus("delivered")).thenReturn(EmailStatus.SUCCESS);
 
     risWebTestClient
         .withDefaultLogin()

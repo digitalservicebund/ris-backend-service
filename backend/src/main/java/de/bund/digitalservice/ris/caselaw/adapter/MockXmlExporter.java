@@ -1,18 +1,21 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.XmlExportResult;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
-import de.bund.digitalservice.ris.caselaw.domain.XmlResultObject;
 import java.time.Instant;
 import java.util.List;
 
 public class MockXmlExporter implements XmlExporter {
 
   @Override
-  public XmlResultObject generateXml(DocumentUnit documentUnit) {
-    String statusCode = documentUnit.coreData().decisionDate() == null ? "400" : "200";
-    return new XmlResultObject(
-        "xml", statusCode, List.of("message 1", "message 2"), "test.xml", Instant.now());
+  public XmlExportResult generateXml(DocumentUnit documentUnit) {
+    return new XmlExportResult(
+        "xml",
+        documentUnit.coreData().decisionDate() != null,
+        List.of("message 1", "message 2"),
+        "test.xml",
+        Instant.now());
   }
 
   @Override

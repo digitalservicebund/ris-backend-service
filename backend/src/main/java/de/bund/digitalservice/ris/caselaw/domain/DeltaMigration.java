@@ -9,10 +9,10 @@ import lombok.Builder;
 public record DeltaMigration(
     String xml,
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY, value = "date") Instant migratedDate)
-    implements PublicationHistoryRecord {
+    implements EventRecord {
   @Override
-  public PublicationHistoryRecordType getType() {
-    return PublicationHistoryRecordType.MIGRATION;
+  public EventType getType() {
+    return EventType.MIGRATION;
   }
 
   @Override

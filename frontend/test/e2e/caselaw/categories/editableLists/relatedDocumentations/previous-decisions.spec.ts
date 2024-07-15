@@ -2,7 +2,7 @@ import { expect } from "@playwright/test"
 import {
   navigateToCategories,
   waitForSaving,
-  publishDocumentationUnit,
+  handoverDocumentationUnit,
   fillPreviousDecisionInputs,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
@@ -148,7 +148,7 @@ test.describe("previous decisions", () => {
     documentNumber,
     prefilledDocumentUnit,
   }) => {
-    await publishDocumentationUnit(
+    await handoverDocumentationUnit(
       page,
       prefilledDocumentUnit.documentNumber || "",
     )

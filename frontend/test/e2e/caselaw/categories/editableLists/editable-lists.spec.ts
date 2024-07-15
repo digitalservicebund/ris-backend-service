@@ -7,7 +7,7 @@ import {
   fillActiveCitationInputs,
   fillEnsuingDecisionInputs,
   navigateToCategories,
-  publishDocumentationUnit,
+  handoverDocumentationUnit,
   waitForSaving,
   fillNormInputs,
 } from "~/e2e/caselaw/e2e-utils"
@@ -138,7 +138,7 @@ test.describe("related documentation units", () => {
     documentNumber,
     prefilledDocumentUnit,
   }) => {
-    await publishDocumentationUnit(
+    await handoverDocumentationUnit(
       page,
       prefilledDocumentUnit.documentNumber || "",
     )

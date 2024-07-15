@@ -164,7 +164,7 @@ onMounted(async () => {
           <ExtraContentSidePanel
             v-if="
               !(
-                route.path.includes('publication') ||
+                route.path.includes('handover') ||
                 route.path.includes('preview')
               )
             "

@@ -64,7 +64,7 @@ export function useCaseLawMenuItems(
       label: "Übergabe an jDV",
       route: {
         ...baseRoute,
-        name: "caselaw-documentUnit-documentNumber-publication",
+        name: "caselaw-documentUnit-documentNumber-handover",
       },
     },
   ]

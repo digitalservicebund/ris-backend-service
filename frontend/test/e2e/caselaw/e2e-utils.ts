@@ -70,23 +70,23 @@ export const navigateToFiles = async (page: Page, documentNumber: string) => {
   })
 }
 
-export const navigateToPublication = async (
+export const nagivateToHandover = async (
   page: Page,
   documentNumber: string,
 ) => {
   await test.step("Navigate to 'Übergabe an jDV'", async () => {
-    await page.goto(`/caselaw/documentunit/${documentNumber}/publication`)
+    await page.goto(`/caselaw/documentunit/${documentNumber}/handover`)
     await expect(page.locator("h1:has-text('Übergabe an jDV')")).toBeVisible({
       timeout: 15000, // for backend warm up
     })
   })
 }
 
-export const publishDocumentationUnit = async (
+export const handoverDocumentationUnit = async (
   page: Page,
   documentNumber: string,
 ) => {
-  await navigateToPublication(page, documentNumber)
+  await nagivateToHandover(page, documentNumber)
   await page
     .locator("[aria-label='Dokumentationseinheit an jDV übergeben']")
     .click()

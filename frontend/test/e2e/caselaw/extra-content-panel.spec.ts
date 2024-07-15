@@ -4,7 +4,7 @@ import {
   navigateToCategories,
   navigateToFiles,
   navigateToPreview,
-  navigateToPublication,
+  nagivateToHandover,
   navigateToSearch,
   uploadTestfile,
 } from "./e2e-utils"
@@ -67,8 +67,8 @@ test.describe(
           await expect(page.locator("#attachment-view")).toBeVisible()
         })
 
-        await test.step("navigate to publication, check that panel is not displayed", async () => {
-          await navigateToPublication(page, documentNumber)
+        await test.step("navigate to handover, check that panel is not displayed", async () => {
+          await nagivateToHandover(page, documentNumber)
           await expect(page.getByLabel("Seitenpanel schließen")).toBeHidden()
           await expect(page.getByLabel("Seitenpanel öffnen")).toBeHidden()
         })
@@ -231,8 +231,8 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
       // DS does not export note field, that's why we need BGH user here
       async ({ pageWithBghUser, prefilledDocumentUnitBgh }) => {
         const documentNumber = prefilledDocumentUnitBgh.documentNumber!
-        await test.step("Confirm note is exported in XML on publish page", async () => {
-          await navigateToPublication(pageWithBghUser, documentNumber)
+        await test.step("Confirm note is exported in XML on handover page", async () => {
+          await nagivateToHandover(pageWithBghUser, documentNumber)
           await expect(pageWithBghUser.getByText("XML Vorschau")).toBeVisible()
 
           await pageWithBghUser.getByText("XML Vorschau").click()
@@ -251,8 +251,8 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
           await pageWithBghUser.waitForEvent("requestfinished")
         })
 
-        await test.step("Confirm note is not exported in XML on publish page", async () => {
-          await navigateToPublication(pageWithBghUser, documentNumber)
+        await test.step("Confirm note is not exported in XML on handover page", async () => {
+          await nagivateToHandover(pageWithBghUser, documentNumber)
           await expect(pageWithBghUser.getByText("XML Vorschau")).toBeVisible()
 
           await pageWithBghUser.getByText("XML Vorschau").click()

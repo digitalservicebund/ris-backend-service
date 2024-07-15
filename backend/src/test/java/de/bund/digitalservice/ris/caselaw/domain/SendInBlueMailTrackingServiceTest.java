@@ -28,27 +28,27 @@ class SendInBlueMailTrackingServiceTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
 
   @Test
-  void testMapEventToPublishState_withSuccessfulState() {
-    EmailPublishState expectedEmailPublishState = EmailPublishState.SUCCESS;
-    EmailPublishState mappedEmailPublishState = service.mapEventToPublishState("delivered");
+  void testMapMailEventToState_withSuccessfulState() {
+    EmailStatus expectedEmailStatus = EmailStatus.SUCCESS;
+    EmailStatus mappedEmailStatus = service.mapEventToStatus("delivered");
 
-    assertThat(mappedEmailPublishState).isEqualTo(expectedEmailPublishState);
+    assertThat(mappedEmailStatus).isEqualTo(expectedEmailStatus);
   }
 
   @Test
-  void testMapEventToPublishState_withUnsuccessfulState() {
-    EmailPublishState expectedEmailPublishState = EmailPublishState.ERROR;
-    EmailPublishState mappedEmailPublishState = service.mapEventToPublishState("bounces");
+  void testMapMailEventToState_withUnsuccessfulState() {
+    EmailStatus expectedEmailStatus = EmailStatus.ERROR;
+    EmailStatus mappedEmailStatus = service.mapEventToStatus("bounces");
 
-    assertThat(mappedEmailPublishState).isEqualTo(expectedEmailPublishState);
+    assertThat(mappedEmailStatus).isEqualTo(expectedEmailStatus);
   }
 
   @Test
-  void testMapEventToPublishState_withNeutralState() {
-    EmailPublishState expectedEmailPublishState = EmailPublishState.UNKNOWN;
-    EmailPublishState mappedEmailPublishState = service.mapEventToPublishState("opened");
+  void testMailEventToState_withNeutralState() {
+    EmailStatus expectedEmailStatus = EmailStatus.UNKNOWN;
+    EmailStatus mappedEmailStatus = service.mapEventToStatus("opened");
 
-    assertThat(mappedEmailPublishState).isEqualTo(expectedEmailPublishState);
+    assertThat(mappedEmailStatus).isEqualTo(expectedEmailStatus);
   }
 
   @Test
@@ -86,7 +86,7 @@ class SendInBlueMailTrackingServiceTest {
         // unknown event
         "randomEvent"
       })
-  void testUpdatePublishingState_noReactionOnOtherState(String event) {
+  void testUpdateState_noReactionOnOtherState(String event) {
     ResponseEntity<String> responseEntity =
         service.processMailSendingState(TEST_UUID.toString(), event);
     assertThat(responseEntity.getStatusCode().isSameCodeAs(HttpStatusCode.valueOf(204))).isTrue();
