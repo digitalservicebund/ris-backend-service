@@ -33,16 +33,13 @@ public class ReferenceDTO {
 
   private String type;
 
+  // Klammerzusatz
   @Column(name = "reference_supplement")
   private String referenceSupplement;
 
   @JoinColumn(name = "legal_periodical_id")
   @ManyToOne
   private LegalPeriodicalDTO legalPeriodical;
-
-  @Column(name = "legal_periodical_raw_value")
-  @NotBlank
-  private String legalPeriodicalRawValue;
 
   @NotBlank private String citation;
 

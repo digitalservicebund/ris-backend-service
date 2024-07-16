@@ -10,6 +10,7 @@ import PreviewContentRelatedIndexing from "@/components/preview/PreviewContentRe
 import PreviewCoreData from "@/components/preview/PreviewCoreData.vue"
 import PreviewNote from "@/components/preview/PreviewNote.vue"
 import PreviewProceedingDecisions from "@/components/preview/PreviewProceedingDecisions.vue"
+import PreviewReferences from "@/components/preview/PreviewReferences.vue"
 import PreviewTexts from "@/components/preview/PreviewTexts.vue"
 import DocumentUnit from "@/domain/documentUnit"
 
@@ -46,5 +47,6 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
       :texts="documentUnit.texts"
       :valid-border-numbers="documentUnit.borderNumbers"
     />
+    <PreviewReferences :references="documentUnit.references || []" />
   </FlexContainer>
 </template>
