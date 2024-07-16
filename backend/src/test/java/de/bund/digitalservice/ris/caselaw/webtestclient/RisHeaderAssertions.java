@@ -21,6 +21,17 @@ public class RisHeaderAssertions {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+
+    return responseSpec;
+  }
+
+  public RisResponseSpec valueEquals(String name, String value) {
+    try {
+      resultActions.andExpect(header().string(name, value));
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+
     return responseSpec;
   }
 }

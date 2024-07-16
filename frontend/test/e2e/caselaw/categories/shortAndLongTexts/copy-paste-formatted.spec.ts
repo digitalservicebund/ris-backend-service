@@ -1,4 +1,4 @@
-import { expect } from "@playwright/test"
+import { expect, Locator, Page } from "@playwright/test"
 import {
   navigateToFiles,
   uploadTestfile,
@@ -16,7 +16,10 @@ test.beforeEach(async ({ page, documentNumber }) => {
   await navigateToFiles(page, documentNumber)
 })
 
-test("copy-paste from side panel", async ({ page, documentNumber }) => {
+test("copy-paste text with different styles and alignments from side panel", async ({
+  page,
+  documentNumber,
+}) => {
   const leftAlignText = "I am left aligned"
   const rightAlignText = "I am right aligned"
   const centerAlignText = "I am centered"
@@ -43,6 +46,79 @@ test("copy-paste from side panel", async ({ page, documentNumber }) => {
   await expect(page.getByText(centerAlignText)).toBeVisible()
   await expect(page.getByText(justifyAlignText)).toBeVisible()
   const originalFileParagraph = page.getByText("centered")
+  const inputField = await copyPaste(originalFileParagraph, page)
+
+  // Check all text copied
+  const inputFieldAlleText = await inputField.allTextContents()
+  expect(inputFieldAlleText[0].includes(leftAlignText)).toBeTruthy()
+  expect(inputFieldAlleText[0].includes(rightAlignText)).toBeTruthy()
+  expect(inputFieldAlleText[0].includes(centerAlignText)).toBeTruthy()
+  expect(inputFieldAlleText[0].includes(justifyAlignText)).toBeTruthy()
+
+  // hide invisible characters
+  await inputField.click()
+  await page.getByLabel("invisible-characters").click()
+
+  const inputFieldInnerHTML = await inputField.innerHTML()
+  // Check all text copied with style
+  expect(inputFieldInnerHTML.includes(leftAlignTextWithStyle)).toBeTruthy()
+  expect(inputFieldInnerHTML.includes(rightAlignTextWithStyle)).toBeTruthy()
+  expect(inputFieldInnerHTML.includes(centerAlignTextWithStyle)).toBeTruthy()
+  expect(inputFieldInnerHTML.includes(justifyAlignTextWithStyle)).toBeTruthy()
+})
+
+test("copy-paste indented text from side panel", async ({
+  page,
+  documentNumber,
+}) => {
+  const noIndentationText = "Abschnitt mit Einzug 0"
+  const singleIndentationText = "Abschnitt mit Einzug 1"
+  const doubleIndentationText = "Abschnitt mit Einzug 2"
+  const tripleIndentationText = "Abschnitt mit Einzug 3"
+  const noIndentation = `<p>Abschnitt mit Einzug 0</p>`
+  const singleIndentation = `<p style="margin-left: 40px!important;">Abschnitt mit Einzug 1</p>`
+  const doubleIndentation = `<p style="margin-left: 80px!important;">Abschnitt mit Einzug 2</p>`
+  const tripleIndentation = `<p style="margin-left: 120px!important;">Abschnitt mit Einzug 3</p>`
+
+  // upload file
+  await uploadTestfile(page, "some-indentations.docx")
+  await expect(page.getByText("some-indentations.docx")).toBeVisible()
+  await expect(page.getByLabel(`Datei löschen`)).toBeVisible()
+  await expect(page.getByText(noIndentationText)).toBeVisible()
+  await expect(page.getByText(singleIndentationText)).toBeVisible()
+  await expect(page.getByText(doubleIndentationText)).toBeVisible()
+  await expect(page.getByText(tripleIndentationText)).toBeVisible()
+
+  // Click on "Rubriken" und check if original document loaded
+  await navigateToCategories(page, documentNumber)
+
+  await expect(page.getByLabel("Ladestatus")).toBeHidden()
+  await expect(page.getByText(singleIndentationText)).toBeVisible()
+  await expect(page.getByText(doubleIndentationText)).toBeVisible()
+  await expect(page.getByText(tripleIndentationText)).toBeVisible()
+  const originalFileParagraph = page.getByText("Text", { exact: true })
+  const inputField = await copyPaste(originalFileParagraph, page)
+
+  // Check all text copied
+  const inputFieldAlleText = await inputField.allTextContents()
+  expect(inputFieldAlleText[0].includes(noIndentationText)).toBeTruthy()
+  expect(inputFieldAlleText[0].includes(singleIndentationText)).toBeTruthy()
+  expect(inputFieldAlleText[0].includes(doubleIndentationText)).toBeTruthy()
+  expect(inputFieldAlleText[0].includes(tripleIndentationText)).toBeTruthy()
+
+  // hide invisible characters
+  await inputField.click()
+  await page.getByLabel("invisible-characters").click()
+
+  const inputFieldInnerHTML = await inputField.innerHTML()
+  // Check all text copied with style
+  expect(inputFieldInnerHTML.includes(singleIndentation)).toBeTruthy()
+  expect(inputFieldInnerHTML.includes(doubleIndentation)).toBeTruthy()
+  expect(inputFieldInnerHTML.includes(tripleIndentation)).toBeTruthy()
+  expect(inputFieldInnerHTML.includes(noIndentation)).toBeTruthy()
+})
+
+async function copyPaste(originalFileParagraph: Locator, page: Page) {
   await expect(originalFileParagraph).toBeVisible()
 
   // Selected all text from sidepanel
@@ -72,26 +148,10 @@ test("copy-paste from side panel", async ({ page, documentNumber }) => {
     : "Control"
   await page.keyboard.press(`${modifier}+KeyC`)
 
-  // paste from clipboard into input field "Entscheidungsgründe"
+  // paste from clipboard into input field "Leitsatz"
   const inputField = page.locator("[data-testid='Leitsatz']")
   await inputField.click()
   await page.keyboard.press(`${modifier}+KeyV`)
 
-  // Check all text copied
-  const inputFieldAlleText = await inputField.allTextContents()
-  expect(inputFieldAlleText[0].includes(leftAlignText)).toBeTruthy()
-  expect(inputFieldAlleText[0].includes(rightAlignText)).toBeTruthy()
-  expect(inputFieldAlleText[0].includes(centerAlignText)).toBeTruthy()
-  expect(inputFieldAlleText[0].includes(justifyAlignText)).toBeTruthy()
-
-  // hide invisible characters
-  await inputField.click()
-  await page.getByLabel("invisible-characters").click()
-
-  const inputFieldInnerHTML = await inputField.innerHTML()
-  // Check all text copied with style
-  expect(inputFieldInnerHTML.includes(leftAlignTextWithStyle)).toBeTruthy()
-  expect(inputFieldInnerHTML.includes(rightAlignTextWithStyle)).toBeTruthy()
-  expect(inputFieldInnerHTML.includes(centerAlignTextWithStyle)).toBeTruthy()
-  expect(inputFieldInnerHTML.includes(justifyAlignTextWithStyle)).toBeTruthy()
-})
+  return inputField
+}

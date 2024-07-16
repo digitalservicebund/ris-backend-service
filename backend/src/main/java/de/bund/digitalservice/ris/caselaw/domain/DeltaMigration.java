@@ -4,15 +4,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
 import lombok.Builder;
 
-/** Domain object for delta migration runs */
+/** Domain object for delta migration runs or import events */
 @Builder(toBuilder = true)
 public record DeltaMigration(
     String xml,
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY, value = "date") Instant migratedDate)
-    implements PublicationHistoryRecord {
+    implements EventRecord {
   @Override
-  public PublicationHistoryRecordType getType() {
-    return PublicationHistoryRecordType.MIGRATION;
+  public EventType getType() {
+    return EventType.MIGRATION;
   }
 
   @Override

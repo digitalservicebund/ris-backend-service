@@ -42,10 +42,10 @@ function renderComponent() {
         },
       },
       {
-        path: "/caselaw/documentUnit/:documentNumber/publication",
-        name: "caselaw-documentUnit-documentNumber-publication",
+        path: "/caselaw/documentUnit/:documentNumber/handover",
+        name: "caselaw-documentUnit-documentNumber-handover",
         component: {
-          template: "<div data-testid='publication'>Publication</div>",
+          template: "<div data-testid='handover'>Handover</div>",
         },
       },
       {
@@ -161,11 +161,11 @@ describe("Document Number Route", () => {
       expect(screen.getByTestId("files")).toBeInTheDocument()
     })
 
-    test("should render publication with only nav side panel and header", async () => {
+    test("should render handover with only nav side panel and header", async () => {
       const { router } = renderComponent()
 
       await router.push({
-        path: "/caselaw/documentUnit/1234567891234/publication",
+        path: "/caselaw/documentUnit/1234567891234/handover",
       })
 
       expect(screen.getByTestId("side-toggle-navigation")).toBeInTheDocument()
@@ -182,7 +182,7 @@ describe("Document Number Route", () => {
       ).not.toBeInTheDocument()
 
       // Main route is rendered
-      expect(screen.getByTestId("publication")).toBeInTheDocument()
+      expect(screen.getByTestId("handover")).toBeInTheDocument()
     })
 
     test("should render preview without side panels and header", async () => {

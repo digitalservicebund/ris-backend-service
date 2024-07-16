@@ -22,14 +22,15 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
+import de.bund.digitalservice.ris.caselaw.domain.EmailService;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
@@ -69,7 +70,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseDocumentNumberRecyclingService.class,
       DatabaseDocumentUnitStatusService.class,
       PostgresDocumentationUnitRepositoryImpl.class,
-      PostgresPublicationReportRepositoryImpl.class,
+      PostgresHandoverReportRepositoryImpl.class,
       PostgresJPAConfig.class,
       FlywayConfig.class,
       SecurityConfig.class,
@@ -98,11 +99,13 @@ class DocumentUnitControllerAuthIntegrationTest {
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
-  @MockBean private EmailPublishService publishService;
+  @MockBean private EmailService emailService;
   @MockBean DocxConverterService docxConverterService;
   @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean AttachmentService attachmentService;
   @MockBean private PatchMapperService patchMapperService;
+
+  @MockBean private HandoverService handoverService;
 
   static Stream<Arguments> getUnauthorizedCases() {
     return Stream.of(
@@ -145,7 +148,6 @@ class DocumentUnitControllerAuthIntegrationTest {
   @AfterEach
   void cleanUp() {
     repository.deleteAll();
-    //    databasePublishReportRepository.deleteAll().block();
   }
 
   @ParameterizedTest

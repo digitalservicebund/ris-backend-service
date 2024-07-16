@@ -1,6 +1,9 @@
 import { expect, Page } from "@playwright/test"
 import { generateString } from "../../test-helper/dataGenerators"
+import { caselawTest as test } from "./fixtures"
 import SingleNorm from "@/domain/singleNorm"
+
+/* eslint-disable playwright/no-conditional-in-test */
 
 const getAllQueryParamsFromUrl = (page: Page): string => {
   const url = new URL(page.url())
@@ -8,12 +11,21 @@ const getAllQueryParamsFromUrl = (page: Page): string => {
   return params ? `?${params}` : ""
 }
 
-export const navigateToSearch = async (page: Page) => {
-  await page.goto(`/caselaw`)
-  await page.waitForURL("/caselaw")
+export const navigateToSearch = async (
+  page: Page,
+  { navigationBy }: { navigationBy: "click" | "url" } = { navigationBy: "url" },
+) => {
+  await test.step("Navigate to 'Suche'", async () => {
+    if (navigationBy === "url") {
+      await page.goto(`/caselaw`)
+    } else {
+      await page.getByRole("link", { name: "Suche" }).click()
+    }
+    await page.waitForURL("/caselaw")
 
-  await expect(page.getByText("Übersicht Rechtsprechung")).toBeVisible({
-    timeout: 15000, // for backend warm up
+    await expect(page.getByText("Übersicht Rechtsprechung")).toBeVisible({
+      timeout: 15000, // for backend warm up
+    })
   })
 }
 
@@ -21,57 +33,66 @@ export const navigateToCategories = async (
   page: Page,
   documentNumber: string,
 ) => {
-  const queryParams = getAllQueryParamsFromUrl(page)
-  const baseUrl = `/caselaw/documentunit/${documentNumber}/categories${queryParams}`
+  await test.step("Navigate to 'Rubriken'", async () => {
+    const queryParams = getAllQueryParamsFromUrl(page)
+    const baseUrl = `/caselaw/documentunit/${documentNumber}/categories${queryParams}`
 
-  await page.goto(baseUrl)
-  await expect(page.getByText("Spruchkörper")).toBeVisible({
-    timeout: 15000, // for backend warm up
+    await page.goto(baseUrl)
+    await expect(page.getByText("Spruchkörper")).toBeVisible({
+      timeout: 15000, // for backend warm up
+    })
+    await expect(page.getByText(documentNumber)).toBeVisible()
   })
-  await expect(page.getByText(documentNumber)).toBeVisible()
 }
 
 export const navigateToPreview = async (page: Page, documentNumber: string) => {
-  const queryParams = getAllQueryParamsFromUrl(page)
-  const baseUrl = `/caselaw/documentunit/${documentNumber}/preview${queryParams}`
+  await test.step("Navigate to 'Vorschau'", async () => {
+    const queryParams = getAllQueryParamsFromUrl(page)
+    const baseUrl = `/caselaw/documentunit/${documentNumber}/preview${queryParams}`
 
-  await page.goto(baseUrl)
-  await expect(page.getByTestId("preview")).toBeVisible({
-    timeout: 15000, // for backend warm up
+    await page.goto(baseUrl)
+    await expect(page.getByTestId("preview")).toBeVisible({
+      timeout: 15000, // for backend warm up
+    })
+    await expect(page.getByText(documentNumber)).toBeVisible()
   })
-  await expect(page.getByText(documentNumber)).toBeVisible()
 }
 
 export const navigateToFiles = async (page: Page, documentNumber: string) => {
-  const queryParams = getAllQueryParamsFromUrl(page)
-  await page.goto(`/caselaw/documentunit/${documentNumber}/files${queryParams}`)
-  await expect(page.locator("h1:has-text('Dokumente')")).toBeVisible({
-    timeout: 15000, // for backend warm up
+  await test.step("Navigate to 'Dokumente'", async () => {
+    const queryParams = getAllQueryParamsFromUrl(page)
+    await page.goto(
+      `/caselaw/documentunit/${documentNumber}/files${queryParams}`,
+    )
+    await expect(page.locator("h1:has-text('Dokumente')")).toBeVisible({
+      timeout: 15000, // for backend warm up
+    })
   })
 }
 
-export const navigateToPublication = async (
+export const nagivateToHandover = async (
   page: Page,
   documentNumber: string,
 ) => {
-  await page.goto(`/caselaw/documentunit/${documentNumber}/publication`)
-  await expect(page.locator("h1:has-text('Veröffentlichen')")).toBeVisible({
-    timeout: 15000, // for backend warm up
+  await test.step("Navigate to 'Übergabe an jDV'", async () => {
+    await page.goto(`/caselaw/documentunit/${documentNumber}/handover`)
+    await expect(page.locator("h1:has-text('Übergabe an jDV')")).toBeVisible({
+      timeout: 15000, // for backend warm up
+    })
   })
 }
 
-export const publishDocumentationUnit = async (
+export const handoverDocumentationUnit = async (
   page: Page,
   documentNumber: string,
 ) => {
-  await navigateToPublication(page, documentNumber)
+  await nagivateToHandover(page, documentNumber)
   await page
-    .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
+    .locator("[aria-label='Dokumentationseinheit an jDV übergeben']")
     .click()
   await expect(page.getByText("Email wurde versendet")).toBeVisible()
 
   await expect(page.getByText("Xml Email Abgabe -")).toBeVisible()
-  await expect(page.getByText("In Veröffentlichung")).toBeVisible()
 }
 
 export const uploadTestfile = async (

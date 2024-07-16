@@ -10,9 +10,9 @@ plugins {
     java
     jacoco
     id("org.springframework.boot") version "3.3.1"
-    id("io.spring.dependency-management") version "1.1.5"
+    id("io.spring.dependency-management") version "1.1.6"
     id("com.diffplug.spotless") version "6.25.0"
-    id("org.sonarqube") version "5.0.0.4638"
+    id("org.sonarqube") version "5.1.0.4882"
     id("com.github.jk1.dependency-license-report") version "2.8"
     id("com.gorylenko.gradle-git-properties") version "2.4.2"
     id("com.adarshr.test-logger") version "4.0.0"
@@ -145,11 +145,9 @@ dependencies {
     implementation("org.springframework.security:spring-security-oauth2-resource-server:6.3.1")
 
     // CVE-2024-22262
-    implementation("org.springframework:spring-web:6.1.10")
+    implementation("org.springframework:spring-web:6.1.11")
 
-    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.6.0")
-
-    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.2")
+    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.3")
 
     // CVE-2024-26308
     implementation("org.apache.commons:commons-compress:1.26.2")
@@ -166,7 +164,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.1")
 
-    implementation(platform("software.amazon.awssdk:bom:2.26.15"))
+    implementation(platform("software.amazon.awssdk:bom:2.26.20"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -178,7 +176,7 @@ dependencies {
     implementation("com.icegreen:greenmail:2.1.0-rc-1")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.44") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.45") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
@@ -186,20 +184,20 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.12")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.14")
     // for local development:
     // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.8.jar"))
 
-    implementation("com.fasterxml.jackson.core:jackson-core:2.17.1")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.1")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.17.1")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.17.2")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.17.2")
 
     implementation("com.github.java-json-tools:json-patch:1.12")
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.13.1")
-    implementation("io.micrometer:micrometer-core:1.13.1")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.13.2")
+    implementation("io.micrometer:micrometer-core:1.13.2")
 
-    implementation(platform("io.sentry:sentry-bom:8.0.0-alpha.3"))
+    implementation(platform("io.sentry:sentry-bom:8.0.0-alpha.4"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
     implementation("io.sentry:sentry-logback")
 
@@ -209,7 +207,7 @@ dependencies {
 
     implementation("io.getunleash:unleash-client-java:9.2.2")
     implementation("org.apache.commons:commons-text:1.12.0")
-    implementation("org.jsoup:jsoup:1.17.2")
+    implementation("org.jsoup:jsoup:1.18.1")
 
     val flywayCore = "org.flywaydb:flyway-core:10.15.2"
     implementation(flywayCore)
@@ -222,7 +220,7 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:5.12.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("io.projectreactor:reactor-test:3.6.7")
+    testImplementation("io.projectreactor:reactor-test:3.6.8")
     testImplementation("org.springframework.security:spring-security-test:6.3.1")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.3.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")

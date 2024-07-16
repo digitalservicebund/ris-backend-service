@@ -50,7 +50,7 @@ test.describe(
         ? "Meta"
         : "Control"
 
-      await test.step("Upload file with border Numbers (Randnummern) (Randnummern)", async () => {
+      await test.step("Upload file with border Numbers (Randnummern)", async () => {
         await uploadTestfile(page, "some-border-numbers.docx")
         await expect(page.getByText("some-border-numbers.docx")).toBeVisible()
         await expect(page.getByLabel("Datei löschen")).toBeVisible()
@@ -90,7 +90,7 @@ test.describe(
           selection?.addRange(range)
         })
 
-        // copy from sidepanel to clipboard
+        // copy from side panel to clipboard
         await page.keyboard.press(`${modifier}+KeyC`)
 
         // paste from clipboard into input field "Entscheidungsgründe"

@@ -24,7 +24,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRep
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalForceTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.NormAbbreviationTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.RegionTransformer;
@@ -37,7 +37,8 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
+import de.bund.digitalservice.ris.caselaw.domain.EmailService;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
@@ -71,7 +72,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseDocumentNumberRecyclingService.class,
       DatabaseDocumentUnitStatusService.class,
       PostgresDocumentationUnitRepositoryImpl.class,
-      PostgresPublicationReportRepositoryImpl.class,
+      PostgresHandoverReportRepositoryImpl.class,
       FlywayConfig.class,
       PostgresJPAConfig.class,
       SecurityConfig.class,
@@ -108,11 +109,12 @@ class LegalForceIntegrationTest {
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
-  @MockBean private EmailPublishService publishService;
+  @MockBean private EmailService emailService;
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private UserService userService;
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private AttachmentService attachmentService;
+  @MockBean private HandoverService handoverService;
   @MockBean private PatchMapperService patchMapperService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();

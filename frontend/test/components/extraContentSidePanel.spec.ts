@@ -76,8 +76,8 @@ describe("ExtraContentSidePanel", () => {
           component: {},
         },
         {
-          path: "/caselaw/documentUnit/:documentNumber/publication",
-          name: "caselaw-documentUnit-documentNumber-publication",
+          path: "/caselaw/documentUnit/:documentNumber/handover",
+          name: "caselaw-documentUnit-documentNumber-handover",
           component: {},
         },
         {

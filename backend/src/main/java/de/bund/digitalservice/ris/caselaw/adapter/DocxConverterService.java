@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,15 +50,15 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import software.amazon.awssdk.core.ResponseBytes;
-import software.amazon.awssdk.core.async.AsyncResponseTransformer;
-import software.amazon.awssdk.services.s3.S3AsyncClient;
+import software.amazon.awssdk.core.sync.ResponseTransformer;
+import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 @Service
 @Slf4j
 public class DocxConverterService implements ConverterService {
-  private final S3AsyncClient client;
+  private final S3Client client;
   private final DocumentBuilderFactory documentBuilderFactory;
   private final DocxConverter converter;
 
@@ -68,9 +66,7 @@ public class DocxConverterService implements ConverterService {
   private String bucketName;
 
   public DocxConverterService(
-      S3AsyncClient client,
-      DocumentBuilderFactory documentBuilderFactory,
-      DocxConverter converter) {
+      S3Client client, DocumentBuilderFactory documentBuilderFactory, DocxConverter converter) {
     this.client = client;
     this.documentBuilderFactory = documentBuilderFactory;
     this.converter = converter;
@@ -122,20 +118,11 @@ public class DocxConverterService implements ConverterService {
 
     GetObjectRequest request = GetObjectRequest.builder().bucket(bucketName).key(fileName).build();
 
-    CompletableFuture<ResponseBytes<GetObjectResponse>> futureResponse =
-        client.getObject(request, AsyncResponseTransformer.toBytes());
+    ResponseBytes<GetObjectResponse> response =
+        client.getObject(request, ResponseTransformer.toBytes());
 
     List<DocumentUnitDocx> documentUnitDocxList;
-    try {
-      documentUnitDocxList = parseAsDocumentUnitDocxList(futureResponse.get().asInputStream());
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      log.error("Couldn't load the docx file", e);
-      return null;
-    } catch (ExecutionException e) {
-      log.error("Couldn't load the docx file", e);
-      return null;
-    }
+    documentUnitDocxList = parseAsDocumentUnitDocxList(response.asInputStream());
     List<DocumentUnitDocx> packedList = DocumentUnitDocxListUtils.packList(documentUnitDocxList);
     List<String> ecliList =
         packedList.stream()

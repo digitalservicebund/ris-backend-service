@@ -3,7 +3,7 @@ import { expect } from "@playwright/test"
 import { caselawTest as test } from "../../e2e/caselaw/fixtures"
 import {
   navigateToFiles,
-  navigateToPublication,
+  nagivateToHandover,
   uploadTestfile,
 } from "~/e2e/caselaw/e2e-utils"
 
@@ -64,17 +64,17 @@ test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/fil
   })
 })
 
-test.describe("a11y of publication page (/caselaw/documentunit/{documentNumber}/publication)", () => {
-  test("publication", async ({ page, documentNumber }) => {
-    await navigateToPublication(page, documentNumber)
+test.describe("a11y of handover page (/caselaw/documentunit/{documentNumber}/handover)", () => {
+  test("handover", async ({ page, documentNumber }) => {
+    await nagivateToHandover(page, documentNumber)
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
-  test("publication not possible", async ({ page, documentNumber }) => {
-    await navigateToPublication(page, documentNumber)
+  test("handover not possible", async ({ page, documentNumber }) => {
+    await nagivateToHandover(page, documentNumber)
     await page
-      .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
+      .locator("[aria-label='Dokumentationseinheit an jDV übergeben']")
       .click()
     await expect(
       page.getByText("Es sind noch nicht alle Pflichtfelder befüllt."),

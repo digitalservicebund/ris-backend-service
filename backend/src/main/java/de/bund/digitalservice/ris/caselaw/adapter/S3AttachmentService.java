@@ -15,7 +15,6 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +25,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import software.amazon.awssdk.core.async.AsyncRequestBody;
-import software.amazon.awssdk.services.s3.S3AsyncClient;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
@@ -36,7 +35,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 @Service
 public class S3AttachmentService implements AttachmentService {
   private final AttachmentRepository repository;
-  private final S3AsyncClient s3AsyncClient;
+  private final S3Client s3Client;
   private final DatabaseDocumentationUnitRepository documentUnitRepository;
 
   @Value("${otc.obs.bucket-name}")
@@ -44,10 +43,10 @@ public class S3AttachmentService implements AttachmentService {
 
   public S3AttachmentService(
       AttachmentRepository repository,
-      S3AsyncClient s3AsyncClient,
+      S3Client s3Client,
       DatabaseDocumentationUnitRepository documentUnitRepository) {
     this.repository = repository;
-    this.s3AsyncClient = s3AsyncClient;
+    this.s3Client = s3Client;
     this.documentUnitRepository = documentUnitRepository;
   }
 
@@ -124,7 +123,7 @@ public class S3AttachmentService implements AttachmentService {
 
     log.debug("upload header information: mediaType{}, contentLength={}", mediaType, contentLength);
 
-    var asyncRequestBody = AsyncRequestBody.fromByteBuffer(byteBuffer);
+    var requestBody = RequestBody.fromByteBuffer(byteBuffer);
     var putObjectRequestBuilder =
         PutObjectRequest.builder()
             .bucket(bucketName)
@@ -138,14 +137,7 @@ public class S3AttachmentService implements AttachmentService {
 
     var putObjectRequest = putObjectRequestBuilder.build();
 
-    try {
-      return s3AsyncClient.putObject(putObjectRequest, asyncRequestBody).get();
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      throw new AttachmentException("Could not save object to bucket: " + fileUuid);
-    } catch (ExecutionException e) {
-      throw new AttachmentException("Could not save object to bucket: " + fileUuid);
-    }
+    return s3Client.putObject(putObjectRequest, requestBody);
   }
 
   private void deleteObjectFromBucket(String s3Path) {
@@ -154,6 +146,6 @@ public class S3AttachmentService implements AttachmentService {
     }
 
     var deleteObjectRequest = DeleteObjectRequest.builder().bucket(bucketName).key(s3Path).build();
-    s3AsyncClient.deleteObject(deleteObjectRequest);
+    s3Client.deleteObject(deleteObjectRequest);
   }
 }

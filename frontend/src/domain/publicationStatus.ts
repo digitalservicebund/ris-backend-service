@@ -13,7 +13,7 @@ export enum PublicationState {
 
 export const Label: Record<PublicationState, string> = {
   [PublicationState.PUBLISHED]: "Veröffentlicht",
-  [PublicationState.UNPUBLISHED]: "Unveröffentlicht", // or "Nicht veröffentlicht" when withError
+  [PublicationState.UNPUBLISHED]: "Unveröffentlicht",
   [PublicationState.PUBLISHING]: "In Veröffentlichung",
   [PublicationState.DUPLICATED]: "Dublette",
   [PublicationState.LOCKED]: "Gesperrt",

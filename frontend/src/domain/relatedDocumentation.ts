@@ -42,7 +42,7 @@ export default class RelatedDocumentation {
       case PublicationState.PUBLISHED:
         return Label.PUBLISHED
       case PublicationState.UNPUBLISHED:
-        return status.withError ? "Nicht veröffentlicht" : Label.UNPUBLISHED
+        return Label.UNPUBLISHED
       case PublicationState.PUBLISHING:
         return Label.PUBLISHING
       case PublicationState.DUPLICATED:

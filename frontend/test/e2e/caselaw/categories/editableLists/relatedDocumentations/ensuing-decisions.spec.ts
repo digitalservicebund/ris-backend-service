@@ -3,7 +3,7 @@ import {
   fillEnsuingDecisionInputs,
   navigateToCategories,
   waitForInputValue,
-  publishDocumentationUnit,
+  handoverDocumentationUnit,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
@@ -94,7 +94,7 @@ test.describe("ensuing decisions", () => {
     documentNumber,
     prefilledDocumentUnit,
   }) => {
-    await publishDocumentationUnit(
+    await handoverDocumentationUnit(
       page,
       prefilledDocumentUnit.documentNumber || "",
     )

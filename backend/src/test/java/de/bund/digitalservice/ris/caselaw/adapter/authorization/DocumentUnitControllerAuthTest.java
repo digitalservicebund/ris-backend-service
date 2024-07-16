@@ -21,6 +21,8 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -50,6 +52,7 @@ class DocumentUnitControllerAuthTest {
   @Autowired private RisWebTestClient risWebTestClient;
 
   @MockBean private DocumentUnitService service;
+  @MockBean private HandoverService handoverService;
   @MockBean private KeycloakUserService userService;
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private AttachmentService attachmentService;
@@ -243,12 +246,12 @@ class DocumentUnitControllerAuthTest {
   }
 
   @Test
-  void testPublishDocumentUnitAsEmail() throws DocumentationUnitNotExistsException {
+  void testHandoverDocumentUnitAsEmail() throws DocumentationUnitNotExistsException {
     mockDocumentUnit(docOffice2, null, null);
     when(userService.getEmail(any(OidcUser.class))).thenReturn("abc");
-    when(service.publishAsEmail(TEST_UUID, "abc")).thenReturn(null);
+    when(handoverService.handoverAsEmail(TEST_UUID, "abc")).thenReturn(null);
 
-    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish";
+    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/handover";
 
     risWebTestClient
         .withLogin(docOffice1Group)
@@ -262,11 +265,11 @@ class DocumentUnitControllerAuthTest {
   }
 
   @Test
-  void testGetPublishedMails() {
+  void testGetEvents() {
     mockDocumentUnit(docOffice1, null, Status.builder().publicationStatus(PUBLISHED).build());
-    when(service.getPublicationHistory(TEST_UUID)).thenReturn(List.of());
+    when(handoverService.getEventLog(TEST_UUID)).thenReturn(List.of());
 
-    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish";
+    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/handover";
 
     risWebTestClient.withLogin(docOffice1Group).get().uri(uri).exchange().expectStatus().isOk();
 

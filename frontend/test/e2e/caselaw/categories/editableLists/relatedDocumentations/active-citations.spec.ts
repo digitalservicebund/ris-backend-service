@@ -2,7 +2,7 @@ import { expect } from "@playwright/test"
 import {
   fillActiveCitationInputs,
   navigateToCategories,
-  publishDocumentationUnit,
+  handoverDocumentationUnit,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
@@ -26,7 +26,7 @@ test.describe("active citations", () => {
     documentNumber,
     prefilledDocumentUnit,
   }) => {
-    await publishDocumentationUnit(
+    await handoverDocumentationUnit(
       page,
       prefilledDocumentUnit.documentNumber || "",
     )

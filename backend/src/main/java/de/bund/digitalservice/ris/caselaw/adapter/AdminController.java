@@ -29,10 +29,9 @@ public class AdminController {
 
   @PostMapping("/webhook")
   @PreAuthorize("permitAll")
-  public ResponseEntity<String> setPublishState(
-      @RequestBody @Valid MailTrackingResponsePayload payload) {
+  public ResponseEntity<String> trackMail(@RequestBody @Valid MailTrackingResponsePayload payload) {
     if (payload != null && payload.tags() != null && !payload.tags().isEmpty()) {
-      return mailTrackingService.updatePublishingState(payload.tags().get(0), payload.event());
+      return mailTrackingService.processMailSendingState(payload.tags().get(0), payload.event());
     }
     return ResponseEntity.badRequest().build();
   }

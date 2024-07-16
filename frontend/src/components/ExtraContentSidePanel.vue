@@ -42,23 +42,46 @@ const hasAttachments = computed(() => {
   )
 })
 
-const handleOnSelect = (index: number) => {
+/**
+ * Updates the local attachment index reference, which is used to display the selected attachment in the panel,
+ * if the panel content is set to "attachments".
+ * @param index
+ */
+const handleOnSelectAttachment = (index: number) => {
   currentAttachmentIndex.value = index
 }
 
+/**
+ * Sets the panel content to "note", so that the notes text input field is displayed in the panel.
+ */
 function selectNotes() {
   selectedPanelContent.value = "note"
 }
 
+/**
+ * Sets the panel content to "attachments", so that the attachment view is displayed in the panel.
+ * If a selected attachment index is provided, the local attachment index reference is updated accordingly,
+ * so that the selected attachment is displayed in the attachment view.
+ * @param selectedIndex (optional) selected attachment index
+ */
 function selectAttachments(selectedIndex?: number) {
   if (selectedIndex !== undefined) currentAttachmentIndex.value = selectedIndex
   selectedPanelContent.value = "attachments"
 }
 
+/**
+ * Sets the panel content to "preview", so that the document preview is displayed in the panel.
+ */
 function selectPreview() {
   selectedPanelContent.value = "preview"
 }
 
+/**
+ * Expands or collapses the panel.
+ * Can be forced by passing a boolean parameter. Otherwise, it will collapse when expanded and expand when collapsed.
+ * Pushes the state to the route as a query parameter.
+ * @param expand optional boolean to enforce expanding or collapsing
+ */
 function togglePanel(expand?: boolean) {
   isExpanded.value = expand === undefined ? !isExpanded.value : expand
   pushQueryToRoute({
@@ -67,6 +90,11 @@ function togglePanel(expand?: boolean) {
   })
 }
 
+/**
+ * Adjusts the local attachment index reference if necessary.
+ * If all attachments have been deleted, switches to display the note instead.
+ * @param index the deleted attachment index
+ */
 function onAttachmentDeleted(index: number) {
   if (currentAttachmentIndex.value >= index) {
     currentAttachmentIndex.value = store.documentUnit!.attachments.length - 1
@@ -76,8 +104,20 @@ function onAttachmentDeleted(index: number) {
   }
 }
 
+/**
+ * Exposes the functions "togglePanel", "selectAttachments" and "onAttachmentDeleted", so that they can be accessed from the parent component.
+ * This is required to have smooth and explicit interactions between the DocumentUnitAttachments component and this component through their shared parent.
+ */
 defineExpose({ togglePanel, selectAttachments, onAttachmentDeleted })
 
+/**
+ * Checks whether the panel should be expanded when it is mounted.
+ * If the showAttachmentPanel query parameter is present in the route, its value is taken. This parameter is only present,
+ * after the user first interacts with the panel, by expanding or collapsing it manually.
+ * This ensures that their selection does not get overridden.
+ * If the query is not present, the panel is expanded by default if either a note, an attachment or both are present.
+ * Otherwise, it is collapsed by default.
+ */
 onMounted(() => {
   if (route.query.showAttachmentPanel) {
     isExpanded.value = route.query.showAttachmentPanel === "true"
@@ -138,7 +178,7 @@ onMounted(() => {
           v-if="selectedPanelContent === 'attachments'"
           :attachments="store.documentUnit!.attachments"
           :current-index="currentAttachmentIndex"
-          @select="handleOnSelect"
+          @select="handleOnSelectAttachment"
         ></FileNavigator>
         <router-link
           v-if="selectedPanelContent === 'preview'"

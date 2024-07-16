@@ -1,15 +1,18 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -30,6 +33,7 @@ import org.testcontainers.utility.DockerImageName;
       "management.endpoint.health.group.readiness.include=readinessState,db,redis"
     })
 @Tag("integration")
+@AutoConfigureMockMvc
 class HealthEndpointIntegrationTest {
 
   @Container
@@ -53,30 +57,20 @@ class HealthEndpointIntegrationTest {
     registry.add("spring.data.redis.timeout", () -> "200");
   }
 
-  @Autowired WebTestClient webTestClient;
+  @Autowired MockMvc mockMvc;
   @MockBean ClientRegistrationRepository clientRegistrationRepository;
 
   @Test
-  void shouldExposeHealthEndpoint() {
-    webTestClient.get().uri("/actuator/health").exchange().expectStatus().isOk();
-    webTestClient.get().uri("/actuator/health/liveness").exchange().expectStatus().isOk();
+  void shouldExposeHealthEndpoint() throws Exception {
+    mockMvc.perform(get("/actuator/health")).andExpect(status().isOk());
+    mockMvc.perform(get("/actuator/health/liveness")).andExpect(status().isOk());
   }
 
   @Test
-  void shouldBeUnhealthyWithoutRedis() {
+  void shouldBeUnhealthyWithoutRedis() throws Exception {
     redis.stop();
-    webTestClient
-        .get()
-        .uri("/actuator/health")
-        .exchange()
-        .expectStatus()
-        .isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
-    webTestClient.get().uri("/actuator/health/liveness").exchange().expectStatus().isOk();
-    webTestClient
-        .get()
-        .uri("/actuator/health/readiness")
-        .exchange()
-        .expectStatus()
-        .isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+    mockMvc.perform(get("/actuator/health")).andExpect(status().is5xxServerError());
+    mockMvc.perform(get("/actuator/health/liveness")).andExpect(status().isOk());
+    mockMvc.perform(get("/actuator/health/readiness")).andExpect(status().is5xxServerError());
   }
 }

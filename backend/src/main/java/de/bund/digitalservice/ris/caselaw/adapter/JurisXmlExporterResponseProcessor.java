@@ -1,12 +1,14 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.MailStoreFactory;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.domain.export.juris.response.ImportMessageWrapper;
 import de.bund.digitalservice.ris.domain.export.juris.response.MessageWrapper;
@@ -31,6 +33,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+/**
+ * Processor for the response mails from jDV. The processor reads the mails from the inbox, saves
+ * them to be displayed in NeuRIS and possibly forwards them to the issuer.
+ */
 @Component
 public class JurisXmlExporterResponseProcessor {
 
@@ -38,21 +44,29 @@ public class JurisXmlExporterResponseProcessor {
       LoggerFactory.getLogger(JurisXmlExporterResponseProcessor.class);
   private final HttpMailSender mailSender;
   private final DocumentUnitStatusService statusService;
-  private final PublicationReportRepository reportRepository;
+
+  private final HandoverReportRepository reportRepository;
   private final MailStoreFactory storeFactory;
   private final JurisMessageWrapperFactory wrapperFactory;
+
+  private final DocumentUnitRepository documentUnitRepository;
+  private final HandoverRepository xmlHandoverRepository;
 
   public JurisXmlExporterResponseProcessor(
       HttpMailSender mailSender,
       DocumentUnitStatusService statusService,
       MailStoreFactory storeFactory,
-      PublicationReportRepository reportRepository,
-      JurisMessageWrapperFactory wrapperFactory) {
+      HandoverReportRepository reportRepository,
+      JurisMessageWrapperFactory wrapperFactory,
+      DocumentUnitRepository documentUnitRepository,
+      HandoverRepository xmlHandoverRepository) {
     this.mailSender = mailSender;
     this.statusService = statusService;
     this.storeFactory = storeFactory;
     this.reportRepository = reportRepository;
     this.wrapperFactory = wrapperFactory;
+    this.documentUnitRepository = documentUnitRepository;
+    this.xmlHandoverRepository = xmlHandoverRepository;
   }
 
   @Scheduled(fixedDelay = 60000, initialDelay = 60000)
@@ -92,7 +106,7 @@ public class JurisXmlExporterResponseProcessor {
                 subject = messageWrapper.getSubject();
 
                 forwardMessage(messageWrapper);
-                setPublicationStatus(messageWrapper);
+                updateDocUnitErrorStatusBasedOnJurisMessage(messageWrapper);
                 saveAttachments(messageWrapper);
 
                 successfulProcessedMessages.add(messageWrapper);
@@ -131,7 +145,7 @@ public class JurisXmlExporterResponseProcessor {
           mailAttachments.stream()
               .map(
                   attachment ->
-                      PublicationReport.builder()
+                      HandoverReport.builder()
                           .documentNumber(documentNumber)
                           .receivedDate(receivedDate)
                           .content(
@@ -166,13 +180,23 @@ public class JurisXmlExporterResponseProcessor {
         .toList();
   }
 
-  private void setPublicationStatus(MessageWrapper messageWrapper) {
+  /**
+   * Sets the error state for documentation unit based on the jDV response mail. If the message has
+   * errors or couldn't be published, the error state is set to true.
+   *
+   * @param messageWrapper the wrapped message from jDV
+   */
+  private void updateDocUnitErrorStatusBasedOnJurisMessage(MessageWrapper messageWrapper) {
     try {
+      var lastStatus = statusService.getLatestStatus(messageWrapper.getDocumentNumber());
+      if (lastStatus == null) {
+        return;
+      }
       statusService.update(
           messageWrapper.getDocumentNumber(),
           Status.builder()
-              .publicationStatus(getPublicationStatus(messageWrapper.isPublished()))
-              .withError(messageWrapper.hasErrors())
+              .publicationStatus(lastStatus)
+              .withError(messageWrapper.hasErrors() || !messageWrapper.isPublished().orElse(true))
               .build());
     } catch (Exception e) {
       throw new StatusImporterException("Could not update publicationStatus", e);
@@ -185,11 +209,16 @@ public class JurisXmlExporterResponseProcessor {
       String subject = messageWrapper.getSubject();
       List<MailAttachment> mailAttachments = collectAttachments(messageWrapper);
 
-      var issuerAddress = statusService.getLatestIssuerAddress(documentNumber);
-      if (issuerAddress != null) {
+      var xmlHandoverMail =
+          xmlHandoverRepository.getLastXmlHandoverMail(
+              documentUnitRepository
+                  .findByDocumentNumber(documentNumber)
+                  .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber))
+                  .uuid());
+      if (xmlHandoverMail != null && xmlHandoverMail.getIssuerAddress() != null) {
         mailSender.sendMail(
             storeFactory.getUsername(),
-            issuerAddress,
+            xmlHandoverMail.getIssuerAddress(),
             "FWD: " + subject,
             "Anbei weitergeleitet von der jDV:",
             mailAttachments,
@@ -227,11 +256,5 @@ public class JurisXmlExporterResponseProcessor {
             throw new StatusImporterException("Error deleting Message", e);
           }
         });
-  }
-
-  private PublicationStatus getPublicationStatus(Optional<Boolean> isPublished) {
-    return isPublished
-        .map(published -> published ? PublicationStatus.PUBLISHED : PublicationStatus.UNPUBLISHED)
-        .orElse(PublicationStatus.PUBLISHING);
   }
 }

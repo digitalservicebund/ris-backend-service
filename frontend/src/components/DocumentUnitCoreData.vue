@@ -270,6 +270,6 @@ watch(
       </InputField>
     </div>
 
-    <div class="mt-4">* Pflichtfelder zum Veröffentlichen</div>
+    <div class="mt-4">* Pflichtfelder zur Übergabe</div>
   </div>
 </template>

@@ -1,8 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
-import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentUnitPublishException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +16,10 @@ import sibModel.SendSmtpEmailAttachment;
 import sibModel.SendSmtpEmailSender;
 import sibModel.SendSmtpEmailTo;
 
+/**
+ * Implementation of the {@link HttpMailSender} interface that sends emails using the SendInBlue
+ * Service API.
+ */
 public class SendInBlueHttpMailSender implements HttpMailSender {
   private final String apiKey;
 
@@ -23,6 +27,16 @@ public class SendInBlueHttpMailSender implements HttpMailSender {
     this.apiKey = apiKey;
   }
 
+  /**
+   * Sends an email using the SendInBlue API.
+   *
+   * @param senderAddress the sender's email address
+   * @param receiverAddress the receiver's email address
+   * @param subject the email subject
+   * @param content the email content
+   * @param mailAttachments the email attachments
+   * @param tag the tag to assign to the email, used to track the email in SendInBlue
+   */
   @Override
   public void sendMail(
       String senderAddress,
@@ -66,7 +80,7 @@ public class SendInBlueHttpMailSender implements HttpMailSender {
     try {
       api.sendTransacEmail(sendSmtpEmail);
     } catch (ApiException e) {
-      throw new DocumentUnitPublishException("Couldn't send email.", e);
+      throw new DocumentationUnitHandoverException("Couldn't send email.", e);
     }
   }
 }

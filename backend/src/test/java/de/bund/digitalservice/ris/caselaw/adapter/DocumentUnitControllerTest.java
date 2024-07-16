@@ -29,14 +29,14 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MergeableJsonPatch;
-import de.bund.digitalservice.ris.caselaw.domain.Publication;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecord;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
-import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
-import de.bund.digitalservice.ris.caselaw.domain.XmlResultObject;
+import de.bund.digitalservice.ris.caselaw.domain.XmlExportResult;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -67,6 +67,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class DocumentUnitControllerTest {
   @Autowired private RisWebTestClient risWebClient;
   @MockBean private DocumentUnitService service;
+
+  @MockBean private HandoverService handoverService;
   @MockBean private KeycloakUserService userService;
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
@@ -248,165 +250,165 @@ class DocumentUnitControllerTest {
   }
 
   @Test
-  void testPublishAsEmail() throws DocumentationUnitNotExistsException {
+  void testHandoverAsEmail() throws DocumentationUnitNotExistsException {
     when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
-    when(service.publishAsEmail(TEST_UUID, ISSUER_ADDRESS))
+    when(handoverService.handoverAsEmail(TEST_UUID, ISSUER_ADDRESS))
         .thenReturn(
-            XmlPublication.builder()
+            HandoverMail.builder()
                 .documentUnitUuid(TEST_UUID)
                 .receiverAddress("receiver address")
                 .mailSubject("mailSubject")
                 .xml("xml")
-                .statusCode("status-code")
+                .success(true)
                 .statusMessages(List.of("status-messages"))
                 .fileName("test.xml")
-                .publishDate(Instant.parse("2020-01-01T01:01:01.00Z"))
+                .handoverDate(Instant.parse("2020-01-01T01:01:01.00Z"))
                 .build());
 
-    Publication responseBody =
+    HandoverMail responseBody =
         risWebClient
             .withDefaultLogin()
             .put()
-            .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
+            .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/handover")
             .exchange()
             .expectHeader()
             .contentType(MediaType.APPLICATION_JSON)
             .expectStatus()
             .isOk()
-            .expectBody(XmlPublication.class)
+            .expectBody(HandoverMail.class)
             .returnResult()
             .getResponseBody();
 
     assertThat(responseBody)
         .isEqualTo(
-            XmlPublication.builder()
+            HandoverMail.builder()
                 .documentUnitUuid(TEST_UUID)
                 .receiverAddress("receiver address")
                 .mailSubject("mailSubject")
                 .xml("xml")
-                .statusCode("status-code")
+                .success(true)
                 .fileName("test.xml")
                 .statusMessages(List.of("status-messages"))
-                .publishDate(Instant.parse("2020-01-01T01:01:01Z"))
+                .handoverDate(Instant.parse("2020-01-01T01:01:01Z"))
                 .build());
 
-    verify(service).publishAsEmail(TEST_UUID, ISSUER_ADDRESS);
+    verify(handoverService).handoverAsEmail(TEST_UUID, ISSUER_ADDRESS);
   }
 
   @Test
-  void testPublishAsEmail_withServiceThrowsException() throws DocumentationUnitNotExistsException {
+  void testHandoverAsEmail_withServiceThrowsException() throws DocumentationUnitNotExistsException {
     when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
-    when(service.publishAsEmail(TEST_UUID, ISSUER_ADDRESS))
+    when(handoverService.handoverAsEmail(TEST_UUID, ISSUER_ADDRESS))
         .thenThrow(DocumentationUnitNotExistsException.class);
 
     risWebClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/handover")
         .exchange()
         .expectStatus()
         .is5xxServerError();
 
-    verify(service).publishAsEmail(TEST_UUID, ISSUER_ADDRESS);
+    verify(handoverService).handoverAsEmail(TEST_UUID, ISSUER_ADDRESS);
   }
 
   @Test
-  void testGetLastPublishedXml() {
+  void testGetLastHandoverXmlMail() {
 
-    when(service.getPublicationHistory(TEST_UUID))
+    when(handoverService.getEventLog(TEST_UUID))
         .thenReturn(
             List.of(
-                PublicationReport.builder()
+                HandoverReport.builder()
                     .content("<html>2021 Report</html>")
                     .receivedDate(Instant.parse("2021-01-01T01:01:01.00Z"))
                     .build(),
-                XmlPublication.builder()
+                HandoverMail.builder()
                     .documentUnitUuid(TEST_UUID)
                     .receiverAddress("receiver address")
                     .mailSubject("mailSubject")
                     .xml("xml")
-                    .statusCode("status-code")
+                    .success(true)
                     .statusMessages(List.of("status-messages"))
                     .fileName("test.xml")
-                    .publishDate(Instant.parse("2020-01-01T01:01:01.00Z"))
+                    .handoverDate(Instant.parse("2020-01-01T01:01:01.00Z"))
                     .build(),
-                PublicationReport.builder()
+                HandoverReport.builder()
                     .content("<html>2019 Report</html>")
                     .receivedDate(Instant.parse("2019-01-01T01:01:01.00Z"))
                     .build()));
 
-    List<PublicationHistoryRecord> responseBody =
+    List<EventRecord> responseBody =
         risWebClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
+            .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/handover")
             .exchange()
             .expectStatus()
             .isOk()
-            .expectBody(new TypeReference<List<PublicationHistoryRecord>>() {})
+            .expectBody(new TypeReference<List<EventRecord>>() {})
             .returnResult()
             .getResponseBody();
 
     assertThat(responseBody)
         .containsExactly(
-            PublicationReport.builder()
+            HandoverReport.builder()
                 .content("<html>2021 Report</html>")
                 .receivedDate(Instant.parse("2021-01-01T01:01:01Z"))
                 .build(),
-            XmlPublication.builder()
+            HandoverMail.builder()
                 .documentUnitUuid(TEST_UUID)
                 .receiverAddress("receiver address")
                 .mailSubject("mailSubject")
                 .xml("xml")
-                .statusCode("status-code")
+                .success(true)
                 .statusMessages(List.of("status-messages"))
-                .publishDate(Instant.parse("2020-01-01T01:01:01Z"))
+                .handoverDate(Instant.parse("2020-01-01T01:01:01Z"))
                 .fileName("test.xml")
                 .build(),
-            PublicationReport.builder()
+            HandoverReport.builder()
                 .content("<html>2019 Report</html>")
                 .receivedDate(Instant.parse("2019-01-01T01:01:01Z"))
                 .build());
 
-    verify(service).getPublicationHistory(TEST_UUID);
+    verify(handoverService).getEventLog(TEST_UUID);
   }
 
   @Test
-  void testGetPublicationXmlPreview() throws DocumentationUnitNotExistsException {
+  void testGetXmlPreview() throws DocumentationUnitNotExistsException {
     when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
-    when(service.previewPublication(TEST_UUID))
+    when(handoverService.createPreviewXml(TEST_UUID))
         .thenReturn(
-            new XmlResultObject(
+            new XmlExportResult(
                 "xml",
-                "200",
+                true,
                 List.of("status-messages"),
                 "test.xml",
                 Instant.parse("2020-01-01T01:01:01.00Z")));
 
-    XmlResultObject responseBody =
+    XmlExportResult responseBody =
         risWebClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/preview-publication-xml")
+            .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/preview-xml")
             .exchange()
             .expectHeader()
             .contentType(MediaType.APPLICATION_JSON)
             .expectStatus()
             .isOk()
-            .expectBody(XmlResultObject.class)
+            .expectBody(XmlExportResult.class)
             .returnResult()
             .getResponseBody();
     assertThat(responseBody)
         .isEqualTo(
-            XmlResultObject.builder()
+            XmlExportResult.builder()
                 .xml("xml")
-                .statusCode("200")
+                .success(true)
                 .statusMessages(List.of("status-messages"))
-                .publishDate(Instant.parse("2020-01-01T01:01:01Z"))
+                .creationDate(Instant.parse("2020-01-01T01:01:01Z"))
                 .fileName("test.xml")
                 .build());
 
-    verify(service).previewPublication(TEST_UUID);
+    verify(handoverService).createPreviewXml(TEST_UUID);
   }
 
   @Test

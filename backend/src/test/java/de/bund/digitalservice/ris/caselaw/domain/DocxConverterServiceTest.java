@@ -35,7 +35,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -79,8 +78,8 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import software.amazon.awssdk.core.ResponseBytes;
-import software.amazon.awssdk.core.async.AsyncResponseTransformer;
-import software.amazon.awssdk.services.s3.S3AsyncClient;
+import software.amazon.awssdk.core.sync.ResponseTransformer;
+import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
@@ -90,7 +89,7 @@ class DocxConverterServiceTest {
 
   @Autowired DocxConverterService service;
 
-  @MockBean S3AsyncClient client;
+  @MockBean S3Client client;
 
   @SpyBean DocumentBuilderFactory documentBuilderFactory;
 
@@ -176,8 +175,8 @@ class DocxConverterServiceTest {
 
   @Test
   void testGetHtml_withStyleInformation() {
-    when(client.getObject(any(GetObjectRequest.class), any(AsyncResponseTransformer.class)))
-        .thenReturn(CompletableFuture.completedFuture(responseBytes));
+    when(client.getObject(any(GetObjectRequest.class), any(ResponseTransformer.class)))
+        .thenReturn(responseBytes);
     when(responseBytes.asInputStream()).thenReturn(new ByteArrayInputStream(new byte[] {}));
     MainDocumentPart mainDocumentPart = mock(MainDocumentPart.class);
     StyleDefinitionsPart styleDefinitionsPart = mock(StyleDefinitionsPart.class);
@@ -207,8 +206,8 @@ class DocxConverterServiceTest {
 
   @Test
   void testGetHtml_withImages() throws InvalidFormatException, IOException {
-    when(client.getObject(any(GetObjectRequest.class), any(AsyncResponseTransformer.class)))
-        .thenReturn(CompletableFuture.completedFuture(responseBytes));
+    when(client.getObject(any(GetObjectRequest.class), any(ResponseTransformer.class)))
+        .thenReturn(responseBytes);
     when(responseBytes.asInputStream()).thenReturn(new ByteArrayInputStream(new byte[] {}));
     MainDocumentPart mainDocumentPart = mock(MainDocumentPart.class);
     Parts parts = mock(Parts.class);
@@ -264,8 +263,8 @@ class DocxConverterServiceTest {
 
   @Test
   void testGetHtml_withFooters() {
-    when(client.getObject(any(GetObjectRequest.class), any(AsyncResponseTransformer.class)))
-        .thenReturn(CompletableFuture.completedFuture(responseBytes));
+    when(client.getObject(any(GetObjectRequest.class), any(ResponseTransformer.class)))
+        .thenReturn(responseBytes);
     when(responseBytes.asInputStream()).thenReturn(new ByteArrayInputStream(new byte[] {}));
     MainDocumentPart mainDocumentPart = mock(MainDocumentPart.class);
     when(mlPackage.getMainDocumentPart()).thenReturn(mainDocumentPart);
@@ -1255,8 +1254,8 @@ class DocxConverterServiceTest {
 
   @Test
   void testGetHtml_withInputStreamIsNull() {
-    when(client.getObject(any(GetObjectRequest.class), any(AsyncResponseTransformer.class)))
-        .thenReturn(CompletableFuture.completedFuture(responseBytes));
+    when(client.getObject(any(GetObjectRequest.class), any(ResponseTransformer.class)))
+        .thenReturn(responseBytes);
     when(responseBytes.asInputStream()).thenReturn(null);
 
     Docx2Html docx2Html = service.getConvertedObject("test.docx");
@@ -1265,8 +1264,8 @@ class DocxConverterServiceTest {
 
   @Test
   void testGetHtml_withLoadDocxThrowsException() {
-    when(client.getObject(any(GetObjectRequest.class), any(AsyncResponseTransformer.class)))
-        .thenReturn(CompletableFuture.completedFuture(responseBytes));
+    when(client.getObject(any(GetObjectRequest.class), any(ResponseTransformer.class)))
+        .thenReturn(responseBytes);
     when(responseBytes.asInputStream()).thenReturn(new ByteArrayInputStream(new byte[] {}));
 
     try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
@@ -1313,13 +1312,13 @@ class DocxConverterServiceTest {
   private static class TestDocumentGenerator {
 
     private final List<Object> ids = new ArrayList<>();
-    private final S3AsyncClient client;
+    private final S3Client client;
     private final ResponseBytes<GetObjectResponse> responseBytes;
     private final WordprocessingMLPackage mlPackage;
     private final DocxConverter converter;
 
     public TestDocumentGenerator(
-        S3AsyncClient client,
+        S3Client client,
         ResponseBytes<GetObjectResponse> responseBytes,
         WordprocessingMLPackage mlPackage,
         DocxConverter converter) {
@@ -1338,8 +1337,8 @@ class DocxConverterServiceTest {
     }
 
     private void generate() {
-      when(client.getObject(any(GetObjectRequest.class), any(AsyncResponseTransformer.class)))
-          .thenReturn(CompletableFuture.completedFuture(responseBytes));
+      when(client.getObject(any(GetObjectRequest.class), any(ResponseTransformer.class)))
+          .thenReturn(responseBytes);
       when(responseBytes.asInputStream()).thenReturn(new ByteArrayInputStream(new byte[] {}));
       MainDocumentPart mainDocumentPart = mock(MainDocumentPart.class);
       when(mlPackage.getMainDocumentPart()).thenReturn(mainDocumentPart);

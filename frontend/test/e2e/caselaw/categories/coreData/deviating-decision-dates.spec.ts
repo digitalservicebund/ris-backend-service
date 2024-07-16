@@ -2,8 +2,8 @@ import { expect } from "@playwright/test"
 import {
   navigateToCategories,
   navigateToPreview,
-  navigateToPublication,
-  publishDocumentationUnit,
+  nagivateToHandover,
+  handoverDocumentationUnit,
   waitForSaving,
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
@@ -92,7 +92,7 @@ test.describe("deviating decision dates", () => {
     page,
     prefilledDocumentUnit,
   }) => {
-    await publishDocumentationUnit(
+    await handoverDocumentationUnit(
       page,
       prefilledDocumentUnit.documentNumber || "",
     )
@@ -122,14 +122,12 @@ test.describe("deviating decision dates", () => {
       { clickSaveButton: true },
     )
 
-    await test.step("Navigate to publication, click in 'XML-Vorschau', check they are visible", async () => {
-      await navigateToPublication(page, prefilledDocumentUnit.documentNumber!)
+    await test.step("Navigate to handover, click in 'XML-Vorschau', check they are visible", async () => {
+      await nagivateToHandover(page, prefilledDocumentUnit.documentNumber!)
 
-      await expect(
-        page.getByText("XML Vorschau der Veröffentlichung"),
-      ).toBeVisible()
+      await expect(page.getByText("XML Vorschau")).toBeVisible()
 
-      await page.getByText("XML Vorschau der Veröffentlichung").click()
+      await page.getByText("XML Vorschau").click()
 
       await expect(
         page.getByText("<begriff>2021-02-01</begriff>"),

@@ -1,19 +1,16 @@
 package de.bund.digitalservice.ris.caselaw.config;
 
-import de.bund.digitalservice.ris.caselaw.adapter.S3AsyncMockClient;
+import de.bund.digitalservice.ris.caselaw.adapter.S3MockClient;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.http.async.SdkAsyncHttpClient;
-import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient;
 import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3AsyncClient;
+import software.amazon.awssdk.services.s3.S3Client;
 
 @Configuration
 public class OtcObsConfig {
@@ -28,23 +25,19 @@ public class OtcObsConfig {
 
   @Bean
   @Profile({"staging", "production", "uat"})
-  public S3AsyncClient amazonS3Async() throws URISyntaxException {
-    SdkAsyncHttpClient httpClient =
-        NettyNioAsyncHttpClient.builder().writeTimeout(Duration.ZERO).maxConcurrency(64).build();
-
-    return S3AsyncClient.builder()
+  public S3Client amazonS3() throws URISyntaxException {
+    return S3Client.builder()
         .credentialsProvider(
             StaticCredentialsProvider.create(
                 AwsBasicCredentials.create(accessKeyId, secretAccessKey)))
         .endpointOverride(new URI(endpoint))
         .region(Region.of("eu-de"))
-        .httpClient(httpClient)
         .build();
   }
 
   @Bean
   @Profile({"!production & !staging & !uat"})
-  public S3AsyncClient amazonS3AsyncMock() {
-    return new S3AsyncMockClient();
+  public S3Client amazonS3Mock() {
+    return new S3MockClient();
   }
 }

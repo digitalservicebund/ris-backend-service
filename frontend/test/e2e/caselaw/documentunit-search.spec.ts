@@ -4,10 +4,14 @@ import errorMessages from "@/i18n/errors.json"
 
 import {
   deleteDocumentUnit,
+  fillInput,
   fillSearchInput,
+  navigateToCategories,
   navigateToSearch,
+  waitForSaving,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
+import { noteContent } from "~/e2e/testdata"
 import { generateString } from "~/test-helper/dataGenerators"
 
 /* eslint-disable playwright/no-conditional-in-test */
@@ -313,6 +317,61 @@ test.describe("search", () => {
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
     await expect(page.getByTestId("headnote-principle-icon")).toBeVisible()
   })
+
+  test(
+    "existing note is indicated as icon",
+    {
+      annotation: {
+        type: "story",
+        description: "RISDEV-4176",
+      },
+    },
+    async ({ page, prefilledDocumentUnit }) => {
+      await test.step("fill notiz", async () => {
+        await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
+
+        await page.getByRole("button", { name: "Seitenpanel öffnen" }).click()
+
+        await waitForSaving(
+          () => fillInput(page, "Notiz Eingabefeld", noteContent),
+          page,
+          { clickSaveButton: true },
+        )
+      })
+
+      await test.step("search indicates by icon that doc unit has notiz", async () => {
+        await navigateToSearch(page)
+
+        await fillSearchInput(page, {
+          documentNumber: prefilledDocumentUnit.documentNumber,
+        })
+        await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+        await expect(page.getByLabel("Notiz vorhanden")).toBeVisible()
+      })
+
+      await test.step("delete notiz", async () => {
+        await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
+
+        await waitForSaving(
+          () => fillInput(page, "Notiz Eingabefeld", ""),
+          page,
+          {
+            clickSaveButton: true,
+          },
+        )
+      })
+
+      await test.step("search indicates by icon that doc unit has no notiz", async () => {
+        await navigateToSearch(page)
+
+        await fillSearchInput(page, {
+          documentNumber: prefilledDocumentUnit.documentNumber,
+        })
+        await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+        await expect(page.getByLabel("Keine Notiz vorhanden")).toBeVisible()
+      })
+    },
+  )
 
   test("displaying errors on focus and blur", async ({
     page,

@@ -5,7 +5,7 @@ import {
   fillEnsuingDecisionInputs,
   fillPreviousDecisionInputs,
   navigateToCategories,
-  publishDocumentationUnit,
+  handoverDocumentationUnit,
   waitForSaving,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
@@ -16,7 +16,7 @@ test("search for documentunits and link decision", async ({
   documentNumber,
   prefilledDocumentUnit,
 }) => {
-  await publishDocumentationUnit(
+  await handoverDocumentationUnit(
     page,
     prefilledDocumentUnit.documentNumber || "",
   )
@@ -57,7 +57,7 @@ test("search for documentunits and link decision", async ({
         await expect(container.getByText("1 Ergebnis gefunden")).toBeVisible()
 
         let listItemSummary = `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`
-        const searchSummary = `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, In Veröffentlichung`
+        const searchSummary = `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, Unveröffentlicht`
 
         const result = container.getByText(searchSummary)
         await expect(result).toBeVisible()
@@ -163,7 +163,7 @@ test("search for documentunits does not return current documentation unit", asyn
   page,
   prefilledDocumentUnit,
 }) => {
-  await publishDocumentationUnit(
+  await handoverDocumentationUnit(
     page,
     prefilledDocumentUnit.documentNumber || "",
   )
@@ -216,7 +216,7 @@ test("clicking on link of referenced documentation unit added by search opens ne
   documentNumber,
   prefilledDocumentUnit,
 }) => {
-  await publishDocumentationUnit(
+  await handoverDocumentationUnit(
     page,
     prefilledDocumentUnit.documentNumber || "",
   )
@@ -265,7 +265,7 @@ test("clicking on link of referenced documentation unit added by search opens ne
               container.getByText("1 Ergebnis gefunden"),
             ).toBeVisible()
 
-            const summary = `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, In Veröffentlichung`
+            const summary = `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, Unveröffentlicht`
 
             const result = container.getByText(summary)
             await expect(result).toBeVisible()

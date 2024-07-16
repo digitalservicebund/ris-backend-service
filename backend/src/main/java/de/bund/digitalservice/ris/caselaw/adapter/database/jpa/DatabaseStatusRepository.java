@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,9 +14,6 @@ public interface DatabaseStatusRepository extends JpaRepository<StatusDTO, UUID>
   StatusDTO findFirstByDocumentationUnitDTOOrderByCreatedAtDesc(
       DocumentationUnitDTO documentationUnitDTO);
 
-  StatusDTO findFirstByDocumentationUnitDTOAndPublicationStatusOrderByCreatedAtDesc(
-      DocumentationUnitDTO documentationUnitDTO, PublicationStatus publicationStatus);
-
-  Optional<StatusDTO> findFirstByDocumentationUnitDTO_IdAndPublicationStatusOrderByCreatedAtDesc(
-      UUID documentationUnitId, PublicationStatus publicationStatus);
+  Optional<StatusDTO> findFirstByDocumentationUnitDTO_IdOrderByCreatedAtDesc(
+      UUID documentationUnitId);
 }
