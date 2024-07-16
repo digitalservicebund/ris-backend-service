@@ -1,7 +1,7 @@
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createHead } from "@unhead/vue"
-import { createPinia, setActivePinia } from "pinia"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnit from "@/domain/documentUnit"
 import categories from "@/routes/caselaw/documentUnit/[documentNumber]/categories.vue"
@@ -9,12 +9,10 @@ import DocumentNumber from "@/routes/caselaw/documentUnit/[documentNumber].vue"
 import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
-import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 function renderComponent() {
   const user = userEvent.setup()
   const head = createHead()
-  mockDocumentUnitStore()
 
   const router = createRouter({
     history: createWebHistory(),
@@ -64,35 +62,37 @@ function renderComponent() {
       props: {
         documentNumber: "1234567891234",
       },
-      global: { plugins: [head, router] },
+      global: {
+        plugins: [
+          head,
+          router,
+          [
+            createTestingPinia({
+              initialState: {
+                docunitStore: {
+                  documentUnit: new DocumentUnit("foo", {
+                    documentNumber: "1234567891234",
+                    coreData: {
+                      court: {
+                        type: "AG",
+                        location: "Test",
+                        label: "AG Test",
+                      },
+                    },
+                  }),
+                },
+              },
+              stubActions: false,
+            }),
+          ],
+        ],
+      },
     }),
   }
 }
 
-function mockDocumentUnitStore() {
-  const mockedDocumentUnitStore = useDocumentUnitStore()
-  const documentUnit = new DocumentUnit("foo", {
-    documentNumber: "1234567891234",
-    coreData: {
-      court: {
-        type: "AG",
-        location: "Test",
-        label: "AG Test",
-      },
-    },
-    texts: {},
-    previousDecisions: undefined,
-    ensuingDecisions: undefined,
-    contentRelatedIndexing: {},
-  })
-  mockedDocumentUnitStore.documentUnit = documentUnit
-
-  return mockedDocumentUnitStore
-}
-
 describe("Document Number Route", () => {
   beforeEach(() => {
-    setActivePinia(createPinia())
     vi.spyOn(documentUnitService, "update").mockImplementation(() =>
       Promise.resolve({
         status: 200,
