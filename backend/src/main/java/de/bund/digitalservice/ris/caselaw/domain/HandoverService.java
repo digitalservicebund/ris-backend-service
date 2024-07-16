@@ -55,7 +55,6 @@ public class HandoverService {
    */
   public HandoverMail handoverAsMail(UUID documentUnitUuid, String issuerAddress)
       throws DocumentationUnitNotExistsException {
-
     DocumentUnit documentUnit =
         repository
             .findByUuid(documentUnitUuid)

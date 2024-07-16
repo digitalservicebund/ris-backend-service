@@ -1317,6 +1317,45 @@ class DocumentUnitDocxBuilderTest {
     }
   }
 
+  @Test
+  void testBuild_paragraphWithSpecialHyphenRunElements_shouldBeTransformed() {
+    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    P parentParagraph = new P();
+
+    // SoftHyphen
+    R softHyphenRun = new R();
+    R.SoftHyphen softHyphen = new R.SoftHyphen();
+    JAXBElement<R.SoftHyphen> softHyphenElement =
+        new JAXBElement<>(new QName("text"), R.SoftHyphen.class, softHyphen);
+    softHyphenRun.getContent().add(softHyphenElement);
+
+    // NoBreakHyphen
+    R noBreakHyphenRun = new R();
+    R.NoBreakHyphen noBreakHyphen = new R.NoBreakHyphen();
+    noBreakHyphenRun.getContent().add(noBreakHyphen);
+    JAXBElement<R.NoBreakHyphen> noBreakHyphenElement =
+        new JAXBElement<>(new QName("text"), R.NoBreakHyphen.class, noBreakHyphen);
+    softHyphenRun.getContent().add(noBreakHyphenElement);
+
+    parentParagraph.getContent().add(softHyphenRun);
+    parentParagraph.getContent().add(noBreakHyphenRun);
+
+    var result = builder.setParagraph(parentParagraph).build();
+    assertInstanceOf(ParagraphElement.class, result);
+
+    ParagraphElement paragraphElement = (ParagraphElement) result;
+    assertEquals(2, paragraphElement.getRunElements().size());
+
+    // expect soft hyphen and no break hyphen to be transformed
+    RunElement firstRunElement = paragraphElement.getRunElements().get(0);
+    assertEquals(RunTextElement.class, firstRunElement.getClass());
+    assertEquals("\u00AD", firstRunElement.toHtmlString());
+
+    RunElement secondRunElement = paragraphElement.getRunElements().get(1);
+    assertEquals(RunTextElement.class, secondRunElement.getClass());
+    assertEquals("\u2011", secondRunElement.toHtmlString());
+  }
+
   private Inline generateInline(String name, String description, Dimension size) {
     Inline inline = new Inline();
 

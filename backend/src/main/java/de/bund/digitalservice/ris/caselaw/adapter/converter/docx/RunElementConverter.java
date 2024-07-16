@@ -83,6 +83,14 @@ public class RunElementConverter {
         // ignored because in our web presentation of the docx file there are no page breaks
       } else if (declaredType == FldChar.class) {
         // used for field calculations. don't allow calculation at the moment.
+      } else if (declaredType == R.NoBreakHyphen.class) {
+        RunTextElement runTextElement = new RunTextElement();
+        runTextElement.setText("\u2011");
+        paragraphElement.addRunElement(runTextElement);
+      } else if (declaredType == R.SoftHyphen.class) {
+        RunTextElement runTextElement = new RunTextElement();
+        runTextElement.setText("\u00AD");
+        paragraphElement.addRunElement(runTextElement);
       } else {
         LOGGER.error("unknown run element: {}", declaredType.getName());
         paragraphElement.addRunElement(new ErrorRunElement(declaredType.getName()));
