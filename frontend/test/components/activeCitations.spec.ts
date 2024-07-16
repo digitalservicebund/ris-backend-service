@@ -1,7 +1,6 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { fireEvent, render, screen } from "@testing-library/vue"
-import { setActivePinia } from "pinia"
 import ActiveCitations from "@/components/ActiveCitations.vue"
 import { ComboboxItem } from "@/components/input/types"
 import ActiveCitation from "@/domain/activeCitation"
@@ -9,36 +8,35 @@ import { CitationType } from "@/domain/citationType"
 import DocumentUnit, { Court, DocumentType } from "@/domain/documentUnit"
 import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
-import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 function renderComponent(activeCitations?: ActiveCitation[]) {
   const user = userEvent.setup()
-  mockDocumentUnitStore(activeCitations)
+
   return {
     user,
     ...render(ActiveCitations, {
       global: {
+        plugins: [
+          [
+            createTestingPinia({
+              initialState: {
+                docunitStore: {
+                  documentUnit: new DocumentUnit("foo", {
+                    documentNumber: "1234567891234",
+                    contentRelatedIndexing: {
+                      activeCitations: activeCitations ?? [],
+                    },
+                  }),
+                },
+              },
+              stubActions: false,
+            }),
+          ],
+        ],
         stubs: { routerLink: { template: "<a><slot/></a>" } },
       },
     }),
   }
-}
-
-function mockDocumentUnitStore(activeCitations?: ActiveCitation[]) {
-  const mockedDocumentUnitStore = useDocumentUnitStore()
-  const documentUnit = new DocumentUnit("foo", {
-    documentNumber: "1234567891234",
-    coreData: {},
-    texts: {},
-    previousDecisions: undefined,
-    ensuingDecisions: undefined,
-    contentRelatedIndexing: {
-      activeCitations: activeCitations ?? [],
-    },
-  })
-  mockedDocumentUnitStore.documentUnit = documentUnit
-
-  return mockedDocumentUnitStore
 }
 
 function generateActiveCitation(options?: {
@@ -77,7 +75,6 @@ function generateActiveCitation(options?: {
 
 describe("active citations", () => {
   beforeEach(() => {
-    setActivePinia(createTestingPinia())
     vi.spyOn(
       documentUnitService,
       "searchByRelatedDocumentation",
