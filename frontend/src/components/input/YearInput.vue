@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
-import { vMaska, MaskaDetail } from "maska"
+import { MaskaDetail } from "maska"
+import { vMaska } from "maska/vue"
 import { computed, ref, watch } from "vue"
 import TextInput from "@/components/input/TextInput.vue"
 import { ValidationError } from "@/components/input/types"
