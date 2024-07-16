@@ -64,13 +64,6 @@ pre-push:
         which gh 2>&1 >/dev/null ||
         (echo "You need to install and configure Github CLI."; exit 1)
 
-        # Check current brunch, skipping if not main.
-        current_branch=$(git rev-parse --abbrev-ref HEAD)
-        if [[ "$current_branch" != "main" ]]; then
-          echo "Skipping pipeline status. Performs check only on main branch"
-          exit 0
-        fi
-
         conclusion="$(
           gh run list --branch main --workflow pipeline --json conclusion,status \
           --jq '[.[] | select(.status=="completed")][0].conclusion' \
