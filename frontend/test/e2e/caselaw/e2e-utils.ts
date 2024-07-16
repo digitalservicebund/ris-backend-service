@@ -70,7 +70,7 @@ export const navigateToFiles = async (page: Page, documentNumber: string) => {
   })
 }
 
-export const nagivateToHandover = async (
+export const navigateToHandover = async (
   page: Page,
   documentNumber: string,
 ) => {
@@ -86,7 +86,7 @@ export const handoverDocumentationUnit = async (
   page: Page,
   documentNumber: string,
 ) => {
-  await nagivateToHandover(page, documentNumber)
+  await navigateToHandover(page, documentNumber)
   await page
     .locator("[aria-label='Dokumentationseinheit an jDV übergeben']")
     .click()

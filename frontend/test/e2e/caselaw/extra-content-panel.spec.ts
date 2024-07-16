@@ -4,7 +4,7 @@ import {
   navigateToCategories,
   navigateToFiles,
   navigateToPreview,
-  nagivateToHandover,
+  navigateToHandover,
   navigateToSearch,
   uploadTestfile,
 } from "./e2e-utils"
@@ -68,7 +68,7 @@ test.describe(
         })
 
         await test.step("navigate to handover, check that panel is not displayed", async () => {
-          await nagivateToHandover(page, documentNumber)
+          await navigateToHandover(page, documentNumber)
           await expect(page.getByLabel("Seitenpanel schließen")).toBeHidden()
           await expect(page.getByLabel("Seitenpanel öffnen")).toBeHidden()
         })
@@ -232,7 +232,7 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
       async ({ pageWithBghUser, prefilledDocumentUnitBgh }) => {
         const documentNumber = prefilledDocumentUnitBgh.documentNumber!
         await test.step("Confirm note is exported in XML on handover page", async () => {
-          await nagivateToHandover(pageWithBghUser, documentNumber)
+          await navigateToHandover(pageWithBghUser, documentNumber)
           await expect(pageWithBghUser.getByText("XML Vorschau")).toBeVisible()
 
           await pageWithBghUser.getByText("XML Vorschau").click()
@@ -252,7 +252,7 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
         })
 
         await test.step("Confirm note is not exported in XML on handover page", async () => {
-          await nagivateToHandover(pageWithBghUser, documentNumber)
+          await navigateToHandover(pageWithBghUser, documentNumber)
           await expect(pageWithBghUser.getByText("XML Vorschau")).toBeVisible()
 
           await pageWithBghUser.getByText("XML Vorschau").click()
