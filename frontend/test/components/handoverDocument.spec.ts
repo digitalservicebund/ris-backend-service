@@ -195,7 +195,7 @@ describe("HandoverView:", () => {
         }),
       })
       const handoverButton = screen.getByRole("button", {
-        name: "Dokumentationseinheit veröffentlichen",
+        name: "Dokumentationseinheit an jDV übergeben",
       })
       await fireEvent.click(handoverButton)
 
@@ -247,8 +247,8 @@ describe("HandoverView:", () => {
     })
   })
 
-  describe("last published xml", () => {
-    it("with earlier published document unit", async () => {
+  describe("last handed over xml", () => {
+    it("with earlier handed over document unit", async () => {
       renderComponent({
         props: {
           eventLog: [
@@ -264,17 +264,6 @@ describe("HandoverView:", () => {
           ],
         },
       })
-      expect(
-        screen.getByLabelText("Letzte Veröffentlichungen"),
-      ).toHaveTextContent(
-        `Es sind noch nicht alle Pflichtfelder befüllt.Die Dokumentationseinheit kann nicht übergeben werden.`,
-      )
-    })
-  })
-
-  describe("last handed over xml", () => {
-    it("with earlier handed over document unit", async () => {
-      setupWithDocUnitThatHasBeenHandedOver()
       expect(screen.getByLabelText("Letzte Ereignisse")).toHaveTextContent(
         `Letzte EreignisseXml Email Abgabe - 01.02.2000ÜBERE-Mail an: receiver address Betreff: mail subjectALSXML1<?xml version="1.0"?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>`,
       )
