@@ -13,8 +13,8 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
-import de.bund.digitalservice.ris.caselaw.domain.XmlExportResult;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
+import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import java.time.Clock;
 import java.time.Instant;
@@ -44,7 +44,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
       "mail.exporter.jurisUsername=NeuRIS"
     })
 @ActiveProfiles(profiles = {"production"})
-class XmlEmailServiceProdTest {
+class XmlMailServiceProdTest {
   private static final String RECEIVER_ADDRESS = "test-to@mail.com";
 
   private static final String ISSUER_ADDRESS = "neuris-user@example.com";
@@ -81,8 +81,8 @@ class XmlEmailServiceProdTest {
           .handoverDate(CREATED_DATE)
           .issuerAddress(ISSUER_ADDRESS)
           .build();
-  private static final XmlExportResult FORMATTED_XML =
-      new XmlExportResult("xml", true, List.of("succeed"), "test.xml", CREATED_DATE);
+  private static final XmlTransformationResult FORMATTED_XML =
+      new XmlTransformationResult("xml", true, List.of("succeed"), "test.xml", CREATED_DATE);
 
   private DocumentUnit documentUnit;
 
@@ -108,7 +108,7 @@ class XmlEmailServiceProdTest {
                     .build())
             .attachments(Collections.singletonList(Attachment.builder().name("file_name").build()))
             .build();
-    when(xmlExporter.generateXml(any(DocumentUnit.class))).thenReturn(FORMATTED_XML);
+    when(xmlExporter.transformToXml(any(DocumentUnit.class))).thenReturn(FORMATTED_XML);
 
     when(repository.save(EXPECTED_BEFORE_SAVE_PROD)).thenReturn(SAVED_XML_MAIL_PROD);
   }
@@ -121,7 +121,7 @@ class XmlEmailServiceProdTest {
 
     assertThat(response.mailSubject()).isEqualTo(PROD_MAIL_SUBJECT);
 
-    verify(xmlExporter).generateXml(documentUnit);
+    verify(xmlExporter).transformToXml(documentUnit);
     verify(repository).save(EXPECTED_BEFORE_SAVE_PROD);
     verify(mailSender)
         .sendMail(

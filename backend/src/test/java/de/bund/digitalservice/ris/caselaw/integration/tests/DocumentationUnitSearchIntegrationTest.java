@@ -33,8 +33,8 @@ import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
-import de.bund.digitalservice.ris.caselaw.domain.EmailService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
@@ -95,7 +95,7 @@ class DocumentationUnitSearchIntegrationTest {
   @Autowired private DatabaseStatusRepository statusRepository;
 
   @MockBean S3AsyncClient s3AsyncClient;
-  @MockBean EmailService emailService;
+  @MockBean MailService mailService;
   @MockBean DocxConverterService docxConverterService;
   @MockBean UserService userService;
   @MockBean ClientRegistrationRepository clientRegistrationRepository;

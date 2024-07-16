@@ -45,7 +45,7 @@ class DocumentUnitServiceTest {
   @MockBean private DocumentUnitRepository repository;
   @MockBean private DocumentNumberService documentNumberService;
   @MockBean private DocumentNumberRecyclingService documentNumberRecyclingService;
-  @MockBean private EmailService emailService;
+  @MockBean private MailService mailService;
   @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @MockBean private AttachmentService attachmentService;
   @MockBean private Validator validator;

@@ -9,8 +9,8 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
-import de.bund.digitalservice.ris.caselaw.domain.EmailService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
+import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.NormElement;
 import de.bund.digitalservice.ris.caselaw.domain.NormElementRepository;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
@@ -45,7 +45,7 @@ class SingleNormValidationTest {
   @MockBean private DocumentNumberService numberService;
   @MockBean private DocumentNumberRecyclingService documentNumberRecyclingService;
   @MockBean private S3AsyncClient s3AsyncClient;
-  @MockBean private EmailService emailService;
+  @MockBean private MailService mailService;
   @MockBean private DocumentUnitStatusService statusService;
   @MockBean private DeltaMigrationRepository deltaMigrationRepository;
   @MockBean private HandoverReportRepository handoverReportRepository;

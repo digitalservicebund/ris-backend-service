@@ -27,7 +27,7 @@ public class HandoverService {
 
   private final DocumentUnitRepository repository;
   private final HandoverReportRepository handoverReportRepository;
-  private final EmailService emailService;
+  private final MailService mailService;
   private final DeltaMigrationRepository deltaMigrationRepository;
 
   @Value("${mail.exporter.recipientAddress:neuris@example.com}")
@@ -35,12 +35,12 @@ public class HandoverService {
 
   public HandoverService(
       DocumentUnitRepository repository,
-      EmailService emailService,
+      MailService mailService,
       DeltaMigrationRepository migrationService,
       HandoverReportRepository handoverReportRepository) {
 
     this.repository = repository;
-    this.emailService = emailService;
+    this.mailService = mailService;
     this.deltaMigrationRepository = migrationService;
     this.handoverReportRepository = handoverReportRepository;
   }
@@ -53,7 +53,7 @@ public class HandoverService {
    * @return the handover result
    * @throws DocumentationUnitNotExistsException if the documentation unit does not exist
    */
-  public HandoverMail handoverAsEmail(UUID documentUnitUuid, String issuerAddress)
+  public HandoverMail handoverAsMail(UUID documentUnitUuid, String issuerAddress)
       throws DocumentationUnitNotExistsException {
 
     DocumentUnit documentUnit =
@@ -61,13 +61,12 @@ public class HandoverService {
             .findByUuid(documentUnitUuid)
             .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnitUuid));
 
-    HandoverMail mailResponse =
-        emailService.handOver(documentUnit, recipientAddress, issuerAddress);
-    if (!mailResponse.success()) {
+    HandoverMail handoverMail = mailService.handOver(documentUnit, recipientAddress, issuerAddress);
+    if (!handoverMail.success()) {
       log.warn("Failed to send mail for documentation unit {}", documentUnitUuid);
     }
 
-    return mailResponse;
+    return handoverMail;
   }
 
   /**
@@ -76,13 +75,13 @@ public class HandoverService {
    * @param documentUuid the UUID of the documentation unit
    * @return the export result, containing the juris xml and export metadata
    */
-  public XmlExportResult createPreviewXml(UUID documentUuid)
+  public XmlTransformationResult createPreviewXml(UUID documentUuid)
       throws DocumentationUnitNotExistsException {
     DocumentUnit documentUnit =
         repository
             .findByUuid(documentUuid)
             .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUuid));
-    return emailService.getXmlPreview(documentUnit);
+    return mailService.getXmlPreview(documentUnit);
   }
 
   /**
@@ -95,7 +94,7 @@ public class HandoverService {
   public List<EventRecord> getEventLog(UUID documentUuid) {
     List<EventRecord> list =
         ListUtils.union(
-            emailService.getHandoverResult(documentUuid),
+            mailService.getHandoverResult(documentUuid),
             handoverReportRepository.getAllByDocumentUnitUuid(documentUuid));
     var migration = deltaMigrationRepository.getLatestMigration(documentUuid);
     if (migration != null) {

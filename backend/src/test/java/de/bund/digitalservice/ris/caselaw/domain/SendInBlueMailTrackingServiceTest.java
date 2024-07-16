@@ -29,26 +29,26 @@ class SendInBlueMailTrackingServiceTest {
 
   @Test
   void testMapMailEventToState_withSuccessfulState() {
-    EmailStatus expectedEmailStatus = EmailStatus.SUCCESS;
-    EmailStatus mappedEmailStatus = service.mapEventToStatus("delivered");
+    MailStatus expectedMailStatus = MailStatus.SUCCESS;
+    MailStatus mappedMailStatus = service.mapEventToStatus("delivered");
 
-    assertThat(mappedEmailStatus).isEqualTo(expectedEmailStatus);
+    assertThat(mappedMailStatus).isEqualTo(expectedMailStatus);
   }
 
   @Test
   void testMapMailEventToState_withUnsuccessfulState() {
-    EmailStatus expectedEmailStatus = EmailStatus.ERROR;
-    EmailStatus mappedEmailStatus = service.mapEventToStatus("bounces");
+    MailStatus expectedMailStatus = MailStatus.ERROR;
+    MailStatus mappedMailStatus = service.mapEventToStatus("bounces");
 
-    assertThat(mappedEmailStatus).isEqualTo(expectedEmailStatus);
+    assertThat(mappedMailStatus).isEqualTo(expectedMailStatus);
   }
 
   @Test
   void testMailEventToState_withNeutralState() {
-    EmailStatus expectedEmailStatus = EmailStatus.UNKNOWN;
-    EmailStatus mappedEmailStatus = service.mapEventToStatus("opened");
+    MailStatus expectedMailStatus = MailStatus.UNKNOWN;
+    MailStatus mappedMailStatus = service.mapEventToStatus("opened");
 
-    assertThat(mappedEmailStatus).isEqualTo(expectedEmailStatus);
+    assertThat(mappedMailStatus).isEqualTo(expectedMailStatus);
   }
 
   @Test

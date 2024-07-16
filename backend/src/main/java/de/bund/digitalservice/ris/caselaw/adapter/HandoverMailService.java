@@ -3,13 +3,13 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHandoverException;
-import de.bund.digitalservice.ris.caselaw.domain.EmailService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
-import de.bund.digitalservice.ris.caselaw.domain.XmlExportResult;
+import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
+import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -26,9 +26,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-/** Implementation of the {@link EmailService} interface that sends juris-XML files via email. */
+/** Implementation of the {@link MailService} interface that sends juris-XML files via email. */
 @Service
-public class HandoverMailService implements EmailService {
+public class HandoverMailService implements MailService {
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
   private final XmlExporter xmlExporter;
@@ -68,9 +68,9 @@ public class HandoverMailService implements EmailService {
   @Override
   public HandoverMail handOver(
       DocumentUnit documentUnit, String receiverAddress, String issuerAddress) {
-    XmlExportResult xml;
+    XmlTransformationResult xml;
     try {
-      xml = xmlExporter.generateXml(getTestDocumentUnit(documentUnit));
+      xml = xmlExporter.transformToXml(getTestDocumentUnit(documentUnit));
     } catch (ParserConfigurationException | TransformerException ex) {
       throw new DocumentationUnitHandoverException("Couldn't generate xml.", ex);
     }
@@ -106,9 +106,9 @@ public class HandoverMailService implements EmailService {
    * @throws DocumentationUnitHandoverException if the XML export fails
    */
   @Override
-  public XmlExportResult getXmlPreview(DocumentUnit documentUnit) {
+  public XmlTransformationResult getXmlPreview(DocumentUnit documentUnit) {
     try {
-      return xmlExporter.generateXml(documentUnit);
+      return xmlExporter.transformToXml(documentUnit);
     } catch (ParserConfigurationException | TransformerException ex) {
       throw new DocumentationUnitHandoverException("Couldn't generate xml.", ex);
     }
@@ -167,7 +167,7 @@ public class HandoverMailService implements EmailService {
       UUID documentUnitUuid,
       String receiverAddress,
       String mailSubject,
-      XmlExportResult xml,
+      XmlTransformationResult xml,
       String issuerAddress) {
     var xmlHandoverMailBuilder =
         HandoverMail.builder()

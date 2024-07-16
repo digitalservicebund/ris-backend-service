@@ -2,9 +2,9 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.XmlExportResult;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporterException;
+import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.domain.export.juris.JurisXmlExporter;
 import de.bund.digitalservice.ris.domain.export.juris.ResultObject;
 import javax.xml.parsers.ParserConfigurationException;
@@ -27,10 +27,10 @@ public class JurisXmlExporterWrapper implements XmlExporter {
    * @throws TransformerException if the XML generation fails due to failed transformation
    */
   @Override
-  public XmlExportResult generateXml(DocumentUnit documentUnit)
+  public XmlTransformationResult transformToXml(DocumentUnit documentUnit)
       throws ParserConfigurationException, TransformerException {
     ResultObject resultObject = jurisXmlExporter.generateXml(documentUnit);
-    return new XmlExportResult(
+    return new XmlTransformationResult(
         resultObject.xml(),
         resultObject.status().statusCode().equals("200"),
         resultObject.status().statusMessages(),

@@ -29,7 +29,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
-import de.bund.digitalservice.ris.caselaw.domain.XmlExportResult;
+import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Instant;
 import java.util.Collections;
@@ -214,7 +214,7 @@ class DocumentUnitControllerTest {
   @Test
   void testHandoverAsEmail() throws DocumentationUnitNotExistsException {
     when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
-    when(handoverService.handoverAsEmail(TEST_UUID, ISSUER_ADDRESS))
+    when(handoverService.handoverAsMail(TEST_UUID, ISSUER_ADDRESS))
         .thenReturn(
             HandoverMail.builder()
                 .documentUnitUuid(TEST_UUID)
@@ -254,13 +254,13 @@ class DocumentUnitControllerTest {
                 .handoverDate(Instant.parse("2020-01-01T01:01:01Z"))
                 .build());
 
-    verify(handoverService).handoverAsEmail(TEST_UUID, ISSUER_ADDRESS);
+    verify(handoverService).handoverAsMail(TEST_UUID, ISSUER_ADDRESS);
   }
 
   @Test
   void testHandoverAsEmail_withServiceThrowsException() throws DocumentationUnitNotExistsException {
     when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
-    when(handoverService.handoverAsEmail(TEST_UUID, ISSUER_ADDRESS))
+    when(handoverService.handoverAsMail(TEST_UUID, ISSUER_ADDRESS))
         .thenThrow(DocumentationUnitNotExistsException.class);
 
     risWebClient
@@ -271,7 +271,7 @@ class DocumentUnitControllerTest {
         .expectStatus()
         .is5xxServerError();
 
-    verify(handoverService).handoverAsEmail(TEST_UUID, ISSUER_ADDRESS);
+    verify(handoverService).handoverAsMail(TEST_UUID, ISSUER_ADDRESS);
   }
 
   @Test
@@ -340,14 +340,14 @@ class DocumentUnitControllerTest {
     when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
     when(handoverService.createPreviewXml(TEST_UUID))
         .thenReturn(
-            new XmlExportResult(
+            new XmlTransformationResult(
                 "xml",
                 true,
                 List.of("status-messages"),
                 "test.xml",
                 Instant.parse("2020-01-01T01:01:01.00Z")));
 
-    XmlExportResult responseBody =
+    XmlTransformationResult responseBody =
         risWebClient
             .withDefaultLogin()
             .get()
@@ -357,12 +357,12 @@ class DocumentUnitControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .expectStatus()
             .isOk()
-            .expectBody(XmlExportResult.class)
+            .expectBody(XmlTransformationResult.class)
             .returnResult()
             .getResponseBody();
     assertThat(responseBody)
         .isEqualTo(
-            XmlExportResult.builder()
+            XmlTransformationResult.builder()
                 .xml("xml")
                 .success(true)
                 .statusMessages(List.of("status-messages"))
