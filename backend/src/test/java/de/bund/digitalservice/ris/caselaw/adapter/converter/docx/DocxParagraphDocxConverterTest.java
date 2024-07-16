@@ -52,21 +52,6 @@ class DocxParagraphDocxConverterTest {
     assertTrue(result instanceof TextElement);
   }
 
-  @Test
-  void testConvert_withNoBreakHyphen() {
-    P paragraph = new P();
-    R run = new R();
-    Text text = new Text();
-    text.setValue("text");
-    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
-    run.getContent().add(element);
-    paragraph.getContent().add(run);
-
-    var result = converter.convert(paragraph);
-
-    assertTrue(result instanceof TextElement);
-  }
-
   @ParameterizedTest
   @CsvSource({"0, 0", "1, 40", "720, 40", "721, 80", "1440, 80", "1441, 120"})
   void testConvert_withIndentedP(BigInteger indentationInTwips, int expectedMarginLeft) {
