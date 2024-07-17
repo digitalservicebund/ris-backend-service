@@ -210,16 +210,10 @@ test.describe(
           { clickSaveButton: true },
         )
 
-        await test.step("Navigate to handover, click in 'XML-Vorschau', check they are visible", async () => {
+        await test.step("Navigate to handover, click in 'XML-Vorschau', check they are visible in correct order", async () => {
           await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
           await expect(page.getByText("XML Vorschau")).toBeVisible()
           await page.getByText("XML Vorschau").click()
-          await expect(
-            page.getByText("<streitjahr>2020</streitjahr>"),
-          ).toBeVisible()
-          await expect(
-            page.getByText("<streitjahr>2021</streitjahr>"),
-          ).toBeVisible()
 
           const nodes = await page
             .locator('code:has-text("<streitjahr>")')
