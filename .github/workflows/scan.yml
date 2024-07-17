@@ -19,7 +19,6 @@ jobs:
         uses: aquasecurity/trivy-action@d9cd5b1c23aaf8cb31bb09141028215828364bbb
         env:
           TRIVY_ALL: true
-          TRIVY_DEBUG: true
         with:
           scan-type: "clean"
       - name: Download trivy vulnerabilities DB
