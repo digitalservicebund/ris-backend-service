@@ -18,9 +18,7 @@ jobs:
       - name: Remove all caches and database of the trivy scanner
         uses: aquasecurity/trivy-action@d9cd5b1c23aaf8cb31bb09141028215828364bbb
         env:
-          # TRIVY_RESET was removed and replaced with --clean all, but the envs are not properly supported
-          # see https://github.com/aquasecurity/trivy/pull/6993#issuecomment-2222264578
-          TRIVY_ALL: true
+          TRIVY_CLEAN: all
           TRIVY_DEBUG: true
         with:
           scan-type: "image"
