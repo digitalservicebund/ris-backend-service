@@ -33,6 +33,9 @@ public class ReferenceDTO {
 
   private Integer rank;
 
+  // amtlich or nichtamtlich
+  private String type;
+
   @NotBlank private String citation;
 
   // Klammerzusatz

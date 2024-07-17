@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
@@ -51,9 +50,12 @@ import java.time.Year;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class DocumentationUnitTransformerTest {
@@ -670,6 +672,24 @@ class DocumentationUnitTransformerTest {
                                 .subtitle("Legal Periodical Subtitle")
                                 .abbreviation("LPA")
                                 .build())
+                        .build(),
+                    ReferenceDTO.builder()
+                        .rank(1)
+                        .citation("2024, 123")
+                        .legalPeriodical(null)
+                        .type("amtlich")
+                        .build(),
+                    ReferenceDTO.builder()
+                        .rank(1)
+                        .citation("2024, 123")
+                        .legalPeriodical(null)
+                        .type("other")
+                        .build(),
+                    ReferenceDTO.builder()
+                        .rank(1)
+                        .citation("2024, 123")
+                        .legalPeriodical(null)
+                        .type(null)
                         .build()))
             .build();
 
@@ -687,6 +707,21 @@ class DocumentationUnitTransformerTest {
                         .legalPeriodicalTitle("Legal Periodical Title")
                         .legalPeriodicalSubtitle("Legal Periodical Subtitle")
                         .legalPeriodicalAbbreviation("LPA")
+                        .build(),
+                    Reference.builder()
+                        .citation("2024, 123")
+                        .primaryReference(true)
+                        .legalPeriodicalId(null)
+                        .build(),
+                    Reference.builder()
+                        .citation("2024, 123")
+                        .primaryReference(false)
+                        .legalPeriodicalId(null)
+                        .build(),
+                    Reference.builder()
+                        .citation("2024, 123")
+                        .primaryReference(false)
+                        .legalPeriodicalId(null)
                         .build()))
             .build();
     DocumentUnit documentUnit =
@@ -1054,44 +1089,98 @@ class DocumentationUnitTransformerTest {
         List.of(1, 2, 3));
   }
 
-  @Test
-  void testTransformToDTO_shouldAddReferences() {
-    DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
+  private static Stream<Arguments> provideReferencesTestData() {
     var legalPeriodicalId = UUID.randomUUID();
     var referenceId = UUID.randomUUID();
+    return Stream.of(
+        Arguments.of(
+            Reference.builder()
+                .id(referenceId)
+                .legalPeriodicalTitle("Aa Bb Cc")
+                .legalPeriodicalAbbreviation("ABC")
+                .legalPeriodicalSubtitle("a test reference")
+                .legalPeriodicalId(legalPeriodicalId)
+                .citation("2024, S.5")
+                .footnote("a footnote")
+                .referenceSupplement("Klammerzusatz")
+                .build(),
+            ReferenceDTO.builder()
+                .id(referenceId)
+                .rank(1)
+                .type("nichtamtlich")
+                .citation("2024, S.5")
+                .footnote("a footnote")
+                .referenceSupplement("Klammerzusatz")
+                .legalPeriodical(LegalPeriodicalDTO.builder().id(legalPeriodicalId).build())
+                .legalPeriodicalRawValue("ABC")
+                .build()),
+        Arguments.of(
+            Reference.builder()
+                .legalPeriodicalId(legalPeriodicalId)
+                .legalPeriodicalAbbreviation("ABC")
+                .citation("2024, S.5")
+                .primaryReference(true)
+                .build(),
+            ReferenceDTO.builder()
+                .rank(1)
+                .citation("2024, S.5")
+                .type("amtlich")
+                .legalPeriodical(LegalPeriodicalDTO.builder().id(legalPeriodicalId).build())
+                .legalPeriodicalRawValue("ABC")
+                .build()),
+        Arguments.of(
+            Reference.builder()
+                .legalPeriodicalId(legalPeriodicalId)
+                .legalPeriodicalAbbreviation("ABC")
+                .citation("2024, S.5")
+                .primaryReference(false)
+                .build(),
+            ReferenceDTO.builder()
+                .rank(1)
+                .citation("2024, S.5")
+                .type("nichtamtlich")
+                .legalPeriodical(LegalPeriodicalDTO.builder().id(legalPeriodicalId).build())
+                .legalPeriodicalRawValue("ABC")
+                .build()),
+        Arguments.of(
+            Reference.builder()
+                .legalPeriodicalAbbreviation("ABC")
+                .citation("2024, S.5")
+                .primaryReference(true)
+                .build(),
+            ReferenceDTO.builder()
+                .rank(1)
+                .citation("2024, S.5")
+                .type("amtlich")
+                .legalPeriodicalRawValue("ABC")
+                .build()),
+        Arguments.of(
+            Reference.builder().legalPeriodicalAbbreviation("ABC").citation("2024, S.5").build(),
+            ReferenceDTO.builder()
+                .rank(1)
+                .citation("2024, S.5")
+                .type("nichtamtlich")
+                .legalPeriodicalRawValue("ABC")
+                .build()));
+  }
+
+  @ParameterizedTest
+  @MethodSource("provideReferencesTestData")
+  void testTransformToDTO_shouldAddReferences(Reference reference, ReferenceDTO expected) {
+    DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
+
     DocumentUnit documentUnit =
-        generateSimpleDocumentUnitBuilder()
-            .references(
-                List.of(
-                    Reference.builder()
-                        .id(referenceId)
-                        .legalPeriodicalTitle("Aa Bb Cc")
-                        .legalPeriodicalAbbreviation("ABC")
-                        .legalPeriodicalSubtitle("a test reference")
-                        .legalPeriodicalId(legalPeriodicalId)
-                        .citation("2024, S.5")
-                        .footnote("a footnote")
-                        .referenceSupplement("Klammerzusatz")
-                        .build()))
-            .build();
+        generateSimpleDocumentUnitBuilder().references(List.of(reference)).build();
 
     List<ReferenceDTO> referenceDTOS =
         DocumentationUnitTransformer.transformToDTO(currentDto, documentUnit).getReferences();
 
     assertEquals(1, referenceDTOS.size());
-    ReferenceDTO transformedReferenceDTO = referenceDTOS.get(0);
-    assertEquals(1, transformedReferenceDTO.getRank());
 
-    assertEquals(legalPeriodicalId, transformedReferenceDTO.getLegalPeriodical().getId());
-    assertNull(transformedReferenceDTO.getLegalPeriodical().getTitle());
-    assertNull(transformedReferenceDTO.getLegalPeriodical().getAbbreviation());
-    assertNull(transformedReferenceDTO.getLegalPeriodical().getSubtitle());
-
-    assertEquals("2024, S.5", transformedReferenceDTO.getCitation());
-    assertEquals("a footnote", transformedReferenceDTO.getFootnote());
-    assertEquals("Klammerzusatz", transformedReferenceDTO.getReferenceSupplement());
-    assertEquals("ABC", transformedReferenceDTO.getLegalPeriodicalRawValue());
-    assertEquals(referenceId, transformedReferenceDTO.getId());
+    assertThat(referenceDTOS.get(0))
+        .usingRecursiveComparison()
+        .ignoringFields("documentationUnit")
+        .isEqualTo(expected);
   }
 
   private DocumentUnitBuilder generateSimpleDocumentUnitBuilder() {

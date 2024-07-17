@@ -138,6 +138,7 @@ public class DocumentationUnitTransformer {
 
   private static void addReferences(
       DocumentUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
+    AtomicInteger i = new AtomicInteger(1);
     builder.references(
         updatedDomainObject.references() == null
             ? Collections.emptyList()
@@ -147,7 +148,7 @@ public class DocumentationUnitTransformer {
                     referenceDTO -> {
                       // TODO why is this necessary?
                       referenceDTO.setDocumentationUnit(builder.build());
-                      referenceDTO.setRank(1);
+                      referenceDTO.setRank(i.getAndIncrement());
                       return referenceDTO;
                     })
                 .toList());

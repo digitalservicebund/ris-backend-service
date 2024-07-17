@@ -19,7 +19,7 @@ import lombok.Builder;
 @Builder(toBuilder = true)
 public record Reference(
     UUID id,
-    Boolean primaryReference,
+    boolean primaryReference,
     String citation,
     String referenceSupplement,
     String footnote,

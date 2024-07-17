@@ -154,6 +154,7 @@ class ReferenceIntegrationTest {
                         .referenceSupplement("Klammerzusatz")
                         .footnote("footnote")
                         .legalPeriodicalId(legalPeriodical.getId())
+                        .legalPeriodicalAbbreviation("BVerwGE")
                         .build()))
             .build();
 
