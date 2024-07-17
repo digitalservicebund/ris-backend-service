@@ -39,8 +39,12 @@
     "title": "Name konnte nicht geladen werden.",
     "description": ""
   },
-  "DOCUMENT_UNIT_COULD_NOT_BE_LOADED": {
+  "DOCUMENT_UNITS_COULD_NOT_BE_LOADED": {
     "title": "Dokumentationseinheiten konnten nicht geladen werden.",
+    "description": ""
+  },
+  "DOCUMENT_UNIT_COULD_NOT_BE_LOADED": {
+    "title": "Dokumentationseinheit konnte nicht geladen werden.",
     "description": ""
   },
   "DOCUMENT_UNIT_NOT_ALLOWED": {

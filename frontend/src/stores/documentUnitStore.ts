@@ -40,14 +40,14 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
       }
     }
 
-    // Generate the JSON Patch document
+    // Create JSON Patch
     const patch = jsonpatch.compare(
       originalDocumentUnit.value,
       documentUnit.value,
     )
 
+    // If there are no updates in the client, get the current version from backend
     if (patch.length === 0 && documentUnit.value.documentNumber) {
-      // Even though there are no updates in the client, get the current version from backend
       const response = await loadDocumentUnit(documentUnit.value.documentNumber)
       if (response.data) {
         return {
@@ -74,21 +74,32 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
     })
 
     if (response.status === 200) {
-      const newPatch = response.data as RisJsonPatch
-      jsonpatch.applyPatch(originalDocumentUnit.value, newPatch.patch)
+      //Apply backend patch to original documentunit reference, with updated version
+      const backendPatch = response.data as RisJsonPatch
+      jsonpatch.applyPatch(originalDocumentUnit.value, backendPatch.patch)
+      originalDocumentUnit.value.version = backendPatch.documentationUnitVersion
 
-      const parsedDocumentUnit = JSON.parse(
-        JSON.stringify(originalDocumentUnit.value),
-      )
+      // Deep copy
       documentUnit.value = new DocumentUnit(originalDocumentUnit.value.uuid, {
-        ...parsedDocumentUnit,
+        ...JSON.parse(JSON.stringify(originalDocumentUnit.value)),
       })
 
-      if (newPatch.errorPaths != undefined && newPatch.errorPaths.length > 0) {
+      // Todo: which status?
+      // Todo: retrieve error message from errorMessages.json
+      if (
+        backendPatch.errorPaths != undefined &&
+        backendPatch.errorPaths.length > 0
+      ) {
         response.error = {
           title: "Fehler beim Patchen",
-          description: newPatch.errorPaths,
+          description: backendPatch.errorPaths,
         }
+      }
+    } else {
+      return {
+        status: response.status,
+        data: undefined,
+        error: errorMessages.DOCUMENT_UNIT_UPDATE_FAILED,
       }
     }
     return response
