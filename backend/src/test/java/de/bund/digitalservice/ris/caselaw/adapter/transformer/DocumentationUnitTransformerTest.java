@@ -1058,11 +1058,13 @@ class DocumentationUnitTransformerTest {
   void testTransformToDTO_shouldAddReferences() {
     DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
     var legalPeriodicalId = UUID.randomUUID();
+    var referenceId = UUID.randomUUID();
     DocumentUnit documentUnit =
         generateSimpleDocumentUnitBuilder()
             .references(
                 List.of(
                     Reference.builder()
+                        .id(referenceId)
                         .legalPeriodicalTitle("Aa Bb Cc")
                         .legalPeriodicalAbbreviation("ABC")
                         .legalPeriodicalSubtitle("a test reference")
@@ -1088,6 +1090,8 @@ class DocumentationUnitTransformerTest {
     assertEquals("2024, S.5", transformedReferenceDTO.getCitation());
     assertEquals("a footnote", transformedReferenceDTO.getFootnote());
     assertEquals("Klammerzusatz", transformedReferenceDTO.getReferenceSupplement());
+    assertEquals("ABC", transformedReferenceDTO.getLegalPeriodicalRawValue());
+    assertEquals(referenceId, transformedReferenceDTO.getId());
   }
 
   private DocumentUnitBuilder generateSimpleDocumentUnitBuilder() {

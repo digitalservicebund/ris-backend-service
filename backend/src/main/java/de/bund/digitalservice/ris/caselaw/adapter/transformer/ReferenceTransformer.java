@@ -16,16 +16,18 @@ public class ReferenceTransformer {
         .primaryReference(referenceDTO.getLegalPeriodical().getPrimaryReference())
         .citation(referenceDTO.getCitation())
         .footnote(referenceDTO.getFootnote())
+        .id(referenceDTO.getId())
         .build();
   }
 
   public static ReferenceDTO transformToDTO(Reference reference) {
     return ReferenceDTO.builder()
+        .id(reference.id())
         .referenceSupplement(reference.referenceSupplement())
         .legalPeriodical(LegalPeriodicalDTO.builder().id(reference.legalPeriodicalId()).build())
         .citation(reference.citation())
         .footnote(reference.footnote())
-        .legalPeriodicalRawValue("test")
+        .legalPeriodicalRawValue(reference.legalPeriodicalAbbreviation())
         .build();
   }
 

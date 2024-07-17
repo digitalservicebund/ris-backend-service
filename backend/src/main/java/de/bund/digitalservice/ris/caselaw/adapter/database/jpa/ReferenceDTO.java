@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/** A reference to a legal periodical (Fundstelle). */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -32,11 +33,13 @@ public class ReferenceDTO {
 
   private Integer rank;
 
-  private String type;
+  @NotBlank private String citation;
 
   // Klammerzusatz
   @Column(name = "reference_supplement")
   private String referenceSupplement;
+
+  private String footnote;
 
   @JoinColumn(name = "legal_periodical_id")
   @ManyToOne
@@ -45,8 +48,4 @@ public class ReferenceDTO {
   @Column(name = "legal_periodical_raw_value")
   @NotNull
   private String legalPeriodicalRawValue;
-
-  @NotBlank private String citation;
-
-  private String footnote;
 }
