@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onBeforeUnmount, toRaw } from "vue"
+import { onBeforeUnmount } from "vue"
 import TextButton from "@/components/input/TextButton.vue"
 import { useSaveToRemote } from "@/composables/useSaveToRemote"
 
@@ -10,16 +10,8 @@ const props = defineProps<{
 const { triggerSave, lastSaveError, formattedLastSavedOn } =
   useSaveToRemote(10000)
 
-const getErrorDetails = () => {
-  if (
-    lastSaveError.value &&
-    toRaw(lastSaveError.value).title &&
-    toRaw(lastSaveError.value).title.includes("Berechtigung") // temporary workaround
-  ) {
-    return ": " + toRaw(lastSaveError.value).title
-  }
-  return ""
-}
+const getErrorDetails = () =>
+  lastSaveError.value?.title ? ": " + lastSaveError.value.title : ""
 
 onBeforeUnmount(function () {
   triggerSave()

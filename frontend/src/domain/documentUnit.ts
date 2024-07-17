@@ -183,4 +183,31 @@ export default class DocumentUnit {
     }
     return false
   }
+
+  // get patchPaths() {
+  //   return this.getAllPaths(this)
+  // }
+
+  // public getAllPaths(obj: any, parentPath = "") {
+  //   let paths: string[] = []
+
+  //   for (const key in obj) {
+  //     if (obj.hasOwnProperty(key)) {
+  //       const currentPath = parentPath ? `${parentPath}/${key}` : key
+  //       if (
+  //         typeof obj[key] === "object" &&
+  //         obj[key] !== null &&
+  //         !Array.isArray(obj[key])
+  //       ) {
+  //         // Recursively get paths for nested objects
+  //         paths = paths.concat(this.getAllPaths(obj[key], currentPath))
+  //       } else {
+  //         // Add current path
+  //         paths.push(currentPath)
+  //       }
+  //     }
+  //   }
+
+  //   return paths
+  // }
 }

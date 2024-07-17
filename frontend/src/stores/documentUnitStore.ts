@@ -1,10 +1,10 @@
 import * as jsonpatch from "fast-json-patch"
 import { defineStore } from "pinia"
 import { ref } from "vue"
+import fields from "@/data/fieldNames.json"
 import DocumentUnit from "@/domain/documentUnit"
 import { RisJsonPatch } from "@/domain/risJsonPatch"
 import errorMessages from "@/i18n/errors.json"
-
 import documentUnitService from "@/services/documentUnitService"
 import {
   FailedValidationServerResponse,
@@ -84,17 +84,21 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
         ...JSON.parse(JSON.stringify(originalDocumentUnit.value)),
       })
 
-      // Todo: which status?
-      // Todo: retrieve error message from errorMessages.json
       if (
         backendPatch.errorPaths != undefined &&
         backendPatch.errorPaths.length > 0
-      ) {
-        response.error = {
-          title: "Fehler beim Patchen",
-          description: backendPatch.errorPaths,
+      )
+        return {
+          status: 207,
+          data: undefined,
+          error: {
+            title: (
+              fields as {
+                [key: string]: string
+              }
+            )[backendPatch.errorPaths[0].replace(/\/\d+$/, "")],
+          },
         }
-      }
     } else {
       return {
         status: response.status,
