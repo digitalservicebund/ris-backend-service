@@ -8,6 +8,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,6 +41,10 @@ public class ReferenceDTO {
   @JoinColumn(name = "legal_periodical_id")
   @ManyToOne
   private LegalPeriodicalDTO legalPeriodical;
+
+  @Column(name = "legal_periodical_raw_value")
+  @NotNull
+  private String legalPeriodicalRawValue;
 
   @NotBlank private String citation;
 

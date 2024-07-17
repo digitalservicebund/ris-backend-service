@@ -43,10 +43,10 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
     <PreviewContentRelatedIndexing
       :content-related-indexing="documentUnit.contentRelatedIndexing"
     />
+    <PreviewReferences :references="documentUnit.references || []" />
     <PreviewTexts
       :texts="documentUnit.texts"
       :valid-border-numbers="documentUnit.borderNumbers"
     />
-    <PreviewReferences :references="documentUnit.references || []" />
   </FlexContainer>
 </template>

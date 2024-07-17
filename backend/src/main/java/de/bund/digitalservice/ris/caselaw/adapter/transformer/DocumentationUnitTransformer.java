@@ -139,9 +139,18 @@ public class DocumentationUnitTransformer {
   private static void addReferences(
       DocumentUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
     builder.references(
-        updatedDomainObject.references().stream()
-            .map(ReferenceTransformer::transformToDTO)
-            .toList());
+        updatedDomainObject.references() == null
+            ? Collections.emptyList()
+            : updatedDomainObject.references().stream()
+                .map(ReferenceTransformer::transformToDTO)
+                .map(
+                    referenceDTO -> {
+                      // TODO why is this necessary?
+                      referenceDTO.setDocumentationUnit(builder.build());
+                      referenceDTO.setRank(1);
+                      return referenceDTO;
+                    })
+                .toList());
   }
 
   private static void addTexts(
@@ -589,9 +598,11 @@ public class DocumentationUnitTransformer {
   private static void addReferencesToDomain(
       DocumentationUnitDTO documentationUnitDTO, DocumentUnitBuilder builder) {
     builder.references(
-        documentationUnitDTO.getReferences().stream()
-            .map(ReferenceTransformer::transformToDomain)
-            .toList());
+        documentationUnitDTO.getReferences() == null
+            ? Collections.emptyList()
+            : documentationUnitDTO.getReferences().stream()
+                .map(ReferenceTransformer::transformToDomain)
+                .toList());
   }
 
   /**

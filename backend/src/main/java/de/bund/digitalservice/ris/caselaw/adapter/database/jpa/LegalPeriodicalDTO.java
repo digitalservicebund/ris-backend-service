@@ -34,4 +34,7 @@ public class LegalPeriodicalDTO {
 
   @Column(name = "citation_style")
   private String citationStyle;
+
+  @Column(name = "juris_id")
+  private int jurisId;
 }
