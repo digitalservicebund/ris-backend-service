@@ -8,6 +8,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,6 +34,7 @@ public class ReferenceDTO {
 
   private String type;
 
+  // Klammerzusatz
   @Column(name = "reference_supplement")
   private String referenceSupplement;
 
@@ -41,7 +43,7 @@ public class ReferenceDTO {
   private LegalPeriodicalDTO legalPeriodical;
 
   @Column(name = "legal_periodical_raw_value")
-  @NotBlank
+  @NotNull
   private String legalPeriodicalRawValue;
 
   @NotBlank private String citation;

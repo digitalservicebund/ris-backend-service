@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
@@ -17,10 +18,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
@@ -36,6 +39,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
@@ -648,6 +652,49 @@ class DocumentationUnitTransformerTest {
   }
 
   @Test
+  void testTransformToDomain_shouldTransformReferences() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder()
+            .references(
+                List.of(
+                    ReferenceDTO.builder()
+                        .rank(1)
+                        .citation("2024, 123")
+                        .footnote("footnote")
+                        .referenceSupplement("Klammerzusatz")
+                        .legalPeriodical(
+                            LegalPeriodicalDTO.builder()
+                                .id(UUID.fromString("33333333-2222-3333-4444-555555555555"))
+                                .primaryReference(true)
+                                .title("Legal Periodical Title")
+                                .subtitle("Legal Periodical Subtitle")
+                                .abbreviation("LPA")
+                                .build())
+                        .build()))
+            .build();
+
+    DocumentUnit expected =
+        generateSimpleDocumentUnitBuilder()
+            .coreData(generateSimpleCoreDataBuilder().build())
+            .references(
+                List.of(
+                    Reference.builder()
+                        .citation("2024, 123")
+                        .footnote("footnote")
+                        .primaryReference(true)
+                        .referenceSupplement("Klammerzusatz")
+                        .legalPeriodicalId(UUID.fromString("33333333-2222-3333-4444-555555555555"))
+                        .legalPeriodicalTitle("Legal Periodical Title")
+                        .legalPeriodicalSubtitle("Legal Periodical Subtitle")
+                        .legalPeriodicalAbbreviation("LPA")
+                        .build()))
+            .build();
+    DocumentUnit documentUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+    assertThat(documentUnit).isEqualTo(expected);
+  }
+
+  @Test
   void testTransformToDomain_withDocumentationUnitDTOIsNull_shouldReturnEmptyDocumentUnit() {
 
     assertThatThrownBy(() -> DocumentationUnitTransformer.transformToDomain(null))
@@ -1007,6 +1054,42 @@ class DocumentationUnitTransformerTest {
         List.of(1, 2, 3));
   }
 
+  @Test
+  void testTransformToDTO_shouldAddReferences() {
+    DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
+    var legalPeriodicalId = UUID.randomUUID();
+    DocumentUnit documentUnit =
+        generateSimpleDocumentUnitBuilder()
+            .references(
+                List.of(
+                    Reference.builder()
+                        .legalPeriodicalTitle("Aa Bb Cc")
+                        .legalPeriodicalAbbreviation("ABC")
+                        .legalPeriodicalSubtitle("a test reference")
+                        .legalPeriodicalId(legalPeriodicalId)
+                        .citation("2024, S.5")
+                        .footnote("a footnote")
+                        .referenceSupplement("Klammerzusatz")
+                        .build()))
+            .build();
+
+    List<ReferenceDTO> referenceDTOS =
+        DocumentationUnitTransformer.transformToDTO(currentDto, documentUnit).getReferences();
+
+    assertEquals(1, referenceDTOS.size());
+    ReferenceDTO transformedReferenceDTO = referenceDTOS.get(0);
+    assertEquals(1, transformedReferenceDTO.getRank());
+
+    assertEquals(legalPeriodicalId, transformedReferenceDTO.getLegalPeriodical().getId());
+    assertNull(transformedReferenceDTO.getLegalPeriodical().getTitle());
+    assertNull(transformedReferenceDTO.getLegalPeriodical().getAbbreviation());
+    assertNull(transformedReferenceDTO.getLegalPeriodical().getSubtitle());
+
+    assertEquals("2024, S.5", transformedReferenceDTO.getCitation());
+    assertEquals("a footnote", transformedReferenceDTO.getFootnote());
+    assertEquals("Klammerzusatz", transformedReferenceDTO.getReferenceSupplement());
+  }
+
   private DocumentUnitBuilder generateSimpleDocumentUnitBuilder() {
     return DocumentUnit.builder()
         .previousDecisions(Collections.emptyList())
@@ -1020,7 +1103,8 @@ class DocumentationUnitTransformerTest {
                 .fieldsOfLaw(Collections.emptyList())
                 .norms(Collections.emptyList())
                 .activeCitations(Collections.emptyList())
-                .build());
+                .build())
+        .references(Collections.emptyList());
   }
 
   private CoreDataBuilder generateSimpleCoreDataBuilder() {

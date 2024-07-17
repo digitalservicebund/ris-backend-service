@@ -131,7 +131,26 @@ public class DocumentationUnitTransformer {
           .decisionGrounds(null);
     }
 
+    addReferences(updatedDomainObject, builder);
+
     return builder.build();
+  }
+
+  private static void addReferences(
+      DocumentUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
+    builder.references(
+        updatedDomainObject.references() == null
+            ? Collections.emptyList()
+            : updatedDomainObject.references().stream()
+                .map(ReferenceTransformer::transformToDTO)
+                .map(
+                    referenceDTO -> {
+                      // TODO why is this necessary?
+                      referenceDTO.setDocumentationUnit(builder.build());
+                      referenceDTO.setRank(1);
+                      return referenceDTO;
+                    })
+                .toList());
   }
 
   private static void addTexts(
@@ -571,8 +590,19 @@ public class DocumentationUnitTransformer {
         .contentRelatedIndexing(contentRelatedIndexing);
 
     addStatusToDomain(documentationUnitDTO, builder);
+    addReferencesToDomain(documentationUnitDTO, builder);
 
     return builder.build();
+  }
+
+  private static void addReferencesToDomain(
+      DocumentationUnitDTO documentationUnitDTO, DocumentUnitBuilder builder) {
+    builder.references(
+        documentationUnitDTO.getReferences() == null
+            ? Collections.emptyList()
+            : documentationUnitDTO.getReferences().stream()
+                .map(ReferenceTransformer::transformToDomain)
+                .toList());
   }
 
   /**
