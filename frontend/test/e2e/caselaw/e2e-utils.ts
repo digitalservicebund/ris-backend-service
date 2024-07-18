@@ -17,7 +17,7 @@ export const navigateToSearch = async (
 ) => {
   await test.step("Navigate to 'Suche'", async () => {
     if (navigationBy === "url") {
-      await page.getByTestId("search").click()
+      await page.goto(`/caselaw`)
     } else {
       await page.getByTestId("search-navbar-button").click()
     }
