@@ -76,7 +76,6 @@ test.describe(
       await page.keyboard.type("Abschnitt mit Einzug")
 
       let inputFieldInnerHTML = await inputField.innerHTML()
-      console.log(inputFieldInnerHTML)
       expect(inputFieldInnerHTML.includes(noIndentation)).toBeTruthy()
 
       await inputField.click()
