@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, onBeforeUnmount, ref, watch } from "vue"
+import { computed, onMounted, ref, watch } from "vue"
 import { ValidationError } from "./input/types"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
@@ -123,7 +123,7 @@ async function addActiveCitation() {
     !validationStore.getByMessage("Das Datum darf nicht in der Zukunft liegen")
       .length
   ) {
-    validateRequiredInput()
+    await validateRequiredInput()
     emit("update:modelValue", activeCitation.value as ActiveCitation)
     emit("addEntry")
   }
@@ -194,10 +194,6 @@ onMounted(() => {
     validateRequiredInput()
   }
   activeCitation.value = new ActiveCitation({ ...props.modelValue })
-})
-
-onBeforeUnmount(() => {
-  if (activeCitation.value.isEmpty) emit("removeEntry")
 })
 </script>
 

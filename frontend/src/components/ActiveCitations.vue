@@ -15,7 +15,7 @@ const activeCitations = computed({
   },
 })
 
-const defaultValue = new ActiveCitation()
+const defaultValue = new ActiveCitation() as ActiveCitation
 </script>
 
 <template>

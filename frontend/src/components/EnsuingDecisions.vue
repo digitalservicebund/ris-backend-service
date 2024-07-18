@@ -27,7 +27,7 @@ const ensuingDecisions = computed({
     emit("update:modelValue", value)
   },
 })
-const defaultValue = new EnsuingDecision()
+const defaultValue = new EnsuingDecision() as EnsuingDecision
 
 /**
  * Returns a render function with an error icon badge

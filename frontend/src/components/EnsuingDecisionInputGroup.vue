@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { watch, ref, computed, onMounted, onBeforeUnmount } from "vue"
+import { watch, ref, computed, onMounted } from "vue"
 import { ValidationError } from "./input/types"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
@@ -165,10 +165,6 @@ onMounted(() => {
     validateRequiredInput()
   }
   ensuingDecision.value = new EnsuingDecision({ ...props.modelValue })
-})
-
-onBeforeUnmount(() => {
-  if (ensuingDecision.value.isEmpty) emit("removeEntry")
 })
 </script>
 

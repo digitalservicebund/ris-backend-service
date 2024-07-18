@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { watch, ref, computed, onMounted, onBeforeUnmount } from "vue"
+import { watch, ref, computed, onMounted } from "vue"
 import { ValidationError } from "./input/types"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
@@ -26,7 +26,7 @@ const emit = defineEmits<{
   "update:modelValue": [value: PreviousDecision]
   addEntry: [void]
   cancelEdit: [void]
-  removeEntry: [value?: boolean]
+  removeEntry: [value: PreviousDecision]
 }>()
 
 const lastSearchInput = ref(new PreviousDecision())
@@ -109,7 +109,7 @@ async function addPreviousDecision() {
     !validationStore.getByMessage("Das Datum darf nicht in der Zukunft liegen")
       .length
   ) {
-    validateRequiredInput()
+    await validateRequiredInput()
     emit("update:modelValue", previousDecision.value as PreviousDecision)
     emit("addEntry")
   }
@@ -122,7 +122,7 @@ async function addPreviousDecisionFromSearch(decision: RelatedDocumentation) {
     deviatingFileNumber: previousDecision.value.deviatingFileNumber,
   })
   emit("update:modelValue", previousDecision.value as PreviousDecision)
-  emit("addEntry")
+  emit("addEntry", decision)
   scrollToTop()
 }
 
@@ -162,10 +162,6 @@ onMounted(() => {
     validateRequiredInput()
   }
   previousDecision.value = new PreviousDecision({ ...props.modelValue })
-})
-
-onBeforeUnmount(() => {
-  if (previousDecision.value.isEmpty) emit("removeEntry")
 })
 </script>
 
@@ -323,7 +319,7 @@ onBeforeUnmount(() => {
         button-type="destructive"
         label="Eintrag löschen"
         size="small"
-        @click.stop="emit('removeEntry', true)"
+        @click.stop="emit('removeEntry', modelValue)"
       />
     </div>
 

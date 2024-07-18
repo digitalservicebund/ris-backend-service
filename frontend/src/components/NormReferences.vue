@@ -24,7 +24,7 @@ const norms = computed({
 const ambiguousNormReferenceError = "Mehrdeutiger Verweis"
 const missingDataError = "Fehlende Daten"
 
-const defaultValue = new NormReference()
+const defaultValue = new NormReference() as NormReference
 
 /**
  * Summarizer for a legal force

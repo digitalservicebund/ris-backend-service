@@ -23,7 +23,14 @@ export default class PreviousDecision
 
   constructor(data: Partial<PreviousDecision> = {}) {
     super()
+    if (this.uuid == undefined) {
+      this.uuid = crypto.randomUUID()
+    }
     Object.assign(this, data)
+  }
+
+  get id() {
+    return this.uuid
   }
 
   get renderDecision(): string {
@@ -72,6 +79,10 @@ export default class PreviousDecision
       }
     })
     return isEmpty
+  }
+
+  equals(entry: PreviousDecision): boolean {
+    return this.id === entry.id
   }
 
   get showSummaryOnEdit(): boolean {

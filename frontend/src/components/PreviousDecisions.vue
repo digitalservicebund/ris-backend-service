@@ -21,7 +21,7 @@ const previousDecisions = computed({
   },
 })
 
-const defaultValue = new PreviousDecision()
+const defaultValue = new PreviousDecision() as PreviousDecision
 
 /**
  * Returns a render function with an error icon badge
