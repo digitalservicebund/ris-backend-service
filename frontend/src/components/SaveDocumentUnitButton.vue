@@ -46,6 +46,7 @@ window.onbeforeunload = function () {
     </p>
     <TextButton
       :aria-label="ariaLabel"
+      data-testid="save-button"
       label="Speichern"
       size="small"
       @click="triggerSave"
