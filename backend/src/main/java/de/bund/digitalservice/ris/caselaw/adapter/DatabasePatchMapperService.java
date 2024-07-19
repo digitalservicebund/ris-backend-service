@@ -16,7 +16,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -72,29 +71,15 @@ public class DatabasePatchMapperService implements PatchMapperService {
   @Override
   public JsonPatch removePatchForSamePath(JsonPatch patch1, JsonPatch patch2) {
     Map<String, List<JsonPatchOperation>> pathList1 =
-        patch1.getOperations().stream()
-            .collect(
-                Collectors.groupingBy(
-                    op -> {
-                      JsonNode operation = objectMapper.convertValue(op, JsonNode.class);
-                      return operation.get("path").textValue();
-                    }));
+        patch1.getOperations().stream().collect(Collectors.groupingBy(JsonPatchOperation::getPath));
     Map<String, List<JsonPatchOperation>> pathList2 =
-        patch2.getOperations().stream()
-            .collect(
-                Collectors.groupingBy(
-                    op -> {
-                      JsonNode operation = objectMapper.convertValue(op, JsonNode.class);
-                      return operation.get("path").textValue();
-                    }));
+        patch2.getOperations().stream().collect(Collectors.groupingBy(JsonPatchOperation::getPath));
 
-    List<String> errorPaths = new ArrayList<>();
     List<JsonPatchOperation> operations = new ArrayList<>(patch1.getOperations());
     for (Entry<String, List<JsonPatchOperation>> entry : pathList2.entrySet()) {
       if (pathList1.containsKey(entry.getKey())) {
         List<JsonPatchOperation> toRemove = pathList1.get(entry.getKey());
         toRemove.forEach(operations::remove);
-        errorPaths.add(entry.getKey());
       }
     }
 
@@ -102,9 +87,25 @@ public class DatabasePatchMapperService implements PatchMapperService {
   }
 
   @Override
+  public RisJsonPatch removeExistPatches(RisJsonPatch toFrontend, JsonPatch patch) {
+    List<String> operationAsStringList =
+        patch.getOperations().stream().map(JsonPatchOperation::toString).toList();
+    List<JsonPatchOperation> operations =
+        toFrontend.patch().getOperations().stream()
+            .filter(operation -> !operationAsStringList.contains(operation.toString()))
+            .toList();
+
+    return new RisJsonPatch(
+        toFrontend.documentationUnitVersion(), new JsonPatch(operations), toFrontend.errorPaths());
+  }
+
+  @Override
   public void savePatch(JsonPatch patch, UUID documentationUnitId, Long documentationUnitVersion) {
+    List<JsonPatchOperation> patchWithoutVersion =
+        patch.getOperations().stream().filter(op -> !op.getPath().equals("/version")).toList();
+
     try {
-      String patchJson = objectMapper.writeValueAsString(patch);
+      String patchJson = objectMapper.writeValueAsString(new JsonPatch(patchWithoutVersion));
       DocumentationUnitPatchDTO dto =
           DocumentationUnitPatchDTO.builder()
               .documentationUnitId(documentationUnitId)
@@ -119,14 +120,11 @@ public class DatabasePatchMapperService implements PatchMapperService {
   }
 
   @Override
-  public RisJsonPatch calculatePatch(
-      UUID documentationUnitId,
-      Long frontendDocumentationUnitVersion,
-      Long newDocumentationUnitVersion) {
+  public JsonPatch calculatePatch(UUID documentationUnitId, Long frontendDocumentationUnitVersion) {
     List<JsonPatchOperation> operations = new ArrayList<>();
 
     repository
-        .findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
+        .findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThan(
             documentationUnitId, frontendDocumentationUnitVersion)
         .forEach(
             patch -> {
@@ -138,29 +136,16 @@ public class DatabasePatchMapperService implements PatchMapperService {
               }
             });
 
-    return new RisJsonPatch(
-        newDocumentationUnitVersion, new JsonPatch(operations), Collections.emptyList());
+    return new JsonPatch(operations);
   }
 
   @Override
   public RisJsonPatch handlePatchForSamePath(
       DocumentUnit existingDocumentationUnit, JsonPatch patch1, JsonPatch patch2) {
     Map<String, List<JsonPatchOperation>> pathList1 =
-        patch1.getOperations().stream()
-            .collect(
-                Collectors.groupingBy(
-                    op -> {
-                      JsonNode operation = objectMapper.convertValue(op, JsonNode.class);
-                      return operation.get("path").textValue();
-                    }));
+        patch1.getOperations().stream().collect(Collectors.groupingBy(JsonPatchOperation::getPath));
     Map<String, List<JsonPatchOperation>> pathList2 =
-        patch2.getOperations().stream()
-            .collect(
-                Collectors.groupingBy(
-                    op -> {
-                      JsonNode operation = objectMapper.convertValue(op, JsonNode.class);
-                      return operation.get("path").textValue();
-                    }));
+        patch2.getOperations().stream().collect(Collectors.groupingBy(JsonPatchOperation::getPath));
 
     List<String> errorPaths = new ArrayList<>();
     List<JsonPatchOperation> operations = new ArrayList<>(patch1.getOperations());
@@ -174,8 +159,7 @@ public class DatabasePatchMapperService implements PatchMapperService {
               } else if (patch instanceof RemoveOperation) {
                 JsonNode node =
                     objectMapper.convertValue(existingDocumentationUnit, JsonNode.class);
-                JsonNode value =
-                    node.at(JsonPointer.valueOf(entry.getKey()));
+                JsonNode value = node.at(JsonPointer.valueOf(entry.getKey()));
                 operations.add(new AddOperation(entry.getKey(), value));
               }
               operations.remove(patch);

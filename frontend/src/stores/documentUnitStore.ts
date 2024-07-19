@@ -76,12 +76,12 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
     if (response.status === 200) {
       //Apply backend patch to original documentunit reference, with updated version
       const backendPatch = response.data as RisJsonPatch
-      jsonpatch.applyPatch(originalDocumentUnit.value, backendPatch.patch)
-      originalDocumentUnit.value.version = backendPatch.documentationUnitVersion
+      jsonpatch.applyPatch(documentUnit.value, backendPatch.patch)
+      documentUnit.value.version = backendPatch.documentationUnitVersion
 
       // Deep copy
-      documentUnit.value = new DocumentUnit(originalDocumentUnit.value.uuid, {
-        ...JSON.parse(JSON.stringify(originalDocumentUnit.value)),
+      originalDocumentUnit.value = new DocumentUnit(documentUnit.value.uuid, {
+        ...JSON.parse(JSON.stringify(documentUnit.value)),
       })
 
       if (

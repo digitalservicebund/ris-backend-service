@@ -9,7 +9,7 @@ import java.util.UUID;
 
 /** A service to enable partial updates of object by patch */
 public interface PatchMapperService {
-  RisJsonPatch calculatePatch(UUID uuid, Long documentationUnitVersion, Long newVersion);
+  JsonPatch calculatePatch(UUID uuid, Long documentationUnitVersion);
 
   RisJsonPatch handlePatchForSamePath(
       DocumentUnit existingDocumentationUnit, JsonPatch patch, JsonPatch patch1);
@@ -24,4 +24,6 @@ public interface PatchMapperService {
   JsonPatch getDiffPatch(DocumentUnit existed, DocumentUnit updated);
 
   JsonPatch removePatchForSamePath(JsonPatch patch1, JsonPatch patch2);
+
+  RisJsonPatch removeExistPatches(RisJsonPatch toFrontend, JsonPatch patch);
 }

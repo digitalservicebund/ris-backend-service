@@ -13,6 +13,7 @@ import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -161,31 +162,39 @@ public class DocumentUnitService {
       newVersion = existingDocumentationUnit.version() + 1;
     }
 
-    RisJsonPatch newPatch = patchMapperService.calculatePatch(
-      existingDocumentationUnit.uuid(), patch.documentationUnitVersion(), newVersion
-    );
+    JsonPatch newPatch =
+        patchMapperService.calculatePatch(
+            existingDocumentationUnit.uuid(), patch.documentationUnitVersion());
 
-    JsonPatch toUpdate = patchMapperService.removePatchForSamePath(patch.patch(), newPatch.patch());
+    RisJsonPatch toFrontend;
+    if (!patch.patch().getOperations().isEmpty()) {
+      JsonPatch toUpdate = patchMapperService.removePatchForSamePath(patch.patch(), newPatch);
 
-    DocumentUnit patchedDocumentationUnit = patchMapperService.applyPatchToEntity(
-      toUpdate, existingDocumentationUnit, DocumentUnit.class
-    );
+      DocumentUnit patchedDocumentationUnit =
+          patchMapperService.applyPatchToEntity(
+              toUpdate, existingDocumentationUnit, DocumentUnit.class);
+      patchedDocumentationUnit = patchedDocumentationUnit.toBuilder().version(newVersion).build();
+      DocumentUnit updatedDocumentUnit = updateDocumentUnit(patchedDocumentationUnit);
 
-    DocumentUnit updatedDocumentUnit = updateDocumentUnit(patchedDocumentationUnit);
+      JsonPatch toSaveJsonPatch =
+          patchMapperService.getDiffPatch(existingDocumentationUnit, updatedDocumentUnit);
+      JsonPatch toFrontendJsonPatch =
+          patchMapperService.getDiffPatch(patchedDocumentationUnit, updatedDocumentUnit);
 
-    JsonPatch diffJsonPatch = patchMapperService.getDiffPatch(existingDocumentationUnit, updatedDocumentUnit);
+      patchMapperService.savePatch(
+          toSaveJsonPatch, existingDocumentationUnit.uuid(), existingDocumentationUnit.version());
 
-    patchMapperService.savePatch(
-        diffJsonPatch, existingDocumentationUnit.uuid(), existingDocumentationUnit.version()
-    );
+      toFrontend =
+          patchMapperService.handlePatchForSamePath(
+              existingDocumentationUnit, toFrontendJsonPatch, newPatch);
 
-    RisJsonPatch toFrontend = patchMapperService.handlePatchForSamePath(
-        existingDocumentationUnit, patch.patch(), newPatch.patch()
-    );
+      toFrontend = patchMapperService.removeExistPatches(toFrontend, patch.patch());
+      toFrontend = toFrontend.toBuilder().documentationUnitVersion(newVersion).build();
+    } else {
+      toFrontend = new RisJsonPatch(newVersion, null, Collections.emptyList());
+    }
 
-    return toFrontend.toBuilder()
-        .documentationUnitVersion(newVersion)
-        .build();
+    return toFrontend;
   }
 
   public DocumentUnit updateDocumentUnit(DocumentUnit documentUnit)

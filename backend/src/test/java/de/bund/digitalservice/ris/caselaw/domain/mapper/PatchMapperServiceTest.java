@@ -180,14 +180,13 @@ class PatchMapperServiceTest {
             .patch("[{\"op\":\"add\",\"path\":\"/decisionDate\",\"value\":\"20.01.2000\"}]")
             .build();
     Mockito.when(
-            repository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
+            repository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThan(
                 documentationUnitId, 2L))
         .thenReturn(List.of());
 
-    RisJsonPatch result = service.calculatePatch(documentationUnitId, 2L, 3L);
+    JsonPatch result = service.calculatePatch(documentationUnitId, 2L);
 
-    assertThat(result.documentationUnitVersion()).isEqualTo(3L);
-    assertThat(result.patch().getOperations()).isEmpty();
+    assertThat(result.getOperations()).isEmpty();
   }
 
   @Test
@@ -206,14 +205,13 @@ class PatchMapperServiceTest {
             .patch("[{\"op\":\"add\",\"path\":\"/decisionDate\",\"value\":\"20.01.2000\"}]")
             .build();
     Mockito.when(
-            repository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
+            repository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThan(
                 documentationUnitId, 1L))
         .thenReturn(List.of(patchDTO2));
 
-    RisJsonPatch result = service.calculatePatch(documentationUnitId, 1L, 3L);
+    JsonPatch result = service.calculatePatch(documentationUnitId, 1L);
 
-    assertThat(result.documentationUnitVersion()).isEqualTo(3L);
-    assertThat(result.patch().getOperations()).hasSize(1);
+    assertThat(result.getOperations()).hasSize(1);
   }
 
   @Test
@@ -232,13 +230,12 @@ class PatchMapperServiceTest {
             .patch("[{\"op\":\"add\",\"path\":\"/decisionDate\",\"value\":\"20.01.2000\"}]")
             .build();
     Mockito.when(
-            repository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
+            repository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThan(
                 documentationUnitId, 0L))
         .thenReturn(List.of(patchDTO1, patchDTO2));
 
-    RisJsonPatch result = service.calculatePatch(documentationUnitId, 0L, 3L);
+    JsonPatch result = service.calculatePatch(documentationUnitId, 0L);
 
-    assertThat(result.documentationUnitVersion()).isEqualTo(3L);
-    assertThat(result.patch().getOperations()).hasSize(2);
+    assertThat(result.getOperations()).hasSize(2);
   }
 }

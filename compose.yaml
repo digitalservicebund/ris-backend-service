@@ -90,7 +90,7 @@ services:
     restart: always
     container_name: postgres14
     volumes:
-      - postgres14-minimal:/var/lib/postgresql/data
+      - postgres14-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=neuris
       - POSTGRES_PASSWORD=test
@@ -157,4 +157,4 @@ services:
 
 volumes:
   gradle-cache:
-  postgres14-minimal:
+  postgres14-data:
