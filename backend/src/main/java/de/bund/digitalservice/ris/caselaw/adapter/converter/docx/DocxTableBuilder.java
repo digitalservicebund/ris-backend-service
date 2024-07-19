@@ -555,7 +555,7 @@ public class DocxTableBuilder extends DocxBuilder {
         .forEach(
             element -> {
               if (element instanceof P p) {
-                paragraphElements.add(ParagraphConverter.convert(p, converter));
+                paragraphElements.add(ParagraphConverter.convert(p, converter, false));
               } else {
                 LOGGER.error("unknown tr element: {}", element);
               }

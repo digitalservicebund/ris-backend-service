@@ -29,7 +29,8 @@ public class ParagraphConverter {
    * @param converter reference to the converter
    * @return the internal representation as {@link ParagraphElement}
    */
-  public static ParagraphElement convert(P paragraph, DocxConverter converter) {
+  public static ParagraphElement convert(
+      P paragraph, DocxConverter converter, boolean isInsideListElement) {
     if (paragraph == null) {
       return null;
     }
@@ -41,7 +42,9 @@ public class ParagraphConverter {
       if (paragraphProperties.getPStyle() != null) {
         paragraphElement.setStyleReference(paragraphProperties.getPStyle().getVal());
       }
-      if (paragraphProperties.getInd() != null && paragraphProperties.getInd().getLeft() != null) {
+      if (paragraphProperties.getInd() != null
+          && paragraphProperties.getInd().getLeft() != null
+          && !isInsideListElement) {
         // Default Tab Size in Docx = 1.27cm = 48px = 720 twips
         int baseIndentTwips = 720;
         int indentInTwips = paragraphProperties.getInd().getLeft().intValue();

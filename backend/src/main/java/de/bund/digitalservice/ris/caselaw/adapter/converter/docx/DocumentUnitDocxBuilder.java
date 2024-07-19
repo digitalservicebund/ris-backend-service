@@ -40,7 +40,7 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
     } else if (isNumberingListEntry()) {
       return convertToNumberingListEntry();
     } else if (isParagraph()) {
-      return ParagraphConverter.convert(paragraph, converter);
+      return ParagraphConverter.convert(paragraph, converter, false);
     }
 
     return null;
@@ -245,7 +245,7 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
     }
 
     return new NumberingListEntry(
-        ParagraphConverter.convert(paragraph, converter), numberingListEntryIndex);
+        ParagraphConverter.convert(paragraph, converter, true), numberingListEntryIndex);
   }
 
   private NumberingListEntryIndex setNumberingListEntryIndex(ListLevel listLevel, String iLvl) {
