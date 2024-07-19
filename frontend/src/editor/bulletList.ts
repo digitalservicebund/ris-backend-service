@@ -10,6 +10,7 @@ export const CustomBulletList = BulletList.extend({
         renderHTML: (attributes) => {
           return {
             style: attributes.style,
+            class: "list-disc",
           }
         },
       },
