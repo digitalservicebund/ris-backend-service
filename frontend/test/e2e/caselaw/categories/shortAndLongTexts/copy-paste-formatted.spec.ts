@@ -118,6 +118,53 @@ test("copy-paste indented text from side panel", async ({
   expect(inputFieldInnerHTML.includes(noIndentation)).toBeTruthy()
 })
 
+test("copy-paste lists from side panel", async ({ page, documentNumber }) => {
+  const bulletListItemText = "This is a bullet list"
+  const bulletListSecondItemText = "Second bullet list item"
+  const orderedListItemText = "This is an ordered list"
+  const orderedListSecondItemText = "Second ordered list item"
+  const bulletList = `<ul style="list-style-type:disc;" class="list-disc"><li><p>This is a bullet list</p></li><li><p>Second bullet list item</p></li></ul>`
+  const orderedList = `ol style="list-style-type:decimal;" class="list-decimal"><li><p>This is an ordered list</p></li><li><p>Second ordered list item</p></li></ol>`
+
+  // upload file
+  await uploadTestfile(page, "some-lists.docx")
+  await expect(page.getByText("some-lists.docx")).toBeVisible()
+  await expect(page.getByLabel(`Datei löschen`)).toBeVisible()
+  await expect(page.getByText(bulletListItemText)).toBeVisible()
+  await expect(page.getByText(bulletListSecondItemText)).toBeVisible()
+  await expect(page.getByText(orderedListItemText)).toBeVisible()
+  await expect(page.getByText(orderedListSecondItemText)).toBeVisible()
+
+  // Click on "Rubriken" und check if original document loaded
+  await navigateToCategories(page, documentNumber)
+
+  await expect(page.getByLabel("Ladestatus")).toBeHidden()
+  await expect(page.getByText(bulletListItemText)).toBeVisible()
+  await expect(page.getByText(bulletListSecondItemText)).toBeVisible()
+  await expect(page.getByText(orderedListItemText)).toBeVisible()
+  await expect(page.getByText(orderedListSecondItemText)).toBeVisible()
+  const originalFileParagraph = page.getByText("Text", {
+    exact: true,
+  })
+  const inputField = await copyPaste(originalFileParagraph, page)
+
+  // Check all text copied
+  const inputFieldAllText = await inputField.allTextContents()
+  expect(inputFieldAllText[0].includes(bulletListItemText)).toBeTruthy()
+  expect(inputFieldAllText[0].includes(bulletListSecondItemText)).toBeTruthy()
+  expect(inputFieldAllText[0].includes(orderedListItemText)).toBeTruthy()
+  expect(inputFieldAllText[0].includes(orderedListSecondItemText)).toBeTruthy()
+
+  // hide invisible characters
+  await inputField.click()
+  await page.getByLabel("invisible-characters").click()
+
+  const inputFieldInnerHTML = await inputField.innerHTML()
+  // Check all text copied with style
+  expect(inputFieldInnerHTML.includes(bulletList)).toBeTruthy()
+  expect(inputFieldInnerHTML.includes(orderedList)).toBeTruthy()
+})
+
 async function copyPaste(originalFileParagraph: Locator, page: Page) {
   await expect(originalFileParagraph).toBeVisible()
 
