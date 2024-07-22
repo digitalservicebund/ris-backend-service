@@ -22,7 +22,7 @@ public class FooterConverter {
     content.forEach(
         c -> {
           if (c instanceof P p) {
-            paragraphElement.set(ParagraphConverter.convert(p, converter, false));
+            paragraphElement.set(ParagraphConverter.convert(p, converter));
           }
         });
 

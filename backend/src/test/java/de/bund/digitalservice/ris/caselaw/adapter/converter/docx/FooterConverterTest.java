@@ -22,7 +22,7 @@ class FooterConverterTest {
         Mockito.mockStatic(ParagraphConverter.class)) {
       ParagraphElement mockParagraphElement = new ParagraphElement();
       mockedStatic
-          .when(() -> ParagraphConverter.convert(mockP, mockConverter, false))
+          .when(() -> ParagraphConverter.convert(mockP, mockConverter))
           .thenReturn(mockParagraphElement);
       List<Object> content = Arrays.asList(mockP);
 

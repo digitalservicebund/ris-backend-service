@@ -74,6 +74,10 @@ class DocxParagraphDocxConverterTest {
     PPr pPr = new PPr();
     PPrBase.NumPr numPr = new PPrBase.NumPr();
     pPr.setNumPr(numPr);
+    PPrBase.Ind ind = new PPrBase.Ind();
+    ind.setLeft(BigInteger.valueOf(1));
+    pPr.setInd(ind);
+    paragraph.setPPr(pPr);
     R run = new R();
     Text text = new Text();
     text.setValue("text");
@@ -83,6 +87,7 @@ class DocxParagraphDocxConverterTest {
 
     var result = converter.convert(paragraph);
 
+    assertTrue(result.toHtmlString().contains("text"));
     assertFalse(result.toHtmlString().contains("margin-left:"));
   }
 
