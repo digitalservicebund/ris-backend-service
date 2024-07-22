@@ -190,7 +190,7 @@ test.describe(
           prefilledDocumentUnit.documentNumber ?? "",
         )
 
-        const testData = ["2020", "2021"]
+        const testData = ["2020", "2021", "1980", "1999"]
 
         await waitForSaving(
           async () => {
