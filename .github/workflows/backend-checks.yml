@@ -39,7 +39,7 @@ jobs:
           java-version: "17.0"
           distribution: "temurin"
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@c9872874b099717fffc25bee4cac9c04ac16c873
+        uses: gradle/actions/setup-gradle@6c9e5473141d9a428221ea9a229a025d7bf331d4
         with:
           gradle-version: ${{ env.GRADLE_VERSION}}
       - name: Run backend tests
@@ -72,7 +72,7 @@ jobs:
           java-version: "17.0"
           distribution: "temurin"
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@c9872874b099717fffc25bee4cac9c04ac16c873
+        uses: gradle/actions/setup-gradle@6c9e5473141d9a428221ea9a229a025d7bf331d4
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
       - name: Run backend tests
@@ -109,7 +109,7 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@c9872874b099717fffc25bee4cac9c04ac16c873
+        uses: gradle/actions/setup-gradle@6c9e5473141d9a428221ea9a229a025d7bf331d4
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
       - name: Scan with SonarQube
