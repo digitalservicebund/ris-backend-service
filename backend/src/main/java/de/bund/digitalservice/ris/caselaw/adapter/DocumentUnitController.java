@@ -1,7 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.gravity9.jsonpatch.JsonPatchException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformerException;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
@@ -20,7 +18,7 @@ import de.bund.digitalservice.ris.caselaw.domain.XmlExportResult;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
-import de.bund.digitalservice.ris.caselaw.domain.exception.PatchForSamePathException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitPatchException;
 import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
 import java.time.Duration;
@@ -214,6 +212,13 @@ public class DocumentUnitController {
     }
   }
 
+  /**
+   * Update a documentation unit with a {@link com.gravity9.jsonpatch.JsonPatch} object.
+   *
+   * @param uuid id of the documentation unit
+   * @param patch patch with the change operations
+   * @return updated and saved documentation unit
+   */
   @PatchMapping(
       value = "/{uuid}",
       consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -227,12 +232,9 @@ public class DocumentUnitController {
       }
 
       var newPatch = service.updateDocumentUnit(uuid, patch);
+
       return ResponseEntity.ok().body(newPatch);
-    } catch (JsonPatchException | JsonProcessingException e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    } catch (PatchForSamePathException e) {
-      return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
-    } catch (DocumentationUnitNotExistsException e) {
+    } catch (DocumentationUnitNotExistsException | DocumentationUnitPatchException e) {
       log.error("Error by updating documentation unit '{}'", uuid, e);
       return ResponseEntity.internalServerError().build();
     }

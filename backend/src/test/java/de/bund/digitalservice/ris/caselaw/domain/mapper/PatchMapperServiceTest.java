@@ -54,7 +54,7 @@ class PatchMapperServiceTest {
     operations.add(replaceOp);
     JsonPatch patch = new JsonPatch(operations);
 
-    documentUnit = service.applyPatchToEntity(patch, documentUnit, DocumentUnit.class);
+    documentUnit = service.applyPatchToEntity(patch, documentUnit);
     assertThat(documentUnit.coreData().appraisalBody()).isEqualTo("newValue");
   }
 

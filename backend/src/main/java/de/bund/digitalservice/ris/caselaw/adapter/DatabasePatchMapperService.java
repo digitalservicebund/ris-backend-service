@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitPatchDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitPatchException;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,36 +37,26 @@ public class DatabasePatchMapperService implements PatchMapperService {
     this.repository = repository;
   }
 
-  /**
-   * Applies a JSON Patch to an entity and returns the updated entity.
-   *
-   * @param patch the JSON Patch to apply
-   * @param targetEntity the entity to update
-   * @param entityType the class of the entity
-   * @param <T> the type of the entity
-   * @return the updated entity
-   */
   @Override
-  public <T> T applyPatchToEntity(JsonPatch patch, T targetEntity, Class<T> entityType)
-      throws JsonProcessingException, JsonPatchException {
-    return objectMapper.treeToValue(applyPatch(patch, targetEntity), entityType);
-  }
+  public DocumentUnit applyPatchToEntity(JsonPatch patch, DocumentUnit targetEntity) {
+    DocumentUnit documentationUnit;
 
-  private <T> JsonNode applyPatch(JsonPatch patch, T targetEntity) throws JsonPatchException {
-    return patch.apply(objectMapper.convertValue(targetEntity, JsonNode.class));
-  }
+    try {
+      JsonNode jsonNode = objectMapper.convertValue(targetEntity, JsonNode.class);
+      JsonNode updatedNode = patch.apply(jsonNode);
+      documentationUnit = objectMapper.treeToValue(updatedNode, DocumentUnit.class);
+    } catch (JsonProcessingException | JsonPatchException e) {
+      throw new DocumentationUnitPatchException("Couldn't apply patch", e);
+    }
 
-  @Override
-  public JsonPatch findDiff(DocumentUnit source, DocumentUnit target) {
-
-    return JsonDiff.asJsonPatch(
-        objectMapper.convertValue(source, JsonNode.class),
-        objectMapper.convertValue(target, JsonNode.class));
+    return documentationUnit;
   }
 
   @Override
   public JsonPatch getDiffPatch(DocumentUnit existed, DocumentUnit updated) {
-    return objectMapper.convertValue(findDiff(existed, updated), JsonPatch.class);
+    return JsonDiff.asJsonPatch(
+        objectMapper.convertValue(existed, JsonNode.class),
+        objectMapper.convertValue(updated, JsonNode.class));
   }
 
   @Override
@@ -92,6 +83,12 @@ public class DatabasePatchMapperService implements PatchMapperService {
         patch.getOperations().stream().map(JsonPatchOperation::toString).toList();
     List<JsonPatchOperation> operations =
         toFrontend.patch().getOperations().stream()
+            .peek(
+                operation -> {
+                  if (operationAsStringList.contains(operation.toString())) {
+                    log.info("remove '{}' patch", operation.getPath());
+                  }
+                })
             .filter(operation -> !operationAsStringList.contains(operation.toString()))
             .toList();
 
@@ -115,7 +112,7 @@ public class DatabasePatchMapperService implements PatchMapperService {
               .build();
       repository.save(dto);
     } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
+      throw new DocumentationUnitPatchException("Couldn't save patch", e);
     }
   }
 
@@ -132,7 +129,8 @@ public class DatabasePatchMapperService implements PatchMapperService {
                 JsonPatch jsonPatch = objectMapper.readValue(patch.getPatch(), JsonPatch.class);
                 operations.addAll(jsonPatch.getOperations());
               } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
+                throw new DocumentationUnitPatchException(
+                    "Couldn't read patch information from database", e);
               }
             });
 

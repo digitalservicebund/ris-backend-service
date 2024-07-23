@@ -2,13 +2,12 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import static de.bund.digitalservice.ris.caselaw.domain.StringUtils.normalizeSpace;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gravity9.jsonpatch.JsonPatch;
-import com.gravity9.jsonpatch.JsonPatchException;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitPatchException;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -152,8 +151,18 @@ public class DocumentUnitService {
     return "Dokumentationseinheit gelöscht: " + documentUnitUuid;
   }
 
+  /**
+   * Update a documenation unit with a {@link RisJsonPatch}.
+   *
+   * @param documentationUnitId id of the documentation unit
+   * @param patch patch to update the documentation unit
+   * @return a patch with changes the client not know yet (automatically set fields, fields update
+   *     by other user)
+   * @throws DocumentationUnitNotExistsException if the documentation unit not exist
+   * @throws DocumentationUnitPatchException if the documentation unit couldn't updated
+   */
   public RisJsonPatch updateDocumentUnit(UUID documentationUnitId, RisJsonPatch patch)
-      throws JsonPatchException, JsonProcessingException, DocumentationUnitNotExistsException {
+      throws DocumentationUnitNotExistsException, DocumentationUnitPatchException {
 
     DocumentUnit existingDocumentationUnit = getByUuid(documentationUnitId);
 
@@ -171,8 +180,7 @@ public class DocumentUnitService {
       JsonPatch toUpdate = patchMapperService.removePatchForSamePath(patch.patch(), newPatch);
 
       DocumentUnit patchedDocumentationUnit =
-          patchMapperService.applyPatchToEntity(
-              toUpdate, existingDocumentationUnit, DocumentUnit.class);
+          patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit);
       patchedDocumentationUnit = patchedDocumentationUnit.toBuilder().version(newVersion).build();
       DocumentUnit updatedDocumentUnit = updateDocumentUnit(patchedDocumentationUnit);
 
@@ -188,6 +196,7 @@ public class DocumentUnitService {
           patchMapperService.handlePatchForSamePath(
               existingDocumentationUnit, toFrontendJsonPatch, newPatch);
 
+      // TODO: check logs. possible not needed
       toFrontend = patchMapperService.removeExistPatches(toFrontend, patch.patch());
       toFrontend = toFrontend.toBuilder().documentationUnitVersion(newVersion).build();
     } else {
