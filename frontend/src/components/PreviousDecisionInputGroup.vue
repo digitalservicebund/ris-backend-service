@@ -122,7 +122,7 @@ async function addPreviousDecisionFromSearch(decision: RelatedDocumentation) {
     deviatingFileNumber: previousDecision.value.deviatingFileNumber,
   })
   emit("update:modelValue", previousDecision.value as PreviousDecision)
-  emit("addEntry")
+  emit("addEntry", decision)
   scrollToTop()
 }
 
