@@ -510,6 +510,7 @@ describe("NormReferenceEntry", () => {
     it("updates legal force type", async () => {
       const { user, emitted } = renderComponent({
         modelValue: {
+          uuid: "8f54255f-cbd6-43e2-b266-dc3abdeb077b",
           normAbbreviation: { id: "123", abbreviation: "ABC" },
         } as NormReference,
       })
@@ -530,6 +531,8 @@ describe("NormReferenceEntry", () => {
       expect(emitted("update:modelValue")).toEqual([
         [
           {
+            uuid: "8f54255f-cbd6-43e2-b266-dc3abdeb077b",
+
             normAbbreviation: {
               abbreviation: "ABC",
               id: "123",
@@ -556,6 +559,7 @@ describe("NormReferenceEntry", () => {
     it("updates legal force region", async () => {
       const { user, emitted } = renderComponent({
         modelValue: {
+          uuid: "8f54255f-cbd6-43e2-b266-dc3abdeb077b",
           normAbbreviation: { id: "123", abbreviation: "ABC" },
         } as NormReference,
       })
@@ -576,6 +580,7 @@ describe("NormReferenceEntry", () => {
       expect(emitted("update:modelValue")).toEqual([
         [
           {
+            uuid: "8f54255f-cbd6-43e2-b266-dc3abdeb077b",
             normAbbreviation: {
               abbreviation: "ABC",
               id: "123",

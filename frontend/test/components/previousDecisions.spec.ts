@@ -47,7 +47,7 @@ function generatePreviousDecision(options?: {
   referenceFound?: boolean
 }) {
   const previousDecision = new PreviousDecision({
-    uuid: options?.uuid ?? "123",
+    uuid: options?.uuid ?? crypto.randomUUID(),
     documentNumber: options?.documentNumber ?? undefined,
     referenceFound: options?.referenceFound ?? false,
     court: options?.court ?? {

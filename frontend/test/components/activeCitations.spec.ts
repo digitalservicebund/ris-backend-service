@@ -50,7 +50,7 @@ function generateActiveCitation(options?: {
   citationStyle?: CitationType
 }) {
   const activeCitation = new ActiveCitation({
-    uuid: options?.uuid ?? "123",
+    uuid: options?.uuid ?? crypto.randomUUID(),
     documentNumber: options?.documentNumber ?? undefined,
     court: options?.court ?? {
       type: "type1",
