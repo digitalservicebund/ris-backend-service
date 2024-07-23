@@ -10,7 +10,6 @@ import FlexItem from "@/components/FlexItem.vue"
 import PreviousDecisions from "@/components/PreviousDecisions.vue"
 import { useProvideCourtType } from "@/composables/useCourtType"
 import { useScrollToHash } from "@/composables/useScrollToHash"
-import EnsuingDecision from "@/domain/ensuingDecision"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const route = useRoute()
@@ -66,13 +65,6 @@ const coreData = computed({
   },
 })
 
-const ensuingDecisions = computed({
-  get: () => store.documentUnit!.ensuingDecisions as EnsuingDecision[],
-  set: (newValues) => {
-    store.documentUnit!.ensuingDecisions = newValues
-  },
-})
-
 const { hash: routeHash } = toRefs(route)
 const headerOffset = 145
 useScrollToHash(routeHash, headerOffset)
@@ -84,7 +76,7 @@ useProvideCourtType(courtTypeRef)
   <FlexItem class="w-full flex-1 grow flex-col p-24">
     <DocumentUnitCoreData id="coreData" v-model="coreData" class="mb-24" />
     <PreviousDecisions id="proceedingDecisions" />
-    <EnsuingDecisions v-model="ensuingDecisions" class="mb-24" />
+    <EnsuingDecisions class="mb-24" />
     <DocumentUnitContentRelatedIndexing id="contentRelatedIndexing" />
     <DocumentUnitTexts id="texts" />
   </FlexItem>

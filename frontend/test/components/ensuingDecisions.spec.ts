@@ -1,24 +1,35 @@
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import EnsuingDecisions from "@/components/EnsuingDecisions.vue"
 import { ComboboxItem } from "@/components/input/types"
-import { Court, DocumentType } from "@/domain/documentUnit"
+import DocumentUnit, { Court, DocumentType } from "@/domain/documentUnit"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 
-function renderComponent(options?: { modelValue?: EnsuingDecision[] }) {
-  const props = {
-    modelValue: options?.modelValue ? options?.modelValue : [],
-  }
-
+function renderComponent(ensuingDecisions?: EnsuingDecision[]) {
   // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
   return {
     user,
     ...render(EnsuingDecisions, {
-      props,
       global: {
+        plugins: [
+          [
+            createTestingPinia({
+              initialState: {
+                docunitStore: {
+                  documentUnit: new DocumentUnit("foo", {
+                    documentNumber: "1234567891234",
+                    ensuingDecisions: ensuingDecisions ?? [],
+                  }),
+                },
+              },
+              stubActions: false,
+            }),
+          ],
+        ],
         stubs: { routerLink: { template: "<a><slot/></a>" } },
       },
     }),
@@ -152,11 +163,11 @@ describe("EnsuingDecisions", () => {
   })
 
   it("renders ensuing decisions as list entries", () => {
-    const modelValue: EnsuingDecision[] = [
+    const ensuingDecisions: EnsuingDecision[] = [
       generateEnsuingDecision({ fileNumber: "123" }),
       generateEnsuingDecision({ fileNumber: "345" }),
     ]
-    renderComponent({ modelValue })
+    renderComponent(ensuingDecisions)
 
     expect(
       screen.queryByLabelText("Nachgehende Entscheidung speichern"),
@@ -180,13 +191,11 @@ describe("EnsuingDecisions", () => {
   })
 
   it("click on list item, opens the list entry in edit mode", async () => {
-    const { user } = renderComponent({
-      modelValue: [
-        generateEnsuingDecision({
-          fileNumber: "123",
-        }),
-      ],
-    })
+    const { user } = renderComponent([
+      generateEnsuingDecision({
+        fileNumber: "123",
+      }),
+    ])
 
     expect(
       screen.queryByLabelText("Nachgehende Entscheidung speichern"),
@@ -200,9 +209,7 @@ describe("EnsuingDecisions", () => {
   })
 
   it("correctly toggles value of date known checkbox", async () => {
-    const { user } = renderComponent({
-      modelValue: [generateEnsuingDecision()],
-    })
+    const { user } = renderComponent([generateEnsuingDecision()])
 
     await user.click(screen.getByTestId("list-entry-0"))
 
@@ -215,9 +222,7 @@ describe("EnsuingDecisions", () => {
   })
 
   it("correctly updates value court input", async () => {
-    const { user } = renderComponent({
-      modelValue: [generateEnsuingDecision()],
-    })
+    const { user } = renderComponent([generateEnsuingDecision()])
 
     expect(screen.queryByText(/AG Test/)).not.toBeInTheDocument()
 
@@ -237,9 +242,7 @@ describe("EnsuingDecisions", () => {
   })
 
   it("correctly updates value of fileNumber input", async () => {
-    const { user } = renderComponent({
-      modelValue: [generateEnsuingDecision()],
-    })
+    const { user } = renderComponent([generateEnsuingDecision()])
 
     expect(screen.queryByText(/new fileNumber/)).not.toBeInTheDocument()
     await user.click(screen.getByTestId("list-entry-0"))
@@ -257,9 +260,7 @@ describe("EnsuingDecisions", () => {
   })
 
   it("correctly updates value of decision date input", async () => {
-    const { user } = renderComponent({
-      modelValue: [generateEnsuingDecision()],
-    })
+    const { user } = renderComponent([generateEnsuingDecision()])
 
     expect(screen.queryByText(/02.02.2022/)).not.toBeInTheDocument()
     await user.click(screen.getByTestId("list-entry-0"))
@@ -277,9 +278,10 @@ describe("EnsuingDecisions", () => {
   })
 
   it("correctly deletes ensuing decision", async () => {
-    const { user } = renderComponent({
-      modelValue: [generateEnsuingDecision(), generateEnsuingDecision()],
-    })
+    const { user } = renderComponent([
+      generateEnsuingDecision(),
+      generateEnsuingDecision(),
+    ])
     const ensuingDecisions = screen.getAllByLabelText("Listen Eintrag")
     expect(ensuingDecisions.length).toBe(2)
 
@@ -289,14 +291,12 @@ describe("EnsuingDecisions", () => {
   })
 
   it("renders from search added ensuing decisions as editable list item, note can be updated", async () => {
-    const { user } = renderComponent({
-      modelValue: [
-        generateEnsuingDecision({
-          documentNumber: "ABC",
-          referenceFound: true,
-        }),
-      ],
-    })
+    const { user } = renderComponent([
+      generateEnsuingDecision({
+        documentNumber: "ABC",
+        referenceFound: true,
+      }),
+    ])
     await user.click(screen.getByTestId("list-entry-0"))
 
     expect(screen.getByLabelText("Anhängige Entscheidung")).toBeDisabled()
@@ -335,18 +335,18 @@ describe("EnsuingDecisions", () => {
   })
 
   it("indicates that search result already added to ensuing decisions", async () => {
-    const modelValue: EnsuingDecision[] = [
+    const ensuingDecisions: EnsuingDecision[] = [
       generateEnsuingDecision({ uuid: "123" }),
     ]
-    const { user } = renderComponent({ modelValue })
+    const { user } = renderComponent(ensuingDecisions)
     await user.click(screen.getByText(/Weitere Angabe/))
     await user.click(screen.getByLabelText("Nach Entscheidung suchen"))
     expect(screen.getByText(/Bereits hinzugefügt/)).toBeInTheDocument()
   })
 
   it("displays error in list and edit component when fields missing", async () => {
-    const modelValue: EnsuingDecision[] = [generateEnsuingDecision()]
-    const { user } = renderComponent({ modelValue })
+    const ensuingDecisions: EnsuingDecision[] = [generateEnsuingDecision()]
+    const { user } = renderComponent(ensuingDecisions)
     await user.click(screen.getByTestId("list-entry-0"))
 
     const fileInput = await screen.findByLabelText(
