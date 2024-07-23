@@ -103,6 +103,10 @@ describe("EditableList", () => {
 
   it("automatically adds a default entry in edit mode if user deletes all entries", async () => {
     const { user } = await renderComponent({
+      modelValue: [
+        new DummyListItem({ text: "first entry" }),
+        new DummyListItem({ text: "second entry" }),
+      ],
       defaultValue: new DummyListItem({ text: "default entry" }),
     })
 
@@ -114,7 +118,7 @@ describe("EditableList", () => {
     await user.click(screen.getByTestId("list-entry-0"))
     await user.click(screen.getByLabelText("Eintrag löschen"))
 
-    expect(screen.getByLabelText("Editier Input")).toHaveValue("default entry")
+    expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
   })
 
   it("updates the model value entry on editing it", async () => {
