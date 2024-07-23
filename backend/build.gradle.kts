@@ -83,6 +83,7 @@ spotless {
         }
     }
     format("misc") {
+
         target(
             "**/*.js",
             "**/*.json",
@@ -93,14 +94,23 @@ spotless {
             "**/*.yaml",
             "**/*.yml"
         )
-        targetExclude("frontend/**", "**/dist/**", "**/static/**")
+
+        targetExclude(
+            "frontend/**",
+            "**/?/**",
+            "**/*.sql",
+            "**/dist/**",
+            "**/static/**",
+            "**/gradle.properties",
+            "**/gradle-wrapper.properties"
+        )
         // spotless:off
         prettier(
             mapOf(
-                "prettier" to "2.8.4",
-                "prettier-plugin-properties" to "0.2.0",
-                "prettier-plugin-sh" to "0.12.8",
-                "prettier-plugin-sql" to "0.13.0"
+                "prettier" to "3.3.3",
+                "prettier-plugin-properties" to "0.3.0",
+                "prettier-plugin-sh" to "0.14.0",
+                "prettier-plugin-sql" to "0.18.0"
             )
         ).config(
             mapOf(
