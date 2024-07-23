@@ -37,7 +37,7 @@ function generateEnsuingDecision(options?: {
   note?: string
 }) {
   const ensuingDecision = new EnsuingDecision({
-    uuid: options?.uuid ?? "123",
+    uuid: options?.uuid ?? crypto.randomUUID(),
     documentNumber: options?.documentNumber ?? undefined,
     court: options?.court ?? {
       type: "type1",
