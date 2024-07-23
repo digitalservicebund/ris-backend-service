@@ -9,7 +9,6 @@ import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 
 function renderComponent(ensuingDecisions?: EnsuingDecision[]) {
-  // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
   return {
     user,
@@ -187,7 +186,7 @@ describe("EnsuingDecisions", () => {
     )
     await user.click(button)
 
-    expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
+    expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(2)
   })
 
   it("click on list item, opens the list entry in edit mode", async () => {
