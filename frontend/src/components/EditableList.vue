@@ -40,7 +40,7 @@ const mergedValues = computed(() => {
  * Toggles the display of the default entry and sets the editing entry.
  * @param {boolean} shouldDisplay
  */
-function showEmptyEntry(shouldDisplay: boolean) {
+function toggleDisplayDefaultValue(shouldDisplay: boolean) {
   if (shouldDisplay) {
     displayDefaultValue.value = true
     const { defaultValue } = props
@@ -63,7 +63,7 @@ function setEditEntry(entry?: T) {
  * Resetting the edit to undefined, to show all list items in summary mode
  */
 function cancelEdit() {
-  showEmptyEntry(false)
+  toggleDisplayDefaultValue(false)
 }
 
 /**
@@ -102,38 +102,38 @@ function isSelected(entry: T): boolean {
  */
 function updateModel() {
   emit("update:modelValue", modelValueList.value)
-  showEmptyEntry(true)
+  toggleDisplayDefaultValue(true)
 }
 
 /**
  * When the modelValue changes, it is copied to a local copy. The user can update an item in that local model value list,
- * it is not saved until the save or edited button is clicked.
+ * it is not saved until the save button is clicked.
  */
 watch(
   () => props.modelValue,
   (newValue) => {
-    // Check if there's an entry being edited
-    const editedEntry = editEntry.value
-    if (editedEntry && !editEntry.value?.equals(props.defaultValue)) {
-      // Find the index of the edited entry in the current modelValueList
-      const index = modelValueList.value.findIndex(
-        (item) => item.id === editedEntry.id,
+    const editItem = editEntry.value
+
+    if (editItem) {
+      // Find the index of the edit entry in the current modelValueList
+      const editIndex = modelValueList.value.findIndex(
+        (item) => item.id === editItem.id,
       )
-      if (index !== -1) {
-        // Update the edited entry in modelValueList with the current props.modelValue
-        const updates = [...newValue]
-        updates[index] = newValue[index]
-        modelValueList.value = [...updates]
-        // Set the new referred item in list to not interrupt user fixes
-        setEditEntry(modelValueList.value[index])
+
+      // Update modelValueList based on the newValue while keeping the edit item intact
+      modelValueList.value = modelValueList.value.map((item, i) =>
+        i === editIndex ? item : newValue[i],
+      )
+
+      // Update the edit entry with the newly mapped value
+      if (editIndex !== -1) {
+        setEditEntry(modelValueList.value[editIndex])
       }
     } else {
-      // No entry being edited, just update modelValueList with props.modelValue
+      // If no edit entry, replace modelValueList with newValue
       modelValueList.value = [...newValue]
-      // TODO: Observe default behaviour, it removed from the list on a new patch, when two tabs are opened.
     }
   },
-
   {
     immediate: true,
     deep: true,
@@ -147,7 +147,7 @@ watch(
   () => modelValueList,
   () => {
     if (modelValueList.value.length == 0) {
-      showEmptyEntry(true)
+      toggleDisplayDefaultValue(true)
     }
   },
   {
@@ -174,18 +174,22 @@ watch(
         class="group flex gap-8 py-16"
       >
         <component :is="summaryComponent" :data="entry" />
-
         <button
           id="editable-list-select-button"
           class="flex h-32 w-32 items-center justify-center text-blue-800 hover:bg-blue-100 focus:shadow-[inset_0_0_0_0.125rem] focus:shadow-blue-800 focus:outline-none"
           :data-testid="`list-entry-${index}`"
           @click="
             () => {
-              showEmptyEntry(false)
+              toggleDisplayDefaultValue(false)
               setEditEntry(entry)
             }
           "
-          @keypress.enter="setEditEntry(entry)"
+          @keypress.enter="
+            () => {
+              toggleDisplayDefaultValue(false)
+              setEditEntry(entry)
+            }
+          "
         >
           <IconArrowDown />
         </button>
@@ -210,7 +214,7 @@ watch(
       class="mt-24 first:mt-0"
       label="Weitere Angabe"
       size="small"
-      @click="showEmptyEntry(true)"
+      @click="toggleDisplayDefaultValue(true)"
     />
   </div>
 </template>

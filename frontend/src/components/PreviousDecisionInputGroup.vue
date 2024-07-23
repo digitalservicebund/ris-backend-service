@@ -122,7 +122,7 @@ async function addPreviousDecisionFromSearch(decision: RelatedDocumentation) {
     deviatingFileNumber: previousDecision.value.deviatingFileNumber,
   })
   emit("update:modelValue", previousDecision.value as PreviousDecision)
-  emit("addEntry", decision)
+  emit("addEntry")
   scrollToTop()
 }
 
@@ -208,7 +208,8 @@ onMounted(() => {
             label="Entscheidungsdatum *"
             :validation-error="validationStore.getByField('decisionDate')"
             @update:validation-error="
-              (validationError) => updateDateFormatValidation(validationError)
+              (validationError: any) =>
+                updateDateFormatValidation(validationError)
             "
           >
             <DateInput
