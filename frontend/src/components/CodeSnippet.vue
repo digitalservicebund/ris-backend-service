@@ -25,7 +25,7 @@ watch(
 <template>
   <div class="xml-container flex flex-col gap-24 text-base">
     <p class="ds-label-01-bold">{{ title }}</p>
-    <div class="border-1 border-solid border-white">
+    <div class="border-1 border-solid border-white" data-testid="code-snippet">
       <div v-for="(line, index) in codeLines" :key="index" class="code-line">
         <code
           class="line-number"

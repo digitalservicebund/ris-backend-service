@@ -29,7 +29,6 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit.DocumentUnitBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
@@ -1007,7 +1006,7 @@ class DocumentationUnitTransformerTest {
         List.of(1, 2, 3));
   }
 
-  private DocumentUnitBuilder generateSimpleDocumentUnitBuilder() {
+  private DocumentUnit.DocumentUnitBuilder generateSimpleDocumentUnitBuilder() {
     return DocumentUnit.builder()
         .previousDecisions(Collections.emptyList())
         .ensuingDecisions(Collections.emptyList())
@@ -1020,7 +1019,8 @@ class DocumentationUnitTransformerTest {
                 .fieldsOfLaw(Collections.emptyList())
                 .norms(Collections.emptyList())
                 .activeCitations(Collections.emptyList())
-                .build());
+                .build())
+        .references(Collections.emptyList());
   }
 
   private CoreDataBuilder generateSimpleCoreDataBuilder() {

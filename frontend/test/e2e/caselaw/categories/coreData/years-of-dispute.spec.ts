@@ -2,7 +2,7 @@ import { expect } from "@playwright/test"
 import {
   navigateToCategories,
   navigateToPreview,
-  nagivateToHandover,
+  navigateToHandover,
   handoverDocumentationUnit,
   waitForSaving,
 } from "../../e2e-utils"
@@ -190,7 +190,7 @@ test.describe(
           prefilledDocumentUnit.documentNumber ?? "",
         )
 
-        const testData = ["2020", "2021"]
+        const testData = ["2020", "2021", "1980", "1999"]
 
         await waitForSaving(
           async () => {
@@ -210,16 +210,10 @@ test.describe(
           { clickSaveButton: true },
         )
 
-        await test.step("Navigate to handover, click in 'XML-Vorschau', check they are visible", async () => {
-          await nagivateToHandover(page, prefilledDocumentUnit.documentNumber!)
+        await test.step("Navigate to handover, click in 'XML-Vorschau', check they are visible in correct order", async () => {
+          await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
           await expect(page.getByText("XML Vorschau")).toBeVisible()
           await page.getByText("XML Vorschau").click()
-          await expect(
-            page.getByText("<streitjahr>2020</streitjahr>"),
-          ).toBeVisible()
-          await expect(
-            page.getByText("<streitjahr>2021</streitjahr>"),
-          ).toBeVisible()
 
           const nodes = await page
             .locator('code:has-text("<streitjahr>")')

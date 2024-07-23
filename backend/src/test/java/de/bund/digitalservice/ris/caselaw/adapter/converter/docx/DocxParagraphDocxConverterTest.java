@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.converter.docx;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.bund.digitalservice.ris.caselaw.domain.docx.TableElement;
@@ -65,6 +66,29 @@ class DocxParagraphDocxConverterTest {
     var result = converter.convert(paragraph);
 
     assertTrue(result.toHtmlString().contains("margin-left: " + expectedMarginLeft + ".0px"));
+  }
+
+  @Test
+  void testConvert_withPInsideList() {
+    P paragraph = new P();
+    PPr pPr = new PPr();
+    PPrBase.NumPr numPr = new PPrBase.NumPr();
+    pPr.setNumPr(numPr);
+    PPrBase.Ind ind = new PPrBase.Ind();
+    ind.setLeft(BigInteger.valueOf(1));
+    pPr.setInd(ind);
+    paragraph.setPPr(pPr);
+    R run = new R();
+    Text text = new Text();
+    text.setValue("text");
+    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    var result = converter.convert(paragraph);
+
+    assertTrue(result.toHtmlString().contains("text"));
+    assertFalse(result.toHtmlString().contains("margin-left:"));
   }
 
   @Test

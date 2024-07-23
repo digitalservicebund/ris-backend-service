@@ -5,6 +5,7 @@ import EnsuingDecision from "./ensuingDecision"
 import { FieldOfLaw } from "./fieldOfLaw"
 import NormReference from "./normReference"
 import PreviousDecision from "./previousDecision"
+import Reference from "./reference"
 import SingleNorm from "./singleNorm"
 import Attachment from "@/domain/attachment"
 import LegalForce from "@/domain/legalForce"
@@ -84,6 +85,7 @@ export default class DocumentUnit {
   public contentRelatedIndexing: ContentRelatedIndexing = {}
   public borderNumbers: string[] = []
   public note: string = ""
+  public references?: Reference[]
 
   static readonly requiredFields = [
     "fileNumbers",
@@ -147,6 +149,12 @@ export default class DocumentUnit {
     if (data.attachments != undefined && data.attachments.length > 0) {
       data.attachments.map(
         (attachment: Attachment) => new Attachment({ ...attachment }),
+      )
+    }
+
+    if (data.references != undefined && data.references.length > 0) {
+      data.references.map(
+        (reference: Reference) => new Reference({ ...reference }),
       )
     }
 

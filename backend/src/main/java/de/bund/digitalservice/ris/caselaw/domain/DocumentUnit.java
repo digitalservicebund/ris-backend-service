@@ -21,4 +21,6 @@ public record DocumentUnit(
     List<String> borderNumbers,
     Status status,
     String note,
-    ContentRelatedIndexing contentRelatedIndexing) {}
+    ContentRelatedIndexing contentRelatedIndexing,
+    // Fundstellen
+    List<Reference> references) {}

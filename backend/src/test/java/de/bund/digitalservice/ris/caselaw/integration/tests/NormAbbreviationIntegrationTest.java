@@ -19,7 +19,7 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.EmailService;
+import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation.NormAbbreviationBuilder;
@@ -195,7 +195,7 @@ class NormAbbreviationIntegrationTest {
   @MockBean private DocumentUnitService documentUnitService;
   @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
-  @MockBean private EmailService emailService;
+  @MockBean private MailService mailService;
 
   @AfterEach
   void cleanUp() {

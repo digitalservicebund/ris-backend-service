@@ -2,7 +2,7 @@ import { expect } from "@playwright/test"
 import {
   navigateToCategories,
   navigateToPreview,
-  nagivateToHandover,
+  navigateToHandover,
   handoverDocumentationUnit,
   waitForSaving,
 } from "../../e2e-utils"
@@ -123,7 +123,7 @@ test.describe("deviating decision dates", () => {
     )
 
     await test.step("Navigate to handover, click in 'XML-Vorschau', check they are visible", async () => {
-      await nagivateToHandover(page, prefilledDocumentUnit.documentNumber!)
+      await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
 
       await expect(page.getByText("XML Vorschau")).toBeVisible()
 

@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDefaultDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
 
@@ -16,8 +17,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
@@ -31,10 +34,9 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
+import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
-import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
-import java.time.Year;
 import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.AfterEach;
@@ -68,7 +70,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DocumentNumberPatternConfig.class
     },
     controllers = {DocumentUnitController.class})
-class YearOfDisputeIntegrationTest {
+class ReferenceIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
       new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
@@ -85,6 +87,7 @@ class YearOfDisputeIntegrationTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentationUnitRepository repository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  @Autowired private DatabaseLegalPeriodicalRepository legalPeriodicalRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private MailService mailService;
@@ -92,12 +95,11 @@ class YearOfDisputeIntegrationTest {
   @MockBean private UserService userService;
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private AttachmentService attachmentService;
-  @MockBean private PatchMapperService patchMapperService;
-  @MockBean private HandoverService handoverService;
 
+  @MockBean private HandoverService handoverService;
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private DocumentationOfficeDTO documentationOffice;
-  private static final String DEFAULT_DOCUMENT_NUMBER = "1234567890123";
+  private static final String DEFAULT_DOCUMENT_NUMBER = "1234567890126";
 
   @BeforeEach
   void setUp() {
@@ -117,12 +119,11 @@ class YearOfDisputeIntegrationTest {
   @AfterEach
   void cleanUp() {
     repository.deleteAll();
+    legalPeriodicalRepository.deleteAll();
   }
 
   @Test
-  void testDuplicatedYearsAreNotAllowed() {
-
-    List<Year> years = List.of(Year.now(), Year.now());
+  void testReferencesCanBeSaved() {
     DocumentationUnitDTO dto =
         repository.save(
             DocumentationUnitDTO.builder()
@@ -130,11 +131,31 @@ class YearOfDisputeIntegrationTest {
                 .documentNumber(DEFAULT_DOCUMENT_NUMBER)
                 .build());
 
+    LegalPeriodicalDTO legalPeriodical =
+        legalPeriodicalRepository.save(
+            LegalPeriodicalDTO.builder()
+                .abbreviation("BVerwGE")
+                .title("Bundesverwaltungsgerichtsentscheidungen")
+                .subtitle("Entscheidungen des Bundesverwaltungsgerichts")
+                .jurisId(123)
+                .primaryReference(true)
+                .build());
+
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getId())
             .documentNumber(dto.getDocumentNumber())
-            .coreData(CoreData.builder().yearsOfDispute(years).build())
+            .coreData(CoreData.builder().build())
+            .references(
+                List.of(
+                    Reference.builder()
+                        .citation("2024, S.3")
+                        .primaryReference(true)
+                        .referenceSupplement("Klammerzusatz")
+                        .footnote("footnote")
+                        .legalPeriodicalId(legalPeriodical.getId())
+                        .legalPeriodicalAbbreviation("BVerwGE")
+                        .build()))
             .build();
 
     risWebTestClient
@@ -151,82 +172,27 @@ class YearOfDisputeIntegrationTest {
               assertThat(response.getResponseBody()).isNotNull();
               assertThat(response.getResponseBody().documentNumber())
                   .isEqualTo(DEFAULT_DOCUMENT_NUMBER);
-              assertThat(response.getResponseBody().coreData().yearsOfDispute()).hasSize(1);
-              assertThat(response.getResponseBody().coreData().yearsOfDispute().get(0).toString())
-                  .hasToString(Year.now().toString());
+              assertThat(response.getResponseBody().references()).hasSize(1);
+              assertThat(response.getResponseBody().references())
+                  .extracting(
+                      "citation",
+                      "referenceSupplement",
+                      "footnote",
+                      "primaryReference",
+                      "legalPeriodicalId",
+                      "legalPeriodicalAbbreviation",
+                      "legalPeriodicalTitle",
+                      "legalPeriodicalSubtitle")
+                  .containsExactly(
+                      tuple(
+                          "2024, S.3",
+                          "Klammerzusatz",
+                          "footnote",
+                          true,
+                          legalPeriodical.getId(),
+                          "BVerwGE",
+                          "Bundesverwaltungsgerichtsentscheidungen",
+                          "Entscheidungen des Bundesverwaltungsgerichts"));
             });
-  }
-
-  @Test
-  void testYearsSorting() {
-    var firstYear = Year.parse("2022");
-    var secondYear = Year.parse("2010");
-    var lastYear = Year.parse("2009");
-
-    List<Year> years = List.of(firstYear, secondYear, lastYear);
-    DocumentationUnitDTO dto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber(DEFAULT_DOCUMENT_NUMBER)
-                .documentationOffice(documentationOffice)
-                .build());
-
-    DocumentUnit documentUnitFromFrontend =
-        DocumentUnit.builder()
-            .uuid(dto.getId())
-            .documentNumber(dto.getDocumentNumber())
-            .coreData(CoreData.builder().yearsOfDispute(years).build())
-            .build();
-
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
-        .bodyValue(documentUnitFromFrontend)
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(DocumentUnit.class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().documentNumber())
-                  .isEqualTo(DEFAULT_DOCUMENT_NUMBER);
-              assertThat(response.getResponseBody().coreData().yearsOfDispute()).hasSize(3);
-              assertThat(response.getResponseBody().coreData().yearsOfDispute().get(0).toString())
-                  .hasToString(firstYear.toString());
-              assertThat(response.getResponseBody().coreData().yearsOfDispute().get(1).toString())
-                  .hasToString(secondYear.toString());
-              assertThat(response.getResponseBody().coreData().yearsOfDispute().get(2).toString())
-                  .hasToString(lastYear.toString());
-            });
-  }
-
-  @Test
-  void testFutureYearsAreNotAllowed() {
-    var futureYear = Year.now().plusYears(1);
-
-    DocumentationUnitDTO dto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber(DEFAULT_DOCUMENT_NUMBER)
-                .documentationOffice(documentationOffice)
-                .build());
-
-    DocumentUnit documentUnitFromFrontend =
-        DocumentUnit.builder()
-            .uuid(dto.getId())
-            .documentNumber(dto.getDocumentNumber())
-            .coreData(CoreData.builder().yearsOfDispute(List.of(futureYear)).build())
-            .build();
-
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
-        .bodyValue(documentUnitFromFrontend)
-        .exchange()
-        .expectStatus()
-        .isBadRequest();
   }
 }

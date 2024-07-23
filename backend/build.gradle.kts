@@ -9,7 +9,7 @@ import org.flywaydb.gradle.task.FlywayMigrateTask
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.3.1"
+    id("org.springframework.boot") version "3.3.2"
     id("io.spring.dependency-management") version "1.1.6"
     id("com.diffplug.spotless") version "6.25.0"
     id("org.sonarqube") version "5.1.0.4882"
@@ -19,7 +19,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.51.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "10.15.2"
+    id("org.flywaydb.flyway") version "10.16.0"
 }
 
 group = "de.bund.digitalservice"
@@ -83,6 +83,7 @@ spotless {
         }
     }
     format("misc") {
+
         target(
             "**/*.js",
             "**/*.json",
@@ -93,14 +94,23 @@ spotless {
             "**/*.yaml",
             "**/*.yml"
         )
-        targetExclude("frontend/**", "**/dist/**", "**/static/**")
+
+        targetExclude(
+            "frontend/**",
+            "**/?/**",
+            "**/*.sql",
+            "**/dist/**",
+            "**/static/**",
+            "**/gradle.properties",
+            "**/gradle-wrapper.properties"
+        )
         // spotless:off
         prettier(
             mapOf(
-                "prettier" to "2.8.4",
-                "prettier-plugin-properties" to "0.2.0",
-                "prettier-plugin-sh" to "0.12.8",
-                "prettier-plugin-sql" to "0.13.0"
+                "prettier" to "3.3.3",
+                "prettier-plugin-properties" to "0.3.0",
+                "prettier-plugin-sh" to "0.14.0",
+                "prettier-plugin-sql" to "0.18.0"
             )
         ).config(
             mapOf(
@@ -131,7 +141,7 @@ sonar {
 }
 
 dependencies {
-    val testContainersVersion = "1.19.8"
+    val testContainersVersion = "1.20.0"
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -164,7 +174,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.1")
 
-    implementation(platform("software.amazon.awssdk:bom:2.26.20"))
+    implementation(platform("software.amazon.awssdk:bom:2.26.22"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -176,7 +186,7 @@ dependencies {
     implementation("com.icegreen:greenmail:2.1.0-rc-1")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.45") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.46") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
@@ -209,10 +219,10 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.12.0")
     implementation("org.jsoup:jsoup:1.18.1")
 
-    val flywayCore = "org.flywaydb:flyway-core:10.15.2"
+    val flywayCore = "org.flywaydb:flyway-core:10.16.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.15.2")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.16.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")

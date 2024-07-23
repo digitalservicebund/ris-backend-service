@@ -4,7 +4,7 @@ import {
   navigateToCategories,
   navigateToFiles,
   navigateToPreview,
-  nagivateToHandover,
+  navigateToHandover,
 } from "~/e2e/caselaw/e2e-utils"
 
 test.describe("catagories page title", () => {
@@ -18,7 +18,7 @@ test.describe("catagories page title", () => {
     await navigateToCategories(page, documentNumber)
     expect(await page.title()).toBe(expectedPageTitle)
 
-    await nagivateToHandover(page, documentNumber)
+    await navigateToHandover(page, documentNumber)
     expect(await page.title()).toBe(expectedPageTitle)
 
     await navigateToFiles(page, documentNumber)

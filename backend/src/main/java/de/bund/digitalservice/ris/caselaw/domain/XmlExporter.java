@@ -4,7 +4,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 public interface XmlExporter {
-  XmlExportResult generateXml(DocumentUnit documentUnit)
+  XmlTransformationResult transformToXml(DocumentUnit documentUnit)
       throws ParserConfigurationException, TransformerException;
 
   String generateEncryptedXMLString(DocumentUnit documentUnit) throws XmlExporterException;

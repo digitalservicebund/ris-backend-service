@@ -15,13 +15,15 @@ jobs:
   reset-trivy-cache:
     runs-on: ubuntu-latest
     steps:
-      - name: Remove all caches and database of the trivy scanner
-        uses: aquasecurity/trivy-action@d9cd5b1c23aaf8cb31bb09141028215828364bbb
-        env:
-          TRIVY_RESET: true
-          TRIVY_DEBUG: true
-        with:
-          scan-type: "image"
+      # TODO with latest release 0.24.0 there is no environment variable for resetting cache anymore
+      # GH issue: https://github.com/aquasecurity/trivy-action/issues/372
+#      - name: Remove all caches and database of the trivy scanner
+#        uses: aquasecurity/trivy-action@d9cd5b1c23aaf8cb31bb09141028215828364bbb
+#        env:
+#          TRIVY_CLEAN: ALL
+#          TRIVY_DEBUG: true
+#        with:
+#          scan-type: "image"
       - name: Download trivy vulnerabilities DB
         uses: aquasecurity/trivy-action@d9cd5b1c23aaf8cb31bb09141028215828364bbb
         env:
@@ -89,7 +91,7 @@ jobs:
       - name: Log into container registry
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
@@ -180,7 +182,7 @@ jobs:
       - name: Log into container registry
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}

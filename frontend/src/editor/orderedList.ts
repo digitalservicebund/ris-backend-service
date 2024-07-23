@@ -10,6 +10,7 @@ export const CustomOrderedList = OrderedList.extend({
         renderHTML: (attributes) => {
           return {
             style: attributes.style,
+            class: "list-decimal",
           }
         },
       },

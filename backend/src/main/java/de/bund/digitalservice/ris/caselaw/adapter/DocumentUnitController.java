@@ -14,7 +14,7 @@ import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
-import de.bund.digitalservice.ris.caselaw.domain.XmlExportResult;
+import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -250,12 +250,12 @@ public class DocumentUnitController {
    */
   @PutMapping(value = "/{uuid}/handover", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
-  public ResponseEntity<HandoverMail> handoverDocumentUnitAsEmail(
+  public ResponseEntity<HandoverMail> handoverDocumentUnitAsMail(
       @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
 
     try {
       HandoverMail handoverMail =
-          handoverService.handoverAsEmail(uuid, userService.getEmail(oidcUser));
+          handoverService.handoverAsMail(uuid, userService.getEmail(oidcUser));
       return ResponseEntity.ok(handoverMail);
     } catch (DocumentationUnitNotExistsException | DocumentationUnitHandoverException e) {
       log.error("Error handing over documentation unit '{}' as email", uuid, e);
@@ -286,7 +286,7 @@ public class DocumentUnitController {
    */
   @GetMapping(value = "/{uuid}/preview-xml", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
-  public XmlExportResult getXmlPreview(@PathVariable UUID uuid) {
+  public XmlTransformationResult getXmlPreview(@PathVariable UUID uuid) {
     try {
       return handoverService.createPreviewXml(uuid);
     } catch (DocumentationUnitNotExistsException e) {

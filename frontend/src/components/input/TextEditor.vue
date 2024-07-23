@@ -56,6 +56,8 @@ import IconBlockquote from "~icons/ic/sharp-format-quote"
 import MaterialSymbolsDeleteSweepOutline from "~icons/material-symbols/delete-sweep-outline"
 import IndentDecrease from "~icons/material-symbols/format-indent-decrease"
 import IndentIncrease from "~icons/material-symbols/format-indent-increase"
+import IconUnorderedList from "~icons/material-symbols/format-list-bulleted"
+import IconOrderedList from "~icons/material-symbols/format-list-numbered"
 import IconParagraph from "~icons/material-symbols/format-paragraph"
 
 interface Props {
@@ -275,6 +277,22 @@ const buttons = computed(() => [
     group: "blockquote",
     isCollapsable: false,
     callback: () => editor.chain().focus().toggleBlockquote().run(),
+  },
+  {
+    type: "orderedList",
+    icon: IconOrderedList,
+    ariaLabel: "orderedList",
+    group: "lists",
+    isCollapsable: false,
+    callback: () => editor.chain().focus().toggleOrderedList().run(),
+  },
+  {
+    type: "bulletList",
+    icon: IconUnorderedList,
+    ariaLabel: "bulletList",
+    group: "lists",
+    isCollapsable: false,
+    callback: () => editor.chain().focus().toggleBulletList().run(),
   },
   {
     type: "borderNumber",

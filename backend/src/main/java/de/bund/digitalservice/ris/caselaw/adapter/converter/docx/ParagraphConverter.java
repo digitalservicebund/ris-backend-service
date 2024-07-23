@@ -41,7 +41,9 @@ public class ParagraphConverter {
       if (paragraphProperties.getPStyle() != null) {
         paragraphElement.setStyleReference(paragraphProperties.getPStyle().getVal());
       }
-      if (paragraphProperties.getInd() != null && paragraphProperties.getInd().getLeft() != null) {
+      if (paragraphProperties.getInd() != null
+          && paragraphProperties.getInd().getLeft() != null
+          && paragraphProperties.getNumPr() == null) {
         // Default Tab Size in Docx = 1.27cm = 48px = 720 twips
         int baseIndentTwips = 720;
         int indentInTwips = paragraphProperties.getInd().getLeft().intValue();

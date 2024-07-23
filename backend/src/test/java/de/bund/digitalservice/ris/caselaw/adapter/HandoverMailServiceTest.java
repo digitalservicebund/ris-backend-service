@@ -17,8 +17,8 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
-import de.bund.digitalservice.ris.caselaw.domain.XmlExportResult;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
+import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import java.time.Clock;
 import java.time.Instant;
@@ -94,8 +94,8 @@ class HandoverMailServiceTest {
           .build();
 
   private static final HandoverMail EXPECTED_RESPONSE = SAVED_XML_MAIL;
-  private static final XmlExportResult FORMATTED_XML =
-      new XmlExportResult("xml", true, List.of("succeed"), "test.xml", CREATED_DATE);
+  private static final XmlTransformationResult FORMATTED_XML =
+      new XmlTransformationResult("xml", true, List.of("succeed"), "test.xml", CREATED_DATE);
 
   private DocumentUnit documentUnit;
 
@@ -113,7 +113,7 @@ class HandoverMailServiceTest {
   void setUp() throws ParserConfigurationException, TransformerException {
     documentUnit =
         DocumentUnit.builder().uuid(TEST_UUID).documentNumber("test-document-number").build();
-    when(xmlExporter.generateXml(any(DocumentUnit.class))).thenReturn(FORMATTED_XML);
+    when(xmlExporter.transformToXml(any(DocumentUnit.class))).thenReturn(FORMATTED_XML);
 
     when(repository.save(EXPECTED_BEFORE_SAVE)).thenReturn(SAVED_XML_MAIL);
   }
@@ -125,7 +125,7 @@ class HandoverMailServiceTest {
     assertThat(response).usingRecursiveComparison().isEqualTo(EXPECTED_RESPONSE);
 
     verify(xmlExporter)
-        .generateXml(
+        .transformToXml(
             documentUnit.toBuilder()
                 .coreData(
                     CoreData.builder()
@@ -156,7 +156,8 @@ class HandoverMailServiceTest {
   @Test
   void testSend_withValidationError() throws ParserConfigurationException, TransformerException {
     var xmlWithValidationError =
-        new XmlExportResult("xml", false, List.of("status-message"), "test.xml", CREATED_DATE);
+        new XmlTransformationResult(
+            "xml", false, List.of("status-message"), "test.xml", CREATED_DATE);
     var expected =
         HandoverMail.builder()
             .documentUnitUuid(TEST_UUID)
@@ -164,7 +165,7 @@ class HandoverMailServiceTest {
             .success(false)
             .build();
 
-    when(xmlExporter.generateXml(any(DocumentUnit.class))).thenReturn(xmlWithValidationError);
+    when(xmlExporter.transformToXml(any(DocumentUnit.class))).thenReturn(xmlWithValidationError);
 
     var response = service.handOver(documentUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS);
     assertThat(response).usingRecursiveComparison().isEqualTo(expected);
@@ -177,7 +178,7 @@ class HandoverMailServiceTest {
   @Test
   void testSend_withExceptionFromXmlExporter()
       throws ParserConfigurationException, TransformerException {
-    when(xmlExporter.generateXml(any(DocumentUnit.class)))
+    when(xmlExporter.transformToXml(any(DocumentUnit.class)))
         .thenThrow(ParserConfigurationException.class);
 
     DocumentationUnitHandoverException ex =

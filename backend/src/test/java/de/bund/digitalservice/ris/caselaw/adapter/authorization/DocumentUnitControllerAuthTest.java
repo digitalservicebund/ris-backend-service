@@ -248,7 +248,7 @@ class DocumentUnitControllerAuthTest {
   void testHandoverDocumentUnitAsEmail() throws DocumentationUnitNotExistsException {
     mockDocumentUnit(docOffice2, null, null);
     when(userService.getEmail(any(OidcUser.class))).thenReturn("abc");
-    when(handoverService.handoverAsEmail(TEST_UUID, "abc")).thenReturn(null);
+    when(handoverService.handoverAsMail(TEST_UUID, "abc")).thenReturn(null);
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/handover";
 

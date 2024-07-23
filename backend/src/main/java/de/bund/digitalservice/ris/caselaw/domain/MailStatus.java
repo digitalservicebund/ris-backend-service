@@ -4,7 +4,7 @@ import lombok.Getter;
 
 /** Enum representing the status of an email. */
 @Getter
-public enum EmailStatus {
+public enum MailStatus {
   SUCCESS("erfolgreich angekommen"),
   ERROR("fehlgeschlagen"),
   UNKNOWN("unbekannt"),
@@ -12,7 +12,7 @@ public enum EmailStatus {
 
   private final String displayText;
 
-  EmailStatus(String displayText) {
+  MailStatus(String displayText) {
     this.displayText = displayText;
   }
 }

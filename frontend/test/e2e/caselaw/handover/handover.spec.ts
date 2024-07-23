@@ -4,7 +4,7 @@ import {
   fillEnsuingDecisionInputs,
   fillPreviousDecisionInputs,
   navigateToCategories,
-  nagivateToHandover,
+  navigateToHandover,
   waitForSaving,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
@@ -14,7 +14,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
     page,
     documentNumber,
   }) => {
-    await nagivateToHandover(page, documentNumber)
+    await navigateToHandover(page, documentNumber)
 
     await expect(page.locator("li:has-text('Aktenzeichen')")).toBeVisible()
     await expect(page.locator("li:has-text('Gericht')")).toBeVisible()
@@ -46,7 +46,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
         exact: true,
       }),
     ).toBeVisible()
-    await nagivateToHandover(page, documentNumber)
+    await navigateToHandover(page, documentNumber)
 
     await expect(
       page.locator("li:has-text('Vorgehende Entscheidungen')"),
@@ -88,7 +88,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
       }),
     ).toBeVisible()
 
-    await nagivateToHandover(page, prefilledDocumentUnit.documentNumber!)
+    await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
 
     await expect(
       page.locator("li:has-text('Vorgehende Entscheidungen')"),
@@ -128,7 +128,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
         exact: true,
       }),
     ).toBeVisible()
-    await nagivateToHandover(page, documentNumber)
+    await navigateToHandover(page, documentNumber)
 
     await expect(
       page.locator("li:has-text('Nachgehende Entscheidungen')"),
@@ -170,7 +170,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
         exact: true,
       }),
     ).toBeVisible()
-    await nagivateToHandover(page, documentNumber)
+    await navigateToHandover(page, documentNumber)
 
     await expect(
       page.locator("li:has-text('Nachgehende Entscheidungen')"),
@@ -194,7 +194,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
       { clickSaveButton: true },
     )
 
-    await nagivateToHandover(page, documentNumber)
+    await navigateToHandover(page, documentNumber)
 
     await expect(page.locator("li:has-text('Aktivzitierung')")).toBeVisible()
 
@@ -222,7 +222,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
     page,
     documentNumber,
   }) => {
-    await nagivateToHandover(page, documentNumber)
+    await navigateToHandover(page, documentNumber)
     await expect(page.locator("li:has-text('Aktenzeichen')")).toBeVisible()
     await expect(page.locator("li:has-text('Gericht')")).toBeVisible()
     await expect(
@@ -245,7 +245,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
 
     await expect(page.locator("[aria-label='Gericht']")).toHaveValue("AG Aalen")
 
-    await nagivateToHandover(page, documentNumber)
+    await navigateToHandover(page, documentNumber)
     await expect(page.locator("li:has-text('Aktenzeichen')")).toBeHidden()
     await expect(page.locator("li:has-text('Gericht')")).toBeHidden()
     await expect(
@@ -258,7 +258,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
     page,
     documentNumber,
   }) => {
-    await nagivateToHandover(page, documentNumber)
+    await navigateToHandover(page, documentNumber)
 
     await page
       .locator("[aria-label='Dokumentationseinheit an jDV übergeben']")
@@ -274,7 +274,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
     page,
     prefilledDocumentUnit,
   }) => {
-    await nagivateToHandover(page, prefilledDocumentUnit.documentNumber!)
+    await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
 
     await expect(page.getByText("XML Vorschau")).toBeVisible()
 

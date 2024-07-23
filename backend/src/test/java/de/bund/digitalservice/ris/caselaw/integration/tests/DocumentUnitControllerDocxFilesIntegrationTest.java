@@ -36,8 +36,8 @@ import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.EmailService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
@@ -125,7 +125,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
 
   @MockBean private S3Client s3Client;
 
-  @MockBean private EmailService emailService;
+  @MockBean private MailService mailService;
 
   @MockBean private UserService userService;
 
