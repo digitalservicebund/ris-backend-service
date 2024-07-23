@@ -136,7 +136,7 @@ test.describe(
           .toLowerCase()
           .includes("mac")
           ? "Meta"
-          : "Command"
+          : "Control"
         await page.keyboard.press(`Shift+${modifier}+KeyB`)
       })
 
@@ -189,7 +189,7 @@ test.describe(
           .toLowerCase()
           .includes("mac")
           ? "Meta"
-          : "Command"
+          : "Control"
         await page.keyboard.press(`Shift+${modifier}+KeyB`)
       })
 
@@ -199,7 +199,7 @@ test.describe(
           .toLowerCase()
           .includes("mac")
           ? "Meta"
-          : "Command"
+          : "Control"
         await page.keyboard.press(`Shift+${modifier}+KeyB`)
       })
 
