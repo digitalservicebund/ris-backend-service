@@ -328,7 +328,7 @@ describe("NormReferenceEntry", () => {
   })
 
   it("correctly updates the value of ris abbreviation input", async () => {
-    const { user, emitted } = renderComponent()
+    const { user, emitted, props } = renderComponent()
     const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
 
     await user.type(abbreviationField, "1000")
@@ -349,6 +349,7 @@ describe("NormReferenceEntry", () => {
           singleNorms: [],
           normAbbreviationRawValue: undefined,
           hasForeignSource: false,
+          uuid: props.modelValue.uuid,
         },
       ],
     ])

@@ -9,8 +9,8 @@ import DummyInputGroupVue from "@/kitchensink/components/DummyInputGroup.vue"
 import DummyListItem from "@/kitchensink/domain/dummyListItem"
 
 const listWithEntries = ref<DummyListItem[]>([
-  new DummyListItem({ text: "foo" }),
-  new DummyListItem({ text: "bar" }),
+  new DummyListItem({ text: "foo", uuid: "123" }),
+  new DummyListItem({ text: "bar", uuid: "124" }),
 ])
 
 function summerizer(dataEntry: EditableListItem) {
@@ -129,9 +129,11 @@ describe("EditableList", () => {
         [
           {
             text: "foo1",
+            uuid: "123",
           },
           {
             text: "bar",
+            uuid: "124",
           },
         ],
       ],
