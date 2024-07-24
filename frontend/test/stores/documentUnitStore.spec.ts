@@ -132,14 +132,23 @@ describe("useDocumentUnitStore", () => {
 
       //load docunit to fill "originalDocumentUnit"
       await store.loadDocumentUnit("123")
-      expect(documentUnitServiceLoadMock).toHaveBeenCalledTimes(1)
 
       await store.updateDocumentUnit()
 
-      //Becuase there are no changes, just load the docunit
-      expect(documentUnitServiceLoadMock).toHaveBeenCalledTimes(2)
-      expect(documentUnitServiceUpdateMock).not.toHaveBeenCalled()
-      expect(store.documentUnit?.version).toBe(0)
+      expect(
+        documentUnitServiceUpdateMock,
+        "doc unit update should be called once during update with no changes",
+      ).toHaveBeenCalledTimes(1)
+
+      expect(
+        documentUnitServiceLoadMock,
+        "doc unit load should be called once to load document unit",
+      ).toHaveBeenCalledTimes(1)
+
+      expect(
+        store.documentUnit?.version,
+        "version needs to be bumped after update",
+      ).toBe(1)
     })
 
     it("handles update failure when document unit is not loaded", async () => {
