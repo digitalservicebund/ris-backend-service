@@ -33,7 +33,7 @@ public interface PatchMapperService {
    * @return extended JsonPatch {@link RisJsonPatch} with version information and error paths
    */
   RisJsonPatch handlePatchForSamePath(
-      DocumentUnit existingDocumentationUnit, JsonPatch patch1, JsonPatch patch2);
+      DocumentUnit existingDocumentationUnit, JsonPatch patch1, JsonPatch patch2, JsonPatch patch3);
 
   /**
    * Save the patch for the new version. Diff of the updated documentation unit to the existing
@@ -74,4 +74,6 @@ public interface PatchMapperService {
   JsonPatch removePatchForSamePath(JsonPatch patch1, JsonPatch patch2);
 
   RisJsonPatch removeExistPatches(RisJsonPatch toFrontend, JsonPatch patch);
+
+  JsonPatch addUpdatePatch(JsonPatch toUpdate, JsonPatch toSaveJsonPatch);
 }

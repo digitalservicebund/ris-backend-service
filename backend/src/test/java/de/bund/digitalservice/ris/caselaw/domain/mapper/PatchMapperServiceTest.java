@@ -19,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.assertj.core.groups.Tuple;
@@ -66,12 +67,14 @@ class PatchMapperServiceTest {
     JsonPatchOperation addOperationBE =
         new AddOperation("/coreData/decisionDate", new TextNode("20.03.2014"));
     JsonPatch patchBE = new JsonPatch(List.of(addOperationBE));
+    JsonPatch toFEPatch = new JsonPatch(Collections.emptyList());
     DocumentUnit existingDocumentUnit =
         DocumentUnit.builder()
             .coreData(CoreData.builder().fileNumbers(List.of("123")).build())
             .build();
 
-    RisJsonPatch result = service.handlePatchForSamePath(existingDocumentUnit, patchFE, patchBE);
+    RisJsonPatch result =
+        service.handlePatchForSamePath(existingDocumentUnit, toFEPatch, patchFE, patchBE);
 
     assertThat(result.errorPaths()).isEmpty();
     assertThat(result.patch().getOperations()).hasSize(1);
@@ -85,10 +88,12 @@ class PatchMapperServiceTest {
     JsonPatchOperation addOperationBE =
         new AddOperation("/coreData/fileNumbers/1", new TextNode("xyz"));
     JsonPatch patchBE = new JsonPatch(new ArrayList<>(List.of(addOperationBE)));
+    JsonPatch toFEPatch = new JsonPatch(Collections.emptyList());
     DocumentUnit existingDocumentUnit =
         DocumentUnit.builder().coreData(CoreData.builder().fileNumbers(List.of()).build()).build();
 
-    RisJsonPatch result = service.handlePatchForSamePath(existingDocumentUnit, patchFE, patchBE);
+    RisJsonPatch result =
+        service.handlePatchForSamePath(existingDocumentUnit, toFEPatch, patchFE, patchBE);
 
     assertThat(result.errorPaths()).containsExactly("/coreData/fileNumbers/1");
     assertThat(result.patch().getOperations())
@@ -103,12 +108,14 @@ class PatchMapperServiceTest {
     JsonPatchOperation addOperationBE =
         new AddOperation("/coreData/fileNumbers/1", new TextNode("xyz"));
     JsonPatch patchBE = new JsonPatch(new ArrayList<>(List.of(addOperationBE)));
+    JsonPatch toFEPatch = new JsonPatch(Collections.emptyList());
     DocumentUnit existingDocumentUnit =
         DocumentUnit.builder()
             .coreData(CoreData.builder().fileNumbers(List.of("abc", "123")).build())
             .build();
 
-    RisJsonPatch result = service.handlePatchForSamePath(existingDocumentUnit, patchFE, patchBE);
+    RisJsonPatch result =
+        service.handlePatchForSamePath(existingDocumentUnit, toFEPatch, patchFE, patchBE);
 
     assertThat(result.errorPaths()).containsExactly("/coreData/fileNumbers/1");
     assertThat(result.patch().getOperations())
@@ -124,12 +131,14 @@ class PatchMapperServiceTest {
     JsonPatchOperation addOperationBE =
         new AddOperation("/coreData/fileNumbers/1", new TextNode("xyz"));
     JsonPatch patchBE = new JsonPatch(new ArrayList<>(List.of(addOperationBE)));
+    JsonPatch toFEPatch = new JsonPatch(Collections.emptyList());
     DocumentUnit existingDocumentUnit =
         DocumentUnit.builder()
             .coreData(CoreData.builder().fileNumbers(List.of("123")).build())
             .build();
 
-    RisJsonPatch result = service.handlePatchForSamePath(existingDocumentUnit, patchFE, patchBE);
+    RisJsonPatch result =
+        service.handlePatchForSamePath(existingDocumentUnit, toFEPatch, patchFE, patchBE);
 
     assertThat(result.errorPaths()).containsExactly("/coreData/fileNumbers/1");
     assertThat(result.patch().getOperations()).isEmpty();
@@ -146,12 +155,14 @@ class PatchMapperServiceTest {
     JsonPatchOperation addOperationBE =
         new AddOperation("/coreData/fileNumbers/1", new TextNode("xyz"));
     JsonPatch patchBE = new JsonPatch(new ArrayList<>(List.of(addOperationBE)));
+    JsonPatch toFEPatch = new JsonPatch(Collections.emptyList());
     DocumentUnit existingDocumentUnit =
         DocumentUnit.builder()
             .coreData(CoreData.builder().fileNumbers(List.of("123")).build())
             .build();
 
-    RisJsonPatch result = service.handlePatchForSamePath(existingDocumentUnit, patchFE, patchBE);
+    RisJsonPatch result =
+        service.handlePatchForSamePath(existingDocumentUnit, toFEPatch, patchFE, patchBE);
 
     assertThat(result.errorPaths()).containsExactly("/coreData/fileNumbers/1");
     assertThat(result.patch().getOperations())
@@ -180,7 +191,7 @@ class PatchMapperServiceTest {
             .patch("[{\"op\":\"add\",\"path\":\"/decisionDate\",\"value\":\"20.01.2000\"}]")
             .build();
     Mockito.when(
-            repository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThan(
+            repository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
                 documentationUnitId, 2L))
         .thenReturn(List.of());
 
@@ -205,7 +216,7 @@ class PatchMapperServiceTest {
             .patch("[{\"op\":\"add\",\"path\":\"/decisionDate\",\"value\":\"20.01.2000\"}]")
             .build();
     Mockito.when(
-            repository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThan(
+            repository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
                 documentationUnitId, 1L))
         .thenReturn(List.of(patchDTO2));
 
@@ -230,7 +241,7 @@ class PatchMapperServiceTest {
             .patch("[{\"op\":\"add\",\"path\":\"/decisionDate\",\"value\":\"20.01.2000\"}]")
             .build();
     Mockito.when(
-            repository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThan(
+            repository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
                 documentationUnitId, 0L))
         .thenReturn(List.of(patchDTO1, patchDTO2));
 

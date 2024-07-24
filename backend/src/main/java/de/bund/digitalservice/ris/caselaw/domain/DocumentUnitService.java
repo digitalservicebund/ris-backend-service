@@ -164,6 +164,12 @@ public class DocumentUnitService {
   public RisJsonPatch updateDocumentUnit(UUID documentationUnitId, RisJsonPatch patch)
       throws DocumentationUnitNotExistsException, DocumentationUnitPatchException {
 
+    log.debug(
+        "documentation unit '{}' with patch '{}' for version '{}'",
+        documentationUnitId,
+        patch.documentationUnitVersion(),
+        patch.patch());
+
     DocumentUnit existingDocumentationUnit = getByUuid(documentationUnitId);
 
     long newVersion = 1L;
@@ -171,36 +177,61 @@ public class DocumentUnitService {
       newVersion = existingDocumentationUnit.version() + 1;
     }
 
+    log.debug("new version is {}", newVersion);
+
     JsonPatch newPatch =
         patchMapperService.calculatePatch(
             existingDocumentationUnit.uuid(), patch.documentationUnitVersion());
 
+    log.debug("version {} - patch in database: {}", patch.documentationUnitVersion(), newPatch);
+
     RisJsonPatch toFrontend;
     if (!patch.patch().getOperations().isEmpty()) {
       JsonPatch toUpdate = patchMapperService.removePatchForSamePath(patch.patch(), newPatch);
+
+      log.debug("version {} - update patch: {}", patch.documentationUnitVersion(), toUpdate);
 
       DocumentUnit patchedDocumentationUnit =
           patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit);
       patchedDocumentationUnit = patchedDocumentationUnit.toBuilder().version(newVersion).build();
       DocumentUnit updatedDocumentUnit = updateDocumentUnit(patchedDocumentationUnit);
 
-      JsonPatch toSaveJsonPatch =
-          patchMapperService.getDiffPatch(existingDocumentationUnit, updatedDocumentUnit);
       JsonPatch toFrontendJsonPatch =
           patchMapperService.getDiffPatch(patchedDocumentationUnit, updatedDocumentUnit);
+
+      log.debug(
+          "version {} - raw to frontend patch: {}",
+          patch.documentationUnitVersion(),
+          toFrontendJsonPatch);
+
+      JsonPatch toSaveJsonPatch = patchMapperService.addUpdatePatch(toUpdate, toFrontendJsonPatch);
+
+      log.debug(
+          "version {} - to save patch: {}", patch.documentationUnitVersion(), toSaveJsonPatch);
 
       patchMapperService.savePatch(
           toSaveJsonPatch, existingDocumentationUnit.uuid(), existingDocumentationUnit.version());
 
       toFrontend =
           patchMapperService.handlePatchForSamePath(
-              existingDocumentationUnit, toFrontendJsonPatch, newPatch);
+              existingDocumentationUnit, toFrontendJsonPatch, patch.patch(), newPatch);
+
+      log.debug(
+          "version {} - cleaned to frontend patch: {}",
+          patch.documentationUnitVersion(),
+          toFrontend);
 
       // TODO: check logs. possible not needed
       toFrontend = patchMapperService.removeExistPatches(toFrontend, patch.patch());
       toFrontend = toFrontend.toBuilder().documentationUnitVersion(newVersion).build();
+
+      log.debug(
+          "version {} - second cleaned to frontend patch: {}",
+          patch.documentationUnitVersion(),
+          toFrontend);
     } else {
-      toFrontend = new RisJsonPatch(newVersion, null, Collections.emptyList());
+      toFrontend =
+          new RisJsonPatch(existingDocumentationUnit.version(), newPatch, Collections.emptyList());
     }
 
     return toFrontend;

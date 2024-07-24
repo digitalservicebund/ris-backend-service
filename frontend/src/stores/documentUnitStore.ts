@@ -47,25 +47,25 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
     )
 
     // If there are no updates in the client, get the current version from backend
-    if (patch.length === 0 && documentUnit.value.documentNumber) {
-      const response = await loadDocumentUnit(documentUnit.value.documentNumber)
-      if (response.data) {
-        return {
-          status: response.status,
-          data: {
-            documentationUnitVersion: response.data.version,
-            patch: [],
-            errorPaths: [],
-          },
-        }
-      } else {
-        return {
-          status: 404,
-          data: undefined,
-          error: errorMessages.DOCUMENT_UNIT_COULD_NOT_BE_LOADED,
-        }
-      }
-    }
+    // if (patch.length === 0 && documentUnit.value.documentNumber) {
+    //   const response = await loadDocumentUnit(documentUnit.value.documentNumber)
+    //   if (response.data) {
+    //     return {
+    //       status: response.status,
+    //       data: {
+    //         documentationUnitVersion: response.data.version,
+    //         patch: [],
+    //         errorPaths: [],
+    //       },
+    //     }
+    //   } else {
+    //     return {
+    //       status: 404,
+    //       data: undefined,
+    //       error: errorMessages.DOCUMENT_UNIT_COULD_NOT_BE_LOADED,
+    //     }
+    //   }
+    // }
 
     const response = await documentUnitService.update(documentUnit.value.uuid, {
       documentationUnitVersion: documentUnit.value.version,
@@ -76,7 +76,33 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
     if (response.status === 200) {
       //Apply backend patch to original documentunit reference, with updated version
       const backendPatch = response.data as RisJsonPatch
-      jsonpatch.applyPatch(documentUnit.value, backendPatch.patch)
+
+      try {
+        jsonpatch.applyPatch(documentUnit.value, backendPatch.patch)
+      } catch (error) {
+        console.log("apply patch: ", error)
+        if (documentUnit.value.documentNumber) {
+          const response = await loadDocumentUnit(
+            documentUnit.value.documentNumber,
+          )
+          if (response.data) {
+            return {
+              status: response.status,
+              data: {
+                documentationUnitVersion: response.data.version,
+                patch: [],
+                errorPaths: [],
+              },
+            }
+          } else {
+            return {
+              status: 404,
+              data: undefined,
+              error: errorMessages.DOCUMENT_UNIT_COULD_NOT_BE_LOADED,
+            }
+          }
+        }
+      }
       documentUnit.value.version = backendPatch.documentationUnitVersion
 
       // Deep copy

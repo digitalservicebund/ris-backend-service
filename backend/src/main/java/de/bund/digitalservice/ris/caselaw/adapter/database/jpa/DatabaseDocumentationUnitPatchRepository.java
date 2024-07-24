@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 public interface DatabaseDocumentationUnitPatchRepository
     extends JpaRepository<DocumentationUnitPatchDTO, UUID> {
 
-  List<DocumentationUnitPatchDTO> findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThan(
-      UUID uuid, Long documentationUnitVersion);
+  List<DocumentationUnitPatchDTO>
+      findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
+          UUID uuid, Long documentationUnitVersion);
 }

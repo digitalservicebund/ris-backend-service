@@ -97,6 +97,13 @@ public class DatabasePatchMapperService implements PatchMapperService {
   }
 
   @Override
+  public JsonPatch addUpdatePatch(JsonPatch toUpdate, JsonPatch toSaveJsonPatch) {
+    List<JsonPatchOperation> operations = new ArrayList<>(toUpdate.getOperations());
+    operations.addAll(toSaveJsonPatch.getOperations());
+    return new JsonPatch(operations);
+  }
+
+  @Override
   public void savePatch(JsonPatch patch, UUID documentationUnitId, Long documentationUnitVersion) {
     List<JsonPatchOperation> patchWithoutVersion =
         patch.getOperations().stream().filter(op -> !op.getPath().equals("/version")).toList();
@@ -121,7 +128,7 @@ public class DatabasePatchMapperService implements PatchMapperService {
     List<JsonPatchOperation> operations = new ArrayList<>();
 
     repository
-        .findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThan(
+        .findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
             documentationUnitId, frontendDocumentationUnitVersion)
         .forEach(
             patch -> {
@@ -139,17 +146,21 @@ public class DatabasePatchMapperService implements PatchMapperService {
 
   @Override
   public RisJsonPatch handlePatchForSamePath(
-      DocumentUnit existingDocumentationUnit, JsonPatch patch1, JsonPatch patch2) {
-    Map<String, List<JsonPatchOperation>> pathList1 =
-        patch1.getOperations().stream().collect(Collectors.groupingBy(JsonPatchOperation::getPath));
+      DocumentUnit existingDocumentationUnit,
+      JsonPatch patch1,
+      JsonPatch patch2,
+      JsonPatch patch3) {
     Map<String, List<JsonPatchOperation>> pathList2 =
         patch2.getOperations().stream().collect(Collectors.groupingBy(JsonPatchOperation::getPath));
+    Map<String, List<JsonPatchOperation>> pathList3 =
+        patch3.getOperations().stream().collect(Collectors.groupingBy(JsonPatchOperation::getPath));
 
     List<String> errorPaths = new ArrayList<>();
     List<JsonPatchOperation> operations = new ArrayList<>(patch1.getOperations());
-    for (Entry<String, List<JsonPatchOperation>> entry : pathList2.entrySet()) {
-      if (pathList1.containsKey(entry.getKey())) {
-        List<JsonPatchOperation> toRemove = pathList1.get(entry.getKey());
+    for (Entry<String, List<JsonPatchOperation>> entry : pathList3.entrySet()) {
+      if (pathList2.containsKey(entry.getKey())) {
+        List<JsonPatchOperation> toRemove = pathList2.get(entry.getKey());
+        log.debug("remove path '{}': {}", entry.getKey(), toRemove);
         toRemove.forEach(
             patch -> {
               if (patch instanceof AddOperation) {
@@ -160,10 +171,12 @@ public class DatabasePatchMapperService implements PatchMapperService {
                 JsonNode value = node.at(JsonPointer.valueOf(entry.getKey()));
                 operations.add(new AddOperation(entry.getKey(), value));
               }
-              operations.remove(patch);
             });
-
+        operations.addAll(entry.getValue());
         errorPaths.add(entry.getKey());
+      } else {
+        log.debug("add backend patches '{}'", entry.getValue());
+        operations.addAll(entry.getValue());
       }
     }
 
