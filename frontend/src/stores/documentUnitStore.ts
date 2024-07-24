@@ -79,6 +79,9 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
 
       try {
         jsonpatch.applyPatch(documentUnit.value, backendPatch.patch)
+        originalDocumentUnit.value = new DocumentUnit(documentUnit.value.uuid, {
+          ...JSON.parse(JSON.stringify(documentUnit.value)),
+        })
       } catch (error) {
         console.log("apply patch: ", error)
         if (documentUnit.value.documentNumber) {
