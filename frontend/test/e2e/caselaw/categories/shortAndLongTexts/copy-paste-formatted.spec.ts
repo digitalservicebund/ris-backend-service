@@ -74,7 +74,7 @@ test(
     annotation: {
       type: "story",
       description:
-        "https://digitalservicebund.atlassian.net/browse/RISDEV-4117",
+        "https://digitalservicebund.atlassian.net/browse/RISDEV-4120",
     },
   },
   async ({ page, documentNumber }) => {
