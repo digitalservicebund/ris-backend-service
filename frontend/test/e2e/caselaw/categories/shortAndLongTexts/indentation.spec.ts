@@ -9,7 +9,7 @@ test.describe(
     annotation: {
       type: "story",
       description:
-        "https://digitalservicebund.atlassian.net/browse/RISDEV-4119",
+        "https://digitalservicebund.atlassian.net/browse/RISDEV-4117",
     },
   },
   () => {
