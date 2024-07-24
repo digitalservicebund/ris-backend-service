@@ -230,6 +230,9 @@ public class DocumentUnitService {
           patch.documentationUnitVersion(),
           toFrontend);
     } else {
+      if (newPatch == null) {
+        newPatch = new JsonPatch(Collections.emptyList());
+      }
       toFrontend =
           new RisJsonPatch(existingDocumentationUnit.version(), newPatch, Collections.emptyList());
     }
