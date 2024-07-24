@@ -113,6 +113,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
             .documentNumber(documentNumber)
             .documentationOffice(documentationOfficeDTO)
             .legalEffect(LegalEffectDTO.KEINE_ANGABE)
+            .version(0L)
             .build();
 
     documentationUnitDTO
