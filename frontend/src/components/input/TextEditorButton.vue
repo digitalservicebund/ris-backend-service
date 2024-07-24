@@ -11,6 +11,9 @@ const emits = defineEmits<{
 
 const showDropdown = ref(false)
 
+const button = ref<HTMLElement>()
+const children = ref<HTMLElement[]>([])
+
 function onClickToggle(button: EditorButton) {
   if (!button.childButtons || button.type === "more") emits("toggle", button)
   else if (button.type === "menu") showDropdown.value = !showDropdown.value
@@ -32,12 +35,14 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener("click", closeDropDownWhenClickOutSide)
 })
+defineExpose({ button, children })
 
 export interface EditorButton {
   type: string
   icon: Component
   ariaLabel: string
   childButtons?: EditorButton[]
+  tabIndex?: number
   isLast?: boolean
   isActive?: boolean
   isCollapsable?: boolean
@@ -49,12 +54,14 @@ export interface EditorButton {
 <template>
   <div>
     <button
+      ref="button"
       :aria-label="ariaLabel"
       class="flex cursor-pointer p-8 text-blue-900 hover:bg-blue-200"
       :class="{
         'bg-blue-200': isActive && !childButtons,
         'border-r-1 border-solid border-gray-400': isLast,
       }"
+      :tabindex="tabIndex"
       @click="onClickToggle(props)"
       @keydown.m="onClickToggle(props)"
       @mousedown.prevent=""
@@ -69,12 +76,14 @@ export interface EditorButton {
       <button
         v-for="(childButton, index) in childButtons"
         :key="index"
+        ref="children"
         :aria-label="childButton.ariaLabel"
         class="z-50 cursor-pointer items-center p-8 text-blue-900 hover:bg-blue-200"
         :class="{
           'bg-blue-200': isActive,
           'border-r-1 border-solid border-gray-400': isLast,
         }"
+        :tabindex="tabIndex"
         @click="emits('toggle', childButton)"
         @keydown.m="emits('toggle', childButton)"
         @mousedown.prevent=""

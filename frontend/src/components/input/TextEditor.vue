@@ -80,6 +80,7 @@ const emit = defineEmits<{
   updateValue: [newValue: string]
 }>()
 
+const editorElement = ref<HTMLElement>()
 const hasFocus = ref(false)
 
 const editor = new Editor({
@@ -141,7 +142,6 @@ const editor = new Editor({
     emit("updateValue", editor.getHTML())
   },
   onFocus: () => (hasFocus.value = true),
-  onBlur: () => (hasFocus.value = false),
   editable: props.editable,
   parseOptions: {
     preserveWhitespace: "full",
@@ -376,6 +376,44 @@ watch(
   },
 )
 
+const fixButtonElements = ref<(typeof TextEditorButton)[]>([])
+const collapsedButtonElements = ref<(typeof TextEditorButton)[]>([])
+// All the HTML <button> elements of the TextEditorButtons, so we can call .focus() on them
+const buttonElements = computed<HTMLElement[]>(() =>
+  [...collapsedButtonElements.value, ...fixButtonElements.value]
+    .flatMap((buttomComponent) => [
+      buttomComponent.button,
+      ...(buttomComponent?.children ?? []),
+    ])
+    .filter((button) => !!button),
+)
+
+const focusedButtonIndex = ref(-1)
+const focusNextButton = () => {
+  if (focusedButtonIndex.value >= buttonElements.value.length) {
+    focusedButtonIndex.value = buttonElements.value.length - 1
+  }
+  if (focusedButtonIndex.value < buttonElements.value.length) {
+    focusedButtonIndex.value++
+  }
+  const buttonElement = buttonElements.value?.[focusedButtonIndex.value]
+  if (buttonElement) {
+    buttonElement.focus()
+  }
+}
+const focusPreviousButton = () => {
+  if (focusedButtonIndex.value >= buttonElements.value.length) {
+    focusedButtonIndex.value = buttonElements.value.length - 1
+  }
+  if (focusedButtonIndex.value > 0) {
+    focusedButtonIndex.value--
+  }
+  const buttonElement = buttonElements.value?.[focusedButtonIndex.value]
+  if (buttonElement) {
+    buttonElement.focus()
+  }
+}
+
 const showButtons = computed(() => props.editable && hasFocus.value)
 
 watch(
@@ -405,17 +443,32 @@ const resizeObserver = new ResizeObserver((entries) => {
 </script>
 
 <template>
-  <div id="text-editor" class="editor bg-white" fluid>
+  <div
+    id="text-editor"
+    ref="editorElement"
+    class="editor bg-white"
+    fluid
+    @focusout="
+      () => !editorElement?.matches(':focus-within') && (hasFocus = false)
+    "
+  >
     <div v-if="showButtons">
+      <!-- Menu bar can be focused so that you can navigate between the buttons with arrow left and right -->
+      <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
       <div
         :aria-label="ariaLabel + ' Button Leiste'"
         class="pa-1 flex flex-row flex-wrap justify-between"
+        tabindex="0"
+        @keydown.left.stop.prevent="focusPreviousButton"
+        @keydown.right.stop.prevent="focusNextButton"
       >
         <div class="flex flex-row">
           <TextEditorButton
             v-for="(button, index) in collapsedButtons"
             :key="index"
             v-bind="button"
+            ref="collapsedButtonElements"
+            :tab-index="-1"
             @toggle="handleButtonClick"
           />
         </div>
@@ -424,6 +477,8 @@ const resizeObserver = new ResizeObserver((entries) => {
             v-for="(button, index) in fixButtons"
             :key="index"
             v-bind="button"
+            ref="fixButtonElements"
+            :tab-index="-1"
             @toggle="handleButtonClick"
           />
         </div>
