@@ -76,16 +76,28 @@ describe("EditableList", () => {
     expect(screen.getByLabelText("Eintrag löschen")).toBeVisible()
   })
 
-  it("deletes correct entry when delete button is clicked", async () => {
-    const { user } = await renderComponent()
-
+  it("delete button emits modelValue without the deleted entry", async () => {
+    const { user, emitted } = await renderComponent()
     await user.click(screen.getByTestId("list-entry-0"))
     await user.click(screen.getByLabelText("Eintrag löschen"))
-    expect(screen.queryByText("foo")).not.toBeInTheDocument()
-    expect(screen.getByText("bar")).toBeVisible()
 
-    //deleting resets edit index
-    expect(screen.getByLabelText("Weitere Angabe")).toBeVisible()
+    expect(listWithEntries.value.length).toEqual(2)
+
+    expect(emitted()["update:modelValue"]).toEqual([
+      [
+        [
+          {
+            text: "bar",
+            uuid: "124",
+          },
+        ],
+      ],
+    ])
+
+    expect(
+      screen.getByLabelText("Weitere Angabe"),
+      "Deleting did not reset edit entry",
+    ).toBeVisible()
   })
 
   it("automatically adds a default entry in edit mode if list is empty on initial render", async () => {
