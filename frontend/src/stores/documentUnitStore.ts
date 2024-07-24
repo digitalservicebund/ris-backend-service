@@ -116,18 +116,22 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
       if (
         backendPatch.errorPaths != undefined &&
         backendPatch.errorPaths.length > 0
-      )
+      ) {
+        // ^\/ matches a leading slash.
+        // \/$ matches a trailing slash.
+        // \/\d+$ matches a trailing slash followed by one or more digits at the end of the string, to collect list items.
+        const path = backendPatch.errorPaths[0].replace(/(^\/|\/$|\/\d+$)/g, "")
+
+        const mappedValue = fields[path as keyof typeof fields]
+
         return {
           status: 207,
           data: undefined,
           error: {
-            title: (
-              fields as {
-                [key: string]: string
-              }
-            )[backendPatch.errorPaths[0].replace(/\/\d+$/, "")],
+            title: mappedValue,
           },
         }
+      }
     } else {
       return {
         status: response.status,
