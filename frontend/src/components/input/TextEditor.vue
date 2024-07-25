@@ -376,6 +376,7 @@ watch(
   },
 )
 
+const menuBar = ref<HTMLElement>()
 const fixButtonElements = ref<(typeof TextEditorButton)[]>([])
 const collapsedButtonElements = ref<(typeof TextEditorButton)[]>([])
 // All the HTML <button> elements of the TextEditorButtons, so we can call .focus() on them
@@ -383,23 +384,22 @@ const buttonElements = computed<HTMLElement[]>(() =>
   [...collapsedButtonElements.value, ...fixButtonElements.value]
     .flatMap((buttomComponent) => [
       buttomComponent.button,
+      // If it is a collapsed button, it might have visible children
       ...(buttomComponent?.children ?? []),
     ])
     .filter((button) => !!button),
 )
 
-const focusedButtonIndex = ref(-1)
+const focusedButtonIndex = ref(0)
 const focusNextButton = () => {
   if (focusedButtonIndex.value >= buttonElements.value.length) {
+    // If menu buttons are removed (collapsable), the index might be too high
     focusedButtonIndex.value = buttonElements.value.length - 1
   }
   if (focusedButtonIndex.value < buttonElements.value.length) {
     focusedButtonIndex.value++
   }
-  const buttonElement = buttonElements.value?.[focusedButtonIndex.value]
-  if (buttonElement) {
-    buttonElement.focus()
-  }
+  focusCurrentButton()
 }
 const focusPreviousButton = () => {
   if (focusedButtonIndex.value >= buttonElements.value.length) {
@@ -408,6 +408,9 @@ const focusPreviousButton = () => {
   if (focusedButtonIndex.value > 0) {
     focusedButtonIndex.value--
   }
+  focusCurrentButton()
+}
+const focusCurrentButton = () => {
   const buttonElement = buttonElements.value?.[focusedButtonIndex.value]
   if (buttonElement) {
     buttonElement.focus()
@@ -456,9 +459,11 @@ const resizeObserver = new ResizeObserver((entries) => {
       <!-- Menu bar can be focused so that you can navigate between the buttons with arrow left and right -->
       <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
       <div
+        ref="menuBar"
         :aria-label="ariaLabel + ' Button Leiste'"
         class="pa-1 flex flex-row flex-wrap justify-between"
-        tabindex="0"
+        :tabindex="menuBar?.matches(':focus-within') ? -1 : 0"
+        @focusin="focusCurrentButton"
         @keydown.left.stop.prevent="focusPreviousButton"
         @keydown.right.stop.prevent="focusNextButton"
       >
