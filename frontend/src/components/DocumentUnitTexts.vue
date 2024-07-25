@@ -31,7 +31,7 @@ const data = computed(() => {
           v-if="item.fieldType == TextAreaInput"
           :id="item.id"
           :aria-label="item.aria"
-          class="ml-2 pl-2 outline outline-2 outline-blue-900"
+          class="shadow-blue hover:shadow-hover focus:shadow-focus"
           editable
           :field-size="item.fieldSize"
           :value="item.value"

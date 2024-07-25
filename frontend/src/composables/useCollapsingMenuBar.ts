@@ -21,6 +21,7 @@ export function useCollapsingMenuBar(
       )
 
       if (collapsableButtonsWithGroup.length == 0) {
+        setIsLast(buttonList)
         return buttonList
       }
 
