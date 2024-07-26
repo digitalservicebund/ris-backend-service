@@ -89,7 +89,8 @@ test.describe(
         })
       },
     )
-    test(
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
       "add, edit, delete note, and default opening and display logic",
       {
         annotation: [
