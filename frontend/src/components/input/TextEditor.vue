@@ -290,7 +290,7 @@ const buttons = computed(() => [
   {
     type: "deleteBorderNumber",
     icon: MaterialSymbolsDeleteSweepOutline,
-    ariaLabel: "borderNumber",
+    ariaLabel: "deleteBorderNumber",
     group: "borderNumber",
     isCollapsable: false,
     callback: () => editor.chain().focus().removeBorderNumbers().run(),
