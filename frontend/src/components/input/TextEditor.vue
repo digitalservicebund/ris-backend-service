@@ -191,8 +191,7 @@ const resizeObserver = new ResizeObserver((entries) => {
 </script>
 
 <template>
-  <!-- eslint-disable vuejs-accessibility/no-static-element-interactions, vuejs-accessibility/mouse-events-have-key-events
-   focus and blur events are covered in the editor properties, this is just additional fluff for mouse users -->
+  <!-- eslint-disable vuejs-accessibility/no-static-element-interactions -->
   <div
     id="text-editor"
     ref="editorElement"
@@ -207,6 +206,7 @@ const resizeObserver = new ResizeObserver((entries) => {
     @mouseleave="() => (isHovered = false)"
   >
     <TextEditorMenu
+      v-if="editable"
       :aria-label="props.ariaLabel"
       :buttons-disabled="buttonsDisabled"
       :container-width="containerWidth"
@@ -216,7 +216,7 @@ const resizeObserver = new ResizeObserver((entries) => {
         (isExpanded) => (editorExpanded = isExpanded)
       "
     />
-    <hr class="ml-12 mr-12 border-blue-300" />
+    <hr v-if="editable" class="ml-8 mr-8 border-blue-300" />
     <div>
       <EditorContent
         :class="editorSize"

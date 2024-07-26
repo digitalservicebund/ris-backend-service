@@ -38,9 +38,10 @@ export function useCollapsingMenuBar(
       buttonList = buttonList.filter(
         (button) => !buttonsOfGroup.includes(button),
       )
+      const activeButton = buttonsOfGroup.find((button) => button.isActive)
       const menuButton = {
         type: "menu",
-        icon: buttonsOfGroup[0].icon,
+        icon: activeButton ? activeButton.icon : buttonsOfGroup[0].icon,
         ariaLabel: "menu",
         group: buttonsOfGroup[0].group,
         isCollapsable: false,

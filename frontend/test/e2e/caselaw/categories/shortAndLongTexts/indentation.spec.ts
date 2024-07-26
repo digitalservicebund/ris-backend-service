@@ -29,16 +29,18 @@ test.describe(
       await page.keyboard.type("Abschnitt mit Einzug 0")
       await page.keyboard.press("Enter")
       await page.keyboard.type("Abschnitt mit Einzug 1")
-      await page.getByLabel("indent").click()
+      await page.locator(`[aria-label='indent']:not([disabled])`).click()
       await page.keyboard.press("Enter")
       await page.keyboard.type("Abschnitt mit Einzug 2")
-      await page.getByLabel("indent").click()
+      await page.locator(`[aria-label='indent']:not([disabled])`).click()
       await page.keyboard.press("Enter")
       await page.keyboard.type("Abschnitt mit Einzug 3")
-      await page.getByLabel("indent").click()
+      await page.locator(`[aria-label='indent']:not([disabled])`).click()
 
       // hide invisible characters
-      await page.getByLabel("invisible-characters").click()
+      await page
+        .locator(`[aria-label='invisible-characters']:not([disabled])`)
+        .click()
 
       const inputFieldInnerHTML = await inputField.innerHTML()
       // Check text styling
@@ -72,29 +74,31 @@ test.describe(
 
       const inputField = page.locator("[data-testid='Gründe']")
       await inputField.click()
-      await page.getByLabel("invisible-characters").click()
+      await page
+        .locator(`[aria-label='invisible-characters']:not([disabled])`)
+        .click()
       await page.keyboard.type("Abschnitt mit Einzug")
 
       let inputFieldInnerHTML = await inputField.innerHTML()
       expect(inputFieldInnerHTML.includes(noIndentation)).toBeTruthy()
 
       await inputField.click()
-      await page.getByLabel("indent").click()
+      await page.locator(`[aria-label='indent']:not([disabled])`).click()
 
       inputFieldInnerHTML = await inputField.innerHTML()
       expect(inputFieldInnerHTML.includes(singleIndentation)).toBeTruthy()
 
       await inputField.click()
-      await page.getByLabel("indent").click()
-      await page.getByLabel("indent").click()
+      await page.locator(`[aria-label='indent']:not([disabled])`).click()
+      await page.locator(`[aria-label='indent']:not([disabled])`).click()
 
       inputFieldInnerHTML = await inputField.innerHTML()
       expect(inputFieldInnerHTML.includes(tripleIndentation)).toBeTruthy()
 
       await inputField.click()
-      await page.getByLabel("outdent").click()
-      await page.getByLabel("outdent").click()
-      await page.getByLabel("outdent").click()
+      await page.locator(`[aria-label='outdent']:not([disabled])`).click()
+      await page.locator(`[aria-label='outdent']:not([disabled])`).click()
+      await page.locator(`[aria-label='outdent']:not([disabled])`).click()
 
       inputFieldInnerHTML = await inputField.innerHTML()
       expect(inputFieldInnerHTML.includes(noIndentation)).toBeTruthy()
