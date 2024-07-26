@@ -402,31 +402,28 @@ const buttonElements = computed<HTMLElement[]>(() =>
 
 const focusedButtonIndex = ref(0)
 const focusNextButton = () => {
-  if (focusedButtonIndex.value >= buttonElements.value.length) {
-    // If menu buttons are removed (collapsable), the index might be too high
-    focusedButtonIndex.value = buttonElements.value.length - 1
-  }
   if (focusedButtonIndex.value < buttonElements.value.length) {
     focusedButtonIndex.value++
   }
   focusCurrentButton()
 }
 const focusPreviousButton = () => {
-  if (focusedButtonIndex.value >= buttonElements.value.length) {
-    focusedButtonIndex.value = buttonElements.value.length - 1
-  }
   if (focusedButtonIndex.value > 0) {
     focusedButtonIndex.value--
   }
   focusCurrentButton()
 }
 const focusCurrentButton = () => {
+  if (focusedButtonIndex.value >= buttonElements.value.length) {
+    // If menu buttons are removed (collapsable), the index might be too high
+    focusedButtonIndex.value = buttonElements.value.length - 1
+  }
   const buttonElement = buttonElements.value?.[focusedButtonIndex.value]
   if (buttonElement && !buttonsDisabled.value) {
     buttonElement.focus()
-  } else {
-    // When navigating from a previous element the buttons are initially disabled
-    // we don't want to focus the toolbar but the EditorContent instead
+  } else if (buttonsDisabled.value) {
+    // When navigating from a previous element the buttons are initially disabled.
+    // We don't want to focus the toolbar but the EditorContent instead
     editor.commands.focus()
   }
 }
@@ -479,8 +476,8 @@ const resizeObserver = new ResizeObserver((entries) => {
       ref="menuBar"
       :aria-label="ariaLabel + ' Button Leiste'"
       class="flex flex-row flex-wrap justify-between pb-8 pe-12 ps-12 pt-12"
-      :tabindex="menuBar?.matches(':focus-within') ? -1 : 0"
-      @focusin="focusCurrentButton"
+      :tabindex="menuBar?.matches(':focus-within') || buttonsDisabled ? -1 : 0"
+      @focus="focusCurrentButton"
       @keydown.left.stop.prevent="focusPreviousButton"
       @keydown.right.stop.prevent="focusNextButton"
     >
