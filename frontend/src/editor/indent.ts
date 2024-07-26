@@ -84,9 +84,7 @@ const getOutdent =
     // If the cursor is not at the start of the node, don't unindent
     if (editor.state.selection.$head.parentOffset > 0) return false
 
-    return editor.can().liftListItem("listItem")
-      ? editor.chain().focus().liftListItem("listItem").run()
-      : editor.chain().focus().outdent().run()
+    return editor.chain().focus().outdent().run()
   }
 
 export const Indent = Extension.create<IndentOptions, never>({
