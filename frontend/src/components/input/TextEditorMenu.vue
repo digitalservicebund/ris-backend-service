@@ -37,7 +37,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const emit = defineEmits<{ onEditorExpandedChanged: boolean }>()
+const emit = defineEmits<{ onEditorExpandedChanged: [boolean] }>()
 
 const buttons = computed(() => [
   {
@@ -232,7 +232,7 @@ const editorButtons = computed(() =>
 )
 const buttonSize = 48
 const maxButtonEntries = computed(() =>
-  Math.floor((props.containerWidth.value - 100) / buttonSize),
+  Math.floor((props.containerWidth - 100) / buttonSize),
 )
 
 const { collapsedButtons } = useCollapsingMenuBar(
