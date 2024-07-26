@@ -418,6 +418,8 @@ const resizeObserver = new ResizeObserver((entries) => {
     id="text-editor"
     class="editor bg-white"
     fluid
+    @blur="() => (hasFocus = false)"
+    @focusin="() => (hasFocus = true)"
     @mouseenter="() => (isHovered = true)"
     @mouseleave="() => (isHovered = false)"
   >
