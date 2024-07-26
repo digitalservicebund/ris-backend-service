@@ -412,8 +412,7 @@ const resizeObserver = new ResizeObserver((entries) => {
 </script>
 
 <template>
-  <!-- eslint-disable vuejs-accessibility/no-static-element-interactions, vuejs-accessibility/mouse-events-have-key-events
-   focus and blur events are covered in the editor properties, this is just additional fluff for mouse users -->
+  <!-- eslint-disable vuejs-accessibility/no-static-element-interactions -->
   <div
     id="text-editor"
     class="editor bg-white"
