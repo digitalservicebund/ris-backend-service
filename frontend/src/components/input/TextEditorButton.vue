@@ -73,10 +73,7 @@ export interface EditorButton {
         <component :is="icon" />
         <IconDropdown v-if="type === 'menu'" class="-mr-8" />
       </button>
-      <div
-        v-if="isLast"
-        class="ml-8 mr-8 h-24 w-1 self-center bg-blue-300"
-      ></div>
+      <div v-if="isLast" class="h-24 w-1 self-center bg-blue-300"></div>
     </div>
     <div
       v-if="showDropdown"

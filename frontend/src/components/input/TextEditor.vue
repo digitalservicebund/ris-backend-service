@@ -426,7 +426,7 @@ const resizeObserver = new ResizeObserver((entries) => {
     <div
       v-if="editable"
       :aria-label="ariaLabel + ' Button Leiste'"
-      class="flex flex-row flex-wrap justify-between pb-8 pe-12 ps-12 pt-12"
+      class="flex flex-row flex-wrap justify-between pb-4 pe-8 ps-8 pt-8"
     >
       <div class="flex flex-row">
         <TextEditorButton
@@ -447,7 +447,7 @@ const resizeObserver = new ResizeObserver((entries) => {
         />
       </div>
     </div>
-    <hr v-if="editable" class="ml-12 mr-12 border-blue-300" />
+    <hr v-if="editable" class="ml-8 mr-8 border-blue-300" />
     <div>
       <EditorContent
         :class="editorSize"
