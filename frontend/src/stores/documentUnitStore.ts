@@ -78,10 +78,7 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
       const backendPatch = response.data as RisJsonPatch
 
       try {
-        jsonpatch.applyPatch(documentUnit.value, backendPatch.patch)
-        originalDocumentUnit.value = new DocumentUnit(documentUnit.value.uuid, {
-          ...JSON.parse(JSON.stringify(documentUnit.value)),
-        })
+        applyPatch(backendPatch)
       } catch (error) {
         console.log("apply patch: ", error)
         if (documentUnit.value.documentNumber) {
@@ -140,6 +137,16 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
       }
     }
     return response
+  }
+
+  function applyPatch(backendPatch: RisJsonPatch) {
+    if (!documentUnit.value?.uuid) {
+      throw new Error("Can't apply patch on an empty uuid")
+    }
+    jsonpatch.applyPatch(documentUnit.value, backendPatch.patch)
+    documentUnit.value = new DocumentUnit(documentUnit.value.uuid, {
+      ...JSON.parse(JSON.stringify(documentUnit.value)),
+    })
   }
 
   return {

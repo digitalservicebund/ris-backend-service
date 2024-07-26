@@ -112,27 +112,12 @@ function updateModel() {
 watch(
   () => props.modelValue,
   (newValue) => {
-    const editItem = editEntry.value
-
-    if (editItem) {
-      // Find the index of the edit entry in the current modelValueList
-      const editIndex = modelValueList.value.findIndex(
-        (item) => item.id === editItem.id,
-      )
-
-      // Update modelValueList based on the newValue while keeping the edit item intact
-      modelValueList.value = modelValueList.value.map((item, i) =>
-        i === editIndex ? item : newValue[i],
-      )
-
-      // Update the edit entry with the newly mapped value
-      if (editIndex !== -1) {
-        setEditEntry(modelValueList.value[editIndex])
-      }
-    } else {
-      // If no edit entry, replace modelValueList with newValue
-      modelValueList.value = [...newValue]
-    }
+    // Update modelValueList based on the newValue while keeping the edit item intact
+    modelValueList.value = [...newValue].map((item) =>
+      editEntry.value !== undefined && editEntry.value.equals(item)
+        ? editEntry.value
+        : item,
+    )
   },
   {
     immediate: true,
