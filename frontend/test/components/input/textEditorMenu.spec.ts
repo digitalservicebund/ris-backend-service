@@ -4,7 +4,7 @@ import { render, screen, waitFor } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import { createRouter, createWebHistory } from "vue-router"
 import TextEditor from "@/components/input/TextEditor.vue"
-import { mockDocumentForProsemirror } from "~/components/input/prosemirror-document-mock"
+import { mockDocumentForProsemirror } from "~/test-helper/prosemirror-document-mock"
 
 mockDocumentForProsemirror()
 
