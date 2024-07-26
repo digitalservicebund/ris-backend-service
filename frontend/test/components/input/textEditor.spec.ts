@@ -29,10 +29,6 @@ describe("text editor", async () => {
     })
 
     expect(screen.getAllByTestId("Editor Feld").length).toBe(1)
-
-    expect(
-      screen.queryByLabelText("Editor Feld Button Leiste"),
-    ).not.toBeInTheDocument()
   })
 
   test("renders text editor with props", async () => {
@@ -47,11 +43,6 @@ describe("text editor", async () => {
     await flushPromises()
 
     expect(screen.getByText("Test Value")).toBeInTheDocument()
-
-    expect(
-      screen.queryByLabelText("Test Editor Feld Button Leiste"),
-    ).not.toBeInTheDocument()
-
     expect(screen.getByTestId("Test Editor Feld")).toBeInTheDocument()
   })
 
@@ -70,7 +61,7 @@ describe("text editor", async () => {
     expect(await screen.findByTestId("Editor Feld")).toHaveClass(expected)
   })
 
-  test("show buttons on focus", async () => {
+  test("enable buttons on focus", async () => {
     render(TextEditor, {
       props: {
         value: "Test Value",
@@ -91,9 +82,12 @@ describe("text editor", async () => {
     expect(
       screen.getByLabelText("Test Editor Feld Button Leiste"),
     ).toBeInTheDocument()
+    expect(screen.getByLabelText("fullview")).toBeEnabled()
+    expect(screen.getByLabelText("undo")).toBeEnabled()
+    expect(screen.getByLabelText("redo")).toBeEnabled()
   })
 
-  test("hide buttons on blur", async () => {
+  test("disable buttons on blur", async () => {
     render(TextEditor, {
       props: { value: "Test Value", ariaLabel: "Test Editor Feld" },
       global: { plugins: [router] },
@@ -108,8 +102,11 @@ describe("text editor", async () => {
     }
 
     expect(
-      screen.queryByLabelText("Test Editor Feld Button Leiste"),
-    ).not.toBeInTheDocument()
+      screen.getByLabelText("Test Editor Feld Button Leiste"),
+    ).toBeInTheDocument()
+    expect(screen.getByLabelText("fullview")).toBeDisabled()
+    expect(screen.getByLabelText("undo")).toBeDisabled()
+    expect(screen.getByLabelText("redo")).toBeDisabled()
   })
 
   /*
@@ -143,19 +140,25 @@ describe("text editor", async () => {
       await fireEvent.focus(editorField.firstElementChild)
     }
 
-    expect(screen.getByLabelText("undo")).toBeInTheDocument()
-    expect(screen.getByLabelText("redo")).toBeInTheDocument()
+    expect(screen.getByLabelText("fullview")).toBeInTheDocument()
+    expect(screen.getByLabelText("invisible-characters")).toBeInTheDocument()
     expect(screen.getByLabelText("bold")).toBeInTheDocument()
     expect(screen.getByLabelText("italic")).toBeInTheDocument()
     expect(screen.getByLabelText("underline")).toBeInTheDocument()
     expect(screen.getByLabelText("strike")).toBeInTheDocument()
+    expect(screen.getByLabelText("superscript")).toBeInTheDocument()
+    expect(screen.getByLabelText("subscript")).toBeInTheDocument()
     expect(screen.getByLabelText("left")).toBeInTheDocument()
     expect(screen.getByLabelText("center")).toBeInTheDocument()
     expect(screen.getByLabelText("right")).toBeInTheDocument()
     expect(screen.getByLabelText("justify")).toBeInTheDocument()
-    expect(screen.getByLabelText("superscript")).toBeInTheDocument()
-    expect(screen.getByLabelText("subscript")).toBeInTheDocument()
-    expect(screen.getByLabelText("fullview")).toBeInTheDocument()
-    expect(screen.getByLabelText("invisible-characters")).toBeInTheDocument()
+    expect(screen.getByLabelText("bulletList")).toBeInTheDocument()
+    expect(screen.getByLabelText("orderedList")).toBeInTheDocument()
+    expect(screen.getByLabelText("outdent")).toBeInTheDocument()
+    expect(screen.getByLabelText("indent")).toBeInTheDocument()
+    expect(screen.getByLabelText("blockquote")).toBeInTheDocument()
+    expect(screen.getByLabelText("deleteBorderNumber")).toBeInTheDocument()
+    expect(screen.getByLabelText("undo")).toBeInTheDocument()
+    expect(screen.getByLabelText("redo")).toBeInTheDocument()
   })
 })

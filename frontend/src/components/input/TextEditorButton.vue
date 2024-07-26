@@ -46,6 +46,7 @@ export interface EditorButton {
   isLast?: boolean
   isActive?: boolean
   isCollapsable?: boolean
+  disabled?: boolean
   group?: string
   callback?: () => void
 }
@@ -53,22 +54,28 @@ export interface EditorButton {
 
 <template>
   <div>
-    <button
-      ref="button"
-      :aria-label="ariaLabel"
-      class="flex cursor-pointer p-8 text-blue-900 hover:bg-blue-200"
-      :class="{
-        'bg-blue-200': isActive && !childButtons,
-        'border-r-1 border-solid border-gray-400': isLast,
-      }"
-      :tabindex="tabIndex"
-      @click="onClickToggle(props)"
-      @keydown.m="onClickToggle(props)"
-      @mousedown.prevent=""
-    >
-      <component :is="icon" />
-      <IconDropdown v-if="type === 'menu'" class="-mr-8" />
-    </button>
+    <div class="flex flex-row">
+      <button
+        ref="button"
+        :aria-label="ariaLabel"
+        class="flex cursor-pointer p-8 text-blue-800 hover:bg-blue-200 disabled:bg-transparent disabled:text-gray-600"
+        :class="{
+          'bg-blue-200': isActive && !childButtons,
+        }"
+        :disabled="disabled"
+        :tabindex="tabIndex"
+        @click="onClickToggle(props)"
+        @keydown.m="onClickToggle(props)"
+        @mousedown.prevent=""
+      >
+        <component :is="icon" />
+        <IconDropdown v-if="type === 'menu'" class="-mr-8" />
+      </button>
+      <div
+        v-if="isLast"
+        class="ml-8 mr-8 h-24 w-1 self-center bg-blue-300"
+      ></div>
+    </div>
     <div
       v-if="showDropdown"
       class="absolute z-50 mt-1 flex flex-row items-center border-1 border-solid border-blue-800 bg-white"
@@ -78,11 +85,11 @@ export interface EditorButton {
         :key="index"
         ref="children"
         :aria-label="childButton.ariaLabel"
-        class="z-50 cursor-pointer items-center p-8 text-blue-900 hover:bg-blue-200"
+        class="hover:bg-blue-20 z-50 cursor-pointer items-center p-8 text-blue-900 disabled:bg-transparent disabled:text-gray-600"
         :class="{
           'bg-blue-200': isActive,
-          'border-r-1 border-solid border-gray-400': isLast,
         }"
+        :disabled="disabled"
         :tabindex="tabIndex"
         @click="emits('toggle', childButton)"
         @keydown.m="emits('toggle', childButton)"
