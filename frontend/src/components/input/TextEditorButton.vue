@@ -94,7 +94,7 @@ export interface EditorButton {
         :key="index"
         ref="children"
         :aria-label="childButton.ariaLabel"
-        class="hover:bg-blue-20 z-50 cursor-pointer items-center p-8 text-blue-900 disabled:bg-transparent disabled:text-gray-600"
+        class="hover:bg-blue-20 z-50 cursor-pointer items-center p-8 text-blue-900 focus:shadow-focus focus:outline-none disabled:bg-transparent disabled:text-gray-600"
         :class="{
           'bg-blue-200': isActive,
         }"
