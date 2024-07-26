@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref } from "vue"
+import { onMounted, onUnmounted, ref, watch } from "vue"
 import type { Component } from "vue"
 import IconDropdown from "~icons/ic/baseline-arrow-drop-down"
 
@@ -10,23 +10,23 @@ const emits = defineEmits<{
 }>()
 
 const showDropdown = ref(false)
+const clickedInside = ref(false)
 
 const button = ref<HTMLElement>()
 const children = ref<HTMLElement[]>([])
 
 function onClickToggle(button: EditorButton) {
+  clickedInside.value = true
   if (!button.childButtons || button.type === "more") emits("toggle", button)
   else if (button.type === "menu") showDropdown.value = !showDropdown.value
 }
 
-const closeDropDownWhenClickOutSide = (event: MouseEvent) => {
-  if (props.type) {
-    const button = document.querySelector(`#${props.type}`)
-    if (button == null) return
-    if ((event.target as HTMLElement) === button) return
-    if ((event.target as HTMLElement).id === "menu") return
-    showDropdown.value = false
+const closeDropDownWhenClickOutSide = () => {
+  if (clickedInside.value) {
+    clickedInside.value = false
+    return
   }
+  showDropdown.value = false
 }
 
 onMounted(() => {
@@ -36,6 +36,15 @@ onUnmounted(() => {
   document.removeEventListener("click", closeDropDownWhenClickOutSide)
 })
 defineExpose({ button, children })
+
+watch(
+  () => props.disabled,
+  (newValue) => {
+    if (newValue) {
+      showDropdown.value = false
+    }
+  },
+)
 
 export interface EditorButton {
   type: string
