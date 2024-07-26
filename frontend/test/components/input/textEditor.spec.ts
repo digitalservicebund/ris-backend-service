@@ -89,7 +89,11 @@ describe("text editor", async () => {
 
   test("disable buttons on blur", async () => {
     render(TextEditor, {
-      props: { value: "Test Value", ariaLabel: "Test Editor Feld" },
+      props: {
+        value: "Test Value",
+        ariaLabel: "Test Editor Feld",
+        editable: true,
+      },
       global: { plugins: [router] },
     })
 
