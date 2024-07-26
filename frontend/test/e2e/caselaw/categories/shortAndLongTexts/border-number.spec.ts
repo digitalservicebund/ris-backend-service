@@ -159,7 +159,9 @@ test.describe(
 
       async function clickBorderNumberButton() {
         await test.step("Click border number button to delete border numbers from selection", async () => {
-          await page.getByLabel("borderNumber").click()
+          await page
+            .locator(`[aria-label='deleteBorderNumber']:not([disabled])`)
+            .click()
         })
       }
 

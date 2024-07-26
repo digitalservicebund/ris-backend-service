@@ -25,12 +25,14 @@ test.describe(
       const inputField = page.locator("[data-testid='Gründe']")
       await inputField.click()
       await page.keyboard.type("This is a bullet list")
-      await page.getByLabel("bulletList").click()
+      await page.locator(`[aria-label='bulletList']:not([disabled])`).click()
       await page.keyboard.press("Enter")
       await page.keyboard.type("Second bullet list item")
 
       // hide invisible characters
-      await page.getByLabel("invisible-characters").click()
+      await page
+        .locator(`[aria-label='invisible-characters']:not([disabled])`)
+        .click()
 
       const inputFieldInnerHTML = await inputField.innerHTML()
       // Check text styling
@@ -58,12 +60,14 @@ test.describe(
       const inputField = page.locator("[data-testid='Gründe']")
       await inputField.click()
       await page.keyboard.type("This is an ordered list")
-      await page.getByLabel("orderedList").click()
+      await page.locator(`[aria-label='orderedList']:not([disabled])`).click()
       await page.keyboard.press("Enter")
       await page.keyboard.type("Second ordered list item")
 
       // hide invisible characters
-      await page.getByLabel("invisible-characters").click()
+      await page
+        .locator(`[aria-label='invisible-characters']:not([disabled])`)
+        .click()
 
       const inputFieldInnerHTML = await inputField.innerHTML()
       // Check text styling
@@ -92,20 +96,22 @@ test.describe(
       const inputField = page.locator("[data-testid='Gründe']")
       await inputField.click()
       // hide invisible characters
-      await page.getByLabel("invisible-characters").click()
+      await page
+        .locator(`[aria-label='invisible-characters']:not([disabled])`)
+        .click()
 
       await page.keyboard.type("This is a list")
-      await page.getByLabel("bulletList").click()
+      await page.locator(`[aria-label='bulletList']:not([disabled])`).click()
 
       let inputFieldInnerHTML = await inputField.innerHTML()
       // Check text styling
       expect(inputFieldInnerHTML.includes(bulletList)).toBeTruthy()
 
-      await page.getByLabel("orderedList").click()
+      await page.locator(`[aria-label='orderedList']:not([disabled])`).click()
       inputFieldInnerHTML = await inputField.innerHTML()
       expect(inputFieldInnerHTML.includes(orderedList)).toBeTruthy()
 
-      await page.getByLabel("orderedList").click()
+      await page.locator(`[aria-label='orderedList']:not([disabled])`).click()
       inputFieldInnerHTML = await inputField.innerHTML()
       expect(inputFieldInnerHTML.includes(noList)).toBeTruthy()
     })

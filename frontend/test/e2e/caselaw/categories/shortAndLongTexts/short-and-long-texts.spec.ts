@@ -42,7 +42,9 @@ test("toggle invisible characters", async ({ page, documentNumber }) => {
   await expect(
     guidingPrincipleInput.locator("[class='ProseMirror-trailingBreak']"),
   ).toHaveCount(1)
-  await page.getByLabel("invisible-characters").click()
+  await page
+    .locator(`[aria-label='invisible-characters']:not([disabled])`)
+    .click()
   await expect(
     guidingPrincipleInput.locator("[class='ProseMirror-trailingBreak']"),
   ).toHaveCount(0)
