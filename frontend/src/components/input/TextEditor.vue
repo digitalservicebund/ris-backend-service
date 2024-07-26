@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { commands, selectActiveState } from "@guardian/prosemirror-invisibles"
+import { commands } from "@guardian/prosemirror-invisibles"
 import { Blockquote } from "@tiptap/extension-blockquote"
 import { Bold } from "@tiptap/extension-bold"
 import { Color } from "@tiptap/extension-color"
@@ -16,13 +16,10 @@ import { Text } from "@tiptap/extension-text"
 import { TextAlign } from "@tiptap/extension-text-align"
 import { TextStyle } from "@tiptap/extension-text-style"
 import { Underline } from "@tiptap/extension-underline"
-import { EditorContent, Editor } from "@tiptap/vue-3"
-import { computed, watch, ref, onMounted } from "vue"
-import TextEditorButton, {
-  EditorButton,
-} from "@/components/input/TextEditorButton.vue"
+import { Editor, EditorContent } from "@tiptap/vue-3"
+import { computed, onMounted, ref, watch } from "vue"
+import TextEditorMenu from "@/components/input/TextEditorMenu.vue"
 import { TextAreaInputAttributes } from "@/components/input/types"
-import { useCollapsingMenuBar } from "@/composables/useCollapsingMenuBar"
 import {
   BorderNumber,
   BorderNumberContent,
@@ -37,28 +34,8 @@ import { InvisibleCharacters } from "@/editor/invisibleCharacters"
 import { CustomListItem } from "@/editor/listItem"
 import { CustomOrderedList } from "@/editor/orderedList"
 import { CustomParagraph } from "@/editor/paragraph"
-import { CustomSuperscript, CustomSubscript } from "@/editor/scriptText"
+import { CustomSubscript, CustomSuperscript } from "@/editor/scriptText"
 import { TableStyle } from "@/editor/tableStyle"
-import MaterialSymbolsDeleteSweepOutline from "~icons/ic/sharp-delete-sweep"
-import IconExpand from "~icons/ic/sharp-expand"
-import IconAlignCenter from "~icons/ic/sharp-format-align-center"
-import IconAlignJustify from "~icons/ic/sharp-format-align-justify"
-import IconAlignLeft from "~icons/ic/sharp-format-align-left"
-import IconAlignRight from "~icons/ic/sharp-format-align-right"
-import IconBold from "~icons/ic/sharp-format-bold"
-import IndentDecrease from "~icons/ic/sharp-format-indent-decrease"
-import IndentIncrease from "~icons/ic/sharp-format-indent-increase"
-import IconItalic from "~icons/ic/sharp-format-italic"
-import IconUnorderedList from "~icons/ic/sharp-format-list-bulleted"
-import IconOrderedList from "~icons/ic/sharp-format-list-numbered"
-import IconBlockquote from "~icons/ic/sharp-format-quote"
-import IconStrikethrough from "~icons/ic/sharp-format-strikethrough"
-import IconUnderline from "~icons/ic/sharp-format-underlined"
-import IconRedo from "~icons/ic/sharp-redo"
-import IconSubscript from "~icons/ic/sharp-subscript"
-import IconSuperscript from "~icons/ic/sharp-superscript"
-import IconUndo from "~icons/ic/sharp-undo"
-import IconParagraph from "~icons/material-symbols/format-paragraph"
 
 interface Props {
   value?: string
@@ -150,198 +127,7 @@ const editor = new Editor({
   },
 })
 
-const buttons = computed(() => [
-  {
-    type: "expand",
-    icon: IconExpand,
-    ariaLabel: "fullview",
-    group: "display",
-    isCollapsable: false,
-    callback: () => (editorExpanded.value = !editorExpanded.value),
-  },
-  {
-    type: "invisible-characters",
-    icon: IconParagraph,
-    ariaLabel: "invisible-characters",
-    group: "display",
-    isCollapsable: false,
-    callback: () =>
-      commands.toggleActiveState()(editor.state, editor.view.dispatch),
-  },
-  {
-    type: "bold",
-    icon: IconBold,
-    ariaLabel: "bold",
-    group: "format",
-    isCollapsable: false,
-    callback: () => editor.chain().focus().toggleMark("bold").run(),
-  },
-  {
-    type: "italic",
-    icon: IconItalic,
-    ariaLabel: "italic",
-    group: "format",
-    isCollapsable: false,
-    callback: () => editor.chain().focus().toggleMark("italic").run(),
-  },
-  {
-    type: "underline",
-    icon: IconUnderline,
-    ariaLabel: "underline",
-    group: "format",
-    isCollapsable: false,
-    callback: () => editor.chain().focus().toggleMark("underline").run(),
-  },
-  {
-    type: "strike",
-    icon: IconStrikethrough,
-    ariaLabel: "strike",
-    group: "format",
-    isCollapsable: false,
-    callback: () => editor.chain().focus().toggleMark("strike").run(),
-  },
-  {
-    type: "superscript",
-    icon: IconSuperscript,
-    ariaLabel: "superscript",
-    group: "format",
-    isCollapsable: false,
-    callback: () => editor.chain().focus().toggleMark("superscript").run(),
-  },
-  {
-    type: "subscript",
-    icon: IconSubscript,
-    ariaLabel: "subscript",
-    group: "format",
-    isCollapsable: false,
-    callback: () => editor.chain().focus().toggleMark("subscript").run(),
-  },
-  {
-    type: "left",
-    icon: IconAlignLeft,
-    ariaLabel: "left",
-    group: "alignment",
-    isCollapsable: true,
-    callback: () => editor.chain().focus().setTextAlign("left").run(),
-  },
-  {
-    type: "center",
-    icon: IconAlignCenter,
-    ariaLabel: "center",
-    group: "alignment",
-    isCollapsable: true,
-    callback: () => editor.chain().focus().setTextAlign("center").run(),
-  },
-  {
-    type: "right",
-    icon: IconAlignRight,
-    ariaLabel: "right",
-    group: "alignment",
-    isCollapsable: true,
-    callback: () => editor.chain().focus().setTextAlign("right").run(),
-  },
-  {
-    type: "justify",
-    icon: IconAlignJustify,
-    ariaLabel: "justify",
-    group: "alignment",
-    isCollapsable: true,
-    callback: () => editor.chain().focus().setTextAlign("justify").run(),
-  },
-  {
-    type: "bulletList",
-    icon: IconUnorderedList,
-    ariaLabel: "bulletList",
-    group: "indent",
-    isCollapsable: false,
-    callback: () => editor.chain().focus().toggleBulletList().run(),
-  },
-  {
-    type: "orderedList",
-    icon: IconOrderedList,
-    ariaLabel: "orderedList",
-    group: "indent",
-    isCollapsable: false,
-    callback: () => editor.chain().focus().toggleOrderedList().run(),
-  },
-  {
-    type: "outdent",
-    icon: IndentDecrease,
-    ariaLabel: "outdent",
-    group: "indent",
-    isCollapsable: false,
-    callback: () => editor.chain().focus().outdent().run(),
-  },
-  {
-    type: "indent",
-    icon: IndentIncrease,
-    ariaLabel: "indent",
-    group: "indent",
-    isCollapsable: false,
-    callback: () => editor.chain().focus().indent().run(),
-  },
-  {
-    type: "blockquote",
-    icon: IconBlockquote,
-    ariaLabel: "blockquote",
-    group: "blockquote",
-    isCollapsable: false,
-    callback: () => editor.chain().focus().toggleBlockquote().run(),
-  },
-  {
-    type: "deleteBorderNumber",
-    icon: MaterialSymbolsDeleteSweepOutline,
-    ariaLabel: "deleteBorderNumber",
-    group: "borderNumber",
-    isCollapsable: false,
-    callback: () => editor.chain().focus().removeBorderNumbers().run(),
-  },
-])
-
-const fixButtons = [
-  {
-    type: "undo",
-    icon: IconUndo,
-    ariaLabel: "undo",
-    group: "arrow",
-    isCollapsable: false,
-    callback: () => editor.chain().focus().undo().run(),
-  },
-  {
-    type: "redo",
-    icon: IconRedo,
-    ariaLabel: "redo",
-    group: "arrow",
-    isCollapsable: false,
-    callback: () => editor.chain().focus().redo().run(),
-  },
-]
-
-const editorButtons = computed(() =>
-  buttons.value.map((button) => {
-    let isActive
-
-    if (button.group === "alignment") {
-      isActive = editor.isActive({ textAlign: button.type })
-    } else if (button.ariaLabel === "invisible-characters") {
-      isActive = selectActiveState(editor.view.state)
-    } else if (button.ariaLabel === "fullview") {
-      isActive = editorExpanded.value
-    } else {
-      isActive = editor.isActive(button.type)
-    }
-
-    return {
-      ...button,
-      isActive,
-    }
-  }),
-)
-const buttonSize = 48
-const containerWidth = ref()
-const maxButtonEntries = computed(() =>
-  Math.floor((containerWidth.value - 100) / buttonSize),
-)
+const containerWidth = ref<number>(0)
 
 const editorExpanded = ref(false)
 const editorSize = computed(() => {
@@ -359,14 +145,6 @@ const editorSize = computed(() => {
   }
   return undefined
 })
-const { collapsedButtons } = useCollapsingMenuBar(
-  editorButtons,
-  maxButtonEntries,
-)
-
-function handleButtonClick(button: EditorButton) {
-  if (button.callback) button.callback()
-}
 
 watch(
   () => props.value,
@@ -385,48 +163,6 @@ watch(
 const buttonsDisabled = computed(
   () => !(props.editable && (hasFocus.value || isHovered.value)),
 )
-
-const menuBar = ref<HTMLElement>()
-const fixButtonElements = ref<(typeof TextEditorButton)[]>([])
-const collapsedButtonElements = ref<(typeof TextEditorButton)[]>([])
-// All the HTML <button> elements of the TextEditorButtons, so we can call .focus() on them
-const buttonElements = computed<HTMLElement[]>(() =>
-  [...collapsedButtonElements.value, ...fixButtonElements.value]
-    .flatMap((buttonComponent) => [
-      buttonComponent.button,
-      // If it is a collapsed button, it might have visible children
-      ...(buttonComponent?.children ?? []),
-    ])
-    .filter((button) => !!button),
-)
-
-const focusedButtonIndex = ref(0)
-const focusNextButton = () => {
-  if (focusedButtonIndex.value < buttonElements.value.length) {
-    focusedButtonIndex.value++
-  }
-  focusCurrentButton()
-}
-const focusPreviousButton = () => {
-  if (focusedButtonIndex.value > 0) {
-    focusedButtonIndex.value--
-  }
-  focusCurrentButton()
-}
-const focusCurrentButton = () => {
-  if (focusedButtonIndex.value >= buttonElements.value.length) {
-    // If menu buttons are removed (collapsable), the index might be too high
-    focusedButtonIndex.value = buttonElements.value.length - 1
-  }
-  const buttonElement = buttonElements.value?.[focusedButtonIndex.value]
-  if (buttonElement && !buttonsDisabled.value) {
-    buttonElement.focus()
-  } else if (buttonsDisabled.value) {
-    // When navigating from a previous element the buttons are initially disabled.
-    // We don't want to focus the toolbar but the EditorContent instead
-    editor.commands.focus()
-  }
-}
 
 watch(
   () => hasFocus.value,
@@ -470,40 +206,16 @@ const resizeObserver = new ResizeObserver((entries) => {
     @mouseenter="() => (isHovered = true)"
     @mouseleave="() => (isHovered = false)"
   >
-    <!-- Menu bar can be focused so that you can navigate between the buttons with arrow left and right -->
-    <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
-    <div
-      ref="menuBar"
-      :aria-label="ariaLabel + ' Button Leiste'"
-      class="flex flex-row flex-wrap justify-between pb-8 pe-12 ps-12 pt-12"
-      :tabindex="menuBar?.matches(':focus-within') || buttonsDisabled ? -1 : 0"
-      @focus="focusCurrentButton"
-      @keydown.left.stop.prevent="focusPreviousButton"
-      @keydown.right.stop.prevent="focusNextButton"
-    >
-      <div class="flex flex-row">
-        <TextEditorButton
-          v-for="(button, index) in collapsedButtons"
-          :key="index"
-          v-bind="button"
-          ref="collapsedButtonElements"
-          :disabled="buttonsDisabled"
-          :tab-index="-1"
-          @toggle="handleButtonClick"
-        />
-      </div>
-      <div class="flex flex-row">
-        <TextEditorButton
-          v-for="(button, index) in fixButtons"
-          :key="index"
-          v-bind="button"
-          ref="fixButtonElements"
-          :disabled="buttonsDisabled"
-          :tab-index="-1"
-          @toggle="handleButtonClick"
-        />
-      </div>
-    </div>
+    <TextEditorMenu
+      :aria-label="props.ariaLabel"
+      :buttons-disabled="buttonsDisabled"
+      :container-width="containerWidth"
+      :editor="editor"
+      :editor-expanded="editorExpanded"
+      @on-editor-expanded-changed="
+        (isExpanded) => (editorExpanded = isExpanded)
+      "
+    />
     <hr class="ml-12 mr-12 border-blue-300" />
     <div>
       <EditorContent
