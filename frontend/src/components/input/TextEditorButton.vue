@@ -67,7 +67,7 @@ export interface EditorButton {
       <button
         ref="button"
         :aria-label="ariaLabel"
-        class="flex cursor-pointer p-8 text-blue-800 hover:bg-blue-200 disabled:bg-transparent disabled:text-gray-600"
+        class="flex cursor-pointer p-8 text-blue-800 hover:bg-blue-200 focus:shadow-focus focus:outline-none disabled:bg-transparent disabled:text-gray-600"
         :class="{
           'bg-blue-200': isActive && !childButtons,
         }"

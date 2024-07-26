@@ -392,10 +392,10 @@ const collapsedButtonElements = ref<(typeof TextEditorButton)[]>([])
 // All the HTML <button> elements of the TextEditorButtons, so we can call .focus() on them
 const buttonElements = computed<HTMLElement[]>(() =>
   [...collapsedButtonElements.value, ...fixButtonElements.value]
-    .flatMap((buttomComponent) => [
-      buttomComponent.button,
+    .flatMap((buttonComponent) => [
+      buttonComponent.button,
       // If it is a collapsed button, it might have visible children
-      ...(buttomComponent?.children ?? []),
+      ...(buttonComponent?.children ?? []),
     ])
     .filter((button) => !!button),
 )
@@ -422,8 +422,12 @@ const focusPreviousButton = () => {
 }
 const focusCurrentButton = () => {
   const buttonElement = buttonElements.value?.[focusedButtonIndex.value]
-  if (buttonElement) {
+  if (buttonElement && !buttonsDisabled.value) {
     buttonElement.focus()
+  } else {
+    // When navigating from a previous element the buttons are initially disabled
+    // we don't want to focus the toolbar but the EditorContent instead
+    editor.commands.focus()
   }
 }
 
