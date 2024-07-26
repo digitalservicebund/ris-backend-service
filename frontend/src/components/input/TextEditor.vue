@@ -424,6 +424,7 @@ const resizeObserver = new ResizeObserver((entries) => {
     @mouseleave="() => (isHovered = false)"
   >
     <div
+      v-if="editable"
       :aria-label="ariaLabel + ' Button Leiste'"
       class="flex flex-row flex-wrap justify-between pb-8 pe-12 ps-12 pt-12"
     >
@@ -446,7 +447,7 @@ const resizeObserver = new ResizeObserver((entries) => {
         />
       </div>
     </div>
-    <hr class="ml-12 mr-12 border-blue-300" />
+    <hr v-if="editable" class="ml-12 mr-12 border-blue-300" />
     <div>
       <EditorContent
         :class="editorSize"
