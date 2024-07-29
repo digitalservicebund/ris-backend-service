@@ -7,7 +7,7 @@ import lombok.Builder;
 /**
  * A reference to a legal periodical (Fundstelle).
  *
- * @param id The id of the reference.
+ * @param uuid The id of the reference.
  * @param legalPeriodical The periodical, where reference was found.
  * @param citation The citation (Zitierung).
  * @param referenceSupplement The reference supplement (Klammerzusatz).
@@ -15,7 +15,7 @@ import lombok.Builder;
  */
 @Builder(toBuilder = true)
 public record Reference(
-    UUID id,
+    UUID uuid,
     String citation,
     String referenceSupplement,
     String footnote,

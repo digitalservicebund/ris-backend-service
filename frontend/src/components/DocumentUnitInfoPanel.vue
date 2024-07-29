@@ -86,7 +86,11 @@ watchEffect(() => {
 
     <span class="flex-grow"></span>
     <SaveButton
-      v-if="route.path.includes('categories') || route.path.includes('files')"
+      v-if="
+        route.path.includes('categories') ||
+        route.path.includes('files') ||
+        route.path.includes('references')
+      "
       aria-label="Speichern Button"
     />
   </div>

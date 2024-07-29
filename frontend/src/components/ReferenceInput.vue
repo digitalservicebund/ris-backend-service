@@ -37,7 +37,6 @@ const legalPeriodical = computed({
     } else {
       reference.value.legalPeriodical = undefined
     }
-    console.log(reference.value)
   },
 })
 
@@ -53,7 +52,6 @@ async function addReference() {
 watch(
   () => props.modelValue,
   () => {
-    console.log(props.modelValue)
     reference.value = new Reference({ ...props.modelValue })
     lastSavedModelValue.value = new Reference({ ...props.modelValue })
   },

@@ -8,21 +8,21 @@ public class ReferenceTransformer {
 
   public static Reference transformToDomain(ReferenceDTO referenceDTO) {
     return Reference.builder()
+        .uuid(referenceDTO.getId())
         .referenceSupplement(referenceDTO.getReferenceSupplement())
         .legalPeriodical(
             LegalPeriodicalTransformer.transformToDomain(referenceDTO.getLegalPeriodical()))
         .citation(referenceDTO.getCitation())
         .footnote(referenceDTO.getFootnote())
-        .id(referenceDTO.getId())
         .build();
   }
 
   public static ReferenceDTO transformToDTO(Reference reference) {
     return ReferenceDTO.builder()
-        .id(reference.id())
+        .id(reference.uuid())
         .referenceSupplement(reference.referenceSupplement())
         .legalPeriodical(
-            reference.legalPeriodical().legalPeriodicalId() == null
+                reference.legalPeriodical() == null || reference.legalPeriodical().legalPeriodicalId() == null
                 ? null
                 : LegalPeriodicalDTO.builder()
                     .id(reference.legalPeriodical().legalPeriodicalId())
