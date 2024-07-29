@@ -295,7 +295,7 @@ const ariaLabel = props.ariaLabel ? props.ariaLabel : null
   <div
     ref="menuBar"
     :aria-label="ariaLabel + ' Button Leiste'"
-    class="flex flex-row flex-wrap justify-between pb-8 pe-12 ps-12 pt-12"
+    class="flex flex-row flex-wrap justify-between pb-4 pe-8 ps-8 pt-8"
     :tabindex="
       menuBar?.matches(':focus-within') || props.buttonsDisabled ? -1 : 0
     "
