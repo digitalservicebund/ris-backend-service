@@ -127,7 +127,7 @@ const editor = new Editor({
   },
 })
 
-const containerWidth = ref<number>(0)
+const containerWidth = ref<number>()
 
 const editorExpanded = ref(false)
 const editorSize = computed(() => {

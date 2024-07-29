@@ -32,7 +32,7 @@ interface Props {
   ariaLabel: string
   buttonsDisabled: boolean
   editor: Editor
-  containerWidth: number
+  containerWidth?: number
 }
 
 const props = defineProps<Props>()
@@ -232,7 +232,9 @@ const editorButtons = computed(() =>
 )
 const buttonSize = 48
 const maxButtonEntries = computed(() =>
-  Math.floor((props.containerWidth - 100) / buttonSize),
+  props.containerWidth !== undefined
+    ? Math.floor((props.containerWidth - 100) / buttonSize)
+    : Number.MAX_VALUE,
 )
 
 const { collapsedButtons } = useCollapsingMenuBar(
