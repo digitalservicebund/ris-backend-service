@@ -64,10 +64,9 @@ test.describe("court", () => {
     await page.keyboard.press("Enter")
 
     await save(page)
-
     await page.reload()
-    await page.locator("[aria-label='Fehlerhaftes Gericht anzeigen']").click()
 
+    await page.locator("[aria-label='Fehlerhaftes Gericht anzeigen']").click()
     await expect(page.getByText("IncorrectCourt1")).toBeVisible()
     await expect(page.getByText("IncorrectCourt2")).toBeVisible()
 
@@ -75,7 +74,9 @@ test.describe("court", () => {
       .locator(":text('incorrectCourt1') + button[aria-label='Löschen']")
       .click()
 
+    await save(page)
     await page.reload()
+
     await page.locator("[aria-label='Fehlerhaftes Gericht anzeigen']").click()
     await expect(page.getByText("IncorrectCourt1")).toHaveCount(0)
     await expect(page.getByText("IncorrectCourt2")).toBeVisible()
