@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue"
+import { computed, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
-import Reference from "@/domain/reference"
+import Reference, { LegalPeriodical } from "@/domain/reference"
 import ComboboxItemService from "@/services/comboboxItemService"
 
 const props = defineProps<{
@@ -26,27 +26,39 @@ const legalPeriodical = computed({
   get: () =>
     reference?.value?.legalPeriodical
       ? {
-          label: reference?.value?.legalPeriodicalAbbreviation,
-          value: reference?.value?.legalPeriodicalAbbreviation,
+          label: reference?.value?.legalPeriodical.legalPeriodicalAbbreviation,
+          value: reference?.value?.legalPeriodical,
         }
       : undefined,
   set: (newValue) => {
-    if (newValue?.label) {
-      reference.value.legalPeriodicalAbbreviation = { ...newValue }
+    const legalPeriodical = { ...newValue } as LegalPeriodical
+    if (newValue) {
+      reference.value.legalPeriodical = legalPeriodical
     } else {
-      reference.value.legalPeriodicalAbbreviation = undefined
+      reference.value.legalPeriodical = undefined
     }
+    console.log(reference.value)
   },
 })
 
 async function addReference() {
-  emit("update:modelValue", reference.value)
+  emit("update:modelValue", reference.value as Reference)
   emit("addEntry")
 }
 
-onMounted(() => {
-  reference.value = new Reference({ ...props.modelValue })
-})
+/**
+ * This updates the local reference with the updated model value from the props. It also stores a copy of the last saved
+ * model value, because the local reference might change in between.
+ */
+watch(
+  () => props.modelValue,
+  () => {
+    console.log(props.modelValue)
+    reference.value = new Reference({ ...props.modelValue })
+    lastSavedModelValue.value = new Reference({ ...props.modelValue })
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -57,7 +69,7 @@ onMounted(() => {
         v-model="legalPeriodical"
         aria-label="Periodikum"
         clear-on-choosing-item
-        :item-service="ComboboxItemService.getCitationTypes"
+        :item-service="ComboboxItemService.getLegalPeriodicals"
       ></ComboboxInput>
     </InputField>
     <div class="flex flex-col gap-24">

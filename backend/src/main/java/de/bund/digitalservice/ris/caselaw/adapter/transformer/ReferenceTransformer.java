@@ -9,26 +9,8 @@ public class ReferenceTransformer {
   public static Reference transformToDomain(ReferenceDTO referenceDTO) {
     return Reference.builder()
         .referenceSupplement(referenceDTO.getReferenceSupplement())
-        .legalPeriodicalId(
-            referenceDTO.getLegalPeriodical() == null
-                ? null
-                : referenceDTO.getLegalPeriodical().getId())
-        .legalPeriodicalAbbreviation(
-            referenceDTO.getLegalPeriodical() == null
-                ? referenceDTO.getLegalPeriodicalRawValue()
-                : referenceDTO.getLegalPeriodical().getAbbreviation())
-        .legalPeriodicalTitle(
-            referenceDTO.getLegalPeriodical() == null
-                ? null
-                : referenceDTO.getLegalPeriodical().getTitle())
-        .legalPeriodicalSubtitle(
-            referenceDTO.getLegalPeriodical() == null
-                ? null
-                : referenceDTO.getLegalPeriodical().getSubtitle())
-        .primaryReference(
-            referenceDTO.getLegalPeriodical() == null
-                ? (referenceDTO.getType() != null && referenceDTO.getType().equals("amtlich"))
-                : referenceDTO.getLegalPeriodical().getPrimaryReference())
+        .legalPeriodical(
+            LegalPeriodicalTransformer.transformToDomain(referenceDTO.getLegalPeriodical()))
         .citation(referenceDTO.getCitation())
         .footnote(referenceDTO.getFootnote())
         .id(referenceDTO.getId())
@@ -40,13 +22,14 @@ public class ReferenceTransformer {
         .id(reference.id())
         .referenceSupplement(reference.referenceSupplement())
         .legalPeriodical(
-            reference.legalPeriodicalId() == null
+            reference.legalPeriodical().legalPeriodicalId() == null
                 ? null
-                : LegalPeriodicalDTO.builder().id(reference.legalPeriodicalId()).build())
+                : LegalPeriodicalDTO.builder()
+                    .id(reference.legalPeriodical().legalPeriodicalId())
+                    .build())
         .citation(reference.citation())
         .footnote(reference.footnote())
-        .legalPeriodicalRawValue(reference.legalPeriodicalAbbreviation())
-        .type(reference.primaryReference() ? "amtlich" : "nichtamtlich")
+        .legalPeriodicalRawValue(reference.legalPeriodical().legalPeriodicalAbbreviation())
         .build();
   }
 

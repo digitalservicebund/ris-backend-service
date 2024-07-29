@@ -4,18 +4,16 @@ import EditableList from "@/components/EditableList.vue"
 import ReferenceInput from "@/components/ReferenceInput.vue"
 import ReferenceSummary from "@/components/ReferenceSummary.vue"
 import Reference from "@/domain/reference"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
-// Todo: uncomment when partial saving merged
-// const references = computed({
-//   get: () => {
-//     return store.documentUnit?.references
-//   },
-//   set: (value) => {
-//     store.documentUnit.references = value
-//   },
-// })
+const store = useDocumentUnitStore()
 
-const references = computed(() => [])
+const references = computed({
+  get: () => store.documentUnit!.references,
+  set: (newValues) => {
+    store.documentUnit!.references = newValues
+  },
+})
 
 const defaultValue = new Reference()
 </script>

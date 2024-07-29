@@ -5,6 +5,7 @@ import { Court, DocumentType, Procedure } from "@/domain/documentUnit"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
+import { LegalPeriodical } from "@/domain/reference"
 import { ResponseError } from "@/services/httpClient"
 
 export enum InputType {
@@ -132,6 +133,7 @@ export type ComboboxInputModelType =
   | Procedure
   | LegalForceRegion
   | LegalForceType
+  | LegalPeriodical
 
 export type ComboboxItem = {
   label: string

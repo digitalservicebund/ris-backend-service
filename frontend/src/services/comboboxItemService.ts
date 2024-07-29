@@ -1,4 +1,5 @@
 import { capitalize } from "vue"
+import { LegalPeriodical } from "./../domain/reference"
 import httpClient, { ServiceResponse } from "./httpClient"
 import { ComboboxInputModelType, ComboboxItem } from "@/components/input/types"
 import { Page } from "@/components/Pagination.vue"
@@ -18,6 +19,7 @@ enum Endpoint {
   procedures = `procedure`,
   legalForceRegions = `region/applicable`,
   legalForceTypes = `legalforcetype`,
+  legalPeriodicals = `legalperiodicals`,
 }
 
 function formatDropdownItems(
@@ -79,6 +81,12 @@ function formatDropdownItems(
     case Endpoint.legalForceRegions: {
       return (responseData as LegalForceRegion[]).map((item) => ({
         label: item.longText,
+        value: item,
+      }))
+    }
+    case Endpoint.legalPeriodicals: {
+      return (responseData as LegalPeriodical[]).map((item) => ({
+        label: item.legalPeriodicalAbbreviation,
         value: item,
       }))
     }
@@ -147,6 +155,8 @@ const service: ComboboxItemService = {
     await fetchFromEndpoint(Endpoint.legalForceTypes, filter),
   getLegalForceRegions: async (filter?: string) =>
     await fetchFromEndpoint(Endpoint.legalForceRegions, filter),
+  getLegalPeriodicals: async (filter?: string) =>
+    await fetchFromEndpoint(Endpoint.legalPeriodicals, filter),
 }
 
 export default service
