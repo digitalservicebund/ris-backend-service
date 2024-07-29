@@ -67,7 +67,7 @@
     "dayjs": "^1.11.12",
     "immer": "^10.1.1",
     "maska": "^2.1.11",
-    "pinia": "^2.1.7",
+    "pinia": "^2.2.0",
     "resize-observer-polyfill": "^1.5.1",
     "tippy.js": "^6.3.7",
     "vue": "^3.4.34",
