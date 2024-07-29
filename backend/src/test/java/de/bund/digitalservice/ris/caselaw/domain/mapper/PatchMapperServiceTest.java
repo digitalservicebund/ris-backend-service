@@ -81,7 +81,7 @@ class PatchMapperServiceTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("fix and enable")
   void testHandlePatchForSamePath_withSamePathPatchesAddOperation_returnTrueAndRemovePatches() {
     JsonPatchOperation addOperationFE =
         new AddOperation("/coreData/fileNumbers/1", new TextNode("abc"));
@@ -103,7 +103,7 @@ class PatchMapperServiceTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("fix and enable")
   void testHandlePatchForSamePath_withSamePathPatchesRemoveOperation_returnTrueAndRemovePatches() {
     JsonPatchOperation addOperationFE = new RemoveOperation("/coreData/fileNumbers/1");
     JsonPatch patchFE = new JsonPatch(new ArrayList<>(List.of(addOperationFE)));
@@ -126,7 +126,7 @@ class PatchMapperServiceTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("fix and enable")
   void testHandlePatchForSamePath_withSamePathPatchesReplaceOperation_returnTrueAndRemovePatches() {
     JsonPatchOperation replaceOperationFE =
         new ReplaceOperation("/coreData/fileNumbers/1", new TextNode("abc"));
@@ -148,7 +148,7 @@ class PatchMapperServiceTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("fix and enable")
   void
       testHandlePatchForSamePath_withSamePathPatchesAndOtherInBE_returnTrueAndRemoveOnlySamePathPatches() {
     JsonPatchOperation addOperationFE =

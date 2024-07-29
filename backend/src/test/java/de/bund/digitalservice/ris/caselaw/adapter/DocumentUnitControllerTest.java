@@ -202,7 +202,7 @@ class DocumentUnitControllerTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("fix and enable")
   void testPatchUpdateByUuid() throws DocumentationUnitNotExistsException {
     DocumentationUnitDTO documentUnitDTO =
         DocumentationUnitDTO.builder()
