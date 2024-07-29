@@ -33,6 +33,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
+import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -102,6 +103,7 @@ class DocumentUnitControllerAuthIntegrationTest {
   @MockBean DocxConverterService docxConverterService;
   @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean AttachmentService attachmentService;
+  @MockBean private PatchMapperService patchMapperService;
 
   @MockBean private HandoverService handoverService;
 

@@ -50,6 +50,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisBodySpec;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Instant;
@@ -113,6 +114,7 @@ class PreviousDecisionIntegrationTest {
   @Autowired private DatabaseCourtRepository courtRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseHandoverReportRepository databaseHandoverReportRepository;
+  @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
 
   @MockBean UserService userService;
   @MockBean ClientRegistrationRepository clientRegistrationRepository;
@@ -120,8 +122,8 @@ class PreviousDecisionIntegrationTest {
   @MockBean private MailService mailService;
   @MockBean DocxConverterService docxConverterService;
   @MockBean AttachmentService attachmentService;
+  @MockBean private PatchMapperService patchMapperService;
   @MockBean private HandoverService handoverService;
-  @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private DocumentationOfficeDTO documentationOfficeDTO;

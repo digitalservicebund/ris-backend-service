@@ -35,6 +35,7 @@ import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.LocalDate;
 import java.util.List;
@@ -99,6 +100,7 @@ class EnsuingDecisionsIntegrationTest {
   @MockBean private MailService mailService;
   @MockBean DocxConverterService docxConverterService;
   @MockBean AttachmentService attachmentService;
+  @MockBean private PatchMapperService patchMapperService;
 
   @MockBean private HandoverService handoverService;
 

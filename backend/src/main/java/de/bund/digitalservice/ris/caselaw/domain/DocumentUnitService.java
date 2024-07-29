@@ -2,10 +2,17 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import static de.bund.digitalservice.ris.caselaw.domain.StringUtils.normalizeSpace;
 
+import com.gravity9.jsonpatch.JsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentUnitDeletionException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitPatchException;
+import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -25,6 +32,7 @@ public class DocumentUnitService {
   private final DocumentNumberService documentNumberService;
   private final AttachmentService attachmentService;
   private final DocumentNumberRecyclingService documentNumberRecyclingService;
+  private final PatchMapperService patchMapperService;
   private final Validator validator;
 
   public DocumentUnitService(
@@ -32,13 +40,15 @@ public class DocumentUnitService {
       DocumentNumberService documentNumberService,
       DocumentNumberRecyclingService documentNumberRecyclingService,
       Validator validator,
-      AttachmentService attachmentService) {
+      AttachmentService attachmentService,
+      PatchMapperService patchMapperService) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
     this.documentNumberRecyclingService = documentNumberRecyclingService;
     this.validator = validator;
     this.attachmentService = attachmentService;
+    this.patchMapperService = patchMapperService;
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -139,6 +149,95 @@ public class DocumentUnitService {
     saveForRecycling(documentUnit);
     repository.delete(documentUnit);
     return "Dokumentationseinheit gelöscht: " + documentUnitUuid;
+  }
+
+  /**
+   * Update a documenation unit with a {@link RisJsonPatch}.
+   *
+   * @param documentationUnitId id of the documentation unit
+   * @param patch patch to update the documentation unit
+   * @return a patch with changes the client not know yet (automatically set fields, fields update
+   *     by other user)
+   * @throws DocumentationUnitNotExistsException if the documentation unit not exist
+   * @throws DocumentationUnitPatchException if the documentation unit couldn't updated
+   */
+  public RisJsonPatch updateDocumentUnit(UUID documentationUnitId, RisJsonPatch patch)
+      throws DocumentationUnitNotExistsException, DocumentationUnitPatchException {
+
+    log.debug(
+        "documentation unit '{}' with patch '{}' for version '{}'",
+        documentationUnitId,
+        patch.documentationUnitVersion(),
+        patch.patch());
+
+    DocumentUnit existingDocumentationUnit = getByUuid(documentationUnitId);
+
+    long newVersion = 1L;
+    if (existingDocumentationUnit.version() != null) {
+      newVersion = existingDocumentationUnit.version() + 1;
+    }
+
+    log.debug("new version is {}", newVersion);
+
+    JsonPatch newPatch =
+        patchMapperService.calculatePatch(
+            existingDocumentationUnit.uuid(), patch.documentationUnitVersion());
+
+    log.debug("version {} - patch in database: {}", patch.documentationUnitVersion(), newPatch);
+
+    RisJsonPatch toFrontend;
+    if (!patch.patch().getOperations().isEmpty()) {
+      JsonPatch toUpdate = patchMapperService.removePatchForSamePath(patch.patch(), newPatch);
+
+      log.debug("version {} - update patch: {}", patch.documentationUnitVersion(), toUpdate);
+
+      DocumentUnit patchedDocumentationUnit =
+          patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit);
+      patchedDocumentationUnit = patchedDocumentationUnit.toBuilder().version(newVersion).build();
+      DocumentUnit updatedDocumentUnit = updateDocumentUnit(patchedDocumentationUnit);
+
+      JsonPatch toFrontendJsonPatch =
+          patchMapperService.getDiffPatch(patchedDocumentationUnit, updatedDocumentUnit);
+
+      log.debug(
+          "version {} - raw to frontend patch: {}",
+          patch.documentationUnitVersion(),
+          toFrontendJsonPatch);
+
+      JsonPatch toSaveJsonPatch = patchMapperService.addUpdatePatch(toUpdate, toFrontendJsonPatch);
+
+      log.debug(
+          "version {} - to save patch: {}", patch.documentationUnitVersion(), toSaveJsonPatch);
+
+      patchMapperService.savePatch(
+          toSaveJsonPatch, existingDocumentationUnit.uuid(), existingDocumentationUnit.version());
+
+      toFrontend =
+          patchMapperService.handlePatchForSamePath(
+              existingDocumentationUnit, toFrontendJsonPatch, patch.patch(), newPatch);
+
+      log.debug(
+          "version {} - cleaned to frontend patch: {}",
+          patch.documentationUnitVersion(),
+          toFrontend);
+
+      // TODO: check logs. possible not needed
+      toFrontend = patchMapperService.removeExistPatches(toFrontend, patch.patch());
+      toFrontend = toFrontend.toBuilder().documentationUnitVersion(newVersion).build();
+
+      log.debug(
+          "version {} - second cleaned to frontend patch: {}",
+          patch.documentationUnitVersion(),
+          toFrontend);
+    } else {
+      if (newPatch == null) {
+        newPatch = new JsonPatch(Collections.emptyList());
+      }
+      toFrontend =
+          new RisJsonPatch(existingDocumentationUnit.version(), newPatch, Collections.emptyList());
+    }
+
+    return toFrontend;
   }
 
   public DocumentUnit updateDocumentUnit(DocumentUnit documentUnit)

@@ -7,6 +7,7 @@ import { PageableService, Page } from "@/components/Pagination.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
+import { RisJsonPatch } from "@/domain/risJsonPatch"
 import { SingleNormValidationInfo } from "@/domain/singleNorm"
 import errorMessages from "@/i18n/errors.json"
 
@@ -14,16 +15,25 @@ interface DocumentUnitService {
   getByDocumentNumber(
     documentNumber: string,
   ): Promise<ServiceResponse<DocumentUnit>>
+
   createNew(): Promise<ServiceResponse<DocumentUnit>>
-  update(documentUnit: DocumentUnit): Promise<ServiceResponse<unknown>>
+
+  update(
+    documentUnitUuid: string,
+    patch: RisJsonPatch,
+  ): Promise<ServiceResponse<RisJsonPatch | FailedValidationServerResponse>>
+
   delete(documentUnitUuid: string): Promise<ServiceResponse<unknown>>
+
   searchByRelatedDocumentation: PageableService<
     RelatedDocumentation,
     RelatedDocumentation
   >
+
   searchByDocumentUnitSearchInput(
     requestParams?: { [key: string]: string } | undefined,
   ): Promise<ServiceResponse<Page<DocumentUnitListEntry>>>
+
   validateSingleNorm(
     singleNormValidationInfo: SingleNormValidationInfo,
   ): Promise<ServiceResponse<unknown>>
@@ -64,20 +74,21 @@ const service: DocumentUnitService = {
     return response
   },
 
-  async update(documentUnit: DocumentUnit) {
-    const response = await httpClient.put<
-      DocumentUnit,
-      DocumentUnit | FailedValidationServerResponse
+  async update(documentUnitUuid: string, patch: RisJsonPatch) {
+    const response = await httpClient.patch<
+      RisJsonPatch,
+      RisJsonPatch | FailedValidationServerResponse
     >(
-      `caselaw/documentunits/${documentUnit.uuid}`,
+      `caselaw/documentunits/${documentUnitUuid}`,
       {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
       },
-      documentUnit,
+      patch,
     )
+
     if (response.status >= 300) {
       response.error = {
         title:
@@ -96,10 +107,6 @@ const service: DocumentUnitService = {
       } else {
         response.data = undefined
       }
-    } else {
-      response.data = new DocumentUnit((response.data as DocumentUnit).uuid, {
-        ...(response.data as DocumentUnit),
-      })
     }
     return response
   },

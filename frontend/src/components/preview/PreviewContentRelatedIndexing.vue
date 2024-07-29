@@ -5,37 +5,41 @@ import FieldOfLawNodeView from "@/components/preview/FieldOfLawNodeView.vue"
 import PreviewCategory from "@/components/preview/PreviewCategory.vue"
 import PreviewContent from "@/components/preview/PreviewContent.vue"
 import PreviewRow from "@/components/preview/PreviewRow.vue"
-import { ContentRelatedIndexing } from "@/domain/documentUnit"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
-const props = defineProps<{
-  contentRelatedIndexing: ContentRelatedIndexing
-}>()
+const store = useDocumentUnitStore()
+const contentRelatedIndexing = computed({
+  get: () => store.documentUnit!.contentRelatedIndexing,
+  set: (newValues) => {
+    store.documentUnit!.contentRelatedIndexing = newValues
+  },
+})
 
 const hasKeywords = computed(() => {
   return (
-    props.contentRelatedIndexing.keywords &&
-    props.contentRelatedIndexing.keywords?.length > 0
+    contentRelatedIndexing.value.keywords &&
+    contentRelatedIndexing.value.keywords?.length > 0
   )
 })
 
 const hasFieldsOfLaw = computed(() => {
   return (
-    props.contentRelatedIndexing.fieldsOfLaw &&
-    props.contentRelatedIndexing.fieldsOfLaw?.length > 0
+    contentRelatedIndexing.value.fieldsOfLaw &&
+    contentRelatedIndexing.value.fieldsOfLaw?.length > 0
   )
 })
 
 const hasNorms = computed(() => {
   return (
-    props.contentRelatedIndexing.norms &&
-    props.contentRelatedIndexing.norms?.length > 0
+    contentRelatedIndexing.value.norms &&
+    contentRelatedIndexing.value.norms?.length > 0
   )
 })
 
 const hasActiveCitations = computed(() => {
   return (
-    props.contentRelatedIndexing.activeCitations &&
-    props.contentRelatedIndexing.activeCitations?.length > 0
+    contentRelatedIndexing.value.activeCitations &&
+    contentRelatedIndexing.value.activeCitations?.length > 0
   )
 })
 </script>
@@ -62,7 +66,9 @@ const hasActiveCitations = computed(() => {
           class="flex flex-row"
         >
           <div class="min-w-[150px]">{{ fieldOfLaw.identifier }}</div>
-          <div><FieldOfLawNodeView :node="fieldOfLaw" /></div>
+          <div>
+            <FieldOfLawNodeView :node="fieldOfLaw" />
+          </div>
         </div>
       </PreviewContent>
     </PreviewRow>

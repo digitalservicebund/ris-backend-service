@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useHead } from "@unhead/vue"
+import { storeToRefs } from "pinia"
 import { onMounted, ref, Ref } from "vue"
 import { useRoute } from "vue-router"
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
@@ -11,9 +12,8 @@ import NavbarSide from "@/components/NavbarSide.vue"
 import SideToggle from "@/components/SideToggle.vue"
 import { useCaseLawMenuItems } from "@/composables/useCaseLawMenuItems"
 import useQuery from "@/composables/useQueryFromRoute"
-import DocumentUnit from "@/domain/documentUnit"
-import documentUnitService from "@/services/documentUnitService"
-import { ResponseError, ServiceResponse } from "@/services/httpClient"
+import { ResponseError } from "@/services/httpClient"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const props = defineProps<{
   documentNumber: string
@@ -23,12 +23,14 @@ useHead({
   title: props.documentNumber + " · NeuRIS Rechtsinformationssystem",
 })
 
+const store = useDocumentUnitStore()
+
 const route = useRoute()
 const menuItems = useCaseLawMenuItems(props.documentNumber, route.query)
 const { pushQueryToRoute } = useQuery()
 
-const documentUnit = ref<DocumentUnit>()
-const lastUpdatedDocumentUnit = ref()
+const { documentUnit } = storeToRefs(store)
+
 const validationErrors = ref<ValidationError[]>([])
 const showNavigationPanelRef: Ref<boolean> = ref(
   route.query.showNavigationPanel !== "false",
@@ -48,50 +50,10 @@ const toggleNavigationPanel = () => {
   })
 }
 
-async function saveDocumentUnitToServer(): Promise<ServiceResponse<void>> {
-  if (!hasDataChange())
-    return {
-      status: 304,
-      data: undefined,
-    } as ServiceResponse<void>
-
-  lastUpdatedDocumentUnit.value = JSON.parse(JSON.stringify(documentUnit.value))
-  const response = await documentUnitService.update(
-    lastUpdatedDocumentUnit.value,
-  )
-
-  if (response?.error?.validationErrors) {
-    validationErrors.value = response.error.validationErrors
-  } else {
-    validationErrors.value = []
-  }
-
-  if (!hasDataChange() && response.data) {
-    documentUnit.value = response.data as DocumentUnit
-  }
-
-  return response as ServiceResponse<void>
-}
-
-function hasDataChange(): boolean {
-  const newValue = JSON.stringify(documentUnit.value)
-  const oldValue = JSON.stringify(lastUpdatedDocumentUnit.value)
-
-  return newValue !== oldValue
-}
-
-function updateLocalDocumentUnit(updatedDocumentUnitFromChild: DocumentUnit) {
-  documentUnit.value = updatedDocumentUnitFromChild
-}
-
 async function requestDocumentUnitFromServer() {
-  const response = await documentUnitService.getByDocumentNumber(
-    props.documentNumber,
-  )
+  const response = await store.loadDocumentUnit(props.documentNumber)
 
-  if (response.data) {
-    documentUnit.value = response.data
-  } else {
+  if (!response.data) {
     responseError.value = response.error
   }
 }
@@ -145,11 +107,6 @@ onMounted(async () => {
         data-testid="document-unit-info-panel"
         :document-unit="documentUnit"
         :heading="documentUnit?.documentNumber ?? ''"
-        :save-callback="
-          route.path.includes('categories') || route.path.includes('files')
-            ? saveDocumentUnitToServer
-            : undefined
-        "
       />
       <div class="flex grow flex-col items-start">
         <FlexContainer
@@ -169,18 +126,12 @@ onMounted(async () => {
               )
             "
             ref="extraContentSidePanel"
-            :document-unit="documentUnit"
-            @document-unit-updated-locally="updateLocalDocumentUnit"
           ></ExtraContentSidePanel>
           <router-view
-            :document-unit="documentUnit"
             :validation-errors="validationErrors"
             @attachment-index-deleted="attachmentIndexDeleted"
             @attachment-index-selected="attachmentIndexSelected"
             @attachments-uploaded="attachmentsUploaded"
-            @document-unit-updated-locally="updateLocalDocumentUnit"
-            @request-document-unit-from-server="requestDocumentUnitFromServer"
-            @save-document-unit-to-server="saveDocumentUnitToServer"
           />
         </FlexContainer>
       </div>

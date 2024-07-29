@@ -4,23 +4,18 @@ import ActiveCitationInput from "@/components/ActiveCitationInput.vue"
 import ActiveCitationSummary from "@/components/ActiveCitationSummary.vue"
 import EditableList from "@/components/EditableList.vue"
 import ActiveCitation from "@/domain/activeCitation"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
-const props = defineProps<{
-  modelValue: ActiveCitation[] | undefined
-}>()
-
-const emit = defineEmits<{ "update:modelValue": [value?: ActiveCitation[]] }>()
+const store = useDocumentUnitStore()
 
 const activeCitations = computed({
-  get: () => {
-    return props.modelValue
-  },
-  set: (value) => {
-    if (value) emit("update:modelValue", value)
+  get: () => store.documentUnit!.contentRelatedIndexing.activeCitations,
+  set: (newValues) => {
+    store.documentUnit!.contentRelatedIndexing.activeCitations = newValues
   },
 })
 
-const defaultValue = new ActiveCitation()
+const defaultValue = new ActiveCitation() as ActiveCitation
 </script>
 
 <template>

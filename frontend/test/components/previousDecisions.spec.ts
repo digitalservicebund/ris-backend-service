@@ -1,25 +1,36 @@
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { ComboboxItem } from "@/components/input/types"
 import PreviousDecisions from "@/components/PreviousDecisions.vue"
-import { Court, DocumentType } from "@/domain/documentUnit"
+import DocumentUnit, { Court, DocumentType } from "@/domain/documentUnit"
 import PreviousDecision from "@/domain/previousDecision"
 import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 
-function renderComponent(options?: { modelValue?: PreviousDecision[] }) {
-  const props = {
-    modelValue: options?.modelValue ? options?.modelValue : [],
-  }
-
-  // eslint-disable-next-line testing-library/await-async-events
+function renderComponent(previousDecisions?: PreviousDecision[]) {
   const user = userEvent.setup()
   return {
     user,
     ...render(PreviousDecisions, {
-      props,
       global: {
         stubs: { routerLink: { template: "<a><slot/></a>" } },
+        plugins: [
+          [
+            createTestingPinia({
+              initialState: {
+                docunitStore: {
+                  documentUnit: new DocumentUnit("foo", {
+                    documentNumber: "1234567891234",
+                    coreData: {},
+                    texts: {},
+                    previousDecisions: previousDecisions ?? [],
+                  }),
+                },
+              },
+            }),
+          ],
+        ],
       },
     }),
   }
@@ -36,7 +47,7 @@ function generatePreviousDecision(options?: {
   referenceFound?: boolean
 }) {
   const previousDecision = new PreviousDecision({
-    uuid: options?.uuid ?? "123",
+    uuid: options?.uuid ?? crypto.randomUUID(),
     documentNumber: options?.documentNumber ?? undefined,
     referenceFound: options?.referenceFound ?? false,
     court: options?.court ?? {
@@ -151,11 +162,11 @@ describe("PreviousDecisions", () => {
   })
 
   it("renders previousDecisions as list entries", () => {
-    const modelValue: PreviousDecision[] = [
+    const previousDecisions: PreviousDecision[] = [
       generatePreviousDecision({ fileNumber: "123" }),
       generatePreviousDecision({ fileNumber: "345" }),
     ]
-    renderComponent({ modelValue })
+    renderComponent(previousDecisions)
 
     expect(
       screen.queryByLabelText("Vorgehende Entscheidung speichern"),
@@ -173,17 +184,15 @@ describe("PreviousDecisions", () => {
     const button = screen.getByLabelText("Vorgehende Entscheidung speichern")
     await user.click(button)
 
-    expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
+    expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(2)
   })
 
   it("click on list item, opens the list entry in edit mode", async () => {
-    const { user } = renderComponent({
-      modelValue: [
-        generatePreviousDecision({
-          fileNumber: "123",
-        }),
-      ],
-    })
+    const { user } = renderComponent([
+      generatePreviousDecision({
+        fileNumber: "123",
+      }),
+    ])
     await user.click(screen.getByTestId("list-entry-0"))
 
     expect(
@@ -204,16 +213,12 @@ describe("PreviousDecisions", () => {
   })
 
   it("renders manually added decision as editable list item", async () => {
-    renderComponent({
-      modelValue: [generatePreviousDecision()],
-    })
+    renderComponent([generatePreviousDecision()])
     expect(screen.getByLabelText("Listen Eintrag")).toBeInTheDocument()
   })
 
   it("correctly updates value court input", async () => {
-    const { user } = renderComponent({
-      modelValue: [generatePreviousDecision()],
-    })
+    const { user } = renderComponent([generatePreviousDecision()])
 
     expect(screen.queryByText(/AG Test/)).not.toBeInTheDocument()
 
@@ -233,9 +238,7 @@ describe("PreviousDecisions", () => {
   })
 
   it("correctly updates value of fileNumber input", async () => {
-    const { user } = renderComponent({
-      modelValue: [generatePreviousDecision()],
-    })
+    const { user } = renderComponent([generatePreviousDecision()])
 
     expect(screen.queryByText(/new fileNumber/)).not.toBeInTheDocument()
     await user.click(screen.getByTestId("list-entry-0"))
@@ -253,9 +256,7 @@ describe("PreviousDecisions", () => {
   })
 
   it("correctly toggles value of date known checkbox", async () => {
-    const { user } = renderComponent({
-      modelValue: [generatePreviousDecision()],
-    })
+    const { user } = renderComponent([generatePreviousDecision()])
 
     await user.click(screen.getByTestId("list-entry-0"))
 
@@ -270,9 +271,7 @@ describe("PreviousDecisions", () => {
   })
 
   it("correctly updates value of decision date input", async () => {
-    const { user } = renderComponent({
-      modelValue: [generatePreviousDecision()],
-    })
+    const { user } = renderComponent([generatePreviousDecision()])
 
     expect(screen.queryByText(/02.02.2022/)).not.toBeInTheDocument()
     await user.click(screen.getByTestId("list-entry-0"))
@@ -290,9 +289,10 @@ describe("PreviousDecisions", () => {
   })
 
   it("correctly deletes manually added previous decisions", async () => {
-    const { user } = renderComponent({
-      modelValue: [generatePreviousDecision(), generatePreviousDecision()],
-    })
+    const { user } = renderComponent([
+      generatePreviousDecision(),
+      generatePreviousDecision(),
+    ])
     const previousDecisions = screen.getAllByLabelText("Listen Eintrag")
     expect(previousDecisions.length).toBe(2)
     await user.click(screen.getByTestId("list-entry-0"))
@@ -301,11 +301,10 @@ describe("PreviousDecisions", () => {
   })
 
   it("correctly deletes previous decisions added by search", async () => {
-    const modelValue: PreviousDecision[] = [
+    const { user } = renderComponent([
       generatePreviousDecision(),
       generatePreviousDecision(),
-    ]
-    const { user } = renderComponent({ modelValue })
+    ])
     const previousDecisions = screen.getAllByLabelText("Listen Eintrag")
     expect(previousDecisions.length).toBe(2)
     await user.click(screen.getByTestId("list-entry-0"))
@@ -314,9 +313,7 @@ describe("PreviousDecisions", () => {
   })
 
   it("correctly updates deleted values in previous decisions", async () => {
-    const { user } = renderComponent({
-      modelValue: [generatePreviousDecision()],
-    })
+    const { user } = renderComponent([generatePreviousDecision()])
 
     expect(
       screen.getByText("label1, 01.02.2022, test fileNumber, documentType1"),
@@ -339,14 +336,12 @@ describe("PreviousDecisions", () => {
   })
 
   it("renders from search added previous decisions as editable list item", async () => {
-    renderComponent({
-      modelValue: [
-        generatePreviousDecision({
-          documentNumber: "ABC",
-          referenceFound: true,
-        }),
-      ],
-    })
+    renderComponent([
+      generatePreviousDecision({
+        documentNumber: "ABC",
+        referenceFound: true,
+      }),
+    ])
     expect(screen.getByLabelText("Listen Eintrag")).toBeInTheDocument()
   })
 
@@ -368,18 +363,16 @@ describe("PreviousDecisions", () => {
   })
 
   it("indicates that search result already added to previous decisions", async () => {
-    const modelValue: PreviousDecision[] = [
+    const { user } = renderComponent([
       generatePreviousDecision({ uuid: "123" }),
-    ]
-    const { user } = renderComponent({ modelValue })
+    ])
     await user.click(screen.getByText(/Weitere Angabe/))
     await user.click(screen.getByLabelText("Nach Entscheidung suchen"))
     expect(screen.getByText(/Bereits hinzugefügt/)).toBeInTheDocument()
   })
 
   it("displays error in list and edit component when fields missing", async () => {
-    const modelValue: PreviousDecision[] = [generatePreviousDecision()]
-    const { user } = renderComponent({ modelValue })
+    const { user } = renderComponent([generatePreviousDecision()])
     await user.click(screen.getByTestId("list-entry-0"))
 
     const fileInput = await screen.findByLabelText(

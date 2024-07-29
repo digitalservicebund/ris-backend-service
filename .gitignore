@@ -26,3 +26,5 @@ ris-data-migration/
 ### structurizr c4 language server log ###
 c4-language-server.log
 doc/structurizr
+test/e2e/shared/.auth/user.json
+test/e2e/shared/.auth/user_bgh.json

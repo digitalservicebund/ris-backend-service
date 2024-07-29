@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 import { ValidationError } from "./input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
@@ -21,7 +21,7 @@ const emit = defineEmits<{
   "update:modelValue": [value: NormReference]
   addEntry: [void]
   cancelEdit: [void]
-  removeEntry: [value?: boolean]
+  removeEntry: [void]
 }>()
 
 const validationStore =
@@ -114,8 +114,8 @@ async function addNormReference() {
  * boolean value indicates, that the edit index should be resetted to undefined, ergo show all list items in summary mode.
  */
 async function removeNormReference() {
-  emit("removeEntry", true)
   singleNorms.value = []
+  emit("removeEntry")
 }
 
 /**
@@ -135,7 +135,7 @@ function removeSingleNormEntry(index: number) {
 
 function cancelEdit() {
   if (new NormReference({ ...props.modelValue }).isEmpty) {
-    emit("removeEntry", true)
+    emit("removeEntry")
     singleNorms.value = []
   }
   emit("cancelEdit")
@@ -188,13 +188,6 @@ watch(
   },
   { immediate: true },
 )
-
-/**
- * When an empty component unmounts, meaning cancel or save was clicked, this self deletion is triggered.
- */
-onBeforeUnmount(() => {
-  if (norm.value.isEmpty) emit("removeEntry")
-})
 </script>
 
 <template>

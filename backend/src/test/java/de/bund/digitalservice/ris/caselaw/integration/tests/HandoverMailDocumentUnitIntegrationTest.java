@@ -41,6 +41,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Clock;
 import java.time.Instant;
@@ -119,6 +120,7 @@ class HandoverMailDocumentUnitIntegrationTest {
   @MockBean private HttpMailSender mailSender;
   @MockBean DocxConverterService docxConverterService;
   @MockBean AttachmentService attachmentService;
+  @MockBean private PatchMapperService patchMapperService;
 
   private DocumentationOfficeDTO docOffice;
 
