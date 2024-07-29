@@ -1,9 +1,14 @@
 import { expect, Page } from "@playwright/test"
-import { generateString } from "../../test-helper/dataGenerators"
 import { caselawTest as test } from "./fixtures"
+import { DocumentUnitCatagoriesEnum } from "@/components/enumDocumentUnitCatagories"
 import SingleNorm from "@/domain/singleNorm"
+import { generateString } from "~/test-helper/dataGenerators"
 
 /* eslint-disable playwright/no-conditional-in-test */
+
+function scrollToID(category?: DocumentUnitCatagoriesEnum): string {
+  return category ? "#" + category : ""
+}
 
 const getAllQueryParamsFromUrl = (page: Page): string => {
   const url = new URL(page.url())
@@ -32,10 +37,13 @@ export const navigateToSearch = async (
 export const navigateToCategories = async (
   page: Page,
   documentNumber: string,
+  category?: DocumentUnitCatagoriesEnum,
 ) => {
   await test.step("Navigate to 'Rubriken'", async () => {
     const queryParams = getAllQueryParamsFromUrl(page)
-    const baseUrl = `/caselaw/documentunit/${documentNumber}/categories${queryParams}`
+    const baseUrl =
+      `/caselaw/documentunit/${documentNumber}/categories${queryParams}` +
+      scrollToID(category)
 
     await page.goto(baseUrl)
     await expect(page.getByText("Spruchkörper")).toBeVisible({
@@ -516,15 +524,4 @@ export async function fillActiveCitationInputs(
       values.documentType,
     )
   }
-}
-
-export async function checkIfPreviousDecisionCleared(page: Page) {
-  ;[
-    "Gericht Vorgehende Entscheidung",
-    "Entscheidungsdatum Vorgehende Entscheidung",
-    "Aktenzeichen Vorgehende Entscheidung",
-    "Dokumenttyp Vorgehende Entscheidung",
-  ].forEach((ariaLabel) =>
-    waitForInputValue(page, `[aria-label='${ariaLabel}']`, ""),
-  )
 }

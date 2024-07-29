@@ -6,6 +6,7 @@ import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContent
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 import DocumentUnitTexts from "@/components/DocumentUnitTexts.vue"
 import EnsuingDecisions from "@/components/EnsuingDecisions.vue"
+import { DocumentUnitCatagoriesEnum } from "@/components/enumDocumentUnitCatagories"
 import FlexItem from "@/components/FlexItem.vue"
 import PreviousDecisions from "@/components/PreviousDecisions.vue"
 import { useProvideCourtType } from "@/composables/useCourtType"
@@ -74,10 +75,16 @@ useProvideCourtType(courtTypeRef)
 
 <template>
   <FlexItem class="w-full flex-1 grow flex-col p-24">
-    <DocumentUnitCoreData id="coreData" v-model="coreData" class="mb-24" />
-    <PreviousDecisions id="proceedingDecisions" />
+    <DocumentUnitCoreData
+      :id="DocumentUnitCatagoriesEnum.CORE_DATA"
+      v-model="coreData"
+      class="mb-24"
+    />
+    <PreviousDecisions :id="DocumentUnitCatagoriesEnum.PROCEEDINGS_DECISIONS" />
     <EnsuingDecisions class="mb-24" />
-    <DocumentUnitContentRelatedIndexing id="contentRelatedIndexing" />
-    <DocumentUnitTexts id="texts" />
+    <DocumentUnitContentRelatedIndexing
+      :id="DocumentUnitCatagoriesEnum.CONTENT_RELATED_INDEXING"
+    />
+    <DocumentUnitTexts :id="DocumentUnitCatagoriesEnum.TEXTS" />
   </FlexItem>
 </template>

@@ -299,6 +299,7 @@ onMounted(() => {
           <TextButton
             aria-label="Vorgehende Entscheidung speichern"
             button-type="tertiary"
+            data-testid="previous-decision-save-button"
             :disabled="previousDecision.isEmpty"
             label="Übernehmen"
             size="small"
