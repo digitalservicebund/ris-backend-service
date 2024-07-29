@@ -182,18 +182,6 @@ class PatchMapperServiceTest {
   @Test
   void testCalculatePath_withoutBackendPatches() {
     UUID documentationUnitId = UUID.randomUUID();
-    DocumentationUnitPatchDTO patchDTO1 =
-        DocumentationUnitPatchDTO.builder()
-            .documentationUnitId(documentationUnitId)
-            .documentationUnitVersion(1L)
-            .patch("[{\"op\":\"add\",\"path\":\"/appraisalBody\",\"value\":\"appraisal body\"}]")
-            .build();
-    DocumentationUnitPatchDTO patchDTO2 =
-        DocumentationUnitPatchDTO.builder()
-            .documentationUnitId(documentationUnitId)
-            .documentationUnitVersion(2L)
-            .patch("[{\"op\":\"add\",\"path\":\"/decisionDate\",\"value\":\"20.01.2000\"}]")
-            .build();
     Mockito.when(
             repository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
                 documentationUnitId, 2L))
@@ -207,13 +195,8 @@ class PatchMapperServiceTest {
   @Test
   void testCalculatePath_withOneBackendPatches() {
     UUID documentationUnitId = UUID.randomUUID();
-    DocumentationUnitPatchDTO patchDTO1 =
-        DocumentationUnitPatchDTO.builder()
-            .documentationUnitId(documentationUnitId)
-            .documentationUnitVersion(1L)
-            .patch("[{\"op\":\"add\",\"path\":\"/appraisalBody\",\"value\":\"appraisal body\"}]")
-            .build();
-    DocumentationUnitPatchDTO patchDTO2 =
+
+    DocumentationUnitPatchDTO patchDTO =
         DocumentationUnitPatchDTO.builder()
             .documentationUnitId(documentationUnitId)
             .documentationUnitVersion(2L)
@@ -222,7 +205,7 @@ class PatchMapperServiceTest {
     Mockito.when(
             repository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
                 documentationUnitId, 1L))
-        .thenReturn(List.of(patchDTO2));
+        .thenReturn(List.of(patchDTO));
 
     JsonPatch result = service.calculatePatch(documentationUnitId, 1L);
 
