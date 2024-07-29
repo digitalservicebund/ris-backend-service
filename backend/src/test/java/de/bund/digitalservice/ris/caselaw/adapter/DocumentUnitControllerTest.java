@@ -9,7 +9,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -203,8 +202,8 @@ class DocumentUnitControllerTest {
   }
 
   @Test
-  @Disabled
-  void testPatchUpdateByUuid() throws DocumentationUnitNotExistsException, JsonProcessingException {
+  @Disabled("fix and enable")
+  void testPatchUpdateByUuid() throws DocumentationUnitNotExistsException {
     DocumentationUnitDTO documentUnitDTO =
         DocumentationUnitDTO.builder()
             .id(TEST_UUID)

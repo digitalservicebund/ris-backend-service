@@ -85,7 +85,7 @@ class JurisXmlExporterResponseProcessorTest {
   private JurisXmlExporterResponseProcessor responseProcessor;
 
   @BeforeEach
-  void setup() throws MessagingException, DocumentationUnitNotExistsException {
+  void setup() throws MessagingException {
     when(storeFactory.createStore()).thenReturn(store);
     when(store.getFolder("INBOX")).thenReturn(inbox);
     when(store.getFolder("processed")).thenReturn(processed);
@@ -123,7 +123,7 @@ class JurisXmlExporterResponseProcessorTest {
   }
 
   @Test
-  void testMessageGetsForwarded() throws MessagingException, DocumentationUnitNotExistsException {
+  void testMessageGetsForwarded() throws MessagingException {
     when(inbox.getMessages()).thenReturn(new Message[] {importMessage});
 
     responseProcessor.readEmails();

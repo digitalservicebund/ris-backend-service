@@ -93,7 +93,8 @@ class S3AttachmentServiceTest {
     assertEquals("content/extension", putObjectRequestCaptor.getValue().contentType());
     var value = requestBodyCaptor.getValue();
     var expected = RequestBody.fromByteBuffer(ByteBuffer.wrap(new byte[] {}));
-    assertEquals(expected.contentLength(), value.contentLength());
+    assertEquals(
+        expected.optionalContentLength().orElse(0L), value.optionalContentLength().orElse(0L));
     assertEquals(expected.contentType(), value.contentType());
 
     // repo interaction

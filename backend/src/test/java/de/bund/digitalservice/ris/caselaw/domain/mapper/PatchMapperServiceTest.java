@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.gravity9.jsonpatch.AddOperation;
 import com.gravity9.jsonpatch.JsonPatch;
-import com.gravity9.jsonpatch.JsonPatchException;
 import com.gravity9.jsonpatch.JsonPatchOperation;
 import com.gravity9.jsonpatch.RemoveOperation;
 import com.gravity9.jsonpatch.ReplaceOperation;
@@ -42,7 +41,7 @@ class PatchMapperServiceTest {
   private final ObjectMapper mapper = new ObjectMapper();
 
   @Test
-  void testApplyPatchToEntity() throws JsonPatchException, JsonProcessingException {
+  void testApplyPatchToEntity() throws JsonProcessingException {
     List<JsonPatchOperation> operations = new ArrayList<>();
     DocumentUnit documentUnit =
         DocumentUnit.builder()
@@ -82,7 +81,7 @@ class PatchMapperServiceTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("fix and enable")
   void testHandlePatchForSamePath_withSamePathPatchesAddOperation_returnTrueAndRemovePatches() {
     JsonPatchOperation addOperationFE =
         new AddOperation("/coreData/fileNumbers/1", new TextNode("abc"));
@@ -104,7 +103,7 @@ class PatchMapperServiceTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("fix and enable")
   void testHandlePatchForSamePath_withSamePathPatchesRemoveOperation_returnTrueAndRemovePatches() {
     JsonPatchOperation addOperationFE = new RemoveOperation("/coreData/fileNumbers/1");
     JsonPatch patchFE = new JsonPatch(new ArrayList<>(List.of(addOperationFE)));
@@ -127,7 +126,7 @@ class PatchMapperServiceTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("fix and enable")
   void testHandlePatchForSamePath_withSamePathPatchesReplaceOperation_returnTrueAndRemovePatches() {
     JsonPatchOperation replaceOperationFE =
         new ReplaceOperation("/coreData/fileNumbers/1", new TextNode("abc"));
@@ -149,7 +148,7 @@ class PatchMapperServiceTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("fix and enable")
   void
       testHandlePatchForSamePath_withSamePathPatchesAndOtherInBE_returnTrueAndRemoveOnlySamePathPatches() {
     JsonPatchOperation addOperationFE =
@@ -183,18 +182,6 @@ class PatchMapperServiceTest {
   @Test
   void testCalculatePath_withoutBackendPatches() {
     UUID documentationUnitId = UUID.randomUUID();
-    DocumentationUnitPatchDTO patchDTO1 =
-        DocumentationUnitPatchDTO.builder()
-            .documentationUnitId(documentationUnitId)
-            .documentationUnitVersion(1L)
-            .patch("[{\"op\":\"add\",\"path\":\"/appraisalBody\",\"value\":\"appraisal body\"}]")
-            .build();
-    DocumentationUnitPatchDTO patchDTO2 =
-        DocumentationUnitPatchDTO.builder()
-            .documentationUnitId(documentationUnitId)
-            .documentationUnitVersion(2L)
-            .patch("[{\"op\":\"add\",\"path\":\"/decisionDate\",\"value\":\"20.01.2000\"}]")
-            .build();
     Mockito.when(
             repository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
                 documentationUnitId, 2L))
@@ -208,13 +195,8 @@ class PatchMapperServiceTest {
   @Test
   void testCalculatePath_withOneBackendPatches() {
     UUID documentationUnitId = UUID.randomUUID();
-    DocumentationUnitPatchDTO patchDTO1 =
-        DocumentationUnitPatchDTO.builder()
-            .documentationUnitId(documentationUnitId)
-            .documentationUnitVersion(1L)
-            .patch("[{\"op\":\"add\",\"path\":\"/appraisalBody\",\"value\":\"appraisal body\"}]")
-            .build();
-    DocumentationUnitPatchDTO patchDTO2 =
+
+    DocumentationUnitPatchDTO patchDTO =
         DocumentationUnitPatchDTO.builder()
             .documentationUnitId(documentationUnitId)
             .documentationUnitVersion(2L)
@@ -223,7 +205,7 @@ class PatchMapperServiceTest {
     Mockito.when(
             repository.findByDocumentationUnitIdAndDocumentationUnitVersionGreaterThanEqual(
                 documentationUnitId, 1L))
-        .thenReturn(List.of(patchDTO2));
+        .thenReturn(List.of(patchDTO));
 
     JsonPatch result = service.calculatePatch(documentationUnitId, 1L);
 

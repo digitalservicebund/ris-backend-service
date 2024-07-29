@@ -22,7 +22,8 @@ public class ReferenceTransformer {
         .id(reference.uuid())
         .referenceSupplement(reference.referenceSupplement())
         .legalPeriodical(
-                reference.legalPeriodical() == null || reference.legalPeriodical().legalPeriodicalId() == null
+            reference.legalPeriodical() == null
+                    || reference.legalPeriodical().legalPeriodicalId() == null
                 ? null
                 : LegalPeriodicalDTO.builder()
                     .id(reference.legalPeriodical().legalPeriodicalId())

@@ -1,13 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain.lookuptable;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Builder;
-import lombok.Getter;
-
 import java.util.UUID;
+import lombok.Builder;
 
 /**
  * A legal periodical (Fundstelle).
@@ -21,10 +15,9 @@ import java.util.UUID;
  */
 @Builder
 public record LegalPeriodical(
-        UUID legalPeriodicalId,
-        String legalPeriodicalAbbreviation,
-        String legalPeriodicalTitle,
-        String legalPeriodicalSubtitle,
-        Boolean primaryReference,
-        String citationStyle
-) {}
+    UUID legalPeriodicalId,
+    String legalPeriodicalAbbreviation,
+    String legalPeriodicalTitle,
+    String legalPeriodicalSubtitle,
+    Boolean primaryReference,
+    String citationStyle) {}
