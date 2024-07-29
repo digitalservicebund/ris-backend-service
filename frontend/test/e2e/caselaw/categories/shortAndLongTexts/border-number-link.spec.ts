@@ -2,6 +2,7 @@ import { expect } from "@playwright/test"
 import {
   navigateToCategories,
   navigateToFiles,
+  save,
   uploadTestfile,
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
@@ -100,8 +101,7 @@ test("create and validate border number links", async ({
   await page.keyboard.type(`#1# #4# #99999# #1000000# #not a border number#`)
 
   // save
-  await page.getByText("Speichern").click()
-  await page.waitForEvent("requestfinished")
+  await save(page)
 
   // check valid border number link
   const locators = await page
@@ -138,8 +138,7 @@ test("create and validate border number links", async ({
   await page.keyboard.press(`${modifier}+Backspace`)
 
   // save
-  await page.getByText("Speichern").click()
-  await page.waitForEvent("requestfinished")
+  await save(page)
 
   // check first border number link: should be invalid now
   await expect(validLink).toHaveAttribute("valid", "false")

@@ -1,7 +1,7 @@
 import { expect } from "@playwright/test"
 import {
   navigateToCategories,
-  waitForSaving,
+  save,
   handoverDocumentationUnit,
   fillPreviousDecisionInputs,
 } from "~/e2e/caselaw/e2e-utils"
@@ -82,19 +82,14 @@ test.describe("previous decisions", () => {
       container.getByText("Abweichendes Aktenzeichen Vorinstanz").first(),
     ).toBeVisible()
 
-    await waitForSaving(
-      async () => {
-        await page
-          .locator(
-            "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung']",
-          )
-          .fill(deviatingFileNumber1)
+    await page
+      .locator(
+        "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung']",
+      )
+      .fill(deviatingFileNumber1)
 
-        await page.getByLabel("Vorgehende Entscheidung speichern").click()
-      },
-      page,
-      { clickSaveButton: true },
-    )
+    await page.getByLabel("Vorgehende Entscheidung speichern").click()
+    await save(page)
 
     await page
       .getByLabel("Vorgehende Entscheidung", { exact: true })
@@ -112,19 +107,14 @@ test.describe("previous decisions", () => {
       ),
     ).toHaveValue(deviatingFileNumber1)
 
-    await waitForSaving(
-      async () => {
-        await page
-          .locator(
-            "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung']",
-          )
-          .fill(deviatingFileNumber2)
+    await page
+      .locator(
+        "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung']",
+      )
+      .fill(deviatingFileNumber2)
 
-        await page.getByLabel("Vorgehende Entscheidung speichern").click()
-      },
-      page,
-      { clickSaveButton: true },
-    )
+    await page.getByLabel("Vorgehende Entscheidung speichern").click()
+    await save(page)
 
     await page
       .getByLabel("Vorgehende Entscheidung", { exact: true })
@@ -203,19 +193,15 @@ test.describe("previous decisions", () => {
     await expect(page.getByLabel("Datum unbekannt")).not.toBeEditable()
 
     const deviatingFileNumber1 = generateString()
-    await waitForSaving(
-      async () => {
-        await page
-          .getByLabel("Abweichendes Aktenzeichen Vorgehende Entscheidung", {
-            exact: true,
-          })
-          .fill(deviatingFileNumber1)
 
-        await page.getByLabel("Vorgehende Entscheidung speichern").click()
-      },
-      page,
-      { clickSaveButton: true },
-    )
+    await page
+      .getByLabel("Abweichendes Aktenzeichen Vorgehende Entscheidung", {
+        exact: true,
+      })
+      .fill(deviatingFileNumber1)
+
+    await page.getByLabel("Vorgehende Entscheidung speichern").click()
+    await save(page)
     await expect(
       page.getByText(
         `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, ${deviatingFileNumber1}, Anerkenntnisurteil`,
@@ -228,7 +214,6 @@ test.describe("previous decisions", () => {
 
     await previousDecisionContainer.getByLabel("Eintrag löschen").click()
 
-    await page.getByText("Speichern").click()
-    await page.waitForEvent("requestfinished")
+    await save(page)
   })
 })

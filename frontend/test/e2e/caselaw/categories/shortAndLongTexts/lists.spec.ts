@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories } from "../../e2e-utils"
+import { navigateToCategories, save } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 import { navigateToHandover } from "~/e2e/caselaw/e2e-utils"
 
@@ -35,9 +35,7 @@ test.describe(
       const inputFieldInnerHTML = await inputField.innerHTML()
       // Check text styling
       expect(inputFieldInnerHTML.includes(bulletList)).toBeTruthy()
-
-      await page.getByText("Speichern").click()
-      await page.waitForEvent("requestfinished", { timeout: 5_000 })
+      await save(page)
 
       await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
       await expect(page.getByText("XML Vorschau")).toBeVisible()
@@ -69,8 +67,7 @@ test.describe(
       // Check text styling
       expect(inputFieldInnerHTML.includes(orderedList)).toBeTruthy()
 
-      await page.getByText("Speichern").click()
-      await page.waitForEvent("requestfinished", { timeout: 5_000 })
+      await save(page)
 
       await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
       await expect(page.getByText("XML Vorschau")).toBeVisible()

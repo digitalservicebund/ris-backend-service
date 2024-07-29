@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories, waitForSaving } from "../../e2e-utils"
+import { navigateToCategories, save } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 
 test.describe("decision date", () => {
@@ -96,39 +96,32 @@ test.describe("decision date", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await waitForSaving(
-      async () => {
-        await page
-          .locator("[aria-label='Entscheidungsdatum']")
-          .fill("03.02.2022")
-        await expect(
-          page.locator("[aria-label='Entscheidungsdatum']"),
-        ).toHaveValue("03.02.2022")
-
-        await expect(
-          page.getByText("Abweichendes Entscheidungsdatum>"),
-        ).toBeHidden()
-
-        await page
-          .locator("[aria-label='Abweichendes Entscheidungsdatum anzeigen']")
-          .click()
-
-        await expect(
-          page.getByText("Abweichendes Entscheidungsdatum").first(),
-        ).toBeVisible()
-
-        await page
-          .locator("[aria-label='Abweichendes Entscheidungsdatum']")
-          .fill("02.02.2022")
-        await page.keyboard.press("Enter")
-        await page
-          .locator("[aria-label='Abweichendes Entscheidungsdatum']")
-          .fill("01.02.2022")
-        await page.keyboard.press("Enter")
-      },
-      page,
-      { clickSaveButton: true },
+    await page.locator("[aria-label='Entscheidungsdatum']").fill("03.02.2022")
+    await expect(page.locator("[aria-label='Entscheidungsdatum']")).toHaveValue(
+      "03.02.2022",
     )
+
+    await expect(
+      page.getByText("Abweichendes Entscheidungsdatum>"),
+    ).toBeHidden()
+
+    await page
+      .locator("[aria-label='Abweichendes Entscheidungsdatum anzeigen']")
+      .click()
+
+    await expect(
+      page.getByText("Abweichendes Entscheidungsdatum").first(),
+    ).toBeVisible()
+
+    await page
+      .locator("[aria-label='Abweichendes Entscheidungsdatum']")
+      .fill("02.02.2022")
+    await page.keyboard.press("Enter")
+    await page
+      .locator("[aria-label='Abweichendes Entscheidungsdatum']")
+      .fill("01.02.2022")
+    await page.keyboard.press("Enter")
+    await save(page)
 
     await page.reload()
 

@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories } from "../../e2e-utils"
+import { navigateToCategories, save } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 import { navigateToHandover } from "~/e2e/caselaw/e2e-utils"
 
@@ -47,8 +47,7 @@ test.describe(
       expect(inputFieldInnerHTML.includes(tripleIndentation)).toBeTruthy()
       expect(inputFieldInnerHTML.includes(noIndentation)).toBeTruthy()
 
-      await page.getByText("Speichern").click()
-      await page.waitForEvent("requestfinished", { timeout: 5_000 })
+      await save(page)
 
       await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
       await expect(page.getByText("XML Vorschau")).toBeVisible()

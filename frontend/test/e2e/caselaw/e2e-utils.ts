@@ -123,40 +123,9 @@ export const uploadTestfile = async (
   }).toPass({ timeout: 15000 })
 }
 
-export async function waitForSaving(
-  body: () => Promise<void>,
-  page: Page,
-  options?: { clickSaveButton?: boolean; reload?: boolean; error?: string },
-) {
-  if (options?.reload) {
-    await page.reload()
-  }
-
-  const saveStatus = page.getByText(/Zuletzt .* Uhr/).first()
-  let lastSaving: string | undefined = undefined
-  if (await saveStatus.isVisible()) {
-    lastSaving = /Zuletzt (.*) Uhr/.exec(
-      await saveStatus.innerText(),
-    )?.[1] as string
-  }
-
-  await body()
-
-  if (options?.clickSaveButton) {
-    await page.locator("[aria-label='Speichern Button']").click()
-  }
-
-  if (options?.error) {
-    await expect(page.getByText(options.error).first()).toBeVisible()
-  } else {
-    await Promise.all([
-      await expect(page.getByText(`Zuletzt`).first()).toBeVisible(),
-      lastSaving ??
-        (await expect(
-          page.getByText(`Zuletzt ${lastSaving} Uhr`).first(),
-        ).toBeHidden()),
-    ])
-  }
+export async function save(page: Page) {
+  await page.locator("[aria-label='Speichern Button']").click()
+  await expect(page.getByText(`Zuletzt`).first()).toBeVisible()
 }
 
 export async function toggleFieldOfLawSection(page: Page): Promise<void> {

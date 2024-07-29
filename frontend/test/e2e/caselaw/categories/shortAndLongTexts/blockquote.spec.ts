@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories } from "../../e2e-utils"
+import { navigateToCategories, save } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 import { navigateToHandover } from "~/e2e/caselaw/e2e-utils"
 
@@ -40,8 +40,7 @@ test.describe(
       })
 
       await test.step("save document", async () => {
-        await page.getByText("Speichern").click()
-        await page.waitForEvent("requestfinished")
+        await save(page)
       })
 
       await test.step("navigate to 'XML Vorschau' in 'Übergabe an jDV'", async () => {
@@ -91,8 +90,7 @@ test.describe(
       })
 
       await test.step("save document", async () => {
-        await page.getByText("Speichern").click()
-        await page.waitForEvent("requestfinished")
+        await save(page)
       })
 
       await test.step("navigate to 'XML Vorschau' in 'Übergabe an jDV'", async () => {
@@ -145,8 +143,7 @@ test.describe(
       })
 
       await test.step("save document", async () => {
-        await page.getByText("Speichern").click()
-        await page.waitForEvent("requestfinished")
+        await save(page)
       })
 
       await test.step("navigate to 'XML Vorschau' in 'Übergabe an jDV'", async () => {
@@ -208,8 +205,7 @@ test.describe(
       })
 
       await test.step("save document", async () => {
-        await page.getByText("Speichern").click()
-        await page.waitForEvent("requestfinished")
+        await save(page)
       })
 
       await test.step("navigate to 'XML Vorschau' in 'Übergabe an jDV'", async () => {
