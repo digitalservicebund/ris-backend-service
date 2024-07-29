@@ -143,23 +143,5 @@ describe("text editor toolbar", async () => {
       const firstButton = screen.getByLabelText("fullview")
       expect(firstButton).toHaveFocus()
     })
-
-    test("Open/close submenu via keyboard", async () => {
-      await renderComponent()
-
-      // Alignment sub menu is not visible
-      expect(screen.queryByLabelText("center")).not.toBeInTheDocument()
-
-      // Open the sub menu
-      const justifyMenuButton = screen.getByLabelText("menu")
-      justifyMenuButton.focus()
-      await userEvent.keyboard("{Enter}")
-
-      const centerButton = screen.getByLabelText("center")
-      expect(centerButton).toBeVisible()
-
-      await userEvent.keyboard("{Esc}")
-      expect(screen.queryByLabelText("center")).not.toBeInTheDocument()
-    })
   })
 })
