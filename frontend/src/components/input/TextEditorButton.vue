@@ -62,7 +62,8 @@ export interface EditorButton {
 </script>
 
 <template>
-  <div>
+  <!-- eslint-disable vuejs-accessibility/no-static-element-interactions -->
+  <div @keydown.esc="showDropdown = false">
     <div class="flex flex-row">
       <button
         ref="button"
