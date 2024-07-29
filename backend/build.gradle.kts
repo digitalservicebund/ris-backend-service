@@ -215,7 +215,7 @@ dependencies {
     // => CVE-2023-2976
     implementation("com.google.guava:guava:33.2.1-jre")
 
-    implementation("io.getunleash:unleash-client-java:9.2.3")
+    implementation("io.getunleash:unleash-client-java:9.2.4")
     implementation("org.apache.commons:commons-text:1.12.0")
     implementation("org.jsoup:jsoup:1.18.1")
 
