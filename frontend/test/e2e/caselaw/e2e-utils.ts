@@ -45,6 +45,18 @@ export const navigateToCategories = async (
   })
 }
 
+export const navigateToReferences = async (
+  page: Page,
+  documentNumber: string,
+) => {
+  await test.step("Navigate to 'Fundstellen'", async () => {
+    const baseUrl = `/caselaw/documentunit/${documentNumber}/references`
+
+    await page.goto(baseUrl)
+    await expect(page.getByText("Periodikum")).toBeVisible()
+  })
+}
+
 export const navigateToPreview = async (page: Page, documentNumber: string) => {
   await test.step("Navigate to 'Vorschau'", async () => {
     const queryParams = getAllQueryParamsFromUrl(page)
