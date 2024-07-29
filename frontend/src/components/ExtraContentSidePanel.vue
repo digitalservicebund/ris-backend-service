@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue"
+import { computed, onMounted, ref } from "vue"
 import { useRoute } from "vue-router"
 import AttachmentView from "@/components/AttachmentView.vue"
 import FileNavigator from "@/components/FileNavigator.vue"
@@ -11,50 +11,17 @@ import TextButton from "@/components/input/TextButton.vue"
 import DocumentUnitPreview from "@/components/preview/DocumentUnitPreview.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
 import useQuery from "@/composables/useQueryFromRoute"
-import DocumentUnit from "@/domain/documentUnit"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import IconAttachFile from "~icons/ic/baseline-attach-file"
 import IconOpenInNewTab from "~icons/ic/outline-open-in-new"
 import IconPreview from "~icons/ic/outline-remove-red-eye"
 import IconStickyNote from "~icons/ic/outline-sticky-note-2"
 
-interface Props {
-  documentUnit: DocumentUnit
-}
-
-const props = defineProps<Props>()
-
-const emits = defineEmits<{
-  documentUnitUpdatedLocally: [DocumentUnit]
-}>()
-
-const updatedDocumentUnit = ref(props.documentUnit)
-/**
- * Emits changes that are made to the local reference of the document unit to the parent when they occur.
- */
-watch(
-  updatedDocumentUnit,
-  () => {
-    emits(
-      "documentUnitUpdatedLocally",
-      updatedDocumentUnit.value as DocumentUnit,
-    )
-  },
-  { deep: true },
-)
-
-/**
- * Updates the local document unit reference with the updated value from the props.
- */
-watch(
-  () => props.documentUnit,
-  (newValue) => {
-    updatedDocumentUnit.value = newValue
-  },
-)
+const store = useDocumentUnitStore()
 
 type SelectablePanelContent = "note" | "attachments" | "preview"
 const selectedPanelContent = ref<SelectablePanelContent>(
-  !props.documentUnit.note && props.documentUnit.hasAttachments
+  !store.documentUnit!.note && store.documentUnit!.hasAttachments
     ? "attachments"
     : "note",
 )
@@ -65,13 +32,13 @@ const route = useRoute()
 const { pushQueryToRoute } = useQuery()
 
 const hasNote = computed(() => {
-  return !!props.documentUnit.note && props.documentUnit.note.length > 0
+  return !!store.documentUnit!.note && store.documentUnit!.note.length > 0
 })
 
 const hasAttachments = computed(() => {
   return (
-    !!props.documentUnit.attachments &&
-    props.documentUnit.attachments.length > 0
+    !!store.documentUnit!.attachments &&
+    store.documentUnit!.attachments.length > 0
   )
 })
 
@@ -130,9 +97,9 @@ function togglePanel(expand?: boolean) {
  */
 function onAttachmentDeleted(index: number) {
   if (currentAttachmentIndex.value >= index) {
-    currentAttachmentIndex.value = props.documentUnit.attachments.length - 1
+    currentAttachmentIndex.value = store.documentUnit!.attachments.length - 1
   }
-  if (props.documentUnit.attachments.length === 0) {
+  if (store.documentUnit!.attachments.length === 0) {
     selectNotes()
   }
 }
@@ -209,7 +176,7 @@ onMounted(() => {
 
         <FileNavigator
           v-if="selectedPanelContent === 'attachments'"
-          :attachments="documentUnit.attachments"
+          :attachments="store.documentUnit!.attachments"
           :current-index="currentAttachmentIndex"
           @select="handleOnSelectAttachment"
         ></FileNavigator>
@@ -219,7 +186,7 @@ onMounted(() => {
           target="_blank"
           :to="{
             name: 'caselaw-documentUnit-documentNumber-preview',
-            params: { documentNumber: documentUnit.documentNumber },
+            params: { documentNumber: store.documentUnit!.documentNumber },
           }"
         >
           <TextButton
@@ -235,7 +202,7 @@ onMounted(() => {
           <InputField id="notesInput" v-slot="{ id }" label="Notiz">
             <TextAreaInput
               :id="id"
-              v-model="updatedDocumentUnit.note"
+              v-model="store.documentUnit!.note"
               aria-label="Notiz Eingabefeld"
               autosize
               custom-classes="max-h-[65vh]"
@@ -245,12 +212,14 @@ onMounted(() => {
         <div v-if="selectedPanelContent === 'attachments'">
           <AttachmentView
             v-if="
-              documentUnit.uuid &&
-              documentUnit.attachments &&
-              documentUnit.attachments[currentAttachmentIndex]?.s3path
+              store.documentUnit!.uuid &&
+              store.documentUnit!.attachments &&
+              store.documentUnit!.attachments[currentAttachmentIndex]?.s3path
             "
-            :document-unit-uuid="documentUnit.uuid"
-            :s3-path="documentUnit.attachments[currentAttachmentIndex].s3path"
+            :document-unit-uuid="store.documentUnit!.uuid"
+            :s3-path="
+              store.documentUnit!.attachments[currentAttachmentIndex].s3path
+            "
           />
           <div v-else class="ds-label-01-reg">
             Wenn Sie eine Datei hochladen, können Sie die Datei hier sehen.
@@ -260,7 +229,10 @@ onMounted(() => {
           v-if="selectedPanelContent === 'preview'"
           class="max-h-[70vh] overflow-auto"
         >
-          <DocumentUnitPreview :document-unit="documentUnit" layout="narrow" />
+          <DocumentUnitPreview
+            :document-unit="store.documentUnit!"
+            layout="narrow"
+          />
         </FlexContainer>
       </div>
     </SideToggle>

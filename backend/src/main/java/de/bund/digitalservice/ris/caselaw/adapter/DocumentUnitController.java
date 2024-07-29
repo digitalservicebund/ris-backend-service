@@ -5,18 +5,20 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitPatchException;
 import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
 import java.time.Duration;
@@ -38,6 +40,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -206,6 +209,34 @@ public class DocumentUnitController {
         | DocumentUnitTransformerException e) {
       log.error("Error by updating documentation unit '{}'", documentUnit.documentNumber(), e);
       return ResponseEntity.internalServerError().body(DocumentUnit.builder().build());
+    }
+  }
+
+  /**
+   * Update a documentation unit with a {@link com.gravity9.jsonpatch.JsonPatch} object.
+   *
+   * @param uuid id of the documentation unit
+   * @param patch patch with the change operations
+   * @return updated and saved documentation unit
+   */
+  @PatchMapping(
+      value = "/{uuid}",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
+  public ResponseEntity<RisJsonPatch> partialUpdateByUuid(
+      @PathVariable UUID uuid, @RequestBody RisJsonPatch patch) {
+    try {
+      if (patch == null) {
+        return ResponseEntity.internalServerError().build();
+      }
+
+      var newPatch = service.updateDocumentUnit(uuid, patch);
+
+      return ResponseEntity.ok().body(newPatch);
+    } catch (DocumentationUnitNotExistsException | DocumentationUnitPatchException e) {
+      log.error("Error by updating documentation unit '{}'", uuid, e);
+      return ResponseEntity.internalServerError().build();
     }
   }
 

@@ -25,6 +25,17 @@ export default class EnsuingDecision
   constructor(data: Partial<EnsuingDecision> = {}) {
     super()
     Object.assign(this, data)
+    if (this.uuid == undefined) {
+      this.uuid = crypto.randomUUID()
+    }
+  }
+
+  get id() {
+    return this.uuid
+  }
+
+  equals(entry: EnsuingDecision): boolean {
+    return this.id === entry.id
   }
 
   get renderDecision(): string {

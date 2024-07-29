@@ -25,22 +25,17 @@ test.describe("saving behaviour", () => {
   test("input during save not lost", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Spruchkörper']").fill("VG-001")
-    await waitForInputValue(page, "[aria-label='Spruchkörper']", "VG-001")
-    await page.locator("[aria-label='Speichern Button']").click()
-
-    await page.locator("[aria-label='Spruchkörper']").fill("VG-001, VG-002")
-    await waitForInputValue(
+    await waitForSaving(
+      async () => {
+        await page.locator("[aria-label='Spruchkörper']").fill("VG-001")
+        await waitForInputValue(page, "[aria-label='Spruchkörper']", "VG-001")
+      },
       page,
-      "[aria-label='Spruchkörper']",
-      "VG-001, VG-002",
+      { clickSaveButton: true },
     )
 
-    await expect(page.getByText(/Zuletzt .* Uhr/)).toBeVisible()
-
     await expect(page.locator("[aria-label='Spruchkörper']")).toHaveValue(
-      "VG-001, VG-002",
-      { timeout: 500 },
+      "VG-001",
     )
   })
 

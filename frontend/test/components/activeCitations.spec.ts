@@ -1,25 +1,38 @@
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { fireEvent, render, screen } from "@testing-library/vue"
 import ActiveCitations from "@/components/ActiveCitations.vue"
 import { ComboboxItem } from "@/components/input/types"
 import ActiveCitation from "@/domain/activeCitation"
 import { CitationType } from "@/domain/citationType"
-import { Court, DocumentType } from "@/domain/documentUnit"
+import DocumentUnit, { Court, DocumentType } from "@/domain/documentUnit"
 import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 
-function renderComponent(options?: { modelValue?: ActiveCitation[] }) {
-  const props = {
-    modelValue: options?.modelValue ? options?.modelValue : [],
-  }
-
-  // eslint-disable-next-line testing-library/await-async-events
+function renderComponent(activeCitations?: ActiveCitation[]) {
   const user = userEvent.setup()
+
   return {
     user,
     ...render(ActiveCitations, {
-      props,
       global: {
+        plugins: [
+          [
+            createTestingPinia({
+              initialState: {
+                docunitStore: {
+                  documentUnit: new DocumentUnit("foo", {
+                    documentNumber: "1234567891234",
+                    contentRelatedIndexing: {
+                      activeCitations: activeCitations ?? [],
+                    },
+                  }),
+                },
+              },
+              stubActions: false,
+            }),
+          ],
+        ],
         stubs: { routerLink: { template: "<a><slot/></a>" } },
       },
     }),
@@ -37,7 +50,7 @@ function generateActiveCitation(options?: {
   citationStyle?: CitationType
 }) {
   const activeCitation = new ActiveCitation({
-    uuid: options?.uuid ?? "123",
+    uuid: options?.uuid ?? crypto.randomUUID(),
     documentNumber: options?.documentNumber ?? undefined,
     court: options?.court ?? {
       type: "type1",
@@ -61,42 +74,57 @@ function generateActiveCitation(options?: {
 }
 
 describe("active citations", () => {
-  global.ResizeObserver = require("resize-observer-polyfill")
+  beforeEach(() => {
+    vi.spyOn(
+      documentUnitService,
+      "searchByRelatedDocumentation",
+    ).mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: {
+          content: [
+            new ActiveCitation({
+              uuid: "123",
+              court: {
+                type: "type1",
+                location: "location1",
+                label: "label1",
+              },
+              decisionDate: "2022-02-01",
+              documentType: {
+                jurisShortcut: "documentTypeShortcut1",
+                label: "documentType1",
+              },
+              fileNumber: "test fileNumber1",
+            }),
+          ],
+          size: 0,
+          number: 0,
+          numberOfElements: 20,
+          first: true,
+          last: false,
+          empty: false,
+        },
+      }),
+    )
 
-  vi.spyOn(
-    documentUnitService,
-    "searchByRelatedDocumentation",
-  ).mockImplementation(() =>
-    Promise.resolve({
-      status: 200,
-      data: {
-        content: [
-          new ActiveCitation({
-            uuid: "123",
-            court: {
-              type: "type1",
-              location: "location1",
-              label: "label1",
-            },
-            decisionDate: "2022-02-01",
-            documentType: {
-              jurisShortcut: "documentTypeShortcut1",
-              label: "documentType1",
-            },
-            fileNumber: "test fileNumber1",
-          }),
-        ],
-        size: 0,
-        number: 0,
-        numberOfElements: 20,
-        first: true,
-        last: false,
-        empty: false,
-      },
-    }),
-  )
+    vi.spyOn(window, "scrollTo").mockImplementation(() => vi.fn())
 
-  vi.spyOn(window, "scrollTo").mockImplementation(() => vi.fn())
+    vi.spyOn(comboboxItemService, "getCourts").mockImplementation(() =>
+      Promise.resolve({ status: 200, data: dropdownCourtItems }),
+    )
+
+    vi.spyOn(comboboxItemService, "getDocumentTypes").mockImplementation(() =>
+      Promise.resolve({ status: 200, data: dropdownDocumentTypesItems }),
+    )
+
+    vi.spyOn(comboboxItemService, "getCitationTypes").mockImplementation(() =>
+      Promise.resolve({ status: 200, data: dropdownCitationStyleItems }),
+    )
+  })
+  afterEach(() => {
+    vi.resetAllMocks()
+  })
 
   const court: Court = {
     type: "AG",
@@ -138,17 +166,6 @@ describe("active citations", () => {
       additionalInformation: citationStyle.jurisShortcut,
     },
   ]
-  vi.spyOn(comboboxItemService, "getCourts").mockImplementation(() =>
-    Promise.resolve({ status: 200, data: dropdownCourtItems }),
-  )
-
-  vi.spyOn(comboboxItemService, "getDocumentTypes").mockImplementation(() =>
-    Promise.resolve({ status: 200, data: dropdownDocumentTypesItems }),
-  )
-
-  vi.spyOn(comboboxItemService, "getCitationTypes").mockImplementation(() =>
-    Promise.resolve({ status: 200, data: dropdownCitationStyleItems }),
-  )
 
   it("renders empty active citation in edit mode, when no activeCitations in list", async () => {
     renderComponent()
@@ -168,11 +185,10 @@ describe("active citations", () => {
   })
 
   it("renders activeCitations as list entries", () => {
-    const modelValue: ActiveCitation[] = [
+    renderComponent([
       generateActiveCitation({ fileNumber: "123" }),
       generateActiveCitation({ fileNumber: "345" }),
-    ]
-    renderComponent({ modelValue })
+    ])
 
     expect(screen.queryByLabelText("Art der Zitierung")).not.toBeInTheDocument()
     expect(screen.getByText(/123/)).toBeInTheDocument()
@@ -186,17 +202,15 @@ describe("active citations", () => {
     const button = screen.getByLabelText("Aktivzitierung speichern")
     await user.click(button)
 
-    expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
+    expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(2)
   })
 
   it("click on edit icon, opens the list entry in edit mode", async () => {
-    const { user } = renderComponent({
-      modelValue: [
-        generateActiveCitation({
-          fileNumber: "123",
-        }),
-      ],
-    })
+    const { user } = renderComponent([
+      generateActiveCitation({
+        fileNumber: "123",
+      }),
+    ])
     const itemHeader = screen.getByTestId("list-entry-0")
     await user.click(itemHeader)
 
@@ -216,24 +230,20 @@ describe("active citations", () => {
   })
 
   it("renders manually added active citations as editable list item", async () => {
-    renderComponent({
-      modelValue: [generateActiveCitation()],
-    })
+    renderComponent([generateActiveCitation()])
     expect(screen.getByTestId("list-entry-0")).toBeInTheDocument()
   })
 
   it("correctly updates value citation style input", async () => {
-    const { user } = renderComponent({
-      modelValue: [
-        generateActiveCitation({
-          citationStyle: {
-            uuid: "123",
-            jurisShortcut: "ABC",
-            label: "ABC",
-          },
-        }),
-      ],
-    })
+    const { user } = renderComponent([
+      generateActiveCitation({
+        citationStyle: {
+          uuid: "123",
+          jurisShortcut: "ABC",
+          label: "ABC",
+        },
+      }),
+    ])
 
     expect(screen.queryByText(/Änderungen/)).not.toBeInTheDocument()
 
@@ -254,9 +264,7 @@ describe("active citations", () => {
   })
 
   it("correctly updates value document type input", async () => {
-    const { user } = renderComponent({
-      modelValue: [generateActiveCitation()],
-    })
+    const { user } = renderComponent([generateActiveCitation()])
 
     expect(screen.queryByText(/EuGH-Vorlage/)).not.toBeInTheDocument()
 
@@ -277,9 +285,7 @@ describe("active citations", () => {
   })
 
   it("correctly updates value court input", async () => {
-    const { user } = renderComponent({
-      modelValue: [generateActiveCitation()],
-    })
+    const { user } = renderComponent([generateActiveCitation()])
 
     expect(screen.queryByText(/AG Test/)).not.toBeInTheDocument()
 
@@ -300,9 +306,7 @@ describe("active citations", () => {
   })
 
   it("correctly updates value of fileNumber input", async () => {
-    const { user } = renderComponent({
-      modelValue: [generateActiveCitation()],
-    })
+    const { user } = renderComponent([generateActiveCitation()])
 
     expect(screen.queryByText(/new fileNumber/)).not.toBeInTheDocument()
     const itemHeader = screen.getByTestId("list-entry-0")
@@ -321,9 +325,7 @@ describe("active citations", () => {
   })
 
   it("correctly updates value of decision date input", async () => {
-    const { user } = renderComponent({
-      modelValue: [generateActiveCitation()],
-    })
+    const { user } = renderComponent([generateActiveCitation()])
 
     expect(screen.queryByText(/02.02.2022/)).not.toBeInTheDocument()
     const itemHeader = screen.getByTestId("list-entry-0")
@@ -342,9 +344,10 @@ describe("active citations", () => {
   })
 
   it("correctly deletes manually added active citations", async () => {
-    const { user } = renderComponent({
-      modelValue: [generateActiveCitation(), generateActiveCitation()],
-    })
+    const { user } = renderComponent([
+      generateActiveCitation(),
+      generateActiveCitation(),
+    ])
     const activeCitations = screen.getAllByLabelText("Listen Eintrag")
     expect(activeCitations.length).toBe(2)
     await user.click(screen.getByTestId("list-entry-0"))
@@ -353,11 +356,10 @@ describe("active citations", () => {
   })
 
   it("correctly deletes active citations added by search", async () => {
-    const modelValue: ActiveCitation[] = [
+    const { user } = renderComponent([
       generateActiveCitation(),
       generateActiveCitation(),
-    ]
-    const { user } = renderComponent({ modelValue })
+    ])
     const activeCitations = screen.getAllByLabelText("Listen Eintrag")
     expect(activeCitations.length).toBe(2)
     await user.click(screen.getByTestId("list-entry-0"))
@@ -366,9 +368,7 @@ describe("active citations", () => {
   })
 
   it("correctly updates deleted values in active citations", async () => {
-    const { user } = renderComponent({
-      modelValue: [generateActiveCitation()],
-    })
+    const { user } = renderComponent([generateActiveCitation()])
 
     expect(
       screen.getByText(
@@ -411,18 +411,14 @@ describe("active citations", () => {
   })
 
   it("indicates that search result already added to active citations", async () => {
-    const modelValue: ActiveCitation[] = [
-      generateActiveCitation({ uuid: "123" }),
-    ]
-    const { user } = renderComponent({ modelValue })
+    const { user } = renderComponent([generateActiveCitation({ uuid: "123" })])
     await user.click(screen.getByText(/Weitere Angabe/))
     await user.click(screen.getByLabelText("Nach Entscheidung suchen"))
     expect(screen.getByText(/Bereits hinzugefügt/)).toBeInTheDocument()
   })
 
   it("displays error in list and edit component when fields missing", async () => {
-    const modelValue: ActiveCitation[] = [generateActiveCitation()]
-    const { user } = renderComponent({ modelValue })
+    const { user } = renderComponent([generateActiveCitation()])
     const itemHeader = screen.getByTestId("list-entry-0")
     await user.click(itemHeader)
 
@@ -453,17 +449,15 @@ describe("active citations", () => {
   })
 
   it("shows missing citationStyle validation for linked decision", async () => {
-    const { user } = renderComponent({
-      modelValue: [
-        generateActiveCitation({
-          documentNumber: "123",
-          referenceFound: true,
-          citationStyle: {
-            label: "invalid",
-          },
-        }),
-      ],
-    })
+    const { user } = renderComponent([
+      generateActiveCitation({
+        documentNumber: "123",
+        referenceFound: true,
+        citationStyle: {
+          label: "invalid",
+        },
+      }),
+    ])
     const itemHeader = screen.getByTestId("list-entry-0")
     await user.click(itemHeader)
 
@@ -519,9 +513,7 @@ describe("active citations", () => {
   })
 
   it("should copy text of active citation summary", async () => {
-    const { user } = renderComponent({
-      modelValue: [generateActiveCitation()],
-    })
+    const { user } = renderComponent([generateActiveCitation()])
     const copyButton = screen.getByTestId("copy-summary")
     await user.click(copyButton)
 
@@ -535,9 +527,7 @@ describe("active citations", () => {
 
   describe("keyboard navigation", () => {
     it("should copy text of active citation summary", async () => {
-      const { user } = renderComponent({
-        modelValue: [generateActiveCitation()],
-      })
+      const { user } = renderComponent([generateActiveCitation()])
       const copyButton = screen.getByTestId("copy-summary")
       await fireEvent.focus(copyButton)
       await user.type(copyButton, "{enter}")

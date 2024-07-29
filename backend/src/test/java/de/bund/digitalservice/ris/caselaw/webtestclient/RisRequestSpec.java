@@ -57,6 +57,11 @@ public class RisRequestSpec {
     return this;
   }
 
+  public RisRequestSpec patch() {
+    this.httpMethod = HttpMethod.PATCH;
+    return this;
+  }
+
   public RisRequestSpec uri(String uri) {
     this.uri = UriComponentsBuilder.fromUriString(uri).buildAndExpand().encode().toUri();
 
@@ -100,6 +105,8 @@ public class RisRequestSpec {
       request = MockMvcRequestBuilders.post(uri);
     } else if (httpMethod.equals(HttpMethod.DELETE)) {
       request = MockMvcRequestBuilders.delete(uri);
+    } else if (httpMethod.equals(HttpMethod.PATCH)) {
+      request = MockMvcRequestBuilders.patch(uri);
     }
 
     if (request == null) {

@@ -1,5 +1,6 @@
-package de.bund.digitalservice.ris.caselaw.domain;
+package de.bund.digitalservice.ris.caselaw.domain.exception;
 
+import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType;
 import java.util.Map;
 
 public class DocumentUnitDeletionException extends RuntimeException {

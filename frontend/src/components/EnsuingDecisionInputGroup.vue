@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { watch, ref, computed, onMounted, onBeforeUnmount } from "vue"
+import { watch, ref, computed, onMounted } from "vue"
 import { ValidationError } from "./input/types"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
@@ -155,20 +155,17 @@ watch(
   },
 )
 
+/*
+  On first mount, we don't need to validate. When the props.modelValue do not
+  have the isEmpty getter, we can be sure that it has not been initialized as
+  EnsuingDecision and is therefore the initial load. As soon as we are using
+  uuids, the check should be 'props.modelValue?.uuid !== undefined'
+ */
 onMounted(() => {
-  // On first mount, we don't need to validate. When the props.modelValue do not
-  // have the isEmpty getter, we can be sure that it has not been initialized as
-  // EnsuingDecision and is therefore the inital load. As soons as we are using
-  // uuids, the check should be 'props.modelValue?.uuid !== undefined'
-
   if (props.modelValue?.isEmpty !== undefined) {
     validateRequiredInput()
   }
   ensuingDecision.value = new EnsuingDecision({ ...props.modelValue })
-})
-
-onBeforeUnmount(() => {
-  if (ensuingDecision.value.isEmpty) emit("removeEntry")
 })
 </script>
 

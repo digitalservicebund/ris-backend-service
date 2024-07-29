@@ -328,7 +328,7 @@ describe("NormReferenceEntry", () => {
   })
 
   it("correctly updates the value of ris abbreviation input", async () => {
-    const { user, emitted } = renderComponent()
+    const { user, emitted, props } = renderComponent()
     const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
 
     await user.type(abbreviationField, "1000")
@@ -349,6 +349,7 @@ describe("NormReferenceEntry", () => {
           singleNorms: [],
           normAbbreviationRawValue: undefined,
           hasForeignSource: false,
+          uuid: props.modelValue.uuid,
         },
       ],
     ])
@@ -510,6 +511,7 @@ describe("NormReferenceEntry", () => {
     it("updates legal force type", async () => {
       const { user, emitted } = renderComponent({
         modelValue: {
+          uuid: "8f54255f-cbd6-43e2-b266-dc3abdeb077b",
           normAbbreviation: { id: "123", abbreviation: "ABC" },
         } as NormReference,
       })
@@ -530,6 +532,8 @@ describe("NormReferenceEntry", () => {
       expect(emitted("update:modelValue")).toEqual([
         [
           {
+            uuid: "8f54255f-cbd6-43e2-b266-dc3abdeb077b",
+
             normAbbreviation: {
               abbreviation: "ABC",
               id: "123",
@@ -556,6 +560,7 @@ describe("NormReferenceEntry", () => {
     it("updates legal force region", async () => {
       const { user, emitted } = renderComponent({
         modelValue: {
+          uuid: "8f54255f-cbd6-43e2-b266-dc3abdeb077b",
           normAbbreviation: { id: "123", abbreviation: "ABC" },
         } as NormReference,
       })
@@ -576,6 +581,7 @@ describe("NormReferenceEntry", () => {
       expect(emitted("update:modelValue")).toEqual([
         [
           {
+            uuid: "8f54255f-cbd6-43e2-b266-dc3abdeb077b",
             normAbbreviation: {
               abbreviation: "ABC",
               id: "123",

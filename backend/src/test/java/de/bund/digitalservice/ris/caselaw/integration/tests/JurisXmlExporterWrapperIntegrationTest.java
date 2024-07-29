@@ -199,6 +199,7 @@ class JurisXmlExporterWrapperIntegrationTest {
             .borderNumbers(Collections.emptyList())
             .contentRelatedIndexing(indexing)
             .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
+            .version(0L)
             .references(Collections.emptyList())
             .build();
 

@@ -1,3 +1,4 @@
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
@@ -42,13 +43,21 @@ function renderComponent(attachments?: Attachment[]) {
   return {
     user,
     ...render(DocumentUnitAttachments, {
-      props: {
-        documentUnit: new DocumentUnit("foo", {
-          documentNumber: "1234567891234",
-          attachments: attachments,
-        }),
+      global: {
+        plugins: [
+          createTestingPinia({
+            initialState: {
+              docunitStore: {
+                documentUnit: new DocumentUnit("foo", {
+                  documentNumber: "1234567891234",
+                  attachments: attachments ?? [],
+                }),
+              },
+            },
+          }),
+          [router],
+        ],
       },
-      global: { plugins: [router] },
     }),
   }
 }

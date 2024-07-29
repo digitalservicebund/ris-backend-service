@@ -4,6 +4,7 @@ import static de.bund.digitalservice.ris.caselaw.domain.DateUtil.getYear;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberFormatterException;
 import jakarta.validation.ConstraintViolationException;
 import java.time.Year;
 import org.apache.commons.lang3.StringUtils;
