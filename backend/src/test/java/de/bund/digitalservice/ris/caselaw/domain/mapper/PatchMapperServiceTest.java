@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.gravity9.jsonpatch.AddOperation;
 import com.gravity9.jsonpatch.JsonPatch;
-import com.gravity9.jsonpatch.JsonPatchException;
 import com.gravity9.jsonpatch.JsonPatchOperation;
 import com.gravity9.jsonpatch.RemoveOperation;
 import com.gravity9.jsonpatch.ReplaceOperation;
@@ -42,7 +41,7 @@ class PatchMapperServiceTest {
   private final ObjectMapper mapper = new ObjectMapper();
 
   @Test
-  void testApplyPatchToEntity() throws JsonPatchException, JsonProcessingException {
+  void testApplyPatchToEntity() throws JsonProcessingException {
     List<JsonPatchOperation> operations = new ArrayList<>();
     DocumentUnit documentUnit =
         DocumentUnit.builder()
