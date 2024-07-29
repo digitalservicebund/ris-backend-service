@@ -197,13 +197,11 @@ const resizeObserver = new ResizeObserver((entries) => {
     ref="editorElement"
     class="editor bg-white"
     fluid
-    @blur="() => (hasFocus = false)"
-    @focusin="() => (hasFocus = true)"
-    @focusout="
-      () => !editorElement?.matches(':focus-within') && (hasFocus = false)
-    "
-    @mouseenter="() => (isHovered = true)"
-    @mouseleave="() => (isHovered = false)"
+    @blur="hasFocus = false"
+    @focusin="hasFocus = true"
+    @focusout="!editorElement?.matches(':focus-within') && (hasFocus = false)"
+    @mouseenter="isHovered = true"
+    @mouseleave="isHovered = false"
   >
     <TextEditorMenu
       v-if="editable"
