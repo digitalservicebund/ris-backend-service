@@ -77,7 +77,7 @@ test.describe("keywords", () => {
     await waitForInputValue(page, "[aria-label='Schlagwörter']", keyword)
     await page.keyboard.press("Enter")
     // first
-    await save(page, { clickSaveButton: true })
+    await save(page)
     await expect(page.getByText(keyword)).toBeVisible()
 
     await page.locator("[aria-label='Schlagwörter']").fill(keyword)

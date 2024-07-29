@@ -354,7 +354,7 @@ test.describe("field of law", () => {
     await expect(searchResultInTree).toBeVisible()
     await searchResultInTree.click()
 
-    await save(page, { clickSaveButton: true })
+    await save(page)
   })
 
   test("Search with both norm string and stext string - sets show norm checkbox to true", async ({
