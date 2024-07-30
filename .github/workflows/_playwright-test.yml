@@ -104,7 +104,7 @@ jobs:
             curl -X POST ${{ secrets.E2E_TEST_METRICS_ENDPOINT }} \
                   -H "xc-token: ${{ secrets.E2E_TEST_METRICS_TOKEN }}" \
                   -H "Content-Type: application/json" \
-                  -d "{\"test\": \"${test_title}\", \"run_id\": \"${{ github.run_id }}\", \"browser\": \"${{ inputs.browser }}\""}"
+                  -d "{\"test\": \"${test_title}\", \"run_id\": \"${{ github.run_id }}\", \"browser\": \"${{ inputs.browser }}\"}"
           done
         working-directory: ./frontend
       - name: Upload json reports
