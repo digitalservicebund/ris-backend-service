@@ -234,12 +234,11 @@ test.describe("search", () => {
   })
 
   test("search for status", async ({ page }) => {
-    await page.goto("/")
+    await navigateToSearch(page)
 
     await page.getByLabel("Dokumentnummer Suche").fill("YYTestDoc")
 
-    const docofficeOnly = page.getByLabel("Nur meine Dokstelle Filter")
-    await docofficeOnly.click()
+    await page.getByLabel("Nur meine Dokstelle Filter").click()
 
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
 
@@ -251,11 +250,14 @@ test.describe("search", () => {
     await select.selectOption("Veröffentlicht")
 
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+
     await page.waitForEvent("requestfinished")
 
     await expect
-      .poll(async () => page.getByText("Veröffentlicht").count())
-      .toBe(9)
+      .poll(async () =>
+        page.getByText("Veröffentlicht", { exact: true }).count(),
+      )
+      .toBe(8)
     await expect(page.getByText("Unveröffentlicht")).toBeHidden()
   })
 
