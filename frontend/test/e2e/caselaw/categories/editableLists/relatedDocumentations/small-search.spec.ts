@@ -98,11 +98,21 @@ test("search for documentunits and link decision", async ({
   await activeCitationContainer.getByTestId("list-entry-0").click()
   await activeCitationContainer.getByLabel("Eintrag löschen").click()
 
+  await expect(
+    activeCitationContainer.getByLabel("Listen Eintrag"),
+  ).toHaveCount(1)
+
   await ensuingDecisionContainer.getByTestId("list-entry-0").click()
   await ensuingDecisionContainer.getByLabel("Eintrag löschen").click()
+  await expect(
+    ensuingDecisionContainer.getByLabel("Listen Eintrag"),
+  ).toHaveCount(1)
 
   await previousDecisionContainer.getByTestId("list-entry-0").click()
   await previousDecisionContainer.getByLabel("Eintrag löschen").click()
+  await expect(
+    previousDecisionContainer.getByLabel("Listen Eintrag"),
+  ).toHaveCount(1)
 
   await save(page)
 })
