@@ -155,9 +155,7 @@ test.describe("core data", () => {
     ).toHaveCount(1)
   })
 
-  // Todo: Fix flakyness
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("document type dropdown", async ({ page, documentNumber }) => {
+  test("document type dropdown", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     // on start: closed dropdown, no input text
@@ -190,6 +188,7 @@ test.describe("core data", () => {
     await expect(
       page.locator("[aria-label='dropdown-option']"),
     ).not.toHaveCount(0)
+    await expect(page.getByText("Anerkenntnisurteil")).toBeVisible()
 
     // close dropdown
     await page.getByLabel("Dropdown schließen").click()
