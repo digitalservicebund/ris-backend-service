@@ -43,6 +43,8 @@ test.describe(
       const firstReason = "First reason"
       const secondReason = "Second reason"
       const thirdReason = "Third reason"
+      const firstReasonHtml =
+        '<span style="color: rgb(0, 0, 0); font-size: 12pt">First </span><strong><span style="color: rgb(0, 0, 0); font-size: 12pt">reason</span></strong>'
       // eslint-disable-next-line playwright/no-conditional-in-test
       const modifier = (await page.evaluate(() => navigator.platform))
         .toLowerCase()
@@ -69,7 +71,7 @@ test.describe(
       })
 
       const editor = page.locator("[data-testid='Gründe']")
-      let inputFieldInnerHTML = await editor.innerText()
+      let inputFieldInnerText = await editor.innerText()
 
       await test.step("Copy border numbers (Randnummern) from side panel into reasons to have reference data", async () => {
         // Selected all text from sidepanel
@@ -96,6 +98,7 @@ test.describe(
         // paste from clipboard into input field "Entscheidungsgründe"
         await editor.click()
         await page.keyboard.press(`${modifier}+KeyV`)
+        await page.getByLabel("invisible-characters").click()
       })
 
       await checkAllBorderNumbersAreVisible()
@@ -107,10 +110,10 @@ test.describe(
       await clickBorderNumberButton()
 
       await test.step("Check all border Numbers (Randnummern) have gone", async () => {
-        inputFieldInnerHTML = await editor.innerText()
-        expect(inputFieldInnerHTML.includes("1\n\n" + firstReason)).toBeFalsy()
-        expect(inputFieldInnerHTML.includes("2\n\n" + secondReason)).toBeFalsy()
-        expect(inputFieldInnerHTML.includes("3\n\n" + thirdReason)).toBeFalsy()
+        inputFieldInnerText = await editor.innerText()
+        expect(inputFieldInnerText.includes("1\n\n" + firstReason)).toBeFalsy()
+        expect(inputFieldInnerText.includes("2\n\n" + secondReason)).toBeFalsy()
+        expect(inputFieldInnerText.includes("3\n\n" + thirdReason)).toBeFalsy()
       })
 
       await reinsertAllBorderNumbers()
@@ -173,31 +176,23 @@ test.describe(
 
       async function checkAllBorderNumbersAreVisible() {
         await test.step("Check all border numbers (Randnummern) are visible", async () => {
-          inputFieldInnerHTML = await editor.innerText()
-          expect(
-            inputFieldInnerHTML.includes("1\n\n" + firstReason),
-          ).toBeTruthy()
-          expect(
-            inputFieldInnerHTML.includes("2\n\n" + secondReason),
-          ).toBeTruthy()
-          expect(
-            inputFieldInnerHTML.includes("3\n\n" + thirdReason),
-          ).toBeTruthy()
+          inputFieldInnerText = await editor.innerText()
+          const inputFieldInnerHtml = await editor.innerHTML()
+          expect(inputFieldInnerText).toContain("1\n\n" + firstReason)
+          expect(inputFieldInnerText).toContain("2\n\n" + secondReason)
+          expect(inputFieldInnerText).toContain("3\n\n" + thirdReason)
+          expect(inputFieldInnerHtml).toContain(firstReasonHtml)
         })
       }
 
       async function checkLastBorderNumberHasGone() {
         await test.step("Check the last border Number (Randnummer) has gone", async () => {
-          inputFieldInnerHTML = await editor.innerText()
-          expect(
-            inputFieldInnerHTML.includes("1\n\n" + firstReason),
-          ).toBeTruthy()
-          expect(
-            inputFieldInnerHTML.includes("2\n\n" + secondReason),
-          ).toBeTruthy()
-          expect(
-            inputFieldInnerHTML.includes("3\n\n" + thirdReason),
-          ).toBeFalsy()
+          inputFieldInnerText = await editor.innerText()
+          const inputFieldInnerHtml = await editor.innerHTML()
+          expect(inputFieldInnerText).toContain("1\n\n" + firstReason)
+          expect(inputFieldInnerText).toContain("2\n\n" + secondReason)
+          expect(inputFieldInnerText).not.toContain("3\n\n" + thirdReason)
+          expect(inputFieldInnerHtml).toContain(firstReasonHtml)
         })
       }
     })
