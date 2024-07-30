@@ -7,6 +7,7 @@ import {
   navigateToHandover,
   navigateToSearch,
   uploadTestfile,
+  save,
 } from "./e2e-utils"
 import { caselawTest as test } from "./fixtures"
 
@@ -110,9 +111,7 @@ test.describe(
           await navigateToCategories(page, documentNumber)
           await page.getByLabel("Seitenpanel öffnen").click()
           await fillInput(page, "Notiz Eingabefeld", "some text")
-          await page.getByTestId("save-button").click()
-
-          await page.waitForEvent("requestfinished")
+          await save(page)
           await navigateToSearch(page, { navigationBy: "click" })
         })
 
@@ -181,8 +180,7 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
 
          .com erneut zu sperren oder den Beitrag zu löschen. Für den Fall der Zuwiderhandlung wird der Beklagten Ordnungsgeld von bis zu 250.000 €, ersatzweise Ordnungshaft, oder Ordnungshaft bis zu sechs Monaten angedroht, wobei die Ordnungshaft an ihren Vorstandsmitgliedern zu vollziehen ist.`
           await fillInput(page, "Notiz Eingabefeld", longNoteText)
-          await page.getByTestId("save-button").click()
-          await page.waitForEvent("requestfinished")
+          await save(page)
           await expect(page.getByLabel("Notiz Eingabefeld")).toHaveValue(
             longNoteText,
           )
@@ -199,7 +197,7 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
           await navigateToCategories(page, documentNumber)
           await page.getByLabel("Notiz anzeigen").click()
           await fillInput(page, "Notiz Eingabefeld", "")
-          await page.getByTestId("save-button").click()
+          await save(page)
           await expect(page.getByLabel("Notiz Eingabefeld")).toHaveValue("")
         })
 
@@ -249,9 +247,7 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
         await test.step("Delete note from doc unit", async () => {
           await navigateToCategories(pageWithBghUser, documentNumber)
           await fillInput(pageWithBghUser, "Notiz Eingabefeld", "")
-          await pageWithBghUser.getByTestId("save-button").click()
-
-          await pageWithBghUser.waitForEvent("requestfinished")
+          await save(pageWithBghUser)
         })
 
         await test.step("Confirm note is not exported in XML on handover page", async () => {
