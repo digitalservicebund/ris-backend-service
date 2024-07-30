@@ -276,6 +276,9 @@ test.describe("search", () => {
     )
     await errorsOnly.click()
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+    await expect(
+      page.getByTestId("document-unit-list-loading-spinner"),
+    ).toBeVisible()
 
     //3 + table header
     await expect.poll(async () => page.locator(".table-row").count()).toBe(4)

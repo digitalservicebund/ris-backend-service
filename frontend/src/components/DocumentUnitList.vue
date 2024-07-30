@@ -286,6 +286,7 @@ function onDelete() {
     <div
       v-if="isLoading"
       class="my-112 grid justify-items-center bg-white bg-opacity-60"
+      data-test-id="document-unit-list-loading-spinner"
     >
       <LoadingSpinner />
     </div>
