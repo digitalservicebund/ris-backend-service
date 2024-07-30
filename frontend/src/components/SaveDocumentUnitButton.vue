@@ -1,29 +1,17 @@
 <script lang="ts" setup>
-import { onBeforeUnmount, toRaw } from "vue"
+import { onBeforeUnmount } from "vue"
 import TextButton from "@/components/input/TextButton.vue"
 import { useSaveToRemote } from "@/composables/useSaveToRemote"
-import { ServiceResponse } from "@/services/httpClient"
 
 const props = defineProps<{
   ariaLabel: string
-  serviceCallback: () => Promise<ServiceResponse<void>>
 }>()
 
-const { triggerSave, lastSaveError, formattedLastSavedOn } = useSaveToRemote(
-  props.serviceCallback,
-  10000,
-)
+const { saveIsInProgress, triggerSave, lastSaveError, formattedLastSavedOn } =
+  useSaveToRemote(10000)
 
-const getErrorDetails = () => {
-  if (
-    lastSaveError.value &&
-    toRaw(lastSaveError.value).title &&
-    toRaw(lastSaveError.value).title.includes("Berechtigung") // temporary workaround
-  ) {
-    return ": " + toRaw(lastSaveError.value).title
-  }
-  return ""
-}
+const getErrorDetails = () =>
+  lastSaveError.value?.title ? ": " + lastSaveError.value.title : ""
 
 onBeforeUnmount(function () {
   triggerSave()
@@ -39,13 +27,16 @@ window.onbeforeunload = function () {
     <p v-if="lastSaveError !== undefined" class="ds-label-01-reg text-red-800">
       Fehler beim Speichern{{ getErrorDetails() }}
     </p>
+    <p v-else-if="saveIsInProgress === true" class="ds-label-01-reg">
+      speichern...
+    </p>
     <p v-else-if="formattedLastSavedOn !== undefined" class="ds-label-01-reg">
       Zuletzt
       <span>{{ formattedLastSavedOn }}</span>
       Uhr
     </p>
     <TextButton
-      :aria-label="ariaLabel"
+      :aria-label="props.ariaLabel"
       data-testid="save-button"
       label="Speichern"
       size="small"

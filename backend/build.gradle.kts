@@ -174,7 +174,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.1")
 
-    implementation(platform("software.amazon.awssdk:bom:2.26.23"))
+    implementation(platform("software.amazon.awssdk:bom:2.26.26"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -186,7 +186,7 @@ dependencies {
     implementation("com.icegreen:greenmail:2.1.0-rc-1")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.46") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.47") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
@@ -202,6 +202,8 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.17.2")
 
+    implementation("com.gravity9:json-patch-path:2.0.2");
+
     implementation("io.micrometer:micrometer-registry-prometheus:1.13.2")
     implementation("io.micrometer:micrometer-core:1.13.2")
 
@@ -213,7 +215,7 @@ dependencies {
     // => CVE-2023-2976
     implementation("com.google.guava:guava:33.2.1-jre")
 
-    implementation("io.getunleash:unleash-client-java:9.2.3")
+    implementation("io.getunleash:unleash-client-java:9.2.4")
     implementation("org.apache.commons:commons-text:1.12.0")
     implementation("org.jsoup:jsoup:1.18.1")
 

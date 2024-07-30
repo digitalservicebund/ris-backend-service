@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import dayjs from "dayjs"
+import { storeToRefs } from "pinia"
 import { provide } from "vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import {
@@ -12,17 +13,20 @@ import PreviewNote from "@/components/preview/PreviewNote.vue"
 import PreviewProceedingDecisions from "@/components/preview/PreviewProceedingDecisions.vue"
 import PreviewReferences from "@/components/preview/PreviewReferences.vue"
 import PreviewTexts from "@/components/preview/PreviewTexts.vue"
-import DocumentUnit from "@/domain/documentUnit"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const props = defineProps<{
-  documentUnit: DocumentUnit
   layout?: PreviewLayout
 }>()
+
+const { documentUnit } = storeToRefs(useDocumentUnitStore())
+
 provide(previewLayoutInjectionKey, props.layout || "wide")
 </script>
 
 <template>
   <FlexContainer
+    v-if="documentUnit"
     class="max-w-screen-xl"
     data-testid="preview"
     flex-direction="flex-col"
@@ -36,13 +40,8 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
     </p>
     <PreviewCoreData :core-data="documentUnit.coreData" />
     <PreviewNote :note="documentUnit.note" />
-    <PreviewProceedingDecisions
-      :ensuing-decisions="documentUnit.ensuingDecisions"
-      :previous-decisions="documentUnit.previousDecisions"
-    />
-    <PreviewContentRelatedIndexing
-      :content-related-indexing="documentUnit.contentRelatedIndexing"
-    />
+    <PreviewProceedingDecisions />
+    <PreviewContentRelatedIndexing />
     <PreviewReferences :references="documentUnit.references || []" />
     <PreviewTexts
       :texts="documentUnit.texts"

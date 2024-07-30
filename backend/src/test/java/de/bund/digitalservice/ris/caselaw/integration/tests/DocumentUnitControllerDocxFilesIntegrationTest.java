@@ -40,6 +40,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
+import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -131,6 +132,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   @MockBean private HandoverService handoverService;
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private DocumentBuilderFactory documentBuilderFactory;
+  @MockBean private PatchMapperService patchMapperService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
 

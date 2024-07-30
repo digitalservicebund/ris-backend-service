@@ -7,7 +7,6 @@ import { InfoStatus } from "@/components/enumInfoStatus"
 import InfoModal from "@/components/InfoModal.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import ActiveCitation, { activeCitationLabels } from "@/domain/activeCitation"
-import DocumentUnit from "@/domain/documentUnit"
 import EnsuingDecision, {
   ensuingDecisionFieldLabels,
 } from "@/domain/ensuingDecision"
@@ -18,6 +17,7 @@ import PreviousDecision, {
 import { fieldLabels } from "@/fields/caselaw"
 import handoverService from "@/services/handoverService"
 import { ResponseError } from "@/services/httpClient"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import IconCheck from "~icons/ic/baseline-check"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
 import IconKeyboardArrowDown from "~icons/ic/baseline-keyboard-arrow-down"
@@ -25,7 +25,6 @@ import IconKeyboardArrowUp from "~icons/ic/baseline-keyboard-arrow-up"
 import IconHandover from "~icons/ic/outline-campaign"
 
 const props = defineProps<{
-  documentUnit: DocumentUnit
   handoverResult?: EventRecord
   eventLog?: EventRecord[]
   errorMessage?: ResponseError
@@ -36,9 +35,11 @@ const emits = defineEmits<{
   handoverDocument: []
 }>()
 
+const store = useDocumentUnitStore()
+
 const categoriesRoute = computed(() => ({
   name: "caselaw-documentUnit-documentNumber-categories",
-  params: { documentNumber: props.documentUnit.documentNumber },
+  params: { documentNumber: store.documentUnit!.documentNumber },
 }))
 const isFirstTimeHandover = computed(() => {
   return !props.eventLog || props.eventLog.length === 0
@@ -54,7 +55,7 @@ const errorMessage = computed(
 onMounted(async () => {
   if (fieldsMissing.value) return
   const previewResponse = await handoverService.getPreview(
-    props.documentUnit.uuid,
+    store.documentUnit!.uuid,
   )
   if (previewResponse.error) {
     previewError.value = previewResponse.error
@@ -76,21 +77,29 @@ function handoverDocumentUnit() {
 
 //Required Core Data fields
 const missingCoreDataFields = ref(
-  props.documentUnit.missingRequiredFields.map((field) => fieldLabels[field]),
+  store.documentUnit!.missingRequiredFields.map((field) => fieldLabels[field]),
 )
 
 //Required Previous Decision fields
 const missingPreviousDecisionFields = ref(
-  props.documentUnit.previousDecisions
-    ?.filter((previousDecision) => {
-      return getMissingPreviousDecisionFields(previousDecision).length > 0
-    })
-    .map((previousDecision) => {
-      return {
-        identifier: previousDecision.renderDecision,
-        missingFields: getMissingPreviousDecisionFields(previousDecision),
-      }
-    }),
+  store.documentUnit && store.documentUnit.previousDecisions
+    ? store.documentUnit.previousDecisions
+        .filter((previousDecision) => {
+          return (
+            getMissingPreviousDecisionFields(
+              previousDecision as PreviousDecision,
+            ).length > 0
+          )
+        })
+        .map((previousDecision) => {
+          return {
+            identifier: previousDecision.renderDecision,
+            missingFields: getMissingPreviousDecisionFields(
+              previousDecision as PreviousDecision,
+            ),
+          }
+        })
+    : [],
 )
 
 function getMissingPreviousDecisionFields(previousDecision: PreviousDecision) {
@@ -101,16 +110,23 @@ function getMissingPreviousDecisionFields(previousDecision: PreviousDecision) {
 
 //Required Ensuing Decision fields
 const missingEnsuingDecisionFields = ref(
-  props.documentUnit.ensuingDecisions
-    ?.filter((ensuingDecision) => {
-      return getMissingEnsuingDecisionFields(ensuingDecision).length > 0
-    })
-    .map((ensuingDecision) => {
-      return {
-        identifier: ensuingDecision.renderDecision,
-        missingFields: getMissingEnsuingDecisionFields(ensuingDecision),
-      }
-    }),
+  store.documentUnit && store.documentUnit.ensuingDecisions
+    ? store
+        .documentUnit!.ensuingDecisions?.filter((ensuingDecision) => {
+          return (
+            getMissingEnsuingDecisionFields(ensuingDecision as EnsuingDecision)
+              .length > 0
+          )
+        })
+        .map((ensuingDecision) => {
+          return {
+            identifier: ensuingDecision.renderDecision,
+            missingFields: getMissingEnsuingDecisionFields(
+              ensuingDecision as EnsuingDecision,
+            ),
+          }
+        })
+    : [],
 )
 
 function getMissingEnsuingDecisionFields(ensuingDecision: EnsuingDecision) {
@@ -134,8 +150,8 @@ function getHeader(item: EventRecord) {
 
 //Required Norms fields
 const missingNormsFields = ref(
-  props.documentUnit.contentRelatedIndexing?.norms
-    ?.filter((normReference) => {
+  store
+    .documentUnit!.contentRelatedIndexing?.norms?.filter((normReference) => {
       return normReference.hasMissingFieldsInLegalForce
     })
     .map((normReference) => {
@@ -148,16 +164,27 @@ const missingNormsFields = ref(
 
 //Required Active Citation fields
 const missingActiveCitationFields = ref(
-  props.documentUnit.contentRelatedIndexing?.activeCitations
-    ?.filter((activeCitation) => {
-      return getActiveCitationsFields(activeCitation).length > 0
-    })
-    .map((activeCitation) => {
-      return {
-        identifier: activeCitation.renderDecision,
-        missingFields: getActiveCitationsFields(activeCitation),
-      }
-    }),
+  store.documentUnit &&
+    store.documentUnit.contentRelatedIndexing &&
+    store.documentUnit.contentRelatedIndexing.activeCitations
+    ? store
+        .documentUnit!.contentRelatedIndexing?.activeCitations?.filter(
+          (activeCitation) => {
+            return (
+              getActiveCitationsFields(activeCitation as ActiveCitation)
+                .length > 0
+            )
+          },
+        )
+        .map((activeCitation) => {
+          return {
+            identifier: activeCitation.renderDecision,
+            missingFields: getActiveCitationsFields(
+              activeCitation as ActiveCitation,
+            ),
+          }
+        })
+    : [],
 )
 
 function getActiveCitationsFields(activeCitation: ActiveCitation) {
@@ -178,7 +205,10 @@ const fieldsMissing = computed(() => {
 </script>
 
 <template>
-  <div class="flex-start flex max-w-[80rem] flex-col justify-start gap-40">
+  <div
+    v-if="store.documentUnit"
+    class="flex-start flex max-w-[80rem] flex-col justify-start gap-40"
+  >
     <h1 class="ds-heading-02-reg">Übergabe an jDV</h1>
     <div aria-label="Plausibilitätsprüfung" class="flex flex-row gap-16">
       <div class="w-[15.625rem]">
@@ -297,13 +327,14 @@ const fieldsMissing = computed(() => {
             </ul>
           </div>
 
-          <RouterLink :to="categoriesRoute"
-            ><TextButton
+          <RouterLink :to="categoriesRoute">
+            <TextButton
               aria-label="Rubriken bearbeiten"
               button-type="tertiary"
               class="w-fit"
               label="Rubriken bearbeiten"
-          /></RouterLink>
+            />
+          </RouterLink>
         </div>
       </div>
       <div v-else class="flex flex-row gap-8">

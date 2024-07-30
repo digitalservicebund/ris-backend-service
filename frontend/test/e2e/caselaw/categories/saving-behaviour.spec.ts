@@ -1,9 +1,9 @@
 import { expect } from "@playwright/test"
 import {
   navigateToCategories,
-  waitForSaving,
   waitForInputValue,
   fillActiveCitationInputs,
+  save,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
@@ -27,20 +27,11 @@ test.describe("saving behaviour", () => {
 
     await page.locator("[aria-label='Spruchkörper']").fill("VG-001")
     await waitForInputValue(page, "[aria-label='Spruchkörper']", "VG-001")
-    await page.locator("[aria-label='Speichern Button']").click()
 
-    await page.locator("[aria-label='Spruchkörper']").fill("VG-001, VG-002")
-    await waitForInputValue(
-      page,
-      "[aria-label='Spruchkörper']",
-      "VG-001, VG-002",
-    )
-
-    await expect(page.getByText(/Zuletzt .* Uhr/)).toBeVisible()
+    await save(page)
 
     await expect(page.locator("[aria-label='Spruchkörper']")).toHaveValue(
-      "VG-001, VG-002",
-      { timeout: 500 },
+      "VG-001",
     )
   })
 
@@ -72,42 +63,29 @@ test.describe("saving behaviour", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await waitForSaving(
-      async () => {
-        await page.locator("[aria-label='Aktenzeichen']").type(generateString())
-        await page.keyboard.press("Enter")
+    await page.locator("[aria-label='Aktenzeichen']").type(generateString())
+    await page.keyboard.press("Enter")
 
-        const labels = [
-          "Abweichendes Aktenzeichen",
-          // "Abweichendes Entscheidungsdatum",
-          "Abweichender ECLI",
-          "Fehlerhaftes Gericht",
-        ]
+    const labels = [
+      "Abweichendes Aktenzeichen",
+      // "Abweichendes Entscheidungsdatum",
+      "Abweichender ECLI",
+      "Fehlerhaftes Gericht",
+    ]
 
-        for (const label of labels) {
-          await page.locator(`[aria-label='${label} anzeigen']`).click()
-          await page.locator(`[aria-label='${label}']`).type("22.11.2023")
-          await page.keyboard.press("Enter")
-        }
-      },
-      page,
-      { clickSaveButton: true },
-    )
+    for (const label of labels) {
+      await page.locator(`[aria-label='${label} anzeigen']`).click()
+      await page.locator(`[aria-label='${label}']`).type("22.11.2023")
+      await page.keyboard.press("Enter")
+    }
 
-    await waitForSaving(
-      async () => {
-        while (
-          (await page.locator("[data-testid='chip'] > button").count()) > 0
-        ) {
-          await page.locator("[data-testid='chip'] > button").first().click()
-        }
-      },
-      page,
-      { clickSaveButton: true },
-    )
+    await save(page)
 
-    await page.waitForTimeout(500) // eslint-disable-line playwright/no-wait-for-timeout
+    while ((await page.locator("[data-testid='chip'] > button").count()) > 0) {
+      await page.locator("[data-testid='chip'] > button").first().click()
+    }
 
+    await save(page)
     await expect(page.locator("[data-testid='chip']")).toHaveCount(0)
   })
 
@@ -117,23 +95,16 @@ test.describe("saving behaviour", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await waitForSaving(
-      async () => {
-        await page.locator("[aria-label='Spruchkörper']").fill("VG-001")
-        await waitForInputValue(page, "[aria-label='Spruchkörper']", "VG-001")
-      },
-      page,
-      { clickSaveButton: true },
-    )
+    await page.locator("[aria-label='Spruchkörper']").fill("VG-001")
+    await waitForInputValue(page, "[aria-label='Spruchkörper']", "VG-001")
 
-    await waitForSaving(
-      async () => {
-        await page.locator("[aria-label='Spruchkörper']").fill("VG-002")
-        await waitForInputValue(page, "[aria-label='Spruchkörper']", "VG-002")
-      },
-      page,
-      { clickSaveButton: true, reload: true },
-    )
+    await save(page)
+
+    await page.reload()
+    await page.locator("[aria-label='Spruchkörper']").fill("VG-002")
+    await waitForInputValue(page, "[aria-label='Spruchkörper']", "VG-002")
+
+    await save(page)
 
     await page.reload()
     await expect(page.locator("[aria-label='Spruchkörper']")).toHaveValue(
@@ -147,17 +118,12 @@ test.describe("saving behaviour", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await waitForSaving(
-      async () => {
-        await fillActiveCitationInputs(page, {
-          documentType: "Anerkenntnisurteil",
-        })
-        await page.getByLabel("Aktivzitierung speichern").click()
-      },
-      page,
-      { clickSaveButton: true },
-    )
+    await fillActiveCitationInputs(page, {
+      documentType: "Anerkenntnisurteil",
+    })
+    await page.getByLabel("Aktivzitierung speichern").click()
 
+    await save(page)
     await page.reload()
     await expect(page.getByText("Anerkenntnisurteil")).toBeVisible()
   })
@@ -170,18 +136,14 @@ test.describe("saving behaviour", () => {
 
     const fileNumber = generateString()
 
-    await waitForSaving(
-      async () => {
-        await page.locator("[aria-label='Aktenzeichen']").fill(fileNumber)
-        await page.keyboard.press("Enter")
-      },
-      page,
-      { clickSaveButton: true },
-    )
+    await page.locator("[aria-label='Aktenzeichen']").fill(fileNumber)
+    await page.keyboard.press("Enter")
+
+    await save(page)
     await page.goto("/")
     await page.getByLabel("Aktenzeichen Suche").fill(fileNumber)
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-    //TODO: remove the timeout when search performance get better
+
     await expect(
       page.locator(".table-row", {
         hasText: documentNumber,

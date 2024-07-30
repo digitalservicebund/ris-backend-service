@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { watch, ref, computed, onMounted, onBeforeUnmount } from "vue"
+import { watch, ref, computed, onMounted } from "vue"
 import { ValidationError } from "./input/types"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
@@ -26,7 +26,7 @@ const emit = defineEmits<{
   "update:modelValue": [value: PreviousDecision]
   addEntry: [void]
   cancelEdit: [void]
-  removeEntry: [value?: boolean]
+  removeEntry: [value: PreviousDecision]
 }>()
 
 const lastSearchInput = ref(new PreviousDecision())
@@ -109,7 +109,7 @@ async function addPreviousDecision() {
     !validationStore.getByMessage("Das Datum darf nicht in der Zukunft liegen")
       .length
   ) {
-    validateRequiredInput()
+    await validateRequiredInput()
     emit("update:modelValue", previousDecision.value as PreviousDecision)
     emit("addEntry")
   }
@@ -163,10 +163,6 @@ onMounted(() => {
   }
   previousDecision.value = new PreviousDecision({ ...props.modelValue })
 })
-
-onBeforeUnmount(() => {
-  if (previousDecision.value.isEmpty) emit("removeEntry")
-})
 </script>
 
 <template>
@@ -212,7 +208,8 @@ onBeforeUnmount(() => {
             label="Entscheidungsdatum *"
             :validation-error="validationStore.getByField('decisionDate')"
             @update:validation-error="
-              (validationError) => updateDateFormatValidation(validationError)
+              (validationError: any) =>
+                updateDateFormatValidation(validationError)
             "
           >
             <DateInput
@@ -302,6 +299,7 @@ onBeforeUnmount(() => {
           <TextButton
             aria-label="Vorgehende Entscheidung speichern"
             button-type="tertiary"
+            data-testid="previous-decision-save-button"
             :disabled="previousDecision.isEmpty"
             label="Übernehmen"
             size="small"
@@ -323,7 +321,7 @@ onBeforeUnmount(() => {
         button-type="destructive"
         label="Eintrag löschen"
         size="small"
-        @click.stop="emit('removeEntry', true)"
+        @click.stop="emit('removeEntry', modelValue)"
       />
     </div>
 

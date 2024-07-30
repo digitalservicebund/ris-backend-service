@@ -1,8 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberFormatter;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberPatternException;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberPatternException;
 import java.util.Map;
 import lombok.Data;
 import org.springframework.beans.factory.InitializingBean;

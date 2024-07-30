@@ -6,28 +6,22 @@ import { withSummarizer } from "@/components/DataSetSummary.vue"
 import EditableList from "@/components/EditableList.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import EnsuingDecision from "@/domain/ensuingDecision"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import BaselineArrowOutward from "~icons/ic/baseline-arrow-outward"
 import IconBaselineDescription from "~icons/ic/baseline-description"
 import IconError from "~icons/ic/baseline-error"
 import IconOutlineDescription from "~icons/ic/outline-description"
 
-const props = defineProps<{
-  modelValue: EnsuingDecision[] | undefined
-}>()
-
-const emit = defineEmits<{
-  "update:modelValue": [value?: EnsuingDecision[]]
-}>()
+const store = useDocumentUnitStore()
 
 const ensuingDecisions = computed({
-  get: () => {
-    return props.modelValue
-  },
-  set: (value) => {
-    emit("update:modelValue", value)
+  get: () => store.documentUnit!.ensuingDecisions as EnsuingDecision[],
+  set: (newValues) => {
+    store.documentUnit!.ensuingDecisions = newValues
   },
 })
-const defaultValue = new EnsuingDecision()
+
+const defaultValue = new EnsuingDecision() as EnsuingDecision
 
 /**
  * Returns a render function with an error icon badge

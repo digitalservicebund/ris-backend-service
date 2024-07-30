@@ -5,16 +5,27 @@ import TextAreaInput from "@/components/input/TextAreaInput.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import { useValidBorderNumbers } from "@/composables/useValidBorderNumbers"
 import { Texts } from "@/domain/documentUnit"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
-const props = defineProps<{ texts: Texts; validBorderNumbers: string[] }>()
-
-const emit = defineEmits<{
-  updateValue: [updatedValue: [keyof Texts, string]]
-}>()
+const store = useDocumentUnitStore()
 
 const data = computed(() => {
-  return useValidBorderNumbers(props.texts, props.validBorderNumbers)
+  if (store.documentUnit == undefined) return null
+  return useValidBorderNumbers(
+    store.documentUnit.texts,
+    store.documentUnit?.borderNumbers,
+  )
 })
+
+const updateValueByTextId = async (id: keyof Texts, updatedText: string) => {
+  const divElem = document.createElement("div")
+  divElem.innerHTML = updatedText
+  const hasImgElem = divElem.getElementsByTagName("img").length > 0
+  const hasTable = divElem.getElementsByTagName("table").length > 0
+  const hasInnerText = divElem.innerText.length > 0
+  store.documentUnit!.texts[id] =
+    hasInnerText || hasImgElem || hasTable ? updatedText : ""
+}
 </script>
 
 <template>
@@ -35,7 +46,7 @@ const data = computed(() => {
           editable
           :field-size="item.fieldSize"
           :value="item.value"
-          @update-value="emit('updateValue', [item.id, $event])"
+          @update-value="updateValueByTextId(item.id, $event)"
         />
 
         <TextInput
@@ -44,7 +55,7 @@ const data = computed(() => {
           :aria-label="item.aria"
           :model-value="item.value"
           size="medium"
-          @update:model-value="emit('updateValue', [item.id, $event as string])"
+          @update-value="updateValueByTextId(item.id, $event)"
         />
       </div>
     </div>

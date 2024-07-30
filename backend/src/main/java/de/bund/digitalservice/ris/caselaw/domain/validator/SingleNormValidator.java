@@ -1,9 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.domain.validator;
 
-import de.bund.digitalservice.ris.caselaw.domain.InvalidSingleNormValueException;
 import de.bund.digitalservice.ris.caselaw.domain.NormElement;
 import de.bund.digitalservice.ris.caselaw.domain.NormElementRepository;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
+import de.bund.digitalservice.ris.caselaw.domain.exception.InvalidSingleNormValueException;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormCode;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

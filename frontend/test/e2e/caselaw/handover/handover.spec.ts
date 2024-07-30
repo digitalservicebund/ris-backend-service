@@ -5,7 +5,7 @@ import {
   fillPreviousDecisionInputs,
   navigateToCategories,
   navigateToHandover,
-  waitForSaving,
+  save,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 
@@ -30,16 +30,11 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await waitForSaving(
-      async () => {
-        await fillPreviousDecisionInputs(page, {
-          court: "AG Aalen",
-        })
-        await page.getByLabel("Vorgehende Entscheidung speichern").click()
-      },
-      page,
-      { clickSaveButton: true },
-    )
+    await fillPreviousDecisionInputs(page, {
+      court: "AG Aalen",
+    })
+    await page.getByLabel("Vorgehende Entscheidung speichern").click()
+    await save(page)
 
     await expect(
       page.getByText(`AG Aalen`, {
@@ -71,16 +66,11 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
   }) => {
     await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
 
-    await waitForSaving(
-      async () => {
-        await fillPreviousDecisionInputs(page, {
-          court: "AG Aalen",
-        })
-        await page.getByLabel("Vorgehende Entscheidung speichern").click()
-      },
-      page,
-      { clickSaveButton: true },
-    )
+    await fillPreviousDecisionInputs(page, {
+      court: "AG Aalen",
+    })
+    await page.getByLabel("Vorgehende Entscheidung speichern").click()
+    await save(page)
 
     await expect(
       page.getByText(`AG Aalen`, {
@@ -112,16 +102,11 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await waitForSaving(
-      async () => {
-        await fillEnsuingDecisionInputs(page, {
-          court: "AG Aalen",
-        })
-        await page.getByLabel("Nachgehende Entscheidung speichern").click()
-      },
-      page,
-      { clickSaveButton: true },
-    )
+    await fillEnsuingDecisionInputs(page, {
+      court: "AG Aalen",
+    })
+    await page.getByLabel("Nachgehende Entscheidung speichern").click()
+    await save(page)
 
     await expect(
       page.getByText(`nachgehend, AG Aalen`, {
@@ -152,19 +137,13 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await waitForSaving(
-      async () => {
-        await fillEnsuingDecisionInputs(page, {
-          pending: true,
-          court: "AG Aalen",
-          fileNumber: "123",
-        })
-        await page.getByLabel("Nachgehende Entscheidung speichern").click()
-      },
-      page,
-      { clickSaveButton: true },
-    )
-
+    await fillEnsuingDecisionInputs(page, {
+      pending: true,
+      court: "AG Aalen",
+      fileNumber: "123",
+    })
+    await page.getByLabel("Nachgehende Entscheidung speichern").click()
+    await save(page)
     await expect(
       page.getByText(`anhängig, AG Aalen, Datum unbekannt, 123`, {
         exact: true,
@@ -183,16 +162,12 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
     prefilledDocumentUnit,
   }) => {
     await navigateToCategories(page, documentNumber)
-    await waitForSaving(
-      async () => {
-        await fillActiveCitationInputs(page, {
-          documentType: prefilledDocumentUnit.coreData.documentType?.label,
-        })
-        await page.getByLabel("Aktivzitierung speichern").click()
-      },
-      page,
-      { clickSaveButton: true },
-    )
+
+    await fillActiveCitationInputs(page, {
+      documentType: prefilledDocumentUnit.coreData.documentType?.label,
+    })
+    await page.getByLabel("Aktivzitierung speichern").click()
+    await save(page)
 
     await navigateToHandover(page, documentNumber)
 
@@ -231,14 +206,9 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
     await expect(page.locator("li:has-text('Dokumenttyp')")).toBeVisible()
     await page.locator("[aria-label='Rubriken bearbeiten']").click()
 
-    await waitForSaving(
-      async () => {
-        await page.locator("[aria-label='Aktenzeichen']").fill("abc")
-        await page.keyboard.press("Enter")
-      },
-      page,
-      { clickSaveButton: true },
-    )
+    await page.locator("[aria-label='Aktenzeichen']").fill("abc")
+    await page.keyboard.press("Enter")
+    await save(page)
 
     await page.locator("[aria-label='Gericht']").fill("aalen")
     await page.getByText("AG Aalen").click()

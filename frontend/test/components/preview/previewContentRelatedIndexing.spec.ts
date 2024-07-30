@@ -1,22 +1,36 @@
+import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewContentRelatedIndexing from "@/components/preview/PreviewContentRelatedIndexing.vue"
 import ActiveCitation from "@/domain/activeCitation"
-import { ContentRelatedIndexing } from "@/domain/documentUnit"
+import DocumentUnit, { ContentRelatedIndexing } from "@/domain/documentUnit"
 import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
 
-function renderComponent(contentRelatedIndexing: ContentRelatedIndexing) {
-  return render(PreviewContentRelatedIndexing, {
-    props: {
-      contentRelatedIndexing: contentRelatedIndexing,
-    },
-    global: {
-      provide: {
-        [previewLayoutInjectionKey as symbol]: "wide",
+function renderComponent(contentRelatedIndexing?: ContentRelatedIndexing) {
+  return {
+    ...render(PreviewContentRelatedIndexing, {
+      global: {
+        plugins: [
+          [
+            createTestingPinia({
+              initialState: {
+                docunitStore: {
+                  documentUnit: new DocumentUnit("123", {
+                    documentNumber: "foo",
+                    contentRelatedIndexing: contentRelatedIndexing ?? {},
+                  }),
+                },
+              },
+            }),
+          ],
+        ],
+        provide: {
+          [previewLayoutInjectionKey as symbol]: "wide",
+        },
       },
-    },
-  })
+    }),
+  }
 }
 
 describe("preview content related indexing", () => {

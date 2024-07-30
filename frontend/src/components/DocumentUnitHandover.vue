@@ -1,18 +1,12 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
 import HandoverView from "@/components/HandoverView.vue"
-import DocumentUnit from "@/domain/documentUnit"
 import EventRecord from "@/domain/eventRecord"
 import handoverService from "@/services/handoverService"
 import { ResponseError } from "@/services/httpClient"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
-const props = defineProps<{
-  documentUnit: DocumentUnit
-}>()
-
-const emits = defineEmits<{
-  requestDocumentUnitFromServer: []
-}>()
+const store = useDocumentUnitStore()
 
 const loadDone = ref(false)
 const eventLog = ref<EventRecord[]>()
@@ -22,7 +16,7 @@ const succeedMessage = ref<{ title: string; description: string }>()
 
 async function handoverDocument() {
   const response = await handoverService.handoverDocument(
-    props.documentUnit.uuid,
+    store.documentUnit!.uuid,
   )
   handoverResult.value = response.data
   if (!eventLog.value) eventLog.value = []
@@ -37,10 +31,11 @@ async function handoverDocument() {
       title: "Email wurde versendet",
       description: "",
     }
+    if (store.documentUnit?.documentNumber)
+      await store.loadDocumentUnit(store.documentUnit.documentNumber)
   } else {
     errorMessage.value = response.error
   }
-  emits("requestDocumentUnitFromServer")
 }
 
 function formatDate(date?: string): string {
@@ -59,7 +54,7 @@ function formatDate(date?: string): string {
 }
 
 onMounted(async () => {
-  const response = await handoverService.getEventLog(props.documentUnit.uuid)
+  const response = await handoverService.getEventLog(store.documentUnit!.uuid)
   if (!response.error && response.data) {
     eventLog.value = response.data
     for (const item of eventLog.value) {
@@ -78,7 +73,6 @@ onMounted(async () => {
   <div class="w-full grow p-24">
     <HandoverView
       v-if="loadDone"
-      :document-unit="documentUnit"
       :error-message="errorMessage"
       :event-log="eventLog"
       :handover-result="handoverResult"

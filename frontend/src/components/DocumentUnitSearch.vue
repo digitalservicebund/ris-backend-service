@@ -16,8 +16,10 @@ import errorMessages from "@/i18n/errors.json"
 import ComboboxItemService from "@/services/comboboxItemService"
 import service from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const router = useRouter()
+const store = useDocumentUnitStore()
 
 const currentPage = ref<Page<DocumentUnitListEntry>>()
 const documentUnitListEntries = computed(() => currentPage.value?.content)
@@ -165,8 +167,11 @@ async function createFromSearchQuery() {
     : []
   docUnit.coreData.decisionDate = dateFromQuery.value
   docUnit.coreData.court = courtFromQuery.value
+  await store.loadDocumentUnit(docUnit.documentNumber!)
+  store.documentUnit = docUnit
 
-  const updateResponse = await service.update(docUnit)
+  const updateResponse = await store.updateDocumentUnit()
+
   if (updateResponse.error) {
     createFromSearchQueryResponseError.value = updateResponse.error
     if (docUnit?.uuid) await service.delete(docUnit.uuid)

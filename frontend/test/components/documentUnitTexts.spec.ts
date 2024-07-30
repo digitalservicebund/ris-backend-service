@@ -1,18 +1,27 @@
+import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import DocumentUnitTexts from "@/components/DocumentUnitTexts.vue"
 import DocumentUnit from "@/domain/documentUnit"
 
 describe("Texts", () => {
-  global.ResizeObserver = require("resize-observer-polyfill")
-
   test("renders all text fields with labels", async () => {
     render(DocumentUnitTexts, {
-      props: {
-        texts: new DocumentUnit("foo").texts,
-        validBorderNumbers: ["1", "2", "3"],
+      global: {
+        plugins: [
+          [
+            createTestingPinia({
+              initialState: {
+                docunitStore: {
+                  documentUnit: new DocumentUnit("foo", {
+                    documentNumber: "1234567891234",
+                  }),
+                },
+              },
+            }),
+          ],
+        ],
       },
     })
-
     screen.getByText("Entscheidungsname")
     screen.getByText("Titelzeile")
     screen.getByText("Leitsatz")

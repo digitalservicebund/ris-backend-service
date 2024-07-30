@@ -57,7 +57,7 @@ export function useCaseLawMenuItems(
       label: "Dokumente",
       route: {
         ...baseRoute,
-        name: "caselaw-documentUnit-documentNumber-files",
+        name: "caselaw-documentUnit-documentNumber-attachments",
       },
     },
     {

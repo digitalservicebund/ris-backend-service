@@ -1,15 +1,16 @@
 /* eslint-disable playwright/no-conditional-in-test */
 /* eslint-disable playwright/no-conditional-expect */
 import { expect } from "@playwright/test"
+import { DocumentUnitCatagoriesEnum } from "@/components/enumDocumentUnitCatagories"
 import SingleNorm from "@/domain/singleNorm"
 import {
-  fillPreviousDecisionInputs,
   fillActiveCitationInputs,
   fillEnsuingDecisionInputs,
-  navigateToCategories,
-  handoverDocumentationUnit,
-  waitForSaving,
   fillNormInputs,
+  fillPreviousDecisionInputs,
+  handoverDocumentationUnit,
+  navigateToCategories,
+  save,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
@@ -104,16 +105,11 @@ test.describe("related documentation units", () => {
         await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
 
         // add second entry
-        await waitForSaving(
-          async () => {
-            await container
-              .getByLabel("Aktenzeichen " + section, { exact: true })
-              .fill(fileNumber3)
-            await container.getByLabel(section + " speichern").click()
-          },
-          page,
-          { clickSaveButton: true },
-        )
+        await container
+          .getByLabel("Aktenzeichen " + section, { exact: true })
+          .fill(fileNumber3)
+        await container.getByLabel(section + " speichern").click()
+        await save(page)
 
         // the third list item is a default list entry
         await expect(container.getByLabel("Listen Eintrag")).toHaveCount(3)
@@ -279,6 +275,36 @@ test.describe("related documentation units", () => {
         },
       )
     }
+  })
+
+  test("second user gets changes made by first user", async ({
+    browser,
+    page,
+    documentNumber,
+  }) => {
+    const fileNumber = "Aktenzeichen123"
+    const secondUserContext = await browser.newContext()
+    const secondPage = await secondUserContext.newPage()
+
+    await navigateToCategories(secondPage, documentNumber, {
+      category: DocumentUnitCatagoriesEnum.PROCEEDINGS_DECISIONS,
+    })
+
+    await navigateToCategories(page, documentNumber, {
+      category: DocumentUnitCatagoriesEnum.PROCEEDINGS_DECISIONS,
+    })
+
+    await fillPreviousDecisionInputs(page, {
+      fileNumber: fileNumber,
+    })
+    await page.getByTestId("previous-decision-save-button").click()
+    await save(page)
+    await save(secondPage)
+
+    await expect(
+      secondPage.getByText(fileNumber),
+      "Failed loading updates from another user",
+    ).toBeVisible()
   })
 
   test("deleting behaviour of list items", async ({ page, documentNumber }) => {

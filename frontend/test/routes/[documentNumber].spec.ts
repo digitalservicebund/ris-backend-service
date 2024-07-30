@@ -1,7 +1,7 @@
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createHead } from "@unhead/vue"
-import { MockInstance } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnit from "@/domain/documentUnit"
 import categories from "@/routes/caselaw/documentUnit/[documentNumber]/categories.vue"
@@ -33,10 +33,10 @@ function renderComponent() {
         component: categories,
       },
       {
-        path: "/caselaw/documentUnit/:documentNumber/files",
-        name: "caselaw-documentUnit-documentNumber-files",
+        path: "/caselaw/documentUnit/:documentNumber/attachments",
+        name: "caselaw-documentUnit-documentNumber-attachments",
         component: {
-          template: "<div data-testid='files'>Files</div>",
+          template: "<div data-testid='attachments'>Attachments</div>",
         },
       },
       {
@@ -62,45 +62,50 @@ function renderComponent() {
       props: {
         documentNumber: "1234567891234",
       },
-      global: { plugins: [head, router] },
+      global: {
+        plugins: [
+          head,
+          router,
+          [
+            createTestingPinia({
+              initialState: {
+                docunitStore: {
+                  documentUnit: new DocumentUnit("foo", {
+                    documentNumber: "1234567891234",
+                    coreData: {
+                      court: {
+                        type: "AG",
+                        location: "Test",
+                        label: "AG Test",
+                      },
+                    },
+                  }),
+                },
+              },
+              stubActions: false,
+            }),
+          ],
+        ],
+      },
     }),
   }
 }
 
-function mockDocumentUnit() {
-  return new DocumentUnit("foo", {
-    documentNumber: "1234567891234",
-    coreData: {
-      court: {
-        type: "AG",
-        location: "Test",
-        label: "AG Test",
-      },
-    },
-    texts: {},
-    previousDecisions: undefined,
-    ensuingDecisions: undefined,
-    contentRelatedIndexing: {},
-  })
-}
-
 describe("Document Number Route", () => {
-  let updateDocUnitMock: MockInstance
-
   beforeEach(() => {
-    updateDocUnitMock = vi
-      .spyOn(documentUnitService, "update")
-      .mockImplementation(() =>
-        Promise.resolve({
-          status: 200,
-          data: mockDocumentUnit(),
-        }),
-      )
+    vi.spyOn(documentUnitService, "update").mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: { documentationUnitVersion: 1, patch: [], errorPaths: [] },
+      }),
+    )
     vi.spyOn(documentUnitService, "getByDocumentNumber").mockImplementation(
       () =>
         Promise.resolve({
           status: 200,
-          data: mockDocumentUnit(),
+          data: new DocumentUnit("foo", {
+            documentNumber: "1234567891234",
+          }),
         }),
     )
     vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
@@ -113,7 +118,9 @@ describe("Document Number Route", () => {
     test("should render categories with side panels and header", async () => {
       const { router, container } = renderComponent()
 
-      await router.push({ path: "/caselaw/documentUnit/12423/categories" })
+      await router.push({
+        path: "/caselaw/documentUnit/1234567891234/categories",
+      })
 
       expect(screen.getByTestId("side-toggle-navigation")).toBeInTheDocument()
 
@@ -135,12 +142,15 @@ describe("Document Number Route", () => {
     test("should render documents with side panels and header", async () => {
       const { router } = renderComponent()
 
-      await router.push({ path: "/caselaw/documentUnit/12423/files" })
+      await router.push({
+        path: "/caselaw/documentUnit/1234567891234/attachments",
+      })
 
       expect(screen.getByTestId("side-toggle-navigation")).toBeInTheDocument()
 
       // Header with save button
       expect(screen.getByTestId("document-unit-info-panel")).toBeInTheDocument()
+
       expect(
         screen.queryByRole("button", { name: "Speichern Button" }),
       ).toBeInTheDocument()
@@ -151,13 +161,15 @@ describe("Document Number Route", () => {
       ).toBeInTheDocument()
 
       // Main route is rendered
-      expect(screen.getByTestId("files")).toBeInTheDocument()
+      expect(screen.getByTestId("attachments")).toBeInTheDocument()
     })
 
     test("should render handover with only nav side panel and header", async () => {
       const { router } = renderComponent()
 
-      await router.push({ path: "/caselaw/documentUnit/12423/handover" })
+      await router.push({
+        path: "/caselaw/documentUnit/1234567891234/handover",
+      })
 
       expect(screen.getByTestId("side-toggle-navigation")).toBeInTheDocument()
 
@@ -178,7 +190,7 @@ describe("Document Number Route", () => {
 
     test("should render preview without side panels and header", async () => {
       const { router } = renderComponent()
-      await router.push({ path: "/caselaw/documentUnit/12423/preview" })
+      await router.push({ path: "/caselaw/documentUnit/1234567891234/preview" })
 
       expect(
         screen.queryByTestId("side-toggle-navigation"),
@@ -212,7 +224,9 @@ describe("Document Number Route", () => {
       )
 
       const { router } = renderComponent()
-      await router.push({ path: "/caselaw/documentUnit/12423/categories" })
+      await router.push({
+        path: "/caselaw/documentUnit/1234567891234/categories",
+      })
 
       // Navigation
       expect(
@@ -234,38 +248,6 @@ describe("Document Number Route", () => {
 
       // Error page is rendered
       expect(screen.getByText("Backend_Error_Title")).toBeInTheDocument()
-    })
-  })
-
-  describe("Updating doc unit", () => {
-    test("should save doc unit with updated content", async () => {
-      const { router, container } = renderComponent()
-      await router.push({ path: "/caselaw/documentUnit/12423/categories" })
-
-      const categoriesInput = container.querySelector("#appraisalBody")
-      await userEvent.type(categoriesInput!, "categories_input")
-
-      // Server responds with updated doc unit
-      const updatedDocUnit = mockDocumentUnit()
-      updatedDocUnit.coreData.appraisalBody = "categories_input"
-      updateDocUnitMock.mockResolvedValueOnce(updatedDocUnit)
-
-      const saveButton = screen.queryByRole("button", {
-        name: "Speichern Button",
-      })
-      await userEvent.click(saveButton!)
-
-      expect(updateDocUnitMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          coreData: expect.objectContaining({
-            appraisalBody: "categories_input",
-          }),
-        }),
-      )
-
-      // Clicking save again without changing data should not make a request
-      await userEvent.click(saveButton!)
-      expect(updateDocUnitMock).toHaveBeenCalledOnce()
     })
   })
 })

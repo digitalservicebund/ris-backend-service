@@ -1,5 +1,6 @@
 import { computed, onUnmounted, ref } from "vue"
-import { ServiceResponse, ResponseError } from "@/services/httpClient"
+import { ResponseError } from "@/services/httpClient"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 function getCurrentTime(dateSaved: Date) {
   const fullHour = ("0" + dateSaved.getHours()).slice(-2)
@@ -7,10 +8,8 @@ function getCurrentTime(dateSaved: Date) {
   return `${fullHour}:${fullMinute}`
 }
 
-export function useSaveToRemote(
-  saveCallback: () => Promise<ServiceResponse<void>>,
-  autoSaveInterval = 0,
-) {
+export function useSaveToRemote(autoSaveInterval = 0) {
+  const store = useDocumentUnitStore()
   const saveIsInProgress = ref(false)
   const lastSaveError = ref<ResponseError | undefined>(undefined)
   const lastSavedOn = ref<Date | undefined>(undefined)
@@ -25,7 +24,7 @@ export function useSaveToRemote(
     saveIsInProgress.value = true
 
     try {
-      const response = await saveCallback()
+      const response = await store.updateDocumentUnit()
 
       if (response.status != 304) {
         lastSaveError.value = response.error

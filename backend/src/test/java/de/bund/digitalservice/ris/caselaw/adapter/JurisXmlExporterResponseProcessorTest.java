@@ -18,7 +18,6 @@ import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
@@ -27,6 +26,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.domain.export.juris.response.ImportMessageWrapper;
 import de.bund.digitalservice.ris.domain.export.juris.response.MessageAttachment;
 import de.bund.digitalservice.ris.domain.export.juris.response.ProcessMessageWrapper;
@@ -85,7 +85,7 @@ class JurisXmlExporterResponseProcessorTest {
   private JurisXmlExporterResponseProcessor responseProcessor;
 
   @BeforeEach
-  void setup() throws MessagingException, DocumentationUnitNotExistsException {
+  void setup() throws MessagingException {
     when(storeFactory.createStore()).thenReturn(store);
     when(store.getFolder("INBOX")).thenReturn(inbox);
     when(store.getFolder("processed")).thenReturn(processed);
@@ -123,7 +123,7 @@ class JurisXmlExporterResponseProcessorTest {
   }
 
   @Test
-  void testMessageGetsForwarded() throws MessagingException, DocumentationUnitNotExistsException {
+  void testMessageGetsForwarded() throws MessagingException {
     when(inbox.getMessages()).thenReturn(new Message[] {importMessage});
 
     responseProcessor.readEmails();

@@ -31,7 +31,7 @@ function deleteChip(index: number, value: string) {
     draft.splice(index, 1)
   })
 
-  emit("update:modelValue", next.length === 0 ? undefined : next)
+  emit("update:modelValue", next.length === 0 ? [] : next)
   emit("chipDeleted", index, value)
 }
 

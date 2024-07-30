@@ -1,0 +1,23 @@
+{
+  "coreData/fileNumbers": "Aktenzeichen",
+  "coreData/deviatingFileNumbers": "Abweichendes Aktenzeichen",
+  "coreData/court": "Gericht",
+  "coreData/deviatingCourts": "Abweichendes Gericht",
+  "coreData/previousProcedures": "Vorgänge",
+  "coreData/ecli": "ECLI",
+  "coreData/deviatingEclis": "Abweichender ECLI",
+  "coreData/appraisalBody": "Spruchkörper",
+  "coreData/decisionDate": "Entscheidungsdatum",
+  "coreData/deviatingDecisionDates": "Abweichendes Entscheidungsdatum",
+  "coreData/region": "Region",
+  "coreData/leadingDecisionNormReferences": "Gesetzeskraft",
+  "coreData/yearsOfDispute": "Streitjahr",
+  "texts/tenor": "Tenor",
+  "previousDecisions": "Vorgehende Entscheidung",
+  "ensuingDecisions": "Nachgehende Entscheidung",
+  "contentRelatedIndexing/keywords": "Schlagwörter",
+  "contentRelatedIndexing/fieldsOfLaw": "Sachgebiete",
+  "contentRelatedIndexing/norms": "Normen",
+  "contentRelatedIndexing/activeCitations": "Aktivzitierung",
+  "note": "Notiz"
+}

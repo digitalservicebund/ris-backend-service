@@ -4,7 +4,7 @@ import errorMessages from "@/i18n/errors.json"
 import {
   navigateToCategories,
   toggleFieldOfLawSection,
-  waitForSaving,
+  save,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
@@ -348,17 +348,13 @@ test.describe("field of law", () => {
     await expect(searchResult).toBeVisible()
     await searchResult.click()
 
-    await waitForSaving(
-      async () => {
-        const searchResultInTree = page.getByLabel(
-          "BR-01-06-05 Grundstückskaufvertrag hinzufügen",
-        )
-        await expect(searchResultInTree).toBeVisible()
-        await searchResultInTree.click()
-      },
-      page,
-      { clickSaveButton: true },
+    const searchResultInTree = page.getByLabel(
+      "BR-01-06-05 Grundstückskaufvertrag hinzufügen",
     )
+    await expect(searchResultInTree).toBeVisible()
+    await searchResultInTree.click()
+
+    await save(page)
   })
 
   test("Search with both norm string and stext string - sets show norm checkbox to true", async ({

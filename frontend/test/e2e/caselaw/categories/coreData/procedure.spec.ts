@@ -3,6 +3,7 @@ import {
   deleteDocumentUnit,
   deleteProcedure,
   navigateToCategories,
+  save,
   waitForInputValue,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
@@ -31,8 +32,7 @@ test.describe("procedure", () => {
         await page.getByText(`${newProcedure} neu erstellen`).click()
       }).toPass()
 
-      await page.locator("[aria-label='Speichern Button']").click()
-      await expect(page.getByText(`Zuletzt`).first()).toBeVisible()
+      await save(page)
 
       await page.reload()
       await waitForInputValue(page, "[aria-label='Vorgang']", newProcedure)
@@ -45,8 +45,7 @@ test.describe("procedure", () => {
         await page.getByText(`${secondProcedure} neu erstellen`).click()
       }).toPass()
 
-      await page.locator("[aria-label='Speichern Button']").click()
-      await expect(page.getByText(`Zuletzt`).first()).toBeVisible()
+      await save(page)
 
       await page.getByLabel("Vorgangshistorie anzeigen").click()
       await expect(page.getByText("Vorgangshistorie")).toBeVisible()

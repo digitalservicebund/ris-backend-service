@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories } from "../../e2e-utils"
+import { navigateToCategories, save } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 import { navigateToHandover } from "~/e2e/caselaw/e2e-utils"
 
@@ -44,13 +44,12 @@ test.describe(
 
       const inputFieldInnerHTML = await inputField.innerHTML()
       // Check text styling
-      expect(inputFieldInnerHTML.includes(singleIndentation)).toBeTruthy()
-      expect(inputFieldInnerHTML.includes(doubleIndentation)).toBeTruthy()
-      expect(inputFieldInnerHTML.includes(tripleIndentation)).toBeTruthy()
-      expect(inputFieldInnerHTML.includes(noIndentation)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(singleIndentation)
+      expect(inputFieldInnerHTML).toContain(doubleIndentation)
+      expect(inputFieldInnerHTML).toContain(tripleIndentation)
+      expect(inputFieldInnerHTML).toContain(noIndentation)
 
-      await page.getByText("Speichern").click()
-      await page.waitForEvent("requestfinished", { timeout: 5_000 })
+      await save(page)
 
       await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
       await expect(page.getByText("XML Vorschau")).toBeVisible()
@@ -80,20 +79,20 @@ test.describe(
       await page.keyboard.type("Abschnitt mit Einzug")
 
       let inputFieldInnerHTML = await inputField.innerHTML()
-      expect(inputFieldInnerHTML.includes(noIndentation)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(noIndentation)
 
       await inputField.click()
       await page.locator(`[aria-label='indent']:not([disabled])`).click()
 
       inputFieldInnerHTML = await inputField.innerHTML()
-      expect(inputFieldInnerHTML.includes(singleIndentation)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(singleIndentation)
 
       await inputField.click()
       await page.locator(`[aria-label='indent']:not([disabled])`).click()
       await page.locator(`[aria-label='indent']:not([disabled])`).click()
 
       inputFieldInnerHTML = await inputField.innerHTML()
-      expect(inputFieldInnerHTML.includes(tripleIndentation)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(tripleIndentation)
 
       await inputField.click()
       await page.locator(`[aria-label='outdent']:not([disabled])`).click()
@@ -101,7 +100,7 @@ test.describe(
       await page.locator(`[aria-label='outdent']:not([disabled])`).click()
 
       inputFieldInnerHTML = await inputField.innerHTML()
-      expect(inputFieldInnerHTML.includes(noIndentation)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(noIndentation)
     })
   },
 )

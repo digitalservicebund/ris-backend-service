@@ -1,9 +1,5 @@
 import { expect } from "@playwright/test"
-import {
-  navigateToCategories,
-  waitForInputValue,
-  waitForSaving,
-} from "../../e2e-utils"
+import { navigateToCategories, waitForInputValue, save } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 
 test.describe("court", () => {
@@ -13,17 +9,13 @@ test.describe("court", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await waitForSaving(
-      async () => {
-        await page.locator("[aria-label='Gericht']").fill("BGH")
-        await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
-        await expect(page.getByText("BGH")).toBeVisible()
-        await page.getByText("BGH").click()
-        await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
-      },
-      page,
-      { reload: true, clickSaveButton: true },
-    )
+    await page.locator("[aria-label='Gericht']").fill("BGH")
+    await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
+    await expect(page.getByText("BGH")).toBeVisible()
+    await page.getByText("BGH").click()
+    await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
+
+    await save(page)
 
     await page.reload()
     await page.locator("[aria-label='Gericht']").focus()
@@ -37,23 +29,16 @@ test.describe("court", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await waitForSaving(
-      async () => {
-        await page
-          .locator("[aria-label='Fehlerhaftes Gericht anzeigen']")
-          .click()
+    await page.locator("[aria-label='Fehlerhaftes Gericht anzeigen']").click()
 
-        await page.locator("[aria-label='Fehlerhaftes Gericht']").type("abc")
+    await page.locator("[aria-label='Fehlerhaftes Gericht']").type("abc")
 
-        await expect(
-          page.locator("[aria-label='Fehlerhaftes Gericht']"),
-        ).toHaveValue("abc")
+    await expect(
+      page.locator("[aria-label='Fehlerhaftes Gericht']"),
+    ).toHaveValue("abc")
 
-        await page.keyboard.press("Enter")
-      },
-      page,
-      { clickSaveButton: true },
-    )
+    await page.keyboard.press("Enter")
+    await save(page)
 
     await page.reload()
 
@@ -68,42 +53,30 @@ test.describe("court", () => {
     test.slow()
     await navigateToCategories(page, documentNumber)
 
-    await waitForSaving(
-      async () => {
-        await page
-          .locator("[aria-label='Fehlerhaftes Gericht anzeigen']")
-          .click()
-        await page
-          .locator("[aria-label='Fehlerhaftes Gericht']")
-          .type("incorrectCourt1")
-        await page.keyboard.press("Enter")
-        await page
-          .locator("[aria-label='Fehlerhaftes Gericht']")
-          .type("incorrectCourt2")
-        await page.keyboard.press("Enter")
-      },
-      page,
-      { clickSaveButton: true },
-    )
+    await page.locator("[aria-label='Fehlerhaftes Gericht anzeigen']").click()
+    await page
+      .locator("[aria-label='Fehlerhaftes Gericht']")
+      .type("incorrectCourt1")
+    await page.keyboard.press("Enter")
+    await page
+      .locator("[aria-label='Fehlerhaftes Gericht']")
+      .type("incorrectCourt2")
+    await page.keyboard.press("Enter")
 
-    await waitForSaving(
-      async () => {
-        await page
-          .locator("[aria-label='Fehlerhaftes Gericht anzeigen']")
-          .click()
-
-        await expect(page.getByText("IncorrectCourt1")).toBeVisible()
-        await expect(page.getByText("IncorrectCourt2")).toBeVisible()
-
-        await page
-          .locator(":text('incorrectCourt1') + button[aria-label='Löschen']")
-          .click()
-      },
-      page,
-      { clickSaveButton: true, reload: true },
-    )
-
+    await save(page)
     await page.reload()
+
+    await page.locator("[aria-label='Fehlerhaftes Gericht anzeigen']").click()
+    await expect(page.getByText("IncorrectCourt1")).toBeVisible()
+    await expect(page.getByText("IncorrectCourt2")).toBeVisible()
+
+    await page
+      .locator(":text('incorrectCourt1') + button[aria-label='Löschen']")
+      .click()
+
+    await save(page)
+    await page.reload()
+
     await page.locator("[aria-label='Fehlerhaftes Gericht anzeigen']").click()
     await expect(page.getByText("IncorrectCourt1")).toHaveCount(0)
     await expect(page.getByText("IncorrectCourt2")).toBeVisible()
@@ -197,33 +170,25 @@ test.describe("court", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await waitForSaving(
-      async () => {
-        await page.locator("[aria-label='Gericht']").fill("aalen")
+    await page.locator("[aria-label='Gericht']").fill("aalen")
 
-        // clicking on dropdown item triggers auto save
-        await page.getByText("AG Aalen").click()
-        await waitForInputValue(page, "[aria-label='Gericht']", "AG Aalen")
-      },
-      page,
-      { clickSaveButton: true },
-    )
+    // clicking on dropdown item triggers auto save
+    await page.getByText("AG Aalen").click()
+    await waitForInputValue(page, "[aria-label='Gericht']", "AG Aalen")
+
+    await save(page)
 
     await expect(page.getByText("Region")).toBeVisible()
 
     // region was set by the backend based on state database table
     await waitForInputValue(page, "[aria-label='Region']", "BW")
+    await page.reload()
+    // clear the court
+    await page.locator("[aria-label='Auswahl zurücksetzen']").click()
+    await expect(page.getByText("AG Aalen")).toBeHidden()
+    await waitForInputValue(page, "[aria-label='Gericht']", "")
 
-    await waitForSaving(
-      async () => {
-        // clear the court
-        await page.locator("[aria-label='Auswahl zurücksetzen']").click()
-        await expect(page.getByText("AG Aalen")).toBeHidden()
-        await waitForInputValue(page, "[aria-label='Gericht']", "")
-      },
-      page,
-      { clickSaveButton: true, reload: true },
-    )
+    await save(page)
 
     await expect(page.getByText("Region")).toBeVisible()
     // region was cleared by the backend
@@ -254,15 +219,10 @@ test.describe("court", () => {
     await navigateToCategories(page, documentNumber)
     await waitForInputValue(page, "select#legalEffect", "Keine Angabe")
 
-    await waitForSaving(
-      async () => {
-        await page.locator("[aria-label='Gericht']").fill("aachen")
-        await page.getByText("AG Aachen").click()
-        await waitForInputValue(page, "[aria-label='Gericht']", "AG Aachen")
-      },
-      page,
-      { clickSaveButton: true },
-    )
+    await page.locator("[aria-label='Gericht']").fill("aachen")
+    await page.getByText("AG Aachen").click()
+    await waitForInputValue(page, "[aria-label='Gericht']", "AG Aachen")
+    await save(page)
 
     await waitForInputValue(page, "select#legalEffect", "Keine Angabe")
     await expect(

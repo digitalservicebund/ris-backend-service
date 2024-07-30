@@ -1,3 +1,4 @@
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
@@ -9,7 +10,6 @@ import handoverService from "@/services/handoverService"
 
 function renderComponent() {
   const user = userEvent.setup()
-
   const router = createRouter({
     history: createWebHistory(),
     routes: [
@@ -40,28 +40,33 @@ function renderComponent() {
       },
     ],
   })
+
   return {
     user,
     ...render(DocumentUnitHandover, {
-      props: {
-        documentUnit: new DocumentUnit("foo", {
-          documentNumber: "1234567891234",
-          coreData: {
-            fileNumbers: ["123"],
-            court: {
-              label: "foo",
+      global: {
+        plugins: [
+          createTestingPinia({
+            initialState: {
+              docunitStore: {
+                documentUnit: new DocumentUnit("foo", {
+                  documentNumber: "1234567891234",
+                  coreData: {
+                    fileNumbers: ["123"],
+                    court: {
+                      label: "foo",
+                    },
+                    decisionDate: "2024-01-01",
+                    documentType: { jurisShortcut: "", label: "" },
+                    legalEffect: "Ja",
+                  },
+                }),
+              },
             },
-            decisionDate: "2024-01-01",
-            documentType: { jurisShortcut: "", label: "" },
-            legalEffect: "Ja",
-          },
-          texts: {},
-          previousDecisions: undefined,
-          ensuingDecisions: undefined,
-          contentRelatedIndexing: {},
-        }),
+          }),
+          [router],
+        ],
       },
-      global: { plugins: [router] },
     }),
   }
 }

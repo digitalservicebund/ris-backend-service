@@ -2,20 +2,16 @@
 import { ref, computed } from "vue"
 import KeywordsChipsInput from "@/components/input/KeywordsChipsInput.vue"
 import { ResponseError } from "@/services/httpClient"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
-const props = defineProps<{
-  modelValue: string[] | undefined
-}>()
-
-const emit = defineEmits<{ "update:modelValue": [value?: string[]] }>()
 const errorMessage = ref<ResponseError>()
 
+const store = useDocumentUnitStore()
+
 const keywords = computed({
-  get: () => {
-    return props.modelValue
-  },
-  set: (value) => {
-    if (value) emit("update:modelValue", value)
+  get: () => store.documentUnit!.contentRelatedIndexing.keywords,
+  set: (newValues) => {
+    store.documentUnit!.contentRelatedIndexing.keywords = newValues
   },
 })
 </script>

@@ -1,5 +1,7 @@
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, fireEvent, screen } from "@testing-library/vue"
+import { Stubs } from "@vue/test-utils/dist/types"
 import { createRouter, createWebHistory } from "vue-router"
 import HandoverView from "@/components/HandoverView.vue"
 import DocumentUnit from "@/domain/documentUnit"
@@ -25,47 +27,41 @@ const router = createRouter({
   ],
 })
 
-const setupWithDocUnitThatHasBeenHandedOver = () =>
-  render(HandoverView, {
-    props: {
-      documentUnit: new DocumentUnit("123", { documentNumber: "foo" }),
-      eventLog: [
-        {
-          type: EventRecordType.HANDOVER,
-          xml: '<?xml version="1.0"?>\n<!DOCTYPE juris-r SYSTEM "juris-r.dtd">\n<xml>content</xml>',
-          statusMessages: ["success"],
-          success: true,
-          receiverAddress: "receiver address",
-          mailSubject: "mail subject",
-          date: "01.02.2000",
-        },
-      ],
-    },
-    global: {
-      plugins: [router],
-    },
-  })
+function renderComponent(
+  options: {
+    props?: unknown
+    documentUnit?: DocumentUnit
+    stubs?: Stubs
+  } = {},
+) {
+  const user = userEvent.setup()
 
-const setupWithAllRequiredFields = () =>
-  render(HandoverView, {
-    props: {
-      documentUnit: new DocumentUnit("123", {
-        coreData: {
-          fileNumbers: ["foo"],
-          court: { type: "type", location: "location", label: "label" },
-          decisionDate: "2022-02-01",
-          legalEffect: "legalEffect",
-          documentType: {
-            jurisShortcut: "ca",
-            label: "category",
-          },
-        },
-      }),
-    },
-    global: {
-      plugins: [router],
-    },
-  })
+  return {
+    user,
+    ...render(HandoverView, {
+      props: options.props ?? {},
+      global: {
+        plugins: [
+          [router],
+          [
+            createTestingPinia({
+              initialState: {
+                docunitStore: {
+                  documentUnit:
+                    options.documentUnit ??
+                    new DocumentUnit("123", {
+                      documentNumber: "foo",
+                    }),
+                },
+              },
+            }),
+          ],
+        ],
+        stubs: options.stubs ?? undefined,
+      },
+    }),
+  }
+}
 
 describe("HandoverView:", () => {
   vi.spyOn(handoverService, "getPreview").mockImplementation(() =>
@@ -80,7 +76,25 @@ describe("HandoverView:", () => {
 
   describe("renders plausibility check", () => {
     it("with all required fields filled", async () => {
-      setupWithAllRequiredFields()
+      renderComponent({
+        documentUnit: new DocumentUnit("123", {
+          documentNumber: "foo",
+          coreData: {
+            fileNumbers: ["foo"],
+            court: {
+              type: "type",
+              location: "location",
+              label: "label",
+            },
+            decisionDate: "2022-02-01",
+            legalEffect: "legalEffect",
+            documentType: {
+              jurisShortcut: "ca",
+              label: "category",
+            },
+          },
+        }),
+      })
 
       expect(
         screen.getByText("Alle Pflichtfelder sind korrekt ausgefüllt"),
@@ -94,55 +108,35 @@ describe("HandoverView:", () => {
     })
 
     it("render preview error", async () => {
-      render(HandoverView, {
+      renderComponent({
         props: {
-          documentUnit: new DocumentUnit("123", {
-            coreData: {
-              fileNumbers: ["foo"],
-              court: { type: "type", location: "location", label: "label" },
-              decisionDate: "2022-02-01",
-              legalEffect: "legalEffect",
-              documentType: {
-                jurisShortcut: "ca",
-                label: "category",
-              },
-            },
-          }),
           errorMessage: {
             title: "preview error",
             description: "error message description",
           },
-        },
-        global: {
-          plugins: [router],
         },
       })
       expect(await screen.findByText("preview error")).toBeInTheDocument()
     })
 
     it("with required fields missing", async () => {
-      render(HandoverView, {
-        props: {
-          documentUnit: new DocumentUnit("123", {
-            documentNumber: "foo",
-            contentRelatedIndexing: {
-              norms: [
-                new NormReference({
-                  normAbbreviationRawValue: "ABC",
-                  singleNorms: [
-                    new SingleNorm({
-                      singleNorm: "§ 1",
-                      legalForce: new LegalForce(),
-                    }),
-                  ],
-                }),
-              ],
-            },
-          }),
-        },
-        global: {
-          plugins: [router],
-        },
+      renderComponent({
+        documentUnit: new DocumentUnit("123", {
+          documentNumber: "foo",
+          contentRelatedIndexing: {
+            norms: [
+              new NormReference({
+                normAbbreviationRawValue: "ABC",
+                singleNorms: [
+                  new SingleNorm({
+                    singleNorm: "§ 1",
+                    legalForce: new LegalForce(),
+                  }),
+                ],
+              }),
+            ],
+          },
+        }),
       })
       expect(
         await screen.findByText(
@@ -164,9 +158,6 @@ describe("HandoverView:", () => {
 
     it("'Rubriken bearbeiten' button links back to categories", async () => {
       render(HandoverView, {
-        props: {
-          documentUnit: new DocumentUnit("123", { documentNumber: "foo" }),
-        },
         global: {
           plugins: [router],
         },
@@ -184,7 +175,25 @@ describe("HandoverView:", () => {
 
   describe("on press 'Dokumentationseinheit an jDV übergeben'", () => {
     it("hands over successfully", async () => {
-      const { emitted } = setupWithAllRequiredFields()
+      const { emitted } = renderComponent({
+        documentUnit: new DocumentUnit("123", {
+          documentNumber: "foo",
+          coreData: {
+            fileNumbers: ["foo"],
+            court: {
+              type: "type",
+              location: "location",
+              label: "label",
+            },
+            decisionDate: "2022-02-01",
+            legalEffect: "legalEffect",
+            documentType: {
+              jurisShortcut: "ca",
+              label: "category",
+            },
+          },
+        }),
+      })
       const handoverButton = screen.getByRole("button", {
         name: "Dokumentationseinheit an jDV übergeben",
       })
@@ -194,9 +203,8 @@ describe("HandoverView:", () => {
     })
 
     it("renders error modal from backend", async () => {
-      render(HandoverView, {
+      renderComponent({
         props: {
-          documentUnit: new DocumentUnit("123", { documentNumber: "foo" }),
           handoverResult: {
             xml: "xml",
             statusMessages: ["error message 1", "error message 2"],
@@ -210,9 +218,6 @@ describe("HandoverView:", () => {
             description: "error message description",
           },
         },
-        global: {
-          plugins: [router],
-        },
       })
 
       expect(
@@ -224,14 +229,7 @@ describe("HandoverView:", () => {
     })
 
     it("renders error modal from frontend", async () => {
-      render(HandoverView, {
-        props: {
-          documentUnit: new DocumentUnit("123", { documentNumber: "foo" }),
-        },
-        global: {
-          plugins: [router],
-        },
-      })
+      renderComponent()
 
       const handoverButton = screen.getByRole("button", {
         name: "Dokumentationseinheit an jDV übergeben",
@@ -251,21 +249,28 @@ describe("HandoverView:", () => {
 
   describe("last handed over xml", () => {
     it("with earlier handed over document unit", async () => {
-      setupWithDocUnitThatHasBeenHandedOver()
+      renderComponent({
+        props: {
+          eventLog: [
+            {
+              type: EventRecordType.HANDOVER,
+              xml: '<?xml version="1.0"?>\n<!DOCTYPE juris-r SYSTEM "juris-r.dtd">\n<xml>content</xml>',
+              statusMessages: ["success"],
+              success: true,
+              receiverAddress: "receiver address",
+              mailSubject: "mail subject",
+              date: "01.02.2000",
+            },
+          ],
+        },
+      })
       expect(screen.getByLabelText("Letzte Ereignisse")).toHaveTextContent(
         `Letzte EreignisseXml Email Abgabe - 01.02.2000ÜBERE-Mail an: receiver address Betreff: mail subjectALSXML1<?xml version="1.0"?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>`,
       )
     })
 
     it("without earlier handed over document unit", async () => {
-      render(HandoverView, {
-        props: {
-          documentUnit: new DocumentUnit("123", { documentNumber: "foo" }),
-        },
-        global: {
-          plugins: [router],
-        },
-      })
+      renderComponent()
       expect(screen.getByLabelText("Letzte Ereignisse")).toHaveTextContent(
         `Letzte Ereignisse Diese Dokumentationseinheit wurde bisher nicht an die jDV übergeben`,
       )
@@ -273,27 +278,22 @@ describe("HandoverView:", () => {
   })
 
   it("with preview stubbing", async () => {
-    render(HandoverView, {
-      props: {
-        documentUnit: new DocumentUnit("123", {
-          coreData: {
-            fileNumbers: ["foo"],
-            court: { type: "type", location: "location", label: "label" },
-            decisionDate: "2022-02-01",
-            legalEffect: "legalEffect",
-            documentType: {
-              jurisShortcut: "ca",
-              label: "category",
-            },
+    renderComponent({
+      documentUnit: new DocumentUnit("123", {
+        coreData: {
+          fileNumbers: ["foo"],
+          court: { type: "type", location: "location", label: "label" },
+          decisionDate: "2022-02-01",
+          legalEffect: "legalEffect",
+          documentType: {
+            jurisShortcut: "ca",
+            label: "category",
           },
-        }),
-      },
-      global: {
-        plugins: [router],
-        stubs: {
-          CodeSnippet: {
-            template: '<div data-testid="code-snippet"/>',
-          },
+        },
+      }),
+      stubs: {
+        CodeSnippet: {
+          template: '<div data-testid="code-snippet"/>',
         },
       },
     })
@@ -309,20 +309,8 @@ describe("HandoverView:", () => {
   })
 
   it("with stubbing", () => {
-    const { container } = render(HandoverView, {
+    const { container } = renderComponent({
       props: {
-        documentUnit: new DocumentUnit("123", {
-          coreData: {
-            fileNumbers: ["foo"],
-            court: { type: "type", location: "location", label: "label" },
-            decisionDate: "2022-02-01",
-            legalEffect: "legalEffect",
-            documentType: {
-              jurisShortcut: "ca",
-              label: "category",
-            },
-          },
-        }),
         eventLog: [
           {
             type: EventRecordType.HANDOVER,
@@ -335,12 +323,21 @@ describe("HandoverView:", () => {
           },
         ],
       },
-      global: {
-        plugins: [router],
-        stubs: {
-          CodeSnippet: {
-            template: '<div data-testid="code-snippet"/>',
+      documentUnit: new DocumentUnit("123", {
+        coreData: {
+          fileNumbers: ["foo"],
+          court: { type: "type", location: "location", label: "label" },
+          decisionDate: "2022-02-01",
+          legalEffect: "legalEffect",
+          documentType: {
+            jurisShortcut: "ca",
+            label: "category",
           },
+        },
+      }),
+      stubs: {
+        CodeSnippet: {
+          template: '<div data-testid="code-snippet"/>',
         },
       },
     })
