@@ -89,9 +89,7 @@ test.describe(
         })
       },
     )
-    // Todo: Fix flakyness
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip(
+    test(
       "add, edit, delete note, and default opening and display logic",
       {
         annotation: [
@@ -143,8 +141,8 @@ test.describe(
           await navigateToAttachments(page, documentNumber)
           await uploadTestfile(page, "sample.docx")
           await expect(page.getByText("Die ist ein Test")).toBeVisible()
+          await expect(page).toHaveURL(/showAttachmentPanel=true/)
 
-          await page.waitForEvent("requestfinished")
           await navigateToSearch(page, { navigationBy: "click" })
 
           await navigateToCategories(page, documentNumber)
@@ -209,6 +207,7 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
           await navigateToAttachments(page, documentNumber)
           await uploadTestfile(page, "sample.docx")
           await expect(page.getByText("Die ist ein Test")).toBeVisible()
+          await expect(page).toHaveURL(/showAttachmentPanel=true/)
         })
 
         await test.step("open document with attachment and no note, check that attachment is displayed in open panel", async () => {
