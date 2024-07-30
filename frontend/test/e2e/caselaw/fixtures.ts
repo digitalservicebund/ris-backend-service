@@ -133,7 +133,6 @@ export const caselawTest = test.extend<MyFixtures>({
 
   // The prefilledDocumentUnit fixture is a dependant worker fixture, because it nees to be setup before and teared down after this function (in order to be deletable).
   linkedDocumentNumber: async (
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     { request, context, prefilledDocumentUnit },
     use,
   ) => {
@@ -152,7 +151,7 @@ export const caselawTest = test.extend<MyFixtures>({
     )
 
     if (!deleteResponse.ok()) {
-      throw Error(`DocumentUnit with number ${documentNumber} couldn't be deleted:
+      throw Error(`DocumentUnit with number ${documentNumber}, linked to ${prefilledDocumentUnit} couldn't be deleted:
       ${deleteResponse.status()} ${deleteResponse.statusText()}`)
     }
   },
