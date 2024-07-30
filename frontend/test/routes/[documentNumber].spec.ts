@@ -33,10 +33,10 @@ function renderComponent() {
         component: categories,
       },
       {
-        path: "/caselaw/documentUnit/:documentNumber/files",
-        name: "caselaw-documentUnit-documentNumber-files",
+        path: "/caselaw/documentUnit/:documentNumber/attachments",
+        name: "caselaw-documentUnit-documentNumber-attachments",
         component: {
-          template: "<div data-testid='files'>Files</div>",
+          template: "<div data-testid='attachments'>Attachments</div>",
         },
       },
       {
@@ -142,12 +142,15 @@ describe("Document Number Route", () => {
     test("should render documents with side panels and header", async () => {
       const { router } = renderComponent()
 
-      await router.push({ path: "/caselaw/documentUnit/1234567891234/files" })
+      await router.push({
+        path: "/caselaw/documentUnit/1234567891234/attachments",
+      })
 
       expect(screen.getByTestId("side-toggle-navigation")).toBeInTheDocument()
 
       // Header with save button
       expect(screen.getByTestId("document-unit-info-panel")).toBeInTheDocument()
+
       expect(
         screen.queryByRole("button", { name: "Speichern Button" }),
       ).toBeInTheDocument()
@@ -158,7 +161,7 @@ describe("Document Number Route", () => {
       ).toBeInTheDocument()
 
       // Main route is rendered
-      expect(screen.getByTestId("files")).toBeInTheDocument()
+      expect(screen.getByTestId("attachments")).toBeInTheDocument()
     })
 
     test("should render handover with only nav side panel and header", async () => {

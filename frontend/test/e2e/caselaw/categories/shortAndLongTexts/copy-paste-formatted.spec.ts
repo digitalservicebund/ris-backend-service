@@ -1,6 +1,6 @@
 import { expect, Locator, Page } from "@playwright/test"
 import {
-  navigateToFiles,
+  navigateToAttachments,
   uploadTestfile,
   navigateToCategories,
 } from "../../e2e-utils"
@@ -13,7 +13,7 @@ test.skip(
 )
 
 test.beforeEach(async ({ page, documentNumber }) => {
-  await navigateToFiles(page, documentNumber)
+  await navigateToAttachments(page, documentNumber)
 })
 
 test("copy-paste text with different styles and alignments from side panel", async ({

@@ -286,17 +286,13 @@ test.describe("related documentation units", () => {
     const secondUserContext = await browser.newContext()
     const secondPage = await secondUserContext.newPage()
 
-    await navigateToCategories(
-      secondPage,
-      documentNumber,
-      DocumentUnitCatagoriesEnum.PROCEEDINGS_DECISIONS,
-    )
+    await navigateToCategories(secondPage, documentNumber, {
+      category: DocumentUnitCatagoriesEnum.PROCEEDINGS_DECISIONS,
+    })
 
-    await navigateToCategories(
-      page,
-      documentNumber,
-      DocumentUnitCatagoriesEnum.PROCEEDINGS_DECISIONS,
-    )
+    await navigateToCategories(page, documentNumber, {
+      category: DocumentUnitCatagoriesEnum.PROCEEDINGS_DECISIONS,
+    })
 
     await fillPreviousDecisionInputs(page, {
       fileNumber: fileNumber,

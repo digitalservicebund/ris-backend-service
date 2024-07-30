@@ -1,7 +1,7 @@
 import { expect } from "@playwright/test"
 import {
   navigateToCategories,
-  navigateToFiles,
+  navigateToAttachments,
   uploadTestfile,
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
@@ -13,7 +13,7 @@ test.skip(
 )
 
 test.beforeEach(async ({ page, documentNumber }) => {
-  await navigateToFiles(page, documentNumber)
+  await navigateToAttachments(page, documentNumber)
 })
 
 /*

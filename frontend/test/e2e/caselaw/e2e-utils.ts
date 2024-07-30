@@ -37,15 +37,21 @@ export const navigateToSearch = async (
 export const navigateToCategories = async (
   page: Page,
   documentNumber: string,
-  category?: DocumentUnitCatagoriesEnum,
+  options?: {
+    category?: DocumentUnitCatagoriesEnum
+    skipAssert?: boolean
+  },
 ) => {
   await test.step("Navigate to 'Rubriken'", async () => {
     const queryParams = getAllQueryParamsFromUrl(page)
     const baseUrl =
       `/caselaw/documentunit/${documentNumber}/categories${queryParams}` +
-      scrollToID(category)
+      scrollToID(options?.category)
 
     await page.goto(baseUrl)
+
+    if (options?.skipAssert) return
+
     await expect(page.getByText("Spruchkörper")).toBeVisible({
       timeout: 15000, // for backend warm up
     })
@@ -53,12 +59,20 @@ export const navigateToCategories = async (
   })
 }
 
-export const navigateToPreview = async (page: Page, documentNumber: string) => {
+export const navigateToPreview = async (
+  page: Page,
+  documentNumber: string,
+  options?: {
+    skipAssert?: boolean
+  },
+) => {
   await test.step("Navigate to 'Vorschau'", async () => {
     const queryParams = getAllQueryParamsFromUrl(page)
     const baseUrl = `/caselaw/documentunit/${documentNumber}/preview${queryParams}`
 
     await page.goto(baseUrl)
+
+    if (options?.skipAssert) return
     await expect(page.getByTestId("preview")).toBeVisible({
       timeout: 15000, // for backend warm up
     })
@@ -66,13 +80,21 @@ export const navigateToPreview = async (page: Page, documentNumber: string) => {
   })
 }
 
-export const navigateToFiles = async (page: Page, documentNumber: string) => {
+export const navigateToAttachments = async (
+  page: Page,
+  documentNumber: string,
+  options?: {
+    skipAssert?: boolean
+  },
+) => {
   await test.step("Navigate to 'Dokumente'", async () => {
     const queryParams = getAllQueryParamsFromUrl(page)
     await page.goto(
-      `/caselaw/documentunit/${documentNumber}/files${queryParams}`,
+      `/caselaw/documentunit/${documentNumber}/attachments${queryParams}`,
     )
-    await expect(page.locator("h1:has-text('Dokumente')")).toBeVisible({
+    if (options?.skipAssert) return
+
+    await expect(page.getByTestId("document-unit-attachments")).toBeVisible({
       timeout: 15000, // for backend warm up
     })
   })
@@ -81,9 +103,13 @@ export const navigateToFiles = async (page: Page, documentNumber: string) => {
 export const navigateToHandover = async (
   page: Page,
   documentNumber: string,
+  options?: {
+    skipAssert?: boolean
+  },
 ) => {
   await test.step("Navigate to 'Übergabe an jDV'", async () => {
     await page.goto(`/caselaw/documentunit/${documentNumber}/handover`)
+    if (options?.skipAssert) return
     await expect(page.locator("h1:has-text('Übergabe an jDV')")).toBeVisible({
       timeout: 15000, // for backend warm up
     })

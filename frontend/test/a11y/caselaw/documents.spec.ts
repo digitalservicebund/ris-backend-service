@@ -2,14 +2,14 @@ import AxeBuilder from "@axe-core/playwright"
 import { expect } from "@playwright/test"
 import { caselawTest as test } from "../../e2e/caselaw/fixtures"
 import {
-  navigateToFiles,
+  navigateToAttachments,
   navigateToHandover,
   uploadTestfile,
 } from "~/e2e/caselaw/e2e-utils"
 
 test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/files)", () => {
   test("upload document", async ({ page, documentNumber }) => {
-    await navigateToFiles(page, documentNumber)
+    await navigateToAttachments(page, documentNumber)
 
     const tableView = page.getByRole("cell", {
       name: "Hochgeladen am",
@@ -23,7 +23,7 @@ test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/fil
   })
 
   test("delete document", async ({ page, documentNumber }) => {
-    await navigateToFiles(page, documentNumber)
+    await navigateToAttachments(page, documentNumber)
     const tableView = page.getByRole("cell", {
       name: "Hochgeladen am",
       exact: true,
@@ -38,7 +38,7 @@ test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/fil
   })
 
   test("delete document modal", async ({ page, documentNumber }) => {
-    await navigateToFiles(page, documentNumber)
+    await navigateToAttachments(page, documentNumber)
     await uploadTestfile(page, "sample.docx")
     await page.getByLabel("Datei löschen").click()
     await page.locator("[aria-label='Anhang löschen']").click()
@@ -51,7 +51,7 @@ test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/fil
     page,
     documentNumber,
   }) => {
-    await navigateToFiles(page, documentNumber)
+    await navigateToAttachments(page, documentNumber)
     await uploadTestfile(page, "sample.png")
     await expect(
       page.locator(

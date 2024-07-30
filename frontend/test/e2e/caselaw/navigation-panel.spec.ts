@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories, navigateToFiles } from "./e2e-utils"
+import { navigateToCategories, navigateToAttachments } from "./e2e-utils"
 import { caselawTest as test } from "./fixtures"
 
 test.describe("test navigation panel", () => {
@@ -25,7 +25,7 @@ test.describe("test navigation panel", () => {
     await page.getByLabel("Navigation schließen").click()
     await expect(page).toHaveURL(/showNavigationPanel=false/)
 
-    await navigateToFiles(page, documentNumber)
+    await navigateToAttachments(page, documentNumber)
     await expect(page.locator("aside", { hasText: "Rubriken" })).toBeHidden()
     await expect(page).toHaveURL(/showNavigationPanel=false/)
   })

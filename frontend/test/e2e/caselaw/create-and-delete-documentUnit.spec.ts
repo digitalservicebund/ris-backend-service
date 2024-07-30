@@ -10,11 +10,11 @@ test.describe("create a doc unit and delete it again", () => {
       .click()
     await expect(page.getByText("Oder hier auswählen")).toBeVisible()
     await expect(page).toHaveURL(
-      /\/caselaw\/documentunit\/[A-Z0-9]{13}\/files$/,
+      /\/caselaw\/documentunit\/[A-Z0-9]{13}\/attachments$/,
     )
 
     // Given the earlier expectation we can assume that the regex will match...
-    const documentNumber = /caselaw\/documentunit\/(.*)\/files/g.exec(
+    const documentNumber = /caselaw\/documentunit\/(.*)\/attachments/g.exec(
       page.url(),
     )?.[1] as string
 

@@ -140,7 +140,11 @@ const attachments = computed({
 </script>
 
 <template>
-  <FlexItem v-if="documentUnit" class="w-full flex-1 grow space-y-20 p-24">
+  <FlexItem
+    v-if="documentUnit"
+    class="w-full flex-1 grow space-y-20 p-24"
+    data-testid="document-unit-attachments"
+  >
     <PopupModal
       v-if="showDeleteModal"
       :aria-label="deleteModalHeaderText"

@@ -2,7 +2,7 @@ import { expect } from "@playwright/test"
 import {
   fillInput,
   navigateToCategories,
-  navigateToFiles,
+  navigateToAttachments,
   navigateToPreview,
   navigateToHandover,
   navigateToSearch,
@@ -53,7 +53,7 @@ test.describe(
         })
 
         await test.step("navigate to file upload, check that panel stays open", async () => {
-          await navigateToFiles(page, documentNumber)
+          await navigateToAttachments(page, documentNumber)
           await expect(page.getByLabel("Seitenpanel schließen")).toBeVisible()
         })
 
@@ -140,7 +140,7 @@ test.describe(
         })
 
         await test.step("open document with note and attachment, check that note is displayed in open panel", async () => {
-          await navigateToFiles(page, documentNumber)
+          await navigateToAttachments(page, documentNumber)
           await uploadTestfile(page, "sample.docx")
           await expect(page.getByText("Die ist ein Test")).toBeVisible()
 
@@ -206,7 +206,7 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
         })
 
         await test.step("prepare document with attachment", async () => {
-          await navigateToFiles(page, documentNumber)
+          await navigateToAttachments(page, documentNumber)
           await uploadTestfile(page, "sample.docx")
           await expect(page.getByText("Die ist ein Test")).toBeVisible()
         })
@@ -279,7 +279,7 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
       },
       async ({ page, documentNumber }) => {
         await test.step("prepare doc unit with attachments", async () => {
-          await navigateToFiles(page, documentNumber)
+          await navigateToAttachments(page, documentNumber)
           await uploadTestfile(page, "sample.docx")
           await expect(page.getByText("Die ist ein Test")).toBeVisible()
           await uploadTestfile(page, "some-formatting.docx")
