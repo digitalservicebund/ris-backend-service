@@ -99,12 +99,14 @@ jobs:
       - name: Send failed tests to metrics endpoint
         if: always()
         run: |
-          jq -r '[.suites[] | .specs[]?, .suites[]?.specs[]? | select(.tests[].results[].status == "failed" or .tests[].results[].status == "timedOut") | .title] | unique[]' test-results.json | while read test_title
+          BROWSER_NAME="${{ secrets.BROWSER_NAME }}"
+          RUN_ID="${{ github.run_id }}"
+          jq -r --arg browser "$BROWSER_NAME" --arg run_id "$RUN_ID" '[.suites[] | .specs[]?, .suites[]?.specs[]? | select(.tests[].results[].status == "failed" or .tests[].results[].status == "timedOut") | {title: .title, browser: $browser, run_id: $run_id}] | unique[]' test-results.json | while read -r test_case
           do
             curl -X POST ${{ secrets.E2E_TEST_METRICS_ENDPOINT }} \
                   -H "xc-token: ${{ secrets.E2E_TEST_METRICS_TOKEN }}" \
                   -H "Content-Type: application/json" \
-                  -d "{\"test\": \"${test_title}\", \"run_id\": \"${{ github.run_id }}\", \"browser\": \"${{ inputs.browser }}\"}"
+                  -d "$test_case"
           done
         working-directory: ./frontend
       - name: Upload json reports
