@@ -111,9 +111,9 @@ test.describe(
 
       await test.step("Check all border Numbers (Randnummern) have gone", async () => {
         inputFieldInnerText = await editor.innerText()
-        expect(inputFieldInnerText.includes("1\n\n" + firstReason)).toBeFalsy()
-        expect(inputFieldInnerText.includes("2\n\n" + secondReason)).toBeFalsy()
-        expect(inputFieldInnerText.includes("3\n\n" + thirdReason)).toBeFalsy()
+        expect(inputFieldInnerText).not.toContain("1\n\n" + firstReason)
+        expect(inputFieldInnerText).not.toContain("2\n\n" + secondReason)
+        expect(inputFieldInnerText).not.toContain("3\n\n" + thirdReason)
       })
 
       await reinsertAllBorderNumbers()

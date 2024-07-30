@@ -34,7 +34,7 @@ test.describe(
 
       const inputFieldInnerHTML = await inputField.innerHTML()
       // Check text styling
-      expect(inputFieldInnerHTML.includes(bulletList)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(bulletList)
       await save(page)
 
       await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
@@ -65,7 +65,7 @@ test.describe(
 
       const inputFieldInnerHTML = await inputField.innerHTML()
       // Check text styling
-      expect(inputFieldInnerHTML.includes(orderedList)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(orderedList)
 
       await save(page)
 
@@ -96,15 +96,15 @@ test.describe(
 
       let inputFieldInnerHTML = await inputField.innerHTML()
       // Check text styling
-      expect(inputFieldInnerHTML.includes(bulletList)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(bulletList)
 
       await page.getByLabel("orderedList").click()
       inputFieldInnerHTML = await inputField.innerHTML()
-      expect(inputFieldInnerHTML.includes(orderedList)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(orderedList)
 
       await page.getByLabel("orderedList").click()
       inputFieldInnerHTML = await inputField.innerHTML()
-      expect(inputFieldInnerHTML.includes(noList)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(noList)
     })
   },
 )

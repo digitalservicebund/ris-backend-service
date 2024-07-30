@@ -42,10 +42,10 @@ test.describe(
 
       const inputFieldInnerHTML = await inputField.innerHTML()
       // Check text styling
-      expect(inputFieldInnerHTML.includes(singleIndentation)).toBeTruthy()
-      expect(inputFieldInnerHTML.includes(doubleIndentation)).toBeTruthy()
-      expect(inputFieldInnerHTML.includes(tripleIndentation)).toBeTruthy()
-      expect(inputFieldInnerHTML.includes(noIndentation)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(singleIndentation)
+      expect(inputFieldInnerHTML).toContain(doubleIndentation)
+      expect(inputFieldInnerHTML).toContain(tripleIndentation)
+      expect(inputFieldInnerHTML).toContain(noIndentation)
 
       await save(page)
 
@@ -75,20 +75,20 @@ test.describe(
       await page.keyboard.type("Abschnitt mit Einzug")
 
       let inputFieldInnerHTML = await inputField.innerHTML()
-      expect(inputFieldInnerHTML.includes(noIndentation)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(noIndentation)
 
       await inputField.click()
       await page.getByLabel("indent").click()
 
       inputFieldInnerHTML = await inputField.innerHTML()
-      expect(inputFieldInnerHTML.includes(singleIndentation)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(singleIndentation)
 
       await inputField.click()
       await page.getByLabel("indent").click()
       await page.getByLabel("indent").click()
 
       inputFieldInnerHTML = await inputField.innerHTML()
-      expect(inputFieldInnerHTML.includes(tripleIndentation)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(tripleIndentation)
 
       await inputField.click()
       await page.getByLabel("outdent").click()
@@ -96,7 +96,7 @@ test.describe(
       await page.getByLabel("outdent").click()
 
       inputFieldInnerHTML = await inputField.innerHTML()
-      expect(inputFieldInnerHTML.includes(noIndentation)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(noIndentation)
     })
   },
 )

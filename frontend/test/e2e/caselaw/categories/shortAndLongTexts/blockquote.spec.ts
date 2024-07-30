@@ -36,7 +36,7 @@ test.describe(
       await test.step("check blockquote has been added to text", async () => {
         await page.getByLabel("invisible-characters").click()
         const inputFieldInnerHTML = await inputField.innerHTML()
-        expect(inputFieldInnerHTML.includes(blockquote)).toBeTruthy()
+        expect(inputFieldInnerHTML).toContain(blockquote)
       })
 
       await test.step("save document", async () => {
@@ -85,8 +85,8 @@ test.describe(
       await test.step("check blockquote has been removed from text", async () => {
         await page.getByLabel("invisible-characters").click()
         const inputFieldInnerHTML = await inputField.innerHTML()
-        expect(inputFieldInnerHTML.includes(blockquote)).toBeFalsy()
-        expect(inputFieldInnerHTML.includes(noBlockquote)).toBeTruthy()
+        expect(inputFieldInnerHTML).not.toContain(blockquote)
+        expect(inputFieldInnerHTML).toContain(noBlockquote)
       })
 
       await test.step("save document", async () => {
@@ -139,7 +139,7 @@ test.describe(
       await test.step("check blockquote has been added to text", async () => {
         await page.getByLabel("invisible-characters").click()
         const inputFieldInnerHTML = await inputField.innerHTML()
-        expect(inputFieldInnerHTML.includes(blockquote)).toBeTruthy()
+        expect(inputFieldInnerHTML).toContain(blockquote)
       })
 
       await test.step("save document", async () => {
@@ -200,8 +200,8 @@ test.describe(
       await test.step("check blockquote has been removed from text", async () => {
         await page.getByLabel("invisible-characters").click()
         const inputFieldInnerHTML = await inputField.innerHTML()
-        expect(inputFieldInnerHTML.includes(blockquote)).toBeFalsy()
-        expect(inputFieldInnerHTML.includes(noBlockquote)).toBeTruthy()
+        expect(inputFieldInnerHTML).not.toContain(blockquote)
+        expect(inputFieldInnerHTML).toContain(noBlockquote)
       })
 
       await test.step("save document", async () => {

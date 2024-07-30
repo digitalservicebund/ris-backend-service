@@ -87,13 +87,13 @@ test("create and validate border number links", async ({
   const inputFieldInnerHTML = await inputField.innerText()
 
   // Check all text copied
-  const inputFieldAlleText = await inputField.allTextContents()
-  expect(inputFieldAlleText[0].includes(firstReason)).toBeTruthy()
-  expect(inputFieldAlleText[0].includes(secondReason)).toBeTruthy()
-  expect(inputFieldAlleText[0].includes(thirdReason)).toBeTruthy()
-  expect(inputFieldInnerHTML.includes(firstReason)).toBeTruthy()
-  expect(inputFieldInnerHTML.includes(secondReason)).toBeTruthy()
-  expect(inputFieldInnerHTML.includes(thirdReason)).toBeTruthy()
+  const inputFieldAllText = await inputField.allTextContents()
+  expect(inputFieldAllText[0]).toContain(firstReason)
+  expect(inputFieldAllText[0]).toContain(secondReason)
+  expect(inputFieldAllText[0]).toContain(thirdReason)
+  expect(inputFieldInnerHTML).toContain(firstReason)
+  expect(inputFieldInnerHTML).toContain(secondReason)
+  expect(inputFieldInnerHTML).toContain(thirdReason)
 
   // Create valid and invalid border number links in Leitsatz
   const guidingPrincipleInput = page.locator("[data-testid='Leitsatz']")
