@@ -99,7 +99,7 @@ jobs:
       - name: Send failed tests to metrics endpoint
         if: always()
         run: |
-          BROWSER_NAME="${{ secrets.BROWSER_NAME }}"
+          BROWSER_NAME="${{ inputs.browser }}"
           RUN_ID="${{ github.run_id }}"
           jq -r --arg browser "$BROWSER_NAME" --arg run_id "$RUN_ID" '[.suites[] | .specs[]?, .suites[]?.specs[]? | select(.tests[].results[].status == "failed" or .tests[].results[].status == "timedOut") | {title: .title, browser: $browser, run_id: $run_id}] | unique[]' test-results.json | while read -r test_case
           do
