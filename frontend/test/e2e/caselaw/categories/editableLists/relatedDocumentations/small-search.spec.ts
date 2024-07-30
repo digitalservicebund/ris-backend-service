@@ -98,21 +98,35 @@ test("search for documentunits and link decision", async ({
   await activeCitationContainer.getByTestId("list-entry-0").click()
   await activeCitationContainer.getByLabel("Eintrag löschen").click()
 
+  //Check that active citation was actually deleted and replaced by a default empty entry
   await expect(
     activeCitationContainer.getByLabel("Listen Eintrag"),
   ).toHaveCount(1)
+  await expect(
+    activeCitationContainer.getByLabel("Gericht Aktivzitierung"),
+  ).toHaveValue("")
 
   await ensuingDecisionContainer.getByTestId("list-entry-0").click()
   await ensuingDecisionContainer.getByLabel("Eintrag löschen").click()
+
+  //Check that active citation was actually deleted and replaced by a default empty entry
   await expect(
     ensuingDecisionContainer.getByLabel("Listen Eintrag"),
   ).toHaveCount(1)
+  await expect(
+    ensuingDecisionContainer.getByLabel("Gericht Nachgehende Entscheidung"),
+  ).toHaveValue("")
 
   await previousDecisionContainer.getByTestId("list-entry-0").click()
   await previousDecisionContainer.getByLabel("Eintrag löschen").click()
+
+  //Check that active citation was actually deleted and replaced by a default empty entry
   await expect(
     previousDecisionContainer.getByLabel("Listen Eintrag"),
   ).toHaveCount(1)
+  await expect(
+    previousDecisionContainer.getByLabel("Gericht Vorgehende Entscheidung"),
+  ).toHaveValue("")
 
   await save(page)
 })
