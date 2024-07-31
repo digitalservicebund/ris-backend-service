@@ -9,13 +9,13 @@ import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 const store = useDocumentUnitStore()
 
 const references = computed({
-  get: () => store.documentUnit!.references,
+  get: () => store.documentUnit!.references as Reference[],
   set: (newValues) => {
     store.documentUnit!.references = newValues
   },
 })
 
-const defaultValue = new Reference()
+const defaultValue = new Reference() as Reference
 </script>
 
 <template>

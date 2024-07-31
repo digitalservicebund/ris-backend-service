@@ -152,11 +152,10 @@ export default class DocumentUnit {
       )
     }
 
-    if (data.references != undefined && data.references.length > 0) {
-      data.references.map(
-        (reference: Reference) => new Reference({ ...reference }),
+    if (data.references)
+      data.references = data.references.map(
+        (reference) => new Reference({ ...reference }),
       )
-    }
 
     Object.assign(this, data)
   }
