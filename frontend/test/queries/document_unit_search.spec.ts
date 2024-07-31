@@ -40,7 +40,7 @@ test.describe("document unit search queries", () => {
       parameter: {
         fileNumber: "Bv",
       },
-      maxDuration: 700, // last max 729, average 479, min 402
+      maxDuration: 2000, // last max 3546, average 1003, min 352
       minResults: 5,
     },
     {

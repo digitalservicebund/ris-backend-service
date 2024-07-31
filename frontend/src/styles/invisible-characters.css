@@ -1,8 +1,9 @@
+.ProseMirror-widget.invisible {
+  visibility: visible;
+}
+
 .invisible:before {
   color: #4466ff;
-}
-.invisible--soft-hyphen:before {
-  content: "-";
 }
 .invisible--tab:before {
   content: "→";
