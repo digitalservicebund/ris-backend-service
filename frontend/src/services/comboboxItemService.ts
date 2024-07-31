@@ -86,8 +86,9 @@ function formatDropdownItems(
     }
     case Endpoint.legalPeriodicals: {
       return (responseData as LegalPeriodical[]).map((item) => ({
-        label: item.legalPeriodicalAbbreviation,
+        label: `${item.legalPeriodicalAbbreviation} | ${item.legalPeriodicalTitle}`,
         value: item,
+        additionalInformation: item.legalPeriodicalSubtitle,
       }))
     }
   }
