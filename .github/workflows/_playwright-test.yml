@@ -86,7 +86,7 @@ jobs:
             workers_config="--workers=${{ inputs.workers }}"
           fi
 
-          npm run test:"$test_target" -- --project ${{ inputs.browser }} --repeat-each ${{ inputs.runs}} $workers_config
+          npm run test:"$test_target" -- --project ${{ inputs.browser }} --repeat-each ${{ inputs.runs}} $workers_config --fail-on-flaky-tests
         working-directory: ./frontend
       - name: Upload screenshots and traces of failed tests
         uses: actions/upload-artifact@v4
@@ -104,7 +104,7 @@ jobs:
             curl -X POST ${{ secrets.E2E_TEST_METRICS_ENDPOINT }} \
                   -H "xc-token: ${{ secrets.E2E_TEST_METRICS_TOKEN }}" \
                   -H "Content-Type: application/json" \
-                  -d "{\"test\": \"${test_title}\"}"
+                  -d "{\"test\": \"${test_title}\", \"githubRunId\": \"${{ github.run_id }}\", \"browser\": \"${{ inputs.browser }}\"}"
           done
         working-directory: ./frontend
       - name: Upload json reports

@@ -13,14 +13,14 @@ import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 /* eslint-disable playwright/no-conditional-in-test */
 test("search for documentunits and link decision", async ({
   page,
-  documentNumber,
+  linkedDocumentNumber,
   prefilledDocumentUnit,
 }) => {
   await handoverDocumentationUnit(
     page,
     prefilledDocumentUnit.documentNumber || "",
   )
-  await navigateToCategories(page, documentNumber)
+  await navigateToCategories(page, linkedDocumentNumber)
 
   const activeCitationContainer = page.getByLabel("Aktivzitierung")
   const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
@@ -92,19 +92,6 @@ test("search for documentunits and link decision", async ({
       },
     )
   }
-
-  // Clean up:
-  // We need to unlink the document units in order to be allowed to delete them in the fixtures
-  await activeCitationContainer.getByTestId("list-entry-0").click()
-  await activeCitationContainer.getByLabel("Eintrag löschen").click()
-
-  await ensuingDecisionContainer.getByTestId("list-entry-0").click()
-  await ensuingDecisionContainer.getByLabel("Eintrag löschen").click()
-
-  await previousDecisionContainer.getByTestId("list-entry-0").click()
-  await previousDecisionContainer.getByLabel("Eintrag löschen").click()
-
-  await save(page)
 })
 
 test("search with changed parameters resets the page to 0", async ({
