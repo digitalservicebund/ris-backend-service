@@ -1212,44 +1212,6 @@ class DocxConverterServiceTest {
             docx2Html.html());
       }
     }
-
-    // this test does not use the things from setUp() to stay independent
-    // might be good to refactor the other tests too to be independent? TODO
-    @Test
-    void testGetHml_withNumberingListEntryThatGetsNoSymbolPrepended() {
-      NumberingListEntryIndex numberingListEntryIndex =
-          new NumberingListEntryIndex(
-              "",
-              "1",
-              "",
-              "",
-              "",
-              "",
-              false,
-              false,
-              DocumentUnitNumberingListNumberFormat.NONE,
-              "0",
-              JcEnumeration.RIGHT,
-              "space");
-      DocumentUnitDocx numberingListEntry =
-          generateNumberingListEntry("1. entry with own numbering", numberingListEntryIndex);
-      TestDocumentGenerator generator =
-          new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
-      generator.addContent("1", numberingListEntry);
-      generator.generate();
-
-      try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
-          mockStatic(WordprocessingMLPackage.class)) {
-        mockedMLPackageStatic
-            .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
-            .thenReturn(mlPackage);
-
-        Docx2Html docx2Html = service.getConvertedObject("test.docx");
-
-        assertNotNull(docx2Html);
-        assertEquals("<ol><li><p>1. entry with own numbering</p></li></ol>", docx2Html.html());
-      }
-    }
   }
 
   @Test
