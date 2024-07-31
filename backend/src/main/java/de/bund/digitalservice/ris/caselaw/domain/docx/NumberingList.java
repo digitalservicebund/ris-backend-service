@@ -96,9 +96,9 @@ public class NumberingList implements DocumentUnitDocx {
     DocumentUnitNumberingListNumberFormat listNumberFormat = numberingListEntryIndex.numberFormat();
     String listStyle = getListType(listNumberFormat, numberingListEntryIndex);
     if (listNumberFormat == DocumentUnitNumberingListNumberFormat.BULLET) {
-      return listStyle == null ? "<ul>" : String.format("<ul style=\"%s\">", listStyle);
+      return String.format("<ul style=\"%s\">", listStyle);
     } else {
-      return listStyle == null ? "<ol>" : String.format("<ol style=\"%s\">", listStyle);
+      return String.format("<ol style=\"%s\">", listStyle);
     }
   }
 
