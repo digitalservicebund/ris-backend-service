@@ -279,7 +279,7 @@ test.describe("related documentation units", () => {
 
   test(
     "second user gets changes made by first user",
-    { tag: "Partielles Speichern" },
+    { tag: "@partielles-speichern" },
     async ({ browser, page, documentNumber }) => {
       const fileNumber = "Aktenzeichen123"
       const secondUserContext = await browser.newContext()
