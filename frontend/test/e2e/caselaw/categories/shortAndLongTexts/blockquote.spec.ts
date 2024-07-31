@@ -30,11 +30,13 @@ test.describe(
       })
 
       await test.step("mark text as blockquote via button", async () => {
-        await page.getByLabel("blockquote").click()
+        await page.locator(`[aria-label='blockquote']:not([disabled])`).click()
       })
 
       await test.step("check blockquote has been added to text", async () => {
-        await page.getByLabel("invisible-characters").click()
+        await page
+          .locator(`[aria-label='invisible-characters']:not([disabled])`)
+          .click()
         const inputFieldInnerHTML = await inputField.innerHTML()
         expect(inputFieldInnerHTML).toContain(blockquote)
       })
@@ -75,15 +77,17 @@ test.describe(
       })
 
       await test.step("mark text as blockquote via button", async () => {
-        await page.getByLabel("blockquote").click()
+        await page.locator(`[aria-label='blockquote']:not([disabled])`).click()
       })
 
       await test.step("remove blockquote from text via button", async () => {
-        await page.getByLabel("blockquote").click()
+        await page.locator(`[aria-label='blockquote']:not([disabled])`).click()
       })
 
       await test.step("check blockquote has been removed from text", async () => {
-        await page.getByLabel("invisible-characters").click()
+        await page
+          .locator(`[aria-label='invisible-characters']:not([disabled])`)
+          .click()
         const inputFieldInnerHTML = await inputField.innerHTML()
         expect(inputFieldInnerHTML).not.toContain(blockquote)
         expect(inputFieldInnerHTML).toContain(noBlockquote)
@@ -137,7 +141,9 @@ test.describe(
       })
 
       await test.step("check blockquote has been added to text", async () => {
-        await page.getByLabel("invisible-characters").click()
+        await page
+          .locator(`[aria-label='invisible-characters']:not([disabled])`)
+          .click()
         const inputFieldInnerHTML = await inputField.innerHTML()
         expect(inputFieldInnerHTML).toContain(blockquote)
       })
@@ -198,7 +204,9 @@ test.describe(
       })
 
       await test.step("check blockquote has been removed from text", async () => {
-        await page.getByLabel("invisible-characters").click()
+        await page
+          .locator(`[aria-label='invisible-characters']:not([disabled])`)
+          .click()
         const inputFieldInnerHTML = await inputField.innerHTML()
         expect(inputFieldInnerHTML).not.toContain(blockquote)
         expect(inputFieldInnerHTML).toContain(noBlockquote)

@@ -98,7 +98,9 @@ test.describe(
         // paste from clipboard into input field "Entscheidungsgründe"
         await editor.click()
         await page.keyboard.press(`${modifier}+KeyV`)
-        await page.getByLabel("invisible-characters").click()
+        await page
+          .locator(`[aria-label='invisible-characters']:not([disabled])`)
+          .click()
       })
 
       await checkAllBorderNumbersAreVisible()
@@ -162,7 +164,9 @@ test.describe(
 
       async function clickBorderNumberButton() {
         await test.step("Click border number button to delete border numbers from selection", async () => {
-          await page.getByLabel("borderNumber").click()
+          await page
+            .locator(`[aria-label='deleteBorderNumber']:not([disabled])`)
+            .click()
         })
       }
 

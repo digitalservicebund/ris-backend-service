@@ -57,7 +57,9 @@ test("copy-paste text with different styles and alignments from side panel", asy
 
     // hide invisible characters
     await inputField.click()
-    await page.getByLabel("invisible-characters").click()
+    await page
+      .locator(`[aria-label='invisible-characters']:not([disabled])`)
+      .click()
 
     const inputFieldInnerHTML = await inputField.innerHTML()
     // Check all text copied with style
@@ -115,7 +117,9 @@ test(
 
       // hide invisible characters
       await inputField.click()
-      await page.getByLabel("invisible-characters").click()
+      await page
+        .locator(`[aria-label='invisible-characters']:not([disabled])`)
+        .click()
 
       const inputFieldInnerHTML = await inputField.innerHTML()
       // Check all text copied with style
@@ -174,7 +178,9 @@ test(
 
       // hide invisible characters
       await inputField.click()
-      await page.getByLabel("invisible-characters").click()
+      await page
+        .locator(`[aria-label='invisible-characters']:not([disabled])`)
+        .click()
 
       const inputFieldInnerHTML = await inputField.innerHTML()
       // Check all text copied with style

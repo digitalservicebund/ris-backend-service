@@ -51,9 +51,9 @@ module.exports = {
         3: "3px",
       },
       boxShadow: {
-        white: "inset 0 0 0 50px bg-white",
-        focus: "inset 0 0 0 2px bg-blue-900",
-        hover: "inset 0 0 0 2px bg-blue-900",
+        blue: "inset 0 0 0 2px rgba(0, 75, 118, 1)",
+        focus: "inset 0 0 0 4px rgba(0, 75, 118, 1)",
+        hover: "inset 0 0 0 4px rgba(0, 75, 118, 1)",
         button: "inset 0 0 0 2px",
       },
       borderRadius: {
