@@ -40,9 +40,6 @@ export default class Reference implements EditableListItem {
         ? [this.legalPeriodical.legalPeriodicalAbbreviation]
         : []),
       ...(this.citation ? [this.citation] : []),
-      ...(this.legalPeriodical && this.legalPeriodical.primaryReference
-        ? ["amtlich"]
-        : ["nichtamtlich"]),
     ].join(", ")
   }
 
