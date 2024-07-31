@@ -98,7 +98,9 @@ test.describe(
         // paste from clipboard into input field "Entscheidungsgründe"
         await editor.click()
         await page.keyboard.press(`${modifier}+KeyV`)
-        await page.getByLabel("invisible-characters").click()
+        await page
+          .locator(`[aria-label='invisible-characters']:not([disabled])`)
+          .click()
       })
 
       await checkAllBorderNumbersAreVisible()
