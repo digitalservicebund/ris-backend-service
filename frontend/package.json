@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@braintree/sanitize-url": "^7.1.0",
-    "@guardian/prosemirror-invisibles": "^3.0.3",
+    "@guardian/prosemirror-invisibles": "^3.1.1",
     "@sentry/integrations": "^7.114.0",
     "@sentry/vue": "^8.20.0",
     "@tiptap/extension-blockquote": "^2.5.8",
