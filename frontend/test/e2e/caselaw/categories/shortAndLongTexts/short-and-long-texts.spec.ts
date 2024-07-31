@@ -59,9 +59,15 @@ test("text editor keyboard navigation", async ({ page, documentNumber }) => {
   await guidingPrincipleInput.click()
   await expect(guidingPrincipleInput).toBeFocused()
 
+  // Write text and select all
+  await page.keyboard.type("Text input")
+  await page.keyboard.press("ControlOrMeta+A")
+
   // Navigate to toolbar -> first button is focused
   await page.keyboard.press("Shift+Tab")
-  const firstButton = page.locator(`[aria-label='fullview']:not([disabled])`)
+  const firstButton = page
+    .getByLabel("Leitsatz Button Leiste")
+    .getByLabel("fullview")
   await expect(firstButton).toBeFocused()
 
   // Navigate to bold button with arrow keys
@@ -69,16 +75,23 @@ test("text editor keyboard navigation", async ({ page, documentNumber }) => {
   await page.keyboard.press("ArrowRight")
   await page.keyboard.press("ArrowRight")
   await page.keyboard.press("ArrowLeft")
-  const boldButton = page.locator(`[aria-label='bold']:not([disabled])`)
+  const boldButton = page
+    .getByLabel("Leitsatz Button Leiste")
+    .getByLabel("bold")
   await expect(boldButton).toBeFocused()
 
   // Pressing enter moves focus to the editor
   await page.keyboard.press("Enter")
   await expect(guidingPrincipleInput).toBeFocused()
 
-  // Tiptap editor needs to finish internal focus magic
-  // eslint-disable-next-line playwright/no-wait-for-timeout
-  await page.waitForTimeout(100)
+  // Without these two assertions the test is flaky -> timeout is necessary here. It is unclear why.
+  expect(await page.getByText("Text input").innerHTML()).toContain(
+    "<strong>Text</strong>",
+  )
+  // Tiptap inserts invisible characters -> input is split into two parts
+  expect(await page.getByText("Text input").innerHTML()).toContain(
+    "<strong> input</strong>",
+  )
 
   // Tabbing back into the toolbar sets focus to last active button
   await page.keyboard.press("Shift+Tab")
@@ -95,7 +108,9 @@ test("text editor keyboard navigation", async ({ page, documentNumber }) => {
 
   // Navigate to submenu button
   await page.keyboard.press("ArrowRight")
-  const leftButton = page.locator(`[aria-label='left']:not([disabled])`)
+  const leftButton = page
+    .getByLabel("Leitsatz Button Leiste")
+    .getByLabel("left")
   await expect(leftButton).toBeFocused()
 
   // Close submenu with ESC
