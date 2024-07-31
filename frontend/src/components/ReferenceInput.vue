@@ -4,6 +4,7 @@ import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
+import { useValidationStore } from "@/composables/useValidationStore"
 import Reference, { LegalPeriodical } from "@/domain/reference"
 import ComboboxItemService from "@/services/comboboxItemService"
 
@@ -21,6 +22,8 @@ const emit = defineEmits<{
 
 const reference = ref(new Reference({ ...props.modelValue }))
 const lastSavedModelValue = ref(new Reference({ ...props.modelValue }))
+
+const validationStore = useValidationStore<(typeof Reference.fields)[number]>()
 
 const legalPeriodical = computed({
   get: () =>
@@ -40,9 +43,21 @@ const legalPeriodical = computed({
   },
 })
 
+async function validateRequiredInput() {
+  validationStore.reset()
+
+  reference.value.missingRequiredFields.forEach((missingField) =>
+    validationStore.add("Pflichtfeld nicht befüllt", missingField),
+  )
+}
+
 async function addReference() {
-  emit("update:modelValue", reference.value as Reference)
-  emit("addEntry")
+  await validateRequiredInput()
+
+  if (!validationStore.getByMessage("Pflichtfeld nicht befüllt").length) {
+    emit("update:modelValue", reference.value as Reference)
+    emit("addEntry")
+  }
 }
 
 /**
@@ -61,31 +76,52 @@ watch(
 
 <template>
   <div class="flex flex-col gap-24">
-    <InputField id="legalPeriodical" label="Periodikum *">
+    <InputField
+      id="legalPeriodical"
+      v-slot="slotProps"
+      label="Periodikum *"
+      :validation-error="validationStore.getByField('legalPeriodical')"
+    >
       <ComboboxInput
         id="legalPeriodical"
         v-model="legalPeriodical"
         aria-label="Periodikum"
         clear-on-choosing-item
+        :has-error="slotProps.hasError"
         :item-service="ComboboxItemService.getLegalPeriodicals"
+        @focus="validationStore.remove('legalPeriodical')"
       ></ComboboxInput>
     </InputField>
     <div class="flex flex-col gap-24">
       <div class="flex justify-between gap-24">
-        <InputField id="citation" label="Zitatstelle *">
+        <InputField
+          id="citation"
+          v-slot="slotProps"
+          label="Zitatstelle *"
+          :validation-error="validationStore.getByField('citation')"
+        >
           <TextInput
             id="citation"
             v-model="reference.citation"
             aria-label="Zitatstelle"
+            :has-error="slotProps.hasError"
             size="medium"
+            @focus="validationStore.remove('citation')"
           ></TextInput>
         </InputField>
-        <InputField id="citation" label="Klammernzusatz *">
+        <InputField
+          id="citation"
+          v-slot="slotProps"
+          label="Klammernzusatz *"
+          :validation-error="validationStore.getByField('referenceSupplement')"
+        >
           <TextInput
             id="citation"
             v-model="reference.referenceSupplement"
             aria-label="Klammernzusatz"
+            :has-error="slotProps.hasError"
             size="medium"
+            @focus="validationStore.remove('referenceSupplement')"
           ></TextInput>
         </InputField>
       </div>

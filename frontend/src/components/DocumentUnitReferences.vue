@@ -19,7 +19,7 @@ const defaultValue = new Reference() as Reference
 </script>
 
 <template>
-  <div aria-label="Fundstellen" class="w-full bg-white p-32">
+  <div aria-label="Fundstellen" class="flex-1 bg-white p-32">
     <h2 class="ds-heading-03-reg mb-24">Fundstellen</h2>
     <div class="flex flex-row">
       <EditableList
