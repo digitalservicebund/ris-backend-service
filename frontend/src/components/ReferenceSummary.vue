@@ -20,7 +20,6 @@ const primaryReference = computed(() =>
       <div class="ds-label-01-reg mr-8">{{ data?.renderDecision }}</div>
 
       <IconBadge
-        v-if="props.data?.legalPeriodical?.primaryReference"
         background-color="bg-blue-300"
         color="text-blue-900"
         :label="primaryReference"

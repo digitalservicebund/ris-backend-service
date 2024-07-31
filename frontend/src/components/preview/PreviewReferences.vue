@@ -10,10 +10,14 @@ const props = defineProps<{
 }>()
 
 const primaryReferences = computed(() =>
-  props.references.filter((reference) => reference.primaryReference),
+  props.references.filter(
+    (reference) => reference.legalPeriodical?.primaryReference,
+  ),
 )
 const secondaryReferences = computed(() =>
-  props.references.filter((reference) => !reference.primaryReference),
+  props.references.filter(
+    (reference) => !reference.legalPeriodical?.primaryReference,
+  ),
 )
 </script>
 
@@ -27,9 +31,11 @@ const secondaryReferences = computed(() =>
       <div v-if="primaryReferences.length > 0">
         <span class="ds-body-01-bold">Amtliche Fundstellen</span>
 
-        <div v-for="item in primaryReferences" :key="item.legalPeriodicalId">
-          {{ item.legalPeriodicalAbbreviation }}
-          - {{ item.citation }}
+        <div
+          v-for="item in primaryReferences"
+          :key="item.legalPeriodical?.legalPeriodicalId"
+        >
+          {{ item.renderDecision }}
         </div>
       </div>
       <div
@@ -39,9 +45,11 @@ const secondaryReferences = computed(() =>
       </div>
       <div v-if="secondaryReferences.length > 0" class="pt-4">
         <span class="ds-body-01-bold">Sekundäre Fundstellen</span>
-        <div v-for="item in secondaryReferences" :key="item.legalPeriodicalId">
-          {{ item.legalPeriodicalAbbreviation }}
-          - {{ item.citation }}
+        <div
+          v-for="item in secondaryReferences"
+          :key="item.legalPeriodical?.legalPeriodicalId"
+        >
+          {{ item.renderDecision }}
         </div>
       </div>
     </PreviewContent>

@@ -35,12 +35,15 @@ export default class Reference implements EditableListItem {
   }
 
   get renderDecision(): string {
-    return [
+    const parts = [
       ...(this.legalPeriodical
         ? [this.legalPeriodical.legalPeriodicalAbbreviation]
         : []),
-      ...(this.citation ? [this.citation] : []),
-    ].join(", ")
+      ...(this.citation && this.referenceSupplement
+        ? [`${this.citation} (${this.referenceSupplement})`]
+        : [this.citation]),
+    ]
+    return parts.join(", ")
   }
 
   get hasMissingRequiredFields(): boolean {

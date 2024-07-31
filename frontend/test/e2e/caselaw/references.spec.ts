@@ -45,30 +45,20 @@ test.describe(
               await page
                 .getByText("MM | Mieter Magazin", { exact: true })
                 .click()
-              await waitForInputValue(
-                page,
-                "[aria-label='Periodikum']",
-                "MM | Mieter Magazin",
-              )
+              await waitForInputValue(page, "[aria-label='Periodikum']", "MM")
             })
 
             await test.step("When typing the incomplete legal periodical title (Mieter Magaz), the entry including abbreviation, title and subtitle can be found in the combobox", async () => {
-              ;async () => {
-                await fillInput(page, "Periodikum", "Mieter Magaz")
-                await expect(
-                  page.getByText("Magazin des Berliner Mieterverein e.V.", {
-                    exact: true,
-                  }),
-                ).toBeVisible()
-                await page
-                  .getByText("MM | Mieter Magazin", { exact: true })
-                  .click()
-                await waitForInputValue(
-                  page,
-                  "[aria-label='Periodikum']",
-                  "MM | Mieter Magazin",
-                )
-              }
+              await fillInput(page, "Periodikum", "Mieter Magaz")
+              await expect(
+                page.getByText("Magazin des Berliner Mieterverein e.V.", {
+                  exact: true,
+                }),
+              ).toBeVisible()
+              await page
+                .getByText("MM | Mieter Magazin", { exact: true })
+                .click()
+              await waitForInputValue(page, "[aria-label='Periodikum']", "MM")
             })
 
             await test.step("citation shows citation example", async () => {
@@ -83,9 +73,12 @@ test.describe(
             })
 
             await test.step("Reference can be added to editable list", async () => {
-              await page.locator("[aria-label='Übernehmen']").click()
+              await page.locator("[aria-label='Fundstelle speichern']").click()
               await expect(
-                page.getByText("MM, 2ß24, Nr. 1 2-5 (LT) sekundär"),
+                page.getByText("MM, 2024, Nr 1, 2-5 (LT)"),
+              ).toBeVisible()
+              await expect(
+                page.getByText("nichtamtlich", { exact: true }),
               ).toBeVisible()
             })
           },
@@ -95,17 +88,16 @@ test.describe(
 
         await test.step("Reference is persisted and shown after reload", async () => {
           await page.reload()
+          await expect(page.getByText("MM, 2024, Nr 1, 2-5 (LT)")).toBeVisible()
           await expect(
-            page.getByText("MM, 2ß24, Nr. 1 2-5 (LT) sekundär"),
+            page.getByText("nichtamtlich", { exact: true }),
           ).toBeVisible()
         })
 
         await waitForSaving(
           async () => {
             await test.step("Edit legal periodical in reference, verify that it is updated in the list", async () => {
-              await page
-                .getByText("MM - Mieter Magazin, 2ß24, Nr. 1 2-5 (LT) sekundär")
-                .click()
+              await page.getByTestId("list-entry-0").click()
               await fillInput(page, "Periodikum", "GVBl BB")
               await page
                 .getByText(
@@ -116,25 +108,19 @@ test.describe(
               await waitForInputValue(
                 page,
                 "[aria-label='Periodikum']",
-                "GVBl BB | Gesetz- und Verordnungsblatt für das Land Brandenburg",
+                "GVBl BB",
               )
               await expect(
                 page.getByText("Zitierbeispiel: 1991, 676-681"),
               ).toBeVisible()
-              await page
-                .getByText("GVBl BB, 2ß24, Nr. 1 2-5 (LT) amtlich")
-                .click()
-            })
+              await page.locator("[aria-label='Fundstelle speichern']").click()
+              await expect(
+                page.getByText("GVBl BB, 2024, Nr 1, 2-5 (LT)"),
+              ).toBeVisible()
 
-            await test.step("Verify correct rendering in list when removing citation and changing supplement", async () => {
-              ;async () => {
-                await fillInput(page, "Zitatstelle", "")
-                await fillInput(page, "Klammernzusatz", "LT")
-                await page.locator("[aria-label='Übernehmen']").click()
-                await expect(
-                  page.getByText("GVBl BB, (LT) amtlich"),
-                ).toBeVisible()
-              }
+              await expect(
+                page.getByText("amtlich", { exact: true }),
+              ).toBeVisible()
             })
           },
           page,
@@ -143,23 +129,19 @@ test.describe(
 
         await waitForSaving(
           async () => {
-            await test.step("Add second reference without supplement, verify that it shown in the list", async () => {
-              await page.locator("[aria-label='Weitere Angabe']").click()
+            await test.step("Add second reference, verify that it shown in the list", async () => {
               await fillInput(page, "Periodikum", "wdg")
               await page
                 .getByText("WdG | Welt der Gesundheitsversorgung", {
                   exact: true,
                 })
                 .click()
-              await waitForInputValue(
-                page,
-                "[aria-label='Periodikum']",
-                "WdG | Welt der Gesundheitsversorgung",
-              )
+              await waitForInputValue(page, "[aria-label='Periodikum']", "WdG")
               await fillInput(page, "Zitatstelle", "2024, 10-12")
-              await page.locator("[aria-label='Übernehmen']").click()
+              await fillInput(page, "Klammernzusatz", "ST")
+              await page.locator("[aria-label='Fundstelle speichern']").click()
               await expect(
-                page.getByText("WdG, 2024, 10-12 sekundär"),
+                page.getByText("WdG, 2024, 10-12 (ST)"),
               ).toBeVisible()
             })
           },
@@ -170,14 +152,14 @@ test.describe(
         await waitForSaving(
           async () => {
             await test.step("Delete references and verify they disappear from the list", async () => {
-              await page.getByText("WdG, 2024, 10-12 sekundär").click()
-              await page.locator("[aria-label='Eintrag Löschen']").click()
+              await page.getByTestId("list-entry-1").click()
+              await page.locator("[aria-label='Eintrag löschen']").click()
+              await expect(page.getByText("WdG, 2024, 10-12 (ST)")).toBeHidden()
+              await page.getByTestId("list-entry-0").click()
+              await page.locator("[aria-label='Eintrag löschen']").click()
               await expect(
-                page.getByText("WdG, 2024, 10-12 sekundär"),
+                page.getByText("GVBl BB, 2024, Nr 1, 2-5 (LT)"),
               ).toBeHidden()
-              await page.getByText("GVBl BB, (LT) amtlich").click()
-              await page.locator("[aria-label='Eintrag Löschen']").click()
-              await expect(page.getByText("GVBl BB, (LT) amtlich")).toBeHidden()
             })
           },
           page,
@@ -210,7 +192,6 @@ test.describe(
         await waitForSaving(
           async () => {
             await test.step("Add primary and secondary references with all data, verify remdering in preview", async () => {
-              await page.locator("[aria-label='Weitere Angabe']").click()
               await fillInput(page, "Periodikum", "wdg")
               await page
                 .getByText("WdG | Welt der Gesundheitsversorgung", {
@@ -219,12 +200,15 @@ test.describe(
                 .click()
               await fillInput(page, "Zitatstelle", "2024, 10-12")
               await fillInput(page, "Klammernzusatz", "LT")
-              await page.locator("[aria-label='Übernehmen']").click()
+              await page.locator("[aria-label='Fundstelle speichern']").click()
               await expect(
-                page.getByText("WdG, 2024, 10-12 (LT) sekundär"),
+                page.getByText("WdG, 2024, 10-12 (LT)"),
               ).toBeVisible()
-
-              await page.locator("[aria-label='Weitere Angabe']").click()
+              await expect(
+                page.getByText("nichtamtlich", {
+                  exact: true,
+                }),
+              ).toBeVisible()
               await fillInput(page, "Periodikum", "GVBl BB")
               await page
                 .getByText(
@@ -234,9 +218,14 @@ test.describe(
                 .click()
               await fillInput(page, "Zitatstelle", "2020, 01-99")
               await fillInput(page, "Klammernzusatz", "L")
-              await page.locator("[aria-label='Übernehmen']").click()
+              await page.locator("[aria-label='Fundstelle speichern']").click()
               await expect(
-                page.getByText("GVBl BB, 2020, 01-99 (L) amtlich"),
+                page.getByText("GVBl BB, 2020, 01-99 (L)"),
+              ).toBeVisible()
+              await expect(
+                page.getByText("amtlich", {
+                  exact: true,
+                }),
               ).toBeVisible()
             })
           },
@@ -247,10 +236,10 @@ test.describe(
         await navigateToPreview(page, documentNumber)
 
         await expect(
-          page.getByText("Amtliche FundstellenGVBl BB - 2020, 01-99 (L)"),
+          page.getByText("Amtliche FundstellenGVBl BB, 2020, 01-99 (L)"),
         ).toBeVisible()
         await expect(
-          page.getByText("Sekundäre FundstellenMM- 2024, 10-12 (LT)"),
+          page.getByText("Sekundäre FundstellenWdG, 2024, 10-12 (LT)"),
         ).toBeVisible()
       },
     )
@@ -273,7 +262,6 @@ test.describe(
         await waitForSaving(
           async () => {
             await test.step("Add primary and secondary references with all data", async () => {
-              await page.locator("[aria-label='Weitere Angabe']").click()
               await fillInput(page, "Periodikum", "wdg")
               await page
                 .getByText("WdG | Welt der Gesundheitsversorgung", {
@@ -282,12 +270,13 @@ test.describe(
                 .click()
               await fillInput(page, "Zitatstelle", "2024, 10-12")
               await fillInput(page, "Klammernzusatz", "LT")
-              await page.locator("[aria-label='Übernehmen']").click()
+              await page.locator("[aria-label='Fundstelle speichern']").click()
               await expect(
-                page.getByText("WdG, 2024, 10-12 (LT) sekundär"),
+                page.getByText("WdG, 2024, 10-12 (LT)"),
               ).toBeVisible()
-
-              await page.locator("[aria-label='Weitere Angabe']").click()
+              await expect(
+                page.getByText("nichtamtlich", { exact: true }),
+              ).toBeVisible()
               await fillInput(page, "Periodikum", "GVBl BB")
               await page
                 .getByText(
@@ -297,9 +286,12 @@ test.describe(
                 .click()
               await fillInput(page, "Zitatstelle", "2020, 01-99")
               await fillInput(page, "Klammernzusatz", "L")
-              await page.locator("[aria-label='Übernehmen']").click()
+              await page.locator("[aria-label='Fundstelle speichern']").click()
               await expect(
-                page.getByText("GVBl BB, 2020, 01-99 (L) amtlich"),
+                page.getByText("GVBl BB, 2020, 01-99 (L)"),
+              ).toBeVisible()
+              await expect(
+                page.getByText("amtlich", { exact: true }),
               ).toBeVisible()
             })
           },
@@ -307,56 +299,49 @@ test.describe(
           { clickSaveButton: true },
         )
 
-        await test.step("Navigate to handover, click in 'XML-Vorschau', check references are visible", async () => {
+        await test.step("Navigate to handover, click in 'XML-Vorschau', check references are visible in correct order", async () => {
           await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
           await expect(page.getByText("XML Vorschau")).toBeVisible()
           await page.getByText("XML Vorschau").click()
 
-          const primaryNodes = await page
-            .locator('code:has-text("<fundstelle typ="amtlich">")')
+          // <fundstelle typ="nichtamtlich">
+          //   <periodikum>WdG</periodikum>
+          //   <zitstelle>2024, 10-12 (LT)</zitstelle>
+          // </fundstelle>
+          // <fundstelle typ="amtlich">
+          //   <periodikum>GVBl BB</periodikum>
+          //   <zitstelle>2020, 01-99 (L)</zitstelle>
+          // </fundstelle>
+
+          const referencesNodes = await page
+            .locator('code:has-text("<fundstelle ")')
             .all()
-          expect(primaryNodes.length).toBe(1)
+          await expect(referencesNodes[0]).toHaveText(
+            '<fundstelle typ="nichtamtlich">',
+          )
+          await expect(referencesNodes[1]).toHaveText(
+            '<fundstelle typ="amtlich">',
+          )
 
-          const secondaryNodes = await page
-            .locator('code:has-text("<fundstelle typ="nichtamtlich">")')
+          const legalPeriodicalNodes = await page
+            .locator('code:has-text("<periodikum>")')
             .all()
-          expect(secondaryNodes.length).toBe(1)
-
-          const nodeText = await primaryNodes[0].textContent()
-          const primaryPeriodical = nodeText?.match(
-            /<periodikum>(.*?)<\/periodikum>/,
+          await expect(legalPeriodicalNodes[0]).toHaveText(
+            "<periodikum>WdG</periodikum>",
           )
-          // eslint-disable-next-line playwright/no-conditional-in-test
-          const extractedValue = primaryPeriodical ? primaryPeriodical[1] : null
-          expect(extractedValue).toBe("GVBl BB")
-
-          const primaryCitation = nodeText?.match(
-            /<zitstelle>(.*?)<\/zitstelle>/,
+          await expect(legalPeriodicalNodes[1]).toHaveText(
+            "<periodikum>GVBl BB</periodikum>",
           )
-          // eslint-disable-next-line playwright/no-conditional-in-test
-          const extractepPrimaryCitation = primaryCitation
-            ? primaryCitation[1]
-            : null
-          expect(extractepPrimaryCitation).toBe("2020, 01-99 (L)")
 
-          const secondaryNodeText = await secondaryNodes[0].textContent()
-          const secondaryPeriodical = secondaryNodeText?.match(
-            /<periodikum>(.*?)<\/periodikum>/,
+          const citationNodes = await page
+            .locator('code:has-text("<zitstelle>")')
+            .all()
+          await expect(citationNodes[0]).toHaveText(
+            "<zitstelle>2024, 10-12 (LT)</zitstelle>",
           )
-          // eslint-disable-next-line playwright/no-conditional-in-test
-          const extractedSecondaryValue = secondaryPeriodical
-            ? secondaryPeriodical[1]
-            : null
-          expect(extractedSecondaryValue).toBe("WdG")
-
-          const secondaryCitation = secondaryNodeText?.match(
-            /<zitstelle>(.*?)<\/zitstelle>/,
+          await expect(citationNodes[1]).toHaveText(
+            "<zitstelle>2020, 01-99 (L)</zitstelle>",
           )
-          // eslint-disable-next-line playwright/no-conditional-in-test
-          const extractepSecondaryCitation = secondaryCitation
-            ? secondaryCitation[1]
-            : null
-          expect(extractepSecondaryCitation).toBe("2024, 10-12 (LT)")
         })
       },
     )

@@ -30,7 +30,6 @@ const legalPeriodical = computed({
     reference?.value?.legalPeriodical
       ? {
           label: reference?.value?.legalPeriodical.legalPeriodicalAbbreviation,
-          // label: `${reference?.value?.legalPeriodical.legalPeriodicalAbbreviation} | ${reference?.value?.legalPeriodical.legalPeriodicalTitle}`,
           value: reference?.value?.legalPeriodical,
           additionalInformation:
             reference?.value?.legalPeriodical.legalPeriodicalSubtitle,
