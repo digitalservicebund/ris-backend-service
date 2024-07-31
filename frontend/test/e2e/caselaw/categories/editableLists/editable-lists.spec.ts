@@ -277,35 +277,35 @@ test.describe("related documentation units", () => {
     }
   })
 
-  test("second user gets changes made by first user", async ({
-    browser,
-    page,
-    documentNumber,
-  }) => {
-    const fileNumber = "Aktenzeichen123"
-    const secondUserContext = await browser.newContext()
-    const secondPage = await secondUserContext.newPage()
+  test(
+    "second user gets changes made by first user",
+    { tag: "Partielles Speichern" },
+    async ({ browser, page, documentNumber }) => {
+      const fileNumber = "Aktenzeichen123"
+      const secondUserContext = await browser.newContext()
+      const secondPage = await secondUserContext.newPage()
 
-    await navigateToCategories(secondPage, documentNumber, {
-      category: DocumentUnitCatagoriesEnum.PROCEEDINGS_DECISIONS,
-    })
+      await navigateToCategories(secondPage, documentNumber, {
+        category: DocumentUnitCatagoriesEnum.PROCEEDINGS_DECISIONS,
+      })
 
-    await navigateToCategories(page, documentNumber, {
-      category: DocumentUnitCatagoriesEnum.PROCEEDINGS_DECISIONS,
-    })
+      await navigateToCategories(page, documentNumber, {
+        category: DocumentUnitCatagoriesEnum.PROCEEDINGS_DECISIONS,
+      })
 
-    await fillPreviousDecisionInputs(page, {
-      fileNumber: fileNumber,
-    })
-    await page.getByTestId("previous-decision-save-button").click()
-    await save(page)
-    await save(secondPage)
+      await fillPreviousDecisionInputs(page, {
+        fileNumber: fileNumber,
+      })
+      await page.getByTestId("previous-decision-save-button").click()
+      await save(page)
+      await save(secondPage)
 
-    await expect(
-      secondPage.getByText(fileNumber),
-      "Failed loading updates from another user",
-    ).toBeVisible()
-  })
+      await expect(
+        secondPage.getByText(fileNumber),
+        "Failed loading updates from another user",
+      ).toBeVisible()
+    },
+  )
 
   test("deleting behaviour of list items", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
