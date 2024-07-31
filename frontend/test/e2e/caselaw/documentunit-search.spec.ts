@@ -251,14 +251,16 @@ test.describe("search", () => {
 
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
 
-    await page.waitForEvent("requestfinished")
-
     await expect
       .poll(async () =>
         page.getByText("Veröffentlicht", { exact: true }).count(),
       )
       .toBe(8)
-    await expect(page.getByText("Unveröffentlicht")).toBeHidden()
+
+    // only the unpublished in select should be counted.
+    await expect
+      .poll(async () => page.getByText("Unveröffentlicht").count())
+      .toBe(1)
   })
 
   test("filter for documentunits with errors only", async ({ page }) => {
