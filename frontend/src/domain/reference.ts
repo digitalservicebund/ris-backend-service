@@ -5,6 +5,8 @@ export type LegalPeriodical = {
   legalPeriodicalTitle?: string
   legalPeriodicalSubtitle?: string
   legalPeriodicalAbbreviation: string
+  primaryReference?: boolean
+  citationStyle: string
 }
 
 export default class Reference implements EditableListItem {
@@ -12,7 +14,6 @@ export default class Reference implements EditableListItem {
   citation?: string
   referenceSupplement?: string
   footnote?: string
-  primaryReference?: boolean
   legalPeriodical?: LegalPeriodical
 
   static readonly requiredFields = [
@@ -39,7 +40,9 @@ export default class Reference implements EditableListItem {
         ? [this.legalPeriodical.legalPeriodicalAbbreviation]
         : []),
       ...(this.citation ? [this.citation] : []),
-      ...(this.primaryReference ? ["amtlich"] : ["nichtamtlich"]),
+      ...(this.legalPeriodical && this.legalPeriodical.primaryReference
+        ? ["amtlich"]
+        : ["nichtamtlich"]),
     ].join(", ")
   }
 

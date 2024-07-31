@@ -40,6 +40,7 @@ const legalPeriodical = computed({
     } else {
       reference.value.legalPeriodical = undefined
     }
+    console.log(reference.value)
   },
 })
 
@@ -94,24 +95,30 @@ watch(
     </InputField>
     <div class="flex flex-col gap-24">
       <div class="flex justify-between gap-24">
-        <InputField
-          id="citation"
-          v-slot="slotProps"
-          label="Zitatstelle *"
-          :validation-error="validationStore.getByField('citation')"
-        >
-          <TextInput
+        <div class="flex-1">
+          <InputField
             id="citation"
-            v-model="reference.citation"
-            aria-label="Zitatstelle"
-            :has-error="slotProps.hasError"
-            size="medium"
-            @focus="validationStore.remove('citation')"
-          ></TextInput>
-        </InputField>
+            v-slot="slotProps"
+            label="Zitatstelle *"
+            :validation-error="validationStore.getByField('citation')"
+          >
+            <TextInput
+              id="citation"
+              v-model="reference.citation"
+              aria-label="Zitatstelle"
+              :has-error="slotProps.hasError"
+              size="medium"
+              @focus="validationStore.remove('citation')"
+            ></TextInput>
+          </InputField>
+          <span v-if="legalPeriodical" class="ds-label-03-reg"
+            >Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}</span
+          >
+        </div>
         <InputField
           id="citation"
           v-slot="slotProps"
+          class="flex-1"
           label="Klammernzusatz *"
           :validation-error="validationStore.getByField('referenceSupplement')"
         >
