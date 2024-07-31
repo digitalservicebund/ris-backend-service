@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+/**
+ * Mock for Prosemirrors dom access
+ * see https://github.com/ueberdosis/tiptap/discussions/4008
+ */
 export const mockDocumentForProsemirror = () => {
   function getBoundingClientRect() {
     const rec = {

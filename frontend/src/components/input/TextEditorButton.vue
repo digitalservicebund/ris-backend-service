@@ -39,8 +39,8 @@ defineExpose({ button, children })
 
 watch(
   () => props.disabled,
-  (newValue) => {
-    if (newValue) {
+  (isDisabled) => {
+    if (isDisabled) {
       showDropdown.value = false
     }
   },
