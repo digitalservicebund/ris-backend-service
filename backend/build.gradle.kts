@@ -174,7 +174,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.1")
 
-    implementation(platform("software.amazon.awssdk:bom:2.26.25"))
+    implementation(platform("software.amazon.awssdk:bom:2.26.27"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -215,14 +215,14 @@ dependencies {
     // => CVE-2023-2976
     implementation("com.google.guava:guava:33.2.1-jre")
 
-    implementation("io.getunleash:unleash-client-java:9.2.3")
+    implementation("io.getunleash:unleash-client-java:9.2.4")
     implementation("org.apache.commons:commons-text:1.12.0")
     implementation("org.jsoup:jsoup:1.18.1")
 
-    val flywayCore = "org.flywaydb:flyway-core:10.16.0"
+    val flywayCore = "org.flywaydb:flyway-core:10.17.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.16.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.17.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")

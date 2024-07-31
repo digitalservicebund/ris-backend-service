@@ -1,12 +1,12 @@
 import fs from "fs"
 import { expect } from "@playwright/test"
-import { navigateToFiles, uploadTestfile } from "../e2e-utils"
+import { navigateToAttachments, uploadTestfile } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 import { createDataTransfer } from "~/e2e/shared/e2e-utils"
 
 test.describe("upload an original document to a doc unit", () => {
   test.beforeEach(async ({ page, documentNumber }) => {
-    await navigateToFiles(page, documentNumber)
+    await navigateToAttachments(page, documentNumber)
   })
 
   test("upload and delete docx file per file chooser", async ({ page }) => {

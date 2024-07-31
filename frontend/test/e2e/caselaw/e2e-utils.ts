@@ -1,9 +1,14 @@
 import { expect, Page } from "@playwright/test"
-import { generateString } from "../../test-helper/dataGenerators"
 import { caselawTest as test } from "./fixtures"
+import { DocumentUnitCatagoriesEnum } from "@/components/enumDocumentUnitCatagories"
 import SingleNorm from "@/domain/singleNorm"
+import { generateString } from "~/test-helper/dataGenerators"
 
 /* eslint-disable playwright/no-conditional-in-test */
+
+function scrollToID(category?: DocumentUnitCatagoriesEnum): string {
+  return category ? "#" + category : ""
+}
 
 const getAllQueryParamsFromUrl = (page: Page): string => {
   const url = new URL(page.url())
@@ -32,12 +37,21 @@ export const navigateToSearch = async (
 export const navigateToCategories = async (
   page: Page,
   documentNumber: string,
+  options?: {
+    category?: DocumentUnitCatagoriesEnum
+    skipAssert?: boolean
+  },
 ) => {
   await test.step("Navigate to 'Rubriken'", async () => {
     const queryParams = getAllQueryParamsFromUrl(page)
-    const baseUrl = `/caselaw/documentunit/${documentNumber}/categories${queryParams}`
+    const baseUrl =
+      `/caselaw/documentunit/${documentNumber}/categories${queryParams}` +
+      scrollToID(options?.category)
 
     await page.goto(baseUrl)
+
+    if (options?.skipAssert) return
+
     await expect(page.getByText("Spruchkörper")).toBeVisible({
       timeout: 15000, // for backend warm up
     })
@@ -57,12 +71,20 @@ export const navigateToReferences = async (
   })
 }
 
-export const navigateToPreview = async (page: Page, documentNumber: string) => {
+export const navigateToPreview = async (
+  page: Page,
+  documentNumber: string,
+  options?: {
+    skipAssert?: boolean
+  },
+) => {
   await test.step("Navigate to 'Vorschau'", async () => {
     const queryParams = getAllQueryParamsFromUrl(page)
     const baseUrl = `/caselaw/documentunit/${documentNumber}/preview${queryParams}`
 
     await page.goto(baseUrl)
+
+    if (options?.skipAssert) return
     await expect(page.getByTestId("preview")).toBeVisible({
       timeout: 15000, // for backend warm up
     })
@@ -70,13 +92,21 @@ export const navigateToPreview = async (page: Page, documentNumber: string) => {
   })
 }
 
-export const navigateToFiles = async (page: Page, documentNumber: string) => {
+export const navigateToAttachments = async (
+  page: Page,
+  documentNumber: string,
+  options?: {
+    skipAssert?: boolean
+  },
+) => {
   await test.step("Navigate to 'Dokumente'", async () => {
     const queryParams = getAllQueryParamsFromUrl(page)
     await page.goto(
-      `/caselaw/documentunit/${documentNumber}/files${queryParams}`,
+      `/caselaw/documentunit/${documentNumber}/attachments${queryParams}`,
     )
-    await expect(page.locator("h1:has-text('Dokumente')")).toBeVisible({
+    if (options?.skipAssert) return
+
+    await expect(page.getByTestId("document-unit-attachments")).toBeVisible({
       timeout: 15000, // for backend warm up
     })
   })
@@ -85,9 +115,13 @@ export const navigateToFiles = async (page: Page, documentNumber: string) => {
 export const navigateToHandover = async (
   page: Page,
   documentNumber: string,
+  options?: {
+    skipAssert?: boolean
+  },
 ) => {
   await test.step("Navigate to 'Übergabe an jDV'", async () => {
     await page.goto(`/caselaw/documentunit/${documentNumber}/handover`)
+    if (options?.skipAssert) return
     await expect(page.locator("h1:has-text('Übergabe an jDV')")).toBeVisible({
       timeout: 15000, // for backend warm up
     })
@@ -127,40 +161,9 @@ export const uploadTestfile = async (
   }).toPass({ timeout: 15000 })
 }
 
-export async function waitForSaving(
-  body: () => Promise<void>,
-  page: Page,
-  options?: { clickSaveButton?: boolean; reload?: boolean; error?: string },
-) {
-  if (options?.reload) {
-    await page.reload()
-  }
-
-  const saveStatus = page.getByText(/Zuletzt .* Uhr/).first()
-  let lastSaving: string | undefined = undefined
-  if (await saveStatus.isVisible()) {
-    lastSaving = /Zuletzt (.*) Uhr/.exec(
-      await saveStatus.innerText(),
-    )?.[1] as string
-  }
-
-  await body()
-
-  if (options?.clickSaveButton) {
-    await page.locator("[aria-label='Speichern Button']").click()
-  }
-
-  if (options?.error) {
-    await expect(page.getByText(options.error).first()).toBeVisible()
-  } else {
-    await Promise.all([
-      await expect(page.getByText(`Zuletzt`).first()).toBeVisible(),
-      lastSaving ??
-        (await expect(
-          page.getByText(`Zuletzt ${lastSaving} Uhr`).first(),
-        ).toBeHidden()),
-    ])
-  }
+export async function save(page: Page) {
+  await page.locator("[aria-label='Speichern Button']").click()
+  await expect(page.getByText(`Zuletzt`).first()).toBeVisible()
 }
 
 export async function toggleFieldOfLawSection(page: Page): Promise<void> {
@@ -528,15 +531,4 @@ export async function fillActiveCitationInputs(
       values.documentType,
     )
   }
-}
-
-export async function checkIfPreviousDecisionCleared(page: Page) {
-  ;[
-    "Gericht Vorgehende Entscheidung",
-    "Entscheidungsdatum Vorgehende Entscheidung",
-    "Aktenzeichen Vorgehende Entscheidung",
-    "Dokumenttyp Vorgehende Entscheidung",
-  ].forEach((ariaLabel) =>
-    waitForInputValue(page, `[aria-label='${ariaLabel}']`, ""),
-  )
 }

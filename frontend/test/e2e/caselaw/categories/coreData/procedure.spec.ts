@@ -3,15 +3,18 @@ import {
   deleteDocumentUnit,
   deleteProcedure,
   navigateToCategories,
+  save,
   waitForInputValue,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("procedure", () => {
+  // If tests run in parallel, we do not want to delete other procedures -> random prefix
+  const testPrefix = "test_" + generateString({ length: 10 })
   test.beforeAll(async ({ browser }) => {
     const page = await browser.newPage()
-    await page.goto(`/caselaw/procedures?q=test_`)
+    await page.goto(`/caselaw/procedures?q=${testPrefix}`)
     const listItems = await page.getByLabel("Vorgang Listenelement").all()
     expect(listItems.length).toBe(0)
   })
@@ -26,13 +29,12 @@ test.describe("procedure", () => {
       await navigateToCategories(page, documentNumber)
 
       await expect(async () => {
-        newProcedure = "test_" + generateString({ length: 10 })
+        newProcedure = testPrefix + generateString({ length: 10 })
         await page.locator("[aria-label='Vorgang']").fill(newProcedure)
         await page.getByText(`${newProcedure} neu erstellen`).click()
       }).toPass()
 
-      await page.locator("[aria-label='Speichern Button']").click()
-      await expect(page.getByText(`Zuletzt`).first()).toBeVisible()
+      await save(page)
 
       await page.reload()
       await waitForInputValue(page, "[aria-label='Vorgang']", newProcedure)
@@ -40,13 +42,12 @@ test.describe("procedure", () => {
 
     await test.step("fill previous procedures", async () => {
       await expect(async () => {
-        const secondProcedure = "test_" + generateString({ length: 10 })
+        const secondProcedure = testPrefix + generateString({ length: 10 })
         await page.locator("[aria-label='Vorgang']").fill(secondProcedure)
         await page.getByText(`${secondProcedure} neu erstellen`).click()
       }).toPass()
 
-      await page.locator("[aria-label='Speichern Button']").click()
-      await expect(page.getByText(`Zuletzt`).first()).toBeVisible()
+      await save(page)
 
       await page.getByLabel("Vorgangshistorie anzeigen").click()
       await expect(page.getByText("Vorgangshistorie")).toBeVisible()
@@ -98,7 +99,7 @@ test.describe("procedure", () => {
   })
   test.afterAll(async ({ browser }) => {
     const page = await browser.newPage()
-    await page.goto(`/caselaw/procedures?q=test_`)
+    await page.goto(`/caselaw/procedures?q=${testPrefix}`)
     await expect(page.getByLabel("Nach Vorgängen suchen")).toBeVisible()
     const listItems = await page.getByLabel("Vorgang Listenelement").all()
 

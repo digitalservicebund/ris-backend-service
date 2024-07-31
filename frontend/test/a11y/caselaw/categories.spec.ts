@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright"
 import { expect } from "@playwright/test"
 import {
   navigateToCategories,
-  waitForSaving,
+  save,
   fillPreviousDecisionInputs,
 } from "../../e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "../../e2e/caselaw/fixtures"
@@ -116,8 +116,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     await page.getByLabel("Vorgang", { exact: true }).press("ArrowDown")
     await page.getByLabel("dropdown-option").press("Enter")
 
-    await page.getByLabel("Speichern Button").click()
-    await page.waitForEvent("requestfinished")
+    await save(page)
 
     await page.locator("[aria-label='Vorgang']").click()
     await expect(
@@ -159,17 +158,13 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
   test("proceeding decision", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
-    await waitForSaving(
-      async () => {
-        await fillPreviousDecisionInputs(page, {
-          court: "AG Aalen",
-          decisionDate: "03.12.2004",
-          fileNumber: "1a2b3c",
-        })
-      },
-      page,
-      { clickSaveButton: true },
-    )
+    await fillPreviousDecisionInputs(page, {
+      court: "AG Aalen",
+      decisionDate: "03.12.2004",
+      fileNumber: "1a2b3c",
+    })
+    await save(page)
+
     await page.reload()
     await fillPreviousDecisionInputs(page, {
       decisionDate: "03.12.2004",

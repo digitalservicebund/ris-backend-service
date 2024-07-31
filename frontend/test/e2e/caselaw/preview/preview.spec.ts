@@ -3,6 +3,7 @@ import {
   fillInput,
   navigateToCategories,
   navigateToPreview,
+  save,
   waitForInputValue,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
@@ -40,7 +41,7 @@ test.describe("preview", () => {
       )
       await expect(page.getByText("AG Aachen")).toBeVisible()
       await expect(page.getByText("31.12.2019")).toBeVisible()
-      await expect(page.getByText("NW")).toBeVisible()
+      await expect(page.getByText("NW", { exact: true })).toBeVisible()
       await expect(page.getByText("guidingPrinciple")).toBeVisible()
     })
 
@@ -62,8 +63,7 @@ test.describe("preview", () => {
       await inputField.click()
       await page.keyboard.type("some more text")
 
-      await page.getByLabel("Speichern Button").click()
-      await page.waitForEvent("requestfinished", { timeout: 5_000 })
+      await save(page)
     })
 
     await test.step("check updated values in preview", async () => {
@@ -110,8 +110,7 @@ test.describe("preview", () => {
       // Delete court entry
       await page.locator("[aria-label='Auswahl zurücksetzen']").first().click()
 
-      await page.getByLabel("Speichern Button").click()
-      await page.waitForEvent("requestfinished", { timeout: 5_000 })
+      await save(page)
     })
 
     await test.step("check deleted values are not in preview", async () => {

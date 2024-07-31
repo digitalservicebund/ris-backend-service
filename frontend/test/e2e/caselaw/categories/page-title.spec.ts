@@ -2,7 +2,7 @@ import { expect } from "@playwright/test"
 import { caselawTest as test } from "../fixtures"
 import {
   navigateToCategories,
-  navigateToFiles,
+  navigateToAttachments,
   navigateToPreview,
   navigateToHandover,
 } from "~/e2e/caselaw/e2e-utils"
@@ -21,7 +21,7 @@ test.describe("catagories page title", () => {
     await navigateToHandover(page, documentNumber)
     expect(await page.title()).toBe(expectedPageTitle)
 
-    await navigateToFiles(page, documentNumber)
+    await navigateToAttachments(page, documentNumber)
     expect(await page.title()).toBe(expectedPageTitle)
 
     await navigateToPreview(page, documentNumber)

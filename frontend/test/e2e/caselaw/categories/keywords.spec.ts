@@ -1,9 +1,5 @@
 import { expect } from "@playwright/test"
-import {
-  navigateToCategories,
-  waitForSaving,
-  waitForInputValue,
-} from "../e2e-utils"
+import { navigateToCategories, save, waitForInputValue } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
@@ -77,16 +73,11 @@ test.describe("keywords", () => {
 
     const keyword = generateString()
 
+    await page.locator("[aria-label='Schlagwörter']").fill(keyword)
+    await waitForInputValue(page, "[aria-label='Schlagwörter']", keyword)
+    await page.keyboard.press("Enter")
     // first
-    await waitForSaving(
-      async () => {
-        await page.locator("[aria-label='Schlagwörter']").fill(keyword)
-        await waitForInputValue(page, "[aria-label='Schlagwörter']", keyword)
-        await page.keyboard.press("Enter")
-      },
-      page,
-      { clickSaveButton: true },
-    )
+    await save(page)
     await expect(page.getByText(keyword)).toBeVisible()
 
     await page.locator("[aria-label='Schlagwörter']").fill(keyword)

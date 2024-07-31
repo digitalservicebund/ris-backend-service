@@ -3,9 +3,13 @@ http:
     backend:
       rule: "PathPrefix(`/api`) || PathPrefix(`/actuator`) || PathPrefix(`/login`) || PathPrefix(`/logout`) || PathPrefix(`/oauth`)"
       service: backend
+      middlewares:
+        - test-compress
     frontend:
       rule: "PathPrefix(`/`)"
       service: frontend
+      middlewares:
+        - test-compress
 
   services:
     backend:
@@ -17,3 +21,14 @@ http:
       loadBalancer:
         servers:
           - url: "http://localhost:3000"
+
+  middlewares:
+    test-compress:
+      compress:
+        includedContentTypes:
+          - application/json
+          - application/javascript
+          - text/css
+          - text/html
+          - text/plain
+          - text/javascript

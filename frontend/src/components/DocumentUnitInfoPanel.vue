@@ -88,10 +88,11 @@ watchEffect(() => {
     <SaveButton
       v-if="
         route.path.includes('categories') ||
-        route.path.includes('files') ||
+        route.path.includes('attachments') ||
         route.path.includes('references')
       "
       aria-label="Speichern Button"
+      data-testid="document-unit-save-button"
     />
   </div>
 </template>

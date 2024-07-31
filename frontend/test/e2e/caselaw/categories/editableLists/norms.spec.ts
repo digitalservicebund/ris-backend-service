@@ -5,7 +5,7 @@ import {
   fillInput,
   fillNormInputs,
   navigateToCategories,
-  waitForSaving,
+  save,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
@@ -52,16 +52,12 @@ test.describe("norm", () => {
     await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
 
     // add second entry
-    await waitForSaving(
-      async () => {
-        await fillNormInputs(page, {
-          normAbbreviation: "PBefG",
-        })
-        await container.getByLabel("Norm speichern").click()
-      },
-      page,
-      { clickSaveButton: true },
-    )
+
+    await fillNormInputs(page, {
+      normAbbreviation: "PBefG",
+    })
+    await container.getByLabel("Norm speichern").click()
+    await save(page)
 
     // the third list item is a default list entry
     await expect(container.getByLabel("Listen Eintrag")).toHaveCount(3)
@@ -338,7 +334,7 @@ test.describe("norm", () => {
       const saveNormButton = normContainer.getByLabel("Norm speichern")
       await saveNormButton.click()
 
-      await page.getByText("Speichern").click()
+      await save(page)
       await expect(page.locator("text=Nichtig (Brandenburg)")).toBeVisible()
 
       // edit legal force
@@ -354,7 +350,7 @@ test.describe("norm", () => {
 
       await saveNormButton.click()
 
-      await page.getByText("Speichern").click()
+      await save(page)
       await expect(page.locator("text=Vereinbar (Berlin (Ost))")).toBeVisible()
 
       // remove legal force
@@ -364,7 +360,7 @@ test.describe("norm", () => {
       await clearInput(page, "Gesetzeskraft Geltungsbereich")
 
       await saveNormButton.click()
-      await page.getByText("Speichern").click()
+      await save(page)
       await expect(page.locator("text=Vereinbar (Berlin (Ost))")).toBeHidden()
     })
 
@@ -399,7 +395,7 @@ test.describe("norm", () => {
       const saveNormButton = normContainer.getByLabel("Norm speichern")
       await saveNormButton.click()
 
-      await page.getByText("Speichern").click()
+      await save(page)
       await expect(page.locator("text=Fehlende Daten")).toBeVisible()
 
       // enter edit mode
@@ -427,7 +423,7 @@ test.describe("norm", () => {
 
       await saveNormButton.click()
 
-      await page.getByText("Speichern").click()
+      await save(page)
       await expect(page.locator("text=Vereinbar (Berlin (Ost))")).toBeVisible()
     })
   })

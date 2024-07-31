@@ -42,7 +42,7 @@ const updateValueByTextId = async (id: keyof Texts, updatedText: string) => {
           v-if="item.fieldType == TextAreaInput"
           :id="item.id"
           :aria-label="item.aria"
-          class="ml-2 pl-2 outline outline-2 outline-blue-900"
+          class="shadow-blue focus-within:shadow-focus hover:shadow-hover"
           editable
           :field-size="item.fieldSize"
           :value="item.value"

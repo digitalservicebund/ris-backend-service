@@ -1,7 +1,8 @@
 import { expect } from "@playwright/test"
 import {
   navigateToCategories,
-  navigateToFiles,
+  navigateToAttachments,
+  save,
   uploadTestfile,
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
@@ -13,7 +14,7 @@ test.skip(
 )
 
 test.beforeEach(async ({ page, documentNumber }) => {
-  await navigateToFiles(page, documentNumber)
+  await navigateToAttachments(page, documentNumber)
 })
 
 /*
@@ -86,13 +87,13 @@ test("create and validate border number links", async ({
   const inputFieldInnerHTML = await inputField.innerText()
 
   // Check all text copied
-  const inputFieldAlleText = await inputField.allTextContents()
-  expect(inputFieldAlleText[0].includes(firstReason)).toBeTruthy()
-  expect(inputFieldAlleText[0].includes(secondReason)).toBeTruthy()
-  expect(inputFieldAlleText[0].includes(thirdReason)).toBeTruthy()
-  expect(inputFieldInnerHTML.includes(firstReason)).toBeTruthy()
-  expect(inputFieldInnerHTML.includes(secondReason)).toBeTruthy()
-  expect(inputFieldInnerHTML.includes(thirdReason)).toBeTruthy()
+  const inputFieldAllText = await inputField.allTextContents()
+  expect(inputFieldAllText[0]).toContain(firstReason)
+  expect(inputFieldAllText[0]).toContain(secondReason)
+  expect(inputFieldAllText[0]).toContain(thirdReason)
+  expect(inputFieldInnerHTML).toContain(firstReason)
+  expect(inputFieldInnerHTML).toContain(secondReason)
+  expect(inputFieldInnerHTML).toContain(thirdReason)
 
   // Create valid and invalid border number links in Leitsatz
   const guidingPrincipleInput = page.locator("[data-testid='Leitsatz']")
@@ -100,8 +101,7 @@ test("create and validate border number links", async ({
   await page.keyboard.type(`#1# #4# #99999# #1000000# #not a border number#`)
 
   // save
-  await page.getByText("Speichern").click()
-  await page.waitForEvent("requestfinished")
+  await save(page)
 
   // check valid border number link
   const locators = await page
@@ -138,8 +138,7 @@ test("create and validate border number links", async ({
   await page.keyboard.press(`${modifier}+Backspace`)
 
   // save
-  await page.getByText("Speichern").click()
-  await page.waitForEvent("requestfinished")
+  await save(page)
 
   // check first border number link: should be invalid now
   await expect(validLink).toHaveAttribute("valid", "false")

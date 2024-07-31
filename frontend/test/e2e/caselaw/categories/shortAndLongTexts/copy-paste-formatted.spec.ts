@@ -1,6 +1,6 @@
 import { expect, Locator, Page } from "@playwright/test"
 import {
-  navigateToFiles,
+  navigateToAttachments,
   uploadTestfile,
   navigateToCategories,
 } from "../../e2e-utils"
@@ -13,7 +13,7 @@ test.skip(
 )
 
 test.beforeEach(async ({ page, documentNumber }) => {
-  await navigateToFiles(page, documentNumber)
+  await navigateToAttachments(page, documentNumber)
 })
 
 test("copy-paste text with different styles and alignments from side panel", async ({
@@ -49,22 +49,24 @@ test("copy-paste text with different styles and alignments from side panel", asy
     const inputField = await copyPaste(originalFileParagraph, page)
 
     // Check all text copied
-    const inputFieldAlleText = await inputField.allTextContents()
-    expect(inputFieldAlleText[0].includes(leftAlignText)).toBeTruthy()
-    expect(inputFieldAlleText[0].includes(rightAlignText)).toBeTruthy()
-    expect(inputFieldAlleText[0].includes(centerAlignText)).toBeTruthy()
-    expect(inputFieldAlleText[0].includes(justifyAlignText)).toBeTruthy()
+    const inputFieldAllText = await inputField.allTextContents()
+    expect(inputFieldAllText[0]).toContain(leftAlignText)
+    expect(inputFieldAllText[0]).toContain(rightAlignText)
+    expect(inputFieldAllText[0]).toContain(centerAlignText)
+    expect(inputFieldAllText[0]).toContain(justifyAlignText)
 
     // hide invisible characters
     await inputField.click()
-    await page.getByLabel("invisible-characters").click()
+    await page
+      .locator(`[aria-label='invisible-characters']:not([disabled])`)
+      .click()
 
     const inputFieldInnerHTML = await inputField.innerHTML()
     // Check all text copied with style
-    expect(inputFieldInnerHTML.includes(leftAlignTextWithStyle)).toBeTruthy()
-    expect(inputFieldInnerHTML.includes(rightAlignTextWithStyle)).toBeTruthy()
-    expect(inputFieldInnerHTML.includes(centerAlignTextWithStyle)).toBeTruthy()
-    expect(inputFieldInnerHTML.includes(justifyAlignTextWithStyle)).toBeTruthy()
+    expect(inputFieldInnerHTML).toContain(leftAlignTextWithStyle)
+    expect(inputFieldInnerHTML).toContain(rightAlignTextWithStyle)
+    expect(inputFieldInnerHTML).toContain(centerAlignTextWithStyle)
+    expect(inputFieldInnerHTML).toContain(justifyAlignTextWithStyle)
   })
 })
 
@@ -107,22 +109,24 @@ test(
       const inputField = await copyPaste(originalFileParagraph, page)
 
       // Check all text copied
-      const inputFieldAlleText = await inputField.allTextContents()
-      expect(inputFieldAlleText[0].includes(noIndentationText)).toBeTruthy()
-      expect(inputFieldAlleText[0].includes(singleIndentationText)).toBeTruthy()
-      expect(inputFieldAlleText[0].includes(doubleIndentationText)).toBeTruthy()
-      expect(inputFieldAlleText[0].includes(tripleIndentationText)).toBeTruthy()
+      const inputFieldAllText = await inputField.allTextContents()
+      expect(inputFieldAllText[0]).toContain(noIndentationText)
+      expect(inputFieldAllText[0]).toContain(noIndentationText)
+      expect(inputFieldAllText[0]).toContain(doubleIndentationText)
+      expect(inputFieldAllText[0]).toContain(tripleIndentationText)
 
       // hide invisible characters
       await inputField.click()
-      await page.getByLabel("invisible-characters").click()
+      await page
+        .locator(`[aria-label='invisible-characters']:not([disabled])`)
+        .click()
 
       const inputFieldInnerHTML = await inputField.innerHTML()
       // Check all text copied with style
-      expect(inputFieldInnerHTML.includes(singleIndentation)).toBeTruthy()
-      expect(inputFieldInnerHTML.includes(doubleIndentation)).toBeTruthy()
-      expect(inputFieldInnerHTML.includes(tripleIndentation)).toBeTruthy()
-      expect(inputFieldInnerHTML.includes(noIndentation)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(singleIndentation)
+      expect(inputFieldInnerHTML).toContain(doubleIndentation)
+      expect(inputFieldInnerHTML).toContain(tripleIndentation)
+      expect(inputFieldInnerHTML).toContain(noIndentation)
     })
   },
 )
@@ -167,23 +171,21 @@ test(
 
       // Check all text copied
       const inputFieldAllText = await inputField.allTextContents()
-      expect(inputFieldAllText[0].includes(bulletListItemText)).toBeTruthy()
-      expect(
-        inputFieldAllText[0].includes(bulletListSecondItemText),
-      ).toBeTruthy()
-      expect(inputFieldAllText[0].includes(orderedListItemText)).toBeTruthy()
-      expect(
-        inputFieldAllText[0].includes(orderedListSecondItemText),
-      ).toBeTruthy()
+      expect(inputFieldAllText[0]).toContain(bulletListItemText)
+      expect(inputFieldAllText[0]).toContain(bulletListSecondItemText)
+      expect(inputFieldAllText[0]).toContain(orderedListItemText)
+      expect(inputFieldAllText[0]).toContain(orderedListSecondItemText)
 
       // hide invisible characters
       await inputField.click()
-      await page.getByLabel("invisible-characters").click()
+      await page
+        .locator(`[aria-label='invisible-characters']:not([disabled])`)
+        .click()
 
       const inputFieldInnerHTML = await inputField.innerHTML()
       // Check all text copied with style
-      expect(inputFieldInnerHTML.includes(bulletList)).toBeTruthy()
-      expect(inputFieldInnerHTML.includes(orderedList)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(bulletList)
+      expect(inputFieldInnerHTML).toContain(orderedList)
     })
   },
 )

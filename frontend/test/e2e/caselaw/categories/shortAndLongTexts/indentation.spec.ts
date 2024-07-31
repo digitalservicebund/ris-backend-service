@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories } from "../../e2e-utils"
+import { navigateToCategories, save } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 import { navigateToHandover } from "~/e2e/caselaw/e2e-utils"
 
@@ -29,26 +29,27 @@ test.describe(
       await page.keyboard.type("Abschnitt mit Einzug 0")
       await page.keyboard.press("Enter")
       await page.keyboard.type("Abschnitt mit Einzug 1")
-      await page.getByLabel("indent").click()
+      await page.locator(`[aria-label='indent']:not([disabled])`).click()
       await page.keyboard.press("Enter")
       await page.keyboard.type("Abschnitt mit Einzug 2")
-      await page.getByLabel("indent").click()
+      await page.locator(`[aria-label='indent']:not([disabled])`).click()
       await page.keyboard.press("Enter")
       await page.keyboard.type("Abschnitt mit Einzug 3")
-      await page.getByLabel("indent").click()
+      await page.locator(`[aria-label='indent']:not([disabled])`).click()
 
       // hide invisible characters
-      await page.getByLabel("invisible-characters").click()
+      await page
+        .locator(`[aria-label='invisible-characters']:not([disabled])`)
+        .click()
 
       const inputFieldInnerHTML = await inputField.innerHTML()
       // Check text styling
-      expect(inputFieldInnerHTML.includes(singleIndentation)).toBeTruthy()
-      expect(inputFieldInnerHTML.includes(doubleIndentation)).toBeTruthy()
-      expect(inputFieldInnerHTML.includes(tripleIndentation)).toBeTruthy()
-      expect(inputFieldInnerHTML.includes(noIndentation)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(singleIndentation)
+      expect(inputFieldInnerHTML).toContain(doubleIndentation)
+      expect(inputFieldInnerHTML).toContain(tripleIndentation)
+      expect(inputFieldInnerHTML).toContain(noIndentation)
 
-      await page.getByText("Speichern").click()
-      await page.waitForEvent("requestfinished", { timeout: 5_000 })
+      await save(page)
 
       await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
       await expect(page.getByText("XML Vorschau")).toBeVisible()
@@ -72,32 +73,34 @@ test.describe(
 
       const inputField = page.locator("[data-testid='Gründe']")
       await inputField.click()
-      await page.getByLabel("invisible-characters").click()
+      await page
+        .locator(`[aria-label='invisible-characters']:not([disabled])`)
+        .click()
       await page.keyboard.type("Abschnitt mit Einzug")
 
       let inputFieldInnerHTML = await inputField.innerHTML()
-      expect(inputFieldInnerHTML.includes(noIndentation)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(noIndentation)
 
       await inputField.click()
-      await page.getByLabel("indent").click()
+      await page.locator(`[aria-label='indent']:not([disabled])`).click()
 
       inputFieldInnerHTML = await inputField.innerHTML()
-      expect(inputFieldInnerHTML.includes(singleIndentation)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(singleIndentation)
 
       await inputField.click()
-      await page.getByLabel("indent").click()
-      await page.getByLabel("indent").click()
+      await page.locator(`[aria-label='indent']:not([disabled])`).click()
+      await page.locator(`[aria-label='indent']:not([disabled])`).click()
 
       inputFieldInnerHTML = await inputField.innerHTML()
-      expect(inputFieldInnerHTML.includes(tripleIndentation)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(tripleIndentation)
 
       await inputField.click()
-      await page.getByLabel("outdent").click()
-      await page.getByLabel("outdent").click()
-      await page.getByLabel("outdent").click()
+      await page.locator(`[aria-label='outdent']:not([disabled])`).click()
+      await page.locator(`[aria-label='outdent']:not([disabled])`).click()
+      await page.locator(`[aria-label='outdent']:not([disabled])`).click()
 
       inputFieldInnerHTML = await inputField.innerHTML()
-      expect(inputFieldInnerHTML.includes(noIndentation)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(noIndentation)
     })
   },
 )

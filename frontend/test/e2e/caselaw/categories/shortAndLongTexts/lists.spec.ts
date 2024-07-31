@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories } from "../../e2e-utils"
+import { navigateToCategories, save } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 import { navigateToHandover } from "~/e2e/caselaw/e2e-utils"
 
@@ -25,19 +25,19 @@ test.describe(
       const inputField = page.locator("[data-testid='Gründe']")
       await inputField.click()
       await page.keyboard.type("This is a bullet list")
-      await page.getByLabel("bulletList").click()
+      await page.locator(`[aria-label='bulletList']:not([disabled])`).click()
       await page.keyboard.press("Enter")
       await page.keyboard.type("Second bullet list item")
 
       // hide invisible characters
-      await page.getByLabel("invisible-characters").click()
+      await page
+        .locator(`[aria-label='invisible-characters']:not([disabled])`)
+        .click()
 
       const inputFieldInnerHTML = await inputField.innerHTML()
       // Check text styling
-      expect(inputFieldInnerHTML.includes(bulletList)).toBeTruthy()
-
-      await page.getByText("Speichern").click()
-      await page.waitForEvent("requestfinished", { timeout: 5_000 })
+      expect(inputFieldInnerHTML).toContain(bulletList)
+      await save(page)
 
       await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
       await expect(page.getByText("XML Vorschau")).toBeVisible()
@@ -58,19 +58,20 @@ test.describe(
       const inputField = page.locator("[data-testid='Gründe']")
       await inputField.click()
       await page.keyboard.type("This is an ordered list")
-      await page.getByLabel("orderedList").click()
+      await page.locator(`[aria-label='orderedList']:not([disabled])`).click()
       await page.keyboard.press("Enter")
       await page.keyboard.type("Second ordered list item")
 
       // hide invisible characters
-      await page.getByLabel("invisible-characters").click()
+      await page
+        .locator(`[aria-label='invisible-characters']:not([disabled])`)
+        .click()
 
       const inputFieldInnerHTML = await inputField.innerHTML()
       // Check text styling
-      expect(inputFieldInnerHTML.includes(orderedList)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(orderedList)
 
-      await page.getByText("Speichern").click()
-      await page.waitForEvent("requestfinished", { timeout: 5_000 })
+      await save(page)
 
       await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
       await expect(page.getByText("XML Vorschau")).toBeVisible()
@@ -92,22 +93,24 @@ test.describe(
       const inputField = page.locator("[data-testid='Gründe']")
       await inputField.click()
       // hide invisible characters
-      await page.getByLabel("invisible-characters").click()
+      await page
+        .locator(`[aria-label='invisible-characters']:not([disabled])`)
+        .click()
 
       await page.keyboard.type("This is a list")
-      await page.getByLabel("bulletList").click()
+      await page.locator(`[aria-label='bulletList']:not([disabled])`).click()
 
       let inputFieldInnerHTML = await inputField.innerHTML()
       // Check text styling
-      expect(inputFieldInnerHTML.includes(bulletList)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(bulletList)
 
-      await page.getByLabel("orderedList").click()
+      await page.locator(`[aria-label='orderedList']:not([disabled])`).click()
       inputFieldInnerHTML = await inputField.innerHTML()
-      expect(inputFieldInnerHTML.includes(orderedList)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(orderedList)
 
-      await page.getByLabel("orderedList").click()
+      await page.locator(`[aria-label='orderedList']:not([disabled])`).click()
       inputFieldInnerHTML = await inputField.innerHTML()
-      expect(inputFieldInnerHTML.includes(noList)).toBeTruthy()
+      expect(inputFieldInnerHTML).toContain(noList)
     })
   },
 )

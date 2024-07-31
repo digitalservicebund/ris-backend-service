@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories } from "../../e2e-utils"
+import { navigateToCategories, save } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 import { navigateToHandover } from "~/e2e/caselaw/e2e-utils"
 
@@ -30,18 +30,19 @@ test.describe(
       })
 
       await test.step("mark text as blockquote via button", async () => {
-        await page.getByLabel("blockquote").click()
+        await page.locator(`[aria-label='blockquote']:not([disabled])`).click()
       })
 
       await test.step("check blockquote has been added to text", async () => {
-        await page.getByLabel("invisible-characters").click()
+        await page
+          .locator(`[aria-label='invisible-characters']:not([disabled])`)
+          .click()
         const inputFieldInnerHTML = await inputField.innerHTML()
-        expect(inputFieldInnerHTML.includes(blockquote)).toBeTruthy()
+        expect(inputFieldInnerHTML).toContain(blockquote)
       })
 
       await test.step("save document", async () => {
-        await page.getByText("Speichern").click()
-        await page.waitForEvent("requestfinished")
+        await save(page)
       })
 
       await test.step("navigate to 'XML Vorschau' in 'Übergabe an jDV'", async () => {
@@ -76,23 +77,24 @@ test.describe(
       })
 
       await test.step("mark text as blockquote via button", async () => {
-        await page.getByLabel("blockquote").click()
+        await page.locator(`[aria-label='blockquote']:not([disabled])`).click()
       })
 
       await test.step("remove blockquote from text via button", async () => {
-        await page.getByLabel("blockquote").click()
+        await page.locator(`[aria-label='blockquote']:not([disabled])`).click()
       })
 
       await test.step("check blockquote has been removed from text", async () => {
-        await page.getByLabel("invisible-characters").click()
+        await page
+          .locator(`[aria-label='invisible-characters']:not([disabled])`)
+          .click()
         const inputFieldInnerHTML = await inputField.innerHTML()
-        expect(inputFieldInnerHTML.includes(blockquote)).toBeFalsy()
-        expect(inputFieldInnerHTML.includes(noBlockquote)).toBeTruthy()
+        expect(inputFieldInnerHTML).not.toContain(blockquote)
+        expect(inputFieldInnerHTML).toContain(noBlockquote)
       })
 
       await test.step("save document", async () => {
-        await page.getByText("Speichern").click()
-        await page.waitForEvent("requestfinished")
+        await save(page)
       })
 
       await test.step("navigate to 'XML Vorschau' in 'Übergabe an jDV'", async () => {
@@ -139,14 +141,15 @@ test.describe(
       })
 
       await test.step("check blockquote has been added to text", async () => {
-        await page.getByLabel("invisible-characters").click()
+        await page
+          .locator(`[aria-label='invisible-characters']:not([disabled])`)
+          .click()
         const inputFieldInnerHTML = await inputField.innerHTML()
-        expect(inputFieldInnerHTML.includes(blockquote)).toBeTruthy()
+        expect(inputFieldInnerHTML).toContain(blockquote)
       })
 
       await test.step("save document", async () => {
-        await page.getByText("Speichern").click()
-        await page.waitForEvent("requestfinished")
+        await save(page)
       })
 
       await test.step("navigate to 'XML Vorschau' in 'Übergabe an jDV'", async () => {
@@ -201,15 +204,16 @@ test.describe(
       })
 
       await test.step("check blockquote has been removed from text", async () => {
-        await page.getByLabel("invisible-characters").click()
+        await page
+          .locator(`[aria-label='invisible-characters']:not([disabled])`)
+          .click()
         const inputFieldInnerHTML = await inputField.innerHTML()
-        expect(inputFieldInnerHTML.includes(blockquote)).toBeFalsy()
-        expect(inputFieldInnerHTML.includes(noBlockquote)).toBeTruthy()
+        expect(inputFieldInnerHTML).not.toContain(blockquote)
+        expect(inputFieldInnerHTML).toContain(noBlockquote)
       })
 
       await test.step("save document", async () => {
-        await page.getByText("Speichern").click()
-        await page.waitForEvent("requestfinished")
+        await save(page)
       })
 
       await test.step("navigate to 'XML Vorschau' in 'Übergabe an jDV'", async () => {

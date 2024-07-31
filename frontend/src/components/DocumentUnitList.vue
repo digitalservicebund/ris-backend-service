@@ -197,6 +197,7 @@ function onDelete() {
           <IconBadge
             v-if="listEntry.status?.publicationStatus"
             v-bind="useStatusBadge(listEntry.status).value"
+            data-testid="publication-status"
           />
         </CellItem>
         <CellItem>
