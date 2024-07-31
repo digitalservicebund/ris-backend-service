@@ -26,7 +26,7 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
     } else {
       documentUnit.value = undefined
     }
-    return response as ServiceResponse<DocumentUnit>
+    return response
   }
 
   async function updateDocumentUnit(): Promise<
