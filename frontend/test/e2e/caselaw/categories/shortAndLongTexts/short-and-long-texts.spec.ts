@@ -76,6 +76,10 @@ test("text editor keyboard navigation", async ({ page, documentNumber }) => {
   await page.keyboard.press("Enter")
   await expect(guidingPrincipleInput).toBeFocused()
 
+  // Tiptap editor needs to finish internal focus magic
+  // eslint-disable-next-line playwright/no-wait-for-timeout
+  await page.waitForTimeout(100)
+
   // Tabbing back into the toolbar sets focus to last active button
   await page.keyboard.press("Shift+Tab")
   await expect(boldButton).toBeFocused()
