@@ -28,6 +28,9 @@ export default class Reference implements EditableListItem {
 
   constructor(data: Partial<Reference> = {}) {
     Object.assign(this, data)
+    if (this.uuid == undefined) {
+      this.uuid = crypto.randomUUID()
+    }
   }
 
   get renderDecision(): string {
