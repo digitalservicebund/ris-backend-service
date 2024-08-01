@@ -36,6 +36,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
@@ -152,11 +153,14 @@ class ReferenceIntegrationTest {
                 List.of(
                     Reference.builder()
                         .citation("2024, S.3")
-                        .primaryReference(true)
                         .referenceSupplement("Klammerzusatz")
                         .footnote("footnote")
-                        .legalPeriodicalId(legalPeriodical.getId())
-                        .legalPeriodicalAbbreviation("BVerwGE")
+                        .legalPeriodical(
+                            LegalPeriodical.builder()
+                                .legalPeriodicalId(legalPeriodical.getId())
+                                .legalPeriodicalAbbreviation("BVerwGE")
+                                .primaryReference(true)
+                                .build())
                         .build()))
             .build();
 

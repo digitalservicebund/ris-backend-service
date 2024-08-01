@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 
@@ -21,13 +20,7 @@ public class ReferenceTransformer {
     return ReferenceDTO.builder()
         .id(reference.uuid())
         .referenceSupplement(reference.referenceSupplement())
-        .legalPeriodical(
-            reference.legalPeriodical() == null
-                    || reference.legalPeriodical().legalPeriodicalId() == null
-                ? null
-                : LegalPeriodicalDTO.builder()
-                    .id(reference.legalPeriodical().legalPeriodicalId())
-                    .build())
+        .legalPeriodical(LegalPeriodicalTransformer.transformToDTO(reference.legalPeriodical()))
         .citation(reference.citation())
         .footnote(reference.footnote())
         .legalPeriodicalRawValue(reference.legalPeriodical().legalPeriodicalAbbreviation())

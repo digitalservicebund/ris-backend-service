@@ -22,4 +22,19 @@ public class LegalPeriodicalTransformer {
         .citationStyle(legalPeriodicalDTO.getCitationStyle())
         .build();
   }
+
+  public static LegalPeriodicalDTO transformToDTO(LegalPeriodical legalPeriodical) {
+    if (legalPeriodical == null) {
+      return null;
+    }
+
+    return LegalPeriodicalDTO.builder()
+        .id(legalPeriodical.legalPeriodicalId())
+        .title(legalPeriodical.legalPeriodicalTitle())
+        .abbreviation(legalPeriodical.legalPeriodicalAbbreviation())
+        .subtitle(legalPeriodical.legalPeriodicalSubtitle())
+        .citationStyle(legalPeriodical.citationStyle())
+        .primaryReference(legalPeriodical.primaryReference())
+        .build();
+  }
 }

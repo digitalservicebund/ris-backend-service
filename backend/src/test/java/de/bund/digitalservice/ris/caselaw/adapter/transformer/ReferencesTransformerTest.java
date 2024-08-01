@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -39,25 +40,16 @@ class ReferencesTransformerTest {
             Reference.builder()
                 .citation("2024, 123")
                 .footnote("footnote")
-                .primaryReference(true)
                 .referenceSupplement("Klammerzusatz")
-                .legalPeriodicalId(UUID.fromString("33333333-2222-3333-4444-555555555555"))
-                .legalPeriodicalTitle("Legal Periodical Title")
-                .legalPeriodicalSubtitle("Legal Periodical Subtitle")
-                .legalPeriodicalAbbreviation("LPA")
-                .build()),
-        // without legal periodical reference but with amtlich type, the type is primary
-        Arguments.of(
-            ReferenceDTO.builder().rank(1).citation("2024, 123").type("amtlich").build(),
-            Reference.builder().citation("2024, 123").primaryReference(true).build()),
-        // with unknown type, the default is non-primary
-        Arguments.of(
-            ReferenceDTO.builder().rank(1).citation("2024, 123").type("other").build(),
-            Reference.builder().citation("2024, 123").primaryReference(false).build()),
-        // without legalPeriodical id and type, the default is non-primary
-        Arguments.of(
-            ReferenceDTO.builder().rank(1).citation("2024, 123").build(),
-            Reference.builder().citation("2024, 123").primaryReference(false).build()));
+                .legalPeriodical(
+                    LegalPeriodical.builder()
+                        .legalPeriodicalId(UUID.fromString("33333333-2222-3333-4444-555555555555"))
+                        .legalPeriodicalTitle("Legal Periodical Title")
+                        .legalPeriodicalSubtitle("Legal Periodical Subtitle")
+                        .legalPeriodicalAbbreviation("LPA")
+                        .primaryReference(true)
+                        .build())
+                .build()));
   }
 
   @ParameterizedTest
@@ -74,63 +66,77 @@ class ReferencesTransformerTest {
         // all fields set
         Arguments.of(
             Reference.builder()
-                .id(referenceId)
-                .legalPeriodicalTitle("Aa Bb Cc")
-                .legalPeriodicalAbbreviation("ABC")
-                .legalPeriodicalSubtitle("a test reference")
-                .legalPeriodicalId(legalPeriodicalId)
+                .uuid(referenceId)
+                .legalPeriodical(
+                    LegalPeriodical.builder()
+                        .legalPeriodicalTitle("Aa Bb Cc")
+                        .legalPeriodicalAbbreviation("ABC")
+                        .legalPeriodicalSubtitle("a test reference")
+                        .legalPeriodicalId(legalPeriodicalId)
+                        .primaryReference(false)
+                        .build())
                 .citation("2024, S.5")
                 .footnote("a footnote")
                 .referenceSupplement("Klammerzusatz")
-                .primaryReference(false)
                 .build(),
             ReferenceDTO.builder()
                 .id(referenceId)
                 .rank(1)
-                .type("nichtamtlich")
                 .citation("2024, S.5")
                 .footnote("a footnote")
                 .referenceSupplement("Klammerzusatz")
-                .legalPeriodical(LegalPeriodicalDTO.builder().id(legalPeriodicalId).build())
+                .legalPeriodical(
+                    LegalPeriodicalDTO.builder()
+                        .id(legalPeriodicalId)
+                        .title("Aa Bb Cc")
+                        .abbreviation("ABC")
+                        .subtitle("a test reference")
+                        .primaryReference(false)
+                        .build())
                 .legalPeriodicalRawValue("ABC")
                 .build()),
         // with primary flag, the type is amtlich
         Arguments.of(
             Reference.builder()
-                .legalPeriodicalId(legalPeriodicalId)
-                .legalPeriodicalAbbreviation("ABC")
+                .legalPeriodical(
+                    LegalPeriodical.builder()
+                        .legalPeriodicalId(legalPeriodicalId)
+                        .legalPeriodicalAbbreviation("ABC")
+                        .primaryReference(true)
+                        .build())
                 .citation("2024, S.5")
-                .primaryReference(true)
                 .build(),
             ReferenceDTO.builder()
                 .rank(1)
                 .citation("2024, S.5")
-                .type("amtlich")
-                .legalPeriodical(LegalPeriodicalDTO.builder().id(legalPeriodicalId).build())
+                .legalPeriodical(
+                    LegalPeriodicalDTO.builder()
+                        .id(legalPeriodicalId)
+                        .abbreviation("ABC")
+                        .primaryReference(true)
+                        .build())
                 .legalPeriodicalRawValue("ABC")
                 .build()),
         // with primary=false flag, the type is nichtamtlich
         Arguments.of(
             Reference.builder()
-                .legalPeriodicalId(legalPeriodicalId)
-                .legalPeriodicalAbbreviation("ABC")
+                .legalPeriodical(
+                    LegalPeriodical.builder()
+                        .legalPeriodicalId(legalPeriodicalId)
+                        .legalPeriodicalAbbreviation("ABC")
+                        .primaryReference(false)
+                        .build())
                 .citation("2024, S.5")
-                .primaryReference(false)
                 .build(),
             ReferenceDTO.builder()
                 .rank(1)
                 .citation("2024, S.5")
-                .type("nichtamtlich")
-                .legalPeriodical(LegalPeriodicalDTO.builder().id(legalPeriodicalId).build())
-                .legalPeriodicalRawValue("ABC")
-                .build()),
-        // accept entries without legalPeriodical id. without primary flag, the type is nichtamtlich
-        Arguments.of(
-            Reference.builder().legalPeriodicalAbbreviation("ABC").citation("2024, S.5").build(),
-            ReferenceDTO.builder()
-                .rank(1)
-                .citation("2024, S.5")
-                .type("nichtamtlich")
+                .legalPeriodical(
+                    LegalPeriodicalDTO.builder()
+                        .id(legalPeriodicalId)
+                        .abbreviation("ABC")
+                        .primaryReference(false)
+                        .build())
                 .legalPeriodicalRawValue("ABC")
                 .build()));
   }
