@@ -5,11 +5,13 @@ import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverter;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverterException;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.FooterConverter;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
+import de.bund.digitalservice.ris.caselaw.domain.docx.DocXPropertyField;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentUnitDocx;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocxImagePart;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ECLIElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.FooterElement;
+import de.bund.digitalservice.ris.caselaw.domain.docx.MetadataProperty;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ParagraphElement;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +40,7 @@ import org.docx4j.model.listnumbering.ListNumberingDefinition;
 import org.docx4j.model.structure.HeaderFooterPolicy;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+import org.docx4j.openpackaging.parts.DocPropsCustomPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
 import org.docx4j.openpackaging.parts.WordprocessingML.ImageJpegPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.ImagePngPart;
@@ -137,7 +140,13 @@ public class DocxConverterService implements ConverterService {
           packedList.stream().map(DocumentUnitDocx::toHtmlString).collect(Collectors.joining());
     }
 
-    return new Docx2Html(content, ecliList);
+    Map<DocXPropertyField, String> properties =
+        packedList.stream()
+            .filter(MetadataProperty.class::isInstance)
+            .map(MetadataProperty.class::cast)
+            .collect(Collectors.toMap(MetadataProperty::getKey, MetadataProperty::getValue));
+
+    return new Docx2Html(content, ecliList, properties);
   }
 
   /**
@@ -178,9 +187,28 @@ public class DocxConverterService implements ConverterService {
             .filter(footerElement -> !(footerElement instanceof ECLIElement))
             .toList());
 
+    documentUnitDocxList.addAll(readDocumentProperties(mlPackage));
+
     DocumentUnitDocxListUtils.postProcessBorderNumbers(documentUnitDocxList);
 
     return documentUnitDocxList;
+  }
+
+  private List<MetadataProperty> readDocumentProperties(WordprocessingMLPackage mlPackage) {
+    DocPropsCustomPart customProps = mlPackage.getDocPropsCustomPart();
+    List<MetadataProperty> props = new ArrayList<>();
+
+    if (customProps == null || customProps.getJaxbElement() == null) {
+      return props;
+    }
+    for (var prop : customProps.getJaxbElement().getProperty()) {
+      DocXPropertyField field = DocXPropertyField.fromKey(prop.getName());
+      if (prop.getLpwstr() != null && field != null) {
+        props.add(new MetadataProperty(field, prop.getLpwstr()));
+      }
+    }
+
+    return props;
   }
 
   private Set<FooterElement> parseFooterAndIdentifyECLI() {

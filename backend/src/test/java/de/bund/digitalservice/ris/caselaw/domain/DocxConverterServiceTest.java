@@ -15,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverter;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverterException;
 import de.bund.digitalservice.ris.caselaw.config.ConverterConfig;
 import de.bund.digitalservice.ris.caselaw.domain.docx.BorderNumber;
+import de.bund.digitalservice.ris.caselaw.domain.docx.DocXPropertyField;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentUnitDocx;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocxImagePart;
@@ -38,12 +39,14 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.docx4j.docProps.custom.Properties;
 import org.docx4j.model.structure.DocumentModel;
 import org.docx4j.model.structure.HeaderFooterPolicy;
 import org.docx4j.model.structure.SectionWrapper;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.exceptions.InvalidFormatException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+import org.docx4j.openpackaging.parts.DocPropsCustomPart;
 import org.docx4j.openpackaging.parts.Part;
 import org.docx4j.openpackaging.parts.PartName;
 import org.docx4j.openpackaging.parts.Parts;
@@ -304,7 +307,6 @@ class DocxConverterServiceTest {
           .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
           .thenReturn(mlPackage);
 
-      // assertEquals(3,docx2Html.ecliList().size());
       Docx2Html docx2Html = service.getConvertedObject("test.docx");
       Assertions.assertNotNull(docx2Html);
     }
@@ -1239,6 +1241,68 @@ class DocxConverterServiceTest {
       // TODO throwable.getMessage().equals("Couldn't load docx file!"))
       Assertions.assertThrows(
           DocxConverterException.class, () -> service.getConvertedObject("test.docx"));
+    }
+  }
+
+  @Test
+  void testGetHtml_withProperties() {
+    when(client.getObject(any(GetObjectRequest.class), any(ResponseTransformer.class)))
+        .thenReturn(responseBytes);
+    when(responseBytes.asInputStream()).thenReturn(new ByteArrayInputStream(new byte[] {}));
+
+    MainDocumentPart mainDocumentPart = mock(MainDocumentPart.class);
+    when(mainDocumentPart.getContent()).thenReturn(Collections.emptyList());
+
+    DocPropsCustomPart docPropsCustomPart = mock(DocPropsCustomPart.class);
+
+    Properties.Property courtTypeProperty = mock(Properties.Property.class);
+    when(courtTypeProperty.getName()).thenReturn("Gerichtstyp");
+    when(courtTypeProperty.getLpwstr()).thenReturn("BGH");
+
+    Properties.Property fileNumberProperty = mock(Properties.Property.class);
+    when(fileNumberProperty.getName()).thenReturn("Aktenzeichen");
+    when(fileNumberProperty.getLpwstr()).thenReturn("VI ZR 20/23");
+
+    Properties.Property legalEffectProperty = mock(Properties.Property.class);
+    when(legalEffectProperty.getName()).thenReturn("Rechtskraft");
+    when(legalEffectProperty.getLpwstr()).thenReturn("ja");
+
+    Properties.Property appraisalBodyProperty = mock(Properties.Property.class);
+    when(appraisalBodyProperty.getName()).thenReturn("Spruchkoerper");
+    when(appraisalBodyProperty.getLpwstr()).thenReturn("1. Senat");
+
+    Properties.Property randomProperty = mock(Properties.Property.class);
+    when(randomProperty.getName()).thenReturn("Random");
+    when(randomProperty.getLpwstr()).thenReturn("foo");
+
+    Properties jaxbElement = mock(Properties.class);
+    when(docPropsCustomPart.getJaxbElement()).thenReturn(jaxbElement);
+    when(jaxbElement.getProperty())
+        .thenReturn(
+            List.of(
+                fileNumberProperty,
+                courtTypeProperty,
+                legalEffectProperty,
+                appraisalBodyProperty,
+                randomProperty));
+
+    when(mlPackage.getDocPropsCustomPart()).thenReturn(docPropsCustomPart);
+    when(mlPackage.getMainDocumentPart()).thenReturn(mainDocumentPart);
+
+    try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+        mockStatic(WordprocessingMLPackage.class)) {
+      mockedMLPackageStatic
+          .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+          .thenReturn(mlPackage);
+
+      Docx2Html docx2Html = service.getConvertedObject("test.docx");
+      Assertions.assertNotNull(docx2Html);
+
+      assertEquals(4, docx2Html.properties().size());
+      assertEquals("VI ZR 20/23", docx2Html.properties().get(DocXPropertyField.FILE_NUMBER));
+      assertEquals("BGH", docx2Html.properties().get(DocXPropertyField.COURT_TYPE));
+      assertEquals("1. Senat", docx2Html.properties().get(DocXPropertyField.APPRAISAL_BODY));
+      assertEquals("ja", docx2Html.properties().get(DocXPropertyField.LEGAL_EFFECT));
     }
   }
 

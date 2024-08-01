@@ -111,7 +111,7 @@ public class DocumentUnitController {
             attachmentService
                 .attachFileToDocumentationUnit(uuid, ByteBuffer.wrap(bytes), httpHeaders)
                 .s3path());
-    service.updateECLI(uuid, docx2html);
+    service.initializeCoreData(uuid, docx2html);
     if (docx2html == null) {
       return ResponseEntity.unprocessableEntity().build();
     }
