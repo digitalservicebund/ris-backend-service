@@ -1,4 +1,23 @@
 services:
+  initialization:
+    image: ghcr.io/digitalservicebund/ris-data-migration:sha256-09dd3c0f29d941c2ae0497ccc4634ad24b263e72781de4251d1a010f0e0c72d2.att
+    depends_on:
+      - postgres14
+    environment:
+      - SPRING_PROFILES_ACTIVE=tables # TODO create profile with command
+      - RIS_MIGRATION_DB_HOST=localhost
+      - RIS_MIGRATION_DB_PORT=5432
+      - RIS_MIGRATION_DB_NAME=neuris
+      - RIS_MIGRATION_DB_USER=test
+      - RIS_MIGRATION_DB_PASSWORD=test
+      - RIS_MIGRATION_DB_SCHEMA=incremental_migration
+      - RIS_MIGRATION_S3_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} # TODO Use OTC entry in 1PW
+      - RIS_MIGRATION_S3_SECRET=${AWS_ACCESS_KEY_ID} # TODO Use OTC entry in 1PW
+      - RIS_MIGRATION_S3_ENDPOINT=${RIS_MIGRATION_S3_ENDPOINT} # TODO Add to 1PW and read from there
+      - RIS_MIGRATION_S3_BUCKET=${RIS_MIGRATION_S3_BUCKET} # TODO Add to 1PW and read from there
+      - RIS_MIGRATION_S3_DATA_VERSION=2024-08 # TODO maybe remove and use the latest instead?
+      - RIS_MIGRATION_S3_FIRST_DAILY_VERSION=2024-07-31 # TODO maybe remove and use the latest instead?
+
   traefik:
     image: traefik:v3.1
     extra_hosts:
@@ -50,9 +69,10 @@ services:
       - JAVA_OPTS=-XX:MaxDirectMemorySize=100M
     command: sh run.sh _start
     depends_on:
-      - traefik
-      - postgres14
-      - redis
+      traefik : {condition: service_healthy}
+      postgres14: {condition: service_healthy}
+      redis: {condition: service_healthy}
+      initialization: {condition: service_completed_successfully}
     ports:
       - 8080:8080
     healthcheck:
