@@ -119,8 +119,11 @@ public class HandoverService {
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
       transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 
+      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+      factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+      factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
       Node node =
-          DocumentBuilderFactory.newDefaultInstance()
+          factory
               .newDocumentBuilder()
               .parse(new ByteArrayInputStream(xml.getBytes()))
               .getDocumentElement();
