@@ -144,6 +144,15 @@ class ReferenceIntegrationTest {
                 .primaryReference(true)
                 .build());
 
+    LegalPeriodical expectedLegalPeriodical =
+        LegalPeriodical.builder()
+            .legalPeriodicalId(legalPeriodical.getId())
+            .legalPeriodicalTitle(legalPeriodical.getTitle())
+            .legalPeriodicalSubtitle(legalPeriodical.getSubtitle())
+            .legalPeriodicalAbbreviation(legalPeriodical.getAbbreviation())
+            .primaryReference(true)
+            .build();
+
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getId())
@@ -180,25 +189,12 @@ class ReferenceIntegrationTest {
                   .isEqualTo(DEFAULT_DOCUMENT_NUMBER);
               assertThat(response.getResponseBody().references()).hasSize(1);
               assertThat(response.getResponseBody().references())
-                  .extracting(
-                      "citation",
-                      "referenceSupplement",
-                      "footnote",
-                      "primaryReference",
-                      "legalPeriodicalId",
-                      "legalPeriodicalAbbreviation",
-                      "legalPeriodicalTitle",
-                      "legalPeriodicalSubtitle")
-                  .containsExactly(
-                      tuple(
-                          "2024, S.3",
-                          "Klammerzusatz",
-                          "footnote",
-                          true,
-                          legalPeriodical.getId(),
-                          "BVerwGE",
-                          "Bundesverwaltungsgerichtsentscheidungen",
-                          "Entscheidungen des Bundesverwaltungsgerichts"));
+                  .extracting("citation", "referenceSupplement", "footnote")
+                  .containsExactly(tuple("2024, S.3", "Klammerzusatz", "footnote"));
+              assertThat(response.getResponseBody().references())
+                  .extracting("legalPeriodical")
+                  .usingRecursiveComparison()
+                  .isEqualTo(List.of(expectedLegalPeriodical));
             });
   }
 }
