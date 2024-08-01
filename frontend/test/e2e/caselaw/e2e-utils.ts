@@ -201,13 +201,14 @@ export async function waitForInputValue(
   page: Page,
   selector: string,
   expectedValue: string,
+  timeout?: number,
 ) {
   await page.waitForFunction(
     ({ selector, expectedValue }) => {
       const input = document.querySelector(selector) as HTMLInputElement
       return input && input.value === expectedValue
     },
-    { selector, expectedValue },
+    { selector, expectedValue, timeout },
   )
 }
 
