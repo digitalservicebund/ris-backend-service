@@ -84,14 +84,17 @@ test("text editor keyboard navigation", async ({ page, documentNumber }) => {
   await page.keyboard.press("Enter")
   await expect(guidingPrincipleInput).toBeFocused()
 
-  // Without these two assertions the test is flaky -> timeout is necessary here. It is unclear why.
+  // Tiptap inserts invisible characters -> input is split into two parts
   expect(await page.getByText("Text input").innerHTML()).toContain(
     "<strong>Text</strong>",
   )
-  // Tiptap inserts invisible characters -> input is split into two parts
   expect(await page.getByText("Text input").innerHTML()).toContain(
     "<strong> input</strong>",
   )
+
+  // The timeout is needed for the focus, otherwise tabbing back to the menu is flaky. It's unclear why.
+  // eslint-disable-next-line playwright/no-wait-for-timeout
+  await page.waitForTimeout(100)
 
   // Tabbing back into the toolbar sets focus to last active button
   await page.keyboard.press("Shift+Tab")
