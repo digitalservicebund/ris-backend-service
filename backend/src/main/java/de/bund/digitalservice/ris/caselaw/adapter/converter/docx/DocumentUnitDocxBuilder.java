@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter.converter.docx;
 
 import de.bund.digitalservice.ris.caselaw.domain.docx.BorderNumber;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentUnitDocx;
-import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingList.DocumentUnitNumberingListNumberFormat;
 import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingListEntryIndex;
 import jakarta.xml.bind.JAXBElement;
@@ -10,7 +9,6 @@ import java.util.List;
 import org.docx4j.model.listnumbering.AbstractListNumberingDefinition;
 import org.docx4j.model.listnumbering.ListLevel;
 import org.docx4j.model.listnumbering.ListNumberingDefinition;
-import org.docx4j.wml.JcEnumeration;
 import org.docx4j.wml.P;
 import org.docx4j.wml.PPr;
 import org.docx4j.wml.PPrBase.NumPr;
@@ -205,7 +203,7 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
     return paragraph.getPPr().getNumPr() != null;
   }
 
-  private NumberingListEntry convertToNumberingListEntry() {
+  private DocumentUnitDocx convertToNumberingListEntry() {
     NumPr numPr = paragraph.getPPr().getNumPr();
     String numId = null;
     String iLvl = null;
@@ -220,32 +218,26 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
       iLvl = numPr.getIlvl().getVal().toString();
     }
 
-    // Unless we find a counter example, we treat the presence of a numPr element with numId 0
-    // as a list entry that brings its own numbering symbol inside the paragraph part --> we don't
-    // add any own numbering symbols
-    DocumentUnitNumberingListNumberFormat numberFormat =
-        numId != null && numId.equals("0")
-            ? DocumentUnitNumberingListNumberFormat.NONE
-            : DocumentUnitNumberingListNumberFormat.BULLET;
-
-    NumberingListEntryIndex numberingListEntryIndex =
-        new NumberingListEntryIndex(
-            "", "1", "", "", "", "", false, false, numberFormat, iLvl, JcEnumeration.RIGHT, "tab");
+    ListLevel listLevel = null;
     if (listNumberingDefinition != null) {
       AbstractListNumberingDefinition abstractListDefinition =
           listNumberingDefinition.getAbstractListDefinition();
 
       if (abstractListDefinition != null && iLvl != null) {
-        ListLevel listLevel = abstractListDefinition.getListLevels().get(iLvl);
-
-        if (listLevel != null) {
-          numberingListEntryIndex = setNumberingListEntryIndex(listLevel, iLvl);
-        }
+        listLevel = abstractListDefinition.getListLevels().get(iLvl);
       }
     }
 
-    return new NumberingListEntry(
-        ParagraphConverter.convert(paragraph, converter), numberingListEntryIndex);
+    // Unless we find a counter example, we treat the presence of a numPr element with numId 0
+    // as a list entry that brings its own numbering symbol inside the paragraph part,
+    // --> we therefore convert it as a paragraph instead of a list
+    if (numId == null || numId.equals("0") || listLevel == null) {
+      return ParagraphConverter.convert(paragraph, converter);
+    } else {
+      NumberingListEntryIndex numberingListEntryIndex = setNumberingListEntryIndex(listLevel, iLvl);
+      return new NumberingListEntry(
+          ParagraphConverter.convert(paragraph, converter), numberingListEntryIndex);
+    }
   }
 
   private NumberingListEntryIndex setNumberingListEntryIndex(ListLevel listLevel, String iLvl) {

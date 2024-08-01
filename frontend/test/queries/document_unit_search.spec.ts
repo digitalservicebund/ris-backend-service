@@ -1,6 +1,6 @@
 import { expect, test, Request, Page, TestInfo } from "@playwright/test"
-import { DocumentUnitSearchParameter } from "../../src/components/DocumentUnitSearchEntryForm.vue"
 import DocumentUnit from "../../src/domain/documentUnit"
+import { DocumentUnitSearchParameter } from "@/components/DocumentUnitSearchEntryForm.vue"
 
 // This is a performance test for the backend search endpoint
 // We run it sequentially not to skew the results
@@ -25,7 +25,7 @@ test.describe("document unit search queries", () => {
       parameter: {
         documentNumber: "BV",
       },
-      maxDuration: 1800, // last max 1846, average 1574, min 1475
+      maxDuration: 3800, // last max 3516, average 2140, min 1505
       minResults: 5,
     },
     {

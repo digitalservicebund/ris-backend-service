@@ -84,7 +84,6 @@ public class NumberingList implements DocumentUnitDocx {
   }
 
   public enum DocumentUnitNumberingListNumberFormat {
-    NONE,
     DECIMAL,
     BULLET,
     UPPER_ROMAN,
@@ -97,9 +96,9 @@ public class NumberingList implements DocumentUnitDocx {
     DocumentUnitNumberingListNumberFormat listNumberFormat = numberingListEntryIndex.numberFormat();
     String listStyle = getListType(listNumberFormat, numberingListEntryIndex);
     if (listNumberFormat == DocumentUnitNumberingListNumberFormat.BULLET) {
-      return listStyle == null ? "<ul>" : String.format("<ul style=\"%s\">", listStyle);
+      return String.format("<ul style=\"%s\">", listStyle);
     } else {
-      return listStyle == null ? "<ol>" : String.format("<ol style=\"%s\">", listStyle);
+      return String.format("<ol style=\"%s\">", listStyle);
     }
   }
 
@@ -126,7 +125,6 @@ public class NumberingList implements DocumentUnitDocx {
       return "list-style-type:disc;";
     }
     return switch (numberFormat) {
-      case NONE -> null;
       case DECIMAL -> "list-style-type:decimal;";
       case UPPER_LETTER -> "list-style-type:upper-latin;";
       case LOWER_LETTER -> "list-style-type:lower-latin;";

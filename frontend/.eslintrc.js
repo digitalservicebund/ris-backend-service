@@ -124,7 +124,14 @@ module.exports = {
     {
       files: ["**/e2e/**/*.ts", "**/a11y/**/*.ts"],
       extends: ["plugin:playwright/playwright-test"],
-      rules: { ...moduleImportRules },
+      rules: {
+        ...moduleImportRules,
+        "playwright/prefer-to-contain": 2,
+        "playwright/prefer-to-have-count": 2,
+        "playwright/prefer-comparison-matcher": 2,
+        "playwright/prefer-equality-matcher": 2,
+        "playwright/prefer-to-have-length": 2,
+      },
     },
   ],
 }

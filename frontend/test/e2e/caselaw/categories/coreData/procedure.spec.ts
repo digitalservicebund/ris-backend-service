@@ -16,7 +16,7 @@ test.describe("procedure", () => {
     const page = await browser.newPage()
     await page.goto(`/caselaw/procedures?q=${testPrefix}`)
     const listItems = await page.getByLabel("Vorgang Listenelement").all()
-    expect(listItems.length).toBe(0)
+    expect(listItems).toHaveLength(0)
   })
   test("add new procedure in coreData", async ({
     page,
@@ -117,6 +117,6 @@ test.describe("procedure", () => {
 
     await page.reload()
     const listItemsAfterDeletion = await page.getByRole("listitem").all()
-    expect(listItemsAfterDeletion.length).toBe(0)
+    expect(listItemsAfterDeletion).toHaveLength(0)
   })
 })

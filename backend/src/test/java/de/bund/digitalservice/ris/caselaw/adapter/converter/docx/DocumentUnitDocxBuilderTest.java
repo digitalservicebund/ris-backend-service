@@ -12,8 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import ch.qos.logback.classic.Level;
-import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
 import de.bund.digitalservice.ris.caselaw.domain.docx.AnchorImageElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.BorderNumber;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocxImagePart;
@@ -1048,7 +1046,7 @@ class DocumentUnitDocxBuilderTest {
     PPr pPr = new PPr();
     NumPr numPr = new NumPr();
     NumId numId = new NumId();
-    numId.setVal(new BigInteger("0"));
+    numId.setVal(new BigInteger("1"));
     numPr.setNumId(numId);
     Ilvl ilvl = new Ilvl();
     ilvl.setVal(new BigInteger("0"));
@@ -1072,7 +1070,7 @@ class DocumentUnitDocxBuilderTest {
     HashMap<String, ListLevel> listLevels = new HashMap<>();
     listLevels.put("0", listLevel);
     when(abstractListDefinition.getListLevels()).thenReturn(listLevels);
-    listNumberingDefinitions.put("0", listNumberingDefinition);
+    listNumberingDefinitions.put("1", listNumberingDefinition);
 
     var converter = new DocxConverter();
     converter.setListNumberingDefinitions(listNumberingDefinitions);
@@ -1097,14 +1095,28 @@ class DocumentUnitDocxBuilderTest {
     NumPr numPr = new NumPr();
     NumId numId = new NumId();
     numId.setVal(new BigInteger("1"));
+    Ilvl ilvl = new Ilvl();
+    ilvl.setVal(new BigInteger("0"));
     numPr.setNumId(numId);
+    numPr.setIlvl(ilvl);
     pPr.setNumPr(numPr);
     P paragraph = new P();
     paragraph.setPPr(pPr);
 
     var listNumberingDefinitions = new HashMap<String, ListNumberingDefinition>();
+    var listNumberingDefinition = mock(ListNumberingDefinition.class);
+    listNumberingDefinitions.put("1", listNumberingDefinition);
+    var abstractListDefinition = mock(AbstractListNumberingDefinition.class);
+    var listLevel = mock(ListLevel.class);
+    when(listLevel.getNumFmt()).thenReturn(NumberFormat.BULLET);
+    when(listNumberingDefinition.getAbstractListDefinition()).thenReturn(abstractListDefinition);
+    HashMap<String, ListLevel> listLevels = new HashMap<>();
+    listLevels.put("0", listLevel);
+    when(abstractListDefinition.getListLevels()).thenReturn(listLevels);
+    listNumberingDefinitions.put("1", listNumberingDefinition);
     var converter = new DocxConverter();
     converter.setListNumberingDefinitions(listNumberingDefinitions);
+
     var result = builder.setParagraph(paragraph).setConverter(converter).build();
     assertTrue(result instanceof NumberingListEntry);
     var numberingListEntry = (NumberingListEntry) result;
@@ -1185,8 +1197,6 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withNumberingList_withNotAllowedNumberingFormat() {
-    TestMemoryAppender memoryAppender =
-        new TestMemoryAppender(NumberingListEntryIndexGenerator.class);
     DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
     PPr pPr = new PPr();
     NumPr numPr = new NumPr();
@@ -1221,23 +1231,101 @@ class DocumentUnitDocxBuilderTest {
     converter.setListNumberingDefinitions(listNumberingDefinitions);
     var result = builder.setParagraph(paragraph).setConverter(converter).build();
 
-    assertTrue(result instanceof NumberingListEntry);
-    var numberingListEntry = (NumberingListEntry) result;
-    assertNotNull(numberingListEntry.paragraphElement());
-    ParagraphElement paragraphElement = (ParagraphElement) numberingListEntry.paragraphElement();
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(RunTextElement.class, runElement.getClass());
 
-    var htmlString = numberingListEntry.toHtmlString();
+    var htmlString = result.toHtmlString();
     assertEquals("<p>test text</p>", htmlString);
+  }
 
-    assertEquals(1, memoryAppender.count(Level.ERROR));
-    assertEquals(
-        "not implemented number format (CHICAGO) in list. use default bullet list",
-        memoryAppender.getMessage(Level.ERROR, 0));
+  @Test
+  void testBuild_withNumberingList_withoutNumId() {
+    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    PPr pPr = new PPr();
+    NumPr numPr = new NumPr();
+    NumId numId = new NumId();
+    numId.setVal(new BigInteger("0"));
+    numPr.setNumId(numId);
+    Ilvl ilvl = new Ilvl();
+    ilvl.setVal(new BigInteger("0"));
+    numPr.setIlvl(ilvl);
+    pPr.setNumPr(numPr);
+    P paragraph = new P();
+    paragraph.setPPr(pPr);
+    R run = new R();
+    Text text = new Text();
+    text.setValue("test text");
+    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
 
-    memoryAppender.detachLoggingTestAppender();
+    var listNumberingDefinitions = new HashMap<String, ListNumberingDefinition>();
+    var listNumberingDefinition = mock(ListNumberingDefinition.class);
+    var abstractListDefinition = mock(AbstractListNumberingDefinition.class);
+    var listLevel = mock(ListLevel.class);
+    when(listLevel.getNumFmt()).thenReturn(NumberFormat.CHICAGO);
+    when(listNumberingDefinition.getAbstractListDefinition()).thenReturn(abstractListDefinition);
+    HashMap<String, ListLevel> listLevels = new HashMap<>();
+    listLevels.put("0", listLevel);
+    when(abstractListDefinition.getListLevels()).thenReturn(listLevels);
+    listNumberingDefinitions.put("0", listNumberingDefinition);
+
+    var converter = new DocxConverter();
+    converter.setListNumberingDefinitions(listNumberingDefinitions);
+    var result = builder.setParagraph(paragraph).setConverter(converter).build();
+
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(RunTextElement.class, runElement.getClass());
+
+    var htmlString = result.toHtmlString();
+    assertEquals("<p>test text</p>", htmlString);
+  }
+
+  @Test
+  void testBuild_withNumberingList_withoutListLevel() {
+    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    PPr pPr = new PPr();
+    NumPr numPr = new NumPr();
+    NumId numId = new NumId();
+    numId.setVal(new BigInteger("1"));
+    numPr.setNumId(numId);
+    Ilvl ilvl = new Ilvl();
+    ilvl.setVal(new BigInteger("0"));
+    numPr.setIlvl(ilvl);
+    pPr.setNumPr(numPr);
+    P paragraph = new P();
+    paragraph.setPPr(pPr);
+    R run = new R();
+    Text text = new Text();
+    text.setValue("test text");
+    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    var listNumberingDefinitions = new HashMap<String, ListNumberingDefinition>();
+    var listNumberingDefinition = mock(ListNumberingDefinition.class);
+    var abstractListDefinition = mock(AbstractListNumberingDefinition.class);
+    when(listNumberingDefinition.getAbstractListDefinition()).thenReturn(abstractListDefinition);
+    listNumberingDefinitions.put("1", listNumberingDefinition);
+
+    var converter = new DocxConverter();
+    converter.setListNumberingDefinitions(listNumberingDefinitions);
+    var result = builder.setParagraph(paragraph).setConverter(converter).build();
+
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(RunTextElement.class, runElement.getClass());
+
+    var htmlString = result.toHtmlString();
+    assertEquals("<p>test text</p>", htmlString);
   }
 
   public static Stream<Arguments> nodesThatShouldTurnIntoAHyphen() {
