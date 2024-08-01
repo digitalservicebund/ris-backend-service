@@ -16,7 +16,8 @@ function renderComponent(texts: Texts) {
     },
   })
 }
-describe("preview texts", () => {
+
+describe("preview texts", { repeats: 150 }, () => {
   test("renders all texts", async () => {
     renderComponent({
       decisionName: "decision name",
