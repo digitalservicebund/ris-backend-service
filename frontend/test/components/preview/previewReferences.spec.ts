@@ -27,52 +27,64 @@ describe("preview references", () => {
 
   it.each([
     [
-      "FundstellenAmtliche FundstellenABC - 2006, S.3",
+      "FundstellenAmtliche FundstellenABC, 2006, S.3",
       [
         new Reference({
           citation: "2006, S.3",
-          legalPeriodicalAbbreviation: "ABC",
-          primaryReference: true,
+          legalPeriodical: {
+            legalPeriodicalAbbreviation: "ABC",
+            primaryReference: true,
+          },
         }),
       ],
     ],
     [
-      "FundstellenAmtliche FundstellenABC - 2006, S.3XYZ - 2007, S.4",
+      "FundstellenAmtliche FundstellenABC, 2006, S.3XYZ, 2007, S.4",
       [
         new Reference({
           citation: "2006, S.3",
-          legalPeriodicalAbbreviation: "ABC",
-          primaryReference: true,
+          legalPeriodical: {
+            legalPeriodicalAbbreviation: "ABC",
+            primaryReference: true,
+          },
         }),
         new Reference({
           citation: "2007, S.4",
-          legalPeriodicalAbbreviation: "XYZ",
-          primaryReference: true,
+          legalPeriodical: {
+            legalPeriodicalAbbreviation: "XYZ",
+            primaryReference: true,
+          },
         }),
       ],
     ],
     [
-      "FundstellenSekundäre FundstellenDEF - 2008, S.5",
+      "FundstellenAmtliche FundstellenDEF, 2008, S.5",
       [
         new Reference({
           citation: "2008, S.5",
-          legalPeriodicalAbbreviation: "DEF",
-          primaryReference: false,
+          legalPeriodical: {
+            legalPeriodicalAbbreviation: "DEF",
+            primaryReference: true,
+          },
         }),
       ],
     ],
     [
-      "FundstellenAmtliche FundstellenABC - 2006, S.3Sekundäre FundstellenDEF - 2008, S.5",
+      "FundstellenAmtliche FundstellenABC, 2006, S.3DEF, 2008, S.5",
       [
         new Reference({
           citation: "2006, S.3",
-          legalPeriodicalAbbreviation: "ABC",
-          primaryReference: true,
+          legalPeriodical: {
+            legalPeriodicalAbbreviation: "ABC",
+            primaryReference: true,
+          },
         }),
         new Reference({
           citation: "2008, S.5",
-          legalPeriodicalAbbreviation: "DEF",
-          primaryReference: false,
+          legalPeriodical: {
+            legalPeriodicalAbbreviation: "DEF",
+            primaryReference: true,
+          },
         }),
       ],
     ],

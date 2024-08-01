@@ -6,7 +6,7 @@ export type LegalPeriodical = {
   legalPeriodicalSubtitle?: string
   legalPeriodicalAbbreviation: string
   primaryReference?: boolean
-  citationStyle: string
+  citationStyle?: string
 }
 
 export default class Reference implements EditableListItem {

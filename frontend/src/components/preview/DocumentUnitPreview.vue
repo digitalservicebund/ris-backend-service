@@ -13,6 +13,7 @@ import PreviewNote from "@/components/preview/PreviewNote.vue"
 import PreviewProceedingDecisions from "@/components/preview/PreviewProceedingDecisions.vue"
 import PreviewReferences from "@/components/preview/PreviewReferences.vue"
 import PreviewTexts from "@/components/preview/PreviewTexts.vue"
+import Reference from "@/domain/reference"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const props = defineProps<{
@@ -42,7 +43,7 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
     <PreviewNote :note="documentUnit.note" />
     <PreviewProceedingDecisions />
     <PreviewContentRelatedIndexing />
-    <PreviewReferences :references="documentUnit.references || []" />
+    <PreviewReferences :references="documentUnit.references as Reference[]" />
     <PreviewTexts
       :texts="documentUnit.texts"
       :valid-border-numbers="documentUnit.borderNumbers"
