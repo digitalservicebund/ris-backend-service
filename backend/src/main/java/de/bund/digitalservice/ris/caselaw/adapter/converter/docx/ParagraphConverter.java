@@ -3,7 +3,9 @@ package de.bund.digitalservice.ris.caselaw.adapter.converter.docx;
 import de.bund.digitalservice.ris.caselaw.domain.docx.AnchorImageElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ParagraphElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.RunElement;
+import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 import org.docx4j.wml.Jc;
 import org.docx4j.wml.JcEnumeration;
 import org.docx4j.wml.P;
@@ -46,8 +48,13 @@ public class ParagraphConverter {
           && paragraphProperties.getNumPr() == null) {
         // Default Tab Size in Docx = 1.27cm = 48px = 720 twips
         int baseIndentTwips = 720;
-        int indentInTwips = paragraphProperties.getInd().getLeft().intValue();
-        double numberOfEstimatedIndentations = Math.ceil((double) indentInTwips / baseIndentTwips);
+        int leftIndentInTwips = paragraphProperties.getInd().getLeft().intValue();
+        Optional<BigInteger> hangingIndentInTwips =
+            Optional.ofNullable(paragraphProperties.getInd().getHanging());
+        int actualIndentInTwips =
+            leftIndentInTwips - hangingIndentInTwips.orElse(BigInteger.ZERO).intValue();
+        double numberOfEstimatedIndentations =
+            Math.ceil((double) actualIndentInTwips / baseIndentTwips);
         // We use 40px as the default indentation size
         paragraphElement.addStyle(
             "margin-left", HTML_INDENT_SIZE_IN_PX * numberOfEstimatedIndentations + "px");

@@ -68,6 +68,23 @@ class DocxParagraphDocxConverterTest {
     assertTrue(result.toHtmlString().contains("margin-left: " + expectedMarginLeft + ".0px"));
   }
 
+  @ParameterizedTest
+  @CsvSource({"5, 5, 0", "5, 1, 40", "5, 0, 40"})
+  void testConvert_withLeftAndHangingIndent(
+      BigInteger leftIndentation, BigInteger hangingIndentation, int expectedMarginLeft) {
+    P paragraph = new P();
+    PPr pPr = new PPr();
+    PPrBase.Ind ind = new PPrBase.Ind();
+    ind.setLeft(leftIndentation);
+    ind.setHanging(hangingIndentation);
+    pPr.setInd(ind);
+    paragraph.setPPr(pPr);
+
+    var result = converter.convert(paragraph);
+
+    assertTrue(result.toHtmlString().contains("margin-left: " + expectedMarginLeft + ".0px"));
+  }
+
   @Test
   void testConvert_withPInsideList() {
     P paragraph = new P();
