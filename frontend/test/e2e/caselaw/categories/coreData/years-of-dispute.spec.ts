@@ -55,7 +55,9 @@ test.describe(
               await page.locator("[aria-label='Streitjahr']").fill(year)
               await page.keyboard.press("Enter")
 
-              await expect(page.getByText(year)).toBeVisible()
+              await expect(
+                page.getByTestId("chips-input_yearOfDispute").getByText(year),
+              ).toBeVisible()
             },
           )
         }
@@ -70,15 +72,21 @@ test.describe(
         })
 
         await test.step("Navigate back by arrow left, delete last chip on enter", async () => {
-          await expect(page.getByText("2024")).toBeVisible()
+          await expect(
+            page.getByTestId("chips-input_yearOfDispute").getByText("2024"),
+          ).toBeVisible()
           await page.keyboard.press("ArrowLeft")
           await page.keyboard.press("Enter")
 
-          await expect(page.getByText("2024")).toBeHidden()
+          await expect(
+            page.getByTestId("chips-input_yearOfDispute").getByText("2024"),
+          ).toBeHidden()
         })
 
         await test.step("Tab out, tab in, navigate back by arrow left, delete last chip on enter", async () => {
-          await expect(page.getByText("2023")).toBeVisible()
+          await expect(
+            page.getByTestId("chips-input_yearOfDispute").getByText("2023"),
+          ).toBeVisible()
           await page.keyboard.press("Tab")
           await page.keyboard.press("Tab")
           await page.keyboard.down("Shift")
@@ -86,7 +94,9 @@ test.describe(
 
           await page.keyboard.press("ArrowLeft")
           await page.keyboard.press("Enter")
-          await expect(page.getByText("2023")).toBeHidden()
+          await expect(
+            page.getByTestId("chips-input_yearOfDispute").getByText("2023"),
+          ).toBeHidden()
         })
 
         await save(page)
@@ -101,7 +111,9 @@ test.describe(
 
           await page.reload()
           for (const year of testData) {
-            await expect(page.getByText(year)).toBeVisible()
+            await expect(
+              page.getByTestId("chips-input_yearOfDispute").getByText(year),
+            ).toBeVisible()
           }
         })
       },
@@ -127,7 +139,9 @@ test.describe(
               await page.locator("[aria-label='Streitjahr']").fill(year)
               await page.keyboard.press("Enter")
 
-              await expect(page.getByText(year)).toBeVisible()
+              await expect(
+                page.getByTestId("chips-input_yearOfDispute").getByText(year),
+              ).toBeVisible()
             },
           )
         }
@@ -136,7 +150,9 @@ test.describe(
         await test.step("Expect all three years to be visible in preview", async () => {
           await navigateToPreview(page, documentNumber)
           for (const year of testData) {
-            await expect(page.getByText(year)).toBeVisible()
+            await expect(
+              page.getByTestId("preview").getByText(year),
+            ).toBeVisible()
           }
         })
 
@@ -182,7 +198,9 @@ test.describe(
               await page.locator("[aria-label='Streitjahr']").fill(year)
               await page.keyboard.press("Enter")
 
-              await expect(page.getByText(year)).toBeVisible()
+              await expect(
+                page.getByTestId("chips-input_yearOfDispute").getByText(year),
+              ).toBeVisible()
             },
           )
         }
@@ -223,7 +241,9 @@ test.describe(
         await test.step("Add two identical years of dispute not possible, shows error", async () => {
           await page.locator("[aria-label='Streitjahr']").fill("2022")
           await page.keyboard.press("Enter")
-          await expect(page.getByText("2022")).toBeVisible()
+          await expect(
+            page.getByTestId("chips-input_yearOfDispute").getByText("2022"),
+          ).toBeVisible()
 
           await page.locator("[aria-label='Streitjahr']").fill("2022")
           await page.keyboard.press("Enter")
@@ -240,13 +260,17 @@ test.describe(
         await test.step("Add more then 4 numbers not possible", async () => {
           await page.locator("[aria-label='Streitjahr']").fill("20202")
           await page.keyboard.press("Enter")
-          await expect(page.getByText("2020")).toBeVisible()
+          await expect(
+            page.getByTestId("chips-input_yearOfDispute").getByText("2020"),
+          ).toBeVisible()
         })
 
         await test.step("Add characters not possible", async () => {
           await page.locator("[aria-label='Streitjahr']").fill("abcd")
           await page.keyboard.press("Enter")
-          await expect(page.getByText("abcd")).toBeHidden()
+          await expect(
+            page.getByTestId("chips-input_yearOfDispute").getByText("abcd"),
+          ).toBeHidden()
         })
 
         await test.step("Add years of dispute in future not possible, former error replaced by new one", async () => {
@@ -270,7 +294,9 @@ test.describe(
 
         await test.step("Check if onyl valids years of dispute are persisted in reload", async () => {
           await page.reload()
-          await expect(page.getByText("2022")).toBeVisible()
+          await expect(
+            page.getByTestId("chips-input_yearOfDispute").getByText("2022"),
+          ).toBeVisible()
         })
       },
     )
