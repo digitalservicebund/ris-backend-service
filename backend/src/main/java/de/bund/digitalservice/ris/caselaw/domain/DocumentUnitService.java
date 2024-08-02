@@ -285,12 +285,12 @@ public class DocumentUnitService {
   }
 
   public void initializeCoreData(UUID uuid, Docx2Html docx2html) {
-    Optional<DocumentUnit> documentationUnitDTOOptional = repository.findByUuid(uuid);
-    if (documentationUnitDTOOptional.isEmpty()) {
+    Optional<DocumentUnit> documentationUnitOptional = repository.findByUuid(uuid);
+    if (documentationUnitOptional.isEmpty()) {
       return;
     }
-    DocumentUnit documentUnit = documentationUnitDTOOptional.get();
-    CoreData.CoreDataBuilder builder = documentationUnitDTOOptional.get().coreData().toBuilder();
+    DocumentUnit documentUnit = documentationUnitOptional.get();
+    CoreData.CoreDataBuilder builder = documentationUnitOptional.get().coreData().toBuilder();
 
     initializeEcli(docx2html.ecliList(), documentUnit, builder);
     initializeFieldsFromProperties(docx2html.properties(), documentUnit, builder);
