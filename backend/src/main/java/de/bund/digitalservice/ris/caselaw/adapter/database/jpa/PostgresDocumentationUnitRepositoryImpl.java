@@ -155,7 +155,13 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
         }
         // delete leading decision norm references if court is not BGH
         if (court.isPresent() && !court.get().getType().equals("BGH")) {
-          documentationUnitDTO.getLeadingDecisionNormReferences().clear();
+          documentUnit =
+              documentUnit.toBuilder()
+                  .coreData(
+                      documentUnit.coreData().toBuilder()
+                          .leadingDecisionNormReferences(List.of())
+                          .build())
+                  .build();
         }
       }
     }
