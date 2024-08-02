@@ -121,6 +121,7 @@ export const handoverDocumentationUnit = async (
   documentNumber: string,
 ) => {
   await navigateToHandover(page, documentNumber)
+  await expect(page.getByText("XML Vorschau")).toBeVisible()
   await page
     .locator("[aria-label='Dokumentationseinheit an jDV übergeben']")
     .click()
