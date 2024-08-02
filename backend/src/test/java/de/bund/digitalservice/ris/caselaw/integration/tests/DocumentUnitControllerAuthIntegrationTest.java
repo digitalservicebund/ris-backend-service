@@ -28,8 +28,8 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitAttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
@@ -107,7 +107,10 @@ class DocumentUnitControllerAuthIntegrationTest {
   @MockBean private PatchMapperService patchMapperService;
 
   @MockBean private HandoverService handoverService;
-  @MockBean private DocumentUnitAttachmentService documentUnitAttachmentService;
+
+  @MockBean
+  private DocumentationUnitDocxMetadataInitializationService
+      documentationUnitDocxMetadataInitializationService;
 
   static Stream<Arguments> getUnauthorizedCases() {
     return Stream.of(

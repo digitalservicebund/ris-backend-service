@@ -48,9 +48,9 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitAttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
@@ -142,7 +142,10 @@ class DocumentationUnitIntegrationTest {
   @MockBean private AttachmentService attachmentService;
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private HandoverService handoverService;
-  @MockBean private DocumentUnitAttachmentService documentUnitAttachmentService;
+
+  @MockBean
+  private DocumentationUnitDocxMetadataInitializationService
+      documentationUnitDocxMetadataInitializationService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private DocumentationOfficeDTO documentationOffice;

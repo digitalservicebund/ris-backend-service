@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -33,9 +34,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @Import({DocumentUnitService.class, DatabaseDocumentUnitStatusService.class})
-class DocumentUnitAttachmentServiceTest {
+class DocumentationUnitDocxMetadataInitializationServiceTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
-  @SpyBean private DocumentUnitAttachmentService service;
+  @SpyBean private DocumentationUnitDocxMetadataInitializationService service;
   @MockBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
   @MockBean private DatabaseStatusRepository statusRepository;
   @MockBean private DocumentUnitRepository repository;
@@ -65,7 +66,7 @@ class DocumentUnitAttachmentServiceTest {
             DocxMetadataProperty.FILE_NUMBER,
             "VII ZR 10/23",
             DocxMetadataProperty.DECISION_DATE,
-            "2020-02-01",
+            "01.12.2000",
             DocxMetadataProperty.COURT_TYPE,
             "AG",
             DocxMetadataProperty.COURT_LOCATION,
@@ -86,13 +87,13 @@ class DocumentUnitAttachmentServiceTest {
 
     when(courtRepository.findByTypeAndLocation("AG", "Berlin"))
         .thenReturn(Optional.of(Court.builder().label("AG Berlin").build()));
-    when(documentTypeRepository.findCaselawBySearchStr("Urt"))
-        .thenReturn(List.of(DocumentType.builder().label("Urt").build()));
+    when(documentTypeRepository.findUniqueCaselawBySearchStr("Urt"))
+        .thenReturn(Optional.of(DocumentType.builder().label("Urt").build()));
 
     service.initializeCoreData(TEST_UUID, docx2html);
 
     ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository).save(documentUnitCaptor.capture());
+    verify(repository, times(2)).save(documentUnitCaptor.capture());
     CoreData savedCoreData = documentUnitCaptor.getValue().coreData();
 
     assertEquals("ECLI:ABCD", savedCoreData.ecli());
@@ -103,7 +104,7 @@ class DocumentUnitAttachmentServiceTest {
     assertEquals("Urt", savedCoreData.documentType().label());
     assertEquals("my-procedure-from-metadata", savedCoreData.procedure().label());
     assertEquals(
-        "2020-02-01",
+        "2000-12-01",
         savedCoreData.decisionDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
   }
 
@@ -115,7 +116,7 @@ class DocumentUnitAttachmentServiceTest {
     service.initializeCoreData(TEST_UUID, docx2html);
 
     ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository).save(documentUnitCaptor.capture());
+    verify(repository, times(2)).save(documentUnitCaptor.capture());
     CoreData savedCoreData = documentUnitCaptor.getValue().coreData();
 
     assertNull(savedCoreData.ecli());
@@ -131,7 +132,7 @@ class DocumentUnitAttachmentServiceTest {
     service.initializeCoreData(TEST_UUID, docx2html);
 
     ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository).save(documentUnitCaptor.capture());
+    verify(repository, times(2)).save(documentUnitCaptor.capture());
     CoreData savedCoreData = documentUnitCaptor.getValue().coreData();
 
     assertEquals("ECLI:FOOTER", savedCoreData.ecli());
@@ -154,7 +155,7 @@ class DocumentUnitAttachmentServiceTest {
     service.initializeCoreData(TEST_UUID, docx2html);
 
     ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository).save(documentUnitCaptor.capture());
+    verify(repository, times(2)).save(documentUnitCaptor.capture());
 
     CoreData savedCoreData = documentUnitCaptor.getValue().coreData();
     assertEquals(LegalEffect.NO.getLabel(), savedCoreData.legalEffect());
@@ -174,7 +175,7 @@ class DocumentUnitAttachmentServiceTest {
     service.initializeCoreData(TEST_UUID, docx2html);
 
     ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository).save(documentUnitCaptor.capture());
+    verify(repository, times(2)).save(documentUnitCaptor.capture());
     CoreData savedCoreData = documentUnitCaptor.getValue().coreData();
 
     assertNull(savedCoreData.court());
@@ -194,7 +195,7 @@ class DocumentUnitAttachmentServiceTest {
     service.initializeCoreData(TEST_UUID, docx2html);
 
     ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository).save(documentUnitCaptor.capture());
+    verify(repository, times(2)).save(documentUnitCaptor.capture());
     CoreData savedCoreData = documentUnitCaptor.getValue().coreData();
 
     assertNull(savedCoreData.court());
@@ -215,7 +216,7 @@ class DocumentUnitAttachmentServiceTest {
     service.initializeCoreData(TEST_UUID, docx2html);
 
     ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository).save(documentUnitCaptor.capture());
+    verify(repository, times(2)).save(documentUnitCaptor.capture());
     CoreData savedCoreData = documentUnitCaptor.getValue().coreData();
 
     assertNull(savedCoreData.court());
@@ -232,7 +233,7 @@ class DocumentUnitAttachmentServiceTest {
     service.initializeCoreData(TEST_UUID, docx2html);
 
     ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository).save(documentUnitCaptor.capture());
+    verify(repository, times(2)).save(documentUnitCaptor.capture());
     CoreData savedCoreData = documentUnitCaptor.getValue().coreData();
 
     assertEquals("BFH", savedCoreData.court().label());
@@ -256,7 +257,7 @@ class DocumentUnitAttachmentServiceTest {
     service.initializeCoreData(TEST_UUID, docx2html);
 
     ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository).save(documentUnitCaptor.capture());
+    verify(repository, times(2)).save(documentUnitCaptor.capture());
     CoreData savedCoreData = documentUnitCaptor.getValue().coreData();
 
     assertEquals("LG Bern", savedCoreData.court().label());
@@ -283,7 +284,7 @@ class DocumentUnitAttachmentServiceTest {
     service.initializeCoreData(TEST_UUID, docx2html);
 
     ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository).save(documentUnitCaptor.capture());
+    verify(repository, times(2)).save(documentUnitCaptor.capture());
     CoreData savedCoreData = documentUnitCaptor.getValue().coreData();
 
     assertEquals("LG Bernau", savedCoreData.court().label());

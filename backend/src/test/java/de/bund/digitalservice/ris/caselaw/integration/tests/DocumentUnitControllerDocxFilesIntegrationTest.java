@@ -27,10 +27,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresCourtRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentTypeRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
@@ -38,9 +40,9 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitAttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
@@ -86,6 +88,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 @RISIntegrationTest(
     imports = {
       DocumentUnitService.class,
+      DocumentationUnitDocxMetadataInitializationService.class,
       PostgresDeltaMigrationRepositoryImpl.class,
       DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentNumberRecyclingService.class,
@@ -102,7 +105,8 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
       S3AttachmentService.class,
       DocxConverterService.class,
       DocxConverter.class,
-      PostgresCourtRepositoryImpl.class
+      PostgresCourtRepositoryImpl.class,
+      PostgresDocumentTypeRepositoryImpl.class
     },
     controllers = {DocumentUnitController.class})
 class DocumentUnitControllerDocxFilesIntegrationTest {
@@ -131,9 +135,8 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   @Autowired private DocxConverterService docxConverterService;
   @Autowired private CourtRepository courtRepository;
   @Autowired private DocumentTypeRepository documentTypeRepository;
-  @SpyBean private DocumentUnitAttachmentService service;
+  @SpyBean private DocumentationUnitDocxMetadataInitializationService service;
   @Autowired private DocumentUnitService documentUnitService;
-  @Autowired private DocumentUnitAttachmentService documentUnitAttachmentService;
 
   @MockBean private S3Client s3Client;
 
@@ -153,6 +156,8 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   void setUp() {
     documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()).getId();
 
+    databaseDocumentCategoryRepository.save(DocumentCategoryDTO.builder().label("R").build());
+
     doReturn(docOffice)
         .when(userService)
         .getDocumentationOffice(
@@ -168,6 +173,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
     repository.deleteAll();
     attachmentRepository.deleteAll();
     databaseCourtRepository.deleteAll();
+    databaseDocumentCategoryRepository.deleteAll();
   }
 
   @Test
@@ -352,16 +358,13 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
                 .documentNumber("1234567890123")
                 .legalEffect(LegalEffectDTO.NEIN) // file has "Ja"
                 .judicialBody("1. Senat") // file has "2. Senat"
+                .court(null) // file has BFH
+                .legalEffect(null) // file has "Nein"
                 .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
                 .build());
 
     databaseCourtRepository.save(
-        CourtDTO.builder()
-            .type("AG")
-            .location("Oberkirchingen")
-            .isForeignCourt(true)
-            .isSuperiorCourt(false)
-            .build());
+        CourtDTO.builder().type("BFH").isForeignCourt(true).isSuperiorCourt(false).build());
 
     risWebTestClient
         .withDefaultLogin()
@@ -386,17 +389,16 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
                           DocxMetadataProperty.FILE_NUMBER,
                           "II B 29/24",
                           DocxMetadataProperty.LEGAL_EFFECT,
-                          "Ja",
+                          "Nein",
                           DocxMetadataProperty.COURT_TYPE,
-                          "AG Oberkirch"));
+                          "BFH"));
             });
 
     DocumentationUnitDTO savedDTO = repository.findById(dto.getId()).get();
     assertThat(savedDTO.getLegalEffect()).isEqualTo(LegalEffectDTO.NEIN); // kept old value
     assertThat(savedDTO.getJudicialBody()).isEqualTo("1. Senat"); // kept old value
     assertThat(savedDTO.getCourt().getType())
-        .isEqualTo("AG"); // added court based on docx properties
-    assertThat(savedDTO.getCourt().getLocation()).isEqualTo("Oberkirchingen");
+        .isEqualTo("BFH"); // added court based on docx properties
   }
 
   @Test

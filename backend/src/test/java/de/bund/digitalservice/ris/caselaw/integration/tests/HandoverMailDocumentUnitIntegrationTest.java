@@ -34,8 +34,8 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitAttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
 import de.bund.digitalservice.ris.caselaw.domain.EventType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
@@ -122,7 +122,10 @@ class HandoverMailDocumentUnitIntegrationTest {
   @MockBean DocxConverterService docxConverterService;
   @MockBean AttachmentService attachmentService;
   @MockBean private PatchMapperService patchMapperService;
-  @MockBean private DocumentUnitAttachmentService documentUnitAttachmentService;
+
+  @MockBean
+  private DocumentationUnitDocxMetadataInitializationService
+      documentationUnitDocxMetadataInitializationService;
 
   private DocumentationOfficeDTO docOffice;
 

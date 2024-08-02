@@ -34,10 +34,10 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitAttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
@@ -117,7 +117,10 @@ class ProcedureIntegrationTest {
   @MockBean private AttachmentService attachmentService;
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private HandoverService handoverService;
-  @MockBean private DocumentUnitAttachmentService documentUnitAttachmentService;
+
+  @MockBean
+  private DocumentationUnitDocxMetadataInitializationService
+      documentationUnitDocxMetadataInitializationService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private DocumentationOfficeDTO docOfficeDTO;
