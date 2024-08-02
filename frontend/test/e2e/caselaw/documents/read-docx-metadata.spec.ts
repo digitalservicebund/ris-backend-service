@@ -38,5 +38,53 @@ test.describe(
         })
       },
     )
+
+    test(
+      "upload file with metadata into prefilled document unit should add unset properties",
+      {
+        annotation: {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-4423",
+        },
+      },
+      async ({ page, prefilledDocumentUnit }) => {
+        await navigateToAttachments(
+          page,
+          prefilledDocumentUnit.documentNumber || "",
+        )
+
+        await test.step("upload file with Aktenzeichen, Rechtskraft, Gericht and Spruchkoerper metadata", async () => {
+          await uploadTestfile(page, "with_metadata.docx")
+          await expect(page.getByText("Hochgeladen am")).toBeVisible()
+        })
+
+        await test.step("open preview in sidepanel and check if metadata is filled", async () => {
+          await page.getByLabel("Vorschau anzeigen").click()
+          await expect(
+            page.getByText(
+              "Aktenzeichen" +
+                prefilledDocumentUnit.coreData.fileNumbers?.at(0),
+            ),
+          ).toBeVisible()
+          await expect(page.getByText("RechtskraftJa")).toBeVisible()
+          await expect(
+            page.getByText(
+              "Rechtskraft" + prefilledDocumentUnit.coreData.legalEffect,
+            ),
+          ).toBeHidden()
+          await expect(
+            page.getByText(
+              "Gericht" + prefilledDocumentUnit.coreData.court?.label,
+            ),
+          ).toBeVisible()
+          await expect(
+            page.getByText(
+              "Spruchkörper" + prefilledDocumentUnit.coreData.appraisalBody,
+            ),
+          ).toBeVisible()
+        })
+      },
+    )
   },
 )

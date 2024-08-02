@@ -292,14 +292,14 @@ public class DocumentUnitService {
     DocumentUnit documentUnit = documentationUnitDTOOptional.get();
     CoreData.CoreDataBuilder builder = documentationUnitDTOOptional.get().coreData().toBuilder();
 
-    initializeEcli(docx2html, documentUnit, builder);
-    initializeFromProperties(docx2html.properties(), documentUnit, builder);
+    initializeEcli(docx2html.ecliList(), documentUnit, builder);
+    initializeFieldsFromProperties(docx2html.properties(), documentUnit, builder);
 
     repository.save(documentUnit.toBuilder().coreData(builder.build()).build());
   }
 
   @SuppressWarnings("java:S3776")
-  private void initializeFromProperties(
+  private void initializeFieldsFromProperties(
       Map<DocXPropertyField, String> properties,
       DocumentUnit documentUnit,
       CoreData.CoreDataBuilder builder) {
@@ -319,7 +319,11 @@ public class DocumentUnitService {
           }
         }
         case LEGAL_EFFECT -> {
-          if (documentUnit.coreData().legalEffect() == null) {
+          if (documentUnit.coreData().legalEffect() == null
+              || documentUnit
+                  .coreData()
+                  .legalEffect()
+                  .equals(LegalEffect.NOT_SPECIFIED.getLabel())) {
             builder.legalEffect(entry.getValue());
           }
         }
@@ -334,9 +338,9 @@ public class DocumentUnitService {
   }
 
   private void initializeEcli(
-      Docx2Html docx2html, DocumentUnit documentUnit, CoreData.CoreDataBuilder builder) {
-    if (docx2html.ecliList().size() == 1 && documentUnit.coreData().ecli() == null) {
-      builder.ecli(docx2html.ecliList().get(0));
+      List<String> ecliList, DocumentUnit documentUnit, CoreData.CoreDataBuilder builder) {
+    if (ecliList.size() == 1 && documentUnit.coreData().ecli() == null) {
+      builder.ecli(ecliList.get(0));
     }
   }
 

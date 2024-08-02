@@ -127,6 +127,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   @Autowired private AttachmentService attachmentService;
   @Autowired private AttachmentRepository attachmentRepository;
   @Autowired private DocxConverterService docxConverterService;
+  @Autowired private CourtRepository courtRepository;
 
   @SpyBean private DocumentUnitService service;
 
@@ -137,7 +138,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   @MockBean private UserService userService;
 
   @MockBean private HandoverService handoverService;
-  @MockBean private CourtRepository courtRepository;
+
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private DocumentBuilderFactory documentBuilderFactory;
   @MockBean private PatchMapperService patchMapperService;
@@ -162,6 +163,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   void cleanUp() {
     repository.deleteAll();
     attachmentRepository.deleteAll();
+    databaseCourtRepository.deleteAll();
   }
 
   @Test
@@ -336,9 +338,9 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   void
       testAttachFileToDocumentationUnit_withMetadataProperties_shouldExtractCoreDataAndShouldNotOverrideFields()
           throws IOException {
-    var attachmentWithEcli =
+    var attachmentWithMetadata =
         Files.readAllBytes(Paths.get("src/test/resources/fixtures/with_metadata.docx"));
-    mockS3ClientToReturnFile(attachmentWithEcli);
+    mockS3ClientToReturnFile(attachmentWithMetadata);
 
     DocumentationUnitDTO dto =
         repository.save(
@@ -350,7 +352,12 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
                 .build());
 
     databaseCourtRepository.save(
-        CourtDTO.builder().type("BFH").isForeignCourt(true).isSuperiorCourt(false).build());
+        CourtDTO.builder()
+            .type("AG")
+            .location("Oberkirchingen")
+            .isForeignCourt(true)
+            .isSuperiorCourt(false)
+            .build());
 
     risWebTestClient
         .withDefaultLogin()
@@ -359,7 +366,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
         .contentType(
             MediaType.parseMediaType(
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
-        .bodyAsByteArray(attachmentWithEcli)
+        .bodyAsByteArray(attachmentWithMetadata)
         .exchange()
         .expectStatus()
         .isOk()
@@ -377,13 +384,69 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
                           DocXPropertyField.LEGAL_EFFECT,
                           "Ja",
                           DocXPropertyField.COURT_TYPE,
-                          "BFH"));
+                          "AG Oberkirch"));
             });
 
     DocumentationUnitDTO savedDTO = repository.findById(dto.getId()).get();
-    assertThat(savedDTO.getLegalEffect()).isEqualTo(LegalEffectDTO.JA);
-    assertThat(savedDTO.getJudicialBody()).isEqualTo("1. Senat");
-    assertThat(savedDTO.getCourt().getType()).isEqualTo("BFH");
+    assertThat(savedDTO.getLegalEffect()).isEqualTo(LegalEffectDTO.NEIN); // kept old value
+    assertThat(savedDTO.getJudicialBody()).isEqualTo("1. Senat"); // kept old value
+    assertThat(savedDTO.getCourt().getType())
+        .isEqualTo("AG"); // added court based on docx properties
+    assertThat(savedDTO.getCourt().getLocation()).isEqualTo("Oberkirchingen");
+  }
+
+  @Test
+  void testAttachFileToDocumentationUnit_withMetadataProperties_shouldNotSetAmbiguousCourt()
+      throws IOException {
+    var attachmentWithMetadata =
+        Files.readAllBytes(Paths.get("src/test/resources/fixtures/with_metadata.docx"));
+    mockS3ClientToReturnFile(attachmentWithMetadata);
+
+    DocumentationUnitDTO dto =
+        repository.save(
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .build());
+
+    databaseCourtRepository.save(
+        CourtDTO.builder()
+            .type("AG")
+            .location("Oberkirch Eins")
+            .isForeignCourt(true)
+            .isSuperiorCourt(false)
+            .jurisId(1)
+            .build());
+
+    databaseCourtRepository.save(
+        CourtDTO.builder()
+            .type("AG")
+            .location("Oberkirch Zwei")
+            .isForeignCourt(true)
+            .isSuperiorCourt(false)
+            .jurisId(2)
+            .build());
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file")
+        .contentType(
+            MediaType.parseMediaType(
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+        .bodyAsByteArray(attachmentWithMetadata)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(Docx2Html.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().properties().size()).isEqualTo(4);
+            });
+
+    DocumentationUnitDTO savedDTO = repository.findById(dto.getId()).get();
+    assertThat(savedDTO.getCourt()).isNull();
   }
 
   @Test
