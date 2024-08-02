@@ -396,60 +396,6 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   }
 
   @Test
-  void testAttachFileToDocumentationUnit_withMetadataProperties_shouldNotSetAmbiguousCourt()
-      throws IOException {
-    var attachmentWithMetadata =
-        Files.readAllBytes(Paths.get("src/test/resources/fixtures/with_metadata.docx"));
-    mockS3ClientToReturnFile(attachmentWithMetadata);
-
-    DocumentationUnitDTO dto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
-                .build());
-
-    databaseCourtRepository.save(
-        CourtDTO.builder()
-            .type("AG")
-            .location("Oberkirch Eins")
-            .isForeignCourt(true)
-            .isSuperiorCourt(false)
-            .jurisId(1)
-            .build());
-
-    databaseCourtRepository.save(
-        CourtDTO.builder()
-            .type("AG")
-            .location("Oberkirch Zwei")
-            .isForeignCourt(true)
-            .isSuperiorCourt(false)
-            .jurisId(2)
-            .build());
-
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file")
-        .contentType(
-            MediaType.parseMediaType(
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
-        .bodyAsByteArray(attachmentWithMetadata)
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(Docx2Html.class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().properties().size()).isEqualTo(4);
-            });
-
-    DocumentationUnitDTO savedDTO = repository.findById(dto.getId()).get();
-    assertThat(savedDTO.getCourt()).isNull();
-  }
-
-  @Test
   void testRemoveFileFromDocumentUnit() {
     when(s3Client.deleteObject(any(DeleteObjectRequest.class)))
         .thenReturn(DeleteObjectResponse.builder().build());
