@@ -19,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitAttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
@@ -49,8 +50,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @Import({DocumentUnitControllerTestConfig.class})
 class DocumentUnitControllerAuthTest {
   @Autowired private RisWebTestClient risWebTestClient;
-
   @MockBean private DocumentUnitService service;
+  @MockBean private DocumentUnitAttachmentService documentUnitAttachmentService;
   @MockBean private HandoverService handoverService;
   @MockBean private KeycloakUserService userService;
   @MockBean private DocxConverterService docxConverterService;

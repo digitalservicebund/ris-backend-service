@@ -15,10 +15,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverter;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverterException;
 import de.bund.digitalservice.ris.caselaw.config.ConverterConfig;
 import de.bund.digitalservice.ris.caselaw.domain.docx.BorderNumber;
-import de.bund.digitalservice.ris.caselaw.domain.docx.DocXPropertyField;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentUnitDocx;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocxImagePart;
+import de.bund.digitalservice.ris.caselaw.domain.docx.DocxMetadataProperty;
 import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingList.DocumentUnitNumberingListNumberFormat;
 import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingListEntryIndex;
@@ -1299,10 +1299,10 @@ class DocxConverterServiceTest {
       Assertions.assertNotNull(docx2Html);
 
       assertEquals(4, docx2Html.properties().size());
-      assertEquals("VI ZR 20/23", docx2Html.properties().get(DocXPropertyField.FILE_NUMBER));
-      assertEquals("BGH", docx2Html.properties().get(DocXPropertyField.COURT_TYPE));
-      assertEquals("1. Senat", docx2Html.properties().get(DocXPropertyField.APPRAISAL_BODY));
-      assertEquals("ja", docx2Html.properties().get(DocXPropertyField.LEGAL_EFFECT));
+      assertEquals("VI ZR 20/23", docx2Html.properties().get(DocxMetadataProperty.FILE_NUMBER));
+      assertEquals("BGH", docx2Html.properties().get(DocxMetadataProperty.COURT_TYPE));
+      assertEquals("1. Senat", docx2Html.properties().get(DocxMetadataProperty.APPRAISAL_BODY));
+      assertEquals("ja", docx2Html.properties().get(DocxMetadataProperty.LEGAL_EFFECT));
     }
   }
 

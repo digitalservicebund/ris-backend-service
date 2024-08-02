@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,6 +12,31 @@ import org.springframework.stereotype.Repository;
 public interface DatabaseCourtRepository extends JpaRepository<CourtDTO, UUID> {
 
   List<CourtDTO> findAllByOrderByTypeAscLocationAsc();
+
+  Optional<CourtDTO> findOneByTypeAndLocation(String type, String location);
+
+  @Query(
+      nativeQuery = true,
+      value =
+          """
+  WITH court_with_label AS (
+    SELECT
+      *,
+      UPPER(CONCAT(type,' ',location)) AS label
+    FROM
+      incremental_migration.court
+  )
+  SELECT
+    *,
+    label
+  FROM
+    court_with_label
+    LEFT JOIN incremental_migration.court_region AS region ON court_with_label.id = region.court_id
+  WHERE
+    label LIKE :searchStr
+
+  """)
+  Optional<CourtDTO> findOneBySearchStr(@Param("searchStr") String searchStr);
 
   /*
   The query gets all rows where searchStr is anywhere in the label.

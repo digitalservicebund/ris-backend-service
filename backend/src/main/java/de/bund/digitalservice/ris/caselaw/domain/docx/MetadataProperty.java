@@ -3,10 +3,10 @@ package de.bund.digitalservice.ris.caselaw.domain.docx;
 /** Property element of the docx file */
 public class MetadataProperty implements DocumentUnitDocx {
 
-  private DocXPropertyField key;
+  private DocxMetadataProperty key;
   private final String value;
 
-  public MetadataProperty(DocXPropertyField key, String value) {
+  public MetadataProperty(DocxMetadataProperty key, String value) {
     this.key = key;
     this.value = value;
   }
@@ -16,7 +16,7 @@ public class MetadataProperty implements DocumentUnitDocx {
     return null;
   }
 
-  public DocXPropertyField getKey() {
+  public DocxMetadataProperty getKey() {
     return key;
   }
 

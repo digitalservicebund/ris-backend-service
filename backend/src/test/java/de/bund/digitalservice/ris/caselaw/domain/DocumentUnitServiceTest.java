@@ -4,7 +4,6 @@ import static de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -15,10 +14,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusServ
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseStatusRepository;
-import de.bund.digitalservice.ris.caselaw.domain.court.Court;
-import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
-import de.bund.digitalservice.ris.caselaw.domain.docx.DocXPropertyField;
-import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberFormatterException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberPatternException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentUnitDeletionException;
@@ -50,11 +45,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class DocumentUnitServiceTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   @SpyBean private DocumentUnitService service;
-
   @MockBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
   @MockBean private DatabaseStatusRepository statusRepository;
   @MockBean private DocumentUnitRepository repository;
-  @MockBean private CourtRepository courtRepository;
   @MockBean private DocumentNumberService documentNumberService;
   @MockBean private DocumentNumberRecyclingService documentNumberRecyclingService;
   @MockBean private MailService mailService;
@@ -289,114 +282,5 @@ class DocumentUnitServiceTest {
     // Verify that the fileNumber field has normalized spaces
     assertThat(capturedRelatedDocumentationUnit.getFileNumber())
         .isEqualTo("This is a test filenumber with spaces.");
-  }
-
-  @Test
-  void testInitializeCoreData_withMetadataAndEcliSet() {
-    UUID uuid = UUID.randomUUID();
-    List<String> ecliList = Collections.singletonList("ECLI:TEST");
-    Map<DocXPropertyField, String> properties =
-        Map.of(
-            DocXPropertyField.COURT_TYPE, "AG Berlin",
-            DocXPropertyField.FILE_NUMBER, "VII ZR 10/23",
-            DocXPropertyField.LEGAL_EFFECT, "Nein",
-            DocXPropertyField.APPRAISAL_BODY, "2. Senat");
-    Docx2Html docx2html = new Docx2Html(null, ecliList, properties);
-
-    CoreData coreData = CoreData.builder().fileNumbers(List.of()).build();
-    DocumentUnit documentUnit = DocumentUnit.builder().coreData(coreData).build();
-
-    when(repository.findByUuid(uuid)).thenReturn(Optional.of(documentUnit));
-    when(courtRepository.findBySearchStr("AG Berlin"))
-        .thenReturn(List.of(Court.builder().label("AG Berlin").build()));
-
-    service.initializeCoreData(uuid, docx2html);
-
-    ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository).save(documentUnitCaptor.capture());
-
-    DocumentUnit savedDocumentUnit = documentUnitCaptor.getValue();
-    CoreData savedCoreData = savedDocumentUnit.coreData();
-
-    assertEquals("ECLI:TEST", savedCoreData.ecli());
-    assertEquals("AG Berlin", savedCoreData.court().label());
-    assertEquals(List.of("VII ZR 10/23"), savedCoreData.fileNumbers());
-    assertEquals(LegalEffect.NO.getLabel(), savedCoreData.legalEffect());
-    assertEquals("2. Senat", savedCoreData.appraisalBody());
-  }
-
-  @Test
-  void testInitializeCoreData_doNotSetEcliIfMultipleFound() {
-    UUID uuid = UUID.randomUUID();
-    List<String> ecliList = List.of("ECLI:TEST", "ECLI:TEST2");
-    Docx2Html docx2html = new Docx2Html(null, ecliList, Collections.emptyMap());
-
-    CoreData coreData = CoreData.builder().fileNumbers(List.of()).build();
-    DocumentUnit documentUnit = DocumentUnit.builder().coreData(coreData).build();
-
-    when(repository.findByUuid(uuid)).thenReturn(Optional.of(documentUnit));
-
-    service.initializeCoreData(uuid, docx2html);
-
-    ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository).save(documentUnitCaptor.capture());
-
-    DocumentUnit savedDocumentUnit = documentUnitCaptor.getValue();
-    CoreData savedCoreData = savedDocumentUnit.coreData();
-
-    assertEquals(null, savedCoreData.ecli());
-  }
-
-  @Test
-  void testInitializeCoreData_initializeLegalEffectIfExplicitlyNotSpecified() {
-    UUID uuid = UUID.randomUUID();
-    Map<DocXPropertyField, String> properties = Map.of(DocXPropertyField.LEGAL_EFFECT, "Nein");
-    Docx2Html docx2html = new Docx2Html(null, List.of(), properties);
-
-    CoreData coreData =
-        CoreData.builder()
-            .fileNumbers(List.of())
-            .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
-            .build();
-    DocumentUnit documentUnit = DocumentUnit.builder().coreData(coreData).build();
-
-    when(repository.findByUuid(uuid)).thenReturn(Optional.of(documentUnit));
-
-    service.initializeCoreData(uuid, docx2html);
-
-    ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository).save(documentUnitCaptor.capture());
-
-    DocumentUnit savedDocumentUnit = documentUnitCaptor.getValue();
-    CoreData savedCoreData = savedDocumentUnit.coreData();
-
-    assertEquals(LegalEffect.NO.getLabel(), savedCoreData.legalEffect());
-  }
-
-  @Test
-  void testInitializeCoreData_shouldNotInitializeAmbiguousCourt() {
-    UUID uuid = UUID.randomUUID();
-    Map<DocXPropertyField, String> properties = Map.of(DocXPropertyField.COURT_TYPE, "AG B");
-    Docx2Html docx2html = new Docx2Html(null, List.of(), properties);
-
-    CoreData coreData = CoreData.builder().fileNumbers(List.of()).build();
-    DocumentUnit documentUnit = DocumentUnit.builder().coreData(coreData).build();
-
-    when(repository.findByUuid(uuid)).thenReturn(Optional.of(documentUnit));
-    when(courtRepository.findBySearchStr("AG B"))
-        .thenReturn(
-            List.of(
-                Court.builder().label("AG Berlin").build(),
-                Court.builder().label("AG Bernau").build()));
-
-    service.initializeCoreData(uuid, docx2html);
-
-    ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository).save(documentUnitCaptor.capture());
-
-    DocumentUnit savedDocumentUnit = documentUnitCaptor.getValue();
-    CoreData savedCoreData = savedDocumentUnit.coreData();
-
-    assertNull(savedCoreData.court());
   }
 }

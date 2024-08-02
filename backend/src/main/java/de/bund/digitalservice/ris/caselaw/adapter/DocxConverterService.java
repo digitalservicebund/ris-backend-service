@@ -5,10 +5,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverter;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverterException;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.FooterConverter;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
-import de.bund.digitalservice.ris.caselaw.domain.docx.DocXPropertyField;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentUnitDocx;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocxImagePart;
+import de.bund.digitalservice.ris.caselaw.domain.docx.DocxMetadataProperty;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ECLIElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.FooterElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.MetadataProperty;
@@ -140,7 +140,7 @@ public class DocxConverterService implements ConverterService {
           packedList.stream().map(DocumentUnitDocx::toHtmlString).collect(Collectors.joining());
     }
 
-    Map<DocXPropertyField, String> properties =
+    Map<DocxMetadataProperty, String> properties =
         packedList.stream()
             .filter(MetadataProperty.class::isInstance)
             .map(MetadataProperty.class::cast)
@@ -202,7 +202,7 @@ public class DocxConverterService implements ConverterService {
       return props;
     }
     for (var prop : customProps.getJaxbElement().getProperty()) {
-      DocXPropertyField field = DocXPropertyField.fromKey(prop.getName());
+      DocxMetadataProperty field = DocxMetadataProperty.fromKey(prop.getName());
       if (prop.getLpwstr() != null && field != null) {
         props.add(new MetadataProperty(field, prop.getLpwstr()));
       }

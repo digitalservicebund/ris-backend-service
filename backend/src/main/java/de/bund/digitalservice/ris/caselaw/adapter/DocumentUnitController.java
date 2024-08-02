@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransf
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitAttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
@@ -58,20 +59,22 @@ public class DocumentUnitController {
   private final UserService userService;
   private final AttachmentService attachmentService;
   private final ConverterService converterService;
-
   private final HandoverService handoverService;
+  private final DocumentUnitAttachmentService documentUnitAttachmentService;
 
   public DocumentUnitController(
       DocumentUnitService service,
       UserService userService,
       AttachmentService attachmentService,
       ConverterService converterService,
-      HandoverService handoverService) {
+      HandoverService handoverService,
+      DocumentUnitAttachmentService documentUnitAttachmentService) {
     this.service = service;
     this.userService = userService;
     this.attachmentService = attachmentService;
     this.converterService = converterService;
     this.handoverService = handoverService;
+    this.documentUnitAttachmentService = documentUnitAttachmentService;
   }
 
   @GetMapping(value = "new", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -111,7 +114,7 @@ public class DocumentUnitController {
             attachmentService
                 .attachFileToDocumentationUnit(uuid, ByteBuffer.wrap(bytes), httpHeaders)
                 .s3path());
-    service.initializeCoreData(uuid, docx2html);
+    documentUnitAttachmentService.initializeCoreData(uuid, docx2html);
     if (docx2html == null) {
       return ResponseEntity.unprocessableEntity().build();
     }

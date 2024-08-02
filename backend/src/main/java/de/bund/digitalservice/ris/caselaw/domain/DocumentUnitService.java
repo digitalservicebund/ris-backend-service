@@ -3,10 +3,6 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import static de.bund.digitalservice.ris.caselaw.domain.StringUtils.normalizeSpace;
 
 import com.gravity9.jsonpatch.JsonPatch;
-import de.bund.digitalservice.ris.caselaw.domain.court.Court;
-import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
-import de.bund.digitalservice.ris.caselaw.domain.docx.DocXPropertyField;
-import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -16,7 +12,6 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.time.LocalDate;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -37,7 +32,6 @@ public class DocumentUnitService {
   private final AttachmentService attachmentService;
   private final DocumentNumberRecyclingService documentNumberRecyclingService;
   private final PatchMapperService patchMapperService;
-  private final CourtRepository courtRepository;
   private final Validator validator;
 
   public DocumentUnitService(
@@ -46,8 +40,7 @@ public class DocumentUnitService {
       DocumentNumberRecyclingService documentNumberRecyclingService,
       Validator validator,
       AttachmentService attachmentService,
-      PatchMapperService patchMapperService,
-      CourtRepository courtRepository) {
+      PatchMapperService patchMapperService) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
@@ -55,7 +48,6 @@ public class DocumentUnitService {
     this.validator = validator;
     this.attachmentService = attachmentService;
     this.patchMapperService = patchMapperService;
-    this.courtRepository = courtRepository;
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -282,66 +274,6 @@ public class DocumentUnitService {
       return "Ok";
     }
     return "Validation error";
-  }
-
-  public void initializeCoreData(UUID uuid, Docx2Html docx2html) {
-    Optional<DocumentUnit> documentationUnitOptional = repository.findByUuid(uuid);
-    if (documentationUnitOptional.isEmpty()) {
-      return;
-    }
-    DocumentUnit documentUnit = documentationUnitOptional.get();
-    CoreData.CoreDataBuilder builder = documentationUnitOptional.get().coreData().toBuilder();
-
-    initializeEcli(docx2html.ecliList(), documentUnit, builder);
-    initializeFieldsFromProperties(docx2html.properties(), documentUnit, builder);
-
-    repository.save(documentUnit.toBuilder().coreData(builder.build()).build());
-  }
-
-  @SuppressWarnings("java:S3776")
-  private void initializeFieldsFromProperties(
-      Map<DocXPropertyField, String> properties,
-      DocumentUnit documentUnit,
-      CoreData.CoreDataBuilder builder) {
-    for (Map.Entry<DocXPropertyField, String> entry : properties.entrySet()) {
-      switch (entry.getKey()) {
-        case COURT_TYPE -> {
-          if (documentUnit.coreData().court() == null) {
-            List<Court> courts = courtRepository.findBySearchStr(entry.getValue());
-            if (courts.size() == 1) {
-              builder.court(courts.get(0));
-            }
-          }
-        }
-        case FILE_NUMBER -> {
-          if (documentUnit.coreData().fileNumbers().isEmpty()) {
-            builder.fileNumbers(Collections.singletonList(entry.getValue()));
-          }
-        }
-        case LEGAL_EFFECT -> {
-          if (documentUnit.coreData().legalEffect() == null
-              || documentUnit
-                  .coreData()
-                  .legalEffect()
-                  .equals(LegalEffect.NOT_SPECIFIED.getLabel())) {
-            builder.legalEffect(entry.getValue());
-          }
-        }
-        case APPRAISAL_BODY -> {
-          if (documentUnit.coreData().appraisalBody() == null) {
-            builder.appraisalBody(entry.getValue());
-          }
-        }
-        default -> {}
-      }
-    }
-  }
-
-  private void initializeEcli(
-      List<String> ecliList, DocumentUnit documentUnit, CoreData.CoreDataBuilder builder) {
-    if (ecliList.size() == 1 && documentUnit.coreData().ecli() == null) {
-      builder.ecli(ecliList.get(0));
-    }
   }
 
   private void saveForRecycling(DocumentUnit documentUnit) {

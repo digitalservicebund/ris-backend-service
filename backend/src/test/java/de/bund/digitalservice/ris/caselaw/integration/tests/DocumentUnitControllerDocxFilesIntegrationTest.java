@@ -37,14 +37,16 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitAttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
-import de.bund.digitalservice.ris.caselaw.domain.docx.DocXPropertyField;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
+import de.bund.digitalservice.ris.caselaw.domain.docx.DocxMetadataProperty;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.io.IOException;
@@ -128,8 +130,10 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   @Autowired private AttachmentRepository attachmentRepository;
   @Autowired private DocxConverterService docxConverterService;
   @Autowired private CourtRepository courtRepository;
-
-  @SpyBean private DocumentUnitService service;
+  @Autowired private DocumentTypeRepository documentTypeRepository;
+  @SpyBean private DocumentUnitAttachmentService service;
+  @Autowired private DocumentUnitService documentUnitService;
+  @Autowired private DocumentUnitAttachmentService documentUnitAttachmentService;
 
   @MockBean private S3Client s3Client;
 
@@ -377,13 +381,13 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
               assertThat(response.getResponseBody().properties())
                   .containsAllEntriesOf(
                       Map.of(
-                          DocXPropertyField.APPRAISAL_BODY,
+                          DocxMetadataProperty.APPRAISAL_BODY,
                           "2. Senat",
-                          DocXPropertyField.FILE_NUMBER,
+                          DocxMetadataProperty.FILE_NUMBER,
                           "II B 29/24",
-                          DocXPropertyField.LEGAL_EFFECT,
+                          DocxMetadataProperty.LEGAL_EFFECT,
                           "Ja",
-                          DocXPropertyField.COURT_TYPE,
+                          DocxMetadataProperty.COURT_TYPE,
                           "AG Oberkirch"));
             });
 
