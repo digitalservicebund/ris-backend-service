@@ -16,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
@@ -72,6 +73,7 @@ class FieldOfLawIntegrationTest {
   @MockBean private DocumentUnitService service;
 
   @MockBean private HandoverService handoverService;
+  @MockBean private CourtRepository courtRepository;
 
   @Test
   void testGetAllFieldsOfLaw() {

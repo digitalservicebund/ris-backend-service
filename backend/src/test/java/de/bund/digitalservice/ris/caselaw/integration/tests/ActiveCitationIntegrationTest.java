@@ -36,6 +36,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -103,8 +104,8 @@ class ActiveCitationIntegrationTest {
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private AttachmentService attachmentService;
   @MockBean private PatchMapperService patchMapperService;
-
   @MockBean private HandoverService handoverService;
+  @MockBean private CourtRepository courtRepository;
 
   @BeforeEach
   void setUp() {

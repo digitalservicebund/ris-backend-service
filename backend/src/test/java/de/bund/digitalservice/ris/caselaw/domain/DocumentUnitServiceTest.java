@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusServ
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseStatusRepository;
+import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberFormatterException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberPatternException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentUnitDeletionException;
@@ -49,6 +50,7 @@ class DocumentUnitServiceTest {
   @MockBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
   @MockBean private DatabaseStatusRepository statusRepository;
   @MockBean private DocumentUnitRepository repository;
+  @MockBean private CourtRepository courtRepository;
   @MockBean private DocumentNumberService documentNumberService;
   @MockBean private DocumentNumberRecyclingService documentNumberRecyclingService;
   @MockBean private MailService mailService;

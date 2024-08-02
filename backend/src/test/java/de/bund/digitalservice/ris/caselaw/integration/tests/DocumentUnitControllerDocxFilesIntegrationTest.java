@@ -137,11 +137,10 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   @MockBean private UserService userService;
 
   @MockBean private HandoverService handoverService;
+  @MockBean private CourtRepository courtRepository;
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private DocumentBuilderFactory documentBuilderFactory;
   @MockBean private PatchMapperService patchMapperService;
-
-  @Autowired private CourtRepository courtRepository;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
 
