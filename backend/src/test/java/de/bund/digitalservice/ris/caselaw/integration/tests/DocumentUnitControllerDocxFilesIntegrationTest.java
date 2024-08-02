@@ -356,10 +356,9 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
         repository.save(
             DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
-                .legalEffect(LegalEffectDTO.NEIN) // file has "Ja"
+                .legalEffect(LegalEffectDTO.JA) // file has "Nein"
                 .judicialBody("1. Senat") // file has "2. Senat"
                 .court(null) // file has BFH
-                .legalEffect(null) // file has "Nein"
                 .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
                 .build());
 
@@ -395,7 +394,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
             });
 
     DocumentationUnitDTO savedDTO = repository.findById(dto.getId()).get();
-    assertThat(savedDTO.getLegalEffect()).isEqualTo(LegalEffectDTO.NEIN); // kept old value
+    assertThat(savedDTO.getLegalEffect()).isEqualTo(LegalEffectDTO.JA); // kept old value
     assertThat(savedDTO.getJudicialBody()).isEqualTo("1. Senat"); // kept old value
     assertThat(savedDTO.getCourt().getType())
         .isEqualTo("BFH"); // added court based on docx properties
