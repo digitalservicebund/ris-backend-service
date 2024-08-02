@@ -38,6 +38,7 @@ test.describe("saving behaviour", () => {
   test("input not lost on page unload (autosave not triggered yet)", async ({
     page,
     documentNumber,
+    browser,
   }) => {
     await navigateToCategories(page, documentNumber)
 
@@ -45,13 +46,15 @@ test.describe("saving behaviour", () => {
     await waitForInputValue(page, "[aria-label='Spruchkörper']", "VG-001")
 
     await expect(page.getByText(/Zuletzt .* Uhr/)).toBeHidden()
-    await page.locator("a:has-text('Übergabe an jDV')").click()
-    await expect(page.locator("h1:has-text('Übergabe an jDV')")).toBeVisible({
-      timeout: 15000,
-    })
-    await navigateToCategories(page, documentNumber)
 
-    await expect(page.locator("[aria-label='Spruchkörper']")).toHaveValue(
+    // Close the tab -> We expect the document unit to be saved
+    await page.close({ runBeforeUnload: true })
+
+    const newPage = await browser.newPage()
+
+    await navigateToCategories(newPage, documentNumber)
+
+    await expect(newPage.locator("[aria-label='Spruchkörper']")).toHaveValue(
       "VG-001",
       { timeout: 500 },
     )
