@@ -98,7 +98,7 @@
     "@vue/eslint-config-prettier": "^9.0.0",
     "@vue/eslint-config-typescript": "^13.0.0",
     "@vue/test-utils": "^2.4.6",
-    "autoprefixer": "^10.4.19",
+    "autoprefixer": "^10.4.20",
     "axe-playwright": "^2.0.1",
     "axios-mock-adapter": "^1.22.0",
     "eslint": "^8.57.0",
