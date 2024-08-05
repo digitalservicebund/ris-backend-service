@@ -120,7 +120,7 @@ watch(
           id="citation"
           v-slot="slotProps"
           class="flex-1"
-          label="Klammernzusatz *"
+          label="Klammernzusatz"
           :validation-error="validationStore.getByField('referenceSupplement')"
         >
           <TextInput

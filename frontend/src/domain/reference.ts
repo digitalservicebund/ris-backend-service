@@ -16,11 +16,7 @@ export default class Reference implements EditableListItem {
   footnote?: string
   legalPeriodical?: LegalPeriodical
 
-  static readonly requiredFields = [
-    "legalPeriodical",
-    "citation",
-    "referenceSupplement",
-  ] as const
+  static readonly requiredFields = ["legalPeriodical", "citation"] as const
   static readonly fields = [
     "legalPeriodical",
     "citation",

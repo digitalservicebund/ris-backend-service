@@ -12,6 +12,7 @@ import { caselawTest as test } from "./fixtures"
 test.describe(
   "references",
   {
+    tag: "@fundstellen",
     annotation: {
       type: "epic",
       description:
@@ -106,7 +107,7 @@ test.describe(
         })
         await save(page)
 
-        await test.step("Add second reference, verify that it shown in the list", async () => {
+        await test.step("Add second reference, verify that it is shown in the list", async () => {
           await fillInput(page, "Periodikum", "wdg")
           await page
             .getByText("WdG | Welt der Gesundheitsversorgung", {
@@ -136,6 +137,48 @@ test.describe(
         await page.reload()
 
         await expect(page.getByLabel("Listen Eintrag")).not.toBeAttached()
+      },
+    )
+
+    test(
+      "References input validated against required fields",
+      {
+        annotation: {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-4336",
+        },
+      },
+      async ({ page, prefilledDocumentUnit }) => {
+        await navigateToReferences(
+          page,
+          prefilledDocumentUnit.documentNumber ?? "",
+        )
+
+        await test.step("Add reference with only 'Klammerzusatz' shows error in 'Periodikum' & 'Zitatstelle'", async () => {
+          await fillInput(page, "Klammernzusatz", "LT")
+          await page.locator("[aria-label='Fundstelle speichern']").click()
+          await expect(page.getByText("Pflichtfeld nicht befüllt")).toHaveCount(
+            2,
+          )
+        })
+        await test.step("Add 'Periodikum' removes error there, but still shows error for 'Zitatstelle'", async () => {
+          await fillInput(page, "Periodikum", "wdg")
+          await page
+            .getByText("WdG | Welt der Gesundheitsversorgung", {
+              exact: true,
+            })
+            .click()
+          await page.locator("[aria-label='Fundstelle speichern']").click()
+          await expect(page.getByText("Pflichtfeld nicht befüllt")).toHaveCount(
+            1,
+          )
+        })
+        await test.step("Add 'Zitatstelle' removes error, reference can be saved", async () => {
+          await fillInput(page, "Zitatstelle", "2024, 10-12")
+          await page.locator("[aria-label='Fundstelle speichern']").click()
+          await expect(page.getByText("Pflichtfeld nicht befüllt")).toBeHidden()
+        })
       },
     )
 
@@ -250,15 +293,6 @@ test.describe(
           await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
           await expect(page.getByText("XML Vorschau")).toBeVisible()
           await page.getByText("XML Vorschau").click()
-
-          // <fundstelle typ="nichtamtlich">
-          //   <periodikum>WdG</periodikum>
-          //   <zitstelle>2024, 10-12 (LT)</zitstelle>
-          // </fundstelle>
-          // <fundstelle typ="amtlich">
-          //   <periodikum>GVBl BB</periodikum>
-          //   <zitstelle>2020, 01-99 (L)</zitstelle>
-          // </fundstelle>
 
           const referencesNodes = await page
             .locator('code:has-text("<fundstelle ")')
