@@ -36,6 +36,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
@@ -143,6 +144,15 @@ class ReferenceIntegrationTest {
                 .primaryReference(true)
                 .build());
 
+    LegalPeriodical expectedLegalPeriodical =
+        LegalPeriodical.builder()
+            .legalPeriodicalId(legalPeriodical.getId())
+            .legalPeriodicalTitle(legalPeriodical.getTitle())
+            .legalPeriodicalSubtitle(legalPeriodical.getSubtitle())
+            .legalPeriodicalAbbreviation(legalPeriodical.getAbbreviation())
+            .primaryReference(true)
+            .build();
+
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getId())
@@ -152,11 +162,14 @@ class ReferenceIntegrationTest {
                 List.of(
                     Reference.builder()
                         .citation("2024, S.3")
-                        .primaryReference(true)
                         .referenceSupplement("Klammerzusatz")
                         .footnote("footnote")
-                        .legalPeriodicalId(legalPeriodical.getId())
-                        .legalPeriodicalAbbreviation("BVerwGE")
+                        .legalPeriodical(
+                            LegalPeriodical.builder()
+                                .legalPeriodicalId(legalPeriodical.getId())
+                                .legalPeriodicalAbbreviation("BVerwGE")
+                                .primaryReference(true)
+                                .build())
                         .build()))
             .build();
 
@@ -176,25 +189,12 @@ class ReferenceIntegrationTest {
                   .isEqualTo(DEFAULT_DOCUMENT_NUMBER);
               assertThat(response.getResponseBody().references()).hasSize(1);
               assertThat(response.getResponseBody().references())
-                  .extracting(
-                      "citation",
-                      "referenceSupplement",
-                      "footnote",
-                      "primaryReference",
-                      "legalPeriodicalId",
-                      "legalPeriodicalAbbreviation",
-                      "legalPeriodicalTitle",
-                      "legalPeriodicalSubtitle")
-                  .containsExactly(
-                      tuple(
-                          "2024, S.3",
-                          "Klammerzusatz",
-                          "footnote",
-                          true,
-                          legalPeriodical.getId(),
-                          "BVerwGE",
-                          "Bundesverwaltungsgerichtsentscheidungen",
-                          "Entscheidungen des Bundesverwaltungsgerichts"));
+                  .extracting("citation", "referenceSupplement", "footnote")
+                  .containsExactly(tuple("2024, S.3", "Klammerzusatz", "footnote"));
+              assertThat(response.getResponseBody().references())
+                  .extracting("legalPeriodical")
+                  .usingRecursiveComparison()
+                  .isEqualTo(List.of(expectedLegalPeriodical));
             });
   }
 }

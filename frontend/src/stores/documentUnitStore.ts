@@ -80,7 +80,6 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
       try {
         applyPatch(backendPatch)
       } catch (error) {
-        console.log("apply patch: ", error)
         if (documentUnit.value.documentNumber) {
           const response = await loadDocumentUnit(
             documentUnit.value.documentNumber,
