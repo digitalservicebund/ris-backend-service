@@ -21,6 +21,11 @@ public class CourtController {
     this.service = service;
   }
 
+  /**
+   * Returns court objects in a list
+   * @param searchStr An optional search string, which filters the list.
+   * @return
+   */
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public List<Court> getCourts(@RequestParam(value = "q", required = false) String searchStr) {

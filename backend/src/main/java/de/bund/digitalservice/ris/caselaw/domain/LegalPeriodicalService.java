@@ -16,6 +16,11 @@ public class LegalPeriodicalService {
     this.legalPeriodicalRepository = legalPeriodicalRepository;
   }
 
+  /**
+   * Get legal periodical objects in a list, filtered by an optional search string
+   * @param searchStr optional search string
+   * @return
+   */
   public List<LegalPeriodical> getLegalPeriodicals(Optional<String> searchStr) {
     return legalPeriodicalRepository.findAllBySearchStr(searchStr.map(String::trim));
   }

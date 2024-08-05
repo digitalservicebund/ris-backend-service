@@ -22,6 +22,11 @@ public class LegalPeriodicalController {
     this.service = service;
   }
 
+  /**
+   * Returns legal periodical objects in a list
+   * @param searchStr An optional search string, that filters the list by abbreviation.
+   * @return
+   */
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public List<LegalPeriodical> getLegalPeriodicals(
