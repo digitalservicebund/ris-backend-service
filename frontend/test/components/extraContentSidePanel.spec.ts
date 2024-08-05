@@ -32,7 +32,6 @@ function renderComponent(
                     documentNumber: "1234567891234",
                     note: options.note ?? "",
                     attachments: options.attachments ?? [],
-                    references: options.references ?? [],
                   }),
                 },
               },

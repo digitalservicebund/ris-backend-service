@@ -42,7 +42,6 @@ const legalPeriodical = computed({
     } else {
       reference.value.legalPeriodical = undefined
     }
-    console.log(reference.value)
   },
 })
 

@@ -58,19 +58,19 @@ describe("preview references", () => {
       ],
     ],
     [
-      "FundstellenAmtliche FundstellenDEF, 2008, S.5",
+      "FundstellenSekundäre FundstellenDEF, 2008, S.5",
       [
         new Reference({
           citation: "2008, S.5",
           legalPeriodical: {
             legalPeriodicalAbbreviation: "DEF",
-            primaryReference: true,
+            primaryReference: false,
           },
         }),
       ],
     ],
     [
-      "FundstellenAmtliche FundstellenABC, 2006, S.3DEF, 2008, S.5",
+      "FundstellenAmtliche FundstellenABC, 2006, S.3Sekundäre FundstellenDEF, 2008, S.5",
       [
         new Reference({
           citation: "2006, S.3",
@@ -83,7 +83,7 @@ describe("preview references", () => {
           citation: "2008, S.5",
           legalPeriodical: {
             legalPeriodicalAbbreviation: "DEF",
-            primaryReference: true,
+            primaryReference: false,
           },
         }),
       ],

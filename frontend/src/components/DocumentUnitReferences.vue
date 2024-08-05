@@ -20,7 +20,7 @@ const defaultValue = new Reference() as Reference
 
 <template>
   <div aria-label="Fundstellen" class="flex-1 bg-white p-32">
-    <h2 class="ds-heading-03-reg mb-24">Fundstellen</h2>
+    <h2 class="ds-heading-03-reg mb-24">Fundstellen bearbeiten</h2>
     <div class="flex flex-row">
       <EditableList
         v-model="references"
