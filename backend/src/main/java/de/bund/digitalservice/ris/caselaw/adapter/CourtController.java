@@ -23,6 +23,7 @@ public class CourtController {
 
   /**
    * Returns court objects in a list
+   *
    * @param searchStr An optional search string, which filters the list.
    * @return
    */

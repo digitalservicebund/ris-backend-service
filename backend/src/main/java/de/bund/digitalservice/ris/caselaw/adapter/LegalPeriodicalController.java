@@ -24,6 +24,7 @@ public class LegalPeriodicalController {
 
   /**
    * Returns legal periodical objects in a list
+   *
    * @param searchStr An optional search string, that filters the list by abbreviation.
    * @return
    */

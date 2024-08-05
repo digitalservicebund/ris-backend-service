@@ -18,6 +18,7 @@ public class LegalPeriodicalService {
 
   /**
    * Get legal periodical objects in a list, filtered by an optional search string
+   *
    * @param searchStr optional search string
    * @return
    */
