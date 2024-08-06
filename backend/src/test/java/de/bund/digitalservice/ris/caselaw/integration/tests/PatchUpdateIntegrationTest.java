@@ -97,7 +97,8 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
     },
     controllers = {DocumentUnitController.class})
 @Slf4j
-public class PatchUpdateIntegrationTest {
+@SuppressWarnings("java:S5961")
+class PatchUpdateIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
       new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
@@ -130,15 +131,13 @@ public class PatchUpdateIntegrationTest {
   @MockBean private HandoverService handoverService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
-  private DocumentationOfficeDTO documentationOffice;
   private UUID court1Id;
   private UUID court2Id;
   private UUID region1Id;
-  private UUID region2Id;
 
   @BeforeEach
   void setUp() {
-    documentationOffice =
+    DocumentationOfficeDTO documentationOffice =
         documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
 
     RegionDTO region1DTO =
@@ -2353,7 +2352,7 @@ public class PatchUpdateIntegrationTest {
                 assertThat(operation).isInstanceOf(ReplaceOperation.class);
                 ReplaceOperation replaceOperation = (ReplaceOperation) operation;
                 assertThat(replaceOperation.getPath()).isEqualTo("/coreData/region");
-                assertThat(replaceOperation.getValue().textValue()).isEqualTo(null);
+                assertThat(replaceOperation.getValue().textValue()).isNull();
 
                 assertThat(responsePatch.errorPaths()).isEmpty();
               });
