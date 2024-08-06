@@ -114,7 +114,7 @@
     "jsdom": "^24.1.1",
     "license-checker": "^25.0.1",
     "playwright": "^1.45.3",
-    "postcss": "^8.4.40",
+    "postcss": "^8.4.41",
     "postcss-import": "^16.1.0",
     "postcss-scrollbar": "^0.5.1",
     "prettier": "^3.3.3",
