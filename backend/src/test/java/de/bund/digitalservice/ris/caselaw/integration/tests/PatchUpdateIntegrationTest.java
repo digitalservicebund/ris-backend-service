@@ -151,7 +151,6 @@ class PatchUpdateIntegrationTest {
     RegionDTO region2DTO =
         regionRepository.save(
             RegionDTO.builder().code("HE").longText("Hessen").applicability(true).build());
-    region2Id = region2DTO.getId();
     court1Id =
         courtRepository
             .save(
