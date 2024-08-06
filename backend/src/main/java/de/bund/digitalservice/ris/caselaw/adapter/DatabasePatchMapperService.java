@@ -78,25 +78,6 @@ public class DatabasePatchMapperService implements PatchMapperService {
   }
 
   @Override
-  public RisJsonPatch removeExistPatches(RisJsonPatch toFrontend, JsonPatch patch) {
-    List<String> operationAsStringList =
-        patch.getOperations().stream().map(JsonPatchOperation::toString).toList();
-    List<JsonPatchOperation> operations =
-        toFrontend.patch().getOperations().stream()
-            .peek(
-                operation -> {
-                  if (operationAsStringList.contains(operation.toString())) {
-                    log.info("remove '{}' patch", operation.getPath());
-                  }
-                })
-            .filter(operation -> !operationAsStringList.contains(operation.toString()))
-            .toList();
-
-    return new RisJsonPatch(
-        toFrontend.documentationUnitVersion(), new JsonPatch(operations), toFrontend.errorPaths());
-  }
-
-  @Override
   public JsonPatch addUpdatePatch(JsonPatch toUpdate, JsonPatch toSaveJsonPatch) {
     List<JsonPatchOperation> operations = new ArrayList<>(toUpdate.getOperations());
     operations.addAll(toSaveJsonPatch.getOperations());
@@ -108,13 +89,17 @@ public class DatabasePatchMapperService implements PatchMapperService {
     List<JsonPatchOperation> patchWithoutVersion =
         patch.getOperations().stream().filter(op -> !op.getPath().equals("/version")).toList();
 
+    if (patchWithoutVersion.isEmpty()) {
+      return;
+    }
+
     try {
       String patchJson = objectMapper.writeValueAsString(new JsonPatch(patchWithoutVersion));
       DocumentationUnitPatchDTO dto =
           DocumentationUnitPatchDTO.builder()
               .documentationUnitId(documentationUnitId)
               .documentationUnitVersion(
-                  documentationUnitVersion == null ? 1 : documentationUnitVersion)
+                  documentationUnitVersion == null ? 0 : documentationUnitVersion)
               .patch(patchJson)
               .build();
       repository.save(dto);
