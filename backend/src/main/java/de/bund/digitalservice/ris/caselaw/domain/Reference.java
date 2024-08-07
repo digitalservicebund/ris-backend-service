@@ -19,4 +19,5 @@ public record Reference(
     String citation,
     String referenceSupplement,
     String footnote,
-    LegalPeriodical legalPeriodical) {}
+    LegalPeriodical legalPeriodical,
+    String legalPeriodicalRawValue) {}

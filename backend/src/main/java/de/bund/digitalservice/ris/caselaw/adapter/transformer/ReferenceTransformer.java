@@ -11,6 +11,7 @@ public class ReferenceTransformer {
         .referenceSupplement(referenceDTO.getReferenceSupplement())
         .legalPeriodical(
             LegalPeriodicalTransformer.transformToDomain(referenceDTO.getLegalPeriodical()))
+        .legalPeriodicalRawValue(referenceDTO.getLegalPeriodicalRawValue())
         .citation(referenceDTO.getCitation())
         .footnote(referenceDTO.getFootnote())
         .build();

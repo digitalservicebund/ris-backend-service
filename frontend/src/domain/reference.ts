@@ -15,6 +15,7 @@ export default class Reference implements EditableListItem {
   referenceSupplement?: string
   footnote?: string
   legalPeriodical?: LegalPeriodical
+  legalPeriodicalRawValue?: string
 
   static readonly requiredFields = ["legalPeriodical", "citation"] as const
   static readonly fields = [
@@ -34,12 +35,12 @@ export default class Reference implements EditableListItem {
     const parts = [
       ...(this.legalPeriodical
         ? [this.legalPeriodical.legalPeriodicalAbbreviation]
-        : []),
+        : [this.legalPeriodicalRawValue]),
       ...(this.citation && this.referenceSupplement
         ? [`${this.citation} (${this.referenceSupplement})`]
         : [this.citation]),
     ]
-    return parts.join(", ")
+    return parts.join(" ")
   }
 
   get hasMissingRequiredFields(): boolean {
