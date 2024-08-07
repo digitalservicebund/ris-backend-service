@@ -71,7 +71,7 @@
     "pinia": "^2.2.1",
     "resize-observer-polyfill": "^1.5.1",
     "tippy.js": "^6.3.7",
-    "vue": "^3.4.35",
+    "vue": "^3.4.36",
     "vue-router": "4.4.2",
     "vue-tsc": "^2.0.29"
   },
