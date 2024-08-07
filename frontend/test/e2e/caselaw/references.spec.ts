@@ -12,7 +12,7 @@ import { caselawTest as test } from "./fixtures"
 test.describe(
   "references",
   {
-    tag: "@fundstellen",
+    tag: "@RISDEV-4264",
     annotation: {
       type: "epic",
       description:
