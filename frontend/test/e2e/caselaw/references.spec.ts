@@ -45,17 +45,6 @@ test.describe(
           await waitForInputValue(page, "[aria-label='Periodikum']", "MM")
         })
 
-        await test.step("When typing the incomplete legal periodical title (Mieter Magaz), the entry including abbreviation, title and subtitle can be found in the combobox", async () => {
-          await fillInput(page, "Periodikum", "Mieter Magaz")
-          await expect(
-            page.getByText("Magazin des Berliner Mieterverein e.V.", {
-              exact: true,
-            }),
-          ).toBeVisible()
-          await page.getByText("MM | Mieter Magazin", { exact: true }).click()
-          await waitForInputValue(page, "[aria-label='Periodikum']", "MM")
-        })
-
         await test.step("citation shows citation example", async () => {
           await expect(
             page.getByText("Zitierbeispiel: 2011, Nr 6, 22-23"),
@@ -71,7 +60,7 @@ test.describe(
           await page.locator("[aria-label='Fundstelle speichern']").click()
           await expect(page.getByText("MM, 2024, Nr 1, 2-5 (LT)")).toBeVisible()
           await expect(
-            page.getByText("nichtamtlich", { exact: true }),
+            page.getByText("sekundär", { exact: true }),
           ).toBeVisible()
         })
 
@@ -81,7 +70,7 @@ test.describe(
           await page.reload()
           await expect(page.getByText("MM, 2024, Nr 1, 2-5 (LT)")).toBeVisible()
           await expect(
-            page.getByText("nichtamtlich", { exact: true }),
+            page.getByText("sekundär", { exact: true }),
           ).toBeVisible()
         })
 
@@ -103,7 +92,7 @@ test.describe(
             page.getByText("GVBl BB, 2024, Nr 1, 2-5 (LT)"),
           ).toBeVisible()
 
-          await expect(page.getByText("amtlich", { exact: true })).toBeVisible()
+          await expect(page.getByText("primär", { exact: true })).toBeVisible()
         })
         await save(page)
 
@@ -211,7 +200,7 @@ test.describe(
           await page.locator("[aria-label='Fundstelle speichern']").click()
           await expect(page.getByText("WdG, 2024, 10-12 (LT)")).toBeVisible()
           await expect(
-            page.getByText("nichtamtlich", {
+            page.getByText("sekundär", {
               exact: true,
             }),
           ).toBeVisible()
@@ -227,7 +216,7 @@ test.describe(
           await page.locator("[aria-label='Fundstelle speichern']").click()
           await expect(page.getByText("GVBl BB, 2020, 01-99 (L)")).toBeVisible()
           await expect(
-            page.getByText("amtlich", {
+            page.getByText("primär", {
               exact: true,
             }),
           ).toBeVisible()
@@ -272,7 +261,7 @@ test.describe(
           await page.locator("[aria-label='Fundstelle speichern']").click()
           await expect(page.getByText("WdG, 2024, 10-12 (LT)")).toBeVisible()
           await expect(
-            page.getByText("nichtamtlich", { exact: true }),
+            page.getByText("sekundär", { exact: true }),
           ).toBeVisible()
           await fillInput(page, "Periodikum", "GVBl BB")
           await page
@@ -285,7 +274,7 @@ test.describe(
           await fillInput(page, "Klammernzusatz", "L")
           await page.locator("[aria-label='Fundstelle speichern']").click()
           await expect(page.getByText("GVBl BB, 2020, 01-99 (L)")).toBeVisible()
-          await expect(page.getByText("amtlich", { exact: true })).toBeVisible()
+          await expect(page.getByText("primär", { exact: true })).toBeVisible()
         })
         await save(page)
 

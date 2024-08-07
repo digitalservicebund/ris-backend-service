@@ -73,7 +73,5 @@ public interface PatchMapperService {
    */
   JsonPatch removePatchForSamePath(JsonPatch patch1, JsonPatch patch2);
 
-  RisJsonPatch removeExistPatches(RisJsonPatch toFrontend, JsonPatch patch);
-
   JsonPatch addUpdatePatch(JsonPatch toUpdate, JsonPatch toSaveJsonPatch);
 }

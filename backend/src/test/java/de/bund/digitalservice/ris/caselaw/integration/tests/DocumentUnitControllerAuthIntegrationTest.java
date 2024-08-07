@@ -28,6 +28,7 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
@@ -248,19 +249,18 @@ class DocumentUnitControllerAuthIntegrationTest {
         Status.builder().publicationStatus(UNPUBLISHED).build());
 
     // Documentation Office 1
-    RisEntityExchangeResult<String> result =
-        risWebTestClient
-            .withLogin(officeGroupMap.get("CC-RIS"))
-            .get()
-            .uri("/api/v1/caselaw/documentunits/" + documentationUnitDTO.getDocumentNumber())
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(String.class)
-            .returnResult();
-
-    assertThat(extractUuid(result.getResponseBody()))
-        .isEqualTo(documentationUnitDTO.getId().toString());
+    risWebTestClient
+        .withLogin(officeGroupMap.get("CC-RIS"))
+        .get()
+        .uri("/api/v1/caselaw/documentunits/" + documentationUnitDTO.getDocumentNumber())
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().uuid()).isEqualTo(documentationUnitDTO.getId());
+            });
 
     // Documentation Office 2
     risWebTestClient
@@ -276,38 +276,36 @@ class DocumentUnitControllerAuthIntegrationTest {
         Instant.now().plus(1, ChronoUnit.DAYS),
         Status.builder().publicationStatus(PUBLISHING).build());
 
-    result =
-        risWebTestClient
-            .withLogin(officeGroupMap.get("BGH"))
-            .get()
-            .uri("/api/v1/caselaw/documentunits/" + documentationUnitDTO.getDocumentNumber())
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(String.class)
-            .returnResult();
-
-    assertThat(extractUuid(result.getResponseBody()))
-        .hasToString(documentationUnitDTO.getId().toString());
+    risWebTestClient
+        .withLogin(officeGroupMap.get("BGH"))
+        .get()
+        .uri("/api/v1/caselaw/documentunits/" + documentationUnitDTO.getDocumentNumber())
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody().uuid())
+                    .isEqualTo(documentationUnitDTO.getId()));
 
     saveToStatusRepository(
         documentationUnitDTO,
         Instant.now().plus(2, ChronoUnit.DAYS),
         Status.builder().publicationStatus(PUBLISHED).build());
 
-    result =
-        risWebTestClient
-            .withLogin(officeGroupMap.get("BGH"))
-            .get()
-            .uri("/api/v1/caselaw/documentunits/" + documentationUnitDTO.getDocumentNumber())
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(String.class)
-            .returnResult();
-
-    assertThat(extractUuid(result.getResponseBody()))
-        .hasToString(documentationUnitDTO.getId().toString());
+    risWebTestClient
+        .withLogin(officeGroupMap.get("BGH"))
+        .get()
+        .uri("/api/v1/caselaw/documentunits/" + documentationUnitDTO.getDocumentNumber())
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody().uuid())
+                    .isEqualTo(documentationUnitDTO.getId()));
   }
 
   private PublicationStatus getResultStatus(List<PublicationStatus> publicationStatus) {
@@ -352,9 +350,5 @@ class DocumentUnitControllerAuthIntegrationTest {
 
   private List<String> extractDocUnitsByUuid(String responseBody, UUID uuid) {
     return JsonPath.read(responseBody, String.format("$.content[?(@.uuid=='%s')]", uuid));
-  }
-
-  private String extractUuid(String responseBody) {
-    return JsonPath.read(responseBody, "$.uuid");
   }
 }

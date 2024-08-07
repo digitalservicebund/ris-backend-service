@@ -9,8 +9,8 @@ const props = defineProps<{
 
 const primaryReference = computed(() =>
   props.data?.legalPeriodical && props.data?.legalPeriodical.primaryReference
-    ? "amtlich"
-    : "nichtamtlich",
+    ? "primär"
+    : "sekundär",
 )
 </script>
 
