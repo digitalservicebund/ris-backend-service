@@ -6,17 +6,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseStatusRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresCourtRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocxMetadataProperty;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
-import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
-import jakarta.validation.Validator;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
@@ -27,36 +24,39 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@Import({DocumentUnitService.class, DatabaseDocumentUnitStatusService.class})
+@Import({PostgresCourtRepositoryImpl.class})
 class DocumentationUnitDocxMetadataInitializationServiceTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   @SpyBean private DocumentationUnitDocxMetadataInitializationService service;
-  @MockBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
-  @MockBean private DatabaseStatusRepository statusRepository;
+
+  @Autowired private CourtRepository courtRepository;
+
   @MockBean private DocumentUnitRepository repository;
-  @MockBean private CourtRepository courtRepository;
-  @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
-  @MockBean private AttachmentService attachmentService;
-  @MockBean private PatchMapperService patchMapperService;
-  @MockBean private DocumentNumberService documentNumberService;
-  @MockBean private DocumentNumberRecyclingService documentNumberRecyclingService;
-
-  @MockBean private MailService mailService;
-
+  @MockBean private DatabaseCourtRepository databaseCourtRepository;
   @MockBean private DocumentTypeRepository documentTypeRepository;
-  @MockBean private Validator validator;
 
   @BeforeEach
   void beforeEach() {
     CoreData coreData = CoreData.builder().fileNumbers(List.of()).build();
     DocumentUnit documentUnit = DocumentUnit.builder().coreData(coreData).build();
     when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.of(documentUnit));
+
+    when(databaseCourtRepository.findAll())
+        .thenReturn(
+            List.of(
+                CourtDTO.builder().type("AG").location("Berlin").build(),
+                CourtDTO.builder().type("AG").location("Bernau").build(),
+                CourtDTO.builder().type("LG").location("Berlin").build(),
+                CourtDTO.builder().type("LG").location("Bern").build(),
+                CourtDTO.builder().type("LG").location("Bernau").build(),
+                CourtDTO.builder().type("BFH").location("München").isSuperiorCourt(true).build()));
   }
 
   @Test
@@ -85,8 +85,6 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
             "Nein");
     Docx2Html docx2html = new Docx2Html(null, List.of(), properties);
 
-    when(courtRepository.findByTypeAndLocation("AG", "Berlin"))
-        .thenReturn(Optional.of(Court.builder().label("AG Berlin").build()));
     when(documentTypeRepository.findUniqueCaselawBySearchStr("Urt"))
         .thenReturn(Optional.of(DocumentType.builder().label("Urt").build()));
 
@@ -123,7 +121,7 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
   }
 
   @Test
-  void testInitializeCoreData_prioritizeEcliFromFooter() {
+  void testInitializeCoreData_prioritizeEcliFromMetadata() {
     List<String> ecliList = Collections.singletonList("ECLI:FOOTER");
     Map<DocxMetadataProperty, String> properties = Map.of(DocxMetadataProperty.ECLI, "ECLI:ABCD");
 
@@ -135,7 +133,7 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
     verify(repository, times(2)).save(documentUnitCaptor.capture());
     CoreData savedCoreData = documentUnitCaptor.getValue().coreData();
 
-    assertEquals("ECLI:FOOTER", savedCoreData.ecli());
+    assertEquals("ECLI:ABCD", savedCoreData.ecli());
   }
 
   @Test
@@ -224,11 +222,8 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
   @Test
   void testInitializeCoreData_shouldUseCourtAsFallbackIfNoTypeAndLocation() {
-    Map<DocxMetadataProperty, String> properties = Map.of(DocxMetadataProperty.COURT, "BFH");
+    Map<DocxMetadataProperty, String> properties = Map.of(DocxMetadataProperty.COURT, "LG Bern");
     Docx2Html docx2html = new Docx2Html(null, List.of(), properties);
-
-    when(courtRepository.findUniqueBySearchString("BFH"))
-        .thenReturn(Optional.of(Court.builder().label("BFH").build()));
 
     service.initializeCoreData(TEST_UUID, docx2html);
 
@@ -236,7 +231,7 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
     verify(repository, times(2)).save(documentUnitCaptor.capture());
     CoreData savedCoreData = documentUnitCaptor.getValue().coreData();
 
-    assertEquals("BFH", savedCoreData.court().label());
+    assertEquals("LG Bern", savedCoreData.court().label());
   }
 
   @Test
@@ -251,9 +246,6 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
             "LG Bernau");
     Docx2Html docx2html = new Docx2Html(null, List.of(), properties);
 
-    when(courtRepository.findByTypeAndLocation("LG", "Bern"))
-        .thenReturn(Optional.of(Court.builder().label("LG Bern").build()));
-
     service.initializeCoreData(TEST_UUID, docx2html);
 
     ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
@@ -264,22 +256,31 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
   }
 
   @Test
-  void testInitializeCoreData_shouldUseCourtIfTypeAndLocationAreAmbiguous() {
+  void testInitializeCoreData_withUniqueTypeOnly_shouldReturnCourt() {
+    Map<DocxMetadataProperty, String> properties = Map.of(DocxMetadataProperty.COURT_TYPE, "BFH");
+    Docx2Html docx2html = new Docx2Html(null, List.of(), properties);
+
+    service.initializeCoreData(TEST_UUID, docx2html);
+
+    ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
+    verify(repository, times(2)).save(documentUnitCaptor.capture());
+    CoreData savedCoreData = documentUnitCaptor.getValue().coreData();
+
+    assertEquals("BFH", savedCoreData.court().label());
+  }
+
+  @Test
+  void testInitializeCoreData_shouldUseCourtIfTypeAndLocationNotFound() {
     List<String> ecliList = Collections.singletonList("ECLI:TEST");
     Map<DocxMetadataProperty, String> properties =
         Map.of(
             DocxMetadataProperty.COURT_TYPE,
             "LG",
             DocxMetadataProperty.COURT_LOCATION,
-            "Bern",
+            "Bern 1",
             DocxMetadataProperty.COURT,
             "LG Bernau");
     Docx2Html docx2html = new Docx2Html(null, ecliList, properties);
-
-    when(courtRepository.findByTypeAndLocation("LG", "Bern")).thenReturn(Optional.empty());
-
-    when(courtRepository.findUniqueBySearchString("LG Bernau"))
-        .thenReturn(Optional.of(Court.builder().label("LG Bernau").build()));
 
     service.initializeCoreData(TEST_UUID, docx2html);
 

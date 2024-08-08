@@ -39,10 +39,11 @@ public class DocumentationUnitDocxMetadataInitializationService {
     DocumentUnit documentUnit = documentationUnitOptional.get();
     CoreData.CoreDataBuilder builder = documentationUnitOptional.get().coreData().toBuilder();
 
+    initializeFieldsFromProperties(docx2html.properties(), documentUnit, builder);
+
     if (docx2html.ecliList().size() == 1) {
       handleEcli(documentUnit, builder, docx2html.ecliList().get(0));
     }
-    initializeFieldsFromProperties(docx2html.properties(), documentUnit, builder);
 
     DocumentUnit updatedDocumentationUnit =
         documentUnit.toBuilder().coreData(builder.build()).build();
