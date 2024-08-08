@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import static de.bund.digitalservice.ris.caselaw.domain.StringUtils.normalizeSpace;
 
 import com.gravity9.jsonpatch.JsonPatch;
-import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -290,12 +289,6 @@ public class DocumentUnitService {
       return "Ok";
     }
     return "Validation error";
-  }
-
-  public void updateECLI(UUID uuid, Docx2Html docx2html) {
-    if (docx2html.ecliList().size() == 1) {
-      repository.updateECLI(uuid, docx2html.ecliList().get(0));
-    }
   }
 
   private void saveForRecycling(DocumentUnit documentUnit) {

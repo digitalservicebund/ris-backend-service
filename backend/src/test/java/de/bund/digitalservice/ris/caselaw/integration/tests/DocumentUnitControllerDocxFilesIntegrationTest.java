@@ -20,26 +20,35 @@ import de.bund.digitalservice.ris.caselaw.adapter.S3AttachmentService;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverter;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresCourtRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentTypeRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
+import de.bund.digitalservice.ris.caselaw.domain.docx.DocxMetadataProperty;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.io.IOException;
@@ -47,6 +56,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -78,6 +88,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 @RISIntegrationTest(
     imports = {
       DocumentUnitService.class,
+      DocumentationUnitDocxMetadataInitializationService.class,
       PostgresDeltaMigrationRepositoryImpl.class,
       DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentNumberRecyclingService.class,
@@ -93,7 +104,9 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
       DocumentNumberPatternConfig.class,
       S3AttachmentService.class,
       DocxConverterService.class,
-      DocxConverter.class
+      DocxConverter.class,
+      PostgresCourtRepositoryImpl.class,
+      PostgresDocumentTypeRepositoryImpl.class
     },
     controllers = {DocumentUnitController.class})
 class DocumentUnitControllerDocxFilesIntegrationTest {
@@ -116,12 +129,14 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
-  @Autowired private DatabaseCourtRepository courtRepository;
+  @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private AttachmentService attachmentService;
   @Autowired private AttachmentRepository attachmentRepository;
   @Autowired private DocxConverterService docxConverterService;
-
-  @SpyBean private DocumentUnitService service;
+  @Autowired private CourtRepository courtRepository;
+  @Autowired private DocumentTypeRepository documentTypeRepository;
+  @SpyBean private DocumentationUnitDocxMetadataInitializationService service;
+  @Autowired private DocumentUnitService documentUnitService;
 
   @MockBean private S3Client s3Client;
 
@@ -130,6 +145,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   @MockBean private UserService userService;
 
   @MockBean private HandoverService handoverService;
+
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private DocumentBuilderFactory documentBuilderFactory;
   @MockBean private PatchMapperService patchMapperService;
@@ -139,6 +155,8 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   @BeforeEach
   void setUp() {
     documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()).getId();
+
+    databaseDocumentCategoryRepository.save(DocumentCategoryDTO.builder().label("R").build());
 
     doReturn(docOffice)
         .when(userService)
@@ -154,6 +172,8 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   void cleanUp() {
     repository.deleteAll();
     attachmentRepository.deleteAll();
+    databaseCourtRepository.deleteAll();
+    databaseDocumentCategoryRepository.deleteAll();
   }
 
   @Test
@@ -322,6 +342,62 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
 
     DocumentationUnitDTO savedDTO = repository.findById(dto.getId()).get();
     assertThat(savedDTO.getEcli()).isEqualTo("oldEcli");
+  }
+
+  @Test
+  void
+      testAttachFileToDocumentationUnit_withMetadataProperties_shouldExtractCoreDataAndShouldNotOverrideFields()
+          throws IOException {
+    var attachmentWithMetadata =
+        Files.readAllBytes(Paths.get("src/test/resources/fixtures/with_metadata.docx"));
+    mockS3ClientToReturnFile(attachmentWithMetadata);
+
+    DocumentationUnitDTO dto =
+        repository.save(
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .legalEffect(LegalEffectDTO.JA) // file has "Nein"
+                .judicialBody("1. Senat") // file has "2. Senat"
+                .court(null) // file has BFH
+                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .build());
+
+    databaseCourtRepository.save(
+        CourtDTO.builder().type("BFH").isForeignCourt(true).isSuperiorCourt(false).build());
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file")
+        .contentType(
+            MediaType.parseMediaType(
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+        .bodyAsByteArray(attachmentWithMetadata)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(Docx2Html.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().properties())
+                  .containsAllEntriesOf(
+                      Map.of(
+                          DocxMetadataProperty.APPRAISAL_BODY,
+                          "2. Senat",
+                          DocxMetadataProperty.FILE_NUMBER,
+                          "II B 29/24",
+                          DocxMetadataProperty.LEGAL_EFFECT,
+                          "Nein",
+                          DocxMetadataProperty.COURT_TYPE,
+                          "BFH"));
+            });
+
+    DocumentationUnitDTO savedDTO = repository.findById(dto.getId()).get();
+    assertThat(savedDTO.getLegalEffect()).isEqualTo(LegalEffectDTO.JA); // kept old value
+    assertThat(savedDTO.getJudicialBody()).isEqualTo("1. Senat"); // kept old value
+    assertThat(savedDTO.getCourt().getType())
+        .isEqualTo("BFH"); // added court based on docx properties
   }
 
   @Test

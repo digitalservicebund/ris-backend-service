@@ -155,7 +155,13 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
         }
         // delete leading decision norm references if court is not BGH
         if (court.isPresent() && !court.get().getType().equals("BGH")) {
-          documentUnit.coreData().leadingDecisionNormReferences().clear();
+          documentUnit =
+              documentUnit.toBuilder()
+                  .coreData(
+                      documentUnit.coreData().toBuilder()
+                          .leadingDecisionNormReferences(List.of())
+                          .build())
+                  .build();
         }
       }
     }
@@ -543,18 +549,5 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
         .findAllByReferencedDocumentationUnitId(documentationUnitId)
         .stream()
         .collect(Collectors.groupingBy(RelatedDocumentationDTO::getType, Collectors.counting()));
-  }
-
-  @Override
-  @Transactional(transactionManager = "jpaTransactionManager")
-  public void updateECLI(UUID uuid, String ecli) {
-    Optional<DocumentationUnitDTO> documentationUnitDTOOptional = repository.findById(uuid);
-    if (documentationUnitDTOOptional.isPresent()) {
-      DocumentationUnitDTO dto = documentationUnitDTOOptional.get();
-      if (dto.getEcli() == null) {
-        dto.setEcli(ecli);
-        repository.save(dto);
-      }
-    }
   }
 }

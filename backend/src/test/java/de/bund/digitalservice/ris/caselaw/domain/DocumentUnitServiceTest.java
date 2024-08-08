@@ -45,7 +45,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class DocumentUnitServiceTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   @SpyBean private DocumentUnitService service;
-
   @MockBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
   @MockBean private DatabaseStatusRepository statusRepository;
   @MockBean private DocumentUnitRepository repository;

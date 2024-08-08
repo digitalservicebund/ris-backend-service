@@ -110,12 +110,4 @@ public interface DocumentUnitRepository {
    *     links with this relation in the documentation unit with the given id
    */
   Map<RelatedDocumentationType, Long> getAllDocumentationUnitWhichLink(UUID documentUnitUuid);
-
-  /**
-   * Update the ECLI of a documentation unit
-   *
-   * @param uuid the UUID of the documentation unit to update
-   * @param ecli the new ECLI
-   */
-  void updateECLI(UUID uuid, String ecli);
 }

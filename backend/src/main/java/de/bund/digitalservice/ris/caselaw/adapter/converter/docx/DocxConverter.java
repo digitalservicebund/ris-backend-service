@@ -18,6 +18,7 @@ public class DocxConverter implements Converter<DocumentUnitDocx> {
   private Map<String, DocxImagePart> images;
   private List<ParagraphElement> footers;
   private Map<String, ListNumberingDefinition> listNumberingDefinitions;
+  private Map<String, String> properties;
 
   public Map<String, DocxImagePart> getImages() {
     return images;

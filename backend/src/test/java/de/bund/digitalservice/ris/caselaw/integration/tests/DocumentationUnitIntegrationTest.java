@@ -50,6 +50,7 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
@@ -129,7 +130,7 @@ class DocumentationUnitIntegrationTest {
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
-  @Autowired private DatabaseCourtRepository courtRepository;
+  @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private DatabaseRegionRepository regionRepository;
   @Autowired private DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
 
@@ -141,6 +142,10 @@ class DocumentationUnitIntegrationTest {
   @MockBean private AttachmentService attachmentService;
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private HandoverService handoverService;
+
+  @MockBean
+  private DocumentationUnitDocxMetadataInitializationService
+      documentationUnitDocxMetadataInitializationService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private DocumentationOfficeDTO documentationOffice;
@@ -295,7 +300,7 @@ class DocumentationUnitIntegrationTest {
   @Test
   void testDeleteLeadingDecisionNormReferencesForNonBGHDecisions() {
     CourtDTO bghCourt =
-        courtRepository.save(
+        databaseCourtRepository.save(
             CourtDTO.builder()
                 .type("BGH")
                 .isSuperiorCourt(true)
@@ -303,7 +308,7 @@ class DocumentationUnitIntegrationTest {
                 .jurisId(new Random().nextInt())
                 .build());
     CourtDTO lgCourt =
-        courtRepository.save(
+        databaseCourtRepository.save(
             CourtDTO.builder()
                 .type("LG")
                 .isSuperiorCourt(false)
@@ -438,7 +443,7 @@ class DocumentationUnitIntegrationTest {
         regionRepository.save(RegionDTO.builder().id(UUID.randomUUID()).code("DEU").build());
 
     CourtDTO bghCourt =
-        courtRepository.save(
+        databaseCourtRepository.save(
             CourtDTO.builder()
                 .type("BGH")
                 .location("Karlsruhe")
@@ -622,7 +627,7 @@ class DocumentationUnitIntegrationTest {
       var randomDocNumber =
           i == 0 ? documentNumberToExclude : RandomStringUtils.random(10, true, true);
       CourtDTO court =
-          courtRepository.save(
+          databaseCourtRepository.save(
               CourtDTO.builder()
                   .type("LG")
                   .location("Kassel")
@@ -749,7 +754,7 @@ class DocumentationUnitIntegrationTest {
     for (int i = 0; i < 6; i++) {
 
       CourtDTO court =
-          courtRepository.save(
+          databaseCourtRepository.save(
               CourtDTO.builder()
                   .type(courtTypes.get(i))
                   .location(courtLocations.get(i))

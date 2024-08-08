@@ -41,6 +41,7 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
@@ -111,7 +112,7 @@ class PreviousDecisionIntegrationTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentationUnitRepository repository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
-  @Autowired private DatabaseCourtRepository courtRepository;
+  @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseHandoverReportRepository databaseHandoverReportRepository;
   @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
@@ -124,6 +125,10 @@ class PreviousDecisionIntegrationTest {
   @MockBean AttachmentService attachmentService;
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private HandoverService handoverService;
+
+  @MockBean
+  private DocumentationUnitDocxMetadataInitializationService
+      documentationUnitDocxMetadataInitializationService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private DocumentationOfficeDTO documentationOfficeDTO;
@@ -140,7 +145,7 @@ class PreviousDecisionIntegrationTest {
             DocumentCategoryDTO.builder().label("R").build());
 
     testCourt =
-        courtRepository.save(
+        databaseCourtRepository.save(
             CourtDTO.builder()
                 .type("Court1")
                 .location("Berlin")
@@ -157,7 +162,7 @@ class PreviousDecisionIntegrationTest {
     repository.deleteAll();
     databaseDocumentTypeRepository.deleteAll();
     databaseHandoverReportRepository.deleteAll();
-    courtRepository.deleteAll();
+    databaseCourtRepository.deleteAll();
     databaseDocumentCategoryRepository.delete(category);
   }
 
