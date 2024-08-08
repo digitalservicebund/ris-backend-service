@@ -80,7 +80,7 @@
     "@digitalservice4germany/angie": "^1.2.0",
     "@digitalservice4germany/style-dictionary": "^2.0.0",
     "@iconify-json/ic": "^1.1.18",
-    "@iconify-json/material-symbols": "^1.1.86",
+    "@iconify-json/material-symbols": "^1.1.87",
     "@namics/stylelint-bem": "^10.0.0",
     "@pinia/testing": "^0.1.5",
     "@playwright/test": "^1.46.0",
