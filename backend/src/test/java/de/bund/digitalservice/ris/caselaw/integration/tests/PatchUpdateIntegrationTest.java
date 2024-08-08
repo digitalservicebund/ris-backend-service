@@ -47,6 +47,7 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
@@ -129,6 +130,7 @@ class PatchUpdateIntegrationTest {
 
   @MockBean AttachmentService attachmentService;
   @MockBean private HandoverService handoverService;
+  @MockBean private DocumentationUnitDocxMetadataInitializationService initializationService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private UUID court1Id;
