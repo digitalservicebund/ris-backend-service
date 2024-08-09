@@ -219,7 +219,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build frontend image
-        run: docker build --file frontend/Dockerfile.prod --tag ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }} ./frontend
+        run: docker build --file frontend/Dockerfile.prod --build-arg VITE_POSTHOG_API_KEY=${{ secrets.VITE_POSTHOG_API_KEY }} --tag ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }} ./frontend
       - name: Run Trivy vulnerability image scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions

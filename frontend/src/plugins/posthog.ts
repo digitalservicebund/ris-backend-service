@@ -5,7 +5,7 @@ import useSessionStore from "@/stores/sessionStore"
 
 const posthogApiKey = import.meta.env.VITE_POSTHOG_API_KEY
 
-console.log({ posthogApiKey })
+console.log({ posthogApiKey, processEnv: process.env.VITE_POSTHOG_API_KEY })
 
 declare module "@vue/runtime-core" {
   //Bind to `this` keyword
