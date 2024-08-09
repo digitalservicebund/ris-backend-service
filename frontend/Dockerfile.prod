@@ -1,8 +1,9 @@
+ARG VITE_POSTHOG_API_KEY
 FROM node:22.5.1 AS builder
 WORKDIR /usr/src/app
 COPY . .
-RUN  chmod +x ./build_production.sh
-RUN ./build_production.sh
+ENV VITE_POSTHOG_API_KEY=$VITE_POSTHOG_API_KEY
+RUN npm install && npx vite build
 
 FROM cgr.dev/chainguard/nginx@sha256:4e682413801cb09f45ee7c8a2dfdacc8883ee1a10a0ac075485cfadf24332b51
 EXPOSE 8081
