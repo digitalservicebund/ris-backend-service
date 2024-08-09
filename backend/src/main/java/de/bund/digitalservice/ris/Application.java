@@ -8,12 +8,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-// @OpenAPIDefinition(
-//    info =
-//        @Info(
-//            title = "NeuRIS Caselaw API",
-//            version = "1.0",
-//            description = "Interface for the NeuRIS (legal information system) Caselaw service"))
 public class Application {
   @PostConstruct
   public void init() {
