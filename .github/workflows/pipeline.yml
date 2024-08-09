@@ -219,7 +219,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Print var
-        run: echo "s ${{ secrets.VITE_POSTHOG_API_KEY }} e ${{ VITE_POSTHOG_API_KEY }}"
+        run: echo "s ${{ secrets.VITE_POSTHOG_API_KEY }} e ${{ env.VITE_POSTHOG_API_KEY }}"
       - name: Build frontend image
         run: docker build --file frontend/Dockerfile.prod --build-arg VITE_POSTHOG_API_KEY=${{ secrets.VITE_POSTHOG_API_KEY }} --tag ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }} ./frontend
       - name: Run Trivy vulnerability image scanner
