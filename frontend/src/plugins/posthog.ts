@@ -15,7 +15,7 @@ declare module "@vue/runtime-core" {
 export const posthogPlugin: Plugin = {
   install(app: App) {
     const { env } = useSessionStore()
-    if (env === "staging" && posthogApiKey)
+    if ((env as unknown) === "environment" && posthogApiKey)
       app.config.globalProperties.$posthog = posthog.init(posthogApiKey, {
         api_host: "https://eu.i.posthog.com",
         disable_session_recording: true,
