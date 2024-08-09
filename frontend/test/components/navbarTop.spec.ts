@@ -10,6 +10,7 @@ function renderComponent(options?: { env?: Env; activeUser?: User }) {
   render(NavbarTop, {
     props: {},
     global: {
+      config: { globalProperties: { $posthog: undefined } },
       plugins: [
         createTestingPinia({
           initialState: {
