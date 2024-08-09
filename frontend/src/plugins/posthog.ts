@@ -5,8 +5,6 @@ import useSessionStore from "@/stores/sessionStore"
 
 const posthogApiKey = import.meta.env.VITE_POSTHOG_API_KEY
 
-console.log({ posthogApiKey, processEnv: process.env.VITE_POSTHOG_API_KEY })
-
 declare module "@vue/runtime-core" {
   //Bind to `this` keyword
   interface ComponentCustomProperties {
@@ -21,8 +19,9 @@ export const posthogPlugin: Plugin = {
       app.config.globalProperties.$posthog = posthog.init(posthogApiKey, {
         api_host: "https://eu.i.posthog.com",
         disable_session_recording: true,
-        mask_all_text: false,
-        mask_all_element_attributes: false,
+        session_recording: {
+          maskAllInputs: false,
+        },
       })
   },
 }
