@@ -5,6 +5,8 @@ import useSessionStore from "@/stores/sessionStore"
 
 const posthogApiKey = import.meta.env.VITE_POSTHOG_API_KEY
 
+console.log({ posthogApiKey })
+
 declare module "@vue/runtime-core" {
   //Bind to `this` keyword
   interface ComponentCustomProperties {
