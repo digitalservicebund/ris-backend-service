@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "engines": {
-    "node": ">=22.5.1"
+    "node": ">=22.6.0"
   },
   "engineStrict": true,
   "scripts": {
@@ -36,7 +36,7 @@
     "@braintree/sanitize-url": "^7.1.0",
     "@guardian/prosemirror-invisibles": "^3.1.1",
     "@sentry/integrations": "^7.114.0",
-    "@sentry/vue": "^8.23.0",
+    "@sentry/vue": "^8.25.0",
     "@tiptap/extension-blockquote": "^2.5.9",
     "@tiptap/extension-bold": "^2.5.9",
     "@tiptap/extension-bullet-list": "^2.5.9",
@@ -85,7 +85,7 @@
     "@namics/stylelint-bem": "^10.0.0",
     "@pinia/testing": "^0.1.5",
     "@playwright/test": "^1.46.0",
-    "@sentry/vite-plugin": "^2.21.1",
+    "@sentry/vite-plugin": "^2.22.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.4.8",
     "@testing-library/user-event": "^14.5.2",
