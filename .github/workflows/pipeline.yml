@@ -33,30 +33,30 @@ jobs:
         working-directory: ./backend
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
-      - name: Set up JDK
-        uses: actions/setup-java@67fbd726daaf08212a7b021c1c4d117f94a81dd3
-        with:
-          java-version: "17.0"
-          distribution: "temurin"
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@60851f5fb206ba543d7f2a75652c3a868ccc0264
-        with:
-          gradle-version: ${{ env.GRADLE_VERSION }}
-      - name: Run backend tests
-        working-directory: ./backend
-        run: ./gradlew build --profile -x integrationTest -x test
-      - name: Upload build performance report
-        uses: actions/upload-artifact@v4
-        with:
-          name: performance-report
-          path: backend/build/reports/profile/profile*.html
-      - name: Send status to Slack
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/notify-on-failure-gha@814d0c4b2ad6a3443e89c991f8657b10126510bf # v1.5.0
-        if: ${{ failure() && github.ref == 'refs/heads/main' }}
-        with:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+#      - name: Set up JDK
+#        uses: actions/setup-java@67fbd726daaf08212a7b021c1c4d117f94a81dd3
+#        with:
+#          java-version: "17.0"
+#          distribution: "temurin"
+#      - name: Setup Gradle
+#        uses: gradle/actions/setup-gradle@60851f5fb206ba543d7f2a75652c3a868ccc0264
+#        with:
+#          gradle-version: ${{ env.GRADLE_VERSION }}
+#      - name: Run backend tests
+#        working-directory: ./backend
+#        run: ./gradlew build --profile -x integrationTest -x test
+#      - name: Upload build performance report
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: performance-report
+#          path: backend/build/reports/profile/profile*.html
+#      - name: Send status to Slack
+#        # Third-party action, pin to commit SHA!
+#        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+#        uses: digitalservicebund/notify-on-failure-gha@814d0c4b2ad6a3443e89c991f8657b10126510bf # v1.5.0
+#        if: ${{ failure() && github.ref == 'refs/heads/main' }}
+#        with:
+#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   backend-checks:
     uses: ./.github/workflows/backend-checks.yml
@@ -219,7 +219,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build frontend image
-        run: docker build --file frontend/Dockerfile.prod --tag ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }} ./frontend
+        run: docker build --file frontend/Dockerfile.prod --build-arg VITE_POSTHOG_API_KEY=${{ secrets.VITE_POSTHOG_API_KEY }} --tag ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }} ./frontend
       - name: Run Trivy vulnerability image scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
