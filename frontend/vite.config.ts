@@ -30,6 +30,7 @@ export default defineConfig({
     }),
     EnvironmentPlugin({
       BACKEND_HOST: "",
+      VITE_POSTHOG_API_KEY: null,
     }),
     sentryVitePlugin({
       authToken: process.env.SENTRY_AUTH_TOKEN,
