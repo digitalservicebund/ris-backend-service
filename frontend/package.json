@@ -69,6 +69,7 @@
     "immer": "^10.1.1",
     "maska": "^2.1.11",
     "pinia": "^2.2.1",
+    "posthog-js": "^1.154.5",
     "resize-observer-polyfill": "^1.5.1",
     "tippy.js": "^6.3.7",
     "vue": "^3.4.37",

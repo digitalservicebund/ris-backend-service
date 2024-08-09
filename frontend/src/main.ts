@@ -6,6 +6,7 @@ import "@/styles/global.scss"
 import App from "./App.vue"
 import router from "./router"
 import useSessionStore from "./stores/sessionStore"
+import { posthogPlugin } from "@/plugins/posthog"
 
 const app = createApp(App)
 app.use(createHead())
@@ -39,5 +40,6 @@ const store = useSessionStore()
 
 // Fetch env and wait for it to complete before mounting the app
 await store.initSession().then(() => {
+  app.use(posthogPlugin)
   app.use(router).mount("#app")
 })

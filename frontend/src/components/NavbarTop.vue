@@ -4,12 +4,14 @@ import { useRoute } from "vue-router"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import IconBadge from "@/components/IconBadge.vue"
+import TextButton from "@/components/input/TextButton.vue"
 import useSessionStore from "@/stores/sessionStore"
 import IconPermIdentity from "~icons/ic/baseline-perm-identity"
 
 const route = useRoute()
 const session = useSessionStore()
 const fontColor = ref<string>()
+const isPosthogRecording = ref(false)
 
 const badge = computed(() => {
   const docOffice = session.user?.documentationOffice
@@ -66,6 +68,25 @@ const badge = computed(() => {
         :to="{ name: 'caselaw-procedures' }"
         >Vorgänge
       </router-link>
+    </div>
+
+    <div v-if="$posthog?.__loaded">
+      <TextButton
+        button-type="secondary"
+        :label="
+          isPosthogRecording ? 'Aufzeichnung stoppen' : 'Sitzung aufzeichnen'
+        "
+        @click="
+          () => {
+            isPosthogRecording = !isPosthogRecording
+            if (isPosthogRecording) {
+              $posthog!.startSessionRecording()
+            } else {
+              $posthog!.stopSessionRecording()
+            }
+          }
+        "
+      />
     </div>
 
     <div v-if="session.user" class="grid grid-cols-[auto,1fr] gap-10">
