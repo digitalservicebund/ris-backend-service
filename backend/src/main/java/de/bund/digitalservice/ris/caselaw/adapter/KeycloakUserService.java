@@ -1,36 +1,47 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeUserGroupRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeUserGroupDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
 @Service
 public class KeycloakUserService implements UserService {
   private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  private final DatabaseDocumentationOfficeUserGroupRepository
+      databaseDocumentationOfficeUserGroupRepository;
 
-  private static final Map<String, String> documentationCenterClaims =
-      Map.ofEntries(
-          Map.entry("/caselaw/BGH", "BGH"),
-          Map.entry("/caselaw/BVerfG", "BVerfG"),
-          Map.entry("/caselaw/BAG", "BAG"),
-          Map.entry("/caselaw/BFH", "BFH"),
-          Map.entry("/caselaw/BPatG", "BPatG"),
-          Map.entry("/caselaw/BSG", "BSG"),
-          Map.entry("/caselaw/BVerwG", "BVerwG"),
-          Map.entry("/caselaw/OVG_NRW", "OVG NRW"),
-          Map.entry("/caselaw/BZSt", "BZSt"),
-          Map.entry("/DS", "DS"),
-          Map.entry("/CC-RIS", "CC-RIS"));
+  private static Map<String, String> documentationCenterClaims = Collections.emptyMap();
 
-  public KeycloakUserService(DatabaseDocumentationOfficeRepository documentationOfficeRepository) {
+  public KeycloakUserService(
+      DatabaseDocumentationOfficeRepository documentationOfficeRepository,
+      DatabaseDocumentationOfficeUserGroupRepository documentationOfficeUserGroupRepository) {
     this.documentationOfficeRepository = documentationOfficeRepository;
+    this.databaseDocumentationOfficeUserGroupRepository = documentationOfficeUserGroupRepository;
+  }
+
+  @EventListener
+  public void onApplicationEvent(ContextRefreshedEvent event) {
+    var userGroups = this.databaseDocumentationOfficeUserGroupRepository.findAll();
+    KeycloakUserService.documentationCenterClaims =
+        userGroups.stream()
+            .collect(
+                Collectors.toMap(
+                    DocumentationOfficeUserGroupDTO::getUserGroupPathName,
+                    (DocumentationOfficeUserGroupDTO group) ->
+                        group.getDocumentationOffice().getAbbreviation()));
   }
 
   public User getUser(OidcUser oidcUser) {
