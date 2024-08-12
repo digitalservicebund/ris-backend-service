@@ -17,6 +17,7 @@ import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitPatchException;
@@ -189,7 +190,7 @@ public class DocumentUnitController {
     try {
       var str = service.deleteByUuid(uuid);
       return ResponseEntity.status(HttpStatus.OK).body(str);
-    } catch (DocumentationUnitNotExistsException ex) {
+    } catch (DocumentationUnitNotExistsException | DocumentUnitDeletionException ex) {
       return ResponseEntity.internalServerError().body(ex.getMessage());
     }
   }

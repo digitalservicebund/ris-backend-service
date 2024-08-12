@@ -6,8 +6,11 @@ import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLIS
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import de.bund.digitalservice.ris.caselaw.SliceTestImpl;
@@ -22,6 +25,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDeletedDocumentationIdsRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
@@ -29,8 +33,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseStatusRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeletedDocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
@@ -39,6 +46,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNo
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
@@ -70,9 +78,13 @@ import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.Year;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -132,7 +144,7 @@ class DocumentationUnitIntegrationTest {
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private DatabaseRegionRepository regionRepository;
-  @Autowired private DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
+  @Autowired private DatabaseDeletedDocumentationIdsRepository deletedDocumentationIdsRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private MailService mailService;
@@ -142,10 +154,14 @@ class DocumentationUnitIntegrationTest {
   @MockBean private AttachmentService attachmentService;
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private HandoverService handoverService;
+  @MockBean private DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
 
   @MockBean
   private DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
+
+  @MockBean DocumentNumberPatternConfig documentNumberPatternConfig;
+  @MockBean DatabaseStatusRepository statusRepository;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private DocumentationOfficeDTO documentationOffice;
@@ -174,6 +190,8 @@ class DocumentationUnitIntegrationTest {
 
   @Test
   void testForCorrectDbEntryAfterNewDocumentUnitCreation() {
+    when(documentNumberPatternConfig.getDocumentNumberPatterns())
+        .thenReturn(Map.of("DS", "XXRE0******YY"));
 
     risWebTestClient
         .withDefaultLogin()
@@ -198,6 +216,8 @@ class DocumentationUnitIntegrationTest {
 
   @Test
   void testDocumentUnitDeletionAndRecyclingOfDocumentNumber() {
+    when(documentNumberPatternConfig.getDocumentNumberPatterns())
+        .thenReturn(Map.of("DS", "XXRE0******YY"));
 
     risWebTestClient
         .withDefaultLogin()
@@ -979,5 +999,89 @@ class DocumentationUnitIntegrationTest {
             .getContent();
 
     return content.stream().map(DocumentationUnitListItem::documentNumber).toList();
+  }
+
+  @Test
+  void testDeleteByUuid_withExistingReference_shouldNotCreateDeletedDocumentsEntry() {
+    DocumentationUnitDTO referencedDTO =
+        DocumentationUnitDTO.builder()
+            .documentNumber("ZZRE202400001")
+            .documentationOffice(documentationOffice)
+            .build();
+    repository.save(referencedDTO);
+    DocumentationUnitDTO dto =
+        DocumentationUnitDTO.builder()
+            .documentNumber("ZZRE202400002")
+            .documentationOffice(documentationOffice)
+            .previousDecisions(
+                List.of(
+                    PreviousDecisionDTO.builder()
+                        .documentNumber(referencedDTO.getDocumentNumber())
+                        .rank(1)
+                        .build()))
+            .build();
+    repository.save(dto);
+    when(documentNumberPatternConfig.hasValidPattern(anyString(), anyString())).thenReturn(true);
+    when(statusRepository.findAllByDocumentationUnitDTO_Id(any(UUID.class)))
+        .thenReturn(
+            List.of(
+                StatusDTO.builder()
+                    .publicationStatus(UNPUBLISHED)
+                    .createdAt(Instant.now())
+                    .build()));
+
+    risWebTestClient
+        .withDefaultLogin()
+        .delete()
+        .uri("/api/v1/caselaw/documentunits/" + referencedDTO.getId())
+        .exchange()
+        .expectStatus()
+        .is5xxServerError();
+
+    List<DeletedDocumentationUnitDTO> allDeletedIds = deletedDocumentationIdsRepository.findAll();
+    assertThat(allDeletedIds).isEmpty();
+
+    List<DocumentationUnitDTO> allDTOsAfterDelete = repository.findAll();
+    assertThat(allDTOsAfterDelete)
+        .extracting("documentNumber")
+        .containsExactlyInAnyOrder("ZZRE202400001", "ZZRE202400002");
+  }
+
+  @Test
+  void
+      testGenerateNewDocumentationUnit_withDeletedDocumentNumberWhichExistAsDocumentationUnit_shouldRemoveDeletedDocumentsEntryAndGenerateANewDocumentNumber() {
+    DocumentationUnitDTO referencedDTO =
+        DocumentationUnitDTO.builder()
+            .documentNumber("ZZRE202400001")
+            .documentationOffice(documentationOffice)
+            .build();
+    repository.save(referencedDTO);
+    DeletedDocumentationUnitDTO deletedDocumentationUnitDTO =
+        DeletedDocumentationUnitDTO.builder()
+            .abbreviation("DS")
+            .documentNumber("ZZRE202400001")
+            .year(Year.of(LocalDate.now().get(ChronoField.YEAR)))
+            .build();
+    deletedDocumentationIdsRepository.save(deletedDocumentationUnitDTO);
+    when(documentNumberPatternConfig.getDocumentNumberPatterns())
+        .thenReturn(Map.of("DS", "ZZREYYYY*****"));
+    when(databaseDocumentNumberRepository.findById("DS"))
+        .thenReturn(
+            Optional.of(
+                DocumentNumberDTO.builder()
+                    .documentationOfficeAbbreviation("DS")
+                    .lastNumber(1)
+                    .build()));
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/new")
+        .exchange()
+        .expectStatus()
+        .isCreated();
+
+    List<DeletedDocumentationUnitDTO> allDeletedIds = deletedDocumentationIdsRepository.findAll();
+    assertThat(allDeletedIds).isEmpty();
   }
 }
