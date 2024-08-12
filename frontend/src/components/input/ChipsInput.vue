@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { produce } from "immer"
-import { vMaska } from "maska"
+import { vMaska } from "maska/vue"
 import { nextTick, ref, watch, watchEffect, computed } from "vue"
 import ChipsList from "@/components/input/ChipsList.vue"
 import { ValidationError } from "@/components/input/types"
