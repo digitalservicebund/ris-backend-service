@@ -226,7 +226,7 @@ test.describe(
         await navigateToPreview(page, documentNumber)
 
         await expect(
-          page.getByText("Amtliche FundstellenGVBl BB, 2020, 01-99 (L)"),
+          page.getByText("Primäre FundstellenGVBl BB, 2020, 01-99 (L)"),
         ).toBeVisible()
         await expect(
           page.getByText("Sekundäre FundstellenWdG, 2024, 10-12 (LT)"),

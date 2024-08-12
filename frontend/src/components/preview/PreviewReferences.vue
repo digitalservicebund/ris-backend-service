@@ -29,7 +29,7 @@ const secondaryReferences = computed(() =>
     <PreviewCategory>Fundstellen</PreviewCategory>
     <PreviewContent>
       <div v-if="primaryReferences && primaryReferences.length > 0">
-        <span class="ds-body-01-bold">Amtliche Fundstellen</span>
+        <span class="ds-body-01-bold">Primäre Fundstellen</span>
 
         <div
           v-for="item in primaryReferences"
