@@ -58,7 +58,7 @@ test.describe(
 
         await test.step("Reference can be added to editable list", async () => {
           await page.locator("[aria-label='Fundstelle speichern']").click()
-          await expect(page.getByText("MM, 2024, Nr 1, 2-5 (LT)")).toBeVisible()
+          await expect(page.getByText("MM 2024, Nr 1, 2-5 (LT)")).toBeVisible()
           await expect(
             page.getByText("sekundär", { exact: true }),
           ).toBeVisible()
@@ -68,7 +68,7 @@ test.describe(
 
         await test.step("Reference is persisted and shown after reload", async () => {
           await page.reload()
-          await expect(page.getByText("MM, 2024, Nr 1, 2-5 (LT)")).toBeVisible()
+          await expect(page.getByText("MM 2024, Nr 1, 2-5 (LT)")).toBeVisible()
           await expect(
             page.getByText("sekundär", { exact: true }),
           ).toBeVisible()
@@ -89,7 +89,7 @@ test.describe(
           ).toBeVisible()
           await page.locator("[aria-label='Fundstelle speichern']").click()
           await expect(
-            page.getByText("GVBl BB, 2024, Nr 1, 2-5 (LT)"),
+            page.getByText("GVBl BB 2024, Nr 1, 2-5 (LT)"),
           ).toBeVisible()
 
           await expect(page.getByText("primär", { exact: true })).toBeVisible()
@@ -107,14 +107,14 @@ test.describe(
           await fillInput(page, "Zitatstelle", "2024, 10-12")
           await fillInput(page, "Klammernzusatz", "ST")
           await page.locator("[aria-label='Fundstelle speichern']").click()
-          await expect(page.getByText("WdG, 2024, 10-12 (ST)")).toBeVisible()
+          await expect(page.getByText("WdG 2024, 10-12 (ST)")).toBeVisible()
         })
         await save(page)
 
         await test.step("Delete references and verify they disappear from the list", async () => {
           await page.getByTestId("list-entry-1").click()
           await page.locator("[aria-label='Eintrag löschen']").click()
-          await expect(page.getByText("WdG, 2024, 10-12 (ST)")).toBeHidden()
+          await expect(page.getByText("WdG 2024, 10-12 (ST)")).toBeHidden()
           await page.getByTestId("list-entry-0").click()
           await page.locator("[aria-label='Eintrag löschen']").click()
           await expect(
@@ -198,7 +198,7 @@ test.describe(
           await fillInput(page, "Zitatstelle", "2024, 10-12")
           await fillInput(page, "Klammernzusatz", "LT")
           await page.locator("[aria-label='Fundstelle speichern']").click()
-          await expect(page.getByText("WdG, 2024, 10-12 (LT)")).toBeVisible()
+          await expect(page.getByText("WdG 2024, 10-12 (LT)")).toBeVisible()
           await expect(
             page.getByText("sekundär", {
               exact: true,
@@ -214,7 +214,7 @@ test.describe(
           await fillInput(page, "Zitatstelle", "2020, 01-99")
           await fillInput(page, "Klammernzusatz", "L")
           await page.locator("[aria-label='Fundstelle speichern']").click()
-          await expect(page.getByText("GVBl BB, 2020, 01-99 (L)")).toBeVisible()
+          await expect(page.getByText("GVBl BB 2020, 01-99 (L)")).toBeVisible()
           await expect(
             page.getByText("primär", {
               exact: true,
@@ -226,10 +226,10 @@ test.describe(
         await navigateToPreview(page, documentNumber)
 
         await expect(
-          page.getByText("Primäre FundstellenGVBl BB, 2020, 01-99 (L)"),
+          page.getByText("Primäre FundstellenGVBl BB 2020, 01-99 (L)"),
         ).toBeVisible()
         await expect(
-          page.getByText("Sekundäre FundstellenWdG, 2024, 10-12 (LT)"),
+          page.getByText("Sekundäre FundstellenWdG 2024, 10-12 (LT)"),
         ).toBeVisible()
       },
     )
@@ -259,7 +259,7 @@ test.describe(
           await fillInput(page, "Zitatstelle", "2024, 10-12")
           await fillInput(page, "Klammernzusatz", "LT")
           await page.locator("[aria-label='Fundstelle speichern']").click()
-          await expect(page.getByText("WdG, 2024, 10-12 (LT)")).toBeVisible()
+          await expect(page.getByText("WdG 2024, 10-12 (LT)")).toBeVisible()
           await expect(
             page.getByText("sekundär", { exact: true }),
           ).toBeVisible()
@@ -273,7 +273,7 @@ test.describe(
           await fillInput(page, "Zitatstelle", "2020, 01-99")
           await fillInput(page, "Klammernzusatz", "L")
           await page.locator("[aria-label='Fundstelle speichern']").click()
-          await expect(page.getByText("GVBl BB, 2020, 01-99 (L)")).toBeVisible()
+          await expect(page.getByText("GVBl BB 2020, 01-99 (L)")).toBeVisible()
           await expect(page.getByText("primär", { exact: true })).toBeVisible()
         })
         await save(page)
