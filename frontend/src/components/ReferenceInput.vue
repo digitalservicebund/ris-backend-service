@@ -71,6 +71,14 @@ watch(
   () => {
     reference.value = new Reference({ ...props.modelValue })
     lastSavedModelValue.value = new Reference({ ...props.modelValue })
+    if (lastSavedModelValue.value.isEmpty) {
+      validationStore.reset()
+    } else if (
+      !lastSavedModelValue.value.legalPeriodical &&
+      !!lastSavedModelValue.value.legalPeriodicalRawValue
+    ) {
+      validationStore.add("Mehrdeutiger Verweis", "legalPeriodical")
+    }
   },
   { immediate: true },
 )

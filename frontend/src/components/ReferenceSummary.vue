@@ -12,6 +12,9 @@ const primaryReference = computed(() =>
     ? "primär"
     : "sekundär",
 )
+const hasAmbiguousLegalPeriodicalAbbreviation = computed(
+  () => !props.data?.legalPeriodical && !!props.data?.legalPeriodicalRawValue,
+)
 </script>
 
 <template>
@@ -21,8 +24,15 @@ const primaryReference = computed(() =>
 
       <IconBadge
         background-color="bg-blue-300"
+        class="mr-8"
         color="text-blue-900"
         :label="primaryReference"
+      />
+      <IconBadge
+        v-if="hasAmbiguousLegalPeriodicalAbbreviation"
+        background-color="bg-red-300"
+        color="text-red-900"
+        label="Mehrdeutiger Verweis"
       />
     </div>
   </div>
