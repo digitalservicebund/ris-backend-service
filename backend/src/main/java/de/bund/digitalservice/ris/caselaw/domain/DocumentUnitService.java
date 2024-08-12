@@ -169,12 +169,6 @@ public class DocumentUnitService {
        * handle unique following operation (sometimes by add and remove operations at the same time)
     */
 
-    log.debug(
-        "documentation unit '{}' with patch '{}' for version '{}'",
-        documentationUnitId,
-        patch.documentationUnitVersion(),
-        patch.patch());
-
     DocumentUnit existingDocumentationUnit = getByUuid(documentationUnitId);
 
     long newVersion = 1L;
@@ -182,13 +176,19 @@ public class DocumentUnitService {
       newVersion = existingDocumentationUnit.version() + 1;
     }
 
-    log.debug("new version is {}", newVersion);
-
     JsonPatch newPatch =
         patchMapperService.calculatePatch(
             existingDocumentationUnit.uuid(), patch.documentationUnitVersion());
 
-    log.debug("version {} - patch in database: {}", patch.documentationUnitVersion(), newPatch);
+    if (!patch.patch().getOperations().isEmpty() || !newPatch.getOperations().isEmpty()) {
+      log.debug(
+          "documentation unit '{}' with patch '{}' for version '{}'",
+          documentationUnitId,
+          patch.documentationUnitVersion(),
+          patch.patch());
+      log.debug("new version is {}", newVersion);
+      log.debug("version {} - patch in database: {}", patch.documentationUnitVersion(), newPatch);
+    }
 
     JsonPatch toFrontendJsonPatch = new JsonPatch(Collections.emptyList());
     RisJsonPatch toFrontend;
