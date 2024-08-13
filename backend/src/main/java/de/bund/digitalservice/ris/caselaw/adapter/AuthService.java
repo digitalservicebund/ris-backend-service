@@ -6,9 +6,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ApiKeyTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ApiKey;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.ImportApiKeyException;
@@ -31,18 +31,18 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
   private final UserService userService;
-  private final DocumentUnitService documentUnitService;
+  private final DocumentationUnitService documentationUnitService;
   private final DatabaseApiKeyRepository keyRepository;
   private final DatabaseDocumentationOfficeRepository officeRepository;
 
   public AuthService(
       UserService userService,
-      DocumentUnitService documentUnitService,
+      DocumentationUnitService documentationUnitService,
       DatabaseApiKeyRepository keyRepository,
       DatabaseDocumentationOfficeRepository officeRepository) {
 
     this.userService = userService;
-    this.documentUnitService = documentUnitService;
+    this.documentationUnitService = documentationUnitService;
     this.keyRepository = keyRepository;
     this.officeRepository = officeRepository;
   }
@@ -50,42 +50,42 @@ public class AuthService {
   @Bean
   public Function<String, Boolean> userHasReadAccessByDocumentNumber() {
     return documentNumber ->
-        Optional.ofNullable(documentUnitService.getByDocumentNumber(documentNumber))
+        Optional.ofNullable(documentationUnitService.getByDocumentNumber(documentNumber))
             .map(this::userHasReadAccess)
             .orElse(false);
   }
 
   @Bean
-  public Function<UUID, Boolean> userHasReadAccessByDocumentUnitUuid() {
+  public Function<UUID, Boolean> userHasReadAccessByDocumentationUnitId() {
     return uuid ->
-        Optional.ofNullable(documentUnitService.getByUuid(uuid))
+        Optional.ofNullable(documentationUnitService.getByUuid(uuid))
             .map(this::userHasReadAccess)
             .orElse(false);
   }
 
   @Bean
-  public Function<UUID, Boolean> userHasWriteAccessByDocumentUnitUuid() {
+  public Function<UUID, Boolean> userHasWriteAccessByDocumentationUnitId() {
     return uuid ->
-        Optional.ofNullable(documentUnitService.getByUuid(uuid))
+        Optional.ofNullable(documentationUnitService.getByUuid(uuid))
             .map(this::userHasSameDocOfficeAsDocument)
             .orElse(false);
   }
 
-  private boolean userHasReadAccess(DocumentUnit documentUnit) {
+  private boolean userHasReadAccess(DocumentationUnit documentationUnit) {
     List<PublicationStatus> published =
         List.of(PublicationStatus.PUBLISHED, PublicationStatus.PUBLISHING);
     // legacy documents are published
-    return documentUnit.status() == null
-        || (documentUnit.status().publicationStatus() != null
-            && published.contains(documentUnit.status().publicationStatus()))
-        || userHasSameDocOfficeAsDocument(documentUnit);
+    return documentationUnit.status() == null
+        || (documentationUnit.status().publicationStatus() != null
+            && published.contains(documentationUnit.status().publicationStatus()))
+        || userHasSameDocOfficeAsDocument(documentationUnit);
   }
 
-  private boolean userHasSameDocOfficeAsDocument(DocumentUnit documentUnit) {
+  private boolean userHasSameDocOfficeAsDocument(DocumentationUnit documentationUnit) {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     if (authentication != null && authentication.getPrincipal() instanceof OidcUser principal) {
       DocumentationOffice documentationOffice = userService.getDocumentationOffice(principal);
-      return documentUnit.coreData().documentationOffice().equals(documentationOffice);
+      return documentationUnit.coreData().documentationOffice().equals(documentationOffice);
     }
     return false;
   }

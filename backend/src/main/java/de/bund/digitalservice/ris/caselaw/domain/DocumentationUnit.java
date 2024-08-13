@@ -7,7 +7,7 @@ import java.util.UUID;
 import lombok.Builder;
 
 @Builder(toBuilder = true)
-public record DocumentUnit(
+public record DocumentationUnit(
     UUID uuid,
     Long version,
     @Size(min = 13, max = 14, message = "documentNumber has to be 13 or 14 characters long")

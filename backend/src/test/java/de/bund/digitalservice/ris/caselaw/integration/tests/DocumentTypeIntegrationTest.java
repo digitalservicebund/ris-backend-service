@@ -12,7 +12,7 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -61,7 +61,7 @@ class DocumentTypeIntegrationTest {
   @Autowired private DatabaseDocumentTypeRepository repository;
   @MockBean private UserService userService;
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
-  @MockBean private DocumentUnitService service;
+  @MockBean private DocumentationUnitService service;
 
   @Test
   void testGetAllDocumentTypes() {

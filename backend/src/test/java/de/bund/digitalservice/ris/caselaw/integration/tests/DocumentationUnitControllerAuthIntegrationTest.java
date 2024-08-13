@@ -10,9 +10,9 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclingService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
+import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
@@ -28,9 +28,9 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
@@ -64,13 +64,13 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @RISIntegrationTest(
     imports = {
-      DocumentUnitService.class,
+      DocumentationUnitService.class,
       PostgresDeltaMigrationRepositoryImpl.class,
       AuthService.class,
       KeycloakUserService.class,
       DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentNumberRecyclingService.class,
-      DatabaseDocumentUnitStatusService.class,
+      DatabaseDocumentationUnitStatusService.class,
       PostgresDocumentationUnitRepositoryImpl.class,
       PostgresHandoverReportRepositoryImpl.class,
       PostgresJPAConfig.class,
@@ -80,8 +80,8 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       TestConfig.class,
       DocumentNumberPatternConfig.class
     },
-    controllers = {DocumentUnitController.class})
-class DocumentUnitControllerAuthIntegrationTest {
+    controllers = {DocumentationUnitController.class})
+class DocumentationUnitControllerAuthIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
       new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
@@ -168,7 +168,7 @@ class DocumentUnitControllerAuthIntegrationTest {
     DocumentationOfficeDTO docUnitOffice = officeMap.get(docUnitOfficeAbbreviation);
 
     DocumentationUnitDTO documentationUnitDTO =
-        createNewDocumentUnitDTO(UUID.randomUUID(), docUnitOffice);
+        createNewDocumentationUnitDTO(UUID.randomUUID(), docUnitOffice);
     for (int i = 0; i < publicationStatus.size(); i++) {
       saveToStatusRepository(
           documentationUnitDTO,
@@ -213,7 +213,7 @@ class DocumentUnitControllerAuthIntegrationTest {
     DocumentationOfficeDTO docUnitOfficeId = officeMap.get(docUnitOfficeAbbreviation);
 
     DocumentationUnitDTO documentationUnitDTO =
-        createNewDocumentUnitDTO(UUID.randomUUID(), docUnitOfficeId);
+        createNewDocumentationUnitDTO(UUID.randomUUID(), docUnitOfficeId);
     for (int i = 0; i < publicationStatus.size(); i++) {
       saveToStatusRepository(
           documentationUnitDTO,
@@ -245,9 +245,9 @@ class DocumentUnitControllerAuthIntegrationTest {
   }
 
   @Test
-  void testUnpublishedDocumentUnitIsForbiddenFOrOtherOffice() {
+  void testUnpublishedDocumentationUnitIsForbiddenFOrOtherOffice() {
     DocumentationUnitDTO documentationUnitDTO =
-        createNewDocumentUnitDTO(UUID.randomUUID(), officeMap.get("CC-RIS"));
+        createNewDocumentationUnitDTO(UUID.randomUUID(), officeMap.get("CC-RIS"));
     saveToStatusRepository(
         documentationUnitDTO,
         Instant.now(),
@@ -261,7 +261,7 @@ class DocumentUnitControllerAuthIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().uuid()).isEqualTo(documentationUnitDTO.getId());
@@ -288,7 +288,7 @@ class DocumentUnitControllerAuthIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().uuid())
@@ -306,7 +306,7 @@ class DocumentUnitControllerAuthIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().uuid())
@@ -321,7 +321,7 @@ class DocumentUnitControllerAuthIntegrationTest {
     return publicationStatus.get(publicationStatus.size() - 1);
   }
 
-  private DocumentationUnitDTO createNewDocumentUnitDTO(
+  private DocumentationUnitDTO createNewDocumentationUnitDTO(
       UUID documentationUnitUuid, DocumentationOfficeDTO documentationOffice) {
     String documentNumber =
         new Random().ints(13, 0, 10).mapToObj(Integer::toString).collect(Collectors.joining());

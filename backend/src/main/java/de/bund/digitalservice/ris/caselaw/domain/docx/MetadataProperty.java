@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain.docx;
 
 /** Property element of the docx file */
-public class MetadataProperty implements DocumentUnitDocx {
+public class MetadataProperty implements DocumentationUnitDocx {
 
   private DocxMetadataProperty key;
   private final String value;

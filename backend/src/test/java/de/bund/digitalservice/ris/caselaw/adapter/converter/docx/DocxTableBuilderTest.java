@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentUnitDocx;
+import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentationUnitDocx;
 import de.bund.digitalservice.ris.caselaw.domain.docx.TableElement;
 import jakarta.xml.bind.JAXBElement;
 import java.math.BigInteger;
@@ -335,7 +335,7 @@ class DocxTableBuilderTest {
           borderLeft);
     }
 
-    private DocumentUnitDocx documentUnit(Integer ctCnfInt) {
+    private DocumentationUnitDocx createDocumentationUnit(Integer ctCnfInt) {
       Tbl table = generateTable(List.of(List.of("table cell")));
       TblPr tblPr = new TblPr();
       TblStyle tblStyle = new TblStyle();
@@ -362,7 +362,7 @@ class DocxTableBuilderTest {
 
     @Test
     void testAllPropertySet() {
-      var result = documentUnit(4097);
+      var result = createDocumentationUnit(4097);
 
       assertThat(result).isInstanceOf(TableElement.class);
       TableElement tableElement = (TableElement) result;
@@ -371,7 +371,7 @@ class DocxTableBuilderTest {
 
     @Test
     void testOnePropertySetWhichDoesntMatchCell() {
-      var result = documentUnit(32);
+      var result = createDocumentationUnit(32);
 
       assertThat(result).isInstanceOf(TableElement.class);
       TableElement tableElement = (TableElement) result;
@@ -380,7 +380,7 @@ class DocxTableBuilderTest {
 
     @Test
     void testOnePropertySetWhichMatchesCell() {
-      var result = documentUnit(512);
+      var result = createDocumentationUnit(512);
 
       assertThat(result).isInstanceOf(TableElement.class);
       TableElement tableElement = (TableElement) result;

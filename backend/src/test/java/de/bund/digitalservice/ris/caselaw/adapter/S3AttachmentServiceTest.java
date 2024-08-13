@@ -75,7 +75,7 @@ class S3AttachmentServiceTest {
   }
 
   @Test
-  void testAttachFileToDocumentUnit() {
+  void testAttachFileToDocumentationUnit() {
     var byteBuffer = ByteBuffer.wrap(new byte[] {});
     var headerMap = new LinkedMultiValueMap<String, String>();
     headerMap.put("Content-Type", List.of("content/extension"));
@@ -105,7 +105,7 @@ class S3AttachmentServiceTest {
   }
 
   @Test
-  void testAttachFileToDocumentUnit_withoutFileName() {
+  void testAttachFileToDocumentationUnit_withoutFileName() {
     var byteBuffer = ByteBuffer.wrap(new byte[] {});
     var headerMap = new LinkedMultiValueMap<String, String>();
     headerMap.put("Content-Type", List.of("content/extension"));
@@ -196,7 +196,7 @@ class S3AttachmentServiceTest {
   }
 
   @Test
-  void testGenerateNewDocumentUnitAndAttachFile_withExceptionFromBucket() throws S3Exception {
+  void testGenerateNewDocumentationUnitAndAttachFile_withExceptionFromBucket() throws S3Exception {
     var byteBuffer = ByteBuffer.wrap(new byte[] {});
 
     doNothing().when(service).checkDocx(any(ByteBuffer.class));

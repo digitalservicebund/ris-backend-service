@@ -12,7 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-class DocumentUnitBuilderTest {
+class DocumentationUnitBuilderTest {
   @Test
   void shouldConvertDocumentationUnitCorrectly() {
     DocumentationUnitDTO documentationUnitDTO = new DocumentationUnitDTO();
@@ -20,10 +20,10 @@ class DocumentUnitBuilderTest {
         Collections.singletonList(AttachmentDTO.builder().filename("doc.docx").build()));
     documentationUnitDTO.setGrounds("reasons123");
     documentationUnitDTO.setDocumentationOffice(DocumentationOfficeDTO.builder().build());
-    DocumentUnit documentUnit =
+    DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit.attachments().get(0).name()).isEqualTo("doc.docx");
-    assertThat(documentUnit.texts().reasons()).isEqualTo("reasons123");
+    assertThat(documentationUnit.attachments().get(0).name()).isEqualTo("doc.docx");
+    assertThat(documentationUnit.texts().reasons()).isEqualTo("reasons123");
   }
 }

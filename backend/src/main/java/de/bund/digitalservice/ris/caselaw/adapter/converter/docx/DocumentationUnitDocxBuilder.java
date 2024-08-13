@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.converter.docx;
 
 import de.bund.digitalservice.ris.caselaw.domain.docx.BorderNumber;
-import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentUnitDocx;
+import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentationUnitDocx;
 import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingListEntryIndex;
 import jakarta.xml.bind.JAXBElement;
@@ -15,24 +15,24 @@ import org.docx4j.wml.PPrBase.NumPr;
 import org.docx4j.wml.R;
 import org.docx4j.wml.Text;
 
-public class DocumentUnitDocxBuilder extends DocxBuilder {
+public class DocumentationUnitDocxBuilder extends DocxBuilder {
   public static final String SOFT_HYPHEN = "\u00AD";
   public static final String NON_BREAKING_SPACE = "\u00A0";
   P paragraph;
 
-  private DocumentUnitDocxBuilder() {}
+  private DocumentationUnitDocxBuilder() {}
 
-  public static DocumentUnitDocxBuilder newInstance() {
-    return new DocumentUnitDocxBuilder();
+  public static DocumentationUnitDocxBuilder newInstance() {
+    return new DocumentationUnitDocxBuilder();
   }
 
-  public DocumentUnitDocxBuilder setParagraph(P paragraph) {
+  public DocumentationUnitDocxBuilder setParagraph(P paragraph) {
     this.paragraph = paragraph;
     replaceSoftHyphenNonBreakingSpaceCombination();
     return this;
   }
 
-  public DocumentUnitDocx build() {
+  public DocumentationUnitDocx build() {
     if (isBorderNumber()) {
       return convertToBorderNumber();
     } else if (isNumberingListEntry()) {
@@ -203,7 +203,7 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
     return paragraph.getPPr().getNumPr() != null;
   }
 
-  private DocumentUnitDocx convertToNumberingListEntry() {
+  private DocumentationUnitDocx convertToNumberingListEntry() {
     NumPr numPr = paragraph.getPPr().getNumPr();
     String numId = null;
     String iLvl = null;

@@ -10,7 +10,7 @@ import lombok.Getter;
 /**
  * Represents a mail to handover a documentation unit to jDV
  *
- * @param documentUnitUuid the UUID of the documentation unit
+ * @param documentationUnitId the UUID of the documentation unit
  * @param receiverAddress the address of the receiver (jDV mail interface)
  * @param mailSubject the subject of the mail containing handover options (e.g. desired operation)
  * @param xml the xml as string
@@ -23,7 +23,7 @@ import lombok.Getter;
  */
 @Builder(toBuilder = true)
 public record HandoverMail(
-    UUID documentUnitUuid,
+    UUID documentationUnitId,
     String receiverAddress,
     String mailSubject,
     String xml,

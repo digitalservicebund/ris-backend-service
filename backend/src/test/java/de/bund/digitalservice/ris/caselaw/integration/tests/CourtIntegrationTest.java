@@ -13,7 +13,7 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CourtService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -59,7 +59,7 @@ class CourtIntegrationTest {
   @Autowired private DatabaseCourtRepository databaseCourtRepository;
 
   @MockBean UserService userService;
-  @MockBean private DocumentUnitService documentUnitService;
+  @MockBean private DocumentationUnitService documentationUnitService;
   @MockBean ClientRegistrationRepository clientRegistrationRepository;
 
   @AfterEach

@@ -38,15 +38,15 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
   @Autowired private CourtRepository courtRepository;
 
-  @MockBean private DocumentUnitRepository repository;
+  @MockBean private DocumentationUnitRepository repository;
   @MockBean private DatabaseCourtRepository databaseCourtRepository;
   @MockBean private DocumentTypeRepository documentTypeRepository;
 
   @BeforeEach
   void beforeEach() {
     CoreData coreData = CoreData.builder().fileNumbers(List.of()).build();
-    DocumentUnit documentUnit = DocumentUnit.builder().coreData(coreData).build();
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.of(documentUnit));
+    DocumentationUnit documentationUnit = DocumentationUnit.builder().coreData(coreData).build();
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.of(documentationUnit));
 
     when(databaseCourtRepository.findAll())
         .thenReturn(
@@ -90,9 +90,10 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     service.initializeCoreData(TEST_UUID, docx2html);
 
-    ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository, times(2)).save(documentUnitCaptor.capture());
-    CoreData savedCoreData = documentUnitCaptor.getValue().coreData();
+    ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
+        ArgumentCaptor.forClass(DocumentationUnit.class);
+    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertEquals("ECLI:ABCD", savedCoreData.ecli());
     assertEquals("AG Berlin", savedCoreData.court().label());
@@ -113,9 +114,10 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     service.initializeCoreData(TEST_UUID, docx2html);
 
-    ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository, times(2)).save(documentUnitCaptor.capture());
-    CoreData savedCoreData = documentUnitCaptor.getValue().coreData();
+    ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
+        ArgumentCaptor.forClass(DocumentationUnit.class);
+    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertNull(savedCoreData.ecli());
   }
@@ -129,9 +131,10 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     service.initializeCoreData(TEST_UUID, docx2html);
 
-    ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository, times(2)).save(documentUnitCaptor.capture());
-    CoreData savedCoreData = documentUnitCaptor.getValue().coreData();
+    ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
+        ArgumentCaptor.forClass(DocumentationUnit.class);
+    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertEquals("ECLI:ABCD", savedCoreData.ecli());
   }
@@ -143,8 +146,8 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
             .fileNumbers(List.of())
             .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
             .build();
-    DocumentUnit documentUnit = DocumentUnit.builder().coreData(coreData).build();
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.of(documentUnit));
+    DocumentationUnit documentationUnit = DocumentationUnit.builder().coreData(coreData).build();
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.of(documentationUnit));
 
     Map<DocxMetadataProperty, String> properties =
         Map.of(DocxMetadataProperty.LEGAL_EFFECT, "Nein");
@@ -152,10 +155,11 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     service.initializeCoreData(TEST_UUID, docx2html);
 
-    ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository, times(2)).save(documentUnitCaptor.capture());
+    ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
+        ArgumentCaptor.forClass(DocumentationUnit.class);
+    verify(repository, times(2)).save(documentationUnitCaptor.capture());
 
-    CoreData savedCoreData = documentUnitCaptor.getValue().coreData();
+    CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
     assertEquals(LegalEffect.NO.getLabel(), savedCoreData.legalEffect());
   }
 
@@ -172,9 +176,10 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     service.initializeCoreData(TEST_UUID, docx2html);
 
-    ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository, times(2)).save(documentUnitCaptor.capture());
-    CoreData savedCoreData = documentUnitCaptor.getValue().coreData();
+    ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
+        ArgumentCaptor.forClass(DocumentationUnit.class);
+    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertNull(savedCoreData.court());
   }
@@ -192,9 +197,10 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     service.initializeCoreData(TEST_UUID, docx2html);
 
-    ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository, times(2)).save(documentUnitCaptor.capture());
-    CoreData savedCoreData = documentUnitCaptor.getValue().coreData();
+    ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
+        ArgumentCaptor.forClass(DocumentationUnit.class);
+    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertNull(savedCoreData.court());
   }
@@ -213,9 +219,10 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     service.initializeCoreData(TEST_UUID, docx2html);
 
-    ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository, times(2)).save(documentUnitCaptor.capture());
-    CoreData savedCoreData = documentUnitCaptor.getValue().coreData();
+    ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
+        ArgumentCaptor.forClass(DocumentationUnit.class);
+    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertNull(savedCoreData.court());
   }
@@ -227,9 +234,10 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     service.initializeCoreData(TEST_UUID, docx2html);
 
-    ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository, times(2)).save(documentUnitCaptor.capture());
-    CoreData savedCoreData = documentUnitCaptor.getValue().coreData();
+    ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
+        ArgumentCaptor.forClass(DocumentationUnit.class);
+    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertEquals("LG Bern", savedCoreData.court().label());
   }
@@ -248,9 +256,10 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     service.initializeCoreData(TEST_UUID, docx2html);
 
-    ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository, times(2)).save(documentUnitCaptor.capture());
-    CoreData savedCoreData = documentUnitCaptor.getValue().coreData();
+    ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
+        ArgumentCaptor.forClass(DocumentationUnit.class);
+    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertEquals("LG Bern", savedCoreData.court().label());
   }
@@ -262,9 +271,10 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     service.initializeCoreData(TEST_UUID, docx2html);
 
-    ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository, times(2)).save(documentUnitCaptor.capture());
-    CoreData savedCoreData = documentUnitCaptor.getValue().coreData();
+    ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
+        ArgumentCaptor.forClass(DocumentationUnit.class);
+    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertEquals("BFH", savedCoreData.court().label());
   }
@@ -284,9 +294,10 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     service.initializeCoreData(TEST_UUID, docx2html);
 
-    ArgumentCaptor<DocumentUnit> documentUnitCaptor = ArgumentCaptor.forClass(DocumentUnit.class);
-    verify(repository, times(2)).save(documentUnitCaptor.capture());
-    CoreData savedCoreData = documentUnitCaptor.getValue().coreData();
+    ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
+        ArgumentCaptor.forClass(DocumentationUnit.class);
+    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertEquals("LG Bernau", savedCoreData.court().label());
   }

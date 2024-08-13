@@ -18,10 +18,10 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclingService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
+import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
@@ -55,12 +55,12 @@ import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
@@ -106,11 +106,11 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @RISIntegrationTest(
     imports = {
-      DocumentUnitService.class,
+      DocumentationUnitService.class,
       PostgresDeltaMigrationRepositoryImpl.class,
       DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentNumberRecyclingService.class,
-      DatabaseDocumentUnitStatusService.class,
+      DatabaseDocumentationUnitStatusService.class,
       DatabaseProcedureService.class,
       PostgresHandoverReportRepositoryImpl.class,
       PostgresDocumentationUnitRepositoryImpl.class,
@@ -121,7 +121,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       TestConfig.class,
       DocumentNumberPatternConfig.class
     },
-    controllers = {DocumentUnitController.class})
+    controllers = {DocumentationUnitController.class})
 class DocumentationUnitIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
@@ -189,7 +189,7 @@ class DocumentationUnitIntegrationTest {
   }
 
   @Test
-  void testForCorrectDbEntryAfterNewDocumentUnitCreation() {
+  void testForCorrectDbEntryAfterNewDocumentationUnitCreation() {
     when(documentNumberPatternConfig.getDocumentNumberPatterns())
         .thenReturn(Map.of("DS", "XXRE0******YY"));
 
@@ -200,7 +200,7 @@ class DocumentationUnitIntegrationTest {
         .exchange()
         .expectStatus()
         .isCreated()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -215,7 +215,7 @@ class DocumentationUnitIntegrationTest {
   }
 
   @Test
-  void testDocumentUnitDeletionAndRecyclingOfDocumentNumber() {
+  void testDocumentationUnitDeletionAndRecyclingOfDocumentNumber() {
     when(documentNumberPatternConfig.getDocumentNumberPatterns())
         .thenReturn(Map.of("DS", "XXRE0******YY"));
 
@@ -226,7 +226,7 @@ class DocumentationUnitIntegrationTest {
         .exchange()
         .expectStatus()
         .isCreated()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -234,13 +234,13 @@ class DocumentationUnitIntegrationTest {
             });
 
     assertThat(repository.findAll()).hasSize(1);
-    var deletedDocumentUnit = repository.findAll().get(0);
-    var reusableDocumentNumber = deletedDocumentUnit.getDocumentNumber();
+    var deletedDocumentationUnit = repository.findAll().get(0);
+    var reusableDocumentNumber = deletedDocumentationUnit.getDocumentNumber();
 
     risWebTestClient
         .withDefaultLogin()
         .delete()
-        .uri("/api/v1/caselaw/documentunits/" + deletedDocumentUnit.getId())
+        .uri("/api/v1/caselaw/documentunits/" + deletedDocumentationUnit.getId())
         .exchange()
         .expectStatus()
         .isOk()
@@ -259,7 +259,7 @@ class DocumentationUnitIntegrationTest {
         .exchange()
         .expectStatus()
         .isCreated()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -278,8 +278,8 @@ class DocumentationUnitIntegrationTest {
                 .documentationOffice(documentationOffice)
                 .build());
 
-    DocumentUnit documentUnitFromFrontend =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnitFromFrontend =
+        DocumentationUnit.builder()
             .uuid(dto.getId())
             .documentNumber(dto.getDocumentNumber())
             .coreData(
@@ -294,11 +294,11 @@ class DocumentationUnitIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + dto.getId())
-        .bodyValue(documentUnitFromFrontend)
+        .bodyValue(documentationUnitFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -350,8 +350,8 @@ class DocumentationUnitIntegrationTest {
                 .documentationOffice(documentationOffice)
                 .build());
 
-    DocumentUnit documentUnitFromFrontend =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnitFromFrontend =
+        DocumentationUnit.builder()
             .uuid(dto.getId())
             .documentNumber(dto.getDocumentNumber())
             .coreData(
@@ -366,11 +366,11 @@ class DocumentationUnitIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + dto.getId())
-        .bodyValue(documentUnitFromFrontend)
+        .bodyValue(documentationUnitFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -403,8 +403,8 @@ class DocumentationUnitIntegrationTest {
                 .singleNorms(singleNorms)
                 .build());
 
-    DocumentUnit documentUnitFromFrontend =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnitFromFrontend =
+        DocumentationUnit.builder()
             .uuid(dto.getId())
             .documentNumber(dto.getDocumentNumber())
             .contentRelatedIndexing(ContentRelatedIndexing.builder().norms(norms).build())
@@ -415,11 +415,11 @@ class DocumentationUnitIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + dto.getId())
-        .bodyValue(documentUnitFromFrontend)
+        .bodyValue(documentationUnitFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -480,8 +480,8 @@ class DocumentationUnitIntegrationTest {
                 .documentationOffice(documentationOffice)
                 .build());
 
-    DocumentUnit documentUnitFromFrontend =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnitFromFrontend =
+        DocumentationUnit.builder()
             .uuid(dto.getId())
             .documentNumber(dto.getDocumentNumber())
             .coreData(
@@ -495,11 +495,11 @@ class DocumentationUnitIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + dto.getId())
-        .bodyValue(documentUnitFromFrontend)
+        .bodyValue(documentationUnitFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -553,8 +553,8 @@ class DocumentationUnitIntegrationTest {
                 .documentationOffice(documentationOffice)
                 .build());
 
-    DocumentUnit documentUnitFromFrontend =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnitFromFrontend =
+        DocumentationUnit.builder()
             .uuid(documentationUnitDto.getId())
             .documentNumber(documentationUnitDto.getDocumentNumber())
             .coreData(
@@ -572,12 +572,12 @@ class DocumentationUnitIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
-        .bodyValue(documentUnitFromFrontend)
+        .uri("/api/v1/caselaw/documentunits/" + documentationUnitFromFrontend.uuid())
+        .bodyValue(documentationUnitFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -610,8 +610,8 @@ class DocumentationUnitIntegrationTest {
     assertThat(repository.findAll()).hasSize(1);
     assertThat(repository.findById(dto.getId())).isPresent();
 
-    DocumentUnit documentUnitFromFrontend =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnitFromFrontend =
+        DocumentationUnit.builder()
             .uuid(dto.getId())
             .documentNumber(dto.getDocumentNumber())
             .coreData(CoreData.builder().documentationOffice(docOffice).documentType(null).build())
@@ -620,12 +620,12 @@ class DocumentationUnitIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
-        .bodyValue(documentUnitFromFrontend)
+        .uri("/api/v1/caselaw/documentunits/" + documentationUnitFromFrontend.uuid())
+        .bodyValue(documentationUnitFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -734,7 +734,7 @@ class DocumentationUnitIntegrationTest {
   }
 
   @Test
-  void testSearchByDocumentUnitSearchInput() {
+  void testSearchByDocumentationUnitSearchInput() {
     DocumentationOffice otherDocOffice = buildDocOffice("BGH");
     UUID otherDocOfficeUuid =
         documentationOfficeRepository.findByAbbreviation(otherDocOffice.abbreviation()).getId();

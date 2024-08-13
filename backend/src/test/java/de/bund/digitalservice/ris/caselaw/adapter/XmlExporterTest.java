@@ -7,8 +7,8 @@ import de.bund.digitalservice.ris.caselaw.config.ConverterConfig;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
@@ -46,8 +46,8 @@ class XmlExporterTest {
 
   @Test
   void testExporter() throws XmlExporterException {
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
             .coreData(generateCoreData())
             .documentNumber("document number")
             .previousDecisions(generatePreviousDecisions())
@@ -58,7 +58,7 @@ class XmlExporterTest {
             .build();
 
     String encryptedXml =
-        new JurisXmlExporterWrapper(objectMapper).generateEncryptedXMLString(documentUnit);
+        new JurisXmlExporterWrapper(objectMapper).generateEncryptedXMLString(documentationUnit);
 
     assertThat(encryptedXml)
         .isEqualTo(

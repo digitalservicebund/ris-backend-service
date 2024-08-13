@@ -4,8 +4,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 public interface XmlExporter {
-  XmlTransformationResult transformToXml(DocumentUnit documentUnit)
+  XmlTransformationResult transformToXml(DocumentationUnit documentationUnit)
       throws ParserConfigurationException, TransformerException;
 
-  String generateEncryptedXMLString(DocumentUnit documentUnit) throws XmlExporterException;
+  String generateEncryptedXMLString(DocumentationUnit documentationUnit)
+      throws XmlExporterException;
 }

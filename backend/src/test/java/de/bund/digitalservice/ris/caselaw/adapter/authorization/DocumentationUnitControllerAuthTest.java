@@ -9,8 +9,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.caselaw.DocumentUnitControllerTestConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
+import de.bund.digitalservice.ris.caselaw.DocumentationUnitControllerTestConfig;
+import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRepository;
@@ -18,10 +18,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
@@ -46,11 +46,11 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = DocumentUnitController.class)
-@Import({DocumentUnitControllerTestConfig.class})
-class DocumentUnitControllerAuthTest {
+@WebMvcTest(controllers = DocumentationUnitController.class)
+@Import({DocumentationUnitControllerTestConfig.class})
+class DocumentationUnitControllerAuthTest {
   @Autowired private RisWebTestClient risWebTestClient;
-  @MockBean private DocumentUnitService service;
+  @MockBean private DocumentationUnitService service;
 
   @MockBean
   private DocumentationUnitDocxMetadataInitializationService
@@ -79,7 +79,7 @@ class DocumentUnitControllerAuthTest {
 
   @Test
   void testGetByDocumentNumber_nonExistentDocumentNumber_shouldYield403Too() {
-    // testGetByDocumentNumber() is also in DocumentUnitControllerAuthIntegrationTest
+    // testGetByDocumentNumber() is also in DocumentationUnitControllerAuthIntegrationTest
     when(service.getByDocumentNumber(any(String.class))).thenReturn(null);
 
     risWebTestClient
@@ -100,12 +100,12 @@ class DocumentUnitControllerAuthTest {
   }
 
   @Test
-  void testAttachFileToDocumentUnit() {
+  void testAttachFileToDocumentationUnit() {
     when(attachmentService.attachFileToDocumentationUnit(
             eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class)))
         .thenReturn(Attachment.builder().s3path("fooPath").build());
     when(docxConverterService.getConvertedObject(anyString())).thenReturn(Docx2Html.EMPTY);
-    mockDocumentUnit(docOffice1, null, null);
+    mockDocumentationUnit(docOffice1, null, null);
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file";
 
@@ -135,8 +135,8 @@ class DocumentUnitControllerAuthTest {
   }
 
   @Test
-  void testRemoveFileFromDocumentUnit() {
-    mockDocumentUnit(docOffice2, null, null);
+  void testRemoveFileFromDocumentationUnit() {
+    mockDocumentationUnit(docOffice2, null, null);
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file/fooPath";
 
     risWebTestClient
@@ -159,7 +159,7 @@ class DocumentUnitControllerAuthTest {
   @Test
   void testDeleteByUuid() throws DocumentationUnitNotExistsException {
     when(service.deleteByUuid(TEST_UUID)).thenReturn(null);
-    mockDocumentUnit(docOffice1, null, null);
+    mockDocumentationUnit(docOffice1, null, null);
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID;
 
@@ -176,8 +176,8 @@ class DocumentUnitControllerAuthTest {
 
   @Test
   void testUpdateByUuid() throws DocumentationUnitNotExistsException {
-    DocumentUnit docUnit = mockDocumentUnit(docOffice2, null, null);
-    when(service.updateDocumentUnit(docUnit)).thenReturn(null);
+    DocumentationUnit docUnit = mockDocumentationUnit(docOffice2, null, null);
+    when(service.updateDocumentationUnit(docUnit)).thenReturn(null);
     when(service.getByUuid(TEST_UUID)).thenReturn(docUnit);
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID;
@@ -229,7 +229,7 @@ class DocumentUnitControllerAuthTest {
 
   @Test
   void testGetHtml() {
-    mockDocumentUnit(docOffice1, "123", Status.builder().publicationStatus(PUBLISHED).build());
+    mockDocumentationUnit(docOffice1, "123", Status.builder().publicationStatus(PUBLISHED).build());
     when(docxConverterService.getConvertedObject("123")).thenReturn(null);
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/docx/123";
@@ -238,7 +238,8 @@ class DocumentUnitControllerAuthTest {
 
     risWebTestClient.withLogin(docOffice2Group).get().uri(uri).exchange().expectStatus().isOk();
 
-    mockDocumentUnit(docOffice1, "123", Status.builder().publicationStatus(UNPUBLISHED).build());
+    mockDocumentationUnit(
+        docOffice1, "123", Status.builder().publicationStatus(UNPUBLISHED).build());
 
     risWebTestClient
         .withLogin(docOffice2Group)
@@ -250,8 +251,8 @@ class DocumentUnitControllerAuthTest {
   }
 
   @Test
-  void testHandoverDocumentUnitAsEmail() throws DocumentationUnitNotExistsException {
-    mockDocumentUnit(docOffice2, null, null);
+  void testHandoverDocumentationUnitAsEmail() throws DocumentationUnitNotExistsException {
+    mockDocumentationUnit(docOffice2, null, null);
     when(userService.getEmail(any(OidcUser.class))).thenReturn("abc");
     when(handoverService.handoverAsMail(TEST_UUID, "abc")).thenReturn(null);
 
@@ -270,7 +271,7 @@ class DocumentUnitControllerAuthTest {
 
   @Test
   void testGetEvents() {
-    mockDocumentUnit(docOffice1, null, Status.builder().publicationStatus(PUBLISHED).build());
+    mockDocumentationUnit(docOffice1, null, Status.builder().publicationStatus(PUBLISHED).build());
     when(handoverService.getEventLog(TEST_UUID)).thenReturn(List.of());
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/handover";
@@ -285,7 +286,8 @@ class DocumentUnitControllerAuthTest {
         .expectStatus()
         .isForbidden();
 
-    mockDocumentUnit(docOffice1, null, Status.builder().publicationStatus(UNPUBLISHED).build());
+    mockDocumentationUnit(
+        docOffice1, null, Status.builder().publicationStatus(UNPUBLISHED).build());
 
     risWebTestClient
         .withLogin(docOffice2Group)
@@ -296,10 +298,10 @@ class DocumentUnitControllerAuthTest {
         .isForbidden();
   }
 
-  private DocumentUnit mockDocumentUnit(
+  private DocumentationUnit mockDocumentationUnit(
       DocumentationOffice docOffice, String s3path, Status status) {
-    DocumentUnit docUnit =
-        DocumentUnit.builder()
+    DocumentationUnit docUnit =
+        DocumentationUnit.builder()
             .uuid(TEST_UUID)
             .status(status)
             .attachments(Collections.singletonList(Attachment.builder().s3path(s3path).build()))
