@@ -34,6 +34,7 @@ class DocumentationUnitDocxListUtilsTest {
   }
 
   @Test
+  @SuppressWarnings("java:S2699")
   void testPostprocessBorderNumbers_withNull_shouldDoNothing() {
 
     DocumentationUnitDocxListUtils.postProcessBorderNumbers(null);

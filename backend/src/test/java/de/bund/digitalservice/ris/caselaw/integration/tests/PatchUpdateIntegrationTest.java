@@ -30,7 +30,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRelatedDocumentationRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitPatchDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
@@ -139,9 +138,6 @@ class PatchUpdateIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    DocumentationOfficeDTO documentationOffice =
-        documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
-
     RegionDTO region1DTO =
         regionRepository.save(
             RegionDTO.builder()
