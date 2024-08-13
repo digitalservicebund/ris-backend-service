@@ -205,7 +205,7 @@ dependencies {
     implementation("com.gravity9:json-patch-path:2.0.2");
 
     implementation("io.micrometer:micrometer-registry-prometheus:1.13.2")
-    implementation("io.micrometer:micrometer-core:1.13.2")
+    implementation("io.micrometer:micrometer-core:1.13.3")
 
     implementation(platform("io.sentry:sentry-bom:8.0.0-alpha.4"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
