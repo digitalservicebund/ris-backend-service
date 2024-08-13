@@ -62,9 +62,8 @@ onMounted(async () => {
         class="ds-label-01-reg p-8 hover:bg-yellow-500 hover:underline"
         :class="{
           underline:
-            route.path.includes('caselaw') &&
-            !route.path.includes('procedures') &&
-            !route.path.includes('legal-periodical-evaluation'),
+            route.path === '/caselaw' ||
+            route.path.includes('caselaw/documentunit'),
         }"
         data-testid="search-navbar-button"
         :to="{ name: 'caselaw' }"
@@ -79,10 +78,10 @@ onMounted(async () => {
       <router-link
         class="ds-label-01-reg p-8 hover:bg-yellow-500 hover:underline"
         :class="{
-          underline: route.path.includes('legal-periodical-evaluation'),
+          underline: route.path.includes('legal-periodical-references'),
         }"
-        :to="{ name: 'caselaw-legal-periodical-evaluation' }"
-        >Periodikaauswertung
+        :to="{ name: 'caselaw-legal-periodical-references' }"
+        >Fundstellen
       </router-link>
     </div>
 

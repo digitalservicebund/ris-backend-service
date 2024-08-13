@@ -1,13 +1,13 @@
-import DocumentUnit from "./documentUnit"
 import LegalPeriodical from "./legalPeriodical"
+import Reference from "./reference"
 
 export default class LegalPeriodicalEdition {
   uuid?: string
   legalPeriodical?: LegalPeriodical
-  editionName?: string
+  name?: string
   prefix?: string
   suffix?: string
-  documentationUnits?: DocumentUnit[]
+  references?: Reference[]
 
   constructor(data: Partial<LegalPeriodicalEdition> = {}) {
     Object.assign(this, data)
