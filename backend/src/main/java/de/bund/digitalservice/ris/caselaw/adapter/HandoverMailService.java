@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
@@ -59,7 +59,7 @@ public class HandoverMailService implements MailService {
   /**
    * Hands over a documentation unit as XML to jDV via email.
    *
-   * @param documentUnit the documentation unit to hand over
+   * @param documentationUnit the documentation unit to hand over
    * @param receiverAddress the email address of the receiver
    * @param issuerAddress the email address of the issuer
    * @return the result of the handover
@@ -67,19 +67,19 @@ public class HandoverMailService implements MailService {
    */
   @Override
   public HandoverMail handOver(
-      DocumentUnit documentUnit, String receiverAddress, String issuerAddress) {
+      DocumentationUnit documentationUnit, String receiverAddress, String issuerAddress) {
     XmlTransformationResult xml;
     try {
-      xml = xmlExporter.transformToXml(getTestDocumentUnit(documentUnit));
+      xml = xmlExporter.transformToXml(getTestDocumentationUnit(documentationUnit));
     } catch (ParserConfigurationException | TransformerException ex) {
       throw new DocumentationUnitHandoverException("Couldn't generate xml.", ex);
     }
 
-    String mailSubject = generateMailSubject(documentUnit);
+    String mailSubject = generateMailSubject(documentationUnit);
 
     HandoverMail handoverMail =
         generateXmlHandoverMail(
-            documentUnit.uuid(), receiverAddress, mailSubject, xml, issuerAddress);
+            documentationUnit.uuid(), receiverAddress, mailSubject, xml, issuerAddress);
     generateAndSendMail(handoverMail);
     if (!handoverMail.success()) {
       return handoverMail;
@@ -90,32 +90,32 @@ public class HandoverMailService implements MailService {
   /**
    * Returns the results of performed handover operations for a documentation unit.
    *
-   * @param documentUnitUuid the UUID of the documentation unit
+   * @param documentationUnitId the UUID of the documentation unit
    * @return a list of results of all handover operations for the documentation unit
    */
   @Override
-  public List<HandoverMail> getHandoverResult(UUID documentUnitUuid) {
-    return repository.getHandoversByDocumentUnitUuid(documentUnitUuid);
+  public List<HandoverMail> getHandoverResult(UUID documentationUnitId) {
+    return repository.getHandoversByDocumentationUnitId(documentationUnitId);
   }
 
   /**
    * Generates a preview of the XML that would be sent via email.
    *
-   * @param documentUnit the documentation unit
+   * @param documentationUnit the documentation unit
    * @return the XML export result, containing the XML and possibly errors
    * @throws DocumentationUnitHandoverException if the XML export fails
    */
   @Override
-  public XmlTransformationResult getXmlPreview(DocumentUnit documentUnit) {
+  public XmlTransformationResult getXmlPreview(DocumentationUnit documentationUnit) {
     try {
-      return xmlExporter.transformToXml(documentUnit);
+      return xmlExporter.transformToXml(documentationUnit);
     } catch (ParserConfigurationException | TransformerException ex) {
       throw new DocumentationUnitHandoverException("Couldn't generate xml.", ex);
     }
   }
 
-  private String generateMailSubject(DocumentUnit documentUnit) {
-    if (documentUnit.documentNumber() == null) {
+  private String generateMailSubject(DocumentationUnit documentationUnit) {
+    if (documentationUnit.documentNumber() == null) {
       throw new DocumentationUnitHandoverException(
           "No document number has set in the document unit.");
     }
@@ -131,7 +131,7 @@ public class HandoverMailService implements MailService {
     subject += " mod=T";
     subject += " ld=" + deliveryDate;
     subject += " vg=";
-    subject += documentUnit.documentNumber();
+    subject += documentationUnit.documentNumber();
 
     return subject;
   }
@@ -160,18 +160,18 @@ public class HandoverMailService implements MailService {
                 .fileName(handoverMail.fileName())
                 .fileContent(handoverMail.xml())
                 .build()),
-        handoverMail.documentUnitUuid().toString());
+        handoverMail.documentationUnitId().toString());
   }
 
   private HandoverMail generateXmlHandoverMail(
-      UUID documentUnitUuid,
+      UUID documentationUnitId,
       String receiverAddress,
       String mailSubject,
       XmlTransformationResult xml,
       String issuerAddress) {
     var xmlHandoverMailBuilder =
         HandoverMail.builder()
-            .documentUnitUuid(documentUnitUuid)
+            .documentationUnitId(documentationUnitId)
             .success(xml.success())
             .statusMessages(xml.statusMessages());
 
@@ -189,17 +189,17 @@ public class HandoverMailService implements MailService {
         .build();
   }
 
-  private DocumentUnit getTestDocumentUnit(DocumentUnit documentUnit) {
+  private DocumentationUnit getTestDocumentationUnit(DocumentationUnit documentationUnit) {
     if (env.matchesProfiles("production")) {
-      return documentUnit.toBuilder()
+      return documentationUnit.toBuilder()
           .coreData(
-              Optional.ofNullable(documentUnit.coreData())
+              Optional.ofNullable(documentationUnit.coreData())
                   .orElseGet(() -> CoreData.builder().build()))
           .build();
     }
-    return documentUnit.toBuilder()
+    return documentationUnit.toBuilder()
         .coreData(
-            Optional.ofNullable(documentUnit.coreData())
+            Optional.ofNullable(documentationUnit.coreData())
                 .map(
                     coreData ->
                         coreData.toBuilder()
@@ -212,7 +212,7 @@ public class HandoverMailService implements MailService {
                             .fileNumbers(
                                 Stream.concat(
                                         Stream.of("TEST"),
-                                        documentUnit.coreData().fileNumbers().stream())
+                                        documentationUnit.coreData().fileNumbers().stream())
                                     .toList())
                             .build())
                 .orElseGet(

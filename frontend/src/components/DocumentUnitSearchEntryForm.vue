@@ -122,11 +122,11 @@ async function validateSearchInput() {
   ) {
     !validationStore.getByField("decisionDateEnd") &&
       validationStore.add(
-        "Enddatum darf nich vor Startdatum liegen",
+        "Enddatum darf nicht vor Startdatum liegen",
         "decisionDateEnd",
       )
   } else if (
-    validationStore.getByMessage("Enddatum darf nich vor Startdatum liegen")
+    validationStore.getByMessage("Enddatum darf nicht vor Startdatum liegen")
       .length === 1
   ) {
     validationStore.remove("decisionDateEnd")

@@ -15,11 +15,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverter;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverterException;
 import de.bund.digitalservice.ris.caselaw.config.ConverterConfig;
 import de.bund.digitalservice.ris.caselaw.domain.docx.BorderNumber;
-import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentUnitDocx;
+import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentationUnitDocx;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocxImagePart;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocxMetadataProperty;
-import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingList.DocumentUnitNumberingListNumberFormat;
+import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingList.DocumentationUnitNumberingListNumberFormat;
 import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingListEntryIndex;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ParagraphElement;
@@ -349,7 +349,7 @@ class DocxConverterServiceTest {
     private String fontSize;
     private boolean lvlPicBullet;
     private boolean isLgl;
-    private DocumentUnitNumberingListNumberFormat numberFormat;
+    private DocumentationUnitNumberingListNumberFormat numberFormat;
     private String iLvl;
     private JcEnumeration lvlJc;
     private String suff;
@@ -365,7 +365,7 @@ class DocxConverterServiceTest {
       fontSize = "";
       lvlPicBullet = false;
       isLgl = false;
-      numberFormat = DocumentUnitNumberingListNumberFormat.BULLET;
+      numberFormat = DocumentationUnitNumberingListNumberFormat.BULLET;
       iLvl = "0";
       lvlJc = JcEnumeration.RIGHT;
       suff = "space";
@@ -396,7 +396,7 @@ class DocxConverterServiceTest {
       entries.add(
           (NumberingListEntry)
               generateNumberingListEntry("bullet list entry 2", createNumberingListEntryIndex()));
-      numberFormat = DocumentUnitNumberingListNumberFormat.DECIMAL;
+      numberFormat = DocumentationUnitNumberingListNumberFormat.DECIMAL;
       entries.add(
           (NumberingListEntry)
               generateNumberingListEntry("decimal list entry 1", createNumberingListEntryIndex()));
@@ -407,7 +407,7 @@ class DocxConverterServiceTest {
       TestDocumentGenerator generator =
           new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
       int index = 0;
-      for (DocumentUnitDocx entry : entries) {
+      for (DocumentationUnitDocx entry : entries) {
         generator.addContent(String.valueOf(++index), entry);
       }
       generator.generate();
@@ -444,7 +444,7 @@ class DocxConverterServiceTest {
 
     @Test
     void testGetHtml_withListEntries_shouldHaveLowerLatinStyle() {
-      numberFormat = DocumentUnitNumberingListNumberFormat.LOWER_LETTER;
+      numberFormat = DocumentationUnitNumberingListNumberFormat.LOWER_LETTER;
       entries.add(
           (NumberingListEntry)
               generateNumberingListEntry("list entry 1", createNumberingListEntryIndex()));
@@ -454,7 +454,7 @@ class DocxConverterServiceTest {
       TestDocumentGenerator generator =
           new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
       int index = 0;
-      for (DocumentUnitDocx entry : entries) {
+      for (DocumentationUnitDocx entry : entries) {
         generator.addContent(String.valueOf(++index), entry);
       }
       generator.generate();
@@ -479,7 +479,7 @@ class DocxConverterServiceTest {
 
     @Test
     void testGetHtml_withListEntries_shouldHaveUpperLatinStyle() {
-      numberFormat = DocumentUnitNumberingListNumberFormat.UPPER_LETTER;
+      numberFormat = DocumentationUnitNumberingListNumberFormat.UPPER_LETTER;
       entries.add(
           (NumberingListEntry)
               generateNumberingListEntry("list entry 1", createNumberingListEntryIndex()));
@@ -489,7 +489,7 @@ class DocxConverterServiceTest {
       TestDocumentGenerator generator =
           new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
       int index = 0;
-      for (DocumentUnitDocx entry : entries) {
+      for (DocumentationUnitDocx entry : entries) {
         generator.addContent(String.valueOf(++index), entry);
       }
       generator.generate();
@@ -514,7 +514,7 @@ class DocxConverterServiceTest {
 
     @Test
     void testGetHtml_withListEntries_shouldHaveLowerRomanStyle() {
-      numberFormat = DocumentUnitNumberingListNumberFormat.LOWER_ROMAN;
+      numberFormat = DocumentationUnitNumberingListNumberFormat.LOWER_ROMAN;
       entries.add(
           (NumberingListEntry)
               generateNumberingListEntry("list entry 1", createNumberingListEntryIndex()));
@@ -524,7 +524,7 @@ class DocxConverterServiceTest {
       TestDocumentGenerator generator =
           new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
       int index = 0;
-      for (DocumentUnitDocx entry : entries) {
+      for (DocumentationUnitDocx entry : entries) {
         generator.addContent(String.valueOf(++index), entry);
       }
       generator.generate();
@@ -549,7 +549,7 @@ class DocxConverterServiceTest {
 
     @Test
     void testGetHtml_withListEntries_shouldHaveUpperRomanStyle() {
-      numberFormat = DocumentUnitNumberingListNumberFormat.UPPER_ROMAN;
+      numberFormat = DocumentationUnitNumberingListNumberFormat.UPPER_ROMAN;
       entries.add(
           (NumberingListEntry)
               generateNumberingListEntry("list entry 1", createNumberingListEntryIndex()));
@@ -559,7 +559,7 @@ class DocxConverterServiceTest {
       TestDocumentGenerator generator =
           new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
       int index = 0;
-      for (DocumentUnitDocx entry : entries) {
+      for (DocumentationUnitDocx entry : entries) {
         generator.addContent(String.valueOf(++index), entry);
       }
       generator.generate();
@@ -584,7 +584,7 @@ class DocxConverterServiceTest {
 
     @Test
     void testGetHtml_LglList() {
-      numberFormat = DocumentUnitNumberingListNumberFormat.DECIMAL;
+      numberFormat = DocumentationUnitNumberingListNumberFormat.DECIMAL;
       entries.add(
           (NumberingListEntry)
               generateNumberingListEntry("list entry 1", createNumberingListEntryIndex()));
@@ -601,7 +601,7 @@ class DocxConverterServiceTest {
       TestDocumentGenerator generator =
           new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
       int index = 0;
-      for (DocumentUnitDocx entry : entries) {
+      for (DocumentationUnitDocx entry : entries) {
         generator.addContent(String.valueOf(++index), entry);
       }
       generator.generate();
@@ -631,14 +631,14 @@ class DocxConverterServiceTest {
     void testGetHtml_emptyStartValue() {
       startVal = "";
       lvlText = "%1.";
-      numberFormat = DocumentUnitNumberingListNumberFormat.DECIMAL;
+      numberFormat = DocumentationUnitNumberingListNumberFormat.DECIMAL;
       entries.add(
           (NumberingListEntry)
               generateNumberingListEntry("bullet list entry 1", createNumberingListEntryIndex()));
       TestDocumentGenerator generator =
           new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
       int index = 0;
-      for (DocumentUnitDocx entry : entries) {
+      for (DocumentationUnitDocx entry : entries) {
         generator.addContent(String.valueOf(++index), entry);
       }
       generator.generate();
@@ -696,7 +696,7 @@ class DocxConverterServiceTest {
       TestDocumentGenerator generator =
           new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
       int index = 0;
-      for (DocumentUnitDocx entry : entries) {
+      for (DocumentationUnitDocx entry : entries) {
         generator.addContent(String.valueOf(++index), entry);
       }
       generator.generate();
@@ -730,7 +730,7 @@ class DocxConverterServiceTest {
 
     @Test
     void testGetHtml_withThreeLvlOfNumberingListEntriesLowerRoman() {
-      numberFormat = DocumentUnitNumberingListNumberFormat.LOWER_ROMAN;
+      numberFormat = DocumentationUnitNumberingListNumberFormat.LOWER_ROMAN;
       lvlText = "%1.";
       entries.add(
           (NumberingListEntry)
@@ -776,7 +776,7 @@ class DocxConverterServiceTest {
       TestDocumentGenerator generator =
           new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
       int index = 0;
-      for (DocumentUnitDocx entry : entries) {
+      for (DocumentationUnitDocx entry : entries) {
         generator.addContent(String.valueOf(++index), entry);
       }
       generator.generate();
@@ -811,7 +811,7 @@ class DocxConverterServiceTest {
 
     @Test
     void testGetHtml_withThreeLvlOfNumberingListEntriesUpperRoman() {
-      numberFormat = DocumentUnitNumberingListNumberFormat.UPPER_ROMAN;
+      numberFormat = DocumentationUnitNumberingListNumberFormat.UPPER_ROMAN;
       lvlText = "%1.";
       entries.add(
           (NumberingListEntry)
@@ -857,7 +857,7 @@ class DocxConverterServiceTest {
       TestDocumentGenerator generator =
           new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
       int index = 0;
-      for (DocumentUnitDocx entry : entries) {
+      for (DocumentationUnitDocx entry : entries) {
         generator.addContent(String.valueOf(++index), entry);
       }
       generator.generate();
@@ -890,7 +890,7 @@ class DocxConverterServiceTest {
 
     @Test
     void testGetHtml_withThreeLvlOfNumberingListEntriesLowerLetter() {
-      numberFormat = DocumentUnitNumberingListNumberFormat.LOWER_LETTER;
+      numberFormat = DocumentationUnitNumberingListNumberFormat.LOWER_LETTER;
       lvlText = "%1)";
       entries.add(
           (NumberingListEntry)
@@ -936,7 +936,7 @@ class DocxConverterServiceTest {
       TestDocumentGenerator generator =
           new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
       int index = 0;
-      for (DocumentUnitDocx entry : entries) {
+      for (DocumentationUnitDocx entry : entries) {
         generator.addContent(String.valueOf(++index), entry);
       }
       generator.generate();
@@ -971,7 +971,7 @@ class DocxConverterServiceTest {
 
     @Test
     void testGetHtml_withThreeLvlOfNumberingListEntriesUpperLetter() {
-      numberFormat = DocumentUnitNumberingListNumberFormat.UPPER_LETTER;
+      numberFormat = DocumentationUnitNumberingListNumberFormat.UPPER_LETTER;
       lvlText = "%1)";
       entries.add(
           (NumberingListEntry)
@@ -1017,7 +1017,7 @@ class DocxConverterServiceTest {
       TestDocumentGenerator generator =
           new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
       int index = 0;
-      for (DocumentUnitDocx entry : entries) {
+      for (DocumentationUnitDocx entry : entries) {
         generator.addContent(String.valueOf(++index), entry);
       }
       generator.generate();
@@ -1052,7 +1052,7 @@ class DocxConverterServiceTest {
 
     @Test
     void testGetHtml_withThreeLvlOfNumberingListEntriesDecimal() {
-      numberFormat = DocumentUnitNumberingListNumberFormat.DECIMAL;
+      numberFormat = DocumentationUnitNumberingListNumberFormat.DECIMAL;
       lvlText = "%1.";
       entries.add(
           (NumberingListEntry)
@@ -1095,7 +1095,7 @@ class DocxConverterServiceTest {
       TestDocumentGenerator generator =
           new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
       int index = 0;
-      for (DocumentUnitDocx entry : entries) {
+      for (DocumentationUnitDocx entry : entries) {
         generator.addContent(String.valueOf(++index), entry);
       }
       generator.generate();
@@ -1130,7 +1130,7 @@ class DocxConverterServiceTest {
 
     @Test
     void testGetHtml_withThreeLvlOfNumberingListEntriesMixed() {
-      numberFormat = DocumentUnitNumberingListNumberFormat.DECIMAL;
+      numberFormat = DocumentationUnitNumberingListNumberFormat.DECIMAL;
       lvlText = "%1.";
       entries.add(
           (NumberingListEntry)
@@ -1139,7 +1139,7 @@ class DocxConverterServiceTest {
           (NumberingListEntry)
               generateNumberingListEntry("list entry 2", createNumberingListEntryIndex()));
       iLvl = "1";
-      numberFormat = DocumentUnitNumberingListNumberFormat.BULLET;
+      numberFormat = DocumentationUnitNumberingListNumberFormat.BULLET;
       fontStyle = "Symbol";
       fontSize = "18";
       entries.add(
@@ -1149,7 +1149,7 @@ class DocxConverterServiceTest {
           (NumberingListEntry)
               generateNumberingListEntry("list entry 2.2", createNumberingListEntryIndex()));
       iLvl = "2";
-      numberFormat = DocumentUnitNumberingListNumberFormat.DECIMAL;
+      numberFormat = DocumentationUnitNumberingListNumberFormat.DECIMAL;
       lvlText = "%1.%2.%3.";
       entries.add(
           (NumberingListEntry)
@@ -1163,13 +1163,13 @@ class DocxConverterServiceTest {
           (NumberingListEntry)
               generateNumberingListEntry("list entry 2.3", createNumberingListEntryIndex()));
       iLvl = "2";
-      numberFormat = DocumentUnitNumberingListNumberFormat.BULLET;
+      numberFormat = DocumentationUnitNumberingListNumberFormat.BULLET;
       fontStyle = "Symbol";
       fontSize = "18";
       entries.add(
           (NumberingListEntry)
               generateNumberingListEntry("list entry 2.3.1", createNumberingListEntryIndex()));
-      numberFormat = DocumentUnitNumberingListNumberFormat.DECIMAL;
+      numberFormat = DocumentationUnitNumberingListNumberFormat.DECIMAL;
       iLvl = "0";
       lvlText = "%1.";
       entries.add(
@@ -1179,7 +1179,7 @@ class DocxConverterServiceTest {
       TestDocumentGenerator generator =
           new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
       int index = 0;
-      for (DocumentUnitDocx entry : entries) {
+      for (DocumentationUnitDocx entry : entries) {
         generator.addContent(String.valueOf(++index), entry);
       }
       generator.generate();
@@ -1321,14 +1321,14 @@ class DocxConverterServiceTest {
   }
 
   private TableElement generateTable(String text) {
-    List<DocumentUnitDocx> paragraphElements = List.of(generateText(text));
+    List<DocumentationUnitDocx> paragraphElements = List.of(generateText(text));
     List<TableCellElement> cells = List.of(new TableCellElement(paragraphElements, null));
     List<TableRowElement> rows = List.of(new TableRowElement(cells));
 
     return new TableElement(rows);
   }
 
-  private DocumentUnitDocx generateNumberingListEntry(
+  private DocumentationUnitDocx generateNumberingListEntry(
       String text, NumberingListEntryIndex numberingListEntryIndex) {
     var paragraphElement = generateText(text);
 
@@ -1355,9 +1355,10 @@ class DocxConverterServiceTest {
       this.converter = converter;
     }
 
-    private TestDocumentGenerator addContent(String id, DocumentUnitDocx documentUnitDocx) {
+    private TestDocumentGenerator addContent(
+        String id, DocumentationUnitDocx documentationUnitDocx) {
       ids.add(id);
-      when(converter.convert(id)).thenReturn(documentUnitDocx);
+      when(converter.convert(id)).thenReturn(documentationUnitDocx);
 
       return this;
     }

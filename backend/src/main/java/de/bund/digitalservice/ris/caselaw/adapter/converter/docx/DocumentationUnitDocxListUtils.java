@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.converter.docx;
 
 import de.bund.digitalservice.ris.caselaw.domain.docx.BorderNumber;
-import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentUnitDocx;
+import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentationUnitDocx;
 import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingList;
 import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ParagraphElement;
@@ -12,20 +12,22 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DocumentUnitDocxListUtils {
-  private static final Logger LOGGER = LoggerFactory.getLogger(DocumentUnitDocxListUtils.class);
+public class DocumentationUnitDocxListUtils {
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(DocumentationUnitDocxListUtils.class);
 
-  private DocumentUnitDocxListUtils() {}
+  private DocumentationUnitDocxListUtils() {}
 
-  public static void postProcessBorderNumbers(List<DocumentUnitDocx> documentUnitDocxList) {
-    if (documentUnitDocxList == null) {
+  public static void postProcessBorderNumbers(
+      List<DocumentationUnitDocx> documentationUnitDocxList) {
+    if (documentationUnitDocxList == null) {
       return;
     }
     Integer numIdOfCurrentBorderNumberBlock = null;
     int borderNumberCounter = 1;
 
-    for (DocumentUnitDocx documentUnitDocx : documentUnitDocxList) {
-      if (documentUnitDocx instanceof BorderNumber borderNumber
+    for (DocumentationUnitDocx documentationUnitDocx : documentationUnitDocxList) {
+      if (documentationUnitDocx instanceof BorderNumber borderNumber
           && borderNumber.getNumber().isEmpty()) {
         borderNumber.addNumberText(String.valueOf(borderNumberCounter++));
         if (numIdOfCurrentBorderNumberBlock != null
@@ -42,14 +44,14 @@ public class DocumentUnitDocxListUtils {
     }
   }
 
-  public static List<DocumentUnitDocx> packList(List<DocumentUnitDocx> unpackedList) {
+  public static List<DocumentationUnitDocx> packList(List<DocumentationUnitDocx> unpackedList) {
     if (unpackedList == null) {
       return Collections.emptyList();
     }
 
     AtomicReference<BorderNumber> finalBorderNumber = new AtomicReference<>();
 
-    List<DocumentUnitDocx> mergedList = firstRun(unpackedList, finalBorderNumber);
+    List<DocumentationUnitDocx> mergedList = firstRun(unpackedList, finalBorderNumber);
     return secondRun(mergedList, finalBorderNumber);
   }
 
@@ -60,14 +62,14 @@ public class DocumentUnitDocxListUtils {
    * @param unpackedList list of unpacked elements
    * @return merged list of document unit docx objects
    */
-  private static List<DocumentUnitDocx> firstRun(
-      List<DocumentUnitDocx> unpackedList, AtomicReference<BorderNumber> finalBorderNumber) {
+  private static List<DocumentationUnitDocx> firstRun(
+      List<DocumentationUnitDocx> unpackedList, AtomicReference<BorderNumber> finalBorderNumber) {
 
-    List<DocumentUnitDocx> mergedList = new ArrayList<>();
+    List<DocumentationUnitDocx> mergedList = new ArrayList<>();
 
     NumberingList currentNumberingList = null;
 
-    for (DocumentUnitDocx element : unpackedList) {
+    for (DocumentationUnitDocx element : unpackedList) {
       if (element instanceof NumberingListEntry numberingListEntry) {
         if (currentNumberingList == null) {
           currentNumberingList = new NumberingList();
@@ -101,14 +103,14 @@ public class DocumentUnitDocxListUtils {
    * @return packed list of documentation unit docx objects
    */
   @SuppressWarnings("java:S3776")
-  private static List<DocumentUnitDocx> secondRun(
-      List<DocumentUnitDocx> mergedList, AtomicReference<BorderNumber> finalBorderNumber) {
+  private static List<DocumentationUnitDocx> secondRun(
+      List<DocumentationUnitDocx> mergedList, AtomicReference<BorderNumber> finalBorderNumber) {
 
-    List<DocumentUnitDocx> packedList = new ArrayList<>();
+    List<DocumentationUnitDocx> packedList = new ArrayList<>();
 
     BorderNumber currentBorderNumber = null;
 
-    for (DocumentUnitDocx element : mergedList) {
+    for (DocumentationUnitDocx element : mergedList) {
       // if we encounter a BorderNumber, this is the new parent of all following elements
       // until a new BorderNumber or a BorderNumber-block-breaking condition comes along
       if (element instanceof BorderNumber borderNumber) {

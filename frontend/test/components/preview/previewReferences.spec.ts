@@ -27,7 +27,7 @@ describe("preview references", () => {
 
   it.each([
     [
-      "FundstellenAmtliche FundstellenABC, 2006, S.3",
+      "FundstellenPrimäre FundstellenABC 2006, S.3",
       [
         new Reference({
           citation: "2006, S.3",
@@ -39,7 +39,7 @@ describe("preview references", () => {
       ],
     ],
     [
-      "FundstellenAmtliche FundstellenABC, 2006, S.3XYZ, 2007, S.4",
+      "FundstellenPrimäre FundstellenABC 2006, S.3XYZ 2007, S.4",
       [
         new Reference({
           citation: "2006, S.3",
@@ -58,7 +58,7 @@ describe("preview references", () => {
       ],
     ],
     [
-      "FundstellenSekundäre FundstellenDEF, 2008, S.5",
+      "FundstellenSekundäre FundstellenDEF 2008, S.5",
       [
         new Reference({
           citation: "2008, S.5",
@@ -70,7 +70,7 @@ describe("preview references", () => {
       ],
     ],
     [
-      "FundstellenAmtliche FundstellenABC, 2006, S.3Sekundäre FundstellenDEF, 2008, S.5",
+      "FundstellenPrimäre FundstellenABC 2006, S.3Sekundäre FundstellenDEF 2008, S.5",
       [
         new Reference({
           citation: "2006, S.3",

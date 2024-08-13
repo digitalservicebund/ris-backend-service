@@ -67,7 +67,7 @@ function formatDropdownItems(
           label: item.label,
           value: item,
           additionalInformation: `${
-            item.documentUnitCount ?? 0
+            item.documentationUnitCount ?? 0
           } Dokumentationseinheiten`,
         }),
       )

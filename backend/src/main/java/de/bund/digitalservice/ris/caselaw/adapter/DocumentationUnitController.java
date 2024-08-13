@@ -1,13 +1,13 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformerException;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformerException;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
@@ -17,7 +17,7 @@ import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
-import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentUnitDeletionException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitPatchException;
@@ -55,8 +55,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/v1/caselaw/documentunits")
 @Slf4j
-public class DocumentUnitController {
-  private final DocumentUnitService service;
+public class DocumentationUnitController {
+  private final DocumentationUnitService service;
   private final UserService userService;
   private final AttachmentService attachmentService;
   private final ConverterService converterService;
@@ -64,8 +64,8 @@ public class DocumentUnitController {
   private final DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
 
-  public DocumentUnitController(
-      DocumentUnitService service,
+  public DocumentationUnitController(
+      DocumentationUnitService service,
       UserService userService,
       AttachmentService attachmentService,
       ConverterService converterService,
@@ -83,15 +83,15 @@ public class DocumentUnitController {
 
   @GetMapping(value = "new", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public ResponseEntity<DocumentUnit> generateNewDocumentUnit(
+  public ResponseEntity<DocumentationUnit> generateNewDocumentationUnit(
       @AuthenticationPrincipal OidcUser oidcUser) {
     var docOffice = userService.getDocumentationOffice(oidcUser);
     try {
-      var documentUnit = service.generateNewDocumentUnit(docOffice);
-      return ResponseEntity.status(HttpStatus.CREATED).body(documentUnit);
+      var documentationUnit = service.generateNewDocumentationUnit(docOffice);
+      return ResponseEntity.status(HttpStatus.CREATED).body(documentationUnit);
     } catch (DocumentationUnitException e) {
       log.error("error in generate new documentation unit", e);
-      return ResponseEntity.internalServerError().body(DocumentUnit.builder().build());
+      return ResponseEntity.internalServerError().body(DocumentationUnit.builder().build());
     }
   }
 
@@ -110,8 +110,8 @@ public class DocumentUnitController {
       value = "/{uuid}/file",
       produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
-  public ResponseEntity<Docx2Html> attachFileToDocumentUnit(
+  @PreAuthorize("@userHasWriteAccessByDocumentationUnitId.apply(#uuid)")
+  public ResponseEntity<Docx2Html> attachFileToDocumentationUnit(
       @PathVariable UUID uuid, @RequestBody byte[] bytes, @RequestHeader HttpHeaders httpHeaders) {
     var docx2html =
         converterService.getConvertedObject(
@@ -126,7 +126,7 @@ public class DocumentUnitController {
   }
 
   @DeleteMapping(value = "/{uuid}/file/{s3Path}")
-  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
+  @PreAuthorize("@userHasWriteAccessByDocumentationUnitId.apply(#uuid)")
   public ResponseEntity<Object> removeAttachmentFromDocumentationUnit(
       @PathVariable UUID uuid, @PathVariable String s3Path) {
 
@@ -142,7 +142,7 @@ public class DocumentUnitController {
   @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   // Access rights are being enforced through SQL filtering
-  public Slice<DocumentationUnitListItem> searchByDocumentUnitListEntry(
+  public Slice<DocumentationUnitListItem> searchByDocumentationUnitListEntry(
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
       @RequestParam(value = "documentNumber") Optional<String> documentNumber,
@@ -173,7 +173,7 @@ public class DocumentUnitController {
 
   @GetMapping(value = "/{documentNumber}", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentNumber.apply(#documentNumber)")
-  public ResponseEntity<DocumentUnit> getByDocumentNumber(
+  public ResponseEntity<DocumentationUnit> getByDocumentNumber(
       @NonNull @PathVariable String documentNumber) {
 
     if (documentNumber.length() != 13 && documentNumber.length() != 14) {
@@ -184,13 +184,13 @@ public class DocumentUnitController {
   }
 
   @DeleteMapping(value = "/{uuid}")
-  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
+  @PreAuthorize("@userHasWriteAccessByDocumentationUnitId.apply(#uuid)")
   public ResponseEntity<String> deleteByUuid(@PathVariable UUID uuid) {
 
     try {
       var str = service.deleteByUuid(uuid);
       return ResponseEntity.status(HttpStatus.OK).body(str);
-    } catch (DocumentationUnitNotExistsException | DocumentUnitDeletionException ex) {
+    } catch (DocumentationUnitNotExistsException | DocumentationUnitDeletionException ex) {
       return ResponseEntity.internalServerError().body(ex.getMessage());
     }
   }
@@ -199,23 +199,23 @@ public class DocumentUnitController {
       value = "/{uuid}",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
-  public ResponseEntity<DocumentUnit> updateByUuid(
+  @PreAuthorize("@userHasWriteAccessByDocumentationUnitId.apply(#uuid)")
+  public ResponseEntity<DocumentationUnit> updateByUuid(
       @PathVariable UUID uuid,
-      @Valid @RequestBody DocumentUnit documentUnit,
+      @Valid @RequestBody DocumentationUnit documentationUnit,
       @AuthenticationPrincipal OidcUser oidcUser) {
 
-    if (!uuid.equals(documentUnit.uuid())) {
-      return ResponseEntity.unprocessableEntity().body(DocumentUnit.builder().build());
+    if (!uuid.equals(documentationUnit.uuid())) {
+      return ResponseEntity.unprocessableEntity().body(DocumentationUnit.builder().build());
     }
     try {
-      var du = service.updateDocumentUnit(documentUnit);
+      var du = service.updateDocumentationUnit(documentationUnit);
       return ResponseEntity.status(HttpStatus.OK).body(du);
     } catch (DocumentationUnitNotExistsException
         | DocumentationUnitException
-        | DocumentUnitTransformerException e) {
-      log.error("Error by updating documentation unit '{}'", documentUnit.documentNumber(), e);
-      return ResponseEntity.internalServerError().body(DocumentUnit.builder().build());
+        | DocumentationUnitTransformerException e) {
+      log.error("Error by updating documentation unit '{}'", documentationUnit.documentNumber(), e);
+      return ResponseEntity.internalServerError().body(DocumentationUnit.builder().build());
     }
   }
 
@@ -230,7 +230,7 @@ public class DocumentUnitController {
       value = "/{uuid}",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
+  @PreAuthorize("@userHasWriteAccessByDocumentationUnitId.apply(#uuid)")
   public ResponseEntity<RisJsonPatch> partialUpdateByUuid(
       @PathVariable UUID uuid, @RequestBody RisJsonPatch patch) {
     try {
@@ -238,7 +238,7 @@ public class DocumentUnitController {
         return ResponseEntity.internalServerError().build();
       }
 
-      var newPatch = service.updateDocumentUnit(uuid, patch);
+      var newPatch = service.updateDocumentationUnit(uuid, patch);
 
       return ResponseEntity.ok().body(newPatch);
     } catch (DocumentationUnitNotExistsException | DocumentationUnitPatchException e) {
@@ -256,8 +256,8 @@ public class DocumentUnitController {
    *     user is not authorized
    */
   @PutMapping(value = "/{uuid}/handover", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
-  public ResponseEntity<HandoverMail> handoverDocumentUnitAsMail(
+  @PreAuthorize("@userHasWriteAccessByDocumentationUnitId.apply(#uuid)")
+  public ResponseEntity<HandoverMail> handoverDocumentationUnitAsMail(
       @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
 
     try {
@@ -279,7 +279,7 @@ public class DocumentUnitController {
    *     if the user is not authorized
    */
   @GetMapping(value = "/{uuid}/handover", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
+  @PreAuthorize("@userHasWriteAccessByDocumentationUnitId.apply(#uuid)")
   public List<EventRecord> getEventLog(@PathVariable UUID uuid) {
     return handoverService.getEventLog(uuid);
   }
@@ -292,7 +292,7 @@ public class DocumentUnitController {
    *     or an empty response if the documentation unit does not exist
    */
   @GetMapping(value = "/{uuid}/preview-xml", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
+  @PreAuthorize("@userHasReadAccessByDocumentationUnitId.apply(#uuid)")
   public XmlTransformationResult getXmlPreview(@PathVariable UUID uuid) {
     try {
       return handoverService.createPreviewXml(uuid);
@@ -321,7 +321,7 @@ public class DocumentUnitController {
   }
 
   @GetMapping(value = "/{uuid}/docx/{s3Path}", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
+  @PreAuthorize("@userHasReadAccessByDocumentationUnitId.apply(#uuid)")
   public ResponseEntity<Docx2Html> getHtml(@PathVariable UUID uuid, @PathVariable String s3Path) {
     if (service.getByUuid(uuid) == null) {
       return ResponseEntity.notFound().build();

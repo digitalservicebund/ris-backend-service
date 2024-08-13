@@ -12,14 +12,14 @@ import org.springframework.stereotype.Repository;
 public class PostgresHandoverRepositoryImpl implements HandoverRepository {
 
   private final DatabaseXmlHandoverMailRepository repository;
-  private final DatabaseDocumentationUnitRepository documentUnitRepository;
+  private final DatabaseDocumentationUnitRepository documentationUnitRepository;
 
   public PostgresHandoverRepositoryImpl(
       DatabaseXmlHandoverMailRepository repository,
-      DatabaseDocumentationUnitRepository documentUnitRepository) {
+      DatabaseDocumentationUnitRepository documentationUnitRepository) {
 
     this.repository = repository;
-    this.documentUnitRepository = documentUnitRepository;
+    this.documentationUnitRepository = documentationUnitRepository;
   }
 
   /**
@@ -30,52 +30,52 @@ public class PostgresHandoverRepositoryImpl implements HandoverRepository {
    */
   @Override
   public HandoverMail save(HandoverMail handoverMail) {
-    DocumentationUnitDTO documentUnitDTO =
-        documentUnitRepository.findById(handoverMail.documentUnitUuid()).orElseThrow();
+    DocumentationUnitDTO documentationUnitDTO =
+        documentationUnitRepository.findById(handoverMail.documentationUnitId()).orElseThrow();
 
     HandoverMailDTO handoverMailDTO =
-        HandoverMailTransformer.transformToDTO(handoverMail, documentUnitDTO.getId());
+        HandoverMailTransformer.transformToDTO(handoverMail, documentationUnitDTO.getId());
     handoverMailDTO = repository.save(handoverMailDTO);
 
     return HandoverMailTransformer.transformToDomain(
-        handoverMailDTO, handoverMail.documentUnitUuid());
+        handoverMailDTO, handoverMail.documentationUnitId());
   }
 
   /**
    * Retrieves all handover events for a documentation unit.
    *
-   * @param documentUnitUuid the documentation unit UUID
+   * @param documentationUnitId the documentation unit UUID
    * @return the handover events
    */
   @Override
-  public List<HandoverMail> getHandoversByDocumentUnitUuid(UUID documentUnitUuid) {
-    DocumentationUnitDTO documentUnitDTO =
-        documentUnitRepository.findById(documentUnitUuid).orElseThrow();
+  public List<HandoverMail> getHandoversByDocumentationUnitId(UUID documentationUnitId) {
+    DocumentationUnitDTO documentationUnitDTO =
+        documentationUnitRepository.findById(documentationUnitId).orElseThrow();
 
     List<HandoverMailDTO> handoverMailDTOS =
-        repository.findAllByDocumentUnitIdOrderBySentDateDesc(documentUnitDTO.getId());
+        repository.findAllByDocumentationUnitIdOrderBySentDateDesc(documentationUnitDTO.getId());
 
     return handoverMailDTOS.stream()
         .map(
             handoverMailDTO ->
-                HandoverMailTransformer.transformToDomain(handoverMailDTO, documentUnitUuid))
+                HandoverMailTransformer.transformToDomain(handoverMailDTO, documentationUnitId))
         .toList();
   }
 
   /**
    * Retrieves the last handover event for a documentation unit.
    *
-   * @param documentUnitUuid the documentation unit UUID
+   * @param documentationUnitId the documentation unit UUID
    * @return the last handover event
    */
   @Override
-  public HandoverMail getLastXmlHandoverMail(UUID documentUnitUuid) {
+  public HandoverMail getLastXmlHandoverMail(UUID documentationUnitId) {
     DocumentationUnitDTO documentationUnitDTO =
-        documentUnitRepository.findById(documentUnitUuid).orElseThrow();
+        documentationUnitRepository.findById(documentationUnitId).orElseThrow();
 
     HandoverMailDTO handoverMailDTO =
-        repository.findTopByDocumentUnitIdOrderBySentDateDesc(documentationUnitDTO.getId());
+        repository.findTopByDocumentationUnitIdOrderBySentDateDesc(documentationUnitDTO.getId());
 
-    return HandoverMailTransformer.transformToDomain(handoverMailDTO, documentUnitUuid);
+    return HandoverMailTransformer.transformToDomain(handoverMailDTO, documentationUnitId);
   }
 }

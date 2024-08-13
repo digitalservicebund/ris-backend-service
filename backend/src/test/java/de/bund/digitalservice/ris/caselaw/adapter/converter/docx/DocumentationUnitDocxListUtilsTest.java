@@ -5,9 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import ch.qos.logback.classic.Level;
 import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
 import de.bund.digitalservice.ris.caselaw.domain.docx.BorderNumber;
-import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentUnitDocx;
+import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentationUnitDocx;
 import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingList;
-import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingList.DocumentUnitNumberingListNumberFormat;
+import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingList.DocumentationUnitNumberingListNumberFormat;
 import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingListEntryIndex;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ParagraphElement;
@@ -22,13 +22,13 @@ import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 
 @ExtendWith(OutputCaptureExtension.class)
-class DocumentUnitDocxListUtilsTest {
+class DocumentationUnitDocxListUtilsTest {
 
   @Test
   void testPostprocessBorderNumbers_withEmptyList_shouldDoNothing() {
-    List<DocumentUnitDocx> list = new ArrayList<>();
+    List<DocumentationUnitDocx> list = new ArrayList<>();
 
-    DocumentUnitDocxListUtils.postProcessBorderNumbers(list);
+    DocumentationUnitDocxListUtils.postProcessBorderNumbers(list);
 
     assertThat(list).isEmpty();
   }
@@ -36,16 +36,16 @@ class DocumentUnitDocxListUtilsTest {
   @Test
   void testPostprocessBorderNumbers_withNull_shouldDoNothing() {
 
-    DocumentUnitDocxListUtils.postProcessBorderNumbers(null);
+    DocumentationUnitDocxListUtils.postProcessBorderNumbers(null);
   }
 
   @Test
   void testPostprocessBorderNumbers_withTwoNumberlessBorderNumbers_shouldAssignNumbers() {
-    List<DocumentUnitDocx> list = new ArrayList<>();
+    List<DocumentationUnitDocx> list = new ArrayList<>();
     list.add(createNumberlessBorderNumberWithNumId(7));
     list.add(createNumberlessBorderNumberWithNumId(7));
 
-    DocumentUnitDocxListUtils.postProcessBorderNumbers(list);
+    DocumentationUnitDocxListUtils.postProcessBorderNumbers(list);
 
     assertThat(list).hasSize(2);
     assertThat(list.get(0)).isInstanceOf(BorderNumber.class);
@@ -61,12 +61,13 @@ class DocumentUnitDocxListUtilsTest {
   @Test
   void testPostprocessBorderNumbers_withNumberlessBorderNumbersButDifferentNumIds_shouldLogError(
       CapturedOutput output) {
-    TestMemoryAppender memoryAppender = new TestMemoryAppender(DocumentUnitDocxListUtils.class);
-    List<DocumentUnitDocx> list = new ArrayList<>();
+    TestMemoryAppender memoryAppender =
+        new TestMemoryAppender(DocumentationUnitDocxListUtils.class);
+    List<DocumentationUnitDocx> list = new ArrayList<>();
     list.add(createNumberlessBorderNumberWithNumId(7));
     list.add(createNumberlessBorderNumberWithNumId(8));
 
-    DocumentUnitDocxListUtils.postProcessBorderNumbers(list);
+    DocumentationUnitDocxListUtils.postProcessBorderNumbers(list);
 
     assertThat(list).hasSize(2);
     assertThat(list.get(0)).isInstanceOf(BorderNumber.class);
@@ -87,9 +88,10 @@ class DocumentUnitDocxListUtilsTest {
 
   @Test
   void testPackList_withEmptyList_shouldReturnEmptyList() {
-    List<DocumentUnitDocx> documentUnitDocxList = new ArrayList<>();
+    List<DocumentationUnitDocx> documentationUnitDocxList = new ArrayList<>();
 
-    List<DocumentUnitDocx> packedList = DocumentUnitDocxListUtils.packList(documentUnitDocxList);
+    List<DocumentationUnitDocx> packedList =
+        DocumentationUnitDocxListUtils.packList(documentationUnitDocxList);
 
     assertThat(packedList).isEmpty();
   }
@@ -97,17 +99,18 @@ class DocumentUnitDocxListUtilsTest {
   @Test
   void testPackList_withNull_shouldReturnEmptyList() {
 
-    List<DocumentUnitDocx> packedList = DocumentUnitDocxListUtils.packList(null);
+    List<DocumentationUnitDocx> packedList = DocumentationUnitDocxListUtils.packList(null);
 
     assertThat(packedList).isEmpty();
   }
 
   @Test
   void testPackList_withOneParagraph_shouldNotChangeList() {
-    List<DocumentUnitDocx> documentUnitDocxList = new ArrayList<>();
-    documentUnitDocxList.add(createParagraphWithTextElement("paragraph text"));
+    List<DocumentationUnitDocx> documentationUnitDocxList = new ArrayList<>();
+    documentationUnitDocxList.add(createParagraphWithTextElement("paragraph text"));
 
-    List<DocumentUnitDocx> packedList = DocumentUnitDocxListUtils.packList(documentUnitDocxList);
+    List<DocumentationUnitDocx> packedList =
+        DocumentationUnitDocxListUtils.packList(documentationUnitDocxList);
 
     assertThat(packedList).hasSize(1);
     assertThat(packedList.get(0)).isInstanceOf(ParagraphElement.class);
@@ -116,11 +119,12 @@ class DocumentUnitDocxListUtilsTest {
 
   @Test
   void testPackList_withNumberingListEntries_shouldMergeThemIntoOneNumberingList() {
-    List<DocumentUnitDocx> documentUnitDocxList = new ArrayList<>();
-    documentUnitDocxList.add(createNumberingListEntry("entry 1", false, 0));
-    documentUnitDocxList.add(createNumberingListEntry("entry 2", false, 0));
+    List<DocumentationUnitDocx> documentationUnitDocxList = new ArrayList<>();
+    documentationUnitDocxList.add(createNumberingListEntry("entry 1", false, 0));
+    documentationUnitDocxList.add(createNumberingListEntry("entry 2", false, 0));
 
-    List<DocumentUnitDocx> packedList = DocumentUnitDocxListUtils.packList(documentUnitDocxList);
+    List<DocumentationUnitDocx> packedList =
+        DocumentationUnitDocxListUtils.packList(documentationUnitDocxList);
 
     assertThat(packedList).hasSize(1);
     assertThat(packedList.get(0)).isInstanceOf(NumberingList.class);
@@ -133,12 +137,14 @@ class DocumentUnitDocxListUtilsTest {
   @Test
   void
       testPackList_withOneRandnummerAndTwoParagraphs_shouldOnlyAddFirstParagraphToFinalRandnummer() {
-    List<DocumentUnitDocx> documentUnitDocxList = new ArrayList<>();
-    documentUnitDocxList.add(createBorderNumber(1)); // <-- final (and only) one in the document
-    documentUnitDocxList.add(createParagraphWithTextElement("paragraph1 text"));
-    documentUnitDocxList.add(createParagraphWithTextElement("paragraph2 text"));
+    List<DocumentationUnitDocx> documentationUnitDocxList = new ArrayList<>();
+    documentationUnitDocxList.add(
+        createBorderNumber(1)); // <-- final (and only) one in the document
+    documentationUnitDocxList.add(createParagraphWithTextElement("paragraph1 text"));
+    documentationUnitDocxList.add(createParagraphWithTextElement("paragraph2 text"));
 
-    List<DocumentUnitDocx> packedList = DocumentUnitDocxListUtils.packList(documentUnitDocxList);
+    List<DocumentationUnitDocx> packedList =
+        DocumentationUnitDocxListUtils.packList(documentationUnitDocxList);
 
     assertThat(packedList).hasSize(2);
     assertThat(packedList.get(0)).isInstanceOf(BorderNumber.class);
@@ -154,15 +160,16 @@ class DocumentUnitDocxListUtilsTest {
 
   @Test
   void testPackList_withTwoRandnummernAndParagraphs_headlineShouldResetParentRandnummer() {
-    List<DocumentUnitDocx> documentUnitDocxList = new ArrayList<>();
-    documentUnitDocxList.add(createBorderNumber(1));
-    documentUnitDocxList.add(createParagraphWithTextElement("paragraph before headline"));
-    documentUnitDocxList.add(createCenteredParagraphWithTextElement("||."));
-    documentUnitDocxList.add(createParagraphWithTextElement("paragraph after headline"));
+    List<DocumentationUnitDocx> documentationUnitDocxList = new ArrayList<>();
+    documentationUnitDocxList.add(createBorderNumber(1));
+    documentationUnitDocxList.add(createParagraphWithTextElement("paragraph before headline"));
+    documentationUnitDocxList.add(createCenteredParagraphWithTextElement("||."));
+    documentationUnitDocxList.add(createParagraphWithTextElement("paragraph after headline"));
     // just so that the first Randnummer is not the final one in the document:
-    documentUnitDocxList.add(createBorderNumber(2));
+    documentationUnitDocxList.add(createBorderNumber(2));
 
-    List<DocumentUnitDocx> packedList = DocumentUnitDocxListUtils.packList(documentUnitDocxList);
+    List<DocumentationUnitDocx> packedList =
+        DocumentationUnitDocxListUtils.packList(documentationUnitDocxList);
 
     assertThat(packedList).hasSize(4);
     assertThat(packedList.get(0)).isInstanceOf(BorderNumber.class);
@@ -184,14 +191,15 @@ class DocumentUnitDocxListUtilsTest {
   @Test
   void
       testPackList_withTwoRandnummernAndAParagraphAndNumberingListEntries_shouldCreateCorrectHierarchy() {
-    List<DocumentUnitDocx> documentUnitDocxList = new ArrayList<>();
-    documentUnitDocxList.add(createBorderNumber(1));
-    documentUnitDocxList.add(createParagraphWithTextElement("paragraph text"));
-    documentUnitDocxList.add(createNumberingListEntry("entry 1", false, 0));
-    documentUnitDocxList.add(createNumberingListEntry("entry 2", false, 0));
-    documentUnitDocxList.add(createBorderNumber(2)); // <-- final one in the document
+    List<DocumentationUnitDocx> documentationUnitDocxList = new ArrayList<>();
+    documentationUnitDocxList.add(createBorderNumber(1));
+    documentationUnitDocxList.add(createParagraphWithTextElement("paragraph text"));
+    documentationUnitDocxList.add(createNumberingListEntry("entry 1", false, 0));
+    documentationUnitDocxList.add(createNumberingListEntry("entry 2", false, 0));
+    documentationUnitDocxList.add(createBorderNumber(2)); // <-- final one in the document
 
-    List<DocumentUnitDocx> packedList = DocumentUnitDocxListUtils.packList(documentUnitDocxList);
+    List<DocumentationUnitDocx> packedList =
+        DocumentationUnitDocxListUtils.packList(documentationUnitDocxList);
 
     assertThat(packedList).hasSize(2);
     assertThat(packedList.get(0)).isInstanceOf(BorderNumber.class);
@@ -247,10 +255,10 @@ class DocumentUnitDocxListUtilsTest {
     String fontSize = "";
     boolean lvlPicBullet = false;
     boolean isLgl = false;
-    DocumentUnitNumberingListNumberFormat numberFormat =
+    DocumentationUnitNumberingListNumberFormat numberFormat =
         isOrdered
-            ? DocumentUnitNumberingListNumberFormat.DECIMAL
-            : DocumentUnitNumberingListNumberFormat.BULLET;
+            ? DocumentationUnitNumberingListNumberFormat.DECIMAL
+            : DocumentationUnitNumberingListNumberFormat.BULLET;
     String iLvl = String.valueOf(level);
     JcEnumeration lvlJc = JcEnumeration.RIGHT;
     String suff = "space";

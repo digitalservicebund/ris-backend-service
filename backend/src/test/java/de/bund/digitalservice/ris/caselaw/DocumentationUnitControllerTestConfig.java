@@ -15,4 +15,4 @@ import org.springframework.context.annotation.Import;
   PatchMapperService.class,
   DocumentNumberPatternConfig.class,
 })
-public class DocumentUnitControllerTestConfig {}
+public class DocumentationUnitControllerTestConfig {}

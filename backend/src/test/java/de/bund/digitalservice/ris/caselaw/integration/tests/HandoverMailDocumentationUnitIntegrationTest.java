@@ -9,9 +9,9 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclingService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
+import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.HandoverMailService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
@@ -34,8 +34,8 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
 import de.bund.digitalservice.ris.caselaw.domain.EventType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
@@ -66,7 +66,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @RISIntegrationTest(
     imports = {
-      DocumentUnitService.class,
+      DocumentationUnitService.class,
       de.bund.digitalservice.ris.caselaw.domain.HandoverService.class,
       PostgresDeltaMigrationRepositoryImpl.class,
       KeycloakUserService.class,
@@ -76,7 +76,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       PostgresHandoverRepositoryImpl.class,
       PostgresHandoverReportRepositoryImpl.class,
       HandoverMailService.class,
-      DatabaseDocumentUnitStatusService.class,
+      DatabaseDocumentationUnitStatusService.class,
       MockXmlExporter.class,
       PostgresJPAConfig.class,
       FlywayConfig.class,
@@ -85,13 +85,13 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       TestConfig.class,
       DocumentNumberPatternConfig.class
     },
-    controllers = {DocumentUnitController.class})
+    controllers = {DocumentationUnitController.class})
 @TestPropertySource(
     properties = {
       "mail.exporter.jurisUsername=test-user",
       "mail.exporter.recipientAddress=neuris@example.com"
     })
-class HandoverMailDocumentUnitIntegrationTest {
+class HandoverMailDocumentationUnitIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
       new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
@@ -112,7 +112,7 @@ class HandoverMailDocumentUnitIntegrationTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentationUnitRepository repository;
   @Autowired private DatabaseXmlHandoverMailRepository xmlHandoverRepository;
-  @Autowired private DatabaseStatusRepository documentUnitStatusRepository;
+  @Autowired private DatabaseStatusRepository statusRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseHandoverReportRepository databaseHandoverReportRepository;
 
@@ -138,38 +138,38 @@ class HandoverMailDocumentUnitIntegrationTest {
   void cleanUp() {
     xmlHandoverRepository.deleteAll();
     repository.deleteAll();
-    documentUnitStatusRepository.deleteAll();
+    statusRepository.deleteAll();
     databaseHandoverReportRepository.deleteAll();
   }
 
   @Test
-  void testHandoverDocumentUnit() {
-    DocumentationUnitDTO documentUnitDTO =
+  void testHandoverDocumentationUnit() {
+    DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitDTO.builder()
             .documentationOffice(docOffice)
             .documentNumber("docnr12345678")
             .decisionDate(LocalDate.now())
             .build();
-    DocumentationUnitDTO savedDocumentUnitDTO = repository.saveAndFlush(documentUnitDTO);
+    DocumentationUnitDTO savedDocumentationUnitDTO = repository.saveAndFlush(documentationUnitDTO);
 
     assertThat(repository.findAll()).hasSize(1);
 
     var initialStatus =
-        documentUnitStatusRepository.save(
+        statusRepository.save(
             StatusDTO.builder()
                 .publicationStatus(UNPUBLISHED)
-                .documentationUnitDTO(documentUnitDTO)
+                .documentationUnitDTO(documentationUnitDTO)
                 .build());
 
     HandoverMailDTO expectedHandoverMailDTO =
         HandoverMailDTO.builder()
-            .documentUnitId(savedDocumentUnitDTO.getId())
+            .documentationUnitId(savedDocumentationUnitDTO.getId())
             .receiverAddress("neuris@example.com")
             .mailSubject(
                 "id=juris name=test-user da=R df=X dt=N mod=T ld="
                     + DELIVER_DATE
                     + " vg="
-                    + savedDocumentUnitDTO.getDocumentNumber())
+                    + savedDocumentationUnitDTO.getDocumentNumber())
             .xml("xml")
             .statusCode("200")
             .statusMessages("message 1|message 2")
@@ -179,13 +179,13 @@ class HandoverMailDocumentUnitIntegrationTest {
 
     HandoverMail expectedXmlResultObject =
         HandoverMail.builder()
-            .documentUnitUuid(savedDocumentUnitDTO.getId())
+            .documentationUnitId(savedDocumentationUnitDTO.getId())
             .receiverAddress("neuris@example.com")
             .mailSubject(
                 "id=juris name=test-user da=R df=X dt=N mod=T ld="
                     + DELIVER_DATE
                     + " vg="
-                    + savedDocumentUnitDTO.getDocumentNumber())
+                    + savedDocumentationUnitDTO.getDocumentNumber())
             .xml("xml")
             .success(true)
             .statusMessages(List.of("message 1", "message 2"))
@@ -195,7 +195,7 @@ class HandoverMailDocumentUnitIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + savedDocumentUnitDTO.getId() + "/handover")
+        .uri("/api/v1/caselaw/documentunits/" + savedDocumentationUnitDTO.getId() + "/handover")
         .exchange()
         .expectStatus()
         .isOk()
@@ -216,8 +216,8 @@ class HandoverMailDocumentUnitIntegrationTest {
         .isEqualTo(expectedHandoverMailDTO);
 
     StatusDTO lastStatus =
-        documentUnitStatusRepository.findFirstByDocumentationUnitDTOOrderByCreatedAtDesc(
-            savedDocumentUnitDTO);
+        statusRepository.findFirstByDocumentationUnitDTOOrderByCreatedAtDesc(
+            savedDocumentationUnitDTO);
 
     // publication status should not change because handover does not change the status
     assertThat(lastStatus.getPublicationStatus()).isEqualTo(initialStatus.getPublicationStatus());
@@ -225,25 +225,25 @@ class HandoverMailDocumentUnitIntegrationTest {
   }
 
   @Test
-  void testHandoverDocumentUnitWithNotAllMandatoryFieldsFilled_shouldNotUpdateStatus() {
-    DocumentationUnitDTO documentUnitDTO =
+  void testHandoverDocumentationUnitWithNotAllMandatoryFieldsFilled_shouldNotUpdateStatus() {
+    DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitDTO.builder()
             .documentationOffice(docOffice)
             .documentNumber("docnr12345678")
             .build();
-    DocumentationUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO);
+    DocumentationUnitDTO savedDocumentationUnitDTO = repository.save(documentationUnitDTO);
     assertThat(repository.findAll()).hasSize(1);
 
-    documentUnitStatusRepository.save(
+    statusRepository.save(
         StatusDTO.builder()
-            .documentationUnitDTO(savedDocumentUnitDTO)
+            .documentationUnitDTO(savedDocumentationUnitDTO)
             .publicationStatus(PublicationStatus.UNPUBLISHED)
             .build());
-    assertThat(documentUnitStatusRepository.findAll()).hasSize(1);
+    assertThat(statusRepository.findAll()).hasSize(1);
 
     HandoverMail xmlPublication =
         HandoverMail.builder()
-            .documentUnitUuid(savedDocumentUnitDTO.getId())
+            .documentationUnitId(savedDocumentationUnitDTO.getId())
             .success(false)
             .statusMessages(List.of("message 1", "message 2"))
             .build();
@@ -251,7 +251,7 @@ class HandoverMailDocumentUnitIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + savedDocumentUnitDTO.getId() + "/handover")
+        .uri("/api/v1/caselaw/documentunits/" + savedDocumentationUnitDTO.getId() + "/handover")
         .exchange()
         .expectStatus()
         .isOk()
@@ -266,23 +266,23 @@ class HandoverMailDocumentUnitIntegrationTest {
     List<HandoverMailDTO> xmlPublicationList = xmlHandoverRepository.findAll();
     assertThat(xmlPublicationList).isEmpty();
 
-    List<StatusDTO> statusList = documentUnitStatusRepository.findAll();
+    List<StatusDTO> statusList = statusRepository.findAll();
     assertThat(statusList).hasSize(1);
     assertThat(statusList.get(0).getPublicationStatus()).isEqualTo(PublicationStatus.UNPUBLISHED);
   }
 
   @Test
   void testGetLastXmlHandoverMail() {
-    DocumentationUnitDTO documentUnitDTO =
+    DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitDTO.builder()
             .documentationOffice(docOffice)
             .documentNumber("docnr12345678")
             .build();
-    DocumentationUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO);
+    DocumentationUnitDTO savedDocumentationUnitDTO = repository.save(documentationUnitDTO);
 
     HandoverMailDTO handoverMailDTO =
         HandoverMailDTO.builder()
-            .documentUnitId(savedDocumentUnitDTO.getId())
+            .documentationUnitId(savedDocumentationUnitDTO.getId())
             .receiverAddress("exporter@neuris.de")
             .mailSubject("mailSubject")
             .xml("xml")
@@ -295,7 +295,7 @@ class HandoverMailDocumentUnitIntegrationTest {
 
     HandoverMail expectedXmlPublication =
         HandoverMail.builder()
-            .documentUnitUuid(savedDocumentUnitDTO.getId())
+            .documentationUnitId(savedDocumentationUnitDTO.getId())
             .receiverAddress("exporter@neuris.de")
             .mailSubject("mailSubject")
             .xml("xml")
@@ -307,7 +307,7 @@ class HandoverMailDocumentUnitIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/documentunits/" + savedDocumentUnitDTO.getId() + "/handover")
+        .uri("/api/v1/caselaw/documentunits/" + savedDocumentationUnitDTO.getId() + "/handover")
         .exchange()
         .expectStatus()
         .isOk()
@@ -323,17 +323,17 @@ class HandoverMailDocumentUnitIntegrationTest {
 
   @Test
   void testPublicationHistoryWithXmlAndReport() {
-    DocumentationUnitDTO documentUnitDTO =
+    DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitDTO.builder()
             .documentationOffice(docOffice)
             .documentNumber("docnr12345678")
             .build();
-    DocumentationUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO);
+    DocumentationUnitDTO savedDocumentationUnitDTO = repository.save(documentationUnitDTO);
 
     Instant creationDate = Instant.now();
     xmlHandoverRepository.save(
         HandoverMailDTO.builder()
-            .documentUnitId(savedDocumentUnitDTO.getId())
+            .documentationUnitId(savedDocumentationUnitDTO.getId())
             .receiverAddress("exporter@neuris.de")
             .mailSubject("mailSubject")
             .xml("xml")
@@ -346,7 +346,7 @@ class HandoverMailDocumentUnitIntegrationTest {
     Instant receivedDate = creationDate.plus(1, ChronoUnit.HOURS);
     databaseHandoverReportRepository.save(
         HandoverReportDTO.builder()
-            .documentUnitId(savedDocumentUnitDTO.getId())
+            .documentationUnitId(savedDocumentationUnitDTO.getId())
             .content("<HTML>success!</HTML>")
             .receivedDate(receivedDate)
             .build());
@@ -355,7 +355,7 @@ class HandoverMailDocumentUnitIntegrationTest {
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/documentunits/" + savedDocumentUnitDTO.getId() + "/handover")
+            .uri("/api/v1/caselaw/documentunits/" + savedDocumentationUnitDTO.getId() + "/handover")
             .exchange()
             .expectStatus()
             .isOk()

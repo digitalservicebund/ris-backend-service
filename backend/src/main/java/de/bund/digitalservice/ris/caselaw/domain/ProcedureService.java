@@ -13,7 +13,7 @@ public interface ProcedureService {
       Pageable pageable,
       Optional<Boolean> withDocUnits);
 
-  List<DocumentationUnitListItem> getDocumentUnits(UUID procedureid);
+  List<DocumentationUnitListItem> getDocumentationUnits(UUID procedureid);
 
   void delete(UUID procedureId);
 }

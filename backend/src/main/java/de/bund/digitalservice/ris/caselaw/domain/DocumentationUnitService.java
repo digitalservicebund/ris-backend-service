@@ -3,7 +3,7 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import static de.bund.digitalservice.ris.caselaw.domain.StringUtils.normalizeSpace;
 
 import com.gravity9.jsonpatch.JsonPatch;
-import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentUnitDeletionException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitPatchException;
@@ -25,17 +25,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
-public class DocumentUnitService {
+public class DocumentationUnitService {
 
-  private final DocumentUnitRepository repository;
+  private final DocumentationUnitRepository repository;
   private final DocumentNumberService documentNumberService;
   private final AttachmentService attachmentService;
   private final DocumentNumberRecyclingService documentNumberRecyclingService;
   private final PatchMapperService patchMapperService;
   private final Validator validator;
 
-  public DocumentUnitService(
-      DocumentUnitRepository repository,
+  public DocumentationUnitService(
+      DocumentationUnitRepository repository,
       DocumentNumberService documentNumberService,
       DocumentNumberRecyclingService documentNumberRecyclingService,
       Validator validator,
@@ -51,10 +51,10 @@ public class DocumentUnitService {
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
-  public DocumentUnit generateNewDocumentUnit(DocumentationOffice documentationOffice)
+  public DocumentationUnit generateNewDocumentationUnit(DocumentationOffice documentationOffice)
       throws DocumentationUnitException {
     var documentNumber = generateDocumentNumber(documentationOffice);
-    return repository.createNewDocumentUnit(documentNumber, documentationOffice);
+    return repository.createNewDocumentationUnit(documentNumber, documentationOffice);
   }
 
   private String generateDocumentNumber(DocumentationOffice documentationOffice) {
@@ -103,24 +103,24 @@ public class DocumentUnitService {
         searchInput);
   }
 
-  public DocumentUnit getByDocumentNumber(String documentNumber) {
+  public DocumentationUnit getByDocumentNumber(String documentNumber) {
     try {
-      var optionalDocumentUnit = repository.findByDocumentNumber(documentNumber);
-      return optionalDocumentUnit.orElseThrow();
+      var optionalDocumentationUnit = repository.findByDocumentNumber(documentNumber);
+      return optionalDocumentationUnit.orElseThrow();
     } catch (Exception e) {
       return null;
     }
   }
 
-  public DocumentUnit getByUuid(UUID documentUnitUuid) {
-    return repository.findByUuid(documentUnitUuid).orElseThrow();
+  public DocumentationUnit getByUuid(UUID documentationUnitId) {
+    return repository.findByUuid(documentationUnitId).orElseThrow();
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
-  public String deleteByUuid(UUID documentUnitUuid) throws DocumentationUnitNotExistsException {
+  public String deleteByUuid(UUID documentationUnitId) throws DocumentationUnitNotExistsException {
 
     Map<RelatedDocumentationType, Long> relatedEntities =
-        repository.getAllDocumentationUnitWhichLink(documentUnitUuid);
+        repository.getAllDocumentationUnitWhichLink(documentationUnitId);
 
     if (!(relatedEntities == null
         || relatedEntities.isEmpty()
@@ -128,26 +128,26 @@ public class DocumentUnitService {
 
       log.debug(
           "Could not delete document unit {} cause of related entities: {}",
-          documentUnitUuid,
+          documentationUnitId,
           relatedEntities);
 
-      throw new DocumentUnitDeletionException(
+      throw new DocumentationUnitDeletionException(
           "Die Dokumentationseinheit konnte nicht gelöscht werden, da", relatedEntities);
     }
 
-    DocumentUnit documentUnit =
+    DocumentationUnit documentationUnit =
         repository
-            .findByUuid(documentUnitUuid)
-            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnitUuid));
+            .findByUuid(documentationUnitId)
+            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentationUnitId));
 
-    log.debug("Deleting DocumentUnitDTO " + documentUnitUuid);
+    log.debug("Deleting DocumentationUnitDTO " + documentationUnitId);
 
-    if (documentUnit.attachments() != null && !documentUnit.attachments().isEmpty())
-      attachmentService.deleteAllObjectsFromBucketForDocumentationUnit(documentUnitUuid);
+    if (documentationUnit.attachments() != null && !documentationUnit.attachments().isEmpty())
+      attachmentService.deleteAllObjectsFromBucketForDocumentationUnit(documentationUnitId);
 
-    saveForRecycling(documentUnit);
-    repository.delete(documentUnit);
-    return "Dokumentationseinheit gelöscht: " + documentUnitUuid;
+    saveForRecycling(documentationUnit);
+    repository.delete(documentationUnit);
+    return "Dokumentationseinheit gelöscht: " + documentationUnitId;
   }
 
   /**
@@ -160,7 +160,7 @@ public class DocumentUnitService {
    * @throws DocumentationUnitNotExistsException if the documentation unit not exist
    * @throws DocumentationUnitPatchException if the documentation unit couldn't updated
    */
-  public RisJsonPatch updateDocumentUnit(UUID documentationUnitId, RisJsonPatch patch)
+  public RisJsonPatch updateDocumentationUnit(UUID documentationUnitId, RisJsonPatch patch)
       throws DocumentationUnitNotExistsException, DocumentationUnitPatchException {
 
     /*
@@ -169,26 +169,26 @@ public class DocumentUnitService {
        * handle unique following operation (sometimes by add and remove operations at the same time)
     */
 
-    log.debug(
-        "documentation unit '{}' with patch '{}' for version '{}'",
-        documentationUnitId,
-        patch.documentationUnitVersion(),
-        patch.patch());
-
-    DocumentUnit existingDocumentationUnit = getByUuid(documentationUnitId);
+    DocumentationUnit existingDocumentationUnit = getByUuid(documentationUnitId);
 
     long newVersion = 1L;
     if (existingDocumentationUnit.version() != null) {
       newVersion = existingDocumentationUnit.version() + 1;
     }
 
-    log.debug("new version is {}", newVersion);
-
     JsonPatch newPatch =
         patchMapperService.calculatePatch(
             existingDocumentationUnit.uuid(), patch.documentationUnitVersion());
 
-    log.debug("version {} - patch in database: {}", patch.documentationUnitVersion(), newPatch);
+    if (!patch.patch().getOperations().isEmpty() || !newPatch.getOperations().isEmpty()) {
+      log.debug(
+          "documentation unit '{}' with patch '{}' for version '{}'",
+          documentationUnitId,
+          patch.documentationUnitVersion(),
+          patch.patch());
+      log.debug("new version is {}", newVersion);
+      log.debug("version {} - patch in database: {}", patch.documentationUnitVersion(), newPatch);
+    }
 
     JsonPatch toFrontendJsonPatch = new JsonPatch(Collections.emptyList());
     RisJsonPatch toFrontend;
@@ -198,13 +198,14 @@ public class DocumentUnitService {
       log.debug("version {} - update patch: {}", patch.documentationUnitVersion(), toUpdate);
 
       if (!toUpdate.getOperations().isEmpty()) {
-        DocumentUnit patchedDocumentationUnit =
+        DocumentationUnit patchedDocumentationUnit =
             patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit);
         patchedDocumentationUnit = patchedDocumentationUnit.toBuilder().version(newVersion).build();
-        DocumentUnit updatedDocumentUnit = updateDocumentUnit(patchedDocumentationUnit);
+        DocumentationUnit updatedDocumentationUnit =
+            updateDocumentationUnit(patchedDocumentationUnit);
 
         toFrontendJsonPatch =
-            patchMapperService.getDiffPatch(patchedDocumentationUnit, updatedDocumentUnit);
+            patchMapperService.getDiffPatch(patchedDocumentationUnit, updatedDocumentationUnit);
 
         log.debug(
             "version {} - raw to frontend patch: {}",
@@ -254,17 +255,18 @@ public class DocumentUnitService {
     return toFrontend;
   }
 
-  public DocumentUnit updateDocumentUnit(DocumentUnit documentUnit)
+  public DocumentationUnit updateDocumentationUnit(DocumentationUnit documentationUnit)
       throws DocumentationUnitNotExistsException {
-    repository.saveKeywords(documentUnit);
-    repository.saveFieldsOfLaw(documentUnit);
-    repository.saveProcedures(documentUnit);
+    repository.saveKeywords(documentationUnit);
+    repository.saveFieldsOfLaw(documentationUnit);
+    repository.saveProcedures(documentationUnit);
 
-    repository.save(documentUnit);
+    repository.save(documentationUnit);
 
     return repository
-        .findByUuid(documentUnit.uuid())
-        .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnit.documentNumber()));
+        .findByUuid(documentationUnit.uuid())
+        .orElseThrow(
+            () -> new DocumentationUnitNotExistsException(documentationUnit.documentNumber()));
   }
 
   public Slice<RelatedDocumentationUnit> searchLinkableDocumentationUnits(
@@ -291,12 +293,12 @@ public class DocumentUnitService {
     return "Validation error";
   }
 
-  private void saveForRecycling(DocumentUnit documentUnit) {
+  private void saveForRecycling(DocumentationUnit documentationUnit) {
     try {
       documentNumberRecyclingService.addForRecycling(
-          documentUnit.uuid(),
-          documentUnit.documentNumber(),
-          documentUnit.coreData().documentationOffice().abbreviation());
+          documentationUnit.uuid(),
+          documentationUnit.documentNumber(),
+          documentationUnit.coreData().documentationOffice().abbreviation());
 
     } catch (Exception e) {
       log.info("Did not save for recycling", e);

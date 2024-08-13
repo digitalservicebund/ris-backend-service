@@ -7,7 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
@@ -26,13 +26,13 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@Import({DatabaseDocumentUnitStatusService.class})
-class DocumentUnitStatusServiceTest {
+@Import({DatabaseDocumentationUnitStatusService.class})
+class DocumentationUnitStatusServiceTest {
   private static final UUID TEST_UUID = UUID.fromString("11111111-2222-3333-4444-555555555555");
 
   private static final String DOCUMENT_NUMBER = "TEST00012024";
 
-  @SpyBean private DatabaseDocumentUnitStatusService statusService;
+  @SpyBean private DatabaseDocumentationUnitStatusService statusService;
 
   @MockBean private DatabaseStatusRepository repository;
 
@@ -62,7 +62,7 @@ class DocumentUnitStatusServiceTest {
 
     Status status =
         Status.builder().publicationStatus(PublicationStatus.PUBLISHED).withError(true).build();
-    DocumentUnit.builder().uuid(TEST_UUID).build();
+    DocumentationUnit.builder().uuid(TEST_UUID).build();
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitDTO.builder().id(TEST_UUID).documentNumber(DOCUMENT_NUMBER).build();
 

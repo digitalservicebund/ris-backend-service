@@ -23,7 +23,7 @@ public class HandoverMailDTO {
   @Id @GeneratedValue UUID id;
 
   @Column(name = "documentation_unit_id")
-  UUID documentUnitId;
+  UUID documentationUnitId;
 
   @Column(name = "receiver_address")
   String receiverAddress;

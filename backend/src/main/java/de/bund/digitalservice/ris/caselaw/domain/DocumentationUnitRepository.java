@@ -9,7 +9,7 @@ import org.springframework.data.repository.NoRepositoryBean;
 
 /** Domain repository for documentation units */
 @NoRepositoryBean
-public interface DocumentUnitRepository {
+public interface DocumentationUnitRepository {
 
   /**
    * Find a documentation unit by its document number
@@ -17,7 +17,7 @@ public interface DocumentUnitRepository {
    * @param documentNumber the document number
    * @return the documentation unit found
    */
-  Optional<DocumentUnit> findByDocumentNumber(String documentNumber);
+  Optional<DocumentationUnit> findByDocumentNumber(String documentNumber);
 
   /**
    * Find a documentation unit by its UUID
@@ -25,7 +25,7 @@ public interface DocumentUnitRepository {
    * @param uuid the UUID to search for
    * @return the documentation unit found
    */
-  Optional<DocumentUnit> findByUuid(UUID uuid);
+  Optional<DocumentationUnit> findByUuid(UUID uuid);
 
   /**
    * Create a new documentation unit with the given document number and documentation office
@@ -34,43 +34,43 @@ public interface DocumentUnitRepository {
    * @param documentationOffice the documentation office
    * @return the new documentation unit
    */
-  DocumentUnit createNewDocumentUnit(
+  DocumentationUnit createNewDocumentationUnit(
       String documentNumber, DocumentationOffice documentationOffice);
 
   /**
    * Save a documentation unit
    *
-   * @param documentUnit the documentation unit to save
+   * @param documentationUnit the documentation unit to save
    */
-  void save(DocumentUnit documentUnit);
+  void save(DocumentationUnit documentationUnit);
 
   /**
    * Save the keywords of a documentation unit
    *
-   * @param documentUnit the documentation unit to save the keywords for
+   * @param documentationUnit the documentation unit to save the keywords for
    */
-  void saveKeywords(DocumentUnit documentUnit);
+  void saveKeywords(DocumentationUnit documentationUnit);
 
   /**
    * Save the fields of law of a documentation unit
    *
-   * @param documentUnit the documentation unit to save the fields of law for
+   * @param documentationUnit the documentation unit to save the fields of law for
    */
-  void saveFieldsOfLaw(DocumentUnit documentUnit);
+  void saveFieldsOfLaw(DocumentationUnit documentationUnit);
 
   /**
    * Save the procedures of a documentation unit
    *
-   * @param documentUnit the documentation unit to save the procedures for
+   * @param documentationUnit the documentation unit to save the procedures for
    */
-  void saveProcedures(DocumentUnit documentUnit);
+  void saveProcedures(DocumentationUnit documentationUnit);
 
   /**
    * Delete a documentation unit
    *
-   * @param documentUnit the documentation unit to delete
+   * @param documentationUnit the documentation unit to delete
    */
-  void delete(DocumentUnit documentUnit);
+  void delete(DocumentationUnit documentationUnit);
 
   /**
    * Search for documentation units that are linkable to the given documentation unit
@@ -105,9 +105,9 @@ public interface DocumentUnitRepository {
    * Find existing links to a documentation unit with a given id. This can be used to check if a
    * documentation unit can safely be deleted.
    *
-   * @param documentUnitUuid the UUID of the documentation unit to find links to
+   * @param documentationUnitId the UUID of the documentation unit to find links to
    * @return a map containing the relation extension (e.g. previous decision) and the number of
    *     links with this relation in the documentation unit with the given id
    */
-  Map<RelatedDocumentationType, Long> getAllDocumentationUnitWhichLink(UUID documentUnitUuid);
+  Map<RelatedDocumentationType, Long> getAllDocumentationUnitWhichLink(UUID documentationUnitId);
 }

@@ -15,9 +15,9 @@ import static org.mockito.Mockito.when;
 
 import ch.qos.logback.classic.Level;
 import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
@@ -66,11 +66,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class JurisXmlExporterResponseProcessorTest {
   private static final String DOCUMENT_NUMBER = "KORE123456789";
   private static final UUID DOCUMENT_UUID = UUID.randomUUID();
-  @MockBean private DocumentUnitStatusService statusService;
+  @MockBean private DocumentationUnitStatusService statusService;
   @MockBean private HttpMailSender mailSender;
   @MockBean private ImapStoreFactory storeFactory;
   @MockBean private HandoverReportRepository reportRepository;
-  @MockBean private DocumentUnitRepository documentUnitRepository;
+  @MockBean private DocumentationUnitRepository documentationUnitRepository;
   @MockBean private HandoverRepository xmlHandoverRepository;
   @Mock private Store store;
   @Mock private Folder inbox;
@@ -103,8 +103,8 @@ class JurisXmlExporterResponseProcessorTest {
 
     when(reportRepository.saveAll(any())).thenReturn(Collections.emptyList());
 
-    when(documentUnitRepository.findByDocumentNumber(DOCUMENT_NUMBER))
-        .thenReturn(Optional.of(DocumentUnit.builder().uuid(DOCUMENT_UUID).build()));
+    when(documentationUnitRepository.findByDocumentNumber(DOCUMENT_NUMBER))
+        .thenReturn(Optional.of(DocumentationUnit.builder().uuid(DOCUMENT_UUID).build()));
 
     when(xmlHandoverRepository.getLastXmlHandoverMail(DOCUMENT_UUID))
         .thenReturn(HandoverMail.builder().issuerAddress("test@digitalservice.bund.de").build());
@@ -118,7 +118,7 @@ class JurisXmlExporterResponseProcessorTest {
             storeFactory,
             reportRepository,
             wrapperFactory,
-            documentUnitRepository,
+            documentationUnitRepository,
             xmlHandoverRepository);
   }
 

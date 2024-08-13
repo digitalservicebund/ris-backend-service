@@ -9,7 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import org.junit.jupiter.api.Test;
@@ -47,7 +47,7 @@ class AuthIntegrationTest {
 
   @Autowired private RisWebTestClient risWebTestClient;
   @MockBean ClientRegistrationRepository clientRegistrationRepository;
-  @MockBean DocumentUnitService documentUnitService;
+  @MockBean DocumentationUnitService documentationUnitService;
 
   @Test
   void testGetUser() {

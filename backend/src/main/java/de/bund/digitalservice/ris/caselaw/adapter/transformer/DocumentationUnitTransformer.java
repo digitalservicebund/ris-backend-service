@@ -20,9 +20,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit.DocumentUnitBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
@@ -62,7 +61,7 @@ public class DocumentationUnitTransformer {
    *     updatedDomainObject
    */
   public static DocumentationUnitDTO transformToDTO(
-      DocumentationUnitDTO currentDto, DocumentUnit updatedDomainObject) {
+      DocumentationUnitDTO currentDto, DocumentationUnit updatedDomainObject) {
 
     log.debug("transform database documentation unit '{}'", currentDto.getId());
 
@@ -138,7 +137,7 @@ public class DocumentationUnitTransformer {
   }
 
   private static void addReferences(
-      DocumentUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
+      DocumentationUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
     AtomicInteger i = new AtomicInteger(1);
     builder.references(
         updatedDomainObject.references() == null
@@ -156,7 +155,7 @@ public class DocumentationUnitTransformer {
   }
 
   private static void addTexts(
-      DocumentUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
+      DocumentationUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
     Texts texts = updatedDomainObject.texts();
 
     builder
@@ -237,7 +236,7 @@ public class DocumentationUnitTransformer {
   }
 
   private static void addEnsuingAndPendingDecisions(
-      DocumentUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
+      DocumentationUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
     List<EnsuingDecision> ensuingDecisions = updatedDomainObject.ensuingDecisions();
     if (ensuingDecisions != null) {
 
@@ -269,7 +268,7 @@ public class DocumentationUnitTransformer {
   }
 
   private static void addPreviousDecisions(
-      DocumentUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
+      DocumentationUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
     List<PreviousDecision> previousDecisions = updatedDomainObject.previousDecisions();
     if (previousDecisions != null) {
       AtomicInteger i = new AtomicInteger(1);
@@ -288,7 +287,7 @@ public class DocumentationUnitTransformer {
 
   private static void addLegalEffect(
       DocumentationUnitDTO currentDto,
-      DocumentUnit updatedDomainObject,
+      DocumentationUnit updatedDomainObject,
       DocumentationUnitDTOBuilder builder) {
 
     boolean courtWasAdded =
@@ -322,7 +321,7 @@ public class DocumentationUnitTransformer {
   }
 
   private static void addLeadingDecisionNormReferences(
-      DocumentUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
+      DocumentationUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
 
     List<String> leadingDecisionNormReferences =
         updatedDomainObject.coreData().leadingDecisionNormReferences();
@@ -465,9 +464,9 @@ public class DocumentationUnitTransformer {
    * @param documentationUnitDTO the database documentation unit
    * @return a transformed domain object, or an empty domain object if the input is null
    */
-  public static DocumentUnit transformToDomain(DocumentationUnitDTO documentationUnitDTO) {
+  public static DocumentationUnit transformToDomain(DocumentationUnitDTO documentationUnitDTO) {
     if (documentationUnitDTO == null) {
-      throw new DocumentUnitTransformerException("Document unit is null and won't transform");
+      throw new DocumentationUnitTransformerException("Document unit is null and won't transform");
     }
 
     log.debug(
@@ -475,8 +474,8 @@ public class DocumentationUnitTransformer {
 
     LegalEffect legalEffect = getLegalEffectForDomain(documentationUnitDTO);
 
-    DocumentUnit.DocumentUnitBuilder builder =
-        DocumentUnit.builder()
+    DocumentationUnit.DocumentationUnitBuilder builder =
+        DocumentationUnit.builder()
             .note(documentationUnitDTO.getNote())
             .version(documentationUnitDTO.getVersion());
     CoreDataBuilder coreDataBuilder =
@@ -600,7 +599,8 @@ public class DocumentationUnitTransformer {
   }
 
   private static void addReferencesToDomain(
-      DocumentationUnitDTO documentationUnitDTO, DocumentUnitBuilder builder) {
+      DocumentationUnitDTO documentationUnitDTO,
+      DocumentationUnit.DocumentationUnitBuilder builder) {
     builder.references(
         documentationUnitDTO.getReferences() == null
             ? Collections.emptyList()
@@ -641,7 +641,7 @@ public class DocumentationUnitTransformer {
                     "More than one norm references for norm abbreviation ({}, {})",
                     normReferenceDTO.getNormAbbreviation().getId(),
                     normReferenceDTO.getNormAbbreviation().getAbbreviation());
-                throw new DocumentUnitTransformerException(
+                throw new DocumentationUnitTransformerException(
                     "More than one norm references with the same norm abbreviation.");
               } else if (existingNormReferences.isEmpty()) {
                 normReferences.add(normReference);
@@ -679,7 +679,8 @@ public class DocumentationUnitTransformer {
   }
 
   private static void addOriginalFileDocuments(
-      DocumentationUnitDTO documentationUnitDTO, DocumentUnitBuilder builder) {
+      DocumentationUnitDTO documentationUnitDTO,
+      DocumentationUnit.DocumentationUnitBuilder builder) {
     builder.attachments(
         documentationUnitDTO.getAttachments().stream()
             .map(AttachmentTransformer::transformToDomain)
@@ -687,7 +688,8 @@ public class DocumentationUnitTransformer {
   }
 
   private static void addStatusToDomain(
-      DocumentationUnitDTO documentationUnitDTO, DocumentUnitBuilder builder) {
+      DocumentationUnitDTO documentationUnitDTO,
+      DocumentationUnit.DocumentationUnitBuilder builder) {
     if (documentationUnitDTO.getStatus() == null || documentationUnitDTO.getStatus().isEmpty()) {
       return;
     }
@@ -699,7 +701,8 @@ public class DocumentationUnitTransformer {
   }
 
   private static void addPreviousDecisionsToDomain(
-      DocumentationUnitDTO documentationUnitDTO, DocumentUnitBuilder builder) {
+      DocumentationUnitDTO documentationUnitDTO,
+      DocumentationUnit.DocumentationUnitBuilder builder) {
     if (documentationUnitDTO.getPreviousDecisions() == null) {
       return;
     }
@@ -792,7 +795,8 @@ public class DocumentationUnitTransformer {
   }
 
   private static void addEnsuingDecisionsToDomain(
-      DocumentationUnitDTO documentationUnitDTO, DocumentUnitBuilder builder) {
+      DocumentationUnitDTO documentationUnitDTO,
+      DocumentationUnit.DocumentationUnitBuilder builder) {
 
     List<EnsuingDecisionDTO> ensuingDecisionDTOs = documentationUnitDTO.getEnsuingDecisions();
     List<PendingDecisionDTO> pendingDecisionDTOs = documentationUnitDTO.getPendingDecisions();

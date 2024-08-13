@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-public abstract class StyledElement implements DocumentUnitDocx {
+public abstract class StyledElement implements DocumentationUnitDocx {
   private final Map<String, List<String>> styles = new HashMap<>();
   private String styleReference;
 

@@ -9,10 +9,10 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclingService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
+import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
@@ -29,10 +29,10 @@ import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
@@ -57,11 +57,11 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @RISIntegrationTest(
     imports = {
-      DocumentUnitService.class,
+      DocumentationUnitService.class,
       PostgresDeltaMigrationRepositoryImpl.class,
       DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentNumberRecyclingService.class,
-      DatabaseDocumentUnitStatusService.class,
+      DatabaseDocumentationUnitStatusService.class,
       DatabaseProcedureService.class,
       PostgresHandoverReportRepositoryImpl.class,
       PostgresDocumentationUnitRepositoryImpl.class,
@@ -72,14 +72,14 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       TestConfig.class,
       DocumentNumberPatternConfig.class
     },
-    controllers = {DocumentUnitController.class})
+    controllers = {DocumentationUnitController.class})
 @Sql(
     scripts = {"classpath:fields_of_law_init.sql"},
     executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(
     scripts = {"classpath:fields_of_law_cleanup.sql"},
     executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-class DocumentUnitFieldOfLawIntegrationTest {
+class DocumentationUnitFieldOfLawIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
       new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
@@ -94,7 +94,7 @@ class DocumentUnitFieldOfLawIntegrationTest {
   }
 
   @Autowired private RisWebTestClient risWebTestClient;
-  @Autowired private DatabaseDocumentationUnitRepository documentUnitRepository;
+  @Autowired private DatabaseDocumentationUnitRepository documentationUnitRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
@@ -122,11 +122,11 @@ class DocumentUnitFieldOfLawIntegrationTest {
   }
 
   @Test
-  void testGetAllFieldsOfLawForDocumentUnit_withoutFieldOfLawLinked_shouldReturnEmptyList() {
-    UUID documentUnitUuid = UUID.randomUUID();
-    documentUnitRepository.save(
+  void testGetAllFieldsOfLawForDocumentationUnit_withoutFieldOfLawLinked_shouldReturnEmptyList() {
+    UUID documentationUnitUuid = UUID.randomUUID();
+    documentationUnitRepository.save(
         DocumentationUnitDTO.builder()
-            .id(documentUnitUuid)
+            .id(documentationUnitUuid)
             .documentationOffice(documentationOfficeDTO)
             .documentNumber("docnr12345678")
             .build());
@@ -138,7 +138,7 @@ class DocumentUnitFieldOfLawIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().fieldsOfLaw())
@@ -147,15 +147,15 @@ class DocumentUnitFieldOfLawIntegrationTest {
 
   @Test
   void
-      testGetAllFieldsOfLawForDocumentUnit_withFirstFieldOfLawLinked_shouldReturnListWithLinkedFieldOfLaw() {
-    DocumentationUnitDTO documentUnitDTO =
-        documentUnitRepository.save(
+      testGetAllFieldsOfLawForDocumentationUnit_withFirstFieldOfLawLinked_shouldReturnListWithLinkedFieldOfLaw() {
+    DocumentationUnitDTO documentationUnitDTO =
+        documentationUnitRepository.save(
             DocumentationUnitDTO.builder()
                 .documentationOffice(documentationOfficeDTO)
                 .documentNumber("docnr12345678")
                 .build());
 
-    documentUnitDTO = documentUnitRepository.findById(documentUnitDTO.getId()).get();
+    documentationUnitDTO = documentationUnitRepository.findById(documentationUnitDTO.getId()).get();
 
     DocumentationUnitFieldOfLawDTO documentationUnitFieldOfLawDTO =
         new DocumentationUnitFieldOfLawDTO();
@@ -163,11 +163,11 @@ class DocumentUnitFieldOfLawIntegrationTest {
         FieldOfLawDTO.builder()
             .id(UUID.fromString("71defe05-cd4d-43e5-a07e-06c611b81a26"))
             .build());
-    documentationUnitFieldOfLawDTO.setDocumentationUnit(documentUnitDTO);
+    documentationUnitFieldOfLawDTO.setDocumentationUnit(documentationUnitDTO);
     documentationUnitFieldOfLawDTO.setRank(1);
-    documentUnitDTO.setDocumentationUnitFieldsOfLaw(List.of(documentationUnitFieldOfLawDTO));
+    documentationUnitDTO.setDocumentationUnitFieldsOfLaw(List.of(documentationUnitFieldOfLawDTO));
 
-    documentUnitRepository.save(documentUnitDTO);
+    documentationUnitRepository.save(documentationUnitDTO);
 
     risWebTestClient
         .withDefaultLogin()
@@ -176,7 +176,7 @@ class DocumentUnitFieldOfLawIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().fieldsOfLaw())
@@ -185,15 +185,15 @@ class DocumentUnitFieldOfLawIntegrationTest {
   }
 
   @Test
-  void testGetAllFieldsOfLawForDocumentUnit_shouldReturnSortedList() {
-    DocumentationUnitDTO documentUnitDTO =
-        documentUnitRepository.save(
+  void testGetAllFieldsOfLawForDocumentationUnit_shouldReturnSortedList() {
+    DocumentationUnitDTO documentationUnitDTO =
+        documentationUnitRepository.save(
             DocumentationUnitDTO.builder()
                 .documentationOffice(documentationOfficeDTO)
                 .documentNumber("docnr12345678")
                 .build());
 
-    documentUnitDTO = documentUnitRepository.findById(documentUnitDTO.getId()).get();
+    documentationUnitDTO = documentationUnitRepository.findById(documentationUnitDTO.getId()).get();
 
     DocumentationUnitFieldOfLawDTO documentationUnitFieldOfLawDTO1 =
         new DocumentationUnitFieldOfLawDTO();
@@ -201,7 +201,7 @@ class DocumentUnitFieldOfLawIntegrationTest {
         FieldOfLawDTO.builder()
             .id(UUID.fromString("71defe05-cd4d-43e5-a07e-06c611b81a26"))
             .build());
-    documentationUnitFieldOfLawDTO1.setDocumentationUnit(documentUnitDTO);
+    documentationUnitFieldOfLawDTO1.setDocumentationUnit(documentationUnitDTO);
     documentationUnitFieldOfLawDTO1.setRank(1);
     DocumentationUnitFieldOfLawDTO documentationUnitFieldOfLawDTO2 =
         new DocumentationUnitFieldOfLawDTO();
@@ -209,7 +209,7 @@ class DocumentUnitFieldOfLawIntegrationTest {
         FieldOfLawDTO.builder()
             .id(UUID.fromString("6959af10-7355-4e22-858d-29a485189957"))
             .build());
-    documentationUnitFieldOfLawDTO2.setDocumentationUnit(documentUnitDTO);
+    documentationUnitFieldOfLawDTO2.setDocumentationUnit(documentationUnitDTO);
     documentationUnitFieldOfLawDTO2.setRank(2);
     DocumentationUnitFieldOfLawDTO documentationUnitFieldOfLawDTO3 =
         new DocumentationUnitFieldOfLawDTO();
@@ -217,7 +217,7 @@ class DocumentUnitFieldOfLawIntegrationTest {
         FieldOfLawDTO.builder()
             .id(UUID.fromString("93393410-0ab0-48ab-a61d-5056e440174a"))
             .build());
-    documentationUnitFieldOfLawDTO3.setDocumentationUnit(documentUnitDTO);
+    documentationUnitFieldOfLawDTO3.setDocumentationUnit(documentationUnitDTO);
     documentationUnitFieldOfLawDTO3.setRank(3);
     DocumentationUnitFieldOfLawDTO documentationUnitFieldOfLawDTO4 =
         new DocumentationUnitFieldOfLawDTO();
@@ -225,16 +225,16 @@ class DocumentUnitFieldOfLawIntegrationTest {
         FieldOfLawDTO.builder()
             .id(UUID.fromString("b4f9ee05-38ed-49c3-89d6-50141f031017"))
             .build());
-    documentationUnitFieldOfLawDTO4.setDocumentationUnit(documentUnitDTO);
+    documentationUnitFieldOfLawDTO4.setDocumentationUnit(documentationUnitDTO);
     documentationUnitFieldOfLawDTO4.setRank(4);
-    documentUnitDTO.setDocumentationUnitFieldsOfLaw(
+    documentationUnitDTO.setDocumentationUnitFieldsOfLaw(
         List.of(
             documentationUnitFieldOfLawDTO1,
             documentationUnitFieldOfLawDTO2,
             documentationUnitFieldOfLawDTO3,
             documentationUnitFieldOfLawDTO4));
 
-    documentUnitRepository.save(documentUnitDTO);
+    documentationUnitRepository.save(documentationUnitDTO);
 
     risWebTestClient
         .withDefaultLogin()
@@ -243,7 +243,7 @@ class DocumentUnitFieldOfLawIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().fieldsOfLaw())
@@ -252,17 +252,17 @@ class DocumentUnitFieldOfLawIntegrationTest {
   }
 
   @Test
-  void testAddFieldsOfLawForDocumentUnit_shouldReturnListWithAllLinkedFieldOfLaw() {
-    DocumentationUnitDTO documentUnitDTO =
-        documentUnitRepository.save(
+  void testAddFieldsOfLawForDocumentationUnit_shouldReturnListWithAllLinkedFieldOfLaw() {
+    DocumentationUnitDTO documentationUnitDTO =
+        documentationUnitRepository.save(
             DocumentationUnitDTO.builder()
                 .documentationOffice(documentationOfficeDTO)
                 .documentNumber("docnr12345678")
                 .build());
 
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
-            .uuid(documentUnitDTO.getId())
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .uuid(documentationUnitDTO.getId())
             .documentNumber("docnr12345678")
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
             .contentRelatedIndexing(
@@ -278,17 +278,17 @@ class DocumentUnitFieldOfLawIntegrationTest {
                     .build())
             .build();
 
-    assertThat(documentUnitDTO).isNotNull();
+    assertThat(documentationUnitDTO).isNotNull();
 
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentUnitDTO.getId())
-        .bodyValue(documentUnit)
+        .uri("/api/v1/caselaw/documentunits/" + documentationUnitDTO.getId())
+        .bodyValue(documentationUnit)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().fieldsOfLaw())
@@ -298,17 +298,17 @@ class DocumentUnitFieldOfLawIntegrationTest {
 
   @Test
   void
-      testAddFieldsOfLawForDocumentUnit_withNotExistingFieldOfLaw_shouldReturnListWithAllLinkedFieldOfLaw() {
-    DocumentationUnitDTO documentUnitDTO =
-        documentUnitRepository.save(
+      testAddFieldsOfLawForDocumentationUnit_withNotExistingFieldOfLaw_shouldReturnListWithAllLinkedFieldOfLaw() {
+    DocumentationUnitDTO documentationUnitDTO =
+        documentationUnitRepository.save(
             DocumentationUnitDTO.builder()
                 .documentationOffice(documentationOfficeDTO)
                 .documentNumber("docnr12345678")
                 .build());
 
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
-            .uuid(documentUnitDTO.getId())
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .uuid(documentationUnitDTO.getId())
             .documentNumber("docnr12345678")
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
             .contentRelatedIndexing(
@@ -321,28 +321,28 @@ class DocumentUnitFieldOfLawIntegrationTest {
                     .build())
             .build();
 
-    assertThat(documentUnitDTO).isNotNull();
+    assertThat(documentationUnitDTO).isNotNull();
 
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentUnitDTO.getId())
-        .bodyValue(documentUnit)
+        .uri("/api/v1/caselaw/documentunits/" + documentationUnitDTO.getId())
+        .bodyValue(documentationUnit)
         .exchange()
         .expectStatus()
         .is5xxServerError();
   }
 
   @Test
-  void testRemoveFieldsOfLawForDocumentUnit_shouldReturnListWithAllLinkedFieldOfLaw() {
-    DocumentationUnitDTO documentUnitDTO =
-        documentUnitRepository.save(
+  void testRemoveFieldsOfLawForDocumentationUnit_shouldReturnListWithAllLinkedFieldOfLaw() {
+    DocumentationUnitDTO documentationUnitDTO =
+        documentationUnitRepository.save(
             DocumentationUnitDTO.builder()
                 .documentationOffice(documentationOfficeDTO)
                 .documentNumber("docnr12345678")
                 .build());
 
-    documentUnitDTO = documentUnitRepository.findById(documentUnitDTO.getId()).get();
+    documentationUnitDTO = documentationUnitRepository.findById(documentationUnitDTO.getId()).get();
 
     DocumentationUnitFieldOfLawDTO documentationUnitFieldOfLawDTO =
         new DocumentationUnitFieldOfLawDTO();
@@ -350,32 +350,32 @@ class DocumentUnitFieldOfLawIntegrationTest {
         FieldOfLawDTO.builder()
             .id(UUID.fromString("71defe05-cd4d-43e5-a07e-06c611b81a26"))
             .build());
-    documentationUnitFieldOfLawDTO.setDocumentationUnit(documentUnitDTO);
+    documentationUnitFieldOfLawDTO.setDocumentationUnit(documentationUnitDTO);
     documentationUnitFieldOfLawDTO.setRank(1);
-    documentUnitDTO.setDocumentationUnitFieldsOfLaw(List.of(documentationUnitFieldOfLawDTO));
+    documentationUnitDTO.setDocumentationUnitFieldsOfLaw(List.of(documentationUnitFieldOfLawDTO));
 
-    documentUnitRepository.save(documentUnitDTO);
+    documentationUnitRepository.save(documentationUnitDTO);
 
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
-            .uuid(documentUnitDTO.getId())
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .uuid(documentationUnitDTO.getId())
             .documentNumber("docnr12345678")
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
             .contentRelatedIndexing(
                 ContentRelatedIndexing.builder().fieldsOfLaw(Collections.emptyList()).build())
             .build();
 
-    assertThat(documentUnitDTO).isNotNull();
+    assertThat(documentationUnitDTO).isNotNull();
 
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentUnitDTO.getId())
-        .bodyValue(documentUnit)
+        .uri("/api/v1/caselaw/documentunits/" + documentationUnitDTO.getId())
+        .bodyValue(documentationUnit)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().fieldsOfLaw())

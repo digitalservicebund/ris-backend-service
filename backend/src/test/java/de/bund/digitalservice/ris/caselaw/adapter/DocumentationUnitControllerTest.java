@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.gravity9.jsonpatch.JsonPatch;
 import com.gravity9.jsonpatch.JsonPatchOperation;
 import com.gravity9.jsonpatch.ReplaceOperation;
-import de.bund.digitalservice.ris.caselaw.DocumentUnitControllerTestConfig;
+import de.bund.digitalservice.ris.caselaw.DocumentationUnitControllerTestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
@@ -25,10 +25,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitT
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
@@ -61,11 +61,11 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = DocumentUnitController.class)
-@Import({DocumentUnitControllerTestConfig.class})
-class DocumentUnitControllerTest {
+@WebMvcTest(controllers = DocumentationUnitController.class)
+@Import({DocumentationUnitControllerTestConfig.class})
+class DocumentationUnitControllerTest {
   @Autowired private RisWebTestClient risWebClient;
-  @MockBean private DocumentUnitService service;
+  @MockBean private DocumentationUnitService service;
   @MockBean private DocumentationUnitDocxMetadataInitializationService docUnitAttachmentService;
   @MockBean private HandoverService handoverService;
   @MockBean private KeycloakUserService userService;
@@ -94,15 +94,16 @@ class DocumentUnitControllerTest {
 
     when(service.getByUuid(TEST_UUID))
         .thenReturn(
-            DocumentUnit.builder()
+            DocumentationUnit.builder()
                 .coreData(CoreData.builder().documentationOffice(docOffice).build())
                 .build());
   }
 
   @Test
-  void testGenerateNewDocumentUnit() {
+  void testGenerateNewDocumentationUnit() {
     // userService.getDocumentationOffice is mocked in @BeforeEach
-    when(service.generateNewDocumentUnit(docOffice)).thenReturn(DocumentUnit.builder().build());
+    when(service.generateNewDocumentationUnit(docOffice))
+        .thenReturn(DocumentationUnit.builder().build());
 
     risWebClient
         .withDefaultLogin()
@@ -112,7 +113,7 @@ class DocumentUnitControllerTest {
         .expectStatus()
         .isCreated();
 
-    verify(service, times(1)).generateNewDocumentUnit(docOffice);
+    verify(service, times(1)).generateNewDocumentationUnit(docOffice);
     verify(userService, times(1)).getDocumentationOffice(any(OidcUser.class));
   }
 
@@ -120,7 +121,7 @@ class DocumentUnitControllerTest {
   void testGetByDocumentnumber() {
     when(service.getByDocumentNumber("ABCD202200001"))
         .thenReturn(
-            DocumentUnit.builder()
+            DocumentationUnit.builder()
                 .coreData(CoreData.builder().documentationOffice(docOffice).build())
                 .build());
 
@@ -179,42 +180,44 @@ class DocumentUnitControllerTest {
 
   @Test
   void testUpdateByUuid() throws DocumentationUnitNotExistsException {
-    DocumentationUnitDTO documentUnitDTO =
+    DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitDTO.builder()
             .id(TEST_UUID)
             .documentNumber("ABCD202200001")
             .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("DS").build())
             .build();
-    DocumentUnit documentUnit = DocumentationUnitTransformer.transformToDomain(documentUnitDTO);
+    DocumentationUnit documentationUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    when(service.updateDocumentUnit(documentUnit)).thenReturn(null);
+    when(service.updateDocumentationUnit(documentationUnit)).thenReturn(null);
 
     risWebClient
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
         .contentType(MediaType.APPLICATION_JSON)
-        .bodyValue(documentUnit)
+        .bodyValue(documentationUnit)
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service).updateDocumentUnit(documentUnit);
+    verify(service).updateDocumentationUnit(documentationUnit);
   }
 
   @Test
   @Disabled("fix and enable")
   void testPatchUpdateByUuid() throws DocumentationUnitNotExistsException {
-    DocumentationUnitDTO documentUnitDTO =
+    DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitDTO.builder()
             .id(TEST_UUID)
             .documentNumber("ABCD202200001")
             .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("DS").build())
             .build();
-    DocumentUnit documentUnit = DocumentationUnitTransformer.transformToDomain(documentUnitDTO);
+    DocumentationUnit documentationUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    when(service.updateDocumentUnit(documentUnit)).thenReturn(documentUnit);
-    when(service.getByUuid(TEST_UUID)).thenReturn(documentUnit);
+    when(service.updateDocumentationUnit(documentationUnit)).thenReturn(documentationUnit);
+    when(service.getByUuid(TEST_UUID)).thenReturn(documentationUnit);
 
     JsonNode valueToReplace = new TextNode("newValue");
     JsonPatchOperation replaceOp = new ReplaceOperation("/coreData/appraisalBody", valueToReplace);
@@ -234,14 +237,14 @@ class DocumentUnitControllerTest {
 
   @Test
   void testUpdateByUuid_withInvalidUuid() {
-    DocumentUnit documentUnitDTO = DocumentUnit.builder().uuid(TEST_UUID).build();
+    DocumentationUnit documentationUnitDTO = DocumentationUnit.builder().uuid(TEST_UUID).build();
 
     risWebClient
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/abc")
         .contentType(MediaType.APPLICATION_JSON)
-        .bodyValue(documentUnitDTO)
+        .bodyValue(documentationUnitDTO)
         .exchange()
         .expectStatus()
         .is4xxClientError();
@@ -253,7 +256,7 @@ class DocumentUnitControllerTest {
     when(handoverService.handoverAsMail(TEST_UUID, ISSUER_ADDRESS))
         .thenReturn(
             HandoverMail.builder()
-                .documentUnitUuid(TEST_UUID)
+                .documentationUnitId(TEST_UUID)
                 .receiverAddress("receiver address")
                 .mailSubject("mailSubject")
                 .xml("xml")
@@ -280,7 +283,7 @@ class DocumentUnitControllerTest {
     assertThat(responseBody)
         .isEqualTo(
             HandoverMail.builder()
-                .documentUnitUuid(TEST_UUID)
+                .documentationUnitId(TEST_UUID)
                 .receiverAddress("receiver address")
                 .mailSubject("mailSubject")
                 .xml("xml")
@@ -321,7 +324,7 @@ class DocumentUnitControllerTest {
                     .receivedDate(Instant.parse("2021-01-01T01:01:01.00Z"))
                     .build(),
                 HandoverMail.builder()
-                    .documentUnitUuid(TEST_UUID)
+                    .documentationUnitId(TEST_UUID)
                     .receiverAddress("receiver address")
                     .mailSubject("mailSubject")
                     .xml("xml")
@@ -354,7 +357,7 @@ class DocumentUnitControllerTest {
                 .receivedDate(Instant.parse("2021-01-01T01:01:01Z"))
                 .build(),
             HandoverMail.builder()
-                .documentUnitUuid(TEST_UUID)
+                .documentationUnitId(TEST_UUID)
                 .receiverAddress("receiver address")
                 .mailSubject("mailSubject")
                 .xml("xml")
@@ -435,7 +438,7 @@ class DocumentUnitControllerTest {
   }
 
   @Test
-  void testSearchByDocumentUnitListEntry() {
+  void testSearchByDocumentationUnitListEntry() {
     PageRequest pageRequest = PageRequest.of(0, 10);
 
     when(service.searchByDocumentationUnitSearchInput(
@@ -479,7 +482,7 @@ class DocumentUnitControllerTest {
   void testGetHtml() {
     when(service.getByUuid(TEST_UUID))
         .thenReturn(
-            DocumentUnit.builder()
+            DocumentationUnit.builder()
                 .attachments(Collections.singletonList(Attachment.builder().s3path("123").build()))
                 .coreData(CoreData.builder().documentationOffice(docOffice).build())
                 .build());

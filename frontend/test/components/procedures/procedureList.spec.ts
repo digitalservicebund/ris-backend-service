@@ -50,7 +50,7 @@ async function renderComponent(options?: { procedures: Procedure[][] }) {
         content: options?.procedures[0] ?? [
           {
             label: "testProcedure",
-            documentUnitCount: 2,
+            documentationUnitCount: 2,
             createdAt: "foo",
           },
         ],
@@ -68,7 +68,7 @@ async function renderComponent(options?: { procedures: Procedure[][] }) {
         content: options?.procedures[1] ?? [
           {
             label: "testProcedure",
-            documentUnitCount: 2,
+            documentationUnitCount: 2,
             createdAt: "foo",
           },
         ],
@@ -127,7 +127,7 @@ describe("ProcedureList", () => {
         [
           {
             label: "foo",
-            documentUnitCount: 0,
+            documentationUnitCount: 0,
             createdAt: "2023-09-18T19:57:01.826083Z",
           },
         ],
@@ -147,12 +147,12 @@ describe("ProcedureList", () => {
         [
           {
             label: "foo",
-            documentUnitCount: 0,
+            documentationUnitCount: 0,
             createdAt: "2023-09-18T19:57:01.826083Z",
           },
           {
             label: "bar",
-            documentUnitCount: 0,
+            documentationUnitCount: 0,
             createdAt: "2023-09-18T19:57:01.826083Z",
           },
         ],

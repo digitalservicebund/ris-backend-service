@@ -28,8 +28,8 @@ import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
@@ -55,7 +55,7 @@ class DocumentationUnitTransformerTest {
   @Test
   void testTransformToDTO_withoutCoreData() {
     DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
-    DocumentUnit updatedDomainObject = DocumentUnit.builder().build();
+    DocumentationUnit updatedDomainObject = DocumentationUnit.builder().build();
 
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
@@ -73,7 +73,7 @@ class DocumentationUnitTransformerTest {
   void testTransformToDTO_withoutDecisionNames() {
     DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
     Texts texts = Texts.builder().build();
-    DocumentUnit updatedDomainObject = DocumentUnit.builder().texts(texts).build();
+    DocumentationUnit updatedDomainObject = DocumentationUnit.builder().texts(texts).build();
 
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
@@ -85,7 +85,7 @@ class DocumentationUnitTransformerTest {
   void testTransformToDTO_addLegalEffectWithCoreDataDeleted_shouldSetLegalEffectToNull() {
     DocumentationUnitDTO currentDto =
         DocumentationUnitDTO.builder().court(CourtDTO.builder().build()).build();
-    DocumentUnit updatedDomainObject = DocumentUnit.builder().build();
+    DocumentationUnit updatedDomainObject = DocumentationUnit.builder().build();
 
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
@@ -103,8 +103,8 @@ class DocumentationUnitTransformerTest {
                     .id(UUID.fromString("CCCCCCCC-1111-2222-3333-444444444444"))
                     .build())
             .build();
-    DocumentUnit updatedDomainObject =
-        DocumentUnit.builder()
+    DocumentationUnit updatedDomainObject =
+        DocumentationUnit.builder()
             .coreData(
                 CoreData.builder()
                     .court(
@@ -132,8 +132,8 @@ class DocumentationUnitTransformerTest {
                     .id(UUID.fromString("CCCCCCCC-1111-2222-3333-444444444444"))
                     .build())
             .build();
-    DocumentUnit updatedDomainObject =
-        DocumentUnit.builder()
+    DocumentationUnit updatedDomainObject =
+        DocumentationUnit.builder()
             .coreData(
                 CoreData.builder()
                     .court(
@@ -161,8 +161,8 @@ class DocumentationUnitTransformerTest {
                     .id(UUID.fromString("CCCCCCCC-1111-2222-3333-444444444444"))
                     .build())
             .build();
-    DocumentUnit updatedDomainObject =
-        DocumentUnit.builder()
+    DocumentationUnit updatedDomainObject =
+        DocumentationUnit.builder()
             .coreData(
                 CoreData.builder()
                     .court(
@@ -191,8 +191,8 @@ class DocumentationUnitTransformerTest {
                     .id(UUID.fromString("CCCCCCCC-1111-2222-3333-444444444444"))
                     .build())
             .build();
-    DocumentUnit updatedDomainObject =
-        DocumentUnit.builder()
+    DocumentationUnit updatedDomainObject =
+        DocumentationUnit.builder()
             .coreData(
                 CoreData.builder()
                     .court(
@@ -214,8 +214,10 @@ class DocumentationUnitTransformerTest {
   void testTransformToDTO_withInputTypes() {
     DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
     List<String> inputTypes = List.of("input types 1", "input types 3", "input types 2");
-    DocumentUnit updatedDomainObject =
-        DocumentUnit.builder().coreData(CoreData.builder().inputTypes(inputTypes).build()).build();
+    DocumentationUnit updatedDomainObject =
+        DocumentationUnit.builder()
+            .coreData(CoreData.builder().inputTypes(inputTypes).build())
+            .build();
 
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
@@ -240,8 +242,8 @@ class DocumentationUnitTransformerTest {
             .singleNorms(List.of(SingleNorm.builder().singleNorm("single norm").build()))
             .build();
 
-    DocumentUnit updatedDomainObject =
-        DocumentUnit.builder()
+    DocumentationUnit updatedDomainObject =
+        DocumentationUnit.builder()
             .contentRelatedIndexing(
                 ContentRelatedIndexing.builder().norms(List.of(normReferenceInput)).build())
             .build();
@@ -276,8 +278,8 @@ class DocumentationUnitTransformerTest {
                         .build()))
             .build();
 
-    DocumentUnit updatedDomainObject =
-        DocumentUnit.builder()
+    DocumentationUnit updatedDomainObject =
+        DocumentationUnit.builder()
             .contentRelatedIndexing(
                 ContentRelatedIndexing.builder().norms(List.of(normReferenceInput)).build())
             .build();
@@ -327,8 +329,8 @@ class DocumentationUnitTransformerTest {
                         .build()))
             .build();
 
-    DocumentUnit updatedDomainObject =
-        DocumentUnit.builder()
+    DocumentationUnit updatedDomainObject =
+        DocumentationUnit.builder()
             .contentRelatedIndexing(
                 ContentRelatedIndexing.builder().norms(List.of(normReferenceInput)).build())
             .build();
@@ -397,8 +399,8 @@ class DocumentationUnitTransformerTest {
                         .build()))
             .build();
 
-    DocumentUnit updatedDomainObject =
-        DocumentUnit.builder()
+    DocumentationUnit updatedDomainObject =
+        DocumentationUnit.builder()
             .contentRelatedIndexing(
                 ContentRelatedIndexing.builder()
                     .norms(List.of(normReferenceInput1, normReferenceInput2))
@@ -438,15 +440,15 @@ class DocumentationUnitTransformerTest {
             .singleNorms(List.of(SingleNorm.builder().singleNorm("single norm 1").build()))
             .build();
 
-    DocumentUnit updatedDomainObject =
-        DocumentUnit.builder()
+    DocumentationUnit updatedDomainObject =
+        DocumentationUnit.builder()
             .contentRelatedIndexing(
                 ContentRelatedIndexing.builder().norms(List.of(normReferenceInput)).build())
             .build();
 
     Exception exception =
         assertThrows(
-            DocumentUnitTransformerException.class,
+            DocumentationUnitTransformerException.class,
             () -> {
               DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
             });
@@ -461,8 +463,8 @@ class DocumentationUnitTransformerTest {
   void testTransformToDTO_withLeadingDecisionNormReferences() {
     DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
     List<String> leadingDecisionNormReferences = List.of("BGB §1", "BGB §2", "BGB §3");
-    DocumentUnit updatedDomainObject =
-        DocumentUnit.builder()
+    DocumentationUnit updatedDomainObject =
+        DocumentationUnit.builder()
             .coreData(
                 CoreData.builder()
                     .court(
@@ -503,8 +505,8 @@ class DocumentationUnitTransformerTest {
                         .build()))
             .build();
 
-    DocumentUnit updatedDomainObject =
-        DocumentUnit.builder()
+    DocumentationUnit updatedDomainObject =
+        DocumentationUnit.builder()
             .coreData(
                 CoreData.builder()
                     .court(
@@ -526,8 +528,8 @@ class DocumentationUnitTransformerTest {
   void testTransformToDTO_normalizesNonBreakingSpaces() {
     DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
 
-    DocumentUnit updatedDomainObject =
-        DocumentUnit.builder()
+    DocumentationUnit updatedDomainObject =
+        DocumentationUnit.builder()
             .coreData(
                 CoreData.builder()
                     .ecli("This\u00A0is\u202Fa\uFEFFtest\u2007ecli\u180Ewith\u2060spaces")
@@ -647,10 +649,10 @@ class DocumentationUnitTransformerTest {
   }
 
   @Test
-  void testTransformToDomain_withDocumentationUnitDTOIsNull_shouldReturnEmptyDocumentUnit() {
+  void testTransformToDomain_withDocumentationUnitDTOIsNull_shouldReturnEmptyDocumentationUnit() {
 
     assertThatThrownBy(() -> DocumentationUnitTransformer.transformToDomain(null))
-        .isInstanceOf(DocumentUnitTransformerException.class)
+        .isInstanceOf(DocumentationUnitTransformerException.class)
         .hasMessageContaining("Document unit is null and won't transform");
   }
 
@@ -660,75 +662,75 @@ class DocumentationUnitTransformerTest {
         generateSimpleDTOBuilder()
             .regions(List.of(RegionDTO.builder().code("region").build()))
             .build();
-    DocumentUnit expected =
-        generateSimpleDocumentUnitBuilder()
+    DocumentationUnit expected =
+        generateSimpleDocumentationUnitBuilder()
             .coreData(generateSimpleCoreDataBuilder().region("region").build())
             .build();
 
-    DocumentUnit documentUnit =
+    DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit).isEqualTo(expected);
+    assertThat(documentationUnit).isEqualTo(expected);
   }
 
   @Test
   void testTransformToDomain_withLegalEffectYes_shouldSetLegalEffectToYes() {
     DocumentationUnitDTO documentationUnitDTO =
         generateSimpleDTOBuilder().legalEffect(LegalEffectDTO.JA).build();
-    DocumentUnit expected =
-        generateSimpleDocumentUnitBuilder()
+    DocumentationUnit expected =
+        generateSimpleDocumentationUnitBuilder()
             .coreData(generateSimpleCoreDataBuilder().legalEffect("Ja").build())
             .build();
 
-    DocumentUnit documentUnit =
+    DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit).isEqualTo(expected);
+    assertThat(documentationUnit).isEqualTo(expected);
   }
 
   @Test
   void testTransformToDomain_withLegalEffectNo_shouldSetLegalEffectToNo() {
     DocumentationUnitDTO documentationUnitDTO =
         generateSimpleDTOBuilder().legalEffect(LegalEffectDTO.NEIN).build();
-    DocumentUnit expected =
-        generateSimpleDocumentUnitBuilder()
+    DocumentationUnit expected =
+        generateSimpleDocumentationUnitBuilder()
             .coreData(generateSimpleCoreDataBuilder().legalEffect("Nein").build())
             .build();
 
-    DocumentUnit documentUnit =
+    DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit).isEqualTo(expected);
+    assertThat(documentationUnit).isEqualTo(expected);
   }
 
   @Test
   void testTransformToDomain_withLegalEffectNotSpecified_shouldSetLegalEffectToNotSpecified() {
     DocumentationUnitDTO documentationUnitDTO =
         generateSimpleDTOBuilder().legalEffect(LegalEffectDTO.KEINE_ANGABE).build();
-    DocumentUnit expected =
-        generateSimpleDocumentUnitBuilder()
+    DocumentationUnit expected =
+        generateSimpleDocumentationUnitBuilder()
             .coreData(generateSimpleCoreDataBuilder().legalEffect("Keine Angabe").build())
             .build();
 
-    DocumentUnit documentUnit =
+    DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit).isEqualTo(expected);
+    assertThat(documentationUnit).isEqualTo(expected);
   }
 
   @Test
   void testTransformToDomain_withLegalEffectWrongValue_shouldSetLegalEffectToNull() {
     DocumentationUnitDTO documentationUnitDTO =
         generateSimpleDTOBuilder().legalEffect(LegalEffectDTO.FALSCHE_ANGABE).build();
-    DocumentUnit expected =
-        generateSimpleDocumentUnitBuilder()
+    DocumentationUnit expected =
+        generateSimpleDocumentationUnitBuilder()
             .coreData(generateSimpleCoreDataBuilder().build())
             .build();
 
-    DocumentUnit documentUnit =
+    DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit).isEqualTo(expected);
+    assertThat(documentationUnit).isEqualTo(expected);
   }
 
   @Test
@@ -744,8 +746,8 @@ class DocumentationUnitTransformerTest {
                     PendingDecisionDTO.builder().note("pending with rank").rank(2).build(),
                     PendingDecisionDTO.builder().note("pending without rank").rank(0).build()))
             .build();
-    DocumentUnit expected =
-        generateSimpleDocumentUnitBuilder()
+    DocumentationUnit expected =
+        generateSimpleDocumentationUnitBuilder()
             .coreData(generateSimpleCoreDataBuilder().build())
             .ensuingDecisions(
                 List.of(
@@ -755,10 +757,10 @@ class DocumentationUnitTransformerTest {
                     EnsuingDecision.builder().pending(true).note("pending without rank").build()))
             .build();
 
-    DocumentUnit documentUnit =
+    DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit).isEqualTo(expected);
+    assertThat(documentationUnit).isEqualTo(expected);
   }
 
   @Test
@@ -769,10 +771,10 @@ class DocumentationUnitTransformerTest {
                 "lorem ipsum<border-number><number>1</number><content>foo</content></border-number> dolor sit amet <border-number><number>2</number><content>bar</content></border-number>")
             .build();
 
-    DocumentUnit documentUnit =
+    DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit.borderNumbers()).hasSize(2).containsExactly("1", "2");
+    assertThat(documentationUnit.borderNumbers()).hasSize(2).containsExactly("1", "2");
   }
 
   @Test
@@ -789,10 +791,10 @@ class DocumentationUnitTransformerTest {
                 "adipiscing <border-number><number>4</number><content>qux</content></border-number>")
             .build();
 
-    DocumentUnit documentUnit =
+    DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit.borderNumbers()).hasSize(4).containsExactly("1", "2", "3", "4");
+    assertThat(documentationUnit.borderNumbers()).hasSize(4).containsExactly("1", "2", "3", "4");
   }
 
   @Test
@@ -800,10 +802,10 @@ class DocumentationUnitTransformerTest {
     DocumentationUnitDTO documentationUnitDTO =
         generateSimpleDTOBuilder().grounds("lorem ipsum dolor sit amet").build();
 
-    DocumentUnit documentUnit =
+    DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit.borderNumbers()).isEmpty();
+    assertThat(documentationUnit.borderNumbers()).isEmpty();
   }
 
   @Test
@@ -815,10 +817,10 @@ class DocumentationUnitTransformerTest {
                 "lorem ipsum<border-number><content>foo</content></border-number> dolor sit amet <border-number><number>2</number><content>bar</content></border-number>")
             .build();
 
-    DocumentUnit documentUnit =
+    DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit.borderNumbers()).hasSize(1).containsExactly("2");
+    assertThat(documentationUnit.borderNumbers()).hasSize(1).containsExactly("2");
   }
 
   @Test
@@ -841,10 +843,10 @@ class DocumentationUnitTransformerTest {
                         .build()))
             .build();
 
-    DocumentUnit documentUnit =
+    DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit.coreData().leadingDecisionNormReferences())
+    assertThat(documentationUnit.coreData().leadingDecisionNormReferences())
         .hasSize(3)
         .containsExactly("BGB §1", "BGB §2", "BGB §3");
   }
@@ -869,11 +871,12 @@ class DocumentationUnitTransformerTest {
                         .build()))
             .build();
 
-    DocumentUnit documentUnit =
+    DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit.status().publicationStatus()).isEqualTo(PublicationStatus.UNPUBLISHED);
-    assertThat(documentUnit.status().withError()).isFalse();
+    assertThat(documentationUnit.status().publicationStatus())
+        .isEqualTo(PublicationStatus.UNPUBLISHED);
+    assertThat(documentationUnit.status().withError()).isFalse();
   }
 
   @Test
@@ -895,17 +898,29 @@ class DocumentationUnitTransformerTest {
                         .build()))
             .build();
 
-    DocumentUnit documentUnit =
+    DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit.contentRelatedIndexing().norms()).hasSize(1);
-    assertThat(documentUnit.contentRelatedIndexing().norms().get(0).normAbbreviation().id())
+    assertThat(documentationUnit.contentRelatedIndexing().norms()).hasSize(1);
+    assertThat(documentationUnit.contentRelatedIndexing().norms().get(0).normAbbreviation().id())
         .isEqualTo(normAbbreviationId);
     assertThat(
-            documentUnit.contentRelatedIndexing().norms().get(0).singleNorms().get(0).singleNorm())
+            documentationUnit
+                .contentRelatedIndexing()
+                .norms()
+                .get(0)
+                .singleNorms()
+                .get(0)
+                .singleNorm())
         .isEqualTo("single norm 1");
     assertThat(
-            documentUnit.contentRelatedIndexing().norms().get(0).singleNorms().get(1).singleNorm())
+            documentationUnit
+                .contentRelatedIndexing()
+                .norms()
+                .get(0)
+                .singleNorms()
+                .get(1)
+                .singleNorm())
         .isEqualTo("single norm 2");
   }
 
@@ -927,19 +942,31 @@ class DocumentationUnitTransformerTest {
                         .build()))
             .build();
 
-    DocumentUnit documentUnit =
+    DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit.contentRelatedIndexing().norms()).hasSize(2);
-    assertThat(documentUnit.contentRelatedIndexing().norms().get(0).normAbbreviation().id())
+    assertThat(documentationUnit.contentRelatedIndexing().norms()).hasSize(2);
+    assertThat(documentationUnit.contentRelatedIndexing().norms().get(0).normAbbreviation().id())
         .isEqualTo(documentationUnitDTO.getNormReferences().get(0).getNormAbbreviation().getId());
-    assertThat(documentUnit.contentRelatedIndexing().norms().get(1).normAbbreviation().id())
+    assertThat(documentationUnit.contentRelatedIndexing().norms().get(1).normAbbreviation().id())
         .isEqualTo(documentationUnitDTO.getNormReferences().get(1).getNormAbbreviation().getId());
     assertThat(
-            documentUnit.contentRelatedIndexing().norms().get(0).singleNorms().get(0).singleNorm())
+            documentationUnit
+                .contentRelatedIndexing()
+                .norms()
+                .get(0)
+                .singleNorms()
+                .get(0)
+                .singleNorm())
         .isEqualTo("single norm 1");
     assertThat(
-            documentUnit.contentRelatedIndexing().norms().get(1).singleNorms().get(0).singleNorm())
+            documentationUnit
+                .contentRelatedIndexing()
+                .norms()
+                .get(1)
+                .singleNorms()
+                .get(0)
+                .singleNorm())
         .isEqualTo("single norm 2");
   }
 
@@ -948,40 +975,40 @@ class DocumentationUnitTransformerTest {
     DocumentationUnitDTO documentationUnitDTO =
         generateSimpleDTOBuilder().note("Beispiel Notiz").build();
 
-    DocumentUnit documentUnit =
+    DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit.note()).isEqualTo("Beispiel Notiz");
+    assertThat(documentationUnit.note()).isEqualTo("Beispiel Notiz");
   }
 
   @Test
   void testTransformToDomain_withEmptyNote_shouldAddEmptyNote() {
     DocumentationUnitDTO documentationUnitDTO = generateSimpleDTOBuilder().note("").build();
 
-    DocumentUnit documentUnit =
+    DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit.note()).isEmpty();
+    assertThat(documentationUnit.note()).isEmpty();
   }
 
   @Test
   void testTransformToDomain_withNullNote_shouldAddNullNote() {
     DocumentationUnitDTO documentationUnitDTO = generateSimpleDTOBuilder().note(null).build();
 
-    DocumentUnit documentUnit =
+    DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit.note()).isNull();
+    assertThat(documentationUnit.note()).isNull();
   }
 
   @Test
   void testTransformToDomain_withoutNote_shouldAddNoNote() {
     DocumentationUnitDTO documentationUnitDTO = generateSimpleDTOBuilder().build();
 
-    DocumentUnit documentUnit =
+    DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit.note()).isNull();
+    assertThat(documentationUnit.note()).isNull();
   }
 
   private DocumentationUnitDTOBuilder generateSimpleDTOBuilder() {
@@ -999,15 +1026,15 @@ class DocumentationUnitTransformerTest {
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitTransformer.transformToDTO(
             currentDto,
-            generateSimpleDocumentUnitBuilder().coreData(coreDataBuilder.build()).build());
+            generateSimpleDocumentationUnitBuilder().coreData(coreDataBuilder.build()).build());
 
     assertEquals(
         documentationUnitDTO.getYearsOfDispute().stream().map(YearOfDisputeDTO::getRank).toList(),
         List.of(1, 2, 3));
   }
 
-  private DocumentUnit.DocumentUnitBuilder generateSimpleDocumentUnitBuilder() {
-    return DocumentUnit.builder()
+  private DocumentationUnit.DocumentationUnitBuilder generateSimpleDocumentationUnitBuilder() {
+    return DocumentationUnit.builder()
         .previousDecisions(Collections.emptyList())
         .ensuingDecisions(Collections.emptyList())
         .texts(Texts.builder().build())

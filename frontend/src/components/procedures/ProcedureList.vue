@@ -44,7 +44,7 @@ async function loadDocumentUnits(loadingProcedure: Procedure) {
     responseError.value = undefined
   }
   if (!currentPage.value?.content) return
-  if (loadingProcedure.documentUnitCount == 0) return
+  if (loadingProcedure.documentationUnitCount == 0) return
   if (loadingProcedure.documentUnits) return
 
   const response = await service.getDocumentUnits(loadingProcedure.id)
@@ -95,7 +95,7 @@ async function handleDeleteDocumentationUnit(
         currentPage.value!.content.indexOf(updatedProcedure)
       ]
 
-    owningProcedure.documentUnitCount -= 1
+    owningProcedure.documentationUnitCount -= 1
 
     owningProcedure.documentUnits = updatedProcedure.documentUnits?.filter(
       (documentationUnit) =>
@@ -209,7 +209,7 @@ onMounted(() => {
                 >
                   <IconBaselineDescription class="w-16 text-blue-800" />
                   <span>
-                    {{ procedure.documentUnitCount }}
+                    {{ procedure.documentationUnitCount }}
                   </span>
                 </div>
               </div>

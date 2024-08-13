@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import java.util.List;
@@ -150,7 +150,7 @@ class ReferencesTransformerTest {
     List<ReferenceDTO> referenceDTOS =
         DocumentationUnitTransformer.transformToDTO(
                 DocumentationUnitDTO.builder().build(),
-                DocumentUnit.builder().references(List.of(reference)).build())
+                DocumentationUnit.builder().references(List.of(reference)).build())
             .getReferences();
 
     assertEquals(1, referenceDTOS.size());

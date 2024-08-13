@@ -11,10 +11,10 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclingService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
+import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.S3AttachmentService;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverter;
@@ -40,9 +40,9 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
@@ -87,12 +87,12 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 @RISIntegrationTest(
     imports = {
-      DocumentUnitService.class,
+      DocumentationUnitService.class,
       DocumentationUnitDocxMetadataInitializationService.class,
       PostgresDeltaMigrationRepositoryImpl.class,
       DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentNumberRecyclingService.class,
-      DatabaseDocumentUnitStatusService.class,
+      DatabaseDocumentationUnitStatusService.class,
       DatabaseProcedureService.class,
       PostgresHandoverReportRepositoryImpl.class,
       PostgresDocumentationUnitRepositoryImpl.class,
@@ -108,8 +108,8 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
       PostgresCourtRepositoryImpl.class,
       PostgresDocumentTypeRepositoryImpl.class
     },
-    controllers = {DocumentUnitController.class})
-class DocumentUnitControllerDocxFilesIntegrationTest {
+    controllers = {DocumentationUnitController.class})
+class DocumentationUnitControllerDocxFilesIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
       new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
@@ -136,7 +136,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   @Autowired private CourtRepository courtRepository;
   @Autowired private DocumentTypeRepository documentTypeRepository;
   @SpyBean private DocumentationUnitDocxMetadataInitializationService service;
-  @Autowired private DocumentUnitService documentUnitService;
+  @Autowired private DocumentationUnitService documentationUnitService;
 
   @MockBean private S3Client s3Client;
 
@@ -401,7 +401,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   }
 
   @Test
-  void testRemoveFileFromDocumentUnit() {
+  void testRemoveFileFromDocumentationUnit() {
     when(s3Client.deleteObject(any(DeleteObjectRequest.class)))
         .thenReturn(DeleteObjectResponse.builder().build());
 
@@ -435,7 +435,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   }
 
   @Test
-  void testRemoveFileFromDocumentUnit_withInvalidUuid() {
+  void testRemoveFileFromDocumentationUnit_withInvalidUuid() {
     risWebTestClient
         .withDefaultLogin()
         .delete()

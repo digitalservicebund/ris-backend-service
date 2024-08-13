@@ -10,13 +10,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseStatusRepository;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberFormatterException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberPatternException;
-import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentUnitDeletionException;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
@@ -41,13 +41,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@Import({DocumentUnitService.class, DatabaseDocumentUnitStatusService.class})
-class DocumentUnitServiceTest {
+@Import({DocumentationUnitService.class, DatabaseDocumentationUnitStatusService.class})
+class DocumentationUnitServiceTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
-  @SpyBean private DocumentUnitService service;
+  @SpyBean private DocumentationUnitService service;
   @MockBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
   @MockBean private DatabaseStatusRepository statusRepository;
-  @MockBean private DocumentUnitRepository repository;
+  @MockBean private DocumentationUnitRepository repository;
   @MockBean private DocumentNumberService documentNumberService;
   @MockBean private DocumentNumberRecyclingService documentNumberRecyclingService;
   @MockBean private MailService mailService;
@@ -59,45 +59,45 @@ class DocumentUnitServiceTest {
   @Captor private ArgumentCaptor<RelatedDocumentationUnit> relatedDocumentationUnitCaptor;
 
   @Test
-  void testGenerateNewDocumentUnit()
+  void testGenerateNewDocumentationUnit()
       throws DocumentationUnitExistsException,
           DocumentNumberPatternException,
           DocumentNumberFormatterException {
     DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
-    DocumentUnit documentUnit = DocumentUnit.builder().build();
+    DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
 
-    when(repository.createNewDocumentUnit("nextDocumentNumber", documentationOffice))
-        .thenReturn(documentUnit);
+    when(repository.createNewDocumentationUnit("nextDocumentNumber", documentationOffice))
+        .thenReturn(documentationUnit);
     when(documentNumberService.generateDocumentNumber(documentationOffice.abbreviation()))
         .thenReturn("nextDocumentNumber");
     // Can we use a captor to check if the document number was correctly created?
     // The chicken-egg-problem is, that we are dictating what happens when
     // repository.save(), so we can't just use a captor at the same time
 
-    Assertions.assertNotNull(service.generateNewDocumentUnit(documentationOffice));
+    Assertions.assertNotNull(service.generateNewDocumentationUnit(documentationOffice));
 
     verify(documentNumberService).generateDocumentNumber(documentationOffice.abbreviation());
-    verify(repository).createNewDocumentUnit("nextDocumentNumber", documentationOffice);
+    verify(repository).createNewDocumentationUnit("nextDocumentNumber", documentationOffice);
   }
 
   @Test
   void testGetByDocumentnumber() {
     when(repository.findByDocumentNumber("ABCDE20220001"))
-        .thenReturn(Optional.of(DocumentUnit.builder().build()));
-    var documentUnit = service.getByDocumentNumber("ABCDE20220001");
-    assertEquals(documentUnit.getClass(), DocumentUnit.class);
+        .thenReturn(Optional.of(DocumentationUnit.builder().build()));
+    var documentationUnit = service.getByDocumentNumber("ABCDE20220001");
+    assertEquals(documentationUnit.getClass(), DocumentationUnit.class);
 
     verify(repository).findByDocumentNumber("ABCDE20220001");
   }
 
   @Test
   void testDeleteByUuid_withoutFileAttached() throws DocumentationUnitNotExistsException {
-    // I think I shouldn't have to insert a specific DocumentUnit object here?
+    // I think I shouldn't have to insert a specific DocumentationUnit object here?
     // But if I don't, the test by itself succeeds, but fails if all tests in this class run
     // something flaky with the repository mock? Investigate this later
-    DocumentUnit documentUnit = DocumentUnit.builder().uuid(TEST_UUID).build();
-    // can we also test that the fileUuid from the DocumentUnit is used? with a captor somehow?
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.of(documentUnit));
+    DocumentationUnit documentationUnit = DocumentationUnit.builder().uuid(TEST_UUID).build();
+    // can we also test that the fileUuid from the DocumentationUnit is used? with a captor somehow?
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.of(documentationUnit));
 
     var string = service.deleteByUuid(TEST_UUID);
     assertNotNull(string);
@@ -108,15 +108,15 @@ class DocumentUnitServiceTest {
 
   @Test
   void testDeleteByUuid_withFileAttached() throws DocumentationUnitNotExistsException {
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
             .uuid(TEST_UUID)
             .attachments(
                 Collections.singletonList(
                     Attachment.builder().s3path(TEST_UUID.toString()).build()))
             .build();
 
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.ofNullable(documentUnit));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.ofNullable(documentationUnit));
 
     var string = service.deleteByUuid(TEST_UUID);
     assertNotNull(string);
@@ -128,8 +128,10 @@ class DocumentUnitServiceTest {
   @Test
   void testDeleteByUuid_withoutFileAttached_withExceptionFromRepository() {
     when(repository.findByUuid(TEST_UUID))
-        .thenReturn(Optional.ofNullable(DocumentUnit.builder().build()));
-    doThrow(new IllegalArgumentException()).when(repository).delete(DocumentUnit.builder().build());
+        .thenReturn(Optional.ofNullable(DocumentationUnit.builder().build()));
+    doThrow(new IllegalArgumentException())
+        .when(repository)
+        .delete(DocumentationUnit.builder().build());
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> service.deleteByUuid(TEST_UUID));
 
@@ -139,12 +141,12 @@ class DocumentUnitServiceTest {
   @Test
   void testDeleteByUuid_withLinks() {
     when(repository.findByUuid(TEST_UUID))
-        .thenReturn(Optional.ofNullable(DocumentUnit.builder().build()));
+        .thenReturn(Optional.ofNullable(DocumentationUnit.builder().build()));
     when(repository.getAllDocumentationUnitWhichLink(TEST_UUID))
         .thenReturn(Map.of(ACTIVE_CITATION, 2L));
-    DocumentUnitDeletionException throwable =
+    DocumentationUnitDeletionException throwable =
         Assertions.assertThrows(
-            DocumentUnitDeletionException.class, () -> service.deleteByUuid(TEST_UUID));
+            DocumentationUnitDeletionException.class, () -> service.deleteByUuid(TEST_UUID));
     Assertions.assertTrue(
         throwable
             .getMessage()
@@ -153,25 +155,26 @@ class DocumentUnitServiceTest {
   }
 
   @Test
-  void testUpdateDocumentUnit() throws DocumentationUnitNotExistsException {
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
+  void testUpdateDocumentationUnit() throws DocumentationUnitNotExistsException {
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
             .uuid(UUID.randomUUID())
             .documentNumber("ABCDE20220001")
             .attachments(
                 Collections.singletonList(
                     Attachment.builder().uploadTimestamp(Instant.now()).build()))
             .build();
-    when(repository.findByUuid(documentUnit.uuid())).thenReturn(Optional.of(documentUnit));
+    when(repository.findByUuid(documentationUnit.uuid()))
+        .thenReturn(Optional.of(documentationUnit));
 
-    var du = service.updateDocumentUnit(documentUnit);
-    assertEquals(du, documentUnit);
+    var du = service.updateDocumentationUnit(documentationUnit);
+    assertEquals(du, documentationUnit);
 
-    verify(repository).save(documentUnit);
+    verify(repository).save(documentationUnit);
   }
 
   @Test
-  void testSearchByDocumentUnitListEntry() {
+  void testSearchByDocumentationUnitListEntry() {
     DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
     DocumentationUnitSearchInput documentationUnitSearchInput =
         DocumentationUnitSearchInput.builder().build();
@@ -201,7 +204,7 @@ class DocumentUnitServiceTest {
   }
 
   @Test
-  void testSearchByDocumentUnitListEntry_shouldNormalizeSpaces() {
+  void testSearchByDocumentationUnitListEntry_shouldNormalizeSpaces() {
     DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
     DocumentationUnitListItem documentationUnitListItem =
         DocumentationUnitListItem.builder().build();

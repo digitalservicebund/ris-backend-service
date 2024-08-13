@@ -50,9 +50,9 @@ public class ProcedureController {
 
   @GetMapping(value = "/{procedureUUID}/documentunits", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public List<DocumentationUnitListItem> getDocumentUnits(
+  public List<DocumentationUnitListItem> getDocumentationUnits(
       @AuthenticationPrincipal OidcUser oidcUser, @NonNull @PathVariable UUID procedureUUID) {
-    return service.getDocumentUnits(procedureUUID);
+    return service.getDocumentationUnits(procedureUUID);
   }
 
   @DeleteMapping(value = "/{procedureUUID}")

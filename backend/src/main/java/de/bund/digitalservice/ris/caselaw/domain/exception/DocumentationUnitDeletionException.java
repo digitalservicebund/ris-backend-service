@@ -3,13 +3,13 @@ package de.bund.digitalservice.ris.caselaw.domain.exception;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType;
 import java.util.Map;
 
-public class DocumentUnitDeletionException extends RuntimeException {
+public class DocumentationUnitDeletionException extends RuntimeException {
 
-  public DocumentUnitDeletionException(String message) {
+  public DocumentationUnitDeletionException(String message) {
     super(message);
   }
 
-  public DocumentUnitDeletionException(
+  public DocumentationUnitDeletionException(
       String message, Map<RelatedDocumentationType, Long> relatedEntities) {
     super(printRelatedEntities(message, relatedEntities));
   }

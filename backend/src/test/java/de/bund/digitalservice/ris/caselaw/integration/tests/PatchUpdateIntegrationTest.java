@@ -17,10 +17,10 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclingService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabasePatchMapperService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
+import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
@@ -44,10 +44,10 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
@@ -79,13 +79,13 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @RISIntegrationTest(
     imports = {
-      DocumentUnitService.class,
+      DocumentationUnitService.class,
       PostgresDeltaMigrationRepositoryImpl.class,
       AuthService.class,
       KeycloakUserService.class,
       DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentNumberRecyclingService.class,
-      DatabaseDocumentUnitStatusService.class,
+      DatabaseDocumentationUnitStatusService.class,
       DatabasePatchMapperService.class,
       PostgresDocumentationUnitRepositoryImpl.class,
       PostgresHandoverReportRepositoryImpl.class,
@@ -96,7 +96,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       TestConfig.class,
       DocumentNumberPatternConfig.class
     },
-    controllers = {DocumentUnitController.class})
+    controllers = {DocumentationUnitController.class})
 @Slf4j
 @SuppressWarnings("java:S5961")
 class PatchUpdateIntegrationTest {
@@ -203,7 +203,7 @@ class PatchUpdateIntegrationTest {
     TestTransaction.flagForCommit();
     TestTransaction.end();
 
-    DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
+    DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
 
     RisJsonPatch patch =
         new RisJsonPatch(0L, new JsonPatch(Collections.emptyList()), Collections.emptyList());
@@ -246,7 +246,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
 
       List<JsonPatchOperation> operationsUser1 =
           List.of(new AddOperation("/coreData/ecli", new TextNode("ecliUser1")));
@@ -345,7 +345,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
 
       List<JsonPatchOperation> operationsUser1 =
           List.of(new AddOperation("/coreData/ecli", new TextNode("ecliUser1")));
@@ -502,7 +502,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
 
       List<JsonPatchOperation> operationsUser1 =
           List.of(new AddOperation("/coreData/ecli", new TextNode("ecliUser1")));
@@ -615,7 +615,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
       DocumentationUnitDTO dto = repository.findById(documentationUnit.uuid()).get();
@@ -722,7 +722,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
       DocumentationUnitDTO dto = repository.findById(documentationUnit.uuid()).get();
@@ -886,7 +886,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
       DocumentationUnitDTO dto = repository.findById(documentationUnit.uuid()).get();
@@ -1002,7 +1002,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
 
       List<JsonPatchOperation> operationsUser1 =
           List.of(new AddOperation("/coreData/fileNumbers/0", new TextNode("fileNumberUser1")));
@@ -1105,7 +1105,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
 
       List<JsonPatchOperation> operationsUser1 =
           List.of(new AddOperation("/coreData/fileNumbers/0", new TextNode("fileNumberUser1")));
@@ -1265,7 +1265,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
 
       List<JsonPatchOperation> operationsUser1 =
           List.of(new AddOperation("/coreData/fileNumbers/0", new TextNode("fileNumberUser1")));
@@ -1380,7 +1380,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
       DocumentationUnitDTO dto = repository.findById(documentationUnit.uuid()).get();
@@ -1481,7 +1481,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
       DocumentationUnitDTO dto = repository.findById(documentationUnit.uuid()).get();
@@ -1634,7 +1634,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
       DocumentationUnitDTO dto = repository.findById(documentationUnit.uuid()).get();
@@ -1750,7 +1750,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
 
       JsonNode courtAsNode =
           objectMapper.convertValue(
@@ -1894,7 +1894,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
 
       JsonNode courtAsNode =
           objectMapper.convertValue(
@@ -2104,7 +2104,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
 
       JsonNode court1AsNode =
           objectMapper.convertValue(
@@ -2262,7 +2262,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
       DocumentationUnitDTO documentationUnitDTO =
@@ -2388,7 +2388,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
       DocumentationUnitDTO documentationUnitDTO =
@@ -2572,7 +2572,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
       DocumentationUnitDTO documentationUnitDTO =
@@ -2706,7 +2706,7 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
       DocumentationUnitDTO documentationUnitDTO =
@@ -2852,8 +2852,8 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
-      DocumentUnit previousDecision = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit previousDecision = generateEmptyDocumentationUnit();
 
       JsonNode previousDecisionAsNode =
           objectMapper.convertValue(
@@ -3032,8 +3032,8 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
-      DocumentUnit previousDecision = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit previousDecision = generateEmptyDocumentationUnit();
 
       JsonNode previousDecisionAsNode =
           objectMapper.convertValue(
@@ -3309,9 +3309,9 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
-      DocumentUnit previousDecision1 = generateEmptyDocumentationUnit();
-      DocumentUnit previousDecision2 = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit previousDecision1 = generateEmptyDocumentationUnit();
+      DocumentationUnit previousDecision2 = generateEmptyDocumentationUnit();
 
       JsonNode previousDecision1AsNode =
           objectMapper.convertValue(
@@ -3516,8 +3516,8 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
-      DocumentUnit previousDecision = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit previousDecision = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
       TestTransaction.flagForCommit();
@@ -3636,8 +3636,8 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
-      DocumentUnit previousDecision = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit previousDecision = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
       TestTransaction.flagForCommit();
@@ -3816,8 +3816,8 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
-      DocumentUnit previousDecision1 = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit previousDecision1 = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
       TestTransaction.flagForCommit();
@@ -3944,9 +3944,9 @@ class PatchUpdateIntegrationTest {
       TestTransaction.flagForCommit();
       TestTransaction.end();
 
-      DocumentUnit documentationUnit = generateEmptyDocumentationUnit();
-      DocumentUnit previousDecision1 = generateEmptyDocumentationUnit();
-      DocumentUnit previousDecision2 = generateEmptyDocumentationUnit();
+      DocumentationUnit documentationUnit = generateEmptyDocumentationUnit();
+      DocumentationUnit previousDecision1 = generateEmptyDocumentationUnit();
+      DocumentationUnit previousDecision2 = generateEmptyDocumentationUnit();
 
       TestTransaction.start();
       TestTransaction.flagForCommit();
@@ -4082,8 +4082,8 @@ class PatchUpdateIntegrationTest {
     }
   }
 
-  private DocumentUnit generateEmptyDocumentationUnit() {
-    RisEntityExchangeResult<DocumentUnit> result =
+  private DocumentationUnit generateEmptyDocumentationUnit() {
+    RisEntityExchangeResult<DocumentationUnit> result =
         risWebTestClient
             .withDefaultLogin()
             .get()
@@ -4091,7 +4091,7 @@ class PatchUpdateIntegrationTest {
             .exchange()
             .expectStatus()
             .isCreated()
-            .expectBody(DocumentUnit.class)
+            .expectBody(DocumentationUnit.class)
             .returnResult();
 
     assertThat(result.getResponseBody()).isNotNull();

@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.converter.docx;
 
-import static de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocumentUnitDocxBuilder.NON_BREAKING_SPACE;
-import static de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocumentUnitDocxBuilder.SOFT_HYPHEN;
+import static de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocumentationUnitDocxBuilder.NON_BREAKING_SPACE;
+import static de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocumentationUnitDocxBuilder.SOFT_HYPHEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -17,7 +17,7 @@ import de.bund.digitalservice.ris.caselaw.domain.docx.BorderNumber;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocxImagePart;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ErrorRunElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.InlineImageElement;
-import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingList;
+import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingList.DocumentationUnitNumberingListNumberFormat;
 import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ParagraphElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.RunElement;
@@ -71,11 +71,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class DocumentUnitDocxBuilderTest {
+class DocumentationUnitDocxBuilderTest {
 
   @Test
   void test_withoutConvertableElements() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     var result = builder.build();
 
     assertNull(result);
@@ -83,7 +83,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testSetParagraph() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
 
     var returnedBuilder = builder.setParagraph(paragraph);
@@ -94,7 +94,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withBorderNumber() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
     PPr pPr = new PPr();
     NumPr numPr = new NumPr();
@@ -126,7 +126,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withListParagraphBorderNumber_shouldSucceed() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
     PPr pPr = new PPr();
     PPrBase.PStyle pStyle = new PPrBase.PStyle();
@@ -138,12 +138,12 @@ class DocumentUnitDocxBuilderTest {
 
     assertTrue(result instanceof BorderNumber);
     // it won't have a number assigned because postprocessing is not done, see the
-    // DocumentUnitDocxListUtilsTest for testing the postprocessing of border numbers
+    // DocumentationUnitDocxListUtilsTest for testing the postprocessing of border numbers
   }
 
   @Test
   void testBuild_withListenabsatzBorderNumber_shouldSucceed() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
     PPr pPr = new PPr();
     PPrBase.PStyle pStyle = new PPrBase.PStyle();
@@ -160,7 +160,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withBorderNumberThatHasNoBorderNumberTemplateStyle_shouldSucceed() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
     PPr pPr = new PPr();
     BooleanDefaultTrue keepNext = new BooleanDefaultTrue();
@@ -187,7 +187,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withBorderNumberThatHasNoBorderNumberTemplateStyle_wrongTextShouldFail() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
     PPr pPr = new PPr();
     BooleanDefaultTrue keepNext = new BooleanDefaultTrue();
@@ -212,7 +212,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withText() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
 
     R wrongRun = new R();
@@ -241,7 +241,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withParagraphWithoutText() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
     R run = new R();
     paragraph.getContent().add(run);
@@ -259,7 +259,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withTextAndParagraphAlignmentRight() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
     PPr pPr = new PPr();
     Jc jc = new Jc();
@@ -289,7 +289,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withTextAndParagraphAlignmentLeft() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
     PPr pPr = new PPr();
     Jc jc = new Jc();
@@ -319,7 +319,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withTextAndParagraphAlignmentJustify() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
     PPr pPr = new PPr();
     Jc jc = new Jc();
@@ -349,7 +349,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withTextAndParagraphAlignmentCenter() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
     PPr pPr = new PPr();
     Jc jc = new Jc();
@@ -379,7 +379,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withTextAndSize() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
 
     RPr rPr = new RPr();
@@ -425,7 +425,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withTextAndWeight() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
     RPr rPr = new RPr();
     BooleanDefaultTrue bold = new BooleanDefaultTrue();
@@ -456,7 +456,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withTextAndItalic() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
     RPr rPr = new RPr();
     BooleanDefaultTrue italic = new BooleanDefaultTrue();
@@ -487,7 +487,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withTextAndStrike() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
     RPr rPr = new RPr();
     BooleanDefaultTrue strike = new BooleanDefaultTrue();
@@ -518,7 +518,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withTextAndUnderline() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
     RPr rPr = new RPr();
     U underline = new U();
@@ -549,7 +549,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withTextAndSubscript() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
 
     RPr rPr = new RPr();
@@ -581,7 +581,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withTextAndSuperscript() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
 
     RPr rPr = new RPr();
@@ -628,7 +628,7 @@ class DocumentUnitDocxBuilderTest {
             .addRunElement(TestDocxBuilder.buildTextRunElement("text"))
             .build();
 
-    var result = DocumentUnitDocxBuilder.newInstance().setParagraph(paragraph).build();
+    var result = DocumentationUnitDocxBuilder.newInstance().setParagraph(paragraph).build();
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -656,7 +656,7 @@ class DocumentUnitDocxBuilderTest {
             .addRunElement(TestDocxBuilder.buildTextRunElement("text"))
             .build();
 
-    var result = DocumentUnitDocxBuilder.newInstance().setParagraph(paragraph).build();
+    var result = DocumentationUnitDocxBuilder.newInstance().setParagraph(paragraph).build();
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -697,7 +697,7 @@ class DocumentUnitDocxBuilderTest {
     var converter = new DocxConverter();
     converter.setStyles(styles);
     var result =
-        DocumentUnitDocxBuilder.newInstance()
+        DocumentationUnitDocxBuilder.newInstance()
             .setParagraph(paragraph)
             .setConverter(converter)
             .build();
@@ -722,7 +722,7 @@ class DocumentUnitDocxBuilderTest {
             .addRunElement(TestDocxBuilder.buildTextRunElement("run text 2"))
             .build();
 
-    var result = DocumentUnitDocxBuilder.newInstance().setParagraph(paragraph).build();
+    var result = DocumentationUnitDocxBuilder.newInstance().setParagraph(paragraph).build();
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -742,7 +742,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withInlineImage() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
     R run = new R();
     Drawing drawing = new Drawing();
@@ -774,7 +774,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withInlineImage_withAlternateText() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
     R run = new R();
     Drawing drawing = new Drawing();
@@ -808,7 +808,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withInlineImage_withSize() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
     R run = new R();
     Drawing drawing = new Drawing();
@@ -842,7 +842,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withInlineImage_withAlternateTextAndSize() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
     R run = new R();
     Drawing drawing = new Drawing();
@@ -876,7 +876,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withAnchorGraphic() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
     R run = new R();
     Drawing drawing = new Drawing();
@@ -908,7 +908,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withAnchorGraphic_withLeftFloating() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
     R run = new R();
     Drawing drawing = new Drawing();
@@ -942,7 +942,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withAnchorGraphic_withRightFloating() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
     R run = new R();
     Drawing drawing = new Drawing();
@@ -976,7 +976,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withAnchorGraphic_withUnknownFloating() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
     R run = new R();
     Drawing drawing = new Drawing();
@@ -1007,7 +1007,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withMultipleGraphicObjects() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
     R run = new R();
     Drawing drawing = new Drawing();
@@ -1025,7 +1025,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withInlineImageWithoutGraphicData() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P paragraph = new P();
     R run = new R();
     Drawing drawing = new Drawing();
@@ -1042,7 +1042,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withNumberingList() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     PPr pPr = new PPr();
     NumPr numPr = new NumPr();
     NumId numId = new NumId();
@@ -1090,7 +1090,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withNumberingList_havingBullets() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     PPr pPr = new PPr();
     NumPr numPr = new NumPr();
     NumId numId = new NumId();
@@ -1121,7 +1121,7 @@ class DocumentUnitDocxBuilderTest {
     assertTrue(result instanceof NumberingListEntry);
     var numberingListEntry = (NumberingListEntry) result;
     assertEquals(
-        NumberingList.DocumentUnitNumberingListNumberFormat.BULLET,
+        DocumentationUnitNumberingListNumberFormat.BULLET,
         numberingListEntry.numberingListEntryIndex().numberFormat());
   }
 
@@ -1139,7 +1139,7 @@ class DocumentUnitDocxBuilderTest {
     var converter = new DocxConverter();
     converter.setImages(TestDocxBuilder.getImageMap());
     var result =
-        DocumentUnitDocxBuilder.newInstance()
+        DocumentationUnitDocxBuilder.newInstance()
             .setParagraph(paragraph)
             .setConverter(converter)
             .build();
@@ -1167,7 +1167,7 @@ class DocumentUnitDocxBuilderTest {
     var converter = new DocxConverter();
     converter.setImages(TestDocxBuilder.getImageMap());
     var result =
-        DocumentUnitDocxBuilder.newInstance()
+        DocumentationUnitDocxBuilder.newInstance()
             .setParagraph(paragraph)
             .setConverter(converter)
             .build();
@@ -1187,7 +1187,7 @@ class DocumentUnitDocxBuilderTest {
     runElement.getContent().add(new JAXBElement<>(new QName("error run"), String.class, "error"));
     P paragraph = TestDocxBuilder.newParagraphBuilder().addRunElement(runElement).build();
 
-    var result = DocumentUnitDocxBuilder.newInstance().setParagraph(paragraph).build();
+    var result = DocumentationUnitDocxBuilder.newInstance().setParagraph(paragraph).build();
 
     assertThat(result).isInstanceOf(ParagraphElement.class);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -1197,7 +1197,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withNumberingList_withNotAllowedNumberingFormat() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     PPr pPr = new PPr();
     NumPr numPr = new NumPr();
     NumId numId = new NumId();
@@ -1243,7 +1243,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withNumberingList_withoutNumId() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     PPr pPr = new PPr();
     NumPr numPr = new NumPr();
     NumId numId = new NumId();
@@ -1289,7 +1289,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withNumberingList_withoutListLevel() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     PPr pPr = new PPr();
     NumPr numPr = new NumPr();
     NumId numId = new NumId();
@@ -1381,7 +1381,7 @@ class DocumentUnitDocxBuilderTest {
       expectedValues = inputTextNodes;
     }
 
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P parentParagraph = new P();
     for (String textNodeValue : inputTextNodes) {
       R run = new R();
@@ -1407,7 +1407,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_paragraphWithSpecialHyphenRunElements_shouldBeTransformed() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
     P parentParagraph = new P();
 
     // SoftHyphen

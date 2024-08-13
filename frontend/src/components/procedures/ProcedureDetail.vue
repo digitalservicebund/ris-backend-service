@@ -18,15 +18,20 @@ const emit = defineEmits<{
 }>()
 
 /**
- * Sets loading state to true, when mismatch between the documentUnitCount and the actual loaded documentUnits
+ * Sets loading state to true, when mismatch between the documentationUnitCount and the actual loaded documentUnits
  */
 const isLoading = computed(
-  () => !props.procedure.documentUnits && props.procedure.documentUnitCount > 0,
+  () =>
+    !props.procedure.documentUnits &&
+    props.procedure.documentationUnitCount > 0,
 )
 </script>
 
 <template>
-  <div v-if="procedure.documentUnitCount > 0" class="pb-12 pl-24 pr-48 pt-36">
+  <div
+    v-if="procedure.documentationUnitCount > 0"
+    class="pb-12 pl-24 pr-48 pt-36"
+  >
     <DocumentUnitList
       class="grow"
       :document-unit-list-entries="procedure.documentUnits"
