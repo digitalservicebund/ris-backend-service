@@ -2,7 +2,6 @@
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import { Mask } from "maska"
-import { vMaska } from "maska/vue"
 import { computed, onMounted, ref, watch } from "vue"
 import { ValidationError } from "@/components/input/types"
 
@@ -14,6 +13,7 @@ interface Props {
   isFutureDate?: boolean
   hasError?: boolean
   size?: "regular" | "medium" | "small"
+  readOnly?: boolean
 }
 
 const props = defineProps<Props>()
@@ -121,6 +121,7 @@ watch(inputValue, (is) => {
     class="ds-input"
     :class="conditionalClasses"
     placeholder="TT.MM.JJJJ"
+    :readonly="readOnly"
     @blur="onBlur"
     @focus="emit('update:validationError', undefined)"
     @keydown.delete="backspaceDelete"
