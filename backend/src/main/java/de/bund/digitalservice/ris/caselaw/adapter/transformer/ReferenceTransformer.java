@@ -1,16 +1,24 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 
 public class ReferenceTransformer {
 
   public static Reference transformToDomain(ReferenceDTO referenceDTO) {
+    LegalPeriodical legalPeriodical = null;
+
+    if (referenceDTO.getLegalPeriodical() != null) {
+      legalPeriodical =
+          LegalPeriodicalTransformer.transformToDomain(referenceDTO.getLegalPeriodical());
+    }
+
     return Reference.builder()
         .uuid(referenceDTO.getId())
         .referenceSupplement(referenceDTO.getReferenceSupplement())
-        .legalPeriodical(
-            LegalPeriodicalTransformer.transformToDomain(referenceDTO.getLegalPeriodical()))
+        .legalPeriodical(legalPeriodical)
         .legalPeriodicalRawValue(referenceDTO.getLegalPeriodicalRawValue())
         .citation(referenceDTO.getCitation())
         .footnote(referenceDTO.getFootnote())
@@ -18,13 +26,20 @@ public class ReferenceTransformer {
   }
 
   public static ReferenceDTO transformToDTO(Reference reference) {
+    LegalPeriodicalDTO legalPeriodicalDTO = null;
+    String legalPeriodicalRawValue = null;
+
+    if (reference.legalPeriodical() != null) {
+      legalPeriodicalDTO = LegalPeriodicalTransformer.transformToDTO(reference.legalPeriodical());
+      legalPeriodicalRawValue = reference.legalPeriodical().legalPeriodicalAbbreviation();
+    }
     return ReferenceDTO.builder()
         .id(reference.uuid())
         .referenceSupplement(reference.referenceSupplement())
-        .legalPeriodical(LegalPeriodicalTransformer.transformToDTO(reference.legalPeriodical()))
+        .legalPeriodical(legalPeriodicalDTO)
         .citation(reference.citation())
         .footnote(reference.footnote())
-        .legalPeriodicalRawValue(reference.legalPeriodical().legalPeriodicalAbbreviation())
+        .legalPeriodicalRawValue(legalPeriodicalRawValue)
         .build();
   }
 
