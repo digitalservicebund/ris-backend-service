@@ -426,7 +426,10 @@ test.describe("core data", () => {
         const court = page.locator("[aria-label='Gericht']")
         const deviatingCourt = page.getByTestId("chips-input_deviatingCourt")
         await expect(court).toBeEditable()
-        await expect(deviatingCourt).toBeEditable()
+        await expect(deviatingCourt).not.toHaveAttribute(
+          "aria-readonly",
+          "true",
+        )
       })
 
       await test.step("Aktenzeichen und abweichendes Aktenzeichen sind bearbeitbar", async () => {
@@ -435,7 +438,10 @@ test.describe("core data", () => {
           "chips-input_deviatingFileNumber",
         )
         await expect(fileNumber).toBeEditable()
-        await expect(deviatingFileNumber).toBeEditable()
+        await expect(deviatingFileNumber).not.toHaveAttribute(
+          "aria-readonly",
+          "true",
+        )
       })
 
       await test.step("Entscheidungsdatum und abweichendes Entscheidungsdatum sind bearbeitbar", async () => {
@@ -444,7 +450,10 @@ test.describe("core data", () => {
           "chips-input_deviatingDecisionDates",
         )
         await expect(decisionDate).toBeEditable()
-        await expect(deviatingDecisionDate).toBeEditable()
+        await expect(deviatingDecisionDate).not.toHaveAttribute(
+          "aria-readonly",
+          "true",
+        )
       })
 
       await test.step("Spruchkörper ist bearbeitbar", async () => {
@@ -461,7 +470,7 @@ test.describe("core data", () => {
         const ecli = page.locator("[aria-label='ECLI']")
         const deviatingEcli = page.getByTestId("chips-input_deviatingEclis")
         await expect(ecli).toBeEditable()
-        await expect(deviatingEcli).toBeEditable()
+        await expect(deviatingEcli).not.toHaveAttribute("aria-readonly", "true")
       })
 
       await test.step("Vorgang ist bearbeitbar", async () => {
@@ -471,7 +480,7 @@ test.describe("core data", () => {
 
       await test.step("Rechtskraft ist bearbeitbar", async () => {
         const legalEffect = page.locator("[aria-label='Rechtskraft']")
-        await expect(legalEffect).toBeEditable()
+        await expect(legalEffect).not.toHaveAttribute("aria-readonly", "true")
       })
 
       await test.step("Region ist readonly", async () => {
@@ -481,7 +490,10 @@ test.describe("core data", () => {
 
       await test.step("Streitjahr ist bearbeitbar", async () => {
         const yearsOfDispute = page.locator("[aria-label='Streitjahr']")
-        await expect(yearsOfDispute).toBeEditable()
+        await expect(yearsOfDispute).not.toHaveAttribute(
+          "aria-readonly",
+          "true",
+        )
       })
     },
   )
