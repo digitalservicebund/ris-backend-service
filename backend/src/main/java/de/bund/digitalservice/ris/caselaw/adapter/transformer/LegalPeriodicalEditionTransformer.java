@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalEditionDTO;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
+import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -42,9 +43,11 @@ public class LegalPeriodicalEditionTransformer {
         .prefix(legalPeriodicalEdition.prefix())
         .suffix(legalPeriodicalEdition.suffix())
         .references(
-            legalPeriodicalEdition.references().stream()
-                .map(ReferenceTransformer::transformToDTO)
-                .toList())
+            legalPeriodicalEdition.references() != null
+                ? legalPeriodicalEdition.references().stream()
+                    .map(ReferenceTransformer::transformToDTO)
+                    .toList()
+                : Collections.emptyList())
         .build();
   }
 }
