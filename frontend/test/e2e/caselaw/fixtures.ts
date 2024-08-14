@@ -15,6 +15,7 @@ type MyFixtures = {
   linkedDocumentNumber: string
   editorField: Locator
   pageWithBghUser: Page
+  pageWithExternalUser: Page
   prefilledDocumentUnitBgh: DocumentUnit
 }
 
@@ -175,6 +176,18 @@ export const caselawTest = test.extend<MyFixtures>({
 
     await pageWithBghUser.close()
     await bghContext.close()
+  },
+
+  pageWithExternalUser: async ({ browser }, use) => {
+    const externalContext = await browser.newContext({
+      storageState: `test/e2e/shared/.auth/user_external.json`,
+    })
+    const pageWithExternalUser = await externalContext.newPage()
+
+    await use(pageWithExternalUser)
+
+    await pageWithExternalUser.close()
+    await externalContext.close()
   },
 
   prefilledDocumentUnitBgh: async ({ request, browser }, use) => {
