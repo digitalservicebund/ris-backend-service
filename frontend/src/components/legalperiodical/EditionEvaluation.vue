@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from "vue"
+import { computed, onMounted, ref } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
@@ -7,27 +7,59 @@ import TextInput from "@/components/input/TextInput.vue"
 import LegalPeriodical from "@/domain/legalPeriodical.ts"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition.ts"
 import ComboboxItemService from "@/services/comboboxItemService"
+import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 
-const modelValue = new LegalPeriodicalEdition()
+const legalPeriodicalEdition = ref()
 
 const legalPeriodical = computed({
   get: () =>
-    modelValue.value?.legalPeriodical
+    legalPeriodicalEdition.value?.legalPeriodical
       ? {
-          label: modelValue.value?.legalPeriodical.legalPeriodicalAbbreviation,
-          value: modelValue.value?.legalPeriodical,
+          label:
+            legalPeriodicalEdition.value?.legalPeriodical
+              .legalPeriodicalAbbreviation,
+          value: legalPeriodicalEdition.value?.legalPeriodical,
           additionalInformation:
-            modelValue.value?.legalPeriodical.legalPeriodicalSubtitle,
+            legalPeriodicalEdition.value?.legalPeriodical
+              .legalPeriodicalSubtitle,
         }
       : undefined,
   set: (newValue) => {
     const legalPeriodical = { ...newValue } as LegalPeriodical
     if (newValue) {
-      modelValue.value.legalPeriodical = legalPeriodical
+      legalPeriodicalEdition.value.legalPeriodical = legalPeriodical
     } else {
-      modelValue.value.legalPeriodical = undefined
+      legalPeriodicalEdition.value.legalPeriodical = undefined
     }
   },
+})
+
+const prefix = computed({
+  get: () => legalPeriodicalEdition.value?.prefix ?? undefined,
+  set: (newValue) => {
+    legalPeriodicalEdition.value.prefix = newValue
+  },
+})
+const suffix = computed({
+  get: () => legalPeriodicalEdition.value?.suffix ?? undefined,
+  set: (newValue) => {
+    legalPeriodicalEdition.value.suffix = newValue
+  },
+})
+
+const name = computed({
+  get: () => legalPeriodicalEdition.value?.name ?? undefined,
+  set: (newValue) => {
+    legalPeriodicalEdition.value.name = newValue
+  },
+})
+
+async function saveEdition() {
+  await LegalPeriodicalEditionService.save(legalPeriodicalEdition.value)
+}
+
+onMounted(() => {
+  legalPeriodicalEdition.value = new LegalPeriodicalEdition()
 })
 </script>
 
@@ -38,7 +70,7 @@ const legalPeriodical = computed({
     <InputField id="legalPeriodical" label="Periodikum *">
       <ComboboxInput
         id="legalPeriodical"
-        v-model="modelValue.legalPeriodical"
+        v-model="legalPeriodical"
         aria-label="Periodikum"
         clear-on-choosing-item
         :has-error="false"
@@ -50,7 +82,7 @@ const legalPeriodical = computed({
       <InputField id="prefix" label="Präfix">
         <TextInput
           id="prefix"
-          v-model="modelValue.prefix"
+          v-model="prefix"
           aria-label="Präfix"
           class="ds-input-medium"
           size="medium"
@@ -60,7 +92,7 @@ const legalPeriodical = computed({
       <InputField id="suffix" label="Suffix">
         <TextInput
           id="suffix"
-          v-model="modelValue.suffix"
+          v-model="suffix"
           aria-label="Suffix"
           class="ds-input-medium"
           size="medium"
@@ -75,7 +107,7 @@ const legalPeriodical = computed({
     <InputField id="edition" label="Name der Ausgabe (optional)">
       <TextInput
         id="edition"
-        v-model="modelValue.name"
+        v-model="name"
         aria-label="Name der Ausgabe"
         class="ds-input-medium"
         size="medium"
@@ -84,7 +116,8 @@ const legalPeriodical = computed({
 
     <TextButton
       class="ds-button-02-reg"
-      label="Auswertung startem"
+      label="Auswertung starten"
+      @click="saveEdition"
     ></TextButton>
   </div>
 </template>
