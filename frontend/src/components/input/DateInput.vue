@@ -2,6 +2,7 @@
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import { Mask } from "maska"
+import { vMaska } from "maska/vue"
 import { computed, onMounted, ref, watch } from "vue"
 import { ValidationError } from "@/components/input/types"
 
