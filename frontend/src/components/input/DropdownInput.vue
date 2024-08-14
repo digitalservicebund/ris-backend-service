@@ -40,19 +40,10 @@ const hasPlaceholder = computed(() =>
     :disabled="readOnly"
     tabindex="0"
   >
-    <option
-      v-if="(placeholder && !localModelValue) || readOnly"
-      disabled
-      value=""
-    >
+    <option v-if="placeholder && !localModelValue" disabled value="">
       {{ placeholder }}
     </option>
-    <option
-      v-for="item in items"
-      :key="item.value"
-      :disabled="readOnly"
-      :value="item.value"
-    >
+    <option v-for="item in items" :key="item.value" :value="item.value">
       {{ item.label }}
     </option>
   </select>
