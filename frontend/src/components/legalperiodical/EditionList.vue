@@ -36,9 +36,7 @@ const legalPeriodical = computed({
       <TextButton
         class="ds-button-02-reg"
         label="Neue Periodikaauswertung"
-        @click="
-          router.push({ name: 'caselaw-legal-periodical-references-new' })
-        "
+        @click="router.push({ name: 'caselaw-legal-periodical-editions-new' })"
       ></TextButton>
     </div>
     <div class="flex h-full flex-col space-y-24 bg-gray-100 px-16 py-16">

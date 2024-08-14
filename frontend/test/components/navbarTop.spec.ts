@@ -37,7 +37,7 @@ function renderComponent(options?: { env?: Env; activeUser?: User }) {
             },
             {
               path: "",
-              name: "caselaw-legal-periodical-references",
+              name: "caselaw-legal-periodical-editions",
               component: {},
             },
             {

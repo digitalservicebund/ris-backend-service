@@ -73,7 +73,7 @@ export const navigateToReferences = async (
 
 export const navigateToLegalPeriodicalEvaluation = async (page: Page) => {
   await test.step("Navigate to 'Fundstellen'", async () => {
-    const baseUrl = `/caselaw/caselaw/legal-periodical-references`
+    const baseUrl = `/caselaw/caselaw/legal-periodical-editions`
 
     await page.goto(baseUrl)
     await expect(page.getByText("Fundstellen")).toBeVisible()

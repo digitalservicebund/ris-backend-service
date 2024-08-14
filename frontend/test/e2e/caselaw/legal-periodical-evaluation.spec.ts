@@ -60,7 +60,7 @@ test.describe(
           const promise = page.context().waitForEvent("page")
           await page.getByLabel("Neue Periodikaauswertung").click()
           const newPage = await promise
-          expect(newPage.url()).toContain("legal-periodical-references/new")
+          expect(newPage.url()).toContain("legal-periodical-editions/new")
         })
       },
     )

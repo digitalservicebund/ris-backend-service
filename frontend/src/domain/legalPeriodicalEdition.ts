@@ -2,7 +2,7 @@ import LegalPeriodical from "./legalPeriodical"
 import Reference from "./reference"
 
 export default class LegalPeriodicalEdition {
-  uuid?: string
+  id?: string
   legalPeriodical?: LegalPeriodical
   name?: string
   prefix?: string
