@@ -3,12 +3,15 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.doReturn;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclingService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationOfficeUserGroupService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
@@ -34,6 +37,8 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
@@ -51,6 +56,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -113,8 +119,12 @@ class HandoverMailDocumentationUnitIntegrationTest {
   @Autowired private DatabaseDocumentationUnitRepository repository;
   @Autowired private DatabaseXmlHandoverMailRepository xmlHandoverRepository;
   @Autowired private DatabaseStatusRepository statusRepository;
-  @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseHandoverReportRepository databaseHandoverReportRepository;
+
+  @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+
+  @MockBean
+  private DatabaseDocumentationOfficeUserGroupService databaseDocumentationOfficeUserGroupService;
 
   @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
@@ -132,6 +142,17 @@ class HandoverMailDocumentationUnitIntegrationTest {
   @BeforeEach
   void setUp() {
     docOffice = documentationOfficeRepository.findByAbbreviation("DS");
+    doReturn(
+            Optional.of(
+                DocumentationOfficeUserGroup.builder()
+                    .docOffice(
+                        DocumentationOffice.builder()
+                            .abbreviation(docOffice.getAbbreviation())
+                            .build())
+                    .userGroupPathName("")
+                    .build()))
+        .when(databaseDocumentationOfficeUserGroupService)
+        .getFirstUserGroupWithDocOffice(anyList());
   }
 
   @AfterEach

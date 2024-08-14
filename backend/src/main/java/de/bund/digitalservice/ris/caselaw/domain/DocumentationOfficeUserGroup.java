@@ -1,7 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import java.util.UUID;
 import lombok.Builder;
 
-// FIXME: Doesn't make sense. We rather want a Map<DocumentationOffice, Set<UserGroup>>
 @Builder
-public record DocumentationOfficeUserGroup(DocumentationOffice docOffice, String userGroup) {}
+public record DocumentationOfficeUserGroup(
+    UUID id, String userGroupPathName, DocumentationOffice docOffice, boolean isInternal) {}
