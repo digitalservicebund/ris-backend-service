@@ -12,6 +12,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -31,7 +32,7 @@ import lombok.Setter;
 public class LegalPeriodicalEditionDTO {
   @Id @GeneratedValue private UUID id;
 
-  @NotBlank
+  @NotNull
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "legal_periodical_id")
   private LegalPeriodicalDTO legalPeriodical;
