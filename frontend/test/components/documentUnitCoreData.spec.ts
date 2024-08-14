@@ -1,6 +1,7 @@
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import { createPinia, setActivePinia } from "pinia"
+import { setActivePinia } from "pinia"
 import { beforeEach } from "vitest"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 import DocumentUnit, { CoreData } from "@/domain/documentUnit"
@@ -24,7 +25,7 @@ function renderComponent(props?: Partial<CoreDataProps>) {
 
 describe("Core Data", () => {
   beforeEach(() => {
-    setActivePinia(createPinia())
+    setActivePinia(createTestingPinia())
   })
   test("renders correctly with given documentUnitId", async () => {
     const documentUnit = new DocumentUnit("1", {
