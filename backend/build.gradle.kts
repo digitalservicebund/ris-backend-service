@@ -178,7 +178,7 @@ dependencies {
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
-    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.4.11")
+    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.0")
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
