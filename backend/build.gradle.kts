@@ -19,7 +19,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.51.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "10.17.0"
+    id("org.flywaydb.flyway") version "10.17.1"
 }
 
 group = "de.bund.digitalservice"
@@ -178,7 +178,7 @@ dependencies {
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
-    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.4.11")
+    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.0")
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
@@ -219,10 +219,10 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.12.0")
     implementation("org.jsoup:jsoup:1.18.1")
 
-    val flywayCore = "org.flywaydb:flyway-core:10.17.0"
+    val flywayCore = "org.flywaydb:flyway-core:10.17.1"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.17.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.17.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
