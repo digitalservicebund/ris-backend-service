@@ -81,7 +81,7 @@ onMounted(async () => {
           underline: route.path.includes('legal-periodical-editions'),
         }"
         :to="{ name: 'caselaw-legal-periodical-editions' }"
-        >Fundstellen
+        >Periodika
       </router-link>
     </div>
 

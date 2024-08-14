@@ -32,7 +32,7 @@ const legalPeriodical = computed({
 <template>
   <div class="flex flex-col gap-16 p-16">
     <div class="flex justify-between">
-      <h1 class="ds-heading-02-reg">Fundstellen</h1>
+      <h1 class="ds-heading-02-reg">Periodika</h1>
       <TextButton
         class="ds-button-02-reg"
         label="Neue Periodikaauswertung"

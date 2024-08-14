@@ -74,7 +74,7 @@ onMounted(() => {
 
 <template>
   <div class="flex h-full flex-col space-y-24 bg-gray-100 px-16 py-16">
-    <h2 class="ds-heading-03-reg">Periodikaauswertung</h2>
+    <h2 class="ds-heading-03-reg">Neue Periodikaauswertung</h2>
 
     <InputField id="legalPeriodical" label="Periodikum *">
       <ComboboxInput
