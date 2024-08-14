@@ -34,10 +34,10 @@ const hasPlaceholder = computed(() =>
   <!-- eslint-disable vuejs-accessibility/form-control-has-label -->
   <select
     v-model="localModelValue"
-    :aria-readonly="readOnly"
     class="ds-select ds-select-medium"
     :class="conditionalClasses"
     :data-placeholder="hasPlaceholder ? true : undefined"
+    :disabled="readOnly"
     tabindex="0"
   >
     <option

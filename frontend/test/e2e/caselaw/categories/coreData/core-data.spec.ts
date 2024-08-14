@@ -391,7 +391,7 @@ test.describe("core data", () => {
         const legalEffect = pageWithExternalUser.locator(
           "[aria-label='Rechtskraft']",
         )
-        await expect(legalEffect).toHaveAttribute("aria-readonly", "true")
+        await expect(legalEffect).toBeDisabled()
       })
 
       await test.step("Region ist readonly", async () => {
@@ -480,7 +480,7 @@ test.describe("core data", () => {
 
       await test.step("Rechtskraft ist bearbeitbar", async () => {
         const legalEffect = page.locator("[aria-label='Rechtskraft']")
-        await expect(legalEffect).not.toHaveAttribute("aria-readonly", "true")
+        await expect(legalEffect).toBeEnabled()
       })
 
       await test.step("Region ist readonly", async () => {
