@@ -174,7 +174,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.1")
 
-    implementation(platform("software.amazon.awssdk:bom:2.27.2"))
+    implementation(platform("software.amazon.awssdk:bom:2.27.4"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -204,8 +204,8 @@ dependencies {
 
     implementation("com.gravity9:json-patch-path:2.0.2");
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.13.2")
-    implementation("io.micrometer:micrometer-core:1.13.2")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.13.3")
+    implementation("io.micrometer:micrometer-core:1.13.3")
 
     implementation(platform("io.sentry:sentry-bom:8.0.0-alpha.4"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
@@ -230,7 +230,7 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:5.12.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("io.projectreactor:reactor-test:3.6.8")
+    testImplementation("io.projectreactor:reactor-test:3.6.9")
     testImplementation("org.springframework.security:spring-security-test:6.3.1")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.3.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
