@@ -3,13 +3,11 @@ import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import { ComboboxItem } from "@/components/input/types"
 import NewEditionEvaluation from "@/components/legalperiodical/NewEditionEvaluation.vue"
-import LegalPeriodical from "@/domain/legalPeriodical"
 import { LegalPeriodical } from "@/domain/reference"
 import comboboxItemService from "@/services/comboboxItemService"
 import service from "@/services/legalPeriodicalEditionService"
 
 function renderComponent() {
-  // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
 
   const router = createRouter({

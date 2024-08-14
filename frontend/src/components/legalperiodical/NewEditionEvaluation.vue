@@ -123,6 +123,7 @@ onMounted(() => {
     </InputField>
 
     <TextButton
+      aria-label="Auswertung starten"
       class="ds-button-02-reg"
       label="Auswertung starten"
       @click="saveEdition"

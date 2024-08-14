@@ -34,6 +34,7 @@ const legalPeriodical = computed({
     <div class="flex justify-between">
       <h1 class="ds-heading-02-reg">Periodika</h1>
       <TextButton
+        aria-label="Neue Periodikaauswertung"
         class="ds-button-02-reg"
         label="Neue Periodikaauswertung"
         @click="router.push({ name: 'caselaw-legal-periodical-editions-new' })"
