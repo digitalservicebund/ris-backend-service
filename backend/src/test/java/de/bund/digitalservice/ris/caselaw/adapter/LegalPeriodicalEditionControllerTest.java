@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,9 +28,37 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @Import({SecurityConfig.class, TestConfig.class})
 class LegalPeriodicalEditionControllerTest {
   @Autowired private RisWebTestClient risWebTestClient;
-
   @MockBean private LegalPeriodicalEditionService service;
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
+
+  private final String EDITION_ENDPOINT = "/api/v1/caselaw/legalperiodicaledition";
+
+  @Test
+  void testGetLegalPeriodicalEditionById_shouldReturnValue() {
+    UUID uuid = UUID.randomUUID();
+    var edition =
+        LegalPeriodicalEdition.builder()
+            .id(UUID.randomUUID())
+            .legalPeriodical(
+                LegalPeriodical.builder()
+                    .legalPeriodicalId(uuid)
+                    .legalPeriodicalAbbreviation("ABC")
+                    .build())
+            .name("2024 Sonderheft 1")
+            .prefix("2024,")
+            .suffix("- Sonderheft 1")
+            .build();
+
+    when(service.getById(uuid)).thenReturn(Optional.ofNullable(edition));
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri(EDITION_ENDPOINT + "/" + uuid)
+        .exchange()
+        .expectStatus()
+        .isOk();
+  }
 
   @Test
   void testGetLegalPeriodicalEditions_withNoEditions_shouldCallService() {
@@ -39,7 +68,7 @@ class LegalPeriodicalEditionControllerTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/legalperiodicaledition?legal_periodical_id=" + uuid)
+        .uri(EDITION_ENDPOINT + "?legal_periodical_id=" + uuid)
         .exchange()
         .expectStatus()
         .isOk();
@@ -52,7 +81,7 @@ class LegalPeriodicalEditionControllerTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/legalperiodicaledition")
+        .uri(EDITION_ENDPOINT)
         .exchange()
         .expectStatus()
         .is4xxClientError();
@@ -89,7 +118,7 @@ class LegalPeriodicalEditionControllerTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/legalperiodicaledition?legal_periodical_id=" + uuid)
+        .uri(EDITION_ENDPOINT + "?legal_periodical_id=" + uuid)
         .exchange()
         .expectStatus()
         .isOk()
@@ -124,7 +153,7 @@ class LegalPeriodicalEditionControllerTest {
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/legalperiodicaledition")
+        .uri(EDITION_ENDPOINT)
         .bodyValue(edition)
         .exchange()
         .expectStatus()
@@ -138,7 +167,7 @@ class LegalPeriodicalEditionControllerTest {
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/legalperiodicaledition")
+        .uri(EDITION_ENDPOINT)
         .bodyValue(null)
         .exchange()
         .expectStatus()
