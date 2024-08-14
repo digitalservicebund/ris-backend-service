@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalEdi
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
 
@@ -15,6 +16,10 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
   public PostgresLegalPeriodicalEditionRepositoryImpl(
       DatabaseLegalPeriodicalEditionRepository repository) {
     this.repository = repository;
+  }
+
+  public Optional<LegalPeriodicalEdition> findById(UUID id) {
+    return repository.findById(id).map(LegalPeriodicalEditionTransformer::transformToDomain);
   }
 
   @Override

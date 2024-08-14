@@ -5,7 +5,7 @@ import errorMessages from "@/i18n/errors.json"
 interface LegalPeriodicalEditionService {
   get(
     legalPeriodicalId: string,
-  ): Promise<ServiceResponse<LegalPeriodicalEdition[]>>
+  ): Promise<ServiceResponse<LegalPeriodicalEdition>>
 
   save(
     legalPeriodicalEdition: LegalPeriodicalEdition,
@@ -14,14 +14,10 @@ interface LegalPeriodicalEditionService {
 
 const service: LegalPeriodicalEditionService = {
   async get(legalPeriodicalId: string) {
-    const response = await httpClient.get<LegalPeriodicalEdition[]>(
-      `caselaw/legalperiodicaledition`,
-      {
-        params: {
-          legal_periodical_id: legalPeriodicalId,
-        },
-      },
+    const response = await httpClient.get<DocumentUnit>(
+      `caselaw/legalperiodicaledition/${legalPeriodicalId}`,
     )
+
     if (response.status >= 300) {
       response.error = {
         title:

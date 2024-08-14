@@ -8,5 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DatabaseLegalPeriodicalEditionRepository
     extends JpaRepository<LegalPeriodicalEditionDTO, UUID> {
+
   List<LegalPeriodicalEditionDTO> findAllByLegalPeriodicalId(UUID legalPeriodicalId);
 }
