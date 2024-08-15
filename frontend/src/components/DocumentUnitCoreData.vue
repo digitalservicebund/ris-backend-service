@@ -30,7 +30,7 @@ const validationStore =
   >()
 
 const session = useSessionStore()
-const isReadOnly = session.user?.roles?.includes("External")
+const isReadOnly = await session.isExternal()
 
 /**
  * Our UI turns the chronological order of the list, so the latest previous procedure is first.
