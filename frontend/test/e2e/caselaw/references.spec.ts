@@ -95,7 +95,7 @@ test.describe(
           await expect(page.getByText("primär", { exact: true })).toBeVisible()
         })
 
-        await test.step("Edit legal reference supplement in reference, verify that it is updated in the list", async () => {
+        await test.step("Edit reference supplement in reference, verify that it is updated in the list", async () => {
           await page.getByTestId("list-entry-0").click()
           await fillInput(page, "Klammernzusatz", "S")
 
@@ -109,9 +109,24 @@ test.describe(
 
           await expect(page.getByText("primär", { exact: true })).toBeVisible()
         })
-        await save(page)
+
+        await test.step("Edit reference, click cancel, verify that it is not updated in the list", async () => {
+          await page.getByTestId("list-entry-0").click()
+          await fillInput(page, "Klammernzusatz", "LT")
+
+          await page.getByLabel("Abbrechen").click()
+          await expect(
+            page.getByText("GVBl BB 2024, Nr 1, 2-5 (LT)"),
+          ).toBeHidden()
+          await expect(
+            page.getByText("GVBl BB 2024, Nr 1, 2-5 (S)"),
+          ).toBeVisible()
+
+          await expect(page.getByText("primär", { exact: true })).toBeVisible()
+        })
 
         await test.step("Add second reference, verify that it is shown in the list", async () => {
+          await page.getByLabel("Weitere Angabe").click()
           await fillInput(page, "Periodikum", "wdg")
           await page
             .getByText("WdG | Welt der Gesundheitsversorgung", {

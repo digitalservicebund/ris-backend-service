@@ -44,7 +44,7 @@ test.describe(
       const secondReason = "Second reason"
       const thirdReason = "Third reason"
       const firstReasonHtml =
-        '<span style="color: rgb(0, 0, 0); font-size: 12pt">First </span><strong><span style="color: rgb(0, 0, 0); font-size: 12pt">reason</span></strong>'
+        '<span style="color: rgb(0, 0, 0); font-size: 12pt">First <strong>reason</strong></span>'
       // eslint-disable-next-line playwright/no-conditional-in-test
       const modifier = (await page.evaluate(() => navigator.platform))
         .toLowerCase()

@@ -19,7 +19,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.51.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "10.17.0"
+    id("org.flywaydb.flyway") version "10.17.1"
 }
 
 group = "de.bund.digitalservice"
@@ -155,7 +155,7 @@ dependencies {
     implementation("org.springframework.security:spring-security-oauth2-resource-server:6.3.1")
 
     // CVE-2024-22262
-    implementation("org.springframework:spring-web:6.1.11")
+    implementation("org.springframework:spring-web:6.1.12")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.3")
 
@@ -174,11 +174,11 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.1")
 
-    implementation(platform("software.amazon.awssdk:bom:2.27.2"))
+    implementation(platform("software.amazon.awssdk:bom:2.27.5"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
-    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.4.11")
+    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.0")
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
@@ -204,8 +204,8 @@ dependencies {
 
     implementation("com.gravity9:json-patch-path:2.0.2");
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.13.2")
-    implementation("io.micrometer:micrometer-core:1.13.2")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.13.3")
+    implementation("io.micrometer:micrometer-core:1.13.3")
 
     implementation(platform("io.sentry:sentry-bom:8.0.0-alpha.4"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
@@ -219,10 +219,10 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.12.0")
     implementation("org.jsoup:jsoup:1.18.1")
 
-    val flywayCore = "org.flywaydb:flyway-core:10.17.0"
+    val flywayCore = "org.flywaydb:flyway-core:10.17.1"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.17.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.17.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -230,7 +230,7 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:5.12.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("io.projectreactor:reactor-test:3.6.8")
+    testImplementation("io.projectreactor:reactor-test:3.6.9")
     testImplementation("org.springframework.security:spring-security-test:6.3.1")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.3.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
