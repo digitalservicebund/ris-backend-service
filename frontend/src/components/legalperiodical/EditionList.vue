@@ -1,32 +1,56 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue"
+import { ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
+import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import { LegalPeriodical } from "@/domain/reference"
 import ComboboxItemService from "@/services/comboboxItemService"
+import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 
 const router = useRouter()
 const filter = ref<LegalPeriodical>()
+const currentEditions = ref<LegalPeriodicalEdition[]>()
 
-const legalPeriodical = computed({
-  get: () =>
-    filter.value
-      ? {
-          label: filter.value.legalPeriodicalAbbreviation,
-          value: filter.value,
-        }
-      : undefined,
-  set: (newValue) => {
-    const legalPeriodical = { ...newValue } as LegalPeriodical
-    if (newValue) {
-      filter.value = legalPeriodical
-    } else {
-      filter.value = undefined
-    }
+watch(
+  filter,
+  async (newFilter) => {
+    await updateEditions(newFilter.legalPeriodicalId)
   },
-})
+  { deep: true },
+)
+
+/**
+ * Loads all editions of a legal periodical
+ */
+async function updateEditions(legalPeriodicalId: string) {
+  const response =
+    await LegalPeriodicalEditionService.getAllByLegalPeriodicalId(
+      legalPeriodicalId,
+    )
+  if (response.data) {
+    currentEditions.value = response.data
+  }
+}
+
+// const legalPeriodical = computed({
+//   get: () =>
+//     filter.value
+//       ? {
+//           label: filter.value.legalPeriodicalAbbreviation,
+//           value: filter.value,
+//         }
+//       : undefined,
+//   set: (newValue) => {
+//     const legalPeriodical = { ...newValue } as LegalPeriodical
+//     if (newValue) {
+//       filter.value = legalPeriodical
+//     } else {
+//       filter.value = undefined
+//     }
+//   },
+// })
 </script>
 
 <template>
@@ -46,7 +70,7 @@ const legalPeriodical = computed({
           <InputField id="legalPeriodical" label="Periodikum suchen">
             <ComboboxInput
               id="legalPeriodical"
-              v-model="legalPeriodical"
+              v-model="filter"
               aria-label="Periodikum"
               clear-on-choosing-item
               :has-error="false"
@@ -55,6 +79,15 @@ const legalPeriodical = computed({
           </InputField>
         </div>
       </div>
+      <ul>
+        <li v-for="edition in currentEditions" :key="edition.id">
+          <!-- <router-link
+              :to="{ name: 'caselaw-legal-periodical-editions-show', params: { id: edition.id } }"
+            > -->
+          {{ edition.name }}
+          <!-- </router-link> -->
+        </li>
+      </ul>
     </div>
   </div>
 </template>
