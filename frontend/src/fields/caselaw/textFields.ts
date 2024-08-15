@@ -32,6 +32,6 @@ export const texts = [
     "decisionReasons",
     "Entscheidungsgründe",
     TextAreaInput,
-    true,
+    isReadOnly,
   ),
 ]
