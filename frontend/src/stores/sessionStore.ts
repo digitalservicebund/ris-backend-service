@@ -37,6 +37,11 @@ const useSessionStore = defineStore("session", (): SessionStore => {
     return !!user.value?.name
   }
 
+  /**
+   * Checks if the user has the role of an external user.
+   *
+   * @returns A promise with a boolean indicating if the user is an external user.
+   */
   async function isExternal(): Promise<boolean> {
     return user.value?.roles?.includes("External") ?? false
   }
