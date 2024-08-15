@@ -91,13 +91,7 @@ class DatabaseDocumentationOfficeUserGroupServiceTest {
   void shouldThrowOnNonExistentDocOffice() {
     doReturn(List.of()).when(this.groupRepository).findAll();
     doReturn(List.of()).when(this.officeRepository).findAll();
-    List<DocumentationOfficeConfigUserGroup> configuredGroups =
-        List.of(
-            DocumentationOfficeConfigUserGroup.builder()
-                .docOfficeAbbreviation("DS")
-                .userGroupPathName("/DS")
-                .isInternal(true)
-                .build());
+    List<DocumentationOfficeConfigUserGroup> configuredGroups = List.of(dsInternalGroupConfig);
     this.service =
         new DatabaseDocumentationOfficeUserGroupService(
             groupRepository, officeRepository, configuredGroups);
