@@ -33,7 +33,7 @@ public class LegalPeriodicalEditionDTO {
   @Id @GeneratedValue private UUID id;
 
   @NotNull
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "legal_periodical_id")
   private LegalPeriodicalDTO legalPeriodical;
 
@@ -43,7 +43,7 @@ public class LegalPeriodicalEditionDTO {
 
   @Column private String suffix;
 
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "edition_id")
   @Builder.Default
   @OrderBy("rank")
