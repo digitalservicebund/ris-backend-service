@@ -174,7 +174,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.1")
 
-    implementation(platform("software.amazon.awssdk:bom:2.27.4"))
+    implementation(platform("software.amazon.awssdk:bom:2.27.5"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -186,7 +186,7 @@ dependencies {
     implementation("com.icegreen:greenmail:2.1.0-rc-1")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.51") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.52") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
@@ -194,7 +194,7 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.14")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.16")
     // for local development:
     // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.8.jar"))
 

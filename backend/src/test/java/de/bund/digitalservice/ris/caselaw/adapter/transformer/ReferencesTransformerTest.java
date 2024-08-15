@@ -19,7 +19,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class ReferencesTransformerTest {
 
-  private static Stream<Arguments> provideReferencesForTransformation() {
+  private static Stream<Arguments> provideReferencesTestData_toDomain() {
     return Stream.of(
         Arguments.of(
             // all fields set
@@ -49,17 +49,32 @@ class ReferencesTransformerTest {
                         .legalPeriodicalAbbreviation("LPA")
                         .primaryReference(true)
                         .build())
+                .build()),
+        // without legal periodical
+        Arguments.of(
+            ReferenceDTO.builder()
+                .rank(1)
+                .citation("2024, 123")
+                .footnote("footnote")
+                .referenceSupplement("Klammerzusatz")
+                .legalPeriodicalRawValue("LPA")
+                .build(),
+            Reference.builder()
+                .citation("2024, 123")
+                .footnote("footnote")
+                .referenceSupplement("Klammerzusatz")
+                .legalPeriodicalRawValue("LPA")
                 .build()));
   }
 
   @ParameterizedTest
-  @MethodSource("provideReferencesForTransformation")
+  @MethodSource("provideReferencesTestData_toDomain")
   void testTransformToDomain_shouldTransformReferences(
       ReferenceDTO referenceDTO, Reference expectedReference) {
     assertThat(ReferenceTransformer.transformToDomain(referenceDTO)).isEqualTo(expectedReference);
   }
 
-  private static Stream<Arguments> provideReferencesTestData() {
+  private static Stream<Arguments> provideReferencesTestData_toDTO() {
     var legalPeriodicalId = UUID.randomUUID();
     var referenceId = UUID.randomUUID();
     return Stream.of(
@@ -138,11 +153,19 @@ class ReferencesTransformerTest {
                         .primaryReference(false)
                         .build())
                 .legalPeriodicalRawValue("ABC")
+                .build()),
+        // possible with no legalPeriodical
+        Arguments.of(
+            Reference.builder().citation("2024, S.5").legalPeriodicalRawValue("ABC").build(),
+            ReferenceDTO.builder()
+                .rank(1)
+                .citation("2024, S.5")
+                .legalPeriodicalRawValue("ABC")
                 .build()));
   }
 
   @ParameterizedTest
-  @MethodSource("provideReferencesTestData")
+  @MethodSource("provideReferencesTestData_toDTO")
   void testTransformToDTO_shouldAddReferences(Reference reference, ReferenceDTO expected) {
 
     // we use the documentation unit transformer here because it adds a rank and sets the

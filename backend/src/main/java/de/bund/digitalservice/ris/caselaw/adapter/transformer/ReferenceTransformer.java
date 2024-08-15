@@ -39,7 +39,10 @@ public class ReferenceTransformer {
         .legalPeriodical(legalPeriodicalDTO)
         .citation(reference.citation())
         .footnote(reference.footnote())
-        .legalPeriodicalRawValue(legalPeriodicalRawValue)
+        .legalPeriodicalRawValue(
+            legalPeriodicalRawValue != null
+                ? legalPeriodicalRawValue
+                : reference.legalPeriodicalRawValue())
         .build();
   }
 

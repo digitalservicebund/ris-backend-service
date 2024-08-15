@@ -4,6 +4,8 @@ import {
   navigateToAttachments,
   save,
   uploadTestfile,
+  copyPasteAllTextFromAttachmentIntoEditor,
+  getModifier,
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 
@@ -53,37 +55,18 @@ test("create and validate border number links", async ({
   const originalFileParagraph = page.getByText(documentOrigin)
   await expect(originalFileParagraph).toBeVisible()
 
-  // Selected all text from sidepanel
-  await originalFileParagraph.evaluate((element) => {
-    const originalFile = element.parentElement?.parentElement?.parentElement
-
-    if (!originalFile) {
-      throw new Error("No original file available.")
-    }
-
-    const selection = window.getSelection()
-    const elementChildsLength = originalFile.childNodes.length
-    const startOffset = 0
-    const range = document.createRange()
-    range.setStart(originalFile.childNodes[0], startOffset)
-    range.setEnd(originalFile.childNodes[elementChildsLength - 1], startOffset)
-    selection?.removeAllRanges()
-    selection?.addRange(range)
-  })
-
-  // copy from sidepanel to clipboard
-  // eslint-disable-next-line playwright/no-conditional-in-test
-  const modifier = (await page.evaluate(() => navigator.platform))
-    .toLowerCase()
-    .includes("mac")
-    ? "Meta"
-    : "Control"
-  await page.keyboard.press(`${modifier}+KeyC`)
-
-  // paste from clipboard into input field "Entscheidungsgründe"
+  const attachmentLocator = page
+    .getByText("Gründe:")
+    .locator("..")
+    .locator("..")
+    .locator("..")
   const inputField = page.locator("[data-testid='Gründe']")
-  await inputField.click()
-  await page.keyboard.press(`${modifier}+KeyV`)
+  await copyPasteAllTextFromAttachmentIntoEditor(
+    page,
+    attachmentLocator,
+    inputField,
+  )
+
   const inputFieldInnerHTML = await inputField.innerText()
 
   // Check all text copied
@@ -130,6 +113,8 @@ test("create and validate border number links", async ({
   await expect(invalidHighestNumberLink).toHaveClass(
     'font-bold text-red-900 bg-red-200 before:content-["⚠Rd_"]',
   )
+
+  const modifier = await getModifier(page)
 
   // Delete border numbers in reasons
   const reasons = page.locator("[data-testid='Gründe']")
