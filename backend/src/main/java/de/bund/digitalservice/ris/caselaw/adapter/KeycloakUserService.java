@@ -27,8 +27,6 @@ public class KeycloakUserService implements UserService {
           Map.entry("/caselaw/OVG_NRW", "OVG NRW"),
           Map.entry("/caselaw/BZSt", "BZSt"),
           Map.entry("/DS", "DS"),
-          Map.entry("/DS/Extern", "DS"),
-          Map.entry("/DS/Intern", "DS"),
           Map.entry("/CC-RIS", "CC-RIS"));
 
   public KeycloakUserService(DatabaseDocumentationOfficeRepository documentationOfficeRepository) {
@@ -54,7 +52,6 @@ public class KeycloakUserService implements UserService {
         .name(oidcUser.getAttribute("name"))
         .email(oidcUser.getEmail())
         .documentationOffice(documentationOffice)
-        .roles(oidcUser.getClaimAsStringList("roles"))
         .build();
   }
 

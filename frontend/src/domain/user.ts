@@ -4,5 +4,4 @@ export type User = {
     abbreviation: string
   }
   email?: string
-  roles?: string[]
 }
