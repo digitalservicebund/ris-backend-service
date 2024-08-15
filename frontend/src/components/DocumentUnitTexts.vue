@@ -43,7 +43,7 @@ const updateValueByTextId = async (id: keyof Texts, updatedText: string) => {
           :id="item.id"
           :aria-label="item.aria"
           class="shadow-blue focus-within:shadow-focus hover:shadow-hover"
-          editable
+          :editable="!item.readOnly"
           :field-size="item.fieldSize"
           :value="item.value"
           @update-value="updateValueByTextId(item.id, $event)"

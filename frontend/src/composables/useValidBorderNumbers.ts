@@ -36,6 +36,7 @@ export function useValidBorderNumbers(
       label: item.label,
       aria: item.label,
       value: validatedContent,
+      readOnly: item.readOnly,
       fieldType: item.fieldType,
       fieldSize: item.fieldSize,
     }
