@@ -76,6 +76,7 @@ onMounted(async () => {
         >Vorgänge
       </router-link>
       <router-link
+        v-if="featureToggle"
         class="ds-label-01-reg p-8 hover:bg-yellow-500 hover:underline"
         :class="{
           underline: route.path.includes('legal-periodical-editions'),

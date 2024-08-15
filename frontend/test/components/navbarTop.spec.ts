@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import NavbarTop from "@/components/NavbarTop.vue"
 import { Env } from "@/domain/env"
 import { User } from "@/domain/user"
+import featureToggleService from "@/services/featureToggleService"
 import useSessionStore from "@/stores/sessionStore"
 
 function renderComponent(options?: { env?: Env; activeUser?: User }) {
@@ -57,6 +58,12 @@ function renderComponent(options?: { env?: Env; activeUser?: User }) {
   })
 }
 describe("navbar top", () => {
+  beforeEach(() => {
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
+  })
   test("navbar top should be rendered without error", async () => {
     renderComponent()
 
