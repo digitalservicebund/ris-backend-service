@@ -1002,7 +1002,7 @@ class DocumentationUnitIntegrationTest {
   }
 
   @Test
-  void testDeleteByUuid_withExistingReference_shouldNotCreateDeletedDocumentsEntry() {
+  void testDeleteByUuid_withExistingReference_shouldNotRecycleDocumentNumberAfterFailedDeletion() {
     DocumentationUnitDTO referencedDTO =
         DocumentationUnitDTO.builder()
             .documentNumber("ZZRE202400001")
@@ -1079,7 +1079,13 @@ class DocumentationUnitIntegrationTest {
         .uri("/api/v1/caselaw/documentunits/new")
         .exchange()
         .expectStatus()
-        .isCreated();
+        .isCreated()
+        .expectBody(DocumentationUnit.class)
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody())
+                    .extracting("documentNumber")
+                    .isEqualTo("ZZRE" + LocalDate.now().getYear() + "00002"));
 
     List<DeletedDocumentationUnitDTO> allDeletedIds = deletedDocumentationIdsRepository.findAll();
     assertThat(allDeletedIds).isEmpty();

@@ -94,9 +94,39 @@ test.describe(
 
           await expect(page.getByText("primär", { exact: true })).toBeVisible()
         })
-        await save(page)
+
+        await test.step("Edit reference supplement in reference, verify that it is updated in the list", async () => {
+          await page.getByTestId("list-entry-0").click()
+          await fillInput(page, "Klammernzusatz", "S")
+
+          await page.locator("[aria-label='Fundstelle speichern']").click()
+          await expect(
+            page.getByText("GVBl BB 2024, Nr 1, 2-5 (LT)"),
+          ).toBeHidden()
+          await expect(
+            page.getByText("GVBl BB 2024, Nr 1, 2-5 (S)"),
+          ).toBeVisible()
+
+          await expect(page.getByText("primär", { exact: true })).toBeVisible()
+        })
+
+        await test.step("Edit reference, click cancel, verify that it is not updated in the list", async () => {
+          await page.getByTestId("list-entry-0").click()
+          await fillInput(page, "Klammernzusatz", "LT")
+
+          await page.getByLabel("Abbrechen").click()
+          await expect(
+            page.getByText("GVBl BB 2024, Nr 1, 2-5 (LT)"),
+          ).toBeHidden()
+          await expect(
+            page.getByText("GVBl BB 2024, Nr 1, 2-5 (S)"),
+          ).toBeVisible()
+
+          await expect(page.getByText("primär", { exact: true })).toBeVisible()
+        })
 
         await test.step("Add second reference, verify that it is shown in the list", async () => {
+          await page.getByLabel("Weitere Angabe").click()
           await fillInput(page, "Periodikum", "wdg")
           await page
             .getByText("WdG | Welt der Gesundheitsversorgung", {
@@ -111,21 +141,53 @@ test.describe(
         })
         await save(page)
 
-        await test.step("Delete references and verify they disappear from the list", async () => {
+        await test.step("Add third reference, verify that it is shown in the list", async () => {
+          await fillInput(page, "Periodikum", "AllMBl")
+          await page
+            .getByText("AllMBl | Allgemeines Ministerialblatt", {
+              exact: true,
+            })
+            .click()
+          await waitForInputValue(page, "[aria-label='Periodikum']", "AllMBl")
+          await fillInput(page, "Zitatstelle", "2024, 2")
+          await fillInput(page, "Klammernzusatz", "L")
+          await page.locator("[aria-label='Fundstelle speichern']").click()
+          await expect(page.getByText("AllMBl 2024, 2 (L)")).toBeVisible()
+        })
+        await save(page)
+        await test.step("Delete second of 3 reference and verify it disappears, order of remaining items stays the same", async () => {
           await page.getByTestId("list-entry-1").click()
           await page.locator("[aria-label='Eintrag löschen']").click()
           await expect(page.getByText("WdG 2024, 10-12 (ST)")).toBeHidden()
+
+          await expect(page.getByLabel("Listen Eintrag").nth(0)).toHaveText(
+            "GVBl BB 2024, Nr 1, 2-5 (S)primär",
+          )
+          await expect(page.getByLabel("Listen Eintrag").nth(1)).toHaveText(
+            "AllMBl 2024, 2 (L)primär",
+          )
+        })
+
+        await test.step("Delete second of 2 references and verify it disappears from the list, first item stays the same", async () => {
+          await page.getByTestId("list-entry-1").click()
+          await page.locator("[aria-label='Eintrag löschen']").click()
+          await expect(page.getByText("AllMBl 2024, 2 (L)")).toBeHidden()
+          await expect(
+            page.getByText("GVBl BB 2024, Nr 1, 2-5 (S)"),
+          ).toBeVisible()
+        })
+        await test.step("Delete last reference and verify the list is empty", async () => {
           await page.getByTestId("list-entry-0").click()
           await page.locator("[aria-label='Eintrag löschen']").click()
           await expect(
-            page.getByText("GVBl BB, 2024, Nr 1, 2-5 (LT)"),
+            page.getByText("GVBl BB 2024, Nr 1, 2-5 (S)"),
           ).toBeHidden()
+          await save(page)
+
+          await page.reload()
+
+          await expect(page.getByLabel("Listen Eintrag")).not.toBeAttached()
         })
-        await save(page)
-
-        await page.reload()
-
-        await expect(page.getByLabel("Listen Eintrag")).not.toBeAttached()
       },
     )
 

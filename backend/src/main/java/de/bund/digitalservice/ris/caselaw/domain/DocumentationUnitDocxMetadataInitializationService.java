@@ -74,7 +74,6 @@ public class DocumentationUnitDocxMetadataInitializationService {
             case ECLI -> handleEcli(documentationUnit, builder, value);
             case PROCEDURE -> handleProcedure(documentationUnit, builder, value);
             case LEGAL_EFFECT -> handleLegalEffect(documentationUnit, builder, value);
-            default -> {}
           }
         });
   }

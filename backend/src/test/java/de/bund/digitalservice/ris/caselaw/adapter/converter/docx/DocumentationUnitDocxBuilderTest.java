@@ -1266,7 +1266,7 @@ class DocumentationUnitDocxBuilderTest {
     var listNumberingDefinition = mock(ListNumberingDefinition.class);
     var abstractListDefinition = mock(AbstractListNumberingDefinition.class);
     var listLevel = mock(ListLevel.class);
-    when(listLevel.getNumFmt()).thenReturn(NumberFormat.CHICAGO);
+    when(listLevel.getNumFmt()).thenReturn(NumberFormat.DECIMAL);
     when(listNumberingDefinition.getAbstractListDefinition()).thenReturn(abstractListDefinition);
     HashMap<String, ListLevel> listLevels = new HashMap<>();
     listLevels.put("0", listLevel);
