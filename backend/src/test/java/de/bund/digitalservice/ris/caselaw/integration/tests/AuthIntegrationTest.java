@@ -17,7 +17,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,31 +59,17 @@ class AuthIntegrationTest {
   @BeforeEach
   public void beforeEach() {
     doReturn(
-            Optional.of(
-                DocumentationOfficeUserGroup.builder()
-                    .docOffice(DocumentationOffice.builder().abbreviation("BGH").build())
-                    .userGroupPathName("")
-                    .build()))
-        .when(documentationOfficeUserGroupService)
-        .getFirstUserGroupWithDocOffice(List.of("/caselaw/BGH"));
-
-    doReturn(
-            Optional.of(
+            List.of(
                 DocumentationOfficeUserGroup.builder()
                     .docOffice(DocumentationOffice.builder().abbreviation("CC-RIS").build())
-                    .userGroupPathName("")
-                    .build()))
-        .when(documentationOfficeUserGroupService)
-        .getFirstUserGroupWithDocOffice(List.of("/CC-RIS"));
-
-    doReturn(
-            Optional.of(
+                    .userGroupPathName("/CC-RIS")
+                    .build(),
                 DocumentationOfficeUserGroup.builder()
                     .docOffice(DocumentationOffice.builder().abbreviation("DS").build())
-                    .userGroupPathName("")
+                    .userGroupPathName("/DS")
                     .build()))
         .when(documentationOfficeUserGroupService)
-        .getFirstUserGroupWithDocOffice(List.of("/DS"));
+        .getUserGroups();
   }
 
   @Test

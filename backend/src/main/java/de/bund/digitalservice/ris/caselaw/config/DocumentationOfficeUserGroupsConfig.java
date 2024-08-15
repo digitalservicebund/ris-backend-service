@@ -14,7 +14,7 @@ public class DocumentationOfficeUserGroupsConfig {
    * user group to procedures will be cleared.
    */
   @Bean
-  public List<DocumentationOfficeConfigUserGroup> DocumentationOfficeConfigUserGroupConfig() {
+  public List<DocumentationOfficeConfigUserGroup> getDocumentationOfficeConfigUserGroups() {
     return List.of(
         DocumentationOfficeConfigUserGroup.builder()
             .docOfficeAbbreviation("BGH")

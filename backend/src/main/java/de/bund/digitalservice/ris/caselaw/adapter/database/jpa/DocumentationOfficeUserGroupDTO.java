@@ -28,6 +28,11 @@ public class DocumentationOfficeUserGroupDTO {
   @NotNull
   private String userGroupPathName;
 
+  /**
+   * An external group (e.g. an agency / Dienstleister) will have restricted rights. Corresponds to
+   * a Bare.ID role. The flag is only representational, it is not used for actual right checks. For
+   * right checks, only the Bare.ID role is relevant.
+   */
   @Column(name = "is_internal")
   @NotNull
   private boolean isInternal;

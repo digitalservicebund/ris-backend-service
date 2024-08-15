@@ -4,12 +4,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeUserGroupRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeUserGroupDTO;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeUserGroupTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroupService;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +54,7 @@ public class DatabaseDocumentationOfficeUserGroupService
     var userGroupsToBeDeleted =
         documentationOfficeUserGroups.stream().filter(this::groupIsNotInConfig).toList();
     if (!userGroupsToBeDeleted.isEmpty()) {
-      LOGGER.info("Deleting {} doc office user groups", userGroupsToBeDeleted.size());
+      LOGGER.info("Deleting doc office user groups: {}", groupsToString(userGroupsToBeDeleted));
       this.repository.deleteAll(userGroupsToBeDeleted);
     }
 
@@ -64,7 +64,7 @@ public class DatabaseDocumentationOfficeUserGroupService
             .map(groupFromConfig -> transformToDTO(groupFromConfig, docOffices))
             .toList();
     if (!userGroupsToBeCreated.isEmpty()) {
-      LOGGER.info("Creating {} new doc office user groups", userGroupsToBeCreated.size());
+      LOGGER.info("Creating new doc office user groups: {}", groupsToString(userGroupsToBeCreated));
       this.repository.saveAll(userGroupsToBeCreated);
     }
 
@@ -72,31 +72,10 @@ public class DatabaseDocumentationOfficeUserGroupService
   }
 
   @Override
-  public List<DocumentationOfficeUserGroup> getUserGroupsForDocOffice(
-      DocumentationOffice documentationOffice) {
+  public List<DocumentationOfficeUserGroup> getUserGroups() {
     return this.documentationOfficeUserGroups.stream()
-        .filter(
-            group ->
-                group
-                    .getDocumentationOffice()
-                    .getAbbreviation()
-                    .equals(documentationOffice.abbreviation()))
-        .map(this::transformToDomain)
+        .map(DocumentationOfficeUserGroupTransformer::transformToDomain)
         .toList();
-  }
-
-  @Override
-  public Optional<DocumentationOfficeUserGroup> getFirstUserGroupWithDocOffice(
-      List<String> userGroups) {
-    var matchingUserGroup =
-        this.documentationOfficeUserGroups.stream()
-            .filter(group -> userGroups.contains(group.getUserGroupPathName()))
-            .findFirst();
-    if (matchingUserGroup.isEmpty() && !userGroups.isEmpty()) {
-      LOGGER.warn(
-          "No doc office user group associated with given Keycloak user groups: {}", userGroups);
-    }
-    return matchingUserGroup.map(this::transformToDomain);
   }
 
   private boolean isGroupNotInDatabase(DocumentationOfficeConfigUserGroup groupFromConfig) {
@@ -141,15 +120,10 @@ public class DatabaseDocumentationOfficeUserGroupService
         .build();
   }
 
-  private DocumentationOfficeUserGroup transformToDomain(DocumentationOfficeUserGroupDTO group) {
-    return DocumentationOfficeUserGroup.builder()
-        .id(group.getId())
-        .userGroupPathName(group.getUserGroupPathName())
-        .isInternal(group.isInternal())
-        .docOffice(
-            DocumentationOffice.builder()
-                .abbreviation(group.getDocumentationOffice().getAbbreviation())
-                .build())
-        .build();
+  private static String groupsToString(
+      List<DocumentationOfficeUserGroupDTO> userGroupsToBeCreated) {
+    return userGroupsToBeCreated.stream()
+        .map(DocumentationOfficeUserGroupDTO::getUserGroupPathName)
+        .collect(Collectors.joining(", "));
   }
 }

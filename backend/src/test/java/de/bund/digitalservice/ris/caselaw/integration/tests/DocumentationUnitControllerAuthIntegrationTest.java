@@ -46,7 +46,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -154,28 +153,23 @@ class DocumentationUnitControllerAuthIntegrationTest {
     DocumentationOfficeDTO bghOffice = documentationOfficeRepository.findByAbbreviation("BGH");
 
     doReturn(
-            Optional.of(
+            List.of(
                 DocumentationOfficeUserGroup.builder()
                     .docOffice(
                         DocumentationOffice.builder()
                             .abbreviation(bghOffice.getAbbreviation())
                             .build())
-                    .userGroupPathName("")
-                    .build()))
-        .when(documentationOfficeUserGroupService)
-        .getFirstUserGroupWithDocOffice(List.of("/caselaw/BGH"));
-
-    doReturn(
-            Optional.of(
+                    .userGroupPathName("/caselaw/BGH")
+                    .build(),
                 DocumentationOfficeUserGroup.builder()
                     .docOffice(
                         DocumentationOffice.builder()
                             .abbreviation(ccRisOffice.getAbbreviation())
                             .build())
-                    .userGroupPathName("")
+                    .userGroupPathName("/CC-RIS")
                     .build()))
         .when(documentationOfficeUserGroupService)
-        .getFirstUserGroupWithDocOffice(List.of("/CC-RIS"));
+        .getUserGroups();
 
     officeMap.put("CC-RIS", ccRisOffice);
     officeMap.put("BGH", bghOffice);

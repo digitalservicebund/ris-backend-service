@@ -8,11 +8,14 @@ import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
 @Service
 public class KeycloakUserService implements UserService {
+  private static final Logger LOGGER = LoggerFactory.getLogger(KeycloakUserService.class);
   private final DocumentationOfficeUserGroupService documentationOfficeUserGroupService;
 
   public KeycloakUserService(
@@ -43,9 +46,15 @@ public class KeycloakUserService implements UserService {
   }
 
   private Optional<DocumentationOffice> extractDocumentationOffice(OidcUser oidcUser) {
-    List<String> groups = Objects.requireNonNull(oidcUser.getAttribute("groups"));
-    return this.documentationOfficeUserGroupService
-        .getFirstUserGroupWithDocOffice(groups)
-        .map(DocumentationOfficeUserGroup::docOffice);
+    List<String> userGroups = Objects.requireNonNull(oidcUser.getAttribute("groups"));
+    var matchingUserGroup =
+        this.documentationOfficeUserGroupService.getUserGroups().stream()
+            .filter(group -> userGroups.contains(group.userGroupPathName()))
+            .findFirst();
+    if (matchingUserGroup.isEmpty() && !userGroups.isEmpty()) {
+      LOGGER.warn(
+          "No doc office user group associated with given Keycloak user groups: {}", userGroups);
+    }
+    return matchingUserGroup.map(DocumentationOfficeUserGroup::docOffice);
   }
 }
