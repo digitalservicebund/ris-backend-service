@@ -27,9 +27,11 @@ public class ReferenceTransformer {
 
   public static ReferenceDTO transformToDTO(Reference reference) {
     LegalPeriodicalDTO legalPeriodicalDTO = null;
+    String legalPeriodicalRawValue = null;
 
     if (reference.legalPeriodical() != null) {
       legalPeriodicalDTO = LegalPeriodicalTransformer.transformToDTO(reference.legalPeriodical());
+      legalPeriodicalRawValue = reference.legalPeriodical().legalPeriodicalAbbreviation();
     }
     return ReferenceDTO.builder()
         .id(reference.uuid())
@@ -37,7 +39,7 @@ public class ReferenceTransformer {
         .legalPeriodical(legalPeriodicalDTO)
         .citation(reference.citation())
         .footnote(reference.footnote())
-        .legalPeriodicalRawValue(reference.legalPeriodicalRawValue())
+        .legalPeriodicalRawValue(legalPeriodicalRawValue)
         .build();
   }
 
