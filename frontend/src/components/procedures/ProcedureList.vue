@@ -9,8 +9,10 @@ import Pagination, { Page } from "@/components/Pagination.vue"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { Procedure } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import { UserGroup } from "@/domain/userGroup"
 import documentationUnitService from "@/services/documentUnitService"
 import service from "@/services/procedureService"
+import userGroupsService from "@/services/userGroupsService"
 import IconBaselineDescription from "~icons/ic/baseline-description"
 import IconExpandLess from "~icons/ic/baseline-expand-less"
 import IconExpandMore from "~icons/ic/baseline-expand-more"
@@ -23,6 +25,7 @@ const currentlyExpanded = ref<number[]>([])
 const { getQueryFromRoute, pushQueryToRoute, route } = useQuery<"q">()
 const query = ref(getQueryFromRoute())
 const responseError = ref()
+const userGroups = ref<UserGroup[]>([])
 
 /**
  * Loads all procedures
@@ -33,6 +36,16 @@ async function updateProcedures(page: number, queries?: Query<string>) {
   const response = await service.get(itemsPerPage, page, queries?.q)
   if (response.data) {
     currentPage.value = response.data
+  }
+}
+
+/**
+ * Get all user groups for the current user
+ */
+async function getUserGroups() {
+  const response = await userGroupsService.get()
+  if (response.data) {
+    userGroups.value = response.data
   }
 }
 
@@ -150,6 +163,7 @@ watch(currentPage, (newPage) => {
 
 onMounted(() => {
   updateProcedures(0, query.value)
+  getUserGroups()
 })
 </script>
 
@@ -223,6 +237,7 @@ onMounted(() => {
           <ProcedureDetail
             :procedure="procedure"
             :response-error="responseError"
+            :user-groups="userGroups"
             @delete-document-unit="handleDeleteDocumentationUnit"
           />
         </ExpandableContent>
