@@ -76,7 +76,7 @@ export const navigateToLegalPeriodicalEvaluation = async (page: Page) => {
     const baseUrl = `/caselaw/legal-periodical-editions`
 
     await page.goto(baseUrl)
-    await expect(page.getByText("Periodika")).toBeVisible()
+    await expect(page.getByRole("heading", { name: "Periodika" })).toBeVisible()
   })
 }
 
