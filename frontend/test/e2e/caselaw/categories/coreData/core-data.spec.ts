@@ -316,6 +316,7 @@ test.describe("core data", () => {
         description:
           "https://digitalservicebund.atlassian.net/browse/RISDEV-4523",
       },
+      tag: ["@RISDEV-4523"],
     },
     async ({ pageWithExternalUser, documentNumber }) => {
       await test.step("Navigiere zu Rubriken als external Nutzer", async () => {
@@ -416,6 +417,7 @@ test.describe("core data", () => {
         description:
           "https://digitalservicebund.atlassian.net/browse/RISDEV-4523",
       },
+      tag: ["@RISDEV-4523"],
     },
     async ({ page, documentNumber }) => {
       await test.step("Navigiere zu Rubriken als interner Nutzer", async () => {
