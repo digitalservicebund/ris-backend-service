@@ -61,7 +61,7 @@ export function useCaseLawMenuItems(
       },
     },
     {
-      label: "Fundstellen",
+      label: "Periodika",
       route: {
         ...baseRoute,
         name: "caselaw-documentUnit-documentNumber-references",

@@ -71,6 +71,15 @@ export const navigateToReferences = async (
   })
 }
 
+export const navigateToLegalPeriodicalEvaluation = async (page: Page) => {
+  await test.step("Navigate to 'Periodika'", async () => {
+    const baseUrl = `/caselaw/legal-periodical-editions`
+
+    await page.goto(baseUrl)
+    await expect(page.getByText("Periodika")).toBeVisible()
+  })
+}
+
 export const navigateToPreview = async (
   page: Page,
   documentNumber: string,
