@@ -1,6 +1,6 @@
-import LegalPeriodical from "./legalPeriodical"
-import Reference from "./reference"
+import Reference, { LegalPeriodical } from "./reference"
 
+// Todo: use type instead of class?
 export default class LegalPeriodicalEdition {
   id?: string
   legalPeriodical?: LegalPeriodical

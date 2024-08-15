@@ -2,6 +2,8 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import EditionEvaluation from "@/components/legalperiodical/EditionEvaluation.vue"
+import { LegalPeriodical } from "@/domain/reference"
+import service from "@/services/legalPeriodicalEditionService"
 
 function renderComponent() {
   // eslint-disable-next-line testing-library/await-async-events
@@ -51,11 +53,28 @@ function renderComponent() {
 }
 
 describe("Legal periodical edition list", () => {
+  beforeEach(() => {
+    const legalPeriodical: LegalPeriodical = {
+      legalPeriodicalAbbreviation: "BDZ",
+    }
+    vi.spyOn(service, "get").mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: {
+          id: crypto.randomUUID(),
+          legalPeriodical: legalPeriodical,
+          name: "name",
+          prefix: "präfix",
+          suffix: "suffix",
+          references: [],
+        },
+      }),
+    )
+  })
+
   test("renders correctly", async () => {
     renderComponent()
-
     expect(screen.getByText("Periodikaauswertung")).toBeVisible()
-
     // todo
   })
 })

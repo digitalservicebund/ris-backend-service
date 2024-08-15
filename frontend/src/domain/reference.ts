@@ -1,5 +1,6 @@
 import EditableListItem from "./editableListItem"
 
+// Todo: LegalPeriodical duplicate with domain/legalPeriodical class
 export type LegalPeriodical = {
   legalPeriodicalId?: string
   legalPeriodicalTitle?: string
