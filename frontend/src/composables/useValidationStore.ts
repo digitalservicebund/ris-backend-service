@@ -40,7 +40,6 @@ export function useValidationStore<T extends string>(): ValidationStore<T> {
   }
 
   function isValid(): boolean {
-    console.log(getAll())
     return getAll().length == 0
   }
 
