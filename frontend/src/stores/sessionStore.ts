@@ -10,7 +10,6 @@ type SessionStore = {
   user: Ref<User | undefined>
   env: Ref<Env | undefined>
   isAuthenticated: () => Promise<boolean>
-  isExternal: () => Promise<boolean>
   initSession: () => Promise<void>
 }
 
@@ -37,22 +36,13 @@ const useSessionStore = defineStore("session", (): SessionStore => {
     return !!user.value?.name
   }
 
-  /**
-   * Checks if the user has the role of an external user.
-   *
-   * @returns A promise with a boolean indicating if the user is an external user.
-   */
-  async function isExternal(): Promise<boolean> {
-    return user.value?.roles?.includes("External") ?? false
-  }
-
   async function initSession(): Promise<void> {
     env.value = await fetchEnv()
     const favicon = document.getElementById("favicon") as HTMLAnchorElement
     favicon.href = useFavicon(env.value).value
   }
 
-  return { user, env, isAuthenticated, isExternal, initSession }
+  return { user, env, isAuthenticated, initSession }
 })
 
 export default useSessionStore

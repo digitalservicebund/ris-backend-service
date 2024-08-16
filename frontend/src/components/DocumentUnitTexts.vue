@@ -3,11 +3,25 @@ import { computed } from "vue"
 import TextEditor from "../components/input/TextEditor.vue"
 import TextAreaInput from "@/components/input/TextAreaInput.vue"
 import TextInput from "@/components/input/TextInput.vue"
+import { useExternalUser } from "@/composables/useExternalUser"
 import { useValidBorderNumbers } from "@/composables/useValidBorderNumbers"
 import { Texts } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const store = useDocumentUnitStore()
+const isExternalUser = useExternalUser()
+
+function isReadOnly(item: { name: string }): boolean {
+  switch (item.name) {
+    case "tenor":
+    case "reasons":
+    case "caseFacts":
+    case "decisionReasons":
+      return isExternalUser
+    default:
+      return false
+  }
+}
 
 const data = computed(() => {
   if (store.documentUnit == undefined) return null
@@ -43,7 +57,7 @@ const updateValueByTextId = async (id: keyof Texts, updatedText: string) => {
           :id="item.id"
           :aria-label="item.aria"
           class="shadow-blue focus-within:shadow-focus hover:shadow-hover"
-          :editable="!item.readOnly"
+          :editable="!isReadOnly(item)"
           :field-size="item.fieldSize"
           :value="item.value"
           @update-value="updateValueByTextId(item.id, $event)"
