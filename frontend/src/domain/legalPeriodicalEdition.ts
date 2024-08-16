@@ -13,7 +13,6 @@ export default class LegalPeriodicalEdition {
   static readonly requiredFields = [
     "name",
     "prefix",
-    "suffix",
     "legalPeriodical",
   ] as const
 
@@ -26,10 +25,6 @@ export default class LegalPeriodicalEdition {
 
   constructor(data: Partial<LegalPeriodicalEdition> = {}) {
     Object.assign(this, data)
-  }
-
-  get hasMissingRequiredFields(): boolean {
-    return this.missingRequiredFields.length > 0
   }
 
   get missingRequiredFields() {

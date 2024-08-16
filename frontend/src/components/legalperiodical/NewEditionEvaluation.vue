@@ -62,30 +62,52 @@ const name = computed({
 async function validateRequiredInput() {
   validationStore.reset()
 
-  legalPeriodicalEdition.value.missingRequiredFields.forEach((missingField) =>
-    validationStore.add("Pflichtfeld nicht befüllt", missingField),
-  )
+  const conditaioalGroupFields = ["name", "prefix"]
+
+  legalPeriodicalEdition.value.missingRequiredFields
+    .filter((missingField) => !conditaioalGroupFields.includes(missingField))
+    .forEach((missingField) =>
+      validationStore.add("Pflichtfeld nicht befüllt", missingField),
+    )
+
+  const missingConditionalfields =
+    legalPeriodicalEdition.value.missingRequiredFields.filter((missingField) =>
+      conditaioalGroupFields.includes(missingField),
+    )
+
+  // Add validation error only if all fields are missing
+  if (missingConditionalfields.length == conditaioalGroupFields.length) {
+    missingConditionalfields.forEach((missingField) =>
+      validationStore.add("Name oder Präfix sind nicht befüllt", missingField),
+    )
+  }
 }
 
 async function saveEdition() {
   await validateRequiredInput()
+  console.log(validationStore.isValid())
+  if (validationStore.isValid()) {
+    const response = await LegalPeriodicalEditionService.save(
+      legalPeriodicalEdition.value as LegalPeriodicalEdition,
+    )
 
-  const response = await LegalPeriodicalEditionService.save(
-    legalPeriodicalEdition.value as LegalPeriodicalEdition,
-  )
-
-  if (response.data)
-    await router.replace({
-      name: "caselaw-legal-periodical-editions-uuid",
-      params: { uuid: response.data.uuid },
-    })
+    if (response.data)
+      await router.replace({
+        name: "caselaw-legal-periodical-editions-uuid",
+        params: { uuid: response.data.uuid },
+      })
+  }
 }
 </script>
 
 <template>
   <div class="flex h-full flex-col space-y-24 bg-gray-100 px-16 py-16">
     <h2 class="ds-heading-03-reg">Neue Periodikaauswertung</h2>
-    <InputField id="legalPeriodical" label="Periodikum *">
+    <InputField
+      id="legalPeriodical"
+      label="Periodikum *"
+      :validation-error="validationStore.getByField('legalPeriodical')"
+    >
       <ComboboxInput
         id="legalPeriodical"
         v-model="legalPeriodical"
@@ -96,15 +118,18 @@ async function saveEdition() {
       ></ComboboxInput>
     </InputField>
 
-    <div class="flex flex-row items-end gap-24">
-      <InputField id="prefix" label="Präfix">
+    <div class="flex flex-row items-start gap-24">
+      <InputField
+        id="prefix"
+        label="Präfix"
+        :validation-error="validationStore.getByField('prefix')"
+      >
         <TextInput
           id="prefix"
           v-model="prefix"
           aria-label="Präfix"
           class="ds-input-medium"
           size="medium"
-          :validation-error="validationStore.getByField('prefix')"
         ></TextInput>
       </InputField>
 
@@ -122,14 +147,17 @@ async function saveEdition() {
       >Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}</span
     >
 
-    <InputField id="edition" label="Name der Ausgabe (optional)">
+    <InputField
+      id="name"
+      label="Name der Ausgabe (optional)"
+      :validation-error="validationStore.getByField('name')"
+    >
       <TextInput
-        id="edition"
+        id="name"
         v-model="name"
         aria-label="Name der Ausgabe"
         class="ds-input-medium"
         size="medium"
-        :validation-error="validationStore.getByField('name')"
       ></TextInput>
     </InputField>
 
