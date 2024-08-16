@@ -1,29 +1,32 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue"
+import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
+import { useValidationStore } from "@/composables/useValidationStore"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import ComboboxItemService from "@/services/comboboxItemService"
 import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 
 const router = useRouter()
-const legalPeriodicalEdition = ref()
+const legalPeriodicalEdition = ref<LegalPeriodicalEdition>(
+  new LegalPeriodicalEdition(),
+)
+
+const validationStore =
+  useValidationStore<(typeof LegalPeriodicalEdition.fields)[number]>()
 
 const legalPeriodical = computed({
   get: () =>
     legalPeriodicalEdition.value?.legalPeriodical
       ? {
-          label:
-            legalPeriodicalEdition.value?.legalPeriodical
-              .legalPeriodicalAbbreviation,
+          label: legalPeriodicalEdition.value?.legalPeriodical.abbreviation,
           value: legalPeriodicalEdition.value?.legalPeriodical,
           additionalInformation:
-            legalPeriodicalEdition.value?.legalPeriodical
-              .legalPeriodicalSubtitle,
+            legalPeriodicalEdition.value?.legalPeriodical.subtitle,
         }
       : undefined,
   set: (newValue) => {
@@ -58,7 +61,7 @@ const name = computed({
 
 async function saveEdition() {
   const response = await LegalPeriodicalEditionService.save(
-    legalPeriodicalEdition.value,
+    legalPeriodicalEdition.value as LegalPeriodicalEdition,
   )
   if (response.data)
     await router.replace({
@@ -66,10 +69,6 @@ async function saveEdition() {
       params: { uuid: response.data.id },
     })
 }
-
-onMounted(() => {
-  legalPeriodicalEdition.value = new LegalPeriodicalEdition()
-})
 </script>
 
 <template>
@@ -95,6 +94,7 @@ onMounted(() => {
           aria-label="Präfix"
           class="ds-input-medium"
           size="medium"
+          :validation-error="validationStore.getByField('prefix')"
         ></TextInput>
       </InputField>
 
@@ -119,6 +119,7 @@ onMounted(() => {
         aria-label="Name der Ausgabe"
         class="ds-input-medium"
         size="medium"
+        :validation-error="validationStore.getByField('name')"
       ></TextInput>
     </InputField>
 
