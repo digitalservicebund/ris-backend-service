@@ -155,7 +155,6 @@ describe("text editor", async () => {
     expect(screen.getByLabelText("left")).toBeInTheDocument()
     expect(screen.getByLabelText("center")).toBeInTheDocument()
     expect(screen.getByLabelText("right")).toBeInTheDocument()
-    expect(screen.getByLabelText("justify")).toBeInTheDocument()
     expect(screen.getByLabelText("bulletList")).toBeInTheDocument()
     expect(screen.getByLabelText("orderedList")).toBeInTheDocument()
     expect(screen.getByLabelText("outdent")).toBeInTheDocument()

@@ -100,6 +100,9 @@ const editor = new Editor({
     InvisibleCharacters,
     TextAlign.configure({
       types: ["paragraph", "span"],
+      alignments: props.editable
+        ? ["left", "right", "center"]
+        : ["left", "right", "center", "justify"],
     }),
     CustomImage.configure({
       allowBase64: true,

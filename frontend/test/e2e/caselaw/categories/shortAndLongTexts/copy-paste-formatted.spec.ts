@@ -28,7 +28,7 @@ test("copy-paste text with different styles and alignments from side panel", asy
   const leftAlignTextWithStyle = `<span style="color: rgb(0, 0, 0)">${leftAlignText}</span>`
   const rightAlignTextWithStyle = `<p style="text-align: right"><span style="color: rgb(0, 0, 0)">${rightAlignText}</span></p>`
   const centerAlignTextWithStyle = `<p style="text-align: center">${centerAlignText}</p>`
-  const justifyAlignTextWithStyle = `<p style="text-align: justify">${justifyAlignText}</p>`
+  const justifyAlignTextWithoutStyle = `<p>${justifyAlignText}</p>`
 
   await test.step("upload document", async () => {
     await uploadTestfile(page, "some-text-aligment.docx")
@@ -66,7 +66,7 @@ test("copy-paste text with different styles and alignments from side panel", asy
     expect(inputFieldInnerHTML).toContain(leftAlignTextWithStyle)
     expect(inputFieldInnerHTML).toContain(rightAlignTextWithStyle)
     expect(inputFieldInnerHTML).toContain(centerAlignTextWithStyle)
-    expect(inputFieldInnerHTML).toContain(justifyAlignTextWithStyle)
+    expect(inputFieldInnerHTML).toContain(justifyAlignTextWithoutStyle)
   })
 })
 

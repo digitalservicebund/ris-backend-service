@@ -13,7 +13,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.6"
     id("com.diffplug.spotless") version "6.25.0"
     id("org.sonarqube") version "5.1.0.4882"
-    id("com.github.jk1.dependency-license-report") version "2.8"
+    id("com.github.jk1.dependency-license-report") version "2.9"
     id("com.gorylenko.gradle-git-properties") version "2.4.2"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
@@ -174,7 +174,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.1")
 
-    implementation(platform("software.amazon.awssdk:bom:2.27.5"))
+    implementation(platform("software.amazon.awssdk:bom:2.27.6"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 

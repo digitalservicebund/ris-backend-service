@@ -9,7 +9,6 @@ import { useCollapsingMenuBar } from "@/composables/useCollapsingMenuBar"
 import MaterialSymbolsDeleteSweepOutline from "~icons/ic/sharp-delete-sweep"
 import IconExpand from "~icons/ic/sharp-expand"
 import IconAlignCenter from "~icons/ic/sharp-format-align-center"
-import IconAlignJustify from "~icons/ic/sharp-format-align-justify"
 import IconAlignLeft from "~icons/ic/sharp-format-align-left"
 import IconAlignRight from "~icons/ic/sharp-format-align-right"
 import IconBold from "~icons/ic/sharp-format-bold"
@@ -132,14 +131,6 @@ const buttons = computed(() => [
     group: "alignment",
     isCollapsable: true,
     callback: () => props.editor.chain().focus().setTextAlign("right").run(),
-  },
-  {
-    type: "justify",
-    icon: IconAlignJustify,
-    ariaLabel: "justify",
-    group: "alignment",
-    isCollapsable: true,
-    callback: () => props.editor.chain().focus().setTextAlign("justify").run(),
   },
   {
     type: "bulletList",
