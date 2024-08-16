@@ -16,7 +16,7 @@ public class LegalPeriodicalEditionTransformer {
     }
 
     return LegalPeriodicalEdition.builder()
-        .id(legalPeriodicalEditionDTO.getId())
+        .uuid(legalPeriodicalEditionDTO.getId())
         .legalPeriodical(
             LegalPeriodicalTransformer.transformToDomain(
                 legalPeriodicalEditionDTO.getLegalPeriodical()))
@@ -37,7 +37,7 @@ public class LegalPeriodicalEditionTransformer {
     }
 
     return LegalPeriodicalEditionDTO.builder()
-        .id(legalPeriodicalEdition.id())
+        .id(legalPeriodicalEdition.uuid())
         .legalPeriodical(
             LegalPeriodicalTransformer.transformToDTO(legalPeriodicalEdition.legalPeriodical()))
         .name(legalPeriodicalEdition.name())

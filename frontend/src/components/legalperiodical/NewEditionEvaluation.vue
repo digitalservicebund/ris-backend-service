@@ -59,14 +59,25 @@ const name = computed({
   },
 })
 
+async function validateRequiredInput() {
+  validationStore.reset()
+
+  legalPeriodicalEdition.value.missingRequiredFields.forEach((missingField) =>
+    validationStore.add("Pflichtfeld nicht befüllt", missingField),
+  )
+}
+
 async function saveEdition() {
+  await validateRequiredInput()
+
   const response = await LegalPeriodicalEditionService.save(
     legalPeriodicalEdition.value as LegalPeriodicalEdition,
   )
+
   if (response.data)
     await router.replace({
       name: "caselaw-legal-periodical-editions-uuid",
-      params: { uuid: response.data.id },
+      params: { uuid: response.data.uuid },
     })
 }
 </script>
@@ -74,7 +85,6 @@ async function saveEdition() {
 <template>
   <div class="flex h-full flex-col space-y-24 bg-gray-100 px-16 py-16">
     <h2 class="ds-heading-03-reg">Neue Periodikaauswertung</h2>
-
     <InputField id="legalPeriodical" label="Periodikum *">
       <ComboboxInput
         id="legalPeriodical"

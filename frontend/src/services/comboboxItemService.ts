@@ -85,7 +85,6 @@ function formatDropdownItems(
       }))
     }
     case Endpoint.legalPeriodicals: {
-      console.log(responseData)
       return (responseData as LegalPeriodical[]).map((item) => ({
         label: `${item.abbreviation} | ${item.title}`,
         value: item,

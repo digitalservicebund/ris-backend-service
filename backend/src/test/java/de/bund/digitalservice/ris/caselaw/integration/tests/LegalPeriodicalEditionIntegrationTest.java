@@ -156,7 +156,7 @@ class LegalPeriodicalEditionIntegrationTest {
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri(EDITION_ENDPOINT + "/" + saved.id())
+            .uri(EDITION_ENDPOINT + "/" + saved.uuid())
             .exchange()
             .expectBody(LegalPeriodicalEdition.class)
             .returnResult()

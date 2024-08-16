@@ -7,7 +7,7 @@ export default class LegalPeriodicalEdition {
 
   static readonly requiredFields = ["name", "prefix", "suffix"] as const
 
-  id?: string
+  uuid?: string
   legalPeriodical?: LegalPeriodical
   name?: string
   prefix?: string
