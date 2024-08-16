@@ -4,8 +4,8 @@ import { useRouter } from "vue-router"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
+import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
-import { LegalPeriodical } from "@/domain/reference"
 import ComboboxItemService from "@/services/comboboxItemService"
 import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 
@@ -16,7 +16,11 @@ const currentEditions = ref<LegalPeriodicalEdition[]>()
 watch(
   filter,
   async (newFilter) => {
-    await updateEditions(newFilter.uuid)
+    if (newFilter && newFilter.uuid) {
+      await updateEditions(newFilter.uuid)
+    } else {
+      currentEditions.value = []
+    }
   },
   { deep: true },
 )
@@ -85,7 +89,7 @@ const legalPeriodical = computed({
           :key="edition.uuid"
           class="flex gap-24"
         >
-          Ausgabe {{ edition.name }} ({{ edition.references.length }}
+          Ausgabe {{ edition.name }} ({{ edition.references?.length }}
           Fundstellen)
           <router-link
             target="_blank"
