@@ -1,20 +1,44 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue"
+import { computed, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
+import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import { LegalPeriodical } from "@/domain/reference"
 import ComboboxItemService from "@/services/comboboxItemService"
+import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 
 const router = useRouter()
 const filter = ref<LegalPeriodical>()
+const currentEditions = ref<LegalPeriodicalEdition[]>()
+
+watch(
+  filter,
+  async (newFilter) => {
+    await updateEditions(newFilter.uuid)
+  },
+  { deep: true },
+)
+
+/**
+ * Loads all editions of a legal periodical
+ */
+async function updateEditions(legalPeriodicalId: string) {
+  const response =
+    await LegalPeriodicalEditionService.getAllByLegalPeriodicalId(
+      legalPeriodicalId,
+    )
+  if (response.data) {
+    currentEditions.value = response.data
+  }
+}
 
 const legalPeriodical = computed({
   get: () =>
     filter.value
       ? {
-          label: filter.value.legalPeriodicalAbbreviation,
+          label: filter.value.abbreviation,
           value: filter.value,
         }
       : undefined,
@@ -55,6 +79,27 @@ const legalPeriodical = computed({
           </InputField>
         </div>
       </div>
+      <ul>
+        <li
+          v-for="edition in currentEditions"
+          :key="edition.uuid"
+          class="flex gap-24"
+        >
+          Ausgabe {{ edition.name }} ({{ edition.references.length }}
+          Fundstellen)
+          <router-link
+            target="_blank"
+            :to="{
+              name: 'caselaw-legal-periodical-editions-uuid',
+              params: { uuid: edition.uuid },
+            }"
+          >
+            <button class="ds-link-03 border-b-1 border-blue-800 leading-24">
+              bearbeiten
+            </button>
+          </router-link>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
