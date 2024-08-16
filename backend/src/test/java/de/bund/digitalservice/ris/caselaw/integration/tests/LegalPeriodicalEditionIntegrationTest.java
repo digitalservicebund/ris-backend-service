@@ -119,10 +119,7 @@ class LegalPeriodicalEditionIntegrationTest {
                 risWebTestClient
                     .withDefaultLogin()
                     .get()
-                    .uri(
-                        EDITION_ENDPOINT
-                            + "?legal_periodical_id="
-                            + legalPeriodical.legalPeriodicalId())
+                    .uri(EDITION_ENDPOINT + "?legal_periodical_id=" + legalPeriodical.uuid())
                     .exchange()
                     .expectStatus()
                     .isOk()
