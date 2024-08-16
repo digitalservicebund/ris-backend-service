@@ -2,7 +2,9 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import EditionEvaluation from "@/components/legalperiodical/EditionEvaluation.vue"
-import { LegalPeriodical } from "@/domain/reference"
+import LegalPeriodical from "@/domain/legalPeriodical"
+import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
+import { ServiceResponse } from "@/services/httpClient"
 import service from "@/services/legalPeriodicalEditionService"
 
 function renderComponent() {
@@ -55,20 +57,21 @@ function renderComponent() {
 describe("Legal periodical edition list", () => {
   beforeEach(() => {
     const legalPeriodical: LegalPeriodical = {
-      legalPeriodicalAbbreviation: "BDZ",
+      abbreviation: "BDZ",
     }
-    vi.spyOn(service, "get").mockImplementation(() =>
-      Promise.resolve({
-        status: 200,
-        data: {
-          id: crypto.randomUUID(),
-          legalPeriodical: legalPeriodical,
-          name: "name",
-          prefix: "präfix",
-          suffix: "suffix",
-          references: [],
-        },
-      }),
+    vi.spyOn(service, "get").mockImplementation(
+      (): Promise<ServiceResponse<LegalPeriodicalEdition>> =>
+        Promise.resolve({
+          status: 200,
+          data: {
+            uuid: crypto.randomUUID(),
+            legalPeriodical: legalPeriodical,
+            name: "name",
+            prefix: "präfix",
+            suffix: "suffix",
+            references: [],
+          },
+        }),
     )
   })
 

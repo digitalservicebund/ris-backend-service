@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import { ComboboxItem } from "@/components/input/types"
 import EditionList from "@/components/legalperiodical/EditionList.vue"
-import { LegalPeriodical } from "@/domain/reference"
+import LegalPeriodical from "@/domain/legalPeriodical"
 import comboboxItemService from "@/services/comboboxItemService"
 
 function renderComponent() {
@@ -50,11 +50,11 @@ function renderComponent() {
 
 describe("Legal periodical edition list", () => {
   const legalPeriodical: LegalPeriodical = {
-    legalPeriodicalAbbreviation: "BDZ",
+    abbreviation: "BDZ",
   }
   const dropdownLegalPeriodicalItems: ComboboxItem[] = [
     {
-      label: legalPeriodical.legalPeriodicalAbbreviation,
+      label: legalPeriodical.abbreviation!,
       value: legalPeriodical,
     },
   ]

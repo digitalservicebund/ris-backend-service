@@ -3,9 +3,19 @@ import LegalPeriodical from "@/domain/legalPeriodical"
 
 // Todo: use type instead of class?
 export default class LegalPeriodicalEdition {
-  static readonly fields = ["name", "prefix", "suffix"] as const
+  static readonly fields = [
+    "name",
+    "prefix",
+    "suffix",
+    "legalPeriodical",
+  ] as const
 
-  static readonly requiredFields = ["name", "prefix", "suffix"] as const
+  static readonly requiredFields = [
+    "name",
+    "prefix",
+    "suffix",
+    "legalPeriodical",
+  ] as const
 
   uuid?: string
   legalPeriodical?: LegalPeriodical
