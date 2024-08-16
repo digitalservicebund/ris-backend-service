@@ -15,7 +15,6 @@ function defineTextEntry(
     ...(fieldType == TextAreaInput && { fieldSize }),
   }
 }
-
 export const texts = [
   defineTextEntry("decisionName", "Entscheidungsname", TextInput),
   defineTextEntry("headline", "Titelzeile", TextAreaInput, "small"),
