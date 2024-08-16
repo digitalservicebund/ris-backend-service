@@ -118,7 +118,7 @@ onMounted(async () => {
   <ErrorPage
     v-else
     back-button-label="Zurück zu Periodika"
-    back-router-name="caselaw"
+    :back-router="{ name: 'caselaw-legal-periodical-editions' }"
     :error="responseError"
     :title="responseError?.title"
   />

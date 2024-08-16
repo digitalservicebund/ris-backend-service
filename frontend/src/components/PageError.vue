@@ -1,19 +1,20 @@
 <script setup lang="ts">
 import TextButton from "@/components/input/TextButton.vue"
+import Route from "@/domain/route"
 import router from "@/router"
 
 interface Props {
   title?: string
   description?: string
   backButtonLabel?: string
-  backRouterName?: string
+  backRouter?: Route
 }
 
 const props = withDefaults(defineProps<Props>(), {
   title: undefined,
   description: undefined,
   backButtonLabel: "Zurück zur Startseite",
-  backRouterName: "caselaw",
+  backRouter: { name: "caselaw" },
 })
 </script>
 
@@ -33,11 +34,7 @@ const props = withDefaults(defineProps<Props>(), {
       :aria-label="backButtonLabel"
       class="w-auto"
       :label="backButtonLabel"
-      @click="
-        router.push({
-          name: backRouterName,
-        })
-      "
+      @click="router.replace(backRouter)"
     />
   </div>
 </template>
