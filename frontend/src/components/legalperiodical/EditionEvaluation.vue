@@ -18,8 +18,7 @@ const legalPeriodical = computed({
   get: () =>
     edition?.value?.legalPeriodical
       ? {
-          // Todo: fix ts issue, by removing duplicate of LegalPeriodical type
-          label: edition?.value?.legalPeriodical.legalPeriodicalAbbreviation,
+          label: edition?.value?.legalPeriodical.abbreviation,
           value: edition?.value?.legalPeriodical,
         }
       : undefined,
