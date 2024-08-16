@@ -6,7 +6,6 @@ const props = defineProps<{
   items: DropdownItem[]
   modelValue?: DropdownInputModelType
   placeholder?: string
-  readOnly?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -20,10 +19,6 @@ const localModelValue = computed({
   },
 })
 
-const conditionalClasses = computed(() => ({
-  "!shadow-none !bg-blue-300": props.readOnly,
-}))
-
 const hasPlaceholder = computed(() =>
   Boolean(!props.modelValue && props.placeholder),
 )
@@ -35,9 +30,7 @@ const hasPlaceholder = computed(() =>
   <select
     v-model="localModelValue"
     class="ds-select ds-select-medium"
-    :class="conditionalClasses"
     :data-placeholder="hasPlaceholder ? true : undefined"
-    :disabled="readOnly"
     tabindex="0"
   >
     <option v-if="placeholder && !localModelValue" disabled value="">

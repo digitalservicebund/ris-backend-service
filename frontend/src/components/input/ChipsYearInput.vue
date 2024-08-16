@@ -10,7 +10,6 @@ interface Props {
   modelValue?: string[]
   ariaLabel: string
   hasError?: boolean
-  readOnly?: boolean
 }
 
 const props = defineProps<Props>()
@@ -84,7 +83,6 @@ dayjs.extend(customParseFormat)
     :aria-label="ariaLabel"
     :has-error="hasError"
     maska="####"
-    :read-only="readOnly"
     @update:validation-error="validateInput($event)"
   />
 </template>
