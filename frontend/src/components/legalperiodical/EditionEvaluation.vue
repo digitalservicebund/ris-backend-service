@@ -1,18 +1,25 @@
 <script lang="ts" setup>
+import { UUID } from "crypto"
 import { onMounted, ref, computed } from "vue"
-import { useRoute } from "vue-router"
 import ComboboxInput from "@/components/ComboboxInput.vue"
+import ErrorPage from "@/components/ErrorPage.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import Reference from "@/domain/reference"
 import ComboboxItemService from "@/services/comboboxItemService"
+import { ResponseError } from "@/services/httpClient"
 import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 
-const route = useRoute()
+const props = defineProps<{
+  legalPeriodicalEditionId: string
+}>()
+
 const edition = ref<LegalPeriodicalEdition>(new LegalPeriodicalEdition())
 const reference = ref<Reference>(new Reference())
+
+const responseError = ref<ResponseError>()
 
 const legalPeriodical = computed({
   get: () =>
@@ -32,34 +39,22 @@ const legalPeriodical = computed({
   },
 })
 
-// Define a function to check if a string matches the UUID pattern
-function isUuid(
-  value: string,
-): value is `${string}-${string}-${string}-${string}-${string}` {
-  const uuidRegex =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-  return uuidRegex.test(value)
-}
-
 onMounted(async () => {
-  const uuid = route.params.uuid
-  if (typeof uuid === "string" && isUuid(uuid)) {
-    try {
-      const response = await LegalPeriodicalEditionService.get(uuid)
-      if (response.data) edition.value = response.data
-    } catch (error) {
-      console.error("Error fetching edition:", error)
-      // Todo: Show error
-    }
-  } else {
-    console.error("Invalid UUID:", uuid)
-    // Todo: Handle the error
+  const response = await LegalPeriodicalEditionService.get(
+    props.legalPeriodicalEditionId as UUID,
+  )
+  if (response.error) {
+    responseError.value = response.error
   }
+  if (response.data) edition.value = response.data
 })
 </script>
 
 <template>
-  <div class="flex h-full flex-col space-y-24 bg-gray-100 px-16 py-16">
+  <div
+    v-if="!responseError"
+    class="flex h-full flex-col space-y-24 bg-gray-100 px-16 py-16"
+  >
     <h2 class="ds-heading-03-reg">Periodikaauswertung</h2>
 
     <div v-if="edition" class="flex flex-col gap-24">
@@ -120,4 +115,11 @@ onMounted(async () => {
       </div>
     </div>
   </div>
+  <ErrorPage
+    v-else
+    back-button-label="Zurück zu Periodika"
+    back-router-name="caselaw"
+    :error="responseError"
+    :title="responseError?.title"
+  />
 </template>

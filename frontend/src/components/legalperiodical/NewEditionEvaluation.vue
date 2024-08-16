@@ -85,7 +85,6 @@ async function validateRequiredInput() {
 
 async function saveEdition() {
   await validateRequiredInput()
-  console.log(validationStore.isValid())
   if (validationStore.isValid()) {
     const response = await LegalPeriodicalEditionService.save(
       legalPeriodicalEdition.value as LegalPeriodicalEdition,
