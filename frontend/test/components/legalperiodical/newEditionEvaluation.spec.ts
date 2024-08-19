@@ -125,9 +125,9 @@ describe("Legal periodical edition list", () => {
     await user.click(screen.getByText("Auswertung starten"))
     expect(fetchSpy).toHaveBeenCalledTimes(1)
     expect(fetchSpy).toHaveBeenCalledWith({
-      id: undefined,
+      uuid: undefined,
       legalPeriodical: {
-        legalPeriodicalAbbreviation: "BDZ",
+        abbreviation: "BDZ",
       },
       name: "name",
       prefix: "präfix",
