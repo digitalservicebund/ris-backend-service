@@ -42,8 +42,6 @@ const legalPeriodical = computed({
   },
 })
 
-//Todo: add tests for validation, e2e => legalPerdidicalEvaluation adjustion.
-
 async function validateRequiredInput() {
   validationStore.reset()
 

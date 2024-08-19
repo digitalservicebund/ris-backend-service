@@ -1,4 +1,3 @@
-// Todo: use type instead of class?
 export default class LegalPeriodical {
   uuid?: string
   title?: string
