@@ -19,6 +19,7 @@
     "after 9am every weekday",
     "before 5pm every weekday"
   ],
+  "prConcurrentLimit": 5,
   "packageRules": [
     {
       "groupName": "all frontend non-major dependencies",
@@ -36,7 +37,6 @@
       "labels": [
         "frontend-updates"
       ],
-      
       "automerge": true,
       "automergeType": "pr"
     },
