@@ -47,21 +47,21 @@ const legalPeriodical = computed({
 async function validateRequiredInput() {
   validationStore.reset()
 
-  const conditaioalGroupFields = ["name", "prefix"]
+  const conditionalGroupFields = ["name", "prefix"]
 
   legalPeriodicalEdition.value.missingRequiredFields
-    .filter((missingField) => !conditaioalGroupFields.includes(missingField))
+    .filter((missingField) => !conditionalGroupFields.includes(missingField))
     .forEach((missingField) =>
       validationStore.add("Pflichtfeld nicht befüllt", missingField),
     )
 
   const missingConditionalfields =
     legalPeriodicalEdition.value.missingRequiredFields.filter((missingField) =>
-      conditaioalGroupFields.includes(missingField),
+      conditionalGroupFields.includes(missingField),
     )
 
   // Add validation error only if all fields are missing
-  if (missingConditionalfields.length == conditaioalGroupFields.length) {
+  if (missingConditionalfields.length == conditionalGroupFields.length) {
     missingConditionalfields.forEach((missingField) =>
       validationStore.add("Name oder Präfix sind nicht befüllt", missingField),
     )

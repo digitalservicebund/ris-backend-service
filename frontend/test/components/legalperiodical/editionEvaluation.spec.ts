@@ -54,7 +54,7 @@ function renderComponent() {
   }
 }
 
-describe("Legal periodical edition list", () => {
+describe("Legal periodical edition evaluation", () => {
   beforeEach(() => {
     const legalPeriodical: LegalPeriodical = {
       abbreviation: "BDZ",
@@ -63,14 +63,14 @@ describe("Legal periodical edition list", () => {
       (): Promise<ServiceResponse<LegalPeriodicalEdition>> =>
         Promise.resolve({
           status: 200,
-          data: {
+          data: new LegalPeriodicalEdition({
             uuid: crypto.randomUUID(),
             legalPeriodical: legalPeriodical,
             name: "name",
             prefix: "präfix",
             suffix: "suffix",
             references: [],
-          },
+          }),
         }),
     )
   })

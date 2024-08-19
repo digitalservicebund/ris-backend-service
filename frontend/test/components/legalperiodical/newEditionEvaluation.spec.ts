@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import { ComboboxItem } from "@/components/input/types"
 import NewEditionEvaluation from "@/components/legalperiodical/NewEditionEvaluation.vue"
 import LegalPeriodical from "@/domain/legalPeriodical"
+import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import comboboxItemService from "@/services/comboboxItemService"
 import service from "@/services/legalPeriodicalEditionService"
 
@@ -59,7 +60,7 @@ describe("Legal periodical edition list", () => {
   }
   const dropdownLegalPeriodicalItems: ComboboxItem[] = [
     {
-      label: legalPeriodical.abbreviation,
+      label: legalPeriodical.abbreviation!,
       value: legalPeriodical,
     },
   ]
@@ -98,14 +99,14 @@ describe("Legal periodical edition list", () => {
     const fetchSpy = vi.spyOn(service, "save").mockImplementation(() =>
       Promise.resolve({
         status: 200,
-        data: {
+        data: new LegalPeriodicalEdition({
           uuid: crypto.randomUUID(),
           legalPeriodical: legalPeriodical,
           name: "name",
           prefix: "präfix",
           suffix: "suffix",
           references: [],
-        },
+        }),
       }),
     )
     const { user } = renderComponent()

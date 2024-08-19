@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { UUID } from "crypto"
 import { onMounted, ref, computed } from "vue"
+import { useRoute } from "vue-router"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextInput from "@/components/input/TextInput.vue"
@@ -12,10 +13,7 @@ import ComboboxItemService from "@/services/comboboxItemService"
 import { ResponseError } from "@/services/httpClient"
 import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 
-const props = defineProps<{
-  legalPeriodicalEditionId: string
-}>()
-
+const route = useRoute()
 const edition = ref<LegalPeriodicalEdition>(new LegalPeriodicalEdition())
 const reference = ref<Reference>(new Reference())
 
@@ -40,13 +38,16 @@ const legalPeriodical = computed({
 })
 
 onMounted(async () => {
-  const response = await LegalPeriodicalEditionService.get(
-    props.legalPeriodicalEditionId as UUID,
-  )
-  if (response.error) {
-    responseError.value = response.error
+  const uuid = route.params.uuid
+  if (uuid) {
+    const response = await LegalPeriodicalEditionService.get(
+      uuid.toString() as UUID,
+    )
+    if (response.error) {
+      responseError.value = response.error
+    }
+    if (response.data) edition.value = response.data
   }
-  if (response.data) edition.value = response.data
 })
 </script>
 
@@ -117,7 +118,7 @@ onMounted(async () => {
   </div>
   <ErrorPage
     v-else
-    back-button-label="Zurück zu Periodika"
+    back-button-label="Zurück zur Übersicht"
     :back-router="{ name: 'caselaw-legal-periodical-editions' }"
     :error="responseError"
     :title="responseError?.title"
