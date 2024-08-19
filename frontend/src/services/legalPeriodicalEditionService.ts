@@ -16,9 +16,7 @@ interface LegalPeriodicalEditionService {
 }
 
 const service: LegalPeriodicalEditionService = {
-  async get(
-    legalPeriodicalId: string,
-  ): Promise<ServiceResponse<LegalPeriodicalEdition>> {
+  async get(legalPeriodicalId: string) {
     const response = await httpClient.get<LegalPeriodicalEdition>(
       `caselaw/legalperiodicaledition/${legalPeriodicalId}`,
     )
@@ -32,9 +30,7 @@ const service: LegalPeriodicalEditionService = {
     return response
   },
 
-  async getAllByLegalPeriodicalId(
-    legalPeriodicalId: string,
-  ): Promise<ServiceResponse<LegalPeriodicalEdition[]>> {
+  async getAllByLegalPeriodicalId(legalPeriodicalId: string) {
     const response = await httpClient.get<LegalPeriodicalEdition[]>(
       `caselaw/legalperiodicaledition`,
       {

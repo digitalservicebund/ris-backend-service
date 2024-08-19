@@ -4,7 +4,7 @@ export default class LegalPeriodical {
   subtitle?: string
   abbreviation?: string
   primaryReference?: boolean
-  citationStyle?: string
+  citiationStyle?: string
 
   constructor(data: Partial<LegalPeriodical> = {}) {
     Object.assign(this, data)

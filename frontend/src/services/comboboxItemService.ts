@@ -1,4 +1,5 @@
 import { capitalize } from "vue"
+import { LegalPeriodical } from "./../domain/reference"
 import httpClient, { ServiceResponse } from "./httpClient"
 import { ComboboxInputModelType, ComboboxItem } from "@/components/input/types"
 import { Page } from "@/components/Pagination.vue"
@@ -6,7 +7,6 @@ import { CitationType } from "@/domain/citationType"
 import { Court, Procedure, DocumentType } from "@/domain/documentUnit"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import { LegalForceType, LegalForceRegion } from "@/domain/legalForce"
-import LegalPeriodical from "@/domain/legalPeriodical"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import errorMessages from "@/i18n/errors.json"
 
@@ -86,9 +86,9 @@ function formatDropdownItems(
     }
     case Endpoint.legalPeriodicals: {
       return (responseData as LegalPeriodical[]).map((item) => ({
-        label: `${item.abbreviation} | ${item.title}`,
+        label: `${item.legalPeriodicalAbbreviation} | ${item.legalPeriodicalTitle}`,
         value: item,
-        additionalInformation: item.subtitle,
+        additionalInformation: item.legalPeriodicalSubtitle,
       }))
     }
   }

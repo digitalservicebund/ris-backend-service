@@ -2,19 +2,12 @@
 import TextButton from "@/components/input/TextButton.vue"
 import router from "@/router"
 
-interface Props {
+interface ErrorPageProps {
   title?: string
   description?: string
-  backButtonLabel?: string
-  backRouterName?: string
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  title: undefined,
-  description: undefined,
-  backButtonLabel: "Zurück zur Startseite",
-  backRouterName: "caselaw",
-})
+const props = defineProps<ErrorPageProps>()
 </script>
 
 <template>
@@ -30,14 +23,10 @@ const props = withDefaults(defineProps<Props>(), {
       Überprüfen Sie, ob Sie die gesamte Adresse kopiert haben.
     </p>
     <TextButton
-      :aria-label="backButtonLabel"
+      aria-label="Zurück zur Startseite"
       class="w-auto"
-      :label="backButtonLabel"
-      @click="
-        router.push({
-          name: backRouterName,
-        })
-      "
+      label="Zurück zur Startseite"
+      @click="router.push({ name: 'caselaw' })"
     />
   </div>
 </template>

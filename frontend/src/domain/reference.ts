@@ -1,5 +1,13 @@
 import EditableListItem from "./editableListItem"
-import LegalPeriodical from "@/domain/legalPeriodical"
+
+export type LegalPeriodical = {
+  legalPeriodicalId?: string
+  legalPeriodicalTitle?: string
+  legalPeriodicalSubtitle?: string
+  legalPeriodicalAbbreviation: string
+  primaryReference?: boolean
+  citationStyle?: string
+}
 
 export default class Reference implements EditableListItem {
   public uuid?: string
@@ -26,7 +34,7 @@ export default class Reference implements EditableListItem {
   get renderDecision(): string {
     const parts = [
       ...(this.legalPeriodical
-        ? [this.legalPeriodical.abbreviation]
+        ? [this.legalPeriodical.legalPeriodicalAbbreviation]
         : [this.legalPeriodicalRawValue]),
       ...(this.citation && this.referenceSupplement
         ? [`${this.citation} (${this.referenceSupplement})`]

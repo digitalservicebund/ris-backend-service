@@ -296,8 +296,7 @@ test.describe(
       },
     )
 
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip(
+    test(
       "References can be exported",
       {
         annotation: {

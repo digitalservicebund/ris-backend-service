@@ -107,7 +107,7 @@ class LegalPeriodicalEditionIntegrationTest {
 
     repository.save(
         LegalPeriodicalEdition.builder()
-            .uuid(UUID.randomUUID())
+            .id(UUID.randomUUID())
             .legalPeriodical(legalPeriodical)
             .name("2024 Sonderheft 1")
             .prefix("2024,")
@@ -119,7 +119,10 @@ class LegalPeriodicalEditionIntegrationTest {
                 risWebTestClient
                     .withDefaultLogin()
                     .get()
-                    .uri(EDITION_ENDPOINT + "?legal_periodical_id=" + legalPeriodical.uuid())
+                    .uri(
+                        EDITION_ENDPOINT
+                            + "?legal_periodical_id="
+                            + legalPeriodical.legalPeriodicalId())
                     .exchange()
                     .expectStatus()
                     .isOk()
@@ -145,7 +148,7 @@ class LegalPeriodicalEditionIntegrationTest {
     var saved =
         repository.save(
             LegalPeriodicalEdition.builder()
-                .uuid(UUID.randomUUID())
+                .id(UUID.randomUUID())
                 .legalPeriodical(legalPeriodical)
                 .name("2024 Sonderheft 1")
                 .prefix("2024,")
@@ -156,7 +159,7 @@ class LegalPeriodicalEditionIntegrationTest {
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri(EDITION_ENDPOINT + "/" + saved.uuid())
+            .uri(EDITION_ENDPOINT + "/" + saved.id())
             .exchange()
             .expectBody(LegalPeriodicalEdition.class)
             .returnResult()

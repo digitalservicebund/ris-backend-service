@@ -8,7 +8,6 @@ type ValidationStore<T> = {
   add: (message: string, instance: T) => void
   remove: (field: T) => void
   reset: () => void
-  isValid: () => boolean
 }
 
 export function useValidationStore<T extends string>(): ValidationStore<T> {
@@ -39,10 +38,6 @@ export function useValidationStore<T extends string>(): ValidationStore<T> {
       )
   }
 
-  function isValid(): boolean {
-    return getAll().length == 0
-  }
-
   function reset() {
     validationErrors.value = []
   }
@@ -54,6 +49,5 @@ export function useValidationStore<T extends string>(): ValidationStore<T> {
     add,
     remove,
     reset,
-    isValid,
   }
 }

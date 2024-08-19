@@ -3,8 +3,7 @@ import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import { ComboboxItem } from "@/components/input/types"
 import NewEditionEvaluation from "@/components/legalperiodical/NewEditionEvaluation.vue"
-import LegalPeriodical from "@/domain/legalPeriodical"
-import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
+import { LegalPeriodical } from "@/domain/reference"
 import comboboxItemService from "@/services/comboboxItemService"
 import service from "@/services/legalPeriodicalEditionService"
 
@@ -56,11 +55,11 @@ function renderComponent() {
 
 describe("Legal periodical edition list", () => {
   const legalPeriodical: LegalPeriodical = {
-    abbreviation: "BDZ",
+    legalPeriodicalAbbreviation: "BDZ",
   }
   const dropdownLegalPeriodicalItems: ComboboxItem[] = [
     {
-      label: legalPeriodical.abbreviation!,
+      label: legalPeriodical.legalPeriodicalAbbreviation,
       value: legalPeriodical,
     },
   ]
@@ -94,19 +93,19 @@ describe("Legal periodical edition list", () => {
 
   test("clicking Auswertung starten button calls service with correct values", async () => {
     const legalPeriodical: LegalPeriodical = {
-      abbreviation: "BDZ",
+      legalPeriodicalAbbreviation: "BDZ",
     }
     const fetchSpy = vi.spyOn(service, "save").mockImplementation(() =>
       Promise.resolve({
         status: 200,
-        data: new LegalPeriodicalEdition({
-          uuid: crypto.randomUUID(),
+        data: {
+          id: crypto.randomUUID(),
           legalPeriodical: legalPeriodical,
           name: "name",
           prefix: "präfix",
           suffix: "suffix",
           references: [],
-        }),
+        },
       }),
     )
     const { user } = renderComponent()
@@ -126,9 +125,9 @@ describe("Legal periodical edition list", () => {
     await user.click(screen.getByText("Auswertung starten"))
     expect(fetchSpy).toHaveBeenCalledTimes(1)
     expect(fetchSpy).toHaveBeenCalledWith({
-      uuid: undefined,
+      id: undefined,
       legalPeriodical: {
-        abbreviation: "BDZ",
+        legalPeriodicalAbbreviation: "BDZ",
       },
       name: "name",
       prefix: "präfix",
