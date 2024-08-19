@@ -117,7 +117,7 @@ const legalPeriodical = computed({
       <ul>
         <li
           v-for="edition in currentEditions"
-          :key="edition.uuid"
+          :key="edition.id"
           class="flex gap-24"
         >
           Ausgabe {{ edition.name }} ({{ edition.references?.length }}
@@ -126,7 +126,7 @@ const legalPeriodical = computed({
             target="_blank"
             :to="{
               name: 'caselaw-legal-periodical-editions-uuid',
-              params: { uuid: edition.uuid },
+              params: { uuid: edition.id },
             }"
           >
             <button class="ds-link-03 border-b-1 border-blue-800 leading-24">

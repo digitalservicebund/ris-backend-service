@@ -15,7 +15,7 @@ export default class LegalPeriodicalEdition {
     "legalPeriodical",
   ] as const
 
-  uuid?: string
+  id?: string
   name?: string
   prefix?: string
   suffix?: string

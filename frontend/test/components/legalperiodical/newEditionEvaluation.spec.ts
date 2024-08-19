@@ -100,7 +100,7 @@ describe("Legal periodical edition list", () => {
       Promise.resolve({
         status: 200,
         data: new LegalPeriodicalEdition({
-          uuid: crypto.randomUUID(),
+          id: crypto.randomUUID(),
           legalPeriodical: legalPeriodical,
           name: "name",
           prefix: "präfix",
@@ -142,7 +142,7 @@ describe("Legal periodical edition list", () => {
       Promise.resolve({
         status: 200,
         data: new LegalPeriodicalEdition({
-          uuid: crypto.randomUUID(),
+          id: crypto.randomUUID(),
           legalPeriodical: legalPeriodical,
           name: "name",
           prefix: "präfix",

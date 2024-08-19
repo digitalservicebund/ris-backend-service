@@ -72,7 +72,7 @@ describe("Legal periodical edition list", () => {
     )
     const dropdownLegalPeriodicalEditions: LegalPeriodicalEdition[] = [
       new LegalPeriodicalEdition({
-        uuid: "1",
+        id: "1",
         legalPeriodical: dropdownLegalPeriodicalItems[0]
           .value as LegalPeriodical,
         name: "2024, Heft 1",

@@ -64,7 +64,7 @@ describe("Legal periodical edition evaluation", () => {
         Promise.resolve({
           status: 200,
           data: new LegalPeriodicalEdition({
-            uuid: crypto.randomUUID(),
+            id: crypto.randomUUID(),
             legalPeriodical: legalPeriodical,
             name: "name",
             prefix: "präfix",
