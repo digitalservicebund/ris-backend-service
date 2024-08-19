@@ -8,7 +8,7 @@ import lombok.Builder;
 /** A legal periodical edition (Ausgabe eines Periodikums für die Periodikaauswertung). */
 @Builder
 public record LegalPeriodicalEdition(
-    UUID id,
+    UUID uuid,
     LegalPeriodical legalPeriodical,
     String prefix,
     String suffix,
