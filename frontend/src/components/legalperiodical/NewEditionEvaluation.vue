@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue"
+import { computed, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import ComboboxInput from "@/components/ComboboxInput.vue"
+import FlexContainer from "@/components/FlexContainer.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
@@ -15,6 +16,8 @@ const router = useRouter()
 const legalPeriodicalEdition = ref<LegalPeriodicalEdition>(
   new LegalPeriodicalEdition(),
 )
+
+const legalPeriodicalIsEditionIsEmpty = ref(false)
 
 const validationStore =
   useValidationStore<(typeof LegalPeriodicalEdition.fields)[number]>()
@@ -39,25 +42,7 @@ const legalPeriodical = computed({
   },
 })
 
-const prefix = computed({
-  get: () => legalPeriodicalEdition.value?.prefix ?? undefined,
-  set: (newValue) => {
-    legalPeriodicalEdition.value.prefix = newValue
-  },
-})
-const suffix = computed({
-  get: () => legalPeriodicalEdition.value?.suffix ?? undefined,
-  set: (newValue) => {
-    legalPeriodicalEdition.value.suffix = newValue
-  },
-})
-
-const name = computed({
-  get: () => legalPeriodicalEdition.value?.name ?? undefined,
-  set: (newValue) => {
-    legalPeriodicalEdition.value.name = newValue
-  },
-})
+//Todo: add tests for validation, e2e => legalPerdidicalEvaluation adjustion.
 
 async function validateRequiredInput() {
   validationStore.reset()
@@ -97,6 +82,18 @@ async function saveEdition() {
       })
   }
 }
+
+function reset() {
+  legalPeriodicalEdition.value = new LegalPeriodicalEdition()
+}
+
+watch(
+  legalPeriodicalEdition,
+  () => {
+    legalPeriodicalIsEditionIsEmpty.value = legalPeriodicalEdition.value.isEmpty
+  },
+  { deep: true },
+)
 </script>
 
 <template>
@@ -125,7 +122,7 @@ async function saveEdition() {
       >
         <TextInput
           id="prefix"
-          v-model="prefix"
+          v-model="legalPeriodicalEdition.prefix"
           aria-label="Präfix"
           class="ds-input-medium"
           size="medium"
@@ -135,7 +132,7 @@ async function saveEdition() {
       <InputField id="suffix" label="Suffix">
         <TextInput
           id="suffix"
-          v-model="suffix"
+          v-model="legalPeriodicalEdition.suffix"
           aria-label="Suffix"
           class="ds-input-medium"
           size="medium"
@@ -153,18 +150,29 @@ async function saveEdition() {
     >
       <TextInput
         id="name"
-        v-model="name"
+        v-model="legalPeriodicalEdition.name"
         aria-label="Name der Ausgabe"
         class="ds-input-medium"
         size="medium"
       ></TextInput>
     </InputField>
 
-    <TextButton
-      aria-label="Auswertung starten"
-      class="ds-button-02-reg"
-      label="Auswertung starten"
-      @click="saveEdition"
-    ></TextButton>
+    <FlexContainer align-items="items-center">
+      <TextButton
+        aria-label="Auswertung starten"
+        class="ds-button-02-reg"
+        label="Auswertung starten"
+        @click="saveEdition"
+      ></TextButton>
+
+      <TextButton
+        v-if="legalPeriodicalIsEditionIsEmpty"
+        aria-label="zurücksetzen"
+        button-type="ghost"
+        label="zurücksetzen"
+        size="medium"
+        @click="reset"
+      />
+    </FlexContainer>
   </div>
 </template>

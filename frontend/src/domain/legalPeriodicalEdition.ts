@@ -1,7 +1,6 @@
 import Reference from "./reference"
 import LegalPeriodical from "@/domain/legalPeriodical"
 
-// Todo: use type instead of class?
 export default class LegalPeriodicalEdition {
   static readonly fields = [
     "name",
@@ -17,10 +16,10 @@ export default class LegalPeriodicalEdition {
   ] as const
 
   uuid?: string
-  legalPeriodical?: LegalPeriodical
   name?: string
   prefix?: string
   suffix?: string
+  legalPeriodical?: LegalPeriodical
   references?: Reference[]
 
   constructor(data: Partial<LegalPeriodicalEdition> = {}) {
@@ -37,5 +36,12 @@ export default class LegalPeriodicalEdition {
     value: LegalPeriodicalEdition[(typeof LegalPeriodicalEdition.fields)[number]],
   ): boolean {
     return !value
+  }
+
+  get isEmpty(): boolean {
+    const emptyFields = LegalPeriodicalEdition.fields.filter((field) =>
+      this.fieldIsEmpty(this[field]),
+    )
+    return emptyFields.length !== LegalPeriodicalEdition.fields.length
   }
 }
