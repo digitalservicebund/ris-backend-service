@@ -34,6 +34,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -163,5 +164,30 @@ class LegalPeriodicalEditionIntegrationTest {
             .getResponseBody();
 
     Assertions.assertEquals(saved, result);
+  }
+
+  @Test
+  void testSaveWithoutNameOrPrefix_throwsError() {
+    var legalPeriodical =
+        legalPeriodicalRepository.findAllBySearchStr(Optional.of("ABC")).stream()
+            .findAny()
+            .orElseThrow(
+                () ->
+                    new NoSuchElementException(
+                        "Legal periodical not found, check legal_periodical_init.sql"));
+
+    var legalPeriodicalEdition =
+        LegalPeriodicalEdition.builder()
+            .id(UUID.randomUUID())
+            .legalPeriodical(legalPeriodical)
+            .name(null)
+            .prefix(null)
+            .suffix("- Sonderheft 1")
+            .build();
+    // repository.save(legalPeriodicalEdition);
+
+    Assertions.assertThrows(JpaSystemException.class, () -> repository.save(legalPeriodicalEdition))
+        .getMessage()
+        .contains("chk_prefix_or_name_not_null");
   }
 }
