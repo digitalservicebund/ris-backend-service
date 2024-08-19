@@ -136,4 +136,60 @@ describe("Legal periodical edition list", () => {
       suffix: "suffix",
     })
   })
+
+  describe("Legal periodical validation", () => {
+    const fetchSpy = vi.spyOn(service, "save").mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: new LegalPeriodicalEdition({
+          uuid: crypto.randomUUID(),
+          legalPeriodical: legalPeriodical,
+          name: "name",
+          prefix: "präfix",
+          suffix: "suffix",
+          references: [],
+        }),
+      }),
+    )
+    test("don't call save if empty field", async () => {
+      const { user } = renderComponent()
+      const legalPeriodicalEditionStartButton = screen.getByText(
+        "Auswertung starten",
+      ) as HTMLElement
+
+      await user.click(legalPeriodicalEditionStartButton)
+      expect(
+        screen.getAllByText("Name oder Präfix sind nicht befüllt").length,
+        "validation message was not shown for both name and prefix",
+      ).toBe(2)
+
+      expect(
+        screen.getByText("Pflichtfeld nicht befüllt"),
+        "should be shown if legal periodical empty",
+      ).toBeVisible()
+      expect(fetchSpy).toHaveBeenCalledTimes(0)
+    })
+
+    test("save if legal periodical and (name / präfix) are not null", async () => {
+      const { user } = renderComponent()
+      const periodicalField = screen.getByLabelText("Periodikum")
+
+      await user.type(periodicalField, "BDZ")
+      const dropdownItems = screen.getAllByLabelText(
+        "dropdown-option",
+      ) as HTMLElement[]
+      expect(dropdownItems[0]).toHaveTextContent("BDZ")
+      await user.click(dropdownItems[0])
+      await expect(periodicalField).toHaveValue("BDZ")
+
+      await user.type(screen.getByLabelText("Präfix"), "präfix")
+
+      const legalPeriodicalEditionStartButton = screen.getByText(
+        "Auswertung starten",
+      ) as HTMLElement
+
+      await user.click(legalPeriodicalEditionStartButton)
+      expect(fetchSpy).toHaveBeenCalledTimes(1)
+    })
+  })
 })
