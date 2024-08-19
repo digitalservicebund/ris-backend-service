@@ -19,6 +19,11 @@ const reference = ref<Reference>(new Reference())
 
 const responseError = ref<ResponseError>()
 
+const title = computed(
+  () =>
+    `Periodikaauswertung | ${edition.value.legalPeriodical?.abbreviation}, ${edition.value.name ? edition.value.name : edition.value.prefix}`,
+)
+
 const legalPeriodical = computed({
   get: () =>
     edition?.value?.legalPeriodical
@@ -56,7 +61,7 @@ onMounted(async () => {
     v-if="!responseError"
     class="flex h-full flex-col space-y-24 bg-gray-100 px-16 py-16"
   >
-    <h2 class="ds-heading-03-reg">Periodikaauswertung</h2>
+    <h2 class="ds-heading-03-reg">{{ title }}</h2>
 
     <div v-if="edition" class="flex flex-col gap-24">
       <InputField id="legalPeriodical" label="Periodikum *">
