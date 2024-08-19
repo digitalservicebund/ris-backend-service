@@ -8,6 +8,7 @@ public record Texts(
     String headline,
     String guidingPrinciple,
     String headnote,
+    String otherHeadnote,
     String tenor,
     String reasons,
     String caseFacts,

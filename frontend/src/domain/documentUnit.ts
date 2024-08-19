@@ -65,6 +65,7 @@ export type Texts = {
   headline?: string
   guidingPrinciple?: string
   headnote?: string
+  otherHeadnote?: string
   tenor?: string
   reasons?: string
   caseFacts?: string
