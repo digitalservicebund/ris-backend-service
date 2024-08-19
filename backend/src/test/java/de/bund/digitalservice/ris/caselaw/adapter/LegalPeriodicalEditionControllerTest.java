@@ -38,12 +38,8 @@ class LegalPeriodicalEditionControllerTest {
     UUID uuid = UUID.randomUUID();
     var edition =
         LegalPeriodicalEdition.builder()
-            .id(UUID.randomUUID())
-            .legalPeriodical(
-                LegalPeriodical.builder()
-                    .legalPeriodicalId(uuid)
-                    .legalPeriodicalAbbreviation("ABC")
-                    .build())
+            .uuid(UUID.randomUUID())
+            .legalPeriodical(LegalPeriodical.builder().uuid(uuid).abbreviation("ABC").build())
             .name("2024 Sonderheft 1")
             .prefix("2024,")
             .suffix("- Sonderheft 1")
@@ -93,22 +89,14 @@ class LegalPeriodicalEditionControllerTest {
     List<LegalPeriodicalEdition> editions =
         List.of(
             LegalPeriodicalEdition.builder()
-                .id(UUID.randomUUID())
-                .legalPeriodical(
-                    LegalPeriodical.builder()
-                        .legalPeriodicalId(uuid)
-                        .legalPeriodicalAbbreviation("ABC")
-                        .build())
+                .uuid(UUID.randomUUID())
+                .legalPeriodical(LegalPeriodical.builder().uuid(uuid).abbreviation("ABC").build())
                 .name("2024")
                 .prefix("2024,")
                 .build(),
             LegalPeriodicalEdition.builder()
-                .id(UUID.randomUUID())
-                .legalPeriodical(
-                    LegalPeriodical.builder()
-                        .legalPeriodicalId(uuid)
-                        .legalPeriodicalAbbreviation("ABC")
-                        .build())
+                .uuid(UUID.randomUUID())
+                .legalPeriodical(LegalPeriodical.builder().uuid(uuid).abbreviation("ABC").build())
                 .name("2024 Sonderheft 1")
                 .prefix("2024,")
                 .suffix("- Sonderheft 1")
@@ -138,12 +126,8 @@ class LegalPeriodicalEditionControllerTest {
     UUID uuid = UUID.randomUUID();
     var edition =
         LegalPeriodicalEdition.builder()
-            .id(UUID.randomUUID())
-            .legalPeriodical(
-                LegalPeriodical.builder()
-                    .legalPeriodicalId(uuid)
-                    .legalPeriodicalAbbreviation("ABC")
-                    .build())
+            .uuid(UUID.randomUUID())
+            .legalPeriodical(LegalPeriodical.builder().uuid(uuid).abbreviation("ABC").build())
             .name("2024 Sonderheft 1")
             .prefix("2024,")
             .suffix("- Sonderheft 1")
