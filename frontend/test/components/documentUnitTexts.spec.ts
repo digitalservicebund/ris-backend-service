@@ -26,6 +26,7 @@ describe("Texts", () => {
     screen.getByText("Titelzeile")
     screen.getByText("Leitsatz")
     screen.getByText("Orientierungssatz")
+    screen.getByText("Sonstiger Orientierungssatz")
     screen.getByText("Tenor")
     screen.getByText("Gründe")
     screen.getByText("Tatbestand")
