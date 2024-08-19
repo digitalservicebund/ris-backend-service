@@ -73,27 +73,28 @@ onMounted(async () => {
         <div class="flex justify-between gap-24">
           <div class="flex-1">
             <InputField id="citation" label="Zitatstelle *">
-              <TextInput
-                id="citation"
-                v-model="edition.prefix"
-                aria-label="Zitatstelle Präfix"
-                read-only
-                size="medium"
-              ></TextInput>
-              <TextInput
-                id="citation"
-                v-model="reference.citation"
-                aria-label="Zitatstelle *"
-                size="medium"
-              ></TextInput>
-              <TextInput
-                id="citation"
-                v-model="edition.suffix"
-                aria-label="Zitatstelle Suffix"
-                read-only
-                size="medium"
-              ></TextInput>
+              <div class="flex flex-row gap-4">
+                <TextInput
+                  id="citation prefix"
+                  v-model="edition.prefix"
+                  aria-label="Zitatstelle Präfix"
+                  size="medium"
+                ></TextInput>
+                <TextInput
+                  id="citation"
+                  v-model="reference.citation"
+                  aria-label="Zitatstelle *"
+                  size="medium"
+                ></TextInput>
+                <TextInput
+                  id="citation suffix"
+                  v-model="edition.suffix"
+                  aria-label="Zitatstelle Suffix"
+                  size="medium"
+                ></TextInput>
+              </div>
             </InputField>
+
             <span v-if="legalPeriodical" class="ds-label-03-reg"
               >Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}</span
             >
