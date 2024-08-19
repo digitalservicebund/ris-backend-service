@@ -16,9 +16,49 @@
   },
   "timezone": "Europe/Berlin",
   "automergeSchedule": [
-    "every weekday"
+    "after 9am every weekday",
+    "before 5pm every weekday"
   ],
   "packageRules": [
+    {
+      "groupName": "all frontend non-major dependencies",
+      "groupSlug": "all-frontend-minor-patch",
+      "matchPaths": [
+        "frontend/**"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "pinDigest",
+        "digest"
+      ],
+      "labels": [
+        "frontend-updates"
+      ],
+      
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "groupName": "all backend non-major dependencies",
+      "groupSlug": "all-backend-minor-patch",
+      "matchPaths": [
+        "backend/**"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "pinDigest",
+        "digest"
+      ],
+      "automerge": true,
+      "labels": [
+        "backend-updates"
+      ],
+      "automergeType": "pr"
+    },
     {
       "packageNames": [
         "de.bund.digitalservice:neuris-juris-xml-export",
