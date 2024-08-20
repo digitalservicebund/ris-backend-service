@@ -4,7 +4,7 @@ services:
     depends_on:
       - postgres14
     environment:
-      - SPRING_PROFILES_ACTIVE=dev # TODO create profile with command
+      - SPRING_PROFILES_ACTIVE=dev
       - RIS_MIGRATION_CLI_MODE=true
       - RIS_MIGRATION_DB_HOST=host.docker.internal
       - RIS_MIGRATION_DB_PORT=5432

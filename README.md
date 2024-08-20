@@ -116,16 +116,11 @@ Now you can generate a new `.env` file containig the secrets:
 
 ### Local Migration
 
-To be able to pull the ris-data-migration image, login with the "GitHub Package Repository" username and credential token in 1PW:
-
-```shell
-export CR_PAT=ghp_... # use the token
-echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin # use the username
-```
-
 The caselaw application requires the initialization of lookup tables by the migration application.
+
 Follow the steps in [run_migration_locally.md](run_migration_locally.md)
 
+WIP: Run docker image in [migration_image.md](migration_image.md)
 ## Development
 
 ```bash
