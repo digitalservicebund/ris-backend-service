@@ -152,7 +152,7 @@ dependencies {
     implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.3.1")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.3.2")
 
     // CVE-2024-22262
     implementation("org.springframework:spring-web:6.1.12")
@@ -160,7 +160,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.3")
 
     // CVE-2024-26308
-    implementation("org.apache.commons:commons-compress:1.27.0")
+    implementation("org.apache.commons:commons-compress:1.27.1")
     // CVE-2022-3171
     implementation("com.google.protobuf:protobuf-java:4.27.3")
     // CVE-2023-52428 in spring-boot-starter-oauth2-client:3.2.3
@@ -213,7 +213,7 @@ dependencies {
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
     // => CVE-2023-2976
-    implementation("com.google.guava:guava:33.2.1-jre")
+    implementation("com.google.guava:guava:33.3.0-jre")
 
     implementation("io.getunleash:unleash-client-java:9.2.4")
     implementation("org.apache.commons:commons-text:1.12.0")

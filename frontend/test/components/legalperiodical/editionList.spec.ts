@@ -63,6 +63,7 @@ describe("Legal periodical edition list", () => {
     renderComponent()
 
     expect(screen.getByText("Periodika")).toBeVisible()
+
     expect(screen.getByText("Neue Periodikaauswertung")).toBeVisible()
   })
 
