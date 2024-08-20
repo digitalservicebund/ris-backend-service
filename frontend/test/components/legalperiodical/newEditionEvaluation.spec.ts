@@ -3,7 +3,8 @@ import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import { ComboboxItem } from "@/components/input/types"
 import NewEditionEvaluation from "@/components/legalperiodical/NewEditionEvaluation.vue"
-import { LegalPeriodical } from "@/domain/reference"
+import LegalPeriodical from "@/domain/legalPeriodical"
+import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import comboboxItemService from "@/services/comboboxItemService"
 import service from "@/services/legalPeriodicalEditionService"
 
@@ -55,11 +56,11 @@ function renderComponent() {
 
 describe("Legal periodical edition list", () => {
   const legalPeriodical: LegalPeriodical = {
-    legalPeriodicalAbbreviation: "BDZ",
+    abbreviation: "BDZ",
   }
   const dropdownLegalPeriodicalItems: ComboboxItem[] = [
     {
-      label: legalPeriodical.legalPeriodicalAbbreviation,
+      label: legalPeriodical.abbreviation!,
       value: legalPeriodical,
     },
   ]
@@ -93,19 +94,19 @@ describe("Legal periodical edition list", () => {
 
   test("clicking Auswertung starten button calls service with correct values", async () => {
     const legalPeriodical: LegalPeriodical = {
-      legalPeriodicalAbbreviation: "BDZ",
+      abbreviation: "BDZ",
     }
     const fetchSpy = vi.spyOn(service, "save").mockImplementation(() =>
       Promise.resolve({
         status: 200,
-        data: {
+        data: new LegalPeriodicalEdition({
           id: crypto.randomUUID(),
           legalPeriodical: legalPeriodical,
           name: "name",
           prefix: "präfix",
           suffix: "suffix",
           references: [],
-        },
+        }),
       }),
     )
     const { user } = renderComponent()
@@ -125,14 +126,79 @@ describe("Legal periodical edition list", () => {
     await user.click(screen.getByText("Auswertung starten"))
     expect(fetchSpy).toHaveBeenCalledTimes(1)
     expect(fetchSpy).toHaveBeenCalledWith({
-      id: undefined,
+      uuid: undefined,
       legalPeriodical: {
-        legalPeriodicalAbbreviation: "BDZ",
+        abbreviation: "BDZ",
       },
       name: "name",
       prefix: "präfix",
       references: undefined,
       suffix: "suffix",
+    })
+  })
+
+  describe("Legal periodical validation", () => {
+    test("don't call save if empty field", async () => {
+      const fetchSpy = vi.spyOn(service, "save").mockImplementation(() =>
+        Promise.resolve({
+          status: 200,
+          data: new LegalPeriodicalEdition({
+            id: crypto.randomUUID(),
+            legalPeriodical: legalPeriodical,
+            name: "name",
+            prefix: "präfix",
+            suffix: "suffix",
+            references: [],
+          }),
+        }),
+      )
+      const { user } = renderComponent()
+
+      await user.click(screen.getByLabelText("Auswertung starten"))
+
+      expect(
+        screen.getAllByText("Name oder Präfix sind nicht befüllt").length,
+        "validation message was not shown for both name and prefix",
+      ).toBe(2)
+
+      expect(
+        screen.getByText("Pflichtfeld nicht befüllt"),
+        "should be shown if legal periodical empty",
+      ).toBeVisible()
+      expect(fetchSpy).toHaveBeenCalledTimes(0)
+    })
+
+    test("save if legal periodical and (name / präfix) are not null", async () => {
+      const fetchSpy = vi.spyOn(service, "save").mockImplementation(() =>
+        Promise.resolve({
+          status: 200,
+          data: new LegalPeriodicalEdition({
+            id: crypto.randomUUID(),
+            legalPeriodical: legalPeriodical,
+            name: "name",
+            prefix: "präfix",
+            suffix: "suffix",
+            references: [],
+          }),
+        }),
+      )
+
+      const { user } = renderComponent()
+      const periodicalField = screen.getByLabelText("Periodikum")
+
+      await user.type(periodicalField, "BDZ")
+      const dropdownItems = screen.getAllByLabelText(
+        "dropdown-option",
+      ) as HTMLElement[]
+      expect(dropdownItems[0]).toHaveTextContent("BDZ")
+      await user.click(dropdownItems[0])
+      await expect(periodicalField).toHaveValue("BDZ")
+
+      await user.type(screen.getByLabelText("Präfix"), "präfix")
+
+      await user.click(screen.getByLabelText("Auswertung starten"))
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1)
     })
   })
 })

@@ -1,29 +1,35 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue"
+import { computed, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import ComboboxInput from "@/components/ComboboxInput.vue"
+import FlexContainer from "@/components/FlexContainer.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
+import { useValidationStore } from "@/composables/useValidationStore"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import ComboboxItemService from "@/services/comboboxItemService"
 import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 
 const router = useRouter()
-const legalPeriodicalEdition = ref()
+const legalPeriodicalEdition = ref<LegalPeriodicalEdition>(
+  new LegalPeriodicalEdition(),
+)
+
+const legalPeriodicalIsEditionIsEmpty = ref(false)
+
+const validationStore =
+  useValidationStore<(typeof LegalPeriodicalEdition.fields)[number]>()
 
 const legalPeriodical = computed({
   get: () =>
     legalPeriodicalEdition.value?.legalPeriodical
       ? {
-          label:
-            legalPeriodicalEdition.value?.legalPeriodical
-              .legalPeriodicalAbbreviation,
+          label: legalPeriodicalEdition.value?.legalPeriodical.abbreviation,
           value: legalPeriodicalEdition.value?.legalPeriodical,
           additionalInformation:
-            legalPeriodicalEdition.value?.legalPeriodical
-              .legalPeriodicalSubtitle,
+            legalPeriodicalEdition.value?.legalPeriodical.subtitle,
         }
       : undefined,
   set: (newValue) => {
@@ -36,47 +42,66 @@ const legalPeriodical = computed({
   },
 })
 
-const prefix = computed({
-  get: () => legalPeriodicalEdition.value?.prefix ?? undefined,
-  set: (newValue) => {
-    legalPeriodicalEdition.value.prefix = newValue
-  },
-})
-const suffix = computed({
-  get: () => legalPeriodicalEdition.value?.suffix ?? undefined,
-  set: (newValue) => {
-    legalPeriodicalEdition.value.suffix = newValue
-  },
-})
+async function validateRequiredInput() {
+  validationStore.reset()
 
-const name = computed({
-  get: () => legalPeriodicalEdition.value?.name ?? undefined,
-  set: (newValue) => {
-    legalPeriodicalEdition.value.name = newValue
-  },
-})
+  const conditionalGroupFields = ["name", "prefix"]
 
-async function saveEdition() {
-  const response = await LegalPeriodicalEditionService.save(
-    legalPeriodicalEdition.value,
-  )
-  if (response.data)
-    await router.replace({
-      name: "caselaw-legal-periodical-editions-uuid",
-      params: { uuid: response.data.id },
-    })
+  legalPeriodicalEdition.value.missingRequiredFields
+    .filter((missingField) => !conditionalGroupFields.includes(missingField))
+    .forEach((missingField) =>
+      validationStore.add("Pflichtfeld nicht befüllt", missingField),
+    )
+
+  const missingConditionalfields =
+    legalPeriodicalEdition.value.missingRequiredFields.filter((missingField) =>
+      conditionalGroupFields.includes(missingField),
+    )
+
+  // Add validation error only if all fields are missing
+  if (missingConditionalfields.length == conditionalGroupFields.length) {
+    missingConditionalfields.forEach((missingField) =>
+      validationStore.add("Name oder Präfix sind nicht befüllt", missingField),
+    )
+  }
 }
 
-onMounted(() => {
+async function saveEdition() {
+  await validateRequiredInput()
+  if (validationStore.isValid()) {
+    const response = await LegalPeriodicalEditionService.save(
+      legalPeriodicalEdition.value as LegalPeriodicalEdition,
+    )
+
+    if (response.data)
+      await router.replace({
+        name: "caselaw-legal-periodical-editions-uuid",
+        params: { uuid: response.data.id },
+      })
+  }
+}
+
+function reset() {
   legalPeriodicalEdition.value = new LegalPeriodicalEdition()
-})
+}
+
+watch(
+  legalPeriodicalEdition,
+  () => {
+    legalPeriodicalIsEditionIsEmpty.value = legalPeriodicalEdition.value.isEmpty
+  },
+  { deep: true },
+)
 </script>
 
 <template>
   <div class="flex h-full flex-col space-y-24 bg-gray-100 px-16 py-16">
     <h2 class="ds-heading-03-reg">Neue Periodikaauswertung</h2>
-
-    <InputField id="legalPeriodical" label="Periodikum *">
+    <InputField
+      id="legalPeriodical"
+      label="Periodikum *"
+      :validation-error="validationStore.getByField('legalPeriodical')"
+    >
       <ComboboxInput
         id="legalPeriodical"
         v-model="legalPeriodical"
@@ -87,11 +112,15 @@ onMounted(() => {
       ></ComboboxInput>
     </InputField>
 
-    <div class="flex flex-row items-end gap-24">
-      <InputField id="prefix" label="Präfix">
+    <div class="flex flex-row items-start gap-24">
+      <InputField
+        id="prefix"
+        label="Präfix"
+        :validation-error="validationStore.getByField('prefix')"
+      >
         <TextInput
           id="prefix"
-          v-model="prefix"
+          v-model="legalPeriodicalEdition.prefix"
           aria-label="Präfix"
           class="ds-input-medium"
           size="medium"
@@ -101,7 +130,7 @@ onMounted(() => {
       <InputField id="suffix" label="Suffix">
         <TextInput
           id="suffix"
-          v-model="suffix"
+          v-model="legalPeriodicalEdition.suffix"
           aria-label="Suffix"
           class="ds-input-medium"
           size="medium"
@@ -112,21 +141,36 @@ onMounted(() => {
       >Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}</span
     >
 
-    <InputField id="edition" label="Name der Ausgabe (optional)">
+    <InputField
+      id="name"
+      label="Name der Ausgabe (optional)"
+      :validation-error="validationStore.getByField('name')"
+    >
       <TextInput
-        id="edition"
-        v-model="name"
+        id="name"
+        v-model="legalPeriodicalEdition.name"
         aria-label="Name der Ausgabe"
         class="ds-input-medium"
         size="medium"
       ></TextInput>
     </InputField>
 
-    <TextButton
-      aria-label="Auswertung starten"
-      class="ds-button-02-reg"
-      label="Auswertung starten"
-      @click="saveEdition"
-    ></TextButton>
+    <FlexContainer align-items="items-center">
+      <TextButton
+        aria-label="Auswertung starten"
+        class="ds-button-02-reg"
+        label="Auswertung starten"
+        @click="saveEdition"
+      ></TextButton>
+
+      <TextButton
+        v-if="legalPeriodicalIsEditionIsEmpty"
+        aria-label="zurücksetzen"
+        button-type="ghost"
+        label="zurücksetzen"
+        size="medium"
+        @click="reset"
+      />
+    </FlexContainer>
   </div>
 </template>

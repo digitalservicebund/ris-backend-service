@@ -1,20 +1,79 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue"
+import { computed, ref, watch, onMounted } from "vue"
 import { useRouter } from "vue-router"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
-import { LegalPeriodical } from "@/domain/reference"
+import useQuery, { Query } from "@/composables/useQueryFromRoute"
+import LegalPeriodical from "@/domain/legalPeriodical"
+import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import ComboboxItemService from "@/services/comboboxItemService"
+import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 
 const router = useRouter()
 const filter = ref<LegalPeriodical>()
+const currentEditions = ref<LegalPeriodicalEdition[]>()
+const { getQueryFromRoute, pushQueryToRoute, route } = useQuery<"q">()
+const query = ref(getQueryFromRoute())
+
+watch(
+  filter,
+  async (newFilter) => {
+    if (newFilter && newFilter.uuid) {
+      await updateEditions(newFilter.uuid)
+      debouncedPushQueryToRoute({ q: newFilter.uuid })
+    } else {
+      currentEditions.value = []
+    }
+  },
+  { deep: true },
+)
+
+/**
+ * Sets a timeout before pushing the search query to the route,
+ * in order to only change the url params when the user input pauses.
+ */
+const debouncedPushQueryToRoute = (() => {
+  let timeoutId: number | null = null
+
+  return (currentQuery: Query<string>) => {
+    if (timeoutId != null) window.clearTimeout(timeoutId)
+
+    timeoutId = window.setTimeout(() => pushQueryToRoute(currentQuery), 500)
+  }
+})()
+
+/**
+ * Get query from url and set local query value
+ */
+watch(route, () => {
+  const currentQuery = getQueryFromRoute()
+  if (JSON.stringify(query.value) != JSON.stringify(currentQuery))
+    query.value = currentQuery
+})
+
+onMounted(() => {
+  if (query.value.q) updateEditions(query.value.q)
+})
+
+/**
+ * Loads all editions of a legal periodical
+ */
+async function updateEditions(legalPeriodicalId: string) {
+  const response =
+    await LegalPeriodicalEditionService.getAllByLegalPeriodicalId(
+      legalPeriodicalId,
+    )
+  if (response.data) {
+    currentEditions.value = response.data
+  }
+}
 
 const legalPeriodical = computed({
   get: () =>
     filter.value
       ? {
-          label: filter.value.legalPeriodicalAbbreviation,
+          label: filter.value.abbreviation,
           value: filter.value,
         }
       : undefined,
@@ -55,6 +114,27 @@ const legalPeriodical = computed({
           </InputField>
         </div>
       </div>
+      <ul>
+        <li
+          v-for="edition in currentEditions"
+          :key="edition.id"
+          class="flex gap-24"
+        >
+          Ausgabe {{ edition.name }} ({{ edition.references?.length }}
+          Fundstellen)
+          <router-link
+            target="_blank"
+            :to="{
+              name: 'caselaw-legal-periodical-editions-uuid',
+              params: { uuid: edition.id },
+            }"
+          >
+            <button class="ds-link-03 border-b-1 border-blue-800 leading-24">
+              bearbeiten
+            </button>
+          </router-link>
+        </li>
+      </ul>
     </div>
   </div>
 </template>

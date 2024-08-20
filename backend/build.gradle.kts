@@ -186,7 +186,7 @@ dependencies {
     implementation("com.icegreen:greenmail:2.1.0-rc-1")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.53") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.55") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
@@ -194,9 +194,9 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.16")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.17")
     // for local development:
-    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.8.jar"))
+    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.17.jar"))
 
     implementation("com.fasterxml.jackson.core:jackson-core:2.17.2")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2")
@@ -213,7 +213,7 @@ dependencies {
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
     // => CVE-2023-2976
-    implementation("com.google.guava:guava:33.3.0-jre")
+    implementation("com.google.guava:guava:33.2.1-jre")
 
     implementation("io.getunleash:unleash-client-java:9.2.4")
     implementation("org.apache.commons:commons-text:1.12.0")
