@@ -160,7 +160,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.3")
 
     // CVE-2024-26308
-    implementation("org.apache.commons:commons-compress:1.27.0")
+    implementation("org.apache.commons:commons-compress:1.27.1")
     // CVE-2022-3171
     implementation("com.google.protobuf:protobuf-java:4.27.3")
     // CVE-2023-52428 in spring-boot-starter-oauth2-client:3.2.3
