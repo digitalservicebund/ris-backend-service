@@ -138,26 +138,24 @@ describe("Legal periodical edition list", () => {
   })
 
   describe("Legal periodical validation", () => {
-    const fetchSpy = vi.spyOn(service, "save").mockImplementation(() =>
-      Promise.resolve({
-        status: 200,
-        data: new LegalPeriodicalEdition({
-          id: crypto.randomUUID(),
-          legalPeriodical: legalPeriodical,
-          name: "name",
-          prefix: "präfix",
-          suffix: "suffix",
-          references: [],
-        }),
-      }),
-    )
     test("don't call save if empty field", async () => {
+      const fetchSpy = vi.spyOn(service, "save").mockImplementation(() =>
+        Promise.resolve({
+          status: 200,
+          data: new LegalPeriodicalEdition({
+            id: crypto.randomUUID(),
+            legalPeriodical: legalPeriodical,
+            name: "name",
+            prefix: "präfix",
+            suffix: "suffix",
+            references: [],
+          }),
+        }),
+      )
       const { user } = renderComponent()
-      const legalPeriodicalEditionStartButton = screen.getByText(
-        "Auswertung starten",
-      ) as HTMLElement
 
-      await user.click(legalPeriodicalEditionStartButton)
+      await user.click(screen.getByLabelText("Auswertung starten"))
+
       expect(
         screen.getAllByText("Name oder Präfix sind nicht befüllt").length,
         "validation message was not shown for both name and prefix",
@@ -171,6 +169,20 @@ describe("Legal periodical edition list", () => {
     })
 
     test("save if legal periodical and (name / präfix) are not null", async () => {
+      const fetchSpy = vi.spyOn(service, "save").mockImplementation(() =>
+        Promise.resolve({
+          status: 200,
+          data: new LegalPeriodicalEdition({
+            id: crypto.randomUUID(),
+            legalPeriodical: legalPeriodical,
+            name: "name",
+            prefix: "präfix",
+            suffix: "suffix",
+            references: [],
+          }),
+        }),
+      )
+
       const { user } = renderComponent()
       const periodicalField = screen.getByLabelText("Periodikum")
 
@@ -184,11 +196,8 @@ describe("Legal periodical edition list", () => {
 
       await user.type(screen.getByLabelText("Präfix"), "präfix")
 
-      const legalPeriodicalEditionStartButton = screen.getByText(
-        "Auswertung starten",
-      ) as HTMLElement
+      await user.click(screen.getByLabelText("Auswertung starten"))
 
-      await user.click(legalPeriodicalEditionStartButton)
       expect(fetchSpy).toHaveBeenCalledTimes(1)
     })
   })
