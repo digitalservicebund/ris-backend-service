@@ -8,24 +8,31 @@ import { ServiceResponse } from "@/services/httpClient"
 import service from "@/services/legalPeriodicalEditionService"
 import testRoutes from "~/test-helper/routes"
 
-function renderComponent() {
-  // eslint-disable-next-line testing-library/await-async-events
+async function renderComponent() {
   const user = userEvent.setup()
 
   const router = createRouter({
     history: createWebHistory(),
     routes: testRoutes,
   })
-  return {
+
+  // Mock the route with a specific uuid before rendering
+  await router.push({
+    name: "caselaw-legal-periodical-editions-uuid",
+    params: { uuid: "123" },
+  })
+
+  // Wait for the router to be ready
+  return router.isReady().then(() => ({
     user,
     ...render(EditionEvaluation, {
       global: { plugins: [router] },
     }),
-  }
+  }))
 }
 
 describe("Legal periodical edition evaluation", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     const legalPeriodical: LegalPeriodical = {
       abbreviation: "BDZ",
     }
@@ -45,9 +52,8 @@ describe("Legal periodical edition evaluation", () => {
     )
   })
 
-  test("renders correctly", async () => {
-    renderComponent()
-    expect(screen.getByText("Periodikaauswertung")).toBeVisible()
-    // todo
+  test("renders legal periodical and edition name in title", async () => {
+    await renderComponent()
+    expect(screen.getByText("Periodikaauswertung | BDZ, name")).toBeVisible()
   })
 })
