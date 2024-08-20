@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import { Court, DocumentType } from "@/domain/documentUnit"
 import PreviousDecision from "@/domain/previousDecision"
+import routes from "~/test-helper/routes"
 
 function renderComponent(options?: {
   court?: Court
@@ -33,18 +34,7 @@ function renderComponent(options?: {
 
   const router = createRouter({
     history: createWebHistory(),
-    routes: [
-      {
-        path: "",
-        name: "index",
-        component: {},
-      },
-      {
-        path: "/caselaw/documentUnit/:documentNumber/preview",
-        name: "caselaw-documentUnit-documentNumber-preview",
-        component: {},
-      },
-    ],
+    routes: routes,
   })
 
   return render(DecisionSummary, {

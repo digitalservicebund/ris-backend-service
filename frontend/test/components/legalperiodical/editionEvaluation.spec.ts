@@ -6,45 +6,14 @@ import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import { ServiceResponse } from "@/services/httpClient"
 import service from "@/services/legalPeriodicalEditionService"
+import testRoutes from "~/test-helper/routes"
 
 async function renderComponent() {
   const user = userEvent.setup()
 
   const router = createRouter({
     history: createWebHistory(),
-    routes: [
-      // Your routes here
-      {
-        path: "/caselaw/documentUnit/new",
-        name: "new",
-        component: {}, // Mocked component
-      },
-      {
-        path: "/",
-        name: "home",
-        component: {}, // Mocked component
-      },
-      {
-        path: "/caselaw/documentUnit/:documentNumber/categories",
-        name: "caselaw-documentUnit-documentNumber-categories",
-        component: {}, // Mocked component
-      },
-      {
-        path: "/caselaw/documentUnit/:documentNumber/preview",
-        name: "caselaw-documentUnit-documentNumber-preview",
-        component: {}, // Mocked component
-      },
-      {
-        path: "/caselaw/documentUnit/:documentNumber/files",
-        name: "caselaw-documentUnit-documentNumber-files",
-        component: {}, // Mocked component
-      },
-      {
-        path: "/caselaw/legal-periodical-editions/:uuid",
-        name: "caselaw-legal-periodical-editions-uuid",
-        component: EditionEvaluation, // Your real component for testing
-      },
-    ],
+    routes: testRoutes,
   })
 
   // Mock the route with a specific uuid before rendering

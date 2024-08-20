@@ -7,44 +7,14 @@ import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import comboboxItemService from "@/services/comboboxItemService"
 import service from "@/services/legalPeriodicalEditionService"
+import routes from "~/test-helper/routes"
 
 function renderComponent() {
   const user = userEvent.setup()
 
   const router = createRouter({
     history: createWebHistory(),
-    routes: [
-      {
-        path: "/caselaw/documentUnit/new",
-        name: "new",
-        component: {},
-      },
-      {
-        path: "/",
-        name: "home",
-        component: {},
-      },
-      {
-        path: "/caselaw/documentUnit/:documentNumber/categories",
-        name: "caselaw-documentUnit-documentNumber-categories",
-        component: {},
-      },
-      {
-        path: "/caselaw/documentUnit/:documentNumber/preview",
-        name: "caselaw-documentUnit-documentNumber-preview",
-        component: {},
-      },
-      {
-        path: "/caselaw/documentUnit/:documentNumber/files",
-        name: "caselaw-documentUnit-documentNumber-files",
-        component: {},
-      },
-      {
-        path: "/caselaw/legal-periodical-editions/:uuid",
-        name: "caselaw-legal-periodical-editions-uuid",
-        component: {},
-      },
-    ],
+    routes: routes,
   })
   return {
     user,
@@ -54,23 +24,19 @@ function renderComponent() {
   }
 }
 
-describe("New legal periodical edition", () => {
-  beforeEach(async () => {
-    const legalPeriodical: LegalPeriodical = {
-      abbreviation: "BDZ",
-    }
-    const dropdownLegalPeriodicalItems: ComboboxItem[] = [
-      {
-        label: legalPeriodical.abbreviation!,
-        value: legalPeriodical,
-      },
-    ]
-    vi.spyOn(comboboxItemService, "getLegalPeriodicals").mockImplementation(
-      () =>
-        Promise.resolve({ status: 200, data: dropdownLegalPeriodicalItems }),
-    )
-  })
-
+describe("Legal periodical edition list", () => {
+  const legalPeriodical: LegalPeriodical = {
+    abbreviation: "BDZ",
+  }
+  const dropdownLegalPeriodicalItems: ComboboxItem[] = [
+    {
+      label: legalPeriodical.abbreviation!,
+      value: legalPeriodical,
+    },
+  ]
+  vi.spyOn(comboboxItemService, "getLegalPeriodicals").mockImplementation(() =>
+    Promise.resolve({ status: 200, data: dropdownLegalPeriodicalItems }),
+  )
   test("renders correctly", async () => {
     renderComponent()
 
@@ -143,9 +109,6 @@ describe("New legal periodical edition", () => {
 
   describe("Legal periodical validation", () => {
     test("don't call save if empty field", async () => {
-      const legalPeriodical: LegalPeriodical = {
-        abbreviation: "BDZ",
-      }
       const fetchSpy = vi.spyOn(service, "save").mockImplementation(() =>
         Promise.resolve({
           status: 200,
@@ -160,11 +123,9 @@ describe("New legal periodical edition", () => {
         }),
       )
       const { user } = renderComponent()
-      const legalPeriodicalEditionStartButton = screen.getByText(
-        "Auswertung starten",
-      ) as HTMLElement
 
-      await user.click(legalPeriodicalEditionStartButton)
+      await user.click(screen.getByLabelText("Auswertung starten"))
+
       expect(
         screen.getAllByText("Name oder Präfix sind nicht befüllt").length,
         "validation message was not shown for both name and prefix",
@@ -178,9 +139,6 @@ describe("New legal periodical edition", () => {
     })
 
     test("save if legal periodical and (name / präfix) are not null", async () => {
-      const legalPeriodical: LegalPeriodical = {
-        abbreviation: "BDZ",
-      }
       const fetchSpy = vi.spyOn(service, "save").mockImplementation(() =>
         Promise.resolve({
           status: 200,
@@ -194,6 +152,7 @@ describe("New legal periodical edition", () => {
           }),
         }),
       )
+
       const { user } = renderComponent()
       const periodicalField = screen.getByLabelText("Periodikum")
 
@@ -207,11 +166,8 @@ describe("New legal periodical edition", () => {
 
       await user.type(screen.getByLabelText("Präfix"), "präfix")
 
-      const legalPeriodicalEditionStartButton = screen.getByText(
-        "Auswertung starten",
-      ) as HTMLElement
+      await user.click(screen.getByLabelText("Auswertung starten"))
 
-      await user.click(legalPeriodicalEditionStartButton)
       expect(fetchSpy).toHaveBeenCalledTimes(1)
     })
   })

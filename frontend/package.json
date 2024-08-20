@@ -76,7 +76,7 @@
     "vue-tsc": "^2.0.29"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.9.1",
+    "@axe-core/playwright": "^4.10.0",
     "@digitalservice4germany/angie": "^1.2.0",
     "@digitalservice4germany/style-dictionary": "^2.0.0",
     "@iconify-json/ic": "^1.1.18",

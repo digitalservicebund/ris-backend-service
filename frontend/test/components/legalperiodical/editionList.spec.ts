@@ -7,6 +7,7 @@ import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import comboboxItemService from "@/services/comboboxItemService"
 import legalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
+import routes from "~/test-helper/routes"
 
 function renderComponent() {
   // eslint-disable-next-line testing-library/await-async-events
@@ -14,38 +15,7 @@ function renderComponent() {
 
   const router = createRouter({
     history: createWebHistory(),
-    routes: [
-      {
-        path: "/caselaw/documentUnit/new",
-        name: "new",
-        component: {},
-      },
-      {
-        path: "/",
-        name: "home",
-        component: {},
-      },
-      {
-        path: "/caselaw/documentUnit/:documentNumber/categories",
-        name: "caselaw-documentUnit-documentNumber-categories",
-        component: {},
-      },
-      {
-        path: "/caselaw/documentUnit/:documentNumber/preview",
-        name: "caselaw-documentUnit-documentNumber-preview",
-        component: {},
-      },
-      {
-        path: "/caselaw/documentUnit/:documentNumber/files",
-        name: "caselaw-documentUnit-documentNumber-files",
-        component: {},
-      },
-      {
-        path: "/caselaw/legal-periodical-editions/:uuid",
-        name: "caselaw-legal-periodical-editions-uuid",
-        component: {},
-      },
-    ],
+    routes: routes,
   })
   return {
     user,
@@ -93,6 +63,7 @@ describe("Legal periodical edition list", () => {
     renderComponent()
 
     expect(screen.getByText("Periodika")).toBeVisible()
+
     expect(screen.getByText("Neue Periodikaauswertung")).toBeVisible()
   })
 
