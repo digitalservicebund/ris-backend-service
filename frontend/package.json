@@ -61,7 +61,7 @@
     "@tiptap/extension-text-style": "^2.6.4",
     "@tiptap/extension-underline": "^2.6.4",
     "@tiptap/vue-3": "^2.6.4",
-    "@unhead/vue": "^1.9.16",
+    "@unhead/vue": "^1.10.0",
     "@unleash/proxy-client-vue": "^0.1.2",
     "axios": "^1.7.4",
     "dayjs": "^1.11.12",
