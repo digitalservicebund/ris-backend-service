@@ -272,7 +272,7 @@ public class DocumentationUnitService {
   public Slice<RelatedDocumentationUnit> searchLinkableDocumentationUnits(
       RelatedDocumentationUnit relatedDocumentationUnit,
       DocumentationOffice documentationOffice,
-      String documentNumberToExclude,
+      Optional<String> documentNumberToExclude,
       Pageable pageable) {
 
     if (relatedDocumentationUnit.getFileNumber() != null) {
@@ -280,7 +280,10 @@ public class DocumentationUnitService {
           normalizeSpace(relatedDocumentationUnit.getFileNumber()));
     }
     return repository.searchLinkableDocumentationUnits(
-        relatedDocumentationUnit, documentationOffice, documentNumberToExclude, pageable);
+        relatedDocumentationUnit,
+        documentationOffice,
+        documentNumberToExclude.orElse(null),
+        pageable);
   }
 
   public String validateSingleNorm(SingleNormValidationInfo singleNormValidationInfo) {

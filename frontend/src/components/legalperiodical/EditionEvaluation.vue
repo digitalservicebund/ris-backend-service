@@ -79,9 +79,15 @@ async function search() {
   })
 
   const response = await documentUnitService.searchByRelatedDocumentation(
-    pageNumber.value,
-    itemsPerPage.value,
     documentationUnitRef,
+    {
+      ...(pageNumber.value != undefined
+        ? { pg: pageNumber.value.toString() }
+        : {}),
+      ...(itemsPerPage.value != undefined
+        ? { sz: itemsPerPage.value.toString() }
+        : {}),
+    },
   )
   if (response.data) {
     searchResultsCurrentPage.value = {

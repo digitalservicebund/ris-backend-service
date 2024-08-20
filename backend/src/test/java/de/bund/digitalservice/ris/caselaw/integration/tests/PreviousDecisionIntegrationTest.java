@@ -558,7 +558,7 @@ class PreviousDecisionIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri(
-            "/api/v1/caselaw/documentunits/KORE000000000/search-linkable-documentation-units?pg=0&sz=30")
+            "/api/v1/caselaw/documentunits/search-linkable-documentation-units?pg=0&sz=30&documentNumber=KORE000000000")
         .bodyValue(previousDecision)
         .exchange()
         .expectStatus()
