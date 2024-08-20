@@ -54,19 +54,23 @@ function renderComponent() {
   }
 }
 
-describe("Legal periodical edition list", () => {
-  const legalPeriodical: LegalPeriodical = {
-    abbreviation: "BDZ",
-  }
-  const dropdownLegalPeriodicalItems: ComboboxItem[] = [
-    {
-      label: legalPeriodical.abbreviation!,
-      value: legalPeriodical,
-    },
-  ]
-  vi.spyOn(comboboxItemService, "getLegalPeriodicals").mockImplementation(() =>
-    Promise.resolve({ status: 200, data: dropdownLegalPeriodicalItems }),
-  )
+describe("New legal periodical edition", () => {
+  beforeEach(async () => {
+    const legalPeriodical: LegalPeriodical = {
+      abbreviation: "BDZ",
+    }
+    const dropdownLegalPeriodicalItems: ComboboxItem[] = [
+      {
+        label: legalPeriodical.abbreviation!,
+        value: legalPeriodical,
+      },
+    ]
+    vi.spyOn(comboboxItemService, "getLegalPeriodicals").mockImplementation(
+      () =>
+        Promise.resolve({ status: 200, data: dropdownLegalPeriodicalItems }),
+    )
+  })
+
   test("renders correctly", async () => {
     renderComponent()
 
@@ -138,20 +142,23 @@ describe("Legal periodical edition list", () => {
   })
 
   describe("Legal periodical validation", () => {
-    const fetchSpy = vi.spyOn(service, "save").mockImplementation(() =>
-      Promise.resolve({
-        status: 200,
-        data: new LegalPeriodicalEdition({
-          id: crypto.randomUUID(),
-          legalPeriodical: legalPeriodical,
-          name: "name",
-          prefix: "präfix",
-          suffix: "suffix",
-          references: [],
-        }),
-      }),
-    )
     test("don't call save if empty field", async () => {
+      const legalPeriodical: LegalPeriodical = {
+        abbreviation: "BDZ",
+      }
+      const fetchSpy = vi.spyOn(service, "save").mockImplementation(() =>
+        Promise.resolve({
+          status: 200,
+          data: new LegalPeriodicalEdition({
+            id: crypto.randomUUID(),
+            legalPeriodical: legalPeriodical,
+            name: "name",
+            prefix: "präfix",
+            suffix: "suffix",
+            references: [],
+          }),
+        }),
+      )
       const { user } = renderComponent()
       const legalPeriodicalEditionStartButton = screen.getByText(
         "Auswertung starten",
@@ -171,6 +178,22 @@ describe("Legal periodical edition list", () => {
     })
 
     test("save if legal periodical and (name / präfix) are not null", async () => {
+      const legalPeriodical: LegalPeriodical = {
+        abbreviation: "BDZ",
+      }
+      const fetchSpy = vi.spyOn(service, "save").mockImplementation(() =>
+        Promise.resolve({
+          status: 200,
+          data: new LegalPeriodicalEdition({
+            id: crypto.randomUUID(),
+            legalPeriodical: legalPeriodical,
+            name: "name",
+            prefix: "präfix",
+            suffix: "suffix",
+            references: [],
+          }),
+        }),
+      )
       const { user } = renderComponent()
       const periodicalField = screen.getByLabelText("Periodikum")
 

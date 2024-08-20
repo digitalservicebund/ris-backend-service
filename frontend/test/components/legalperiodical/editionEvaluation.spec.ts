@@ -7,55 +7,63 @@ import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import { ServiceResponse } from "@/services/httpClient"
 import service from "@/services/legalPeriodicalEditionService"
 
-function renderComponent() {
-  // eslint-disable-next-line testing-library/await-async-events
+async function renderComponent() {
   const user = userEvent.setup()
 
   const router = createRouter({
     history: createWebHistory(),
     routes: [
+      // Your routes here
       {
         path: "/caselaw/documentUnit/new",
         name: "new",
-        component: {},
+        component: {}, // Mocked component
       },
       {
         path: "/",
         name: "home",
-        component: {},
+        component: {}, // Mocked component
       },
       {
         path: "/caselaw/documentUnit/:documentNumber/categories",
         name: "caselaw-documentUnit-documentNumber-categories",
-        component: {},
+        component: {}, // Mocked component
       },
       {
         path: "/caselaw/documentUnit/:documentNumber/preview",
         name: "caselaw-documentUnit-documentNumber-preview",
-        component: {},
+        component: {}, // Mocked component
       },
       {
         path: "/caselaw/documentUnit/:documentNumber/files",
         name: "caselaw-documentUnit-documentNumber-files",
-        component: {},
+        component: {}, // Mocked component
       },
       {
         path: "/caselaw/legal-periodical-editions/:uuid",
         name: "caselaw-legal-periodical-editions-uuid",
-        component: {},
+        component: EditionEvaluation, // Your real component for testing
       },
     ],
   })
-  return {
+
+  // Mock the route with a specific uuid before rendering
+  await router.push({
+    name: "caselaw-legal-periodical-editions-uuid",
+    params: { uuid: "123" },
+  })
+
+  // Wait for the router to be ready
+  return router.isReady().then(() => ({
     user,
     ...render(EditionEvaluation, {
       global: { plugins: [router] },
     }),
-  }
+  }))
 }
 
 describe("Legal periodical edition evaluation", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     const legalPeriodical: LegalPeriodical = {
       abbreviation: "BDZ",
     }
@@ -75,9 +83,8 @@ describe("Legal periodical edition evaluation", () => {
     )
   })
 
-  test("renders correctly", async () => {
-    renderComponent()
-    expect(screen.getByText("Periodikaauswertung")).toBeVisible()
-    // todo
+  test("renders legal periodical and edition name in title", async () => {
+    await renderComponent()
+    expect(screen.getByText("Periodikaauswertung | BDZ, name")).toBeVisible()
   })
 })

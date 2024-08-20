@@ -98,7 +98,7 @@ onMounted(async () => {
   const uuid = route.params.uuid
   if (uuid) {
     const response = await LegalPeriodicalEditionService.get(
-      uuid.toString() as UUID,
+      route.params.uuid.toString() as UUID,
     )
     if (response.error) {
       responseError.value = response.error
