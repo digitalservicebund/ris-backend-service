@@ -20,7 +20,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
@@ -489,9 +488,8 @@ public class DocumentationUnitTransformer {
                 ProcedureTransformer.transformPreviousProceduresToLabel(
                     documentationUnitDTO.getProcedures()))
             .documentationOffice(
-                DocumentationOffice.builder()
-                    .abbreviation(documentationUnitDTO.getDocumentationOffice().getAbbreviation())
-                    .build())
+                DocumentationOfficeTransformer.transformToDomain(
+                    documentationUnitDTO.getDocumentationOffice()))
             // TODO multiple regions
             .region(
                 documentationUnitDTO.getRegions() == null
