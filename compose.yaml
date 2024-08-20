@@ -4,8 +4,8 @@ services:
     depends_on:
       - postgres14
     environment:
-      - SPRING_PROFILES_ACTIVE=tables # TODO create profile with command
-      - RIS_MIGRATION_DB_HOST=localhost
+      - SPRING_PROFILES_ACTIVE=dev # TODO create profile with command
+      - RIS_MIGRATION_DB_HOST=host.docker.internal
       - RIS_MIGRATION_DB_PORT=5432
       - RIS_MIGRATION_DB_NAME=neuris
       - RIS_MIGRATION_DB_USER=test
@@ -17,6 +17,8 @@ services:
       - RIS_MIGRATION_S3_BUCKET=${RIS_MIGRATION_S3_BUCKET} # TODO Add to 1PW and read from there
       - RIS_MIGRATION_S3_DATA_VERSION=2024-08 # TODO maybe remove and use the latest instead?
       - RIS_MIGRATION_S3_FIRST_DAILY_VERSION=2024-07-31 # TODO maybe remove and use the latest instead?
+    command: ["java", "-jar", "cli/build/libs/ris-data-migration-cli.jar", "refdata", "seed"]
+
 
   traefik:
     image: traefik:v3.1
