@@ -70,6 +70,7 @@ export type Texts = {
   reasons?: string
   caseFacts?: string
   decisionReasons?: string
+  otherLongText?: string
 }
 
 export default class DocumentUnit {

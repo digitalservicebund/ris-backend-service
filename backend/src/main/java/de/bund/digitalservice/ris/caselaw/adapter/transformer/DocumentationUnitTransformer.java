@@ -166,7 +166,8 @@ public class DocumentationUnitTransformer {
         .tenor(texts.tenor())
         .grounds(texts.reasons())
         .caseFacts(texts.caseFacts())
-        .decisionGrounds(texts.decisionReasons());
+        .decisionGrounds(texts.decisionReasons())
+        .otherLongText(texts.otherLongText());
 
     if (texts.decisionName() != null) {
       // Todo multiple decision names?
@@ -573,6 +574,7 @@ public class DocumentationUnitTransformer {
             .reasons(documentationUnitDTO.getGrounds())
             .caseFacts(documentationUnitDTO.getCaseFacts())
             .decisionReasons(documentationUnitDTO.getDecisionGrounds())
+            .otherLongText(documentationUnitDTO.getOtherLongText())
             .build();
 
     List<String> borderNumbers =

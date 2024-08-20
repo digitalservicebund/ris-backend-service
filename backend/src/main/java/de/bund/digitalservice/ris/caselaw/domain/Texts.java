@@ -12,4 +12,5 @@ public record Texts(
     String tenor,
     String reasons,
     String caseFacts,
-    String decisionReasons) {}
+    String decisionReasons,
+    String otherLongText) {}

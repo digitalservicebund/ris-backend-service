@@ -31,5 +31,6 @@ describe("Texts", () => {
     screen.getByText("Gründe")
     screen.getByText("Tatbestand")
     screen.getByText("Entscheidungsgründe")
+    screen.getByText("Sonstiger Langtext")
   })
 })
