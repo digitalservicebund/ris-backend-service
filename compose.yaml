@@ -1,10 +1,11 @@
 services:
   initialization:
-    image: ghcr.io/digitalservicebund/ris-data-migration:b368ea18a0832d4548642a2e53586c7824afb5ee
+    image: ghcr.io/digitalservicebund/ris-data-migration:e54e9e1d87421609eb0de0c7c1f38ed302beb9bd
     depends_on:
       - postgres14
     environment:
       - SPRING_PROFILES_ACTIVE=dev # TODO create profile with command
+      - RIS_MIGRATION_CLI_MODE=true
       - RIS_MIGRATION_DB_HOST=host.docker.internal
       - RIS_MIGRATION_DB_PORT=5432
       - RIS_MIGRATION_DB_NAME=neuris
@@ -13,11 +14,11 @@ services:
       - RIS_MIGRATION_DB_SCHEMA=incremental_migration
       - RIS_MIGRATION_S3_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} # TODO Use OTC entry in 1PW
       - RIS_MIGRATION_S3_SECRET=${AWS_ACCESS_KEY_ID} # TODO Use OTC entry in 1PW
-      - RIS_MIGRATION_S3_ENDPOINT=${RIS_MIGRATION_S3_ENDPOINT} # TODO Add to 1PW and read from there
-      - RIS_MIGRATION_S3_BUCKET=${RIS_MIGRATION_S3_BUCKET} # TODO Add to 1PW and read from there
+      - RIS_MIGRATION_S3_ENDPOINT=https://obs.eu-de.otc.t-systems.com
+      - RIS_MIGRATION_S3_BUCKET=s3://neuris-migration-juris-data
       - RIS_MIGRATION_S3_DATA_VERSION=2024-08 # TODO maybe remove and use the latest instead?
       - RIS_MIGRATION_S3_FIRST_DAILY_VERSION=2024-07-31 # TODO maybe remove and use the latest instead?
-    command: ["java", "-jar", "cli/build/libs/ris-data-migration-cli.jar", "refdata", "seed"]
+    command: [ "refdata", "seed" ]
 
 
   traefik:
@@ -71,10 +72,10 @@ services:
       - JAVA_OPTS=-XX:MaxDirectMemorySize=100M
     command: sh run.sh _start
     depends_on:
-      traefik : {condition: service_healthy}
-      postgres14: {condition: service_healthy}
-      redis: {condition: service_healthy}
-      initialization: {condition: service_completed_successfully}
+      traefik: { condition: service_healthy }
+      postgres14: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      initialization: { condition: service_completed_successfully }
     ports:
       - 8080:8080
     healthcheck:
@@ -146,7 +147,7 @@ services:
         psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -c 'CREATE EXTENSION IF NOT EXISTS pg_trgm;'
         wait
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U test -d neuris"]
+      test: [ "CMD-SHELL", "pg_isready -U test -d neuris" ]
       interval: 5s
       retries: 3
       start_period: 5s
