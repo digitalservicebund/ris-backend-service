@@ -42,6 +42,7 @@ public class KeycloakUserService implements UserService {
         .name(oidcUser.getAttribute("name"))
         .email(oidcUser.getEmail())
         .documentationOffice(documentationOffice)
+        .roles(oidcUser.getClaimAsStringList("roles"))
         .build();
   }
 

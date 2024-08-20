@@ -31,7 +31,7 @@ public class ReferenceTransformer {
 
     if (reference.legalPeriodical() != null) {
       legalPeriodicalDTO = LegalPeriodicalTransformer.transformToDTO(reference.legalPeriodical());
-      legalPeriodicalRawValue = reference.legalPeriodical().legalPeriodicalAbbreviation();
+      legalPeriodicalRawValue = reference.legalPeriodical().abbreviation();
     }
     return ReferenceDTO.builder()
         .id(reference.uuid())
@@ -39,7 +39,10 @@ public class ReferenceTransformer {
         .legalPeriodical(legalPeriodicalDTO)
         .citation(reference.citation())
         .footnote(reference.footnote())
-        .legalPeriodicalRawValue(legalPeriodicalRawValue)
+        .legalPeriodicalRawValue(
+            legalPeriodicalRawValue != null
+                ? legalPeriodicalRawValue
+                : reference.legalPeriodicalRawValue())
         .build();
   }
 

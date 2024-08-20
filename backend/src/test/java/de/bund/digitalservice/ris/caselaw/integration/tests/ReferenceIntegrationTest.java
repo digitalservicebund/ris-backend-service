@@ -152,10 +152,10 @@ class ReferenceIntegrationTest {
 
     LegalPeriodical expectedLegalPeriodical =
         LegalPeriodical.builder()
-            .legalPeriodicalId(legalPeriodical.getId())
-            .legalPeriodicalTitle(legalPeriodical.getTitle())
-            .legalPeriodicalSubtitle(legalPeriodical.getSubtitle())
-            .legalPeriodicalAbbreviation(legalPeriodical.getAbbreviation())
+            .uuid(legalPeriodical.getId())
+            .title(legalPeriodical.getTitle())
+            .subtitle(legalPeriodical.getSubtitle())
+            .abbreviation(legalPeriodical.getAbbreviation())
             .primaryReference(true)
             .build();
 
@@ -172,8 +172,8 @@ class ReferenceIntegrationTest {
                         .footnote("footnote")
                         .legalPeriodical(
                             LegalPeriodical.builder()
-                                .legalPeriodicalId(legalPeriodical.getId())
-                                .legalPeriodicalAbbreviation("BVerwGE")
+                                .uuid(legalPeriodical.getId())
+                                .abbreviation("BVerwGE")
                                 .primaryReference(true)
                                 .build())
                         .build()))

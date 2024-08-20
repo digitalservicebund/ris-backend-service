@@ -5,7 +5,8 @@ import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
-import Reference, { LegalPeriodical } from "@/domain/reference"
+import LegalPeriodical from "@/domain/legalPeriodical"
+import Reference from "@/domain/reference"
 import ComboboxItemService from "@/services/comboboxItemService"
 
 const props = defineProps<{
@@ -29,10 +30,9 @@ const legalPeriodical = computed({
   get: () =>
     reference?.value?.legalPeriodical
       ? {
-          label: reference?.value?.legalPeriodical.legalPeriodicalAbbreviation,
+          label: reference?.value?.legalPeriodical.abbreviation,
           value: reference?.value?.legalPeriodical,
-          additionalInformation:
-            reference?.value?.legalPeriodical.legalPeriodicalSubtitle,
+          additionalInformation: reference?.value?.legalPeriodical.subtitle,
         }
       : undefined,
   set: (newValue) => {

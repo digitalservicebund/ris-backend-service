@@ -189,5 +189,11 @@
   },
   "SEARCH_RESULTS_NOT_FOUND": {
     "title": "Keine Suchergebnisse gefunden"
+  },
+  "LEGAL_PERIODICAL_EDITION_COULD_NOT_BE_SAVED": {
+    "title": "Ausgabe konnte nicht gespeichert werden."
+  },
+  "LEGAL_PERIODICAL_EDITIONS_COULD_NOT_BE_LOADED": {
+    "title": "Ausgabe konnte nicht geladen werden."
   }
 }
