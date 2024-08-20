@@ -6,6 +6,7 @@ import DocumentUnitSearch from "@/components/DocumentUnitSearch.vue"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import authService from "@/services/authService"
 import documentUnitService from "@/services/documentUnitService"
+import routes from "~/test-helper/routes"
 
 function renderComponent() {
   // eslint-disable-next-line testing-library/await-async-events
@@ -13,33 +14,7 @@ function renderComponent() {
 
   const router = createRouter({
     history: createWebHistory(),
-    routes: [
-      {
-        path: "/caselaw/documentUnit/new",
-        name: "new",
-        component: {},
-      },
-      {
-        path: "/",
-        name: "home",
-        component: {},
-      },
-      {
-        path: "/caselaw/documentUnit/:documentNumber/categories",
-        name: "caselaw-documentUnit-documentNumber-categories",
-        component: {},
-      },
-      {
-        path: "/caselaw/documentUnit/:documentNumber/preview",
-        name: "caselaw-documentUnit-documentNumber-preview",
-        component: {},
-      },
-      {
-        path: "/caselaw/documentUnit/:documentNumber/files",
-        name: "caselaw-documentUnit-documentNumber-files",
-        component: {},
-      },
-    ],
+    routes: routes,
   })
   return {
     user,
