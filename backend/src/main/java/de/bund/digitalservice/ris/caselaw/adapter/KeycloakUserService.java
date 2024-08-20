@@ -1,26 +1,38 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroup;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
 @Service
 public class KeycloakUserService implements UserService {
-  private static final Logger LOGGER = LoggerFactory.getLogger(KeycloakUserService.class);
-  private final DocumentationOfficeUserGroupService documentationOfficeUserGroupService;
+  private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
-  public KeycloakUserService(
-      DocumentationOfficeUserGroupService documentationOfficeUserGroupService) {
-    this.documentationOfficeUserGroupService = documentationOfficeUserGroupService;
+  private static final Map<String, String> documentationCenterClaims =
+      Map.ofEntries(
+          Map.entry("/caselaw/BGH", "BGH"),
+          Map.entry("/caselaw/BVerfG", "BVerfG"),
+          Map.entry("/caselaw/BAG", "BAG"),
+          Map.entry("/caselaw/BFH", "BFH"),
+          Map.entry("/caselaw/BPatG", "BPatG"),
+          Map.entry("/caselaw/BSG", "BSG"),
+          Map.entry("/caselaw/BVerwG", "BVerwG"),
+          Map.entry("/caselaw/OVG_NRW", "OVG NRW"),
+          Map.entry("/caselaw/BZSt", "BZSt"),
+          Map.entry("/DS", "DS"),
+          Map.entry("/DS/Extern", "DS"),
+          Map.entry("/DS/Intern", "DS"),
+          Map.entry("/CC-RIS", "CC-RIS"));
+
+  public KeycloakUserService(DatabaseDocumentationOfficeRepository documentationOfficeRepository) {
+    this.documentationOfficeRepository = documentationOfficeRepository;
   }
 
   public User getUser(OidcUser oidcUser) {
@@ -47,15 +59,20 @@ public class KeycloakUserService implements UserService {
   }
 
   private Optional<DocumentationOffice> extractDocumentationOffice(OidcUser oidcUser) {
-    List<String> userGroups = Objects.requireNonNull(oidcUser.getAttribute("groups"));
-    var matchingUserGroup =
-        this.documentationOfficeUserGroupService.getUserGroups().stream()
-            .filter(group -> userGroups.contains(group.userGroupPathName()))
-            .findFirst();
-    if (matchingUserGroup.isEmpty() && !userGroups.isEmpty()) {
-      LOGGER.warn(
-          "No doc office user group associated with given Keycloak user groups: {}", userGroups);
-    }
-    return matchingUserGroup.map(DocumentationOfficeUserGroup::docOffice);
+    List<String> groups = Objects.requireNonNull(oidcUser.getAttribute("groups"));
+    String documentationOfficeKey =
+        groups.stream()
+            .filter(documentationCenterClaims::containsKey)
+            .findFirst()
+            .map(documentationCenterClaims::get)
+            .orElse(null);
+
+    return Optional.ofNullable(
+            documentationOfficeRepository.findByAbbreviation(documentationOfficeKey))
+        .map(
+            documentationOfficeDTO ->
+                DocumentationOffice.builder()
+                    .abbreviation(documentationOfficeDTO.getAbbreviation())
+                    .build());
   }
 }

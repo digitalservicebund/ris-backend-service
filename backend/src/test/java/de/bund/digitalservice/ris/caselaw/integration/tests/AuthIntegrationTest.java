@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doReturn;
 
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthController;
@@ -10,14 +9,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroup;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
-import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -54,23 +48,6 @@ class AuthIntegrationTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean DocumentationUnitService documentationUnitService;
-  @MockBean DocumentationOfficeUserGroupService documentationOfficeUserGroupService;
-
-  @BeforeEach
-  public void beforeEach() {
-    doReturn(
-            List.of(
-                DocumentationOfficeUserGroup.builder()
-                    .docOffice(DocumentationOffice.builder().abbreviation("CC-RIS").build())
-                    .userGroupPathName("/CC-RIS")
-                    .build(),
-                DocumentationOfficeUserGroup.builder()
-                    .docOffice(DocumentationOffice.builder().abbreviation("DS").build())
-                    .userGroupPathName("/DS")
-                    .build()))
-        .when(documentationOfficeUserGroupService)
-        .getUserGroups();
-  }
 
   @Test
   void testGetUser() {

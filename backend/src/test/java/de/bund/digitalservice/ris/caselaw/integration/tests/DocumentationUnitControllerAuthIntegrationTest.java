@@ -4,7 +4,6 @@ import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLIS
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doReturn;
 
 import com.jayway.jsonpath.JsonPath;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
@@ -29,9 +28,6 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroup;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
@@ -112,7 +108,6 @@ class DocumentationUnitControllerAuthIntegrationTest {
   @MockBean private PatchMapperService patchMapperService;
 
   @MockBean private HandoverService handoverService;
-  @MockBean DocumentationOfficeUserGroupService documentationOfficeUserGroupService;
 
   @MockBean
   private DocumentationUnitDocxMetadataInitializationService
@@ -151,25 +146,6 @@ class DocumentationUnitControllerAuthIntegrationTest {
     // created via db migration V0_79__caselaw_insert_default_documentation_offices
     DocumentationOfficeDTO ccRisOffice = documentationOfficeRepository.findByAbbreviation("CC-RIS");
     DocumentationOfficeDTO bghOffice = documentationOfficeRepository.findByAbbreviation("BGH");
-
-    doReturn(
-            List.of(
-                DocumentationOfficeUserGroup.builder()
-                    .docOffice(
-                        DocumentationOffice.builder()
-                            .abbreviation(bghOffice.getAbbreviation())
-                            .build())
-                    .userGroupPathName("/caselaw/BGH")
-                    .build(),
-                DocumentationOfficeUserGroup.builder()
-                    .docOffice(
-                        DocumentationOffice.builder()
-                            .abbreviation(ccRisOffice.getAbbreviation())
-                            .build())
-                    .userGroupPathName("/CC-RIS")
-                    .build()))
-        .when(documentationOfficeUserGroupService)
-        .getUserGroups();
 
     officeMap.put("CC-RIS", ccRisOffice);
     officeMap.put("BGH", bghOffice);
