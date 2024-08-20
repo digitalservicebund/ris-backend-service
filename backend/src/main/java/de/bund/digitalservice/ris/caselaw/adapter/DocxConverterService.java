@@ -1,15 +1,17 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocumentUnitDocxListUtils;
+import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocumentationUnitDocxListUtils;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverter;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverterException;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.FooterConverter;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
-import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentUnitDocx;
+import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentationUnitDocx;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocxImagePart;
+import de.bund.digitalservice.ris.caselaw.domain.docx.DocxMetadataProperty;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ECLIElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.FooterElement;
+import de.bund.digitalservice.ris.caselaw.domain.docx.MetadataProperty;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ParagraphElement;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +40,7 @@ import org.docx4j.model.listnumbering.ListNumberingDefinition;
 import org.docx4j.model.structure.HeaderFooterPolicy;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+import org.docx4j.openpackaging.parts.DocPropsCustomPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
 import org.docx4j.openpackaging.parts.WordprocessingML.ImageJpegPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.ImagePngPart;
@@ -121,9 +124,10 @@ public class DocxConverterService implements ConverterService {
     ResponseBytes<GetObjectResponse> response =
         client.getObject(request, ResponseTransformer.toBytes());
 
-    List<DocumentUnitDocx> documentUnitDocxList;
-    documentUnitDocxList = parseAsDocumentUnitDocxList(response.asInputStream());
-    List<DocumentUnitDocx> packedList = DocumentUnitDocxListUtils.packList(documentUnitDocxList);
+    List<DocumentationUnitDocx> documentationUnitDocxList;
+    documentationUnitDocxList = parseAsDocumentationUnitDocxList(response.asInputStream());
+    List<DocumentationUnitDocx> packedList =
+        DocumentationUnitDocxListUtils.packList(documentationUnitDocxList);
     List<String> ecliList =
         packedList.stream()
             .filter(ECLIElement.class::isInstance)
@@ -134,20 +138,28 @@ public class DocxConverterService implements ConverterService {
     String content = null;
     if (!packedList.isEmpty()) {
       content =
-          packedList.stream().map(DocumentUnitDocx::toHtmlString).collect(Collectors.joining());
+          packedList.stream()
+              .map(DocumentationUnitDocx::toHtmlString)
+              .collect(Collectors.joining());
     }
 
-    return new Docx2Html(content, ecliList);
+    Map<DocxMetadataProperty, String> properties =
+        packedList.stream()
+            .filter(MetadataProperty.class::isInstance)
+            .map(MetadataProperty.class::cast)
+            .collect(Collectors.toMap(MetadataProperty::getKey, MetadataProperty::getValue));
+
+    return new Docx2Html(content, ecliList, properties);
   }
 
   /**
-   * Convert the content file (docx) into a list of DocumentUnitDocx elements. Read the styles,
+   * Convert the content file (docx) into a list of DocumentationUnitDocx elements. Read the styles,
    * images, footers and numbering definitions from the docx file.
    *
    * @param inputStream input stream of the content file
-   * @return list of DocumentUnitDocx elements
+   * @return list of DocumentationUnitDocx elements
    */
-  public List<DocumentUnitDocx> parseAsDocumentUnitDocxList(InputStream inputStream) {
+  public List<DocumentationUnitDocx> parseAsDocumentationUnitDocxList(InputStream inputStream) {
     if (inputStream == null) {
       return Collections.emptyList();
     }
@@ -164,23 +176,42 @@ public class DocxConverterService implements ConverterService {
     converter.setFooters(readFooters(mlPackage, converter));
     converter.setListNumberingDefinitions(readListNumberingDefinitions(mlPackage));
 
-    List<DocumentUnitDocx> documentUnitDocxList =
+    List<DocumentationUnitDocx> documentationUnitDocxList =
         mlPackage.getMainDocumentPart().getContent().stream()
             .map(converter::convert)
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
 
     Set<FooterElement> footerElements = parseFooterAndIdentifyECLI();
-    documentUnitDocxList.addAll(
+    documentationUnitDocxList.addAll(
         0, footerElements.stream().filter(ECLIElement.class::isInstance).toList());
-    documentUnitDocxList.addAll(
+    documentationUnitDocxList.addAll(
         footerElements.stream()
             .filter(footerElement -> !(footerElement instanceof ECLIElement))
             .toList());
 
-    DocumentUnitDocxListUtils.postProcessBorderNumbers(documentUnitDocxList);
+    documentationUnitDocxList.addAll(readDocumentProperties(mlPackage));
 
-    return documentUnitDocxList;
+    DocumentationUnitDocxListUtils.postProcessBorderNumbers(documentationUnitDocxList);
+
+    return documentationUnitDocxList;
+  }
+
+  private List<MetadataProperty> readDocumentProperties(WordprocessingMLPackage mlPackage) {
+    DocPropsCustomPart customProps = mlPackage.getDocPropsCustomPart();
+    List<MetadataProperty> props = new ArrayList<>();
+
+    if (customProps == null || customProps.getJaxbElement() == null) {
+      return props;
+    }
+    for (var prop : customProps.getJaxbElement().getProperty()) {
+      DocxMetadataProperty field = DocxMetadataProperty.fromKey(prop.getName());
+      if (prop.getLpwstr() != null && field != null) {
+        props.add(new MetadataProperty(field, prop.getLpwstr()));
+      }
+    }
+
+    return props;
   }
 
   private Set<FooterElement> parseFooterAndIdentifyECLI() {

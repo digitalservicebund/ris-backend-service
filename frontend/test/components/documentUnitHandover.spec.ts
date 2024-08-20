@@ -7,38 +7,13 @@ import DocumentUnit from "@/domain/documentUnit"
 import { EventRecordType } from "@/domain/eventRecord"
 import documentUnitService from "@/services/documentUnitService"
 import handoverService from "@/services/handoverService"
+import routes from "~/test-helper/routes"
 
 function renderComponent() {
   const user = userEvent.setup()
   const router = createRouter({
     history: createWebHistory(),
-    routes: [
-      {
-        path: "/caselaw/documentUnit/new",
-        name: "new",
-        component: {},
-      },
-      {
-        path: "/",
-        name: "home",
-        component: {},
-      },
-      {
-        path: "/caselaw/documentUnit/:documentNumber/categories",
-        name: "caselaw-documentUnit-documentNumber-categories",
-        component: {},
-      },
-      {
-        path: "/caselaw/documentUnit/:documentNumber/files",
-        name: "caselaw-documentUnit-documentNumber-files",
-        component: {},
-      },
-      {
-        path: "/caselaw/documentUnit/:documentNumber/handover",
-        name: "caselaw-documentUnit-documentNumber-handover",
-        component: {},
-      },
-    ],
+    routes: routes,
   })
 
   return {

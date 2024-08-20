@@ -84,6 +84,7 @@ useProvideCourtType(courtTypeRef)
     <EnsuingDecisions class="mb-24" />
     <DocumentUnitContentRelatedIndexing
       :id="DocumentUnitCatagoriesEnum.CONTENT_RELATED_INDEXING"
+      class="mb-24"
     />
     <DocumentUnitTexts :id="DocumentUnitCatagoriesEnum.TEXTS" />
   </FlexItem>

@@ -44,20 +44,21 @@ public enum LegalEffect {
     return label;
   }
 
-  public static LegalEffect deriveFrom(DocumentUnit documentUnit, boolean courtHasChanged) {
-    if (documentUnit == null
-        || documentUnit.coreData() == null
-        || documentUnit.coreData().legalEffect() == null) {
+  public static LegalEffect deriveFrom(
+      DocumentationUnit documentationUnit, boolean courtHasChanged) {
+    if (documentationUnit == null
+        || documentationUnit.coreData() == null
+        || documentationUnit.coreData().legalEffect() == null) {
       return null;
     }
 
     if (courtHasChanged
-        && documentUnit.coreData().court() != null
-        && documentUnit.coreData().court().type() != null
-        && autoYesCourtTypes.contains(documentUnit.coreData().court().type())) {
+        && documentationUnit.coreData().court() != null
+        && documentationUnit.coreData().court().type() != null
+        && autoYesCourtTypes.contains(documentationUnit.coreData().court().type())) {
       return YES;
     }
 
-    return of(documentUnit.coreData().legalEffect());
+    return of(documentationUnit.coreData().legalEffect());
   }
 }

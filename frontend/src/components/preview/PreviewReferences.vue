@@ -6,14 +6,18 @@ import PreviewRow from "@/components/preview/PreviewRow.vue"
 import Reference from "@/domain/reference"
 
 const props = defineProps<{
-  references: Reference[]
+  references: Reference[] | undefined
 }>()
 
 const primaryReferences = computed(() =>
-  props.references.filter((reference) => reference.primaryReference),
+  props.references?.filter(
+    (reference) => reference.legalPeriodical?.primaryReference,
+  ),
 )
 const secondaryReferences = computed(() =>
-  props.references.filter((reference) => !reference.primaryReference),
+  props.references?.filter(
+    (reference) => !reference.legalPeriodical?.primaryReference,
+  ),
 )
 </script>
 
@@ -24,24 +28,36 @@ const secondaryReferences = computed(() =>
   >
     <PreviewCategory>Fundstellen</PreviewCategory>
     <PreviewContent>
-      <div v-if="primaryReferences.length > 0">
-        <span class="ds-body-01-bold">Amtliche Fundstellen</span>
+      <div v-if="primaryReferences && primaryReferences.length > 0">
+        <span class="ds-body-01-bold">Primäre Fundstellen</span>
 
-        <div v-for="item in primaryReferences" :key="item.legalPeriodicalId">
-          {{ item.legalPeriodicalAbbreviation }}
-          - {{ item.citation }}
+        <div
+          v-for="item in primaryReferences"
+          :key="item.legalPeriodical?.uuid"
+        >
+          {{ item.renderDecision }}
         </div>
       </div>
       <div
-        v-if="primaryReferences.length > 0 && secondaryReferences.length > 0"
+        v-if="
+          primaryReferences &&
+          primaryReferences.length > 0 &&
+          secondaryReferences &&
+          secondaryReferences.length > 0
+        "
       >
         <br />
       </div>
-      <div v-if="secondaryReferences.length > 0" class="pt-4">
+      <div
+        v-if="secondaryReferences && secondaryReferences.length > 0"
+        class="pt-4"
+      >
         <span class="ds-body-01-bold">Sekundäre Fundstellen</span>
-        <div v-for="item in secondaryReferences" :key="item.legalPeriodicalId">
-          {{ item.legalPeriodicalAbbreviation }}
-          - {{ item.citation }}
+        <div
+          v-for="item in secondaryReferences"
+          :key="item.legalPeriodical?.uuid"
+        >
+          {{ item.renderDecision }}
         </div>
       </div>
     </PreviewContent>

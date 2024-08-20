@@ -9,9 +9,9 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclingService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
+import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
@@ -31,9 +31,10 @@ import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
@@ -60,11 +61,11 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @RISIntegrationTest(
     imports = {
-      DocumentUnitService.class,
+      DocumentationUnitService.class,
       PostgresDeltaMigrationRepositoryImpl.class,
       DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentNumberRecyclingService.class,
-      DatabaseDocumentUnitStatusService.class,
+      DatabaseDocumentationUnitStatusService.class,
       PostgresDocumentationUnitRepositoryImpl.class,
       PostgresHandoverReportRepositoryImpl.class,
       PostgresJPAConfig.class,
@@ -74,7 +75,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       TestConfig.class,
       DocumentNumberPatternConfig.class
     },
-    controllers = {DocumentUnitController.class},
+    controllers = {DocumentationUnitController.class},
     timeout = "PT2M")
 class SaveNormIntegrationTest {
   @Container
@@ -104,6 +105,10 @@ class SaveNormIntegrationTest {
   @MockBean private AttachmentService attachmentService;
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private HandoverService handoverService;
+
+  @MockBean
+  private DocumentationUnitDocxMetadataInitializationService
+      documentationUnitDocxMetadataInitializationService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private DocumentationOfficeDTO documentationOfficeDTO;
@@ -145,17 +150,17 @@ class SaveNormIntegrationTest {
 
     repository.save(dto);
 
-    DocumentUnit documentUnitFromFrontend = generateDocumentationUnit(dto.getId());
+    DocumentationUnit documentationUnitFromFrontend = generateDocumentationUnit(dto.getId());
 
     risWebTestClient
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + dto.getId())
-        .bodyValue(documentUnitFromFrontend)
+        .bodyValue(documentationUnitFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -180,10 +185,10 @@ class SaveNormIntegrationTest {
                             .build()))
                 .build());
 
-    DocumentUnit documentUnitFromFrontend =
+    DocumentationUnit documentationUnitFromFrontend =
         generateDocumentationUnit(savedDocumentationUnitDTO.getId());
 
-    documentUnitFromFrontend
+    documentationUnitFromFrontend
         .contentRelatedIndexing()
         .norms()
         .add(
@@ -195,11 +200,11 @@ class SaveNormIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + savedDocumentationUnitDTO.getId())
-        .bodyValue(documentUnitFromFrontend)
+        .bodyValue(documentationUnitFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -230,7 +235,7 @@ class SaveNormIntegrationTest {
                 .documentationOffice(documentationOfficeDTO)
                 .build());
 
-    DocumentUnit documentUnitFromFrontend = generateDocumentationUnit(dto.getId());
+    DocumentationUnit documentationUnitFromFrontend = generateDocumentationUnit(dto.getId());
 
     NormReference norm1 =
         NormReference.builder()
@@ -240,17 +245,17 @@ class SaveNormIntegrationTest {
         NormReference.builder()
             .normAbbreviation(NormAbbreviation.builder().id(dbNormAbbreviation2.getId()).build())
             .build();
-    documentUnitFromFrontend.contentRelatedIndexing().norms().addAll(List.of(norm1, norm2));
+    documentationUnitFromFrontend.contentRelatedIndexing().norms().addAll(List.of(norm1, norm2));
 
     risWebTestClient
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + dto.getId())
-        .bodyValue(documentUnitFromFrontend)
+        .bodyValue(documentationUnitFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -277,8 +282,8 @@ class SaveNormIntegrationTest {
             });
   }
 
-  private DocumentUnit generateDocumentationUnit(UUID uuid) {
-    return DocumentUnit.builder()
+  private DocumentationUnit generateDocumentationUnit(UUID uuid) {
+    return DocumentationUnit.builder()
         .uuid(uuid)
         .documentNumber("1234567890123")
         .coreData(CoreData.builder().documentationOffice(docOffice).build())

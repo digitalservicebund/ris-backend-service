@@ -124,6 +124,11 @@ public class DatabaseDocumentNumberGeneratorService implements DocumentNumberSer
     if (optionalDeletedDocumentationUnitID.isPresent()) {
       var recycledDocumentNumber = optionalDeletedDocumentationUnitID.get();
       documentNumberRecyclingService.delete(recycledDocumentNumber);
+      if (databaseDocumentationUnitRepository
+          .findByDocumentNumber(recycledDocumentNumber)
+          .isPresent()) {
+        return Optional.empty();
+      }
       return Optional.of(recycledDocumentNumber);
     }
     return Optional.empty();

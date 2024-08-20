@@ -8,9 +8,10 @@ import java.util.UUID;
 public class HandoverMailTransformer {
   private HandoverMailTransformer() {}
 
-  public static HandoverMailDTO transformToDTO(HandoverMail xmlPublication, UUID documentUnitId) {
+  public static HandoverMailDTO transformToDTO(
+      HandoverMail xmlPublication, UUID documentationUnitId) {
     return HandoverMailDTO.builder()
-        .documentUnitId(documentUnitId)
+        .documentationUnitId(documentationUnitId)
         .statusMessages(String.join("|", xmlPublication.statusMessages()))
         .statusCode(xmlPublication.success() ? "200" : "400")
         .xml(xmlPublication.xml())
@@ -23,9 +24,9 @@ public class HandoverMailTransformer {
   }
 
   public static HandoverMail transformToDomain(
-      HandoverMailDTO handoverMailDTO, UUID documentUnitUuid) {
+      HandoverMailDTO handoverMailDTO, UUID documentationUnitId) {
     return HandoverMail.builder()
-        .documentUnitUuid(documentUnitUuid)
+        .documentationUnitId(documentationUnitId)
         .statusMessages(Arrays.stream(handoverMailDTO.getStatusMessages().split("\\|")).toList())
         .success(handoverMailDTO.getStatusCode().equals("200"))
         .xml(handoverMailDTO.getXml())

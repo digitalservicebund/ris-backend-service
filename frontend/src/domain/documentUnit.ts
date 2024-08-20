@@ -55,7 +55,7 @@ export type Court = {
 export type Procedure = {
   id?: string
   label: string
-  documentUnitCount: number
+  documentationUnitCount: number
   createdAt: string
   documentUnits?: DocumentUnitListEntry[]
 }
@@ -65,10 +65,12 @@ export type Texts = {
   headline?: string
   guidingPrinciple?: string
   headnote?: string
+  otherHeadnote?: string
   tenor?: string
   reasons?: string
   caseFacts?: string
   decisionReasons?: string
+  otherLongText?: string
 }
 
 export default class DocumentUnit {
@@ -152,11 +154,10 @@ export default class DocumentUnit {
       )
     }
 
-    if (data.references != undefined && data.references.length > 0) {
-      data.references.map(
-        (reference: Reference) => new Reference({ ...reference }),
+    if (data.references)
+      data.references = data.references.map(
+        (reference) => new Reference({ ...reference }),
       )
-    }
 
     Object.assign(this, data)
   }

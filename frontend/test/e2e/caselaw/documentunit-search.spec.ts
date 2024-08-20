@@ -401,14 +401,14 @@ test.describe("search", () => {
 
     await expect(page.getByText("Startdatum fehlt")).toBeHidden()
     await expect(
-      page.getByText("Enddatum darf nich vor Startdatum liegen"),
+      page.getByText("Enddatum darf nicht vor Startdatum liegen"),
     ).toBeVisible()
 
     await page.getByLabel("Entscheidungsdatum Suche", { exact: true }).clear()
     await page.getByLabel("Entscheidungsdatum Suche", { exact: true }).blur()
     await expect(page.getByText("Startdatum fehlt")).toBeVisible()
     await expect(
-      page.getByText("Enddatum darf nich vor Startdatum liegen"),
+      page.getByText("Enddatum darf nicht vor Startdatum liegen"),
     ).toBeHidden()
 
     // removes startdate missing error if 2nd date is removed
@@ -447,7 +447,7 @@ test.describe("search", () => {
     await expect(page.getByText("Startdatum fehlt")).toBeVisible()
     await firstDate.fill("28.02.2023")
     await expect(
-      secondDateInput.getByText("Enddatum darf nich vor Startdatum liegen"),
+      secondDateInput.getByText("Enddatum darf nicht vor Startdatum liegen"),
     ).toBeVisible()
 
     // no valid error "wins" against range error

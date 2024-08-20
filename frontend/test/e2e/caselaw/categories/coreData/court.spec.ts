@@ -204,7 +204,11 @@ test.describe("court", () => {
     await page.locator("[aria-label='Gericht']").fill("bgh")
     await page.getByText("BGH").click()
     await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
-    await waitForInputValue(page, "select#legalEffect", "Ja")
+
+    // FIXME: Remove this save, when bug RISDEV-4480 is resolved
+    await save(page)
+
+    await waitForInputValue(page, "select#legalEffect", "Ja", 500)
     await page
       .getByRole("combobox", { name: "Rechtskraft" })
       .selectOption("Nein")

@@ -4,9 +4,10 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MailService {
-  HandoverMail handOver(DocumentUnit documentUnit, String receiverAddress, String issuerAddress);
+  HandoverMail handOver(
+      DocumentationUnit documentationUnit, String receiverAddress, String issuerAddress);
 
-  List<HandoverMail> getHandoverResult(UUID documentUnitUuid);
+  List<HandoverMail> getHandoverResult(UUID documentationUnitId);
 
-  XmlTransformationResult getXmlPreview(DocumentUnit documentUnit);
+  XmlTransformationResult getXmlPreview(DocumentationUnit documentationUnit);
 }

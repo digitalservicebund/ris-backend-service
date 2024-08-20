@@ -4,6 +4,7 @@ import DocumentationOffice from "@/domain/documentationOffice"
 import { Court, DocumentType, Procedure } from "@/domain/documentUnit"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
+import LegalPeriodical from "@/domain/legalPeriodical"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import { ResponseError } from "@/services/httpClient"
 
@@ -132,6 +133,7 @@ export type ComboboxInputModelType =
   | Procedure
   | LegalForceRegion
   | LegalForceType
+  | LegalPeriodical
 
 export type ComboboxItem = {
   label: string

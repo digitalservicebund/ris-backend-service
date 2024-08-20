@@ -9,10 +9,10 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclingService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
+import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
@@ -29,9 +29,10 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
@@ -56,11 +57,11 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @RISIntegrationTest(
     imports = {
-      DocumentUnitService.class,
+      DocumentationUnitService.class,
       PostgresDeltaMigrationRepositoryImpl.class,
       DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentNumberRecyclingService.class,
-      DatabaseDocumentUnitStatusService.class,
+      DatabaseDocumentationUnitStatusService.class,
       DatabaseProcedureService.class,
       PostgresHandoverReportRepositoryImpl.class,
       PostgresDocumentationUnitRepositoryImpl.class,
@@ -71,7 +72,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       TestConfig.class,
       DocumentNumberPatternConfig.class
     },
-    controllers = {DocumentUnitController.class})
+    controllers = {DocumentationUnitController.class})
 class DeviatingObjectIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
@@ -98,6 +99,10 @@ class DeviatingObjectIntegrationTest {
   @MockBean private AttachmentService attachmentService;
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private HandoverService handoverService;
+
+  @MockBean
+  private DocumentationUnitDocxMetadataInitializationService
+      documentationUnitDocxMetadataInitializationService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
 
@@ -159,7 +164,7 @@ class DeviatingObjectIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               List<String> deviatingFileNumbers =
@@ -173,8 +178,8 @@ class DeviatingObjectIntegrationTest {
   void testAddANewDeviatingFileNumberToAnExistingList() {
     DocumentationUnitDTO savedDTO = prepareDocumentationUnitDTOWithDeviatingFileNumbers();
 
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
             .uuid(savedDTO.getId())
             .documentNumber("1234567890123")
             .coreData(
@@ -188,11 +193,11 @@ class DeviatingObjectIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + savedDTO.getId())
-        .bodyValue(documentUnit)
+        .bodyValue(documentationUnit)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               List<String> deviatingFileNumbers =
@@ -206,8 +211,8 @@ class DeviatingObjectIntegrationTest {
   void testAddADeviatingFileNumberTwiceToAnExistingList() {
     DocumentationUnitDTO savedDTO = prepareDocumentationUnitDTOWithDeviatingFileNumbers();
 
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
             .uuid(savedDTO.getId())
             .documentNumber("1234567890123")
             .coreData(
@@ -221,7 +226,7 @@ class DeviatingObjectIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + savedDTO.getId())
-        .bodyValue(documentUnit)
+        .bodyValue(documentationUnit)
         .exchange()
         .expectStatus()
         .isBadRequest();
@@ -231,8 +236,8 @@ class DeviatingObjectIntegrationTest {
   void testRemoveOneDeviatingFileNumberFromExistingList() {
     DocumentationUnitDTO savedDTO = prepareDocumentationUnitDTOWithDeviatingFileNumbers();
 
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
             .uuid(savedDTO.getId())
             .documentNumber("1234567890123")
             .coreData(
@@ -246,11 +251,11 @@ class DeviatingObjectIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + savedDTO.getId())
-        .bodyValue(documentUnit)
+        .bodyValue(documentationUnit)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               List<String> deviatingFileNumbers =
@@ -264,8 +269,8 @@ class DeviatingObjectIntegrationTest {
   void testRemoveAllDeviatingFileNumberWithAEmplyListFromExistingList() {
     DocumentationUnitDTO savedDTO = prepareDocumentationUnitDTOWithDeviatingFileNumbers();
 
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
             .uuid(savedDTO.getId())
             .documentNumber("1234567890123")
             .coreData(
@@ -279,11 +284,11 @@ class DeviatingObjectIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + savedDTO.getId())
-        .bodyValue(documentUnit)
+        .bodyValue(documentationUnit)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               List<String> deviatingFileNumbers =
@@ -296,8 +301,8 @@ class DeviatingObjectIntegrationTest {
   void testWithNullDontChangeTheExistingDeviatingFileNumbers() {
     DocumentationUnitDTO savedDTO = prepareDocumentationUnitDTOWithDeviatingFileNumbers();
 
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
             .uuid(savedDTO.getId())
             .documentNumber("1234567890123")
             .coreData(
@@ -310,11 +315,11 @@ class DeviatingObjectIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + savedDTO.getId())
-        .bodyValue(documentUnit)
+        .bodyValue(documentationUnit)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               List<String> deviatingFileNumbers =
@@ -348,7 +353,7 @@ class DeviatingObjectIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               List<String> deviatingEclis = response.getResponseBody().coreData().deviatingEclis();
@@ -372,8 +377,8 @@ class DeviatingObjectIntegrationTest {
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
 
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
             .uuid(savedDTO.getId())
             .documentNumber("1234567890123")
             .coreData(
@@ -388,11 +393,11 @@ class DeviatingObjectIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + savedDTO.getId())
-        .bodyValue(documentUnit)
+        .bodyValue(documentationUnit)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               List<String> deviatingEclis = response.getResponseBody().coreData().deviatingEclis();
@@ -416,8 +421,8 @@ class DeviatingObjectIntegrationTest {
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
 
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
             .uuid(savedDTO.getId())
             .documentNumber("1234567890123")
             .coreData(
@@ -431,7 +436,7 @@ class DeviatingObjectIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + savedDTO.getId())
-        .bodyValue(documentUnit)
+        .bodyValue(documentationUnit)
         .exchange()
         .expectStatus()
         .isBadRequest();
@@ -452,8 +457,8 @@ class DeviatingObjectIntegrationTest {
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
 
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
             .uuid(savedDTO.getId())
             .documentNumber("1234567890123")
             .coreData(
@@ -467,11 +472,11 @@ class DeviatingObjectIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + savedDTO.getId())
-        .bodyValue(documentUnit)
+        .bodyValue(documentationUnit)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               List<String> deviatingEclis = response.getResponseBody().coreData().deviatingEclis();
@@ -495,8 +500,8 @@ class DeviatingObjectIntegrationTest {
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
 
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
             .uuid(savedDTO.getId())
             .documentNumber("1234567890123")
             .coreData(
@@ -510,11 +515,11 @@ class DeviatingObjectIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + savedDTO.getId())
-        .bodyValue(documentUnit)
+        .bodyValue(documentationUnit)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               List<String> deviatingEclis = response.getResponseBody().coreData().deviatingEclis();
@@ -537,8 +542,8 @@ class DeviatingObjectIntegrationTest {
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
 
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
             .uuid(savedDTO.getId())
             .documentNumber("1234567890123")
             .coreData(
@@ -551,11 +556,11 @@ class DeviatingObjectIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + savedDTO.getId())
-        .bodyValue(documentUnit)
+        .bodyValue(documentationUnit)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               List<String> deviatingEclis = response.getResponseBody().coreData().deviatingEclis();
@@ -588,7 +593,7 @@ class DeviatingObjectIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               List<String> deviatingCourts =
@@ -613,8 +618,8 @@ class DeviatingObjectIntegrationTest {
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
 
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
             .uuid(savedDTO.getId())
             .documentNumber("1234567890123")
             .coreData(
@@ -628,11 +633,11 @@ class DeviatingObjectIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + savedDTO.getId())
-        .bodyValue(documentUnit)
+        .bodyValue(documentationUnit)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               List<String> deviatingCourts =
@@ -657,8 +662,8 @@ class DeviatingObjectIntegrationTest {
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
 
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
             .uuid(savedDTO.getId())
             .documentNumber("1234567890123")
             .coreData(
@@ -672,7 +677,7 @@ class DeviatingObjectIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + savedDTO.getId())
-        .bodyValue(documentUnit)
+        .bodyValue(documentationUnit)
         .exchange()
         .expectStatus()
         .isBadRequest();
@@ -693,8 +698,8 @@ class DeviatingObjectIntegrationTest {
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
 
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
             .uuid(savedDTO.getId())
             .documentNumber("1234567890123")
             .coreData(
@@ -708,11 +713,11 @@ class DeviatingObjectIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + savedDTO.getId())
-        .bodyValue(documentUnit)
+        .bodyValue(documentationUnit)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               List<String> deviatingCourts =
@@ -737,8 +742,8 @@ class DeviatingObjectIntegrationTest {
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
 
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
             .uuid(savedDTO.getId())
             .documentNumber("1234567890123")
             .coreData(
@@ -752,11 +757,11 @@ class DeviatingObjectIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + savedDTO.getId())
-        .bodyValue(documentUnit)
+        .bodyValue(documentationUnit)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               List<String> deviatingCourts =
@@ -780,8 +785,8 @@ class DeviatingObjectIntegrationTest {
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
 
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
             .uuid(savedDTO.getId())
             .documentNumber("1234567890123")
             .coreData(
@@ -794,11 +799,11 @@ class DeviatingObjectIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + savedDTO.getId())
-        .bodyValue(documentUnit)
+        .bodyValue(documentationUnit)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               List<String> deviatingCourts =
@@ -832,7 +837,7 @@ class DeviatingObjectIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               List<LocalDate> deviatingDates =
@@ -858,8 +863,8 @@ class DeviatingObjectIntegrationTest {
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
 
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
             .uuid(savedDTO.getId())
             .documentNumber("1234567890123")
             .coreData(
@@ -877,11 +882,11 @@ class DeviatingObjectIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + savedDTO.getId())
-        .bodyValue(documentUnit)
+        .bodyValue(documentationUnit)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               List<LocalDate> deviatingDates =
@@ -911,8 +916,8 @@ class DeviatingObjectIntegrationTest {
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
 
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
             .uuid(savedDTO.getId())
             .documentNumber("1234567890123")
             .coreData(
@@ -930,7 +935,7 @@ class DeviatingObjectIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + savedDTO.getId())
-        .bodyValue(documentUnit)
+        .bodyValue(documentationUnit)
         .exchange()
         .expectStatus()
         .isBadRequest();
@@ -951,8 +956,8 @@ class DeviatingObjectIntegrationTest {
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
 
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
             .uuid(savedDTO.getId())
             .documentNumber("1234567890123")
             .coreData(
@@ -966,11 +971,11 @@ class DeviatingObjectIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + savedDTO.getId())
-        .bodyValue(documentUnit)
+        .bodyValue(documentationUnit)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               List<LocalDate> deviatingDates =
@@ -995,8 +1000,8 @@ class DeviatingObjectIntegrationTest {
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
 
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
             .uuid(savedDTO.getId())
             .documentNumber("1234567890123")
             .coreData(
@@ -1010,11 +1015,11 @@ class DeviatingObjectIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + savedDTO.getId())
-        .bodyValue(documentUnit)
+        .bodyValue(documentationUnit)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               List<LocalDate> deviatingDates =
@@ -1038,8 +1043,8 @@ class DeviatingObjectIntegrationTest {
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
 
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
             .uuid(savedDTO.getId())
             .documentNumber("1234567890123")
             .coreData(
@@ -1052,11 +1057,11 @@ class DeviatingObjectIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + savedDTO.getId())
-        .bodyValue(documentUnit)
+        .bodyValue(documentationUnit)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               List<LocalDate> deviatingDates =

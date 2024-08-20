@@ -6,6 +6,7 @@ import { createRouter, createWebHistory, Router } from "vue-router"
 import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
 import Attachment from "@/domain/attachment"
 import DocumentUnit from "@/domain/documentUnit"
+import Reference from "@/domain/reference"
 
 let router: Router
 
@@ -13,6 +14,7 @@ function renderComponent(
   options: {
     note?: string
     attachments?: Attachment[]
+    references?: Reference[]
   } = {},
 ) {
   const user = userEvent.setup()
@@ -71,9 +73,18 @@ describe("ExtraContentSidePanel", () => {
           component: {},
         },
         {
-          path: "/caselaw/documentUnit/:documentNumber/files",
-          name: "caselaw-documentUnit-documentNumber-files",
-          component: {},
+          path: "/caselaw/documentUnit/:documentNumber/attachments",
+          name: "caselaw-documentUnit-documentNumber-attachments",
+          component: {
+            template: "<div data-testid='attachments'>Attachments</div>",
+          },
+        },
+        {
+          path: "/caselaw/documentUnit/:documentNumber/references",
+          name: "caselaw-documentUnit-documentNumber-references",
+          component: {
+            template: "<div data-testid='references'>References</div>",
+          },
         },
         {
           path: "/caselaw/documentUnit/:documentNumber/handover",

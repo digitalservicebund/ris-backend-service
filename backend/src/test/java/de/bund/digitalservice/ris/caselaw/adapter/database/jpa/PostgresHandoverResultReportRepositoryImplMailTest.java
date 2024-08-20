@@ -21,12 +21,13 @@ class PostgresHandoverResultReportRepositoryImplMailTest {
 
   PostgresHandoverReportRepositoryImpl reportRepository;
   @MockBean private DatabaseHandoverReportRepository handoverReportRepository;
-  @MockBean private DatabaseDocumentationUnitRepository documentUnitRepository;
+  @MockBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
 
   @BeforeEach
   public void setup() {
     this.reportRepository =
-        new PostgresHandoverReportRepositoryImpl(handoverReportRepository, documentUnitRepository);
+        new PostgresHandoverReportRepositoryImpl(
+            handoverReportRepository, documentationUnitRepository);
   }
 
   @Test
@@ -34,7 +35,7 @@ class PostgresHandoverResultReportRepositoryImplMailTest {
     var docUnit = DocumentationUnitDTO.builder().build();
     Instant received = Instant.now();
 
-    when(documentUnitRepository.findByDocumentNumber("ABC126543712683"))
+    when(documentationUnitRepository.findByDocumentNumber("ABC126543712683"))
         .thenReturn(Optional.of(docUnit));
 
     when(handoverReportRepository.saveAll(any(Iterable.class)))
@@ -43,7 +44,7 @@ class PostgresHandoverResultReportRepositoryImplMailTest {
                 HandoverReportDTO.builder()
                     .content("report content")
                     .receivedDate(received)
-                    .documentUnitId(docUnit.getId())
+                    .documentationUnitId(docUnit.getId())
                     .build()));
 
     HandoverReport report =
@@ -66,7 +67,7 @@ class PostgresHandoverResultReportRepositoryImplMailTest {
                 HandoverReportDTO.builder()
                     .content("report content")
                     .receivedDate(received)
-                    .documentUnitId(docUnit.getId())
+                    .documentationUnitId(docUnit.getId())
                     .id(any())
                     .build()));
   }

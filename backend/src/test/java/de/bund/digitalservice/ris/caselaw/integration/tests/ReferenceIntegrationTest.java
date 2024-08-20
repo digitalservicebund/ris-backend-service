@@ -10,10 +10,10 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclingService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
+import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
@@ -29,13 +29,15 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
@@ -55,11 +57,11 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @RISIntegrationTest(
     imports = {
-      DocumentUnitService.class,
+      DocumentationUnitService.class,
       PostgresDeltaMigrationRepositoryImpl.class,
       DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentNumberRecyclingService.class,
-      DatabaseDocumentUnitStatusService.class,
+      DatabaseDocumentationUnitStatusService.class,
       DatabaseProcedureService.class,
       PostgresHandoverReportRepositoryImpl.class,
       PostgresDocumentationUnitRepositoryImpl.class,
@@ -70,7 +72,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       TestConfig.class,
       DocumentNumberPatternConfig.class
     },
-    controllers = {DocumentUnitController.class})
+    controllers = {DocumentationUnitController.class})
 class ReferenceIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
@@ -99,6 +101,11 @@ class ReferenceIntegrationTest {
   @MockBean private PatchMapperService patchMapperService;
 
   @MockBean private HandoverService handoverService;
+
+  @MockBean
+  private DocumentationUnitDocxMetadataInitializationService
+      documentationUnitDocxMetadataInitializationService;
+
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private DocumentationOfficeDTO documentationOffice;
   private static final String DEFAULT_DOCUMENT_NUMBER = "1234567890126";
@@ -143,8 +150,17 @@ class ReferenceIntegrationTest {
                 .primaryReference(true)
                 .build());
 
-    DocumentUnit documentUnitFromFrontend =
-        DocumentUnit.builder()
+    LegalPeriodical expectedLegalPeriodical =
+        LegalPeriodical.builder()
+            .uuid(legalPeriodical.getId())
+            .title(legalPeriodical.getTitle())
+            .subtitle(legalPeriodical.getSubtitle())
+            .abbreviation(legalPeriodical.getAbbreviation())
+            .primaryReference(true)
+            .build();
+
+    DocumentationUnit documentationUnitFromFrontend =
+        DocumentationUnit.builder()
             .uuid(dto.getId())
             .documentNumber(dto.getDocumentNumber())
             .coreData(CoreData.builder().build())
@@ -152,11 +168,14 @@ class ReferenceIntegrationTest {
                 List.of(
                     Reference.builder()
                         .citation("2024, S.3")
-                        .primaryReference(true)
                         .referenceSupplement("Klammerzusatz")
                         .footnote("footnote")
-                        .legalPeriodicalId(legalPeriodical.getId())
-                        .legalPeriodicalAbbreviation("BVerwGE")
+                        .legalPeriodical(
+                            LegalPeriodical.builder()
+                                .uuid(legalPeriodical.getId())
+                                .abbreviation("BVerwGE")
+                                .primaryReference(true)
+                                .build())
                         .build()))
             .build();
 
@@ -164,11 +183,11 @@ class ReferenceIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + dto.getId())
-        .bodyValue(documentUnitFromFrontend)
+        .bodyValue(documentationUnitFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
@@ -176,25 +195,12 @@ class ReferenceIntegrationTest {
                   .isEqualTo(DEFAULT_DOCUMENT_NUMBER);
               assertThat(response.getResponseBody().references()).hasSize(1);
               assertThat(response.getResponseBody().references())
-                  .extracting(
-                      "citation",
-                      "referenceSupplement",
-                      "footnote",
-                      "primaryReference",
-                      "legalPeriodicalId",
-                      "legalPeriodicalAbbreviation",
-                      "legalPeriodicalTitle",
-                      "legalPeriodicalSubtitle")
-                  .containsExactly(
-                      tuple(
-                          "2024, S.3",
-                          "Klammerzusatz",
-                          "footnote",
-                          true,
-                          legalPeriodical.getId(),
-                          "BVerwGE",
-                          "Bundesverwaltungsgerichtsentscheidungen",
-                          "Entscheidungen des Bundesverwaltungsgerichts"));
+                  .extracting("citation", "referenceSupplement", "footnote")
+                  .containsExactly(tuple("2024, S.3", "Klammerzusatz", "footnote"));
+              assertThat(response.getResponseBody().references())
+                  .extracting("legalPeriodical")
+                  .usingRecursiveComparison()
+                  .isEqualTo(List.of(expectedLegalPeriodical));
             });
   }
 }

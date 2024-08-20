@@ -11,7 +11,7 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
@@ -69,7 +69,7 @@ class HandoverMailServiceTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final HandoverMail EXPECTED_BEFORE_SAVE =
       HandoverMail.builder()
-          .documentUnitUuid(TEST_UUID)
+          .documentationUnitId(TEST_UUID)
           .receiverAddress(RECEIVER_ADDRESS)
           .mailSubject(MAIL_SUBJECT)
           .xml("xml")
@@ -82,7 +82,7 @@ class HandoverMailServiceTest {
 
   private static final HandoverMail SAVED_XML_MAIL =
       HandoverMail.builder()
-          .documentUnitUuid(TEST_UUID)
+          .documentationUnitId(TEST_UUID)
           .receiverAddress(RECEIVER_ADDRESS)
           .mailSubject(MAIL_SUBJECT)
           .xml("xml")
@@ -97,7 +97,7 @@ class HandoverMailServiceTest {
   private static final XmlTransformationResult FORMATTED_XML =
       new XmlTransformationResult("xml", true, List.of("succeed"), "test.xml", CREATED_DATE);
 
-  private DocumentUnit documentUnit;
+  private DocumentationUnit documentationUnit;
 
   @Autowired private HandoverMailService service;
 
@@ -111,22 +111,22 @@ class HandoverMailServiceTest {
 
   @BeforeEach
   void setUp() throws ParserConfigurationException, TransformerException {
-    documentUnit =
-        DocumentUnit.builder().uuid(TEST_UUID).documentNumber("test-document-number").build();
-    when(xmlExporter.transformToXml(any(DocumentUnit.class))).thenReturn(FORMATTED_XML);
+    documentationUnit =
+        DocumentationUnit.builder().uuid(TEST_UUID).documentNumber("test-document-number").build();
+    when(xmlExporter.transformToXml(any(DocumentationUnit.class))).thenReturn(FORMATTED_XML);
 
     when(repository.save(EXPECTED_BEFORE_SAVE)).thenReturn(SAVED_XML_MAIL);
   }
 
   @Test
   void testSend() throws ParserConfigurationException, TransformerException {
-    var response = service.handOver(documentUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS);
+    var response = service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS);
 
     assertThat(response).usingRecursiveComparison().isEqualTo(EXPECTED_RESPONSE);
 
     verify(xmlExporter)
         .transformToXml(
-            documentUnit.toBuilder()
+            documentationUnit.toBuilder()
                 .coreData(
                     CoreData.builder()
                         .court(
@@ -150,7 +150,7 @@ class HandoverMailServiceTest {
                     .fileName(SAVED_XML_MAIL.fileName())
                     .fileContent(SAVED_XML_MAIL.xml())
                     .build()),
-            SAVED_XML_MAIL.documentUnitUuid().toString());
+            SAVED_XML_MAIL.documentationUnitId().toString());
   }
 
   @Test
@@ -160,14 +160,15 @@ class HandoverMailServiceTest {
             "xml", false, List.of("status-message"), "test.xml", CREATED_DATE);
     var expected =
         HandoverMail.builder()
-            .documentUnitUuid(TEST_UUID)
+            .documentationUnitId(TEST_UUID)
             .statusMessages(List.of("status-message"))
             .success(false)
             .build();
 
-    when(xmlExporter.transformToXml(any(DocumentUnit.class))).thenReturn(xmlWithValidationError);
+    when(xmlExporter.transformToXml(any(DocumentationUnit.class)))
+        .thenReturn(xmlWithValidationError);
 
-    var response = service.handOver(documentUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS);
+    var response = service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS);
     assertThat(response).usingRecursiveComparison().isEqualTo(expected);
 
     verify(repository, times(0)).save(any(HandoverMail.class));
@@ -178,13 +179,13 @@ class HandoverMailServiceTest {
   @Test
   void testSend_withExceptionFromXmlExporter()
       throws ParserConfigurationException, TransformerException {
-    when(xmlExporter.transformToXml(any(DocumentUnit.class)))
+    when(xmlExporter.transformToXml(any(DocumentationUnit.class)))
         .thenThrow(ParserConfigurationException.class);
 
     DocumentationUnitHandoverException ex =
         Assertions.assertThrows(
             DocumentationUnitHandoverException.class,
-            () -> service.handOver(documentUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
+            () -> service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
     Assertions.assertEquals("Couldn't generate xml.", ex.getMessage());
 
     verify(repository, times(0)).save(any(HandoverMail.class));
@@ -194,13 +195,13 @@ class HandoverMailServiceTest {
 
   @Test
   void testSend_withoutDocumentNumber() {
-    documentUnit = documentUnit.toBuilder().documentNumber(null).build();
+    documentationUnit = documentationUnit.toBuilder().documentNumber(null).build();
 
     // Call the method and check for the exception
     Throwable throwable =
         Assert.assertThrows(
             DocumentationUnitHandoverException.class,
-            () -> service.handOver(documentUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
+            () -> service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
 
     assertThat(throwable.getMessage())
         .isEqualTo("No document number has set in the document unit.");
@@ -217,7 +218,7 @@ class HandoverMailServiceTest {
 
     Assert.assertThrows(
         IllegalArgumentException.class,
-        () -> service.handOver(documentUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
+        () -> service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
 
     verify(repository).save(any(HandoverMail.class));
     verify(mailSender)
@@ -229,7 +230,7 @@ class HandoverMailServiceTest {
     Throwable throwable =
         Assert.assertThrows(
             DocumentationUnitHandoverException.class,
-            () -> service.handOver(documentUnit, null, null));
+            () -> service.handOver(documentationUnit, null, null));
 
     assertThat(throwable.getMessage()).isEqualTo("No receiver mail address is set");
 
@@ -253,7 +254,7 @@ class HandoverMailServiceTest {
 
     Assert.assertThrows(
         DocumentationUnitHandoverException.class,
-        () -> service.handOver(documentUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
+        () -> service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
 
     verify(repository, times(0)).save(any(HandoverMail.class));
     verify(mailSender)
@@ -270,11 +271,11 @@ class HandoverMailServiceTest {
   @Test
   void testGetLastHandoverXmlMail() {
     List<HandoverMail> list = List.of(SAVED_XML_MAIL);
-    when(repository.getHandoversByDocumentUnitUuid(TEST_UUID)).thenReturn((List) list);
+    when(repository.getHandoversByDocumentationUnitId(TEST_UUID)).thenReturn((List) list);
 
     var response = service.getHandoverResult(TEST_UUID);
     assertThat(response.get(0)).usingRecursiveComparison().isEqualTo(EXPECTED_RESPONSE);
 
-    verify(repository).getHandoversByDocumentUnitUuid(TEST_UUID);
+    verify(repository).getHandoversByDocumentationUnitId(TEST_UUID);
   }
 }

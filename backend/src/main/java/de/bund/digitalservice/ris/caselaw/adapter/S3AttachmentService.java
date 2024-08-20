@@ -36,7 +36,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 public class S3AttachmentService implements AttachmentService {
   private final AttachmentRepository repository;
   private final S3Client s3Client;
-  private final DatabaseDocumentationUnitRepository documentUnitRepository;
+  private final DatabaseDocumentationUnitRepository documentationUnitRepository;
 
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
@@ -44,14 +44,14 @@ public class S3AttachmentService implements AttachmentService {
   public S3AttachmentService(
       AttachmentRepository repository,
       S3Client s3Client,
-      DatabaseDocumentationUnitRepository documentUnitRepository) {
+      DatabaseDocumentationUnitRepository documentationUnitRepository) {
     this.repository = repository;
     this.s3Client = s3Client;
-    this.documentUnitRepository = documentUnitRepository;
+    this.documentationUnitRepository = documentationUnitRepository;
   }
 
   public Attachment attachFileToDocumentationUnit(
-      UUID documentationUnitUuid, ByteBuffer byteBuffer, HttpHeaders httpHeaders) {
+      UUID documentationUnitId, ByteBuffer byteBuffer, HttpHeaders httpHeaders) {
     var fileUuid = UUID.randomUUID();
     String fileName =
         httpHeaders.containsKey("X-Filename")
@@ -66,7 +66,8 @@ public class S3AttachmentService implements AttachmentService {
         AttachmentDTO.builder()
             .id(fileUuid)
             .s3ObjectPath(fileUuid.toString())
-            .documentationUnit(documentUnitRepository.findById(documentationUnitUuid).orElseThrow())
+            .documentationUnit(
+                documentationUnitRepository.findById(documentationUnitId).orElseThrow())
             .filename(fileName)
             .format("docx")
             .uploadTimestamp(Instant.now())

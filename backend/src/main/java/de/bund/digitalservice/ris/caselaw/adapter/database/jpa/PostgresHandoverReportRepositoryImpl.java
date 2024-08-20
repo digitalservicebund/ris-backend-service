@@ -16,14 +16,14 @@ import org.springframework.stereotype.Repository;
 public class PostgresHandoverReportRepositoryImpl implements HandoverReportRepository {
 
   private final DatabaseHandoverReportRepository repository;
-  private final DatabaseDocumentationUnitRepository documentUnitRepository;
+  private final DatabaseDocumentationUnitRepository documentationUnitRepository;
 
   public PostgresHandoverReportRepositoryImpl(
       DatabaseHandoverReportRepository repository,
-      DatabaseDocumentationUnitRepository documentUnitRepository) {
+      DatabaseDocumentationUnitRepository documentationUnitRepository) {
 
     this.repository = repository;
-    this.documentUnitRepository = documentUnitRepository;
+    this.documentationUnitRepository = documentationUnitRepository;
   }
 
   /**
@@ -38,14 +38,14 @@ public class PostgresHandoverReportRepositoryImpl implements HandoverReportRepos
         reports.stream()
             .map(
                 report -> {
-                  Optional<DocumentationUnitDTO> documentUnitDTO =
-                      documentUnitRepository.findByDocumentNumber(report.documentNumber());
+                  Optional<DocumentationUnitDTO> documentationUnitDTO =
+                      documentationUnitRepository.findByDocumentNumber(report.documentNumber());
 
-                  return documentUnitDTO
+                  return documentationUnitDTO
                       .map(
-                          documentationUnitDTO ->
+                          dto ->
                               HandoverReportDTO.builder()
-                                  .documentUnitId(documentationUnitDTO.getId())
+                                  .documentationUnitId(dto.getId())
                                   .receivedDate(report.receivedDate())
                                   .content(report.content())
                                   .build())
@@ -67,12 +67,12 @@ public class PostgresHandoverReportRepositoryImpl implements HandoverReportRepos
   /**
    * Retrieves all handover reports for a given documentation unit.
    *
-   * @param documentUnitUuid the document unit UUID
+   * @param documentationUnitUuid the document unit UUID
    * @return the handover reports
    */
   @Override
-  public List<HandoverReport> getAllByDocumentUnitUuid(UUID documentUnitUuid) {
-    return repository.findAllByDocumentUnitId(documentUnitUuid).stream()
+  public List<HandoverReport> getAllByDocumentationUnitUuid(UUID documentationUnitUuid) {
+    return repository.findAllByDocumentationUnitId(documentationUnitUuid).stream()
         .map(
             report ->
                 HandoverReport.builder()

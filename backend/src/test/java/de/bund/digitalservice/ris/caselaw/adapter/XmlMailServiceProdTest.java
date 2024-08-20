@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
@@ -58,7 +58,7 @@ class XmlMailServiceProdTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final HandoverMail EXPECTED_BEFORE_SAVE_PROD =
       HandoverMail.builder()
-          .documentUnitUuid(TEST_UUID)
+          .documentationUnitId(TEST_UUID)
           .receiverAddress(RECEIVER_ADDRESS)
           .mailSubject(PROD_MAIL_SUBJECT)
           .xml("xml")
@@ -71,7 +71,7 @@ class XmlMailServiceProdTest {
 
   private static final HandoverMail SAVED_XML_MAIL_PROD =
       HandoverMail.builder()
-          .documentUnitUuid(TEST_UUID)
+          .documentationUnitId(TEST_UUID)
           .receiverAddress(RECEIVER_ADDRESS)
           .mailSubject(PROD_MAIL_SUBJECT)
           .xml("xml")
@@ -84,7 +84,7 @@ class XmlMailServiceProdTest {
   private static final XmlTransformationResult FORMATTED_XML =
       new XmlTransformationResult("xml", true, List.of("succeed"), "test.xml", CREATED_DATE);
 
-  private DocumentUnit documentUnit;
+  private DocumentationUnit documentationUnit;
 
   @Autowired private HandoverMailService service;
 
@@ -98,8 +98,8 @@ class XmlMailServiceProdTest {
 
   @BeforeEach
   void setUp() throws ParserConfigurationException, TransformerException {
-    documentUnit =
-        DocumentUnit.builder()
+    documentationUnit =
+        DocumentationUnit.builder()
             .uuid(TEST_UUID)
             .documentNumber("test-document-number")
             .coreData(
@@ -108,7 +108,7 @@ class XmlMailServiceProdTest {
                     .build())
             .attachments(Collections.singletonList(Attachment.builder().name("file_name").build()))
             .build();
-    when(xmlExporter.transformToXml(any(DocumentUnit.class))).thenReturn(FORMATTED_XML);
+    when(xmlExporter.transformToXml(any(DocumentationUnit.class))).thenReturn(FORMATTED_XML);
 
     when(repository.save(EXPECTED_BEFORE_SAVE_PROD)).thenReturn(SAVED_XML_MAIL_PROD);
   }
@@ -117,11 +117,11 @@ class XmlMailServiceProdTest {
   void testSendWithProdSubjectAndOriginalCourtAndFileNumber()
       throws ParserConfigurationException, TransformerException {
 
-    var response = service.handOver(documentUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS);
+    var response = service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS);
 
     assertThat(response.mailSubject()).isEqualTo(PROD_MAIL_SUBJECT);
 
-    verify(xmlExporter).transformToXml(documentUnit);
+    verify(xmlExporter).transformToXml(documentationUnit);
     verify(repository).save(EXPECTED_BEFORE_SAVE_PROD);
     verify(mailSender)
         .sendMail(
@@ -134,6 +134,6 @@ class XmlMailServiceProdTest {
                     .fileName(SAVED_XML_MAIL_PROD.fileName())
                     .fileContent(SAVED_XML_MAIL_PROD.xml())
                     .build()),
-            SAVED_XML_MAIL_PROD.documentUnitUuid().toString());
+            SAVED_XML_MAIL_PROD.documentationUnitId().toString());
   }
 }

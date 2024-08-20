@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
@@ -43,29 +43,29 @@ public class JurisXmlExporterResponseProcessor {
   private static final Logger LOGGER =
       LoggerFactory.getLogger(JurisXmlExporterResponseProcessor.class);
   private final HttpMailSender mailSender;
-  private final DocumentUnitStatusService statusService;
+  private final DocumentationUnitStatusService statusService;
 
   private final HandoverReportRepository reportRepository;
   private final MailStoreFactory storeFactory;
   private final JurisMessageWrapperFactory wrapperFactory;
 
-  private final DocumentUnitRepository documentUnitRepository;
+  private final DocumentationUnitRepository documentationUnitRepository;
   private final HandoverRepository xmlHandoverRepository;
 
   public JurisXmlExporterResponseProcessor(
       HttpMailSender mailSender,
-      DocumentUnitStatusService statusService,
+      DocumentationUnitStatusService statusService,
       MailStoreFactory storeFactory,
       HandoverReportRepository reportRepository,
       JurisMessageWrapperFactory wrapperFactory,
-      DocumentUnitRepository documentUnitRepository,
+      DocumentationUnitRepository documentationUnitRepository,
       HandoverRepository xmlHandoverRepository) {
     this.mailSender = mailSender;
     this.statusService = statusService;
     this.storeFactory = storeFactory;
     this.reportRepository = reportRepository;
     this.wrapperFactory = wrapperFactory;
-    this.documentUnitRepository = documentUnitRepository;
+    this.documentationUnitRepository = documentationUnitRepository;
     this.xmlHandoverRepository = xmlHandoverRepository;
   }
 
@@ -211,7 +211,7 @@ public class JurisXmlExporterResponseProcessor {
 
       var xmlHandoverMail =
           xmlHandoverRepository.getLastXmlHandoverMail(
-              documentUnitRepository
+              documentationUnitRepository
                   .findByDocumentNumber(documentNumber)
                   .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber))
                   .uuid());

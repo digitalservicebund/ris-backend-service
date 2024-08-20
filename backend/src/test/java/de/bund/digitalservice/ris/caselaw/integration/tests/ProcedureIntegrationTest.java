@@ -11,7 +11,7 @@ import de.bund.digitalservice.ris.caselaw.SliceTestImpl;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
-import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
+import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.ProcedureController;
@@ -33,11 +33,12 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
@@ -68,7 +69,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @RISIntegrationTest(
     imports = {
-      DocumentUnitService.class,
+      DocumentationUnitService.class,
       PostgresDeltaMigrationRepositoryImpl.class,
       KeycloakUserService.class,
       PostgresDocumentationUnitRepositoryImpl.class,
@@ -79,7 +80,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       TestConfig.class,
       DatabaseProcedureService.class
     },
-    controllers = {DocumentUnitController.class, ProcedureController.class})
+    controllers = {DocumentationUnitController.class, ProcedureController.class})
 @Sql(scripts = {"classpath:doc_office_init.sql", "classpath:procedures_init.sql"})
 @Sql(
     scripts = {"classpath:procedures_cleanup.sql"},
@@ -99,13 +100,13 @@ class ProcedureIntegrationTest {
   }
 
   @Autowired private RisWebTestClient risWebTestClient;
-  @Autowired private DatabaseDocumentationUnitRepository documentUnitRepository;
+  @Autowired private DatabaseDocumentationUnitRepository documentationUnitRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseProcedureRepository repository;
   @Autowired private DatabaseDocumentationUnitProcedureRepository linkRepository;
 
   @MockBean private DocumentNumberService numberService;
-  @MockBean private DocumentUnitStatusService statusService;
+  @MockBean private DocumentationUnitStatusService statusService;
   @MockBean private DocumentNumberRecyclingService documentNumberRecyclingService;
   @MockBean private HandoverReportRepository handoverReportRepository;
   @MockBean private UserService userService;
@@ -117,6 +118,10 @@ class ProcedureIntegrationTest {
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private HandoverService handoverService;
 
+  @MockBean
+  private DocumentationUnitDocxMetadataInitializationService
+      documentationUnitDocxMetadataInitializationService;
+
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private DocumentationOfficeDTO docOfficeDTO;
   private DocumentationUnitDTO docUnitDTO;
@@ -124,13 +129,13 @@ class ProcedureIntegrationTest {
   @BeforeEach
   void setUp() {
     docOfficeDTO = documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
-    docUnitDTO = documentUnitRepository.findByDocumentNumber("1234567890123").get();
+    docUnitDTO = documentationUnitRepository.findByDocumentNumber("1234567890123").get();
     doReturn(docOffice).when(userService).getDocumentationOffice(any(OidcUser.class));
   }
 
   @AfterEach
   void cleanUp() {
-    documentUnitRepository.deleteAll();
+    documentationUnitRepository.deleteAll();
     repository.deleteAll();
   }
 
@@ -146,8 +151,8 @@ class ProcedureIntegrationTest {
   void testAddingNewProcedure(String label) {
     Procedure procedure = Procedure.builder().label(label).build();
 
-    DocumentUnit documentUnitFromFrontend =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnitFromFrontend =
+        DocumentationUnit.builder()
             .uuid(docUnitDTO.getId())
             .documentNumber(docUnitDTO.getDocumentNumber())
             .coreData(
@@ -158,11 +163,11 @@ class ProcedureIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
-        .bodyValue(documentUnitFromFrontend)
+        .bodyValue(documentationUnitFromFrontend)
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().coreData().procedure().label())
@@ -185,8 +190,8 @@ class ProcedureIntegrationTest {
 
     Procedure procedure = Procedure.builder().label("procedure1").build();
 
-    DocumentUnit documentUnitFromFrontend =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnitFromFrontend =
+        DocumentationUnit.builder()
             .uuid(docUnitDTO.getId())
             .documentNumber(docUnitDTO.getDocumentNumber())
             .coreData(
@@ -197,11 +202,11 @@ class ProcedureIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
-        .bodyValue(documentUnitFromFrontend)
+        .bodyValue(documentationUnitFromFrontend)
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().coreData().procedure())
@@ -231,8 +236,8 @@ class ProcedureIntegrationTest {
 
     Procedure procedure = Procedure.builder().label("  procedure1  ").build();
 
-    DocumentUnit documentUnitFromFrontend =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnitFromFrontend =
+        DocumentationUnit.builder()
             .uuid(docUnitDTO.getId())
             .documentNumber(docUnitDTO.getDocumentNumber())
             .coreData(
@@ -243,11 +248,11 @@ class ProcedureIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
-        .bodyValue(documentUnitFromFrontend)
+        .bodyValue(documentationUnitFromFrontend)
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().coreData().procedure())
@@ -274,8 +279,8 @@ class ProcedureIntegrationTest {
   void testProcedureLabelWithTrailingSpaces_shouldSaveProcedureWithoutTrailingSpaces() {
     Procedure procedure = Procedure.builder().label("  procedure1  ").build();
 
-    DocumentUnit documentUnitFromFrontend =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnitFromFrontend =
+        DocumentationUnit.builder()
             .uuid(docUnitDTO.getId())
             .documentNumber(docUnitDTO.getDocumentNumber())
             .coreData(
@@ -286,11 +291,11 @@ class ProcedureIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
-        .bodyValue(documentUnitFromFrontend)
+        .bodyValue(documentationUnitFromFrontend)
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().coreData().procedure())
@@ -318,8 +323,8 @@ class ProcedureIntegrationTest {
     Procedure procedure3 = Procedure.builder().label("baz").build();
 
     // add first procedure
-    DocumentUnit documentUnitFromFrontend1 =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnitFromFrontend1 =
+        DocumentationUnit.builder()
             .uuid(docUnitDTO.getId())
             .documentNumber(docUnitDTO.getDocumentNumber())
             .coreData(
@@ -330,11 +335,11 @@ class ProcedureIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
-        .bodyValue(documentUnitFromFrontend1)
+        .bodyValue(documentationUnitFromFrontend1)
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().coreData().procedure().label())
@@ -346,8 +351,8 @@ class ProcedureIntegrationTest {
         .isNotNull();
 
     // add second procedure
-    DocumentUnit documentUnitFromFrontend2 =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnitFromFrontend2 =
+        DocumentationUnit.builder()
             .uuid(docUnitDTO.getId())
             .documentNumber(docUnitDTO.getDocumentNumber())
             .coreData(
@@ -358,11 +363,11 @@ class ProcedureIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
-        .bodyValue(documentUnitFromFrontend2)
+        .bodyValue(documentationUnitFromFrontend2)
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().coreData().procedure().label())
@@ -375,8 +380,8 @@ class ProcedureIntegrationTest {
         .isNotNull();
 
     // add third procedure
-    DocumentUnit documentUnitFromFrontend3 =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnitFromFrontend3 =
+        DocumentationUnit.builder()
             .uuid(docUnitDTO.getId())
             .documentNumber(docUnitDTO.getDocumentNumber())
             .coreData(
@@ -387,11 +392,11 @@ class ProcedureIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
-        .bodyValue(documentUnitFromFrontend3)
+        .bodyValue(documentationUnitFromFrontend3)
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().coreData().procedure().label())
@@ -417,7 +422,7 @@ class ProcedureIntegrationTest {
                       Objects.requireNonNull(response.getResponseBody())
                           .getContent()
                           .get(0)
-                          .documentUnitCount())
+                          .documentationUnitCount())
                   .isZero();
             });
 
@@ -451,7 +456,7 @@ class ProcedureIntegrationTest {
                       Objects.requireNonNull(response.getResponseBody())
                           .getContent()
                           .get(0)
-                          .documentUnitCount())
+                          .documentationUnitCount())
                   .isEqualTo(1);
             });
 
@@ -478,8 +483,8 @@ class ProcedureIntegrationTest {
     UUID procedureId = addProcedureToDocUnit("foo", docUnitDTO);
     addProcedureToDocUnit("bar", docUnitDTO);
 
-    DocumentUnit documentUnitFromFrontend1 =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnitFromFrontend1 =
+        DocumentationUnit.builder()
             .uuid(docUnitDTO.getId())
             .documentNumber(docUnitDTO.getDocumentNumber())
             .coreData(
@@ -493,11 +498,11 @@ class ProcedureIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
-        .bodyValue(documentUnitFromFrontend1)
+        .bodyValue(documentationUnitFromFrontend1)
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               CoreData coreData = response.getResponseBody().coreData();
@@ -510,8 +515,8 @@ class ProcedureIntegrationTest {
   void testAddProcedureWithSameNameToDifferentOffice() {
     Procedure procedure = Procedure.builder().label("testProcedure").build();
 
-    DocumentUnit documentUnitFromFrontend =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnitFromFrontend =
+        DocumentationUnit.builder()
             .uuid(docUnitDTO.getId())
             .documentNumber(docUnitDTO.getDocumentNumber())
             .coreData(
@@ -522,11 +527,11 @@ class ProcedureIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
-        .bodyValue(documentUnitFromFrontend)
+        .bodyValue(documentationUnitFromFrontend)
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody().coreData().procedure().label())
@@ -564,9 +569,9 @@ class ProcedureIntegrationTest {
   @Test
   void testSearch_withQuery_shouldReturnProceduresWithDateFirst() {
     DocumentationUnitDTO documentationUnitDTO2 =
-        documentUnitRepository.findByDocumentNumber("documentNumber2").get();
+        documentationUnitRepository.findByDocumentNumber("documentNumber2").get();
     DocumentationUnitDTO documentationUnitDTO3 =
-        documentUnitRepository.findByDocumentNumber("documentNumber3").get();
+        documentationUnitRepository.findByDocumentNumber("documentNumber3").get();
 
     addProcedureToDocUnit("with date", docUnitDTO);
 
@@ -581,7 +586,7 @@ class ProcedureIntegrationTest {
                 .documentationUnit(documentationUnitDTO2)
                 .procedure(procedureWithDateInPast)
                 .build()));
-    documentUnitRepository.save(documentationUnitDTO2);
+    documentationUnitRepository.save(documentationUnitDTO2);
 
     documentationUnitDTO3.setProcedures(
         List.of(
@@ -589,7 +594,7 @@ class ProcedureIntegrationTest {
                 .documentationUnit(documentationUnitDTO3)
                 .procedure(procedureWithoutDate)
                 .build()));
-    documentUnitRepository.save(documentationUnitDTO3);
+    documentationUnitRepository.save(documentationUnitDTO3);
 
     risWebTestClient
         .withDefaultLogin()
@@ -710,8 +715,8 @@ class ProcedureIntegrationTest {
     ProcedureDTO procedure =
         repository.findAllByLabelAndDocumentationOffice("testProcedure BGH", bghDocOfficeDTO).get();
 
-    DocumentUnit documentUnitFromFrontend1 =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnitFromFrontend1 =
+        DocumentationUnit.builder()
             .uuid(docUnitDTO.getId())
             .documentNumber(docUnitDTO.getDocumentNumber())
             .coreData(
@@ -725,11 +730,11 @@ class ProcedureIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
-        .bodyValue(documentUnitFromFrontend1)
+        .bodyValue(documentationUnitFromFrontend1)
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().coreData().procedure().label())
@@ -777,8 +782,8 @@ class ProcedureIntegrationTest {
 
   private UUID addProcedureToDocUnit(
       String procedureValue, DocumentationUnitDTO documentationUnitDTO) {
-    DocumentUnit documentUnitFromFrontend1 =
-        DocumentUnit.builder()
+    DocumentationUnit documentationUnitFromFrontend1 =
+        DocumentationUnit.builder()
             .uuid(documentationUnitDTO.getId())
             .documentNumber(documentationUnitDTO.getDocumentNumber())
             .coreData(
@@ -793,11 +798,11 @@ class ProcedureIntegrationTest {
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentationUnitDTO.getId())
-        .bodyValue(documentUnitFromFrontend1)
+        .bodyValue(documentationUnitFromFrontend1)
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentationUnit.class)
         .consumeWith(
             response -> {
               CoreData coreData = response.getResponseBody().coreData();

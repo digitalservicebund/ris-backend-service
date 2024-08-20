@@ -8,6 +8,7 @@ import { PublicationState } from "@/domain/publicationStatus"
 import { User } from "@/domain/user"
 import errorMessages from "@/i18n/errors.json"
 import { ResponseError } from "@/services/httpClient"
+import routes from "~/test-helper/routes"
 
 function renderComponent(options?: {
   documentUnitListEntries?: DocumentUnitListEntry[]
@@ -48,28 +49,7 @@ function renderComponent(options?: {
           }),
           createRouter({
             history: createWebHistory(),
-            routes: [
-              {
-                path: "/caselaw/documentUnit/:documentNumber/files",
-                name: "caselaw-documentUnit-documentNumber-files",
-                component: {},
-              },
-              {
-                path: "/caselaw/documentUnit/:documentNumber/categories",
-                name: "caselaw-documentUnit-documentNumber-categories",
-                component: {},
-              },
-              {
-                path: "/caselaw/documentUnit/:documentNumber/preview",
-                name: "caselaw-documentUnit-documentNumber-preview",
-                component: {},
-              },
-              {
-                path: "/",
-                name: "caselaw",
-                component: {},
-              },
-            ],
+            routes: routes,
           }),
         ],
       },

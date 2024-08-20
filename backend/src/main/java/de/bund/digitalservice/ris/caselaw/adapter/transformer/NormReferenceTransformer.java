@@ -58,7 +58,7 @@ public class NormReferenceTransformer {
 
     if (normReference.normAbbreviation() == null
         && normReference.normAbbreviationRawValue() == null) {
-      throw new DocumentUnitTransformerException(
+      throw new DocumentationUnitTransformerException(
           "Norm reference has no norm abbreviation, but is required.");
     }
 

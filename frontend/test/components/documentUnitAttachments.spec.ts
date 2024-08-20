@@ -5,6 +5,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitAttachments from "@/components/DocumentUnitAttachments.vue"
 import Attachment from "@/domain/attachment"
 import DocumentUnit from "@/domain/documentUnit"
+import routes from "~/test-helper/routes"
 
 function renderComponent(attachments?: Attachment[]) {
   // eslint-disable-next-line testing-library/await-async-events
@@ -12,33 +13,7 @@ function renderComponent(attachments?: Attachment[]) {
 
   const router = createRouter({
     history: createWebHistory(),
-    routes: [
-      {
-        path: "/caselaw/documentUnit/new",
-        name: "new",
-        component: {},
-      },
-      {
-        path: "/",
-        name: "home",
-        component: {},
-      },
-      {
-        path: "/caselaw/documentUnit/:documentNumber/categories",
-        name: "caselaw-documentUnit-documentNumber-categories",
-        component: {},
-      },
-      {
-        path: "/caselaw/documentUnit/:documentNumber/files",
-        name: "caselaw-documentUnit-documentNumber-files",
-        component: {},
-      },
-      {
-        path: "/caselaw/documentUnit/:documentNumber/handover",
-        name: "caselaw-documentUnit-documentNumber-handover",
-        component: {},
-      },
-    ],
+    routes: routes,
   })
   return {
     user,

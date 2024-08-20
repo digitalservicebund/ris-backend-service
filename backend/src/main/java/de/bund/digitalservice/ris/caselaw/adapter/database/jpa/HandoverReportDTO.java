@@ -23,7 +23,7 @@ public class HandoverReportDTO {
   @Id @GeneratedValue private UUID id;
 
   @Column(name = "document_unit_id")
-  private UUID documentUnitId;
+  private UUID documentationUnitId;
 
   private String content;
 

@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.converter.docx;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.bund.digitalservice.ris.caselaw.domain.docx.TableElement;
@@ -65,7 +65,24 @@ class DocxParagraphDocxConverterTest {
 
     var result = converter.convert(paragraph);
 
-    assertTrue(result.toHtmlString().contains("margin-left: " + expectedMarginLeft + ".0px"));
+    assertThat(result.toHtmlString()).contains("margin-left: " + expectedMarginLeft + ".0px");
+  }
+
+  @ParameterizedTest
+  @CsvSource({"5, 5, 0", "5, 1, 40", "5, 0, 40", "1500, 720, 80"})
+  void testConvert_withLeftAndHangingIndent(
+      BigInteger leftIndentation, BigInteger hangingIndentation, int expectedMarginLeft) {
+    P paragraph = new P();
+    PPr pPr = new PPr();
+    PPrBase.Ind ind = new PPrBase.Ind();
+    ind.setLeft(leftIndentation);
+    ind.setHanging(hangingIndentation);
+    pPr.setInd(ind);
+    paragraph.setPPr(pPr);
+
+    var result = converter.convert(paragraph);
+
+    assertThat(result.toHtmlString()).contains("margin-left: " + expectedMarginLeft + ".0px");
   }
 
   @Test
@@ -87,8 +104,8 @@ class DocxParagraphDocxConverterTest {
 
     var result = converter.convert(paragraph);
 
-    assertTrue(result.toHtmlString().contains("text"));
-    assertFalse(result.toHtmlString().contains("margin-left:"));
+    assertThat(result.toHtmlString()).contains("text");
+    assertThat(result.toHtmlString()).doesNotContain("margin-left:");
   }
 
   @Test

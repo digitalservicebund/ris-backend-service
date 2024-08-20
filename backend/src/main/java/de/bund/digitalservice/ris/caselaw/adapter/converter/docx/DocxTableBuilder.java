@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.converter.docx;
 
 import de.bund.digitalservice.ris.caselaw.domain.docx.BlockElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Border;
-import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentUnitDocx;
+import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentationUnitDocx;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ParagraphElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.RunTextElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.TableCellElement;
@@ -49,7 +49,7 @@ public class DocxTableBuilder extends DocxBuilder {
     return this;
   }
 
-  public DocumentUnitDocx build() {
+  public DocumentationUnitDocx build() {
     var tableElement = new TableElement(parseTable(table));
     addTableStyleProperties(tableElement);
     addTableProperties(tableElement);
@@ -550,7 +550,7 @@ public class DocxTableBuilder extends DocxBuilder {
       }
     }
 
-    List<DocumentUnitDocx> paragraphElements = new ArrayList<>();
+    List<DocumentationUnitDocx> paragraphElements = new ArrayList<>();
     tc.getContent()
         .forEach(
             element -> {

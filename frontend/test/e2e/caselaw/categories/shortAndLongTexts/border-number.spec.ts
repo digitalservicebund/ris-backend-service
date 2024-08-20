@@ -3,6 +3,7 @@ import {
   navigateToCategories,
   navigateToAttachments,
   uploadTestfile,
+  copyPasteAllTextFromAttachmentIntoEditor,
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 
@@ -44,7 +45,7 @@ test.describe(
       const secondReason = "Second reason"
       const thirdReason = "Third reason"
       const firstReasonHtml =
-        '<span style="color: rgb(0, 0, 0); font-size: 12pt">First </span><strong><span style="color: rgb(0, 0, 0); font-size: 12pt">reason</span></strong>'
+        '<span style="color: rgb(0, 0, 0); font-size: 12pt">First <strong>reason</strong></span>'
       // eslint-disable-next-line playwright/no-conditional-in-test
       const modifier = (await page.evaluate(() => navigator.platform))
         .toLowerCase()
@@ -70,37 +71,20 @@ test.describe(
         await expect(page.getByText(documentOrigin)).toBeVisible()
       })
 
+      const attachmentLocator = page
+        .getByText(documentOrigin)
+        .locator("..")
+        .locator("..")
+        .locator("..")
       const editor = page.locator("[data-testid='Gründe']")
       let inputFieldInnerText = await editor.innerText()
 
       await test.step("Copy border numbers (Randnummern) from side panel into reasons to have reference data", async () => {
-        // Selected all text from sidepanel
-        await page.getByText(documentOrigin).evaluate((element) => {
-          const originalFile =
-            element.parentElement?.parentElement?.parentElement
-
-          if (!originalFile) {
-            throw new Error("No original file available.")
-          }
-
-          const selection = window.getSelection()
-          const elementChildsLength = originalFile.childNodes.length
-          const range = document.createRange()
-          range.setStart(originalFile.childNodes[0], 0)
-          range.setEnd(originalFile.childNodes[elementChildsLength - 1], 0)
-          selection?.removeAllRanges()
-          selection?.addRange(range)
-        })
-
-        // copy from side panel to clipboard
-        await page.keyboard.press(`${modifier}+KeyC`)
-
-        // paste from clipboard into input field "Entscheidungsgründe"
-        await editor.click()
-        await page.keyboard.press(`${modifier}+KeyV`)
-        await page
-          .locator(`[aria-label='invisible-characters']:not([disabled])`)
-          .click()
+        await copyPasteAllTextFromAttachmentIntoEditor(
+          page,
+          attachmentLocator,
+          editor,
+        )
       })
 
       await checkAllBorderNumbersAreVisible()

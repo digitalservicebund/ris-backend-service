@@ -26,7 +26,7 @@ import org.xml.sax.SAXException;
 @Slf4j
 public class HandoverService {
 
-  private final DocumentUnitRepository repository;
+  private final DocumentationUnitRepository repository;
   private final HandoverReportRepository handoverReportRepository;
   private final MailService mailService;
   private final DeltaMigrationRepository deltaMigrationRepository;
@@ -35,7 +35,7 @@ public class HandoverService {
   private String recipientAddress;
 
   public HandoverService(
-      DocumentUnitRepository repository,
+      DocumentationUnitRepository repository,
       MailService mailService,
       DeltaMigrationRepository migrationService,
       HandoverReportRepository handoverReportRepository) {
@@ -49,21 +49,22 @@ public class HandoverService {
   /**
    * Handover a documentation unit to the email service.
    *
-   * @param documentUnitUuid the UUID of the documentation unit
+   * @param documentationUnitId the UUID of the documentation unit
    * @param issuerAddress the email address of the issuer
    * @return the handover result
    * @throws DocumentationUnitNotExistsException if the documentation unit does not exist
    */
-  public HandoverMail handoverAsMail(UUID documentUnitUuid, String issuerAddress)
+  public HandoverMail handoverAsMail(UUID documentationUnitId, String issuerAddress)
       throws DocumentationUnitNotExistsException {
-    DocumentUnit documentUnit =
+    DocumentationUnit documentationUnit =
         repository
-            .findByUuid(documentUnitUuid)
-            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnitUuid));
+            .findByUuid(documentationUnitId)
+            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentationUnitId));
 
-    HandoverMail handoverMail = mailService.handOver(documentUnit, recipientAddress, issuerAddress);
+    HandoverMail handoverMail =
+        mailService.handOver(documentationUnit, recipientAddress, issuerAddress);
     if (!handoverMail.success()) {
-      log.warn("Failed to send mail for documentation unit {}", documentUnitUuid);
+      log.warn("Failed to send mail for documentation unit {}", documentationUnitId);
     }
 
     return handoverMail;
@@ -77,11 +78,11 @@ public class HandoverService {
    */
   public XmlTransformationResult createPreviewXml(UUID documentUuid)
       throws DocumentationUnitNotExistsException {
-    DocumentUnit documentUnit =
+    DocumentationUnit documentationUnit =
         repository
             .findByUuid(documentUuid)
             .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUuid));
-    return mailService.getXmlPreview(documentUnit);
+    return mailService.getXmlPreview(documentationUnit);
   }
 
   /**
@@ -95,7 +96,7 @@ public class HandoverService {
     List<EventRecord> list =
         ListUtils.union(
             mailService.getHandoverResult(documentUuid),
-            handoverReportRepository.getAllByDocumentUnitUuid(documentUuid));
+            handoverReportRepository.getAllByDocumentationUnitUuid(documentUuid));
     var migration = deltaMigrationRepository.getLatestMigration(documentUuid);
     if (migration != null) {
       list.add(
@@ -119,8 +120,11 @@ public class HandoverService {
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
       transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 
+      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+      factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+      factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
       Node node =
-          DocumentBuilderFactory.newDefaultInstance()
+          factory
               .newDocumentBuilder()
               .parse(new ByteArrayInputStream(xml.getBytes()))
               .getDocumentElement();

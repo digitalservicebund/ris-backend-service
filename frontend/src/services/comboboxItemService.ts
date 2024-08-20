@@ -6,6 +6,7 @@ import { CitationType } from "@/domain/citationType"
 import { Court, Procedure, DocumentType } from "@/domain/documentUnit"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import { LegalForceType, LegalForceRegion } from "@/domain/legalForce"
+import LegalPeriodical from "@/domain/legalPeriodical"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import errorMessages from "@/i18n/errors.json"
 
@@ -18,6 +19,7 @@ enum Endpoint {
   procedures = `procedure`,
   legalForceRegions = `region/applicable`,
   legalForceTypes = `legalforcetype`,
+  legalPeriodicals = `legalperiodicals`,
 }
 
 function formatDropdownItems(
@@ -65,7 +67,7 @@ function formatDropdownItems(
           label: item.label,
           value: item,
           additionalInformation: `${
-            item.documentUnitCount ?? 0
+            item.documentationUnitCount ?? 0
           } Dokumentationseinheiten`,
         }),
       )
@@ -80,6 +82,13 @@ function formatDropdownItems(
       return (responseData as LegalForceRegion[]).map((item) => ({
         label: item.longText,
         value: item,
+      }))
+    }
+    case Endpoint.legalPeriodicals: {
+      return (responseData as LegalPeriodical[]).map((item) => ({
+        label: `${item.abbreviation} | ${item.title}`,
+        value: item,
+        additionalInformation: item.subtitle,
       }))
     }
   }
@@ -147,6 +156,8 @@ const service: ComboboxItemService = {
     await fetchFromEndpoint(Endpoint.legalForceTypes, filter),
   getLegalForceRegions: async (filter?: string) =>
     await fetchFromEndpoint(Endpoint.legalForceRegions, filter),
+  getLegalPeriodicals: async (filter?: string) =>
+    await fetchFromEndpoint(Endpoint.legalPeriodicals, filter),
 }
 
 export default service

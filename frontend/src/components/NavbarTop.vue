@@ -1,15 +1,18 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue"
+import { ref, computed, onMounted } from "vue"
 import { useRoute } from "vue-router"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import IconBadge from "@/components/IconBadge.vue"
+import FeatureToggleService from "@/services/featureToggleService"
 import useSessionStore from "@/stores/sessionStore"
 import IconPermIdentity from "~icons/ic/baseline-perm-identity"
 
 const route = useRoute()
 const session = useSessionStore()
 const fontColor = ref<string>()
+
+const featureToggle = ref()
 
 const badge = computed(() => {
   const docOffice = session.user?.documentationOffice
@@ -32,6 +35,12 @@ const badge = computed(() => {
     }
   }
 })
+
+onMounted(async () => {
+  featureToggle.value = (
+    await FeatureToggleService.isEnabled("neuris.legal_periodical_evaluation")
+  ).data
+})
 </script>
 
 <template>
@@ -53,8 +62,8 @@ const badge = computed(() => {
         class="ds-label-01-reg p-8 hover:bg-yellow-500 hover:underline"
         :class="{
           underline:
-            route.path.includes('caselaw') &&
-            !route.path.includes('procedures'),
+            route.path === '/caselaw' ||
+            route.path.includes('caselaw/documentunit'),
         }"
         data-testid="search-navbar-button"
         :to="{ name: 'caselaw' }"
@@ -65,6 +74,15 @@ const badge = computed(() => {
         :class="{ underline: route.path.includes('procedures') }"
         :to="{ name: 'caselaw-procedures' }"
         >Vorgänge
+      </router-link>
+      <router-link
+        v-if="featureToggle"
+        class="ds-label-01-reg p-8 hover:bg-yellow-500 hover:underline"
+        :class="{
+          underline: route.path.includes('legal-periodical-editions'),
+        }"
+        :to="{ name: 'caselaw-legal-periodical-editions' }"
+        >Periodika
       </router-link>
     </div>
 

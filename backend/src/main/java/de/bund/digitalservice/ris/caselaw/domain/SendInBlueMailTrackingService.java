@@ -12,10 +12,10 @@ import sibModel.GetEmailEventReportEvents.EventEnum;
 @Slf4j
 public class SendInBlueMailTrackingService implements MailTrackingService {
 
-  private final DocumentUnitService documentUnitService;
+  private final DocumentationUnitService documentationUnitService;
 
-  public SendInBlueMailTrackingService(DocumentUnitService documentUnitService) {
-    this.documentUnitService = documentUnitService;
+  public SendInBlueMailTrackingService(DocumentationUnitService documentationUnitService) {
+    this.documentationUnitService = documentationUnitService;
   }
 
   @Override
@@ -45,15 +45,17 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
    * Process updates on the email sending status reported by the email service and log errors if
    * necessary
    *
-   * @param payloadTag a tag provided by the email service that helps us to categorize the mail: If
-   *     the tag is a valid documentation unit UUID, the email was exporting this documentation
-   *     unit. Otherwise, the email was forwarding the process result of a documentation unit export
+   * @param documentationUnitUuid a tag provided by the email service that helps us to categorize
+   *     the mail: If the tag is a valid documentation unit UUID, the email was exporting this
+   *     documentation unit. Otherwise, the email was forwarding the process result of a
+   *     documentation unit export
    * @param event the event that occurred during the mail sending process, e.g. "delivered",
    * @return a response entity with status 200 if the event was processed successfully, 204 if the
    *     event could not be mapped
    */
   @Override
-  public ResponseEntity<String> processMailSendingState(String payloadTag, String event) {
+  public ResponseEntity<String> processMailSendingState(
+      String documentationUnitUuid, String event) {
 
     MailStatus state = mapEventToStatus(event);
     if (state == MailStatus.UNKNOWN) {
@@ -61,12 +63,13 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
     }
 
     if (state == MailStatus.ERROR) {
-      DocumentUnit documentUnit = documentUnitService.getByUuid(parseDocUnitUUID(payloadTag));
+      DocumentationUnit documentationUnit =
+          documentationUnitService.getByUuid(parseDocUnitUUID(documentationUnitUuid));
       log.error(
-          documentUnit == null
+          documentationUnit == null
               ? "Received Mail sending error for forwarded email. Event: {}, Tag {}"
               : "Failed to send Mail for documentation unit {} because of event {}",
-          payloadTag,
+          documentationUnitUuid,
           event);
     }
 

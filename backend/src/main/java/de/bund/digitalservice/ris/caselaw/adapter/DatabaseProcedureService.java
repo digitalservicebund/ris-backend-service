@@ -67,7 +67,7 @@ public class DatabaseProcedureService implements ProcedureService {
 
   @Override
   @Transactional
-  public List<DocumentationUnitListItem> getDocumentUnits(UUID procedureId) {
+  public List<DocumentationUnitListItem> getDocumentationUnits(UUID procedureId) {
     return repository
         .findById(procedureId)
         .map(

@@ -40,6 +40,13 @@ function renderComponent() {
         },
       },
       {
+        path: "/caselaw/documentUnit/:documentNumber/references",
+        name: "caselaw-documentUnit-documentNumber-references",
+        component: {
+          template: "<div data-testid='references'>References</div>",
+        },
+      },
+      {
         path: "/caselaw/documentUnit/:documentNumber/handover",
         name: "caselaw-documentUnit-documentNumber-handover",
         component: {

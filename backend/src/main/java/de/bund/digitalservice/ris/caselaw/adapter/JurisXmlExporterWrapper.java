@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporterException;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
@@ -21,15 +21,15 @@ public class JurisXmlExporterWrapper implements XmlExporter {
   /**
    * Generates juris XML from a documentation unit.
    *
-   * @param documentUnit the documentation unit
+   * @param documentationUnit the documentation unit
    * @return the XML export result that may be unsuccessful and may contain error messages
    * @throws ParserConfigurationException if the XML generation fails due to a configuration error
    * @throws TransformerException if the XML generation fails due to failed transformation
    */
   @Override
-  public XmlTransformationResult transformToXml(DocumentUnit documentUnit)
+  public XmlTransformationResult transformToXml(DocumentationUnit documentationUnit)
       throws ParserConfigurationException, TransformerException {
-    ResultObject resultObject = jurisXmlExporter.generateXml(documentUnit);
+    ResultObject resultObject = jurisXmlExporter.generateXml(documentationUnit);
     return new XmlTransformationResult(
         resultObject.xml(),
         resultObject.status().statusCode().equals("200"),
@@ -39,10 +39,11 @@ public class JurisXmlExporterWrapper implements XmlExporter {
   }
 
   @Override
-  public String generateEncryptedXMLString(DocumentUnit documentUnit) throws XmlExporterException {
+  public String generateEncryptedXMLString(DocumentationUnit documentationUnit)
+      throws XmlExporterException {
     String resultObject;
     try {
-      resultObject = jurisXmlExporter.generateEncryptedXMLString(documentUnit);
+      resultObject = jurisXmlExporter.generateEncryptedXMLString(documentationUnit);
     } catch (Exception e) {
       throw new XmlExporterException("Failed to generate encrypted XML string", e);
     }
