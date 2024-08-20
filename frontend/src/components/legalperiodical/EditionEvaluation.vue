@@ -248,22 +248,8 @@ onMounted(async () => {
             size="small"
             @click="search"
           />
-          <!-- <TextButton
-            aria-label="Abbrechen"
-            button-type="ghost"
-            label="Abbrechen"
-            size="small"
-            @click.stop="emit('cancelEdit')"
-          /> -->
         </div>
       </div>
-      <!-- <TextButton
-        aria-label="Eintrag löschen"
-        button-type="destructive"
-        label="Eintrag löschen"
-        size="small"
-        @click.stop="emit('removeEntry', true)"
-      /> -->
     </div>
   </div>
   <ErrorPage
