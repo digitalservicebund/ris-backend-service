@@ -17,6 +17,7 @@ function isReadOnly(item: { name: string }): boolean {
     case "reasons":
     case "caseFacts":
     case "decisionReasons":
+    case "otherLongText":
       return isExternalUser
     default:
       return false

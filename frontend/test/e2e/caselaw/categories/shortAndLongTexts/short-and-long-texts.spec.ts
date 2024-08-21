@@ -172,6 +172,13 @@ test.describe("short and long texts", () => {
         const inputFieldInnerHTML = await reasons.innerHTML()
         expect(inputFieldInnerHTML).toContain(readOnly)
       })
+
+      await test.step("Sonstiger Langtext ist readonly", async () => {
+        const otherLongText =
+          pageWithExternalUser.getByTestId("Sonstiger Langtext")
+        const inputFieldInnerHTML = await otherLongText.innerHTML()
+        expect(inputFieldInnerHTML).toContain(readOnly)
+      })
     },
   )
 
@@ -212,6 +219,12 @@ test.describe("short and long texts", () => {
       await test.step("Gründe sind bearbeitbar", async () => {
         const reasons = page.getByTestId("Gründe")
         const inputFieldInnerHTML = await reasons.innerHTML()
+        expect(inputFieldInnerHTML).toContain(editable)
+      })
+
+      await test.step("Sonstiger Langtext ist bearbeitbar", async () => {
+        const otherLongText = page.getByTestId("Sonstiger Langtext")
+        const inputFieldInnerHTML = await otherLongText.innerHTML()
         expect(inputFieldInnerHTML).toContain(editable)
       })
     },
