@@ -7,7 +7,7 @@ import {
 import { caselawTest as test } from "./fixtures"
 
 test.describe(
-  "periodical evaluation",
+  "Periodical evaluation",
   {
     tag: "@RISDEV-4264",
     annotation: {

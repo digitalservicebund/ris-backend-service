@@ -131,6 +131,12 @@ async function validateRequiredInput() {
 }
 
 async function addReference(decision: RelatedDocumentation) {
+  reference.value = new Reference({
+    ...decision,
+    legalPeriodical: legalPeriodical.value as LegalPeriodical,
+    citation: reference.value.citation,
+    referenceSupplement: reference.value.referenceSupplement,
+  })
   await validateRequiredInput()
   if (
     !validationStore.getByMessage("Kein valides Datum").length &&
@@ -139,19 +145,9 @@ async function addReference(decision: RelatedDocumentation) {
       .length &&
     !validationStore.getByMessage("Pflichtfeld nicht befüllt").length
   ) {
-    console.log("in emit")
-    emit(
-      "update:modelValue",
-      new Reference({
-        ...decision,
-        legalPeriodical: legalPeriodical.value as LegalPeriodical,
-        citation: reference.value.citation,
-        referenceSupplement: reference.value.referenceSupplement,
-      }),
-    )
+    emit("update:modelValue", reference.value as Reference)
     emit("addEntry")
   }
-  console.log("not in emit")
 }
 </script>
 

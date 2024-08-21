@@ -49,9 +49,10 @@ export default class Reference
   }
 
   get missingRequiredFields() {
-    return Reference.requiredFields.filter((field) =>
-      this.fieldIsEmpty(this[field]),
-    )
+    return Reference.requiredFields.filter((field) => {
+      console.log(field, this.fieldIsEmpty(this[field]))
+      return this.fieldIsEmpty(this[field])
+    })
   }
 
   get id() {
