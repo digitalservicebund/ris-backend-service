@@ -11,6 +11,7 @@ import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
+import LegalPeriodical from "@/domain/legalPeriodical"
 import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -129,7 +130,7 @@ async function validateRequiredInput() {
   }
 }
 
-async function addReference() {
+async function addReference(decision: RelatedDocumentation) {
   await validateRequiredInput()
   if (
     !validationStore.getByMessage("Kein valides Datum").length &&
@@ -138,9 +139,19 @@ async function addReference() {
       .length &&
     !validationStore.getByMessage("Pflichtfeld nicht befüllt").length
   ) {
-    emit("update:modelValue", reference.value as Reference)
+    console.log("in emit")
+    emit(
+      "update:modelValue",
+      new Reference({
+        ...decision,
+        legalPeriodical: legalPeriodical.value as LegalPeriodical,
+        citation: reference.value.citation,
+        referenceSupplement: reference.value.referenceSupplement,
+      }),
+    )
     emit("addEntry")
   }
+  console.log("not in emit")
 }
 </script>
 

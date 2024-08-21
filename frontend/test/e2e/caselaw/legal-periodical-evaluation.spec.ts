@@ -2,12 +2,12 @@ import { expect } from "@playwright/test"
 import {
   fillInput,
   waitForInputValue,
-  navigateToLegalPeriodicalEvaluation,
+  navigateToPeriodicalEvaluation,
 } from "./e2e-utils"
 import { caselawTest as test } from "./fixtures"
 
 test.describe(
-  "references",
+  "periodical evaluation",
   {
     tag: "@RISDEV-4264",
     annotation: {
@@ -18,7 +18,7 @@ test.describe(
   },
   () => {
     test(
-      "Reference overview with a list of editions",
+      "Periodicals overview with a list of editions",
       {
         annotation: {
           type: "story",
@@ -28,7 +28,7 @@ test.describe(
       },
       async ({ page }) => {
         await test.step("References is a new selectable menu item in the top navigation", async () => {
-          await navigateToLegalPeriodicalEvaluation(page)
+          await navigateToPeriodicalEvaluation(page)
         })
 
         await test.step("A periodical can be selected using a combo box.", async () => {
@@ -66,13 +66,13 @@ test.describe(
       },
       async ({ page }) => {
         await test.step("A new evaluation is started using the “Neue Periodikaauswertung” button.", async () => {
-          await navigateToLegalPeriodicalEvaluation(page)
+          await navigateToPeriodicalEvaluation(page)
           await expect(
             page.getByLabel("Neue Periodikaauswertung"),
           ).toBeVisible()
           await page.getByLabel("Neue Periodikaauswertung").click()
 
-          await expect(page).toHaveURL(/legal-periodical-editions\/new/)
+          await expect(page).toHaveURL(/periodical-evaluation\/new/)
         })
 
         await test.step("A legal periodical can be selected", async () => {
@@ -98,7 +98,7 @@ test.describe(
         await test.step("'Auswertung starten' saved the edition and replaces url with new edition id", async () => {
           await page.getByLabel("Auswertung starten").click()
           await expect(page).toHaveURL(
-            /\/caselaw\/legal-periodical-editions\/[0-9a-fA-F\-]{36}/,
+            /\/caselaw\/periodical-evaluation\/[0-9a-fA-F\-]{36}/,
           )
         })
       },
