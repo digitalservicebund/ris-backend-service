@@ -1,3 +1,4 @@
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
@@ -26,7 +27,16 @@ async function renderComponent() {
   return router.isReady().then(() => ({
     user,
     ...render(EditionEvaluation, {
-      global: { plugins: [router] },
+      global: {
+        plugins: [
+          router,
+          [
+            createTestingPinia({
+              stubActions: false,
+            }),
+          ],
+        ],
+      },
     }),
   }))
 }

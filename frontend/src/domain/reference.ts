@@ -1,7 +1,11 @@
 import EditableListItem from "./editableListItem"
+import RelatedDocumentation from "./relatedDocumentation"
 import LegalPeriodical from "@/domain/legalPeriodical"
 
-export default class Reference implements EditableListItem {
+export default class Reference
+  extends RelatedDocumentation
+  implements EditableListItem
+{
   public uuid?: string
   citation?: string
   referenceSupplement?: string
@@ -14,9 +18,14 @@ export default class Reference implements EditableListItem {
     "legalPeriodical",
     "citation",
     "referenceSupplement",
+    "court",
+    "fileNumber",
+    "decisionDate",
+    "documentType",
   ] as const
 
   constructor(data: Partial<Reference> = {}) {
+    super()
     Object.assign(this, data)
     if (this.uuid == undefined) {
       this.uuid = crypto.randomUUID()
