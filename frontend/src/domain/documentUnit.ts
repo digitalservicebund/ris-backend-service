@@ -65,10 +65,12 @@ export type Texts = {
   headline?: string
   guidingPrinciple?: string
   headnote?: string
+  otherHeadnote?: string
   tenor?: string
   reasons?: string
   caseFacts?: string
   decisionReasons?: string
+  otherLongText?: string
 }
 
 export default class DocumentUnit {

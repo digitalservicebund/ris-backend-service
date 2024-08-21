@@ -20,8 +20,14 @@ export const texts = [
   defineTextEntry("headline", "Titelzeile", TextAreaInput, "small"),
   defineTextEntry("guidingPrinciple", "Leitsatz", TextAreaInput),
   defineTextEntry("headnote", "Orientierungssatz", TextAreaInput),
+  defineTextEntry(
+    "otherHeadnote",
+    "Sonstiger Orientierungssatz",
+    TextAreaInput,
+  ),
   defineTextEntry("tenor", "Tenor", TextAreaInput),
   defineTextEntry("reasons", "Gründe", TextAreaInput),
   defineTextEntry("caseFacts", "Tatbestand", TextAreaInput),
   defineTextEntry("decisionReasons", "Entscheidungsgründe", TextAreaInput),
+  defineTextEntry("otherLongText", "Sonstiger Langtext", TextAreaInput),
 ]

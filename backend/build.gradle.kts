@@ -13,7 +13,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.6"
     id("com.diffplug.spotless") version "6.25.0"
     id("org.sonarqube") version "5.1.0.4882"
-    id("com.github.jk1.dependency-license-report") version "2.8"
+    id("com.github.jk1.dependency-license-report") version "2.9"
     id("com.gorylenko.gradle-git-properties") version "2.4.2"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
@@ -152,7 +152,7 @@ dependencies {
     implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.3.1")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.3.2")
 
     // CVE-2024-22262
     implementation("org.springframework:spring-web:6.1.12")
@@ -160,7 +160,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.3")
 
     // CVE-2024-26308
-    implementation("org.apache.commons:commons-compress:1.27.0")
+    implementation("org.apache.commons:commons-compress:1.27.1")
     // CVE-2022-3171
     implementation("com.google.protobuf:protobuf-java:4.27.3")
     // CVE-2023-52428 in spring-boot-starter-oauth2-client:3.2.3
@@ -174,7 +174,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.1")
 
-    implementation(platform("software.amazon.awssdk:bom:2.27.5"))
+    implementation(platform("software.amazon.awssdk:bom:2.27.9"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -186,7 +186,7 @@ dependencies {
     implementation("com.icegreen:greenmail:2.1.0-rc-1")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.51") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.55") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
@@ -194,9 +194,9 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.14")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.18")
     // for local development:
-    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.8.jar"))
+    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.17.jar"))
 
     implementation("com.fasterxml.jackson.core:jackson-core:2.17.2")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2")
@@ -213,7 +213,7 @@ dependencies {
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
     // => CVE-2023-2976
-    implementation("com.google.guava:guava:33.2.1-jre")
+    implementation("com.google.guava:guava:33.3.0-jre")
 
     implementation("io.getunleash:unleash-client-java:9.2.4")
     implementation("org.apache.commons:commons-text:1.12.0")
@@ -231,7 +231,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.6.9")
-    testImplementation("org.springframework.security:spring-security-test:6.3.1")
+    testImplementation("org.springframework.security:spring-security-test:6.3.2")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.3.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")

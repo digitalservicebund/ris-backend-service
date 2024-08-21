@@ -1,4 +1,4 @@
-import { expect, Page } from "@playwright/test"
+import { expect, Locator, Page } from "@playwright/test"
 import { caselawTest as test } from "./fixtures"
 import { DocumentUnitCatagoriesEnum } from "@/components/enumDocumentUnitCatagories"
 import SingleNorm from "@/domain/singleNorm"
@@ -68,6 +68,15 @@ export const navigateToReferences = async (
 
     await page.goto(baseUrl)
     await expect(page.getByText("Periodikum")).toBeVisible()
+  })
+}
+
+export const navigateToLegalPeriodicalEvaluation = async (page: Page) => {
+  await test.step("Navigate to 'Periodika'", async () => {
+    const baseUrl = `/caselaw/legal-periodical-editions`
+
+    await page.goto(baseUrl)
+    await expect(page.getByRole("heading", { name: "Periodika" })).toBeVisible()
   })
 }
 
@@ -533,4 +542,44 @@ export async function fillActiveCitationInputs(
       values.documentType,
     )
   }
+}
+
+export async function copyPasteAllTextFromAttachmentIntoEditor(
+  page: Page,
+  attachmentLocator: Locator,
+  editor: Locator,
+): Promise<void> {
+  await expect(attachmentLocator).toBeVisible()
+  await attachmentLocator.evaluate((element) => {
+    if (!element) {
+      throw new Error("No original file available.")
+    }
+    const selection = window.getSelection()
+    const elementChildsLength = element.childNodes.length
+    const range = document.createRange()
+    range.setStart(element.childNodes[0], 0)
+    range.setEnd(element.childNodes[elementChildsLength - 1], 0)
+    selection?.removeAllRanges()
+    selection?.addRange(range)
+  })
+
+  const modifier = await getModifier(page)
+
+  // copy from side panel to clipboard
+  await page.keyboard.press(`${modifier}+KeyC`)
+
+  // paste from clipboard into input field
+  await editor.click()
+  await page.keyboard.press(`${modifier}+KeyV`)
+  await page
+    .locator(`[aria-label='invisible-characters']:not([disabled])`)
+    .click()
+}
+
+export async function getModifier(page: Page): Promise<string> {
+  return (await page.evaluate(() => navigator.platform))
+    .toLowerCase()
+    .includes("mac")
+    ? "Meta"
+    : "Control"
 }
