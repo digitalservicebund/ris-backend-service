@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
-import DropdownInput from "@/components/input/DropdownInput.vue"
-import InputField from "@/components/input/InputField.vue"
 import { Procedure } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { UserGroup } from "@/domain/userGroup"
@@ -32,18 +30,6 @@ const isLoading = computed(
 </script>
 
 <template>
-  <InputField
-    id="emptyDropdown"
-    v-slot="{ id }"
-    label="Zugewiesene Benutzer:innen"
-  >
-    <DropdownInput
-      :id="id"
-      aria-label="dropdown input"
-      :items="userGroups.map(({ name, id }) => ({ label: name, value: id }))"
-      placeholder="Benutzer:innen zuweisen"
-    />
-  </InputField>
   <div
     v-if="procedure.documentationUnitCount > 0"
     class="pb-12 pl-24 pr-48 pt-36"

@@ -54,7 +54,8 @@ public class DatabaseDocumentationOfficeUserGroupService
     var userGroupsToBeDeleted =
         documentationOfficeUserGroups.stream().filter(this::groupIsNotInConfig).toList();
     if (!userGroupsToBeDeleted.isEmpty()) {
-      LOGGER.info("Deleting doc office user groups: {}", groupsToString(userGroupsToBeDeleted));
+      String groupsString = groupsToString(userGroupsToBeDeleted);
+      LOGGER.info("Deleting doc office user groups: {}", groupsString);
       this.repository.deleteAll(userGroupsToBeDeleted);
     }
 
@@ -64,7 +65,8 @@ public class DatabaseDocumentationOfficeUserGroupService
             .map(groupFromConfig -> transformToDTO(groupFromConfig, docOffices))
             .toList();
     if (!userGroupsToBeCreated.isEmpty()) {
-      LOGGER.info("Creating new doc office user groups: {}", groupsToString(userGroupsToBeCreated));
+      String groupsString = groupsToString(userGroupsToBeCreated);
+      LOGGER.info("Creating new doc office user groups: {}", groupsString);
       this.repository.saveAll(userGroupsToBeCreated);
     }
 

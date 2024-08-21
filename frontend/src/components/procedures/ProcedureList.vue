@@ -3,6 +3,7 @@ import dayjs from "dayjs"
 import { ref, onMounted, watch, computed } from "vue"
 import ProcedureDetail from "./ProcedureDetail.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
+import DropdownInput from "@/components/input/DropdownInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
@@ -93,6 +94,12 @@ async function handleIsExpanded(
       (item) => item !== index,
     )
   }
+}
+
+async function handleAssignUserGroup(procedureId: string, userGroupId: string) {
+  const { error } = await service.assignUserGroup(procedureId, userGroupId)
+  // Todo: What to do on error?
+  console.log(error)
 }
 
 async function handleDeleteDocumentationUnit(
@@ -227,6 +234,21 @@ onMounted(() => {
                   </span>
                 </div>
               </div>
+              <DropdownInput
+                v-model="procedure.userGroupId"
+                aria-label="dropdown input"
+                class="w-1/3"
+                :items="
+                  userGroups.map(({ userGroupPathName, id }) => ({
+                    label: userGroupPathName,
+                    value: id,
+                  }))
+                "
+                placeholder="Benutzer:innen zuweisen"
+                @update:model-value="
+                  (value: string) => handleAssignUserGroup(procedure.id, value)
+                "
+              />
               <span class="mr-24"
                 >erstellt am
                 {{ dayjs(procedure.createdAt).format("DD.MM.YYYY") }}</span

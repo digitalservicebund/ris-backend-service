@@ -13,6 +13,10 @@ interface ProcedureService {
   getDocumentUnits(
     procedureId: string | undefined,
   ): Promise<ServiceResponse<DocumentUnitListEntry[]>>
+  assignUserGroup(
+    procedureId: string,
+    userGroupId: string,
+  ): Promise<ServiceResponse<unknown>>
 }
 
 const service: ProcedureService = {
@@ -37,6 +41,17 @@ const service: ProcedureService = {
   async getDocumentUnits(procedureId: string | undefined) {
     const response = await httpClient.get<DocumentUnitListEntry[]>(
       `caselaw/procedure/${procedureId}/documentunits`,
+    )
+    if (response.status >= 300) {
+      response.error = {
+        title: errorMessages.DOCUMENT_UNIT_COULD_NOT_BE_LOADED.title,
+      }
+    }
+    return response
+  },
+  async assignUserGroup(procedureId: string, userGroupId: string) {
+    const response = await httpClient.put(
+      `caselaw/procedure/${procedureId}/assign/${userGroupId}`,
     )
     if (response.status >= 300) {
       response.error = {

@@ -1,11 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import java.util.Arrays;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroup;
 import java.util.List;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,16 +15,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/v1/caselaw/user-group")
 @Slf4j
 public class UserGroupController {
+  private final KeycloakUserService service;
 
-  public UserGroupController() {}
+  public UserGroupController(KeycloakUserService service) {
+    this.service = service;
+  }
 
-  /** Returns all users groups for the doc office of the current user */
+  /** Returns all user groups for the doc office of the current user */
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public List<Map<String, String>> getUserGroups() {
-    return Arrays.asList(
-        Map.of("id", "1", "name", "Extern/Miotke"),
-        Map.of("id", "2", "name", "Extern/Busenks"),
-        Map.of("id", "3", "name", "Intern"));
+  public List<DocumentationOfficeUserGroup> getUserGroups(
+      @AuthenticationPrincipal OidcUser oidcUser) {
+    return service.getUserGroups(oidcUser);
   }
 }
