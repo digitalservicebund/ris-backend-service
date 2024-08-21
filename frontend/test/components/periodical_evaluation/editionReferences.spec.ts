@@ -2,7 +2,7 @@ import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
-import EditionEvaluation from "@/components/legalperiodical/EditionEvaluation.vue"
+import EditionReferences from "@/components/periodical_evaluation/EditionReferences.vue"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import { ServiceResponse } from "@/services/httpClient"
@@ -19,14 +19,14 @@ async function renderComponent() {
 
   // Mock the route with a specific uuid before rendering
   await router.push({
-    name: "caselaw-legal-periodical-editions-uuid",
+    name: "caselaw-periodical-evaluation-uuid",
     params: { uuid: "123" },
   })
 
   // Wait for the router to be ready
   return router.isReady().then(() => ({
     user,
-    ...render(EditionEvaluation, {
+    ...render(EditionReferences, {
       global: {
         plugins: [
           router,

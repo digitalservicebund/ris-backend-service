@@ -25,8 +25,8 @@ const routes = [
     component: {},
   },
   {
-    path: "/caselaw/legal-periodical-editions/:uuid",
-    name: "caselaw-legal-periodical-editions-uuid",
+    path: "/caselaw/periodical-evaluation/:uuid",
+    name: "caselaw-periodical-evaluation-uuid",
     component: {},
   },
 ]

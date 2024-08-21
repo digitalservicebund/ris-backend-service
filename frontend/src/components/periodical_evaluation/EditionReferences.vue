@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from "vue"
-import EditionEvaluationReference from "./EditionEvaluationReferenceInput.vue"
-import EditionEvaluationReferenceSummary from "./EditionEvaluationReferenceSummary.vue"
+import EditionEvaluationReference from "./EditionReferenceInput.vue"
+import EditionEvaluationReferenceSummary from "./EditionReferenceSummary.vue"
 import EditableList from "@/components/EditableList.vue"
 import ErrorPage from "@/components/PageError.vue"
 import Reference from "@/domain/reference"
@@ -51,7 +51,7 @@ onMounted(async () => {
   <ErrorPage
     v-else
     back-button-label="Zurück zur Übersicht"
-    :back-router="{ name: 'caselaw-legal-periodical-editions' }"
+    :back-router="{ name: 'caselaw-periodical-evaluation' }"
     :error="responseError"
     :title="responseError?.title"
   />

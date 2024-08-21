@@ -79,9 +79,9 @@ onMounted(async () => {
         v-if="featureToggle"
         class="ds-label-01-reg p-8 hover:bg-yellow-500 hover:underline"
         :class="{
-          underline: route.path.includes('legal-periodical-editions'),
+          underline: route.path.includes('periodical-evaluation'),
         }"
-        :to="{ name: 'caselaw-legal-periodical-editions' }"
+        :to="{ name: 'caselaw-periodical-evaluation' }"
         >Periodika
       </router-link>
     </div>

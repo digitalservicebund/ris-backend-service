@@ -96,7 +96,7 @@ const legalPeriodical = computed({
         aria-label="Neue Periodikaauswertung"
         class="ds-button-02-reg"
         label="Neue Periodikaauswertung"
-        @click="router.push({ name: 'caselaw-legal-periodical-editions-new' })"
+        @click="router.push({ name: 'caselaw-periodical-evaluation-new' })"
       ></TextButton>
     </div>
     <div class="flex h-full flex-col space-y-24 bg-gray-100 px-16 py-16">
@@ -125,7 +125,7 @@ const legalPeriodical = computed({
           <router-link
             target="_blank"
             :to="{
-              name: 'caselaw-legal-periodical-editions-uuid',
+              name: 'caselaw-periodical-evaluation-uuid',
               params: { uuid: edition.id },
             }"
           >

@@ -75,7 +75,7 @@ async function saveEdition() {
 
     if (response.data)
       await router.replace({
-        name: "caselaw-legal-periodical-editions-uuid",
+        name: "caselaw-periodical-evaluation-uuid",
         params: { uuid: response.data.id },
       })
   }

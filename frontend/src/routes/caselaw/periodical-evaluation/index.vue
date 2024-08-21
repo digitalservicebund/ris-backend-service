@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import EditionList from "@/components/legalperiodical/EditionList.vue"
+import EditionList from "@/components/periodical_evaluation/EditionList.vue"
 </script>
 
 <template>
