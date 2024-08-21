@@ -1,3 +1,4 @@
+import dayjs from "dayjs"
 import EditableListItem from "./editableListItem"
 import RelatedDocumentation from "./relatedDocumentation"
 import LegalPeriodical from "@/domain/legalPeriodical"
@@ -33,15 +34,25 @@ export default class Reference
   }
 
   get renderDecision(): string {
-    const parts = [
+    const firstPart = [
       ...(this.legalPeriodical
         ? [this.legalPeriodical.abbreviation]
         : [this.legalPeriodicalRawValue]),
       ...(this.citation && this.referenceSupplement
         ? [`${this.citation} (${this.referenceSupplement})`]
         : [this.citation]),
-    ]
-    return parts.join(" ")
+    ].join(" ")
+
+    const secondPart = [
+      ...(this.court ? [`${this.court?.label}`] : []),
+      ...(this.decisionDate
+        ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
+        : []),
+      ...(this.fileNumber ? [this.fileNumber] : []),
+      ...(this.documentType?.label ? [this.documentType.label] : []),
+    ].join(", ")
+
+    return [firstPart, secondPart].filter(Boolean).join(" | ")
   }
 
   get hasMissingRequiredFields(): boolean {
@@ -49,10 +60,9 @@ export default class Reference
   }
 
   get missingRequiredFields() {
-    return Reference.requiredFields.filter((field) => {
-      console.log(field, this.fieldIsEmpty(this[field]))
-      return this.fieldIsEmpty(this[field])
-    })
+    return Reference.requiredFields.filter((field) =>
+      this.fieldIsEmpty(this[field]),
+    )
   }
 
   get id() {

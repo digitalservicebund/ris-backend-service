@@ -28,7 +28,7 @@ export const useReferenceStore = defineStore("referencesStore", () => {
   // async function updateEdition(): Promise<
   //   ServiceResponse<LegalPeriodicalEdition>
   // > {
-  //   // here comes the code to edit the edition infos
+  //   // here comes to save edited edition
   // }
 
   return {

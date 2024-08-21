@@ -133,18 +133,12 @@ async function validateRequiredInput() {
 async function addReference(decision: RelatedDocumentation) {
   reference.value = new Reference({
     ...decision,
-    legalPeriodical: legalPeriodical.value as LegalPeriodical,
+    legalPeriodical: legalPeriodical.value!.value as LegalPeriodical,
     citation: reference.value.citation,
     referenceSupplement: reference.value.referenceSupplement,
   })
   await validateRequiredInput()
-  if (
-    !validationStore.getByMessage("Kein valides Datum").length &&
-    !validationStore.getByMessage("Unvollständiges Datum").length &&
-    !validationStore.getByMessage("Das Datum darf nicht in der Zukunft liegen")
-      .length &&
-    !validationStore.getByMessage("Pflichtfeld nicht befüllt").length
-  ) {
+  if (!validationStore.getByMessage("Pflichtfeld nicht befüllt").length) {
     emit("update:modelValue", reference.value as Reference)
     emit("addEntry")
   }
@@ -226,6 +220,7 @@ async function addReference(decision: RelatedDocumentation) {
             clear-on-choosing-item
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getCourts"
+            :read-only="reference.hasForeignSource"
             @focus="validationStore.remove('court')"
           >
           </ComboboxInput>
@@ -246,6 +241,7 @@ async function addReference(decision: RelatedDocumentation) {
             aria-label="Entscheidungsdatum"
             class="ds-input-medium"
             :has-error="slotProps.hasError"
+            :read-only="reference.hasForeignSource"
             @focus="validationStore.remove('decisionDate')"
             @update:validation-error="slotProps.updateValidationError"
           ></DateInput>
@@ -263,6 +259,7 @@ async function addReference(decision: RelatedDocumentation) {
             v-model="reference.fileNumber"
             aria-label="Aktenzeichen Aktivzitierung"
             :has-error="slotProps.hasError"
+            :read-only="reference.hasForeignSource"
             size="medium"
             @focus="validationStore.remove('fileNumber')"
           ></TextInput>
@@ -273,6 +270,7 @@ async function addReference(decision: RelatedDocumentation) {
             v-model="reference.documentType"
             aria-label="Dokumenttyp Aktivzitierung"
             :item-service="ComboboxItemService.getDocumentTypes"
+            :read-only="reference.hasForeignSource"
           ></ComboboxInput>
         </InputField>
       </div>
@@ -289,16 +287,16 @@ async function addReference(decision: RelatedDocumentation) {
             size="small"
             @click="search"
           />
-          <!-- If no search results, we will need this button -->
-          <!-- <TextButton
+          <TextButton
+            v-if="!lastSavedModelValue.isEmpty"
             aria-label="Fundstelle vermerken"
             button-type="tertiary"
             data-testid="previous-decision-save-button"
             :disabled="reference.isEmpty"
-            label="Fundstelle vermerken"
+            label="Übernehmen"
             size="small"
             @click.stop="addReference"
-          /> -->
+          />
           <TextButton
             v-if="!lastSavedModelValue.isEmpty"
             aria-label="Abbrechen"

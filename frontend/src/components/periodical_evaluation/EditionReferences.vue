@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from "vue"
 import EditionEvaluationReference from "./EditionReferenceInput.vue"
-import EditionEvaluationReferenceSummary from "./EditionReferenceSummary.vue"
 import EditableList from "@/components/EditableList.vue"
 import ErrorPage from "@/components/PageError.vue"
+import ReferenceSummary from "@/components/ReferenceSummary.vue"
 import Reference from "@/domain/reference"
 import { ResponseError } from "@/services/httpClient"
 import { useReferenceStore } from "@/stores/referencesStore"
@@ -44,7 +44,7 @@ onMounted(async () => {
         v-model="references"
         :default-value="defaultValue"
         :edit-component="EditionEvaluationReference"
-        :summary-component="EditionEvaluationReferenceSummary"
+        :summary-component="ReferenceSummary"
       />
     </div>
   </div>
