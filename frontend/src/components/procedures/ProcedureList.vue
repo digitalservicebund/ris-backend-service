@@ -245,8 +245,9 @@ onMounted(() => {
                   }))
                 "
                 placeholder="Benutzer:innen zuweisen"
+                @click.stop
                 @update:model-value="
-                  (value: string) => handleAssignUserGroup(procedure.id, value)
+                  (value) => handleAssignUserGroup(procedure.id, value)
                 "
               />
               <span class="mr-24"
