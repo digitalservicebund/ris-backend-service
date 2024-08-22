@@ -219,7 +219,7 @@ onMounted(() => {
           </template>
 
           <template #header>
-            <div class="flex w-full justify-between">
+            <div class="flex w-full justify-between gap-24">
               <div class="flex flex-row items-center gap-16">
                 <IconFolderOpen />
                 <span class="ds-label-01-reg" :title="procedure.label">{{
@@ -237,7 +237,7 @@ onMounted(() => {
               <DropdownInput
                 v-model="procedure.userGroupId"
                 aria-label="dropdown input"
-                class="w-1/3"
+                class="ml-auto w-auto"
                 :items="
                   userGroups.map(({ userGroupPathName, id }) => ({
                     label: userGroupPathName,
@@ -250,7 +250,7 @@ onMounted(() => {
                   (value) => handleAssignUserGroup(procedure.id, value)
                 "
               />
-              <span class="mr-24"
+              <span class="mr-24 content-center"
                 >erstellt am
                 {{ dayjs(procedure.createdAt).format("DD.MM.YYYY") }}</span
               >
