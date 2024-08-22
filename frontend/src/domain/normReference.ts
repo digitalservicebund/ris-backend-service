@@ -7,7 +7,7 @@ export default class NormReference implements EditableListItem {
   public singleNorms?: SingleNorm[]
   public normAbbreviationRawValue?: string
   public hasForeignSource: boolean = false
-  public uuid?: string
+  // public uuid?: string
 
   static readonly requiredFields = ["normAbbreviation"] as const
   static readonly fields = [
@@ -17,21 +17,36 @@ export default class NormReference implements EditableListItem {
 
   constructor(data: Partial<NormReference> = {}) {
     Object.assign(this, data)
-    if (this.uuid == undefined) {
-      this.uuid = crypto.randomUUID()
-    }
+    // if (this.uuid == undefined) {
+    //   this.uuid = crypto.randomUUID()
+    // }
   }
 
   get id() {
-    return this.uuid
+    return this.normAbbreviation
+      ? this.normAbbreviation
+      : this.normAbbreviationRawValue
   }
 
   get hasAmbiguousNormReference(): boolean {
     return !this.normAbbreviation && !!this.normAbbreviationRawValue
   }
 
+  // equals(entry: NormReference): boolean {
+  //   return this.id === entry.id
+  // }
+
   equals(entry: NormReference): boolean {
-    return this.id === entry.id
+    let isEquals = false
+    if (this.normAbbreviation) {
+      isEquals = entry.normAbbreviation
+        ? this.normAbbreviation?.abbreviation ==
+          entry.normAbbreviation.abbreviation
+        : false
+    } else if (this.normAbbreviationRawValue) {
+      isEquals = this.normAbbreviationRawValue == entry.normAbbreviationRawValue
+    }
+    return isEquals
   }
 
   get renderDecision(): string {
