@@ -153,7 +153,11 @@ describe("Norm references", () => {
   it("deletes norm reference", async () => {
     const { user } = renderComponent([
       generateNormReference(),
-      generateNormReference(),
+      generateNormReference({
+        normAbbreviation: {
+          abbreviation: "1000g-BefV",
+        },
+      }),
     ])
 
     const norms = screen.getAllByLabelText("Listen Eintrag")
