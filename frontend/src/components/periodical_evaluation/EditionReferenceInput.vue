@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue"
+import { ref, computed, watch } from "vue"
 import { ValidationError } from "../input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
@@ -131,18 +131,25 @@ async function validateRequiredInput() {
 }
 
 async function addReference(decision: RelatedDocumentation) {
-  reference.value = new Reference({
-    ...decision,
-    legalPeriodical: legalPeriodical.value!.value as LegalPeriodical,
-    citation: reference.value.citation,
-    referenceSupplement: reference.value.referenceSupplement,
-  })
   await validateRequiredInput()
   if (!validationStore.getByMessage("Pflichtfeld nicht befüllt").length) {
-    emit("update:modelValue", reference.value as Reference)
+    // Merge the decision from search with the current reference input values
+    emit(
+      "update:modelValue",
+      new Reference({
+        ...reference.value,
+        ...decision,
+      }),
+    )
     emit("addEntry")
   }
 }
+
+watch(legalPeriodical, () => {
+  reference.value = new Reference({
+    legalPeriodical: legalPeriodical.value?.value as LegalPeriodical,
+  })
+})
 </script>
 
 <template>
