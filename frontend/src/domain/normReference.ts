@@ -17,9 +17,6 @@ export default class NormReference implements EditableListItem {
 
   constructor(data: Partial<NormReference> = {}) {
     Object.assign(this, data)
-    // if (this.uuid == undefined) {
-    //   this.uuid = crypto.randomUUID()
-    // }
   }
 
   get id() {
@@ -31,10 +28,6 @@ export default class NormReference implements EditableListItem {
   get hasAmbiguousNormReference(): boolean {
     return !this.normAbbreviation && !!this.normAbbreviationRawValue
   }
-
-  // equals(entry: NormReference): boolean {
-  //   return this.id === entry.id
-  // }
 
   equals(entry: NormReference): boolean {
     if (entry.isEmpty) return true
