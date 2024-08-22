@@ -4,11 +4,14 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ApiKeyDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ApiKeyTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ApiKey;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.ImportApiKeyException;
@@ -32,17 +35,20 @@ public class AuthService {
 
   private final UserService userService;
   private final DocumentationUnitService documentationUnitService;
+  private final ProcedureService procedureService;
   private final DatabaseApiKeyRepository keyRepository;
   private final DatabaseDocumentationOfficeRepository officeRepository;
 
   public AuthService(
       UserService userService,
       DocumentationUnitService documentationUnitService,
+      ProcedureService procedureService,
       DatabaseApiKeyRepository keyRepository,
       DatabaseDocumentationOfficeRepository officeRepository) {
 
     this.userService = userService;
     this.documentationUnitService = documentationUnitService;
+    this.procedureService = procedureService;
     this.keyRepository = keyRepository;
     this.officeRepository = officeRepository;
   }
@@ -60,6 +66,20 @@ public class AuthService {
     return uuid ->
         Optional.ofNullable(documentationUnitService.getByUuid(uuid))
             .map(this::userHasReadAccess)
+            .orElse(false);
+  }
+
+  @Bean
+  public Function<OidcUser, Boolean> userIsInternal() {
+    // Todo: use role "Internal" when we have a test user.
+    return oidcUser -> oidcUser.getClaimAsStringList("roles").contains("offline_access");
+  }
+
+  @Bean
+  public Function<UUID, Boolean> userHasWriteAccessByProcedureId() {
+    return uuid ->
+        Optional.ofNullable(procedureService.getByUUID(uuid))
+            .map(this::userHasSameDocOfficeAsProcedure)
             .orElse(false);
   }
 
@@ -86,6 +106,17 @@ public class AuthService {
     if (authentication != null && authentication.getPrincipal() instanceof OidcUser principal) {
       DocumentationOffice documentationOffice = userService.getDocumentationOffice(principal);
       return documentationUnit.coreData().documentationOffice().equals(documentationOffice);
+    }
+    return false;
+  }
+
+  private boolean userHasSameDocOfficeAsProcedure(ProcedureDTO procedure) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication != null && authentication.getPrincipal() instanceof OidcUser principal) {
+      DocumentationOffice documentationOfficeOfUser = userService.getDocumentationOffice(principal);
+      DocumentationOffice documentationOffice =
+          DocumentationOfficeTransformer.transformToDomain(procedure.getDocumentationOffice());
+      return documentationOffice.equals(documentationOfficeOfUser);
     }
     return false;
   }

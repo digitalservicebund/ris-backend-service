@@ -18,7 +18,6 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -97,7 +96,7 @@ public class DatabaseProcedureService implements ProcedureService {
   }
 
   @Override
-  public void assignUserGroup(OidcUser oidcUser, UUID procedureUUID, UUID userGroupId) {
+  public String assignUserGroup(UUID procedureUUID, UUID userGroupId) {
     Optional<ProcedureDTO> procedureDTO = repository.findById(procedureUUID);
     Optional<DocumentationOfficeUserGroupDTO> userGroupDTO =
         userGroupRepository.findById(userGroupId);
@@ -112,6 +111,31 @@ public class DatabaseProcedureService implements ProcedureService {
     ProcedureDTO result = procedureDTO.get();
     result.setDocumentationOfficeUserGroupDTO(userGroupDTO.get());
     repository.save(result);
+    return "Vorgang '"
+        + procedureDTO.get().getLabel()
+        + "' wurde Nutzergruppe '"
+        + userGroupDTO.get().getUserGroupPathName()
+        + "' zugewiesen.";
+  }
+
+  @Override
+  public String unassignUserGroup(UUID procedureUUID) {
+    Optional<ProcedureDTO> procedureDTO = repository.findById(procedureUUID);
+
+    if (procedureDTO.isEmpty()) {
+      throw new IllegalArgumentException(
+          "User group couldn't be assigned as procedure is missing in the data base.");
+    }
+
+    ProcedureDTO result = procedureDTO.get();
+    result.setDocumentationOfficeUserGroupDTO(null);
+    repository.save(result);
+    return "Die Zuweisung aus Vorgang '" + procedureDTO.get().getLabel() + "' wurde entfernt.";
+  }
+
+  @Override
+  public ProcedureDTO getByUUID(UUID procedureId) {
+    return repository.findById(procedureId).orElse(null);
   }
 
   @Override

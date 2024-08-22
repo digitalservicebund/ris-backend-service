@@ -1,11 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 public interface ProcedureService {
   Slice<Procedure> search(
@@ -16,7 +16,11 @@ public interface ProcedureService {
 
   List<DocumentationUnitListItem> getDocumentationUnits(UUID procedureid);
 
-  void assignUserGroup(OidcUser oidcUser, UUID procedureUUID, UUID userGroupId);
+  ProcedureDTO getByUUID(UUID uuid);
+
+  String assignUserGroup(UUID procedureUUID, UUID userGroupId);
+
+  String unassignUserGroup(UUID procedureUUID);
 
   void delete(UUID procedureId);
 }

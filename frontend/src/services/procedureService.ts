@@ -17,6 +17,7 @@ interface ProcedureService {
     procedureId: string,
     userGroupId: string,
   ): Promise<ServiceResponse<unknown>>
+  unassignUserGroup(procedureId: string): Promise<ServiceResponse<unknown>>
 }
 
 const service: ProcedureService = {
@@ -55,7 +56,18 @@ const service: ProcedureService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: errorMessages.DOCUMENT_UNIT_COULD_NOT_BE_LOADED.title,
+        title: errorMessages.PROCEDURE_COULD_NOT_BE_ASSIGNED.title,
+      }
+    }
+    return response
+  },
+  async unassignUserGroup(procedureId: string) {
+    const response = await httpClient.put(
+      `caselaw/procedure/${procedureId}/unassign`,
+    )
+    if (response.status >= 300) {
+      response.error = {
+        title: errorMessages.PROCEDURE_COULD_NOT_BE_UNASSIGNED.title,
       }
     }
     return response

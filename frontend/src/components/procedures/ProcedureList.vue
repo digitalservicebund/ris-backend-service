@@ -12,6 +12,7 @@ import { Procedure } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { UserGroup } from "@/domain/userGroup"
 import documentationUnitService from "@/services/documentUnitService"
+import { ResponseError } from "@/services/httpClient"
 import service from "@/services/procedureService"
 import userGroupsService from "@/services/userGroupsService"
 import IconBaselineDescription from "~icons/ic/baseline-description"
@@ -97,9 +98,18 @@ async function handleIsExpanded(
 }
 
 async function handleAssignUserGroup(procedureId: string, userGroupId: string) {
-  const { error } = await service.assignUserGroup(procedureId, userGroupId)
-  // Todo: What to do on error?
-  console.log(error)
+  let errorResponse: ResponseError | undefined
+  if (userGroupId) {
+    const { error } = await service.assignUserGroup(procedureId, userGroupId)
+    errorResponse = error
+  } else {
+    const { error } = await service.unassignUserGroup(procedureId)
+    errorResponse = error
+  }
+  if (errorResponse) {
+    // Todo: Design input needed
+    alert(errorResponse.title)
+  }
 }
 
 async function handleDeleteDocumentationUnit(
@@ -122,6 +132,15 @@ async function handleDeleteDocumentationUnit(
         documentationUnit.uuid != deletedDocumentationUnit.uuid,
     )
   }
+}
+
+const getDropdownItems = (userGroups: UserGroup[]) => {
+  const dropdownItems = userGroups.map(({ userGroupPathName, id }) => ({
+    label: userGroupPathName,
+    value: id,
+  }))
+  dropdownItems.push({ label: "Nicht zugewiesen", value: "" })
+  return dropdownItems
 }
 
 /**
@@ -238,16 +257,10 @@ onMounted(() => {
                 v-model="procedure.userGroupId"
                 aria-label="dropdown input"
                 class="ml-auto w-auto"
-                :items="
-                  userGroups.map(({ userGroupPathName, id }) => ({
-                    label: userGroupPathName,
-                    value: id,
-                  }))
-                "
-                placeholder="Benutzer:innen zuweisen"
+                :items="getDropdownItems(userGroups)"
                 @click.stop
                 @update:model-value="
-                  (value) => handleAssignUserGroup(procedure.id, value)
+                  (value: string) => handleAssignUserGroup(procedure.id, value)
                 "
               />
               <span class="mr-24 content-center"
