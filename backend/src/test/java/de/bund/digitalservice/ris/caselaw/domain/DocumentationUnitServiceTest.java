@@ -269,7 +269,10 @@ class DocumentationUnitServiceTest {
 
     // Call the service method
     service.searchLinkableDocumentationUnits(
-        relatedDocumentationUnit, documentationOffice, documentNumberToExclude, pageRequest);
+        relatedDocumentationUnit,
+        documentationOffice,
+        Optional.of(documentNumberToExclude),
+        pageRequest);
 
     // Capture the relatedDocumentationUnit argument
     verify(repository)

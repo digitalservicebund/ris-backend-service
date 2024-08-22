@@ -1,7 +1,12 @@
+import dayjs from "dayjs"
 import EditableListItem from "./editableListItem"
+import RelatedDocumentation from "./relatedDocumentation"
 import LegalPeriodical from "@/domain/legalPeriodical"
 
-export default class Reference implements EditableListItem {
+export default class Reference
+  extends RelatedDocumentation
+  implements EditableListItem
+{
   public uuid?: string
   citation?: string
   referenceSupplement?: string
@@ -14,9 +19,14 @@ export default class Reference implements EditableListItem {
     "legalPeriodical",
     "citation",
     "referenceSupplement",
+    "court",
+    "fileNumber",
+    "decisionDate",
+    "documentType",
   ] as const
 
   constructor(data: Partial<Reference> = {}) {
+    super()
     Object.assign(this, data)
     if (this.uuid == undefined) {
       this.uuid = crypto.randomUUID()
@@ -24,15 +34,25 @@ export default class Reference implements EditableListItem {
   }
 
   get renderDecision(): string {
-    const parts = [
+    const firstPart = [
       ...(this.legalPeriodical
         ? [this.legalPeriodical.abbreviation]
         : [this.legalPeriodicalRawValue]),
       ...(this.citation && this.referenceSupplement
         ? [`${this.citation} (${this.referenceSupplement})`]
         : [this.citation]),
-    ]
-    return parts.join(" ")
+    ].join(" ")
+
+    const secondPart = [
+      ...(this.court ? [`${this.court?.label}`] : []),
+      ...(this.decisionDate
+        ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
+        : []),
+      ...(this.fileNumber ? [this.fileNumber] : []),
+      ...(this.documentType?.label ? [this.documentType.label] : []),
+    ].join(", ")
+
+    return [firstPart, secondPart].filter(Boolean).join(" | ")
   }
 
   get hasMissingRequiredFields(): boolean {

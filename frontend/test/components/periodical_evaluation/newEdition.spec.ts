@@ -2,7 +2,7 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import { ComboboxItem } from "@/components/input/types"
-import NewEditionEvaluation from "@/components/legalperiodical/NewEditionEvaluation.vue"
+import NewEdition from "@/components/periodical_evaluation/NewEdition.vue"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import comboboxItemService from "@/services/comboboxItemService"
@@ -18,7 +18,7 @@ function renderComponent() {
   })
   return {
     user,
-    ...render(NewEditionEvaluation, {
+    ...render(NewEdition, {
       global: { plugins: [router] },
     }),
   }

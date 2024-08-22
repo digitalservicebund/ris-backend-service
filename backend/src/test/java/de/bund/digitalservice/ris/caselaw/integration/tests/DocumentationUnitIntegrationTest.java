@@ -688,8 +688,8 @@ class DocumentationUnitIntegrationTest {
         .put()
         .uri(
             "/api/v1/caselaw/documentunits/"
-                + documentNumberToExclude
-                + "/search-linkable-documentation-units?pg=0&sz=20")
+                + "search-linkable-documentation-units?pg=0&sz=20&documentNumber="
+                + documentNumberToExclude)
         .bodyValue(proceedingDecision)
         .exchange()
         .expectStatus()
@@ -713,8 +713,8 @@ class DocumentationUnitIntegrationTest {
         .put()
         .uri(
             "/api/v1/caselaw/documentunits/"
-                + documentNumberToExclude
-                + "/search-linkable-documentation-units?pg=0&sz=20")
+                + "search-linkable-documentation-units?pg=0&sz=20&documentNumber="
+                + documentNumberToExclude)
         .bodyValue(proceedingDecision)
         .exchange()
         .expectStatus()

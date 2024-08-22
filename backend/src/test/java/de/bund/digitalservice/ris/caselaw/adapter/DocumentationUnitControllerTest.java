@@ -418,14 +418,14 @@ class DocumentationUnitControllerTest {
     PageRequest pageRequest = PageRequest.of(0, 10);
 
     when(service.searchLinkableDocumentationUnits(
-            linkedDocumentationUnit, docOffice, "KORE0000000000", pageRequest))
+            linkedDocumentationUnit, docOffice, Optional.of("KORE0000000000"), pageRequest))
         .thenReturn(new PageImpl<>(List.of(), pageRequest, 0));
 
     risWebClient
         .withDefaultLogin()
         .put()
         .uri(
-            "/api/v1/caselaw/documentunits/KORE0000000000/search-linkable-documentation-units?pg=0&sz=10")
+            "/api/v1/caselaw/documentunits/search-linkable-documentation-units?pg=0&sz=10&documentNumber=KORE0000000000")
         .contentType(MediaType.APPLICATION_JSON)
         .bodyValue(linkedDocumentationUnit)
         .exchange()
@@ -434,7 +434,7 @@ class DocumentationUnitControllerTest {
 
     verify(service)
         .searchLinkableDocumentationUnits(
-            linkedDocumentationUnit, docOffice, "KORE0000000000", pageRequest);
+            linkedDocumentationUnit, docOffice, Optional.of("KORE0000000000"), pageRequest);
   }
 
   @Test

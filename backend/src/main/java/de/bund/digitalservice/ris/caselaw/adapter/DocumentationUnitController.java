@@ -302,13 +302,13 @@ public class DocumentationUnitController {
   }
 
   @PutMapping(
-      value = "/{documentNumberToExclude}/search-linkable-documentation-units",
+      value = "/search-linkable-documentation-units",
       produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public Slice<RelatedDocumentationUnit> searchLinkableDocumentationUnits(
-      @PathVariable("documentNumberToExclude") String documentNumberToExclude,
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
+      @RequestParam(value = "documentNumber") Optional<String> documentNumberToExclude,
       @RequestBody RelatedDocumentationUnit relatedDocumentationUnit,
       @AuthenticationPrincipal OidcUser oidcUser) {
 
