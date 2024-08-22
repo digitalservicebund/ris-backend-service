@@ -37,6 +37,7 @@ export default class NormReference implements EditableListItem {
   // }
 
   equals(entry: NormReference): boolean {
+    if (entry.isEmpty) return true
     let isEquals = false
     if (this.normAbbreviation) {
       isEquals = entry.normAbbreviation
