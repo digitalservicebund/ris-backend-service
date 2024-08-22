@@ -64,6 +64,14 @@ const suffix = computed({
   },
 })
 
+const citation = computed(() =>
+  [
+    ...(prefix.value ? [prefix.value] : []),
+    ...(reference.value.citation ? [reference.value.citation] : []),
+    ...(suffix.value ? [suffix.value] : []),
+  ].join(" "),
+)
+
 function updateDateFormatValidation(
   validationError: ValidationError | undefined,
 ) {
@@ -140,6 +148,7 @@ async function addReference(decision: RelatedDocumentation) {
       new Reference({
         ...reference.value,
         ...decision,
+        citation: citation.value,
       }),
     )
     emit("addEntry")
