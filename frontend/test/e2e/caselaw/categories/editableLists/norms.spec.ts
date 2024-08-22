@@ -482,10 +482,16 @@ test.describe("norm", () => {
 
     await normContainer.getByTestId("list-entry-0").click()
 
-    await expect(page.locator("text=Mit Gesetzeskraft")).toBeVisible()
+    await expect(normContainer.locator("text=Mit Gesetzeskraft")).toBeVisible()
+    await expect(
+      normContainer.locator("[aria-label='Einzelnorm der Norm']"),
+    ).toHaveValue("§ 1")
+
+    await expect(
+      normContainer.locator("[aria-label='RIS-Abkürzung']"),
+    ).toHaveValue("BGB")
 
     await expect(page.locator("text=PBefG, § 123")).toBeHidden()
-    await expect(page.locator("text=BGB, § 1")).toBeVisible()
     await expect(page.locator("text=KBErrG, § 8")).toBeVisible()
   })
 })
