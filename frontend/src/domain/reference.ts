@@ -1,4 +1,5 @@
 import dayjs from "dayjs"
+import DocumentUnit from "./documentUnit"
 import EditableListItem from "./editableListItem"
 import RelatedDocumentation from "./relatedDocumentation"
 import LegalPeriodical from "@/domain/legalPeriodical"
@@ -7,12 +8,13 @@ export default class Reference
   extends RelatedDocumentation
   implements EditableListItem
 {
-  public uuid?: string
+  id?: string
   citation?: string
   referenceSupplement?: string
   footnote?: string
   legalPeriodical?: LegalPeriodical
   legalPeriodicalRawValue?: string
+  documentationUnit?: DocumentUnit
 
   static readonly requiredFields = ["legalPeriodical", "citation"] as const
   static readonly fields = [
@@ -44,12 +46,22 @@ export default class Reference
     ].join(" ")
 
     const secondPart = [
-      ...(this.court ? [`${this.court?.label}`] : []),
-      ...(this.decisionDate
-        ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
+      ...(this.documentationUnit && this.documentationUnit.coreData.court
+        ? [this.documentationUnit.coreData.court.label]
         : []),
-      ...(this.fileNumber ? [this.fileNumber] : []),
-      ...(this.documentType?.label ? [this.documentType.label] : []),
+      ...(this.documentationUnit && this.documentationUnit.coreData.decisionDate
+        ? [
+            dayjs(this.documentationUnit.coreData.decisionDate).format(
+              "DD.MM.YYYY",
+            ),
+          ]
+        : []),
+      ...(this.documentationUnit && this.documentationUnit.coreData.fileNumbers
+        ? [this.documentationUnit.coreData.fileNumbers[0]]
+        : []),
+      ...(this.documentationUnit && this.documentationUnit.coreData.documentType
+        ? [this.documentationUnit.coreData.documentType.label]
+        : []),
     ].join(", ")
 
     return [firstPart, secondPart].filter(Boolean).join(" | ")
@@ -63,10 +75,6 @@ export default class Reference
     return Reference.requiredFields.filter((field) =>
       this.fieldIsEmpty(this[field]),
     )
-  }
-
-  get id() {
-    return this.uuid
   }
 
   equals(entry: Reference): boolean {

@@ -11,11 +11,12 @@ import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
+import DocumentUnit from "@/domain/documentUnit"
 import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
-import { useReferenceStore } from "@/stores/referencesStore"
+import { useEditionStore } from "@/stores/editionStore"
 
 const props = defineProps<{
   modelValue?: Reference
@@ -28,7 +29,7 @@ const emit = defineEmits<{
   cancelEdit: [void]
   removeEntry: [value: Reference]
 }>()
-const store = useReferenceStore()
+const store = useEditionStore()
 const lastSearchInput = ref(new Reference())
 const lastSavedModelValue = ref(new Reference({ ...props.modelValue }))
 const reference = ref(new Reference({ ...props.modelValue }))
@@ -139,16 +140,19 @@ async function validateRequiredInput() {
 }
 
 async function addReference(decision: RelatedDocumentation) {
-  console.log(reference.value)
   await validateRequiredInput()
   if (!validationStore.getByMessage("Pflichtfeld nicht befüllt").length) {
     // Merge the decision from search with the current reference input values
     emit(
       "update:modelValue",
       new Reference({
-        ...reference.value,
-        ...decision,
+        id: reference.value.uuid,
         citation: citation.value,
+        referenceSupplement: reference.value.referenceSupplement,
+        footnote: reference.value.footnote,
+        legalPeriodical: reference.value.legalPeriodical,
+        legalPeriodicalRawValue: reference.value.legalPeriodicalRawValue,
+        documentationUnit: new DocumentUnit(decision.uuid as string),
       }),
     )
     emit("addEntry")
@@ -362,3 +366,4 @@ watch(
     </div>
   </div>
 </template>
+@/stores/editionStore

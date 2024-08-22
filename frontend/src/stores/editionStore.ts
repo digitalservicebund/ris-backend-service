@@ -6,7 +6,7 @@ import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import { ServiceResponse } from "@/services/httpClient"
 import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 
-export const useReferenceStore = defineStore("referencesStore", () => {
+export const useEditionStore = defineStore("editionStore", () => {
   const edition = ref<LegalPeriodicalEdition | undefined>(undefined)
   const route = useRoute()
 
@@ -25,14 +25,19 @@ export const useReferenceStore = defineStore("referencesStore", () => {
     return response
   }
 
-  // async function updateEdition(): Promise<
-  //   ServiceResponse<LegalPeriodicalEdition>
-  // > {
-  //   // here comes to save edited edition
-  // }
+  async function updateEdition(): Promise<
+    ServiceResponse<LegalPeriodicalEdition>
+  > {
+    const response = await LegalPeriodicalEditionService.save(
+      edition.value as LegalPeriodicalEdition,
+    )
+
+    return response
+  }
 
   return {
     edition,
     loadEdition,
+    updateEdition,
   }
 })
