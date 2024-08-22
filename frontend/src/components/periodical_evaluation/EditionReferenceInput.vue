@@ -176,7 +176,12 @@ watch(
       <div class="flex flex-col gap-24">
         <div class="flex justify-between gap-24">
           <div class="flex-1">
-            <InputField id="citation" label="Zitatstelle *">
+            <InputField
+              id="citation"
+              v-slot="slotProps"
+              label="Zitatstelle *"
+              :validation-error="validationStore.getByField('citation')"
+            >
               <div class="flex flex-row gap-4">
                 <TextInput
                   id="citation prefix"
@@ -188,7 +193,9 @@ watch(
                   id="citation"
                   v-model="reference.citation"
                   aria-label="Zitatstelle *"
+                  :has-error="slotProps.hasError"
                   size="medium"
+                  @focus="validationStore.remove('citation')"
                 ></TextInput>
                 <TextInput
                   id="citation suffix"
@@ -225,7 +232,7 @@ watch(
         <InputField
           id="courtInput"
           v-slot="slotProps"
-          label="Gericht *"
+          label="Gericht"
           :validation-error="validationStore.getByField('court')"
         >
           <ComboboxInput
@@ -243,7 +250,7 @@ watch(
         <InputField
           id="decisionDate"
           v-slot="slotProps"
-          label="Entscheidungsdatum *"
+          label="Entscheidungsdatum"
           :validation-error="validationStore.getByField('decisionDate')"
           @update:validation-error="
             (validationError: any) =>
@@ -266,7 +273,7 @@ watch(
         <InputField
           id="activeCitationFileNumber"
           v-slot="slotProps"
-          label="Aktenzeichen *"
+          label="Aktenzeichen"
           :validation-error="validationStore.getByField('fileNumber')"
         >
           <TextInput
