@@ -11,7 +11,6 @@ import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
-import LegalPeriodical from "@/domain/legalPeriodical"
 import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -125,12 +124,14 @@ async function validateRequiredInput() {
   validationStore.reset()
   if (reference.value.missingRequiredFields?.length) {
     reference.value.missingRequiredFields.forEach((missingField) => {
+      console.log(missingField)
       validationStore.add("Pflichtfeld nicht befüllt", missingField)
     })
   }
 }
 
 async function addReference(decision: RelatedDocumentation) {
+  console.log(reference.value)
   await validateRequiredInput()
   if (!validationStore.getByMessage("Pflichtfeld nicht befüllt").length) {
     // Merge the decision from search with the current reference input values
@@ -145,11 +146,18 @@ async function addReference(decision: RelatedDocumentation) {
   }
 }
 
-watch(legalPeriodical, () => {
-  reference.value = new Reference({
-    legalPeriodical: legalPeriodical.value?.value as LegalPeriodical,
-  })
-})
+watch(
+  () => store.edition?.legalPeriodical,
+  (legalPeriodical) => {
+    if (legalPeriodical) {
+      reference.value = new Reference({
+        ...props.modelValue,
+        legalPeriodical: legalPeriodical,
+      })
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
