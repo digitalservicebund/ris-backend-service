@@ -21,7 +21,7 @@ export default class NormReference implements EditableListItem {
 
   get id() {
     return this.normAbbreviation
-      ? this.normAbbreviation
+      ? this.normAbbreviation.id
       : this.normAbbreviationRawValue
   }
 
