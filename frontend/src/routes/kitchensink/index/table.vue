@@ -1,0 +1,56 @@
+<script setup lang="ts">
+import { ref } from "vue"
+import CellHeaderItem from "@/components/CellHeaderItem.vue"
+import CellItem from "@/components/CellItem.vue"
+import SearchResultStatus from "@/components/SearchResultStatus.vue"
+import TableHeader from "@/components/TableHeader.vue"
+import TableRow from "@/components/TableRow.vue"
+import TableView from "@/components/TableView.vue"
+import errorMessages from "@/i18n/errors.json"
+import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
+import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
+import { ResponseError } from "@/services/httpClient"
+
+const data = [
+  {
+    name: "Lea",
+    date: new Date().toDateString(),
+  },
+  { name: "Roy", date: new Date(8.64e15).toDateString() },
+]
+const searchResponseError = ref<ResponseError>(
+  errorMessages.SEARCH_RESULTS_NOT_FOUND,
+)
+</script>
+
+<template>
+  <KitchensinkPage name="Table">
+    <KitchensinkStory name="">
+      <TableView class="w-full">
+        <TableHeader>
+          <CellHeaderItem>Name</CellHeaderItem>
+          <CellHeaderItem>Datum</CellHeaderItem>
+        </TableHeader>
+        <TableRow v-for="item in data" :key="item.name">
+          <CellItem>{{ item.name }}</CellItem>
+          <CellItem>{{ item.date }}</CellItem>
+        </TableRow>
+      </TableView>
+    </KitchensinkStory>
+
+    <KitchensinkStory name="No search result">
+      <div class="flex h-full flex-col bg-white">
+        <TableView class="w-full">
+          <TableHeader>
+            <CellHeaderItem>Name</CellHeaderItem>
+            <CellHeaderItem>Datum</CellHeaderItem>
+          </TableHeader>
+          <TableRow />
+        </TableView>
+        <SearchResultStatus
+          :response-error="searchResponseError"
+        ></SearchResultStatus>
+      </div>
+    </KitchensinkStory>
+  </KitchensinkPage>
+</template>
