@@ -32,6 +32,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataIn
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
+import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -95,6 +96,7 @@ class YearOfDisputeIntegrationTest {
   @MockBean private AttachmentService attachmentService;
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private HandoverService handoverService;
+  @MockBean private ProcedureService procedureService;
 
   @MockBean
   private DocumentationUnitDocxMetadataInitializationService

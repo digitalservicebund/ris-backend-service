@@ -7,6 +7,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeUserGroupDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitListItemTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcedureTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -134,8 +135,11 @@ public class DatabaseProcedureService implements ProcedureService {
   }
 
   @Override
-  public ProcedureDTO getByUUID(UUID procedureId) {
-    return repository.findById(procedureId).orElse(null);
+  public DocumentationOffice getDocumentationOfficeByUUID(UUID procedureId) {
+    Optional<ProcedureDTO> procedureDTO = repository.findById(procedureId);
+    return procedureDTO
+        .map(dto -> DocumentationOfficeTransformer.transformToDomain(dto.getDocumentationOffice()))
+        .orElse(null);
   }
 
   @Override

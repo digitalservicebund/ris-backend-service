@@ -23,6 +23,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalRepository;
+import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.Arrays;
@@ -81,6 +82,7 @@ class LegalPeriodicalEditionIntegrationTest {
   @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private DocumentationUnitService service;
   @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  @MockBean private ProcedureService procedureService;
 
   private static final UUID TEST_UUID = UUID.randomUUID();
   private final String EDITION_ENDPOINT = "/api/v1/caselaw/legalperiodicaledition";

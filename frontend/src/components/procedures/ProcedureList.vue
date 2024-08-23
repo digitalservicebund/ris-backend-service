@@ -44,7 +44,7 @@ async function updateProcedures(page: number, queries?: Query<string>) {
 }
 
 /**
- * Get all user groups for the current user
+ * Get all external user groups for the current user
  */
 async function getUserGroups() {
   const response = await userGroupsService.get()
@@ -99,17 +99,19 @@ async function handleIsExpanded(
   }
 }
 
-async function handleAssignUserGroup(procedureId: string, userGroupId: string) {
+async function handleAssignUserGroup(
+  procedureId: string | undefined,
+  userGroupId: string | undefined,
+) {
   let errorResponse: ResponseError | undefined
-  if (userGroupId) {
+  if (procedureId && userGroupId) {
     const { error } = await service.assignUserGroup(procedureId, userGroupId)
     errorResponse = error
-  } else {
+  } else if (procedureId) {
     const { error } = await service.unassignUserGroup(procedureId)
     errorResponse = error
   }
   if (errorResponse) {
-    // Todo: Design input needed
     alert(errorResponse.title)
   }
 }
@@ -136,8 +138,8 @@ async function handleDeleteDocumentationUnit(
   }
 }
 
-const getDropdownItems = (userGroups: UserGroup[]) => {
-  const dropdownItems = userGroups.map(({ userGroupPathName, id }) => ({
+const getDropdownItems = () => {
+  const dropdownItems = userGroups.value.map(({ userGroupPathName, id }) => ({
     label: userGroupPathName,
     value: id,
   }))
@@ -265,10 +267,11 @@ onMounted(async () => {
                 v-model="procedure.userGroupId"
                 aria-label="dropdown input"
                 class="ml-auto w-auto"
-                :items="getDropdownItems(userGroups)"
+                :items="getDropdownItems()"
                 @click.stop
                 @update:model-value="
-                  (value: string) => handleAssignUserGroup(procedure.id, value)
+                  (value: string | undefined) =>
+                    handleAssignUserGroup(procedure.id, value)
                 "
               />
               <span class="mr-24 content-center"
@@ -281,7 +284,6 @@ onMounted(async () => {
           <ProcedureDetail
             :procedure="procedure"
             :response-error="responseError"
-            :user-groups="userGroups"
             @delete-document-unit="handleDeleteDocumentationUnit"
           />
         </ExpandableContent>

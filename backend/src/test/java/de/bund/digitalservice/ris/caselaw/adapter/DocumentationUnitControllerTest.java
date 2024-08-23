@@ -33,6 +33,7 @@ import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
@@ -67,6 +68,7 @@ class DocumentationUnitControllerTest {
   @Autowired private RisWebTestClient risWebClient;
   @MockBean private DocumentationUnitService service;
   @MockBean private DocumentationUnitDocxMetadataInitializationService docUnitAttachmentService;
+  @MockBean private ProcedureService procedureService;
   @MockBean private HandoverService handoverService;
   @MockBean private KeycloakUserService userService;
   @MockBean private DocxConverterService docxConverterService;

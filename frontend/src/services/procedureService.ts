@@ -56,7 +56,12 @@ const service: ProcedureService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: errorMessages.PROCEDURE_COULD_NOT_BE_ASSIGNED.title,
+        title:
+          response.status == 403
+            ? errorMessages.NOT_ALLOWED.title +
+              ". " +
+              errorMessages.PROCEDURE_COULD_NOT_BE_ASSIGNED.title
+            : errorMessages.PROCEDURE_COULD_NOT_BE_ASSIGNED.title,
       }
     }
     return response
@@ -67,7 +72,12 @@ const service: ProcedureService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: errorMessages.PROCEDURE_COULD_NOT_BE_UNASSIGNED.title,
+        title:
+          response.status == 403
+            ? errorMessages.NOT_ALLOWED.title +
+              ". " +
+              errorMessages.PROCEDURE_COULD_NOT_BE_ASSIGNED.title
+            : errorMessages.PROCEDURE_COULD_NOT_BE_UNASSIGNED.title,
       }
     }
     return response

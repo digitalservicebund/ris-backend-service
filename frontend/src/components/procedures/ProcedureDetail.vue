@@ -3,12 +3,10 @@ import { computed } from "vue"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import { Procedure } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
-import { UserGroup } from "@/domain/userGroup"
 import { ResponseError } from "@/services/httpClient"
 
 const props = defineProps<{
   procedure: Procedure
-  userGroups: UserGroup[]
   responseError?: ResponseError
 }>()
 

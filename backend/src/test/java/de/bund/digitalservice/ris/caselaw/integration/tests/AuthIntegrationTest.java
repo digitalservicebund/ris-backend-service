@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
@@ -55,6 +56,7 @@ class AuthIntegrationTest {
   @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean DocumentationUnitService documentationUnitService;
   @MockBean DocumentationOfficeUserGroupService documentationOfficeUserGroupService;
+  @MockBean private ProcedureService procedureService;
 
   @BeforeEach
   public void beforeEach() {

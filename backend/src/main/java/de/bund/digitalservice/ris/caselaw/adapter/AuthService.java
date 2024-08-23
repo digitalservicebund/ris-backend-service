@@ -4,9 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ApiKeyDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ApiKeyTransformer;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ApiKey;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
@@ -77,7 +75,7 @@ public class AuthService {
   @Bean
   public Function<UUID, Boolean> userHasWriteAccessByProcedureId() {
     return uuid ->
-        Optional.ofNullable(procedureService.getByUUID(uuid))
+        Optional.ofNullable(procedureService.getDocumentationOfficeByUUID(uuid))
             .map(this::userHasSameDocOfficeAsProcedure)
             .orElse(false);
   }
@@ -109,12 +107,10 @@ public class AuthService {
     return false;
   }
 
-  private boolean userHasSameDocOfficeAsProcedure(ProcedureDTO procedure) {
+  private boolean userHasSameDocOfficeAsProcedure(DocumentationOffice documentationOffice) {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     if (authentication != null && authentication.getPrincipal() instanceof OidcUser principal) {
       DocumentationOffice documentationOfficeOfUser = userService.getDocumentationOffice(principal);
-      DocumentationOffice documentationOffice =
-          DocumentationOfficeTransformer.transformToDomain(procedure.getDocumentationOffice());
       return documentationOffice.equals(documentationOfficeOfUser);
     }
     return false;

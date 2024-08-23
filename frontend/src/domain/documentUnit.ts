@@ -53,12 +53,12 @@ export type Court = {
 }
 
 export type Procedure = {
-  id: string
+  id?: string
   label: string
   documentationUnitCount: number
   createdAt: string
   documentUnits?: DocumentUnitListEntry[]
-  userGroupId: string
+  userGroupId?: string
 }
 
 export type Texts = {

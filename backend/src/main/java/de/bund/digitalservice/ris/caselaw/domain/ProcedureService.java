@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,7 +15,7 @@ public interface ProcedureService {
 
   List<DocumentationUnitListItem> getDocumentationUnits(UUID procedureid);
 
-  ProcedureDTO getByUUID(UUID uuid);
+  DocumentationOffice getDocumentationOfficeByUUID(UUID uuid);
 
   String assignUserGroup(UUID procedureUUID, UUID userGroupId);
 
