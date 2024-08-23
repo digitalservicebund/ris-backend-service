@@ -9,7 +9,7 @@ import org.flywaydb.gradle.task.FlywayMigrateTask
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.3.2"
+    id("org.springframework.boot") version "3.3.3"
     id("io.spring.dependency-management") version "1.1.6"
     id("com.diffplug.spotless") version "6.25.0"
     id("org.sonarqube") version "5.1.0.4882"
@@ -19,7 +19,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.51.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "10.17.1"
+    id("org.flywaydb.flyway") version "10.17.2"
 }
 
 group = "de.bund.digitalservice"
@@ -168,13 +168,13 @@ dependencies {
     // CVE-2023-31582
     implementation("org.bitbucket.b_c:jose4j:0.9.6")
 
-    implementation("org.postgresql:postgresql:42.7.3")
+    implementation("org.postgresql:postgresql:42.7.4")
 
     implementation("com.sendinblue:sib-api-v3-sdk:7.0.0")
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.1")
 
-    implementation(platform("software.amazon.awssdk:bom:2.27.10"))
+    implementation(platform("software.amazon.awssdk:bom:2.27.11"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -219,10 +219,10 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.12.0")
     implementation("org.jsoup:jsoup:1.18.1")
 
-    val flywayCore = "org.flywaydb:flyway-core:10.17.1"
+    val flywayCore = "org.flywaydb:flyway-core:10.17.2"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.17.1")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.17.2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
