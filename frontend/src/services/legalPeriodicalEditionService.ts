@@ -1,5 +1,5 @@
 import { UUID } from "crypto"
-import httpClient, { ServiceResponse } from "./httpClient"
+import httpClient, { ResponseError, ServiceResponse } from "./httpClient"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import errorMessages from "@/i18n/errors.json"
 
@@ -29,6 +29,7 @@ const service: LegalPeriodicalEditionService = {
           errorMessages.LEGAL_PERIODICAL_EDITIONS_COULD_NOT_BE_LOADED.title,
       }
     }
+
     return response
   },
 
@@ -49,6 +50,13 @@ const service: LegalPeriodicalEditionService = {
           errorMessages.LEGAL_PERIODICAL_EDITIONS_COULD_NOT_BE_LOADED.title,
       }
     }
+
+    if (response.data?.length == 0) {
+      response.error = {
+        title: errorMessages.SEARCH_RESULTS_NOT_FOUND.title,
+      }
+    }
+
     return response
   },
 
@@ -69,7 +77,7 @@ const service: LegalPeriodicalEditionService = {
     if (response.status >= 300) {
       response.error = {
         title: errorMessages.LEGAL_PERIODICAL_EDITION_COULD_NOT_BE_SAVED.title,
-      }
+      } as ResponseError
     }
     return response
   },
