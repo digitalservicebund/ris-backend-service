@@ -36,7 +36,6 @@ describe("preview core data", () => {
       ecli: "ecli123",
       deviatingEclis: ["eclu123"],
       procedure: {
-        id: "id",
         label: "vorgang-1",
         documentationUnitCount: 1,
         createdAt: "2022-12-12",
