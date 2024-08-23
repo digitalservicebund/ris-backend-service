@@ -21,7 +21,12 @@ public class UserGroupController {
     this.service = service;
   }
 
-  /** Returns all user groups for the doc office of the current user */
+  /**
+   * Returns user groups for the doc office of the current user that are not internal.
+   *
+   * @param oidcUser The user.
+   * @return A list of external user groups.
+   */
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public List<DocumentationOfficeUserGroup> getUserGroups(

@@ -71,8 +71,7 @@ public class AuthService {
 
   @Bean
   public Function<OidcUser, Boolean> userIsInternal() {
-    // Todo: use role "Internal" when we have a test user.
-    return oidcUser -> oidcUser.getClaimAsStringList("roles").contains("offline_access");
+    return oidcUser -> oidcUser.getClaimAsStringList("roles").contains("Internal");
   }
 
   @Bean
