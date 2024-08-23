@@ -2,6 +2,7 @@
 import { ref } from "vue"
 import CellHeaderItem from "@/components/CellHeaderItem.vue"
 import CellItem from "@/components/CellItem.vue"
+import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import SearchResultStatus from "@/components/SearchResultStatus.vue"
 import TableHeader from "@/components/TableHeader.vue"
 import TableRow from "@/components/TableRow.vue"
@@ -21,6 +22,8 @@ const data = [
 const searchResponseError = ref<ResponseError>(
   errorMessages.SEARCH_RESULTS_NOT_FOUND,
 )
+
+const isLoading = ref(true)
 </script>
 
 <template>
@@ -50,6 +53,28 @@ const searchResponseError = ref<ResponseError>(
         <SearchResultStatus
           :response-error="searchResponseError"
         ></SearchResultStatus>
+      </div>
+    </KitchensinkStory>
+
+    <KitchensinkStory name="Loading ">
+      <div class="flex h-full flex-col bg-white">
+        <TableView class="w-full">
+          <TableHeader>
+            <CellHeaderItem>Name</CellHeaderItem>
+            <CellHeaderItem>Datum</CellHeaderItem>
+          </TableHeader>
+          <TableRow />
+        </TableView>
+        <SearchResultStatus
+          v-if="!isLoading"
+          :response-error="searchResponseError"
+        ></SearchResultStatus>
+        <div
+          v-if="isLoading"
+          class="grid justify-items-center bg-white bg-opacity-60 py-112"
+        >
+          <LoadingSpinner />
+        </div>
       </div>
     </KitchensinkStory>
   </KitchensinkPage>
