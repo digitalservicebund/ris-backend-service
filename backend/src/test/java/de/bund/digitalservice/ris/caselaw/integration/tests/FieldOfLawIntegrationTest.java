@@ -72,8 +72,8 @@ class FieldOfLawIntegrationTest {
   @MockBean private UserService userService;
   @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private DocumentationUnitService service;
-  @MockBean private ProcedureService procedureService;
   @MockBean private HandoverService handoverService;
+  @MockBean private ProcedureService procedureService;
 
   @MockBean
   private DocumentationUnitDocxMetadataInitializationService

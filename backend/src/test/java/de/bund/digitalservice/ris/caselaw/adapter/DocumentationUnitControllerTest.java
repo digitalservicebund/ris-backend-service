@@ -68,7 +68,6 @@ class DocumentationUnitControllerTest {
   @Autowired private RisWebTestClient risWebClient;
   @MockBean private DocumentationUnitService service;
   @MockBean private DocumentationUnitDocxMetadataInitializationService docUnitAttachmentService;
-  @MockBean private ProcedureService procedureService;
   @MockBean private HandoverService handoverService;
   @MockBean private KeycloakUserService userService;
   @MockBean private DocxConverterService docxConverterService;
@@ -77,6 +76,7 @@ class DocumentationUnitControllerTest {
   @MockBean DatabaseApiKeyRepository apiKeyRepository;
   @MockBean DatabaseDocumentationOfficeRepository officeRepository;
   @MockBean private PatchMapperService patchMapperService;
+  @MockBean private ProcedureService procedureService;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final String ISSUER_ADDRESS = "test-issuer@exporter.neuris";

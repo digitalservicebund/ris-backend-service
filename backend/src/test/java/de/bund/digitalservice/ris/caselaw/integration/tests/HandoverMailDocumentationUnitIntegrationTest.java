@@ -131,12 +131,11 @@ class HandoverMailDocumentationUnitIntegrationTest {
   @MockBean DocxConverterService docxConverterService;
   @MockBean AttachmentService attachmentService;
   @MockBean private PatchMapperService patchMapperService;
+  @MockBean private ProcedureService procedureService;
 
   @MockBean
   private DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
-
-  @MockBean private ProcedureService procedureService;
 
   private DocumentationOfficeDTO docOffice;
 
