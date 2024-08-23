@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import EditionReferences from "@/components/periodical_evaluation/EditionReferences.vue"
+import EditionReferences from "@/components/periodical-evaluation/PeriodicalEvaluation.vue"
 </script>
 
 <template>

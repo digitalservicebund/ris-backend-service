@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import NewEdition from "@/components/periodical_evaluation/NewEdition.vue"
+import NewEdition from "@/components/periodical-evaluation/PeriodicalEvaluationNew.vue"
 </script>
 
 <template>
