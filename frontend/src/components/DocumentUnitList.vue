@@ -10,6 +10,7 @@ import IconBadge from "@/components/IconBadge.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import PopupModal from "@/components/PopupModal.vue"
+import SearchResultStatus from "@/components/SearchResultStatus.vue"
 import TableHeader from "@/components/TableHeader.vue"
 import TableRow from "@/components/TableRow.vue"
 import TableView from "@/components/TableView.vue"
@@ -297,14 +298,12 @@ function onDelete() {
       />
     </div>
 
-    <!-- Empty State -->
-    <!-- TODO: move component to parent, extract it as a component -->
-    <div
+    <SearchResultStatus
       v-if="emptyStatus && !searchResponseError && !isLoading"
-      class="my-112 grid justify-items-center"
+      id="emptySearchResult"
+      :response-error="{ title: emptyStatus }"
     >
-      <span class="mb-16">{{ emptyStatus }}</span>
       <slot name="newlink" />
-    </div>
+    </SearchResultStatus>
   </div>
 </template>

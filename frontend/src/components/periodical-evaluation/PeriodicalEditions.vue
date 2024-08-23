@@ -1,21 +1,31 @@
 <script lang="ts" setup>
 import { computed, ref, watch, onMounted } from "vue"
 import { useRouter } from "vue-router"
+import CellHeaderItem from "@/components/CellHeaderItem.vue"
+import CellItem from "@/components/CellItem.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import InputField from "@/components/input/InputField.vue"
+import FlexContainer from "@/components/FlexContainer.vue"
 import TextButton from "@/components/input/TextButton.vue"
+import LoadingSpinner from "@/components/LoadingSpinner.vue"
+import SearchResultStatus from "@/components/SearchResultStatus.vue"
+import TableHeader from "@/components/TableHeader.vue"
+import TableRow from "@/components/TableRow.vue"
+import TableView from "@/components/TableView.vue"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import ComboboxItemService from "@/services/comboboxItemService"
+import { ResponseError } from "@/services/httpClient"
 import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
+import IconChevronRight from "~icons/ic/baseline-chevron-right"
 
 const router = useRouter()
 const filter = ref<LegalPeriodical>()
 const currentEditions = ref<LegalPeriodicalEdition[]>()
 const { getQueryFromRoute, pushQueryToRoute, route } = useQuery<"q">()
 const query = ref(getQueryFromRoute())
-
+const searchResponseError = ref<ResponseError>()
+const isLoading = ref(false)
 watch(
   filter,
   async (newFilter) => {
@@ -60,6 +70,8 @@ onMounted(() => {
  * Loads all editions of a legal periodical
  */
 async function updateEditions(legalPeriodicalId: string) {
+  isLoading.value = true
+  searchResponseError.value = undefined
   const response =
     await LegalPeriodicalEditionService.getAllByLegalPeriodicalId(
       legalPeriodicalId,
@@ -67,6 +79,10 @@ async function updateEditions(legalPeriodicalId: string) {
   if (response.data) {
     currentEditions.value = response.data
   }
+  if (response.error) {
+    searchResponseError.value = response.error
+  }
+  isLoading.value = false
 }
 
 const legalPeriodical = computed({
@@ -89,52 +105,78 @@ const legalPeriodical = computed({
 </script>
 
 <template>
-  <div class="flex flex-col gap-16 p-16">
-    <div class="flex justify-between">
-      <h1 class="ds-heading-02-reg">Periodika</h1>
-      <TextButton
-        aria-label="Neue Periodikaauswertung"
-        class="ds-button-02-reg"
-        label="Neue Periodikaauswertung"
-        @click="router.push({ name: 'caselaw-periodical-evaluation-new' })"
-      ></TextButton>
-    </div>
-    <div class="flex h-full flex-col space-y-24 bg-gray-100 px-16 py-16">
-      <div class="flex flex-row items-end gap-24">
+  <div>
+    <div class="gap-16 bg-gray-100 p-16">
+      <FlexContainer class="pb-16" justify-content="justify-between">
+        <h1 class="ds-heading-02-reg">Periodika</h1>
+        <TextButton
+          aria-label="Neue Periodikaauswertung"
+          class="ds-button-02-reg"
+          label="Neue Periodikaauswertung"
+          @click="router.push({ name: 'caselaw-periodical-evaluation-new' })"
+        ></TextButton>
+      </FlexContainer>
+      <FlexContainer align-items="items-end" flex-direction="flex-row">
         <div class="flex-grow" role="search">
-          <InputField id="legalPeriodical" label="Periodikum suchen">
-            <ComboboxInput
-              id="legalPeriodical"
-              v-model="legalPeriodical"
-              aria-label="Periodikum"
-              clear-on-choosing-item
-              :has-error="false"
-              :item-service="ComboboxItemService.getLegalPeriodicals"
-            ></ComboboxInput>
-          </InputField>
+          <ComboboxInput
+            id="legalPeriodical"
+            v-model="legalPeriodical"
+            aria-label="Periodikum"
+            clear-on-choosing-item
+            :has-error="false"
+            :item-service="ComboboxItemService.getLegalPeriodicals"
+            placeholder="Nach Periodikum suchen"
+          ></ComboboxInput>
         </div>
-      </div>
-      <ul>
-        <li
-          v-for="edition in currentEditions"
-          :key="edition.id"
-          class="flex gap-24"
-        >
-          Ausgabe {{ edition.name }} ({{ edition.references?.length }}
-          Fundstellen)
-          <router-link
-            target="_blank"
-            :to="{
-              name: 'caselaw-periodical-evaluation-uuid',
-              params: { uuid: edition.id },
-            }"
+      </FlexContainer>
+    </div>
+
+    <div class="flex h-full flex-col space-y-24 px-16 py-16">
+      <TableView class="relative table w-full border-separate">
+        <TableHeader>
+          <CellHeaderItem>Ausgabe</CellHeaderItem>
+          <CellHeaderItem>Periodikum</CellHeaderItem>
+          <CellHeaderItem>Anzahl der Fundstellen</CellHeaderItem>
+          <CellHeaderItem>Hinzugefügt</CellHeaderItem>
+          <CellHeaderItem />
+        </TableHeader>
+
+        <TableRow v-for="edition in currentEditions" :key="edition.id">
+          <CellItem> {{ edition.name }}</CellItem>
+          <CellItem>
+            {{ edition.legalPeriodical?.abbreviation || "" }}</CellItem
           >
-            <button class="ds-link-03 border-b-1 border-blue-800 leading-24">
-              bearbeiten
-            </button>
-          </router-link>
-        </li>
-      </ul>
+          <CellItem>
+            {{ edition.references?.length }}
+          </CellItem>
+          <CellItem>
+            {{ undefined }}
+          </CellItem>
+          <CellItem>
+            <router-link
+              target="_blank"
+              :to="{
+                name: 'caselaw-periodical-evaluation-uuid',
+                params: { uuid: edition.id },
+              }"
+            >
+              <div class="ds-button-primary">
+                <IconChevronRight class="text-blue-800" />
+              </div>
+            </router-link>
+          </CellItem>
+        </TableRow>
+      </TableView>
+      <div
+        v-if="isLoading"
+        class="grid justify-items-center bg-white bg-opacity-60 py-112"
+      >
+        <LoadingSpinner />
+      </div>
+      <SearchResultStatus
+        v-if="!isLoading"
+        :response-error="searchResponseError"
+      />
     </div>
   </div>
 </template>
