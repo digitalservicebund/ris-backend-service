@@ -20,6 +20,7 @@
     "before 5:30am every weekday",
     "after 7:30am every weekday"
   ],
+  "automergeType": "branch",
   "packageRules": [
     {
       "groupName": "all-frontend-non-major-dependencies",
