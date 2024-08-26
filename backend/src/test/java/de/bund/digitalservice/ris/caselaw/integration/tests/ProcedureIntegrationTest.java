@@ -809,6 +809,56 @@ class ProcedureIntegrationTest {
   }
 
   @Test
+  void testAssign_withNonExistingProcedureId_shouldResultInBadRequest() {
+    addProcedureToDocUnit("procedure1", docUnitDTO);
+    String nonExistingProcedureId = "non-existing procedureId";
+    UUID userGroupId = userGroupRepository.findAll().get(0).getId();
+
+    risWebTestClient
+        .withInternalLogin()
+        .put()
+        .uri("/api/v1/caselaw/procedure/" + nonExistingProcedureId + "/assign/" + userGroupId)
+        .exchange()
+        .expectStatus()
+        .isBadRequest()
+        .expectBody(String.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody())
+                  .contains(
+                      "Failed to convert 'procedureUUID' with value: "
+                          + "'non-existing procedureId'\",\"instance\":\""
+                          + "/api/v1/caselaw/procedure/non-existing%20procedureId/assign/"
+                          + userGroupId);
+            });
+  }
+
+  @Test
+  void testAssign_withNonExistingGroupId_shouldResultInBadRequest() {
+    UUID procedureId = addProcedureToDocUnit("procedure1", docUnitDTO);
+    String nonExistingGroupId = "non-existing groupId";
+
+    risWebTestClient
+        .withInternalLogin()
+        .put()
+        .uri("/api/v1/caselaw/procedure/" + procedureId + "/assign/" + nonExistingGroupId)
+        .exchange()
+        .expectStatus()
+        .isBadRequest()
+        .expectBody(String.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody())
+                  .contains(
+                      "Failed to convert 'userGroupId' with value: "
+                          + "'non-existing groupId'\",\"instance\":\""
+                          + "/api/v1/caselaw/procedure/"
+                          + procedureId
+                          + "/assign/non-existing%20groupId");
+            });
+  }
+
+  @Test
   void testUnassign_withInternalUser_shouldReturnSuccessMessage() {
     UUID procedureId = addProcedureToDocUnit("procedure1", docUnitDTO);
     UUID userGroupId = userGroupRepository.findAll().get(0).getId();
