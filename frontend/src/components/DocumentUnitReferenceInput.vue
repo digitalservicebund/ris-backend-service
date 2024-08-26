@@ -125,14 +125,14 @@ watch(
           >
         </div>
         <InputField
-          id="citation"
+          id="referenceSupplement"
           v-slot="slotProps"
           class="flex-1"
           label="Klammernzusatz"
           :validation-error="validationStore.getByField('referenceSupplement')"
         >
           <TextInput
-            id="citation"
+            id="referenceSupplement"
             v-model="reference.referenceSupplement"
             aria-label="Klammernzusatz"
             :has-error="slotProps.hasError"

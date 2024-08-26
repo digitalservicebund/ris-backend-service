@@ -17,10 +17,10 @@ import lombok.Builder;
 @Builder(toBuilder = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record Reference(
-        UUID id,
-        String citation,
-        String referenceSupplement,
-        String footnote,
-        LegalPeriodical legalPeriodical,
-        String legalPeriodicalRawValue,
-        DocumentationUnit documentationUnit) {}
+    UUID id,
+    String citation,
+    String referenceSupplement,
+    String footnote,
+    LegalPeriodical legalPeriodical,
+    String legalPeriodicalRawValue,
+    RelatedDocumentationUnit documentationUnit) {}

@@ -1,5 +1,4 @@
 import dayjs from "dayjs"
-import DocumentUnit from "./documentUnit"
 import EditableListItem from "./editableListItem"
 import RelatedDocumentation from "./relatedDocumentation"
 import LegalPeriodical from "@/domain/legalPeriodical"
@@ -14,7 +13,7 @@ export default class Reference
   footnote?: string
   legalPeriodical?: LegalPeriodical
   legalPeriodicalRawValue?: string
-  documentationUnit?: DocumentUnit
+  documentationUnit?: RelatedDocumentation
 
   static readonly requiredFields = ["legalPeriodical", "citation"] as const
   static readonly fields = [
@@ -30,8 +29,8 @@ export default class Reference
   constructor(data: Partial<Reference> = {}) {
     super()
     Object.assign(this, data)
-    if (this.uuid == undefined) {
-      this.uuid = crypto.randomUUID()
+    if (this.id == undefined) {
+      this.id = crypto.randomUUID()
     }
   }
 
@@ -46,21 +45,17 @@ export default class Reference
     ].join(" ")
 
     const secondPart = [
-      ...(this.documentationUnit && this.documentationUnit.coreData.court
-        ? [this.documentationUnit.coreData.court.label]
+      ...(this.documentationUnit && this.documentationUnit.court
+        ? [this.documentationUnit.court.label]
         : []),
-      ...(this.documentationUnit && this.documentationUnit.coreData.decisionDate
-        ? [
-            dayjs(this.documentationUnit.coreData.decisionDate).format(
-              "DD.MM.YYYY",
-            ),
-          ]
+      ...(this.documentationUnit && this.documentationUnit.decisionDate
+        ? [dayjs(this.documentationUnit.decisionDate).format("DD.MM.YYYY")]
         : []),
-      ...(this.documentationUnit && this.documentationUnit.coreData.fileNumbers
-        ? [this.documentationUnit.coreData.fileNumbers[0]]
+      ...(this.documentationUnit && this.documentationUnit.fileNumber
+        ? [this.documentationUnit.fileNumber]
         : []),
-      ...(this.documentationUnit && this.documentationUnit.coreData.documentType
-        ? [this.documentationUnit.coreData.documentType.label]
+      ...(this.documentationUnit && this.documentationUnit.documentType
+        ? [this.documentationUnit.documentType.label]
         : []),
     ].join(", ")
 

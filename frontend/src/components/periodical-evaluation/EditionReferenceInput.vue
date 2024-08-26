@@ -11,7 +11,6 @@ import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
-import DocumentUnit from "@/domain/documentUnit"
 import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -146,13 +145,13 @@ async function addReference(decision: RelatedDocumentation) {
     emit(
       "update:modelValue",
       new Reference({
-        id: reference.value.uuid,
+        id: reference.value.id,
         citation: citation.value,
         referenceSupplement: reference.value.referenceSupplement,
         footnote: reference.value.footnote,
         legalPeriodical: reference.value.legalPeriodical,
         legalPeriodicalRawValue: reference.value.legalPeriodicalRawValue,
-        documentationUnit: new DocumentUnit(decision.uuid as string),
+        documentationUnit: new RelatedDocumentation({ ...decision }),
       }),
     )
     emit("addEntry")
@@ -224,13 +223,13 @@ watch(
             >
           </div>
           <InputField
-            id="citation"
+            id="referenceSupplement"
             v-slot="slotProps"
             class="flex-1"
             label="Klammernzusatz"
           >
             <TextInput
-              id="citation"
+              id="referenceSupplement"
               v-model="reference.referenceSupplement"
               aria-label="Klammernzusatz"
               :has-error="slotProps.hasError"
@@ -284,13 +283,13 @@ watch(
       </div>
       <div class="flex justify-between gap-24">
         <InputField
-          id="activeCitationFileNumber"
+          id="fileNumber"
           v-slot="slotProps"
           label="Aktenzeichen"
           :validation-error="validationStore.getByField('fileNumber')"
         >
           <TextInput
-            id="activeCitationDocumentType"
+            id="fileNumber"
             v-model="reference.fileNumber"
             aria-label="Aktenzeichen Aktivzitierung"
             :has-error="slotProps.hasError"
@@ -299,9 +298,9 @@ watch(
             @focus="validationStore.remove('fileNumber')"
           ></TextInput>
         </InputField>
-        <InputField id="activeCitationDecisionDocumentType" label="Dokumenttyp">
+        <InputField id="decisionDocumentType" label="Dokumenttyp">
           <ComboboxInput
-            id="activeCitationDecisionDocumentType"
+            id="decisionDocumentType"
             v-model="reference.documentType"
             aria-label="Dokumenttyp Aktivzitierung"
             :item-service="ComboboxItemService.getDocumentTypes"
