@@ -82,19 +82,37 @@ public class JurisXmlExporterResponseProcessor {
     try {
       Folder inbox = store.getFolder("INBOX");
       inbox.open(Folder.READ_WRITE);
+      Message[] messages = inbox.getMessages();
 
-      List<MessageWrapper> processedMessages = processMessages(inbox);
+      List<MessageWrapper> processedMessages = processMessages(messages);
       moveMessages(processedMessages, inbox, store.getFolder("processed"));
+
+      List<MessageWrapper> unprocessedMessages =
+          getUnprocessedMessages(messages, processedMessages);
+      moveMessages(unprocessedMessages, inbox, store.getFolder("unprocessable"));
     } catch (MessagingException e) {
       throw new StatusImporterException("Error processing inbox", e);
     }
   }
 
   @NotNull
-  private List<MessageWrapper> processMessages(Folder inbox) throws MessagingException {
+  private List<MessageWrapper> getUnprocessedMessages(
+      Message[] messages, List<MessageWrapper> processedMessages) {
+    return Arrays.stream(messages)
+        .filter(
+            message ->
+                processedMessages.stream()
+                    .noneMatch(wrapper -> wrapper.getMessage().equals(message)))
+        .map(wrapperFactory::getResponsibleWrapper)
+        .flatMap(Optional::stream)
+        .toList();
+  }
+
+  @NotNull
+  private List<MessageWrapper> processMessages(Message[] messages) {
     List<MessageWrapper> successfulProcessedMessages = new ArrayList<>();
 
-    Arrays.stream(inbox.getMessages())
+    Arrays.stream(messages)
         .map(wrapperFactory::getResponsibleWrapper)
         .flatMap(Optional::stream)
         .sorted(Comparator.comparing(wrapper -> wrapper instanceof ImportMessageWrapper ? 0 : 1))
@@ -227,8 +245,13 @@ public class JurisXmlExporterResponseProcessor {
         throw new StatusImporterException(
             "Couldn't find issuer address for document number: " + documentNumber);
       }
-    } catch (Exception e) {
-      throw new StatusImporterException("Could not forward Message", e);
+    } catch (DocumentationUnitNotExistsException e) {
+      LOGGER.warn(
+          "Got juris email for documentation unit that does not exist in NeuRIS. Possibly caused by a manual test.",
+          e);
+    } catch (MessagingException | IOException e) {
+      throw new StatusImporterException(
+          "Could not forward message due to failed message parsing", e);
     }
   }
 
