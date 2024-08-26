@@ -76,7 +76,7 @@ const service: ProcedureService = {
           response.status == 403
             ? errorMessages.NOT_ALLOWED.title +
               ". " +
-              errorMessages.PROCEDURE_COULD_NOT_BE_ASSIGNED.title
+              errorMessages.PROCEDURE_COULD_NOT_BE_UNASSIGNED.title
             : errorMessages.PROCEDURE_COULD_NOT_BE_UNASSIGNED.title,
       }
     }
