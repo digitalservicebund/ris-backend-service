@@ -544,7 +544,7 @@ export async function fillActiveCitationInputs(
   }
 }
 
-export async function copyPasteTextFromAttachmentIntoEditor(
+export async function copyPasteAllTextFromAttachmentIntoEditor(
   page: Page,
   attachmentLocator: Locator,
   editor: Locator,
