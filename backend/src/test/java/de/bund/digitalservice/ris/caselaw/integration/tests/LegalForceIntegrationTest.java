@@ -42,6 +42,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
+import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
@@ -116,6 +117,7 @@ class LegalForceIntegrationTest {
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private AttachmentService attachmentService;
   @MockBean private HandoverService handoverService;
+  @MockBean private ProcedureService procedureService;
 
   @MockBean
   private DocumentationUnitDocxMetadataInitializationService

@@ -1,9 +1,13 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeUserGroupRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeUserGroupDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcedureDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitListItemTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcedureTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -22,12 +26,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class DatabaseProcedureService implements ProcedureService {
   private final DatabaseProcedureRepository repository;
   private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  private final DatabaseDocumentationOfficeUserGroupRepository userGroupRepository;
 
   public DatabaseProcedureService(
       DatabaseProcedureRepository repository,
-      DatabaseDocumentationOfficeRepository documentationOfficeRepository) {
+      DatabaseDocumentationOfficeRepository documentationOfficeRepository,
+      DatabaseDocumentationOfficeUserGroupRepository userGroupRepository) {
     this.repository = repository;
     this.documentationOfficeRepository = documentationOfficeRepository;
+    this.userGroupRepository = userGroupRepository;
   }
 
   @Override
@@ -86,6 +93,52 @@ public class DatabaseProcedureService implements ProcedureService {
                     .map(DocumentationUnitListItemTransformer::transformToDomain)
                     .map(documentationUnitListItem -> documentationUnitListItem.toBuilder().build())
                     .toList())
+        .orElse(null);
+  }
+
+  @Override
+  public String assignUserGroup(UUID procedureUUID, UUID userGroupId) {
+    Optional<ProcedureDTO> procedureDTO = repository.findById(procedureUUID);
+    Optional<DocumentationOfficeUserGroupDTO> userGroupDTO =
+        userGroupRepository.findById(userGroupId);
+    if (procedureDTO.isEmpty()) {
+      throw new IllegalArgumentException(
+          "User group couldn't be assigned as procedure is missing in the data base.");
+    }
+    if (userGroupDTO.isEmpty()) {
+      throw new IllegalArgumentException(
+          "User group couldn't be assigned as user group is missing in the data base.");
+    }
+    ProcedureDTO result = procedureDTO.get();
+    result.setDocumentationOfficeUserGroupDTO(userGroupDTO.get());
+    repository.save(result);
+    return "Vorgang '"
+        + procedureDTO.get().getLabel()
+        + "' wurde Nutzergruppe '"
+        + userGroupDTO.get().getUserGroupPathName()
+        + "' zugewiesen.";
+  }
+
+  @Override
+  public String unassignUserGroup(UUID procedureUUID) {
+    Optional<ProcedureDTO> procedureDTO = repository.findById(procedureUUID);
+
+    if (procedureDTO.isEmpty()) {
+      throw new IllegalArgumentException(
+          "User group couldn't be unassigned as procedure is missing in the data base.");
+    }
+
+    ProcedureDTO result = procedureDTO.get();
+    result.setDocumentationOfficeUserGroupDTO(null);
+    repository.save(result);
+    return "Die Zuweisung aus Vorgang '" + procedureDTO.get().getLabel() + "' wurde entfernt.";
+  }
+
+  @Override
+  public DocumentationOffice getDocumentationOfficeByUUID(UUID procedureId) {
+    Optional<ProcedureDTO> procedureDTO = repository.findById(procedureId);
+    return procedureDTO
+        .map(dto -> DocumentationOfficeTransformer.transformToDomain(dto.getDocumentationOffice()))
         .orElse(null);
   }
 

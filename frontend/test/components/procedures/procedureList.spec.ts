@@ -1,14 +1,18 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { beforeEach, expect } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import ProcedureList from "@/components/procedures/ProcedureList.vue"
 import useQuery from "@/composables/useQueryFromRoute"
 import { Procedure } from "@/domain/documentUnit"
+import featureToggleService from "@/services/featureToggleService"
 import service from "@/services/procedureService"
+import userGroupsService from "@/services/userGroupsService"
 
 vi.mock("@/services/procedureService")
 vi.mock("@/services/authService")
+vi.mock("@/services/userGroupsService")
 
 const mocks = vi.hoisted(() => ({
   mockedPushQuery: vi.fn(),
@@ -88,6 +92,29 @@ async function renderComponent(options?: { procedures: Procedure[][] }) {
       data: [{ documentNumber: "testABC" }],
     })
 
+  const mockedGetUserGroups = vi
+    .mocked(userGroupsService.get)
+    .mockResolvedValue({
+      status: 200,
+      data: [
+        {
+          id: "userGroupId1",
+          userGroupPathName: "DS/Extern/Agentur1",
+        },
+        {
+          id: "userGroupId2",
+          userGroupPathName: "DS/Extern/Agentur2",
+        },
+      ],
+    })
+
+  const mockedAssignProcedure = vi
+    .mocked(service.assignUserGroup)
+    .mockResolvedValue({
+      status: 200,
+      data: ["Success Response"],
+    })
+
   return {
     ...render(ProcedureList, {
       global: {
@@ -99,10 +126,18 @@ async function renderComponent(options?: { procedures: Procedure[][] }) {
     user: userEvent.setup(),
     mockedGetProcedures,
     mockedGetDocumentUnits,
+    mockedGetUserGroups,
+    mockedAssignProcedure,
   }
 }
 
 describe("ProcedureList", () => {
+  beforeEach(() => {
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
+  })
   afterEach(() => {
     vi.resetAllMocks()
   })
@@ -198,5 +233,26 @@ describe("ProcedureList", () => {
     expect(mockedGetDocumentUnits).toHaveBeenCalledOnce()
     await user.click(await screen.findByLabelText("nächste Ergebnisse"))
     expect(mockedGetDocumentUnits).toHaveBeenCalledOnce()
+  })
+
+  it("should fetch userGroups onMounted", async () => {
+    const { mockedGetUserGroups } = await renderComponent()
+    expect(mockedGetUserGroups).toHaveBeenCalledOnce()
+  })
+
+  it("should list all user groups and default option in dropdown", async () => {
+    const { mockedGetProcedures } = await renderComponent()
+    expect(mockedGetProcedures).toHaveBeenCalledOnce()
+
+    expect(
+      await screen.findByText("Es wurden noch keine Vorgänge angelegt."),
+    ).not.toBeVisible()
+
+    const options = screen.getAllByRole("option")
+
+    expect(options.length).toBe(3)
+    expect(options[0]).toHaveTextContent("DS/Extern/Agentur1")
+    expect(options[1]).toHaveTextContent("DS/Extern/Agentur2")
+    expect(options[2]).toHaveTextContent("Nicht zugewiesen")
   })
 })

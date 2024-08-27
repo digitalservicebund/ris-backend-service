@@ -33,6 +33,14 @@ public class KeycloakUserService implements UserService {
     return getUser(oidcUser).documentationOffice();
   }
 
+  public List<DocumentationOfficeUserGroup> getUserGroups(OidcUser oidcUser) {
+    return documentationOfficeUserGroupService.getUserGroups().stream()
+        .filter(
+            group ->
+                group.docOffice().equals(getDocumentationOffice(oidcUser)) && !group.isInternal())
+        .toList();
+  }
+
   public String getEmail(OidcUser oidcUser) {
     return oidcUser.getEmail();
   }

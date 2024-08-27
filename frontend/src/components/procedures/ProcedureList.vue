@@ -3,14 +3,19 @@ import dayjs from "dayjs"
 import { ref, onMounted, watch, computed } from "vue"
 import ProcedureDetail from "./ProcedureDetail.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
+import DropdownInput from "@/components/input/DropdownInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { Procedure } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import { UserGroup } from "@/domain/userGroup"
 import documentationUnitService from "@/services/documentUnitService"
+import FeatureToggleService from "@/services/featureToggleService"
+import { ResponseError } from "@/services/httpClient"
 import service from "@/services/procedureService"
+import userGroupsService from "@/services/userGroupsService"
 import IconBaselineDescription from "~icons/ic/baseline-description"
 import IconExpandLess from "~icons/ic/baseline-expand-less"
 import IconExpandMore from "~icons/ic/baseline-expand-more"
@@ -23,6 +28,8 @@ const currentlyExpanded = ref<number[]>([])
 const { getQueryFromRoute, pushQueryToRoute, route } = useQuery<"q">()
 const query = ref(getQueryFromRoute())
 const responseError = ref()
+const userGroups = ref<UserGroup[]>([])
+const featureToggle = ref()
 
 /**
  * Loads all procedures
@@ -33,6 +40,16 @@ async function updateProcedures(page: number, queries?: Query<string>) {
   const response = await service.get(itemsPerPage, page, queries?.q)
   if (response.data) {
     currentPage.value = response.data
+  }
+}
+
+/**
+ * Get all external user groups for the current user
+ */
+async function getUserGroups() {
+  const response = await userGroupsService.get()
+  if (response.data) {
+    userGroups.value = response.data
   }
 }
 
@@ -82,6 +99,23 @@ async function handleIsExpanded(
   }
 }
 
+async function handleAssignUserGroup(
+  procedureId: string | undefined,
+  userGroupId: string,
+) {
+  let errorResponse: ResponseError | undefined
+  if (procedureId && userGroupId) {
+    const { error } = await service.assignUserGroup(procedureId, userGroupId)
+    errorResponse = error
+  } else if (procedureId) {
+    const { error } = await service.unassignUserGroup(procedureId)
+    errorResponse = error
+  }
+  if (errorResponse) {
+    alert(errorResponse.title)
+  }
+}
+
 async function handleDeleteDocumentationUnit(
   deletedDocumentationUnit: DocumentUnitListEntry,
   updatedProcedure: Procedure,
@@ -102,6 +136,15 @@ async function handleDeleteDocumentationUnit(
         documentationUnit.uuid != deletedDocumentationUnit.uuid,
     )
   }
+}
+
+const getDropdownItems = () => {
+  const dropdownItems = userGroups.value.map(({ userGroupPathName, id }) => ({
+    label: userGroupPathName,
+    value: id,
+  }))
+  dropdownItems.push({ label: "Nicht zugewiesen", value: "" })
+  return dropdownItems
 }
 
 /**
@@ -150,6 +193,12 @@ watch(currentPage, (newPage) => {
 
 onMounted(() => {
   updateProcedures(0, query.value)
+  getUserGroups()
+})
+onMounted(async () => {
+  featureToggle.value = (
+    await FeatureToggleService.isEnabled("neuris.assign-procedure")
+  ).data
 })
 </script>
 
@@ -198,7 +247,7 @@ onMounted(() => {
           </template>
 
           <template #header>
-            <div class="flex w-full justify-between">
+            <div class="flex w-full justify-between gap-24">
               <div class="flex flex-row items-center gap-16">
                 <IconFolderOpen />
                 <span class="ds-label-01-reg" :title="procedure.label">{{
@@ -213,7 +262,18 @@ onMounted(() => {
                   </span>
                 </div>
               </div>
-              <span class="mr-24"
+              <DropdownInput
+                v-if="featureToggle"
+                v-model="procedure.userGroupId"
+                aria-label="dropdown input"
+                class="ml-auto w-auto"
+                :items="getDropdownItems()"
+                @click.stop
+                @update:model-value="
+                  (value: string) => handleAssignUserGroup(procedure.id, value)
+                "
+              />
+              <span class="mr-24 content-center"
                 >erstellt am
                 {{ dayjs(procedure.createdAt).format("DD.MM.YYYY") }}</span
               >

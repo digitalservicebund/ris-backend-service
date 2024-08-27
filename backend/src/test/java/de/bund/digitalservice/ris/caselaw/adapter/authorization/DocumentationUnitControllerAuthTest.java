@@ -23,6 +23,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -64,6 +65,7 @@ class DocumentationUnitControllerAuthTest {
   @MockBean DatabaseApiKeyRepository apiKeyRepository;
   @MockBean DatabaseDocumentationOfficeRepository officeRepository;
   @MockBean PatchMapperService patchMapperService;
+  @MockBean private ProcedureService procedureService;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private final String docOffice1Group = "/CC-RIS";

@@ -33,6 +33,7 @@ import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
@@ -75,6 +76,7 @@ class DocumentationUnitControllerTest {
   @MockBean DatabaseApiKeyRepository apiKeyRepository;
   @MockBean DatabaseDocumentationOfficeRepository officeRepository;
   @MockBean private PatchMapperService patchMapperService;
+  @MockBean private ProcedureService procedureService;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final String ISSUER_ADDRESS = "test-issuer@exporter.neuris";

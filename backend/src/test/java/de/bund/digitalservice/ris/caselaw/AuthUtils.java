@@ -18,6 +18,14 @@ public class AuthUtils {
     return getMockLoginWithDocOffice("/DS");
   }
 
+  public static OidcLoginRequestPostProcessor getMockLoginInternal() {
+    return getMockLoginWithDocOffice("/DS/Intern", "Internal");
+  }
+
+  public static OidcLoginRequestPostProcessor getMockLoginExternal() {
+    return getMockLoginWithDocOffice("/DS/Extern", "External");
+  }
+
   public static OidcLoginRequestPostProcessor getMockLoginWithDocOffice(String docOfficeGroup) {
     return oidcLogin()
         .idToken(
@@ -25,6 +33,20 @@ public class AuthUtils {
                 token.claims(
                     claims -> {
                       claims.put("groups", Collections.singletonList(docOfficeGroup));
+                      claims.put("name", "testUser");
+                      claims.put("email", "test@test.com");
+                    }));
+  }
+
+  public static OidcLoginRequestPostProcessor getMockLoginWithDocOffice(
+      String docOfficeGroup, String role) {
+    return oidcLogin()
+        .idToken(
+            token ->
+                token.claims(
+                    claims -> {
+                      claims.put("groups", Collections.singletonList(docOfficeGroup));
+                      claims.put("roles", Collections.singletonList(role));
                       claims.put("name", "testUser");
                       claims.put("email", "test@test.com");
                     }));

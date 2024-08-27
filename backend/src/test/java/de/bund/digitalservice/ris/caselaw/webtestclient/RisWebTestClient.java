@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.webtestclient;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.getMockLogin;
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.getMockLoginExternal;
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.getMockLoginInternal;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.getMockLoginWithDocOffice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,6 +32,14 @@ public class RisWebTestClient {
 
   public RisRequestSpec withDefaultLogin() {
     return new RisRequestSpec(mockMvc, objectMapper, getMockLogin(), csrfCookie);
+  }
+
+  public RisRequestSpec withInternalLogin() {
+    return new RisRequestSpec(mockMvc, objectMapper, getMockLoginInternal(), csrfCookie);
+  }
+
+  public RisRequestSpec withExternalLogin() {
+    return new RisRequestSpec(mockMvc, objectMapper, getMockLoginExternal(), csrfCookie);
   }
 
   public RisRequestSpec withLogin(String docOfficeGroup) {

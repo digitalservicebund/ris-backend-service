@@ -58,6 +58,7 @@ export type Procedure = {
   documentationUnitCount: number
   createdAt: string
   documentUnits?: DocumentUnitListEntry[]
+  userGroupId?: string
 }
 
 export type Texts = {

@@ -15,5 +15,11 @@ public interface ProcedureService {
 
   List<DocumentationUnitListItem> getDocumentationUnits(UUID procedureid);
 
+  DocumentationOffice getDocumentationOfficeByUUID(UUID uuid);
+
+  String assignUserGroup(UUID procedureUUID, UUID userGroupId);
+
+  String unassignUserGroup(UUID procedureUUID);
+
   void delete(UUID procedureId);
 }

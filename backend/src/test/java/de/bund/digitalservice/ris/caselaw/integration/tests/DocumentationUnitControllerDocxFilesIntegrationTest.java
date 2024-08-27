@@ -45,6 +45,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataIn
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
+import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
@@ -149,6 +150,7 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private DocumentBuilderFactory documentBuilderFactory;
   @MockBean private PatchMapperService patchMapperService;
+  @MockBean private ProcedureService procedureService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
 

@@ -37,6 +37,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataIn
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
+import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
@@ -113,6 +114,7 @@ class DocumentationUnitControllerAuthIntegrationTest {
 
   @MockBean private HandoverService handoverService;
   @MockBean DocumentationOfficeUserGroupService documentationOfficeUserGroupService;
+  @MockBean private ProcedureService procedureService;
 
   @MockBean
   private DocumentationUnitDocxMetadataInitializationService

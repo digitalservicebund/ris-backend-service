@@ -45,6 +45,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
@@ -125,6 +126,7 @@ class PreviousDecisionIntegrationTest {
   @MockBean AttachmentService attachmentService;
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private HandoverService handoverService;
+  @MockBean private ProcedureService procedureService;
 
   @MockBean
   private DocumentationUnitDocxMetadataInitializationService

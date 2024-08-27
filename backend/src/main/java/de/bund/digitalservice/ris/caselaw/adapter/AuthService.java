@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ApiKey;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.ImportApiKeyException;
@@ -32,17 +33,20 @@ public class AuthService {
 
   private final UserService userService;
   private final DocumentationUnitService documentationUnitService;
+  private final ProcedureService procedureService;
   private final DatabaseApiKeyRepository keyRepository;
   private final DatabaseDocumentationOfficeRepository officeRepository;
 
   public AuthService(
       UserService userService,
       DocumentationUnitService documentationUnitService,
+      ProcedureService procedureService,
       DatabaseApiKeyRepository keyRepository,
       DatabaseDocumentationOfficeRepository officeRepository) {
 
     this.userService = userService;
     this.documentationUnitService = documentationUnitService;
+    this.procedureService = procedureService;
     this.keyRepository = keyRepository;
     this.officeRepository = officeRepository;
   }
@@ -60,6 +64,19 @@ public class AuthService {
     return uuid ->
         Optional.ofNullable(documentationUnitService.getByUuid(uuid))
             .map(this::userHasReadAccess)
+            .orElse(false);
+  }
+
+  @Bean
+  public Function<OidcUser, Boolean> userIsInternal() {
+    return oidcUser -> oidcUser.getClaimAsStringList("roles").contains("Internal");
+  }
+
+  @Bean
+  public Function<UUID, Boolean> userHasWriteAccessByProcedureId() {
+    return uuid ->
+        Optional.ofNullable(procedureService.getDocumentationOfficeByUUID(uuid))
+            .map(this::userHasSameDocOfficeAsProcedure)
             .orElse(false);
   }
 
@@ -86,6 +103,15 @@ public class AuthService {
     if (authentication != null && authentication.getPrincipal() instanceof OidcUser principal) {
       DocumentationOffice documentationOffice = userService.getDocumentationOffice(principal);
       return documentationUnit.coreData().documentationOffice().equals(documentationOffice);
+    }
+    return false;
+  }
+
+  private boolean userHasSameDocOfficeAsProcedure(DocumentationOffice documentationOffice) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication != null && authentication.getPrincipal() instanceof OidcUser principal) {
+      DocumentationOffice documentationOfficeOfUser = userService.getDocumentationOffice(principal);
+      return documentationOffice.equals(documentationOfficeOfUser);
     }
     return false;
   }
