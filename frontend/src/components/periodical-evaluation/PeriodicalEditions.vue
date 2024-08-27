@@ -5,6 +5,7 @@ import CellHeaderItem from "@/components/CellHeaderItem.vue"
 import CellItem from "@/components/CellItem.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
+import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import SearchResultStatus from "@/components/SearchResultStatus.vue"
@@ -106,7 +107,7 @@ const legalPeriodical = computed({
 
 <template>
   <div>
-    <div class="gap-16 bg-gray-100 p-16">
+    <div class="gap-16 p-16">
       <FlexContainer class="pb-16" justify-content="justify-between">
         <h1 class="ds-heading-02-reg">Periodika</h1>
         <TextButton
@@ -117,16 +118,18 @@ const legalPeriodical = computed({
         ></TextButton>
       </FlexContainer>
       <FlexContainer align-items="items-end" flex-direction="flex-row">
-        <div class="flex-grow" role="search">
-          <ComboboxInput
-            id="legalPeriodical"
-            v-model="legalPeriodical"
-            aria-label="Periodikum"
-            clear-on-choosing-item
-            :has-error="false"
-            :item-service="ComboboxItemService.getLegalPeriodicals"
-            placeholder="Nach Periodikum suchen"
-          ></ComboboxInput>
+        <div class="flex-grow gap-16 bg-blue-200 p-16" role="search">
+          <InputField id="legalPeriodical" label="Periodikum*">
+            <ComboboxInput
+              id="legalPeriodical"
+              v-model="legalPeriodical"
+              aria-label="Periodikum"
+              clear-on-choosing-item
+              :has-error="false"
+              :item-service="ComboboxItemService.getLegalPeriodicals"
+              placeholder="Nach Periodikum suchen"
+            ></ComboboxInput>
+          </InputField>
         </div>
       </FlexContainer>
     </div>
@@ -144,8 +147,8 @@ const legalPeriodical = computed({
         <TableRow v-for="edition in currentEditions" :key="edition.id">
           <CellItem> {{ edition.name }}</CellItem>
           <CellItem>
-            {{ edition.legalPeriodical?.abbreviation || "" }}</CellItem
-          >
+            {{ edition.legalPeriodical?.abbreviation || "" }}
+          </CellItem>
           <CellItem>
             {{ edition.references?.length }}
           </CellItem>

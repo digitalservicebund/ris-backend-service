@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -146,8 +145,8 @@ class JurisXmlExporterResponseProcessorTest {
     responseProcessor.readEmails();
 
     verifyNoInteractions(mailSender);
-    verify(inbox, never()).copyMessages(any(), any());
-    verify(importMessage, never()).setFlag(Flag.DELETED, true);
+    verify(inbox).copyMessages(new Message[] {importMessage}, unprocessable);
+    verify(importMessage).setFlag(Flag.DELETED, true);
     assertThat(memoryAppender.count(Level.ERROR)).isEqualTo(1L);
     assertThat(memoryAppender.getMessage(Level.ERROR, 0)).isEqualTo("Message has no subject");
 
@@ -164,13 +163,11 @@ class JurisXmlExporterResponseProcessorTest {
     responseProcessor.readEmails();
 
     verifyNoInteractions(mailSender);
-    verify(inbox, never()).copyMessages(new Message[] {importMessage}, processed);
-    verify(importMessage, never()).setFlag(Flag.DELETED, true);
+    verify(inbox).copyMessages(new Message[] {importMessage}, unprocessable);
+    verify(importMessage).setFlag(Flag.DELETED, true);
     assertThat(memoryAppender.count(Level.ERROR)).isEqualTo(1L);
     assertThat(memoryAppender.getMessage(Level.ERROR, 0))
         .isEqualTo("Message null couldn't processed");
-    assertThat(memoryAppender.getCause(Level.ERROR, 0).getCause().getMessage())
-        .isEqualTo("Couldn't find issuer address for document number: KORE123456789");
 
     memoryAppender.detachLoggingTestAppender();
   }
