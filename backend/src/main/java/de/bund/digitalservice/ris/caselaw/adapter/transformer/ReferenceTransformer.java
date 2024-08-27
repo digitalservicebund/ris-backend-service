@@ -6,7 +6,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public class ReferenceTransformer {
   public static Reference transformToDomain(ReferenceDTO referenceDTO) {
     LegalPeriodical legalPeriodical = null;
@@ -67,9 +69,5 @@ public class ReferenceTransformer {
                 : reference.legalPeriodicalRawValue())
         .documentationUnit(documentationUnitDTO)
         .build();
-  }
-
-  private ReferenceTransformer() {
-    // utility class
   }
 }

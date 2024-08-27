@@ -81,7 +81,7 @@ class ReferencesTransformerTest {
         // all fields set
         Arguments.of(
             Reference.builder()
-                .uuid(referenceId)
+                .id(referenceId)
                 .legalPeriodical(
                     LegalPeriodical.builder()
                         .uuid(legalPeriodicalId)
