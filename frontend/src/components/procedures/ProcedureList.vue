@@ -101,7 +101,7 @@ async function handleIsExpanded(
 
 async function handleAssignUserGroup(
   procedureId: string | undefined,
-  userGroupId: string,
+  userGroupId: string | undefined,
 ) {
   let errorResponse: ResponseError | undefined
   if (procedureId && userGroupId) {
@@ -270,7 +270,8 @@ onMounted(async () => {
                 :items="getDropdownItems()"
                 @click.stop
                 @update:model-value="
-                  (value: string) => handleAssignUserGroup(procedure.id, value)
+                  (value: string | undefined) =>
+                    handleAssignUserGroup(procedure.id, value)
                 "
               />
               <span class="mr-24 content-center"
