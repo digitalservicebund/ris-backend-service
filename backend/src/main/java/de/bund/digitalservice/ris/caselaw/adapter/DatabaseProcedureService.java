@@ -125,7 +125,7 @@ public class DatabaseProcedureService implements ProcedureService {
 
     if (procedureDTO.isEmpty()) {
       throw new IllegalArgumentException(
-          "User group couldn't be assigned as procedure is missing in the data base.");
+          "User group couldn't be unassigned as procedure is missing in the data base.");
     }
 
     ProcedureDTO result = procedureDTO.get();
