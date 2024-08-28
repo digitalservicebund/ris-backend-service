@@ -24,7 +24,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
       .getByLabel("Dropdown öffnen")
       .click()
     await expect(
-      page.locator("[aria-label='dropdown-option'] >> nth=4052"),
+      page.locator("[aria-label='dropdown-option'] >> nth=10"),
     ).toBeVisible()
 
     await expect(page.getByText("AG Aachen")).toBeVisible()

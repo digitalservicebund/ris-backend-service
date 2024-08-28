@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresCourtRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocxMetadataProperty;
@@ -47,16 +46,6 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
     CoreData coreData = CoreData.builder().fileNumbers(List.of()).build();
     DocumentationUnit documentationUnit = DocumentationUnit.builder().coreData(coreData).build();
     when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.of(documentationUnit));
-
-    when(databaseCourtRepository.findAll())
-        .thenReturn(
-            List.of(
-                CourtDTO.builder().type("AG").location("Berlin").build(),
-                CourtDTO.builder().type("AG").location("Bernau").build(),
-                CourtDTO.builder().type("LG").location("Berlin").build(),
-                CourtDTO.builder().type("LG").location("Bern").build(),
-                CourtDTO.builder().type("LG").location("Bernau").build(),
-                CourtDTO.builder().type("BFH").location("München").isSuperiorCourt(true).build()));
   }
 
   @Test
@@ -87,6 +76,9 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
 
     when(documentTypeRepository.findUniqueCaselawBySearchStr("Urt"))
         .thenReturn(Optional.of(DocumentType.builder().label("Urt").build()));
+
+    when(databaseCourtRepository.findOneByTypeAndLocation("AG", "Berlin"))
+        .thenReturn(Optional.of(CourtDTO.builder().type("AG").location("Berlin").build()));
 
     service.initializeCoreData(TEST_UUID, docx2html);
 
@@ -168,11 +160,7 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
     Map<DocxMetadataProperty, String> properties = Map.of(DocxMetadataProperty.COURT, "AG B");
     Docx2Html docx2html = new Docx2Html(null, List.of(), properties);
 
-    when(courtRepository.findBySearchStr("AG B"))
-        .thenReturn(
-            List.of(
-                Court.builder().label("AG Berlin").build(),
-                Court.builder().label("AG Bernau").build()));
+    when(databaseCourtRepository.findByExactSearchString("AG B")).thenReturn(List.of());
 
     service.initializeCoreData(TEST_UUID, docx2html);
 
@@ -189,11 +177,7 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
     Map<DocxMetadataProperty, String> properties = Map.of(DocxMetadataProperty.COURT_TYPE, "AG");
     Docx2Html docx2html = new Docx2Html(null, List.of(), properties);
 
-    when(courtRepository.findBySearchStr("AG"))
-        .thenReturn(
-            List.of(
-                Court.builder().label("AG Berlin").build(),
-                Court.builder().label("AG Bernau").build()));
+    when(courtRepository.findByTypeAndLocation("AG", null)).thenReturn(Optional.empty());
 
     service.initializeCoreData(TEST_UUID, docx2html);
 
@@ -211,11 +195,8 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
         Map.of(DocxMetadataProperty.COURT_LOCATION, "Bonn");
     Docx2Html docx2html = new Docx2Html(null, List.of(), properties);
 
-    when(courtRepository.findBySearchStr("Bonn"))
-        .thenReturn(
-            List.of(
-                Court.builder().label("AG Bonn").build(),
-                Court.builder().label("LG Bonn").build()));
+    when(databaseCourtRepository.findOneByTypeAndLocation(null, "Bonn"))
+        .thenReturn(Optional.empty());
 
     service.initializeCoreData(TEST_UUID, docx2html);
 
@@ -232,6 +213,8 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
     Map<DocxMetadataProperty, String> properties = Map.of(DocxMetadataProperty.COURT, "LG Bern");
     Docx2Html docx2html = new Docx2Html(null, List.of(), properties);
 
+    when(databaseCourtRepository.findByExactSearchString("LG Bern"))
+        .thenReturn(List.of(CourtDTO.builder().type("LG").location("Bern").build()));
     service.initializeCoreData(TEST_UUID, docx2html);
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
@@ -254,6 +237,15 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
             "LG Bernau");
     Docx2Html docx2html = new Docx2Html(null, List.of(), properties);
 
+    when(databaseCourtRepository.findOneByTypeAndLocation("LG", "Bern"))
+        .thenReturn(Optional.of(CourtDTO.builder().type("LG").location("Bern").build()));
+
+    when(databaseCourtRepository.findByExactSearchString("LG Bernau"))
+        .thenReturn(
+            List.of(
+                CourtDTO.builder().type("LG").location("Bernau").build(),
+                CourtDTO.builder().type("LG").location("Bern").build()));
+
     service.initializeCoreData(TEST_UUID, docx2html);
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
@@ -268,6 +260,9 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
   void testInitializeCoreData_withUniqueTypeOnly_shouldReturnCourt() {
     Map<DocxMetadataProperty, String> properties = Map.of(DocxMetadataProperty.COURT_TYPE, "BFH");
     Docx2Html docx2html = new Docx2Html(null, List.of(), properties);
+
+    when(databaseCourtRepository.findOneByTypeAndLocation("BFH", null))
+        .thenReturn(Optional.of(CourtDTO.builder().type("BFH").isSuperiorCourt(true).build()));
 
     service.initializeCoreData(TEST_UUID, docx2html);
 
@@ -291,6 +286,12 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
             DocxMetadataProperty.COURT,
             "LG Bernau");
     Docx2Html docx2html = new Docx2Html(null, ecliList, properties);
+
+    when(databaseCourtRepository.findOneByTypeAndLocation("LG", "Bern 1"))
+        .thenReturn(Optional.empty());
+
+    when(databaseCourtRepository.findByExactSearchString("LG Bernau"))
+        .thenReturn(List.of(CourtDTO.builder().type("LG").location("Bernau").build()));
 
     service.initializeCoreData(TEST_UUID, docx2html);
 
