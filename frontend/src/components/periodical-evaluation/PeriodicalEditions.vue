@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import dayjs from "dayjs"
 import { computed, ref, watch, onMounted } from "vue"
 import { useRouter } from "vue-router"
+import DateUtil from "../../utils/dateUtil"
 import CellHeaderItem from "@/components/CellHeaderItem.vue"
 import CellItem from "@/components/CellItem.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
@@ -154,13 +154,9 @@ const legalPeriodical = computed({
             {{ edition.references?.length }}
           </CellItem>
           <CellItem>
-            <span :class="{ 'text-gray-800': !edition.createdAt }">{{
-              edition.createdAt != undefined
-                ? dayjs(edition.createdAt, "YYYY-MM-DD", true).format(
-                    "DD.MM.YYYY",
-                  )
-                : "Datum unbekannt"
-            }}</span>
+            <span :class="{ 'text-gray-800': !edition.createdAt }">
+              {{ DateUtil.formatDate(edition.createdAt) }}
+            </span>
           </CellItem>
           <CellItem>
             <router-link
