@@ -1,10 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import static de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil.createTestDocumentationUnitDTO;
+import static de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil.createTestLegalPeriodicalDTO;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
@@ -28,27 +29,15 @@ class ReferencesTransformerTest {
                 .citation("2024, 123")
                 .footnote("footnote")
                 .referenceSupplement("Klammerzusatz")
-                .legalPeriodical(
-                    LegalPeriodicalDTO.builder()
-                        .id(UUID.fromString("33333333-2222-3333-4444-555555555555"))
-                        .primaryReference(true)
-                        .title("Legal Periodical Title")
-                        .subtitle("Legal Periodical Subtitle")
-                        .abbreviation("LPA")
-                        .build())
+                .documentationUnit(createTestDocumentationUnitDTO())
+                .legalPeriodical(createTestLegalPeriodicalDTO())
                 .build(),
             Reference.builder()
                 .citation("2024, 123")
                 .footnote("footnote")
                 .referenceSupplement("Klammerzusatz")
-                .legalPeriodical(
-                    LegalPeriodical.builder()
-                        .uuid(UUID.fromString("33333333-2222-3333-4444-555555555555"))
-                        .title("Legal Periodical Title")
-                        .subtitle("Legal Periodical Subtitle")
-                        .abbreviation("LPA")
-                        .primaryReference(true)
-                        .build())
+                .documentationUnit(createTestRelatedDocument())
+                .legalPeriodical(createTestLegalPeriodical())
                 .build()),
         // without legal periodical
         Arguments.of(
@@ -58,12 +47,14 @@ class ReferencesTransformerTest {
                 .footnote("footnote")
                 .referenceSupplement("Klammerzusatz")
                 .legalPeriodicalRawValue("LPA")
+                .documentationUnit(createTestDocumentationUnitDTO())
                 .build(),
             Reference.builder()
                 .citation("2024, 123")
                 .footnote("footnote")
                 .referenceSupplement("Klammerzusatz")
                 .legalPeriodicalRawValue("LPA")
+                .documentationUnit(createTestRelatedDocument())
                 .build()));
   }
 
@@ -90,6 +81,7 @@ class ReferencesTransformerTest {
                         .subtitle("a test reference")
                         .primaryReference(false)
                         .build())
+                .documentationUnit(createTestRelatedDocument())
                 .citation("2024, S.5")
                 .footnote("a footnote")
                 .referenceSupplement("Klammerzusatz")
@@ -172,7 +164,7 @@ class ReferencesTransformerTest {
     // documentation unit
     List<ReferenceDTO> referenceDTOS =
         DocumentationUnitTransformer.transformToDTO(
-                DocumentationUnitDTO.builder().build(),
+                createTestDocumentationUnitDTO(),
                 DocumentationUnit.builder().references(List.of(reference)).build())
             .getReferences();
 

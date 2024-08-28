@@ -4,7 +4,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
-import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import lombok.experimental.UtilityClass;
 
@@ -25,20 +24,9 @@ public class ReferenceTransformer {
         .legalPeriodicalRawValue(referenceDTO.getLegalPeriodicalRawValue())
         .citation(referenceDTO.getCitation())
         .footnote(referenceDTO.getFootnote())
-        // TODO move to minimal transformer?
         .documentationUnit(
-            RelatedDocumentationUnit.builder()
-                .uuid(referenceDTO.getDocumentationUnit().getId())
-                .documentNumber(referenceDTO.getDocumentationUnit().getDocumentNumber())
-                .court(
-                    CourtTransformer.transformToDomain(
-                        referenceDTO.getDocumentationUnit().getCourt()))
-                .decisionDate(referenceDTO.getDocumentationUnit().getDecisionDate())
-                .fileNumber(referenceDTO.getDocumentationUnit().getFileNumbers().get(0).getValue())
-                .documentType(
-                    DocumentTypeTransformer.transformToDomain(
-                        referenceDTO.getDocumentationUnit().getDocumentType()))
-                .build())
+            RelatedDocumentationUnitTransformer.transformFromDTO(
+                referenceDTO.getDocumentationUnit()))
         .build();
   }
 

@@ -2,6 +2,8 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 
@@ -14,6 +16,18 @@ public class RelatedDocumentationUnitTransformer {
     }
 
     return CourtTransformer.transformToDomain(courtDTO);
+  }
+
+  static RelatedDocumentationUnit transformFromDTO(DocumentationUnitDTO documentationUnitDTO) {
+    return RelatedDocumentationUnit.builder()
+        .uuid(documentationUnitDTO.getId())
+        .documentNumber(documentationUnitDTO.getDocumentNumber())
+        .court(CourtTransformer.transformToDomain(documentationUnitDTO.getCourt()))
+        .decisionDate(documentationUnitDTO.getDecisionDate())
+        .fileNumber(documentationUnitDTO.getFileNumbers().get(0).getValue())
+        .documentType(
+            DocumentTypeTransformer.transformToDomain(documentationUnitDTO.getDocumentType()))
+        .build();
   }
 
   static CourtDTO getCourtFromDomain(Court court) {
