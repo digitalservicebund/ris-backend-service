@@ -185,12 +185,11 @@ class DocumentationUnitServiceTest {
     PageRequest pageRequest = PageRequest.of(0, 10);
 
     when(repository.searchByDocumentationUnitSearchInput(
-            pageRequest, documentationOffice, oidcUser, documentationUnitSearchInput))
+            pageRequest, oidcUser, documentationUnitSearchInput))
         .thenReturn(new PageImpl<>(List.of(documentationUnitListItem)));
 
     service.searchByDocumentationUnitSearchInput(
         pageRequest,
-        documentationOffice,
         oidcUser,
         Optional.empty(),
         Optional.empty(),
@@ -202,8 +201,7 @@ class DocumentationUnitServiceTest {
         Optional.empty(),
         Optional.empty());
     verify(repository)
-        .searchByDocumentationUnitSearchInput(
-            pageRequest, documentationOffice, oidcUser, documentationUnitSearchInput);
+        .searchByDocumentationUnitSearchInput(pageRequest, oidcUser, documentationUnitSearchInput);
   }
 
   @Test
@@ -214,15 +212,11 @@ class DocumentationUnitServiceTest {
     PageRequest pageRequest = PageRequest.of(0, 10);
 
     when(repository.searchByDocumentationUnitSearchInput(
-            any(PageRequest.class),
-            any(DocumentationOffice.class),
-            any(OidcUser.class),
-            any(DocumentationUnitSearchInput.class)))
+            any(PageRequest.class), any(OidcUser.class), any(DocumentationUnitSearchInput.class)))
         .thenReturn(new PageImpl<>(List.of(documentationUnitListItem)));
 
     service.searchByDocumentationUnitSearchInput(
         pageRequest,
-        documentationOffice,
         oidcUser,
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007docnumber\u180Ewith\u2060spaces"),
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007filenumber\u180Ewith\u2060spaces"),
@@ -237,10 +231,7 @@ class DocumentationUnitServiceTest {
     // Capture the searchInput argument
     verify(repository)
         .searchByDocumentationUnitSearchInput(
-            any(PageRequest.class),
-            any(DocumentationOffice.class),
-            any(OidcUser.class),
-            searchInputCaptor.capture());
+            any(PageRequest.class), any(OidcUser.class), searchInputCaptor.capture());
 
     DocumentationUnitSearchInput capturedSearchInput = searchInputCaptor.getValue();
 

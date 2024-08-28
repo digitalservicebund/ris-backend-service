@@ -68,7 +68,6 @@ public class DocumentationUnitService {
 
   public Slice<DocumentationUnitListItem> searchByDocumentationUnitSearchInput(
       Pageable pageable,
-      DocumentationOffice documentationOffice,
       OidcUser oidcUser,
       Optional<String> documentNumber,
       Optional<String> fileNumber,
@@ -100,10 +99,7 @@ public class DocumentationUnitService {
             .build();
 
     return repository.searchByDocumentationUnitSearchInput(
-        PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()),
-        documentationOffice,
-        oidcUser,
-        searchInput);
+        PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()), oidcUser, searchInput);
   }
 
   public DocumentationUnit getByDocumentNumber(String documentNumber) {

@@ -156,10 +156,8 @@ public class DocumentationUnitController {
       @RequestParam(value = "myDocOfficeOnly") Optional<Boolean> myDocOfficeOnly,
       @AuthenticationPrincipal OidcUser oidcUser) {
 
-    var documentationOffice = userService.getDocumentationOffice(oidcUser);
     return service.searchByDocumentationUnitSearchInput(
         PageRequest.of(page, size),
-        documentationOffice,
         oidcUser,
         documentNumber,
         fileNumber,

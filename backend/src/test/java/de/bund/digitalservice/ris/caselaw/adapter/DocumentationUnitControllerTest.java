@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDefaultDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -446,7 +447,6 @@ class DocumentationUnitControllerTest {
 
     when(service.searchByDocumentationUnitSearchInput(
             pageRequest,
-            docOffice,
             oidcUser,
             Optional.empty(),
             Optional.empty(),
@@ -469,18 +469,17 @@ class DocumentationUnitControllerTest {
 
     verify(service)
         .searchByDocumentationUnitSearchInput(
-            pageRequest,
-            docOffice,
-            oidcUser,
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty());
+            eq(pageRequest),
+            any(OidcUser.class),
+            eq(Optional.empty()),
+            eq(Optional.empty()),
+            eq(Optional.empty()),
+            eq(Optional.empty()),
+            eq(Optional.empty()),
+            eq(Optional.empty()),
+            eq(Optional.empty()),
+            eq(Optional.empty()),
+            eq(Optional.empty()));
   }
 
   @Test

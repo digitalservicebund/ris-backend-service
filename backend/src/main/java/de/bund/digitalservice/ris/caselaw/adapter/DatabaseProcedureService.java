@@ -32,7 +32,6 @@ public class DatabaseProcedureService implements ProcedureService {
   private final DatabaseDocumentationOfficeUserGroupRepository userGroupRepository;
 
   private final UserService userService;
-  private final KeycloakUserService keycloakUserService;
 
   public DatabaseProcedureService(
       DatabaseProcedureRepository repository,
@@ -44,7 +43,6 @@ public class DatabaseProcedureService implements ProcedureService {
     this.documentationOfficeRepository = documentationOfficeRepository;
     this.userGroupRepository = userGroupRepository;
     this.userService = userService;
-    this.keycloakUserService = keycloakUserService;
   }
 
   @Override
@@ -117,7 +115,7 @@ public class DatabaseProcedureService implements ProcedureService {
   }
 
   private Boolean isExternalUserAssigned(ProcedureDTO procedureDTO, OidcUser oidcUser) {
-    Optional<DocumentationOfficeUserGroup> userGroup = keycloakUserService.getUserGroup(oidcUser);
+    Optional<DocumentationOfficeUserGroup> userGroup = userService.getUserGroup(oidcUser);
     if (userGroup.isPresent() && procedureDTO.getDocumentationOfficeUserGroupDTO() != null) {
       return userGroup.get().id().equals(procedureDTO.getDocumentationOfficeUserGroupDTO().getId());
     }

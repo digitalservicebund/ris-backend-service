@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitListItemTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
@@ -57,7 +56,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private final DatabaseProcedureRepository procedureRepository;
   private final DatabaseRelatedDocumentationRepository relatedDocumentationRepository;
   private final UserService userService;
-  private final KeycloakUserService keycloakUserService;
 
   public PostgresDocumentationUnitRepositoryImpl(
       DatabaseDocumentationUnitRepository repository,
@@ -67,8 +65,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       DatabaseKeywordRepository keywordRepository,
       DatabaseProcedureRepository procedureRepository,
       DatabaseFieldOfLawRepository fieldOfLawRepository,
-      UserService userService,
-      KeycloakUserService keycloakUserService) {
+      UserService userService) {
 
     this.repository = repository;
     this.databaseCourtRepository = databaseCourtRepository;
@@ -78,7 +75,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     this.fieldOfLawRepository = fieldOfLawRepository;
     this.procedureRepository = procedureRepository;
     this.userService = userService;
-    this.keycloakUserService = keycloakUserService;
   }
 
   @Override
@@ -525,9 +521,10 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   @Transactional(transactionManager = "jpaTransactionManager")
   public Slice<DocumentationUnitListItem> searchByDocumentationUnitSearchInput(
       Pageable pageable,
-      DocumentationOffice documentationOffice,
       OidcUser oidcUser,
       @Param("searchInput") DocumentationUnitSearchInput searchInput) {
+
+    DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidcUser);
     log.debug("Find by overview search: {}, {}", documentationOffice.abbreviation(), searchInput);
 
     DocumentationOfficeDTO documentationOfficeDTO =
@@ -552,7 +549,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             null,
             documentationOfficeDTO);
 
-    var userGroup = keycloakUserService.getUserGroup(oidcUser);
+    var userGroup = userService.getUserGroup(oidcUser);
     boolean isInternalUser = userService.isInternal(oidcUser);
     List<ProcedureDTO> assignedProcedures;
     if (userGroup.isPresent() && !isInternalUser) {

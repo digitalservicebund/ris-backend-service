@@ -93,16 +93,12 @@ public interface DocumentationUnitRepository {
    * Search for documentation units with given search parameters
    *
    * @param pageable the pageable to use for the search
-   * @param documentationOffice the documentation office of the current user
    * @param oidcUser current user via openid connect system
    * @param searchInput the search parameters
    * @return the search result containing the documentation units found
    */
   Slice<DocumentationUnitListItem> searchByDocumentationUnitSearchInput(
-      Pageable pageable,
-      DocumentationOffice documentationOffice,
-      OidcUser oidcUser,
-      DocumentationUnitSearchInput searchInput);
+      Pageable pageable, OidcUser oidcUser, DocumentationUnitSearchInput searchInput);
 
   /**
    * Find existing links to a documentation unit with a given id. This can be used to check if a
