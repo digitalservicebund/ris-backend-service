@@ -280,7 +280,7 @@ const showDefaultLink = computed(() => {
                   `${courtFromQuery?.label ?? "Gericht unbekannt"}, `
                 }}</span>
                 <span :class="{ 'text-gray-800': !dateFromQuery }">
-                  {{ DateUtil.formatDate(dateFromQuery) }}
+                  {{ DateUtil.formatDate(dateFromQuery) || "Datum unbekannt" }}
                 </span>
               </p>
               <TextButton

@@ -155,7 +155,7 @@ const legalPeriodical = computed({
           </CellItem>
           <CellItem>
             <span :class="{ 'text-gray-800': !edition.createdAt }">
-              {{ DateUtil.formatDate(edition.createdAt) }}
+              {{ DateUtil.formatDate(edition.createdAt) || "Datum unbekannt" }}
             </span>
           </CellItem>
           <CellItem>
