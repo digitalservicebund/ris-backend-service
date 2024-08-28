@@ -22,9 +22,11 @@ export const useEditionStore = defineStore("editionStore", () => {
     if (response.data) {
       edition.value = response.data
 
-      response.data.references = response.data.references.map(
-        (reference) => new Reference({ ...reference }),
-      )
+      response.data.references = response.data.references
+        ? response.data.references.map(
+            (reference) => new Reference({ ...reference }),
+          )
+        : []
     }
 
     return response
