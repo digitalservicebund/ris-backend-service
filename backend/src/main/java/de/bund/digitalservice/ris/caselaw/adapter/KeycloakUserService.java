@@ -45,6 +45,27 @@ public class KeycloakUserService implements UserService {
     return oidcUser.getEmail();
   }
 
+  public Boolean isInternal(OidcUser oidcUser) {
+    List<String> roles = oidcUser.getClaimAsStringList("roles");
+    if (roles != null) {
+      return roles.contains("Internal");
+    }
+    return false;
+  }
+
+  public Optional<DocumentationOfficeUserGroup> getUserGroup(OidcUser oidcUser) {
+    List<String> userGroups = Objects.requireNonNull(oidcUser.getAttribute("groups"));
+    var matchingUserGroup =
+        this.documentationOfficeUserGroupService.getUserGroups().stream()
+            .filter(group -> userGroups.contains(group.userGroupPathName()))
+            .findFirst();
+    if (matchingUserGroup.isEmpty()) {
+      LOGGER.warn(
+          "No doc office user group associated with given Keycloak user groups: {}", userGroups);
+    }
+    return matchingUserGroup;
+  }
+
   private User createUser(OidcUser oidcUser, DocumentationOffice documentationOffice) {
     return User.builder()
         .name(oidcUser.getAttribute("name"))
@@ -55,15 +76,6 @@ public class KeycloakUserService implements UserService {
   }
 
   private Optional<DocumentationOffice> extractDocumentationOffice(OidcUser oidcUser) {
-    List<String> userGroups = Objects.requireNonNull(oidcUser.getAttribute("groups"));
-    var matchingUserGroup =
-        this.documentationOfficeUserGroupService.getUserGroups().stream()
-            .filter(group -> userGroups.contains(group.userGroupPathName()))
-            .findFirst();
-    if (matchingUserGroup.isEmpty() && !userGroups.isEmpty()) {
-      LOGGER.warn(
-          "No doc office user group associated with given Keycloak user groups: {}", userGroups);
-    }
-    return matchingUserGroup.map(DocumentationOfficeUserGroup::docOffice);
+    return getUserGroup(oidcUser).map(DocumentationOfficeUserGroup::docOffice);
   }
 }

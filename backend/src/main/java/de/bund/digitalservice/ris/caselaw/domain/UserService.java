@@ -8,4 +8,6 @@ public interface UserService {
   DocumentationOffice getDocumentationOffice(OidcUser oidcUser);
 
   String getEmail(OidcUser oidcUser);
+
+  Boolean isInternal(OidcUser oidcUser);
 }

@@ -50,11 +50,23 @@ public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO,
    * Finds a {@link ProcedureDTO} by label and documentation office.
    *
    * @param label the label to search for
-   * @param documentationUnitDTO the documentation office to filter by
+   * @param documentationOfficeDTO the documentation office to filter by
    * @return an Optional containing the found {@link ProcedureDTO}, or empty if not found
    */
   Optional<ProcedureDTO> findAllByLabelAndDocumentationOffice(
-      String label, DocumentationOfficeDTO documentationUnitDTO);
+      String label, DocumentationOfficeDTO documentationOfficeDTO);
+
+  /**
+   * Finds a {@link ProcedureDTO} by id and documentation office.
+   *
+   * @param procedureId the UUID of the procedure to filter by
+   * @param documentationOfficeId the id of the documentation office to filter by
+   * @return an Optional containing the found {@link ProcedureDTO}, or empty if not found
+   */
+  @Query(
+      "SELECT p FROM ProcedureDTO p WHERE p.id = :procedureId AND p.documentationOffice.id = :documentationOfficeId")
+  Optional<ProcedureDTO> findByIdAndDocumentationOffice(
+      UUID procedureId, UUID documentationOfficeId);
 
   /**
    * Retrieves a paginated list of distinct {@link ProcedureDTO} entities filtered by label and

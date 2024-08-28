@@ -69,7 +69,7 @@ public class AuthService {
 
   @Bean
   public Function<OidcUser, Boolean> userIsInternal() {
-    return oidcUser -> oidcUser.getClaimAsStringList("roles").contains("Internal");
+    return userService::isInternal;
   }
 
   @Bean
