@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalEditionDTO;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,6 +20,7 @@ public class LegalPeriodicalEditionTransformer {
 
     return LegalPeriodicalEdition.builder()
         .id(legalPeriodicalEditionDTO.getId())
+        .createdAt(legalPeriodicalEditionDTO.getCreatedAt())
         .legalPeriodical(
             LegalPeriodicalTransformer.transformToDomain(
                 legalPeriodicalEditionDTO.getLegalPeriodical()))
@@ -37,9 +39,14 @@ public class LegalPeriodicalEditionTransformer {
     if (legalPeriodicalEdition == null) {
       return null;
     }
+
     AtomicInteger i = new AtomicInteger(1);
     return LegalPeriodicalEditionDTO.builder()
         .id(legalPeriodicalEdition.id())
+        .createdAt(
+            legalPeriodicalEdition.createdAt() != null
+                ? legalPeriodicalEdition.createdAt()
+                : LocalDate.now())
         .legalPeriodical(
             LegalPeriodicalTransformer.transformToDTO(legalPeriodicalEdition.legalPeriodical()))
         .name(legalPeriodicalEdition.name())

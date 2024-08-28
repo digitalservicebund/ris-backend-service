@@ -155,6 +155,8 @@ class LegalPeriodicalEditionIntegrationTest {
                 .suffix("- Sonderheft 1")
                 .build());
 
+    Assertions.assertNotNull(saved.createdAt());
+
     var result =
         risWebTestClient
             .withDefaultLogin()
