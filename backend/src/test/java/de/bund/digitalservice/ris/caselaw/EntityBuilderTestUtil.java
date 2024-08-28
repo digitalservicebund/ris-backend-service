@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import java.util.List;
 import java.util.UUID;
 
+/** A static test class for generating default, commonly used entities for testing purposes. */
 public class EntityBuilderTestUtil {
 
   public static RelatedDocumentationUnit createTestRelatedDocument() {

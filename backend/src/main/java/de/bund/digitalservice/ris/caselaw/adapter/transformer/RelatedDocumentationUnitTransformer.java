@@ -27,6 +27,7 @@ public class RelatedDocumentationUnitTransformer {
         .fileNumber(documentationUnitDTO.getFileNumbers().get(0).getValue())
         .documentType(
             DocumentTypeTransformer.transformToDomain(documentationUnitDTO.getDocumentType()))
+        .referenceFound(false) //  how to determine based on the documentationUnitDTO?
         .build();
   }
 

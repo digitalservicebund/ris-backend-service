@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDefaultDocOffice;
+import static de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil.createTestFileNumberDTO;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -137,6 +138,7 @@ class ReferenceIntegrationTest {
         repository.save(
             DocumentationUnitDTO.builder()
                 .documentationOffice(documentationOffice)
+                .fileNumbers(List.of(createTestFileNumberDTO()))
                 .documentNumber(DEFAULT_DOCUMENT_NUMBER)
                 .build());
 

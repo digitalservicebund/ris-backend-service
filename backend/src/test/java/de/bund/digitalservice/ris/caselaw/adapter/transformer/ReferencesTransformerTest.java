@@ -1,7 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import static de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil.createTestDocumentationUnitDTO;
+import static de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil.createTestLegalPeriodical;
 import static de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil.createTestLegalPeriodicalDTO;
+import static de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil.createTestRelatedDocument;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
