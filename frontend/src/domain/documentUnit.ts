@@ -71,6 +71,7 @@ export type Texts = {
   reasons?: string
   caseFacts?: string
   decisionReasons?: string
+  dissentingOpinion?: string
   otherLongText?: string
 }
 

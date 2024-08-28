@@ -28,6 +28,7 @@ describe("preview texts", () => {
       reasons: "reasons",
       caseFacts: "casefacts",
       decisionReasons: "decision reasons",
+      dissentingOpinion: "dissenting opinion",
       otherLongText: "other long text",
     })
 
@@ -43,6 +44,7 @@ describe("preview texts", () => {
     expect(await screen.findByText("Tatbestand")).toBeInTheDocument()
     expect(await screen.findByText("Entscheidungsgründe")).toBeInTheDocument()
     expect(await screen.findByText("Sonstiger Langtext")).toBeInTheDocument()
+    expect(await screen.findByText("Abweichende Meinung")).toBeInTheDocument()
   })
 
   it.each([
@@ -59,6 +61,7 @@ describe("preview texts", () => {
         "Tatbestand",
         "Entscheidungsgründe",
         "Sonstiger Langtext",
+        "Abweichende Meinung",
       ],
     ],
     [
@@ -74,6 +77,7 @@ describe("preview texts", () => {
         "Tatbestand",
         "Entscheidungsgründe",
         "Sonstiger Langtext",
+        "Abweichende Meinung",
       ],
     ],
     [
@@ -89,6 +93,7 @@ describe("preview texts", () => {
         "Tatbestand",
         "Entscheidungsgründe",
         "Sonstiger Langtext",
+        "Abweichende Meinung",
       ],
     ],
     [
@@ -104,6 +109,7 @@ describe("preview texts", () => {
         "Tatbestand",
         "Entscheidungsgründe",
         "Sonstiger Langtext",
+        "Abweichende Meinung",
       ],
     ],
     [
@@ -119,6 +125,7 @@ describe("preview texts", () => {
         "Tatbestand",
         "Entscheidungsgründe",
         "Sonstiger Langtext",
+        "Abweichende Meinung",
       ],
     ],
     [
@@ -134,6 +141,7 @@ describe("preview texts", () => {
         "Tatbestand",
         "Entscheidungsgründe",
         "Sonstiger Langtext",
+        "Abweichende Meinung",
       ],
     ],
     [
@@ -149,6 +157,7 @@ describe("preview texts", () => {
         "Tatbestand",
         "Entscheidungsgründe",
         "Sonstiger Langtext",
+        "Abweichende Meinung",
       ],
     ],
     [
@@ -164,6 +173,7 @@ describe("preview texts", () => {
         "Gründe",
         "Entscheidungsgründe",
         "Sonstiger Langtext",
+        "Abweichende Meinung",
       ],
     ],
     [
@@ -179,6 +189,7 @@ describe("preview texts", () => {
         "Gründe",
         "Tatbestand",
         "Sonstiger Langtext",
+        "Abweichende Meinung",
       ],
     ],
     [
@@ -194,6 +205,23 @@ describe("preview texts", () => {
         "Gründe",
         "Tatbestand",
         "Entscheidungsgründe",
+        "Abweichende Meinung",
+      ],
+    ],
+    [
+      "Abweichende Meinung",
+      { dissentingOpinion: "dissenting opinion" },
+      [
+        "Entscheidungsname",
+        "Titelzeile",
+        "Leitsatz",
+        "Orientierungssatz",
+        "Sonstiger Orientierungssatz",
+        "Tenor",
+        "Gründe",
+        "Tatbestand",
+        "Entscheidungsgründe",
+        "Sonstiger Langtext",
       ],
     ],
   ])(

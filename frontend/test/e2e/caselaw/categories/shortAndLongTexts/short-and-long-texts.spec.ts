@@ -173,6 +173,14 @@ test.describe("short and long texts", () => {
         expect(inputFieldInnerHTML).toContain(readOnly)
       })
 
+      await test.step("Abweichende Meinung ist readonly", async () => {
+        const dissentingOpinion = pageWithExternalUser.getByTestId(
+          "Abweichende Meinung",
+        )
+        const inputFieldInnerHTML = await dissentingOpinion.innerHTML()
+        expect(inputFieldInnerHTML).toContain(readOnly)
+      })
+
       await test.step("Sonstiger Langtext ist readonly", async () => {
         const otherLongText =
           pageWithExternalUser.getByTestId("Sonstiger Langtext")
@@ -225,6 +233,12 @@ test.describe("short and long texts", () => {
       await test.step("Sonstiger Langtext ist bearbeitbar", async () => {
         const otherLongText = page.getByTestId("Sonstiger Langtext")
         const inputFieldInnerHTML = await otherLongText.innerHTML()
+        expect(inputFieldInnerHTML).toContain(editable)
+      })
+
+      await test.step("Abweichende Meinung ist bearbeitbar", async () => {
+        const dissentingOpinion = page.getByTestId("Abweichende Meinung")
+        const inputFieldInnerHTML = await dissentingOpinion.innerHTML()
         expect(inputFieldInnerHTML).toContain(editable)
       })
     },
