@@ -36,28 +36,24 @@ export default class Reference
 
   get renderDecision(): string {
     const firstPart = [
-      ...(this.legalPeriodical
-        ? [this.legalPeriodical.abbreviation]
-        : [this.legalPeriodicalRawValue]),
-      ...(this.citation && this.referenceSupplement
-        ? [`${this.citation} (${this.referenceSupplement})`]
-        : [this.citation]),
-    ].join(" ")
+      this.legalPeriodical?.abbreviation ?? this.legalPeriodicalRawValue,
+      this.citation
+        ? `${this.citation}${this.referenceSupplement ? ` (${this.referenceSupplement})` : ""}`
+        : "",
+    ]
+      .filter(Boolean)
+      .join(" ")
 
     const secondPart = [
-      ...(this.documentationUnit && this.documentationUnit.court
-        ? [this.documentationUnit.court.label]
-        : []),
-      ...(this.documentationUnit && this.documentationUnit.decisionDate
-        ? [dayjs(this.documentationUnit.decisionDate).format("DD.MM.YYYY")]
-        : []),
-      ...(this.documentationUnit && this.documentationUnit.fileNumber
-        ? [this.documentationUnit.fileNumber]
-        : []),
-      ...(this.documentationUnit && this.documentationUnit.documentType
-        ? [this.documentationUnit.documentType.label]
-        : []),
-    ].join(", ")
+      this.documentationUnit?.court?.label ?? "",
+      this.documentationUnit?.decisionDate
+        ? dayjs(this.documentationUnit.decisionDate).format("DD.MM.YYYY")
+        : "",
+      this.documentationUnit?.fileNumber ?? "",
+      this.documentationUnit?.documentType?.label ?? "",
+    ]
+      .filter(Boolean)
+      .join(", ")
 
     return [firstPart, secondPart].filter(Boolean).join(" | ")
   }
