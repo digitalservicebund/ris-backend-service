@@ -160,6 +160,7 @@ public class DocumentationUnitController {
     return service.searchByDocumentationUnitSearchInput(
         PageRequest.of(page, size),
         documentationOffice,
+        oidcUser,
         documentNumber,
         fileNumber,
         courtType,

@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitListItemTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
@@ -15,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -38,6 +40,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +56,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private final DatabaseFieldOfLawRepository fieldOfLawRepository;
   private final DatabaseProcedureRepository procedureRepository;
   private final DatabaseRelatedDocumentationRepository relatedDocumentationRepository;
+  private final UserService userService;
+  private final KeycloakUserService keycloakUserService;
 
   public PostgresDocumentationUnitRepositoryImpl(
       DatabaseDocumentationUnitRepository repository,
@@ -61,7 +66,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       DatabaseRelatedDocumentationRepository relatedDocumentationRepository,
       DatabaseKeywordRepository keywordRepository,
       DatabaseProcedureRepository procedureRepository,
-      DatabaseFieldOfLawRepository fieldOfLawRepository) {
+      DatabaseFieldOfLawRepository fieldOfLawRepository,
+      UserService userService,
+      KeycloakUserService keycloakUserService) {
 
     this.repository = repository;
     this.databaseCourtRepository = databaseCourtRepository;
@@ -70,6 +77,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     this.relatedDocumentationRepository = relatedDocumentationRepository;
     this.fieldOfLawRepository = fieldOfLawRepository;
     this.procedureRepository = procedureRepository;
+    this.userService = userService;
+    this.keycloakUserService = keycloakUserService;
   }
 
   @Override
@@ -517,6 +526,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   public Slice<DocumentationUnitListItem> searchByDocumentationUnitSearchInput(
       Pageable pageable,
       DocumentationOffice documentationOffice,
+      OidcUser oidcUser,
       @Param("searchInput") DocumentationUnitSearchInput searchInput) {
     log.debug("Find by overview search: {}, {}", documentationOffice.abbreviation(), searchInput);
 
@@ -542,7 +552,41 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             null,
             documentationOfficeDTO);
 
-    return allResults.map(DocumentationUnitListItemTransformer::transformToDomain);
+    var userGroup = keycloakUserService.getUserGroup(oidcUser);
+    List<ProcedureDTO> assignedProcedures;
+    if (userGroup.isPresent() && !userService.isInternal(oidcUser)) {
+      // Only relevant for external users
+      assignedProcedures =
+          procedureRepository.findAllByDocumentationOfficeUserGroupId(userGroup.get().id());
+    } else {
+      assignedProcedures = List.of();
+    }
+    return allResults.map(
+        item ->
+            DocumentationUnitListItemTransformer.transformToDomain(item).toBuilder()
+                // FIXME: same doc office
+                .isDeletable(hasInternalUserAccess(oidcUser, item))
+                .isEditable(
+                    (hasInternalUserAccess(oidcUser, item)
+                        || isExternalUserAssigned(assignedProcedures, item)))
+                .build());
+  }
+
+  private boolean hasInternalUserAccess(OidcUser oidcUser, DocumentationUnitListItemDTO item) {
+    var documentationOffice = userService.getDocumentationOffice(oidcUser);
+    return userService.isInternal(oidcUser)
+        && item.getDocumentationOffice().getId().equals(documentationOffice.uuid());
+  }
+
+  private boolean isExternalUserAssigned(
+      List<ProcedureDTO> assignedProcedures, DocumentationUnitListItemDTO item) {
+    if (!item.getProcedures().isEmpty()) {
+      var docUnitProcedureId = item.getProcedures().get(0).getProcedure().getId();
+      return assignedProcedures.stream()
+          .anyMatch(procedure -> procedure.getId().equals(docUnitProcedureId));
+    } else {
+      return false;
+    }
   }
 
   @Override

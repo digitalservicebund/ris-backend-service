@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
@@ -67,6 +68,9 @@ public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO,
       "SELECT p FROM ProcedureDTO p WHERE p.id = :procedureId AND p.documentationOffice.id = :documentationOfficeId")
   Optional<ProcedureDTO> findByIdAndDocumentationOffice(
       UUID procedureId, UUID documentationOfficeId);
+
+  @Query("SELECT p FROM ProcedureDTO p WHERE p.documentationOfficeUserGroupDTO.id = :userGroupId")
+  List<ProcedureDTO> findAllByDocumentationOfficeUserGroupId(UUID userGroupId);
 
   /**
    * Retrieves a paginated list of distinct {@link ProcedureDTO} entities filtered by label and

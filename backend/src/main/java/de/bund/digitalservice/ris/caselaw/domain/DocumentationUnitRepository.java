@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.repository.NoRepositoryBean;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 /** Domain repository for documentation units */
 @NoRepositoryBean
@@ -93,12 +94,14 @@ public interface DocumentationUnitRepository {
    *
    * @param pageable the pageable to use for the search
    * @param documentationOffice the documentation office of the current user
+   * @param oidcUser
    * @param searchInput the search parameters
    * @return the search result containing the documentation units found
    */
   Slice<DocumentationUnitListItem> searchByDocumentationUnitSearchInput(
       Pageable pageable,
       DocumentationOffice documentationOffice,
+      OidcUser oidcUser,
       DocumentationUnitSearchInput searchInput);
 
   /**
