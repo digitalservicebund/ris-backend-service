@@ -89,6 +89,7 @@ function formatDropdownItems(
         label: `${item.abbreviation} | ${item.title}`,
         value: item,
         additionalInformation: item.subtitle,
+        sideInformation: item.primaryReference ? "amtlich" : "nicht amtlich",
       }))
     }
   }
