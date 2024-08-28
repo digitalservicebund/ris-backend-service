@@ -22,7 +22,7 @@ public class UserGroupController {
   /**
    * Returns user groups for the doc office of the current user that are not internal.
    *
-   * @param oidcUser The user.
+   * @param oidcUser current user via openid connect system
    * @return A list of external user groups.
    */
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)

@@ -87,7 +87,7 @@ public class DatabaseProcedureService implements ProcedureService {
   public List<DocumentationUnitListItem> getDocumentationUnits(
       UUID procedureId, OidcUser oidcUser) {
     DocumentationOffice documentationOfficeOfUser = userService.getDocumentationOffice(oidcUser);
-    Boolean isInternalUser = userService.isInternal(oidcUser);
+    boolean isInternalUser = userService.isInternal(oidcUser);
     return repository
         .findByIdAndDocumentationOffice(procedureId, documentationOfficeOfUser.uuid())
         .map(
@@ -110,13 +110,13 @@ public class DatabaseProcedureService implements ProcedureService {
                                 .isDeletable(isInternalUser)
                                 .isEditable(
                                     isInternalUser
-                                        || isAssignedExternalUser(procedureDTO, oidcUser))
+                                        || isExternalUserAssigned(procedureDTO, oidcUser))
                                 .build())
                     .toList())
         .orElse(null);
   }
 
-  private Boolean isAssignedExternalUser(ProcedureDTO procedureDTO, OidcUser oidcUser) {
+  private Boolean isExternalUserAssigned(ProcedureDTO procedureDTO, OidcUser oidcUser) {
     Optional<DocumentationOfficeUserGroup> userGroup = keycloakUserService.getUserGroup(oidcUser);
     if (userGroup.isPresent() && procedureDTO.getDocumentationOfficeUserGroupDTO() != null) {
       return userGroup.get().id().equals(procedureDTO.getDocumentationOfficeUserGroupDTO().getId());

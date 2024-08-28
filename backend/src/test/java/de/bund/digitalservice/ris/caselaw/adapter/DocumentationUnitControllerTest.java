@@ -77,6 +77,7 @@ class DocumentationUnitControllerTest {
   @MockBean DatabaseDocumentationOfficeRepository officeRepository;
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private ProcedureService procedureService;
+  @MockBean private OidcUser oidcUser;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final String ISSUER_ADDRESS = "test-issuer@exporter.neuris";
@@ -446,6 +447,7 @@ class DocumentationUnitControllerTest {
     when(service.searchByDocumentationUnitSearchInput(
             pageRequest,
             docOffice,
+            oidcUser,
             Optional.empty(),
             Optional.empty(),
             Optional.empty(),
@@ -469,6 +471,7 @@ class DocumentationUnitControllerTest {
         .searchByDocumentationUnitSearchInput(
             pageRequest,
             docOffice,
+            oidcUser,
             Optional.empty(),
             Optional.empty(),
             Optional.empty(),

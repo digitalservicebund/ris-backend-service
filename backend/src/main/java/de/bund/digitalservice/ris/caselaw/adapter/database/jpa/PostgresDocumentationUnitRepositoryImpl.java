@@ -553,29 +553,28 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             documentationOfficeDTO);
 
     var userGroup = keycloakUserService.getUserGroup(oidcUser);
+    boolean isInternalUser = userService.isInternal(oidcUser);
     List<ProcedureDTO> assignedProcedures;
-    if (userGroup.isPresent() && !userService.isInternal(oidcUser)) {
-      // Only relevant for external users
+    if (userGroup.isPresent() && !isInternalUser) {
       assignedProcedures =
-          procedureRepository.findAllByDocumentationOfficeUserGroupId(userGroup.get().id());
+          procedureRepository.findAllByDocumentationOfficeUserGroupDTO_Id(userGroup.get().id());
     } else {
       assignedProcedures = List.of();
     }
     return allResults.map(
         item ->
             DocumentationUnitListItemTransformer.transformToDomain(item).toBuilder()
-                // FIXME: same doc office
-                .isDeletable(hasInternalUserAccess(oidcUser, item))
+                .isDeletable(
+                    hasSameDocumentationOffice(item, documentationOffice) && isInternalUser)
                 .isEditable(
-                    (hasInternalUserAccess(oidcUser, item)
-                        || isExternalUserAssigned(assignedProcedures, item)))
+                    hasSameDocumentationOffice(item, documentationOffice)
+                        && (isInternalUser || isExternalUserAssigned(assignedProcedures, item)))
                 .build());
   }
 
-  private boolean hasInternalUserAccess(OidcUser oidcUser, DocumentationUnitListItemDTO item) {
-    var documentationOffice = userService.getDocumentationOffice(oidcUser);
-    return userService.isInternal(oidcUser)
-        && item.getDocumentationOffice().getId().equals(documentationOffice.uuid());
+  private boolean hasSameDocumentationOffice(
+      DocumentationUnitListItemDTO item, DocumentationOffice documentationOffice) {
+    return item.getDocumentationOffice().getId().equals(documentationOffice.uuid());
   }
 
   private boolean isExternalUserAssigned(

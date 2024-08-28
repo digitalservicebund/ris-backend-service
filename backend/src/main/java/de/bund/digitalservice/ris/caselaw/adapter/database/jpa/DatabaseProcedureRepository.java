@@ -69,8 +69,14 @@ public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO,
   Optional<ProcedureDTO> findByIdAndDocumentationOffice(
       UUID procedureId, UUID documentationOfficeId);
 
-  @Query("SELECT p FROM ProcedureDTO p WHERE p.documentationOfficeUserGroupDTO.id = :userGroupId")
-  List<ProcedureDTO> findAllByDocumentationOfficeUserGroupId(UUID userGroupId);
+  /**
+   * Finds all {@link ProcedureDTO} by user group id that are assigned to that user group.
+   *
+   * @param userGroupId the uuid of the user group
+   * @return a list of all procedures {@link ProcedureDTO} that have been assigned to the user group
+   *     , or empty if not found
+   */
+  List<ProcedureDTO> findAllByDocumentationOfficeUserGroupDTO_Id(UUID userGroupId);
 
   /**
    * Retrieves a paginated list of distinct {@link ProcedureDTO} entities filtered by label and

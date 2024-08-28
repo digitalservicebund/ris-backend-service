@@ -94,7 +94,7 @@ public interface DocumentationUnitRepository {
    *
    * @param pageable the pageable to use for the search
    * @param documentationOffice the documentation office of the current user
-   * @param oidcUser
+   * @param oidcUser current user via openid connect system
    * @param searchInput the search parameters
    * @return the search result containing the documentation units found
    */
