@@ -194,7 +194,7 @@ watch(
               label="Zitatstelle *"
               :validation-error="validationStore.getByField('citation')"
             >
-              <div class="flex flex-row gap-4">
+              <div class="flex flex-grow flex-row gap-16">
                 <TextInput
                   id="citation prefix"
                   v-model="prefix"
@@ -218,9 +218,9 @@ watch(
               </div>
             </InputField>
 
-            <span v-if="legalPeriodical" class="ds-label-03-reg"
-              >Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}</span
-            >
+            <div v-if="legalPeriodical" class="ds-label-03-reg pt-4">
+              Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}
+            </div>
           </div>
           <InputField
             id="referenceSupplement"

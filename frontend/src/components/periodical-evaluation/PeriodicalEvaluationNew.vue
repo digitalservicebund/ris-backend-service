@@ -112,38 +112,41 @@ watch(
       ></ComboboxInput>
     </InputField>
 
-    <div class="flex flex-row items-start gap-24">
-      <InputField
-        id="prefix"
-        label="Präfix"
-        :validation-error="validationStore.getByField('prefix')"
-      >
-        <TextInput
+    <div class="flex-col">
+      <div class="flex flex-row items-start gap-24">
+        <InputField
           id="prefix"
-          v-model="legalPeriodicalEdition.prefix"
-          aria-label="Präfix"
-          class="ds-input-medium"
-          size="medium"
-        ></TextInput>
-      </InputField>
+          label="Präfix *"
+          :validation-error="validationStore.getByField('prefix')"
+        >
+          <TextInput
+            id="prefix"
+            v-model="legalPeriodicalEdition.prefix"
+            aria-label="Präfix"
+            class="ds-input-medium"
+            size="medium"
+          ></TextInput>
+        </InputField>
 
-      <InputField id="suffix" label="Suffix">
-        <TextInput
-          id="suffix"
-          v-model="legalPeriodicalEdition.suffix"
-          aria-label="Suffix"
-          class="ds-input-medium"
-          size="medium"
-        ></TextInput>
-      </InputField>
+        <InputField id="suffix" label="Suffix">
+          <TextInput
+            id="suffix"
+            v-model="legalPeriodicalEdition.suffix"
+            aria-label="Suffix"
+            class="ds-input-medium"
+            size="medium"
+          ></TextInput>
+        </InputField>
+      </div>
+
+      <div v-if="legalPeriodical" class="ds-label-03-reg pt-4">
+        Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}
+      </div>
     </div>
-    <span v-if="legalPeriodical" class="ds-label-03-reg"
-      >Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}</span
-    >
 
     <InputField
       id="name"
-      label="Name der Ausgabe (optional)"
+      label="Name der Ausgabe *"
       :validation-error="validationStore.getByField('name')"
     >
       <TextInput
@@ -165,9 +168,10 @@ watch(
 
       <TextButton
         v-if="legalPeriodicalIsEditionIsEmpty"
-        aria-label="zurücksetzen"
+        aria-label="Zurücksetzen"
         button-type="ghost"
-        label="zurücksetzen"
+        class="ml-8"
+        label="Zurücksetzen"
         size="medium"
         @click="reset"
       />
