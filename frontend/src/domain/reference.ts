@@ -7,12 +7,13 @@ export default class Reference
   extends RelatedDocumentation
   implements EditableListItem
 {
-  public uuid?: string
+  id?: string
   citation?: string
   referenceSupplement?: string
   footnote?: string
   legalPeriodical?: LegalPeriodical
   legalPeriodicalRawValue?: string
+  documentationUnit?: RelatedDocumentation
 
   static readonly requiredFields = ["legalPeriodical", "citation"] as const
   static readonly fields = [
@@ -28,8 +29,8 @@ export default class Reference
   constructor(data: Partial<Reference> = {}) {
     super()
     Object.assign(this, data)
-    if (this.uuid == undefined) {
-      this.uuid = crypto.randomUUID()
+    if (this.id == undefined) {
+      this.id = crypto.randomUUID()
     }
   }
 
@@ -44,12 +45,18 @@ export default class Reference
     ].join(" ")
 
     const secondPart = [
-      ...(this.court ? [`${this.court?.label}`] : []),
-      ...(this.decisionDate
-        ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
+      ...(this.documentationUnit && this.documentationUnit.court
+        ? [this.documentationUnit.court.label]
         : []),
-      ...(this.fileNumber ? [this.fileNumber] : []),
-      ...(this.documentType?.label ? [this.documentType.label] : []),
+      ...(this.documentationUnit && this.documentationUnit.decisionDate
+        ? [dayjs(this.documentationUnit.decisionDate).format("DD.MM.YYYY")]
+        : []),
+      ...(this.documentationUnit && this.documentationUnit.fileNumber
+        ? [this.documentationUnit.fileNumber]
+        : []),
+      ...(this.documentationUnit && this.documentationUnit.documentType
+        ? [this.documentationUnit.documentType.label]
+        : []),
     ].join(", ")
 
     return [firstPart, secondPart].filter(Boolean).join(" | ")
@@ -63,10 +70,6 @@ export default class Reference
     return Reference.requiredFields.filter((field) =>
       this.fieldIsEmpty(this[field]),
     )
-  }
-
-  get id() {
-    return this.uuid
   }
 
   equals(entry: Reference): boolean {

@@ -15,7 +15,7 @@ import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
-import { useReferenceStore } from "@/stores/referencesStore"
+import { useEditionStore } from "@/stores/editionStore"
 
 const props = defineProps<{
   modelValue?: Reference
@@ -28,7 +28,7 @@ const emit = defineEmits<{
   cancelEdit: [void]
   removeEntry: [value: Reference]
 }>()
-const store = useReferenceStore()
+const store = useEditionStore()
 const lastSearchInput = ref(new Reference())
 const lastSavedModelValue = ref(new Reference({ ...props.modelValue }))
 const reference = ref(new Reference({ ...props.modelValue }))
@@ -139,16 +139,19 @@ async function validateRequiredInput() {
 }
 
 async function addReference(decision: RelatedDocumentation) {
-  console.log(reference.value)
   await validateRequiredInput()
   if (!validationStore.getByMessage("Pflichtfeld nicht befüllt").length) {
     // Merge the decision from search with the current reference input values
     emit(
       "update:modelValue",
       new Reference({
-        ...reference.value,
-        ...decision,
+        id: reference.value.id,
         citation: citation.value,
+        referenceSupplement: reference.value.referenceSupplement,
+        footnote: reference.value.footnote,
+        legalPeriodical: reference.value.legalPeriodical,
+        legalPeriodicalRawValue: reference.value.legalPeriodicalRawValue,
+        documentationUnit: new RelatedDocumentation({ ...decision }),
       }),
     )
     emit("addEntry")
@@ -220,13 +223,13 @@ watch(
             >
           </div>
           <InputField
-            id="citation"
+            id="referenceSupplement"
             v-slot="slotProps"
             class="flex-1"
             label="Klammernzusatz"
           >
             <TextInput
-              id="citation"
+              id="referenceSupplement"
               v-model="reference.referenceSupplement"
               aria-label="Klammernzusatz"
               :has-error="slotProps.hasError"
@@ -280,13 +283,13 @@ watch(
       </div>
       <div class="flex justify-between gap-24">
         <InputField
-          id="activeCitationFileNumber"
+          id="fileNumber"
           v-slot="slotProps"
           label="Aktenzeichen"
           :validation-error="validationStore.getByField('fileNumber')"
         >
           <TextInput
-            id="activeCitationDocumentType"
+            id="fileNumber"
             v-model="reference.fileNumber"
             aria-label="Aktenzeichen Aktivzitierung"
             :has-error="slotProps.hasError"
@@ -295,9 +298,9 @@ watch(
             @focus="validationStore.remove('fileNumber')"
           ></TextInput>
         </InputField>
-        <InputField id="activeCitationDecisionDocumentType" label="Dokumenttyp">
+        <InputField id="decisionDocumentType" label="Dokumenttyp">
           <ComboboxInput
-            id="activeCitationDecisionDocumentType"
+            id="decisionDocumentType"
             v-model="reference.documentType"
             aria-label="Dokumenttyp Aktivzitierung"
             :item-service="ComboboxItemService.getDocumentTypes"
@@ -362,3 +365,4 @@ watch(
     </div>
   </div>
 </template>
+@/stores/editionStore
