@@ -233,16 +233,23 @@ public class DocumentationUnitController {
   @PreAuthorize("@userHasWriteAccessByDocumentationUnitId.apply(#uuid)")
   public ResponseEntity<RisJsonPatch> partialUpdateByUuid(
       @PathVariable UUID uuid, @RequestBody RisJsonPatch patch) {
+
+    String documentNumber = "unknown";
+
     try {
       if (patch == null) {
         return ResponseEntity.internalServerError().build();
       }
 
+      var documentationUnit = service.getByUuid(uuid);
+      if (documentationUnit != null) {
+        documentNumber = documentationUnit.documentNumber();
+      }
       var newPatch = service.updateDocumentationUnit(uuid, patch);
 
       return ResponseEntity.ok().body(newPatch);
     } catch (DocumentationUnitNotExistsException | DocumentationUnitPatchException e) {
-      log.error("Error by updating documentation unit '{}'", uuid, e);
+      log.error("Error by updating documentation unit '{}/{}'", uuid, documentNumber, e);
       return ResponseEntity.internalServerError().build();
     }
   }

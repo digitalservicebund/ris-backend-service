@@ -13,4 +13,5 @@ public record Texts(
     String reasons,
     String caseFacts,
     String decisionReasons,
+    String dissentingOpinion,
     String otherLongText) {}

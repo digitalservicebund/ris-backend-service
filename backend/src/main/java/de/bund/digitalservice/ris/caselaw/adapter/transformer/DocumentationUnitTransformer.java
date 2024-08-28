@@ -166,6 +166,7 @@ public class DocumentationUnitTransformer {
         .grounds(texts.reasons())
         .caseFacts(texts.caseFacts())
         .decisionGrounds(texts.decisionReasons())
+        .dissentingOpinion(texts.dissentingOpinion())
         .otherLongText(texts.otherLongText());
 
     if (texts.decisionName() != null) {
@@ -572,6 +573,7 @@ public class DocumentationUnitTransformer {
             .reasons(documentationUnitDTO.getGrounds())
             .caseFacts(documentationUnitDTO.getCaseFacts())
             .decisionReasons(documentationUnitDTO.getDecisionGrounds())
+            .dissentingOpinion(documentationUnitDTO.getDissentingOpinion())
             .otherLongText(documentationUnitDTO.getOtherLongText())
             .build();
 

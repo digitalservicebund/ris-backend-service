@@ -123,6 +123,9 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @Column(name = "other_headnote")
   String otherHeadnote;
 
+  @Column(name = "dissenting_opinion")
+  private String dissentingOpinion;
+
   @OneToMany(
       mappedBy = "documentationUnit",
       orphanRemoval = true,
