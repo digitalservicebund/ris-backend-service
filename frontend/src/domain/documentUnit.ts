@@ -37,6 +37,7 @@ export type ContentRelatedIndexing = {
   norms?: NormReference[]
   activeCitations?: ActiveCitation[]
   fieldsOfLaw?: FieldOfLaw[]
+  jobProfiles?: string[]
 }
 
 export type DocumentType = {
