@@ -21,25 +21,17 @@ import { ResponseError } from "@/services/httpClient"
 import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 import IconChevronRight from "~icons/ic/baseline-chevron-right"
 
+const emptyResponse: ResponseError = {
+  title: "Wählen Sie ein Periodikum um die Ausgaben anzuzeigen.",
+}
+
 const router = useRouter()
 const filter = ref<LegalPeriodical>()
 const currentEditions = ref<LegalPeriodicalEdition[]>()
 const { getQueryFromRoute, pushQueryToRoute, route } = useQuery<"q">()
 const query = ref(getQueryFromRoute())
-const searchResponseError = ref<ResponseError>()
+const searchResponseError = ref<ResponseError>(emptyResponse)
 const isLoading = ref(false)
-watch(
-  filter,
-  async (newFilter) => {
-    if (newFilter && newFilter.uuid) {
-      await updateEditions(newFilter.uuid)
-      debouncedPushQueryToRoute({ q: newFilter.uuid })
-    } else {
-      currentEditions.value = []
-    }
-  },
-  { deep: true },
-)
 
 /**
  * Sets a timeout before pushing the search query to the route,
@@ -54,15 +46,6 @@ const debouncedPushQueryToRoute = (() => {
     timeoutId = window.setTimeout(() => pushQueryToRoute(currentQuery), 500)
   }
 })()
-
-/**
- * Get query from url and set local query value
- */
-watch(route, () => {
-  const currentQuery = getQueryFromRoute()
-  if (JSON.stringify(query.value) != JSON.stringify(currentQuery))
-    query.value = currentQuery
-})
 
 onMounted(() => {
   if (query.value.q) updateEditions(query.value.q)
@@ -101,9 +84,32 @@ const legalPeriodical = computed({
       filter.value = legalPeriodical
     } else {
       filter.value = undefined
+      searchResponseError.value = emptyResponse
     }
   },
 })
+
+/**
+ * Get query from url and set local query value
+ */
+watch(route, () => {
+  const currentQuery = getQueryFromRoute()
+  if (JSON.stringify(query.value) != JSON.stringify(currentQuery))
+    query.value = currentQuery
+})
+
+watch(
+  filter,
+  async (newFilter) => {
+    if (newFilter && newFilter.uuid) {
+      await updateEditions(newFilter.uuid)
+      debouncedPushQueryToRoute({ q: newFilter.uuid })
+    } else {
+      currentEditions.value = []
+    }
+  },
+  { deep: true },
+)
 </script>
 
 <template>
