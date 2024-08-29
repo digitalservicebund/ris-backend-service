@@ -30,7 +30,7 @@ const filter = ref<LegalPeriodical>()
 const currentEditions = ref<LegalPeriodicalEdition[]>()
 const { getQueryFromRoute, pushQueryToRoute, route } = useQuery<"q">()
 const query = ref(getQueryFromRoute())
-const searchResponseError = ref<ResponseError>(emptyResponse)
+const searchResponseError = ref<ResponseError | undefined>(emptyResponse)
 const isLoading = ref(false)
 
 /**
