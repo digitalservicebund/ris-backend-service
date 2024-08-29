@@ -53,9 +53,8 @@ export default class Reference
   get renderReference(): string {
     return [
       this.legalPeriodical?.abbreviation ?? this.legalPeriodicalRawValue,
-      this.citation
-        ? `${this.citation}${this.referenceSupplement ? ` (${this.referenceSupplement})` : ""}`
-        : "",
+      this.citation,
+      this.referenceSupplement ? ` (${this.referenceSupplement})` : "",
     ]
       .filter(Boolean)
       .join(" ")
