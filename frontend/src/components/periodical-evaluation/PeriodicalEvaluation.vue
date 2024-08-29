@@ -49,6 +49,7 @@ onMounted(async () => {
     <div aria-label="Fundstellen">
       <EditableList
         v-model="references"
+        class="px-16"
         :default-value="defaultValue"
         :edit-component="EditionEvaluationReference"
         :summary-component="EditionReferenceSummary"
