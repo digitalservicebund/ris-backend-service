@@ -37,8 +37,7 @@ public class DatabaseProcedureService implements ProcedureService {
       DatabaseProcedureRepository repository,
       DatabaseDocumentationOfficeRepository documentationOfficeRepository,
       DatabaseDocumentationOfficeUserGroupRepository userGroupRepository,
-      UserService userService,
-      KeycloakUserService keycloakUserService) {
+      UserService userService) {
     this.repository = repository;
     this.documentationOfficeRepository = documentationOfficeRepository;
     this.userGroupRepository = userGroupRepository;

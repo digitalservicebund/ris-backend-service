@@ -102,7 +102,12 @@ public class AuthService {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     if (authentication != null && authentication.getPrincipal() instanceof OidcUser principal) {
       DocumentationOffice documentationOffice = userService.getDocumentationOffice(principal);
-      return documentationUnit.coreData().documentationOffice().equals(documentationOffice);
+      return documentationOffice != null
+          && documentationUnit
+              .coreData()
+              .documentationOffice()
+              .abbreviation()
+              .equals(documentationOffice.abbreviation());
     }
     return false;
   }

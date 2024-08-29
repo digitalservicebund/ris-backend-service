@@ -15,7 +15,7 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 public class AuthUtils {
 
   public static OidcLoginRequestPostProcessor getMockLogin() {
-    return getMockLoginWithDocOffice("/DS");
+    return getMockLoginWithDocOffice("/DS", "Internal");
   }
 
   public static OidcLoginRequestPostProcessor getMockLoginInternal() {
