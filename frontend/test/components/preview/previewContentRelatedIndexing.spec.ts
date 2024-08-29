@@ -122,7 +122,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
     expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()
     expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
-    expect(await screen.findByText("Berufsbild")).not.toBeInTheDocument()
+    expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
   })
 
   test("renders multiple active citations and nothing else", async () => {
@@ -168,7 +168,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
     expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
-    expect(await screen.findByText("Berufsbild")).not.toBeInTheDocument()
+    expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
   })
 
   test("renders multiple fields of law and nothing else", async () => {
@@ -236,7 +236,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
     expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()
-    expect(await screen.findByText("Berufsbild")).not.toBeInTheDocument()
+    expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
   })
 
   test("renders multiple job profiles and nothing else", async () => {
