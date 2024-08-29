@@ -17,7 +17,7 @@ const keywords = computed({
 </script>
 
 <template>
-  <div aria-label="Schlagwörter" class="p-32">
+  <div class="p-32">
     <h2 class="ds-heading-03-reg mb-24">Schlagwörter</h2>
     <div class="flex flex-row">
       <div class="flex-1">
