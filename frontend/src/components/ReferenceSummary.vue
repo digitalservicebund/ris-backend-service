@@ -19,7 +19,7 @@ const hasAmbiguousLegalPeriodicalAbbreviation = computed(
         {{ data.renderDecision }}
       </div>
       <IconBadge
-        v-if="data.legalPeriodical?.primaryReference"
+        v-if="data.primaryReference"
         background-color="bg-blue-300"
         class="mr-8"
         color="text-blue-900"
