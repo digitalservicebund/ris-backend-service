@@ -21,7 +21,7 @@ const hasAmbiguousLegalPeriodicalAbbreviation = computed(
   <div class="flex w-full justify-between">
     <div class="flex flex-row items-center">
       <div class="ds-label-01-reg mr-8">
-        {{ data.renderDecision }}
+        {{ data.renderReference }}
       </div>
       <IconBadge
         background-color="bg-blue-300"
