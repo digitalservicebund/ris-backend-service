@@ -131,6 +131,7 @@ watch(
               id="legalPeriodical"
               v-model="legalPeriodical"
               aria-label="Periodikum"
+              class="max-w-[672px]"
               clear-on-choosing-item
               :has-error="false"
               :item-service="ComboboxItemService.getLegalPeriodicals"
