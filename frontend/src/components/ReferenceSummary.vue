@@ -7,11 +7,6 @@ const props = defineProps<{
   data: Reference
 }>()
 
-const primaryReference = computed(() =>
-  props.data?.legalPeriodical && props.data?.legalPeriodical.primaryReference
-    ? "primär"
-    : "sekundär",
-)
 const hasAmbiguousLegalPeriodicalAbbreviation = computed(
   () => !props.data?.legalPeriodical && !!props.data?.legalPeriodicalRawValue,
 )
@@ -24,10 +19,11 @@ const hasAmbiguousLegalPeriodicalAbbreviation = computed(
         {{ data.renderDecision }}
       </div>
       <IconBadge
+        v-if="data.primaryReference"
         background-color="bg-blue-300"
         class="mr-8"
         color="text-blue-900"
-        :label="primaryReference"
+        label="amtlich"
       />
       <IconBadge
         v-if="hasAmbiguousLegalPeriodicalAbbreviation"
