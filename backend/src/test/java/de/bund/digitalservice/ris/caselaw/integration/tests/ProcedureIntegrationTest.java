@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDefaultDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -26,6 +25,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcedureTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -35,6 +35,8 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroup;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
@@ -59,6 +61,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -111,12 +114,12 @@ class ProcedureIntegrationTest {
   @Autowired private DatabaseProcedureRepository repository;
   @Autowired private DatabaseDocumentationUnitProcedureRepository linkRepository;
   @Autowired private DatabaseDocumentationOfficeUserGroupRepository userGroupRepository;
+  @SpyBean private UserService userService;
 
   @MockBean private DocumentNumberService numberService;
   @MockBean private DocumentationUnitStatusService statusService;
   @MockBean private DocumentNumberRecyclingService documentNumberRecyclingService;
   @MockBean private HandoverReportRepository handoverReportRepository;
-  @MockBean private UserService userService;
   @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private MailService mailService;
@@ -124,20 +127,31 @@ class ProcedureIntegrationTest {
   @MockBean private AttachmentService attachmentService;
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private HandoverService handoverService;
+  @MockBean DocumentationOfficeUserGroupService documentationOfficeUserGroupService;
 
   @MockBean
   private DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
 
-  private final DocumentationOffice docOffice = buildDefaultDocOffice();
+  private DocumentationOffice docOffice;
   private DocumentationOfficeDTO docOfficeDTO;
   private DocumentationUnitDTO docUnitDTO;
 
   @BeforeEach
   void setUp() {
-    docOfficeDTO = documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
+    docOfficeDTO = documentationOfficeRepository.findByAbbreviation("DS");
+    docOffice = DocumentationOfficeTransformer.transformToDomain(docOfficeDTO);
     docUnitDTO = documentationUnitRepository.findByDocumentNumber("1234567890123").get();
     doReturn(docOffice).when(userService).getDocumentationOffice(any(OidcUser.class));
+    doReturn(
+            List.of(
+                DocumentationOfficeUserGroup.builder()
+                    .docOffice(DocumentationOfficeTransformer.transformToDomain(docOfficeDTO))
+                    .isInternal(true)
+                    .userGroupPathName("/DS")
+                    .build()))
+        .when(documentationOfficeUserGroupService)
+        .getUserGroups();
   }
 
   @AfterEach
@@ -717,10 +731,8 @@ class ProcedureIntegrationTest {
 
   @Test
   void testProcedureControllerReturnsDocUnitsPerProcedure() {
-    DocumentationOfficeDTO bghDocOfficeDTO =
-        documentationOfficeRepository.findByAbbreviation("BGH");
     ProcedureDTO procedure =
-        repository.findAllByLabelAndDocumentationOffice("testProcedure BGH", bghDocOfficeDTO).get();
+        repository.findAllByLabelAndDocumentationOffice("procedure1", docOfficeDTO).get();
 
     DocumentationUnit documentationUnitFromFrontend1 =
         DocumentationUnit.builder()
