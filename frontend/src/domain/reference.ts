@@ -34,11 +34,17 @@ export default class Reference
     }
   }
 
-  get renderDocumentationUnit(): string {
-    if (!this.documentationUnit) {
-      return ""
-    }
-    return [
+  get renderDecision(): string {
+    const firstPart = [
+      this.legalPeriodical?.abbreviation ?? this.legalPeriodicalRawValue,
+      this.citation
+        ? `${this.citation}${this.referenceSupplement ? ` (${this.referenceSupplement})` : ""}`
+        : "",
+    ]
+      .filter(Boolean)
+      .join(" ")
+
+    const secondPart = [
       this.documentationUnit?.court?.label ?? "",
       this.documentationUnit?.decisionDate
         ? dayjs(this.documentationUnit.decisionDate).format("DD.MM.YYYY")
@@ -48,17 +54,8 @@ export default class Reference
     ]
       .filter(Boolean)
       .join(", ")
-  }
 
-  get renderReference(): string {
-    return [
-      this.legalPeriodical?.abbreviation ?? this.legalPeriodicalRawValue,
-      this.citation
-        ? `${this.citation}${this.referenceSupplement ? ` (${this.referenceSupplement})` : ""}`
-        : "",
-    ]
-      .filter(Boolean)
-      .join(" ")
+    return [firstPart, secondPart].filter(Boolean).join(" | ")
   }
 
   get hasMissingRequiredFields(): boolean {

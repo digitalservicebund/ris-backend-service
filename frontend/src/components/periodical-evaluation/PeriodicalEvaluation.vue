@@ -3,7 +3,7 @@ import { computed, onMounted, ref, watch } from "vue"
 import EditionEvaluationReference from "./EditionReferenceInput.vue"
 import EditableList from "@/components/EditableList.vue"
 import ErrorPage from "@/components/PageError.vue"
-import EditionReferenceSummary from "@/components/periodical-evaluation/EditionReferenceSummary.vue"
+import ReferenceSummary from "@/components/ReferenceSummary.vue"
 import Reference from "@/domain/reference"
 import { ResponseError } from "@/services/httpClient"
 import { useEditionStore } from "@/stores/editionStore"
@@ -51,7 +51,7 @@ onMounted(async () => {
         v-model="references"
         :default-value="defaultValue"
         :edit-component="EditionEvaluationReference"
-        :summary-component="EditionReferenceSummary"
+        :summary-component="ReferenceSummary"
       />
     </div>
   </div>
