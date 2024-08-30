@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import FlexContainer from "@/components/FlexContainer.vue"
 import Reference from "@/domain/reference"
+import BaselineArrowOutward from "~icons/ic/baseline-arrow-outward"
 
 const props = defineProps<{
   data: Reference
