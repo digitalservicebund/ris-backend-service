@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/vue"
 import { previewLayoutInjectionKey } from "@/components/preview/constants"
-import PreviewTexts from "@/components/preview/PreviewTexts.vue"
+import PreviewTexts from "@/components/preview/PreviewShortTexts.vue"
 import { Texts } from "@/domain/documentUnit"
 
 function renderComponent(texts: Texts) {

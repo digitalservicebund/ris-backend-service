@@ -10,13 +10,14 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
-import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporterException;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
@@ -175,17 +176,22 @@ class XmlExporterTest {
         .build();
   }
 
-  private Texts generateTexts() {
-    return Texts.builder()
-        .decisionReasons("decision reasons")
-        .caseFacts("case facts")
-        .reasons("reasons")
-        .tenor("tenor")
+  private ShortTexts generateShortTexts() {
+    return ShortTexts.builder()
+        .decisionName("decision name")
+        .headline("headline")
+        .guidingPrinciple("guiding principle")
         .headnote("headnote")
         .otherHeadnote("other headnote")
-        .guidingPrinciple("guiding principle")
-        .headline("headline")
-        .decisionName("decision name")
+        .build();
+  }
+
+  private LongTexts generateTexts() {
+    return LongTexts.builder()
+        .tenor("tenor")
+        .reasons("reasons")
+        .caseFacts("case facts")
+        .decisionReasons("decision reasons")
         .dissentingOpinion("dissenting opinion")
         .otherLongText("other long text")
         // outline is missing here because otherHeadnote and outline must not be filled both at the

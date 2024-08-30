@@ -6,6 +6,11 @@ import TextInput from "@/components/input/TextInput.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useValidBorderNumbers } from "@/composables/useValidBorderNumbers"
 import { Texts } from "@/domain/documentUnit"
+import {
+  useLongTexts,
+  useShortTextsWithValidBorderNumberLinks,
+} from "@/composables/useShortTextsWithValidBorderNumberLinks"
+import { LongTexts, ShortTexts } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import StringsUtil from "@/utils/stringsUtil"
 
@@ -27,17 +32,25 @@ function isEditableByUser(item: { name: string }): boolean {
   }
 }
 
-const data = computed(() => {
+const shortTexts = computed(() => {
   if (store.documentUnit == undefined) return null
-  return useValidBorderNumbers(
-    store.documentUnit.texts,
+  return useShortTextsWithValidBorderNumberLinks(
+    store.documentUnit.shortTexts,
     store.documentUnit?.borderNumbers,
   ).filter(isEditableByUser)
 })
 
-const updateValueByTextId = async (id: keyof Texts, updatedText?: string) => {
+const longTexts = computed(() => {
+  if (store.documentUnit == undefined) return null
+  return useLongTexts(store.documentUnit.longTexts).filter(isEditableByUser)
+})
+
+const updateValueByTextIdShort = async (
+  id: keyof ShortTexts,
+  updatedText?: string,
+) => {
   if (StringsUtil.isEmpty(updatedText)) {
-    store.documentUnit!.texts[id] = undefined
+    store.documentUnit!.shortTexts[id] = undefined
   } else {
     const divElem = document.createElement("div")
     if (updatedText == undefined) updatedText = ""
@@ -45,7 +58,25 @@ const updateValueByTextId = async (id: keyof Texts, updatedText?: string) => {
     const hasImgElem = divElem.getElementsByTagName("img").length > 0
     const hasTable = divElem.getElementsByTagName("table").length > 0
     const hasInnerText = divElem.innerText.length > 0
-    store.documentUnit!.texts[id] =
+    store.documentUnit!.shortTexts[id] =
+      hasInnerText || hasImgElem || hasTable ? updatedText : ""
+  }
+}
+
+const updateValueByTextIdLong = async (
+  id: keyof LongTexts,
+  updatedText?: string,
+) => {
+  if (StringsUtil.isEmpty(updatedText)) {
+    store.documentUnit!.longTexts[id] = undefined
+  } else {
+    const divElem = document.createElement("div")
+    if (updatedText == undefined) updatedText = ""
+    divElem.innerHTML = updatedText
+    const hasImgElem = divElem.getElementsByTagName("img").length > 0
+    const hasTable = divElem.getElementsByTagName("table").length > 0
+    const hasInnerText = divElem.innerText.length > 0
+    store.documentUnit!.longTexts[id] =
       hasInnerText || hasImgElem || hasTable ? updatedText : ""
   }
 }
@@ -53,10 +84,9 @@ const updateValueByTextId = async (id: keyof Texts, updatedText?: string) => {
 
 <template>
   <div class="core-data mb-16 flex flex-col gap-24 bg-white p-32">
-    <h2 class="ds-heading-03-bold">Kurz- & Langtexte</h2>
-
+    <h2 class="ds-heading-03-bold">Kurztexte</h2>
     <div class="flex flex-col gap-24">
-      <div v-for="item in data" :key="item.id" class="">
+      <div v-for="item in shortTexts" :key="item.id" class="">
         <label class="ds-label-02-reg mb-4" :for="item.id">{{
           item.label
         }}</label>
@@ -69,7 +99,7 @@ const updateValueByTextId = async (id: keyof Texts, updatedText?: string) => {
           editable
           :field-size="item.fieldSize"
           :value="item.value"
-          @update-value="updateValueByTextId(item.id, $event)"
+          @update-value="updateValueByTextIdShort(item.id, $event)"
         />
 
         <TextInput
@@ -78,7 +108,26 @@ const updateValueByTextId = async (id: keyof Texts, updatedText?: string) => {
           :aria-label="item.aria"
           :model-value="item.value"
           size="medium"
-          @update:model-value="updateValueByTextId(item.id, $event)"
+          @update:model-value="updateValueByTextIdShort(item.id, $event)"
+        />
+      </div>
+    </div>
+    <h2 class="ds-heading-03-bold">Langtexte</h2>
+    <div class="flex flex-col gap-24">
+      <div v-for="item in longTexts" :key="item.id" class="">
+        <label class="ds-label-02-reg mb-4" :for="item.id">{{
+          item.label
+        }}</label>
+
+        <TextEditor
+          v-if="item.fieldType == TextAreaInput"
+          :id="item.id"
+          :aria-label="item.aria"
+          class="shadow-blue focus-within:shadow-focus hover:shadow-hover"
+          :editable="!isReadOnly(item)"
+          :field-size="item.fieldSize"
+          :value="item.value"
+          @update-value="updateValueByTextIdLong(item.id, $event)"
         />
       </div>
     </div>

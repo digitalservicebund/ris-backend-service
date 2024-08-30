@@ -33,11 +33,12 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
+import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
-import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
@@ -73,8 +74,9 @@ class DocumentationUnitTransformerTest {
   @Test
   void testTransformToDTO_withoutDecisionNames() {
     DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
-    Texts texts = Texts.builder().build();
-    DocumentationUnit updatedDomainObject = DocumentationUnit.builder().texts(texts).build();
+    ShortTexts shortTexts = ShortTexts.builder().build();
+    DocumentationUnit updatedDomainObject =
+        DocumentationUnit.builder().shortTexts(shortTexts).build();
 
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
@@ -1093,7 +1095,8 @@ class DocumentationUnitTransformerTest {
     return DocumentationUnit.builder()
         .previousDecisions(Collections.emptyList())
         .ensuingDecisions(Collections.emptyList())
-        .texts(Texts.builder().build())
+        .shortTexts(ShortTexts.builder().build())
+        .longTexts(LongTexts.builder().build())
         .borderNumbers(Collections.emptyList())
         .attachments(Collections.emptyList())
         .contentRelatedIndexing(

@@ -1,8 +1,8 @@
-import { useValidBorderNumbers } from "@/composables/useValidBorderNumbers"
+import { useShortTextsWithValidBorderNumberLinks } from "@/composables/useShortTextsWithValidBorderNumberLinks"
 
 describe("useValidBorderNumbers", () => {
   it("add valid attribute true when border number is valid", () => {
-    const data = useValidBorderNumbers(
+    const data = useShortTextsWithValidBorderNumberLinks(
       {
         guidingPrinciple:
           'lorem ipsum <border-number-link nr="1"></border-number-link>',
@@ -16,7 +16,7 @@ describe("useValidBorderNumbers", () => {
   })
 
   it("add valid attribute false when border number is invalid", () => {
-    const data = useValidBorderNumbers(
+    const data = useShortTextsWithValidBorderNumberLinks(
       {
         guidingPrinciple:
           'lorem ipsum <border-number-link nr="2"></border-number-link>',

@@ -63,12 +63,15 @@ export type Procedure = {
   userGroupId?: string
 }
 
-export type Texts = {
+export type ShortTexts = {
   decisionName?: string
   headline?: string
   guidingPrinciple?: string
   headnote?: string
   otherHeadnote?: string
+}
+
+export type LongTexts = {
   tenor?: string
   reasons?: string
   caseFacts?: string
@@ -86,7 +89,8 @@ export default class DocumentUnit {
   public version: number = 0
   public attachments: Attachment[] = []
   public coreData: CoreData = {}
-  public texts: Texts = {}
+  public shortTexts: ShortTexts = {}
+  public longTexts: LongTexts = {}
   public previousDecisions?: PreviousDecision[]
   public ensuingDecisions?: EnsuingDecision[]
   public contentRelatedIndexing: ContentRelatedIndexing = {}
@@ -114,10 +118,16 @@ export default class DocumentUnit {
       if (data.coreData && data.coreData[coreDataField] === null)
         delete data.coreData[coreDataField]
     }
-    let textsField: keyof Texts
-    for (textsField in data.texts) {
-      if (data.texts && data.texts[textsField] === null)
-        delete data.texts[textsField]
+    let shortTextsField: keyof ShortTexts
+    for (shortTextsField in data.shortTexts) {
+      if (data.shortTexts && data.shortTexts[shortTextsField] === null)
+        delete data.shortTexts[shortTextsField]
+    }
+
+    let longTextsField: keyof LongTexts
+    for (longTextsField in data.longTexts) {
+      if (data.longTexts && data.longTexts[longTextsField] === null)
+        delete data.longTexts[longTextsField]
     }
 
     if (data.previousDecisions)

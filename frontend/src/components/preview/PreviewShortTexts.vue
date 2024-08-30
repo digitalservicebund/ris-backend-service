@@ -4,18 +4,19 @@ import TextEditor from "@/components/input/TextEditor.vue"
 import PreviewCategory from "@/components/preview/PreviewCategory.vue"
 import PreviewContent from "@/components/preview/PreviewContent.vue"
 import PreviewRow from "@/components/preview/PreviewRow.vue"
-import { useValidBorderNumbers } from "@/composables/useValidBorderNumbers"
-import { Texts } from "@/domain/documentUnit"
+import { useShortTextsWithValidBorderNumberLinks } from "@/composables/useShortTextsWithValidBorderNumberLinks"
+import { ShortTexts } from "@/domain/documentUnit"
 
 const props = defineProps<{
-  texts: Texts
+  texts: ShortTexts
   validBorderNumbers: string[]
 }>()
 
 const data = computed(() =>
-  useValidBorderNumbers(props.texts, props.validBorderNumbers).filter(
-    (it) => it.value,
-  ),
+  useShortTextsWithValidBorderNumberLinks(
+    props.texts,
+    props.validBorderNumbers,
+  ).filter((it) => it.value),
 )
 </script>
 

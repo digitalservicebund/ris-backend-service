@@ -24,6 +24,6 @@ class DocumentationUnitBuilderTest {
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentationUnit.attachments().get(0).name()).isEqualTo("doc.docx");
-    assertThat(documentationUnit.texts().reasons()).isEqualTo("reasons123");
+    assertThat(documentationUnit.longTexts().reasons()).isEqualTo("reasons123");
   }
 }

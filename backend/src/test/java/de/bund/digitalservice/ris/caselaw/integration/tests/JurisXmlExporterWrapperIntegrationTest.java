@@ -7,8 +7,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
-import de.bund.digitalservice.ris.caselaw.domain.Texts;
+import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.domain.export.juris.JurisXmlExporter;
@@ -55,7 +56,8 @@ class JurisXmlExporterWrapperIntegrationTest {
             .leadingDecisionNormReferences(List.of("BGB §1"))
             .build();
 
-    Texts texts = Texts.builder().decisionName("decisionName").build();
+    ShortTexts texts = ShortTexts.builder().decisionName("decisionName").build();
+    LongTexts longTexts = LongTexts.builder().tenor("tenor").build();
 
     List<PreviousDecision> previousDecisions =
         List.of(
@@ -75,7 +77,8 @@ class JurisXmlExporterWrapperIntegrationTest {
             .documentNumber(documentNr)
             .coreData(coreData)
             .previousDecisions(previousDecisions)
-            .texts(texts)
+            .shortTexts(texts)
+            .longTexts(longTexts)
             .build();
 
     encryptedXml = jurisXmlExporter.generateEncryptedXMLString(documentationUnit);
