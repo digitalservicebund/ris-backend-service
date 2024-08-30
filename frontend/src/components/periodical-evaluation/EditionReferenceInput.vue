@@ -128,6 +128,7 @@ async function updatePage(page: number) {
   pageNumber.value = page
   search()
 }
+
 async function validateRequiredInput() {
   validationStore.reset()
   if (reference.value.missingRequiredFields?.length) {
@@ -173,7 +174,7 @@ watch(
 </script>
 
 <template>
-  <div class="flex h-full flex-col space-y-24 px-16 py-16">
+  <div class="flex h-full flex-col space-y-24 py-16">
     <div class="flex flex-col gap-24">
       <InputField id="legalPeriodical" label="Periodikum *">
         <ComboboxInput
@@ -199,6 +200,7 @@ watch(
                   id="citation prefix"
                   v-model="prefix"
                   aria-label="Zitatstelle Präfix"
+                  placeholder="Präfix"
                   size="medium"
                 ></TextInput>
                 <TextInput
@@ -213,6 +215,7 @@ watch(
                   id="citation suffix"
                   v-model="suffix"
                   aria-label="Zitatstelle Suffix"
+                  placeholder="Suffix"
                   size="medium"
                 ></TextInput>
               </div>

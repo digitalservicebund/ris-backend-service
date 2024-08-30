@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import FlexContainer from "@/components/FlexContainer.vue"
 import Reference from "@/domain/reference"
 
 const props = defineProps<{
