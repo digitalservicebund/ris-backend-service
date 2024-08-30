@@ -39,6 +39,7 @@ const updateValueByTextId = async (id: keyof Texts, updatedText?: string) => {
     store.documentUnit!.texts[id] = undefined
   } else {
     const divElem = document.createElement("div")
+    if (updatedText == undefined) updatedText = ""
     divElem.innerHTML = updatedText
     const hasImgElem = divElem.getElementsByTagName("img").length > 0
     const hasTable = divElem.getElementsByTagName("table").length > 0
