@@ -4,7 +4,7 @@ import { computed, ref, toRefs } from "vue"
 import { useRoute } from "vue-router"
 import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContentRelatedIndexing.vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
-import DocumentUnitTexts from "@/components/DocumentUnitTexts.vue"
+import DocumentUnitTextsNew from "@/components/DocumentUnitTextsNew.vue"
 import EnsuingDecisions from "@/components/EnsuingDecisions.vue"
 import { DocumentUnitCatagoriesEnum } from "@/components/enumDocumentUnitCatagories"
 import FlexItem from "@/components/FlexItem.vue"
@@ -82,6 +82,6 @@ const isInternalUser = useInternalUser()
       :id="DocumentUnitCatagoriesEnum.CONTENT_RELATED_INDEXING"
       class="mb-24"
     />
-    <DocumentUnitTexts :id="DocumentUnitCatagoriesEnum.TEXTS" />
+    <DocumentUnitTextsNew :id="DocumentUnitCatagoriesEnum.TEXTS" />
   </FlexItem>
 </template>
