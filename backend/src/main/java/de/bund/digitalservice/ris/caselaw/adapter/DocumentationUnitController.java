@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformerException;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
@@ -20,6 +21,7 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDele
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitPatchException;
+import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -195,6 +197,30 @@ public class DocumentationUnitController {
       return ResponseEntity.status(HttpStatus.OK).body(str);
     } catch (DocumentationUnitNotExistsException | DocumentationUnitDeletionException ex) {
       return ResponseEntity.internalServerError().body(ex.getMessage());
+    }
+  }
+
+  @PutMapping(
+      value = "/{uuid}",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("@userHasSameDocumentationOffice.apply(#uuid)")
+  public ResponseEntity<DocumentationUnit> updateByUuid(
+      @PathVariable UUID uuid,
+      @Valid @RequestBody DocumentationUnit documentationUnit,
+      @AuthenticationPrincipal OidcUser oidcUser) {
+
+    if (!uuid.equals(documentationUnit.uuid())) {
+      return ResponseEntity.unprocessableEntity().body(DocumentationUnit.builder().build());
+    }
+    try {
+      var du = service.updateDocumentationUnit(documentationUnit);
+      return ResponseEntity.status(HttpStatus.OK).body(du);
+    } catch (DocumentationUnitNotExistsException
+        | DocumentationUnitException
+        | DocumentationUnitTransformerException e) {
+      log.error("Error by updating documentation unit '{}'", documentationUnit.documentNumber(), e);
+      return ResponseEntity.internalServerError().body(DocumentationUnit.builder().build());
     }
   }
 

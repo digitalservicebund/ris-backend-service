@@ -97,6 +97,7 @@ class ActiveCitationIntegrationTest {
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseRelatedDocumentationRepository relatedDocumentationRepository;
   @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
+  @Autowired private DocumentationUnitService documentationUnitService;
 
   @MockBean private UserService userService;
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;

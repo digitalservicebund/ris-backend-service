@@ -152,12 +152,7 @@ public class AuthService {
     Optional<OidcUser> oidcUser = getOidcUser();
     if (oidcUser.isPresent()) {
       DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidcUser.get());
-      return documentationOffice != null
-          && documentationUnit
-              .coreData()
-              .documentationOffice()
-              .abbreviation()
-              .equals(documentationOffice.abbreviation());
+      return documentationUnit.coreData().documentationOffice().equals(documentationOffice);
     }
     return false;
   }

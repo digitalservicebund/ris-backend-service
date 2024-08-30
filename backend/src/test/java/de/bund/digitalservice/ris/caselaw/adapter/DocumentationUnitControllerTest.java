@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDefaultDocOffice;
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -27,6 +27,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
@@ -37,6 +38,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
@@ -70,7 +72,7 @@ class DocumentationUnitControllerTest {
   @MockBean private DocumentationUnitService service;
   @MockBean private DocumentationUnitDocxMetadataInitializationService docUnitAttachmentService;
   @MockBean private HandoverService handoverService;
-  @MockBean private KeycloakUserService userService;
+  @MockBean private UserService userService;
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private AttachmentService attachmentService;
@@ -79,10 +81,11 @@ class DocumentationUnitControllerTest {
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private ProcedureService procedureService;
   @MockBean private OidcUser oidcUser;
+  @MockBean private DocumentationOfficeUserGroupService documentationOfficeUserGroupService;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final String ISSUER_ADDRESS = "test-issuer@exporter.neuris";
-  private final DocumentationOffice docOffice = buildDefaultDocOffice();
+  private final DocumentationOffice docOffice = buildDSDocOffice();
   private final ObjectMapper mapper = new ObjectMapper();
 
   @BeforeEach
@@ -96,6 +99,8 @@ class DocumentationUnitControllerTest {
                   return Objects.requireNonNull(groups).get(0).equals("/DS");
                 }));
 
+    doReturn(true).when(userService).isInternal(any());
+
     when(service.getByUuid(TEST_UUID))
         .thenReturn(
             DocumentationUnit.builder()
@@ -107,7 +112,10 @@ class DocumentationUnitControllerTest {
   void testGenerateNewDocumentationUnit() {
     // userService.getDocumentationOffice is mocked in @BeforeEach
     when(service.generateNewDocumentationUnit(docOffice))
-        .thenReturn(DocumentationUnit.builder().build());
+        .thenReturn(
+            DocumentationUnit.builder()
+                .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                .build());
 
     risWebClient
         .withDefaultLogin()

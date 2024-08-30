@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDefaultDocOffice;
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -10,7 +10,6 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.LegalPeriodicalEditionController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresFieldOfLawRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalEditionRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalRepositoryImpl;
@@ -86,13 +85,10 @@ class LegalPeriodicalEditionIntegrationTest {
 
   private static final UUID TEST_UUID = UUID.randomUUID();
   private final String EDITION_ENDPOINT = "/api/v1/caselaw/legalperiodicaledition";
-  private final DocumentationOffice docOffice = buildDefaultDocOffice();
-  private DocumentationOfficeDTO documentationOfficeDTO;
+  private final DocumentationOffice docOffice = buildDSDocOffice();
 
   @BeforeEach
   void setUp() {
-    documentationOfficeDTO =
-        documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
 
     when(userService.getDocumentationOffice(any())).thenReturn(docOffice);
   }

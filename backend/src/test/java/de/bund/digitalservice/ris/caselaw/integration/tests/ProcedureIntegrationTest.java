@@ -1,8 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildBGHDocOffice;
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockDocOfficeUserGroups;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -25,7 +26,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcedureTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -35,7 +35,6 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
@@ -46,7 +45,6 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
-import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
@@ -61,9 +59,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
@@ -99,6 +95,8 @@ class ProcedureIntegrationTest {
   static PostgreSQLContainer<?> postgreSQLContainer =
       new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
 
+  @Autowired private DocumentationUnitService documentationUnitService;
+
   @DynamicPropertySource
   static void registerDynamicProperties(DynamicPropertyRegistry registry) {
     registry.add("database.user", () -> postgreSQLContainer.getUsername());
@@ -114,12 +112,12 @@ class ProcedureIntegrationTest {
   @Autowired private DatabaseProcedureRepository repository;
   @Autowired private DatabaseDocumentationUnitProcedureRepository linkRepository;
   @Autowired private DatabaseDocumentationOfficeUserGroupRepository userGroupRepository;
-  @SpyBean private UserService userService;
 
   @MockBean private DocumentNumberService numberService;
   @MockBean private DocumentationUnitStatusService statusService;
   @MockBean private DocumentNumberRecyclingService documentNumberRecyclingService;
   @MockBean private HandoverReportRepository handoverReportRepository;
+  @MockBean private DocumentationOfficeUserGroupService documentationOfficeUserGroupService;
   @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private MailService mailService;
@@ -127,31 +125,20 @@ class ProcedureIntegrationTest {
   @MockBean private AttachmentService attachmentService;
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private HandoverService handoverService;
-  @MockBean DocumentationOfficeUserGroupService documentationOfficeUserGroupService;
 
   @MockBean
   private DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
 
-  private DocumentationOffice docOffice;
+  private final DocumentationOffice docOffice = buildDSDocOffice();
   private DocumentationOfficeDTO docOfficeDTO;
   private DocumentationUnitDTO docUnitDTO;
 
   @BeforeEach
   void setUp() {
-    docOfficeDTO = documentationOfficeRepository.findByAbbreviation("DS");
-    docOffice = DocumentationOfficeTransformer.transformToDomain(docOfficeDTO);
+    docOfficeDTO = documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
     docUnitDTO = documentationUnitRepository.findByDocumentNumber("1234567890123").get();
-    doReturn(docOffice).when(userService).getDocumentationOffice(any(OidcUser.class));
-    doReturn(
-            List.of(
-                DocumentationOfficeUserGroup.builder()
-                    .docOffice(DocumentationOfficeTransformer.transformToDomain(docOfficeDTO))
-                    .isInternal(true)
-                    .userGroupPathName("/DS")
-                    .build()))
-        .when(documentationOfficeUserGroupService)
-        .getAllUserGroups();
+    mockDocOfficeUserGroups(documentationOfficeUserGroupService);
   }
 
   @AfterEach
@@ -731,24 +718,29 @@ class ProcedureIntegrationTest {
 
   @Test
   void testProcedureControllerReturnsDocUnitsPerProcedure() {
+    DocumentationOfficeDTO bghDocOfficeDTO =
+        documentationOfficeRepository.findByAbbreviation("BGH");
     ProcedureDTO procedure =
-        repository.findAllByLabelAndDocumentationOffice("procedure1", docOfficeDTO).get();
+        repository.findAllByLabelAndDocumentationOffice("testProcedure BGH", bghDocOfficeDTO).get();
+
+    var bghDocUnit = documentationUnitRepository.findByDocumentNumber("bghDocument123").get();
+    ;
 
     DocumentationUnit documentationUnitFromFrontend1 =
         DocumentationUnit.builder()
-            .uuid(docUnitDTO.getId())
-            .documentNumber(docUnitDTO.getDocumentNumber())
+            .uuid(bghDocUnit.getId())
+            .documentNumber(bghDocUnit.getDocumentNumber())
             .coreData(
                 CoreData.builder()
                     .procedure(ProcedureTransformer.transformToDomain(procedure))
-                    .documentationOffice(docOffice)
+                    .documentationOffice(buildBGHDocOffice())
                     .build())
             .build();
 
     risWebTestClient
-        .withDefaultLogin()
+        .withLogin("/BGH")
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
+        .uri("/api/v1/caselaw/documentunits/" + bghDocUnit.getId())
         .bodyValue(documentationUnitFromFrontend1)
         .exchange()
         .expectStatus()
@@ -762,7 +754,7 @@ class ProcedureIntegrationTest {
             });
 
     risWebTestClient
-        .withDefaultLogin()
+        .withLogin("/BGH")
         .get()
         .uri("/api/v1/caselaw/procedure/" + procedure.getId() + "/documentunits")
         .exchange()
@@ -772,7 +764,7 @@ class ProcedureIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(Objects.requireNonNull(response.getResponseBody()).get(0).documentNumber())
-                  .isEqualTo("1234567890123");
+                  .isEqualTo(bghDocUnit.getDocumentNumber());
             });
   }
 
@@ -805,7 +797,7 @@ class ProcedureIntegrationTest {
     UUID userGroupId = userGroupRepository.findAll().get(0).getId();
 
     risWebTestClient
-        .withInternalLogin()
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/procedure/" + procedureId + "/assign/" + userGroupId)
         .exchange()
@@ -827,7 +819,7 @@ class ProcedureIntegrationTest {
     UUID userGroupId = userGroupRepository.findAll().get(0).getId();
 
     risWebTestClient
-        .withInternalLogin()
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/procedure/" + nonExistingProcedureId + "/assign/" + userGroupId)
         .exchange()
@@ -851,7 +843,7 @@ class ProcedureIntegrationTest {
     String nonExistingGroupId = "non-existing groupId";
 
     risWebTestClient
-        .withInternalLogin()
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/procedure/" + procedureId + "/assign/" + nonExistingGroupId)
         .exchange()
@@ -876,7 +868,7 @@ class ProcedureIntegrationTest {
     UUID userGroupId = userGroupRepository.findAll().get(0).getId();
 
     risWebTestClient
-        .withInternalLogin()
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/procedure/" + procedureId + "/assign/" + userGroupId)
         .exchange()
@@ -891,7 +883,7 @@ class ProcedureIntegrationTest {
             });
 
     risWebTestClient
-        .withInternalLogin()
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/procedure/" + procedureId + "/unassign")
         .exchange()
