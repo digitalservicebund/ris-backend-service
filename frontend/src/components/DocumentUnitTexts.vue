@@ -71,7 +71,7 @@ const updateValueByTextId = async (id: keyof Texts, updatedText?: string) => {
         />
 
         <TextInput
-          v-if="item.fieldType == TextInput"
+          v-else-if="item.fieldType == TextInput"
           :id="item.id"
           :aria-label="item.aria"
           :model-value="item.value"
