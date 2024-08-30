@@ -71,7 +71,7 @@ const updateValueByTextId = async (id: keyof Texts, updatedText: string) => {
           :aria-label="item.aria"
           :model-value="item.value"
           size="medium"
-          @update-value="updateValueByTextId(item.id, $event)"
+          @update:model-value="updateValueByTextId(item.id, $event)"
         />
       </div>
     </div>
