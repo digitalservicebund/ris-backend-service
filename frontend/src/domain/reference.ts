@@ -19,10 +19,6 @@ export default class Reference
     "legalPeriodical",
     "citation",
     "referenceSupplement",
-    "court",
-    "fileNumber",
-    "decisionDate",
-    "documentType",
   ] as const
 
   constructor(data: Partial<Reference> = {}) {
@@ -48,7 +44,7 @@ export default class Reference
       .join(", ")
   }
 
-  get renderReference(): string {
+  get renderDecision(): string {
     return [
       this.legalPeriodical?.abbreviation ?? this.legalPeriodicalRawValue,
       this.citation,
@@ -68,6 +64,7 @@ export default class Reference
     )
   }
 
+
   equals(entry: Reference): boolean {
     return this.id === entry.id
   }
@@ -85,5 +82,9 @@ export default class Reference
 
   private fieldIsEmpty(value: Reference[(typeof Reference.fields)[number]]) {
     return value === undefined || !value || Object.keys(value).length === 0
+  }
+
+  get hasForeignSource(): boolean {
+    return true
   }
 }

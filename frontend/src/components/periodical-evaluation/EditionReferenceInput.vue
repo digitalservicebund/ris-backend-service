@@ -29,7 +29,6 @@ const emit = defineEmits<{
   removeEntry: [value: Reference]
 }>()
 const store = useEditionStore()
-const lastSearchInput = ref(new Reference())
 const lastSavedModelValue = ref(new Reference({ ...props.modelValue }))
 const reference = ref(new Reference({ ...props.modelValue }))
 const validationStore = useValidationStore<(typeof Reference.fields)[number]>()
@@ -89,16 +88,6 @@ function updateDateFormatValidation(
 async function search() {
   isLoading.value = true
 
-  //Reset page number to 0, when search input changes
-  if (
-    reference.value.court != lastSearchInput.value.court ||
-    reference.value.decisionDate != lastSearchInput.value.decisionDate ||
-    reference.value.fileNumber != lastSearchInput.value.fileNumber ||
-    reference.value.documentType != lastSearchInput.value.documentType
-  ) {
-    pageNumber.value = 0
-  }
-
   const response = await documentUnitService.searchByRelatedDocumentation(
     relatedDocumentationUnit,
     {
@@ -120,7 +109,9 @@ async function search() {
     searchResults.value = response.data.content.map((searchResult) => {
       return {
         decision: new RelatedDocumentation({ ...searchResult }),
-        isLinked: searchResult.isLinkedWith(props.modelValueList),
+        isLinked: searchResult.isLinkedWith(
+          props.modelValueList.map((item) => item.documentationUnit),
+        ),
       }
     })
   }
