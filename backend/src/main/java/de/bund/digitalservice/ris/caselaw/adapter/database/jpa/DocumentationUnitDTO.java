@@ -274,4 +274,10 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @Builder.Default
   @OrderBy("rank")
   private List<ReferenceDTO> references = new ArrayList<>();
+
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id", nullable = false)
+  @OrderBy("rank")
+  @Builder.Default
+  private Set<JobProfileDTO> jobProfiles = new HashSet<>();
 }

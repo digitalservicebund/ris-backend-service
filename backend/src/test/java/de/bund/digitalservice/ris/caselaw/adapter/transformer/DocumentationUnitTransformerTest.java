@@ -15,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO.DocumentationUnitDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
@@ -45,6 +46,7 @@ import java.time.Instant;
 import java.time.Year;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -1033,6 +1035,19 @@ class DocumentationUnitTransformerTest {
         List.of(1, 2, 3));
   }
 
+  @Test
+  void testTransformToDomain_withJobProfiles_shouldAddJobProfiles() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder()
+            .jobProfiles(Set.of(JobProfileDTO.builder().value("job profile").build()))
+            .build();
+
+    DocumentationUnit documentationUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentationUnit.contentRelatedIndexing().jobProfiles()).contains("job profile");
+  }
+
   private DocumentationUnit.DocumentationUnitBuilder generateSimpleDocumentationUnitBuilder() {
     return DocumentationUnit.builder()
         .previousDecisions(Collections.emptyList())
@@ -1046,6 +1061,7 @@ class DocumentationUnitTransformerTest {
                 .fieldsOfLaw(Collections.emptyList())
                 .norms(Collections.emptyList())
                 .activeCitations(Collections.emptyList())
+                .jobProfiles(Collections.emptyList())
                 .build())
         .references(Collections.emptyList());
   }

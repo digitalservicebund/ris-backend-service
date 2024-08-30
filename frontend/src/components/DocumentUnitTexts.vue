@@ -7,6 +7,7 @@ import { useExternalUser } from "@/composables/useExternalUser"
 import { useValidBorderNumbers } from "@/composables/useValidBorderNumbers"
 import { Texts } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import StringsUtil from "@/utils/stringsUtil"
 
 const store = useDocumentUnitStore()
 const isExternalUser = useExternalUser()
@@ -33,14 +34,19 @@ const data = computed(() => {
   )
 })
 
-const updateValueByTextId = async (id: keyof Texts, updatedText: string) => {
-  const divElem = document.createElement("div")
-  divElem.innerHTML = updatedText
-  const hasImgElem = divElem.getElementsByTagName("img").length > 0
-  const hasTable = divElem.getElementsByTagName("table").length > 0
-  const hasInnerText = divElem.innerText.length > 0
-  store.documentUnit!.texts[id] =
-    hasInnerText || hasImgElem || hasTable ? updatedText : ""
+const updateValueByTextId = async (id: keyof Texts, updatedText?: string) => {
+  if (StringsUtil.isEmpty(updatedText)) {
+    store.documentUnit!.texts[id] = undefined
+  } else {
+    const divElem = document.createElement("div")
+    if (updatedText == undefined) updatedText = ""
+    divElem.innerHTML = updatedText
+    const hasImgElem = divElem.getElementsByTagName("img").length > 0
+    const hasTable = divElem.getElementsByTagName("table").length > 0
+    const hasInnerText = divElem.innerText.length > 0
+    store.documentUnit!.texts[id] =
+      hasInnerText || hasImgElem || hasTable ? updatedText : ""
+  }
 }
 </script>
 
@@ -66,12 +72,12 @@ const updateValueByTextId = async (id: keyof Texts, updatedText: string) => {
         />
 
         <TextInput
-          v-if="item.fieldType == TextInput"
+          v-else-if="item.fieldType == TextInput"
           :id="item.id"
           :aria-label="item.aria"
           :model-value="item.value"
           size="medium"
-          @update-value="updateValueByTextId(item.id, $event)"
+          @update:model-value="updateValueByTextId(item.id, $event)"
         />
       </div>
     </div>

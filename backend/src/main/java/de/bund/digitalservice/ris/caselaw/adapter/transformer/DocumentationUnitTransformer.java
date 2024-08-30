@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
@@ -114,6 +115,7 @@ public class DocumentationUnitTransformer {
 
       addActiveCitations(builder, contentRelatedIndexing);
       addNormReferences(builder, contentRelatedIndexing);
+      addJobProfiles(builder, contentRelatedIndexing);
     }
 
     if (updatedDomainObject.texts() != null) {
@@ -124,10 +126,13 @@ public class DocumentationUnitTransformer {
           .headline(null)
           .guidingPrinciple(null)
           .headnote(null)
+          .otherHeadnote(null)
           .tenor(null)
           .grounds(null)
           .caseFacts(null)
-          .decisionGrounds(null);
+          .decisionGrounds(null)
+          .dissentingOpinion(null)
+          .otherLongText(null);
     }
 
     addReferences(updatedDomainObject, builder);
@@ -235,6 +240,22 @@ public class DocumentationUnitTransformer {
                   return activeCitationDTO;
                 })
             .toList());
+  }
+
+  private static void addJobProfiles(
+      DocumentationUnitDTOBuilder builder, ContentRelatedIndexing contentRelatedIndexing) {
+    if (contentRelatedIndexing.jobProfiles() == null) {
+      return;
+    }
+
+    Set<JobProfileDTO> jobProfileDTOs = new LinkedHashSet<>();
+    List<String> jobProfiles = contentRelatedIndexing.jobProfiles();
+
+    for (int i = 0; i < jobProfiles.size(); i++) {
+      jobProfileDTOs.add(JobProfileDTO.builder().value(jobProfiles.get(i)).rank(i + 1L).build());
+    }
+
+    builder.jobProfiles(jobProfileDTOs);
   }
 
   private static void addEnsuingAndPendingDecisions(
@@ -553,6 +574,12 @@ public class DocumentationUnitTransformer {
               .toList();
 
       contentRelatedIndexingBuilder.fieldsOfLaw(fieldOfLaws);
+    }
+
+    if (documentationUnitDTO.getJobProfiles() != null) {
+      List<String> jobProfiles =
+          documentationUnitDTO.getJobProfiles().stream().map(JobProfileDTO::getValue).toList();
+      contentRelatedIndexingBuilder.jobProfiles(jobProfiles);
     }
 
     ContentRelatedIndexing contentRelatedIndexing = contentRelatedIndexingBuilder.build();
