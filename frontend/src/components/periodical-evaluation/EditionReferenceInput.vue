@@ -49,6 +49,12 @@ const legalPeriodical = computed(() =>
     : undefined,
 )
 
+const relatedDocumentationUnit = ref<RelatedDocumentation>(
+  props.modelValue?.documentationUnit
+    ? new RelatedDocumentation({ ...props.modelValue.documentationUnit })
+    : new RelatedDocumentation(),
+)
+
 const prefix = computed({
   get: () =>
     store.edition && store.edition?.prefix ? store.edition.prefix : undefined,
@@ -82,9 +88,6 @@ function updateDateFormatValidation(
 
 async function search() {
   isLoading.value = true
-  const documentationUnitRef = new RelatedDocumentation({
-    ...reference.value,
-  })
 
   //Reset page number to 0, when search input changes
   if (
@@ -97,7 +100,7 @@ async function search() {
   }
 
   const response = await documentUnitService.searchByRelatedDocumentation(
-    documentationUnitRef,
+    relatedDocumentationUnit,
     {
       ...(pageNumber.value != undefined
         ? { pg: pageNumber.value.toString() }
@@ -252,12 +255,12 @@ watch(
         >
           <ComboboxInput
             id="courtInput"
-            v-model="reference.court"
+            v-model="relatedDocumentationUnit.court"
             aria-label="Gericht Aktivzitierung"
             clear-on-choosing-item
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getCourts"
-            :read-only="reference.hasForeignSource"
+            :read-only="relatedDocumentationUnit.hasForeignSource"
             @focus="validationStore.remove('court')"
           >
           </ComboboxInput>
@@ -274,11 +277,11 @@ watch(
         >
           <DateInput
             id="decisionDate"
-            v-model="reference.decisionDate"
+            v-model="relatedDocumentationUnit.decisionDate"
             aria-label="Entscheidungsdatum"
             class="ds-input-medium"
             :has-error="slotProps.hasError"
-            :read-only="reference.hasForeignSource"
+            :read-only="relatedDocumentationUnit.hasForeignSource"
             @focus="validationStore.remove('decisionDate')"
             @update:validation-error="slotProps.updateValidationError"
           ></DateInput>
@@ -293,10 +296,10 @@ watch(
         >
           <TextInput
             id="fileNumber"
-            v-model="reference.fileNumber"
+            v-model="relatedDocumentationUnit.fileNumber"
             aria-label="Aktenzeichen Aktivzitierung"
             :has-error="slotProps.hasError"
-            :read-only="reference.hasForeignSource"
+            :read-only="relatedDocumentationUnit.hasForeignSource"
             size="medium"
             @focus="validationStore.remove('fileNumber')"
           ></TextInput>
@@ -304,10 +307,10 @@ watch(
         <InputField id="decisionDocumentType" label="Dokumenttyp">
           <ComboboxInput
             id="decisionDocumentType"
-            v-model="reference.documentType"
+            v-model="relatedDocumentationUnit.documentType"
             aria-label="Dokumenttyp Aktivzitierung"
             :item-service="ComboboxItemService.getDocumentTypes"
-            :read-only="reference.hasForeignSource"
+            :read-only="relatedDocumentationUnit.hasForeignSource"
           ></ComboboxInput>
         </InputField>
       </div>

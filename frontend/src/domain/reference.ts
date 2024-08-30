@@ -4,7 +4,6 @@ import RelatedDocumentation from "./relatedDocumentation"
 import LegalPeriodical from "@/domain/legalPeriodical"
 
 export default class Reference
-  extends RelatedDocumentation
   implements EditableListItem
 {
   id?: string
@@ -27,7 +26,6 @@ export default class Reference
   ] as const
 
   constructor(data: Partial<Reference> = {}) {
-    super()
     Object.assign(this, data)
     if (this.id == undefined) {
       this.id = crypto.randomUUID()
