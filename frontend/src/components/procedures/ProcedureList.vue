@@ -164,6 +164,17 @@ const debouncedPushQueryToRoute = (() => {
 })()
 
 /**
+ * Get display text for the date the procedure had been created.
+ * If the date is missing a default text is displayed.
+ */
+const getCreatedAtDisplayText = (procedure: Procedure): string => {
+  if (procedure.createdAt) {
+    return "erstellt am " + dayjs(procedure.createdAt).format("DD.MM.YYYY")
+  }
+  return "Erstellungsdatum unbekannt"
+}
+
+/**
  * Get query from url and set local query value
  */
 watch(route, () => {
@@ -268,7 +279,8 @@ onMounted(async () => {
                 v-if="featureToggle"
                 v-model="procedure.userGroupId"
                 aria-label="dropdown input"
-                class="ml-auto w-auto"
+                class="ml-auto w-auto text-center"
+                is-small
                 :items="getDropdownItems()"
                 :read-only="isExternalUser"
                 @click.stop
@@ -277,10 +289,9 @@ onMounted(async () => {
                     handleAssignUserGroup(procedure.id, value)
                 "
               />
-              <span class="mr-24 content-center"
-                >erstellt am
-                {{ dayjs(procedure.createdAt).format("DD.MM.YYYY") }}</span
-              >
+              <span class="mr-24 w-224 content-center text-center">{{
+                getCreatedAtDisplayText(procedure)
+              }}</span>
             </div>
           </template>
 
