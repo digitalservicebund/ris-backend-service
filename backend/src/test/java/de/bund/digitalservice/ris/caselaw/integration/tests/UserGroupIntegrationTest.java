@@ -118,7 +118,7 @@ class UserGroupIntegrationTest {
   void testGetUserGroups_withInternalUser_shouldReturnExternalUserGroupsOfDocOffice() {
     doReturn(List.of(internalUserGroup, externalUserGroup, externalUserGroup1, externalUserGroup2))
         .when(databaseDocumentationOfficeUserGroupService)
-        .getUserGroups();
+        .getAllUserGroups();
 
     risWebTestClient
         .withInternalLogin()
@@ -141,7 +141,7 @@ class UserGroupIntegrationTest {
   void testGetUserGroups_withExternalUser_shouldReturnExternalUserGroupsOfDocOffice() {
     doReturn(List.of(internalUserGroup, externalUserGroup, externalUserGroup1, externalUserGroup2))
         .when(databaseDocumentationOfficeUserGroupService)
-        .getUserGroups();
+        .getAllUserGroups();
 
     risWebTestClient
         .withExternalLogin()
@@ -164,7 +164,7 @@ class UserGroupIntegrationTest {
   void testGetUserGroups_withExternalUser_shouldReturnNoUserGroupsAndWarnings() {
     doReturn(List.of(internalUserGroup, externalUserGroup1, externalUserGroup2))
         .when(databaseDocumentationOfficeUserGroupService)
-        .getUserGroups();
+        .getAllUserGroups();
     TestMemoryAppender memoryAppender = new TestMemoryAppender(KeycloakUserService.class);
 
     risWebTestClient

@@ -171,7 +171,7 @@ class DocumentationUnitControllerAuthIntegrationTest {
                     .userGroupPathName("/CC-RIS")
                     .build()))
         .when(documentationOfficeUserGroupService)
-        .getUserGroups();
+        .getAllUserGroups();
 
     officeMap.put("CC-RIS", ccRisOffice);
     officeMap.put("BGH", bghOffice);

@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroup;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroupService;
 import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,10 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/v1/caselaw/user-group")
 public class UserGroupController {
-  private final KeycloakUserService service;
+  private final DocumentationOfficeUserGroupService service;
 
-  // Fixme: Use UserGroupService instead
-  public UserGroupController(KeycloakUserService service) {
+  public UserGroupController(DocumentationOfficeUserGroupService service) {
     this.service = service;
   }
 
@@ -30,6 +30,6 @@ public class UserGroupController {
   @PreAuthorize("isAuthenticated()")
   public List<DocumentationOfficeUserGroup> getUserGroups(
       @AuthenticationPrincipal OidcUser oidcUser) {
-    return service.getUserGroups(oidcUser);
+    return service.getExternalUserGroups(oidcUser);
   }
 }

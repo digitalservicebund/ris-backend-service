@@ -152,7 +152,7 @@ class HandoverMailDocumentationUnitIntegrationTest {
                     .userGroupPathName("/DS")
                     .build()))
         .when(databaseDocumentationOfficeUserGroupService)
-        .getUserGroups();
+        .getAllUserGroups();
   }
 
   @AfterEach

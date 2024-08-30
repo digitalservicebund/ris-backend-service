@@ -36,15 +36,6 @@ public class KeycloakUserService implements UserService {
   }
 
   @Override
-  public List<DocumentationOfficeUserGroup> getUserGroups(OidcUser oidcUser) {
-    return documentationOfficeUserGroupService.getUserGroups().stream()
-        .filter(
-            group ->
-                group.docOffice().equals(getDocumentationOffice(oidcUser)) && !group.isInternal())
-        .toList();
-  }
-
-  @Override
   public String getEmail(OidcUser oidcUser) {
     return oidcUser.getEmail();
   }
@@ -62,7 +53,7 @@ public class KeycloakUserService implements UserService {
   public Optional<DocumentationOfficeUserGroup> getUserGroup(OidcUser oidcUser) {
     List<String> userGroups = Objects.requireNonNull(oidcUser.getAttribute("groups"));
     var matchingUserGroup =
-        this.documentationOfficeUserGroupService.getUserGroups().stream()
+        this.documentationOfficeUserGroupService.getAllUserGroups().stream()
             .filter(group -> userGroups.contains(group.userGroupPathName()))
             .findFirst();
     if (matchingUserGroup.isEmpty()) {

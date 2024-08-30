@@ -151,7 +151,7 @@ class ProcedureIntegrationTest {
                     .userGroupPathName("/DS")
                     .build()))
         .when(documentationOfficeUserGroupService)
-        .getUserGroups();
+        .getAllUserGroups();
   }
 
   @AfterEach

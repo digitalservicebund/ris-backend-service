@@ -7,6 +7,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeUserGroupTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroupService;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,13 +29,16 @@ public class DatabaseDocumentationOfficeUserGroupService
   private List<DocumentationOfficeUserGroupDTO> documentationOfficeUserGroups;
 
   private final List<DocumentationOfficeConfigUserGroup> userGroupsFromConfig;
+  private final UserService userService;
 
   public DatabaseDocumentationOfficeUserGroupService(
       DatabaseDocumentationOfficeUserGroupRepository repository,
       DatabaseDocumentationOfficeRepository documentationOfficeRepository,
-      List<DocumentationOfficeConfigUserGroup> documentationOfficeConfigUserGroups) {
+      List<DocumentationOfficeConfigUserGroup> documentationOfficeConfigUserGroups,
+      UserService userService) {
     this.repository = repository;
     this.documentationOfficeRepository = documentationOfficeRepository;
+    this.userService = userService;
     this.documentationOfficeUserGroups = new ArrayList<>();
     this.userGroupsFromConfig = documentationOfficeConfigUserGroups;
   }
@@ -74,9 +79,19 @@ public class DatabaseDocumentationOfficeUserGroupService
   }
 
   @Override
-  public List<DocumentationOfficeUserGroup> getUserGroups() {
+  public List<DocumentationOfficeUserGroup> getAllUserGroups() {
     return this.documentationOfficeUserGroups.stream()
         .map(DocumentationOfficeUserGroupTransformer::transformToDomain)
+        .toList();
+  }
+
+  @Override
+  public List<DocumentationOfficeUserGroup> getExternalUserGroups(OidcUser oidcUser) {
+    return getAllUserGroups().stream()
+        .filter(
+            group ->
+                group.docOffice().equals(userService.getDocumentationOffice(oidcUser))
+                    && !group.isInternal())
         .toList();
   }
 

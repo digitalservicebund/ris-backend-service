@@ -13,6 +13,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeUserGroupDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeUserGroupTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -71,6 +72,7 @@ class DatabaseDocumentationOfficeUserGroupServiceTest {
 
   @MockBean private DatabaseDocumentationOfficeRepository officeRepository;
   @MockBean private DatabaseDocumentationOfficeUserGroupRepository groupRepository;
+  @MockBean private UserService userService;
 
   @Test
   void shouldHandleEmptyConfig() {
@@ -79,7 +81,7 @@ class DatabaseDocumentationOfficeUserGroupServiceTest {
     List<DocumentationOfficeConfigUserGroup> configuredGroups = List.of();
     this.service =
         new DatabaseDocumentationOfficeUserGroupService(
-            groupRepository, officeRepository, configuredGroups);
+            groupRepository, officeRepository, configuredGroups, userService);
 
     this.service.onApplicationEvent(null);
 
@@ -94,7 +96,7 @@ class DatabaseDocumentationOfficeUserGroupServiceTest {
     List<DocumentationOfficeConfigUserGroup> configuredGroups = List.of(dsInternalGroupConfig);
     this.service =
         new DatabaseDocumentationOfficeUserGroupService(
-            groupRepository, officeRepository, configuredGroups);
+            groupRepository, officeRepository, configuredGroups, userService);
 
     assertThatThrownBy(() -> this.service.onApplicationEvent(null));
 
@@ -109,7 +111,7 @@ class DatabaseDocumentationOfficeUserGroupServiceTest {
     List<DocumentationOfficeConfigUserGroup> configuredGroups = List.of(dsInternalGroupConfig);
     this.service =
         new DatabaseDocumentationOfficeUserGroupService(
-            groupRepository, officeRepository, configuredGroups);
+            groupRepository, officeRepository, configuredGroups, userService);
 
     this.service.onApplicationEvent(null);
 
@@ -124,7 +126,7 @@ class DatabaseDocumentationOfficeUserGroupServiceTest {
     List<DocumentationOfficeConfigUserGroup> configuredGroups = List.of();
     this.service =
         new DatabaseDocumentationOfficeUserGroupService(
-            groupRepository, officeRepository, configuredGroups);
+            groupRepository, officeRepository, configuredGroups, userService);
 
     this.service.onApplicationEvent(null);
 
@@ -139,7 +141,7 @@ class DatabaseDocumentationOfficeUserGroupServiceTest {
     List<DocumentationOfficeConfigUserGroup> configuredGroups = List.of(dsExternalGroupConfig);
     this.service =
         new DatabaseDocumentationOfficeUserGroupService(
-            groupRepository, officeRepository, configuredGroups);
+            groupRepository, officeRepository, configuredGroups, userService);
 
     this.service.onApplicationEvent(null);
 
@@ -154,7 +156,7 @@ class DatabaseDocumentationOfficeUserGroupServiceTest {
     List<DocumentationOfficeConfigUserGroup> configuredGroups = List.of(dsInternalGroupConfig);
     this.service =
         new DatabaseDocumentationOfficeUserGroupService(
-            groupRepository, officeRepository, configuredGroups);
+            groupRepository, officeRepository, configuredGroups, userService);
 
     this.service.onApplicationEvent(null);
 
@@ -170,7 +172,7 @@ class DatabaseDocumentationOfficeUserGroupServiceTest {
         List.of(dsExternalGroupConfig, dsInternalGroupConfig);
     this.service =
         new DatabaseDocumentationOfficeUserGroupService(
-            groupRepository, officeRepository, configuredGroups);
+            groupRepository, officeRepository, configuredGroups, userService);
 
     this.service.onApplicationEvent(null);
 
@@ -180,6 +182,6 @@ class DatabaseDocumentationOfficeUserGroupServiceTest {
         Stream.of(dsInternalGroupDTO, dsExternalGroupDTO)
             .map(DocumentationOfficeUserGroupTransformer::transformToDomain)
             .toList();
-    assertThat(this.service.getUserGroups()).isEqualTo(expectedGroups);
+    assertThat(this.service.getAllUserGroups()).isEqualTo(expectedGroups);
   }
 }
