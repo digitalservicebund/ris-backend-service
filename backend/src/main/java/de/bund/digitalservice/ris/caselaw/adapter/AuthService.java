@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import com.gravity9.jsonpatch.JsonPatchOperation;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ApiKeyDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
@@ -7,10 +8,13 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ApiKeyTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ApiKey;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.ImportApiKeyException;
 import java.time.Instant;
@@ -36,6 +40,21 @@ public class AuthService {
   private final ProcedureService procedureService;
   private final DatabaseApiKeyRepository keyRepository;
   private final DatabaseDocumentationOfficeRepository officeRepository;
+  private static final List<String> allowedPaths =
+      List.of(
+          "/previousDecisions",
+          "/ensuingDecisions",
+          "/contentRelatedIndexing/keywords",
+          "/contentRelatedIndexing/fieldsOfLaw",
+          "/contentRelatedIndexing/norms",
+          "/contentRelatedIndexing/activeCitations",
+          "/texts/decisionName",
+          "/texts/headline",
+          "/texts/guidingPrinciple",
+          "/texts/headnote",
+          "/texts/otherHeadnote",
+          "/note",
+          "/version");
 
   public AuthService(
       UserService userService,
@@ -81,11 +100,42 @@ public class AuthService {
   }
 
   @Bean
-  public Function<UUID, Boolean> userHasWriteAccessByDocumentationUnitId() {
+  public Function<UUID, Boolean> userHasSameDocumentationOffice() {
     return uuid ->
         Optional.ofNullable(documentationUnitService.getByUuid(uuid))
             .map(this::userHasSameDocOfficeAsDocument)
             .orElse(false);
+  }
+
+  @Bean
+  public Function<UUID, Boolean> isAssignedViaProcedure() {
+    return uuid -> {
+      var documentationUnit = Optional.ofNullable(documentationUnitService.getByUuid(uuid));
+      Optional<OidcUser> oidcUser = getOidcUser();
+      if (documentationUnit.isPresent() && oidcUser.isPresent()) {
+        var procedure = documentationUnit.get().coreData().procedure();
+        if (procedure != null) {
+          return isProcedureAssignedToUser(procedure, oidcUser.get());
+        }
+      }
+      return false;
+    };
+  }
+
+  @Bean
+  public Function<RisJsonPatch, Boolean> isPatchAllowedForExternalUsers() {
+    return patch ->
+        patch.patch().getOperations().stream()
+            .filter(jsonPatchOperation -> !jsonPatchOperation.getOp().equals("test"))
+            .map(JsonPatchOperation::getPath)
+            .map(path -> path.replaceAll("/\\d$", "")) // remove version
+            .allMatch(allowedPaths::contains);
+  }
+
+  private boolean isProcedureAssignedToUser(Procedure procedure, OidcUser oidcUser) {
+    var userGroupIdOfUser =
+        userService.getUserGroup(oidcUser).map(DocumentationOfficeUserGroup::id).orElse(null);
+    return procedure.userGroupId() != null && procedure.userGroupId().equals(userGroupIdOfUser);
   }
 
   private boolean userHasReadAccess(DocumentationUnit documentationUnit) {
@@ -99,9 +149,9 @@ public class AuthService {
   }
 
   private boolean userHasSameDocOfficeAsDocument(DocumentationUnit documentationUnit) {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (authentication != null && authentication.getPrincipal() instanceof OidcUser principal) {
-      DocumentationOffice documentationOffice = userService.getDocumentationOffice(principal);
+    Optional<OidcUser> oidcUser = getOidcUser();
+    if (oidcUser.isPresent()) {
+      DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidcUser.get());
       return documentationOffice != null
           && documentationUnit
               .coreData()
@@ -113,12 +163,22 @@ public class AuthService {
   }
 
   private boolean userHasSameDocOfficeAsProcedure(DocumentationOffice documentationOffice) {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (authentication != null && authentication.getPrincipal() instanceof OidcUser principal) {
-      DocumentationOffice documentationOfficeOfUser = userService.getDocumentationOffice(principal);
+    Optional<OidcUser> oidcUser = getOidcUser();
+    if (oidcUser.isPresent()) {
+      DocumentationOffice documentationOfficeOfUser =
+          userService.getDocumentationOffice(oidcUser.get());
       return documentationOffice.equals(documentationOfficeOfUser);
     }
     return false;
+  }
+
+  private Optional<OidcUser> getOidcUser() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    if (authentication != null && authentication.getPrincipal() instanceof OidcUser principal) {
+      return Optional.of(principal);
+    }
+    return Optional.empty();
   }
 
   /**

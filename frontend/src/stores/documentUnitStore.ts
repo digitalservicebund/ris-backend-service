@@ -132,7 +132,10 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
       return {
         status: response.status,
         data: undefined,
-        error: errorMessages.DOCUMENT_UNIT_UPDATE_FAILED,
+        error:
+          response.status === 403
+            ? errorMessages.NOT_ALLOWED
+            : errorMessages.DOCUMENT_UNIT_UPDATE_FAILED,
       }
     }
     return response

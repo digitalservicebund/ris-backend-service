@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformerException;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
@@ -21,7 +20,6 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDele
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitPatchException;
-import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -82,7 +80,7 @@ public class DocumentationUnitController {
   }
 
   @GetMapping(value = "new", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("isAuthenticated()")
+  @PreAuthorize("isAuthenticated() and @userIsInternal.apply(#oidcUser)")
   public ResponseEntity<DocumentationUnit> generateNewDocumentationUnit(
       @AuthenticationPrincipal OidcUser oidcUser) {
     var docOffice = userService.getDocumentationOffice(oidcUser);
@@ -110,9 +108,12 @@ public class DocumentationUnitController {
       value = "/{uuid}/file",
       produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-  @PreAuthorize("@userHasWriteAccessByDocumentationUnitId.apply(#uuid)")
+  @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasSameDocumentationOffice.apply(#uuid)")
   public ResponseEntity<Docx2Html> attachFileToDocumentationUnit(
-      @PathVariable UUID uuid, @RequestBody byte[] bytes, @RequestHeader HttpHeaders httpHeaders) {
+      @AuthenticationPrincipal OidcUser oidcUser,
+      @PathVariable UUID uuid,
+      @RequestBody byte[] bytes,
+      @RequestHeader HttpHeaders httpHeaders) {
     var docx2html =
         converterService.getConvertedObject(
             attachmentService
@@ -126,9 +127,11 @@ public class DocumentationUnitController {
   }
 
   @DeleteMapping(value = "/{uuid}/file/{s3Path}")
-  @PreAuthorize("@userHasWriteAccessByDocumentationUnitId.apply(#uuid)")
+  @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasSameDocumentationOffice.apply(#uuid)")
   public ResponseEntity<Object> removeAttachmentFromDocumentationUnit(
-      @PathVariable UUID uuid, @PathVariable String s3Path) {
+      @AuthenticationPrincipal OidcUser oidcUser,
+      @PathVariable UUID uuid,
+      @PathVariable String s3Path) {
 
     try {
       attachmentService.deleteByS3Path(s3Path);
@@ -183,38 +186,15 @@ public class DocumentationUnitController {
   }
 
   @DeleteMapping(value = "/{uuid}")
-  @PreAuthorize("@userHasWriteAccessByDocumentationUnitId.apply(#uuid)")
-  public ResponseEntity<String> deleteByUuid(@PathVariable UUID uuid) {
+  @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasSameDocumentationOffice.apply(#uuid)")
+  public ResponseEntity<String> deleteByUuid(
+      @AuthenticationPrincipal OidcUser oidcUser, @PathVariable UUID uuid) {
 
     try {
       var str = service.deleteByUuid(uuid);
       return ResponseEntity.status(HttpStatus.OK).body(str);
     } catch (DocumentationUnitNotExistsException | DocumentationUnitDeletionException ex) {
       return ResponseEntity.internalServerError().body(ex.getMessage());
-    }
-  }
-
-  @PutMapping(
-      value = "/{uuid}",
-      consumes = MediaType.APPLICATION_JSON_VALUE,
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasWriteAccessByDocumentationUnitId.apply(#uuid)")
-  public ResponseEntity<DocumentationUnit> updateByUuid(
-      @PathVariable UUID uuid,
-      @Valid @RequestBody DocumentationUnit documentationUnit,
-      @AuthenticationPrincipal OidcUser oidcUser) {
-
-    if (!uuid.equals(documentationUnit.uuid())) {
-      return ResponseEntity.unprocessableEntity().body(DocumentationUnit.builder().build());
-    }
-    try {
-      var du = service.updateDocumentationUnit(documentationUnit);
-      return ResponseEntity.status(HttpStatus.OK).body(du);
-    } catch (DocumentationUnitNotExistsException
-        | DocumentationUnitException
-        | DocumentationUnitTransformerException e) {
-      log.error("Error by updating documentation unit '{}'", documentationUnit.documentNumber(), e);
-      return ResponseEntity.internalServerError().body(DocumentationUnit.builder().build());
     }
   }
 
@@ -229,9 +209,12 @@ public class DocumentationUnitController {
       value = "/{uuid}",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasWriteAccessByDocumentationUnitId.apply(#uuid)")
+  @PreAuthorize(
+      "@userHasSameDocumentationOffice.apply(#uuid) and (@userIsInternal.apply(#oidcUser) or (@isAssignedViaProcedure.apply(#uuid) and @isPatchAllowedForExternalUsers.apply(#patch)))")
   public ResponseEntity<RisJsonPatch> partialUpdateByUuid(
-      @PathVariable UUID uuid, @RequestBody RisJsonPatch patch) {
+      @AuthenticationPrincipal OidcUser oidcUser,
+      @PathVariable UUID uuid,
+      @RequestBody RisJsonPatch patch) {
 
     String documentNumber = "unknown";
 
@@ -262,7 +245,7 @@ public class DocumentationUnitController {
    *     user is not authorized
    */
   @PutMapping(value = "/{uuid}/handover", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasWriteAccessByDocumentationUnitId.apply(#uuid)")
+  @PreAuthorize("@userHasSameDocumentationOffice.apply(#uuid)")
   public ResponseEntity<HandoverMail> handoverDocumentationUnitAsMail(
       @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
 
@@ -285,7 +268,7 @@ public class DocumentationUnitController {
    *     if the user is not authorized
    */
   @GetMapping(value = "/{uuid}/handover", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasWriteAccessByDocumentationUnitId.apply(#uuid)")
+  @PreAuthorize("@userHasSameDocumentationOffice.apply(#uuid)")
   public List<EventRecord> getEventLog(@PathVariable UUID uuid) {
     return handoverService.getEventLog(uuid);
   }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserGroupController {
   private final KeycloakUserService service;
 
+  // Fixme: Use UserGroupService instead
   public UserGroupController(KeycloakUserService service) {
     this.service = service;
   }
