@@ -71,13 +71,9 @@ export const navigateToReferences = async (
   })
 }
 
-export const navigateToPeriodicalEvaluation = async (
-  page: Page,
-  editionId?: string,
-) => {
+export const navigateToPeriodicalEvaluation = async (page: Page) => {
   await test.step("Navigate to 'Periodika'", async () => {
-    const baseUrl =
-      `/caselaw/periodical-evaluation` + (editionId ? `/${editionId}` : "")
+    const baseUrl = `/caselaw/periodical-evaluation`
 
     await page.goto(baseUrl)
     await expect(page.getByRole("heading", { name: "Periodika" })).toBeVisible()

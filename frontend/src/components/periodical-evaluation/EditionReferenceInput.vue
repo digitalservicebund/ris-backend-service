@@ -69,7 +69,7 @@ const citation = computed(() =>
     ...(prefix.value ? [prefix.value] : []),
     ...(reference.value.citation ? [reference.value.citation] : []),
     ...(suffix.value ? [suffix.value] : []),
-  ].join(""),
+  ].join(" "),
 )
 
 function updateDateFormatValidation(
@@ -250,7 +250,7 @@ watch(
           <ComboboxInput
             id="courtInput"
             v-model="reference.court"
-            aria-label="Gericht"
+            aria-label="Gericht Aktivzitierung"
             clear-on-choosing-item
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getCourts"
@@ -291,7 +291,7 @@ watch(
           <TextInput
             id="fileNumber"
             v-model="reference.fileNumber"
-            aria-label="Aktenzeichen"
+            aria-label="Aktenzeichen Aktivzitierung"
             :has-error="slotProps.hasError"
             :read-only="reference.hasForeignSource"
             size="medium"
@@ -302,7 +302,7 @@ watch(
           <ComboboxInput
             id="decisionDocumentType"
             v-model="reference.documentType"
-            aria-label="Dokumenttyp"
+            aria-label="Dokumenttyp Aktivzitierung"
             :item-service="ComboboxItemService.getDocumentTypes"
             :read-only="reference.hasForeignSource"
           ></ComboboxInput>

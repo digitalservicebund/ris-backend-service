@@ -20,7 +20,6 @@ import ComboboxItemService from "@/services/comboboxItemService"
 import { ResponseError } from "@/services/httpClient"
 import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 import IconChevronRight from "~icons/ic/baseline-chevron-right"
-import IconDelete from "~icons/ic/baseline-close"
 
 const emptyResponse: ResponseError = {
   title: "Wählen Sie ein Periodikum um die Ausgaben anzuzeigen.",
@@ -166,49 +165,18 @@ watch(
               {{ DateUtil.formatDate(edition.createdAt) || "Datum unbekannt" }}
             </span>
           </CellItem>
-          <CellItem class="flex">
-            <div class="float-end flex">
-              <router-link
-                target="_blank"
-                :to="{
-                  name: 'caselaw-periodical-evaluation-uuid',
-                  params: { uuid: edition.id },
-                }"
-              >
-                <div class="ds-button-primary">
-                  <IconChevronRight class="text-blue-800" />
-                </div>
-              </router-link>
-              <button
-                v-if="edition.references?.length == 0"
-                aria-label="Ausgabe löschen"
-                class="cursor-pointer text-red-800 hover:text-red-600"
-                @click="
-                  async () => {
-                    edition.id &&
-                      (await LegalPeriodicalEditionService.delete(edition.id))
-                    edition.id &&
-                      (await updateEditions(filter!.uuid?.toString() || ''))
-                  }
-                "
-                @keyup.enter="
-                  async () => {
-                    edition.id &&
-                      (await LegalPeriodicalEditionService.delete(edition.id))
-                    edition.id &&
-                      (await updateEditions(filter!.uuid?.toString() || ''))
-                  }
-                "
-              >
-                <IconDelete />
-              </button>
-
-              <IconDelete
-                v-else
-                aria-label="Ausgabe kann nicht gelöscht werden"
-                class="text-gray-400"
-              />
-            </div>
+          <CellItem>
+            <router-link
+              target="_blank"
+              :to="{
+                name: 'caselaw-periodical-evaluation-uuid',
+                params: { uuid: edition.id },
+              }"
+            >
+              <div class="ds-button-primary">
+                <IconChevronRight class="text-blue-800" />
+              </div>
+            </router-link>
           </CellItem>
         </TableRow>
       </TableView>
