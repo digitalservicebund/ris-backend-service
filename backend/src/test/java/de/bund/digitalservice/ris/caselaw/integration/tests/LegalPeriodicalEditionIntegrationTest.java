@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -83,13 +84,11 @@ class LegalPeriodicalEditionIntegrationTest {
   @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @MockBean private ProcedureService procedureService;
 
-  private static final UUID TEST_UUID = UUID.randomUUID();
-  private final String EDITION_ENDPOINT = "/api/v1/caselaw/legalperiodicaledition";
+  private static final String EDITION_ENDPOINT = "/api/v1/caselaw/legalperiodicaledition";
   private final DocumentationOffice docOffice = buildDSDocOffice();
 
   @BeforeEach
   void setUp() {
-
     when(userService.getDocumentationOffice(any())).thenReturn(docOffice);
   }
 
@@ -184,10 +183,32 @@ class LegalPeriodicalEditionIntegrationTest {
             .prefix(null)
             .suffix("- Sonderheft 1")
             .build();
-    // repository.save(legalPeriodicalEdition);
 
     Assertions.assertThrows(JpaSystemException.class, () -> repository.save(legalPeriodicalEdition))
         .getMessage()
         .contains("chk_prefix_or_name_not_null");
+  }
+
+  @Test
+  void testDeleteEditionWithoutReferences() {
+    var legalPeriodical =
+        legalPeriodicalRepository.findAllBySearchStr(Optional.of("ABC")).stream()
+            .findAny()
+            .orElseThrow(
+                () ->
+                    new NoSuchElementException(
+                        "Legal periodical not found, check legal_periodical_init.sql"));
+
+    var legalPeriodicalEdition =
+        LegalPeriodicalEdition.builder()
+            .id(UUID.randomUUID())
+            .legalPeriodical(legalPeriodical)
+            .prefix("2024, ")
+            .build();
+    legalPeriodicalEdition = repository.save(legalPeriodicalEdition);
+    assertThat(repository.findAllByLegalPeriodicalId(legalPeriodical.uuid()).size()).isEqualTo(1);
+    repository.delete(legalPeriodicalEdition);
+
+    assertThat(repository.findAllByLegalPeriodicalId(legalPeriodical.uuid())).isEmpty();
   }
 }
