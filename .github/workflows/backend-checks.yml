@@ -34,7 +34,7 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@67fbd726daaf08212a7b021c1c4d117f94a81dd3
+        uses: actions/setup-java@8e04ddff28554375a9a1096c888a2ef2c9803cd7
         with:
           java-version: "17.0"
           distribution: "temurin"
@@ -67,7 +67,7 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@67fbd726daaf08212a7b021c1c4d117f94a81dd3
+        uses: actions/setup-java@8e04ddff28554375a9a1096c888a2ef2c9803cd7
         with:
           java-version: "17.0"
           distribution: "temurin"
@@ -99,7 +99,7 @@ jobs:
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
       - name: Set up JDK
-        uses: actions/setup-java@67fbd726daaf08212a7b021c1c4d117f94a81dd3
+        uses: actions/setup-java@8e04ddff28554375a9a1096c888a2ef2c9803cd7
         with:
           java-version: "17.0"
           distribution: "temurin"
