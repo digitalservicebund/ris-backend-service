@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDocOffice;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockDocOfficeUserGroups;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING;
@@ -727,9 +726,7 @@ class DocumentationUnitIntegrationTest {
 
   @Test
   void testSearchByDocumentationUnitSearchInput() {
-    DocumentationOffice otherDocOffice = buildDocOffice("BGH");
-    UUID otherDocOfficeUuid =
-        documentationOfficeRepository.findByAbbreviation(otherDocOffice.abbreviation()).getId();
+    UUID otherDocOfficeUuid = documentationOfficeRepository.findByAbbreviation("BGH").getId();
 
     List<UUID> docOfficeIds =
         List.of(

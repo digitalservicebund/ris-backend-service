@@ -65,10 +65,6 @@ public class AuthUtils {
                 }));
   }
 
-  public static DocumentationOffice buildDocOffice(String abbreviation) {
-    return DocumentationOffice.builder().abbreviation(abbreviation).build();
-  }
-
   public static DocumentationOffice buildDSDocOffice() {
     return DocumentationOffice.builder()
         .abbreviation("DS")
