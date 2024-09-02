@@ -2,89 +2,101 @@ import dayjs from "dayjs"
 import EditableListItem from "./editableListItem"
 import RelatedDocumentation from "./relatedDocumentation"
 import LegalPeriodical from "@/domain/legalPeriodical"
+import PreviousDecision from "@/domain/previousDecision";
 
 export default class Reference
-  implements EditableListItem
-{
-  id?: string
-  citation?: string
-  referenceSupplement?: string
-  footnote?: string
-  legalPeriodical?: LegalPeriodical
-  legalPeriodicalRawValue?: string
-  documentationUnit?: RelatedDocumentation
+    implements EditableListItem {
+    id?: string
+    citation?: string
+    referenceSupplement?: string
+    footnote?: string
+    legalPeriodical?: LegalPeriodical
+    legalPeriodicalRawValue?: string
+    documentationUnit?: RelatedDocumentation
 
-  static readonly requiredFields = ["legalPeriodical", "citation"] as const
-  static readonly fields = [
-    "legalPeriodical",
-    "citation",
-    "referenceSupplement",
-  ] as const
+    static readonly requiredFields = ["legalPeriodical", "citation", "documentationUnit"] as const
+    static readonly fields = [
+        "legalPeriodical",
+        "citation",
+        "referenceSupplement",
+        "documentationUnit"
+    ] as const
 
-  constructor(data: Partial<Reference> = {}) {
-    Object.assign(this, data)
-    if (this.id == undefined) {
-      this.id = crypto.randomUUID()
+    constructor(data: Partial<Reference> = {}) {
+        Object.assign(this, data)
+
+        if (this.documentationUnit) {
+            this.documentationUnit = new RelatedDocumentation({...data.documentationUnit})
+        }
+        if (this.id == undefined) {
+            this.id = crypto.randomUUID()
+        }
     }
-  }
 
-  get renderDocumentationUnit(): string {
-    if (!this.documentationUnit) {
-      return ""
+    get renderDocumentationUnit(): string {
+        if (!this.documentationUnit) {
+            return ""
+        }
+        return [
+            this.documentationUnit?.court?.label ?? "",
+            this.documentationUnit?.decisionDate
+                ? dayjs(this.documentationUnit.decisionDate).format("DD.MM.YYYY")
+                : "",
+            this.documentationUnit?.fileNumber ?? "",
+            this.documentationUnit?.documentType?.label ?? "",
+        ]
+            .filter(Boolean)
+            .join(", ")
     }
-    return [
-      this.documentationUnit?.court?.label ?? "",
-      this.documentationUnit?.decisionDate
-        ? dayjs(this.documentationUnit.decisionDate).format("DD.MM.YYYY")
-        : "",
-      this.documentationUnit?.fileNumber ?? "",
-      this.documentationUnit?.documentType?.label ?? "",
-    ]
-      .filter(Boolean)
-      .join(", ")
-  }
 
-  get renderDecision(): string {
-    return [
-      this.legalPeriodical?.abbreviation ?? this.legalPeriodicalRawValue,
-      this.citation,
-      this.referenceSupplement ? ` (${this.referenceSupplement})` : "",
-    ]
-      .filter(Boolean)
-      .join(" ")
-  }
+    get renderDecision(): string {
+        return [
+            this.legalPeriodical?.abbreviation ?? this.legalPeriodicalRawValue,
+            this.citation,
+            this.referenceSupplement ? ` (${this.referenceSupplement})` : "",
+        ]
+            .filter(Boolean)
+            .join(" ")
+    }
 
-  get hasMissingRequiredFields(): boolean {
-    return this.missingRequiredFields.length > 0
-  }
+    get hasMissingRequiredFields(): boolean {
+        return this.missingRequiredFields.length > 0
+    }
 
-  get missingRequiredFields() {
-    return Reference.requiredFields.filter((field) =>
-      this.fieldIsEmpty(this[field]),
-    )
-  }
+    get missingRequiredFields() {
+        const requiredFields = Reference.requiredFields.filter((field) =>
+            this.fieldIsEmpty(this[field])
+        );
+
+        const allMissingFields = [
+            ...requiredFields,
+            ...(this.documentationUnit?.missingRequiredFields || [])
+        ];
+
+        return allMissingFields;
+    }
 
 
-  equals(entry: Reference): boolean {
-    return this.id === entry.id
-  }
+    equals(entry: Reference): boolean {
+        return this.id === entry.id
+    }
 
-  get isEmpty(): boolean {
-    let isEmpty = true
+    get isEmpty(): boolean {
+        let isEmpty = true
 
-    Reference.fields.map((key) => {
-      if (!this.fieldIsEmpty(this[key])) {
-        isEmpty = false
-      }
-    })
-    return isEmpty
-  }
+        Reference.fields.map((key) => {
+            if (!this.fieldIsEmpty(this[key])) {
+                isEmpty = false
+            }
+        })
+        return isEmpty
+    }
 
-  private fieldIsEmpty(value: Reference[(typeof Reference.fields)[number]]) {
-    return value === undefined || !value || Object.keys(value).length === 0
-  }
+    private fieldIsEmpty(value: Reference[(typeof Reference.fields)[number]]) {
+        return value === undefined || !value || Object.keys(value).length === 0
+    }
 
-  get hasForeignSource(): boolean {
-    return true
-  }
+    get hasForeignSource(): boolean {
+        return true
+    }
 }

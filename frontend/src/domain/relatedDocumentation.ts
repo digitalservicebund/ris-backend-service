@@ -1,70 +1,95 @@
 import dayjs from "dayjs"
-import { Court, DocumentType } from "./documentUnit"
+import {Court, DocumentType} from "./documentUnit"
 import {
-  Label,
-  PublicationState,
-  PublicationStatus,
+    Label,
+    PublicationState,
+    PublicationStatus,
 } from "@/domain/publicationStatus"
 
 export default class RelatedDocumentation {
-  public uuid?: string
-  public documentNumber?: string
-  public status?: PublicationStatus
-  public deviatingFileNumber?: string
-  public court?: Court
-  public decisionDate?: string
-  public fileNumber?: string
-  public documentType?: DocumentType
-  public referenceFound?: boolean
+    public uuid?: string
+    public documentNumber?: string
+    public status?: PublicationStatus
+    public deviatingFileNumber?: string
+    public court?: Court
+    public decisionDate?: string
+    public fileNumber?: string
+    public documentType?: DocumentType
+    public referenceFound?: boolean
 
-  get hasForeignSource(): boolean {
-    return this.documentNumber != null && !!this.referenceFound
-  }
+    static readonly requiredFields = [
+        "court",
+        "fileNumber",
+        "decisionDate",
+        "documentType",
+    ] as const
 
-  constructor(data: Partial<RelatedDocumentation> = {}) {
-    Object.assign(this, data)
-  }
+    static readonly fields = [
+        "court",
+        "fileNumber",
+        "decisionDate",
+        "documentType",
+    ] as const
 
-  public isLinkedWith<Type extends RelatedDocumentation>(
-    localDecisions: Type[] | undefined,
-  ): boolean {
-    if (!localDecisions) return false
-
-    return localDecisions.some(
-      (localDecision) => localDecision.documentNumber == this.documentNumber,
-    )
-  }
-
-  private getStatusLabel(status: PublicationStatus) {
-    if (!status) return ""
-
-    switch (status.publicationStatus) {
-      case PublicationState.PUBLISHED:
-        return Label.PUBLISHED
-      case PublicationState.UNPUBLISHED:
-        return Label.UNPUBLISHED
-      case PublicationState.PUBLISHING:
-        return Label.PUBLISHING
-      case PublicationState.DUPLICATED:
-        return Label.DUPLICATED
-      case PublicationState.LOCKED:
-        return Label.LOCKED
-      case PublicationState.DELETING:
-        return Label.DELETING
-      default:
-        return ""
+    get hasForeignSource(): boolean {
+        return this.documentNumber != null && !!this.referenceFound
     }
-  }
 
-  get renderDecision(): string {
-    return [
-      ...(this.court ? [`${this.court?.label}`] : []),
-      ...(this.decisionDate
-        ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
-        : []),
-      ...(this.fileNumber ? [this.fileNumber] : []),
-      ...(this.documentType?.label ? [this.documentType.label] : []),
-      ...(this.status ? [this.getStatusLabel(this.status)] : []),
-    ].join(", ")
-  }
+    constructor(data: Partial<RelatedDocumentation> = {}) {
+        Object.assign(this, data)
+    }
+
+    public isLinkedWith<Type extends RelatedDocumentation>(
+        localDecisions: Type[] | undefined,
+    ): boolean {
+        if (!localDecisions) return false
+
+        return localDecisions.some(
+            (localDecision) => localDecision.documentNumber == this.documentNumber,
+        )
+    }
+
+    private getStatusLabel(status: PublicationStatus) {
+        if (!status) return ""
+
+        switch (status.publicationStatus) {
+            case PublicationState.PUBLISHED:
+                return Label.PUBLISHED
+            case PublicationState.UNPUBLISHED:
+                return Label.UNPUBLISHED
+            case PublicationState.PUBLISHING:
+                return Label.PUBLISHING
+            case PublicationState.DUPLICATED:
+                return Label.DUPLICATED
+            case PublicationState.LOCKED:
+                return Label.LOCKED
+            case PublicationState.DELETING:
+                return Label.DELETING
+            default:
+                return ""
+        }
+    }
+
+
+    get missingRequiredFields() {
+        return RelatedDocumentation.requiredFields.filter((field) =>
+            this.fieldIsEmpty(this[field]),
+        )
+    }
+
+    get renderDecision(): string {
+        return [
+            ...(this.court ? [`${this.court?.label}`] : []),
+            ...(this.decisionDate
+                ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
+                : []),
+            ...(this.fileNumber ? [this.fileNumber] : []),
+            ...(this.documentType?.label ? [this.documentType.label] : []),
+            ...(this.status ? [this.getStatusLabel(this.status)] : []),
+        ].join(", ")
+    }
+
+    private fieldIsEmpty(value: Reference[(typeof Reference.fields)[number]]) {
+        return value === undefined || !value || Object.keys(value).length === 0
+    }
 }

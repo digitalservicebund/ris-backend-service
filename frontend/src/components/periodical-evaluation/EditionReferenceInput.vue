@@ -30,7 +30,7 @@ const emit = defineEmits<{
 }>()
 const store = useEditionStore()
 const lastSavedModelValue = ref(new Reference({ ...props.modelValue }))
-const reference = ref(new Reference({ ...props.modelValue }))
+const reference = ref<Reference>(new Reference({ ...props.modelValue }))
 const validationStore = useValidationStore<(typeof Reference.fields)[number]>()
 const pageNumber = ref<number>(0)
 const itemsPerPage = ref<number>(15)
@@ -123,32 +123,29 @@ async function updatePage(page: number) {
   search()
 }
 
-async function validateRequiredInput() {
-  validationStore.reset()
-  if (reference.value.missingRequiredFields?.length) {
-    reference.value.missingRequiredFields.forEach((missingField) => {
-      console.log(missingField)
+async function validateRequiredInput(toValidateReference: Reference) {
+  if (toValidateReference.missingRequiredFields?.length) {
+    toValidateReference.missingRequiredFields.forEach((missingField) => {
       validationStore.add("Pflichtfeld nicht befüllt", missingField)
     })
   }
 }
 
 async function addReference(decision: RelatedDocumentation) {
-  await validateRequiredInput()
+  validationStore.reset()
+  relatedDocumentationUnit.value = new RelatedDocumentation({ ...decision })
+  const newReference: Reference = new Reference({
+    ...reference.value,
+    documentationUnit: {
+      ...decision,
+    },
+  })
+
+  await validateRequiredInput(newReference)
+
   if (!validationStore.getByMessage("Pflichtfeld nicht befüllt").length) {
     // Merge the decision from search with the current reference input values
-    emit(
-      "update:modelValue",
-      new Reference({
-        id: reference.value.id,
-        citation: citation.value,
-        referenceSupplement: reference.value.referenceSupplement,
-        footnote: reference.value.footnote,
-        legalPeriodical: reference.value.legalPeriodical,
-        legalPeriodicalRawValue: reference.value.legalPeriodicalRawValue,
-        documentationUnit: new RelatedDocumentation({ ...decision }),
-      }),
-    )
+    emit("update:modelValue", newReference)
     emit("addEntry")
   }
 }
@@ -168,6 +165,7 @@ watch(
 </script>
 
 <template>
+  {{ validationStore.getAll() }}
   <div class="flex h-full flex-col space-y-24 py-16">
     <div class="flex flex-col gap-24">
       <InputField id="legalPeriodical" label="Periodikum *">
@@ -251,7 +249,7 @@ watch(
             clear-on-choosing-item
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getCourts"
-            :read-only="relatedDocumentationUnit.hasForeignSource"
+            :read-only="reference?.documentationUnit?.hasForeignSource"
             @focus="validationStore.remove('court')"
           >
           </ComboboxInput>
@@ -272,7 +270,7 @@ watch(
             aria-label="Entscheidungsdatum"
             class="ds-input-medium"
             :has-error="slotProps.hasError"
-            :read-only="relatedDocumentationUnit.hasForeignSource"
+            :read-only="reference?.documentationUnit?.hasForeignSource"
             @focus="validationStore.remove('decisionDate')"
             @update:validation-error="slotProps.updateValidationError"
           ></DateInput>
@@ -290,7 +288,7 @@ watch(
             v-model="relatedDocumentationUnit.fileNumber"
             aria-label="Aktenzeichen Aktivzitierung"
             :has-error="slotProps.hasError"
-            :read-only="relatedDocumentationUnit.hasForeignSource"
+            :read-only="reference?.documentationUnit?.hasForeignSource"
             size="medium"
             @focus="validationStore.remove('fileNumber')"
           ></TextInput>
@@ -301,7 +299,7 @@ watch(
             v-model="relatedDocumentationUnit.documentType"
             aria-label="Dokumenttyp Aktivzitierung"
             :item-service="ComboboxItemService.getDocumentTypes"
-            :read-only="relatedDocumentationUnit.hasForeignSource"
+            :read-only="reference?.documentationUnit?.hasForeignSource"
           ></ComboboxInput>
         </InputField>
       </div>
