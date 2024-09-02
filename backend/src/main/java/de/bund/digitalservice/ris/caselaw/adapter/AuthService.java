@@ -128,7 +128,7 @@ public class AuthService {
         patch.patch().getOperations().stream()
             .filter(jsonPatchOperation -> !jsonPatchOperation.getOp().equals("test"))
             .map(JsonPatchOperation::getPath)
-            .map(path -> path.replaceAll("/\\d$", "")) // remove version
+            .map(path -> path.replaceAll("/\\d$", "")) // remove index
             .allMatch(allowedPaths::contains);
   }
 
