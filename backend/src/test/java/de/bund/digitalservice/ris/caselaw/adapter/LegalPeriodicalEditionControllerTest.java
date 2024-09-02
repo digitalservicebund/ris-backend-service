@@ -157,4 +157,32 @@ class LegalPeriodicalEditionControllerTest {
         .expectStatus()
         .is4xxClientError();
   }
+
+  @Test
+  void testDeleteLegalPeriodicalEdition_withoutReferences_shouldSucceed() {
+    UUID uuid = UUID.randomUUID();
+    when(service.delete(uuid)).thenReturn(true);
+
+    risWebTestClient
+        .withDefaultLogin()
+        .delete()
+        .uri(EDITION_ENDPOINT + "/" + uuid)
+        .exchange()
+        .expectStatus()
+        .isOk();
+  }
+
+  @Test
+  void testDeleteLegalPeriodicalEdition_withReferences_shouldReturnUnchanged() {
+    UUID uuid = UUID.randomUUID();
+    when(service.delete(uuid)).thenReturn(false);
+
+    risWebTestClient
+        .withDefaultLogin()
+        .delete()
+        .uri(EDITION_ENDPOINT + "/" + uuid)
+        .exchange()
+        .expectStatus()
+        .isNoContent();
+  }
 }
