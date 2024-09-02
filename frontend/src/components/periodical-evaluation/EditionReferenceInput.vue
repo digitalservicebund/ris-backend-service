@@ -167,7 +167,6 @@ watch(
 </script>
 
 <template>
-  {{ validationStore.getAll() }}
   <div class="flex h-full flex-col space-y-24 py-16">
     <div class="flex flex-col gap-24">
       <InputField id="legalPeriodical" label="Periodikum *">
