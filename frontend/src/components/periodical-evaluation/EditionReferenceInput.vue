@@ -74,7 +74,7 @@ const citation = computed(() =>
     ...(prefix.value ? [prefix.value] : []),
     ...(reference.value.citation ? [reference.value.citation] : []),
     ...(suffix.value ? [suffix.value] : []),
-  ].join(" "),
+  ].join(""),
 )
 
 function updateDateFormatValidation(

@@ -35,4 +35,9 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
     return LegalPeriodicalEditionTransformer.transformToDomain(
         repository.save(LegalPeriodicalEditionTransformer.transformToDTO(legalPeriodicalEdition)));
   }
+
+  @Override
+  public void delete(LegalPeriodicalEdition legalPeriodicalEdition) {
+    repository.deleteById(legalPeriodicalEdition.id());
+  }
 }

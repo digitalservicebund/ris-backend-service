@@ -29,4 +29,14 @@ public class LegalPeriodicalEditionService {
       LegalPeriodicalEdition legalPeriodicalEdition) {
     return legalPeriodicalRepository.save(legalPeriodicalEdition);
   }
+
+  // TODO test
+  public boolean delete(UUID editionId) {
+    var edition = legalPeriodicalRepository.findById(editionId);
+    if (edition.isPresent() && edition.get().references().isEmpty()) {
+      legalPeriodicalRepository.delete(edition.get());
+      return true;
+    }
+    return false;
+  }
 }
