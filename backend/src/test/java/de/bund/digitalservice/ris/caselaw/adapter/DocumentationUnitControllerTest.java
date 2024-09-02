@@ -109,7 +109,7 @@ class DocumentationUnitControllerTest {
   }
 
   @Test
-  void testGenerateNewDocumentationUnit() {
+  void testGenerateNewDocumentationUnit_withInternalUser_shouldSucceed() {
     // userService.getDocumentationOffice is mocked in @BeforeEach
     when(service.generateNewDocumentationUnit(docOffice))
         .thenReturn(
@@ -123,10 +123,28 @@ class DocumentationUnitControllerTest {
         .uri("/api/v1/caselaw/documentunits/new")
         .exchange()
         .expectStatus()
-        .isCreated();
+        .isCreated()
+        .expectBody(DocumentationUnit.class);
 
     verify(service, times(1)).generateNewDocumentationUnit(docOffice);
     verify(userService, times(1)).getDocumentationOffice(any(OidcUser.class));
+  }
+
+  @Test
+  void testGenerateNewDocumentationUnit_withExternalUser_shouldBeForbidden() {
+    // userService.getDocumentationOffice is mocked in @BeforeEach
+    when(userService.isInternal(any(OidcUser.class))).thenReturn(false);
+
+    risWebClient
+        .withExternalLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/new")
+        .exchange()
+        .expectStatus()
+        .isForbidden();
+
+    verify(service, times(0)).generateNewDocumentationUnit(docOffice);
+    verify(userService, times(0)).getDocumentationOffice(any(OidcUser.class));
   }
 
   @Test
@@ -143,7 +161,8 @@ class DocumentationUnitControllerTest {
         .uri("/api/v1/caselaw/documentunits/ABCD202200001")
         .exchange()
         .expectStatus()
-        .isOk();
+        .isOk()
+        .expectBody(DocumentationUnit.class);
 
     // once by the AuthService and once by the controller asking the service
     verify(service, times(2)).getByDocumentNumber("ABCD202200001");
@@ -163,7 +182,8 @@ class DocumentationUnitControllerTest {
   }
 
   @Test
-  void testDeleteByUuid() throws DocumentationUnitNotExistsException {
+  void testDeleteByUuid_withInternalUser_shouldSucceed()
+      throws DocumentationUnitNotExistsException {
     when(service.deleteByUuid(TEST_UUID)).thenReturn(null);
 
     risWebClient
@@ -175,6 +195,24 @@ class DocumentationUnitControllerTest {
         .isOk();
 
     verify(service).deleteByUuid(TEST_UUID);
+  }
+
+  @Test
+  void testDeleteByUuid_withExternalUser_shouldBeForbidden()
+      throws DocumentationUnitNotExistsException {
+    // userService.getDocumentationOffice is mocked in @BeforeEach
+    when(userService.isInternal(any(OidcUser.class))).thenReturn(false);
+    when(service.deleteByUuid(TEST_UUID)).thenReturn(null);
+
+    risWebClient
+        .withExternalLogin()
+        .delete()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
+        .exchange()
+        .expectStatus()
+        .isForbidden();
+
+    verify(service, times(0)).deleteByUuid(TEST_UUID);
   }
 
   @Test

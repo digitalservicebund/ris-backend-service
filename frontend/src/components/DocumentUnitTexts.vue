@@ -3,14 +3,14 @@ import { computed } from "vue"
 import TextEditor from "../components/input/TextEditor.vue"
 import TextAreaInput from "@/components/input/TextAreaInput.vue"
 import TextInput from "@/components/input/TextInput.vue"
-import { useExternalUser } from "@/composables/useExternalUser"
+import { useInternalUser } from "@/composables/useInternalUser"
 import { useValidBorderNumbers } from "@/composables/useValidBorderNumbers"
 import { Texts } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import StringsUtil from "@/utils/stringsUtil"
 
 const store = useDocumentUnitStore()
-const isExternalUser = useExternalUser()
+const isInternalUser = useInternalUser()
 
 function isReadOnly(item: { name: string }): boolean {
   switch (item.name) {
@@ -20,7 +20,7 @@ function isReadOnly(item: { name: string }): boolean {
     case "decisionReasons":
     case "dissentingOpinion":
     case "otherLongText":
-      return isExternalUser
+      return !isInternalUser
     default:
       return false
   }

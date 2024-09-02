@@ -429,14 +429,72 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
   }
 
   @Test
-  void testRemoveFileFromDocumentationUnit_withInvalidUuid() {
+  void testAttachFileToDocumentationUnit_withExternalUser_shouldBeForbidden() throws IOException {
+    var attachment = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
+    mockS3ClientToReturnFile(attachment);
+
+    DocumentationUnitDTO dto =
+        repository.save(
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .build());
+
+    risWebTestClient
+        .withExternalLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file")
+        .contentType(
+            MediaType.parseMediaType(
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+        .bodyAsByteArray(attachment)
+        .exchange()
+        .expectStatus()
+        .isForbidden();
+
+    assertThat(attachmentRepository.findAllByDocumentationUnitId(dto.getId())).isEmpty();
+  }
+
+  @Test
+  void testRemoveFileFromDocumentationUnit_withInvalidUuid_shouldFail() {
     risWebTestClient
         .withDefaultLogin()
         .delete()
-        .uri("/api/v1/caselaw/documentunits/abc/file")
+        .uri("/api/v1/caselaw/documentunits/abc/file/fooPath")
         .exchange()
         .expectStatus()
         .is4xxClientError();
+  }
+
+  @Test
+  void testRemoveFileFromDocumentationUnit_withExternalUser_shouldBeForbidden() {
+    when(s3Client.deleteObject(any(DeleteObjectRequest.class)))
+        .thenReturn(DeleteObjectResponse.builder().build());
+
+    DocumentationUnitDTO dto =
+        repository.save(
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .build());
+
+    attachmentRepository.save(
+        AttachmentDTO.builder()
+            .s3ObjectPath("fooPath")
+            .documentationUnit(dto)
+            .uploadTimestamp(Instant.now())
+            .filename("fooFile")
+            .format("docx")
+            .build());
+
+    assertThat(attachmentRepository.findAll()).hasSize(1);
+    risWebTestClient
+        .withExternalLogin()
+        .delete()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/file/fooPath")
+        .exchange()
+        .expectStatus()
+        .isForbidden();
   }
 
   private void mockS3ClientToReturnFile(byte[] file) {

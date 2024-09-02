@@ -1079,4 +1079,28 @@ class DocumentationUnitIntegrationTest {
     List<DeletedDocumentationUnitDTO> allDeletedIds = deletedDocumentationIdsRepository.findAll();
     assertThat(allDeletedIds).isEmpty();
   }
+
+  @Test
+  void testGenerateNewDocumentationUnit_withInternalUser_shouldSucceed() {
+    when(documentNumberPatternConfig.getDocumentNumberPatterns())
+        .thenReturn(Map.of("DS", "ZZREYYYY*****"));
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/new")
+        .exchange()
+        .expectStatus()
+        .isCreated();
+  }
+
+  @Test
+  void testGenerateNewDocumentationUnit_withExternalUser_shouldBeForbidden() {
+    risWebTestClient
+        .withExternalLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/new")
+        .exchange()
+        .expectStatus()
+        .isForbidden();
+  }
 }
