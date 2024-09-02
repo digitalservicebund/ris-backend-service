@@ -180,6 +180,6 @@ class DatabaseDocumentationOfficeUserGroupServiceTest {
         Stream.of(dsInternalGroupDTO, dsExternalGroupDTO)
             .map(DocumentationOfficeUserGroupTransformer::transformToDomain)
             .toList();
-    assertThat(this.service.getUserGroups()).isEqualTo(expectedGroups);
+    assertThat(this.service.getAllUserGroups()).isEqualTo(expectedGroups);
   }
 }

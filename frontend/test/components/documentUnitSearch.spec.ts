@@ -59,7 +59,6 @@ describe("Documentunit Search", () => {
             },
             documentNumber: "documentNumber",
             fileNumber: "fileNumber",
-            documentationOffice: { abbreviation: "DS" },
           }),
         ],
         size: 0,

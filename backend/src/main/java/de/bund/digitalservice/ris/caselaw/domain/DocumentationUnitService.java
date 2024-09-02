@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,7 +68,7 @@ public class DocumentationUnitService {
 
   public Slice<DocumentationUnitListItem> searchByDocumentationUnitSearchInput(
       Pageable pageable,
-      DocumentationOffice documentationOffice,
+      OidcUser oidcUser,
       Optional<String> documentNumber,
       Optional<String> fileNumber,
       Optional<String> courtType,
@@ -98,9 +99,7 @@ public class DocumentationUnitService {
             .build();
 
     return repository.searchByDocumentationUnitSearchInput(
-        PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()),
-        documentationOffice,
-        searchInput);
+        PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()), oidcUser, searchInput);
   }
 
   public DocumentationUnit getByDocumentNumber(String documentNumber) {

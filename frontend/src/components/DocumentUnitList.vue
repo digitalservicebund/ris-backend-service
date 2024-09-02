@@ -16,7 +16,6 @@ import TableRow from "@/components/TableRow.vue"
 import TableView from "@/components/TableView.vue"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { ResponseError } from "@/services/httpClient"
-import useSessionStore from "@/stores/sessionStore"
 import IconAttachedFile from "~icons/ic/baseline-attach-file"
 import IconDelete from "~icons/ic/baseline-close"
 import IconError from "~icons/ic/baseline-error"
@@ -29,15 +28,11 @@ const props = defineProps<{
   documentUnitListEntries?: DocumentUnitListEntry[]
   searchResponseError?: ResponseError
   isLoading?: boolean
-  isDeletable?: boolean
-  isEditable?: boolean
   emptyState?: string
 }>()
 const emit = defineEmits<{
   deleteDocumentUnit: [documentUnitListEntry: DocumentUnitListEntry]
 }>()
-
-const session = useSessionStore()
 
 const emptyStatus = computed(() => props.emptyState)
 
@@ -214,10 +209,7 @@ function onDelete() {
         <CellItem class="flex">
           <div class="float-end flex">
             <router-link
-              v-if="
-                listEntry.documentationOffice?.abbreviation ===
-                session.user?.documentationOffice?.abbreviation
-              "
+              v-if="listEntry.isEditable"
               aria-label="Dokumentationseinheit bearbeiten"
               class="cursor-pointer border-2 border-r-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
               target="_blank"
@@ -248,11 +240,7 @@ function onDelete() {
               <IconView />
             </router-link>
             <button
-              v-if="
-                isDeletable &&
-                listEntry.documentationOffice?.abbreviation ===
-                  session.user?.documentationOffice?.abbreviation
-              "
+              v-if="listEntry.isDeletable"
               aria-label="Dokumentationseinheit löschen"
               class="cursor-pointer border-2 border-l-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
               @click="
