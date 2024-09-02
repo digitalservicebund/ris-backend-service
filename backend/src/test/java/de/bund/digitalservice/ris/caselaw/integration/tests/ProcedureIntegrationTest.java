@@ -724,7 +724,6 @@ class ProcedureIntegrationTest {
         repository.findAllByLabelAndDocumentationOffice("testProcedure BGH", bghDocOfficeDTO).get();
 
     var bghDocUnit = documentationUnitRepository.findByDocumentNumber("bghDocument123").get();
-    ;
 
     DocumentationUnit documentationUnitFromFrontend1 =
         DocumentationUnit.builder()
@@ -768,9 +767,10 @@ class ProcedureIntegrationTest {
     assertThat(docUnitList.get(0).isDeletable()).isTrue();
     assertThat(docUnitList.get(0).isEditable()).isTrue();
 
+    // Without being assigned, the doc unit is read-only for an external user.
     var docUnitListExternal =
         risWebTestClient
-            .withLogin("/BGH", "External")
+            .withLogin("/BGH/Extern", "External")
             .get()
             .uri("/api/v1/caselaw/procedure/" + procedure.getId() + "/documentunits")
             .exchange()
@@ -783,6 +783,32 @@ class ProcedureIntegrationTest {
         .isEqualTo(bghDocUnit.getDocumentNumber());
     assertThat(docUnitListExternal.get(0).isDeletable()).isFalse();
     assertThat(docUnitListExternal.get(0).isEditable()).isFalse();
+
+    risWebTestClient
+        .withLogin("/BGH")
+        .put()
+        .uri(
+            "/api/v1/caselaw/procedure/"
+                + procedure.getId()
+                + "/assign/3b733549-d2cc-40f0-b7f3-9bfa9f3c1b89")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful();
+
+    // After external user is assigned to doc unit via procedure it is editable.
+    var docUnitListExternalAfterAssign =
+        risWebTestClient
+            .withLogin("/BGH/Extern", "External")
+            .get()
+            .uri("/api/v1/caselaw/procedure/" + procedure.getId() + "/documentunits")
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful()
+            .expectBody(new TypeReference<List<DocumentationUnitListItem>>() {})
+            .returnResult()
+            .getResponseBody();
+    assertThat(docUnitListExternalAfterAssign.get(0).isDeletable()).isFalse();
+    assertThat(docUnitListExternalAfterAssign.get(0).isEditable()).isTrue();
   }
 
   @Test

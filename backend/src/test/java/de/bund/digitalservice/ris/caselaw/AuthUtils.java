@@ -107,6 +107,12 @@ public class AuthUtils {
                     .isInternal(true)
                     .build(),
                 DocumentationOfficeUserGroup.builder()
+                    .id(UUID.fromString("3b733549-d2cc-40f0-b7f3-9bfa9f3c1b89"))
+                    .docOffice(buildBGHDocOffice())
+                    .userGroupPathName("/BGH/Extern")
+                    .isInternal(true)
+                    .build(),
+                DocumentationOfficeUserGroup.builder()
                     .docOffice(buildCCRisDocOffice())
                     .userGroupPathName("/CC-RIS")
                     .isInternal(true)
