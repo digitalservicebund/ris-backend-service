@@ -15,7 +15,7 @@ import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
-import { useReferenceStore } from "@/stores/referencesStore"
+import { useEditionStore } from "@/stores/editionStore"
 
 const props = defineProps<{
   modelValue?: Reference
@@ -28,7 +28,7 @@ const emit = defineEmits<{
   cancelEdit: [void]
   removeEntry: [value: Reference]
 }>()
-const store = useReferenceStore()
+const store = useEditionStore()
 const lastSearchInput = ref(new Reference())
 const lastSavedModelValue = ref(new Reference({ ...props.modelValue }))
 const reference = ref(new Reference({ ...props.modelValue }))
@@ -69,7 +69,7 @@ const citation = computed(() =>
     ...(prefix.value ? [prefix.value] : []),
     ...(reference.value.citation ? [reference.value.citation] : []),
     ...(suffix.value ? [suffix.value] : []),
-  ].join(" "),
+  ].join(""),
 )
 
 function updateDateFormatValidation(
@@ -128,6 +128,7 @@ async function updatePage(page: number) {
   pageNumber.value = page
   search()
 }
+
 async function validateRequiredInput() {
   validationStore.reset()
   if (reference.value.missingRequiredFields?.length) {
@@ -139,16 +140,19 @@ async function validateRequiredInput() {
 }
 
 async function addReference(decision: RelatedDocumentation) {
-  console.log(reference.value)
   await validateRequiredInput()
   if (!validationStore.getByMessage("Pflichtfeld nicht befüllt").length) {
     // Merge the decision from search with the current reference input values
     emit(
       "update:modelValue",
       new Reference({
-        ...reference.value,
-        ...decision,
+        id: reference.value.id,
         citation: citation.value,
+        referenceSupplement: reference.value.referenceSupplement,
+        footnote: reference.value.footnote,
+        legalPeriodical: reference.value.legalPeriodical,
+        legalPeriodicalRawValue: reference.value.legalPeriodicalRawValue,
+        documentationUnit: new RelatedDocumentation({ ...decision }),
       }),
     )
     emit("addEntry")
@@ -170,7 +174,7 @@ watch(
 </script>
 
 <template>
-  <div class="flex h-full flex-col space-y-24 px-16 py-16">
+  <div class="flex h-full flex-col space-y-24 py-16">
     <div class="flex flex-col gap-24">
       <InputField id="legalPeriodical" label="Periodikum *">
         <ComboboxInput
@@ -191,11 +195,12 @@ watch(
               label="Zitatstelle *"
               :validation-error="validationStore.getByField('citation')"
             >
-              <div class="flex flex-row gap-4">
+              <div class="flex flex-grow flex-row gap-16">
                 <TextInput
                   id="citation prefix"
                   v-model="prefix"
                   aria-label="Zitatstelle Präfix"
+                  placeholder="Präfix"
                   size="medium"
                 ></TextInput>
                 <TextInput
@@ -210,23 +215,24 @@ watch(
                   id="citation suffix"
                   v-model="suffix"
                   aria-label="Zitatstelle Suffix"
+                  placeholder="Suffix"
                   size="medium"
                 ></TextInput>
               </div>
             </InputField>
 
-            <span v-if="legalPeriodical" class="ds-label-03-reg"
-              >Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}</span
-            >
+            <div v-if="legalPeriodical" class="ds-label-03-reg pt-4">
+              Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}
+            </div>
           </div>
           <InputField
-            id="citation"
+            id="referenceSupplement"
             v-slot="slotProps"
             class="flex-1"
             label="Klammernzusatz"
           >
             <TextInput
-              id="citation"
+              id="referenceSupplement"
               v-model="reference.referenceSupplement"
               aria-label="Klammernzusatz"
               :has-error="slotProps.hasError"
@@ -247,7 +253,7 @@ watch(
           <ComboboxInput
             id="courtInput"
             v-model="reference.court"
-            aria-label="Gericht Aktivzitierung"
+            aria-label="Gericht"
             clear-on-choosing-item
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getCourts"
@@ -280,26 +286,26 @@ watch(
       </div>
       <div class="flex justify-between gap-24">
         <InputField
-          id="activeCitationFileNumber"
+          id="fileNumber"
           v-slot="slotProps"
           label="Aktenzeichen"
           :validation-error="validationStore.getByField('fileNumber')"
         >
           <TextInput
-            id="activeCitationDocumentType"
+            id="fileNumber"
             v-model="reference.fileNumber"
-            aria-label="Aktenzeichen Aktivzitierung"
+            aria-label="Aktenzeichen"
             :has-error="slotProps.hasError"
             :read-only="reference.hasForeignSource"
             size="medium"
             @focus="validationStore.remove('fileNumber')"
           ></TextInput>
         </InputField>
-        <InputField id="activeCitationDecisionDocumentType" label="Dokumenttyp">
+        <InputField id="decisionDocumentType" label="Dokumenttyp">
           <ComboboxInput
-            id="activeCitationDecisionDocumentType"
+            id="decisionDocumentType"
             v-model="reference.documentType"
-            aria-label="Dokumenttyp Aktivzitierung"
+            aria-label="Dokumenttyp"
             :item-service="ComboboxItemService.getDocumentTypes"
             :read-only="reference.hasForeignSource"
           ></ComboboxInput>
@@ -362,3 +368,4 @@ watch(
     </div>
   </div>
 </template>
+@/stores/editionStore

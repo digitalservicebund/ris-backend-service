@@ -120,19 +120,19 @@ watch(
               @focus="validationStore.remove('citation')"
             ></TextInput>
           </InputField>
-          <span v-if="legalPeriodical" class="ds-label-03-reg"
+          <span v-if="legalPeriodical" class="ds-label-03-reg pt-4"
             >Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}</span
           >
         </div>
         <InputField
-          id="citation"
+          id="referenceSupplement"
           v-slot="slotProps"
           class="flex-1"
           label="Klammernzusatz"
           :validation-error="validationStore.getByField('referenceSupplement')"
         >
           <TextInput
-            id="citation"
+            id="referenceSupplement"
             v-model="reference.referenceSupplement"
             aria-label="Klammernzusatz"
             :has-error="slotProps.hasError"

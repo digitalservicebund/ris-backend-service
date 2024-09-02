@@ -1,14 +1,15 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue"
+import { computed, onMounted, ref, watch } from "vue"
 import EditionEvaluationReference from "./EditionReferenceInput.vue"
 import EditableList from "@/components/EditableList.vue"
 import ErrorPage from "@/components/PageError.vue"
-import ReferenceSummary from "@/components/ReferenceSummary.vue"
+import EditionReferenceSummary from "@/components/periodical-evaluation/EditionReferenceSummary.vue"
 import Reference from "@/domain/reference"
 import { ResponseError } from "@/services/httpClient"
-import { useReferenceStore } from "@/stores/referencesStore"
+import { useEditionStore } from "@/stores/editionStore"
 
-const store = useReferenceStore()
+const store = useEditionStore()
+const responseError = ref<ResponseError>()
 
 const references = computed({
   get: () => (store.edition ? (store.edition.references as Reference[]) : []),
@@ -18,12 +19,18 @@ const references = computed({
 })
 
 const defaultValue = new Reference() as Reference
-const responseError = ref<ResponseError>()
 
 const title = computed(
   () =>
     `Periodikaauswertung | ${store.edition?.legalPeriodical?.abbreviation}, ${store.edition?.name ? store.edition.name : store.edition?.prefix}`,
 )
+
+watch(references, async () => {
+  const response = await store.updateEdition()
+  if (response.error) {
+    responseError.value = response.error
+  }
+})
 
 onMounted(async () => {
   const response = await store.loadEdition()
@@ -42,9 +49,10 @@ onMounted(async () => {
     <div aria-label="Fundstellen">
       <EditableList
         v-model="references"
+        class="px-16"
         :default-value="defaultValue"
         :edit-component="EditionEvaluationReference"
-        :summary-component="ReferenceSummary"
+        :summary-component="EditionReferenceSummary"
       />
     </div>
   </div>

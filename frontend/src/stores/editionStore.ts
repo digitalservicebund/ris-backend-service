@@ -3,10 +3,11 @@ import { defineStore } from "pinia"
 import { ref } from "vue"
 import { useRoute } from "vue-router"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
+import Reference from "@/domain/reference"
 import { ServiceResponse } from "@/services/httpClient"
 import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 
-export const useReferenceStore = defineStore("referencesStore", () => {
+export const useEditionStore = defineStore("editionStore", () => {
   const edition = ref<LegalPeriodicalEdition | undefined>(undefined)
   const route = useRoute()
 
@@ -20,19 +21,30 @@ export const useReferenceStore = defineStore("referencesStore", () => {
 
     if (response.data) {
       edition.value = response.data
+
+      response.data.references = response.data.references
+        ? response.data.references.map(
+            (reference) => new Reference({ ...reference }),
+          )
+        : []
     }
 
     return response
   }
 
-  // async function updateEdition(): Promise<
-  //   ServiceResponse<LegalPeriodicalEdition>
-  // > {
-  //   // here comes to save edited edition
-  // }
+  async function updateEdition(): Promise<
+    ServiceResponse<LegalPeriodicalEdition>
+  > {
+    const response = await LegalPeriodicalEditionService.save(
+      edition.value as LegalPeriodicalEdition,
+    )
+
+    return response
+  }
 
   return {
     edition,
     loadEdition,
+    updateEdition,
   }
 })

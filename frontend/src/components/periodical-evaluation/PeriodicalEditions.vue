@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch, onMounted } from "vue"
 import { useRouter } from "vue-router"
+import DateUtil from "../../utils/dateUtil"
 import CellHeaderItem from "@/components/CellHeaderItem.vue"
 import CellItem from "@/components/CellItem.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
@@ -19,26 +20,19 @@ import ComboboxItemService from "@/services/comboboxItemService"
 import { ResponseError } from "@/services/httpClient"
 import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 import IconChevronRight from "~icons/ic/baseline-chevron-right"
+import IconDelete from "~icons/ic/baseline-close"
+
+const emptyResponse: ResponseError = {
+  title: "Wählen Sie ein Periodikum um die Ausgaben anzuzeigen.",
+}
 
 const router = useRouter()
 const filter = ref<LegalPeriodical>()
 const currentEditions = ref<LegalPeriodicalEdition[]>()
 const { getQueryFromRoute, pushQueryToRoute, route } = useQuery<"q">()
 const query = ref(getQueryFromRoute())
-const searchResponseError = ref<ResponseError>()
+const searchResponseError = ref<ResponseError | undefined>(emptyResponse)
 const isLoading = ref(false)
-watch(
-  filter,
-  async (newFilter) => {
-    if (newFilter && newFilter.uuid) {
-      await updateEditions(newFilter.uuid)
-      debouncedPushQueryToRoute({ q: newFilter.uuid })
-    } else {
-      currentEditions.value = []
-    }
-  },
-  { deep: true },
-)
 
 /**
  * Sets a timeout before pushing the search query to the route,
@@ -53,15 +47,6 @@ const debouncedPushQueryToRoute = (() => {
     timeoutId = window.setTimeout(() => pushQueryToRoute(currentQuery), 500)
   }
 })()
-
-/**
- * Get query from url and set local query value
- */
-watch(route, () => {
-  const currentQuery = getQueryFromRoute()
-  if (JSON.stringify(query.value) != JSON.stringify(currentQuery))
-    query.value = currentQuery
-})
 
 onMounted(() => {
   if (query.value.q) updateEditions(query.value.q)
@@ -100,9 +85,32 @@ const legalPeriodical = computed({
       filter.value = legalPeriodical
     } else {
       filter.value = undefined
+      searchResponseError.value = emptyResponse
     }
   },
 })
+
+/**
+ * Get query from url and set local query value
+ */
+watch(route, () => {
+  const currentQuery = getQueryFromRoute()
+  if (JSON.stringify(query.value) != JSON.stringify(currentQuery))
+    query.value = currentQuery
+})
+
+watch(
+  filter,
+  async (newFilter) => {
+    if (newFilter && newFilter.uuid) {
+      await updateEditions(newFilter.uuid)
+      debouncedPushQueryToRoute({ q: newFilter.uuid })
+    } else {
+      currentEditions.value = []
+    }
+  },
+  { deep: true },
+)
 </script>
 
 <template>
@@ -124,6 +132,7 @@ const legalPeriodical = computed({
               id="legalPeriodical"
               v-model="legalPeriodical"
               aria-label="Periodikum"
+              class="max-w-[672px]"
               clear-on-choosing-item
               :has-error="false"
               :item-service="ComboboxItemService.getLegalPeriodicals"
@@ -153,20 +162,53 @@ const legalPeriodical = computed({
             {{ edition.references?.length }}
           </CellItem>
           <CellItem>
-            {{ undefined }}
+            <span :class="{ 'text-gray-800': !edition.createdAt }">
+              {{ DateUtil.formatDate(edition.createdAt) || "Datum unbekannt" }}
+            </span>
           </CellItem>
-          <CellItem>
-            <router-link
-              target="_blank"
-              :to="{
-                name: 'caselaw-periodical-evaluation-uuid',
-                params: { uuid: edition.id },
-              }"
-            >
-              <div class="ds-button-primary">
-                <IconChevronRight class="text-blue-800" />
-              </div>
-            </router-link>
+          <CellItem class="flex">
+            <div class="float-end flex">
+              <router-link
+                target="_blank"
+                :to="{
+                  name: 'caselaw-periodical-evaluation-uuid',
+                  params: { uuid: edition.id },
+                }"
+              >
+                <div class="ds-button-primary">
+                  <IconChevronRight class="text-blue-800" />
+                </div>
+              </router-link>
+              <button
+                v-if="edition.references?.length == 0"
+                aria-label="Ausgabe löschen"
+                class="cursor-pointer text-red-800 hover:text-red-600"
+                @click="
+                  async () => {
+                    edition.id &&
+                      (await LegalPeriodicalEditionService.delete(edition.id))
+                    edition.id &&
+                      (await updateEditions(filter!.uuid?.toString() || ''))
+                  }
+                "
+                @keyup.enter="
+                  async () => {
+                    edition.id &&
+                      (await LegalPeriodicalEditionService.delete(edition.id))
+                    edition.id &&
+                      (await updateEditions(filter!.uuid?.toString() || ''))
+                  }
+                "
+              >
+                <IconDelete />
+              </button>
+
+              <IconDelete
+                v-else
+                aria-label="Ausgabe kann nicht gelöscht werden"
+                class="text-gray-400"
+              />
+            </div>
           </CellItem>
         </TableRow>
       </TableView>

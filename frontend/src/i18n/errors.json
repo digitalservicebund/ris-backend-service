@@ -196,6 +196,9 @@
   "LEGAL_PERIODICAL_EDITIONS_COULD_NOT_BE_LOADED": {
     "title": "Ausgabe konnte nicht geladen werden."
   },
+  "LEGAL_PERIODICAL_EDITION_COULD_NOT_BE_DELETED": {
+    "title": "Ausgabe konnte nicht gelöscht werden."
+  },
   "PROCEDURE_COULD_NOT_BE_ASSIGNED": {
     "title": "Vorgang konnte nicht zugewiesen werden. Bitte laden Sie die Seite neu."
   },

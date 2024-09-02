@@ -1,8 +1,32 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories } from "../../e2e-utils"
+import { navigateToCategories, save, waitForInputValue } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
+import { DocumentUnitCatagoriesEnum } from "@/components/enumDocumentUnitCatagories"
 
 test.describe("short and long texts", () => {
+  test(
+    "decision name should update",
+    {
+      annotation: {
+        type: "issue",
+        description:
+          "https://digitalservicebund.atlassian.net/browse/RISDEV-4733",
+      },
+      tag: ["@RISDEV-4733"],
+    },
+    async ({ page, documentNumber }) => {
+      await navigateToCategories(page, documentNumber, {
+        category: DocumentUnitCatagoriesEnum.TEXTS,
+      })
+      const inputText = "Family-Karte"
+      const selector = "[aria-label='Entscheidungsname']"
+      await page.locator(selector).fill(inputText)
+      await waitForInputValue(page, selector, inputText)
+      await save(page)
+      await expect(page.locator(selector)).toHaveValue(inputText)
+    },
+  )
+
   test("text editor fields should have predefined height", async ({
     page,
     documentNumber,

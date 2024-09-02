@@ -1,10 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
+import static de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil.createTestFileNumberDTO;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
@@ -41,14 +42,12 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
-import java.util.Objects;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -115,14 +114,7 @@ class ReferenceIntegrationTest {
     documentationOffice =
         documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
 
-    doReturn(docOffice)
-        .when(userService)
-        .getDocumentationOffice(
-            argThat(
-                (OidcUser user) -> {
-                  List<String> groups = user.getAttribute("groups");
-                  return Objects.requireNonNull(groups).get(0).equals("/DS");
-                }));
+    when(userService.getDocumentationOffice(any())).thenReturn(docOffice);
   }
 
   @AfterEach
@@ -133,12 +125,17 @@ class ReferenceIntegrationTest {
 
   @Test
   void testReferencesCanBeSaved() {
+
     DocumentationUnitDTO dto =
         repository.save(
             DocumentationUnitDTO.builder()
                 .documentationOffice(documentationOffice)
                 .documentNumber(DEFAULT_DOCUMENT_NUMBER)
                 .build());
+
+    var fileNumber = createTestFileNumberDTO();
+    fileNumber.setDocumentationUnit(dto);
+    dto.setFileNumbers(List.of(fileNumber));
 
     LegalPeriodicalDTO legalPeriodical =
         legalPeriodicalRepository.save(
@@ -163,7 +160,7 @@ class ReferenceIntegrationTest {
         DocumentationUnit.builder()
             .uuid(dto.getId())
             .documentNumber(dto.getDocumentNumber())
-            .coreData(CoreData.builder().build())
+            .coreData(CoreData.builder().documentationOffice(docOffice).build())
             .references(
                 List.of(
                     Reference.builder()

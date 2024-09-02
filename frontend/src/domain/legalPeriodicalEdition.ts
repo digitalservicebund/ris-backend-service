@@ -21,6 +21,7 @@ export default class LegalPeriodicalEdition {
   suffix?: string
   legalPeriodical?: LegalPeriodical
   references?: Reference[]
+  createdAt?: Date
 
   constructor(data: Partial<LegalPeriodicalEdition> = {}) {
     Object.assign(this, data)

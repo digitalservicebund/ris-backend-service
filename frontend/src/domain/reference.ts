@@ -7,12 +7,13 @@ export default class Reference
   extends RelatedDocumentation
   implements EditableListItem
 {
-  public uuid?: string
+  id?: string
   citation?: string
   referenceSupplement?: string
   footnote?: string
   legalPeriodical?: LegalPeriodical
   legalPeriodicalRawValue?: string
+  documentationUnit?: RelatedDocumentation
 
   static readonly requiredFields = ["legalPeriodical", "citation"] as const
   static readonly fields = [
@@ -28,31 +29,35 @@ export default class Reference
   constructor(data: Partial<Reference> = {}) {
     super()
     Object.assign(this, data)
-    if (this.uuid == undefined) {
-      this.uuid = crypto.randomUUID()
+    if (this.id == undefined) {
+      this.id = crypto.randomUUID()
     }
   }
 
-  get renderDecision(): string {
-    const firstPart = [
-      ...(this.legalPeriodical
-        ? [this.legalPeriodical.abbreviation]
-        : [this.legalPeriodicalRawValue]),
-      ...(this.citation && this.referenceSupplement
-        ? [`${this.citation} (${this.referenceSupplement})`]
-        : [this.citation]),
-    ].join(" ")
+  get renderDocumentationUnit(): string {
+    if (!this.documentationUnit) {
+      return ""
+    }
+    return [
+      this.documentationUnit?.court?.label ?? "",
+      this.documentationUnit?.decisionDate
+        ? dayjs(this.documentationUnit.decisionDate).format("DD.MM.YYYY")
+        : "",
+      this.documentationUnit?.fileNumber ?? "",
+      this.documentationUnit?.documentType?.label ?? "",
+    ]
+      .filter(Boolean)
+      .join(", ")
+  }
 
-    const secondPart = [
-      ...(this.court ? [`${this.court?.label}`] : []),
-      ...(this.decisionDate
-        ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
-        : []),
-      ...(this.fileNumber ? [this.fileNumber] : []),
-      ...(this.documentType?.label ? [this.documentType.label] : []),
-    ].join(", ")
-
-    return [firstPart, secondPart].filter(Boolean).join(" | ")
+  get renderReference(): string {
+    return [
+      this.legalPeriodical?.abbreviation ?? this.legalPeriodicalRawValue,
+      this.citation,
+      this.referenceSupplement ? ` (${this.referenceSupplement})` : "",
+    ]
+      .filter(Boolean)
+      .join(" ")
   }
 
   get hasMissingRequiredFields(): boolean {
@@ -63,10 +68,6 @@ export default class Reference
     return Reference.requiredFields.filter((field) =>
       this.fieldIsEmpty(this[field]),
     )
-  }
-
-  get id() {
-    return this.uuid
   }
 
   equals(entry: Reference): boolean {

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import dayjs from "dayjs"
 import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
+import DateUtil from "../utils/dateUtil"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import DocumentUnitSearchEntryForm, {
   DocumentUnitSearchParameter,
@@ -278,13 +278,9 @@ const showDefaultLink = computed(() => {
                 <span :class="{ 'text-gray-800': !courtFromQuery }">{{
                   `${courtFromQuery?.label ?? "Gericht unbekannt"}, `
                 }}</span>
-                <span :class="{ 'text-gray-800': !dateFromQuery }">{{
-                  dateFromQuery
-                    ? dayjs(dateFromQuery, "YYYY-MM-DD", true).format(
-                        "DD.MM.YYYY",
-                      )
-                    : "Datum unbekannt"
-                }}</span>
+                <span :class="{ 'text-gray-800': !dateFromQuery }">
+                  {{ DateUtil.formatDate(dateFromQuery) || "Datum unbekannt" }}
+                </span>
               </p>
               <TextButton
                 button-type="tertiary"

@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -53,5 +54,15 @@ public class LegalPeriodicalEditionController {
   public LegalPeriodicalEdition save(
       @Valid @RequestBody LegalPeriodicalEdition legalPeriodicalEdition) {
     return service.saveLegalPeriodicalEdition(legalPeriodicalEdition);
+  }
+
+  @DeleteMapping(value = "/{editionId}")
+  @PreAuthorize("isAuthenticated()")
+  public ResponseEntity<Void> delete(@NonNull @PathVariable UUID editionId) {
+    var deleted = service.delete(editionId);
+    if (deleted) {
+      return ResponseEntity.ok().build();
+    }
+    return ResponseEntity.notFound().build();
   }
 }

@@ -13,6 +13,8 @@ interface LegalPeriodicalEditionService {
   save(
     legalPeriodicalEdition: LegalPeriodicalEdition,
   ): Promise<ServiceResponse<LegalPeriodicalEdition>>
+
+  delete(editionId: string): Promise<ServiceResponse<unknown>>
 }
 
 const service: LegalPeriodicalEditionService = {
@@ -73,6 +75,18 @@ const service: LegalPeriodicalEditionService = {
         },
       },
       legalPeriodicalEdition,
+    )
+    if (response.status >= 300) {
+      response.error = {
+        title: errorMessages.LEGAL_PERIODICAL_EDITION_COULD_NOT_BE_SAVED.title,
+      } as ResponseError
+    }
+    return response
+  },
+
+  async delete(editionId: string) {
+    const response = await httpClient.delete(
+      `caselaw/legalperiodicaledition/${editionId}`,
     )
     if (response.status >= 300) {
       response.error = {
