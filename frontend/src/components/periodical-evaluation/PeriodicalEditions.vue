@@ -171,7 +171,7 @@ watch(
               <router-link
                 target="_blank"
                 :to="{
-                  name: 'caselaw-periodical-evaluation-uuid',
+                  name: 'caselaw-periodical-evaluation-uuid-references',
                   params: { uuid: edition.id },
                 }"
               >

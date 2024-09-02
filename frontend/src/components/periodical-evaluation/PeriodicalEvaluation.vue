@@ -20,11 +20,6 @@ const references = computed({
 
 const defaultValue = new Reference() as Reference
 
-const title = computed(
-  () =>
-    `Periodikaauswertung | ${store.edition?.legalPeriodical?.abbreviation}, ${store.edition?.name ? store.edition.name : store.edition?.prefix}`,
-)
-
 watch(references, async () => {
   const response = await store.updateEdition()
   if (response.error) {
@@ -43,9 +38,9 @@ onMounted(async () => {
 <template>
   <div
     v-if="!responseError"
-    class="flex h-full flex-col space-y-24 px-16 py-16"
+    class="flex h-full w-full flex-col space-y-24 px-16 py-16"
   >
-    <h2 class="ds-heading-03-reg">{{ title }}</h2>
+    <h1 class="ds-heading-02-reg">Fundstellen</h1>
     <div aria-label="Fundstellen">
       <EditableList
         v-model="references"

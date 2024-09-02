@@ -204,5 +204,17 @@
   },
   "PROCEDURE_COULD_NOT_BE_UNASSIGNED": {
     "title": "Zuweisung des Vorgangs konnte nicht entfernt werden. Bitte laden Sie die Seite neu."
+  },
+  "EDITION_HANDOVER_FAILED": {
+    "title": "Leider ist ein Fehler aufgetreten.",
+    "description": "Die Ausgabe kann nicht übergeben werden."
+  },
+  "EDITION_LOADING_HANDOVER_FAILED": {
+    "title": "Fehler beim Laden der Ereignisse",
+    "description": "Die Ereignisse konnten nicht geladen werden."
+  },
+  "EDITION_LOADING_XML_PREVIEW": {
+    "title": "Fehler beim Laden der XML-Vorschau",
+    "description": "Die XML-Vorschau konnte nicht geladen werden."
   }
 }
