@@ -753,19 +753,36 @@ class ProcedureIntegrationTest {
               assertThat(response.getResponseBody().coreData().previousProcedures()).isEmpty();
             });
 
-    risWebTestClient
-        .withLogin("/BGH")
-        .get()
-        .uri("/api/v1/caselaw/procedure/" + procedure.getId() + "/documentunits")
-        .exchange()
-        .expectStatus()
-        .is2xxSuccessful()
-        .expectBody(new TypeReference<List<DocumentationUnitListItem>>() {})
-        .consumeWith(
-            response -> {
-              assertThat(Objects.requireNonNull(response.getResponseBody()).get(0).documentNumber())
-                  .isEqualTo(bghDocUnit.getDocumentNumber());
-            });
+    var docUnitList =
+        risWebTestClient
+            .withLogin("/BGH")
+            .get()
+            .uri("/api/v1/caselaw/procedure/" + procedure.getId() + "/documentunits")
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful()
+            .expectBody(new TypeReference<List<DocumentationUnitListItem>>() {})
+            .returnResult()
+            .getResponseBody();
+    assertThat(docUnitList.get(0).documentNumber()).isEqualTo(bghDocUnit.getDocumentNumber());
+    assertThat(docUnitList.get(0).isDeletable()).isTrue();
+    assertThat(docUnitList.get(0).isEditable()).isTrue();
+
+    var docUnitListExternal =
+        risWebTestClient
+            .withLogin("/BGH", "External")
+            .get()
+            .uri("/api/v1/caselaw/procedure/" + procedure.getId() + "/documentunits")
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful()
+            .expectBody(new TypeReference<List<DocumentationUnitListItem>>() {})
+            .returnResult()
+            .getResponseBody();
+    assertThat(docUnitListExternal.get(0).documentNumber())
+        .isEqualTo(bghDocUnit.getDocumentNumber());
+    assertThat(docUnitListExternal.get(0).isDeletable()).isFalse();
+    assertThat(docUnitListExternal.get(0).isEditable()).isFalse();
   }
 
   @Test

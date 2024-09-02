@@ -38,7 +38,11 @@ public class RisWebTestClient {
   }
 
   public RisRequestSpec withLogin(String docOfficeGroup) {
+    return withLogin(docOfficeGroup, "Internal");
+  }
+
+  public RisRequestSpec withLogin(String docOfficeGroup, String role) {
     return new RisRequestSpec(
-        mockMvc, objectMapper, getMockLoginWithDocOffice(docOfficeGroup, "Internal"), csrfCookie);
+        mockMvc, objectMapper, getMockLoginWithDocOffice(docOfficeGroup, role), csrfCookie);
   }
 }
