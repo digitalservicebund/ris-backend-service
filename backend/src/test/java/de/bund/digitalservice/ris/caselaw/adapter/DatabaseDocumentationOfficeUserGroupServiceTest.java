@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeUserGroupDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeUserGroupTransformer;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -96,7 +97,8 @@ class DatabaseDocumentationOfficeUserGroupServiceTest {
         new DatabaseDocumentationOfficeUserGroupService(
             groupRepository, officeRepository, configuredGroups);
 
-    assertThatThrownBy(() -> this.service.onApplicationEvent(null));
+    assertThatThrownBy(() -> this.service.onApplicationEvent(null))
+        .isInstanceOf(NoSuchElementException.class);
 
     verify(this.groupRepository, never()).saveAll(any());
     verify(this.groupRepository, never()).deleteAll(any());

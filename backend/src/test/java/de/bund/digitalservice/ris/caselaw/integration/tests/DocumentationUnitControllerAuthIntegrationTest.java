@@ -238,7 +238,6 @@ class DocumentationUnitControllerAuthIntegrationTest {
             .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
             .returnResult()
             .getResponseBody();
-    ;
 
     assertThat(docUnitsSearchResult)
         .noneMatch(result -> result.uuid().equals(documentationUnitDTO.getId()));
