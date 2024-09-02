@@ -141,6 +141,8 @@ async function addReference(decision: RelatedDocumentation) {
     },
   })
 
+  lastSavedModelValue.value = newReference
+
   await validateRequiredInput(newReference)
 
   if (!validationStore.getByMessage("Pflichtfeld nicht befüllt").length) {
@@ -293,7 +295,11 @@ watch(
             @focus="validationStore.remove('fileNumber')"
           ></TextInput>
         </InputField>
-        <InputField id="decisionDocumentType" label="Dokumenttyp">
+        <InputField
+          id="decisionDocumentType"
+          label="Dokumenttyp"
+          :validation-error="validationStore.getByField('documentType')"
+        >
           <ComboboxInput
             id="decisionDocumentType"
             v-model="relatedDocumentationUnit.documentType"
@@ -324,7 +330,7 @@ watch(
             :disabled="reference.isEmpty"
             label="Übernehmen"
             size="small"
-            @click.stop="addReference"
+            @click.stop="addReference(relatedDocumentationUnit)"
           />
           <TextButton
             v-if="!lastSavedModelValue.isEmpty"
