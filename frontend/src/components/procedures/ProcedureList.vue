@@ -9,7 +9,7 @@ import DropdownInput from "@/components/input/DropdownInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
-import { useInternalUser } from "@/composables/useInternalUser"
+import { useExternalUser } from "@/composables/useExternalUser"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { Procedure } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
@@ -33,7 +33,7 @@ const query = ref(getQueryFromRoute())
 const responseError = ref()
 const userGroups = ref<UserGroup[]>([])
 const featureToggle = ref()
-const isInternalUser = useInternalUser()
+const isExternalUser = useExternalUser()
 const assignError = ref<ResponseError>()
 
 /**
@@ -289,7 +289,7 @@ onMounted(async () => {
                 class="ml-auto w-auto text-center"
                 is-small
                 :items="getDropdownItems()"
-                :read-only="!isInternalUser"
+                :read-only="isExternalUser"
                 @click.stop
                 @update:model-value="
                   (value: string | undefined) =>

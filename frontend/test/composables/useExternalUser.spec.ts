@@ -1,7 +1,7 @@
 import { createTestingPinia } from "@pinia/testing"
 import { setActivePinia } from "pinia"
 import { beforeEach, describe, expect } from "vitest"
-import { useInternalUser } from "@/composables/useInternalUser"
+import { useExternalUser } from "@/composables/useExternalUser"
 import useSessionStore from "@/stores/sessionStore"
 
 function mockUser(role: string) {
@@ -19,17 +19,17 @@ describe("useExternalUser", () => {
     setActivePinia(createTestingPinia())
   })
 
-  it("should return false if user has role external", async () => {
+  it("should return true if user has role external", async () => {
     mockUser("External")
-    const result = useInternalUser()
-
-    expect(result).equals(false)
-  })
-
-  it("should return true if user has role internal", async () => {
-    mockUser("Internal")
-    const result = useInternalUser()
+    const result = useExternalUser()
 
     expect(result).equals(true)
+  })
+
+  it("should return false if user has role internal", async () => {
+    mockUser("Internal")
+    const result = useExternalUser()
+
+    expect(result).equals(false)
   })
 })

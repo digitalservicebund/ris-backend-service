@@ -18,10 +18,10 @@ const mocks = vi.hoisted(() => ({
   mockedPushQuery: vi.fn(),
 }))
 
-let isInternalUser = true
-vi.mock("@/composables/useInternalUser", () => {
+let isExternalUser = false
+vi.mock("@/composables/useExternalUser", () => {
   return {
-    useInternalUser: () => isInternalUser,
+    useExternalUser: () => isExternalUser,
   }
 })
 
@@ -264,7 +264,7 @@ describe("ProcedureList", () => {
   })
 
   it("should disable dropdown when user is external", async () => {
-    isInternalUser = false
+    isExternalUser = true
     const { mockedGetProcedures } = await renderComponent()
     expect(mockedGetProcedures).toHaveBeenCalledOnce()
 
@@ -277,7 +277,7 @@ describe("ProcedureList", () => {
   })
 
   it("should enable dropdown when user is internal", async () => {
-    isInternalUser = true
+    isExternalUser = false
     const { mockedGetProcedures } = await renderComponent()
     expect(mockedGetProcedures).toHaveBeenCalledOnce()
 
