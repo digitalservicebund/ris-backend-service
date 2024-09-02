@@ -97,6 +97,10 @@ function isSelected(entry: T): boolean {
   return false
 }
 
+function isSaved(entry: T): boolean {
+  return modelValueList.value.some((item) => item.equals(entry))
+}
+
 /**
  * Updating the modelValue with the local modelValue list, is not propagated, until the user actively
  * decides to click the save button in edit mode. The edit index is resetted, to show list in summary mode.
@@ -186,6 +190,7 @@ watch(
         v-if="isSelected(entry)"
         v-model="modelValueList[index]"
         class="py-24"
+        :is-saved="isSaved(modelValueList[index])"
         :model-value-list="modelValueList"
         @add-entry="updateModel"
         @cancel-edit="cancelEdit"

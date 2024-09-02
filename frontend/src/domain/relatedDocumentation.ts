@@ -17,19 +17,6 @@ export default class RelatedDocumentation {
     public documentType?: DocumentType
     public referenceFound?: boolean
 
-    static readonly requiredFields = [
-        "court",
-        "fileNumber",
-        "decisionDate",
-        "documentType",
-    ] as const
-
-    static readonly fields = [
-        "court",
-        "fileNumber",
-        "decisionDate",
-        "documentType",
-    ] as const
 
     get hasForeignSource(): boolean {
         return this.documentNumber != null && !!this.referenceFound
@@ -89,7 +76,5 @@ export default class RelatedDocumentation {
         ].join(", ")
     }
 
-    private fieldIsEmpty(value: Reference[(typeof Reference.fields)[number]]) {
-        return value === undefined || !value || Object.keys(value).length === 0
-    }
+
 }

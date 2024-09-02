@@ -2,9 +2,9 @@ import dayjs from "dayjs"
 import EditableListItem from "./editableListItem"
 import RelatedDocumentation from "./relatedDocumentation"
 import LegalPeriodical from "@/domain/legalPeriodical"
-import PreviousDecision from "@/domain/previousDecision";
 
 export default class Reference
+    extends RelatedDocumentation
     implements EditableListItem {
     id?: string
     citation?: string
@@ -12,38 +12,46 @@ export default class Reference
     footnote?: string
     legalPeriodical?: LegalPeriodical
     legalPeriodicalRawValue?: string
-    documentationUnit?: RelatedDocumentation
 
-    static readonly requiredFields = ["legalPeriodical", "citation", "documentationUnit"] as const
+    static readonly requiredFields = [
+        "legalPeriodical",
+        "citation",
+        "court",
+        "fileNumber",
+        "decisionDate",
+    ] as const
+
     static readonly fields = [
         "legalPeriodical",
         "citation",
         "referenceSupplement",
-        "documentationUnit"
+        "court",
+        "fileNumber",
+        "decisionDate",
     ] as const
 
     constructor(data: Partial<Reference> = {}) {
+        super()
         Object.assign(this, data)
-
-        if (this.documentationUnit) {
-            this.documentationUnit = new RelatedDocumentation({...data.documentationUnit})
-        }
         if (this.id == undefined) {
             this.id = crypto.randomUUID()
         }
     }
 
+
+    setDecision(decisionDate: RelatedDocumentation) {
+        Object.assign(this, decisionDate)
+    }
+
     get renderDocumentationUnit(): string {
-        if (!this.documentationUnit) {
-            return ""
-        }
+
         return [
-            this.documentationUnit?.court?.label ?? "",
-            this.documentationUnit?.decisionDate
+            this?.court?.label ?? "",
+            this?.decisionDate
                 ? dayjs(this.documentationUnit.decisionDate).format("DD.MM.YYYY")
                 : "",
-            this.documentationUnit?.fileNumber ?? "",
-            this.documentationUnit?.documentType?.label ?? "",
+            this.fileNumber ?? "",
+            this.documentType?.label ?? "",
         ]
             .filter(Boolean)
             .join(", ")
@@ -64,16 +72,9 @@ export default class Reference
     }
 
     get missingRequiredFields() {
-        const requiredFields = Reference.requiredFields.filter((field) =>
+        return Reference.requiredFields.filter((field) =>
             this.fieldIsEmpty(this[field])
         );
-
-        const allMissingFields = [
-            ...requiredFields,
-            ...(this.documentationUnit?.missingRequiredFields || [])
-        ];
-
-        return allMissingFields;
     }
 
 
@@ -96,7 +97,5 @@ export default class Reference
         return value === undefined || !value || Object.keys(value).length === 0
     }
 
-    get hasForeignSource(): boolean {
-        return true
-    }
+
 }

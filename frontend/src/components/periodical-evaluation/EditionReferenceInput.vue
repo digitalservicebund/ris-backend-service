@@ -20,6 +20,7 @@ import { useEditionStore } from "@/stores/editionStore"
 const props = defineProps<{
   modelValue?: Reference
   modelValueList?: Reference[]
+  isSaved: boolean
 }>()
 
 const emit = defineEmits<{
@@ -36,6 +37,7 @@ const pageNumber = ref<number>(0)
 const itemsPerPage = ref<number>(15)
 const isLoading = ref(false)
 
+console.log(props.isSaved)
 const searchResultsCurrentPage = ref<Page<RelatedDocumentation>>()
 const searchResults = ref<SearchResults<RelatedDocumentation>>()
 
@@ -46,12 +48,6 @@ const legalPeriodical = computed(() =>
         value: store.edition.legalPeriodical,
       }
     : undefined,
-)
-
-const relatedDocumentationUnit = ref<RelatedDocumentation>(
-  props.modelValue?.documentationUnit
-    ? new RelatedDocumentation({ ...props.modelValue.documentationUnit })
-    : new RelatedDocumentation(),
 )
 
 const prefix = computed({
@@ -89,7 +85,7 @@ async function search() {
   isLoading.value = true
 
   const response = await documentUnitService.searchByRelatedDocumentation(
-    relatedDocumentationUnit,
+    reference,
     {
       ...(pageNumber.value != undefined
         ? { pg: pageNumber.value.toString() }
@@ -123,9 +119,9 @@ async function updatePage(page: number) {
   search()
 }
 
-async function validateRequiredInput(toValidateReference: Reference) {
-  if (toValidateReference.missingRequiredFields?.length) {
-    toValidateReference.missingRequiredFields.forEach((missingField) => {
+async function validateRequiredInput() {
+  if (reference.value.missingRequiredFields?.length) {
+    reference.value.missingRequiredFields.forEach((missingField) => {
       validationStore.add("Pflichtfeld nicht befüllt", missingField)
     })
   }
@@ -133,17 +129,8 @@ async function validateRequiredInput(toValidateReference: Reference) {
 
 async function addReference(decision: RelatedDocumentation) {
   validationStore.reset()
-  relatedDocumentationUnit.value = new RelatedDocumentation({ ...decision })
-  const newReference: Reference = new Reference({
-    ...reference.value,
-    documentationUnit: {
-      ...decision,
-    },
-  })
-
-  lastSavedModelValue.value = newReference
-
-  await validateRequiredInput(newReference)
+  reference.value.setDecision(decision)
+  await validateRequiredInput()
 
   if (!validationStore.getByMessage("Pflichtfeld nicht befüllt").length) {
     // Merge the decision from search with the current reference input values
@@ -245,12 +232,12 @@ watch(
         >
           <ComboboxInput
             id="courtInput"
-            v-model="relatedDocumentationUnit.court"
+            v-model="reference.court"
             aria-label="Gericht Aktivzitierung"
             clear-on-choosing-item
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getCourts"
-            :read-only="reference?.documentationUnit?.hasForeignSource"
+            :read-only="isSaved"
             @focus="validationStore.remove('court')"
           >
           </ComboboxInput>
@@ -267,11 +254,11 @@ watch(
         >
           <DateInput
             id="decisionDate"
-            v-model="relatedDocumentationUnit.decisionDate"
+            v-model="reference.decisionDate"
             aria-label="Entscheidungsdatum"
             class="ds-input-medium"
             :has-error="slotProps.hasError"
-            :read-only="reference?.documentationUnit?.hasForeignSource"
+            :read-only="isSaved"
             @focus="validationStore.remove('decisionDate')"
             @update:validation-error="slotProps.updateValidationError"
           ></DateInput>
@@ -286,10 +273,10 @@ watch(
         >
           <TextInput
             id="fileNumber"
-            v-model="relatedDocumentationUnit.fileNumber"
+            v-model="reference.fileNumber"
             aria-label="Aktenzeichen Aktivzitierung"
             :has-error="slotProps.hasError"
-            :read-only="reference?.documentationUnit?.hasForeignSource"
+            :read-only="isSaved"
             size="medium"
             @focus="validationStore.remove('fileNumber')"
           ></TextInput>
@@ -301,10 +288,10 @@ watch(
         >
           <ComboboxInput
             id="decisionDocumentType"
-            v-model="relatedDocumentationUnit.documentType"
+            v-model="reference.documentType"
             aria-label="Dokumenttyp Aktivzitierung"
-            :item-service="ComboboxItemService.getDocumentTypes"
-            :read-only="reference?.documentationUnit?.hasForeignSource"
+            :item-service="ComboboxItemService.getDoreferencecumentTypes"
+            :read-only="isSaved"
           ></ComboboxInput>
         </InputField>
       </div>
@@ -329,7 +316,7 @@ watch(
             :disabled="reference.isEmpty"
             label="Übernehmen"
             size="small"
-            @click.stop="addReference(relatedDocumentationUnit)"
+            @click.stop="addReference"
           />
           <TextButton
             v-if="!lastSavedModelValue.isEmpty"
