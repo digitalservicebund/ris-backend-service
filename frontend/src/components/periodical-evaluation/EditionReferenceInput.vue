@@ -111,7 +111,7 @@ async function search() {
       return {
         decision: new RelatedDocumentation({ ...searchResult }),
         isLinked: searchResult.isLinkedWith(
-          props.modelValueList.map((item) => item.documentationUnit),
+          props.modelValueList.map((item) => item.documentationUnit!),
         ),
       }
     })
