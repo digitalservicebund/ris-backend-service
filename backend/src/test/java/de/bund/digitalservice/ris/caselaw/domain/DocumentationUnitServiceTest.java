@@ -177,6 +177,7 @@ class DocumentationUnitServiceTest {
 
   @Test
   void testSearchByDocumentationUnitListEntry() {
+    DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
     DocumentationUnitSearchInput documentationUnitSearchInput =
         DocumentationUnitSearchInput.builder().build();
     DocumentationUnitListItem documentationUnitListItem =
@@ -205,6 +206,7 @@ class DocumentationUnitServiceTest {
 
   @Test
   void testSearchByDocumentationUnitListEntry_shouldNormalizeSpaces() {
+    DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
     DocumentationUnitListItem documentationUnitListItem =
         DocumentationUnitListItem.builder().build();
     PageRequest pageRequest = PageRequest.of(0, 10);

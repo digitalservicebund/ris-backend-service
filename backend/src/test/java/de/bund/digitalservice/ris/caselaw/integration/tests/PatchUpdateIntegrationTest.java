@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockDocOfficeUserGroups;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,6 +42,7 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
@@ -128,6 +130,7 @@ class PatchUpdateIntegrationTest {
   @MockBean private ProcedureService procedureService;
   @MockBean private DocumentationOfficeUserGroupService documentationOfficeUserGroupService;
 
+  private final DocumentationOffice docOffice = buildDSDocOffice();
   private UUID court1Id;
   private UUID court2Id;
   private UUID region1Id;

@@ -473,6 +473,7 @@ class DocumentationUnitSearchIntegrationTest {
         "classpath:procedures_init.sql",
       })
   void testSearch_withExternalAssignedUser_shouldReturnEditableAndNotDeletableDocumentationUnit() {
+    UUID uuid = UUID.randomUUID();
     Optional<DocumentationUnitDTO> documentationUnitDTO =
         repository.findByDocumentNumber("documentNumber2");
     Optional<ProcedureDTO> procedureDTO =
