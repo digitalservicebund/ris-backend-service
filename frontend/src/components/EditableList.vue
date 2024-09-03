@@ -97,8 +97,14 @@ function isSelected(entry: T): boolean {
   return false
 }
 
-function isSaved(entry: T): boolean {
-  return modelValueList.value.some((item) => item.equals(entry))
+/**
+ * Method to check if entry is given in model value
+ */
+function isSaved(entries: T[], entry?: T): boolean {
+  if (entry) {
+    return entries.some((item) => entry.equals(item))
+  }
+  return false
 }
 
 /**
@@ -190,7 +196,7 @@ watch(
         v-if="isSelected(entry)"
         v-model="modelValueList[index]"
         class="py-24"
-        :is-saved="isSaved(modelValueList[index])"
+        :is-saved="isSaved(modelValue, modelValueList[index])"
         :model-value-list="modelValueList"
         @add-entry="updateModel"
         @cancel-edit="cancelEdit"

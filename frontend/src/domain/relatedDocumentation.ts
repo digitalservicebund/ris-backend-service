@@ -58,12 +58,6 @@ export default class RelatedDocumentation {
     }
 
 
-    get missingRequiredFields() {
-        return RelatedDocumentation.requiredFields.filter((field) =>
-            this.fieldIsEmpty(this[field]),
-        )
-    }
-
     get renderDecision(): string {
         return [
             ...(this.court ? [`${this.court?.label}`] : []),

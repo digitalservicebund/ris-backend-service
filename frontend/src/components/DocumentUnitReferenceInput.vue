@@ -24,7 +24,8 @@ const emit = defineEmits<{
 const reference = ref(new Reference({ ...props.modelValue }))
 const lastSavedModelValue = ref(new Reference({ ...props.modelValue }))
 
-const validationStore = useValidationStore<(typeof Reference.fields)[number]>()
+const validationStore =
+  useValidationStore<(typeof Reference.allFields)[number]>()
 
 const legalPeriodical = computed({
   get: () =>
