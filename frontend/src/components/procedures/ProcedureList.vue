@@ -1,19 +1,23 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
-import { ref, onMounted, watch, computed } from "vue"
+import { computed, onMounted, ref, watch } from "vue"
 import ProcedureDetail from "./ProcedureDetail.vue"
+import { InfoStatus } from "@/components/enumInfoStatus"
 import ExpandableContent from "@/components/ExpandableContent.vue"
+import InfoModal from "@/components/InfoModal.vue"
 import DropdownInput from "@/components/input/DropdownInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextInput from "@/components/input/TextInput.vue"
+import { DropdownItem } from "@/components/input/types"
 import Pagination, { Page } from "@/components/Pagination.vue"
+import { useExternalUser } from "@/composables/useExternalUser"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { Procedure } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { UserGroup } from "@/domain/userGroup"
 import documentationUnitService from "@/services/documentUnitService"
 import FeatureToggleService from "@/services/featureToggleService"
-import { ResponseError } from "@/services/httpClient"
+import { ResponseError, ServiceResponse } from "@/services/httpClient"
 import service from "@/services/procedureService"
 import userGroupsService from "@/services/userGroupsService"
 import IconBaselineDescription from "~icons/ic/baseline-description"
@@ -30,6 +34,8 @@ const query = ref(getQueryFromRoute())
 const responseError = ref()
 const userGroups = ref<UserGroup[]>([])
 const featureToggle = ref()
+const isExternalUser = useExternalUser()
+const assignError = ref<ResponseError>()
 
 /**
  * Loads all procedures
@@ -44,7 +50,7 @@ async function updateProcedures(page: number, queries?: Query<string>) {
 }
 
 /**
- * Get all external user groups for the current user
+ * Get all external user groups for the current user and documentation office.
  */
 async function getUserGroups() {
   const response = await userGroupsService.get()
@@ -99,20 +105,25 @@ async function handleIsExpanded(
   }
 }
 
+/**
+ * Handles a change in the {@link DropdownInput}.
+ * When the user selected an option with a procedureId and a userGroupId
+ * the assign api is called.
+ * When the user selected an option which contains only the procedureId the unassign api is called.
+ **/
 async function handleAssignUserGroup(
   procedureId: string | undefined,
   userGroupId: string | undefined,
 ) {
-  let errorResponse: ResponseError | undefined
+  let response: ServiceResponse<unknown> | undefined
   if (procedureId && userGroupId) {
-    const { error } = await service.assignUserGroup(procedureId, userGroupId)
-    errorResponse = error
+    response = await service.assignUserGroup(procedureId, userGroupId)
   } else if (procedureId) {
-    const { error } = await service.unassignUserGroup(procedureId)
-    errorResponse = error
+    response = await service.unassignUserGroup(procedureId)
   }
-  if (errorResponse) {
-    alert(errorResponse.title)
+  if (response?.error) {
+    assignError.value = response.error
+    alert(response.error.title)
   }
 }
 
@@ -138,9 +149,21 @@ async function handleDeleteDocumentationUnit(
   }
 }
 
-const getDropdownItems = () => {
+/**
+ * Transforms a pathName of a user group (e.g. "/caselaw/BGH/Extern/Agentur1") into
+ * the name of the last subgroup (e.g. "Agentur1")
+ **/
+const getLastSubgroup = (userGroupPathName: string) => {
+  return userGroupPathName.substring(userGroupPathName.lastIndexOf("/") + 1)
+}
+
+/**
+ * Returns a list of {@link DropdownItem} containing the external user groups
+ * of the documentation office.
+ **/
+const getDropdownItems = (): DropdownItem[] => {
   const dropdownItems = userGroups.value.map(({ userGroupPathName, id }) => ({
-    label: userGroupPathName,
+    label: getLastSubgroup(userGroupPathName),
     value: id,
   }))
   dropdownItems.push({ label: "Nicht zugewiesen", value: "" })
@@ -160,6 +183,17 @@ const debouncedPushQueryToRoute = (() => {
     timeoutId = window.setTimeout(() => pushQueryToRoute(currentQuery), 500)
   }
 })()
+
+/**
+ * Get display text for the date the procedure had been created.
+ * If the date is missing a default text is displayed.
+ */
+const getCreatedAtDisplayText = (procedure: Procedure): string => {
+  if (procedure.createdAt) {
+    return "erstellt am " + dayjs(procedure.createdAt).format("DD.MM.YYYY")
+  }
+  return "Erstellungsdatum unbekannt"
+}
 
 /**
  * Get query from url and set local query value
@@ -216,6 +250,12 @@ onMounted(async () => {
         ></TextInput>
       </InputField>
     </div>
+    <InfoModal
+      v-if="assignError"
+      :description="assignError.description"
+      :status="InfoStatus.ERROR"
+      :title="assignError.title"
+    />
 
     <div v-if="procedures" class="flex-1">
       <Pagination
@@ -267,17 +307,18 @@ onMounted(async () => {
                 v-model="procedure.userGroupId"
                 aria-label="dropdown input"
                 class="ml-auto w-auto"
+                is-small
                 :items="getDropdownItems()"
+                :read-only="isExternalUser"
                 @click.stop
                 @update:model-value="
                   (value: string | undefined) =>
                     handleAssignUserGroup(procedure.id, value)
                 "
               />
-              <span class="mr-24 content-center"
-                >erstellt am
-                {{ dayjs(procedure.createdAt).format("DD.MM.YYYY") }}</span
-              >
+              <span class="mr-24 w-224 content-center text-center">{{
+                getCreatedAtDisplayText(procedure)
+              }}</span>
             </div>
           </template>
 

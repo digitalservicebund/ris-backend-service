@@ -1,8 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDefaultDocOffice;
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
@@ -85,7 +84,7 @@ class LegalPeriodicalEditionIntegrationTest {
   @MockBean private ProcedureService procedureService;
 
   private static final String EDITION_ENDPOINT = "/api/v1/caselaw/legalperiodicaledition";
-  private final DocumentationOffice docOffice = buildDefaultDocOffice();
+  private final DocumentationOffice docOffice = buildDSDocOffice();
 
   @BeforeEach
   void setUp() {
@@ -126,8 +125,8 @@ class LegalPeriodicalEditionIntegrationTest {
                     .getResponseBody())
             .toList();
 
-    assertFalse("List should not be empty", editionList.isEmpty());
-    Assertions.assertEquals(editionList.get(0).name(), "2024 Sonderheft 1");
+    Assertions.assertFalse(editionList.isEmpty(), "List should not be empty");
+    Assertions.assertEquals("2024 Sonderheft 1", editionList.get(0).name());
   }
 
   @Test
@@ -206,7 +205,7 @@ class LegalPeriodicalEditionIntegrationTest {
             .prefix("2024, ")
             .build();
     legalPeriodicalEdition = repository.save(legalPeriodicalEdition);
-    assertThat(repository.findAllByLegalPeriodicalId(legalPeriodical.uuid()).size()).isEqualTo(1);
+    assertThat(repository.findAllByLegalPeriodicalId(legalPeriodical.uuid())).hasSize(1);
     repository.delete(legalPeriodicalEdition);
 
     assertThat(repository.findAllByLegalPeriodicalId(legalPeriodical.uuid())).isEmpty();

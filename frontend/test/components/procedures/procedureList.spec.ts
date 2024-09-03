@@ -1,7 +1,7 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import { beforeEach, expect } from "vitest"
+import { afterEach, beforeEach, expect, vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import ProcedureList from "@/components/procedures/ProcedureList.vue"
 import useQuery from "@/composables/useQueryFromRoute"
@@ -17,6 +17,13 @@ vi.mock("@/services/userGroupsService")
 const mocks = vi.hoisted(() => ({
   mockedPushQuery: vi.fn(),
 }))
+
+let isExternalUser = false
+vi.mock("@/composables/useExternalUser", () => {
+  return {
+    useExternalUser: () => isExternalUser,
+  }
+})
 
 vi.mock("@/composables/useQueryFromRoute", async () => {
   const actual = (
@@ -251,8 +258,34 @@ describe("ProcedureList", () => {
     const options = screen.getAllByRole("option")
 
     expect(options.length).toBe(3)
-    expect(options[0]).toHaveTextContent("DS/Extern/Agentur1")
-    expect(options[1]).toHaveTextContent("DS/Extern/Agentur2")
+    expect(options[0]).toHaveTextContent("Agentur1")
+    expect(options[1]).toHaveTextContent("Agentur2")
     expect(options[2]).toHaveTextContent("Nicht zugewiesen")
+  })
+
+  it("should disable dropdown when user is external", async () => {
+    isExternalUser = true
+    const { mockedGetProcedures } = await renderComponent()
+    expect(mockedGetProcedures).toHaveBeenCalledOnce()
+
+    expect(
+      await screen.findByText("Es wurden noch keine Vorgänge angelegt."),
+    ).not.toBeVisible()
+
+    const dropdown = await screen.findByLabelText("dropdown input")
+    expect(dropdown).toBeDisabled()
+  })
+
+  it("should enable dropdown when user is internal", async () => {
+    isExternalUser = false
+    const { mockedGetProcedures } = await renderComponent()
+    expect(mockedGetProcedures).toHaveBeenCalledOnce()
+
+    expect(
+      await screen.findByText("Es wurden noch keine Vorgänge angelegt."),
+    ).not.toBeVisible()
+
+    const dropdown = await screen.findByLabelText("dropdown input")
+    expect(dropdown).toBeEnabled()
   })
 })

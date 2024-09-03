@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 public interface ProcedureService {
   Slice<Procedure> search(
@@ -13,7 +14,7 @@ public interface ProcedureService {
       Pageable pageable,
       Optional<Boolean> withDocUnits);
 
-  List<DocumentationUnitListItem> getDocumentationUnits(UUID procedureid);
+  List<DocumentationUnitListItem> getDocumentationUnits(UUID procedureId, OidcUser oidcUser);
 
   DocumentationOffice getDocumentationOfficeByUUID(UUID uuid);
 
