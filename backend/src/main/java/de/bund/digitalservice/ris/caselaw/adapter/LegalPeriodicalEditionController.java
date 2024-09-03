@@ -63,6 +63,6 @@ public class LegalPeriodicalEditionController {
     if (deleted) {
       return ResponseEntity.ok().build();
     }
-    return ResponseEntity.notFound().build();
+    return ResponseEntity.noContent().build();
   }
 }

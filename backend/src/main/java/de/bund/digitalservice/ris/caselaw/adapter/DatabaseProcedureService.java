@@ -11,14 +11,17 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOffic
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitListItemTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcedureTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,13 +31,17 @@ public class DatabaseProcedureService implements ProcedureService {
   private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   private final DatabaseDocumentationOfficeUserGroupRepository userGroupRepository;
 
+  private final UserService userService;
+
   public DatabaseProcedureService(
       DatabaseProcedureRepository repository,
       DatabaseDocumentationOfficeRepository documentationOfficeRepository,
-      DatabaseDocumentationOfficeUserGroupRepository userGroupRepository) {
+      DatabaseDocumentationOfficeUserGroupRepository userGroupRepository,
+      UserService userService) {
     this.repository = repository;
     this.documentationOfficeRepository = documentationOfficeRepository;
     this.userGroupRepository = userGroupRepository;
+    this.userService = userService;
   }
 
   @Override
@@ -74,9 +81,12 @@ public class DatabaseProcedureService implements ProcedureService {
 
   @Override
   @Transactional
-  public List<DocumentationUnitListItem> getDocumentationUnits(UUID procedureId) {
+  public List<DocumentationUnitListItem> getDocumentationUnits(
+      UUID procedureId, OidcUser oidcUser) {
+    DocumentationOffice documentationOfficeOfUser = userService.getDocumentationOffice(oidcUser);
+    boolean isInternalUser = userService.isInternal(oidcUser);
     return repository
-        .findById(procedureId)
+        .findByIdAndDocumentationOffice(procedureId, documentationOfficeOfUser.uuid())
         .map(
             procedureDTO ->
                 procedureDTO.getDocumentationUnits().stream()
@@ -91,9 +101,24 @@ public class DatabaseProcedureService implements ProcedureService {
                         })
                     .distinct()
                     .map(DocumentationUnitListItemTransformer::transformToDomain)
-                    .map(documentationUnitListItem -> documentationUnitListItem.toBuilder().build())
+                    .map(
+                        documentationUnitListItem ->
+                            documentationUnitListItem.toBuilder()
+                                .isDeletable(isInternalUser)
+                                .isEditable(
+                                    isInternalUser
+                                        || isExternalUserAssigned(procedureDTO, oidcUser))
+                                .build())
                     .toList())
         .orElse(null);
+  }
+
+  private Boolean isExternalUserAssigned(ProcedureDTO procedureDTO, OidcUser oidcUser) {
+    Optional<DocumentationOfficeUserGroup> userGroup = userService.getUserGroup(oidcUser);
+    if (userGroup.isPresent() && procedureDTO.getDocumentationOfficeUserGroupDTO() != null) {
+      return userGroup.get().id().equals(procedureDTO.getDocumentationOfficeUserGroupDTO().getId());
+    }
+    return false;
   }
 
   @Override

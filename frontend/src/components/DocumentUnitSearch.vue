@@ -247,7 +247,6 @@ const showDefaultLink = computed(() => {
         class="grow"
         :document-unit-list-entries="documentUnitListEntries"
         :empty-state="emptyStateLabel"
-        is-deletable
         :is-loading="isLoading"
         :search-response-error="searchResponseError"
         @delete-document-unit="handleDelete"
