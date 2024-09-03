@@ -38,7 +38,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -56,7 +55,6 @@ class DocumentationUnitServiceTest {
   @MockBean private AttachmentService attachmentService;
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private Validator validator;
-  @MockBean private OidcUser oidcUser;
   @Captor private ArgumentCaptor<DocumentationUnitSearchInput> searchInputCaptor;
   @Captor private ArgumentCaptor<RelatedDocumentationUnit> relatedDocumentationUnitCaptor;
 
@@ -177,6 +175,7 @@ class DocumentationUnitServiceTest {
 
   @Test
   void testSearchByDocumentationUnitListEntry() {
+    DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
     DocumentationUnitSearchInput documentationUnitSearchInput =
         DocumentationUnitSearchInput.builder().build();
     DocumentationUnitListItem documentationUnitListItem =
@@ -184,12 +183,12 @@ class DocumentationUnitServiceTest {
     PageRequest pageRequest = PageRequest.of(0, 10);
 
     when(repository.searchByDocumentationUnitSearchInput(
-            pageRequest, oidcUser, documentationUnitSearchInput))
+            pageRequest, documentationOffice, documentationUnitSearchInput))
         .thenReturn(new PageImpl<>(List.of(documentationUnitListItem)));
 
     service.searchByDocumentationUnitSearchInput(
         pageRequest,
-        oidcUser,
+        documentationOffice,
         Optional.empty(),
         Optional.empty(),
         Optional.empty(),
@@ -200,22 +199,26 @@ class DocumentationUnitServiceTest {
         Optional.empty(),
         Optional.empty());
     verify(repository)
-        .searchByDocumentationUnitSearchInput(pageRequest, oidcUser, documentationUnitSearchInput);
+        .searchByDocumentationUnitSearchInput(
+            pageRequest, documentationOffice, documentationUnitSearchInput);
   }
 
   @Test
   void testSearchByDocumentationUnitListEntry_shouldNormalizeSpaces() {
+    DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
     DocumentationUnitListItem documentationUnitListItem =
         DocumentationUnitListItem.builder().build();
     PageRequest pageRequest = PageRequest.of(0, 10);
 
     when(repository.searchByDocumentationUnitSearchInput(
-            any(PageRequest.class), any(OidcUser.class), any(DocumentationUnitSearchInput.class)))
+            any(PageRequest.class),
+            any(DocumentationOffice.class),
+            any(DocumentationUnitSearchInput.class)))
         .thenReturn(new PageImpl<>(List.of(documentationUnitListItem)));
 
     service.searchByDocumentationUnitSearchInput(
         pageRequest,
-        oidcUser,
+        documentationOffice,
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007docnumber\u180Ewith\u2060spaces"),
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007filenumber\u180Ewith\u2060spaces"),
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007courttype\u180Ewith\u2060spaces"),
@@ -229,7 +232,7 @@ class DocumentationUnitServiceTest {
     // Capture the searchInput argument
     verify(repository)
         .searchByDocumentationUnitSearchInput(
-            any(PageRequest.class), any(OidcUser.class), searchInputCaptor.capture());
+            any(PageRequest.class), any(DocumentationOffice.class), searchInputCaptor.capture());
 
     DocumentationUnitSearchInput capturedSearchInput = searchInputCaptor.getValue();
 

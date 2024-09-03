@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.authorization;
 
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildBGHDocOffice;
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildCCRisDocOffice;
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDocOffice;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.setUpDocumentationOfficeMocks;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
@@ -70,9 +69,9 @@ class DocumentationUnitControllerAuthTest {
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private final String docOffice1Group = "/CC-RIS";
-  private final String docOffice2Group = "/BGH";
-  private final DocumentationOffice docOffice1 = buildCCRisDocOffice();
-  private final DocumentationOffice docOffice2 = buildBGHDocOffice();
+  private final String docOffice2Group = "/caselaw/BGH";
+  private final DocumentationOffice docOffice1 = buildDocOffice("CC-RIS");
+  private final DocumentationOffice docOffice2 = buildDocOffice("BGH");
 
   @BeforeEach
   void setUp() {

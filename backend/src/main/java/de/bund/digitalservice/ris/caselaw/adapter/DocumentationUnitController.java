@@ -82,7 +82,7 @@ public class DocumentationUnitController {
   }
 
   @GetMapping(value = "new", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("isAuthenticated() and @userIsInternal.apply(#oidcUser)")
+  @PreAuthorize("isAuthenticated()")
   public ResponseEntity<DocumentationUnit> generateNewDocumentationUnit(
       @AuthenticationPrincipal OidcUser oidcUser) {
     var docOffice = userService.getDocumentationOffice(oidcUser);
@@ -110,12 +110,9 @@ public class DocumentationUnitController {
       value = "/{uuid}/file",
       produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-  @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasSameDocumentationOffice.apply(#uuid)")
+  @PreAuthorize("@userHasWriteAccessByDocumentationUnitId.apply(#uuid)")
   public ResponseEntity<Docx2Html> attachFileToDocumentationUnit(
-      @AuthenticationPrincipal OidcUser oidcUser,
-      @PathVariable UUID uuid,
-      @RequestBody byte[] bytes,
-      @RequestHeader HttpHeaders httpHeaders) {
+      @PathVariable UUID uuid, @RequestBody byte[] bytes, @RequestHeader HttpHeaders httpHeaders) {
     var docx2html =
         converterService.getConvertedObject(
             attachmentService
@@ -129,11 +126,9 @@ public class DocumentationUnitController {
   }
 
   @DeleteMapping(value = "/{uuid}/file/{s3Path}")
-  @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasSameDocumentationOffice.apply(#uuid)")
+  @PreAuthorize("@userHasWriteAccessByDocumentationUnitId.apply(#uuid)")
   public ResponseEntity<Object> removeAttachmentFromDocumentationUnit(
-      @AuthenticationPrincipal OidcUser oidcUser,
-      @PathVariable UUID uuid,
-      @PathVariable String s3Path) {
+      @PathVariable UUID uuid, @PathVariable String s3Path) {
 
     try {
       attachmentService.deleteByS3Path(s3Path);
@@ -161,9 +156,10 @@ public class DocumentationUnitController {
       @RequestParam(value = "myDocOfficeOnly") Optional<Boolean> myDocOfficeOnly,
       @AuthenticationPrincipal OidcUser oidcUser) {
 
+    var documentationOffice = userService.getDocumentationOffice(oidcUser);
     return service.searchByDocumentationUnitSearchInput(
         PageRequest.of(page, size),
-        oidcUser,
+        documentationOffice,
         documentNumber,
         fileNumber,
         courtType,
@@ -188,9 +184,8 @@ public class DocumentationUnitController {
   }
 
   @DeleteMapping(value = "/{uuid}")
-  @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasSameDocumentationOffice.apply(#uuid)")
-  public ResponseEntity<String> deleteByUuid(
-      @AuthenticationPrincipal OidcUser oidcUser, @PathVariable UUID uuid) {
+  @PreAuthorize("@userHasWriteAccessByDocumentationUnitId.apply(#uuid)")
+  public ResponseEntity<String> deleteByUuid(@PathVariable UUID uuid) {
 
     try {
       var str = service.deleteByUuid(uuid);
@@ -204,7 +199,7 @@ public class DocumentationUnitController {
       value = "/{uuid}",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasSameDocumentationOffice.apply(#uuid)")
+  @PreAuthorize("@userHasWriteAccessByDocumentationUnitId.apply(#uuid)")
   public ResponseEntity<DocumentationUnit> updateByUuid(
       @PathVariable UUID uuid,
       @Valid @RequestBody DocumentationUnit documentationUnit,
@@ -235,12 +230,9 @@ public class DocumentationUnitController {
       value = "/{uuid}",
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize(
-      "@userHasSameDocumentationOffice.apply(#uuid) and (@userIsInternal.apply(#oidcUser) or (@isAssignedViaProcedure.apply(#uuid) and @isPatchAllowedForExternalUsers.apply(#patch)))")
+  @PreAuthorize("@userHasWriteAccessByDocumentationUnitId.apply(#uuid)")
   public ResponseEntity<RisJsonPatch> partialUpdateByUuid(
-      @AuthenticationPrincipal OidcUser oidcUser,
-      @PathVariable UUID uuid,
-      @RequestBody RisJsonPatch patch) {
+      @PathVariable UUID uuid, @RequestBody RisJsonPatch patch) {
 
     String documentNumber = "unknown";
 
@@ -271,7 +263,7 @@ public class DocumentationUnitController {
    *     user is not authorized
    */
   @PutMapping(value = "/{uuid}/handover", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasSameDocumentationOffice.apply(#uuid)")
+  @PreAuthorize("@userHasWriteAccessByDocumentationUnitId.apply(#uuid)")
   public ResponseEntity<HandoverMail> handoverDocumentationUnitAsMail(
       @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
 
@@ -294,7 +286,7 @@ public class DocumentationUnitController {
    *     if the user is not authorized
    */
   @GetMapping(value = "/{uuid}/handover", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasSameDocumentationOffice.apply(#uuid)")
+  @PreAuthorize("@userHasWriteAccessByDocumentationUnitId.apply(#uuid)")
   public List<EventRecord> getEventLog(@PathVariable UUID uuid) {
     return handoverService.getEventLog(uuid);
   }

@@ -8,7 +8,5 @@ import java.util.List;
  */
 public interface DocumentationOfficeUserGroupService {
   /** Get all user groups from memory. (Will only be updated after server restart.) */
-  List<DocumentationOfficeUserGroup> getAllUserGroups();
-
-  List<DocumentationOfficeUserGroup> getExternalUserGroups(DocumentationOffice documentationOffice);
+  List<DocumentationOfficeUserGroup> getUserGroups();
 }

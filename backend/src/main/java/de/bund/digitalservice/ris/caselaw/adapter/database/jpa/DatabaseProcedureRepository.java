@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
@@ -51,32 +50,11 @@ public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO,
    * Finds a {@link ProcedureDTO} by label and documentation office.
    *
    * @param label the label to search for
-   * @param documentationOfficeDTO the documentation office to filter by
+   * @param documentationUnitDTO the documentation office to filter by
    * @return an Optional containing the found {@link ProcedureDTO}, or empty if not found
    */
   Optional<ProcedureDTO> findAllByLabelAndDocumentationOffice(
-      String label, DocumentationOfficeDTO documentationOfficeDTO);
-
-  /**
-   * Finds a {@link ProcedureDTO} by id and documentation office.
-   *
-   * @param procedureId the UUID of the procedure to filter by
-   * @param documentationOfficeId the id of the documentation office to filter by
-   * @return an Optional containing the found {@link ProcedureDTO}, or empty if not found
-   */
-  @Query(
-      "SELECT p FROM ProcedureDTO p WHERE p.id = :procedureId AND p.documentationOffice.id = :documentationOfficeId")
-  Optional<ProcedureDTO> findByIdAndDocumentationOffice(
-      UUID procedureId, UUID documentationOfficeId);
-
-  /**
-   * Finds all {@link ProcedureDTO} by user group id that are assigned to that user group.
-   *
-   * @param userGroupId the uuid of the user group
-   * @return a list of all procedures {@link ProcedureDTO} that have been assigned to the user group
-   *     , or empty if not found
-   */
-  List<ProcedureDTO> findAllByDocumentationOfficeUserGroupDTO_Id(UUID userGroupId);
+      String label, DocumentationOfficeDTO documentationUnitDTO);
 
   /**
    * Retrieves a paginated list of distinct {@link ProcedureDTO} entities filtered by label and

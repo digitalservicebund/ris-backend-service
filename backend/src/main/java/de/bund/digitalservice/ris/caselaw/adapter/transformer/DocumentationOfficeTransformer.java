@@ -10,12 +10,7 @@ public class DocumentationOfficeTransformer {
   public static DocumentationOffice transformToDomain(
       DocumentationOfficeDTO documentationOfficeDTO) {
     return Optional.ofNullable(documentationOfficeDTO)
-        .map(
-            dto ->
-                DocumentationOffice.builder()
-                    .uuid(dto.getId())
-                    .abbreviation(dto.getAbbreviation())
-                    .build())
+        .map(dto -> DocumentationOffice.builder().abbreviation(dto.getAbbreviation()).build())
         .orElse(null);
   }
 }

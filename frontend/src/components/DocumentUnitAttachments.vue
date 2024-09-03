@@ -90,7 +90,7 @@ async function upload(files: FileList) {
       )
       if (response.status === 200 && response.data) {
         anySuccessful = true
-      } else if (response.error?.title) {
+      } else if (response.error?.description) {
         errors.value.push(
           file.name +
             " " +

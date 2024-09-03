@@ -14,6 +14,7 @@ function renderComponent(options?: {
   documentUnitListEntries?: DocumentUnitListEntry[]
   searchResponseError?: ResponseError
   isLoading?: boolean
+  isDeletable?: boolean
   emptyState?: string
   activeUser?: User
 }) {
@@ -27,6 +28,7 @@ function renderComponent(options?: {
         documentUnitListEntries: options?.documentUnitListEntries,
         searchResponseError: options?.searchResponseError ?? undefined,
         isLoading: options?.isLoading ?? false,
+        isDeletable: options?.isDeletable ?? true,
         emptyState:
           options?.emptyState ??
           (!options?.documentUnitListEntries
@@ -106,11 +108,10 @@ describe("documentUnit list", () => {
             publicationStatus: PublicationState.PUBLISHED,
             withError: false,
           },
+          documentationOffice: { abbreviation: "OTHER" },
           hasAttachments: true,
           hasHeadnoteOrPrinciple: true,
           hasNote: true,
-          isDeletable: false,
-          isEditable: false,
         },
         {
           id: "id",
@@ -125,11 +126,10 @@ describe("documentUnit list", () => {
             publicationStatus: PublicationState.PUBLISHED,
             withError: false,
           },
+          documentationOffice: { abbreviation: "DS" },
           hasAttachments: false,
           hasHeadnoteOrPrinciple: false,
           hasNote: false,
-          isDeletable: true,
-          isEditable: true,
         },
       ],
     })
@@ -187,8 +187,7 @@ describe("documentUnit list", () => {
             publicationStatus: PublicationState.PUBLISHED,
             withError: false,
           },
-          isDeletable: true,
-          isEditable: true,
+          documentationOffice: { abbreviation: "DS" },
         },
       ],
     })
@@ -220,6 +219,7 @@ describe("documentUnit list", () => {
             publicationStatus: PublicationState.PUBLISHED,
             withError: false,
           },
+          documentationOffice: { abbreviation: "DS" },
         },
       ],
       activeUser: {

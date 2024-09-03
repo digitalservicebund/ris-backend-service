@@ -71,7 +71,7 @@ class AuthIntegrationTest {
                     .userGroupPathName("/DS")
                     .build()))
         .when(documentationOfficeUserGroupService)
-        .getAllUserGroups();
+        .getUserGroups();
   }
 
   @Test

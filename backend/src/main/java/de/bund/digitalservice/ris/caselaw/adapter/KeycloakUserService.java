@@ -6,13 +6,16 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroupSer
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class KeycloakUserService implements UserService {
   private static final Logger LOGGER = LoggerFactory.getLogger(KeycloakUserService.class);
@@ -23,44 +26,34 @@ public class KeycloakUserService implements UserService {
     this.documentationOfficeUserGroupService = documentationOfficeUserGroupService;
   }
 
-  @Override
   public User getUser(OidcUser oidcUser) {
+    Map<String, Object> claims = oidcUser.getClaims();
+    claims.keySet().stream()
+        .filter(
+            key ->
+                !List.of("preferred_username", "given_name", "upn", "name", "family_name", "email")
+                    .contains(key))
+        .forEach(
+            key -> log.debug("OidcUser claim with key '{}' and value '{}'", key, claims.get(key)));
     return extractDocumentationOffice(oidcUser)
         .map(documentationOffice -> createUser(oidcUser, documentationOffice))
         .orElse(createUser(oidcUser, null));
   }
 
-  @Override
   public DocumentationOffice getDocumentationOffice(OidcUser oidcUser) {
     return getUser(oidcUser).documentationOffice();
   }
 
-  @Override
+  public List<DocumentationOfficeUserGroup> getUserGroups(OidcUser oidcUser) {
+    return documentationOfficeUserGroupService.getUserGroups().stream()
+        .filter(
+            group ->
+                group.docOffice().equals(getDocumentationOffice(oidcUser)) && !group.isInternal())
+        .toList();
+  }
+
   public String getEmail(OidcUser oidcUser) {
     return oidcUser.getEmail();
-  }
-
-  @Override
-  public Boolean isInternal(OidcUser oidcUser) {
-    List<String> roles = oidcUser.getClaimAsStringList("roles");
-    if (roles != null) {
-      return roles.contains("Internal");
-    }
-    return false;
-  }
-
-  @Override
-  public Optional<DocumentationOfficeUserGroup> getUserGroup(OidcUser oidcUser) {
-    List<String> userGroups = Objects.requireNonNull(oidcUser.getAttribute("groups"));
-    var matchingUserGroup =
-        this.documentationOfficeUserGroupService.getAllUserGroups().stream()
-            .filter(group -> userGroups.contains(group.userGroupPathName()))
-            .findFirst();
-    if (matchingUserGroup.isEmpty()) {
-      LOGGER.warn(
-          "No doc office user group associated with given Keycloak user groups: {}", userGroups);
-    }
-    return matchingUserGroup;
   }
 
   private User createUser(OidcUser oidcUser, DocumentationOffice documentationOffice) {
@@ -73,6 +66,15 @@ public class KeycloakUserService implements UserService {
   }
 
   private Optional<DocumentationOffice> extractDocumentationOffice(OidcUser oidcUser) {
-    return getUserGroup(oidcUser).map(DocumentationOfficeUserGroup::docOffice);
+    List<String> userGroups = Objects.requireNonNull(oidcUser.getAttribute("groups"));
+    var matchingUserGroup =
+        this.documentationOfficeUserGroupService.getUserGroups().stream()
+            .filter(group -> userGroups.contains(group.userGroupPathName()))
+            .findFirst();
+    if (matchingUserGroup.isEmpty() && !userGroups.isEmpty()) {
+      LOGGER.warn(
+          "No doc office user group associated with given Keycloak user groups: {}", userGroups);
+    }
+    return matchingUserGroup.map(DocumentationOfficeUserGroup::docOffice);
   }
 }
