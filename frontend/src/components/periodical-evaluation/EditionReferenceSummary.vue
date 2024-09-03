@@ -1,7 +1,7 @@
 <script lang="ts" setup>
+import DecisionSummary from "@/components/DecisionSummary.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import Reference from "@/domain/reference"
-import BaselineArrowOutward from "~icons/ic/baseline-arrow-outward"
 
 const props = defineProps<{
   data: Reference
@@ -22,14 +22,9 @@ const props = defineProps<{
           },
         }"
       >
-        <button
-          class="ds-link-02-bold flex flex-row leading-24 focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
-        >
-          <FlexContainer flex-direction="flex-row">
-            <p>{{ props.data.renderDocumentationUnit }}</p>
-            <BaselineArrowOutward />
-          </FlexContainer>
-        </button>
+        <FlexContainer flex-direction="flex-row">
+          <DecisionSummary :decision="props.data.documentationUnit" />
+        </FlexContainer>
       </RouterLink>
 
       <div class="ds-label-01-reg mr-8">
