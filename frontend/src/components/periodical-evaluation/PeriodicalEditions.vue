@@ -19,8 +19,8 @@ import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import ComboboxItemService from "@/services/comboboxItemService"
 import { ResponseError } from "@/services/httpClient"
 import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
-import IconChevronRight from "~icons/ic/baseline-chevron-right"
-import IconDelete from "~icons/ic/baseline-close"
+import IconDelete from "~icons/material-symbols/delete"
+import IconEdit from "~icons/material-symbols/edit-outline"
 
 const emptyResponse: ResponseError = {
   title: "Wählen Sie ein Periodikum um die Ausgaben anzuzeigen.",
@@ -167,7 +167,7 @@ watch(
             </span>
           </CellItem>
           <CellItem class="flex">
-            <div class="float-end flex">
+            <div class="float-end flex gap-24">
               <router-link
                 target="_blank"
                 :to="{
@@ -176,13 +176,13 @@ watch(
                 }"
               >
                 <div class="ds-button-primary">
-                  <IconChevronRight class="text-blue-800" />
+                  <IconEdit class="text-blue-800" />
                 </div>
               </router-link>
               <button
                 v-if="edition.references?.length == 0"
                 aria-label="Ausgabe löschen"
-                class="cursor-pointer text-red-800 hover:text-red-600"
+                class="cursor-pointer"
                 @click="
                   async () => {
                     edition.id &&
@@ -200,7 +200,7 @@ watch(
                   }
                 "
               >
-                <IconDelete />
+                <IconDelete class="text-blue-800" />
               </button>
 
               <IconDelete

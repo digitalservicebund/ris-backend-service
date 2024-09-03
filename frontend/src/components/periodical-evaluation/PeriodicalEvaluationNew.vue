@@ -45,25 +45,9 @@ const legalPeriodical = computed({
 async function validateRequiredInput() {
   validationStore.reset()
 
-  const conditionalGroupFields = ["name", "prefix"]
-
-  legalPeriodicalEdition.value.missingRequiredFields
-    .filter((missingField) => !conditionalGroupFields.includes(missingField))
-    .forEach((missingField) =>
-      validationStore.add("Pflichtfeld nicht befüllt", missingField),
-    )
-
-  const missingConditionalfields =
-    legalPeriodicalEdition.value.missingRequiredFields.filter((missingField) =>
-      conditionalGroupFields.includes(missingField),
-    )
-
-  // Add validation error only if all fields are missing
-  if (missingConditionalfields.length == conditionalGroupFields.length) {
-    missingConditionalfields.forEach((missingField) =>
-      validationStore.add("Name oder Präfix sind nicht befüllt", missingField),
-    )
-  }
+  legalPeriodicalEdition.value.missingRequiredFields.forEach((missingField) =>
+    validationStore.add("Pflichtfeld nicht befüllt", missingField),
+  )
 }
 
 async function saveEdition() {
@@ -114,11 +98,7 @@ watch(
 
     <div class="flex-col">
       <div class="flex flex-row items-start gap-24">
-        <InputField
-          id="prefix"
-          label="Präfix *"
-          :validation-error="validationStore.getByField('prefix')"
-        >
+        <InputField id="prefix" label="Präfix">
           <TextInput
             id="prefix"
             v-model="legalPeriodicalEdition.prefix"
@@ -146,7 +126,7 @@ watch(
 
     <InputField
       id="name"
-      label="Name der Ausgabe *"
+      label="Name der Ausgabe"
       :validation-error="validationStore.getByField('name')"
     >
       <TextInput

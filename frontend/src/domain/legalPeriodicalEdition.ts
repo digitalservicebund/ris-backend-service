@@ -9,11 +9,7 @@ export default class LegalPeriodicalEdition {
     "legalPeriodical",
   ] as const
 
-  static readonly requiredFields = [
-    "name",
-    "prefix",
-    "legalPeriodical",
-  ] as const
+  static readonly requiredFields = ["name", "legalPeriodical"] as const
 
   id?: string
   name?: string

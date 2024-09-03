@@ -141,15 +141,9 @@ test.describe(
 
         await test.step("The inputs are correctly validated (prefix or name have to be chosen, suffix is optional)", async () => {
           await expect(page.getByText("Pflichtfeld nicht befüllt")).toBeHidden()
-          await expect(
-            page.getByText("Name oder Präfix sind nicht befüllt"),
-          ).toBeHidden()
           await page.getByLabel("Auswertung starten").click()
           await expect(
-            page.getByText("Pflichtfeld nicht befüllt"),
-          ).toBeVisible()
-          await expect(
-            page.locator(`text="Name oder Präfix sind nicht befüllt"`),
+            page.locator(`text="Pflichtfeld nicht befüllt"`),
           ).toHaveCount(2)
         })
 
@@ -165,8 +159,8 @@ test.describe(
         await test.step("prefix or name have to be chosen", async () => {
           await page.getByLabel("Auswertung starten").click()
           await expect(
-            page.locator(`text="Name oder Präfix sind nicht befüllt"`),
-          ).toHaveCount(2)
+            page.locator(`text="Pflichtfeld nicht befüllt"`),
+          ).toHaveCount(1)
         })
 
         const name = generateString()
@@ -212,24 +206,6 @@ test.describe(
             await expect(page.locator(".table > tr")).toHaveCount(0)
           })
 
-          await test.step("Prefix is used as edition if empty", async () => {
-            await page.getByLabel("Neue Periodikaauswertung").click()
-            await expect(page).toHaveURL(/periodical-evaluation\/new/)
-            await fillInput(page, "Periodikum", "wdg")
-            await page
-              .getByText("WdG | Welt der Gesundheitsversorgung", {
-                exact: true,
-              })
-              .click()
-            await fillInput(page, "Präfix", "prefix")
-            await page.getByLabel("Auswertung starten").click()
-            await expect(
-              page.getByText("Periodikaauswertung | WdG, prefix", {
-                exact: true,
-              }),
-            ).toBeVisible()
-          })
-
           // make sure the edition is deleted also if the test fails
         } finally {
           await navigateToPeriodicalEvaluation(page)
@@ -237,7 +213,9 @@ test.describe(
           await page
             .getByText("WdG | Welt der Gesundheitsversorgung", { exact: true })
             .click()
-          await page.locator("[aria-label='Ausgabe löschen']").click()
+          if (await page.locator(".table > tr >> nth=0").isVisible()) {
+            await page.locator("[aria-label='Ausgabe löschen']").click()
+          }
         }
       },
     )

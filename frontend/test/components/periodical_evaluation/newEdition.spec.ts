@@ -127,14 +127,9 @@ describe("Legal periodical edition list", () => {
       await user.click(screen.getByLabelText("Auswertung starten"))
 
       expect(
-        screen.getAllByText("Name oder Präfix sind nicht befüllt").length,
-        "validation message was not shown for both name and prefix",
-      ).toBe(2)
-
-      expect(
-        screen.getByText("Pflichtfeld nicht befüllt"),
+        screen.getAllByText("Pflichtfeld nicht befüllt").length,
         "should be shown if legal periodical empty",
-      ).toBeVisible()
+      ).toBe(2)
       expect(fetchSpy).toHaveBeenCalledTimes(0)
     })
 
@@ -164,7 +159,7 @@ describe("Legal periodical edition list", () => {
       await user.click(dropdownItems[0])
       await expect(periodicalField).toHaveValue("BDZ")
 
-      await user.type(screen.getByLabelText("Präfix"), "präfix")
+      await user.type(screen.getByLabelText("Name der Ausgabe"), "name")
 
       await user.click(screen.getByLabelText("Auswertung starten"))
 
