@@ -22,7 +22,6 @@ const localModelValue = computed({
 })
 
 const conditionalClasses = computed(() => ({
-  "!shadow-none !bg-blue-300": props.readOnly,
   "ds-select-small": props.isSmall,
   "ds-select-medium": !props.isSmall,
 }))

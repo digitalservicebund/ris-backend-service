@@ -8,6 +8,7 @@ import InfoModal from "@/components/InfoModal.vue"
 import DropdownInput from "@/components/input/DropdownInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextInput from "@/components/input/TextInput.vue"
+import { DropdownItem } from "@/components/input/types"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import { useExternalUser } from "@/composables/useExternalUser"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
@@ -49,7 +50,7 @@ async function updateProcedures(page: number, queries?: Query<string>) {
 }
 
 /**
- * Get all external user groups for the current user
+ * Get all external user groups for the current user and documentation office.
  */
 async function getUserGroups() {
   const response = await userGroupsService.get()
@@ -104,6 +105,12 @@ async function handleIsExpanded(
   }
 }
 
+/**
+ * Handles a change in the {@link DropdownInput}.
+ * When the user selected an option with a procedureId and a userGroupId
+ * the assign api is called.
+ * When the user selected an option which contains only the procedureId the unassign api is called.
+ **/
 async function handleAssignUserGroup(
   procedureId: string | undefined,
   userGroupId: string | undefined,
@@ -116,6 +123,7 @@ async function handleAssignUserGroup(
   }
   if (response?.error) {
     assignError.value = response.error
+    alert(response.error.title)
   }
 }
 
@@ -141,9 +149,21 @@ async function handleDeleteDocumentationUnit(
   }
 }
 
-const getDropdownItems = () => {
+/**
+ * Transforms a pathName of a user group (e.g. "/caselaw/BGH/Extern/Agentur1") into
+ * the name of the last subgroup (e.g. "Agentur1")
+ **/
+const getLastSubgroup = (userGroupPathName: string) => {
+  return userGroupPathName.substring(userGroupPathName.lastIndexOf("/") + 1)
+}
+
+/**
+ * Returns a list of {@link DropdownItem} containing the external user groups
+ * of the documentation office.
+ **/
+const getDropdownItems = (): DropdownItem[] => {
   const dropdownItems = userGroups.value.map(({ userGroupPathName, id }) => ({
-    label: userGroupPathName,
+    label: getLastSubgroup(userGroupPathName),
     value: id,
   }))
   dropdownItems.push({ label: "Nicht zugewiesen", value: "" })
@@ -286,7 +306,7 @@ onMounted(async () => {
                 v-if="featureToggle"
                 v-model="procedure.userGroupId"
                 aria-label="dropdown input"
-                class="ml-auto w-auto text-center"
+                class="ml-auto w-auto"
                 is-small
                 :items="getDropdownItems()"
                 :read-only="isExternalUser"

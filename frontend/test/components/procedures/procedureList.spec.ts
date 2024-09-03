@@ -258,8 +258,8 @@ describe("ProcedureList", () => {
     const options = screen.getAllByRole("option")
 
     expect(options.length).toBe(3)
-    expect(options[0]).toHaveTextContent("DS/Extern/Agentur1")
-    expect(options[1]).toHaveTextContent("DS/Extern/Agentur2")
+    expect(options[0]).toHaveTextContent("Agentur1")
+    expect(options[1]).toHaveTextContent("Agentur2")
     expect(options[2]).toHaveTextContent("Nicht zugewiesen")
   })
 
