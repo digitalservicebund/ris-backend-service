@@ -98,6 +98,16 @@ function isSelected(entry: T): boolean {
 }
 
 /**
+ * Method to check if entry is given in model value
+ */
+function isSaved(entries: T[], entry?: T): boolean {
+  if (entry) {
+    return entries.some((item) => entry.equals(item))
+  }
+  return false
+}
+
+/**
  * Updating the modelValue with the local modelValue list, is not propagated, until the user actively
  * decides to click the save button in edit mode. The edit index is resetted, to show list in summary mode.
  */
@@ -186,6 +196,7 @@ watch(
         v-if="isSelected(entry)"
         v-model="modelValueList[index]"
         class="py-24"
+        :is-saved="isSaved(modelValue, modelValueList[index])"
         :model-value-list="modelValueList"
         @add-entry="updateModel"
         @cancel-edit="cancelEdit"

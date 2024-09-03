@@ -56,7 +56,7 @@ async function validateRequiredInput() {
 async function addReference() {
   await validateRequiredInput()
 
-  if (!validationStore.getByMessage("Pflichtfeld nicht befüllt").length) {
+  if (validationStore.isValid()) {
     emit("update:modelValue", reference.value as Reference)
     emit("addEntry")
   }
