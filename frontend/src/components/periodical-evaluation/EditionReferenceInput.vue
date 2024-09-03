@@ -137,7 +137,7 @@ async function addReference(decision: RelatedDocumentation) {
   relatedDocumentationUnit.value = new RelatedDocumentation({ ...decision })
   const newReference: Reference = new Reference({
     id: reference.value.id,
-    citation: citation.value,
+    citation: reference.value.citation,
     referenceSupplement: reference.value.referenceSupplement,
     footnote: reference.value.footnote,
     legalPeriodical: reference.value.legalPeriodical,
