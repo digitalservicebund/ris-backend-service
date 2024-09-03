@@ -15,7 +15,6 @@ export default class Reference implements EditableListItem {
   static readonly requiredFields = [
     "legalPeriodical",
     "citation",
-    "documentationUnit",
   ] as const
 
   static readonly fields = [
