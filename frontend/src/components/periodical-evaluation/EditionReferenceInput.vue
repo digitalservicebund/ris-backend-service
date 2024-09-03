@@ -19,8 +19,7 @@ import { useEditionStore } from "@/stores/editionStore"
 
 const props = defineProps<{
   modelValue?: Reference
-  modelValueList: Reference[]
-  isSaved: boolean
+  modelValueList?: Reference[]
 }>()
 
 const emit = defineEmits<{
@@ -30,9 +29,10 @@ const emit = defineEmits<{
   removeEntry: [value: Reference]
 }>()
 const store = useEditionStore()
+const lastSearchInput = ref(new Reference())
 const lastSavedModelValue = ref(new Reference({ ...props.modelValue }))
-const reference = ref<Reference>(new Reference({ ...props.modelValue }))
-const validationStore = useValidationStore()
+const reference = ref(new Reference({ ...props.modelValue }))
+const validationStore = useValidationStore<(typeof Reference.fields)[number]>()
 const pageNumber = ref<number>(0)
 const itemsPerPage = ref<number>(15)
 const isLoading = ref(false)
@@ -47,12 +47,6 @@ const legalPeriodical = computed(() =>
         value: store.edition.legalPeriodical,
       }
     : undefined,
-)
-
-const relatedDocumentationUnit = ref<RelatedDocumentation>(
-  props.modelValue?.documentationUnit
-    ? new RelatedDocumentation({ ...props.modelValue.documentationUnit })
-    : new RelatedDocumentation(),
 )
 
 const prefix = computed({
@@ -75,7 +69,7 @@ const citation = computed(() =>
     ...(prefix.value ? [prefix.value] : []),
     ...(reference.value.citation ? [reference.value.citation] : []),
     ...(suffix.value ? [suffix.value] : []),
-  ].join(" "),
+  ].join(""),
 )
 
 function updateDateFormatValidation(
@@ -88,9 +82,22 @@ function updateDateFormatValidation(
 
 async function search() {
   isLoading.value = true
+  const documentationUnitRef = new RelatedDocumentation({
+    ...reference.value,
+  })
+
+  //Reset page number to 0, when search input changes
+  if (
+    reference.value.court != lastSearchInput.value.court ||
+    reference.value.decisionDate != lastSearchInput.value.decisionDate ||
+    reference.value.fileNumber != lastSearchInput.value.fileNumber ||
+    reference.value.documentType != lastSearchInput.value.documentType
+  ) {
+    pageNumber.value = 0
+  }
 
   const response = await documentUnitService.searchByRelatedDocumentation(
-    relatedDocumentationUnit.value,
+    documentationUnitRef,
     {
       ...(pageNumber.value != undefined
         ? { pg: pageNumber.value.toString() }
@@ -110,9 +117,7 @@ async function search() {
     searchResults.value = response.data.content.map((searchResult) => {
       return {
         decision: new RelatedDocumentation({ ...searchResult }),
-        isLinked: searchResult.isLinkedWith(
-          props.modelValueList.map((item) => item.documentationUnit!),
-        ),
+        isLinked: searchResult.isLinkedWith(props.modelValueList),
       }
     })
   }
@@ -121,38 +126,35 @@ async function search() {
 
 async function updatePage(page: number) {
   pageNumber.value = page
-  await search()
+  search()
 }
 
-async function validateRequiredInput(toValidateReference: Reference) {
-  if (toValidateReference.missingRequiredFields?.length) {
-    toValidateReference.missingRequiredFields.forEach((missingField) => {
+async function validateRequiredInput() {
+  validationStore.reset()
+  if (reference.value.missingRequiredFields?.length) {
+    reference.value.missingRequiredFields.forEach((missingField) => {
+      console.log(missingField)
       validationStore.add("Pflichtfeld nicht befüllt", missingField)
     })
   }
 }
 
 async function addReference(decision: RelatedDocumentation) {
-  validationStore.reset()
-  relatedDocumentationUnit.value = new RelatedDocumentation({ ...decision })
-  const newReference: Reference = new Reference({
-    id: reference.value.id,
-    citation: reference.value.citation,
-    referenceSupplement: reference.value.referenceSupplement,
-    footnote: reference.value.footnote,
-    legalPeriodical: reference.value.legalPeriodical,
-    legalPeriodicalRawValue: reference.value.legalPeriodicalRawValue,
-    documentationUnit: new RelatedDocumentation({ ...decision }),
-  })
-
-  lastSavedModelValue.value = newReference
-
-  await validateRequiredInput(newReference)
-
-  if (validationStore.isValid()) {
-    newReference.citation = citation.value
+  await validateRequiredInput()
+  if (!validationStore.getByMessage("Pflichtfeld nicht befüllt").length) {
     // Merge the decision from search with the current reference input values
-    emit("update:modelValue", newReference)
+    emit(
+      "update:modelValue",
+      new Reference({
+        id: reference.value.id,
+        citation: citation.value,
+        referenceSupplement: reference.value.referenceSupplement,
+        footnote: reference.value.footnote,
+        legalPeriodical: reference.value.legalPeriodical,
+        legalPeriodicalRawValue: reference.value.legalPeriodicalRawValue,
+        documentationUnit: new RelatedDocumentation({ ...decision }),
+      }),
+    )
     emit("addEntry")
   }
 }
@@ -188,7 +190,6 @@ watch(
         <div class="flex justify-between gap-24">
           <div class="flex-1">
             <InputField
-              v-if="!isSaved"
               id="citation"
               v-slot="slotProps"
               label="Zitatstelle *"
@@ -200,7 +201,6 @@ watch(
                   v-model="prefix"
                   aria-label="Zitatstelle Präfix"
                   placeholder="Präfix"
-                  read-only
                   size="medium"
                 ></TextInput>
                 <TextInput
@@ -216,27 +216,7 @@ watch(
                   v-model="suffix"
                   aria-label="Zitatstelle Suffix"
                   placeholder="Suffix"
-                  read-only
                   size="medium"
-                ></TextInput>
-              </div>
-            </InputField>
-
-            <InputField
-              v-else
-              id="citation"
-              v-slot="slotProps"
-              label="Zitatstelle *"
-              :validation-error="validationStore.getByField('citation')"
-            >
-              <div class="flex flex-grow flex-row gap-16">
-                <TextInput
-                  id="citation"
-                  v-model="reference.citation"
-                  aria-label="Zitatstelle *"
-                  :has-error="slotProps.hasError"
-                  size="medium"
-                  @focus="validationStore.remove('citation')"
                 ></TextInput>
               </div>
             </InputField>
@@ -272,12 +252,12 @@ watch(
         >
           <ComboboxInput
             id="courtInput"
-            v-model="relatedDocumentationUnit.court"
-            aria-label="Gericht Aktivzitierung"
+            v-model="reference.court"
+            aria-label="Gericht"
             clear-on-choosing-item
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getCourts"
-            :read-only="reference?.documentationUnit?.hasForeignSource"
+            :read-only="reference.hasForeignSource"
             @focus="validationStore.remove('court')"
           >
           </ComboboxInput>
@@ -294,11 +274,11 @@ watch(
         >
           <DateInput
             id="decisionDate"
-            v-model="relatedDocumentationUnit.decisionDate"
+            v-model="reference.decisionDate"
             aria-label="Entscheidungsdatum"
             class="ds-input-medium"
             :has-error="slotProps.hasError"
-            :read-only="reference?.documentationUnit?.hasForeignSource"
+            :read-only="reference.hasForeignSource"
             @focus="validationStore.remove('decisionDate')"
             @update:validation-error="slotProps.updateValidationError"
           ></DateInput>
@@ -313,25 +293,21 @@ watch(
         >
           <TextInput
             id="fileNumber"
-            v-model="relatedDocumentationUnit.fileNumber"
-            aria-label="Aktenzeichen Aktivzitierung"
+            v-model="reference.fileNumber"
+            aria-label="Aktenzeichen"
             :has-error="slotProps.hasError"
-            :read-only="reference?.documentationUnit?.hasForeignSource"
+            :read-only="reference.hasForeignSource"
             size="medium"
             @focus="validationStore.remove('fileNumber')"
           ></TextInput>
         </InputField>
-        <InputField
-          id="decisionDocumentType"
-          label="Dokumenttyp"
-          :validation-error="validationStore.getByField('documentType')"
-        >
+        <InputField id="decisionDocumentType" label="Dokumenttyp">
           <ComboboxInput
             id="decisionDocumentType"
-            v-model="relatedDocumentationUnit.documentType"
-            aria-label="Dokumenttyp Aktivzitierung"
+            v-model="reference.documentType"
+            aria-label="Dokumenttyp"
             :item-service="ComboboxItemService.getDocumentTypes"
-            :read-only="reference?.documentationUnit?.hasForeignSource"
+            :read-only="reference.hasForeignSource"
           ></ComboboxInput>
         </InputField>
       </div>
@@ -356,7 +332,7 @@ watch(
             :disabled="reference.isEmpty"
             label="Übernehmen"
             size="small"
-            @click.stop="addReference(relatedDocumentationUnit)"
+            @click.stop="addReference"
           />
           <TextButton
             v-if="!lastSavedModelValue.isEmpty"

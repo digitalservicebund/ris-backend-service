@@ -35,7 +35,7 @@ const secondaryReferences = computed(() =>
           v-for="item in primaryReferences"
           :key="item.legalPeriodical?.uuid"
         >
-          {{ item.renderDecision }}
+          {{ item.renderReference }}
         </div>
       </div>
       <div
@@ -57,7 +57,7 @@ const secondaryReferences = computed(() =>
           v-for="item in secondaryReferences"
           :key="item.legalPeriodical?.uuid"
         >
-          {{ item.renderDecision }}
+          {{ item.renderReference }}
         </div>
       </div>
     </PreviewContent>

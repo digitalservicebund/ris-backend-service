@@ -35,7 +35,7 @@ export default class RelatedDocumentation {
     )
   }
 
-  public static getStatusLabel(status: PublicationStatus) {
+  private getStatusLabel(status: PublicationStatus) {
     if (!status) return ""
 
     switch (status.publicationStatus) {
@@ -64,9 +64,7 @@ export default class RelatedDocumentation {
         : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentType?.label ? [this.documentType.label] : []),
-      ...(this.status
-        ? [RelatedDocumentation.getStatusLabel(this.status)]
-        : []),
+      ...(this.status ? [this.getStatusLabel(this.status)] : []),
     ].join(", ")
   }
 }

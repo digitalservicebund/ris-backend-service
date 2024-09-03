@@ -33,7 +33,7 @@ const props = defineProps<{
       </RouterLink>
 
       <div class="ds-label-01-reg mr-8">
-        {{ props.data.renderDecision }}
+        {{ props.data.renderReference }}
       </div>
     </div>
   </div>
