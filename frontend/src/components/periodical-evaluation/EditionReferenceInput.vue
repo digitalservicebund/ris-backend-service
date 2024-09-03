@@ -20,6 +20,7 @@ import { useEditionStore } from "@/stores/editionStore"
 const props = defineProps<{
   modelValue?: Reference
   modelValueList: Reference[]
+  isSaved: boolean
 }>()
 
 const emit = defineEmits<{
@@ -197,6 +198,7 @@ watch(
                   v-model="prefix"
                   aria-label="Zitatstelle Präfix"
                   placeholder="Präfix"
+                  read-only
                   size="medium"
                 ></TextInput>
                 <TextInput
@@ -212,6 +214,7 @@ watch(
                   v-model="suffix"
                   aria-label="Zitatstelle Suffix"
                   placeholder="Suffix"
+                  read-only
                   size="medium"
                 ></TextInput>
               </div>
