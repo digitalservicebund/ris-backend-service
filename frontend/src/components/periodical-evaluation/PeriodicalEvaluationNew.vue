@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
-import { useRouter } from "vue-router"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import InputField from "@/components/input/InputField.vue"
@@ -13,7 +12,6 @@ import ComboboxItemService from "@/services/comboboxItemService"
 import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 import { useEditionStore } from "@/stores/editionStore"
 
-const router = useRouter()
 const store = useEditionStore()
 const legalPeriodicalEdition = ref<LegalPeriodicalEdition>(
   store.edition
@@ -49,7 +47,8 @@ const legalPeriodical = computed({
 async function validateRequiredInput() {
   validationStore.reset()
 
-  legalPeriodicalEdition.value.missingRequiredFields.forEach((missingField) =>
+  // TODO remove ?
+  legalPeriodicalEdition.value.missingRequiredFields?.forEach((missingField) =>
     validationStore.add("Pflichtfeld nicht befüllt", missingField),
   )
 }
@@ -60,17 +59,11 @@ async function saveEdition() {
     const response = await LegalPeriodicalEditionService.save(
       legalPeriodicalEdition.value as LegalPeriodicalEdition,
     )
-
-    if (response.data)
-      await router.replace({
-        name: "caselaw-periodical-evaluation-uuid",
-        params: { uuid: response.data.id },
-      })
+    if (response.data) {
+      store.edition = response.data
+      legalPeriodicalEdition.value = response.data
+    }
   }
-}
-
-function reset() {
-  legalPeriodicalEdition.value = new LegalPeriodicalEdition()
 }
 
 watch(
@@ -101,9 +94,9 @@ watch(
         ></ComboboxInput>
       </InputField>
 
-    <div class="flex-col">
-      <div class="flex flex-row items-start gap-24">
-        <InputField id="prefix" label="Präfix">
+      <div class="flex-col">
+        <div class="flex flex-row items-start gap-24">
+          <InputField id="prefix" label="Präfix">
             <TextInput
               id="prefix"
               v-model="legalPeriodicalEdition.prefix"
@@ -128,38 +121,29 @@ watch(
           Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}
         </div>
       </div>
-    </div>
-    <InputField
-      id="name"
-      label="Name der Ausgabe"
-      :validation-error="validationStore.getByField('name')"
-    >
-      <TextInput
+
+      <InputField
         id="name"
-        v-model="legalPeriodicalEdition.name"
-        aria-label="Name der Ausgabe"
-        class="ds-input-medium"
-        size="medium"
-      ></TextInput>
-    </InputField>
+        label="Name der Ausgabe *"
+        :validation-error="validationStore.getByField('name')"
+      >
+        <TextInput
+          id="name"
+          v-model="legalPeriodicalEdition.name"
+          aria-label="Name der Ausgabe"
+          class="ds-input-medium"
+          size="medium"
+        ></TextInput>
+      </InputField>
 
-    <FlexContainer align-items="items-center">
-      <TextButton
-        aria-label="Auswertung starten"
-        class="ds-button-02-reg"
-        label="Auswertung starten"
-        @click="saveEdition"
-      ></TextButton>
-
-      <TextButton
-        v-if="legalPeriodicalIsEditionIsEmpty"
-        aria-label="Zurücksetzen"
-        button-type="ghost"
-        class="ml-8"
-        label="Zurücksetzen"
-        size="medium"
-        @click="reset"
-      />
-    </FlexContainer>
+      <FlexContainer align-items="items-center">
+        <TextButton
+          aria-label="Speichern"
+          class="ds-button-02-reg"
+          label="Speichern"
+          @click="saveEdition"
+        ></TextButton>
+      </FlexContainer>
+    </div>
   </div>
 </template>

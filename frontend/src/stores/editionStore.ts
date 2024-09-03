@@ -14,7 +14,7 @@ export const useEditionStore = defineStore("editionStore", () => {
   async function loadEdition(): Promise<
     ServiceResponse<LegalPeriodicalEdition>
   > {
-    const uuid = route.params.uuid
+    const uuid = route.params.editionId
     const response = await LegalPeriodicalEditionService.get(
       uuid.toString() as UUID,
     )

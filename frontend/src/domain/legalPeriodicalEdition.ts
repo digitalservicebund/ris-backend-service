@@ -21,6 +21,9 @@ export default class LegalPeriodicalEdition {
 
   constructor(data: Partial<LegalPeriodicalEdition> = {}) {
     Object.assign(this, data)
+    if (this.id === undefined) {
+      this.id = crypto.randomUUID()
+    }
   }
 
   get missingRequiredFields() {

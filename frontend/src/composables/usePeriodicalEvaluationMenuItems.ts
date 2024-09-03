@@ -14,7 +14,7 @@ export function usePeriodicalEvaluationMenuItems(
     {
       label: "Ausgabe",
       route: {
-        name: "caselaw-periodical-evaluation-uuid-edition",
+        name: "caselaw-periodical-evaluation-editionId-edition",
         ...baseRoute,
       },
     },
@@ -22,7 +22,7 @@ export function usePeriodicalEvaluationMenuItems(
       label: "Fundstellen",
       route: {
         ...baseRoute,
-        name: "caselaw-periodical-evaluation-uuid-references",
+        name: "caselaw-periodical-evaluation-editionId-references",
       },
     },
   ]
