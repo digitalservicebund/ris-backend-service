@@ -248,8 +248,8 @@ public class DocumentationUnitTransformer {
       return;
     }
 
-    Set<JobProfileDTO> jobProfileDTOs = new LinkedHashSet<>();
-    List<String> jobProfiles = contentRelatedIndexing.jobProfiles();
+    List<JobProfileDTO> jobProfileDTOs = new ArrayList<>();
+    List<String> jobProfiles = contentRelatedIndexing.jobProfiles().stream().distinct().toList();
 
     for (int i = 0; i < jobProfiles.size(); i++) {
       jobProfileDTOs.add(JobProfileDTO.builder().value(jobProfiles.get(i)).rank(i + 1L).build());

@@ -279,5 +279,5 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @OrderBy("rank")
   @Builder.Default
-  private Set<JobProfileDTO> jobProfiles = new HashSet<>();
+  private List<JobProfileDTO> jobProfiles = new ArrayList<>();
 }

@@ -46,7 +46,6 @@ import java.time.Instant;
 import java.time.Year;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -651,6 +650,25 @@ class DocumentationUnitTransformerTest {
   }
 
   @Test
+  void testTransformToDTO_withSameJobProfiles_shouldMakeJobProfilesDistinct() {
+    DocumentationUnit documentationUnit =
+        generateSimpleDocumentationUnitBuilder()
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .jobProfiles(List.of("job profile", "job profile"))
+                    .build())
+            .build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(
+            DocumentationUnitDTO.builder().build(), documentationUnit);
+
+    assertThat(documentationUnitDTO.getJobProfiles())
+        .extracting("value")
+        .containsExactly("job profile");
+  }
+
+  @Test
   void testTransformToDomain_withDocumentationUnitDTOIsNull_shouldReturnEmptyDocumentationUnit() {
 
     assertThatThrownBy(() -> DocumentationUnitTransformer.transformToDomain(null))
@@ -1039,13 +1057,14 @@ class DocumentationUnitTransformerTest {
   void testTransformToDomain_withJobProfiles_shouldAddJobProfiles() {
     DocumentationUnitDTO documentationUnitDTO =
         generateSimpleDTOBuilder()
-            .jobProfiles(Set.of(JobProfileDTO.builder().value("job profile").build()))
+            .jobProfiles(List.of(JobProfileDTO.builder().value("job profile").build()))
             .build();
 
     DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentationUnit.contentRelatedIndexing().jobProfiles()).contains("job profile");
+    assertThat(documentationUnit.contentRelatedIndexing().jobProfiles())
+        .containsExactly("job profile");
   }
 
   private DocumentationUnit.DocumentationUnitBuilder generateSimpleDocumentationUnitBuilder() {
