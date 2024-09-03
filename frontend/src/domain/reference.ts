@@ -12,10 +12,7 @@ export default class Reference implements EditableListItem {
   legalPeriodicalRawValue?: string
   documentationUnit?: RelatedDocumentation
 
-  static readonly requiredFields = [
-    "legalPeriodical",
-    "citation",
-  ] as const
+  static readonly requiredFields = ["legalPeriodical", "citation"] as const
 
   static readonly fields = [
     "legalPeriodical",
