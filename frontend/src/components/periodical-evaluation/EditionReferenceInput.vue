@@ -246,21 +246,21 @@ watch(
               Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}
             </div>
           </div>
-          <InputField
-            id="referenceSupplement"
-            v-slot="slotProps"
-            class="flex-1"
-            label="Klammernzusatz"
-          >
-            <TextInput
-              id="referenceSupplement"
-              v-model="reference.referenceSupplement"
-              aria-label="Klammernzusatz"
-              :has-error="slotProps.hasError"
-              size="medium"
-            ></TextInput>
-          </InputField>
         </div>
+        <InputField
+          id="referenceSupplement"
+          v-slot="slotProps"
+          class="flex-1"
+          label="Klammernzusatz"
+        >
+          <TextInput
+            id="referenceSupplement"
+            v-model="reference.referenceSupplement"
+            aria-label="Klammernzusatz"
+            :has-error="slotProps.hasError"
+            size="medium"
+          ></TextInput>
+        </InputField>
       </div>
     </div>
     <div class="flex flex-col gap-24">
