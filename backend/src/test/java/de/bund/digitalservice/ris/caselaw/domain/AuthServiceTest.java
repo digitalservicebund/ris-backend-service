@@ -99,7 +99,7 @@ class AuthServiceTest {
   @Test
   void testUserIsInternal_withInternalUser_shouldReturnTrue() {
     // Arrange
-    when(oidcUser.getClaimAsStringList("roles")).thenReturn(List.of("Internal"));
+    when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
 
     // Act
     Function<OidcUser, Boolean> result = service.userIsInternal();

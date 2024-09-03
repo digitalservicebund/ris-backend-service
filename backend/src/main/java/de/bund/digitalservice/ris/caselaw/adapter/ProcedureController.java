@@ -54,7 +54,7 @@ public class ProcedureController {
   @PreAuthorize("isAuthenticated()")
   public List<DocumentationUnitListItem> getDocumentationUnits(
       @AuthenticationPrincipal OidcUser oidcUser, @NonNull @PathVariable UUID procedureUUID) {
-    return service.getDocumentationUnits(procedureUUID);
+    return service.getDocumentationUnits(procedureUUID, oidcUser);
   }
 
   /**
