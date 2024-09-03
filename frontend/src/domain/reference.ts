@@ -3,10 +3,7 @@ import EditableListItem from "./editableListItem"
 import RelatedDocumentation from "./relatedDocumentation"
 import LegalPeriodical from "@/domain/legalPeriodical"
 
-export default class Reference
-  extends RelatedDocumentation
-  implements EditableListItem
-{
+export default class Reference implements EditableListItem {
   id?: string
   citation?: string
   referenceSupplement?: string
@@ -15,20 +12,27 @@ export default class Reference
   legalPeriodicalRawValue?: string
   documentationUnit?: RelatedDocumentation
 
-  static readonly requiredFields = ["legalPeriodical", "citation"] as const
+  static readonly requiredFields = [
+    "legalPeriodical",
+    "citation",
+    "documentationUnit",
+  ] as const
+
   static readonly fields = [
     "legalPeriodical",
     "citation",
     "referenceSupplement",
-    "court",
-    "fileNumber",
-    "decisionDate",
-    "documentType",
+    "documentationUnit",
   ] as const
 
   constructor(data: Partial<Reference> = {}) {
-    super()
     Object.assign(this, data)
+
+    if (this.documentationUnit) {
+      this.documentationUnit = new RelatedDocumentation({
+        ...data.documentationUnit,
+      })
+    }
     if (this.id == undefined) {
       this.id = crypto.randomUUID()
     }
@@ -50,7 +54,7 @@ export default class Reference
       .join(", ")
   }
 
-  get renderReference(): string {
+  get renderDecision(): string {
     return [
       this.legalPeriodical?.abbreviation ?? this.legalPeriodicalRawValue,
       this.citation,
@@ -87,5 +91,9 @@ export default class Reference
 
   private fieldIsEmpty(value: Reference[(typeof Reference.fields)[number]]) {
     return value === undefined || !value || Object.keys(value).length === 0
+  }
+
+  get hasForeignSource(): boolean {
+    return true
   }
 }
