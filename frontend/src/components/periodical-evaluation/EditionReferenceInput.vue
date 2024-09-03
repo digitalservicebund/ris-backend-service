@@ -75,7 +75,7 @@ const citation = computed(() =>
     ...(prefix.value ? [prefix.value] : []),
     ...(reference.value.citation ? [reference.value.citation] : []),
     ...(suffix.value ? [suffix.value] : []),
-  ].join(""),
+  ].join(" "),
 )
 
 function updateDateFormatValidation(
@@ -150,6 +150,7 @@ async function addReference(decision: RelatedDocumentation) {
   await validateRequiredInput(newReference)
 
   if (validationStore.isValid()) {
+    newReference.citation = citation.value
     // Merge the decision from search with the current reference input values
     emit("update:modelValue", newReference)
     emit("addEntry")
@@ -187,6 +188,7 @@ watch(
         <div class="flex justify-between gap-24">
           <div class="flex-1">
             <InputField
+              v-if="!isSaved"
               id="citation"
               v-slot="slotProps"
               label="Zitatstelle *"
@@ -216,6 +218,25 @@ watch(
                   placeholder="Suffix"
                   read-only
                   size="medium"
+                ></TextInput>
+              </div>
+            </InputField>
+
+            <InputField
+              v-else
+              id="citation"
+              v-slot="slotProps"
+              label="Zitatstelle *"
+              :validation-error="validationStore.getByField('citation')"
+            >
+              <div class="flex flex-grow flex-row gap-16">
+                <TextInput
+                  id="citation"
+                  v-model="reference.citation"
+                  aria-label="Zitatstelle *"
+                  :has-error="slotProps.hasError"
+                  size="medium"
+                  @focus="validationStore.remove('citation')"
                 ></TextInput>
               </div>
             </InputField>
