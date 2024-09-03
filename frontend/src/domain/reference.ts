@@ -25,23 +25,6 @@ export default class Reference implements EditableListItem {
     "documentationUnit",
   ] as const
 
-  static readonly documentationUnitFields = [
-    "court",
-    "fileNumber",
-    "decisionDate",
-  ] as const
-
-  static readonly allFields = [
-    ...Reference.fields,
-    ...Reference.documentationUnitFields,
-  ] as const
-
-  static readonly documentUnitRequiredFields = [
-    "court",
-    "fileNumber",
-    "decisionDate",
-  ] as const
-
   constructor(data: Partial<Reference> = {}) {
     Object.assign(this, data)
 
@@ -86,17 +69,9 @@ export default class Reference implements EditableListItem {
   }
 
   get missingRequiredFields() {
-    const requiredFields = Reference.requiredFields.filter((field) =>
+    return Reference.requiredFields.filter((field) =>
       this.fieldIsEmpty(this[field]),
     )
-
-    const documentUnitRequiredFields = this.documentationUnit
-      ? Reference.documentUnitRequiredFields.filter((field) =>
-          this.documentationUnitFieldIsEmpty(this.documentationUnit![field]),
-        )
-      : []
-
-    return [...requiredFields, ...documentUnitRequiredFields]
   }
 
   equals(entry: Reference): boolean {
@@ -115,12 +90,6 @@ export default class Reference implements EditableListItem {
   }
 
   private fieldIsEmpty(value: Reference[(typeof Reference.fields)[number]]) {
-    return value === undefined || !value || Object.keys(value).length === 0
-  }
-
-  private documentationUnitFieldIsEmpty(
-    value: RelatedDocumentation[(typeof Reference.documentationUnitFields)[number]],
-  ) {
     return value === undefined || !value || Object.keys(value).length === 0
   }
 

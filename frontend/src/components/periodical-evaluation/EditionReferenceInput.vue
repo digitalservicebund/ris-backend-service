@@ -31,8 +31,7 @@ const emit = defineEmits<{
 const store = useEditionStore()
 const lastSavedModelValue = ref(new Reference({ ...props.modelValue }))
 const reference = ref<Reference>(new Reference({ ...props.modelValue }))
-const validationStore =
-  useValidationStore<(typeof Reference.allFields)[number]>()
+const validationStore = useValidationStore()
 const pageNumber = ref<number>(0)
 const itemsPerPage = ref<number>(15)
 const isLoading = ref(false)
