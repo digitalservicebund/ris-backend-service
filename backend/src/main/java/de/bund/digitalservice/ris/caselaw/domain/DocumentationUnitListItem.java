@@ -21,8 +21,7 @@ import lombok.Builder;
  * @param referencedDocumentationUnitId the id of a referenced documentation unit, if search result
  *     from a search for related documentation units
  * @param status (Status) of the search result
- * @param isDeletable User can delete the documentation unit
- * @param isEditable User can edit the documentation unit
+ * @param documentationOffice (Dokumentationsstelle) of the search result
  */
 @Builder(toBuilder = true)
 public record DocumentationUnitListItem(
@@ -37,6 +36,5 @@ public record DocumentationUnitListItem(
     DocumentType documentType,
     UUID referencedDocumentationUnitId,
     Status status,
-    Boolean hasNote,
-    Boolean isDeletable,
-    Boolean isEditable) {}
+    DocumentationOffice documentationOffice,
+    Boolean hasNote) {}

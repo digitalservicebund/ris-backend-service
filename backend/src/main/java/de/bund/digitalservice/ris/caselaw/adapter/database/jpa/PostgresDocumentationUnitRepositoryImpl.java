@@ -15,7 +15,6 @@ import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
-import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -39,7 +38,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.repository.query.Param;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,7 +53,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private final DatabaseFieldOfLawRepository fieldOfLawRepository;
   private final DatabaseProcedureRepository procedureRepository;
   private final DatabaseRelatedDocumentationRepository relatedDocumentationRepository;
-  private final UserService userService;
 
   public PostgresDocumentationUnitRepositoryImpl(
       DatabaseDocumentationUnitRepository repository,
@@ -64,8 +61,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       DatabaseRelatedDocumentationRepository relatedDocumentationRepository,
       DatabaseKeywordRepository keywordRepository,
       DatabaseProcedureRepository procedureRepository,
-      DatabaseFieldOfLawRepository fieldOfLawRepository,
-      UserService userService) {
+      DatabaseFieldOfLawRepository fieldOfLawRepository) {
 
     this.repository = repository;
     this.databaseCourtRepository = databaseCourtRepository;
@@ -74,7 +70,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     this.relatedDocumentationRepository = relatedDocumentationRepository;
     this.fieldOfLawRepository = fieldOfLawRepository;
     this.procedureRepository = procedureRepository;
-    this.userService = userService;
   }
 
   @Override
@@ -521,10 +516,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   @Transactional(transactionManager = "jpaTransactionManager")
   public Slice<DocumentationUnitListItem> searchByDocumentationUnitSearchInput(
       Pageable pageable,
-      OidcUser oidcUser,
+      DocumentationOffice documentationOffice,
       @Param("searchInput") DocumentationUnitSearchInput searchInput) {
-
-    DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidcUser);
     log.debug("Find by overview search: {}, {}", documentationOffice.abbreviation(), searchInput);
 
     DocumentationOfficeDTO documentationOfficeDTO =
@@ -549,40 +542,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             null,
             documentationOfficeDTO);
 
-    var userGroup = userService.getUserGroup(oidcUser);
-    boolean isInternalUser = userService.isInternal(oidcUser);
-    List<ProcedureDTO> assignedProcedures;
-    if (userGroup.isPresent() && !isInternalUser) {
-      assignedProcedures =
-          procedureRepository.findAllByDocumentationOfficeUserGroupDTO_Id(userGroup.get().id());
-    } else {
-      assignedProcedures = List.of();
-    }
-    return allResults.map(
-        item ->
-            DocumentationUnitListItemTransformer.transformToDomain(item).toBuilder()
-                .isDeletable(
-                    hasSameDocumentationOffice(item, documentationOffice) && isInternalUser)
-                .isEditable(
-                    hasSameDocumentationOffice(item, documentationOffice)
-                        && (isInternalUser || isExternalUserAssigned(assignedProcedures, item)))
-                .build());
-  }
-
-  private boolean hasSameDocumentationOffice(
-      DocumentationUnitListItemDTO item, DocumentationOffice documentationOffice) {
-    return item.getDocumentationOffice().getId().equals(documentationOffice.uuid());
-  }
-
-  private boolean isExternalUserAssigned(
-      List<ProcedureDTO> assignedProcedures, DocumentationUnitListItemDTO item) {
-    if (!item.getProcedures().isEmpty()) {
-      var docUnitProcedureId = item.getProcedures().get(0).getProcedure().getId();
-      return assignedProcedures.stream()
-          .anyMatch(procedure -> procedure.getId().equals(docUnitProcedureId));
-    } else {
-      return false;
-    }
+    return allResults.map(DocumentationUnitListItemTransformer::transformToDomain);
   }
 
   @Override

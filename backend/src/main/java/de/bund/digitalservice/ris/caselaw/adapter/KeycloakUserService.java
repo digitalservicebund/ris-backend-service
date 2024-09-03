@@ -23,44 +23,26 @@ public class KeycloakUserService implements UserService {
     this.documentationOfficeUserGroupService = documentationOfficeUserGroupService;
   }
 
-  @Override
   public User getUser(OidcUser oidcUser) {
     return extractDocumentationOffice(oidcUser)
         .map(documentationOffice -> createUser(oidcUser, documentationOffice))
         .orElse(createUser(oidcUser, null));
   }
 
-  @Override
   public DocumentationOffice getDocumentationOffice(OidcUser oidcUser) {
     return getUser(oidcUser).documentationOffice();
   }
 
-  @Override
+  public List<DocumentationOfficeUserGroup> getUserGroups(OidcUser oidcUser) {
+    return documentationOfficeUserGroupService.getUserGroups().stream()
+        .filter(
+            group ->
+                group.docOffice().equals(getDocumentationOffice(oidcUser)) && !group.isInternal())
+        .toList();
+  }
+
   public String getEmail(OidcUser oidcUser) {
     return oidcUser.getEmail();
-  }
-
-  @Override
-  public Boolean isInternal(OidcUser oidcUser) {
-    List<String> roles = oidcUser.getClaimAsStringList("roles");
-    if (roles != null) {
-      return roles.contains("Internal");
-    }
-    return false;
-  }
-
-  @Override
-  public Optional<DocumentationOfficeUserGroup> getUserGroup(OidcUser oidcUser) {
-    List<String> userGroups = Objects.requireNonNull(oidcUser.getAttribute("groups"));
-    var matchingUserGroup =
-        this.documentationOfficeUserGroupService.getAllUserGroups().stream()
-            .filter(group -> userGroups.contains(group.userGroupPathName()))
-            .findFirst();
-    if (matchingUserGroup.isEmpty()) {
-      LOGGER.warn(
-          "No doc office user group associated with given Keycloak user groups: {}", userGroups);
-    }
-    return matchingUserGroup;
   }
 
   private User createUser(OidcUser oidcUser, DocumentationOffice documentationOffice) {
@@ -73,6 +55,15 @@ public class KeycloakUserService implements UserService {
   }
 
   private Optional<DocumentationOffice> extractDocumentationOffice(OidcUser oidcUser) {
-    return getUserGroup(oidcUser).map(DocumentationOfficeUserGroup::docOffice);
+    List<String> userGroups = Objects.requireNonNull(oidcUser.getAttribute("groups"));
+    var matchingUserGroup =
+        this.documentationOfficeUserGroupService.getUserGroups().stream()
+            .filter(group -> userGroups.contains(group.userGroupPathName()))
+            .findFirst();
+    if (matchingUserGroup.isEmpty() && !userGroups.isEmpty()) {
+      LOGGER.warn(
+          "No doc office user group associated with given Keycloak user groups: {}", userGroups);
+    }
+    return matchingUserGroup.map(DocumentationOfficeUserGroup::docOffice);
   }
 }

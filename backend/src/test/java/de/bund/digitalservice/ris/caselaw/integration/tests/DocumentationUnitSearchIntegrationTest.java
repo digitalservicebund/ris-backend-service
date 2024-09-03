@@ -1,8 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockDocOfficeUserGroups;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import de.bund.digitalservice.ris.caselaw.SliceTestImpl;
@@ -11,47 +12,39 @@ import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
-import de.bund.digitalservice.ris.caselaw.adapter.ProcedureController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeUserGroupRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeUserGroupDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
+import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,9 +53,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
@@ -75,7 +68,6 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseDocumentationUnitStatusService.class,
       DatabaseDocumentNumberRecyclingService.class,
       DatabaseDocumentNumberGeneratorService.class,
-      DatabaseProcedureService.class,
       PostgresDocumentationUnitRepositoryImpl.class,
       PostgresHandoverReportRepositoryImpl.class,
       PostgresJPAConfig.class,
@@ -83,10 +75,9 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       SecurityConfig.class,
       AuthService.class,
       TestConfig.class,
-      DocumentNumberPatternConfig.class,
-      KeycloakUserService.class
+      DocumentNumberPatternConfig.class
     },
-    controllers = {DocumentationUnitController.class, ProcedureController.class})
+    controllers = {DocumentationUnitController.class})
 class DocumentationUnitSearchIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
@@ -105,20 +96,16 @@ class DocumentationUnitSearchIntegrationTest {
   @Autowired private DatabaseDocumentationUnitRepository repository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseStatusRepository statusRepository;
-  @Autowired private DatabaseProcedureRepository procedureRepository;
-  @Autowired private DatabaseDocumentationOfficeUserGroupRepository userGroupRepository;
-
-  @Autowired
-  private DatabaseDocumentationUnitProcedureRepository documentationUnitProcedureRepository;
 
   @MockBean S3AsyncClient s3AsyncClient;
   @MockBean MailService mailService;
   @MockBean DocxConverterService docxConverterService;
+  @MockBean UserService userService;
   @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean AttachmentService attachmentService;
-  @MockBean private DocumentationOfficeUserGroupService documentationOfficeUserGroupService;
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private HandoverService handoverService;
+  @MockBean private ProcedureService procedureService;
 
   @MockBean
   private DocumentationUnitDocxMetadataInitializationService
@@ -129,7 +116,10 @@ class DocumentationUnitSearchIntegrationTest {
   @BeforeEach
   void setUp() {
     docOfficeDTO = documentationOfficeRepository.findByAbbreviation("DS");
-    mockDocOfficeUserGroups(documentationOfficeUserGroupService);
+
+    doReturn(DocumentationOfficeTransformer.transformToDomain(docOfficeDTO))
+        .when(userService)
+        .getDocumentationOffice(any(OidcUser.class));
   }
 
   @AfterEach
@@ -405,118 +395,6 @@ class DocumentationUnitSearchIntegrationTest {
               assertThat(response.getResponseBody().getContent())
                   .extracting("documentNumber")
                   .containsExactly("AB1234567802");
-            });
-  }
-
-  @Test
-  void testSearch_withInternalUser_shouldReturnEditableAndDeletableDocumentationUnit() {
-    repository.save(
-        DocumentationUnitDTO.builder()
-            .documentNumber("AB1234567802")
-            .documentationOffice(docOfficeDTO)
-            .build());
-
-    risWebTestClient
-        .withDefaultLogin()
-        .get()
-        .uri(
-            "/api/v1/caselaw/documentunits/search?pg=0&sz=10&documentNumberOrFileNumber=AB1234567802")
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody().getContent())
-                  .extracting("documentNumber")
-                  .containsExactly("AB1234567802");
-              assertThat(response.getResponseBody().getContent()).hasSize(1);
-              assertThat(response.getResponseBody().getContent().get(0).isEditable()).isTrue();
-              assertThat(response.getResponseBody().getContent().get(0).isDeletable()).isTrue();
-            });
-  }
-
-  @Test
-  void
-      testSearch_withExternalUnassignedUser_shouldReturnNotEditableAndNotDeletableDocumentationUnit() {
-    repository.save(
-        DocumentationUnitDTO.builder()
-            .documentNumber("AB1234567802")
-            .documentationOffice(docOfficeDTO)
-            .build());
-
-    risWebTestClient
-        .withExternalLogin()
-        .get()
-        .uri(
-            "/api/v1/caselaw/documentunits/search?pg=0&sz=10&documentNumberOrFileNumber=AB1234567802")
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody().getContent())
-                  .extracting("documentNumber")
-                  .containsExactly("AB1234567802");
-              assertThat(response.getResponseBody().getContent()).hasSize(1);
-              assertThat(response.getResponseBody().getContent().get(0).isEditable()).isFalse();
-              assertThat(response.getResponseBody().getContent().get(0).isDeletable()).isFalse();
-            });
-  }
-
-  @Test
-  @Sql(
-      scripts = {
-        "classpath:doc_office_init.sql",
-        "classpath:user_group_init.sql",
-        "classpath:procedures_init.sql",
-      })
-  void testSearch_withExternalAssignedUser_shouldReturnEditableAndNotDeletableDocumentationUnit() {
-    UUID uuid = UUID.randomUUID();
-    Optional<DocumentationUnitDTO> documentationUnitDTO =
-        repository.findByDocumentNumber("documentNumber2");
-    Optional<ProcedureDTO> procedureDTO =
-        procedureRepository.findAllByLabelAndDocumentationOffice("procedure1", docOfficeDTO);
-    Optional<DocumentationOfficeUserGroupDTO> userGroupDTO =
-        userGroupRepository.findById(UUID.fromString("2b733549-d2cc-40f0-b7f3-9bfa9f3c1b89"));
-    DocumentationUnitProcedureDTO documentationUnitProcedureDTO =
-        DocumentationUnitProcedureDTO.builder()
-            .procedure(procedureDTO.get())
-            .documentationUnit(documentationUnitDTO.get())
-            .build();
-    documentationUnitProcedureRepository.save(documentationUnitProcedureDTO);
-
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri(
-            "/api/v1/caselaw/procedure/"
-                + procedureDTO.get().getId()
-                + "/assign/"
-                + userGroupDTO.get().getId())
-        .exchange()
-        .expectStatus()
-        .is2xxSuccessful();
-
-    risWebTestClient
-        .withExternalLogin()
-        .get()
-        .uri(
-            "/api/v1/caselaw/documentunits/search?pg=0&sz=10&documentNumber="
-                + documentationUnitDTO.get().getDocumentNumber())
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody().getContent())
-                  .extracting("documentNumber")
-                  .containsExactly(documentationUnitDTO.get().getDocumentNumber());
-              assertThat(response.getResponseBody().getContent()).hasSize(1);
-              assertThat(response.getResponseBody().getContent().get(0).isEditable()).isTrue();
-              assertThat(response.getResponseBody().getContent().get(0).isDeletable()).isFalse();
             });
   }
 }

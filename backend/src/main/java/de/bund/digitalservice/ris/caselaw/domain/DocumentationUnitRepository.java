@@ -6,7 +6,6 @@ import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.repository.NoRepositoryBean;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 /** Domain repository for documentation units */
 @NoRepositoryBean
@@ -93,12 +92,14 @@ public interface DocumentationUnitRepository {
    * Search for documentation units with given search parameters
    *
    * @param pageable the pageable to use for the search
-   * @param oidcUser current user via openid connect system
+   * @param documentationOffice the documentation office of the current user
    * @param searchInput the search parameters
    * @return the search result containing the documentation units found
    */
   Slice<DocumentationUnitListItem> searchByDocumentationUnitSearchInput(
-      Pageable pageable, OidcUser oidcUser, DocumentationUnitSearchInput searchInput);
+      Pageable pageable,
+      DocumentationOffice documentationOffice,
+      DocumentationUnitSearchInput searchInput);
 
   /**
    * Find existing links to a documentation unit with a given id. This can be used to check if a

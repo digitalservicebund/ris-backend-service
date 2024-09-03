@@ -1,8 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroup;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroupService;
-import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,24 +13,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/v1/caselaw/user-group")
 public class UserGroupController {
-  private final DocumentationOfficeUserGroupService service;
-  private final UserService userService;
+  private final KeycloakUserService service;
 
-  public UserGroupController(DocumentationOfficeUserGroupService service, UserService userService) {
+  public UserGroupController(KeycloakUserService service) {
     this.service = service;
-    this.userService = userService;
   }
 
   /**
    * Returns user groups for the doc office of the current user that are not internal.
    *
-   * @param oidcUser current user via openid connect system
+   * @param oidcUser The user.
    * @return A list of external user groups.
    */
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public List<DocumentationOfficeUserGroup> getUserGroups(
       @AuthenticationPrincipal OidcUser oidcUser) {
-    return service.getExternalUserGroups(userService.getDocumentationOffice(oidcUser));
+    return service.getUserGroups(oidcUser);
   }
 }

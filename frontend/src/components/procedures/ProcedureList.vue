@@ -1,22 +1,19 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
-import { computed, onMounted, ref, watch } from "vue"
+import { ref, onMounted, watch, computed } from "vue"
 import ProcedureDetail from "./ProcedureDetail.vue"
-import { InfoStatus } from "@/components/enumInfoStatus"
 import ExpandableContent from "@/components/ExpandableContent.vue"
-import InfoModal from "@/components/InfoModal.vue"
 import DropdownInput from "@/components/input/DropdownInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
-import { useExternalUser } from "@/composables/useExternalUser"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { Procedure } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { UserGroup } from "@/domain/userGroup"
 import documentationUnitService from "@/services/documentUnitService"
 import FeatureToggleService from "@/services/featureToggleService"
-import { ResponseError, ServiceResponse } from "@/services/httpClient"
+import { ResponseError } from "@/services/httpClient"
 import service from "@/services/procedureService"
 import userGroupsService from "@/services/userGroupsService"
 import IconBaselineDescription from "~icons/ic/baseline-description"
@@ -33,8 +30,6 @@ const query = ref(getQueryFromRoute())
 const responseError = ref()
 const userGroups = ref<UserGroup[]>([])
 const featureToggle = ref()
-const isExternalUser = useExternalUser()
-const assignError = ref<ResponseError>()
 
 /**
  * Loads all procedures
@@ -108,14 +103,16 @@ async function handleAssignUserGroup(
   procedureId: string | undefined,
   userGroupId: string | undefined,
 ) {
-  let response: ServiceResponse<unknown> | undefined
+  let errorResponse: ResponseError | undefined
   if (procedureId && userGroupId) {
-    response = await service.assignUserGroup(procedureId, userGroupId)
+    const { error } = await service.assignUserGroup(procedureId, userGroupId)
+    errorResponse = error
   } else if (procedureId) {
-    response = await service.unassignUserGroup(procedureId)
+    const { error } = await service.unassignUserGroup(procedureId)
+    errorResponse = error
   }
-  if (response?.error) {
-    assignError.value = response.error
+  if (errorResponse) {
+    alert(errorResponse.title)
   }
 }
 
@@ -163,17 +160,6 @@ const debouncedPushQueryToRoute = (() => {
     timeoutId = window.setTimeout(() => pushQueryToRoute(currentQuery), 500)
   }
 })()
-
-/**
- * Get display text for the date the procedure had been created.
- * If the date is missing a default text is displayed.
- */
-const getCreatedAtDisplayText = (procedure: Procedure): string => {
-  if (procedure.createdAt) {
-    return "erstellt am " + dayjs(procedure.createdAt).format("DD.MM.YYYY")
-  }
-  return "Erstellungsdatum unbekannt"
-}
 
 /**
  * Get query from url and set local query value
@@ -230,12 +216,6 @@ onMounted(async () => {
         ></TextInput>
       </InputField>
     </div>
-    <InfoModal
-      v-if="assignError"
-      :description="assignError.description"
-      :status="InfoStatus.ERROR"
-      :title="assignError.title"
-    />
 
     <div v-if="procedures" class="flex-1">
       <Pagination
@@ -286,19 +266,18 @@ onMounted(async () => {
                 v-if="featureToggle"
                 v-model="procedure.userGroupId"
                 aria-label="dropdown input"
-                class="ml-auto w-auto text-center"
-                is-small
+                class="ml-auto w-auto"
                 :items="getDropdownItems()"
-                :read-only="isExternalUser"
                 @click.stop
                 @update:model-value="
                   (value: string | undefined) =>
                     handleAssignUserGroup(procedure.id, value)
                 "
               />
-              <span class="mr-24 w-224 content-center text-center">{{
-                getCreatedAtDisplayText(procedure)
-              }}</span>
+              <span class="mr-24 content-center"
+                >erstellt am
+                {{ dayjs(procedure.createdAt).format("DD.MM.YYYY") }}</span
+              >
             </div>
           </template>
 

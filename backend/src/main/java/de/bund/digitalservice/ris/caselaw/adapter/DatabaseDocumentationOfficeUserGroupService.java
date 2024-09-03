@@ -5,7 +5,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeUserGroupDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeUserGroupTransformer;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroupService;
 import java.util.ArrayList;
@@ -75,17 +74,9 @@ public class DatabaseDocumentationOfficeUserGroupService
   }
 
   @Override
-  public List<DocumentationOfficeUserGroup> getAllUserGroups() {
+  public List<DocumentationOfficeUserGroup> getUserGroups() {
     return this.documentationOfficeUserGroups.stream()
         .map(DocumentationOfficeUserGroupTransformer::transformToDomain)
-        .toList();
-  }
-
-  @Override
-  public List<DocumentationOfficeUserGroup> getExternalUserGroups(
-      DocumentationOffice documentationOffice) {
-    return getAllUserGroups().stream()
-        .filter(group -> group.docOffice().equals(documentationOffice) && !group.isInternal())
         .toList();
   }
 

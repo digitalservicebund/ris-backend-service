@@ -15,11 +15,6 @@ VALUES
     '36f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
     'documentNumber3',
     'ba90a851-3c54-4858-b4fa-7742ffbe8f05'
-  ),
-  (
-    '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
-    'bghDocument123',
-    '41e62dbc-e5b6-414f-91e2-0cfe559447d1'
   );
 
 INSERT INTO
