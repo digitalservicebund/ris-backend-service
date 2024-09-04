@@ -25,8 +25,18 @@ const routes = [
     component: {},
   },
   {
-    path: "/caselaw/periodical-evaluation/:uuid",
-    name: "caselaw-periodical-evaluation-uuid",
+    path: "/caselaw/periodical-evaluation/:editionId",
+    name: "caselaw-periodical-evaluation-editionId",
+    component: {},
+  },
+  {
+    path: "/caselaw/periodical-evaluation/:editionId/references",
+    name: "caselaw-periodical-evaluation-editionId-references",
+    component: {},
+  },
+  {
+    path: "/caselaw/periodical-evaluation/:editionId/edition",
+    name: "caselaw-periodical-evaluation-editionId-edition",
     component: {},
   },
 ]

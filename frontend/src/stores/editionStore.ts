@@ -14,13 +14,13 @@ export const useEditionStore = defineStore("editionStore", () => {
   async function loadEdition(): Promise<
     ServiceResponse<LegalPeriodicalEdition>
   > {
-    const uuid = route.params.uuid
+    const uuid = route.params.editionId
     const response = await LegalPeriodicalEditionService.get(
       uuid.toString() as UUID,
     )
 
     if (response.data) {
-      edition.value = response.data
+      edition.value = response.data as LegalPeriodicalEdition
 
       response.data.references = response.data.references
         ? response.data.references.map(

@@ -71,6 +71,18 @@ async function updateEditions(legalPeriodicalId: string) {
   isLoading.value = false
 }
 
+async function addEdition() {
+  const edition = new LegalPeriodicalEdition({
+    legalPeriodical: { uuid: legalPeriodical?.value?.value.uuid },
+    name: " ",
+  })
+  const response = await LegalPeriodicalEditionService.save(edition)
+  router.push({
+    name: "caselaw-periodical-evaluation-editionId-edition",
+    params: { editionId: response.data?.id },
+  })
+}
+
 const legalPeriodical = computed({
   get: () =>
     filter.value
@@ -118,12 +130,6 @@ watch(
     <div class="gap-16 p-16">
       <FlexContainer class="pb-16" justify-content="justify-between">
         <h1 class="ds-heading-02-reg">Periodika</h1>
-        <TextButton
-          aria-label="Neue Periodikaauswertung"
-          class="ds-button-02-reg"
-          label="Neue Periodikaauswertung"
-          @click="router.push({ name: 'caselaw-periodical-evaluation-new' })"
-        ></TextButton>
       </FlexContainer>
       <FlexContainer align-items="items-end" flex-direction="flex-row">
         <div class="flex-grow gap-16 bg-blue-200 p-16" role="search">
@@ -139,6 +145,13 @@ watch(
               placeholder="Nach Periodikum suchen"
             ></ComboboxInput>
           </InputField>
+          <TextButton
+            v-if="legalPeriodical"
+            aria-label="Neue Periodikaauswertung"
+            class="ds-button-02-reg"
+            label="Neue Periodikaauswertung"
+            @click="addEdition"
+          ></TextButton>
         </div>
       </FlexContainer>
     </div>
@@ -171,8 +184,8 @@ watch(
               <router-link
                 target="_blank"
                 :to="{
-                  name: 'caselaw-periodical-evaluation-uuid',
-                  params: { uuid: edition.id },
+                  name: 'caselaw-periodical-evaluation-editionId-references',
+                  params: { editionId: edition.id },
                 }"
               >
                 <div class="ds-button-primary">

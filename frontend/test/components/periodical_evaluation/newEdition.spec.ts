@@ -1,56 +1,106 @@
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import { ComboboxItem } from "@/components/input/types"
-import NewEdition from "@/components/periodical-evaluation/PeriodicalEvaluationNew.vue"
+import NewEdition from "@/components/periodical-evaluation/PeriodicalEdition.vue"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import comboboxItemService from "@/services/comboboxItemService"
 import service from "@/services/legalPeriodicalEditionService"
-import routes from "~/test-helper/routes"
+import testRoutes from "~/test-helper/routes"
 
-function renderComponent() {
+const editionUUid = crypto.randomUUID()
+
+const legalPeriodical: LegalPeriodical = {
+  uuid: crypto.randomUUID(),
+  abbreviation: "BDZ",
+  citationStyle: "2024, Heft 1",
+}
+
+async function renderComponent() {
   const user = userEvent.setup()
 
   const router = createRouter({
     history: createWebHistory(),
-    routes: routes,
+    routes: testRoutes,
   })
-  return {
+
+  // Mock the route with a specific uuid before rendering
+  await router.push({
+    name: "caselaw-periodical-evaluation-editionId-edition",
+    params: { editionId: editionUUid },
+  })
+
+  // Wait for the router to be ready
+  return router.isReady().then(() => ({
     user,
     ...render(NewEdition, {
-      global: { plugins: [router] },
+      global: {
+        plugins: [
+          router,
+          [
+            createTestingPinia({
+              initialState: {
+                editionStore: {
+                  edition: new LegalPeriodicalEdition({
+                    id: editionUUid,
+                    legalPeriodical: legalPeriodical,
+                    name: "name",
+                    prefix: "präfix",
+                    suffix: "suffix",
+                    references: [],
+                  }),
+                },
+                stubActions: false,
+              },
+            }),
+          ],
+        ],
+      },
     }),
-  }
+  }))
 }
 
 describe("Legal periodical edition list", () => {
-  const legalPeriodical: LegalPeriodical = {
-    abbreviation: "BDZ",
-  }
   const dropdownLegalPeriodicalItems: ComboboxItem[] = [
     {
       label: legalPeriodical.abbreviation!,
       value: legalPeriodical,
     },
   ]
+
   vi.spyOn(comboboxItemService, "getLegalPeriodicals").mockImplementation(() =>
     Promise.resolve({ status: 200, data: dropdownLegalPeriodicalItems }),
   )
-  test("renders correctly", async () => {
-    renderComponent()
 
-    expect(screen.getByText("Neue Periodikaauswertung")).toBeVisible()
+  vi.spyOn(service, "get").mockImplementation(() =>
+    Promise.resolve({
+      status: 200,
+      data: new LegalPeriodicalEdition({
+        id: editionUUid,
+        legalPeriodical: legalPeriodical,
+        name: "name",
+        prefix: "präfix",
+        suffix: "suffix",
+        references: [],
+      }),
+    }),
+  )
+  test("renders correctly", async () => {
+    await renderComponent()
+
+    expect(screen.getByText("Ausgabe")).toBeVisible()
 
     expect(screen.getByLabelText("Periodikum")).toBeVisible()
     expect(screen.getByLabelText("Präfix")).toBeVisible()
     expect(screen.getByLabelText("Suffix")).toBeVisible()
     expect(screen.getByLabelText("Name der Ausgabe")).toBeVisible()
-    expect(screen.getByText("Auswertung starten")).toBeVisible()
+    expect(screen.getByText("Speichern")).toBeVisible()
   })
 
   test("selecting legal periodical from combobox value for legal periodical", async () => {
-    const { user } = renderComponent()
+    const { user } = await renderComponent()
     const periodicalField = screen.getByLabelText("Periodikum")
 
     await user.type(periodicalField, "BDZ")
@@ -62,15 +112,12 @@ describe("Legal periodical edition list", () => {
     await expect(periodicalField).toHaveValue("BDZ")
   })
 
-  test("clicking Auswertung starten button calls service with correct values", async () => {
-    const legalPeriodical: LegalPeriodical = {
-      abbreviation: "BDZ",
-    }
+  test("clicking Speichern button calls service with correct values", async () => {
     const fetchSpy = vi.spyOn(service, "save").mockImplementation(() =>
       Promise.resolve({
         status: 200,
         data: new LegalPeriodicalEdition({
-          id: crypto.randomUUID(),
+          id: editionUUid,
           legalPeriodical: legalPeriodical,
           name: "name",
           prefix: "präfix",
@@ -79,7 +126,7 @@ describe("Legal periodical edition list", () => {
         }),
       }),
     )
-    const { user } = renderComponent()
+    const { user } = await renderComponent()
     const periodicalField = screen.getByLabelText("Periodikum")
 
     await user.type(periodicalField, "BDZ")
@@ -89,22 +136,29 @@ describe("Legal periodical edition list", () => {
     expect(dropdownItems[0]).toHaveTextContent("BDZ")
     await user.click(dropdownItems[0])
     await expect(periodicalField).toHaveValue("BDZ")
-    await user.type(screen.getByLabelText("Präfix"), "präfix")
-    await user.type(screen.getByLabelText("Suffix"), "suffix")
-    await user.type(screen.getByLabelText("Name der Ausgabe"), "name")
 
-    await user.click(screen.getByText("Auswertung starten"))
+    await user.clear(screen.getByLabelText("Präfix"))
+    await user.type(screen.getByLabelText("Präfix"), "new präfix")
+
+    await user.clear(screen.getByLabelText("Suffix"))
+    await user.type(screen.getByLabelText("Suffix"), "new suffix")
+
+    await user.clear(screen.getByLabelText("Name der Ausgabe"))
+    await user.type(screen.getByLabelText("Name der Ausgabe"), "new name")
+
+    await user.click(screen.getByText("Speichern"))
     expect(fetchSpy).toHaveBeenCalledTimes(1)
-    expect(fetchSpy).toHaveBeenCalledWith({
-      uuid: undefined,
-      legalPeriodical: {
-        abbreviation: "BDZ",
-      },
-      name: "name",
-      prefix: "präfix",
-      references: undefined,
-      suffix: "suffix",
-    })
+    expect(fetchSpy).toHaveBeenCalledWith(
+      new LegalPeriodicalEdition({
+        id: editionUUid,
+        createdAt: undefined,
+        legalPeriodical: legalPeriodical,
+        name: "new name",
+        prefix: "new präfix",
+        references: [],
+        suffix: "new suffix",
+      }),
+    )
   })
 
   describe("Legal periodical validation", () => {
@@ -113,7 +167,7 @@ describe("Legal periodical edition list", () => {
         Promise.resolve({
           status: 200,
           data: new LegalPeriodicalEdition({
-            id: crypto.randomUUID(),
+            id: editionUUid,
             legalPeriodical: legalPeriodical,
             name: "name",
             prefix: "präfix",
@@ -122,14 +176,15 @@ describe("Legal periodical edition list", () => {
           }),
         }),
       )
-      const { user } = renderComponent()
+      const { user } = await renderComponent()
 
-      await user.click(screen.getByLabelText("Auswertung starten"))
+      await user.clear(screen.getByLabelText("Name der Ausgabe"))
+      await user.click(screen.getByLabelText("Speichern"))
 
       expect(
         screen.getAllByText("Pflichtfeld nicht befüllt").length,
         "should be shown if legal periodical empty",
-      ).toBe(2)
+      ).toBe(1)
       expect(fetchSpy).toHaveBeenCalledTimes(0)
     })
 
@@ -138,7 +193,7 @@ describe("Legal periodical edition list", () => {
         Promise.resolve({
           status: 200,
           data: new LegalPeriodicalEdition({
-            id: crypto.randomUUID(),
+            id: editionUUid,
             legalPeriodical: legalPeriodical,
             name: "name",
             prefix: "präfix",
@@ -148,7 +203,7 @@ describe("Legal periodical edition list", () => {
         }),
       )
 
-      const { user } = renderComponent()
+      const { user } = await renderComponent()
       const periodicalField = screen.getByLabelText("Periodikum")
 
       await user.type(periodicalField, "BDZ")
@@ -161,7 +216,7 @@ describe("Legal periodical edition list", () => {
 
       await user.type(screen.getByLabelText("Name der Ausgabe"), "name")
 
-      await user.click(screen.getByLabelText("Auswertung starten"))
+      await user.click(screen.getByLabelText("Speichern"))
 
       expect(fetchSpy).toHaveBeenCalledTimes(1)
     })

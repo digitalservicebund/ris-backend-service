@@ -71,16 +71,38 @@ export const navigateToReferences = async (
   })
 }
 
-export const navigateToPeriodicalEvaluation = async (
-  page: Page,
-  editionId?: string,
-) => {
+export const navigateToPeriodicalEvaluation = async (page: Page) => {
   await test.step("Navigate to 'Periodika'", async () => {
-    const baseUrl =
-      `/caselaw/periodical-evaluation` + (editionId ? `/${editionId}` : "")
+    const baseUrl = "/caselaw/periodical-evaluation"
 
     await page.goto(baseUrl)
     await expect(page.getByRole("heading", { name: "Periodika" })).toBeVisible()
+  })
+}
+
+export const navigateToPeriodicalEdition = async (
+  page: Page,
+  editionId: string,
+) => {
+  await test.step("Navigate to 'Periodika'", async () => {
+    const baseUrl = `/caselaw/periodical-evaluation/${editionId}/edition`
+
+    await page.goto(baseUrl)
+    await expect(page.getByRole("heading", { name: "Ausgabe" })).toBeVisible()
+  })
+}
+
+export const navigateToPeriodicalReferences = async (
+  page: Page,
+  editionId: string,
+) => {
+  await test.step("Navigate to 'Periodika'", async () => {
+    const baseUrl = `/caselaw/periodical-evaluation/${editionId}/references`
+
+    await page.goto(baseUrl)
+    await expect(
+      page.getByRole("heading", { name: "Fundstellen" }),
+    ).toBeVisible()
   })
 }
 
