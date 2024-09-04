@@ -4,7 +4,6 @@
         <include resource="org/springframework/boot/logging/logback/base.xml"/>
         <logger name="de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService" level="DEBUG" />
         <logger name="de.bund.digitalservice.ris.caselaw.adapter.DatabasePatchMapperService" level="DEBUG" />
-        <logger name="de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService" level="DEBUG" />
     </springProfile>
     <springProfile name="staging,production,uat">
         <include resource="org/springframework/boot/logging/logback/base.xml"/>
@@ -17,7 +16,6 @@
 
         <logger name="de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService" level="DEBUG" />
         <logger name="de.bund.digitalservice.ris.caselaw.adapter.DatabasePatchMapperService" level="DEBUG" />
-        <logger name="de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService" level="DEBUG" />
 
         <root level="INFO">
             <!-- <appender-ref ref="LOKI" /> -->

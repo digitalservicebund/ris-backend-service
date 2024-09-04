@@ -6,16 +6,13 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroupSer
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @Service
 public class KeycloakUserService implements UserService {
   private static final Logger LOGGER = LoggerFactory.getLogger(KeycloakUserService.class);
@@ -28,14 +25,6 @@ public class KeycloakUserService implements UserService {
 
   @Override
   public User getUser(OidcUser oidcUser) {
-    Map<String, Object> claims = oidcUser.getClaims();
-    claims.keySet().stream()
-        .filter(
-            key ->
-                !List.of("preferred_username", "given_name", "upn", "name", "family_name", "email")
-                    .contains(key))
-        .forEach(
-            key -> log.debug("OidcUser claim with key '{}' and value '{}'", key, claims.get(key)));
     return extractDocumentationOffice(oidcUser)
         .map(documentationOffice -> createUser(oidcUser, documentationOffice))
         .orElse(createUser(oidcUser, null));
