@@ -59,7 +59,7 @@ onMounted(async () => {
   <ErrorPage
     v-else
     back-button-label="Zurück zur Übersicht"
-    :back-router="{ name: 'caselaw-periodical-evaluation' }"
+    back-router-name="caselaw-periodical-evaluation"
     :error="responseError"
     :title="responseError?.title"
   />
