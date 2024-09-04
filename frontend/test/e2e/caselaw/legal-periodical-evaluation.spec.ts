@@ -270,14 +270,13 @@ test.describe(
         await test.step("Citation input is validated when input is left", async () => {})
 
         await test.step("A docunit can be added as reference by entering citation and search fields", async () => {
-          await fillInput(page, "Zitatstelle *", "5")
-          await fillInput(page, "Klammernzusatz", "LT")
           await fillInput(page, "Gericht", "AG Aachen")
           await page.getByText("AG Aachen").click()
           await fillInput(page, "Aktenzeichen", fileNumer)
           await fillInput(page, "Entscheidungsdatum", "31.12.2019")
           await fillInput(page, "Dokumenttyp", "AnU")
           await page.getByText("Anerkenntnisurteil").click()
+
           await page.getByText("Suchen").click()
           await expect(
             page.getByText(
@@ -287,6 +286,9 @@ test.describe(
           await expect(
             page.locator("[aria-label='Listen Eintrag']"),
           ).toHaveCount(1)
+
+          await fillInput(page, "Zitatstelle *", "5")
+          await fillInput(page, "Klammernzusatz", "LT")
           await page.getByLabel("Treffer übernehmen").click()
           await expect(
             page.locator("[aria-label='Listen Eintrag']"),
