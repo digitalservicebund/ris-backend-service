@@ -6,7 +6,6 @@ import {
   navigateToPeriodicalEvaluation,
   navigateToPreview,
   navigateToPeriodicalReferences,
-  clearInput,
 } from "./e2e-utils"
 import { caselawTest as test } from "./fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
@@ -153,10 +152,8 @@ test.describe(
           )
         })
 
-        await test.step("The inputs are correctly validated (prefix or name have to be chosen, suffix is optional)", async () => {
+        await test.step("The inputs are correctly validated (name have to be chosen)", async () => {
           await expect(page.getByText("Pflichtfeld nicht befüllt")).toBeHidden()
-          // TODO should be empty from the beginning
-          await clearInput(page, "Name der Ausgabe")
           await page.getByLabel("Speichern").click()
           await expect(
             page.locator(`text="Pflichtfeld nicht befüllt"`),

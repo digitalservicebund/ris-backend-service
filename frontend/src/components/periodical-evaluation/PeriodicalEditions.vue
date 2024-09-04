@@ -74,7 +74,6 @@ async function updateEditions(legalPeriodicalId: string) {
 async function addEdition() {
   const edition = new LegalPeriodicalEdition({
     legalPeriodical: { uuid: legalPeriodical?.value?.value.uuid },
-    name: " ",
   })
   const response = await LegalPeriodicalEditionService.save(edition)
   router.push({
