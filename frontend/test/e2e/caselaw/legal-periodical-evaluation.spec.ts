@@ -113,8 +113,8 @@ test.describe(
             (edition.name || "") + "MMG0" + formattedDate,
           )
           await line.locator("a").click()
-          const page = await pagePromise
-          await expect(page).toHaveURL(
+          const newTab = await pagePromise
+          await expect(newTab).toHaveURL(
             `/caselaw/periodical-evaluation/${edition.id}/references`,
           )
         })
