@@ -264,6 +264,9 @@ watch(
       </div>
     </div>
     <div class="flex flex-col gap-24">
+      <div v-if="!isSaved" class="ds-heading-03-reg">
+        Entscheidung hinzufügen
+      </div>
       <div class="flex justify-between gap-24">
         <InputField
           id="courtInput"
