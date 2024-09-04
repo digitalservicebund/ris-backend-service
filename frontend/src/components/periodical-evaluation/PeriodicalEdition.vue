@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue"
+import { storeToRefs } from "pinia"
+import { computed } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import InputField from "@/components/input/InputField.vue"
@@ -13,65 +14,54 @@ import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionServ
 import { useEditionStore } from "@/stores/editionStore"
 
 const store = useEditionStore()
-const legalPeriodicalEdition = ref<LegalPeriodicalEdition>(
-  store.edition
-    ? (store.edition as LegalPeriodicalEdition)
-    : new LegalPeriodicalEdition(),
-)
-
-const legalPeriodicalIsEditionIsEmpty = ref(false)
+const { edition } = storeToRefs(store)
 
 const validationStore =
   useValidationStore<(typeof LegalPeriodicalEdition.fields)[number]>()
 
 const legalPeriodical = computed({
   get: () =>
-    legalPeriodicalEdition.value?.legalPeriodical
+    edition.value?.legalPeriodical
       ? {
-          label: legalPeriodicalEdition.value?.legalPeriodical.abbreviation,
-          value: legalPeriodicalEdition.value?.legalPeriodical,
-          additionalInformation:
-            legalPeriodicalEdition.value?.legalPeriodical.subtitle,
+          label: edition.value?.legalPeriodical.abbreviation,
+          value: edition.value?.legalPeriodical,
+          additionalInformation: edition.value?.legalPeriodical.subtitle,
         }
       : undefined,
   set: (newValue) => {
     const legalPeriodical = { ...newValue } as LegalPeriodical
-    if (newValue) {
-      legalPeriodicalEdition.value.legalPeriodical = legalPeriodical
-    } else {
-      legalPeriodicalEdition.value.legalPeriodical = undefined
-    }
+    store.edition!.legalPeriodical = newValue ? legalPeriodical : undefined
   },
 })
 
 async function validateRequiredInput() {
   validationStore.reset()
 
-  legalPeriodicalEdition.value.missingRequiredFields.forEach((missingField) =>
-    validationStore.add("Pflichtfeld nicht befüllt", missingField),
-  )
+  // TODO why doesn't this work?
+  // edition.value?.getMissingRequiredFields.forEach((missingField) =>
+  //   validationStore.add("Pflichtfeld nicht befüllt", missingField),
+  // )
+
+  if (edition.value?.legalPeriodical === undefined) {
+    validationStore.add("Pflichtfeld nicht befüllt", "legalPeriodical")
+  }
+  if (edition.value?.name === undefined) {
+    validationStore.add("Pflichtfeld nicht befüllt", "name")
+  }
 }
 
 async function saveEdition() {
   await validateRequiredInput()
-  if (validationStore.isValid()) {
-    const response = await LegalPeriodicalEditionService.save(
-      legalPeriodicalEdition.value as LegalPeriodicalEdition,
-    )
-    if (response.data) {
-      store.edition = response.data
-      legalPeriodicalEdition.value = response.data
-    }
+  if (!validationStore.isValid()) {
+    return
+  }
+  const response = await LegalPeriodicalEditionService.save(
+    edition.value as LegalPeriodicalEdition,
+  )
+  if (response.data) {
+    edition.value = response.data as LegalPeriodicalEdition
   }
 }
-
-watch(
-  legalPeriodicalEdition,
-  () => {
-    legalPeriodicalIsEditionIsEmpty.value = legalPeriodicalEdition.value.isEmpty
-  },
-  { deep: true },
-)
 </script>
 
 <template>
@@ -90,6 +80,7 @@ watch(
           clear-on-choosing-item
           :has-error="false"
           :item-service="ComboboxItemService.getLegalPeriodicals"
+          :read-only="edition?.references?.length! > 0"
         ></ComboboxInput>
       </InputField>
 
@@ -98,7 +89,7 @@ watch(
           <InputField id="prefix" label="Präfix">
             <TextInput
               id="prefix"
-              v-model="legalPeriodicalEdition.prefix"
+              v-model="edition!.prefix"
               aria-label="Präfix"
               class="ds-input-medium"
               size="medium"
@@ -108,7 +99,7 @@ watch(
           <InputField id="suffix" label="Suffix">
             <TextInput
               id="suffix"
-              v-model="legalPeriodicalEdition.suffix"
+              v-model="edition!.suffix"
               aria-label="Suffix"
               class="ds-input-medium"
               size="medium"
@@ -128,7 +119,7 @@ watch(
       >
         <TextInput
           id="name"
-          v-model="legalPeriodicalEdition.name"
+          v-model="edition!.name"
           aria-label="Name der Ausgabe"
           class="ds-input-medium"
           size="medium"

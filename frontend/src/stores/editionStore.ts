@@ -20,7 +20,7 @@ export const useEditionStore = defineStore("editionStore", () => {
     )
 
     if (response.data) {
-      edition.value = response.data
+      edition.value = response.data as LegalPeriodicalEdition
 
       response.data.references = response.data.references
         ? response.data.references.map(

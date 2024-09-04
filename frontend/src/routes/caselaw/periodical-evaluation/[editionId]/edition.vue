@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import PeriodicalEvaluationNew from "@/components/periodical-evaluation/PeriodicalEvaluationNew.vue"
+import PeriodicalEdition from "@/components/periodical-evaluation/PeriodicalEdition.vue"
 </script>
 
 <template>
-  <PeriodicalEvaluationNew />
+  <PeriodicalEdition />
 </template>

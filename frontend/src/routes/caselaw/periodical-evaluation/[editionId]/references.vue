@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import EditionReferences from "@/components/periodical-evaluation/PeriodicalEvaluation.vue"
+import PeriodicalReferences from "@/components/periodical-evaluation/PeriodicalReferences.vue"
 </script>
 
 <template>
-  <EditionReferences />
+  <PeriodicalReferences />
 </template>

@@ -158,9 +158,9 @@ test.describe(
           // TODO should be empty from the beginning
           await clearInput(page, "Name der Ausgabe")
           await page.getByLabel("Speichern").click()
-          // await expect(
-          //   page.locator(`text="Pflichtfeld nicht befüllt"`),
-          // ).toHaveCount(1)
+          await expect(
+            page.locator(`text="Pflichtfeld nicht befüllt"`),
+          ).toHaveCount(1)
         })
 
         // await test.step("prefix or name have to be chosen", async () => {

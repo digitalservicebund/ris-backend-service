@@ -22,16 +22,12 @@ const defaultValue = new Reference() as Reference
 
 watch(references, async () => {
   const response = await store.updateEdition()
-  if (response.error) {
-    responseError.value = response.error
-  }
+  responseError.value = response.error ? response.error : undefined
 })
 
 onMounted(async () => {
   const response = await store.loadEdition()
-  if (response.error) {
-    responseError.value = response.error
-  }
+  responseError.value = response.error ? response.error : undefined
 })
 </script>
 
