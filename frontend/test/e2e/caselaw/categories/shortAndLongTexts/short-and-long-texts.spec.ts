@@ -117,6 +117,10 @@ test.describe("short and long texts", () => {
       await page.keyboard.press("Enter")
       await expect(guidingPrincipleInput).toBeFocused()
 
+      // The timeout is needed for the focus, otherwise tabbing back to the menu is flaky. It's unclear why.
+      // eslint-disable-next-line playwright/no-wait-for-timeout
+      await page.waitForTimeout(100)
+
       // Tiptap inserts invisible characters -> input is split into two parts
       expect(await page.getByText("Text input").innerHTML()).toContain(
         "<strong>Text</strong>",
