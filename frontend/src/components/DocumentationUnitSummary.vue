@@ -3,13 +3,15 @@ import { computed } from "vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import ActiveCitation from "@/domain/activeCitation"
+import EnsuingDecision from "@/domain/ensuingDecision"
+import PreviousDecision from "@/domain/previousDecision"
 import IconBaselineContentCopy from "~icons/ic/baseline-content-copy"
 import IconBaselineDescription from "~icons/ic/baseline-description"
 import IconError from "~icons/ic/baseline-error"
 import IconOutlineDescription from "~icons/ic/outline-description"
 
 const props = defineProps<{
-  data: ActiveCitation
+  data: ActiveCitation | EnsuingDecision | PreviousDecision
 }>()
 
 const iconComponent = computed(() => {
@@ -19,9 +21,12 @@ const iconComponent = computed(() => {
 })
 
 const showErrorBadge = computed(() => {
-  return props.data?.hasForeignSource
-    ? !props.data.citationTypeIsSet
-    : props.data?.hasMissingRequiredFields
+  if (props.data instanceof ActiveCitation) {
+    return props.data?.hasForeignSource
+      ? !props.data.citationTypeIsSet
+      : props.data?.hasMissingRequiredFields
+  }
+  return props.data?.hasMissingRequiredFields
 })
 
 function copyActiveCitationSummary() {
