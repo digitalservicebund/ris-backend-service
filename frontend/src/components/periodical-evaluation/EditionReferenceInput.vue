@@ -30,6 +30,7 @@ const emit = defineEmits<{
   removeEntry: [value: Reference]
 }>()
 const store = useEditionStore()
+const lastSavedModelValue = ref(new Reference({ ...props.modelValue }))
 const reference = ref<Reference>(new Reference({ ...props.modelValue }))
 const validationStore = useValidationStore()
 const pageNumber = ref<number>(0)
@@ -144,6 +145,8 @@ async function addReference(decision: RelatedDocumentation) {
     documentationUnit: new RelatedDocumentation({ ...decision }),
   })
 
+  lastSavedModelValue.value = newReference
+
   await validateRequiredInput(newReference)
 
   if (validationStore.isValid()) {
@@ -171,11 +174,7 @@ watch(
 <template>
   <div class="flex h-full flex-col space-y-24 py-16">
     <div class="flex flex-col gap-24">
-      <InputField
-        id="legalPeriodical"
-        label="Periodikum *"
-        :validation-error="validationStore.getByField('legalPeriodical')"
-      >
+      <InputField id="legalPeriodical" label="Periodikum *">
         <ComboboxInput
           id="legalPeriodical"
           v-model="legalPeriodical"
@@ -265,9 +264,6 @@ watch(
       </div>
     </div>
     <div class="flex flex-col gap-24">
-      <div v-if="!isSaved" class="ds-heading-03-reg">
-        Entscheidung hinzufügen
-      </div>
       <div class="flex justify-between gap-24">
         <InputField
           id="courtInput"
@@ -354,19 +350,17 @@ watch(
             @click="search"
           />
           <TextButton
+            v-if="!lastSavedModelValue.isEmpty"
             aria-label="Fundstelle vermerken"
             button-type="tertiary"
             data-testid="previous-decision-save-button"
-            :disabled="reference.hasMissingRequiredFields"
+            :disabled="reference.isEmpty"
             label="Übernehmen"
             size="small"
             @click.stop="addReference(relatedDocumentationUnit)"
           />
           <TextButton
-            v-if="
-              !RelatedDocumentation.isEmpty(relatedDocumentationUnit) ||
-              !reference.isEmpty
-            "
+            v-if="!lastSavedModelValue.isEmpty"
             aria-label="Abbrechen"
             button-type="ghost"
             label="Abbrechen"
@@ -376,7 +370,7 @@ watch(
         </div>
       </div>
       <TextButton
-        v-if="isSaved"
+        v-if="!lastSavedModelValue.isEmpty"
         aria-label="Eintrag löschen"
         button-type="destructive"
         label="Eintrag löschen"
