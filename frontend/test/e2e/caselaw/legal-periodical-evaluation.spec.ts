@@ -286,10 +286,11 @@ test.describe(
         })
 
         await test.step("A reference is added to the editable list after being added", async () => {
+          const decisionElement = page.getByText(
+            "AG Aachen, 31.12.2019, " + fileNumer + ", Anerkenntnisurteil",
+          )
+          await expect(decisionElement).toBeVisible()
 
-          const decisionElement = page.getByText("AG Aachen, 31.12.2019, " + fileNumer + ", Anerkenntnisurteil");
-          await expect(decisionElement).toBeVisible();
-          
           await expect(
             page.getByText("MMG 2024, 5, Heft 1 (LT)", { exact: true }),
           ).toBeVisible()
