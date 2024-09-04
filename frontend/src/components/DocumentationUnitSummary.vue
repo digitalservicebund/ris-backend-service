@@ -29,7 +29,7 @@ const showErrorBadge = computed(() => {
   return props.data?.hasMissingRequiredFields
 })
 
-function copyActiveCitationSummary() {
+function copySummary() {
   if (props.data) navigator.clipboard.writeText(props.data.renderDecision)
 }
 </script>
@@ -55,8 +55,8 @@ function copyActiveCitationSummary() {
     <button
       class="flex h-32 w-32 items-center justify-center text-blue-800 hover:bg-blue-100 focus:shadow-[inset_0_0_0_0.125rem] focus:shadow-blue-800 focus:outline-none"
       data-testid="copy-summary"
-      @click="copyActiveCitationSummary"
-      @keypress.enter="copyActiveCitationSummary"
+      @click="copySummary"
+      @keypress.enter="copySummary"
     >
       <IconBaselineContentCopy />
     </button>
