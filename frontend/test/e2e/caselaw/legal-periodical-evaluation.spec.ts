@@ -253,15 +253,12 @@ test.describe(
             page.locator("[aria-label='Periodikum']"),
           ).not.toBeEditable()
 
-          // Enable, once prefix and suffix are disabled
-          if (false) {
-            await expect(
-              page.locator("[aria-label='Zitatstelle Präfix']"),
-            ).not.toBeEditable()
-            await expect(
-              page.locator("[aria-label='Zitatstelle Suffix']"),
-            ).not.toBeEditable()
-          }
+          await expect(
+            page.locator("[aria-label='Zitatstelle Präfix']"),
+          ).not.toBeEditable()
+          await expect(
+            page.locator("[aria-label='Zitatstelle Suffix']"),
+          ).not.toBeEditable()
         })
 
         await test.step("Citation input is validated when input is left", async () => {})
@@ -332,36 +329,32 @@ test.describe(
           )
           await expect(page.getByLabel("Klammernzusatz")).toHaveValue("LT")
 
-          // Enable, once search fields are read-only and prefix and suffix are removed in edit mode
-          if (false) {
-            await page.locator("#editable-list-select-button").click()
-            await expect(page.getByLabel("Zitatstelle Präfix")).toBeHidden()
-            await expect(page.getByLabel("Zitatstelle Suffix")).toBeHidden()
+          await expect(page.getByLabel("Zitatstelle Präfix")).toBeHidden()
+          await expect(page.getByLabel("Zitatstelle Suffix")).toBeHidden()
 
-            await expect(page.getByLabel("Gericht")).toHaveValue("AG Aachen")
-            await expect(
-              page.locator("[aria-label='Gericht']"),
-            ).not.toBeEditable()
+          await expect(page.getByLabel("Gericht")).toHaveValue("AG Aachen")
+          await expect(
+            page.locator("[aria-label='Gericht']"),
+          ).not.toBeEditable()
 
-            await expect(page.getByLabel("Aktenzeichen")).toHaveValue(fileNumer)
-            await expect(
-              page.locator("[aria-label='Aktenzeichen']"),
-            ).not.toBeEditable()
+          await expect(page.getByLabel("Aktenzeichen")).toHaveValue(fileNumer)
+          await expect(
+            page.locator("[aria-label='Aktenzeichen']"),
+          ).not.toBeEditable()
 
-            await expect(page.getByLabel("Entscheidungsdatum")).toHaveValue(
-              "31.12.2019",
-            )
-            await expect(
-              page.locator("[aria-label='Entscheidungsdatum']"),
-            ).not.toBeEditable()
+          await expect(page.getByLabel("Entscheidungsdatum")).toHaveValue(
+            "31.12.2019",
+          )
+          await expect(
+            page.locator("[aria-label='Entscheidungsdatum']"),
+          ).not.toBeEditable()
 
-            await expect(page.getByLabel("Dokumenttyp")).toHaveValue(
-              "Anerkenntnisurteil",
-            )
-            await expect(
-              page.locator("[aria-label='Dokumenttyp']"),
-            ).not.toBeEditable()
-          }
+          await expect(page.getByLabel("Dokumenttyp")).toHaveValue(
+            "Anerkenntnisurteil",
+          )
+          await expect(
+            page.locator("[aria-label='Dokumenttyp']"),
+          ).not.toBeEditable()
 
           // validate citation in edit mode (not allowed to be empty)
           await fillInput(page, "Zitatstelle *", "")
@@ -374,24 +367,22 @@ test.describe(
           await fillInput(page, "Klammernzusatz", "L")
           await page.getByLabel("Fundstelle vermerken", { exact: true }).click()
 
-          // Enable, once editing works
-          if (false) {
+          // TODO should be fixed
+          if (false)
             await expect(
               page.getByText("MMG 2021, 2, Heft 1 (L)", { exact: true }),
             ).toBeVisible()
-          }
 
           // TODO test Abbrechen
         })
 
         await test.step("Changes to the citation are visible in the documentation unit's preview ", async () => {
-          // Enable, once editing works
-          if (false) {
-            await previewTab.reload()
+          await previewTab.reload()
+          // TODO should be fixed
+          if (false)
             await expect(
               previewTab.getByText("MMG 2021, 2, Heft 1 (L)", { exact: true }),
             ).toBeVisible()
-          }
         })
 
         await test.step("The edition can't be deleted as long as it has references", async () => {

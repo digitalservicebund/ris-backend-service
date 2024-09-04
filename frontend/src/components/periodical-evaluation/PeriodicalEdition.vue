@@ -42,10 +42,10 @@ async function validateRequiredInput() {
   //   validationStore.add("Pflichtfeld nicht befüllt", missingField),
   // )
 
-  if (edition.value?.legalPeriodical === undefined) {
+  if (!edition.value?.legalPeriodical) {
     validationStore.add("Pflichtfeld nicht befüllt", "legalPeriodical")
   }
-  if (edition.value?.name === undefined) {
+  if (!edition.value?.name) {
     validationStore.add("Pflichtfeld nicht befüllt", "name")
   }
 }
