@@ -208,7 +208,6 @@ watch(
                   v-model="reference.citation"
                   aria-label="Zitatstelle *"
                   :has-error="slotProps.hasError"
-                  placeholder="Variable"
                   size="medium"
                   @focus="validationStore.remove('citation')"
                 ></TextInput>

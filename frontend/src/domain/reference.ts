@@ -1,3 +1,4 @@
+import dayjs from "dayjs"
 import EditableListItem from "./editableListItem"
 import RelatedDocumentation from "./relatedDocumentation"
 import LegalPeriodical from "@/domain/legalPeriodical"
@@ -31,6 +32,22 @@ export default class Reference implements EditableListItem {
     if (this.id == undefined) {
       this.id = crypto.randomUUID()
     }
+  }
+
+  get renderDocumentationUnit(): string {
+    if (!this.documentationUnit) {
+      return ""
+    }
+    return [
+      this.documentationUnit?.court?.label ?? "",
+      this.documentationUnit?.decisionDate
+        ? dayjs(this.documentationUnit.decisionDate).format("DD.MM.YYYY")
+        : "",
+      this.documentationUnit?.fileNumber ?? "",
+      this.documentationUnit?.documentType?.label ?? "",
+    ]
+      .filter(Boolean)
+      .join(", ")
   }
 
   get renderDecision(): string {
