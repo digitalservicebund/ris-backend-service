@@ -47,8 +47,7 @@ const legalPeriodical = computed({
 async function validateRequiredInput() {
   validationStore.reset()
 
-  // TODO remove ?
-  legalPeriodicalEdition.value.missingRequiredFields?.forEach((missingField) =>
+  legalPeriodicalEdition.value.missingRequiredFields.forEach((missingField) =>
     validationStore.add("Pflichtfeld nicht befüllt", missingField),
   )
 }
