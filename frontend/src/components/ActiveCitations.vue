@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import ActiveCitationInput from "@/components/ActiveCitationInput.vue"
-import ActiveCitationSummary from "@/components/ActiveCitationSummary.vue"
+import ActiveCitationSummary from "@/components/DocumentationUnitSummary.vue"
 import EditableList from "@/components/EditableList.vue"
 import ActiveCitation from "@/domain/activeCitation"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"

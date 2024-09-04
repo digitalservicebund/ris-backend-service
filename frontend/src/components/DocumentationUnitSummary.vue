@@ -3,13 +3,15 @@ import { computed } from "vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import ActiveCitation from "@/domain/activeCitation"
+import EnsuingDecision from "@/domain/ensuingDecision"
+import PreviousDecision from "@/domain/previousDecision"
 import IconBaselineContentCopy from "~icons/ic/baseline-content-copy"
 import IconBaselineDescription from "~icons/ic/baseline-description"
 import IconError from "~icons/ic/baseline-error"
 import IconOutlineDescription from "~icons/ic/outline-description"
 
 const props = defineProps<{
-  data: ActiveCitation
+  data: ActiveCitation | EnsuingDecision | PreviousDecision
 }>()
 
 const iconComponent = computed(() => {
@@ -19,12 +21,15 @@ const iconComponent = computed(() => {
 })
 
 const showErrorBadge = computed(() => {
-  return props.data?.hasForeignSource
-    ? !props.data.citationTypeIsSet
-    : props.data?.hasMissingRequiredFields
+  if (props.data instanceof ActiveCitation) {
+    return props.data?.hasForeignSource
+      ? !props.data.citationTypeIsSet
+      : props.data?.hasMissingRequiredFields
+  }
+  return props.data?.hasMissingRequiredFields
 })
 
-function copyActiveCitationSummary() {
+function copySummary() {
   if (props.data) navigator.clipboard.writeText(props.data.renderDecision)
 }
 </script>
@@ -50,8 +55,8 @@ function copyActiveCitationSummary() {
     <button
       class="flex h-32 w-32 items-center justify-center text-blue-800 hover:bg-blue-100 focus:shadow-[inset_0_0_0_0.125rem] focus:shadow-blue-800 focus:outline-none"
       data-testid="copy-summary"
-      @click="copyActiveCitationSummary"
-      @keypress.enter="copyActiveCitationSummary"
+      @click="copySummary"
+      @keypress.enter="copySummary"
     >
       <IconBaselineContentCopy />
     </button>
