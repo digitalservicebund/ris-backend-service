@@ -25,5 +25,12 @@ export function usePeriodicalEvaluationMenuItems(
         name: "caselaw-periodical-evaluation-editionId-references",
       },
     },
+    {
+      label: "Übergabe an jDV",
+      route: {
+        ...baseRoute,
+        name: "caselaw-periodical-evaluation-editionId-handover",
+      },
+    },
   ]
 }
