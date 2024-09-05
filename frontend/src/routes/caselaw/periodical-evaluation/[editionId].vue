@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from "vue"
 import { useRoute } from "vue-router"
+import PeriodicalEditionInfoPanel from "@/components/LegalPeriodicalInfoPanel.vue"
 import NavbarSide from "@/components/NavbarSide.vue"
 import ErrorPage from "@/components/PageError.vue"
 import { usePeriodicalEvaluationMenuItems } from "@/composables/usePeriodicalEvaluationMenuItems"
@@ -11,9 +12,15 @@ const store = useEditionStore()
 const responseError = ref<ResponseError>()
 const route = useRoute()
 
-const title = computed(
-  () =>
-    `Periodikaauswertung | ${store.edition?.legalPeriodical?.abbreviation}, ${store.edition?.name ? store.edition.name : store.edition?.prefix}`,
+const periodicalEditionTitle = computed(() =>
+  [
+    "Periodikaauswertung",
+    ...(store.edition?.name || store.edition?.legalPeriodical?.abbreviation
+      ? "|"
+      : ""),
+    store.edition?.legalPeriodical?.abbreviation || [],
+    store.edition?.name || [],
+  ].join(" "),
 )
 
 onMounted(async () => {
@@ -38,8 +45,9 @@ const menuItems = usePeriodicalEvaluationMenuItems(
       <NavbarSide :is-child="false" :menu-items="menuItems" :route="route" />
     </div>
     <div v-if="store.edition" class="flex w-full min-w-0 flex-col bg-gray-100">
+      <PeriodicalEditionInfoPanel :title="periodicalEditionTitle" />
+
       <div class="flex grow flex-col items-start">
-        <h2 class="ds-label-01-bold p-24 text-black">{{ title }}</h2>
         <router-view />
       </div>
     </div>

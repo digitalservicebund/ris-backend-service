@@ -56,6 +56,7 @@ async function validateRequiredInput() {
 }
 
 async function saveEdition() {
+  validationStore.reset()
   await validateRequiredInput()
   if (!validationStore.isValid()) {
     return
