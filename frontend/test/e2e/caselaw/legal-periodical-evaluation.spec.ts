@@ -142,11 +142,11 @@ test.describe(
             .click()
         })
 
-        await test.step("A new evaluation is started using the “Neue Periodikaauswertung” button.", async () => {
+        await test.step("A new evaluation is started using the “Neue Periodikumsauswertung button.", async () => {
           await expect(
-            page.getByLabel("Neue Periodikaauswertung"),
+            page.getByLabel("Neue Periodikumsauswertung"),
           ).toBeVisible()
-          await page.getByLabel("Neue Periodikaauswertung").click()
+          await page.getByLabel("Neue Periodikumsauswertung").click()
           await expect(page).toHaveURL(
             /\/caselaw\/periodical-evaluation\/[0-9a-fA-F\-]{36}\/edition/,
           )
@@ -154,7 +154,7 @@ test.describe(
 
         await test.step("The inputs are correctly validated (name have to be chosen)", async () => {
           await expect(page.getByText("Pflichtfeld nicht befüllt")).toBeHidden()
-          await page.getByLabel("Speichern").click()
+          await page.getByLabel("Fortfahren").click()
           await expect(
             page.locator(`text="Pflichtfeld nicht befüllt"`),
           ).toHaveCount(1)
@@ -179,9 +179,8 @@ test.describe(
         })
 
         try {
-          await test.step("'Speichern' saved the edition and replaces url with new edition id", async () => {
-            await page.getByLabel("Speichern").click()
-            await page.getByText("Fundstellen").click()
+          await test.step("'Fortfahren' saved the edition and replaces url with new edition id", async () => {
+            await page.getByLabel("Fortfahren").click()
             await expect(page).toHaveURL(
               /\/caselaw\/periodical-evaluation\/[0-9a-fA-F\-]{36}\/references/,
             )
@@ -203,12 +202,15 @@ test.describe(
             await waitForInputValue(page, "[aria-label='Periodikum']", "WdG")
             await expect(page.locator(".table > tr >> nth=0")).toBeVisible()
             const line = page.getByText(name + "WdG0" + formattedDate)
-            await line.locator("a").click()
 
-            await page.locator("[aria-label='Ausgabe löschen']").click()
-            await expect(page.locator(".table > tr")).toHaveCount(0)
+            await line.locator("[aria-label='Ausgabe löschen']").click()
+            await expect(
+              page.getByText(name + "WdG0" + formattedDate),
+            ).toBeHidden()
             await page.reload()
-            await expect(page.locator(".table > tr")).toHaveCount(0)
+            await expect(
+              page.getByText(name + "WdG0" + formattedDate),
+            ).toBeHidden()
           })
 
           // make sure the edition is deleted also if the test fails
@@ -219,7 +221,8 @@ test.describe(
             .getByText("WdG | Welt der Gesundheitsversorgung", { exact: true })
             .click()
           if (await page.locator(".table > tr >> nth=0").isVisible()) {
-            await page.locator("[aria-label='Ausgabe löschen']").click()
+            const line = page.getByText(name + "WdG0" + formattedDate)
+            await line.locator("[aria-label='Ausgabe löschen']").click()
           }
         }
       },

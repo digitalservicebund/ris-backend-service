@@ -19,8 +19,8 @@ import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import ComboboxItemService from "@/services/comboboxItemService"
 import { ResponseError } from "@/services/httpClient"
 import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
-import IconDelete from "~icons/material-symbols/delete"
-import IconEdit from "~icons/material-symbols/edit-outline"
+import IconDelete from "~icons/ic/baseline-close"
+import IconEdit from "~icons/ic/outline-edit"
 
 const emptyResponse: ResponseError = {
   title: "Wählen Sie ein Periodikum um die Ausgaben anzuzeigen.",
@@ -131,7 +131,10 @@ watch(
         <h1 class="ds-heading-02-reg">Periodika</h1>
       </FlexContainer>
       <FlexContainer align-items="items-end" flex-direction="flex-row">
-        <div class="flex-grow gap-16 bg-blue-200 p-16" role="search">
+        <div
+          class="flex flex-grow flex-col gap-16 bg-blue-200 p-16"
+          role="search"
+        >
           <InputField id="legalPeriodical" label="Periodikum*">
             <ComboboxInput
               id="legalPeriodical"
@@ -146,9 +149,9 @@ watch(
           </InputField>
           <TextButton
             v-if="legalPeriodical"
-            aria-label="Neue Periodikaauswertung"
+            aria-label="Neue Periodikumsauswertung"
             class="ds-button-02-reg"
-            label="Neue Periodikaauswertung"
+            label="Neue Periodikumsauswertung"
             @click="addEdition"
           ></TextButton>
         </div>
@@ -179,22 +182,21 @@ watch(
             </span>
           </CellItem>
           <CellItem class="flex">
-            <div class="float-end flex gap-24">
+            <div class="float-end flex">
               <router-link
+                class="cursor-pointer border-2 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
                 target="_blank"
                 :to="{
                   name: 'caselaw-periodical-evaluation-editionId-references',
                   params: { editionId: edition.id },
                 }"
               >
-                <div class="ds-button-primary">
-                  <IconEdit class="text-blue-800" />
-                </div>
+                <IconEdit class="text-blue-800" />
               </router-link>
               <button
                 v-if="edition.references?.length == 0"
                 aria-label="Ausgabe löschen"
-                class="cursor-pointer"
+                class="cursor-pointer border-2 border-l-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
                 @click="
                   async () => {
                     edition.id &&
@@ -215,11 +217,13 @@ watch(
                 <IconDelete class="text-blue-800" />
               </button>
 
-              <IconDelete
+              <div
                 v-else
                 aria-label="Ausgabe kann nicht gelöscht werden"
-                class="text-gray-400"
-              />
+                class="border-2 border-l-0 border-solid border-gray-600 p-4 text-gray-600"
+              >
+                <IconDelete />
+              </div>
             </div>
           </CellItem>
         </TableRow>

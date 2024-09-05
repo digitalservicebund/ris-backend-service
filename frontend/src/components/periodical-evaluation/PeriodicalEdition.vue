@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
 import { computed } from "vue"
+import { useRouter } from "vue-router"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import InputField from "@/components/input/InputField.vue"
@@ -13,6 +14,7 @@ import ComboboxItemService from "@/services/comboboxItemService"
 import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 import { useEditionStore } from "@/stores/editionStore"
 
+const router = useRouter()
 const store = useEditionStore()
 const { edition } = storeToRefs(store)
 
@@ -23,7 +25,10 @@ const legalPeriodical = computed({
   get: () =>
     edition.value?.legalPeriodical
       ? {
-          label: edition.value?.legalPeriodical.abbreviation,
+          label:
+            edition.value?.legalPeriodical.abbreviation +
+            " | " +
+            edition.value?.legalPeriodical.title,
           value: edition.value?.legalPeriodical,
           additionalInformation: edition.value?.legalPeriodical.subtitle,
         }
@@ -61,6 +66,10 @@ async function saveEdition() {
   if (response.data) {
     edition.value = response.data as LegalPeriodicalEdition
   }
+  router.push({
+    name: "caselaw-periodical-evaluation-editionId-references",
+    params: { editionId: edition?.value?.id },
+  })
 }
 </script>
 
@@ -82,6 +91,19 @@ async function saveEdition() {
           :item-service="ComboboxItemService.getLegalPeriodicals"
           :read-only="edition?.references?.length! > 0"
         ></ComboboxInput>
+      </InputField>
+      <InputField
+        id="name"
+        label="Name der Ausgabe *"
+        :validation-error="validationStore.getByField('name')"
+      >
+        <TextInput
+          id="name"
+          v-model="edition!.name"
+          aria-label="Name der Ausgabe"
+          class="ds-input-medium"
+          size="medium"
+        ></TextInput>
       </InputField>
 
       <div class="flex-col">
@@ -112,27 +134,20 @@ async function saveEdition() {
         </div>
       </div>
 
-      <InputField
-        id="name"
-        label="Name der Ausgabe *"
-        :validation-error="validationStore.getByField('name')"
-      >
-        <TextInput
-          id="name"
-          v-model="edition!.name"
-          aria-label="Name der Ausgabe"
-          class="ds-input-medium"
-          size="medium"
-        ></TextInput>
-      </InputField>
-
-      <FlexContainer align-items="items-center">
+      <FlexContainer align-items="items-center" class="gap-16">
         <TextButton
-          aria-label="Speichern"
+          aria-label="Fortfahren"
           class="ds-button-02-reg"
-          label="Speichern"
+          label="Fortfahren"
           @click="saveEdition"
         ></TextButton>
+        <TextButton
+          aria-label="Abbrechen"
+          button-type="ghost"
+          label="Abbrechen"
+          size="small"
+          @click.stop="$router.push({ name: 'caselaw-periodical-evaluation' })"
+        />
       </FlexContainer>
     </div>
   </div>

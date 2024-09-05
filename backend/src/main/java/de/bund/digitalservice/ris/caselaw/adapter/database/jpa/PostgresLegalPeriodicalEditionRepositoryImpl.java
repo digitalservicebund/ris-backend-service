@@ -26,7 +26,7 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
 
   @Transactional(transactionManager = "jpaTransactionManager")
   public List<LegalPeriodicalEdition> findAllByLegalPeriodicalId(UUID legalPeriodicalId) {
-    return repository.findAllByLegalPeriodicalId(legalPeriodicalId).stream()
+    return repository.findAllByLegalPeriodicalIdOrderByCreatedAtDesc(legalPeriodicalId).stream()
         .map(LegalPeriodicalEditionTransformer::transformToDomain)
         .toList();
   }

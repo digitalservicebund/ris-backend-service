@@ -15,6 +15,7 @@ const editionUUid = crypto.randomUUID()
 const legalPeriodical: LegalPeriodical = {
   uuid: crypto.randomUUID(),
   abbreviation: "BDZ",
+  title: "Bundesgesetzblatt",
   citationStyle: "2024, Heft 1",
 }
 
@@ -65,7 +66,7 @@ async function renderComponent() {
 describe("Legal periodical edition list", () => {
   const dropdownLegalPeriodicalItems: ComboboxItem[] = [
     {
-      label: legalPeriodical.abbreviation!,
+      label: legalPeriodical.abbreviation! + " | " + legalPeriodical.title!,
       value: legalPeriodical,
     },
   ]
@@ -91,12 +92,12 @@ describe("Legal periodical edition list", () => {
     await renderComponent()
 
     expect(screen.getByText("Ausgabe")).toBeVisible()
-
     expect(screen.getByLabelText("Periodikum")).toBeVisible()
+    expect(screen.getByLabelText("Name der Ausgabe")).toBeVisible()
     expect(screen.getByLabelText("Präfix")).toBeVisible()
     expect(screen.getByLabelText("Suffix")).toBeVisible()
-    expect(screen.getByLabelText("Name der Ausgabe")).toBeVisible()
-    expect(screen.getByText("Speichern")).toBeVisible()
+    expect(screen.getByText("Fortfahren")).toBeVisible()
+    expect(screen.getByText("Abbrechen")).toBeVisible()
   })
 
   test("selecting legal periodical from combobox value for legal periodical", async () => {
@@ -107,9 +108,9 @@ describe("Legal periodical edition list", () => {
     const dropdownItems = screen.getAllByLabelText(
       "dropdown-option",
     ) as HTMLElement[]
-    expect(dropdownItems[0]).toHaveTextContent("BDZ")
+    expect(dropdownItems[0]).toHaveTextContent("BDZ | Bundesgesetzblatt")
     await user.click(dropdownItems[0])
-    await expect(periodicalField).toHaveValue("BDZ")
+    await expect(periodicalField).toHaveValue("BDZ | Bundesgesetzblatt")
   })
 
   test("clicking Speichern button calls service with correct values", async () => {
@@ -133,9 +134,12 @@ describe("Legal periodical edition list", () => {
     const dropdownItems = screen.getAllByLabelText(
       "dropdown-option",
     ) as HTMLElement[]
-    expect(dropdownItems[0]).toHaveTextContent("BDZ")
+    expect(dropdownItems[0]).toHaveTextContent("BDZ | Bundesgesetzblatt")
     await user.click(dropdownItems[0])
-    await expect(periodicalField).toHaveValue("BDZ")
+    await expect(periodicalField).toHaveValue("BDZ | Bundesgesetzblatt")
+
+    await user.clear(screen.getByLabelText("Name der Ausgabe"))
+    await user.type(screen.getByLabelText("Name der Ausgabe"), "new name")
 
     await user.clear(screen.getByLabelText("Präfix"))
     await user.type(screen.getByLabelText("Präfix"), "new präfix")
@@ -143,10 +147,7 @@ describe("Legal periodical edition list", () => {
     await user.clear(screen.getByLabelText("Suffix"))
     await user.type(screen.getByLabelText("Suffix"), "new suffix")
 
-    await user.clear(screen.getByLabelText("Name der Ausgabe"))
-    await user.type(screen.getByLabelText("Name der Ausgabe"), "new name")
-
-    await user.click(screen.getByText("Speichern"))
+    await user.click(screen.getByText("Fortfahren"))
     expect(fetchSpy).toHaveBeenCalledTimes(1)
     expect(fetchSpy).toHaveBeenCalledWith(
       new LegalPeriodicalEdition({
@@ -179,7 +180,7 @@ describe("Legal periodical edition list", () => {
       const { user } = await renderComponent()
 
       await user.clear(screen.getByLabelText("Name der Ausgabe"))
-      await user.click(screen.getByLabelText("Speichern"))
+      await user.click(screen.getByLabelText("Fortfahren"))
 
       expect(
         screen.getAllByText("Pflichtfeld nicht befüllt").length,
@@ -210,13 +211,13 @@ describe("Legal periodical edition list", () => {
       const dropdownItems = screen.getAllByLabelText(
         "dropdown-option",
       ) as HTMLElement[]
-      expect(dropdownItems[0]).toHaveTextContent("BDZ")
+      expect(dropdownItems[0]).toHaveTextContent("BDZ | Bundesgesetzblatt")
       await user.click(dropdownItems[0])
-      await expect(periodicalField).toHaveValue("BDZ")
+      expect(periodicalField).toHaveValue("BDZ | Bundesgesetzblatt")
 
       await user.type(screen.getByLabelText("Name der Ausgabe"), "name")
 
-      await user.click(screen.getByLabelText("Speichern"))
+      await user.click(screen.getByLabelText("Fortfahren"))
 
       expect(fetchSpy).toHaveBeenCalledTimes(1)
     })

@@ -30,7 +30,6 @@ public class LegalPeriodicalEditionService {
     return legalPeriodicalRepository.save(legalPeriodicalEdition);
   }
 
-  // TODO test
   public boolean delete(UUID editionId) {
     var edition = legalPeriodicalRepository.findById(editionId);
     if (edition.isPresent() && edition.get().references().isEmpty()) {
