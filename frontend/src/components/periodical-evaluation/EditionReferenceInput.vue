@@ -16,19 +16,20 @@ import RelatedDocumentation from "@/domain/relatedDocumentation"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 import { useEditionStore } from "@/stores/editionStore"
+import StringsUtil from "@/utils/stringsUtil"
 
 const props = defineProps<{
   modelValue?: Reference
   modelValueList: Reference[]
   isSaved: boolean
 }>()
-
 const emit = defineEmits<{
   "update:modelValue": [value: Reference]
   addEntry: [void]
   cancelEdit: [void]
   removeEntry: [value: Reference]
 }>()
+
 const store = useEditionStore()
 const lastSavedModelValue = ref(new Reference({ ...props.modelValue }))
 const reference = ref<Reference>(new Reference({ ...props.modelValue }))
@@ -70,13 +71,16 @@ const suffix = computed({
   },
 })
 
-const citation = computed(() =>
-  [
+function mergeCitation(): string | undefined {
+  if (StringsUtil.isEmpty(reference.value.citation)) {
+    return undefined
+  }
+  return [
     ...(prefix.value ? [prefix.value] : []),
     ...(reference.value.citation ? [reference.value.citation] : []),
     ...(suffix.value ? [suffix.value] : []),
-  ].join(""),
-)
+  ].join("")
+}
 
 function updateDateFormatValidation(
   validationError: ValidationError | undefined,
@@ -137,7 +141,7 @@ async function addReference(decision: RelatedDocumentation) {
   relatedDocumentationUnit.value = new RelatedDocumentation({ ...decision })
   const newReference: Reference = new Reference({
     id: reference.value.id,
-    citation: reference.value.citation,
+    citation: props.isSaved ? reference.value.citation : mergeCitation(),
     referenceSupplement: reference.value.referenceSupplement,
     footnote: reference.value.footnote,
     legalPeriodical: reference.value.legalPeriodical,
@@ -150,8 +154,6 @@ async function addReference(decision: RelatedDocumentation) {
   await validateRequiredInput(newReference)
 
   if (validationStore.isValid()) {
-    newReference.citation = citation.value
-    // Merge the decision from search with the current reference input values
     emit("update:modelValue", newReference)
     emit("addEntry")
   }
@@ -186,7 +188,7 @@ watch(
       </InputField>
       <div class="flex flex-col gap-24">
         <div class="flex justify-between gap-24">
-          <div class="flex-1">
+          <div id="citationInputField" class="flex-1">
             <InputField
               v-if="!isSaved"
               id="citation"
@@ -210,6 +212,7 @@ watch(
                   :has-error="slotProps.hasError"
                   placeholder="Variable"
                   size="medium"
+                  @blur="validateRequiredInput(reference)"
                   @focus="validationStore.remove('citation')"
                 ></TextInput>
                 <TextInput
@@ -237,6 +240,7 @@ watch(
                   aria-label="Zitatstelle *"
                   :has-error="slotProps.hasError"
                   size="medium"
+                  @blur="validateRequiredInput(reference)"
                   @focus="validationStore.remove('citation')"
                 ></TextInput>
               </div>
