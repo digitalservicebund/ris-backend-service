@@ -11,6 +11,7 @@ describe("Texts", () => {
           [
             createTestingPinia({
               initialState: {
+                session: { user: { roles: ["Internal"] } },
                 docunitStore: {
                   documentUnit: new DocumentUnit("foo", {
                     documentNumber: "1234567891234",

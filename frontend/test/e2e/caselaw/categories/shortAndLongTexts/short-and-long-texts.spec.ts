@@ -160,7 +160,7 @@ test.describe("short and long texts", () => {
   )
 
   test(
-    "long texts are readonly for external user",
+    "long texts are hidden for external user",
     {
       annotation: {
         type: "story",
@@ -170,50 +170,43 @@ test.describe("short and long texts", () => {
       tag: ["@RISDEV-4523"],
     },
     async ({ pageWithExternalUser, documentNumber }) => {
-      const readOnly = 'contenteditable="false"'
       await test.step("Navigiere zu Rubriken als external Nutzer", async () => {
         await navigateToCategories(pageWithExternalUser, documentNumber)
       })
 
-      await test.step("Tenor ist readonly", async () => {
+      await test.step("Tenor ist nicht sichtbar", async () => {
         const tenor = pageWithExternalUser.getByTestId("Tenor")
-        const inputFieldInnerHTML = await tenor.innerHTML()
-        expect(inputFieldInnerHTML).toContain(readOnly)
+        await expect(tenor).toBeHidden()
       })
 
-      await test.step("Tatbestand ist readonly", async () => {
+      await test.step("Tatbestand ist nicht sichtbar", async () => {
         const caseFacts = pageWithExternalUser.getByTestId("Tatbestand")
-        const inputFieldInnerHTML = await caseFacts.innerHTML()
-        expect(inputFieldInnerHTML).toContain(readOnly)
+        await expect(caseFacts).toBeHidden()
       })
 
-      await test.step("Entscheidungsgründe sind readonly", async () => {
+      await test.step("Entscheidungsgründe sind nicht sichtbar", async () => {
         const decisionReasons = pageWithExternalUser.getByTestId(
           "Entscheidungsgründe",
         )
-        const inputFieldInnerHTML = await decisionReasons.innerHTML()
-        expect(inputFieldInnerHTML).toContain(readOnly)
+        await expect(decisionReasons).toBeHidden()
       })
 
-      await test.step("Gründe sind readonly", async () => {
+      await test.step("Gründe sind nicht sichtbar", async () => {
         const reasons = pageWithExternalUser.getByTestId("Gründe")
-        const inputFieldInnerHTML = await reasons.innerHTML()
-        expect(inputFieldInnerHTML).toContain(readOnly)
+        await expect(reasons).toBeHidden()
       })
 
-      await test.step("Abweichende Meinung ist readonly", async () => {
+      await test.step("Abweichende Meinung ist nicht sichtbar", async () => {
         const dissentingOpinion = pageWithExternalUser.getByTestId(
           "Abweichende Meinung",
         )
-        const inputFieldInnerHTML = await dissentingOpinion.innerHTML()
-        expect(inputFieldInnerHTML).toContain(readOnly)
+        await expect(dissentingOpinion).toBeHidden()
       })
 
-      await test.step("Sonstiger Langtext ist readonly", async () => {
+      await test.step("Sonstiger Langtext ist nicht sichtbar", async () => {
         const otherLongText =
           pageWithExternalUser.getByTestId("Sonstiger Langtext")
-        const inputFieldInnerHTML = await otherLongText.innerHTML()
-        expect(inputFieldInnerHTML).toContain(readOnly)
+        await expect(otherLongText).toBeHidden()
       })
     },
   )

@@ -52,7 +52,7 @@ export const navigateToCategories = async (
 
     if (options?.skipAssert) return
 
-    await expect(page.getByText("Spruchkörper")).toBeVisible({
+    await expect(page.getByText("Entscheidungsname")).toBeVisible({
       timeout: 15000, // for backend warm up
     })
     await expect(page.getByText(documentNumber)).toBeVisible()
