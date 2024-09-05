@@ -5,23 +5,33 @@ import PeriodicalEditionInfoPanel from "@/components/LegalPeriodicalInfoPanel.vu
 import NavbarSide from "@/components/NavbarSide.vue"
 import ErrorPage from "@/components/PageError.vue"
 import { usePeriodicalEvaluationMenuItems } from "@/composables/usePeriodicalEvaluationMenuItems"
+import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import { ResponseError } from "@/services/httpClient"
 import { useEditionStore } from "@/stores/editionStore"
 
-const store = useEditionStore()
+const store: LegalPeriodicalEdition = useEditionStore()
 const responseError = ref<ResponseError>()
 const route = useRoute()
 
+// Move to edition as render decision once type parser is fixed.
 const periodicalEditionTitle = computed(() =>
   [
     "Periodikaauswertung",
     ...(store.edition?.name || store.edition?.legalPeriodical?.abbreviation
       ? "|"
       : ""),
-    store.edition?.legalPeriodical?.abbreviation || [],
-    store.edition?.name || [],
+    renderExtraInfo(),
   ].join(" "),
 )
+
+function renderExtraInfo() {
+  return [
+    store.edition?.legalPeriodical?.abbreviation || undefined,
+    store.edition?.name || undefined,
+  ]
+    .filter(Boolean)
+    .join(", ")
+}
 
 onMounted(async () => {
   const response = await store.loadEdition()
