@@ -17,17 +17,6 @@ export default class RelatedDocumentation {
   public documentType?: DocumentType
   public referenceFound?: boolean
 
-  static readonly relatedDocumentUnitFields = [
-    "documentNumber",
-    "status",
-    "deviatingFileNumber",
-    "court",
-    "decisionDate",
-    "fileNumber",
-    "documentType",
-    "referenceFound",
-  ] as const
-
   get hasForeignSource(): boolean {
     return this.documentNumber != null && !!this.referenceFound
   }
@@ -79,23 +68,5 @@ export default class RelatedDocumentation {
         ? [RelatedDocumentation.getStatusLabel(this.status)]
         : []),
     ].join(", ")
-  }
-
-  public static isEmpty(
-    relatedDocumentationUnit: RelatedDocumentation,
-  ): boolean {
-    let isEmpty = true
-    RelatedDocumentation.relatedDocumentUnitFields.map((key) => {
-      if (!RelatedDocumentation.fieldIsEmpty(relatedDocumentationUnit[key])) {
-        isEmpty = false
-      }
-    })
-    return isEmpty
-  }
-
-  public static fieldIsEmpty(
-    value: RelatedDocumentation[(typeof RelatedDocumentation.relatedDocumentUnitFields)[number]],
-  ) {
-    return value === undefined || !value || Object.keys(value).length === 0
   }
 }
