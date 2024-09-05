@@ -5,15 +5,13 @@ import PeriodicalEditionInfoPanel from "@/components/LegalPeriodicalInfoPanel.vu
 import NavbarSide from "@/components/NavbarSide.vue"
 import ErrorPage from "@/components/PageError.vue"
 import { usePeriodicalEvaluationMenuItems } from "@/composables/usePeriodicalEvaluationMenuItems"
-import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import { ResponseError } from "@/services/httpClient"
 import { useEditionStore } from "@/stores/editionStore"
 
-const store: LegalPeriodicalEdition = useEditionStore()
+const store = useEditionStore()
 const responseError = ref<ResponseError>()
 const route = useRoute()
 
-// Move to edition as render decision once type parser is fixed.
 const periodicalEditionTitle = computed(() =>
   [
     "Periodikaauswertung",
