@@ -16,7 +16,7 @@
     "enabled": false
   },
   "timezone": "Europe/Berlin",
-  "automergeSchedule": [
+  "schedule": [
     "before 5:30am every weekday",
     "after 7:30am every weekday"
   ],
