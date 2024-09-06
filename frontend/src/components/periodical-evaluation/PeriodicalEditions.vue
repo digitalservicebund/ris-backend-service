@@ -48,14 +48,10 @@ const debouncedPushQueryToRoute = (() => {
   }
 })()
 
-onMounted(() => {
-  if (query.value.q) updateEditions(query.value.q)
-})
-
 /**
  * Loads all editions of a legal periodical
  */
-async function updateEditions(legalPeriodicalId: string) {
+async function getEditions(legalPeriodicalId: string) {
   isLoading.value = true
   searchResponseError.value = undefined
   const response =
@@ -101,6 +97,13 @@ const legalPeriodical = computed({
   },
 })
 
+async function handleDeleteEdition(edition: LegalPeriodicalEdition) {
+  if (edition?.id) {
+    await LegalPeriodicalEditionService.delete(edition.id)
+    await getEditions(filter.value?.uuid?.toString() || "")
+  }
+}
+
 /**
  * Get query from url and set local query value
  */
@@ -114,7 +117,7 @@ watch(
   filter,
   async (newFilter) => {
     if (newFilter && newFilter.uuid) {
-      await updateEditions(newFilter.uuid)
+      await getEditions(newFilter.uuid)
       debouncedPushQueryToRoute({ q: newFilter.uuid })
     } else {
       currentEditions.value = []
@@ -122,6 +125,10 @@ watch(
   },
   { deep: true },
 )
+
+onMounted(() => {
+  if (query.value.q) getEditions(query.value.q)
+})
 </script>
 
 <template>
@@ -197,22 +204,8 @@ watch(
                 v-if="edition.references?.length == 0"
                 aria-label="Ausgabe löschen"
                 class="cursor-pointer border-2 border-l-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
-                @click="
-                  async () => {
-                    edition.id &&
-                      (await LegalPeriodicalEditionService.delete(edition.id))
-                    edition.id &&
-                      (await updateEditions(filter!.uuid?.toString() || ''))
-                  }
-                "
-                @keyup.enter="
-                  async () => {
-                    edition.id &&
-                      (await LegalPeriodicalEditionService.delete(edition.id))
-                    edition.id &&
-                      (await updateEditions(filter!.uuid?.toString() || ''))
-                  }
-                "
+                @click="handleDeleteEdition(edition)"
+                @keyup.enter="handleDeleteEdition(edition)"
               >
                 <IconDelete class="text-blue-800" />
               </button>
