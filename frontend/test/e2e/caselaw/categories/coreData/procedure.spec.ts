@@ -15,7 +15,7 @@ test.describe("procedure", () => {
   const testPrefix = "test_" + generateString({ length: 10 })
   test.beforeAll(async ({ browser }) => {
     const page = await browser.newPage()
-    await navigateToProcedures(page)
+    await navigateToProcedures(page, testPrefix)
     const listItems = await page.getByLabel("Vorgang Listenelement").all()
     expect(listItems).toHaveLength(0)
   })
@@ -100,7 +100,7 @@ test.describe("procedure", () => {
   })
   test.afterAll(async ({ browser }) => {
     const page = await browser.newPage()
-    await navigateToProcedures(page)
+    await navigateToProcedures(page, testPrefix)
     const listItems = await page.getByLabel("Vorgang Listenelement").all()
 
     for (const listItem of listItems) {

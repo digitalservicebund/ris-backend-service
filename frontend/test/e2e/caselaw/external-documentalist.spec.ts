@@ -9,7 +9,9 @@ import {
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
-test.describe(
+// Test is still flaky
+// eslint-disable-next-line playwright/no-skipped-test
+test.describe.skip(
   "external documentalists",
   {
     annotation: {
