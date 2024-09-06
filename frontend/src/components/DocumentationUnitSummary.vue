@@ -53,6 +53,7 @@ function copySummary() {
       />
     </div>
     <button
+      v-if="data instanceof ActiveCitation"
       class="flex h-32 w-32 items-center justify-center text-blue-800 hover:bg-blue-100 focus:shadow-[inset_0_0_0_0.125rem] focus:shadow-blue-800 focus:outline-none"
       data-testid="copy-summary"
       @click="copySummary"
