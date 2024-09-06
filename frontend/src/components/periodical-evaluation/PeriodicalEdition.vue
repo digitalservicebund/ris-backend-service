@@ -42,17 +42,9 @@ const legalPeriodical = computed({
 async function validateRequiredInput() {
   validationStore.reset()
 
-  // TODO why doesn't this work?
-  // edition.value?.getMissingRequiredFields.forEach((missingField) =>
-  //   validationStore.add("Pflichtfeld nicht befüllt", missingField),
-  // )
-
-  if (!edition.value?.legalPeriodical) {
-    validationStore.add("Pflichtfeld nicht befüllt", "legalPeriodical")
-  }
-  if (!edition.value?.name) {
-    validationStore.add("Pflichtfeld nicht befüllt", "name")
-  }
+  edition.value?.missingRequiredFields.forEach((missingField) =>
+    validationStore.add("Pflichtfeld nicht befüllt", missingField),
+  )
 }
 
 async function saveEdition() {

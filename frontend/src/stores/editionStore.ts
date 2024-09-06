@@ -3,7 +3,6 @@ import { defineStore } from "pinia"
 import { ref } from "vue"
 import { useRoute } from "vue-router"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
-import Reference from "@/domain/reference"
 import { ServiceResponse } from "@/services/httpClient"
 import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 
@@ -20,13 +19,9 @@ export const useEditionStore = defineStore("editionStore", () => {
     )
 
     if (response.data) {
-      edition.value = response.data as LegalPeriodicalEdition
-
-      response.data.references = response.data.references
-        ? response.data.references.map(
-            (reference) => new Reference({ ...reference }),
-          )
-        : []
+      edition.value = new LegalPeriodicalEdition({
+        ...response.data,
+      })
     }
 
     return response
