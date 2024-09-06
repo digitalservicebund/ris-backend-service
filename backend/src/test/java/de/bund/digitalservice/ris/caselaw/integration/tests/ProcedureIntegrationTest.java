@@ -577,9 +577,9 @@ class ProcedureIntegrationTest {
   @Test
   void testSearch_withQuery_shouldReturnProceduresWithDateFirst() {
     DocumentationUnitDTO documentationUnitDTO2 =
-        documentationUnitRepository.findByDocumentNumber("documentNumber2").get();
+        documentationUnitRepository.findByDocumentNumber("docNumber00002").get();
     DocumentationUnitDTO documentationUnitDTO3 =
-        documentationUnitRepository.findByDocumentNumber("documentNumber3").get();
+        documentationUnitRepository.findByDocumentNumber("docNumber00003").get();
 
     addProcedureToDocUnit("with date", docUnitDTO);
 
@@ -835,6 +835,52 @@ class ProcedureIntegrationTest {
   }
 
   @Test
+  void testSearch_withQueryAndWithExternalUser_shouldReturnOnlyAssignedProcedure() {
+    DocumentationUnitDTO unassignedDocUnit =
+        documentationUnitRepository.findByDocumentNumber("docNumber00002").get();
+    addProcedureToDocUnit("procedure2", unassignedDocUnit);
+    assignProcedure(docUnitDTO);
+
+    risWebTestClient
+        .withExternalLogin()
+        .get()
+        .uri("/api/v1/caselaw/procedure?withDocUnits=true&q=procedure&sz=20&pg=0")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).hasSize(1);
+              assertThat(response.getResponseBody().getContent().get(0).label())
+                  .isEqualTo("procedure1");
+            });
+  }
+
+  @Test
+  void testSearch_withoutQueryAndWithExternalUser_shouldReturnOnlyAssignedProcedure() {
+    DocumentationUnitDTO unassignedDocUnit =
+        documentationUnitRepository.findByDocumentNumber("docNumber00002").get();
+    addProcedureToDocUnit("procedure2", unassignedDocUnit);
+    assignProcedure(docUnitDTO);
+
+    risWebTestClient
+        .withExternalLogin()
+        .get()
+        .uri("/api/v1/caselaw/procedure?withDocUnits=true&sz=20&pg=0")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).hasSize(1);
+              assertThat(response.getResponseBody().getContent().get(0).label())
+                  .isEqualTo("procedure1");
+            });
+  }
+
+  @Test
   void testAssign_withInternalUser_shouldReturnSuccessMessage() {
     UUID procedureId = addProcedureToDocUnit("procedure1", docUnitDTO);
     UUID userGroupId = userGroupRepository.findAll().get(0).getId();
@@ -966,6 +1012,19 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .isForbidden();
+  }
+
+  private void assignProcedure(DocumentationUnitDTO docUnitDTO) {
+    UUID procedureId = addProcedureToDocUnit("procedure1", docUnitDTO);
+    UUID userGroupId = userGroupRepository.findAll().get(0).getId();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/procedure/" + procedureId + "/assign/" + userGroupId)
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful();
   }
 
   private UUID addProcedureToDocUnit(

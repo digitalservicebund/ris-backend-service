@@ -19,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -50,23 +51,24 @@ public class DatabaseProcedureService implements ProcedureService {
       Optional<String> query,
       DocumentationOffice documentationOffice,
       Pageable pageable,
-      Optional<Boolean> withDocUnits) {
+      Optional<Boolean> withDocUnits,
+      OidcUser oidcUser) {
 
     DocumentationOfficeDTO documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
+    boolean shouldGetAllProcedures = !(withDocUnits.isPresent() && withDocUnits.get());
 
-    if (withDocUnits.isPresent() && Boolean.TRUE.equals(withDocUnits.get())) {
-      return query
-          .map(
-              queryString ->
-                  repository.findLatestUsedProceduresByLabelAndDocumentationOffice(
-                      queryString.trim(), documentationOfficeDTO, pageable))
-          .orElseGet(
-              () ->
-                  repository.findLatestUsedProceduresByDocumentationOffice(
-                      documentationOfficeDTO, pageable))
-          .map(ProcedureTransformer::transformToDomain);
+    if (shouldGetAllProcedures) {
+      // retrieve all procedures (even those without linked documentation units)
+      return getAllProcedures(query, pageable, documentationOfficeDTO);
     }
+    // retrieve only procedures documentation units have been linked to
+    return getOnlyLinkedProcedures(query, pageable, oidcUser, documentationOfficeDTO);
+  }
+
+  @NotNull
+  private Slice<Procedure> getAllProcedures(
+      Optional<String> query, Pageable pageable, DocumentationOfficeDTO documentationOfficeDTO) {
     return query
         .map(
             queryString ->
@@ -76,6 +78,50 @@ public class DatabaseProcedureService implements ProcedureService {
             () ->
                 repository.findAllByDocumentationOfficeOrderByCreatedAtDesc(
                     documentationOfficeDTO, pageable))
+        .map(ProcedureTransformer::transformToDomain);
+  }
+
+  @NotNull
+  private Slice<Procedure> getOnlyLinkedProcedures(
+      Optional<String> query,
+      Pageable pageable,
+      OidcUser oidcUser,
+      DocumentationOfficeDTO documentationOfficeDTO) {
+    var userGroup = userService.getUserGroup(oidcUser);
+    boolean isInternalUser = userService.isInternal(oidcUser);
+    if (!isInternalUser && userGroup.isPresent()) {
+      return getProceduresOfUserGroup(
+          query, pageable, documentationOfficeDTO, userGroup.get().id());
+    }
+    return query
+        .map(
+            queryString ->
+                repository.findLatestUsedProceduresByLabelAndDocumentationOffice(
+                    queryString.trim(), documentationOfficeDTO, pageable))
+        .orElseGet(
+            () ->
+                repository.findLatestUsedProceduresByDocumentationOffice(
+                    documentationOfficeDTO, pageable))
+        .map(ProcedureTransformer::transformToDomain);
+  }
+
+  @NotNull
+  private Slice<Procedure> getProceduresOfUserGroup(
+      Optional<String> query,
+      Pageable pageable,
+      DocumentationOfficeDTO documentationOfficeDTO,
+      UUID userGroupId) {
+    return query
+        .map(
+            queryString ->
+                repository
+                    .findLatestUsedProceduresByLabelAndDocumentationOfficeAndDocumentationOfficeUserGroupDTO_Id(
+                        queryString.trim(), documentationOfficeDTO, userGroupId, pageable))
+        .orElseGet(
+            () ->
+                repository
+                    .findLatestUsedProceduresByDocumentationOfficeAndDocumentationOfficeUserGroupDTO_id(
+                        documentationOfficeDTO, userGroupId, pageable))
         .map(ProcedureTransformer::transformToDomain);
   }
 

@@ -474,7 +474,7 @@ class DocumentationUnitSearchIntegrationTest {
       })
   void testSearch_withExternalAssignedUser_shouldReturnEditableAndNotDeletableDocumentationUnit() {
     Optional<DocumentationUnitDTO> documentationUnitDTO =
-        repository.findByDocumentNumber("documentNumber2");
+        repository.findByDocumentNumber("docNumber00002");
     Optional<ProcedureDTO> procedureDTO =
         procedureRepository.findAllByLabelAndDocumentationOffice("procedure1", docOfficeDTO);
     Optional<DocumentationOfficeUserGroupDTO> userGroupDTO =

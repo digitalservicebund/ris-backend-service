@@ -47,7 +47,8 @@ public class ProcedureController {
         query,
         userService.getDocumentationOffice(oidcUser),
         PageRequest.of(page.orElse(0), size),
-        withDocUnits);
+        withDocUnits,
+        oidcUser);
   }
 
   @GetMapping(value = "/{procedureUUID}/documentunits", produces = MediaType.APPLICATION_JSON_VALUE)

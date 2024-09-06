@@ -12,7 +12,8 @@ public interface ProcedureService {
       Optional<String> query,
       DocumentationOffice documentationOffice,
       Pageable pageable,
-      Optional<Boolean> withDocUnits);
+      Optional<Boolean> withDocUnits,
+      OidcUser oidcUser);
 
   List<DocumentationUnitListItem> getDocumentationUnits(UUID procedureId, OidcUser oidcUser);
 
