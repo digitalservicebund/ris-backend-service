@@ -71,15 +71,15 @@ const suffix = computed({
   },
 })
 
-function mergeCitation(): string | undefined {
+function buildCitation(): string | undefined {
   if (StringsUtil.isEmpty(reference.value.citation)) {
     return undefined
+  } else {
+    return StringsUtil.mergeNonBlankStrings(
+      [prefix.value, reference.value.citation, suffix.value],
+      "",
+    )
   }
-  return [
-    ...(prefix.value ? [prefix.value] : []),
-    ...(reference.value.citation ? [reference.value.citation] : []),
-    ...(suffix.value ? [suffix.value] : []),
-  ].join("")
 }
 
 function updateDateFormatValidation(
@@ -141,7 +141,7 @@ async function addReference(decision: RelatedDocumentation) {
   relatedDocumentationUnit.value = new RelatedDocumentation({ ...decision })
   const newReference: Reference = new Reference({
     id: reference.value.id,
-    citation: props.isSaved ? reference.value.citation : mergeCitation(),
+    citation: props.isSaved ? reference.value.citation : buildCitation(),
     referenceSupplement: reference.value.referenceSupplement,
     footnote: reference.value.footnote,
     legalPeriodical: reference.value.legalPeriodical,
