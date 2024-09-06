@@ -204,10 +204,9 @@ const fieldsMissing = computed(() => {
                 </div>
               </div>
               <div class="ds-label-section text-gray-900">ALS</div>
-              <!-- <CodeSnippet v-if="!!item?.xml" :title="item.attachments?.[0].fileName!" :xml="item.attachments?.[0].fileContent!" /> -->
               <CodeSnippet
                 v-if="!!item?.xml"
-                title="XML"
+                :title="item.attachments?.[0].fileName!"
                 :xml="item.attachments?.[0].fileContent!"
               />
             </div>

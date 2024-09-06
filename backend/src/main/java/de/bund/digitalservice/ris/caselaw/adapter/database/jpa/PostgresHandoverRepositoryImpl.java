@@ -7,6 +7,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 /** Postgres Repository for performed jDV handover operations. */
 @Repository
@@ -34,6 +35,7 @@ public class PostgresHandoverRepositoryImpl implements HandoverRepository {
    * @return the saved handover event
    */
   @Override
+  @Transactional
   public HandoverMail save(HandoverMail handoverMail) {
     DocumentationUnitDTO documentationUnitDTO =
         documentationUnitRepository.findById(handoverMail.entityId()).orElseThrow();
@@ -53,6 +55,7 @@ public class PostgresHandoverRepositoryImpl implements HandoverRepository {
    * @return the handover events
    */
   @Override
+  @Transactional
   public List<HandoverMail> getHandoversByEntity(UUID entityId, HandoverEntityType entityType) {
 
     switch (entityType) {
@@ -77,6 +80,7 @@ public class PostgresHandoverRepositoryImpl implements HandoverRepository {
    * @return the last handover event
    */
   @Override
+  @Transactional
   public HandoverMail getLastXmlHandoverMail(UUID documentationUnitId) {
     DocumentationUnitDTO documentationUnitDTO =
         documentationUnitRepository.findById(documentationUnitId).orElseThrow();
