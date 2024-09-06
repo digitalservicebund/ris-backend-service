@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -18,7 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -60,7 +60,7 @@ class AuthServiceTest {
     Function<String, Boolean> result = service.userHasReadAccessByDocumentNumber();
 
     // Assert
-    Assertions.assertEquals(true, result.apply("DOC12345"));
+    assertThat(result.apply("DOC12345")).isTrue();
   }
 
   @Test
@@ -79,7 +79,7 @@ class AuthServiceTest {
     Function<String, Boolean> result = service.userHasReadAccessByDocumentNumber();
 
     // Assert
-    Assertions.assertEquals(true, result.apply("DOC12345"));
+    assertThat(result.apply("DOC12345")).isTrue();
   }
 
   @Test
@@ -104,7 +104,7 @@ class AuthServiceTest {
     Function<String, Boolean> result = service.userHasReadAccessByDocumentNumber();
 
     // Assert
-    Assertions.assertEquals(true, result.apply(documentNumber));
+    assertThat(result.apply(documentNumber)).isTrue();
   }
 
   @Test
@@ -116,7 +116,7 @@ class AuthServiceTest {
     Function<OidcUser, Boolean> result = service.userIsInternal();
 
     // Assert
-    Assertions.assertEquals(true, result.apply(oidcUser));
+    assertThat(result.apply(oidcUser)).isTrue();
   }
 
   @Test
@@ -128,7 +128,7 @@ class AuthServiceTest {
     Function<OidcUser, Boolean> result = service.userIsInternal();
 
     // Assert
-    Assertions.assertEquals(false, result.apply(oidcUser));
+    assertThat(result.apply(oidcUser)).isFalse();
   }
 
   @Test
@@ -147,11 +147,11 @@ class AuthServiceTest {
     Function<UUID, Boolean> result = service.userHasWriteAccessByProcedureId();
 
     // Assert
-    Assertions.assertEquals(true, result.apply(uuid));
+    assertThat(result.apply(uuid)).isTrue();
   }
 
   @Test
-  void testUserHasWriteAccessByProcedureId_withOtherDocOffice_shouldReturnTrue() {
+  void testUserHasWriteAccessByProcedureId_withOtherDocOffice_shouldReturnFalse() {
     // Arrange
     UUID uuid = UUID.randomUUID();
     when(procedureService.getDocumentationOfficeByUUID(uuid))
@@ -166,7 +166,7 @@ class AuthServiceTest {
     Function<UUID, Boolean> result = service.userHasWriteAccessByProcedureId();
 
     // Assert
-    Assertions.assertEquals(false, result.apply(uuid));
+    assertThat(result.apply(uuid)).isFalse();
   }
 
   @Test
@@ -179,7 +179,7 @@ class AuthServiceTest {
     Function<UUID, Boolean> result = service.userHasSameDocumentationOffice();
 
     // Assert
-    Assertions.assertEquals(false, result.apply(uuid));
+    assertThat(result.apply(uuid)).isFalse();
   }
 
   @Test
@@ -201,7 +201,7 @@ class AuthServiceTest {
     Function<UUID, Boolean> result = service.userHasSameDocumentationOffice();
 
     // Assert
-    Assertions.assertEquals(true, result.apply(uuid));
+    assertThat(result.apply(uuid)).isTrue();
   }
 
   @Test
@@ -214,7 +214,7 @@ class AuthServiceTest {
     Function<UUID, Boolean> result = service.isAssignedViaProcedure();
 
     // Assert
-    Assertions.assertEquals(false, result.apply(uuid));
+    assertThat(result.apply(uuid)).isFalse();
   }
 
   @Test
@@ -241,7 +241,7 @@ class AuthServiceTest {
     Function<UUID, Boolean> result = service.isAssignedViaProcedure();
 
     // Assert
-    Assertions.assertEquals(true, result.apply(documentationUnitId));
+    assertThat(result.apply(documentationUnitId)).isTrue();
   }
 
   @Test
@@ -268,7 +268,7 @@ class AuthServiceTest {
     Function<UUID, Boolean> result = service.isAssignedViaProcedure();
 
     // Assert
-    Assertions.assertEquals(false, result.apply(documentationUnitId));
+    assertThat(result.apply(documentationUnitId)).isFalse();
   }
 
   @ParameterizedTest
@@ -297,7 +297,7 @@ class AuthServiceTest {
     Function<RisJsonPatch, Boolean> result = service.isPatchAllowedForExternalUsers();
 
     // Assert
-    Assertions.assertEquals(true, result.apply(patch));
+    assertThat(result.apply(patch)).isTrue();
   }
 
   @ParameterizedTest
@@ -337,7 +337,7 @@ class AuthServiceTest {
     Function<RisJsonPatch, Boolean> result = service.isPatchAllowedForExternalUsers();
 
     // Assert
-    Assertions.assertEquals(false, result.apply(patch));
+    assertThat(result.apply(patch)).isFalse();
   }
 
   @Test
@@ -360,7 +360,7 @@ class AuthServiceTest {
     Function<RisJsonPatch, Boolean> result = service.isPatchAllowedForExternalUsers();
 
     // Assert
-    Assertions.assertEquals(true, result.apply(patch));
+    assertThat(result.apply(patch)).isTrue();
   }
 
   @Test
@@ -381,6 +381,6 @@ class AuthServiceTest {
     Function<RisJsonPatch, Boolean> result = service.isPatchAllowedForExternalUsers();
 
     // Assert
-    Assertions.assertEquals(false, result.apply(patch));
+    assertThat(result.apply(patch)).isFalse();
   }
 }
