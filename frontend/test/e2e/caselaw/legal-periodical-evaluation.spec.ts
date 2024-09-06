@@ -368,13 +368,9 @@ test.describe(
           await fillInput(page, "Klammernzusatz", "L")
           await page.getByLabel("Fundstelle vermerken", { exact: true }).click()
 
-          // TODO should be fixed
-          if (false)
-            await expect(
-              page.getByText("MMG 2021, 2, Heft 1 (L)", { exact: true }),
-            ).toBeVisible()
-
-          // TODO test Abbrechen
+          await expect(
+            page.getByText("MMG 2021, 2, Heft 1 (L)", { exact: true }),
+          ).toBeVisible()
         })
 
         await test.step("Changes to the citation are visible in the documentation unit's preview ", async () => {
