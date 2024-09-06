@@ -34,6 +34,17 @@ export const navigateToSearch = async (
   })
 }
 
+export const navigateToProcedures = async (
+  page: Page,
+  searchParam?: string,
+) => {
+  await test.step("Navigate to 'Vorgänge'", async () => {
+    const urlPostFix = searchParam ? `?q=${searchParam}` : ""
+    await page.goto(`/caselaw/procedures` + urlPostFix)
+    await expect(page.getByLabel("Nach Vorgängen suchen")).toBeVisible()
+  })
+}
+
 export const navigateToCategories = async (
   page: Page,
   documentNumber: string,
