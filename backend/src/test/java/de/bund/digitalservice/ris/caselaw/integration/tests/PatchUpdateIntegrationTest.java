@@ -17,15 +17,19 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGenerato
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabasePatchMapperService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
+import de.bund.digitalservice.ris.caselaw.adapter.ProcedureController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeUserGroupRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitPatchRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRelatedDocumentationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
@@ -37,10 +41,13 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverR
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RelatedDocumentationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
@@ -48,15 +55,17 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
-import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
+import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.groups.Tuple;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -66,6 +75,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -82,6 +92,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseDocumentNumberRecyclingService.class,
       DatabaseDocumentationUnitStatusService.class,
       DatabasePatchMapperService.class,
+      DatabaseProcedureService.class,
       PostgresDocumentationUnitRepositoryImpl.class,
       PostgresHandoverReportRepositoryImpl.class,
       PostgresJPAConfig.class,
@@ -91,7 +102,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       TestConfig.class,
       DocumentNumberPatternConfig.class
     },
-    controllers = {DocumentationUnitController.class})
+    controllers = {DocumentationUnitController.class, ProcedureController.class})
 @Slf4j
 @SuppressWarnings("java:S5961")
 class PatchUpdateIntegrationTest {
@@ -115,6 +126,8 @@ class PatchUpdateIntegrationTest {
   @Autowired private DatabaseRegionRepository regionRepository;
   @Autowired private DatabaseRelatedDocumentationRepository relatedDocumentationRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  @Autowired private DatabaseProcedureRepository procedureRepository;
+  @Autowired private DatabaseDocumentationOfficeUserGroupRepository userGroupRepository;
   @Autowired private ObjectMapper objectMapper;
 
   @MockBean private S3AsyncClient s3AsyncClient;
@@ -125,7 +138,6 @@ class PatchUpdateIntegrationTest {
   @MockBean AttachmentService attachmentService;
   @MockBean private HandoverService handoverService;
   @MockBean private DocumentationUnitDocxMetadataInitializationService initializationService;
-  @MockBean private ProcedureService procedureService;
   @MockBean private DocumentationOfficeUserGroupService documentationOfficeUserGroupService;
 
   private UUID court1Id;
@@ -179,6 +191,8 @@ class PatchUpdateIntegrationTest {
     repository.deleteAll();
     courtRepository.deleteAll();
     regionRepository.deleteAll();
+    userGroupRepository.deleteAll();
+    procedureRepository.deleteAll();
   }
 
   @Test
@@ -4064,6 +4078,163 @@ class PatchUpdateIntegrationTest {
           .containsExactly(
               Tuple.tuple(0L, "[{\"op\":\"remove\",\"path\":\"/previousDecisions/0\"}]"));
       TestTransaction.end();
+    }
+  }
+
+  @Nested
+  @Sql(
+      scripts = {
+        "classpath:doc_office_init.sql",
+        "classpath:user_group_init.sql",
+        "classpath:procedures_init.sql",
+      })
+  class AuthorizationForExternalUsers {
+    @Test
+    @Transactional
+    void
+        test_partialUpdateByUuid_withAssignedExternalUserAndAllowedOperations_shouldApplyOperations() {
+      // Arrange
+      TestTransaction.flagForCommit();
+      TestTransaction.end();
+      DocumentationUnitDTO docUnitDTO = repository.findByDocumentNumber("1234567890123").get();
+      docUnitDTO.setHeadline("oldHeadline");
+      docUnitDTO.setGuidingPrinciple("guidingPrinciple");
+      repository.save(docUnitDTO);
+      assignProcedure(docUnitDTO);
+
+      // Act
+      risWebTestClient
+          .withExternalLogin()
+          .patch()
+          .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
+          .bodyValue(RisJsonPatch.builder().patch(new JsonPatch(getAllowedOperations())).build())
+          .exchange()
+          .expectStatus()
+          .is2xxSuccessful()
+          .expectBody(RisJsonPatch.class);
+
+      TestTransaction.start();
+      DocumentationUnitDTO result = repository.findById(docUnitDTO.getId()).get();
+
+      // Assert
+      assertThat(result.getDecisionNames().get(0).getValue()).isEqualTo("decisionName");
+      assertThat(result.getHeadline()).isEqualTo("newHeadline");
+      assertThat(result.getGuidingPrinciple()).isNull();
+      TestTransaction.end();
+    }
+
+    @Test
+    void
+        test_partialUpdateByUuid_withAssignedExternalUserAndAtLeastOneProhibitedOperation_shouldBeForbidden() {
+      // Arrange
+      DocumentationUnitDTO docUnitDTO = repository.findByDocumentNumber("1234567890123").get();
+      assignProcedure(docUnitDTO);
+
+      // Act
+      risWebTestClient
+          .withExternalLogin()
+          .patch()
+          .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
+          .bodyValue(
+              RisJsonPatch.builder()
+                  .patch(new JsonPatch(getAtLeastOneProhibitedOperation()))
+                  .build())
+          .exchange()
+          .expectStatus()
+          // Assert
+          .isForbidden();
+    }
+
+    @Test
+    void
+        test_partialUpdateByUuid_withUnassignedExternalUserAndAllowedOperations_shouldBeForbidden() {
+      // Arrange
+      DocumentationUnitDTO docUnitDTO = repository.findByDocumentNumber("1234567890123").get();
+
+      // Act
+      risWebTestClient
+          .withExternalLogin()
+          .patch()
+          .uri("/api/v1/caselaw/documentunits/" + docUnitDTO.getId())
+          .bodyValue(RisJsonPatch.builder().patch(new JsonPatch(getAllowedOperations())).build())
+          .exchange()
+          .expectStatus()
+          // Assert
+          .isForbidden();
+    }
+
+    private void assignProcedure(DocumentationUnitDTO docUnitDTO) {
+      DocumentationOffice documentationOffice =
+          DocumentationOfficeTransformer.transformToDomain(docUnitDTO.getDocumentationOffice());
+      UUID procedureId = addProcedureToDocUnit(docUnitDTO, documentationOffice);
+      UUID userGroupId = userGroupRepository.findAll().get(0).getId();
+
+      risWebTestClient
+          .withDefaultLogin()
+          .put()
+          .uri("/api/v1/caselaw/procedure/" + procedureId + "/assign/" + userGroupId)
+          .exchange()
+          .expectStatus()
+          .is2xxSuccessful();
+    }
+
+    @NotNull
+    private static List<JsonPatchOperation> getAllowedOperations() {
+      JsonNode decisionName = new TextNode("decisionName");
+      JsonNode newHeadline = new TextNode("newHeadline");
+      String firstAllowedPath = "/texts/decisionName";
+      String secondAllowedPath = "/texts/headline";
+      String thirdAllowedPath = "/texts/guidingPrinciple";
+      return List.of(
+          new AddOperation(firstAllowedPath, decisionName),
+          new ReplaceOperation(secondAllowedPath, newHeadline),
+          new RemoveOperation(thirdAllowedPath));
+    }
+
+    @NotNull
+    private static List<JsonPatchOperation> getAtLeastOneProhibitedOperation() {
+      JsonNode decisionName = new TextNode("decisionName");
+      JsonNode newHeadline = new TextNode("newHeadline");
+      String firstAllowedPath = "/texts/decisionName";
+      String secondAllowedPath = "/texts/headline";
+      String prohibitedPath = "/coreData/court";
+      return List.of(
+          new AddOperation(firstAllowedPath, decisionName),
+          new ReplaceOperation(secondAllowedPath, newHeadline),
+          new RemoveOperation(prohibitedPath));
+    }
+
+    private UUID addProcedureToDocUnit(
+        DocumentationUnitDTO documentationUnitDTO, DocumentationOffice docOffice) {
+      DocumentationUnit documentationUnitFromFrontend =
+          DocumentationUnit.builder()
+              .uuid(documentationUnitDTO.getId())
+              .documentNumber(documentationUnitDTO.getDocumentNumber())
+              .coreData(
+                  CoreData.builder()
+                      .procedure(Procedure.builder().label("procedure1").build())
+                      .documentationOffice(docOffice)
+                      .build())
+              .build();
+
+      AtomicReference<UUID> procedureId = new AtomicReference<>();
+      risWebTestClient
+          .withDefaultLogin()
+          .put()
+          .uri("/api/v1/caselaw/documentunits/" + documentationUnitDTO.getId())
+          .bodyValue(documentationUnitFromFrontend)
+          .exchange()
+          .expectStatus()
+          .is2xxSuccessful()
+          .expectBody(DocumentationUnit.class)
+          .consumeWith(
+              response -> {
+                CoreData coreData = response.getResponseBody().coreData();
+                assertThat(coreData.procedure().label()).isEqualTo("procedure1");
+                procedureId.set(coreData.procedure().id());
+              });
+
+      return procedureId.get();
     }
   }
 

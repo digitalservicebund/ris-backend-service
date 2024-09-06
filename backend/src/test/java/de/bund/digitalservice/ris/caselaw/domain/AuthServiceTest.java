@@ -3,15 +3,26 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import com.gravity9.jsonpatch.AddOperation;
+import com.gravity9.jsonpatch.JsonPatch;
+import com.gravity9.jsonpatch.JsonPatchOperation;
+import com.gravity9.jsonpatch.RemoveOperation;
+import com.gravity9.jsonpatch.ReplaceOperation;
+import com.gravity9.jsonpatch.TestOperation;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
@@ -156,5 +167,220 @@ class AuthServiceTest {
 
     // Assert
     Assertions.assertEquals(false, result.apply(uuid));
+  }
+
+  @Test
+  void test_userHasSameDocumentationOffice_withoutDocumentationUnit_shouldReturnFalse() {
+    // Arrange
+    UUID uuid = UUID.randomUUID();
+    when(documentationUnitService.getByUuid(uuid)).thenReturn(null);
+
+    // Act
+    Function<UUID, Boolean> result = service.userHasSameDocumentationOffice();
+
+    // Assert
+    Assertions.assertEquals(false, result.apply(uuid));
+  }
+
+  @Test
+  void test_userHasSameDocumentationOffice_withSameDocumentationOffice_shouldReturnTrue() {
+    // Arrange
+    UUID uuid = UUID.randomUUID();
+    DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
+    SecurityContextHolder.setContext(securityContext);
+    when(documentationUnitService.getByUuid(uuid))
+        .thenReturn(
+            DocumentationUnit.builder()
+                .coreData(CoreData.builder().documentationOffice(documentationOffice).build())
+                .build());
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    when(authentication.getPrincipal()).thenReturn(oidcUser);
+    when(userService.getDocumentationOffice(oidcUser)).thenReturn(documentationOffice);
+
+    // Act
+    Function<UUID, Boolean> result = service.userHasSameDocumentationOffice();
+
+    // Assert
+    Assertions.assertEquals(true, result.apply(uuid));
+  }
+
+  @Test
+  void test_isAssignedViaProcedure_withoutDocumentationUnit_shouldReturnFalse() {
+    // Arrange
+    UUID uuid = UUID.randomUUID();
+    when(documentationUnitService.getByUuid(uuid)).thenReturn(null);
+
+    // Act
+    Function<UUID, Boolean> result = service.isAssignedViaProcedure();
+
+    // Assert
+    Assertions.assertEquals(false, result.apply(uuid));
+  }
+
+  @Test
+  void test_isAssignedViaProcedure_withAssignedProcedure_shouldReturnTrue() {
+    // Arrange
+    UUID documentationUnitId = UUID.randomUUID();
+    UUID userGroupId = UUID.randomUUID();
+    SecurityContextHolder.setContext(securityContext);
+    when(documentationUnitService.getByUuid(documentationUnitId))
+        .thenReturn(
+            DocumentationUnit.builder()
+                .coreData(
+                    CoreData.builder()
+                        .procedure(Procedure.builder().userGroupId(userGroupId).build())
+                        .build())
+                .build());
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    when(authentication.getPrincipal()).thenReturn(oidcUser);
+    when(userService.getUserGroup(oidcUser))
+        .thenReturn(
+            Optional.ofNullable(DocumentationOfficeUserGroup.builder().id(userGroupId).build()));
+
+    // Act
+    Function<UUID, Boolean> result = service.isAssignedViaProcedure();
+
+    // Assert
+    Assertions.assertEquals(true, result.apply(documentationUnitId));
+  }
+
+  @Test
+  void test_isAssignedViaProcedure_withUnAssignedProcedure_shouldReturnFalse() {
+    // Arrange
+    UUID documentationUnitId = UUID.randomUUID();
+    UUID userGroupId = UUID.randomUUID();
+    SecurityContextHolder.setContext(securityContext);
+    when(documentationUnitService.getByUuid(documentationUnitId))
+        .thenReturn(
+            DocumentationUnit.builder()
+                .coreData(
+                    CoreData.builder()
+                        .procedure(Procedure.builder().userGroupId(null).build())
+                        .build())
+                .build());
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    when(authentication.getPrincipal()).thenReturn(oidcUser);
+    when(userService.getUserGroup(oidcUser))
+        .thenReturn(
+            Optional.ofNullable(DocumentationOfficeUserGroup.builder().id(userGroupId).build()));
+
+    // Act
+    Function<UUID, Boolean> result = service.isAssignedViaProcedure();
+
+    // Assert
+    Assertions.assertEquals(false, result.apply(documentationUnitId));
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/previousDecisions",
+        "/ensuingDecisions",
+        "/contentRelatedIndexing/keywords",
+        "/contentRelatedIndexing/fieldsOfLaw",
+        "/contentRelatedIndexing/norms",
+        "/contentRelatedIndexing/activeCitations",
+        "/texts/decisionName",
+        "/texts/headline",
+        "/texts/guidingPrinciple",
+        "/texts/headnote",
+        "/texts/otherHeadnote",
+        "/note",
+        "/version"
+      })
+  void test_isPatchAllowedForExternalUsers_withAllowedPath_shouldReturnTrue(String path) {
+    // Arrange
+    List<JsonPatchOperation> operations = List.of(new AddOperation(path, new TextNode("anyValue")));
+    RisJsonPatch patch = RisJsonPatch.builder().patch(new JsonPatch(operations)).build();
+
+    // Act
+    Function<RisJsonPatch, Boolean> result = service.isPatchAllowedForExternalUsers();
+
+    // Assert
+    Assertions.assertEquals(true, result.apply(patch));
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/coreData/court",
+        "/coreData/deviatingCourts",
+        "/coreData/fileNumbers",
+        "/coreData/deviatingFileNumbers",
+        "/coreData/decisionDate",
+        "/coreData/deviatingDecisionDates",
+        "/coreData/appraisalBody",
+        "/coreData/documentType",
+        "/coreData/ecli",
+        "/coreData/deviatingEclis",
+        "/coreData/procedure",
+        "/coreData/procedure/createdAt",
+        "/coreData/procedure/documentationUnitCount",
+        "/coreData/procedure/label",
+        "/coreData/procedure/id",
+        "/coreData/legalEffect",
+        "/coreData/leadingDecisionNormReferences",
+        "/coreData/yearsOfDispute",
+        "/texts/tenor",
+        "/texts/reasons",
+        "/texts/caseFacts",
+        "/texts/decisionReasons",
+        "/texts/dissentingOpinion",
+        "/texts/otherLongText"
+      })
+  void test_isPatchAllowedForExternalUsers_withProhibitedPath_shouldReturnFalse(String path) {
+    // Arrange
+    List<JsonPatchOperation> operations = List.of(new AddOperation(path, new TextNode("anyValue")));
+    RisJsonPatch patch = RisJsonPatch.builder().patch(new JsonPatch(operations)).build();
+
+    // Act
+    Function<RisJsonPatch, Boolean> result = service.isPatchAllowedForExternalUsers();
+
+    // Assert
+    Assertions.assertEquals(false, result.apply(patch));
+  }
+
+  @Test
+  void test_isPatchAllowedForExternalUsers_withProhibitedPathInTestOperation_shouldReturnTrue() {
+    // Arrange
+    JsonNode anyValue = new TextNode("newValue");
+    String firstAllowedPath = "/previousDecisions";
+    String secondAllowedPath = "/ensuingDecisions";
+    String thirdAllowedPath = "/contentRelatedIndexing/keywords";
+    String prohibitedPath = "/coreData/court";
+    List<JsonPatchOperation> operations =
+        List.of(
+            new AddOperation(firstAllowedPath, new TextNode("anyValue")),
+            new ReplaceOperation(secondAllowedPath, anyValue),
+            new RemoveOperation(thirdAllowedPath),
+            new TestOperation(prohibitedPath, anyValue));
+    RisJsonPatch patch = RisJsonPatch.builder().patch(new JsonPatch(operations)).build();
+
+    // Act
+    Function<RisJsonPatch, Boolean> result = service.isPatchAllowedForExternalUsers();
+
+    // Assert
+    Assertions.assertEquals(true, result.apply(patch));
+  }
+
+  @Test
+  void test_isPatchAllowedForExternalUsers_withAtLeastOneProhibitedPath_shouldReturnFalse() {
+    // Arrange
+    JsonNode anyValue = new TextNode("newValue");
+    String firstAllowedPath = "/previousDecisions";
+    String secondAllowedPath = "/ensuingDecisions";
+    String prohibitedPath = "/coreData/court";
+    List<JsonPatchOperation> operations =
+        List.of(
+            new AddOperation(firstAllowedPath, new TextNode("anyValue")),
+            new ReplaceOperation(secondAllowedPath, anyValue),
+            new RemoveOperation(prohibitedPath));
+    RisJsonPatch patch = RisJsonPatch.builder().patch(new JsonPatch(operations)).build();
+
+    // Act
+    Function<RisJsonPatch, Boolean> result = service.isPatchAllowedForExternalUsers();
+
+    // Assert
+    Assertions.assertEquals(false, result.apply(patch));
   }
 }
