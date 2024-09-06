@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
@@ -29,6 +30,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class LegalPeriodicalEditionControllerTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @MockBean private LegalPeriodicalEditionService service;
+
+  @MockBean private HandoverService handoverService;
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
 
   private final String EDITION_ENDPOINT = "/api/v1/caselaw/legalperiodicaledition";

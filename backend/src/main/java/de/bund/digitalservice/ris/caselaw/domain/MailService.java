@@ -7,7 +7,9 @@ public interface MailService {
   HandoverMail handOver(
       DocumentationUnit documentationUnit, String receiverAddress, String issuerAddress);
 
-  List<HandoverMail> getHandoverResult(UUID documentationUnitId);
+  List<HandoverMail> getHandoverResult(UUID documentationUnitId, HandoverEntityType entityType);
 
   XmlTransformationResult getXmlPreview(DocumentationUnit documentationUnit);
+
+  List<XmlTransformationResult> getXmlPreview(LegalPeriodicalEdition edition);
 }

@@ -2,7 +2,7 @@
 import { onMounted, ref } from "vue"
 import HandoverEditionView from "@/components/HandoverEditionView.vue"
 import EventRecord from "@/domain/eventRecord"
-import handoverEditionService from "@/services/handoverEditionService"
+import HandoverEditionService from "@/services/handoverEditionService"
 import { ResponseError } from "@/services/httpClient"
 import { useEditionStore } from "@/stores/editionStore"
 
@@ -35,7 +35,7 @@ onMounted(async () => {
   if (!store.edition) {
     return
   }
-  const response = await handoverEditionService.getEventLog(store.edition.id!)
+  const response = await HandoverEditionService.getEventLog(store.edition.id!)
   if (!response.error && response.data) {
     eventLog.value = response.data
     for (const item of eventLog.value) {

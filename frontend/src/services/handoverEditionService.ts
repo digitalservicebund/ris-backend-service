@@ -2,16 +2,16 @@ import httpClient, { ServiceResponse } from "./httpClient"
 import EventRecord from "@/domain/eventRecord"
 import errorMessages from "@/i18n/errors.json"
 
-interface handoverEditionService {
+interface HandoverEditionService {
   handoverEdition(editionId: string): Promise<ServiceResponse<EventRecord>>
   getEventLog(editionId: string): Promise<ServiceResponse<EventRecord[]>>
-  getPreview(editionId: string): Promise<ServiceResponse<EventRecord>>
+  getPreview(editionId: string): Promise<ServiceResponse<EventRecord[]>>
 }
 
-const service: handoverEditionService = {
+const service: HandoverEditionService = {
   async handoverEdition(editionId: string) {
     const response = await httpClient.put<string, EventRecord>(
-      `caselaw/periodical-evaluation/${editionId}/handover`,
+      `caselaw/legalperiodicaledition/${editionId}/handover`,
       {
         headers: { "Content-Type": "text/plain" },
       },
@@ -50,7 +50,7 @@ const service: handoverEditionService = {
 
   async getEventLog(editionId?: string) {
     const response = await httpClient.get<EventRecord[]>(
-      `caselaw/periodical-evaluation/${editionId}/handover`,
+      `caselaw/legalperiodicaledition/${editionId}/handover`,
     )
 
     response.error =
@@ -66,18 +66,25 @@ const service: handoverEditionService = {
   },
 
   async getPreview(editionId?: string) {
-    const response = await httpClient.get<EventRecord>(
-      `caselaw/periodical-evaluation/${editionId}/preview-xml`,
+    const response = await httpClient.get<EventRecord[]>(
+      `caselaw/legalperiodicaledition/${editionId}/preview-xml`,
     )
 
-    if (response.status >= 300 || !response.data?.success) {
+    const unsuccessfulRecords =
+      response.data?.filter((record) => !record.success) || []
+
+    if (
+      response.status >= 300 ||
+      !response.data ||
+      unsuccessfulRecords.length > 0
+    ) {
       response.error = {
         title: errorMessages.EDITION_LOADING_XML_PREVIEW.title,
         description:
-          response.data?.statusMessages &&
-          response.data.statusMessages.length > 0
-            ? response.data?.statusMessages
-            : errorMessages.EDITION_LOADING_XML_PREVIEW.description,
+          unsuccessfulRecords
+            .flatMap((record) => record.statusMessages)
+            .join(", ") ||
+          errorMessages.EDITION_LOADING_XML_PREVIEW.description,
       }
     }
 

@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.HandoverMailTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
 import java.util.List;
@@ -14,12 +15,16 @@ public class PostgresHandoverRepositoryImpl implements HandoverRepository {
   private final DatabaseXmlHandoverMailRepository repository;
   private final DatabaseDocumentationUnitRepository documentationUnitRepository;
 
+  private final DatabaseLegalPeriodicalEditionRepository editionRepository;
+
   public PostgresHandoverRepositoryImpl(
       DatabaseXmlHandoverMailRepository repository,
-      DatabaseDocumentationUnitRepository documentationUnitRepository) {
+      DatabaseDocumentationUnitRepository documentationUnitRepository,
+      DatabaseLegalPeriodicalEditionRepository legalPeriodicalEditionRepository) {
 
     this.repository = repository;
     this.documentationUnitRepository = documentationUnitRepository;
+    this.editionRepository = legalPeriodicalEditionRepository;
   }
 
   /**
@@ -31,34 +36,37 @@ public class PostgresHandoverRepositoryImpl implements HandoverRepository {
   @Override
   public HandoverMail save(HandoverMail handoverMail) {
     DocumentationUnitDTO documentationUnitDTO =
-        documentationUnitRepository.findById(handoverMail.documentationUnitId()).orElseThrow();
+        documentationUnitRepository.findById(handoverMail.entityId()).orElseThrow();
 
     HandoverMailDTO handoverMailDTO =
         HandoverMailTransformer.transformToDTO(handoverMail, documentationUnitDTO.getId());
     handoverMailDTO = repository.save(handoverMailDTO);
 
-    return HandoverMailTransformer.transformToDomain(
-        handoverMailDTO, handoverMail.documentationUnitId());
+    return HandoverMailTransformer.transformToDomain(handoverMailDTO, handoverMail.entityId());
   }
 
   /**
    * Retrieves all handover events for a documentation unit.
    *
-   * @param documentationUnitId the documentation unit UUID
+   * @param entityId the documentation unit UUID
+   * @param entityType the entity type (documentation unit or edition)
    * @return the handover events
    */
   @Override
-  public List<HandoverMail> getHandoversByDocumentationUnitId(UUID documentationUnitId) {
-    DocumentationUnitDTO documentationUnitDTO =
-        documentationUnitRepository.findById(documentationUnitId).orElseThrow();
+  public List<HandoverMail> getHandoversByEntity(UUID entityId, HandoverEntityType entityType) {
+
+    switch (entityType) {
+      case DOCUMENTATION_UNIT -> documentationUnitRepository.findById(entityId).orElseThrow();
+      case EDITION -> editionRepository.findById(entityId).orElseThrow();
+      default -> throw new IllegalArgumentException("Unsupported entity type: " + entityType);
+    }
 
     List<HandoverMailDTO> handoverMailDTOS =
-        repository.findAllByDocumentationUnitIdOrderBySentDateDesc(documentationUnitDTO.getId());
+        repository.findAllByEntityIdOrderBySentDateDesc(entityId);
 
     return handoverMailDTOS.stream()
         .map(
-            handoverMailDTO ->
-                HandoverMailTransformer.transformToDomain(handoverMailDTO, documentationUnitId))
+            handoverMailDTO -> HandoverMailTransformer.transformToDomain(handoverMailDTO, entityId))
         .toList();
   }
 
@@ -74,7 +82,7 @@ public class PostgresHandoverRepositoryImpl implements HandoverRepository {
         documentationUnitRepository.findById(documentationUnitId).orElseThrow();
 
     HandoverMailDTO handoverMailDTO =
-        repository.findTopByDocumentationUnitIdOrderBySentDateDesc(documentationUnitDTO.getId());
+        repository.findTopByEntityIdOrderBySentDateDesc(documentationUnitDTO.getId());
 
     return HandoverMailTransformer.transformToDomain(handoverMailDTO, documentationUnitId);
   }

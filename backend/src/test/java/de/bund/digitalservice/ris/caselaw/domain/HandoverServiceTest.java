@@ -33,6 +33,8 @@ class HandoverServiceTest {
   @SpyBean private HandoverService service;
 
   @MockBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
+
+  @MockBean private LegalPeriodicalEditionRepository editionRepository;
   @MockBean private DocumentationUnitRepository repository;
   @MockBean private DocumentationUnitService documentationUnitService;
   @MockBean private DocumentNumberService documentNumberService;
@@ -50,13 +52,14 @@ class HandoverServiceTest {
         .thenReturn(Optional.ofNullable(DocumentationUnit.builder().build()));
     HandoverMail handoverMail =
         HandoverMail.builder()
-            .documentationUnitId(TEST_UUID)
+            .entityId(TEST_UUID)
+            .entityType(HandoverEntityType.DOCUMENTATION_UNIT)
             .receiverAddress("receiver address")
             .mailSubject("subject")
-            .xml("xml")
+            .attachments(
+                List.of(MailAttachment.builder().fileName("filename").fileContent("xml").build()))
             .success(true)
             .statusMessages(List.of("status messages"))
-            .fileName("filename")
             .handoverDate(Instant.now())
             .build();
     when(mailService.handOver(eq(DocumentationUnit.builder().build()), anyString(), anyString()))
@@ -83,16 +86,19 @@ class HandoverServiceTest {
   void testGetLastXmlHandoverMail() {
     HandoverMail handoverMail =
         HandoverMail.builder()
-            .documentationUnitId(TEST_UUID)
+            .entityId(TEST_UUID)
+            .entityType(HandoverEntityType.DOCUMENTATION_UNIT)
             .receiverAddress("receiver address")
             .mailSubject("subject")
-            .xml("xml")
+            .mailSubject("subject")
+            .attachments(
+                List.of(MailAttachment.builder().fileName("filename").fileContent("xml").build()))
             .success(true)
             .statusMessages(List.of("message"))
-            .fileName("filename")
             .handoverDate(Instant.now().minus(2, java.time.temporal.ChronoUnit.DAYS))
             .build();
-    when(mailService.getHandoverResult(TEST_UUID)).thenReturn(List.of(handoverMail));
+    when(mailService.getHandoverResult(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT))
+        .thenReturn(List.of(handoverMail));
     when(handoverReportRepository.getAllByDocumentationUnitUuid(TEST_UUID))
         .thenReturn(Collections.emptyList());
     DeltaMigration deltaMigration =
@@ -102,7 +108,7 @@ class HandoverServiceTest {
             .build();
     when(deltaMigrationRepository.getLatestMigration(TEST_UUID)).thenReturn(deltaMigration);
 
-    var actual = service.getEventLog(TEST_UUID);
+    var actual = service.getEventLog(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT);
     assertThat(actual.get(1)).usingRecursiveComparison().isEqualTo(handoverMail);
     assertThat(actual.get(0))
         .usingRecursiveComparison()
@@ -111,7 +117,7 @@ class HandoverServiceTest {
                 .xml("<?xml version=\"1.0\" encoding=\"UTF-8\"?><test>\n  <element/>\n</test>\n")
                 .build());
 
-    verify(mailService).getHandoverResult(TEST_UUID);
+    verify(mailService).getHandoverResult(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT);
     verify(deltaMigrationRepository).getLatestMigration(TEST_UUID);
   }
 
@@ -124,7 +130,7 @@ class HandoverServiceTest {
             .build();
     when(deltaMigrationRepository.getLatestMigration(TEST_UUID)).thenReturn(deltaMigration);
 
-    var actual = service.getEventLog(TEST_UUID);
+    var actual = service.getEventLog(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT);
     assertThat(actual.get(0))
         .usingRecursiveComparison()
         .isEqualTo(
@@ -140,13 +146,14 @@ class HandoverServiceTest {
     HandoverReport report = new HandoverReport("documentNumber", "<html></html>", Instant.now());
     when(handoverReportRepository.getAllByDocumentationUnitUuid(TEST_UUID))
         .thenReturn(List.of(report));
-    when(mailService.getHandoverResult(TEST_UUID)).thenReturn(List.of());
+    when(mailService.getHandoverResult(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT))
+        .thenReturn(List.of());
     when(deltaMigrationRepository.getLatestMigration(TEST_UUID)).thenReturn(null);
 
-    var events = service.getEventLog(TEST_UUID);
+    var events = service.getEventLog(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT);
     assertThat(events.get(0)).usingRecursiveComparison().isEqualTo(report);
 
-    verify(mailService).getHandoverResult(TEST_UUID);
+    verify(mailService).getHandoverResult(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT);
   }
 
   @Test
@@ -161,13 +168,15 @@ class HandoverServiceTest {
 
     HandoverMail xml1 =
         HandoverMail.builder()
-            .documentationUnitId(TEST_UUID)
+            .entityId(TEST_UUID)
+            .entityType(HandoverEntityType.DOCUMENTATION_UNIT)
             .receiverAddress("receiver address")
             .mailSubject("subject")
-            .xml("xml")
+            .mailSubject("subject")
+            .attachments(
+                List.of(MailAttachment.builder().fileName("filename").fileContent("xml").build()))
             .success(true)
             .statusMessages(List.of("message"))
-            .fileName("filename")
             .handoverDate(secondNewest)
             .build();
 
@@ -175,13 +184,15 @@ class HandoverServiceTest {
 
     HandoverMail xml2 =
         HandoverMail.builder()
-            .documentationUnitId(TEST_UUID)
+            .entityId(TEST_UUID)
+            .entityType(HandoverEntityType.DOCUMENTATION_UNIT)
             .receiverAddress("receiver address")
             .mailSubject("subject")
-            .xml("xml")
+            .mailSubject("subject")
+            .attachments(
+                List.of(MailAttachment.builder().fileName("filename").fileContent("xml").build()))
             .success(true)
             .statusMessages(List.of("message"))
-            .fileName("filename")
             .handoverDate(fourthNewest)
             .build();
 
@@ -189,17 +200,18 @@ class HandoverServiceTest {
 
     when(handoverReportRepository.getAllByDocumentationUnitUuid(TEST_UUID))
         .thenReturn(List.of(report2, report1));
-    when(mailService.getHandoverResult(TEST_UUID)).thenReturn(List.of(xml2, xml1));
+    when(mailService.getHandoverResult(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT))
+        .thenReturn(List.of(xml2, xml1));
     when(deltaMigrationRepository.getLatestMigration(TEST_UUID)).thenReturn(deltaMigration);
 
-    List<EventRecord> list = service.getEventLog(TEST_UUID);
+    List<EventRecord> list = service.getEventLog(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT);
     assertThat(list).hasSize(5);
     assertThat(list.get(0)).usingRecursiveComparison().isEqualTo(report1);
     assertThat(list.get(1)).usingRecursiveComparison().isEqualTo(xml1);
     assertThat(list.get(2)).usingRecursiveComparison().isEqualTo(report2);
     assertThat(list.get(3)).usingRecursiveComparison().isEqualTo(xml2);
     assertThat(list.get(4)).usingRecursiveComparison().isEqualTo(deltaMigration);
-    verify(mailService).getHandoverResult(TEST_UUID);
+    verify(mailService).getHandoverResult(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT);
   }
 
   @Test

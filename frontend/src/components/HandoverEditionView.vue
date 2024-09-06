@@ -6,7 +6,7 @@ import { InfoStatus } from "@/components/enumInfoStatus"
 import InfoModal from "@/components/InfoModal.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import EventRecord, { EventRecordType } from "@/domain/eventRecord"
-import handoverService from "@/services/handoverService"
+import HandoverEditionService from "@/services/handoverEditionService"
 import { ResponseError } from "@/services/httpClient"
 import { useEditionStore } from "@/stores/editionStore"
 import IconCheck from "~icons/ic/baseline-check"
@@ -32,7 +32,7 @@ const isFirstTimeHandover = computed(() => {
   return !props.eventLog || props.eventLog.length === 0
 })
 
-const preview = ref<EventRecord>()
+const preview = ref<EventRecord[]>()
 const frontendError = ref()
 const previewError = ref()
 const errorMessage = computed(
@@ -41,10 +41,13 @@ const errorMessage = computed(
 
 onMounted(async () => {
   if (fieldsMissing.value || !store.edition) return
-  const previewResponse = await handoverService.getPreview(store.edition.id!)
+  const previewResponse = await HandoverEditionService.getPreview(
+    store.edition.id!,
+  )
   if (previewResponse.error) {
     previewError.value = previewResponse.error
-  } else if (previewResponse.data?.xml) {
+  } else if (previewResponse.data) {
+    // TODO check success?
     preview.value = previewResponse.data
   }
 })
@@ -118,7 +121,7 @@ const fieldsMissing = computed(() => {
     <div class="border-b-1 border-b-gray-400"></div>
 
     <ExpandableContent
-      v-if="!fieldsMissing && preview?.success && !!preview?.xml"
+      v-if="!fieldsMissing && preview && preview.length > 0"
       as-column
       class="border-b-1 border-r-1 border-gray-400 bg-white p-10"
       :data-set="preview"
@@ -127,7 +130,14 @@ const fieldsMissing = computed(() => {
       :is-expanded="false"
       title="XML Vorschau"
     >
-      <CodeSnippet title="" :xml="preview.xml" />
+      <CodeSnippet
+        v-for="(item, index) in preview"
+        :key="index"
+        ref="preview"
+        title="Vorschau"
+        :value="item"
+        :xml="item.xml!"
+      />
     </ExpandableContent>
     <InfoModal
       v-if="errorMessage"
@@ -194,7 +204,12 @@ const fieldsMissing = computed(() => {
                 </div>
               </div>
               <div class="ds-label-section text-gray-900">ALS</div>
-              <CodeSnippet v-if="!!item?.xml" title="XML" :xml="item.xml" />
+              <!-- <CodeSnippet v-if="!!item?.xml" :title="item.attachments?.[0].fileName!" :xml="item.attachments?.[0].fileContent!" /> -->
+              <CodeSnippet
+                v-if="!!item?.xml"
+                title="XML"
+                :xml="item.attachments?.[0].fileContent!"
+              />
             </div>
           </ExpandableContent>
         </div>

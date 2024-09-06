@@ -23,6 +23,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
@@ -275,7 +276,8 @@ class DocumentationUnitControllerAuthTest {
   @Test
   void testGetEvents() {
     mockDocumentationUnit(docOffice1, null, Status.builder().publicationStatus(PUBLISHED).build());
-    when(handoverService.getEventLog(TEST_UUID)).thenReturn(List.of());
+    when(handoverService.getEventLog(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT))
+        .thenReturn(List.of());
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/handover";
 

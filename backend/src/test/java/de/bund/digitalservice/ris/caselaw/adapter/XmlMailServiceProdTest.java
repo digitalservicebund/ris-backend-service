@@ -58,26 +58,28 @@ class XmlMailServiceProdTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final HandoverMail EXPECTED_BEFORE_SAVE_PROD =
       HandoverMail.builder()
-          .documentationUnitId(TEST_UUID)
+          .entityId(TEST_UUID)
           .receiverAddress(RECEIVER_ADDRESS)
           .mailSubject(PROD_MAIL_SUBJECT)
-          .xml("xml")
+          .attachments(
+              Collections.singletonList(
+                  MailAttachment.builder().fileContent("xml").fileName("test.xml").build()))
           .success(true)
           .statusMessages(List.of("succeed"))
-          .fileName("test.xml")
           .handoverDate(CREATED_DATE)
           .issuerAddress(ISSUER_ADDRESS)
           .build();
 
   private static final HandoverMail SAVED_XML_MAIL_PROD =
       HandoverMail.builder()
-          .documentationUnitId(TEST_UUID)
+          .entityId(TEST_UUID)
           .receiverAddress(RECEIVER_ADDRESS)
           .mailSubject(PROD_MAIL_SUBJECT)
-          .xml("xml")
+          .attachments(
+              Collections.singletonList(
+                  MailAttachment.builder().fileContent("xml").fileName("test.xml").build()))
           .success(true)
           .statusMessages(List.of("succeed"))
-          .fileName("test.xml")
           .handoverDate(CREATED_DATE)
           .issuerAddress(ISSUER_ADDRESS)
           .build();
@@ -131,9 +133,9 @@ class XmlMailServiceProdTest {
             "neuris",
             Collections.singletonList(
                 MailAttachment.builder()
-                    .fileName(SAVED_XML_MAIL_PROD.fileName())
-                    .fileContent(SAVED_XML_MAIL_PROD.xml())
+                    .fileName(SAVED_XML_MAIL_PROD.attachments().get(0).fileName())
+                    .fileContent(SAVED_XML_MAIL_PROD.attachments().get(0).fileContent())
                     .build()),
-            SAVED_XML_MAIL_PROD.documentationUnitId().toString());
+            SAVED_XML_MAIL_PROD.entityId().toString());
   }
 }

@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHandoverExcept
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
@@ -296,7 +297,7 @@ public class DocumentationUnitController {
   @GetMapping(value = "/{uuid}/handover", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasSameDocumentationOffice.apply(#uuid)")
   public List<EventRecord> getEventLog(@PathVariable UUID uuid) {
-    return handoverService.getEventLog(uuid);
+    return handoverService.getEventLog(uuid, HandoverEntityType.DOCUMENTATION_UNIT);
   }
 
   /**
