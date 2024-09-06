@@ -7,29 +7,24 @@ import ErrorPage from "@/components/PageError.vue"
 import { usePeriodicalEvaluationMenuItems } from "@/composables/usePeriodicalEvaluationMenuItems"
 import { ResponseError } from "@/services/httpClient"
 import { useEditionStore } from "@/stores/editionStore"
+import StringsUtil from "@/utils/stringsUtil"
 
 const store = useEditionStore()
 const responseError = ref<ResponseError>()
 const route = useRoute()
 
 const periodicalEditionTitle = computed(() =>
-  [
-    "Periodikaauswertung",
-    ...(store.edition?.name || store.edition?.legalPeriodical?.abbreviation
-      ? "|"
-      : ""),
-    renderExtraInfo(),
-  ].join(" "),
+  StringsUtil.mergeNonBlankStrings(
+    [
+      "Periodikaauswertung",
+      StringsUtil.mergeNonBlankStrings(
+        [store.edition?.legalPeriodical?.abbreviation, store.edition?.name],
+        " ",
+      ),
+    ],
+    " | ",
+  ),
 )
-
-function renderExtraInfo() {
-  return [
-    store.edition?.legalPeriodical?.abbreviation || undefined,
-    store.edition?.name || undefined,
-  ]
-    .filter(Boolean)
-    .join(", ")
-}
 
 onMounted(async () => {
   const response = await store.loadEdition()

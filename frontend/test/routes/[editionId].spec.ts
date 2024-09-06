@@ -113,7 +113,7 @@ describe("Edition Id Route", () => {
     await renderComponent()
     // await router.push({ name: 'caselaw-periodical-evaluation-editionId-edition', params: { editionId: editionUuid } })
     expect(
-      screen.getAllByText("Periodikaauswertung | BDZ, name").length,
+      screen.getAllByText("Periodikaauswertung | BDZ name").length,
     ).toBeGreaterThan(0)
   })
 })

@@ -185,7 +185,7 @@ test.describe(
               /\/caselaw\/periodical-evaluation\/[0-9a-fA-F\-]{36}\/references/,
             )
             await expect(
-              page.getByText("Periodikaauswertung | WdG, " + name, {
+              page.getByText("Periodikaauswertung | WdG " + name, {
                 exact: true,
               }),
             ).toBeVisible()
