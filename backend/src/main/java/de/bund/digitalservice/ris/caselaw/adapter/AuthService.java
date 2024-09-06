@@ -31,6 +31,32 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service responsible for handling authorization checks for users.
+ *
+ * <p>This service provides functionality to verify user access rights to various resources,
+ * including {@link DocumentationUnit}s and {@link Procedure}s, based on user roles and assigned
+ * permissions.
+ *
+ * <p>Key methods include:
+ *
+ * <ul>
+ *   <li>{@link #userHasReadAccessByDocumentNumber()}: Checks if a user has read access to a {@link
+ *       DocumentationUnit} by its {@link DocumentationUnit#documentNumber() documentNumber}.
+ *   <li>{@link #userHasReadAccessByDocumentationUnitId()}: Checks if a user has read access to a
+ *       {@link DocumentationUnit} by its {@link UUID}.
+ *   <li>{@link #userIsInternal()}: Determines if a user is an internal user based on their {@link
+ *       OidcUser} roles.
+ *   <li>{@link #userHasWriteAccessByProcedureId()}: Checks if a user has write access to a {@link
+ *       Procedure} by its {@link UUID}.
+ *   <li>{@link #userHasSameDocumentationOffice()}: Checks if a user has the same {@link
+ *       DocumentationOffice} as the {@link DocumentationUnit} by its {@link UUID}
+ *   <li>{@link #isAssignedViaProcedure()}: Checks if a {@link Procedure} associated with a {@link
+ *       DocumentationUnit} is assigned to the current {@link OidcUser}
+ *   <li>{@link #isPatchAllowedForExternalUsers()}: Checks if a {@link RisJsonPatch} operation is
+ *       permitted for external users.
+ * </ul>
+ */
 @Service
 @Slf4j
 public class AuthService {
@@ -70,6 +96,18 @@ public class AuthService {
     this.officeRepository = officeRepository;
   }
 
+  /**
+   * Creates a Spring bean that checks if a user has read access to a {@link DocumentationUnit} by
+   * its {@link DocumentationUnit#documentNumber() documentNumber}.
+   *
+   * <p>The function retrieves the {@link DocumentationUnit} using the {@link
+   * DocumentationUnit#documentNumber() documentNumber} and checks if the user has read access.
+   * Returns {@link Boolean#FALSE false} if the {@link DocumentationUnit} is not found.
+   *
+   * @return a {@link Function} that accepts a {@link DocumentationUnit#documentNumber()
+   *     documentNumber} as {@link String} and returns {@link Boolean#TRUE true} if the user has
+   *     read access, otherwise {@link Boolean#FALSE false}.
+   */
   @Bean
   public Function<String, Boolean> userHasReadAccessByDocumentNumber() {
     return documentNumber ->
@@ -78,6 +116,16 @@ public class AuthService {
             .orElse(false);
   }
 
+  /**
+   * Creates a Spring bean that checks if a user has read access to a {@link DocumentationUnit} by
+   * its {@link UUID}.
+   *
+   * <p>The function retrieves the {@link DocumentationUnit} and checks if the user has read access.
+   * Returns {@link Boolean#FALSE false} if the {@link DocumentationUnit} is not found.
+   *
+   * @return a {@link Function} that accepts a {@link UUID} and returns {@link Boolean#TRUE true} if
+   *     the user has read access, otherwise {@link Boolean#FALSE false}.
+   */
   @Bean
   public Function<UUID, Boolean> userHasReadAccessByDocumentationUnitId() {
     return uuid ->
@@ -86,11 +134,32 @@ public class AuthService {
             .orElse(false);
   }
 
+  /**
+   * Defines a Spring bean that returns a function to check if a user has the internal role.
+   *
+   * <p>This bean provides a function that takes an {@link OidcUser} as input and returns a {@link
+   * Boolean} indicating whether the user has the internal role or not. It delegates this check to
+   * the {@link UserService#isInternal(OidcUser)} method.
+   *
+   * @return a {@link Function} that accepts an {@link OidcUser} and returns a {@link Boolean}
+   *     value. {@link Boolean#TRUE true} if the user has the internal role, {@link Boolean#FALSE
+   *     false} otherwise.
+   */
   @Bean
   public Function<OidcUser, Boolean> userIsInternal() {
     return userService::isInternal;
   }
 
+  /**
+   * Creates a Spring bean that checks if a user has write access to a procedure by its UUID.
+   *
+   * <p>The function retrieves the {@link Procedure}'s {@link DocumentationOffice} and verifies if
+   * the user has the same {@link DocumentationOffice}. Returns {@link Boolean#FALSE false} if the
+   * {@link Procedure} is not found.
+   *
+   * @return a {@link Function} that accepts a {@link UUID} and returns {@link Boolean#TRUE true} if
+   *     the user has write access, otherwise {@link Boolean#FALSE false}.
+   */
   @Bean
   public Function<UUID, Boolean> userHasWriteAccessByProcedureId() {
     return uuid ->
@@ -99,6 +168,17 @@ public class AuthService {
             .orElse(false);
   }
 
+  /**
+   * Creates a Spring bean that checks if a user has the same {@link DocumentationOffice} as the
+   * {@link DocumentationUnit} by its {@link UUID}.
+   *
+   * <p>The function retrieves the {@link DocumentationUnit} by its {@link UUID} and verifies if the
+   * user has the same {@link DocumentationOffice}. Returns {@link Boolean#FALSE false} if the
+   * {@link DocumentationUnit} is not found.
+   *
+   * @return a {@link Function} that accepts a {@link UUID} and returns {@link Boolean#TRUE true} if
+   *     the user has the same {@link DocumentationOffice}, otherwise {@link Boolean#FALSE false}.
+   */
   @Bean
   public Function<UUID, Boolean> userHasSameDocumentationOffice() {
     return uuid ->
@@ -107,6 +187,18 @@ public class AuthService {
             .orElse(false);
   }
 
+  /**
+   * Creates a Spring bean that checks if a {@link Procedure} associated with a {@link
+   * DocumentationUnit} is assigned to the current {@link OidcUser}.
+   *
+   * <p>The function retrieves the {@link Procedure} of the {@link DocumentationUnit} by the given
+   * {@link UUID} and verifies if it is assigned to the current {@link OidcUser}. Returns {@link
+   * Boolean#FALSE false} if no {@link DocumentationUnit} or {@link Procedure} is found.
+   *
+   * @return a {@link Function} that accepts a {@link UUID} and returns {@link Boolean#TRUE true} if
+   *     the {@link Procedure} is assigned to the current user, otherwise {@link Boolean#FALSE
+   *     false}.
+   */
   @Bean
   public Function<UUID, Boolean> isAssignedViaProcedure() {
     return uuid -> {
@@ -122,6 +214,16 @@ public class AuthService {
     };
   }
 
+  /**
+   * Creates a Spring bean that checks if a given {@link RisJsonPatch} is allowed for users with the
+   * external role.
+   *
+   * <p>The function filters non-test operations, normalizes the patch paths, and verifies that all
+   * modified paths are in the list of allowed paths.
+   *
+   * @return a {@link Function} that accepts a {@link RisJsonPatch} and returns {@link Boolean#TRUE
+   *     true} if all patch operations are allowed, otherwise {@link Boolean#FALSE false}.
+   */
   @Bean
   public Function<RisJsonPatch, Boolean> isPatchAllowedForExternalUsers() {
     return patch ->

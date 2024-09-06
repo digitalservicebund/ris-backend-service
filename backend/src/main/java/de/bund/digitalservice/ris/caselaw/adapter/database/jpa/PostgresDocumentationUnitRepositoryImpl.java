@@ -565,7 +565,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                     hasSameDocumentationOffice(item, documentationOffice) && isInternalUser)
                 .isEditable(
                     hasSameDocumentationOffice(item, documentationOffice)
-                        && (isInternalUser || isExternalUserAssigned(assignedProcedures, item)))
+                        && (isInternalUser || isUserAssigned(assignedProcedures, item)))
                 .build());
   }
 
@@ -574,7 +574,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     return item.getDocumentationOffice().getId().equals(documentationOffice.uuid());
   }
 
-  private boolean isExternalUserAssigned(
+  private boolean isUserAssigned(
       List<ProcedureDTO> assignedProcedures, DocumentationUnitListItemDTO item) {
     if (!item.getProcedures().isEmpty()) {
       var docUnitProcedureId = item.getProcedures().get(0).getProcedure().getId();

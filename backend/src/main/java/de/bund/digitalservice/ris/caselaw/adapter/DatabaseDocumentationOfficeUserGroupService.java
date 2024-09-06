@@ -74,6 +74,15 @@ public class DatabaseDocumentationOfficeUserGroupService
     this.documentationOfficeUserGroups = this.repository.findAll();
   }
 
+  /**
+   * Retrieves all {@link DocumentationOfficeUserGroup user group} as domain objects.
+   *
+   * <p>This method transforms a list of user groups from internal representation to domain objects
+   * using the {@link DocumentationOfficeUserGroupTransformer}. It returns a list of these
+   * transformed user groups.
+   *
+   * @return a {@link List} of {@link DocumentationOfficeUserGroup} in domain form
+   */
   @Override
   public List<DocumentationOfficeUserGroup> getAllUserGroups() {
     return this.documentationOfficeUserGroups.stream()
@@ -81,6 +90,19 @@ public class DatabaseDocumentationOfficeUserGroupService
         .toList();
   }
 
+  /**
+   * Retrieves a list of external {@link DocumentationOfficeUserGroup user group} associated with a
+   * given {@link DocumentationOffice}.
+   *
+   * <p>This method filters all {@link DocumentationOfficeUserGroup user group} to find those
+   * associated with the specified {@link DocumentationOffice} and that are not marked as internal.
+   * It returns a list of these external {@link DocumentationOfficeUserGroup user group}s.
+   *
+   * @param documentationOffice the {@link DocumentationOffice} for which external user groups are
+   *     to be retrieved
+   * @return a {@link List} of {@link DocumentationOfficeUserGroup} that are external and associated
+   *     with the given {@link DocumentationOffice}
+   */
   @Override
   public List<DocumentationOfficeUserGroup> getExternalUserGroups(
       DocumentationOffice documentationOffice) {
@@ -111,8 +133,7 @@ public class DatabaseDocumentationOfficeUserGroupService
 
   /**
    * Will throw if a doc office for a configured user group does not exist -> Application won't
-   * start. Make sure to mock this class in tests or run the refdata seeding from ris-migration
-   * before starting the application.
+   * start. Make sure to mock this class in tests.
    */
   private @NotNull DocumentationOfficeDTO getMatchingDocumentationOffice(
       DocumentationOfficeConfigUserGroup groupFromConfig, List<DocumentationOfficeDTO> docOffices) {

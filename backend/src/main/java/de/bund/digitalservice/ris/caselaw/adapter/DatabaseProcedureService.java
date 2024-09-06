@@ -106,14 +106,29 @@ public class DatabaseProcedureService implements ProcedureService {
                             documentationUnitListItem.toBuilder()
                                 .isDeletable(isInternalUser)
                                 .isEditable(
-                                    isInternalUser
-                                        || isExternalUserAssigned(procedureDTO, oidcUser))
+                                    isInternalUser || isUserAssigned(procedureDTO, oidcUser))
                                 .build())
                     .toList())
         .orElse(null);
   }
 
-  private Boolean isExternalUserAssigned(ProcedureDTO procedureDTO, OidcUser oidcUser) {
+  /**
+   * Checks if a {@link OidcUser} is assigned to a {@link ProcedureDTO} based on their {@link
+   * DocumentationOfficeUserGroupDTO user group}.
+   *
+   * <p>This method compares the {@link DocumentationOfficeUserGroupDTO user group} associated with
+   * the provided {@link OidcUser} to the {@link DocumentationOfficeUserGroupDTO user group}
+   * assigned to the {@link ProcedureDTO}. It returns {@link Boolean#TRUE true} if the {@link
+   * DocumentationOfficeUserGroupDTO user group}'s ID matches the {@link ProcedureDTO}'s assigned
+   * group ID, otherwise {@link Boolean#FALSE false}.
+   *
+   * @param procedureDTO the {@link ProcedureDTO} containing the {@link DocumentationOffice} user
+   *     group
+   * @param oidcUser the {@link OidcUser} whose user group is being checked
+   * @return {@link Boolean#TRUE true} if the user's group is assigned to the procedure, otherwise
+   *     {@link Boolean#FALSE false}
+   */
+  private Boolean isUserAssigned(ProcedureDTO procedureDTO, OidcUser oidcUser) {
     Optional<DocumentationOfficeUserGroup> userGroup = userService.getUserGroup(oidcUser);
     if (userGroup.isPresent() && procedureDTO.getDocumentationOfficeUserGroupDTO() != null) {
       return userGroup.get().id().equals(procedureDTO.getDocumentationOfficeUserGroupDTO().getId());
@@ -121,6 +136,24 @@ public class DatabaseProcedureService implements ProcedureService {
     return false;
   }
 
+  /**
+   * Assigns a {@link DocumentationOfficeUserGroupDTO user group} to a {@link ProcedureDTO
+   * procedure} identified by their {@link UUID}s.
+   *
+   * <p>This method associates the specified {@link DocumentationOfficeUserGroupDTO user group} with
+   * a {@link ProcedureDTO procedure} by updating the {@link ProcedureDTO procedure}'s {@link
+   * DocumentationOfficeUserGroupDTO user group}. It validates the existence of both entities in the
+   * database. If either is missing, it throws an {@link IllegalArgumentException}.
+   *
+   * @param procedureUUID the UUID of the {@link ProcedureDTO procedure} to which the {@link
+   *     DocumentationOfficeUserGroupDTO user group} will be assigned
+   * @param userGroupId the UUID of the {@link DocumentationOfficeUserGroupDTO user group} to be
+   *     assigned to the {@link ProcedureDTO procedure}
+   * @return a confirmation message indicating the {@link ProcedureDTO procedure} and {@link
+   *     DocumentationOfficeUserGroupDTO user group} that were associated
+   * @throws IllegalArgumentException if the {@link ProcedureDTO procedure} or {@link
+   *     DocumentationOfficeUserGroupDTO user group} is not found in the database
+   */
   @Override
   public String assignUserGroup(UUID procedureUUID, UUID userGroupId) {
     Optional<ProcedureDTO> procedureDTO = repository.findById(procedureUUID);
@@ -144,6 +177,21 @@ public class DatabaseProcedureService implements ProcedureService {
         + "' zugewiesen.";
   }
 
+  /**
+   * Unassign a {@link DocumentationOfficeUserGroupDTO user group} from a {@link ProcedureDTO
+   * procedure} identified by its {@link UUID}.
+   *
+   * <p>This method removes the association of the {@link DocumentationOfficeUserGroupDTO user
+   * group} with the {@link ProcedureDTO procedure}. It validates the existence of the {@link
+   * ProcedureDTO procedure} in the database. If it is missing, it throws an {@link
+   * IllegalArgumentException}.
+   *
+   * @param procedureUUID the UUID of the {@link ProcedureDTO procedure} from which the {@link
+   *     DocumentationOfficeUserGroupDTO user group} will be removed
+   * @return a confirmation message mentioning the {@link ProcedureDTO procedure}
+   * @throws IllegalArgumentException if the {@link ProcedureDTO procedure} is not found in the
+   *     database
+   */
   @Override
   public String unassignUserGroup(UUID procedureUUID) {
     Optional<ProcedureDTO> procedureDTO = repository.findById(procedureUUID);
@@ -159,6 +207,20 @@ public class DatabaseProcedureService implements ProcedureService {
     return "Die Zuweisung aus Vorgang '" + procedureDTO.get().getLabel() + "' wurde entfernt.";
   }
 
+  /**
+   * Retrieves the {@link DocumentationOffice} associated with a {@link ProcedureDTO procedure} by
+   * its {@link UUID}.
+   *
+   * <p>This method fetches the {@link ProcedureDTO procedure} from the repository using the
+   * provided {@link UUID}, and transforms the associated {@link DocumentationOffice} from a {@link
+   * ProcedureDTO} to a domain object {@link DocumentationOffice}. If the {@link ProcedureDTO
+   * procedure} is not found, it returns {@code null}.
+   *
+   * @param procedureId the {@link UUID} of the {@link ProcedureDTO procedure} whose {@link
+   *     DocumentationOffice} is to be retrieved
+   * @return the {@link DocumentationOffice} associated with the {@link ProcedureDTO procedure}, or
+   *     {@code null} if the {@link ProcedureDTO procedure} is not found
+   */
   @Override
   public DocumentationOffice getDocumentationOfficeByUUID(UUID procedureId) {
     Optional<ProcedureDTO> procedureDTO = repository.findById(procedureId);
