@@ -174,7 +174,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.1")
 
-    implementation(platform("software.amazon.awssdk:bom:2.27.21"))
+    implementation(platform("software.amazon.awssdk:bom:2.27.22"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -204,8 +204,8 @@ dependencies {
 
     implementation("com.gravity9:json-patch-path:2.0.2");
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.13.3")
-    implementation("io.micrometer:micrometer-core:1.13.3")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.13.4")
+    implementation("io.micrometer:micrometer-core:1.13.4")
 
     implementation(platform("io.sentry:sentry-bom:8.0.0-alpha.4"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
