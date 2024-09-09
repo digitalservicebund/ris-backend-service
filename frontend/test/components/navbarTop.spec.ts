@@ -88,8 +88,9 @@ describe("navbar top", () => {
     expect(screen.getByText("Rechtsinformationen")).toBeInTheDocument()
     expect(screen.getByText("Vorgänge")).toBeInTheDocument()
     expect(screen.getByText("des Bundes")).toBeInTheDocument()
-    expect(screen.getByText("fooUser")).toBeInTheDocument
-    expect(screen.getByText("fooDocumentationOffice | Staging"))
-      .toBeInTheDocument
+    expect(screen.getByText("fooUser")).toBeInTheDocument()
+    expect(
+      screen.getByText("fooDocumentationOffice | Staging"),
+    ).toBeInTheDocument()
   })
 })
