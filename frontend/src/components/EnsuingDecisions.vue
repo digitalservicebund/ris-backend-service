@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import EnsuingDecisionInputGroup from "./EnsuingDecisionInputGroup.vue"
-import ActiveCitationSummary from "@/components/DocumentationUnitSummary.vue"
+import DocumentationUnitDecisionSummary from "@/components/DocumentUnitDecisionSummary.vue"
 import EditableList from "@/components/EditableList.vue"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -29,7 +29,7 @@ const defaultValue = new EnsuingDecision() as EnsuingDecision
           v-model="ensuingDecisions"
           :default-value="defaultValue"
           :edit-component="EnsuingDecisionInputGroup"
-          :summary-component="ActiveCitationSummary"
+          :summary-component="DocumentationUnitDecisionSummary"
         />
       </div>
     </div>
