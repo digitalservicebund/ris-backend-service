@@ -13,16 +13,10 @@ const store = useEditionStore()
 const responseError = ref<ResponseError>()
 const route = useRoute()
 
-const periodicalEditionTitle = computed(() =>
+const infoSubtitle = computed(() =>
   StringsUtil.mergeNonBlankStrings(
-    [
-      "Periodikaauswertung",
-      StringsUtil.mergeNonBlankStrings(
-        [store.edition?.legalPeriodical?.abbreviation, store.edition?.name],
-        " ",
-      ),
-    ],
-    " | ",
+    [store.edition?.legalPeriodical?.abbreviation, store.edition?.name],
+    " ",
   ),
 )
 
@@ -48,7 +42,7 @@ const menuItems = usePeriodicalEvaluationMenuItems(
       <NavbarSide :is-child="false" :menu-items="menuItems" :route="route" />
     </div>
     <div v-if="store.edition" class="flex w-full min-w-0 flex-col bg-gray-100">
-      <PeriodicalEditionInfoPanel :title="periodicalEditionTitle" />
+      <PeriodicalEditionInfoPanel :subtitle="infoSubtitle" />
 
       <div class="flex grow flex-col items-start">
         <router-view />

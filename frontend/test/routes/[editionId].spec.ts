@@ -112,8 +112,17 @@ describe("Edition Id Route", () => {
   test("renders legal periodical and edition name in title", async () => {
     await renderComponent()
     // await router.push({ name: 'caselaw-periodical-evaluation-editionId-edition', params: { editionId: editionUuid } })
-    expect(
-      screen.getAllByText("Periodikaauswertung | BDZ name").length,
-    ).toBeGreaterThan(0)
+    const titleElements = screen.getAllByText("Periodikumsauswertung")
+    const separatorElements = screen.getAllByText("|")
+    const editionNames = screen.getAllByText("BDZ name")
+
+    expect(titleElements.length).toBeGreaterThan(1)
+    expect(titleElements[0]).toHaveClass("font-bold")
+
+    expect(separatorElements.length).toBeGreaterThan(1)
+    expect(separatorElements[0]).toHaveClass("m-4")
+
+    expect(editionNames.length).toBeGreaterThan(1)
+    expect(editionNames[0]).not.toHaveClass("font-bold")
   })
 })
