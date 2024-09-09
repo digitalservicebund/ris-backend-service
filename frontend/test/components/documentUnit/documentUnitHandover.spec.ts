@@ -145,7 +145,8 @@ describe("Document Unit Handover", () => {
       screen.getByLabelText("Dokumentationseinheit an jDV übergeben"),
     )
 
-    expect(await screen.findByLabelText("Erfolg der jDV Übergabe"))
-      .toBeInTheDocument
+    expect(
+      await screen.findByLabelText("Erfolg der jDV Übergabe"),
+    ).toBeInTheDocument()
   })
 })
