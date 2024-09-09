@@ -94,7 +94,13 @@ test.describe("short and long texts", () => {
 
       // Write text and select all
       await page.keyboard.type("Text input")
+
+      // Wait for text to be typed in the editor and selected via keyboard
+      // eslint-disable-next-line playwright/no-wait-for-timeout
+      await page.waitForTimeout(100)
       await page.keyboard.press("ControlOrMeta+A")
+      // eslint-disable-next-line playwright/no-wait-for-timeout
+      await page.waitForTimeout(100)
 
       // Navigate to toolbar -> first button is focused
       await page.keyboard.press("Shift+Tab")
@@ -119,7 +125,7 @@ test.describe("short and long texts", () => {
 
       // The timeout is needed for the focus, otherwise tabbing back to the menu is flaky. It's unclear why.
       // eslint-disable-next-line playwright/no-wait-for-timeout
-      await page.waitForTimeout(100)
+      await page.waitForTimeout(300)
 
       // Tiptap inserts invisible characters -> input is split into two parts
       expect(await page.getByText("Text input").innerHTML()).toContain(
