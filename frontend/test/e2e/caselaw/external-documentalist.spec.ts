@@ -9,9 +9,7 @@ import {
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
-// Test is still flaky
-// eslint-disable-next-line playwright/no-skipped-test
-test.describe.skip(
+test.describe(
   "external documentalists",
   {
     annotation: {
@@ -315,7 +313,9 @@ test.describe.skip(
         procedureName =
           procedurePrefix + testCaseInfix + generateString({ length: 10 })
         await page.locator("[aria-label='Vorgang']").fill(procedureName)
-        await page.getByText(`${procedureName} neu erstellen`).click()
+        await page
+          .getByText(`${procedureName} neu erstellen`)
+          .click({ timeout: 5_000 })
         await save(page)
       })
       return procedureName
@@ -330,13 +330,13 @@ test.describe.skip(
 
         const assignRequest = page.waitForRequest(
           "**/api/v1/caselaw/procedure/*/assign/*",
-          { timeout: 500 },
+          { timeout: 5_000 },
         )
 
         await page
           .getByLabel("Vorgang Listenelement")
           .getByLabel("dropdown input")
-          .selectOption("Extern")
+          .selectOption("Extern", { timeout: 5_000 })
 
         await assignRequest
         await page.reload()
@@ -344,7 +344,7 @@ test.describe.skip(
         await expect(
           page.getByLabel("Vorgang Listenelement").getByLabel("dropdown input"),
           // The id of the user group "Extern"
-        ).toHaveValue(/.+/)
+        ).toHaveValue(/.+/, { timeout: 5_000 })
       })
     }
 
@@ -357,13 +357,13 @@ test.describe.skip(
 
         const unassignRequest = page.waitForRequest(
           "**/api/v1/caselaw/procedure/*/unassign",
-          { timeout: 500 },
+          { timeout: 5_000 },
         )
 
         await page
           .getByLabel("Vorgang Listenelement")
           .getByLabel("dropdown input")
-          .selectOption("Nicht zugewiesen")
+          .selectOption("Nicht zugewiesen", { timeout: 5_000 })
 
         await unassignRequest
         await page.reload()
@@ -371,7 +371,7 @@ test.describe.skip(
         await expect(
           page.getByLabel("Vorgang Listenelement").getByLabel("dropdown input"),
           // The unassigned option has an empty value
-        ).toHaveValue(/^$/)
+        ).toHaveValue(/^$/, { timeout: 5_000 })
       })
     }
   },
