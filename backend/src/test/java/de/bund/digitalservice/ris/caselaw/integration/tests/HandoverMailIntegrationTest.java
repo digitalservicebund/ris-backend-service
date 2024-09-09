@@ -4,6 +4,7 @@ import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockDocOfficeUserGrou
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
@@ -16,10 +17,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.HandoverMailService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
+import de.bund.digitalservice.ris.caselaw.adapter.LegalPeriodicalEditionController;
 import de.bund.digitalservice.ris.caselaw.adapter.MockXmlExporter;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseHandoverReportRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseXmlHandoverMailRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
@@ -27,10 +30,14 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HandoverMailAttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HandoverMailDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HandoverReportDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalEditionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalEditionRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.HandoverMailTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
@@ -45,8 +52,11 @@ import de.bund.digitalservice.ris.caselaw.domain.EventType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
+import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionService;
+import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalRepository;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
@@ -63,12 +73,15 @@ import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -77,12 +90,14 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 @RISIntegrationTest(
     imports = {
       DocumentationUnitService.class,
-      de.bund.digitalservice.ris.caselaw.domain.HandoverService.class,
+      HandoverService.class,
       PostgresDeltaMigrationRepositoryImpl.class,
       KeycloakUserService.class,
       DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentNumberRecyclingService.class,
       PostgresDocumentationUnitRepositoryImpl.class,
+      PostgresLegalPeriodicalEditionRepositoryImpl.class,
+      PostgresLegalPeriodicalRepositoryImpl.class,
       PostgresHandoverRepositoryImpl.class,
       PostgresHandoverReportRepositoryImpl.class,
       HandoverMailService.class,
@@ -95,13 +110,17 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       TestConfig.class,
       DocumentNumberPatternConfig.class
     },
-    controllers = {DocumentationUnitController.class})
+    controllers = {DocumentationUnitController.class, LegalPeriodicalEditionController.class})
 @TestPropertySource(
     properties = {
       "mail.exporter.jurisUsername=test-user",
       "mail.exporter.recipientAddress=neuris@example.com"
     })
-class HandoverMailDocumentationUnitIntegrationTest {
+@Sql(scripts = {"classpath:legal_periodical_init.sql"})
+@Sql(
+    scripts = {"classpath:legal_periodical_cleanup.sql"},
+    executionPhase = AFTER_TEST_METHOD)
+class HandoverMailIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
       new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
@@ -121,6 +140,8 @@ class HandoverMailDocumentationUnitIntegrationTest {
 
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentationUnitRepository repository;
+  @Autowired private DatabaseLegalPeriodicalEditionRepository editionRepository;
+  @Autowired private LegalPeriodicalRepository legalPeriodicalRepository;
   @Autowired private DatabaseXmlHandoverMailRepository xmlHandoverRepository;
   @Autowired private DatabaseStatusRepository statusRepository;
   @Autowired private DatabaseHandoverReportRepository databaseHandoverReportRepository;
@@ -135,6 +156,8 @@ class HandoverMailDocumentationUnitIntegrationTest {
   @MockBean private ProcedureService procedureService;
   @MockBean private DocumentationOfficeUserGroupService documentationOfficeUserGroupService;
   @MockBean private LegalPeriodicalEditionRepository legalPeriodicalEditionRepository;
+
+  @MockBean private LegalPeriodicalEditionService legalPeriodicalEditionService;
 
   @MockBean
   private DocumentationUnitDocxMetadataInitializationService
@@ -293,19 +316,38 @@ class HandoverMailDocumentationUnitIntegrationTest {
     assertThat(statusList.get(0).getPublicationStatus()).isEqualTo(PublicationStatus.UNPUBLISHED);
   }
 
-  @Test
-  @Transactional
-  void testGetLastXmlHandoverMail() {
-    DocumentationUnitDTO documentationUnitDTO =
-        DocumentationUnitDTO.builder()
-            .documentationOffice(docOffice)
-            .documentNumber("docnr12345678")
-            .build();
-    DocumentationUnitDTO savedDocumentationUnitDTO = repository.save(documentationUnitDTO);
+  public static List<HandoverEntityType> getHandoverMailTestData() {
+    return List.of(HandoverEntityType.DOCUMENTATION_UNIT, HandoverEntityType.EDITION);
+  }
+
+  @ParameterizedTest
+  @MethodSource("getHandoverMailTestData")
+  void testGetLastXmlHandoverMail(HandoverEntityType entityType) {
+    UUID entityId = UUID.randomUUID();
+
+    if (entityType == HandoverEntityType.DOCUMENTATION_UNIT) {
+      entityId =
+          repository
+              .save(
+                  DocumentationUnitDTO.builder()
+                      .documentationOffice(docOffice)
+                      .documentNumber("docnr12345678")
+                      .build())
+              .getId();
+    } else if (entityType == HandoverEntityType.EDITION) {
+      editionRepository.save(
+          LegalPeriodicalEditionDTO.builder()
+              .id(entityId)
+              .legalPeriodical(
+                  LegalPeriodicalDTO.builder()
+                      .id(UUID.fromString("1abf62fe-9ddf-487e-962e-1c71cf661c5b"))
+                      .build())
+              .build());
+    }
 
     HandoverMail handoverMailDTO =
         HandoverMail.builder()
-            .entityId(savedDocumentationUnitDTO.getId())
+            .entityId(entityId)
             .receiverAddress("exporter@neuris.de")
             .mailSubject("mailSubject")
             .attachments(
@@ -314,13 +356,12 @@ class HandoverMailDocumentationUnitIntegrationTest {
             .statusMessages(List.of("message 1", "message 2"))
             .handoverDate(Instant.now())
             .build();
-    xmlHandoverRepository.save(
-        HandoverMailTransformer.transformToDTO(handoverMailDTO, savedDocumentationUnitDTO.getId()));
+    xmlHandoverRepository.save(HandoverMailTransformer.transformToDTO(handoverMailDTO, entityId));
 
     HandoverMail expectedXmlPublication =
         HandoverMail.builder()
-            .entityId(savedDocumentationUnitDTO.getId())
-            .entityType(HandoverEntityType.DOCUMENTATION_UNIT)
+            .entityId(entityId)
+            .entityType(entityType)
             .receiverAddress("exporter@neuris.de")
             .mailSubject("mailSubject")
             .attachments(
@@ -329,10 +370,15 @@ class HandoverMailDocumentationUnitIntegrationTest {
             .statusMessages(List.of("message 1", "message 2"))
             .build();
 
+    String url =
+        entityType == HandoverEntityType.DOCUMENTATION_UNIT
+            ? "/api/v1/caselaw/documentunits/" + entityId + "/handover"
+            : "/api/v1/caselaw/legalperiodicaledition/" + entityId + "/handover";
+
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/documentunits/" + savedDocumentationUnitDTO.getId() + "/handover")
+        .uri(url)
         .exchange()
         .expectStatus()
         .isOk()

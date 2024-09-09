@@ -42,6 +42,10 @@ onMounted(async () => {
       item.date = formatDate(item.date)
       item.xml = item.xml ? item.xml : ""
     }
+    succeedMessage.value = {
+      title: "Email wurde versendet",
+      description: "",
+    }
   } else {
     errorMessage.value = response.error
   }

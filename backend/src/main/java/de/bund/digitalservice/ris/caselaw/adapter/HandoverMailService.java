@@ -204,6 +204,7 @@ public class HandoverMailService implements MailService {
         .attachments(
             Collections.singletonList(
                 MailAttachment.builder().fileName(xml.fileName()).fileContent(xml.xml()).build()))
+        .entityType(HandoverEntityType.DOCUMENTATION_UNIT)
         .build();
   }
 

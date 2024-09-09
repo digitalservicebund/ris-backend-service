@@ -71,6 +71,7 @@ class HandoverMailServiceTest {
   private static final HandoverMail EXPECTED_BEFORE_SAVE =
       HandoverMail.builder()
           .entityId(TEST_UUID)
+          .entityType(HandoverEntityType.DOCUMENTATION_UNIT)
           .receiverAddress(RECEIVER_ADDRESS)
           .mailSubject(MAIL_SUBJECT)
           .attachments(
@@ -84,6 +85,7 @@ class HandoverMailServiceTest {
   private static final HandoverMail SAVED_XML_MAIL =
       HandoverMail.builder()
           .entityId(TEST_UUID)
+          .entityType(HandoverEntityType.DOCUMENTATION_UNIT)
           .receiverAddress(RECEIVER_ADDRESS)
           .mailSubject(MAIL_SUBJECT)
           .attachments(
@@ -279,5 +281,16 @@ class HandoverMailServiceTest {
     assertThat(response.get(0)).usingRecursiveComparison().isEqualTo(EXPECTED_RESPONSE);
 
     verify(repository).getHandoversByEntity(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT);
+  }
+
+  @Test
+  void testGetLastEditionHandoverXmlMail() {
+    List<HandoverMail> list = List.of(SAVED_XML_MAIL);
+    when(repository.getHandoversByEntity(TEST_UUID, HandoverEntityType.EDITION)).thenReturn(list);
+
+    var response = service.getHandoverResult(TEST_UUID, HandoverEntityType.EDITION);
+    assertThat(response.get(0)).usingRecursiveComparison().isEqualTo(EXPECTED_RESPONSE);
+
+    verify(repository).getHandoversByEntity(TEST_UUID, HandoverEntityType.EDITION);
   }
 }

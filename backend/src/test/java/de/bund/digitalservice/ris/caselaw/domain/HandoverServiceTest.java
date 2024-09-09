@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import jakarta.validation.Validator;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -83,7 +84,7 @@ class HandoverServiceTest {
   }
 
   @Test
-  void testGetLastXmlHandoverMail() {
+  void testGetLastXmlHandoverMailForDocumentationUnit() {
     HandoverMail handoverMail =
         HandoverMail.builder()
             .entityId(TEST_UUID)
@@ -119,6 +120,30 @@ class HandoverServiceTest {
 
     verify(mailService).getHandoverResult(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT);
     verify(deltaMigrationRepository).getLatestMigration(TEST_UUID);
+  }
+
+  @Test
+  void testGetLastXmlHandoverMailForEdition() {
+    HandoverMail handoverMail =
+        HandoverMail.builder()
+            .entityId(TEST_UUID)
+            .entityType(HandoverEntityType.EDITION)
+            .receiverAddress("receiver address")
+            .mailSubject("subject")
+            .mailSubject("subject")
+            .attachments(
+                List.of(MailAttachment.builder().fileName("filename").fileContent("xml").build()))
+            .success(true)
+            .statusMessages(List.of("message"))
+            .handoverDate(Instant.now().minus(2, java.time.temporal.ChronoUnit.DAYS))
+            .build();
+    when(mailService.getHandoverResult(TEST_UUID, HandoverEntityType.EDITION))
+        .thenReturn(List.of(handoverMail));
+
+    var actual = service.getEventLog(TEST_UUID, HandoverEntityType.EDITION);
+    assertThat(actual.get(0)).usingRecursiveComparison().isEqualTo(handoverMail);
+
+    verify(mailService).getHandoverResult(TEST_UUID, HandoverEntityType.EDITION);
   }
 
   @Test
@@ -223,6 +248,22 @@ class HandoverServiceTest {
     when(mailService.getXmlPreview(testDocumentationUnit)).thenReturn(mockXmlTransformationResult);
 
     Assertions.assertEquals(mockXmlTransformationResult, service.createPreviewXml(TEST_UUID));
+  }
+
+  @Test
+  void testPreviewEditionXml() throws IOException {
+    LegalPeriodicalEdition testEdition = LegalPeriodicalEdition.builder().build();
+    List<XmlTransformationResult> mockXmlTransformationResult =
+        List.of(
+            new XmlTransformationResult(
+                "Fundstelle 1 XML", true, List.of("success"), "foo1.xml", Instant.now()),
+            new XmlTransformationResult(
+                "Fundstelle 2 XML", true, List.of("success"), "foo2.xml", Instant.now()));
+    when(editionRepository.findById(TEST_UUID)).thenReturn(Optional.ofNullable(testEdition));
+    when(mailService.getXmlPreview(testEdition)).thenReturn(mockXmlTransformationResult);
+
+    Assertions.assertEquals(
+        mockXmlTransformationResult, service.createEditionPreviewXml(TEST_UUID));
   }
 
   @Test

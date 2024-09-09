@@ -93,7 +93,7 @@ describe("Document Unit Handover", () => {
     ).toBeInTheDocument()
   })
 
-  test.skip("renders handover result", async () => {
+  test("renders handover result", async () => {
     vi.spyOn(handoverService, "handoverDocument").mockImplementation(() =>
       Promise.resolve({
         status: 200,

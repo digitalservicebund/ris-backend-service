@@ -40,7 +40,7 @@ const errorMessage = computed(
 )
 
 onMounted(async () => {
-  if (fieldsMissing.value || !store.edition) return
+  if (referencesMissing.value || !store.edition) return
   const previewResponse = await HandoverEditionService.getPreview(
     store.edition.id!,
   )
@@ -53,18 +53,15 @@ onMounted(async () => {
 })
 
 function handoverEdition() {
-  if (fieldsMissing.value) {
+  if (referencesMissing.value) {
     frontendError.value = {
-      title: "Es sind noch nicht alle Pflichtfelder befüllt.",
+      title: "Es sind noch keine Fundstellen vermerkt.",
       description: "Die Ausgabe kann nicht übergeben werden.",
     }
   } else {
     emits("handoverEdition")
   }
 }
-
-//Required Core Data fields
-const missingCoreDataFields = ref([])
 
 function getHeader(item: EventRecord) {
   switch (item.type) {
@@ -77,8 +74,8 @@ function getHeader(item: EventRecord) {
   }
 }
 
-const fieldsMissing = computed(() => {
-  return !!missingCoreDataFields.value.length
+const referencesMissing = computed(() => {
+  return !store.edition?.references?.length
 })
 </script>
 
@@ -92,24 +89,15 @@ const fieldsMissing = computed(() => {
       <div class="w-[15.625rem]">
         <p class="ds-subhead">Plausibilitätsprüfung</p>
       </div>
-      <div v-if="fieldsMissing" class="flex flex-row gap-8">
+      <div v-if="referencesMissing" class="flex flex-row gap-8">
         <div>
           <IconErrorOutline class="text-red-800" />
         </div>
         <div class="flex flex-col gap-32">
           <div>
             <p class="ds-body-01-reg">
-              Die folgenden Rubriken-Pflichtfelder sind nicht befüllt:
+              Es wurden noch keine Fundstellen hinzugefügt
             </p>
-            <ul class="list-disc">
-              <li
-                v-for="field in missingCoreDataFields"
-                :key="field"
-                class="ds-body-01-reg ml-[1rem] list-item"
-              >
-                {{ field }}
-              </li>
-            </ul>
           </div>
         </div>
       </div>
@@ -121,7 +109,7 @@ const fieldsMissing = computed(() => {
     <div class="border-b-1 border-b-gray-400"></div>
 
     <ExpandableContent
-      v-if="!fieldsMissing && preview && preview.length > 0"
+      v-if="!referencesMissing && preview && preview.length > 0"
       as-column
       class="border-b-1 border-r-1 border-gray-400 bg-white p-10"
       :data-set="preview"
@@ -205,9 +193,11 @@ const fieldsMissing = computed(() => {
               </div>
               <div class="ds-label-section text-gray-900">ALS</div>
               <CodeSnippet
-                v-if="!!item?.xml"
-                :title="item.attachments?.[0].fileName!"
-                :xml="item.attachments?.[0].fileContent!"
+                v-for="(attachment, attachmentIndex) in item.attachments"
+                :key="attachmentIndex"
+                :title="attachment.fileName!"
+                :v-for="item?.attachments"
+                :xml="attachment.fileContent!"
               />
             </div>
           </ExpandableContent>

@@ -44,7 +44,8 @@ public class PostgresHandoverRepositoryImpl implements HandoverRepository {
         HandoverMailTransformer.transformToDTO(handoverMail, documentationUnitDTO.getId());
     handoverMailDTO = repository.save(handoverMailDTO);
 
-    return HandoverMailTransformer.transformToDomain(handoverMailDTO, handoverMail.entityId());
+    return HandoverMailTransformer.transformToDomain(
+        handoverMailDTO, handoverMail.entityId(), HandoverEntityType.DOCUMENTATION_UNIT);
   }
 
   /**
@@ -69,7 +70,8 @@ public class PostgresHandoverRepositoryImpl implements HandoverRepository {
 
     return handoverMailDTOS.stream()
         .map(
-            handoverMailDTO -> HandoverMailTransformer.transformToDomain(handoverMailDTO, entityId))
+            handoverMailDTO ->
+                HandoverMailTransformer.transformToDomain(handoverMailDTO, entityId, entityType))
         .toList();
   }
 
@@ -88,6 +90,7 @@ public class PostgresHandoverRepositoryImpl implements HandoverRepository {
     HandoverMailDTO handoverMailDTO =
         repository.findTopByEntityIdOrderBySentDateDesc(documentationUnitDTO.getId());
 
-    return HandoverMailTransformer.transformToDomain(handoverMailDTO, documentationUnitId);
+    return HandoverMailTransformer.transformToDomain(
+        handoverMailDTO, documentationUnitId, HandoverEntityType.DOCUMENTATION_UNIT);
   }
 }

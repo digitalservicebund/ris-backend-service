@@ -104,14 +104,15 @@ public class LegalPeriodicalEditionController {
    * Get all events of a edition (can be handover events, received handover reports,
    * import/migration events)
    *
-   * @param uuid id of the edition
+   * @param editionId id of the edition
    * @return ordered list of event records (newest first) or an empty response with status code 400
    *     if the user is not authorized
    */
-  @GetMapping(value = "/{uuid}/handover", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/{editionId}/handover", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public List<EventRecord> getEventLog(@PathVariable UUID uuid) {
-    return handoverService.getEventLog(uuid, HandoverEntityType.EDITION);
+  public List<EventRecord> getEventLog(@PathVariable UUID editionId) {
+    List<EventRecord> result = handoverService.getEventLog(editionId, HandoverEntityType.EDITION);
+    return result;
   }
 
   /**

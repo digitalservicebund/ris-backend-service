@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
@@ -59,6 +60,7 @@ class XmlMailServiceProdTest {
   private static final HandoverMail EXPECTED_BEFORE_SAVE_PROD =
       HandoverMail.builder()
           .entityId(TEST_UUID)
+          .entityType(HandoverEntityType.DOCUMENTATION_UNIT)
           .receiverAddress(RECEIVER_ADDRESS)
           .mailSubject(PROD_MAIL_SUBJECT)
           .attachments(
@@ -119,7 +121,7 @@ class XmlMailServiceProdTest {
   void testSendWithProdSubjectAndOriginalCourtAndFileNumber()
       throws ParserConfigurationException, TransformerException {
 
-    var response = service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS);
+    HandoverMail response = service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS);
 
     assertThat(response.mailSubject()).isEqualTo(PROD_MAIL_SUBJECT);
 

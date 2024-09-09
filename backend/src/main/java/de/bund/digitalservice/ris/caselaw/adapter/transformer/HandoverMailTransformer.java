@@ -30,10 +30,11 @@ public class HandoverMailTransformer {
     return mail;
   }
 
-  public static HandoverMail transformToDomain(HandoverMailDTO handoverMailDTO, UUID entityId) {
+  public static HandoverMail transformToDomain(
+      HandoverMailDTO handoverMailDTO, UUID entityId, HandoverEntityType entityType) {
     return HandoverMail.builder()
         .entityId(entityId)
-        .entityType(HandoverEntityType.DOCUMENTATION_UNIT)
+        .entityType(entityType)
         .statusMessages(Arrays.stream(handoverMailDTO.getStatusMessages().split("\\|")).toList())
         .success(handoverMailDTO.getStatusCode().equals("200"))
         .receiverAddress(handoverMailDTO.getReceiverAddress())
