@@ -70,18 +70,16 @@ const service: HandoverEditionService = {
       `caselaw/legalperiodicaledition/${editionId}/preview-xml`,
     )
 
-    const unsuccessfulRecords =
-      response.data?.filter((record) => !record.success) || []
-
     if (
       response.status >= 300 ||
       !response.data ||
-      unsuccessfulRecords.length > 0
+      response.data!.filter((record) => !record.success).length > 0
     ) {
       response.error = {
         title: errorMessages.EDITION_LOADING_XML_PREVIEW.title,
         description:
-          unsuccessfulRecords
+          response.data
+            ?.filter((record) => !record.success)
             .flatMap((record) => record.statusMessages)
             .join(", ") ||
           errorMessages.EDITION_LOADING_XML_PREVIEW.description,

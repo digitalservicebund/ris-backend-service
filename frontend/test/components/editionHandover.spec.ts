@@ -2,11 +2,12 @@ import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
-import DocumentUnitHandover from "@/components/DocumentUnitHandover.vue"
-import DocumentUnit from "@/domain/documentUnit"
+import EditionHandover from "@/components/EditionHandover.vue"
 import { EventRecordType } from "@/domain/eventRecord"
-import documentUnitService from "@/services/documentUnitService"
-import handoverService from "@/services/handoverService"
+import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
+import Reference from "@/domain/reference"
+import handoverEditionService from "@/services/handoverEditionService"
+import legalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 import routes from "~/test-helper/routes"
 
 function renderComponent() {
@@ -18,23 +19,19 @@ function renderComponent() {
 
   return {
     user,
-    ...render(DocumentUnitHandover, {
+    ...render(EditionHandover, {
       global: {
         plugins: [
           createTestingPinia({
             initialState: {
-              docunitStore: {
-                documentUnit: new DocumentUnit("foo", {
-                  documentNumber: "1234567891234",
-                  coreData: {
-                    fileNumbers: ["123"],
-                    court: {
-                      label: "foo",
-                    },
-                    decisionDate: "2024-01-01",
-                    documentType: { jurisShortcut: "", label: "" },
-                    legalEffect: "Ja",
+              editionStore: {
+                edition: new LegalPeriodicalEdition({
+                  id: "123",
+                  legalPeriodical: {
+                    uuid: "456",
+                    title: "foo",
                   },
+                  references: [new Reference({ id: "789", citation: "AB, 3" })],
                 }),
               },
             },
@@ -45,8 +42,8 @@ function renderComponent() {
     }),
   }
 }
-describe("Document Unit Handover", () => {
-  vi.spyOn(handoverService, "getEventLog").mockImplementation(() =>
+describe("Edition Handover", () => {
+  vi.spyOn(handoverEditionService, "getEventLog").mockImplementation(() =>
     Promise.resolve({
       status: 200,
       data: [
@@ -71,7 +68,7 @@ describe("Document Unit Handover", () => {
   })
 
   test("renders error", async () => {
-    vi.spyOn(handoverService, "getEventLog").mockImplementation(() =>
+    vi.spyOn(handoverEditionService, "getEventLog").mockImplementation(() =>
       Promise.resolve({
         status: 300,
         error: {
@@ -94,9 +91,9 @@ describe("Document Unit Handover", () => {
   })
 
   test("renders handover result", async () => {
-    vi.spyOn(handoverService, "getEventLog").mockImplementation(() =>
+    vi.spyOn(handoverEditionService, "getEventLog").mockImplementation(() =>
       Promise.resolve({
-        status: 300,
+        status: 200,
         data: [
           {
             type: EventRecordType.HANDOVER_REPORT,
@@ -104,8 +101,7 @@ describe("Document Unit Handover", () => {
         ],
       }),
     )
-
-    vi.spyOn(handoverService, "handoverDocument").mockImplementation(() =>
+    vi.spyOn(handoverEditionService, "handoverEdition").mockImplementation(() =>
       Promise.resolve({
         status: 200,
         data: {
@@ -114,34 +110,22 @@ describe("Document Unit Handover", () => {
         },
       }),
     )
-    vi.spyOn(handoverService, "getPreview").mockImplementation(() =>
+    vi.spyOn(handoverEditionService, "getPreview").mockImplementation(() =>
       Promise.resolve({
         status: 200,
-        data: {
-          xml: "<xml>all good</xml>",
-          success: true,
-        },
+        data: [
+          {
+            xml: "<xml>all good</xml>",
+            success: true,
+          },
+        ],
       }),
     )
-    vi.spyOn(documentUnitService, "getByDocumentNumber").mockImplementation(
-      () =>
-        Promise.resolve({
-          status: 200,
-          data: new DocumentUnit("foo", {
-            documentNumber: "1234567891234",
-            coreData: {
-              court: {
-                type: "AG",
-                location: "Test",
-                label: "AG Test",
-              },
-            },
-            texts: {},
-            previousDecisions: undefined,
-            ensuingDecisions: undefined,
-            contentRelatedIndexing: {},
-          }),
-        }),
+    vi.spyOn(legalPeriodicalEditionService, "get").mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: new LegalPeriodicalEdition({}),
+      }),
     )
     const { user } = renderComponent()
 
@@ -149,15 +133,14 @@ describe("Document Unit Handover", () => {
       screen.getByRole("heading", { name: "Überprüfung der Daten ..." }),
     ).toBeInTheDocument()
     expect(
-      await screen.findByLabelText("Dokumentationseinheit an jDV übergeben"),
+      await screen.findByLabelText("Fundstellen der Ausgabe an jDV übergeben"),
     ).toBeInTheDocument()
 
     await user.click(
-      screen.getByLabelText("Dokumentationseinheit an jDV übergeben"),
+      screen.getByLabelText("Fundstellen der Ausgabe an jDV übergeben"),
     )
 
-    expect(
-      await screen.findByLabelText("Erfolg der jDV Übergabe"),
-    ).toBeInTheDocument()
+    expect(await screen.findByLabelText("Erfolg der jDV Übergabe"))
+      .toBeInTheDocument
   })
 })
