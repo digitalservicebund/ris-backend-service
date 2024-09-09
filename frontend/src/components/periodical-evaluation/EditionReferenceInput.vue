@@ -27,7 +27,7 @@ const emit = defineEmits<{
   "update:modelValue": [value: Reference]
   addEntry: [void]
   cancelEdit: [void]
-  removeEntry: [value?: Reference]
+  removeEntry: [value: Reference]
 }>()
 
 const store = useEditionStore()
@@ -385,7 +385,7 @@ watch(
         button-type="destructive"
         label="Eintrag löschen"
         size="small"
-        @click.stop="emit('removeEntry', modelValue)"
+        @click.stop="modelValue && emit('removeEntry', modelValue)"
       />
     </div>
     <div class="bg-blue-200">
