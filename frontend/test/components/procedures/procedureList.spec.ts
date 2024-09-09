@@ -248,6 +248,7 @@ describe("ProcedureList", () => {
   })
 
   it("should list all user groups and default option in dropdown", async () => {
+    isInternalUser = true
     const { mockedGetProcedures } = await renderComponent()
     expect(mockedGetProcedures).toHaveBeenCalledOnce()
 
@@ -263,7 +264,7 @@ describe("ProcedureList", () => {
     expect(options[2]).toHaveTextContent("Nicht zugewiesen")
   })
 
-  it("should disable dropdown when user is external", async () => {
+  it("should hide dropdown when user is external", async () => {
     isInternalUser = false
     const { mockedGetProcedures } = await renderComponent()
     expect(mockedGetProcedures).toHaveBeenCalledOnce()
@@ -272,8 +273,7 @@ describe("ProcedureList", () => {
       await screen.findByText("Es wurden noch keine Vorgänge angelegt."),
     ).not.toBeVisible()
 
-    const dropdown = await screen.findByLabelText("dropdown input")
-    expect(dropdown).toBeDisabled()
+    expect(screen.queryByLabelText("dropdown input")).not.toBeInTheDocument()
   })
 
   it("should enable dropdown when user is internal", async () => {

@@ -303,13 +303,12 @@ onMounted(async () => {
                 </div>
               </div>
               <DropdownInput
-                v-if="featureToggle"
+                v-if="featureToggle && isInternalUser"
                 v-model="procedure.userGroupId"
                 aria-label="dropdown input"
                 class="ml-auto w-auto"
                 is-small
                 :items="getDropdownItems()"
-                :read-only="!isInternalUser"
                 @click.stop
                 @update:model-value="
                   (value: string | undefined) =>
