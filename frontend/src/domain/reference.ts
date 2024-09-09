@@ -68,7 +68,7 @@ export default class Reference implements EditableListItem {
     return isEmpty
   }
 
-  private fieldIsEmpty(value: Reference[(typeof Reference.fields)[number]]) {
+  fieldIsEmpty(value: Reference[(typeof Reference.fields)[number]]) {
     return value === undefined || !value || Object.keys(value).length === 0
   }
 

@@ -140,7 +140,7 @@ export type ComboboxItem = {
   value?: ComboboxInputModelType
   labelCssClasses?: string
   additionalInformation?: string
-  sideInforamtion?: string
+  sideInformation?: string
 }
 
 export interface ComboboxAttributes extends BaseInputAttributes {

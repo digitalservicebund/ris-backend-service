@@ -27,7 +27,7 @@ const emit = defineEmits<{
   "update:modelValue": [value: Reference]
   addEntry: [void]
   cancelEdit: [void]
-  removeEntry: [value: Reference]
+  removeEntry: [value?: Reference]
 }>()
 
 const store = useEditionStore()

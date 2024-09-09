@@ -28,11 +28,11 @@ const validationStore = useValidationStore<(typeof Reference.fields)[number]>()
 
 const legalPeriodical = computed({
   get: () =>
-    reference?.value?.legalPeriodical
+    reference?.value?.legalPeriodical?.abbreviation
       ? {
-          label: reference?.value?.legalPeriodical.abbreviation,
-          value: reference?.value?.legalPeriodical,
-          additionalInformation: reference?.value?.legalPeriodical.subtitle,
+          label: reference.value.legalPeriodical.abbreviation,
+          value: reference.value.legalPeriodical,
+          additionalInformation: reference.value.legalPeriodical.subtitle,
         }
       : undefined,
   set: (newValue) => {
