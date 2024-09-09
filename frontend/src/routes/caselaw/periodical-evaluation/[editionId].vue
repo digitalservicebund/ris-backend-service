@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from "vue"
 import { useRoute } from "vue-router"
-import PeriodicalEditionInfoPanel from "@/components/LegalPeriodicalInfoPanel.vue"
 import NavbarSide from "@/components/NavbarSide.vue"
 import ErrorPage from "@/components/PageError.vue"
+import PeriodicalEditionInfoPanel from "@/components/periodical-evaluation/PeriodicalInfoPanel.vue"
 import { usePeriodicalEvaluationMenuItems } from "@/composables/usePeriodicalEvaluationMenuItems"
 import { ResponseError } from "@/services/httpClient"
 import { useEditionStore } from "@/stores/editionStore"
