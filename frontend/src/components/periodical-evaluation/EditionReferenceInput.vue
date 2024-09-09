@@ -385,7 +385,7 @@ watch(
         button-type="destructive"
         label="Eintrag löschen"
         size="small"
-        @click.stop="emit('removeEntry', modelValue)"
+        @click.stop="modelValue && emit('removeEntry', modelValue)"
       />
     </div>
     <div class="bg-blue-200">

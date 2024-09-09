@@ -80,7 +80,7 @@ async function addEdition() {
 
 const legalPeriodical = computed({
   get: () =>
-    filter.value
+    filter.value?.abbreviation
       ? {
           label: filter.value.abbreviation,
           value: filter.value,
