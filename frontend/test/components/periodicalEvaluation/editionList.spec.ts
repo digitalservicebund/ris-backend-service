@@ -1,3 +1,4 @@
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
@@ -20,7 +21,19 @@ function renderComponent() {
   return {
     user,
     ...render(EditionList, {
-      global: { plugins: [router] },
+      global: {
+        plugins: [
+          router,
+          [
+            createTestingPinia({
+              initialState: {
+                editionStore: undefined,
+              },
+              stubActions: false,
+            }),
+          ],
+        ],
+      },
     }),
   }
 }

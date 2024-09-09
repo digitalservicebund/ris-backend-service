@@ -19,6 +19,7 @@ import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import ComboboxItemService from "@/services/comboboxItemService"
 import { ResponseError } from "@/services/httpClient"
 import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
+import { useEditionStore } from "@/stores/editionStore"
 import IconDelete from "~icons/ic/baseline-close"
 import IconEdit from "~icons/ic/outline-edit"
 
@@ -33,6 +34,7 @@ const { getQueryFromRoute, pushQueryToRoute, route } = useQuery<"q">()
 const query = ref(getQueryFromRoute())
 const searchResponseError = ref<ResponseError | undefined>(emptyResponse)
 const isLoading = ref(false)
+const editionStore = useEditionStore()
 
 /**
  * Sets a timeout before pushing the search query to the route,
@@ -72,6 +74,7 @@ async function addEdition() {
     legalPeriodical: { uuid: legalPeriodical?.value?.value.uuid },
   })
   const response = await LegalPeriodicalEditionService.save(edition)
+  editionStore.edition = response.data
   router.push({
     name: "caselaw-periodical-evaluation-editionId-edition",
     params: { editionId: response.data?.id },
