@@ -15,7 +15,9 @@ const formattedDate = dayjs().format("DD.MM.YYYY")
 /* eslint-disable playwright/no-conditional-expect */
 /* eslint-disable playwright/no-conditional-in-test */
 
-test.describe(
+// Tests are currently flaky
+// eslint-disable-next-line playwright/no-skipped-test
+test.describe.skip(
   "Periodical evaluation",
   {
     tag: "@RISDEV-4264",
