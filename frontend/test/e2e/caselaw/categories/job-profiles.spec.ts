@@ -10,6 +10,7 @@ test.describe(
       description:
         "https://digitalservicebund.atlassian.net/browse/RISDEV-4571",
     },
+    tag: ["@RISDEV-4571"],
   },
   () => {
     const firstJobProfile = "Handwerker"
