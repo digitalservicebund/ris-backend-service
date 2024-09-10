@@ -18,6 +18,7 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionService;
@@ -81,6 +82,8 @@ class LegalPeriodicalEditionIntegrationTest {
   @MockBean private DocumentationUnitService service;
   @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @MockBean private ProcedureService procedureService;
+
+  @MockBean private HandoverService handoverService;
 
   private static final String EDITION_ENDPOINT = "/api/v1/caselaw/legalperiodicaledition";
   private final DocumentationOffice docOffice = buildDSDocOffice();

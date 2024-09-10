@@ -32,9 +32,11 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
@@ -306,13 +308,14 @@ class DocumentationUnitControllerTest {
     when(handoverService.handoverAsMail(TEST_UUID, ISSUER_ADDRESS))
         .thenReturn(
             HandoverMail.builder()
-                .documentationUnitId(TEST_UUID)
+                .entityId(TEST_UUID)
                 .receiverAddress("receiver address")
                 .mailSubject("mailSubject")
-                .xml("xml")
+                .attachments(
+                    Collections.singletonList(
+                        MailAttachment.builder().fileContent("xml").fileName("test.xml").build()))
                 .success(true)
                 .statusMessages(List.of("status-messages"))
-                .fileName("test.xml")
                 .handoverDate(Instant.parse("2020-01-01T01:01:01.00Z"))
                 .build());
 
@@ -333,12 +336,13 @@ class DocumentationUnitControllerTest {
     assertThat(responseBody)
         .isEqualTo(
             HandoverMail.builder()
-                .documentationUnitId(TEST_UUID)
+                .entityId(TEST_UUID)
                 .receiverAddress("receiver address")
                 .mailSubject("mailSubject")
-                .xml("xml")
+                .attachments(
+                    Collections.singletonList(
+                        MailAttachment.builder().fileContent("xml").fileName("test.xml").build()))
                 .success(true)
-                .fileName("test.xml")
                 .statusMessages(List.of("status-messages"))
                 .handoverDate(Instant.parse("2020-01-01T01:01:01Z"))
                 .build());
@@ -366,7 +370,7 @@ class DocumentationUnitControllerTest {
   @Test
   void testGetLastHandoverXmlMail() {
 
-    when(handoverService.getEventLog(TEST_UUID))
+    when(handoverService.getEventLog(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT))
         .thenReturn(
             List.of(
                 HandoverReport.builder()
@@ -374,13 +378,17 @@ class DocumentationUnitControllerTest {
                     .receivedDate(Instant.parse("2021-01-01T01:01:01.00Z"))
                     .build(),
                 HandoverMail.builder()
-                    .documentationUnitId(TEST_UUID)
+                    .entityId(TEST_UUID)
                     .receiverAddress("receiver address")
                     .mailSubject("mailSubject")
-                    .xml("xml")
+                    .attachments(
+                        Collections.singletonList(
+                            MailAttachment.builder()
+                                .fileContent("xml")
+                                .fileName("test.xml")
+                                .build()))
                     .success(true)
                     .statusMessages(List.of("status-messages"))
-                    .fileName("test.xml")
                     .handoverDate(Instant.parse("2020-01-01T01:01:01.00Z"))
                     .build(),
                 HandoverReport.builder()
@@ -407,21 +415,22 @@ class DocumentationUnitControllerTest {
                 .receivedDate(Instant.parse("2021-01-01T01:01:01Z"))
                 .build(),
             HandoverMail.builder()
-                .documentationUnitId(TEST_UUID)
+                .entityId(TEST_UUID)
                 .receiverAddress("receiver address")
                 .mailSubject("mailSubject")
-                .xml("xml")
+                .attachments(
+                    Collections.singletonList(
+                        MailAttachment.builder().fileContent("xml").fileName("test.xml").build()))
                 .success(true)
                 .statusMessages(List.of("status-messages"))
                 .handoverDate(Instant.parse("2020-01-01T01:01:01Z"))
-                .fileName("test.xml")
                 .build(),
             HandoverReport.builder()
                 .content("<html>2019 Report</html>")
                 .receivedDate(Instant.parse("2019-01-01T01:01:01Z"))
                 .build());
 
-    verify(handoverService).getEventLog(TEST_UUID);
+    verify(handoverService).getEventLog(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT);
   }
 
   @Test

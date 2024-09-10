@@ -1,7 +1,6 @@
 import EventRecord from "@/domain/eventRecord"
-import service from "@/services/handoverService"
+import service from "@/services/handoverEditionService"
 
-// TODO as stated in https://vitest.dev/api/vi.html#vi-mock, the vi.mock is the same for all tests. This should be refactored
 describe("handoverService", () => {
   it("returns error message if event report contains error but status is success", async () => {
     vi.mock("@/services/httpClient", () => {
@@ -13,10 +12,10 @@ describe("handoverService", () => {
       }
     })
 
-    const result = await service.handoverDocument("123")
+    const result = await service.handoverEdition("123")
     expect(result.error?.title).toEqual("Leider ist ein Fehler aufgetreten.")
     expect(result.error?.description).toContain(
-      "Die Dokumentationseinheit kann nicht übergeben werden.",
+      "Die Ausgabe kann nicht übergeben werden.",
     )
   })
 
@@ -24,8 +23,8 @@ describe("handoverService", () => {
     vi.mock("@/services/httpClient", () => {
       return {
         default: {
-          get: vi.fn().mockReturnValue({ status: 400, data: {} }),
-          put: vi.fn().mockReturnValue({ status: 400, data: {} }),
+          get: vi.fn().mockReturnValue({ status: 400, data: [{}] }),
+          put: vi.fn().mockReturnValue({ status: 400, data: [{}] }),
         },
       }
     })
@@ -40,17 +39,21 @@ describe("handoverService", () => {
         default: {
           get: vi.fn().mockReturnValue({
             status: 200,
-            data: {
-              success: false,
-              statusMessages: ["Fehler 1", "Fehler 2"],
-            },
+            data: [
+              {
+                success: false,
+                statusMessages: ["Fehler 1", "Fehler 2"],
+              },
+            ],
           }),
           put: vi.fn().mockReturnValue({
             status: 200,
-            data: {
-              success: false,
-              statusMessages: ["Fehler 1", "Fehler 2"],
-            },
+            data: [
+              {
+                success: false,
+                statusMessages: ["Fehler 1", "Fehler 2"],
+              },
+            ],
           }),
         },
       }

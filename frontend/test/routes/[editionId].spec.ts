@@ -29,14 +29,21 @@ async function renderComponent() {
         path: "/caselaw/periodical-evaluation/:editionId/edition",
         name: "caselaw-periodical-evaluation-editionId-edition",
         component: {
-          template: "<div data-testid='preview'>Ausgabe</div>",
+          template: "<div data-testid='edition'>Ausgabe</div>",
         },
       },
       {
         path: "/caselaw/periodical-evaluation/:editionId/references",
         name: "caselaw-periodical-evaluation-editionId-references",
         component: {
-          template: "<div data-testid='preview'>Fundstellen</div>",
+          template: "<div data-testid='references'>Fundstellen</div>",
+        },
+      },
+      {
+        path: "/caselaw/periodical-evaluation/:editionId/handover",
+        name: "caselaw-periodical-evaluation-editionId-handover",
+        component: {
+          template: "<div data-testid='handover'>Übergabe</div>",
         },
       },
     ],

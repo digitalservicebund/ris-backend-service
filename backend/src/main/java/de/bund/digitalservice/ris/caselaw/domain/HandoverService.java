@@ -27,6 +27,8 @@ import org.xml.sax.SAXException;
 public class HandoverService {
 
   private final DocumentationUnitRepository repository;
+
+  private final LegalPeriodicalEditionRepository editionRepository;
   private final HandoverReportRepository handoverReportRepository;
   private final MailService mailService;
   private final DeltaMigrationRepository deltaMigrationRepository;
@@ -38,12 +40,14 @@ public class HandoverService {
       DocumentationUnitRepository repository,
       MailService mailService,
       DeltaMigrationRepository migrationService,
-      HandoverReportRepository handoverReportRepository) {
+      HandoverReportRepository handoverReportRepository,
+      LegalPeriodicalEditionRepository editionRepository) {
 
     this.repository = repository;
     this.mailService = mailService;
     this.deltaMigrationRepository = migrationService;
     this.handoverReportRepository = handoverReportRepository;
+    this.editionRepository = editionRepository;
   }
 
   /**
@@ -86,26 +90,50 @@ public class HandoverService {
   }
 
   /**
-   * Get the event log for a documentation unit, containing jDV email handover operations, handover
-   * reports (response emails from the jDV) and migrations/import events.
+   * Create a preview juris xml for a edition
    *
-   * @param documentUuid the UUID of the documentation unit
+   * @param editionId the id of the edition
+   * @return the export result, containing the juris xml and export metadata
+   */
+  public List<XmlTransformationResult> createEditionPreviewXml(UUID editionId) throws IOException {
+    LegalPeriodicalEdition edition =
+        editionRepository
+            .findById(editionId)
+            .orElseThrow(() -> new IOException("Edition not found: " + editionId));
+    return mailService.getXmlPreview(edition);
+  }
+
+  /**
+   * Get the event log for a entity (documentation unit or edition), containing jDV email handover
+   * operations, handover reports (response emails from the jDV) and migrations/import events.
+   *
+   * @param entityId the UUID of the entity
    * @return the event log
    */
-  public List<EventRecord> getEventLog(UUID documentUuid) {
-    List<EventRecord> list =
-        ListUtils.union(
-            mailService.getHandoverResult(documentUuid),
-            handoverReportRepository.getAllByDocumentationUnitUuid(documentUuid));
-    var migration = deltaMigrationRepository.getLatestMigration(documentUuid);
-    if (migration != null) {
-      list.add(
-          migration.xml() != null
-              ? migration.toBuilder().xml(prettifyXml(migration.xml())).build()
-              : migration);
+  public List<EventRecord> getEventLog(UUID entityId, HandoverEntityType entityType) {
+    switch (entityType) {
+      case EDITION -> {
+        return mailService.getHandoverResult(entityId, entityType).stream()
+            .map(mail -> (EventRecord) mail)
+            .toList();
+      }
+      case DOCUMENTATION_UNIT -> {
+        List<EventRecord> list =
+            ListUtils.union(
+                mailService.getHandoverResult(entityId, entityType),
+                handoverReportRepository.getAllByDocumentationUnitUuid(entityId));
+        var migration = deltaMigrationRepository.getLatestMigration(entityId);
+        if (migration != null) {
+          list.add(
+              migration.xml() != null
+                  ? migration.toBuilder().xml(prettifyXml(migration.xml())).build()
+                  : migration);
+        }
+        list.sort(Comparator.comparing(EventRecord::getDate).reversed());
+        return list;
+      }
+      default -> throw new IllegalArgumentException("Unsupported entity type: " + entityType);
     }
-    list.sort(Comparator.comparing(EventRecord::getDate).reversed());
-    return list;
   }
 
   /**

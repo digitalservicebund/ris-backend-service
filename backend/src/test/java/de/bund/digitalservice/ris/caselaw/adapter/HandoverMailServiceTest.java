@@ -13,6 +13,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHandoverException;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
@@ -69,26 +70,28 @@ class HandoverMailServiceTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final HandoverMail EXPECTED_BEFORE_SAVE =
       HandoverMail.builder()
-          .documentationUnitId(TEST_UUID)
+          .entityId(TEST_UUID)
+          .entityType(HandoverEntityType.DOCUMENTATION_UNIT)
           .receiverAddress(RECEIVER_ADDRESS)
           .mailSubject(MAIL_SUBJECT)
-          .xml("xml")
+          .attachments(
+              List.of(MailAttachment.builder().fileName("test.xml").fileContent("xml").build()))
           .success(true)
           .statusMessages(List.of("succeed"))
-          .fileName("test.xml")
           .handoverDate(CREATED_DATE)
           .issuerAddress(ISSUER_ADDRESS)
           .build();
 
   private static final HandoverMail SAVED_XML_MAIL =
       HandoverMail.builder()
-          .documentationUnitId(TEST_UUID)
+          .entityId(TEST_UUID)
+          .entityType(HandoverEntityType.DOCUMENTATION_UNIT)
           .receiverAddress(RECEIVER_ADDRESS)
           .mailSubject(MAIL_SUBJECT)
-          .xml("xml")
+          .attachments(
+              List.of(MailAttachment.builder().fileName("test.xml").fileContent("xml").build()))
           .success(true)
           .statusMessages(List.of("succeed"))
-          .fileName("test.xml")
           .handoverDate(CREATED_DATE)
           .issuerAddress(ISSUER_ADDRESS)
           .build();
@@ -147,10 +150,10 @@ class HandoverMailServiceTest {
             "neuris",
             Collections.singletonList(
                 MailAttachment.builder()
-                    .fileName(SAVED_XML_MAIL.fileName())
-                    .fileContent(SAVED_XML_MAIL.xml())
+                    .fileName(SAVED_XML_MAIL.attachments().get(0).fileName())
+                    .fileContent(SAVED_XML_MAIL.attachments().get(0).fileContent())
                     .build()),
-            SAVED_XML_MAIL.documentationUnitId().toString());
+            SAVED_XML_MAIL.entityId().toString());
   }
 
   @Test
@@ -160,7 +163,7 @@ class HandoverMailServiceTest {
             "xml", false, List.of("status-message"), "test.xml", CREATED_DATE);
     var expected =
         HandoverMail.builder()
-            .documentationUnitId(TEST_UUID)
+            .entityId(TEST_UUID)
             .statusMessages(List.of("status-message"))
             .success(false)
             .build();
@@ -271,11 +274,23 @@ class HandoverMailServiceTest {
   @Test
   void testGetLastHandoverXmlMail() {
     List<HandoverMail> list = List.of(SAVED_XML_MAIL);
-    when(repository.getHandoversByDocumentationUnitId(TEST_UUID)).thenReturn((List) list);
+    when(repository.getHandoversByEntity(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT))
+        .thenReturn(list);
 
-    var response = service.getHandoverResult(TEST_UUID);
+    var response = service.getHandoverResult(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT);
     assertThat(response.get(0)).usingRecursiveComparison().isEqualTo(EXPECTED_RESPONSE);
 
-    verify(repository).getHandoversByDocumentationUnitId(TEST_UUID);
+    verify(repository).getHandoversByEntity(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT);
+  }
+
+  @Test
+  void testGetLastEditionHandoverXmlMail() {
+    List<HandoverMail> list = List.of(SAVED_XML_MAIL);
+    when(repository.getHandoversByEntity(TEST_UUID, HandoverEntityType.EDITION)).thenReturn(list);
+
+    var response = service.getHandoverResult(TEST_UUID, HandoverEntityType.EDITION);
+    assertThat(response.get(0)).usingRecursiveComparison().isEqualTo(EXPECTED_RESPONSE);
+
+    verify(repository).getHandoversByEntity(TEST_UUID, HandoverEntityType.EDITION);
   }
 }

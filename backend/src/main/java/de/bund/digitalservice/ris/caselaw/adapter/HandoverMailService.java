@@ -3,9 +3,11 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHandoverException;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
+import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
@@ -88,14 +90,15 @@ public class HandoverMailService implements MailService {
   }
 
   /**
-   * Returns the results of performed handover operations for a documentation unit.
+   * Returns the results of performed handover operations for an entity (documentation unit or
+   * edition).
    *
-   * @param documentationUnitId the UUID of the documentation unit
-   * @return a list of results of all handover operations for the documentation unit
+   * @param entityId the UUID of the entity
+   * @return a list of results of all handover operations for the entity
    */
   @Override
-  public List<HandoverMail> getHandoverResult(UUID documentationUnitId) {
-    return repository.getHandoversByDocumentationUnitId(documentationUnitId);
+  public List<HandoverMail> getHandoverResult(UUID entityId, HandoverEntityType entityType) {
+    return repository.getHandoversByEntity(entityId, entityType);
   }
 
   /**
@@ -112,6 +115,18 @@ public class HandoverMailService implements MailService {
     } catch (ParserConfigurationException | TransformerException ex) {
       throw new DocumentationUnitHandoverException("Couldn't generate xml.", ex);
     }
+  }
+
+  /**
+   * Generates a preview of the XMLs that would be sent via email.
+   *
+   * @param edition the edition
+   * @return the XML export results, containing the XMLs and possibly errors
+   */
+  @Override
+  public List<XmlTransformationResult> getXmlPreview(LegalPeriodicalEdition edition) {
+    // TODO
+    return List.of();
   }
 
   private String generateMailSubject(DocumentationUnit documentationUnit) {
@@ -155,12 +170,15 @@ public class HandoverMailService implements MailService {
         handoverMail.receiverAddress(),
         handoverMail.mailSubject(),
         "neuris",
-        Collections.singletonList(
-            MailAttachment.builder()
-                .fileName(handoverMail.fileName())
-                .fileContent(handoverMail.xml())
-                .build()),
-        handoverMail.documentationUnitId().toString());
+        handoverMail.attachments().stream()
+            .map(
+                attachment ->
+                    MailAttachment.builder()
+                        .fileName(attachment.fileName())
+                        .fileContent(attachment.fileContent())
+                        .build())
+            .toList(),
+        handoverMail.entityId().toString());
   }
 
   private HandoverMail generateXmlHandoverMail(
@@ -171,7 +189,7 @@ public class HandoverMailService implements MailService {
       String issuerAddress) {
     var xmlHandoverMailBuilder =
         HandoverMail.builder()
-            .documentationUnitId(documentationUnitId)
+            .entityId(documentationUnitId)
             .success(xml.success())
             .statusMessages(xml.statusMessages());
 
@@ -182,10 +200,12 @@ public class HandoverMailService implements MailService {
     return xmlHandoverMailBuilder
         .receiverAddress(receiverAddress)
         .mailSubject(mailSubject)
-        .xml(xml.xml())
-        .fileName(xml.fileName())
         .handoverDate(xml.creationDate())
         .issuerAddress(issuerAddress)
+        .attachments(
+            Collections.singletonList(
+                MailAttachment.builder().fileName(xml.fileName()).fileContent(xml.xml()).build()))
+        .entityType(HandoverEntityType.DOCUMENTATION_UNIT)
         .build();
   }
 

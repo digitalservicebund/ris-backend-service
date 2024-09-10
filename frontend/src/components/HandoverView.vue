@@ -421,7 +421,11 @@ const fieldsMissing = computed(() => {
                 </div>
               </div>
               <div class="ds-label-section text-gray-900">ALS</div>
-              <CodeSnippet v-if="!!item?.xml" title="XML" :xml="item.xml" />
+              <CodeSnippet
+                v-if="item.attachments?.[0]"
+                title="XML"
+                :xml="item.attachments?.[0].fileContent!"
+              />
             </div>
             <div
               v-else-if="item.type == EventRecordType.MIGRATION"

@@ -1,8 +1,14 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionService;
+import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -26,8 +32,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class LegalPeriodicalEditionController {
   private final LegalPeriodicalEditionService service;
 
-  public LegalPeriodicalEditionController(LegalPeriodicalEditionService service) {
+  private final HandoverService handoverService;
+
+  public LegalPeriodicalEditionController(
+      LegalPeriodicalEditionService service, HandoverService handoverService) {
     this.service = service;
+    this.handoverService = handoverService;
   }
 
   @GetMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -64,5 +74,53 @@ public class LegalPeriodicalEditionController {
       return ResponseEntity.ok().build();
     }
     return ResponseEntity.noContent().build();
+  }
+
+  /**
+   * Hands over the references of the edition to jDV as XML via email.
+   *
+   * @param uuid UUID of the documentation unit
+   * @return the email sent containing the XML files
+   */
+  @PutMapping(value = "/{uuid}/handover", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("isAuthenticated()")
+  public ResponseEntity<HandoverMail> handoverEditionAsMail(@PathVariable UUID uuid) {
+
+    // TODO
+    return ResponseEntity.ok(
+        HandoverMail.builder()
+            .entityId(uuid)
+            .entityType(HandoverEntityType.EDITION)
+            .success(false)
+            .build());
+  }
+
+  /**
+   * Get all events of a edition (can be handover events, received handover reports)
+   *
+   * @param editionId id of the edition
+   * @return ordered list of event records (newest first)
+   */
+  @GetMapping(value = "/{editionId}/handover", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("isAuthenticated()")
+  public List<EventRecord> getEventLog(@PathVariable UUID editionId) {
+    return handoverService.getEventLog(editionId, HandoverEntityType.EDITION);
+  }
+
+  /**
+   * Get the XML preview of an edition.
+   *
+   * @param uuid id of the edition
+   * @return the XML preview or an empty response with status code 400 if the user is not authorized
+   *     or an empty response if the edition does not exist
+   */
+  @GetMapping(value = "/{uuid}/preview-xml", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("isAuthenticated()")
+  public List<XmlTransformationResult> getXmlPreview(@PathVariable UUID uuid) {
+    try {
+      return handoverService.createEditionPreviewXml(uuid);
+    } catch (IOException e) {
+      return List.of();
+    }
   }
 }

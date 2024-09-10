@@ -254,7 +254,13 @@ describe("HandoverView:", () => {
           eventLog: [
             {
               type: EventRecordType.HANDOVER,
-              xml: '<?xml version="1.0"?>\n<!DOCTYPE juris-r SYSTEM "juris-r.dtd">\n<xml>content</xml>',
+              attachments: [
+                {
+                  fileContent:
+                    '<?xml version="1.0"?>\n<!DOCTYPE juris-r SYSTEM "juris-r.dtd">\n<xml>content</xml>',
+                  fileName: "file.xml",
+                },
+              ],
               statusMessages: ["success"],
               success: true,
               receiverAddress: "receiver address",
@@ -314,7 +320,7 @@ describe("HandoverView:", () => {
         eventLog: [
           {
             type: EventRecordType.HANDOVER,
-            xml: "xml content",
+            attachments: [{ fileContent: "xml content", fileName: "file.xml" }],
             statusMessages: ["success"],
             success: true,
             receiverAddress: "receiver address",
