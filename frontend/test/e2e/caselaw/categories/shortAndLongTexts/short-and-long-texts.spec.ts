@@ -1,5 +1,11 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories, save, waitForInputValue } from "../../e2e-utils"
+import {
+  navigateToCategories,
+  navigateToHandover,
+  navigateToPreview,
+  save,
+  waitForInputValue,
+} from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 import { DocumentUnitCatagoriesEnum } from "@/components/enumDocumentUnitCatagories"
 
@@ -268,6 +274,136 @@ test.describe("short and long texts", () => {
         const inputFieldInnerHTML = await dissentingOpinion.innerHTML()
         expect(inputFieldInnerHTML).toContain(editable)
       })
+    },
+  )
+
+  test(
+    "text editor input should be saved and displayed in preview and in 'XML-Vorschau'",
+    {
+      annotation: [
+        {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-4570",
+        },
+        {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-4572",
+        },
+        {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-4573",
+        },
+      ],
+      tag: ["@RISDEV-4570", "@RISDEV-4572", "@RISDEV-4573"],
+    },
+    async ({ page, prefilledDocumentUnit }) => {
+      const testCases: {
+        testId: string
+        value: string
+      }[] = [
+        {
+          testId: "Titelzeile",
+          value: "Titelzeile Test Text",
+        },
+        {
+          testId: "Leitsatz",
+          value: ": Leitsatz Test Text",
+        },
+        {
+          testId: "Orientierungssatz",
+          value: ": Orientierungssatz Test Text",
+        },
+        {
+          testId: "Sonstiger Orientierungssatz",
+          value: "Sonstiger Orientierungssatz Test Text",
+        },
+        {
+          testId: "Tenor",
+          value: "Tenor Test Text",
+        },
+        {
+          testId: "Gründe",
+          value: "Gründe Test Text",
+        },
+        {
+          testId: "Tatbestand",
+          value: "Tatbestand Test Text",
+        },
+        {
+          testId: "Entscheidungsgründe",
+          value: "Entscheidungsgründe Test Text",
+        },
+        {
+          testId: "Abweichende Meinung",
+          value: "Abweichende Meinung Test Text",
+        },
+        {
+          testId: "Sonstiger Langtext",
+          value: "Sonstiger Langtext Test Text",
+        },
+      ]
+
+      for (let index = 0; index < testCases.length; index++) {
+        const testId = testCases[index].testId
+        const value = testCases[index].value
+        const selector = `[data-testid='${testId}']`
+
+        await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
+
+        await test.step(`text field '${testId}' should be filled with value '${value}`, async () => {
+          const textField = page.locator(selector)
+          await textField.click()
+          await page.keyboard.press("ControlOrMeta+A")
+          await page.keyboard.press("Backspace")
+          await page.keyboard.type(value)
+          const innerText = await textField.innerText()
+          expect(innerText).toContain(value)
+        })
+
+        // eslint-disable-next-line playwright/no-conditional-in-test
+        if (testId == "Tatbestand") {
+          const textField = page.locator(`[data-testid='Entscheidungsgründe']`)
+          await textField.click()
+          await page.keyboard.type("Test")
+          const innerText = await textField.innerText()
+          // eslint-disable-next-line playwright/no-conditional-expect
+          expect(innerText).toContain("Test")
+        }
+
+        await save(page)
+
+        await test.step(`value '${value} should be saved (be present after reload)`, async () => {
+          await page.reload()
+          const textField = page.locator(selector)
+          const innerText = await textField.innerText()
+          expect(innerText).toContain(value)
+        })
+
+        await test.step(`text field '${testId}' and value '${value} should be visible in preview`, async () => {
+          await navigateToPreview(
+            page,
+            prefilledDocumentUnit.documentNumber as string,
+          )
+
+          await expect(page.getByText(testId, { exact: true })).toBeVisible()
+          await expect(
+            page.getByText(value, {
+              exact: true,
+            }),
+          ).toBeVisible()
+        })
+
+        await test.step(`text field '${testId}' and value '${value} should be visible in 'XML-Vorschau'`, async () => {
+          await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
+          await page.getByText("XML Vorschau").click()
+          const xmlPreview = page.getByTitle("XML Vorschau")
+          const innerText = await xmlPreview.innerText()
+          expect(innerText).toContain(value)
+        })
+      }
     },
   )
 })

@@ -43,8 +43,8 @@ describe("preview texts", () => {
     expect(await screen.findByText("Gründe")).toBeInTheDocument()
     expect(await screen.findByText("Tatbestand")).toBeInTheDocument()
     expect(await screen.findByText("Entscheidungsgründe")).toBeInTheDocument()
-    expect(await screen.findByText("Sonstiger Langtext")).toBeInTheDocument()
     expect(await screen.findByText("Abweichende Meinung")).toBeInTheDocument()
+    expect(await screen.findByText("Sonstiger Langtext")).toBeInTheDocument()
   })
 
   it.each([
@@ -60,8 +60,8 @@ describe("preview texts", () => {
         "Gründe",
         "Tatbestand",
         "Entscheidungsgründe",
-        "Sonstiger Langtext",
         "Abweichende Meinung",
+        "Sonstiger Langtext",
       ],
     ],
     [
@@ -76,8 +76,8 @@ describe("preview texts", () => {
         "Gründe",
         "Tatbestand",
         "Entscheidungsgründe",
-        "Sonstiger Langtext",
         "Abweichende Meinung",
+        "Sonstiger Langtext",
       ],
     ],
     [
@@ -92,8 +92,8 @@ describe("preview texts", () => {
         "Gründe",
         "Tatbestand",
         "Entscheidungsgründe",
-        "Sonstiger Langtext",
         "Abweichende Meinung",
+        "Sonstiger Langtext",
       ],
     ],
     [
@@ -108,8 +108,8 @@ describe("preview texts", () => {
         "Gründe",
         "Tatbestand",
         "Entscheidungsgründe",
-        "Sonstiger Langtext",
         "Abweichende Meinung",
+        "Sonstiger Langtext",
       ],
     ],
     [
@@ -124,8 +124,8 @@ describe("preview texts", () => {
         "Gründe",
         "Tatbestand",
         "Entscheidungsgründe",
-        "Sonstiger Langtext",
         "Abweichende Meinung",
+        "Sonstiger Langtext",
       ],
     ],
     [
@@ -140,8 +140,8 @@ describe("preview texts", () => {
         "Gründe",
         "Tatbestand",
         "Entscheidungsgründe",
-        "Sonstiger Langtext",
         "Abweichende Meinung",
+        "Sonstiger Langtext",
       ],
     ],
     [
@@ -156,8 +156,8 @@ describe("preview texts", () => {
         "Tenor",
         "Tatbestand",
         "Entscheidungsgründe",
-        "Sonstiger Langtext",
         "Abweichende Meinung",
+        "Sonstiger Langtext",
       ],
     ],
     [
@@ -172,8 +172,8 @@ describe("preview texts", () => {
         "Tenor",
         "Gründe",
         "Entscheidungsgründe",
-        "Sonstiger Langtext",
         "Abweichende Meinung",
+        "Sonstiger Langtext",
       ],
     ],
     [
@@ -188,8 +188,8 @@ describe("preview texts", () => {
         "Tenor",
         "Gründe",
         "Tatbestand",
-        "Sonstiger Langtext",
         "Abweichende Meinung",
+        "Sonstiger Langtext",
       ],
     ],
     [

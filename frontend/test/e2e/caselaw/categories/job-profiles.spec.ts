@@ -36,7 +36,7 @@ test.describe(
         await expect(page.getByText(firstJobProfile)).toBeVisible()
       })
 
-      await removeFirsJobProfile(page)
+      await removeFirstJobProfile(page)
 
       await save(page)
 
@@ -131,7 +131,7 @@ test.describe(
       })
     }
 
-    async function removeFirsJobProfile(page: Page) {
+    async function removeFirstJobProfile(page: Page) {
       await test.step("remove job profile", async () => {
         await page
           .locator("[data-testid='chip']", { hasText: firstJobProfile })
