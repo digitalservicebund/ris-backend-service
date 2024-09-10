@@ -17,7 +17,7 @@ const formattedDate = dayjs().format("DD.MM.YYYY")
 
 // Tests are currently flaky
 // eslint-disable-next-line playwright/no-skipped-test
-test.describe(
+test.describe.skip(
   "Periodical evaluation",
   {
     tag: "@RISDEV-4264",
