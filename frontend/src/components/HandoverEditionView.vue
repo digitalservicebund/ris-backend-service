@@ -47,7 +47,6 @@ onMounted(async () => {
   if (previewResponse.error) {
     previewError.value = previewResponse.error
   } else if (previewResponse.data) {
-    // TODO check success?
     preview.value = previewResponse.data
   }
 })

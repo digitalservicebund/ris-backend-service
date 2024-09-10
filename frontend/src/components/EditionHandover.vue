@@ -14,7 +14,9 @@ const handoverResult = ref<EventRecord>()
 const errorMessage = ref<ResponseError>()
 const succeedMessage = ref<{ title: string; description: string }>()
 
-async function handoverEdition() {}
+async function handoverEdition() {
+  HandoverEditionService.handoverEdition(store.edition!.id!)
+}
 
 function formatDate(date?: string): string {
   if (!date) {

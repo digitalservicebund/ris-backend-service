@@ -27,7 +27,7 @@ export default class LegalPeriodicalEdition {
       ? this.references.map((reference) => new Reference({ ...reference }))
       : []
 
-    this.id = this.id || crypto.randomUUID()
+    this.id = this.id ?? crypto.randomUUID()
   }
 
   /**

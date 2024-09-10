@@ -73,7 +73,7 @@ const service: HandoverEditionService = {
     if (
       response.status >= 300 ||
       !Array.isArray(response.data) ||
-      response.data!.filter((record) => !record.success).length > 0
+      response.data.filter((record) => !record.success).length > 0
     ) {
       response.error = {
         title: errorMessages.EDITION_LOADING_XML_PREVIEW.title,
