@@ -12,8 +12,8 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
@@ -185,9 +185,9 @@ class HandoverMailServiceTest {
     when(xmlExporter.transformToXml(any(DocumentationUnit.class)))
         .thenThrow(ParserConfigurationException.class);
 
-    DocumentationUnitHandoverException ex =
+    HandoverException ex =
         Assertions.assertThrows(
-            DocumentationUnitHandoverException.class,
+            HandoverException.class,
             () -> service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
     Assertions.assertEquals("Couldn't generate xml.", ex.getMessage());
 
@@ -203,7 +203,7 @@ class HandoverMailServiceTest {
     // Call the method and check for the exception
     Throwable throwable =
         Assert.assertThrows(
-            DocumentationUnitHandoverException.class,
+            HandoverException.class,
             () -> service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
 
     assertThat(throwable.getMessage())
@@ -232,8 +232,7 @@ class HandoverMailServiceTest {
   void testSend_withoutToReceiverAddressSet() {
     Throwable throwable =
         Assert.assertThrows(
-            DocumentationUnitHandoverException.class,
-            () -> service.handOver(documentationUnit, null, null));
+            HandoverException.class, () -> service.handOver(documentationUnit, null, null));
 
     assertThat(throwable.getMessage()).isEqualTo("No receiver mail address is set");
 
@@ -244,7 +243,7 @@ class HandoverMailServiceTest {
 
   @Test
   void testSend_withExceptionBySendingEmail() {
-    doThrow(DocumentationUnitHandoverException.class)
+    doThrow(HandoverException.class)
         .when(mailSender)
         .sendMail(
             SENDER_ADDRESS,
@@ -256,7 +255,7 @@ class HandoverMailServiceTest {
             TEST_UUID.toString());
 
     Assert.assertThrows(
-        DocumentationUnitHandoverException.class,
+        HandoverException.class,
         () -> service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
 
     verify(repository, times(0)).save(any(HandoverMail.class));

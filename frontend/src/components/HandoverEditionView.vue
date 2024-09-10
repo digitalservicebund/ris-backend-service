@@ -120,9 +120,8 @@ const referencesMissing = computed(() => {
       <CodeSnippet
         v-for="(item, index) in preview"
         :key="index"
-        ref="preview"
-        title="Vorschau"
-        :value="item"
+        class="mb-16"
+        :title="item.fileName!"
         :xml="item.xml!"
       />
     </ExpandableContent>

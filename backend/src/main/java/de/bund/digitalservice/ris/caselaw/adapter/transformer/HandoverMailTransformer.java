@@ -12,10 +12,10 @@ import java.util.UUID;
 public class HandoverMailTransformer {
   private HandoverMailTransformer() {}
 
-  public static HandoverMailDTO transformToDTO(HandoverMail handoverMail, UUID entityId) {
+  public static HandoverMailDTO transformToDTO(HandoverMail handoverMail) {
     var mail =
         HandoverMailDTO.builder()
-            .entityId(entityId)
+            .entityId(handoverMail.entityId())
             .statusMessages(String.join("|", handoverMail.statusMessages()))
             .statusCode(handoverMail.success() ? "200" : "400")
             .receiverAddress(handoverMail.receiverAddress())

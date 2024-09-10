@@ -37,15 +37,21 @@ public class PostgresHandoverRepositoryImpl implements HandoverRepository {
   @Override
   @Transactional
   public HandoverMail save(HandoverMail handoverMail) {
-    DocumentationUnitDTO documentationUnitDTO =
-        documentationUnitRepository.findById(handoverMail.entityId()).orElseThrow();
 
-    HandoverMailDTO handoverMailDTO =
-        HandoverMailTransformer.transformToDTO(handoverMail, documentationUnitDTO.getId());
+    switch (handoverMail.entityType()) {
+      case DOCUMENTATION_UNIT ->
+          documentationUnitRepository.findById(handoverMail.entityId()).orElseThrow();
+      case EDITION -> editionRepository.findById(handoverMail.entityId()).orElseThrow();
+      default ->
+          throw new IllegalArgumentException(
+              "Unsupported entity type: " + handoverMail.entityType());
+    }
+
+    HandoverMailDTO handoverMailDTO = HandoverMailTransformer.transformToDTO(handoverMail);
     handoverMailDTO = repository.save(handoverMailDTO);
 
     return HandoverMailTransformer.transformToDomain(
-        handoverMailDTO, handoverMail.entityId(), HandoverEntityType.DOCUMENTATION_UNIT);
+        handoverMailDTO, handoverMail.entityId(), handoverMail.entityType());
   }
 
   /**

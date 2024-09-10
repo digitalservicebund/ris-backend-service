@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,7 +43,7 @@ public class LegalPeriodicalEditionTransformer {
 
     AtomicInteger i = new AtomicInteger(1);
     return LegalPeriodicalEditionDTO.builder()
-        .id(legalPeriodicalEdition.id())
+        .id(legalPeriodicalEdition.id() != null ? legalPeriodicalEdition.id() : UUID.randomUUID())
         .createdAt(
             legalPeriodicalEdition.createdAt() != null
                 ? legalPeriodicalEdition.createdAt()
@@ -57,11 +58,7 @@ public class LegalPeriodicalEditionTransformer {
                 ? legalPeriodicalEdition.references().stream()
                     .map(ReferenceTransformer::transformToDTO)
                     .filter(Objects::nonNull)
-                    .map(
-                        referenceDTO -> {
-                          referenceDTO.setRank(i.getAndIncrement());
-                          return referenceDTO;
-                        })
+                    .peek(referenceDTO -> referenceDTO.setRank(i.getAndIncrement()))
                     .toList()
                 : Collections.emptyList())
         .build();
