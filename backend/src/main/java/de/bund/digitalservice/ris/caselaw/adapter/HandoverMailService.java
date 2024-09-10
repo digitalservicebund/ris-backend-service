@@ -185,7 +185,8 @@ public class HandoverMailService implements MailService {
       throw new HandoverException("No legalPeriodical (abbreviation) has been set in the edition.");
     }
     return generateMailSubject(
-        edition.legalPeriodical().abbreviation() + "-" + edition.name(), "F");
+        (edition.legalPeriodical().abbreviation() + "-" + edition.name()).replaceAll("\\s", ""),
+        "F");
   }
 
   private String generateMailSubject(String vg, String dt) {
