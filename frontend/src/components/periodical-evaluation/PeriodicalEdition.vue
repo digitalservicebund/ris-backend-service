@@ -59,7 +59,7 @@ async function saveEdition() {
   if (response.data) {
     edition.value = response.data as LegalPeriodicalEdition
   }
-  router.push({
+  await router.push({
     name: "caselaw-periodical-evaluation-editionId-references",
     params: { editionId: edition?.value?.id },
   })
@@ -68,7 +68,7 @@ async function saveEdition() {
 
 <template>
   <div class="flex h-full w-full flex-col space-y-24 bg-gray-100 px-16 py-16">
-    <h1 class="ds-heading-02-reg">Ausgabe</h1>
+    <h1 class="ds-heading-02-reg" data-testid="edition-title">Ausgabe</h1>
     <div class="mb-24 flex flex-col gap-24 bg-white p-32">
       <InputField
         id="legalPeriodical"

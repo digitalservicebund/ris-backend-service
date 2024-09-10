@@ -149,7 +149,7 @@ test.describe.skip(
             page.getByLabel("Neue Periodikumsauswertung"),
           ).toBeVisible()
           await page.getByLabel("Neue Periodikumsauswertung").click()
-          await expect(page).toHaveURL(
+          await page.waitForURL(
             /\/caselaw\/periodical-evaluation\/[0-9a-fA-F\-]{36}\/edition/,
           )
         })
@@ -161,13 +161,6 @@ test.describe.skip(
             page.locator(`text="Pflichtfeld nicht befüllt"`),
           ).toHaveCount(1)
         })
-
-        // await test.step("prefix or name have to be chosen", async () => {
-        //   await page.getByLabel("Speichern").click()
-        //   await expect(
-        //     page.locator(`text="Pflichtfeld nicht befüllt"`),
-        //   ).toHaveCount(1)
-        // })
 
         const name = generateString()
 
@@ -183,9 +176,11 @@ test.describe.skip(
         try {
           await test.step("'Fortfahren' saved the edition and replaces url with new edition id", async () => {
             await page.getByLabel("Fortfahren").click()
-            await expect(page).toHaveURL(
+
+            await page.waitForURL(
               /\/caselaw\/periodical-evaluation\/[0-9a-fA-F\-]{36}\/references/,
             )
+
             await expect(
               page.getByText("Periodikumsauswertung | WdG " + name, {
                 exact: true,

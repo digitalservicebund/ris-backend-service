@@ -75,7 +75,7 @@ async function addEdition() {
   })
   const response = await LegalPeriodicalEditionService.save(edition)
   editionStore.edition = response.data
-  router.push({
+  await router.push({
     name: "caselaw-periodical-evaluation-editionId-edition",
     params: { editionId: response.data?.id },
   })
@@ -130,7 +130,9 @@ watch(
 )
 
 onMounted(() => {
-  if (query.value.q) getEditions(query.value.q)
+  if (query.value.q) {
+    getEditions(query.value.q)
+  }
 })
 </script>
 
@@ -138,7 +140,9 @@ onMounted(() => {
   <div>
     <div class="gap-16 p-16">
       <FlexContainer class="pb-16" justify-content="justify-between">
-        <h1 class="ds-heading-02-reg">Periodika</h1>
+        <h1 class="ds-heading-02-reg" data-testid="periodical-evaluation-title">
+          Periodika
+        </h1>
       </FlexContainer>
       <FlexContainer align-items="items-end" flex-direction="flex-row">
         <div

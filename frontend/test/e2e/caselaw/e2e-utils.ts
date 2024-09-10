@@ -87,7 +87,8 @@ export const navigateToPeriodicalEvaluation = async (page: Page) => {
     const baseUrl = "/caselaw/periodical-evaluation"
 
     await page.goto(baseUrl)
-    await expect(page.getByRole("heading", { name: "Periodika" })).toBeVisible()
+
+    await expect(page.getByTestId("periodical-evaluation-title")).toBeVisible()
   })
 }
 
@@ -99,7 +100,7 @@ export const navigateToPeriodicalEdition = async (
     const baseUrl = `/caselaw/periodical-evaluation/${editionId}/edition`
 
     await page.goto(baseUrl)
-    await expect(page.getByRole("heading", { name: "Ausgabe" })).toBeVisible()
+    await expect(page.getByTestId("edition-title")).toBeVisible()
   })
 }
 
