@@ -36,7 +36,9 @@ onMounted(async () => {
     v-if="!responseError"
     class="flex h-full w-full flex-col space-y-24 px-16 py-16"
   >
-    <h1 class="ds-heading-02-reg">Fundstellen</h1>
+    <h1 class="ds-heading-02-reg" data-testid="references-title">
+      Fundstellen
+    </h1>
     <div aria-label="Fundstellen">
       <EditableList
         v-model="references"

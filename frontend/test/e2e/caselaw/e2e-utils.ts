@@ -112,9 +112,7 @@ export const navigateToPeriodicalReferences = async (
     const baseUrl = `/caselaw/periodical-evaluation/${editionId}/references`
 
     await page.goto(baseUrl)
-    await expect(
-      page.getByRole("heading", { name: "Fundstellen" }),
-    ).toBeVisible()
+    await expect(page.getByTestId("references-title")).toBeVisible()
   })
 }
 
