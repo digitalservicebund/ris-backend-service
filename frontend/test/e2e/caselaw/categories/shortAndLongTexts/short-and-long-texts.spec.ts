@@ -353,7 +353,7 @@ test.describe("short and long texts", () => {
 
         await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
 
-        await test.step(`text field '${testId}' should be filled with value '${value}`, async () => {
+        await test.step(`text field '${testId}' should be filled with value '${value}'`, async () => {
           const textField = page.locator(selector)
           await textField.click()
           await page.keyboard.press("ControlOrMeta+A")
@@ -375,14 +375,14 @@ test.describe("short and long texts", () => {
 
         await save(page)
 
-        await test.step(`value '${value} should be saved (be present after reload)`, async () => {
+        await test.step(`value '${value}' should be saved (be present after reload)`, async () => {
           await page.reload()
           const textField = page.locator(selector)
           const innerText = await textField.innerText()
           expect(innerText).toContain(value)
         })
 
-        await test.step(`text field '${testId}' and value '${value} should be visible in preview`, async () => {
+        await test.step(`text field '${testId}' and value '${value}' should be visible in preview`, async () => {
           await navigateToPreview(
             page,
             prefilledDocumentUnit.documentNumber as string,
@@ -396,7 +396,7 @@ test.describe("short and long texts", () => {
           ).toBeVisible()
         })
 
-        await test.step(`text field '${testId}' and value '${value} should be visible in 'XML-Vorschau'`, async () => {
+        await test.step(`text field '${testId}' and value '${value}' should be visible in 'XML-Vorschau'`, async () => {
           await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
           await page.getByText("XML Vorschau").click()
           const xmlPreview = page.getByTitle("XML Vorschau")
