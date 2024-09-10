@@ -356,7 +356,7 @@ class HandoverMailIntegrationTest {
             .statusMessages(List.of("message 1", "message 2"))
             .handoverDate(Instant.now())
             .build();
-    xmlHandoverRepository.save(HandoverMailTransformer.transformToDTO(handoverMailDTO, entityId));
+    xmlHandoverRepository.save(HandoverMailTransformer.transformToDTO(handoverMailDTO));
 
     HandoverMail expectedXmlPublication =
         HandoverMail.builder()
@@ -415,8 +415,7 @@ class HandoverMailIntegrationTest {
                 .success(true)
                 .statusMessages(List.of("message 1", "message 2"))
                 .handoverDate(creationDate)
-                .build(),
-            savedDocumentationUnitDTO.getId()));
+                .build()));
 
     Instant receivedDate = creationDate.plus(1, ChronoUnit.HOURS);
     databaseHandoverReportRepository.save(
