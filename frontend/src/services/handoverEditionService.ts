@@ -78,10 +78,11 @@ const service: HandoverEditionService = {
       response.error = {
         title: errorMessages.EDITION_LOADING_XML_PREVIEW.title,
         description:
-          response.data
-            ?.filter((record) => !record.success)
-            .flatMap((record) => record.statusMessages)
-            .join(", ") ||
+          (Array.isArray(response.data) &&
+            response.data
+              ?.filter((record) => !record.success)
+              .flatMap((record) => record.statusMessages)
+              .join(", ")) ||
           errorMessages.EDITION_LOADING_XML_PREVIEW.description,
       }
     }
