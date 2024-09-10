@@ -152,6 +152,7 @@ test.describe.skip(
           await newLegalPeriodicalEvaluation.click()
           await page.waitForURL(
             /\/caselaw\/periodical-evaluation\/[0-9a-fA-F\-]{36}\/edition/,
+            { timeout: 5_000 },
           )
         })
 
@@ -180,6 +181,7 @@ test.describe.skip(
 
             await page.waitForURL(
               /\/caselaw\/periodical-evaluation\/[0-9a-fA-F\-]{36}\/references/,
+              { timeout: 5_000 },
             )
 
             await expect(
