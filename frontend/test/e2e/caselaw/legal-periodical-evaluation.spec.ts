@@ -17,7 +17,7 @@ const formattedDate = dayjs().format("DD.MM.YYYY")
 
 // Tests are currently flaky
 // eslint-disable-next-line playwright/no-skipped-test
-test.describe.skip(
+test.describe(
   "Periodical evaluation",
   {
     tag: "@RISDEV-4264",
@@ -145,10 +145,11 @@ test.describe.skip(
         })
 
         await test.step("A new evaluation is started using the “Neue Periodikumsauswertung button.", async () => {
-          await expect(
-            page.getByLabel("Neue Periodikumsauswertung"),
-          ).toBeVisible()
-          await page.getByLabel("Neue Periodikumsauswertung").click()
+          const newLegalPeriodicalEvaluation = page.getByLabel(
+            "Neue Periodikumsauswertung",
+          )
+          await expect(newLegalPeriodicalEvaluation).toBeVisible()
+          await newLegalPeriodicalEvaluation.click()
           await page.waitForURL(
             /\/caselaw\/periodical-evaluation\/[0-9a-fA-F\-]{36}\/edition/,
           )
