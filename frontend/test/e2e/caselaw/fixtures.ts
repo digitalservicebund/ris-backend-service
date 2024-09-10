@@ -263,6 +263,7 @@ export const caselawTest = test.extend<MyFixtures>({
       {
         data: {
           legalPeriodical: legalPeriodical,
+          id: crypto.randomUUID(),
           prefix: "2024, ",
           suffix: ", Heft 1",
           name: "2024, " + generateString(),
