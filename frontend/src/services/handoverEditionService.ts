@@ -72,7 +72,7 @@ const service: HandoverEditionService = {
 
     if (
       response.status >= 300 ||
-      !response.data ||
+      !Array.isArray(response.data) ||
       response.data!.filter((record) => !record.success).length > 0
     ) {
       response.error = {
