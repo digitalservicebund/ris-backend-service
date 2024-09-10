@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HandoverMailAttachmentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.HandoverMailDTO;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
@@ -11,21 +12,25 @@ import java.util.UUID;
 public class HandoverMailTransformer {
   private HandoverMailTransformer() {}
 
-  public static HandoverMailDTO transformToDTO(HandoverMail xmlPublication, UUID entityId) {
+  public static HandoverMailDTO transformToDTO(HandoverMail handoverMail, UUID entityId) {
     var mail =
         HandoverMailDTO.builder()
             .entityId(entityId)
-            .statusMessages(String.join("|", xmlPublication.statusMessages()))
-            .statusCode(xmlPublication.success() ? "200" : "400")
-            .receiverAddress(xmlPublication.receiverAddress())
-            .sentDate(xmlPublication.getHandoverDate())
-            .mailSubject(xmlPublication.mailSubject())
-            .issuerAddress(xmlPublication.issuerAddress())
+            .statusMessages(String.join("|", handoverMail.statusMessages()))
+            .statusCode(handoverMail.success() ? "200" : "400")
+            .receiverAddress(handoverMail.receiverAddress())
+            .sentDate(handoverMail.getHandoverDate())
+            .mailSubject(handoverMail.mailSubject())
+            .issuerAddress(handoverMail.issuerAddress())
             .attachments(new ArrayList<>())
             .build();
 
-    for (MailAttachment mailAttachment : xmlPublication.attachments()) {
-      mail.addAttachment(HandoverMailAttachmentTransformer.transformToDTO(mailAttachment));
+    for (MailAttachment attachment : handoverMail.attachments()) {
+      mail.addAttachment(
+          HandoverMailAttachmentDTO.builder()
+              .xml(attachment.fileContent())
+              .fileName(attachment.fileName())
+              .build());
     }
     return mail;
   }
@@ -43,7 +48,12 @@ public class HandoverMailTransformer {
         .issuerAddress(handoverMailDTO.getIssuerAddress())
         .attachments(
             handoverMailDTO.getAttachments().stream()
-                .map(HandoverMailAttachmentTransformer::transformToDomain)
+                .map(
+                    attachmentDTO ->
+                        MailAttachment.builder()
+                            .fileContent(attachmentDTO.getXml())
+                            .fileName(attachmentDTO.getFileName())
+                            .build())
                 .toList())
         .build();
   }

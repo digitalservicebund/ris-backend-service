@@ -104,30 +104,36 @@ public class HandoverService {
   }
 
   /**
-   * Get the event log for a documentation unit, containing jDV email handover operations, handover
-   * reports (response emails from the jDV) and migrations/import events.
+   * Get the event log for a entity (documentation unit or edition), containing jDV email handover
+   * operations, handover reports (response emails from the jDV) and migrations/import events.
    *
-   * @param entityId the UUID of the documentation unit
+   * @param entityId the UUID of the entity
    * @return the event log
    */
   public List<EventRecord> getEventLog(UUID entityId, HandoverEntityType entityType) {
-    if (entityType == HandoverEntityType.EDITION) {
-      // TODO better solution
-      return ListUtils.union(mailService.getHandoverResult(entityId, entityType), List.of());
+    switch (entityType) {
+      case EDITION -> {
+        return mailService.getHandoverResult(entityId, entityType).stream()
+            .map(mail -> (EventRecord) mail)
+            .toList();
+      }
+      case DOCUMENTATION_UNIT -> {
+        List<EventRecord> list =
+            ListUtils.union(
+                mailService.getHandoverResult(entityId, entityType),
+                handoverReportRepository.getAllByDocumentationUnitUuid(entityId));
+        var migration = deltaMigrationRepository.getLatestMigration(entityId);
+        if (migration != null) {
+          list.add(
+              migration.xml() != null
+                  ? migration.toBuilder().xml(prettifyXml(migration.xml())).build()
+                  : migration);
+        }
+        list.sort(Comparator.comparing(EventRecord::getDate).reversed());
+        return list;
+      }
+      default -> throw new IllegalArgumentException("Unsupported entity type: " + entityType);
     }
-    List<EventRecord> list =
-        ListUtils.union(
-            mailService.getHandoverResult(entityId, entityType),
-            handoverReportRepository.getAllByDocumentationUnitUuid(entityId));
-    var migration = deltaMigrationRepository.getLatestMigration(entityId);
-    if (migration != null) {
-      list.add(
-          migration.xml() != null
-              ? migration.toBuilder().xml(prettifyXml(migration.xml())).build()
-              : migration);
-    }
-    list.sort(Comparator.comparing(EventRecord::getDate).reversed());
-    return list;
   }
 
   /**

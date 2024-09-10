@@ -90,10 +90,11 @@ public class HandoverMailService implements MailService {
   }
 
   /**
-   * Returns the results of performed handover operations for a documentation unit.
+   * Returns the results of performed handover operations for an entity (documentation unit or
+   * edition).
    *
-   * @param entityId the UUID of the documentation unit
-   * @return a list of results of all handover operations for the documentation unit
+   * @param entityId the UUID of the entity
+   * @return a list of results of all handover operations for the entity
    */
   @Override
   public List<HandoverMail> getHandoverResult(UUID entityId, HandoverEntityType entityType) {

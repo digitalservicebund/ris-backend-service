@@ -17,8 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -82,14 +80,11 @@ public class LegalPeriodicalEditionController {
    * Hands over the references of the edition to jDV as XML via email.
    *
    * @param uuid UUID of the documentation unit
-   * @param oidcUser the logged-in user, used to forward the response email
-   * @return the email sent containing the XML or an empty response with status code 400 * if the
-   *     user is not authorized
+   * @return the email sent containing the XML files
    */
   @PutMapping(value = "/{uuid}/handover", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public ResponseEntity<HandoverMail> handoverEditionAsMail(
-      @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
+  public ResponseEntity<HandoverMail> handoverEditionAsMail(@PathVariable UUID uuid) {
 
     // TODO
     return ResponseEntity.ok(
@@ -101,18 +96,15 @@ public class LegalPeriodicalEditionController {
   }
 
   /**
-   * Get all events of a edition (can be handover events, received handover reports,
-   * import/migration events)
+   * Get all events of a edition (can be handover events, received handover reports)
    *
    * @param editionId id of the edition
-   * @return ordered list of event records (newest first) or an empty response with status code 400
-   *     if the user is not authorized
+   * @return ordered list of event records (newest first)
    */
   @GetMapping(value = "/{editionId}/handover", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public List<EventRecord> getEventLog(@PathVariable UUID editionId) {
-    List<EventRecord> result = handoverService.getEventLog(editionId, HandoverEntityType.EDITION);
-    return result;
+    return handoverService.getEventLog(editionId, HandoverEntityType.EDITION);
   }
 
   /**
@@ -120,7 +112,7 @@ public class LegalPeriodicalEditionController {
    *
    * @param uuid id of the edition
    * @return the XML preview or an empty response with status code 400 if the user is not authorized
-   *     or an empty response if the documentation unit does not exist
+   *     or an empty response if the edition does not exist
    */
   @GetMapping(value = "/{uuid}/preview-xml", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")

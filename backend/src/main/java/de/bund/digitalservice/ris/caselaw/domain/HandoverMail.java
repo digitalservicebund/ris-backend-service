@@ -8,9 +8,9 @@ import lombok.Builder;
 import lombok.Getter;
 
 /**
- * Represents a mail to handover a documentation unit to jDV
+ * Represents a mail to handover an entity to jDV
  *
- * @param entityId the UUID of the documentation unit
+ * @param entityId the UUID of the entity (documentation unit or edition)
  * @param entityType tells whether it's a documentation unit or an edition handover
  * @param receiverAddress the address of the receiver (jDV mail interface)
  * @param mailSubject the subject of the mail containing handover options (e.g. desired operation)

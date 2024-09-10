@@ -49,9 +49,9 @@ public class PostgresHandoverRepositoryImpl implements HandoverRepository {
   }
 
   /**
-   * Retrieves all handover events for a documentation unit.
+   * Retrieves all handover events for an entity (documentation unit or edition).
    *
-   * @param entityId the documentation unit UUID
+   * @param entityId the entity UUID
    * @param entityType the entity type (documentation unit or edition)
    * @return the handover events
    */
