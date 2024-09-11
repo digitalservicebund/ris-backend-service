@@ -139,7 +139,7 @@ public class HandoverService {
         List<EventRecord> list =
             ListUtils.union(
                 mailService.getHandoverResult(entityId, entityType),
-                handoverReportRepository.getAllByDocumentationUnitUuid(entityId));
+                handoverReportRepository.getAllByEntityId(entityId));
         var migration = deltaMigrationRepository.getLatestMigration(entityId);
         if (migration != null) {
           list.add(

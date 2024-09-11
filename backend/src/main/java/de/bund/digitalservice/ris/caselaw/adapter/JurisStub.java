@@ -14,12 +14,16 @@ import jakarta.mail.Store;
 import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JurisStub implements MailStoreFactory, HttpMailSender {
+
+  public static final String UUID_REGEX =
+      "([0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12})";
   private final String username;
   private final String password;
   private final GreenMail server;
@@ -66,24 +70,36 @@ public class JurisStub implements MailStoreFactory, HttpMailSender {
       String tag) {
 
     LOGGER.info("Message sent: {}", subject);
-    if (!isPublication(subject)) {
-      return;
+    if (isPublication(subject)) {
+      String documentNumber = getDocumentNumber(subject);
+      if (documentNumber == null) {
+        LOGGER.warn("Document number could found in subject: {}", subject);
+        return;
+      }
+      addMessage(
+          JurisMailMockBuilder.generateImportMessage(
+              server.getSmtp().createSession(), documentNumber, hasErrors(mailAttachments)));
+      addMessage(
+          JurisMailMockBuilder.generateProcessMessage(
+              server.getSmtp().createSession(), documentNumber, hasErrors(mailAttachments)));
+
+      LOGGER.info("Publication received and created mocked response");
+    } else if (isEdition(subject)) {
+      UUID editionId = getEditionId(subject);
+      if (editionId == null) {
+        LOGGER.warn("EditionId could found in subject: {}", subject);
+        return;
+      }
+      // TODO
+      addMessage(
+          JurisMailMockBuilder.generateImportMessage(
+              server.getSmtp().createSession(), "Ausgabe", hasErrors(mailAttachments)));
+      addMessage(
+          JurisMailMockBuilder.generateProcessMessage(
+              server.getSmtp().createSession(), "Ausgabe", hasErrors(mailAttachments)));
+
+      LOGGER.info("Edition received and created mocked response");
     }
-
-    String documentNumber = getDocumentNumber(subject);
-    if (documentNumber == null) {
-      LOGGER.info("Document number not found in subject: {}", subject);
-      return;
-    }
-
-    addMessage(
-        JurisMailMockBuilder.generateImportMessage(
-            server.getSmtp().createSession(), documentNumber, hasErrors(mailAttachments)));
-    addMessage(
-        JurisMailMockBuilder.generateProcessMessage(
-            server.getSmtp().createSession(), documentNumber, hasErrors(mailAttachments)));
-
-    LOGGER.info("Publication received and created mocked response");
   }
 
   private boolean isPublication(String subject) {
@@ -91,10 +107,23 @@ public class JurisStub implements MailStoreFactory, HttpMailSender {
         && !subject.contains("FWD: ");
   }
 
+  private boolean isEdition(String subject) {
+    return subject.contains("id=juris name=NeuRIS da=R df=X dt=F mod=T")
+        && !subject.contains("FWD: ");
+  }
+
   private String getDocumentNumber(String subject) {
     Matcher matcher = Pattern.compile("vg=([A-Z0-9]{13})").matcher(subject);
     if (matcher.find()) {
       return matcher.group(1);
+    }
+    return null;
+  }
+
+  private UUID getEditionId(String subject) {
+    Matcher matcher = Pattern.compile("vg=edition-" + UUID_REGEX).matcher(subject);
+    if (matcher.find()) {
+      return UUID.fromString(matcher.group(1));
     }
     return null;
   }

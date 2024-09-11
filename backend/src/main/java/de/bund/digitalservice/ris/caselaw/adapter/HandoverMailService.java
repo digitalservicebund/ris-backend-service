@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 /** Implementation of the {@link MailService} interface that sends juris-XML files via email. */
 @Service
 public class HandoverMailService implements MailService {
+
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
   private final XmlExporter xmlExporter;
@@ -181,12 +182,10 @@ public class HandoverMailService implements MailService {
   }
 
   private String generateMailSubject(LegalPeriodicalEdition edition) {
-    if (edition.legalPeriodical() == null || edition.legalPeriodical().abbreviation() == null) {
-      throw new HandoverException("No legalPeriodical (abbreviation) has been set in the edition.");
+    if (edition.id() == null) {
+      throw new HandoverException("No id has been set in the edition.");
     }
-    return generateMailSubject(
-        (edition.legalPeriodical().abbreviation() + "-" + edition.name()).replaceAll("\\s", ""),
-        "F");
+    return generateMailSubject("edition-" + edition.id(), "F");
   }
 
   private String generateMailSubject(String vg, String dt) {

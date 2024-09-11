@@ -22,6 +22,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
+import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
@@ -71,6 +72,8 @@ class JurisXmlExporterResponseProcessorTest {
   @MockBean private HandoverReportRepository reportRepository;
   @MockBean private DocumentationUnitRepository documentationUnitRepository;
   @MockBean private HandoverRepository xmlHandoverRepository;
+
+  @MockBean private LegalPeriodicalEditionRepository editionRepository;
   @Mock private Store store;
   @Mock private Folder inbox;
   @Mock private Folder processed;
@@ -91,12 +94,12 @@ class JurisXmlExporterResponseProcessorTest {
     when(store.getFolder("unprocessable")).thenReturn(unprocessable);
 
     when(importMessageWrapper.getMessage()).thenReturn(importMessage);
-    when(importMessageWrapper.getDocumentNumber()).thenReturn(DOCUMENT_NUMBER);
+    when(importMessageWrapper.getIdentifier()).thenReturn(DOCUMENT_NUMBER);
     when(wrapperFactory.getResponsibleWrapper(importMessage))
         .thenReturn(Optional.of(importMessageWrapper));
 
     when(processMessageWrapper.getMessage()).thenReturn(processMessage);
-    when(processMessageWrapper.getDocumentNumber()).thenReturn(DOCUMENT_NUMBER);
+    when(processMessageWrapper.getIdentifier()).thenReturn(DOCUMENT_NUMBER);
     when(wrapperFactory.getResponsibleWrapper(processMessage))
         .thenReturn(Optional.of(processMessageWrapper));
 
@@ -118,7 +121,8 @@ class JurisXmlExporterResponseProcessorTest {
             reportRepository,
             wrapperFactory,
             documentationUnitRepository,
-            xmlHandoverRepository);
+            xmlHandoverRepository,
+            editionRepository);
   }
 
   @Test
@@ -215,8 +219,8 @@ class JurisXmlExporterResponseProcessorTest {
                 new MessageAttachment(String.format("%s.html", DOCUMENT_NUMBER), "report"),
                 new MessageAttachment(
                     String.format("%s-spellcheck.html", DOCUMENT_NUMBER), "spellcheck")));
-    when(processMessageWrapper.getDocumentNumber()).thenReturn(DOCUMENT_NUMBER);
-    when((processMessageWrapper.getReceivedDate())).thenReturn(now.toInstant());
+    when(processMessageWrapper.getIdentifier()).thenReturn(DOCUMENT_NUMBER);
+    when(processMessageWrapper.getReceivedDate()).thenReturn(now.toInstant());
 
     responseProcessor.readEmails();
 
@@ -226,12 +230,12 @@ class JurisXmlExporterResponseProcessorTest {
             List.of(
                 HandoverReport.builder()
                     .content("report")
-                    .documentNumber(DOCUMENT_NUMBER)
+                    .entityId(DOCUMENT_UUID)
                     .receivedDate(now.toInstant())
                     .build(),
                 HandoverReport.builder()
                     .content("spellcheck")
-                    .documentNumber(DOCUMENT_NUMBER)
+                    .entityId(DOCUMENT_UUID)
                     .receivedDate(now.toInstant())
                     .build()));
   }
@@ -301,7 +305,7 @@ class JurisXmlExporterResponseProcessorTest {
                 new MessageAttachment(
                     String.format("%s-spellcheck.html", DOCUMENT_NUMBER),
                     "<p><script>alert('sanitize me')</script></p>")));
-    when(processMessageWrapper.getDocumentNumber()).thenReturn(DOCUMENT_NUMBER);
+    when(processMessageWrapper.getIdentifier()).thenReturn(DOCUMENT_NUMBER);
     when((processMessageWrapper.getReceivedDate())).thenReturn(now.toInstant());
 
     responseProcessor.readEmails();
@@ -312,12 +316,12 @@ class JurisXmlExporterResponseProcessorTest {
             List.of(
                 HandoverReport.builder()
                     .content(expectedHtml.replaceAll("\\s+", " ").replaceAll(">\\s+<", "><"))
-                    .documentNumber(DOCUMENT_NUMBER)
+                    .entityId(DOCUMENT_UUID)
                     .receivedDate(now.toInstant())
                     .build(),
                 HandoverReport.builder()
                     .content("<p></p>")
-                    .documentNumber(DOCUMENT_NUMBER)
+                    .entityId(DOCUMENT_UUID)
                     .receivedDate(now.toInstant())
                     .build()));
   }

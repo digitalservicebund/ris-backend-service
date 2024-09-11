@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
@@ -68,11 +69,11 @@ class HandoverMailServiceTest {
       "id=juris name=%s da=R df=X dt=N mod=T ld=%s vg=test-document-number"
           .formatted(JURIS_USERNAME, DELIVER_DATE);
 
-  private static final String EDITION_MAIL_SUBJECT =
-      "id=juris name=%s da=R df=X dt=F mod=T ld=%s vg=ABC-null"
-          .formatted(JURIS_USERNAME, DELIVER_DATE);
-
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
+
+  private static final String EDITION_MAIL_SUBJECT =
+      "id=juris name=%s da=R df=X dt=F mod=T ld=%s vg=edition-%s"
+          .formatted(JURIS_USERNAME, DELIVER_DATE, TEST_UUID);
 
   private static final HandoverMail DOC_UNIT_SAVED_MAIL =
       HandoverMail.builder()
@@ -123,6 +124,8 @@ class HandoverMailServiceTest {
   @MockBean private HandoverRepository repository;
 
   @MockBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
+
+  @MockBean private DatabaseLegalPeriodicalEditionRepository editionRepository;
 
   @MockBean private HttpMailSender mailSender;
 

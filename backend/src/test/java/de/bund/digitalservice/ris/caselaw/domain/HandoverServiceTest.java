@@ -101,8 +101,7 @@ class HandoverServiceTest {
             .build();
     when(mailService.getHandoverResult(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT))
         .thenReturn(List.of(handoverMail));
-    when(handoverReportRepository.getAllByDocumentationUnitUuid(TEST_UUID))
-        .thenReturn(Collections.emptyList());
+    when(handoverReportRepository.getAllByEntityId(TEST_UUID)).thenReturn(Collections.emptyList());
     DeltaMigration deltaMigration =
         DeltaMigration.builder()
             .migratedDate(Instant.now().minus(1, java.time.temporal.ChronoUnit.DAYS))
@@ -169,9 +168,8 @@ class HandoverServiceTest {
 
   @Test
   void testGetLastHandoverReport() {
-    HandoverReport report = new HandoverReport("documentNumber", "<html></html>", Instant.now());
-    when(handoverReportRepository.getAllByDocumentationUnitUuid(TEST_UUID))
-        .thenReturn(List.of(report));
+    HandoverReport report = new HandoverReport(TEST_UUID, "<html></html>", Instant.now());
+    when(handoverReportRepository.getAllByEntityId(TEST_UUID)).thenReturn(List.of(report));
     when(mailService.getHandoverResult(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT))
         .thenReturn(List.of());
     when(deltaMigrationRepository.getLatestMigration(TEST_UUID)).thenReturn(null);
@@ -190,7 +188,7 @@ class HandoverServiceTest {
     Instant fourthNewest = thirdNewest.minusSeconds(61);
     Instant fifthNewest = fourthNewest.minusSeconds(61);
 
-    HandoverReport report1 = new HandoverReport("documentNumber", "<html></html>", newest);
+    HandoverReport report1 = new HandoverReport(TEST_UUID, "<html></html>", newest);
 
     HandoverMail xml1 =
         HandoverMail.builder()
@@ -206,7 +204,7 @@ class HandoverServiceTest {
             .handoverDate(secondNewest)
             .build();
 
-    HandoverReport report2 = new HandoverReport("documentNumber", "<html></html>", thirdNewest);
+    HandoverReport report2 = new HandoverReport(TEST_UUID, "<html></html>", thirdNewest);
 
     HandoverMail xml2 =
         HandoverMail.builder()
@@ -224,7 +222,7 @@ class HandoverServiceTest {
 
     DeltaMigration deltaMigration = DeltaMigration.builder().migratedDate(fifthNewest).build();
 
-    when(handoverReportRepository.getAllByDocumentationUnitUuid(TEST_UUID))
+    when(handoverReportRepository.getAllByEntityId(TEST_UUID))
         .thenReturn(List.of(report2, report1));
     when(mailService.getHandoverResult(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT))
         .thenReturn(List.of(xml2, xml1));

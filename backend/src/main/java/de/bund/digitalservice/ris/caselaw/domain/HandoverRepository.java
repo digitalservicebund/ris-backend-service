@@ -8,5 +8,5 @@ public interface HandoverRepository {
 
   List<HandoverMail> getHandoversByEntity(UUID entityId, HandoverEntityType entityType);
 
-  HandoverMail getLastXmlHandoverMail(UUID documentationUnitId);
+  HandoverMail getLastXmlHandoverMail(UUID entityId);
 }

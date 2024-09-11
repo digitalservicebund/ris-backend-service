@@ -15,7 +15,6 @@ public class PostgresHandoverRepositoryImpl implements HandoverRepository {
 
   private final DatabaseXmlHandoverMailRepository repository;
   private final DatabaseDocumentationUnitRepository documentationUnitRepository;
-
   private final DatabaseLegalPeriodicalEditionRepository editionRepository;
 
   public PostgresHandoverRepositoryImpl(
@@ -82,21 +81,25 @@ public class PostgresHandoverRepositoryImpl implements HandoverRepository {
   }
 
   /**
-   * Retrieves the last handover event for a documentation unit.
+   * Retrieves the last handover event for a documentation unit or edition.
    *
-   * @param documentationUnitId the documentation unit UUID
+   * @param entityId the entity UUID
    * @return the last handover event
    */
   @Override
   @Transactional
-  public HandoverMail getLastXmlHandoverMail(UUID documentationUnitId) {
-    DocumentationUnitDTO documentationUnitDTO =
-        documentationUnitRepository.findById(documentationUnitId).orElseThrow();
+  public HandoverMail getLastXmlHandoverMail(UUID entityId) {
+    boolean isDocUnit = documentationUnitRepository.findById(entityId).isPresent();
+    boolean isEdition = editionRepository.findById(entityId).isPresent();
+    if (!isDocUnit && !isEdition) {
+      throw new IllegalArgumentException("Entity not found: " + entityId);
+    }
 
-    HandoverMailDTO handoverMailDTO =
-        repository.findTopByEntityIdOrderBySentDateDesc(documentationUnitDTO.getId());
+    HandoverMailDTO handoverMailDTO = repository.findTopByEntityIdOrderBySentDateDesc(entityId);
 
     return HandoverMailTransformer.transformToDomain(
-        handoverMailDTO, documentationUnitId, HandoverEntityType.DOCUMENTATION_UNIT);
+        handoverMailDTO,
+        entityId,
+        isDocUnit ? HandoverEntityType.DOCUMENTATION_UNIT : HandoverEntityType.EDITION);
   }
 }

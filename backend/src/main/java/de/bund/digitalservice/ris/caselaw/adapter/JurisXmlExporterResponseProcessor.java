@@ -1,15 +1,17 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
+import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
+import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.MailStoreFactory;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
-import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.domain.export.juris.response.ImportMessageWrapper;
 import de.bund.digitalservice.ris.domain.export.juris.response.MessageWrapper;
 import de.bund.digitalservice.ris.domain.export.juris.response.StatusImporterException;
@@ -25,7 +27,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
 import org.slf4j.Logger;
@@ -40,6 +46,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class JurisXmlExporterResponseProcessor {
 
+  public static final String UUID_REGEX =
+      "([0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12})";
+
   private static final Logger LOGGER =
       LoggerFactory.getLogger(JurisXmlExporterResponseProcessor.class);
   private final HttpMailSender mailSender;
@@ -50,6 +59,7 @@ public class JurisXmlExporterResponseProcessor {
   private final JurisMessageWrapperFactory wrapperFactory;
 
   private final DocumentationUnitRepository documentationUnitRepository;
+  private final LegalPeriodicalEditionRepository editionRepository;
   private final HandoverRepository xmlHandoverRepository;
 
   public JurisXmlExporterResponseProcessor(
@@ -59,7 +69,8 @@ public class JurisXmlExporterResponseProcessor {
       HandoverReportRepository reportRepository,
       JurisMessageWrapperFactory wrapperFactory,
       DocumentationUnitRepository documentationUnitRepository,
-      HandoverRepository xmlHandoverRepository) {
+      HandoverRepository xmlHandoverRepository,
+      LegalPeriodicalEditionRepository editionRepository) {
     this.mailSender = mailSender;
     this.statusService = statusService;
     this.storeFactory = storeFactory;
@@ -67,6 +78,7 @@ public class JurisXmlExporterResponseProcessor {
     this.wrapperFactory = wrapperFactory;
     this.documentationUnitRepository = documentationUnitRepository;
     this.xmlHandoverRepository = xmlHandoverRepository;
+    this.editionRepository = editionRepository;
   }
 
   @Scheduled(fixedDelay = 60000, initialDelay = 60000)
@@ -123,9 +135,14 @@ public class JurisXmlExporterResponseProcessor {
               try {
                 subject = messageWrapper.getSubject();
 
-                forwardMessage(messageWrapper);
+                UUID id = getEntityId(messageWrapper.getIdentifier());
+                if (id == null) {
+                  throw new StatusImporterException("Could not find entity for message");
+                }
+
+                forwardMessage(messageWrapper, id);
                 updateDocUnitErrorStatusBasedOnJurisMessage(messageWrapper);
-                saveAttachments(messageWrapper);
+                saveAttachments(messageWrapper, id);
 
                 successfulProcessedMessages.add(messageWrapper);
               } catch (MessagingException ex) {
@@ -140,7 +157,28 @@ public class JurisXmlExporterResponseProcessor {
     return successfulProcessedMessages;
   }
 
-  private void saveAttachments(MessageWrapper messageWrapper) {
+  @Nullable
+  private UUID getEntityId(String identifier) {
+    Matcher docNumberMatcher = Pattern.compile("([A-Z0-9]{13})").matcher(identifier);
+    Matcher editionMatcher = Pattern.compile("edition-" + UUID_REGEX).matcher(identifier);
+    if (docNumberMatcher.find()) {
+      String documentNumber = docNumberMatcher.group(1);
+      Optional<DocumentationUnit> docUnit =
+          documentationUnitRepository.findByDocumentNumber(documentNumber);
+      if (docUnit.isPresent()) {
+        return docUnit.get().uuid();
+      }
+    } else if (editionMatcher.find()) {
+      Optional<LegalPeriodicalEdition> edition =
+          editionRepository.findById(UUID.fromString(editionMatcher.group(1)));
+      if (edition.isPresent()) {
+        return edition.get().id();
+      }
+    }
+    return null;
+  }
+
+  private void saveAttachments(MessageWrapper messageWrapper, UUID id) {
     PolicyFactory policy =
         new HtmlPolicyBuilder()
             .allowElements(
@@ -157,14 +195,13 @@ public class JurisXmlExporterResponseProcessor {
 
     try {
       List<MailAttachment> mailAttachments = collectAttachments(messageWrapper);
-      String documentNumber = messageWrapper.getDocumentNumber();
       Instant receivedDate = messageWrapper.getReceivedDate();
       reportRepository.saveAll(
           mailAttachments.stream()
               .map(
                   attachment ->
                       HandoverReport.builder()
-                          .documentNumber(documentNumber)
+                          .entityId(id)
                           .receivedDate(receivedDate)
                           .content(
                               policy.sanitize(
@@ -206,12 +243,12 @@ public class JurisXmlExporterResponseProcessor {
    */
   private void updateDocUnitErrorStatusBasedOnJurisMessage(MessageWrapper messageWrapper) {
     try {
-      var lastStatus = statusService.getLatestStatus(messageWrapper.getDocumentNumber());
+      var lastStatus = statusService.getLatestStatus(messageWrapper.getIdentifier());
       if (lastStatus == null) {
         return;
       }
       statusService.update(
-          messageWrapper.getDocumentNumber(),
+          messageWrapper.getIdentifier(),
           Status.builder()
               .publicationStatus(lastStatus)
               .withError(messageWrapper.hasErrors() || !messageWrapper.isPublished().orElse(true))
@@ -221,15 +258,13 @@ public class JurisXmlExporterResponseProcessor {
     }
   }
 
-  private void forwardMessage(MessageWrapper messageWrapper) {
+  private void forwardMessage(MessageWrapper messageWrapper, UUID entityId) {
     try {
-      String documentNumber = messageWrapper.getDocumentNumber();
+      String identifier = messageWrapper.getIdentifier();
       String subject = messageWrapper.getSubject();
       List<MailAttachment> mailAttachments = collectAttachments(messageWrapper);
 
-      var xmlHandoverMail =
-          xmlHandoverRepository.getLastXmlHandoverMail(
-              documentationUnitRepository.findByDocumentNumber(documentNumber).uuid());
+      var xmlHandoverMail = xmlHandoverRepository.getLastXmlHandoverMail(entityId);
 
       if (xmlHandoverMail != null && xmlHandoverMail.getIssuerAddress() != null) {
         mailSender.sendMail(
@@ -238,14 +273,13 @@ public class JurisXmlExporterResponseProcessor {
             "FWD: " + subject,
             "Anbei weitergeleitet von der jDV:",
             mailAttachments,
-            "report-" + documentNumber);
+            "report-" + identifier);
       } else {
-        throw new StatusImporterException(
-            "Couldn't find issuer address for document number: " + documentNumber);
+        throw new StatusImporterException("Couldn't find issuer address for entity: " + identifier);
       }
-    } catch (DocumentationUnitNotExistsException e) {
+    } catch (IllegalArgumentException e) {
       LOGGER.warn(
-          "Got juris email for documentation unit that does not exist in NeuRIS. Possibly caused by a manual test.",
+          "Got juris email for entity (edition of documentation unit) that does not exist in NeuRIS. Possibly caused by a manual test.",
           e);
     } catch (MessagingException | IOException e) {
       throw new StatusImporterException(

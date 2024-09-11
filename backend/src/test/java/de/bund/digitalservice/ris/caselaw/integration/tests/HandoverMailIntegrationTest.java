@@ -420,7 +420,7 @@ class HandoverMailIntegrationTest {
     Instant receivedDate = creationDate.plus(1, ChronoUnit.HOURS);
     databaseHandoverReportRepository.save(
         HandoverReportDTO.builder()
-            .documentationUnitId(savedDocumentationUnitDTO.getId())
+            .entityId(savedDocumentationUnitDTO.getId())
             .content("<HTML>success!</HTML>")
             .receivedDate(receivedDate)
             .build());
