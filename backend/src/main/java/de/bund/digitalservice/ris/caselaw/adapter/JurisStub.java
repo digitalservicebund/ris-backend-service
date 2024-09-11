@@ -65,12 +65,16 @@ public class JurisStub implements MailStoreFactory, HttpMailSender {
       List<MailAttachment> mailAttachments,
       String tag) {
 
+    LOGGER.info("Message sent: {}", subject);
     if (!isPublication(subject)) {
-      LOGGER.info("Message sent: {}", subject);
       return;
     }
 
     String documentNumber = getDocumentNumber(subject);
+    if (documentNumber == null) {
+      LOGGER.info("Document number not found in subject: {}", subject);
+      return;
+    }
 
     addMessage(
         JurisMailMockBuilder.generateImportMessage(
@@ -91,9 +95,8 @@ public class JurisStub implements MailStoreFactory, HttpMailSender {
     Matcher matcher = Pattern.compile("vg=([A-Z0-9]{13})").matcher(subject);
     if (matcher.find()) {
       return matcher.group(1);
-    } else {
-      return null;
     }
+    return null;
   }
 
   private void addMessage(Message message) {

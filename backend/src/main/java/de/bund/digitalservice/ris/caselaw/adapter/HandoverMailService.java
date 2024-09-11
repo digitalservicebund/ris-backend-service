@@ -193,16 +193,8 @@ public class HandoverMailService implements MailService {
     String deliveryDate =
         LocalDate.now(Clock.system(ZoneId.of("Europe/Berlin"))).format(DATE_FORMATTER);
 
-    String subject = "id=juris";
-    subject += " name=" + jurisUsername;
-    subject += " da=R";
-    subject += " df=X";
-    subject += " dt=" + dt;
-    subject += " mod=T";
-    subject += " ld=" + deliveryDate;
-    subject += " vg=" + vg;
-
-    return subject;
+    return "id=juris name=%s da=R df=X dt=%s mod=T ld=%s vg=%s"
+        .formatted(jurisUsername, dt, deliveryDate, vg);
   }
 
   private void generateAndSendMail(HandoverMail handoverMail) throws HandoverException {

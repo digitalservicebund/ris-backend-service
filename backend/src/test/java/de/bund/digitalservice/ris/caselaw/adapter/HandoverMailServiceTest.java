@@ -17,10 +17,14 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
+import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
+import de.bund.digitalservice.ris.caselaw.domain.Reference;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -60,20 +64,22 @@ class HandoverMailServiceTest {
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
   private static final String DELIVER_DATE =
       LocalDate.now(Clock.system(ZoneId.of("Europe/Berlin"))).format(DATE_FORMATTER);
-  private static final String MAIL_SUBJECT =
-      "id=juris name="
-          + JURIS_USERNAME
-          + " da=R df=X dt=N mod=T ld="
-          + DELIVER_DATE
-          + " vg=test-document-number";
+  private static final String DOC_UNIT_MAIL_SUBJECT =
+      "id=juris name=%s da=R df=X dt=N mod=T ld=%s vg=test-document-number"
+          .formatted(JURIS_USERNAME, DELIVER_DATE);
+
+  private static final String EDITION_MAIL_SUBJECT =
+      "id=juris name=%s da=R df=X dt=F mod=T ld=%s vg=ABC-null"
+          .formatted(JURIS_USERNAME, DELIVER_DATE);
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
-  private static final HandoverMail EXPECTED_BEFORE_SAVE =
+
+  private static final HandoverMail DOC_UNIT_SAVED_MAIL =
       HandoverMail.builder()
           .entityId(TEST_UUID)
           .entityType(HandoverEntityType.DOCUMENTATION_UNIT)
           .receiverAddress(RECEIVER_ADDRESS)
-          .mailSubject(MAIL_SUBJECT)
+          .mailSubject(DOC_UNIT_MAIL_SUBJECT)
           .attachments(
               List.of(MailAttachment.builder().fileName("test.xml").fileContent("xml").build()))
           .success(true)
@@ -82,25 +88,33 @@ class HandoverMailServiceTest {
           .issuerAddress(ISSUER_ADDRESS)
           .build();
 
-  private static final HandoverMail SAVED_XML_MAIL =
+  private static final HandoverMail EDITION_SAVED_MAIL =
       HandoverMail.builder()
           .entityId(TEST_UUID)
-          .entityType(HandoverEntityType.DOCUMENTATION_UNIT)
+          .entityType(HandoverEntityType.EDITION)
           .receiverAddress(RECEIVER_ADDRESS)
-          .mailSubject(MAIL_SUBJECT)
+          .mailSubject(EDITION_MAIL_SUBJECT)
           .attachments(
-              List.of(MailAttachment.builder().fileName("test.xml").fileContent("xml").build()))
+              List.of(
+                  MailAttachment.builder().fileName("test1.xml").fileContent("xml 1").build(),
+                  MailAttachment.builder().fileName("test2.xml").fileContent("xml 2").build()))
           .success(true)
-          .statusMessages(List.of("succeed"))
+          .statusMessages(List.of("succeed", "succeed"))
           .handoverDate(CREATED_DATE)
           .issuerAddress(ISSUER_ADDRESS)
           .build();
-
-  private static final HandoverMail EXPECTED_RESPONSE = SAVED_XML_MAIL;
-  private static final XmlTransformationResult FORMATTED_XML =
+  private static final XmlTransformationResult DOC_UNIT_XML =
       new XmlTransformationResult("xml", true, List.of("succeed"), "test.xml", CREATED_DATE);
 
+  private static final List<XmlTransformationResult> EDITION_XML =
+      List.of(
+          new XmlTransformationResult("xml 1", true, List.of("succeed"), "test1.xml", CREATED_DATE),
+          new XmlTransformationResult(
+              "xml 2", true, List.of("succeed"), "test2.xml", CREATED_DATE));
+
   private DocumentationUnit documentationUnit;
+
+  private LegalPeriodicalEdition edition;
 
   @Autowired private HandoverMailService service;
 
@@ -116,17 +130,41 @@ class HandoverMailServiceTest {
   void setUp() throws ParserConfigurationException, TransformerException {
     documentationUnit =
         DocumentationUnit.builder().uuid(TEST_UUID).documentNumber("test-document-number").build();
-    when(xmlExporter.transformToXml(any(DocumentationUnit.class))).thenReturn(FORMATTED_XML);
-    // TODO
-
-    when(repository.save(EXPECTED_BEFORE_SAVE)).thenReturn(SAVED_XML_MAIL);
+    LegalPeriodical legalPeriodical = LegalPeriodical.builder().abbreviation("ABC").build();
+    edition =
+        LegalPeriodicalEdition.builder()
+            .legalPeriodical(legalPeriodical)
+            .id(TEST_UUID)
+            .references(
+                List.of(
+                    Reference.builder()
+                        .citation("2004, 1")
+                        .legalPeriodical(legalPeriodical)
+                        .documentationUnit(
+                            RelatedDocumentationUnit.builder()
+                                .documentNumber("document-number-1")
+                                .build())
+                        .build(),
+                    Reference.builder()
+                        .citation("2004, 2")
+                        .legalPeriodical(legalPeriodical)
+                        .documentationUnit(
+                            RelatedDocumentationUnit.builder()
+                                .documentNumber("document-number-2")
+                                .build())
+                        .build()))
+            .build();
+    when(xmlExporter.transformToXml(any(DocumentationUnit.class))).thenReturn(DOC_UNIT_XML);
+    when(xmlExporter.transformToXml(any(LegalPeriodicalEdition.class))).thenReturn(EDITION_XML);
+    when(repository.save(DOC_UNIT_SAVED_MAIL)).thenReturn(DOC_UNIT_SAVED_MAIL);
+    when(repository.save(EDITION_SAVED_MAIL)).thenReturn(EDITION_SAVED_MAIL);
   }
 
   @Test
-  void testSend() throws ParserConfigurationException, TransformerException {
+  void testSendDocumentationUnit() throws ParserConfigurationException, TransformerException {
     var response = service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS);
 
-    assertThat(response).usingRecursiveComparison().isEqualTo(EXPECTED_RESPONSE);
+    assertThat(response).usingRecursiveComparison().isEqualTo(DOC_UNIT_SAVED_MAIL);
 
     verify(xmlExporter)
         .transformToXml(
@@ -142,19 +180,37 @@ class HandoverMailServiceTest {
                         .fileNumbers(List.of("TEST"))
                         .build())
                 .build());
-    verify(repository).save(EXPECTED_BEFORE_SAVE);
+    verify(repository).save(DOC_UNIT_SAVED_MAIL);
     verify(mailSender)
         .sendMail(
             SENDER_ADDRESS,
             RECEIVER_ADDRESS,
-            SAVED_XML_MAIL.mailSubject(),
+            DOC_UNIT_SAVED_MAIL.mailSubject(),
             "neuris",
             Collections.singletonList(
                 MailAttachment.builder()
-                    .fileName(SAVED_XML_MAIL.attachments().get(0).fileName())
-                    .fileContent(SAVED_XML_MAIL.attachments().get(0).fileContent())
+                    .fileName(DOC_UNIT_SAVED_MAIL.attachments().get(0).fileName())
+                    .fileContent(DOC_UNIT_SAVED_MAIL.attachments().get(0).fileContent())
                     .build()),
-            SAVED_XML_MAIL.entityId().toString());
+            DOC_UNIT_SAVED_MAIL.entityId().toString());
+  }
+
+  @Test
+  void testSendEdition() throws ParserConfigurationException, TransformerException {
+    var response = service.handOver(edition, RECEIVER_ADDRESS, ISSUER_ADDRESS);
+
+    assertThat(response).usingRecursiveComparison().isEqualTo(EDITION_SAVED_MAIL);
+
+    verify(xmlExporter).transformToXml(edition);
+    verify(repository).save(EDITION_SAVED_MAIL);
+    verify(mailSender)
+        .sendMail(
+            SENDER_ADDRESS,
+            RECEIVER_ADDRESS,
+            EDITION_SAVED_MAIL.mailSubject(),
+            "neuris",
+            EDITION_SAVED_MAIL.attachments(),
+            EDITION_SAVED_MAIL.entityId().toString());
   }
 
   @Test
@@ -218,7 +274,7 @@ class HandoverMailServiceTest {
 
   @Test
   void testSend_withExceptionBySaving() {
-    when(repository.save(EXPECTED_BEFORE_SAVE)).thenThrow(IllegalArgumentException.class);
+    when(repository.save(DOC_UNIT_SAVED_MAIL)).thenThrow(IllegalArgumentException.class);
 
     Assert.assertThrows(
         IllegalArgumentException.class,
@@ -249,7 +305,7 @@ class HandoverMailServiceTest {
         .sendMail(
             SENDER_ADDRESS,
             RECEIVER_ADDRESS,
-            MAIL_SUBJECT,
+            DOC_UNIT_MAIL_SUBJECT,
             "neuris",
             Collections.singletonList(
                 MailAttachment.builder().fileName("test.xml").fileContent("xml").build()),
@@ -264,7 +320,7 @@ class HandoverMailServiceTest {
         .sendMail(
             SENDER_ADDRESS,
             RECEIVER_ADDRESS,
-            MAIL_SUBJECT,
+            DOC_UNIT_MAIL_SUBJECT,
             "neuris",
             Collections.singletonList(
                 MailAttachment.builder().fileName("test.xml").fileContent("xml").build()),
@@ -272,24 +328,24 @@ class HandoverMailServiceTest {
   }
 
   @Test
-  void testGetLastHandoverXmlMail() {
-    List<HandoverMail> list = List.of(SAVED_XML_MAIL);
+  void testGetLastDocumentationUnitHandoverXmlMail() {
+    List<HandoverMail> list = List.of(DOC_UNIT_SAVED_MAIL);
     when(repository.getHandoversByEntity(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT))
         .thenReturn(list);
 
     var response = service.getHandoverResult(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT);
-    assertThat(response.get(0)).usingRecursiveComparison().isEqualTo(EXPECTED_RESPONSE);
+    assertThat(response.get(0)).usingRecursiveComparison().isEqualTo(DOC_UNIT_SAVED_MAIL);
 
     verify(repository).getHandoversByEntity(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT);
   }
 
   @Test
   void testGetLastEditionHandoverXmlMail() {
-    List<HandoverMail> list = List.of(SAVED_XML_MAIL);
+    List<HandoverMail> list = List.of(DOC_UNIT_SAVED_MAIL);
     when(repository.getHandoversByEntity(TEST_UUID, HandoverEntityType.EDITION)).thenReturn(list);
 
     var response = service.getHandoverResult(TEST_UUID, HandoverEntityType.EDITION);
-    assertThat(response.get(0)).usingRecursiveComparison().isEqualTo(EXPECTED_RESPONSE);
+    assertThat(response.get(0)).usingRecursiveComparison().isEqualTo(DOC_UNIT_SAVED_MAIL);
 
     verify(repository).getHandoversByEntity(TEST_UUID, HandoverEntityType.EDITION);
   }
