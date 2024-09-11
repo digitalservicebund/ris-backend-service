@@ -10,12 +10,12 @@ import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe(
-  "external documentalists",
+  "external user",
   {
     annotation: {
       description:
         "https://digitalservicebund.atlassian.net/browse/RISDEV-2075",
-      type: "story",
+      type: "epic",
     },
     tag: ["@RISDEV-2075"],
   },
