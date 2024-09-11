@@ -208,7 +208,11 @@ export const uploadTestfile = async (
 }
 
 export async function save(page: Page) {
+  const saveRequest = page.waitForRequest("**/api/v1/caselaw/documentunits/*", {
+    timeout: 5_000,
+  })
   await page.locator("[aria-label='Speichern Button']").click()
+  await saveRequest
   await expect(page.getByText(`Zuletzt`).first()).toBeVisible()
 }
 
