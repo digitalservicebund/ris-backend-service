@@ -4,5 +4,5 @@ import java.util.UUID;
 import lombok.Builder;
 
 @Builder
-public record DocumentationOfficeUserGroup(
+public record UserGroup(
     UUID id, String userGroupPathName, DocumentationOffice docOffice, boolean isInternal) {}

@@ -6,7 +6,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 public interface UserService {
   User getUser(OidcUser oidcUser);
 
-  Optional<DocumentationOfficeUserGroup> getUserGroup(OidcUser oidcUser);
+  Optional<UserGroup> getUserGroup(OidcUser oidcUser);
 
   DocumentationOffice getDocumentationOffice(OidcUser oidcUser);
 

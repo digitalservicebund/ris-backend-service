@@ -10,14 +10,14 @@ import ch.qos.logback.classic.Level;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationOfficeUserGroupService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseUserGroupService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.UserGroupController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeUserGroupRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserGroupRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -25,9 +25,9 @@ import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
+import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
@@ -49,7 +49,7 @@ import org.testcontainers.junit.jupiter.Container;
       PostgresJPAConfig.class,
       FlywayConfig.class,
       KeycloakUserService.class,
-      DatabaseDocumentationOfficeUserGroupService.class,
+      DatabaseUserGroupService.class,
       SecurityConfig.class,
       AuthService.class,
       TestConfig.class,
@@ -78,7 +78,7 @@ class UserGroupIntegrationTest {
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseProcedureRepository repository;
   @Autowired private DatabaseDocumentationUnitProcedureRepository linkRepository;
-  @Autowired private DatabaseDocumentationOfficeUserGroupRepository userGroupRepository;
+  @Autowired private DatabaseUserGroupRepository userGroupRepository;
 
   @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private DocumentNumberService numberService;
@@ -87,30 +87,29 @@ class UserGroupIntegrationTest {
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private ProcedureService procedureService;
 
-  @MockBean
-  private DatabaseDocumentationOfficeUserGroupService databaseDocumentationOfficeUserGroupService;
+  @MockBean private DatabaseUserGroupService databaseUserGroupService;
 
-  DocumentationOfficeUserGroup internalUserGroup =
-      DocumentationOfficeUserGroup.builder()
+  UserGroup internalUserGroup =
+      UserGroup.builder()
           .docOffice(buildDSDocOffice())
           .userGroupPathName("/DS/Intern")
           .isInternal(true)
           .build();
 
-  DocumentationOfficeUserGroup externalUserGroup =
-      DocumentationOfficeUserGroup.builder()
+  UserGroup externalUserGroup =
+      UserGroup.builder()
           .docOffice(buildDSDocOffice())
           .userGroupPathName("/DS/Extern")
           .isInternal(false)
           .build();
-  DocumentationOfficeUserGroup externalUserGroup1 =
-      DocumentationOfficeUserGroup.builder()
+  UserGroup externalUserGroup1 =
+      UserGroup.builder()
           .docOffice(buildDSDocOffice())
           .userGroupPathName("/DS/Extern/Agentur1")
           .isInternal(false)
           .build();
-  DocumentationOfficeUserGroup externalUserGroup2 =
-      DocumentationOfficeUserGroup.builder()
+  UserGroup externalUserGroup2 =
+      UserGroup.builder()
           .docOffice(buildDSDocOffice())
           .userGroupPathName("/DS/Extern/Agentur2")
           .isInternal(false)
@@ -119,14 +118,14 @@ class UserGroupIntegrationTest {
   @BeforeEach()
   void beforeEach() {
     doReturn(List.of(internalUserGroup, externalUserGroup, externalUserGroup1, externalUserGroup2))
-        .when(databaseDocumentationOfficeUserGroupService)
+        .when(databaseUserGroupService)
         .getAllUserGroups();
   }
 
   @Test
   void testGetUserGroups_withInternalUser_shouldReturnExternalUserGroupsOfDocOffice() {
     doReturn(List.of(externalUserGroup, externalUserGroup1, externalUserGroup2))
-        .when(databaseDocumentationOfficeUserGroupService)
+        .when(databaseUserGroupService)
         .getExternalUserGroups(any());
 
     risWebTestClient
@@ -136,7 +135,7 @@ class UserGroupIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationOfficeUserGroup[].class)
+        .expectBody(UserGroup[].class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).hasSize(3);
@@ -149,7 +148,7 @@ class UserGroupIntegrationTest {
   @Test
   void testGetUserGroups_withExternalUser_shouldReturnExternalUserGroupsOfDocOffice() {
     doReturn(List.of(externalUserGroup, externalUserGroup1, externalUserGroup2))
-        .when(databaseDocumentationOfficeUserGroupService)
+        .when(databaseUserGroupService)
         .getExternalUserGroups(any());
 
     risWebTestClient
@@ -159,7 +158,7 @@ class UserGroupIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationOfficeUserGroup[].class)
+        .expectBody(UserGroup[].class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).hasSize(3);
@@ -171,9 +170,7 @@ class UserGroupIntegrationTest {
 
   @Test
   void testGetUserGroups_withExternalUser_shouldReturnNoUserGroupsAndWarnings() {
-    doReturn(List.of())
-        .when(databaseDocumentationOfficeUserGroupService)
-        .getExternalUserGroups(any());
+    doReturn(List.of()).when(databaseUserGroupService).getExternalUserGroups(any());
     TestMemoryAppender memoryAppender = new TestMemoryAppender(KeycloakUserService.class);
 
     risWebTestClient
@@ -183,7 +180,7 @@ class UserGroupIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentationOfficeUserGroup[].class)
+        .expectBody(UserGroup[].class)
         .consumeWith(response -> assertThat(response.getResponseBody()).isEmpty());
     assertThat(memoryAppender.getMessage(Level.WARN, 0))
         .isEqualTo(

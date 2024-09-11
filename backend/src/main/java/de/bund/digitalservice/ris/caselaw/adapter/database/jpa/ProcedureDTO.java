@@ -57,5 +57,5 @@ public class ProcedureDTO {
   @Include
   @ManyToOne()
   @JoinColumn(name = "documentation_office_user_group_id")
-  DocumentationOfficeUserGroupDTO documentationOfficeUserGroupDTO;
+  UserGroupDTO userGroupDTO;
 }

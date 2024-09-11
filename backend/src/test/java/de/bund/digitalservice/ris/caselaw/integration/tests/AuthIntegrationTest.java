@@ -11,11 +11,11 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroup;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.User;
+import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
+import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,22 +55,22 @@ class AuthIntegrationTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean DocumentationUnitService documentationUnitService;
-  @MockBean DocumentationOfficeUserGroupService documentationOfficeUserGroupService;
+  @MockBean UserGroupService userGroupService;
   @MockBean private ProcedureService procedureService;
 
   @BeforeEach
   public void beforeEach() {
     doReturn(
             List.of(
-                DocumentationOfficeUserGroup.builder()
+                UserGroup.builder()
                     .docOffice(DocumentationOffice.builder().abbreviation("CC-RIS").build())
                     .userGroupPathName("/CC-RIS")
                     .build(),
-                DocumentationOfficeUserGroup.builder()
+                UserGroup.builder()
                     .docOffice(DocumentationOffice.builder().abbreviation("DS").build())
                     .userGroupPathName("/DS")
                     .build()))
-        .when(documentationOfficeUserGroupService)
+        .when(userGroupService)
         .getAllUserGroups();
   }
 

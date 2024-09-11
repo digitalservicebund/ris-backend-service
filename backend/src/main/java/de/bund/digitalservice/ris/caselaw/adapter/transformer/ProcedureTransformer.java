@@ -62,8 +62,8 @@ public class ProcedureTransformer {
   }
 
   private static UUID extractUserGroupId(ProcedureDTO procedureDTO) {
-    if (procedureDTO.getDocumentationOfficeUserGroupDTO() != null) {
-      return procedureDTO.getDocumentationOfficeUserGroupDTO().getId();
+    if (procedureDTO.getUserGroupDTO() != null) {
+      return procedureDTO.getUserGroupDTO().getId();
     }
     return null;
   }

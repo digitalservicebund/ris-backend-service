@@ -1,12 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.config;
 
-import de.bund.digitalservice.ris.caselaw.adapter.DocumentationOfficeConfigUserGroup;
+import de.bund.digitalservice.ris.caselaw.adapter.UserGroupFromConfig;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class DocumentationOfficeUserGroupsConfig {
+public class UserGroupsConfig {
 
   /**
    * Caution: Changing values will delete and recreate the affected group in our database. This
@@ -14,84 +14,84 @@ public class DocumentationOfficeUserGroupsConfig {
    * user group to procedures will be cleared.
    */
   @Bean
-  public List<DocumentationOfficeConfigUserGroup> getDocumentationOfficeConfigUserGroups() {
+  public List<UserGroupFromConfig> getDocumentationOfficeConfigUserGroups() {
     return List.of(
-        DocumentationOfficeConfigUserGroup.builder()
+        UserGroupFromConfig.builder()
             .docOfficeAbbreviation("BGH")
             .userGroupPathName("/caselaw/BGH")
             .isInternal(true)
             .build(),
-        DocumentationOfficeConfigUserGroup.builder()
+        UserGroupFromConfig.builder()
             .docOfficeAbbreviation("BGH")
             .userGroupPathName("/caselaw/BGH/Intern")
             .isInternal(true)
             .build(),
-        DocumentationOfficeConfigUserGroup.builder()
+        UserGroupFromConfig.builder()
             .docOfficeAbbreviation("BGH")
             .userGroupPathName("/caselaw/BGH/Extern/Miotke")
             .isInternal(false)
             .build(),
-        DocumentationOfficeConfigUserGroup.builder()
+        UserGroupFromConfig.builder()
             .docOfficeAbbreviation("BGH")
             .userGroupPathName("/caselaw/BGH/Extern/Busenks")
             .isInternal(false)
             .build(),
-        DocumentationOfficeConfigUserGroup.builder()
+        UserGroupFromConfig.builder()
             .docOfficeAbbreviation("BVerfG")
             .userGroupPathName("/caselaw/BVerfG")
             .isInternal(true)
             .build(),
-        DocumentationOfficeConfigUserGroup.builder()
+        UserGroupFromConfig.builder()
             .docOfficeAbbreviation("BAG")
             .userGroupPathName("/caselaw/BAG")
             .isInternal(true)
             .build(),
-        DocumentationOfficeConfigUserGroup.builder()
+        UserGroupFromConfig.builder()
             .docOfficeAbbreviation("BFH")
             .userGroupPathName("/caselaw/BFH")
             .isInternal(true)
             .build(),
-        DocumentationOfficeConfigUserGroup.builder()
+        UserGroupFromConfig.builder()
             .docOfficeAbbreviation("BSG")
             .userGroupPathName("/caselaw/BSG")
             .isInternal(true)
             .build(),
-        DocumentationOfficeConfigUserGroup.builder()
+        UserGroupFromConfig.builder()
             .docOfficeAbbreviation("BPatG")
             .userGroupPathName("/caselaw/BPatG")
             .isInternal(true)
             .build(),
-        DocumentationOfficeConfigUserGroup.builder()
+        UserGroupFromConfig.builder()
             .docOfficeAbbreviation("BVerwG")
             .userGroupPathName("/caselaw/BVerwG")
             .isInternal(true)
             .build(),
-        DocumentationOfficeConfigUserGroup.builder()
+        UserGroupFromConfig.builder()
             .docOfficeAbbreviation("OVGNW")
             .userGroupPathName("/caselaw/OVG_NRW")
             .isInternal(true)
             .build(),
-        DocumentationOfficeConfigUserGroup.builder()
+        UserGroupFromConfig.builder()
             .docOfficeAbbreviation("BZSt")
             .userGroupPathName("/caselaw/BZSt")
             .isInternal(true)
             .build(),
-        DocumentationOfficeConfigUserGroup.builder()
+        UserGroupFromConfig.builder()
             .docOfficeAbbreviation("DS")
             .userGroupPathName("/DS")
             .isInternal(true)
             .build(),
-        DocumentationOfficeConfigUserGroup.builder()
+        UserGroupFromConfig.builder()
             .docOfficeAbbreviation("DS")
             .userGroupPathName("/DS/Intern")
             .isInternal(true)
             .build(),
-        DocumentationOfficeConfigUserGroup.builder()
+        UserGroupFromConfig.builder()
             .docOfficeAbbreviation("DS")
             .userGroupPathName("/DS/Extern")
             .isInternal(false)
             .build(),
-        DocumentationOfficeConfigUserGroup.builder()
+        UserGroupFromConfig.builder()
             .docOfficeAbbreviation("CC-RIS")
             .userGroupPathName("/CC-RIS")
             .isInternal(true)

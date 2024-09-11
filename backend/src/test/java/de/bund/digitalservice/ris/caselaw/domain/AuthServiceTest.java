@@ -234,8 +234,7 @@ class AuthServiceTest {
     when(securityContext.getAuthentication()).thenReturn(authentication);
     when(authentication.getPrincipal()).thenReturn(oidcUser);
     when(userService.getUserGroup(oidcUser))
-        .thenReturn(
-            Optional.ofNullable(DocumentationOfficeUserGroup.builder().id(userGroupId).build()));
+        .thenReturn(Optional.ofNullable(UserGroup.builder().id(userGroupId).build()));
 
     // Act
     Function<UUID, Boolean> result = service.isAssignedViaProcedure();
@@ -261,8 +260,7 @@ class AuthServiceTest {
     when(securityContext.getAuthentication()).thenReturn(authentication);
     when(authentication.getPrincipal()).thenReturn(oidcUser);
     when(userService.getUserGroup(oidcUser))
-        .thenReturn(
-            Optional.ofNullable(DocumentationOfficeUserGroup.builder().id(userGroupId).build()));
+        .thenReturn(Optional.ofNullable(UserGroup.builder().id(userGroupId).build()));
 
     // Act
     Function<UUID, Boolean> result = service.isAssignedViaProcedure();

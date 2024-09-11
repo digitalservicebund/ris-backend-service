@@ -76,7 +76,7 @@ public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO,
    * @return a list of all procedures {@link ProcedureDTO} that have been assigned to the user group
    *     , or empty if not found
    */
-  List<ProcedureDTO> findAllByDocumentationOfficeUserGroupDTO_Id(UUID userGroupId);
+  List<ProcedureDTO> findAllByUserGroupDTO_Id(UUID userGroupId);
 
   /**
    * Retrieves a paginated list of distinct {@link ProcedureDTO} entities filtered by label and
@@ -119,18 +119,17 @@ public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO,
           + "JOIN DocumentationUnitProcedureDTO dup ON p.id = dup.procedure.id "
           + "WHERE (:label IS NULL OR p.label LIKE %:label%) "
           + "AND p.documentationOffice = :documentationOffice "
-          + "AND p.documentationOfficeUserGroupDTO.id = :userGroupId "
+          + "AND p.userGroupDTO.id = :userGroupId "
           + "AND ( dup.documentationUnit, dup.rank) IN ("
           + "    SELECT  dupMax.documentationUnit.id, MAX( dupMax.rank) "
           + "    FROM DocumentationUnitProcedureDTO dupMax "
           + "    GROUP BY  dupMax.documentationUnit.id)"
           + "    ORDER BY  p.createdAt DESC NULLS LAST")
-  Slice<ProcedureDTO>
-      findLatestUsedProceduresByLabelAndDocumentationOfficeAndDocumentationOfficeUserGroupDTO_Id(
-          @Param("label") String label,
-          @Param("documentationOffice") DocumentationOfficeDTO documentationOfficeDTO,
-          @Param("userGroupId") UUID userGroupId,
-          Pageable pageable);
+  Slice<ProcedureDTO> findLatestUsedProceduresByLabelAndDocumentationOfficeAndUserGroupDTO_Id(
+      @Param("label") String label,
+      @Param("documentationOffice") DocumentationOfficeDTO documentationOfficeDTO,
+      @Param("userGroupId") UUID userGroupId,
+      Pageable pageable);
 
   /**
    * Retrieves a paginated list of distinct {@link ProcedureDTO} entities filtered by documentation
@@ -167,15 +166,14 @@ public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO,
       "SELECT DISTINCT p FROM ProcedureDTO p "
           + "JOIN DocumentationUnitProcedureDTO dup ON p.id = dup.procedure.id "
           + "WHERE p.documentationOffice = :documentationOffice "
-          + "AND p.documentationOfficeUserGroupDTO.id = :userGroupId "
+          + "AND p.userGroupDTO.id = :userGroupId "
           + "AND ( dup.documentationUnit, dup.rank) IN ("
           + "    SELECT  dupMax.documentationUnit.id, MAX( dupMax.rank) "
           + "    FROM DocumentationUnitProcedureDTO dupMax "
           + "    GROUP BY  dupMax.documentationUnit.id)"
           + "    ORDER BY  p.createdAt DESC NULLS LAST")
-  Slice<ProcedureDTO>
-      findLatestUsedProceduresByDocumentationOfficeAndDocumentationOfficeUserGroupDTO_id(
-          @Param("documentationOffice") DocumentationOfficeDTO documentationOffice,
-          @Param("userGroupId") UUID userGroupId,
-          Pageable pageable);
+  Slice<ProcedureDTO> findLatestUsedProceduresByDocumentationOfficeAndUserGroupDTO_id(
+      @Param("documentationOffice") DocumentationOfficeDTO documentationOffice,
+      @Param("userGroupId") UUID userGroupId,
+      Pageable pageable);
 }

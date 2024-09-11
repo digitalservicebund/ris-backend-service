@@ -1,19 +1,18 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeUserGroupDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserGroupDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroup;
+import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 
-public class DocumentationOfficeUserGroupTransformer {
-  private DocumentationOfficeUserGroupTransformer() {}
+public class UserGroupTransformer {
+  private UserGroupTransformer() {}
 
-  public static DocumentationOfficeUserGroup transformToDomain(
-      DocumentationOfficeUserGroupDTO group) {
+  public static UserGroup transformToDomain(UserGroupDTO group) {
     if (group == null) {
       return null;
     }
 
-    return DocumentationOfficeUserGroup.builder()
+    return UserGroup.builder()
         .id(group.getId())
         .userGroupPathName(group.getUserGroupPathName())
         .isInternal(group.isInternal())

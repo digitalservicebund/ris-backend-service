@@ -7,8 +7,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroup;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroupService;
+import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
+import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -86,38 +86,37 @@ public class AuthUtils {
         .build();
   }
 
-  public static void mockDocOfficeUserGroups(
-      DocumentationOfficeUserGroupService documentationOfficeUserGroupService) {
+  public static void mockUserGroups(UserGroupService userGroupService) {
     doReturn(
             List.of(
-                DocumentationOfficeUserGroup.builder()
+                UserGroup.builder()
                     .docOffice(buildDSDocOffice())
                     .userGroupPathName("/DS")
                     .isInternal(true)
                     .build(),
-                DocumentationOfficeUserGroup.builder()
+                UserGroup.builder()
                     .id(UUID.fromString("2b733549-d2cc-40f0-b7f3-9bfa9f3c1b89"))
                     .docOffice(buildDSDocOffice())
                     .userGroupPathName("/DS/Extern")
                     .isInternal(false)
                     .build(),
-                DocumentationOfficeUserGroup.builder()
+                UserGroup.builder()
                     .docOffice(buildBGHDocOffice())
                     .userGroupPathName("/BGH")
                     .isInternal(true)
                     .build(),
-                DocumentationOfficeUserGroup.builder()
+                UserGroup.builder()
                     .id(UUID.fromString("3b733549-d2cc-40f0-b7f3-9bfa9f3c1b89"))
                     .docOffice(buildBGHDocOffice())
                     .userGroupPathName("/BGH/Extern")
                     .isInternal(true)
                     .build(),
-                DocumentationOfficeUserGroup.builder()
+                UserGroup.builder()
                     .docOffice(buildCCRisDocOffice())
                     .userGroupPathName("/CC-RIS")
                     .isInternal(true)
                     .build()))
-        .when(documentationOfficeUserGroupService)
+        .when(userGroupService)
         .getAllUserGroups();
   }
 }

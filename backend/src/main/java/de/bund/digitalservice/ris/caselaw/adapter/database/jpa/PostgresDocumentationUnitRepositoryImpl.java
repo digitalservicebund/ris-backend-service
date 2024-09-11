@@ -553,8 +553,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     boolean isInternalUser = userService.isInternal(oidcUser);
     List<ProcedureDTO> assignedProcedures;
     if (userGroup.isPresent() && !isInternalUser) {
-      assignedProcedures =
-          procedureRepository.findAllByDocumentationOfficeUserGroupDTO_Id(userGroup.get().id());
+      assignedProcedures = procedureRepository.findAllByUserGroupDTO_Id(userGroup.get().id());
     } else {
       assignedProcedures = List.of();
     }

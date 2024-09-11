@@ -1,9 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroup;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.User;
+import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
+import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.List;
 import java.util.Objects;
@@ -16,11 +16,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class KeycloakUserService implements UserService {
   private static final Logger LOGGER = LoggerFactory.getLogger(KeycloakUserService.class);
-  private final DocumentationOfficeUserGroupService documentationOfficeUserGroupService;
+  private final UserGroupService userGroupService;
 
-  public KeycloakUserService(
-      DocumentationOfficeUserGroupService documentationOfficeUserGroupService) {
-    this.documentationOfficeUserGroupService = documentationOfficeUserGroupService;
+  public KeycloakUserService(UserGroupService userGroupService) {
+    this.userGroupService = userGroupService;
   }
 
   @Override
@@ -50,10 +49,10 @@ public class KeycloakUserService implements UserService {
   }
 
   @Override
-  public Optional<DocumentationOfficeUserGroup> getUserGroup(OidcUser oidcUser) {
+  public Optional<UserGroup> getUserGroup(OidcUser oidcUser) {
     List<String> userGroups = Objects.requireNonNull(oidcUser.getAttribute("groups"));
     var matchingUserGroup =
-        this.documentationOfficeUserGroupService.getAllUserGroups().stream()
+        this.userGroupService.getAllUserGroups().stream()
             .filter(group -> userGroups.contains(group.userGroupPathName()))
             .findFirst();
     if (matchingUserGroup.isEmpty()) {
@@ -73,6 +72,6 @@ public class KeycloakUserService implements UserService {
   }
 
   private Optional<DocumentationOffice> extractDocumentationOffice(OidcUser oidcUser) {
-    return getUserGroup(oidcUser).map(DocumentationOfficeUserGroup::docOffice);
+    return getUserGroup(oidcUser).map(UserGroup::docOffice);
   }
 }

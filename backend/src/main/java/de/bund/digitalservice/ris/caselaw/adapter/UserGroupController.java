@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroup;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOfficeUserGroupService;
+import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
+import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.List;
 import org.springframework.http.MediaType;
@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/v1/caselaw/user-group")
 public class UserGroupController {
-  private final DocumentationOfficeUserGroupService service;
+  private final UserGroupService service;
   private final UserService userService;
 
-  public UserGroupController(DocumentationOfficeUserGroupService service, UserService userService) {
+  public UserGroupController(UserGroupService service, UserService userService) {
     this.service = service;
     this.userService = userService;
   }
@@ -31,8 +31,7 @@ public class UserGroupController {
    */
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public List<DocumentationOfficeUserGroup> getUserGroups(
-      @AuthenticationPrincipal OidcUser oidcUser) {
+  public List<UserGroup> getUserGroups(@AuthenticationPrincipal OidcUser oidcUser) {
     return service.getExternalUserGroups(userService.getDocumentationOffice(oidcUser));
   }
 }
