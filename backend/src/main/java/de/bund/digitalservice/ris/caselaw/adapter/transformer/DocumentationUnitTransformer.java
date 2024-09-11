@@ -132,7 +132,8 @@ public class DocumentationUnitTransformer {
           .caseFacts(null)
           .decisionGrounds(null)
           .dissentingOpinion(null)
-          .otherLongText(null);
+          .otherLongText(null)
+          .outline(null);
     }
 
     addReferences(updatedDomainObject, builder);
@@ -172,7 +173,8 @@ public class DocumentationUnitTransformer {
         .caseFacts(texts.caseFacts())
         .decisionGrounds(texts.decisionReasons())
         .dissentingOpinion(texts.dissentingOpinion())
-        .otherLongText(texts.otherLongText());
+        .otherLongText(texts.otherLongText())
+        .outline(texts.outline());
 
     if (texts.decisionName() != null) {
       // Todo multiple decision names?
@@ -602,6 +604,7 @@ public class DocumentationUnitTransformer {
             .decisionReasons(documentationUnitDTO.getDecisionGrounds())
             .dissentingOpinion(documentationUnitDTO.getDissentingOpinion())
             .otherLongText(documentationUnitDTO.getOtherLongText())
+            .outline(documentationUnitDTO.getOutline())
             .build();
 
     List<String> borderNumbers =

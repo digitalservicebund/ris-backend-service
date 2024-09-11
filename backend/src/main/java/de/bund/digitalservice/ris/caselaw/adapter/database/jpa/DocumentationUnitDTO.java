@@ -120,6 +120,9 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @Column(name = "other_long_text")
   String otherLongText;
 
+  @Column(name = "outline")
+  String outline;
+
   @Column(name = "other_headnote")
   String otherHeadnote;
 

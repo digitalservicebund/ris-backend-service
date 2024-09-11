@@ -220,6 +220,11 @@ test.describe("short and long texts", () => {
           pageWithExternalUser.getByTestId("Sonstiger Langtext")
         await expect(otherLongText).toBeHidden()
       })
+
+      await test.step("Gliederung ist nicht sichtbar", async () => {
+        const outline = pageWithExternalUser.getByTestId("Gliederung")
+        await expect(outline).toBeHidden()
+      })
     },
   )
 
@@ -266,6 +271,12 @@ test.describe("short and long texts", () => {
       await test.step("Sonstiger Langtext ist bearbeitbar", async () => {
         const otherLongText = page.getByTestId("Sonstiger Langtext")
         const inputFieldInnerHTML = await otherLongText.innerHTML()
+        expect(inputFieldInnerHTML).toContain(editable)
+      })
+
+      await test.step("Gliederung ist bearbeitbar", async () => {
+        const outline = page.getByTestId("Gliederung")
+        const inputFieldInnerHTML = await outline.innerHTML()
         expect(inputFieldInnerHTML).toContain(editable)
       })
 

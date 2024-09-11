@@ -30,6 +30,7 @@ describe("preview texts", () => {
       decisionReasons: "decision reasons",
       dissentingOpinion: "dissenting opinion",
       otherLongText: "other long text",
+      outline: "outline",
     })
 
     expect(await screen.findByText("Entscheidungsname")).toBeInTheDocument()
@@ -45,6 +46,7 @@ describe("preview texts", () => {
     expect(await screen.findByText("Entscheidungsgründe")).toBeInTheDocument()
     expect(await screen.findByText("Abweichende Meinung")).toBeInTheDocument()
     expect(await screen.findByText("Sonstiger Langtext")).toBeInTheDocument()
+    expect(await screen.findByText("Gliederung")).toBeInTheDocument()
   })
 
   it.each([
@@ -209,6 +211,23 @@ describe("preview texts", () => {
       ],
     ],
     [
+      "Gliederung",
+      { outline: "outline" },
+      [
+        "Entscheidungsname",
+        "Titelzeile",
+        "Leitsatz",
+        "Orientierungssatz",
+        "Sonstiger Orientierungssatz",
+        "Tenor",
+        "Gründe",
+        "Tatbestand",
+        "Entscheidungsgründe",
+        "Abweichende Meinung",
+        "Sonstiger Langtext",
+      ],
+    ],
+    [
       "Abweichende Meinung",
       { dissentingOpinion: "dissenting opinion" },
       [
@@ -222,6 +241,7 @@ describe("preview texts", () => {
         "Tatbestand",
         "Entscheidungsgründe",
         "Sonstiger Langtext",
+        "Gliederung",
       ],
     ],
   ])(

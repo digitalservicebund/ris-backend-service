@@ -74,6 +74,7 @@ export type Texts = {
   decisionReasons?: string
   dissentingOpinion?: string
   otherLongText?: string
+  outline?: string
 }
 
 export default class DocumentUnit {

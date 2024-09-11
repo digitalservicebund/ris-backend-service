@@ -20,6 +20,7 @@ function isEditableByUser(item: { name: string }): boolean {
     case "decisionReasons":
     case "dissentingOpinion":
     case "otherLongText":
+    case "outline":
       return isInternalUser
     default:
       return true

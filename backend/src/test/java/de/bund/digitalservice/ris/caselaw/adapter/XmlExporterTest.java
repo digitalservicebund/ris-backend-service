@@ -187,6 +187,7 @@ class XmlExporterTest {
         .decisionName("decision name")
         .dissentingOpinion("dissenting opinion")
         .otherLongText("other long text")
+        .outline("outline")
         .build();
   }
 
