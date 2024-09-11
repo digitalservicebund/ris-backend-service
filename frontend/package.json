@@ -36,7 +36,7 @@
     "@braintree/sanitize-url": "^7.1.0",
     "@guardian/prosemirror-invisibles": "^3.1.1",
     "@sentry/integrations": "^7.114.0",
-    "@sentry/vue": "^8.29.0",
+    "@sentry/vue": "^8.30.0",
     "@tiptap/extension-blockquote": "^2.6.6",
     "@tiptap/extension-bold": "^2.6.6",
     "@tiptap/extension-bullet-list": "^2.6.6",
@@ -71,8 +71,8 @@
     "pinia": "^2.2.2",
     "resize-observer-polyfill": "^1.5.1",
     "tippy.js": "^6.3.7",
-    "vue": "^3.5.3",
-    "vue-router": "4.4.3",
+    "vue": "^3.5.4",
+    "vue-router": "4.4.4",
     "vue-tsc": "^2.1.6"
   },
   "devDependencies": {
