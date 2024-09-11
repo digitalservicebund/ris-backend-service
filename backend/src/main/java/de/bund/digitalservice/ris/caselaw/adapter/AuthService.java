@@ -16,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.ImportApiKeyException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -110,10 +111,15 @@ public class AuthService {
    */
   @Bean
   public Function<String, Boolean> userHasReadAccessByDocumentNumber() {
-    return documentNumber ->
-        Optional.ofNullable(documentationUnitService.getByDocumentNumber(documentNumber))
+    return documentNumber -> {
+      try {
+        return Optional.ofNullable(documentationUnitService.getByDocumentNumber(documentNumber))
             .map(this::userHasReadAccess)
             .orElse(false);
+      } catch (DocumentationUnitNotExistsException ex) {
+        return false;
+      }
+    };
   }
 
   /**
@@ -128,10 +134,15 @@ public class AuthService {
    */
   @Bean
   public Function<UUID, Boolean> userHasReadAccessByDocumentationUnitId() {
-    return uuid ->
-        Optional.ofNullable(documentationUnitService.getByUuid(uuid))
+    return uuid -> {
+      try {
+        return Optional.ofNullable(documentationUnitService.getByUuid(uuid))
             .map(this::userHasReadAccess)
             .orElse(false);
+      } catch (DocumentationUnitNotExistsException ex) {
+        return false;
+      }
+    };
   }
 
   /**
@@ -181,10 +192,15 @@ public class AuthService {
    */
   @Bean
   public Function<UUID, Boolean> userHasSameDocumentationOffice() {
-    return uuid ->
-        Optional.ofNullable(documentationUnitService.getByUuid(uuid))
+    return uuid -> {
+      try {
+        return Optional.ofNullable(documentationUnitService.getByUuid(uuid))
             .map(this::userHasSameDocOfficeAsDocument)
             .orElse(false);
+      } catch (DocumentationUnitNotExistsException e) {
+        return false;
+      }
+    };
   }
 
   /**
@@ -202,15 +218,19 @@ public class AuthService {
   @Bean
   public Function<UUID, Boolean> isAssignedViaProcedure() {
     return uuid -> {
-      var documentationUnit = Optional.ofNullable(documentationUnitService.getByUuid(uuid));
-      Optional<OidcUser> oidcUser = getOidcUser();
-      if (documentationUnit.isPresent() && oidcUser.isPresent()) {
-        var procedure = documentationUnit.get().coreData().procedure();
-        if (procedure != null) {
-          return isProcedureAssignedToUser(procedure, oidcUser.get());
+      try {
+        var documentationUnit = Optional.ofNullable(documentationUnitService.getByUuid(uuid));
+        Optional<OidcUser> oidcUser = getOidcUser();
+        if (documentationUnit.isPresent() && oidcUser.isPresent()) {
+          var procedure = documentationUnit.get().coreData().procedure();
+          if (procedure != null) {
+            return isProcedureAssignedToUser(procedure, oidcUser.get());
+          }
         }
+        return false;
+      } catch (DocumentationUnitNotExistsException ex) {
+        return false;
       }
-      return false;
     };
   }
 

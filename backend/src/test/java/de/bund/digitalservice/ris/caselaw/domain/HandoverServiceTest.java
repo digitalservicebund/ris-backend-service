@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -49,8 +48,7 @@ class HandoverServiceTest {
 
   @Test
   void testHandoverByEmail() throws DocumentationUnitNotExistsException {
-    when(repository.findByUuid(TEST_UUID))
-        .thenReturn(Optional.ofNullable(DocumentationUnit.builder().build()));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(DocumentationUnit.builder().build());
     HandoverMail handoverMail =
         HandoverMail.builder()
             .entityId(TEST_UUID)
@@ -72,8 +70,10 @@ class HandoverServiceTest {
   }
 
   @Test
-  void testHandoverByEmail_withoutDocumentationUnitForUuid() {
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.empty());
+  void testHandoverByEmail_withoutDocumentationUnitForUuid()
+      throws DocumentationUnitNotExistsException {
+
+    when(repository.findByUuid(TEST_UUID)).thenThrow(DocumentationUnitNotExistsException.class);
 
     Assertions.assertThrows(
         DocumentationUnitNotExistsException.class,
@@ -244,7 +244,7 @@ class HandoverServiceTest {
     DocumentationUnit testDocumentationUnit = DocumentationUnit.builder().build();
     XmlTransformationResult mockXmlTransformationResult =
         new XmlTransformationResult("some xml", true, List.of("success"), "foo.xml", Instant.now());
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.ofNullable(testDocumentationUnit));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(testDocumentationUnit);
     when(mailService.getXmlPreview(testDocumentationUnit)).thenReturn(mockXmlTransformationResult);
 
     Assertions.assertEquals(mockXmlTransformationResult, service.createPreviewXml(TEST_UUID));

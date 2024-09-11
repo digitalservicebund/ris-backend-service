@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -18,7 +18,8 @@ public interface DocumentationUnitRepository {
    * @param documentNumber the document number
    * @return the documentation unit found
    */
-  Optional<DocumentationUnit> findByDocumentNumber(String documentNumber);
+  DocumentationUnit findByDocumentNumber(String documentNumber)
+      throws DocumentationUnitNotExistsException;
 
   /**
    * Find a documentation unit by its UUID
@@ -26,7 +27,7 @@ public interface DocumentationUnitRepository {
    * @param uuid the UUID to search for
    * @return the documentation unit found
    */
-  Optional<DocumentationUnit> findByUuid(UUID uuid);
+  DocumentationUnit findByUuid(UUID uuid) throws DocumentationUnitNotExistsException;
 
   /**
    * Create a new documentation unit with the given document number and documentation office

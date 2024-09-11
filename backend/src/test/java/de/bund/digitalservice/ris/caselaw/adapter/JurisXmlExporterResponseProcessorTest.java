@@ -84,7 +84,7 @@ class JurisXmlExporterResponseProcessorTest {
   private JurisXmlExporterResponseProcessor responseProcessor;
 
   @BeforeEach
-  void setup() throws MessagingException {
+  void setup() throws MessagingException, DocumentationUnitNotExistsException {
     when(storeFactory.createStore()).thenReturn(store);
     when(store.getFolder("INBOX")).thenReturn(inbox);
     when(store.getFolder("processed")).thenReturn(processed);
@@ -103,7 +103,7 @@ class JurisXmlExporterResponseProcessorTest {
     when(reportRepository.saveAll(any())).thenReturn(Collections.emptyList());
 
     when(documentationUnitRepository.findByDocumentNumber(DOCUMENT_NUMBER))
-        .thenReturn(Optional.of(DocumentationUnit.builder().uuid(DOCUMENT_UUID).build()));
+        .thenReturn(DocumentationUnit.builder().uuid(DOCUMENT_UUID).build());
 
     when(xmlHandoverRepository.getLastXmlHandoverMail(DOCUMENT_UUID))
         .thenReturn(HandoverMail.builder().issuerAddress("test@digitalservice.bund.de").build());

@@ -15,6 +15,7 @@ import com.gravity9.jsonpatch.TestOperation;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -48,7 +49,8 @@ class AuthServiceTest {
   @MockBean private OidcUser oidcUser;
 
   @Test
-  void testUserHasReadAccessByDocumentNumber_withStatusNull_shouldReturnTrue() {
+  void testUserHasReadAccessByDocumentNumber_withStatusNull_shouldReturnTrue()
+      throws DocumentationUnitNotExistsException {
     // Arrange
     String documentNumber = "DOC12345";
     DocumentationUnit documentationUnit =
@@ -64,7 +66,9 @@ class AuthServiceTest {
   }
 
   @Test
-  void testUserHasReadAccessByDocumentNumber_withStatusPublished_shouldReturnTrue() {
+  void testUserHasReadAccessByDocumentNumber_withStatusPublished_shouldReturnTrue()
+      throws DocumentationUnitNotExistsException {
+
     // Arrange
     String documentNumber = "DOC12345";
     DocumentationUnit documentationUnit =
@@ -83,7 +87,9 @@ class AuthServiceTest {
   }
 
   @Test
-  void testUserHasReadAccessByDocumentNumber_withSameDocOffice_shouldReturnTrue() {
+  void testUserHasReadAccessByDocumentNumber_withSameDocOffice_shouldReturnTrue()
+      throws DocumentationUnitNotExistsException {
+
     // Arrange
     SecurityContextHolder.setContext(securityContext);
     when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -170,7 +176,8 @@ class AuthServiceTest {
   }
 
   @Test
-  void test_userHasSameDocumentationOffice_withoutDocumentationUnit_shouldReturnFalse() {
+  void test_userHasSameDocumentationOffice_withoutDocumentationUnit_shouldReturnFalse()
+      throws DocumentationUnitNotExistsException {
     // Arrange
     UUID uuid = UUID.randomUUID();
     when(documentationUnitService.getByUuid(uuid)).thenReturn(null);
@@ -183,7 +190,9 @@ class AuthServiceTest {
   }
 
   @Test
-  void test_userHasSameDocumentationOffice_withSameDocumentationOffice_shouldReturnTrue() {
+  void test_userHasSameDocumentationOffice_withSameDocumentationOffice_shouldReturnTrue()
+      throws DocumentationUnitNotExistsException {
+
     // Arrange
     UUID uuid = UUID.randomUUID();
     DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
@@ -205,7 +214,9 @@ class AuthServiceTest {
   }
 
   @Test
-  void test_isAssignedViaProcedure_withoutDocumentationUnit_shouldReturnFalse() {
+  void test_isAssignedViaProcedure_withoutDocumentationUnit_shouldReturnFalse()
+      throws DocumentationUnitNotExistsException {
+
     // Arrange
     UUID uuid = UUID.randomUUID();
     when(documentationUnitService.getByUuid(uuid)).thenReturn(null);
@@ -218,7 +229,9 @@ class AuthServiceTest {
   }
 
   @Test
-  void test_isAssignedViaProcedure_withAssignedProcedure_shouldReturnTrue() {
+  void test_isAssignedViaProcedure_withAssignedProcedure_shouldReturnTrue()
+      throws DocumentationUnitNotExistsException {
+
     // Arrange
     UUID documentationUnitId = UUID.randomUUID();
     UUID userGroupId = UUID.randomUUID();
@@ -244,7 +257,9 @@ class AuthServiceTest {
   }
 
   @Test
-  void test_isAssignedViaProcedure_withUnAssignedProcedure_shouldReturnFalse() {
+  void test_isAssignedViaProcedure_withUnAssignedProcedure_shouldReturnFalse()
+      throws DocumentationUnitNotExistsException {
+
     // Arrange
     UUID documentationUnitId = UUID.randomUUID();
     UUID userGroupId = UUID.randomUUID();

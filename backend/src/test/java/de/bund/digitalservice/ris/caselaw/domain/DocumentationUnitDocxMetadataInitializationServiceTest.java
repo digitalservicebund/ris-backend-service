@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresCourtRepo
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocxMetadataProperty;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
@@ -42,10 +43,10 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
   @MockBean private DocumentTypeRepository documentTypeRepository;
 
   @BeforeEach
-  void beforeEach() {
+  void beforeEach() throws DocumentationUnitNotExistsException {
     CoreData coreData = CoreData.builder().fileNumbers(List.of()).build();
     DocumentationUnit documentationUnit = DocumentationUnit.builder().coreData(coreData).build();
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.of(documentationUnit));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(documentationUnit);
   }
 
   @Test
@@ -132,14 +133,16 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
   }
 
   @Test
-  void testInitializeCoreData_initializeLegalEffectIfExplicitlyNotSpecified() {
+  void testInitializeCoreData_initializeLegalEffectIfExplicitlyNotSpecified()
+      throws DocumentationUnitNotExistsException {
+
     CoreData coreData =
         CoreData.builder()
             .fileNumbers(List.of())
             .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
             .build();
     DocumentationUnit documentationUnit = DocumentationUnit.builder().coreData(coreData).build();
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.of(documentationUnit));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(documentationUnit);
 
     Map<DocxMetadataProperty, String> properties =
         Map.of(DocxMetadataProperty.LEGAL_EFFECT, "Nein");

@@ -82,7 +82,9 @@ class DocumentationUnitControllerAuthTest {
   }
 
   @Test
-  void testGetByDocumentNumber_nonExistentDocumentNumber_shouldYield403Too() {
+  void testGetByDocumentNumber_nonExistentDocumentNumber_shouldYield403Too()
+      throws DocumentationUnitNotExistsException {
+
     // testGetByDocumentNumber() is also in DocumentationUnitControllerAuthIntegrationTest
     when(service.getByDocumentNumber(any(String.class))).thenReturn(null);
 
@@ -104,7 +106,7 @@ class DocumentationUnitControllerAuthTest {
   }
 
   @Test
-  void testAttachFileToDocumentationUnit() {
+  void testAttachFileToDocumentationUnit() throws DocumentationUnitNotExistsException {
     when(attachmentService.attachFileToDocumentationUnit(
             eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class)))
         .thenReturn(Attachment.builder().s3path("fooPath").build());
@@ -139,7 +141,7 @@ class DocumentationUnitControllerAuthTest {
   }
 
   @Test
-  void testRemoveFileFromDocumentationUnit() {
+  void testRemoveFileFromDocumentationUnit() throws DocumentationUnitNotExistsException {
     mockDocumentationUnit(docOffice2, null, null);
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file/fooPath";
 
@@ -232,7 +234,7 @@ class DocumentationUnitControllerAuthTest {
   }
 
   @Test
-  void testGetHtml() {
+  void testGetHtml() throws DocumentationUnitNotExistsException {
     mockDocumentationUnit(docOffice1, "123", Status.builder().publicationStatus(PUBLISHED).build());
     when(docxConverterService.getConvertedObject("123")).thenReturn(null);
 
@@ -274,7 +276,7 @@ class DocumentationUnitControllerAuthTest {
   }
 
   @Test
-  void testGetEvents() {
+  void testGetEvents() throws DocumentationUnitNotExistsException {
     mockDocumentationUnit(docOffice1, null, Status.builder().publicationStatus(PUBLISHED).build());
     when(handoverService.getEventLog(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT))
         .thenReturn(List.of());
@@ -304,7 +306,9 @@ class DocumentationUnitControllerAuthTest {
   }
 
   private DocumentationUnit mockDocumentationUnit(
-      DocumentationOffice docOffice, String s3path, Status status) {
+      DocumentationOffice docOffice, String s3path, Status status)
+      throws DocumentationUnitNotExistsException {
+
     DocumentationUnit docUnit =
         DocumentationUnit.builder()
             .uuid(TEST_UUID)

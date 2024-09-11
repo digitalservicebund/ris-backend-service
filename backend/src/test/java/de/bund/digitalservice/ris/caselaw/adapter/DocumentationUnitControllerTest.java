@@ -91,7 +91,7 @@ class DocumentationUnitControllerTest {
   private final ObjectMapper mapper = new ObjectMapper();
 
   @BeforeEach
-  void setup() {
+  void setup() throws DocumentationUnitNotExistsException {
     doReturn(docOffice)
         .when(userService)
         .getDocumentationOffice(
@@ -150,7 +150,7 @@ class DocumentationUnitControllerTest {
   }
 
   @Test
-  void testGetByDocumentnumber() {
+  void testGetByDocumentnumber() throws DocumentationUnitNotExistsException {
     when(service.getByDocumentNumber("ABCD202200001"))
         .thenReturn(
             DocumentationUnit.builder()
@@ -171,7 +171,9 @@ class DocumentationUnitControllerTest {
   }
 
   @Test
-  void testGetByDocumentNumber_withInvalidDocumentNumber() {
+  void testGetByDocumentNumber_withInvalidDocumentNumber()
+      throws DocumentationUnitNotExistsException {
+
     when(service.getByDocumentNumber("abc")).thenReturn(null);
 
     risWebClient
@@ -218,7 +220,7 @@ class DocumentationUnitControllerTest {
   }
 
   @Test
-  void testDeleteByUuid_withInvalidUuid() {
+  void testDeleteByUuid_withInvalidUuid() throws DocumentationUnitNotExistsException {
     when(service.getByDocumentNumber("abc")).thenReturn(null);
 
     risWebClient
@@ -538,7 +540,7 @@ class DocumentationUnitControllerTest {
   }
 
   @Test
-  void testGetHtml() {
+  void testGetHtml() throws DocumentationUnitNotExistsException {
     when(service.getByUuid(TEST_UUID))
         .thenReturn(
             DocumentationUnit.builder()

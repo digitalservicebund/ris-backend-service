@@ -229,10 +229,8 @@ public class JurisXmlExporterResponseProcessor {
 
       var xmlHandoverMail =
           xmlHandoverRepository.getLastXmlHandoverMail(
-              documentationUnitRepository
-                  .findByDocumentNumber(documentNumber)
-                  .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber))
-                  .uuid());
+              documentationUnitRepository.findByDocumentNumber(documentNumber).uuid());
+
       if (xmlHandoverMail != null && xmlHandoverMail.getIssuerAddress() != null) {
         mailSender.sendMail(
             storeFactory.getUsername(),

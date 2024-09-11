@@ -185,7 +185,12 @@ public class DocumentationUnitController {
       throw new DocumentationUnitException("Die Dokumentennummer unterstützt nur 13-14 Zeichen");
     }
 
-    return ResponseEntity.ok(service.getByDocumentNumber(documentNumber));
+    try {
+      return ResponseEntity.ok(service.getByDocumentNumber(documentNumber));
+    } catch (DocumentationUnitNotExistsException e) {
+      log.error("Documentation unit '{}' doesn't exist", documentNumber);
+      return ResponseEntity.ok(DocumentationUnit.builder().build());
+    }
   }
 
   @DeleteMapping(value = "/{uuid}")
@@ -257,7 +262,9 @@ public class DocumentationUnitController {
       var newPatch = service.updateDocumentationUnit(uuid, patch);
 
       return ResponseEntity.ok().body(newPatch);
-    } catch (DocumentationUnitNotExistsException | DocumentationUnitPatchException e) {
+    } catch (DocumentationUnitNotExistsException e) {
+      return ResponseEntity.internalServerError().build();
+    } catch (DocumentationUnitPatchException e) {
       log.error("Error by updating documentation unit '{}/{}'", uuid, documentNumber, e);
       return ResponseEntity.internalServerError().build();
     }
@@ -339,7 +346,10 @@ public class DocumentationUnitController {
   @GetMapping(value = "/{uuid}/docx/{s3Path}", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentationUnitId.apply(#uuid)")
   public ResponseEntity<Docx2Html> getHtml(@PathVariable UUID uuid, @PathVariable String s3Path) {
-    if (service.getByUuid(uuid) == null) {
+
+    try {
+      service.getByUuid(uuid);
+    } catch (DocumentationUnitNotExistsException ex) {
       return ResponseEntity.notFound().build();
     }
 

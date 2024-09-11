@@ -60,10 +60,8 @@ public class HandoverService {
    */
   public HandoverMail handoverAsMail(UUID documentationUnitId, String issuerAddress)
       throws DocumentationUnitNotExistsException {
-    DocumentationUnit documentationUnit =
-        repository
-            .findByUuid(documentationUnitId)
-            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentationUnitId));
+
+    DocumentationUnit documentationUnit = repository.findByUuid(documentationUnitId);
 
     HandoverMail handoverMail =
         mailService.handOver(documentationUnit, recipientAddress, issuerAddress);
@@ -82,10 +80,8 @@ public class HandoverService {
    */
   public XmlTransformationResult createPreviewXml(UUID documentUuid)
       throws DocumentationUnitNotExistsException {
-    DocumentationUnit documentationUnit =
-        repository
-            .findByUuid(documentUuid)
-            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUuid));
+
+    DocumentationUnit documentationUnit = repository.findByUuid(documentUuid);
     return mailService.getXmlPreview(documentationUnit);
   }
 

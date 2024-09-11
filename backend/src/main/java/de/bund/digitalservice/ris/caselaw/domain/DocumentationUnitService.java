@@ -102,17 +102,14 @@ public class DocumentationUnitService {
         PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()), oidcUser, searchInput);
   }
 
-  public DocumentationUnit getByDocumentNumber(String documentNumber) {
-    try {
-      var optionalDocumentationUnit = repository.findByDocumentNumber(documentNumber);
-      return optionalDocumentationUnit.orElseThrow();
-    } catch (Exception e) {
-      return null;
-    }
+  public DocumentationUnit getByDocumentNumber(String documentNumber)
+      throws DocumentationUnitNotExistsException {
+    return repository.findByDocumentNumber(documentNumber);
   }
 
-  public DocumentationUnit getByUuid(UUID documentationUnitId) {
-    return repository.findByUuid(documentationUnitId).orElseThrow();
+  public DocumentationUnit getByUuid(UUID documentationUnitId)
+      throws DocumentationUnitNotExistsException {
+    return repository.findByUuid(documentationUnitId);
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -134,10 +131,7 @@ public class DocumentationUnitService {
           "Die Dokumentationseinheit konnte nicht gelöscht werden, da", relatedEntities);
     }
 
-    DocumentationUnit documentationUnit =
-        repository
-            .findByUuid(documentationUnitId)
-            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentationUnitId));
+    DocumentationUnit documentationUnit = repository.findByUuid(documentationUnitId);
 
     log.debug("Deleting DocumentationUnitDTO " + documentationUnitId);
 
@@ -262,10 +256,7 @@ public class DocumentationUnitService {
 
     repository.save(documentationUnit);
 
-    return repository
-        .findByUuid(documentationUnit.uuid())
-        .orElseThrow(
-            () -> new DocumentationUnitNotExistsException(documentationUnit.documentNumber()));
+    return repository.findByUuid(documentationUnit.uuid());
   }
 
   public Slice<RelatedDocumentationUnit> searchLinkableDocumentationUnits(

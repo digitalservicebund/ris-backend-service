@@ -79,32 +79,21 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public Optional<DocumentationUnit> findByDocumentNumber(String documentNumber) {
-    try {
-      var documentationUnit =
-          repository
-              .findByDocumentNumber(documentNumber)
-              .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
-      return Optional.of(DocumentationUnitTransformer.transformToDomain(documentationUnit));
-    } catch (Exception ex) {
-      log.error("Error to get a documentation unit by document number.", ex);
-      return Optional.empty();
-    }
+  public DocumentationUnit findByDocumentNumber(String documentNumber)
+      throws DocumentationUnitNotExistsException {
+    var documentationUnit =
+        repository
+            .findByDocumentNumber(documentNumber)
+            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
+    return DocumentationUnitTransformer.transformToDomain(documentationUnit);
   }
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public Optional<DocumentationUnit> findByUuid(UUID uuid) {
-    try {
-      var documentationUnit =
-          repository
-              .findById(uuid)
-              .orElseThrow(() -> new DocumentationUnitNotExistsException(uuid));
-      return Optional.of(DocumentationUnitTransformer.transformToDomain(documentationUnit));
-    } catch (Exception ex) {
-      log.error("Error to get a documentation unit by uuid.", ex);
-      return Optional.empty();
-    }
+  public DocumentationUnit findByUuid(UUID uuid) throws DocumentationUnitNotExistsException {
+    var documentationUnit =
+        repository.findById(uuid).orElseThrow(() -> new DocumentationUnitNotExistsException(uuid));
+    return DocumentationUnitTransformer.transformToDomain(documentationUnit);
   }
 
   @Override
