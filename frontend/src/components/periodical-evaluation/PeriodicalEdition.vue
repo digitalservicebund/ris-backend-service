@@ -50,19 +50,18 @@ async function validateRequiredInput() {
 async function saveEdition() {
   validationStore.reset()
   await validateRequiredInput()
-  if (!validationStore.isValid()) {
-    return
+  if (validationStore.isValid()) {
+    const response = await LegalPeriodicalEditionService.save(
+      edition.value as LegalPeriodicalEdition,
+    )
+    if (response.data) {
+      edition.value = response.data as LegalPeriodicalEdition
+    }
+    await router.push({
+      name: "caselaw-periodical-evaluation-editionId-references",
+      params: { editionId: edition?.value?.id },
+    })
   }
-  const response = await LegalPeriodicalEditionService.save(
-    edition.value as LegalPeriodicalEdition,
-  )
-  if (response.data) {
-    edition.value = response.data as LegalPeriodicalEdition
-  }
-  await router.push({
-    name: "caselaw-periodical-evaluation-editionId-references",
-    params: { editionId: edition?.value?.id },
-  })
 }
 </script>
 
