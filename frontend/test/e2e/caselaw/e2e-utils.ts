@@ -53,9 +53,6 @@ export const navigateToCategories = async (
     skipAssert?: boolean
   },
 ) => {
-  if (Math.random() > 0.5) {
-    throw new Error("This will fail")
-  }
   await test.step("Navigate to 'Rubriken'", async () => {
     const queryParams = getAllQueryParamsFromUrl(page)
     const baseUrl =
