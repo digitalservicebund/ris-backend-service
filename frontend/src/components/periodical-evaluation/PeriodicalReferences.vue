@@ -34,7 +34,7 @@ onMounted(async () => {
 <template>
   <div
     v-if="!responseError"
-    class="flex h-full w-full flex-col space-y-24 px-16 py-16"
+    class="space-24 flex h-full w-full flex-col space-y-24 p-24"
   >
     <h1 class="ds-heading-02-reg" data-testid="references-title">
       Fundstellen
@@ -42,7 +42,6 @@ onMounted(async () => {
     <div aria-label="Fundstellen">
       <EditableList
         v-model="references"
-        class="px-16"
         :default-value="defaultValue"
         :edit-component="EditionEvaluationReference"
         :summary-component="EditionReferenceSummary"

@@ -271,7 +271,7 @@ watch(
       </div>
     </div>
     <div class="flex flex-col gap-24">
-      <div v-if="!isSaved" class="ds-heading-03-reg">
+      <div v-if="!isSaved" class="ds-heading-03-reg pt-24">
         Entscheidung hinzufügen
       </div>
       <div class="flex justify-between gap-24">

@@ -174,7 +174,7 @@ onMounted(() => {
       </FlexContainer>
     </div>
 
-    <div class="flex h-full flex-col space-y-24 px-16 py-16">
+    <div class="flex h-full flex-col p-24">
       <TableView class="relative table w-full border-separate">
         <TableHeader>
           <CellHeaderItem>Ausgabe</CellHeaderItem>
