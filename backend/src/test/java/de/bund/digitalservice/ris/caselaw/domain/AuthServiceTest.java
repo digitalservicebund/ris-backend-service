@@ -326,7 +326,8 @@ class AuthServiceTest {
         "/texts/caseFacts",
         "/texts/decisionReasons",
         "/texts/dissentingOpinion",
-        "/texts/otherLongText"
+        "/texts/otherLongText",
+        "/references"
       })
   void test_isPatchAllowedForExternalUsers_withProhibitedPath_shouldReturnFalse(String path) {
     // Arrange

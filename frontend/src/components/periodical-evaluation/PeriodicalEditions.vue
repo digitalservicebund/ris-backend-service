@@ -13,6 +13,7 @@ import SearchResultStatus from "@/components/SearchResultStatus.vue"
 import TableHeader from "@/components/TableHeader.vue"
 import TableRow from "@/components/TableRow.vue"
 import TableView from "@/components/TableView.vue"
+import { useInternalUser } from "@/composables/useInternalUser"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
@@ -35,6 +36,7 @@ const query = ref(getQueryFromRoute())
 const searchResponseError = ref<ResponseError | undefined>(emptyResponse)
 const isLoading = ref(false)
 const editionStore = useEditionStore()
+const isInternalUser = useInternalUser()
 
 /**
  * Sets a timeout before pushing the search query to the route,
@@ -162,7 +164,7 @@ onMounted(() => {
             ></ComboboxInput>
           </InputField>
           <TextButton
-            v-if="legalPeriodical"
+            v-if="legalPeriodical && isInternalUser"
             aria-label="Neue Periodikumsauswertung"
             class="ds-button-02-reg"
             label="Neue Periodikumsauswertung"
@@ -198,6 +200,7 @@ onMounted(() => {
           <CellItem class="flex">
             <div class="float-end flex">
               <router-link
+                v-if="isInternalUser"
                 class="cursor-pointer border-2 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
                 target="_blank"
                 :to="{
@@ -207,8 +210,15 @@ onMounted(() => {
               >
                 <IconEdit class="text-blue-800" />
               </router-link>
+              <div
+                v-else
+                aria-label="Ausgabe kann nicht editiert werden"
+                class="border-2 border-solid border-gray-600 p-4 text-gray-600"
+              >
+                <IconEdit />
+              </div>
               <button
-                v-if="edition.references?.length == 0"
+                v-if="edition.references?.length == 0 && isInternalUser"
                 aria-label="Ausgabe löschen"
                 class="cursor-pointer border-2 border-l-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
                 @click="handleDeleteEdition(edition)"

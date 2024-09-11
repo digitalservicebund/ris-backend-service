@@ -310,11 +310,11 @@ test.describe("short and long texts", () => {
         },
         {
           testId: "Leitsatz",
-          value: ": Leitsatz Test Text",
+          value: "Leitsatz Test Text",
         },
         {
           testId: "Orientierungssatz",
-          value: ": Orientierungssatz Test Text",
+          value: "Orientierungssatz Test Text",
         },
         {
           testId: "Sonstiger Orientierungssatz",

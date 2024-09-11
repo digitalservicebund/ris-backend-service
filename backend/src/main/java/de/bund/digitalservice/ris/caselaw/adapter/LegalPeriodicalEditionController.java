@@ -17,6 +17,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -60,15 +62,17 @@ public class LegalPeriodicalEditionController {
   @PutMapping(
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("isAuthenticated()")
+  @PreAuthorize("isAuthenticated() && @userIsInternal.apply(#oidcUser)")
   public LegalPeriodicalEdition save(
-      @Valid @RequestBody LegalPeriodicalEdition legalPeriodicalEdition) {
+      @Valid @RequestBody LegalPeriodicalEdition legalPeriodicalEdition,
+      @AuthenticationPrincipal OidcUser oidcUser) {
     return service.saveLegalPeriodicalEdition(legalPeriodicalEdition);
   }
 
   @DeleteMapping(value = "/{editionId}")
-  @PreAuthorize("isAuthenticated()")
-  public ResponseEntity<Void> delete(@NonNull @PathVariable UUID editionId) {
+  @PreAuthorize("isAuthenticated() && @userIsInternal.apply(#oidcUser)")
+  public ResponseEntity<Void> delete(
+      @NonNull @PathVariable UUID editionId, @AuthenticationPrincipal OidcUser oidcUser) {
     var deleted = service.delete(editionId);
     if (deleted) {
       return ResponseEntity.ok().build();
