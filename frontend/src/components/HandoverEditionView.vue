@@ -42,6 +42,9 @@ const errorMessage = computed(
 )
 
 onMounted(async () => {
+  featureToggle.value = (
+    await FeatureToggleService.isEnabled("neuris.evaluation-handover")
+  ).data
   if (referencesMissing.value || !store.edition) return
   const previewResponse = await HandoverEditionService.getPreview(
     store.edition.id!,
@@ -51,9 +54,6 @@ onMounted(async () => {
   } else if (previewResponse.data) {
     preview.value = previewResponse.data
   }
-  featureToggle.value = (
-    await FeatureToggleService.isEnabled("neuris.evaluation-handover")
-  ).data
 })
 
 function handoverEdition() {
