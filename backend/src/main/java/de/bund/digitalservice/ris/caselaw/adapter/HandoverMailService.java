@@ -2,8 +2,8 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitHandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
+import de.bund.digitalservice.ris.caselaw.domain.HandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 /** Implementation of the {@link MailService} interface that sends juris-XML files via email. */
 @Service
 public class HandoverMailService implements MailService {
+
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
   private final XmlExporter xmlExporter;
@@ -65,7 +66,7 @@ public class HandoverMailService implements MailService {
    * @param receiverAddress the email address of the receiver
    * @param issuerAddress the email address of the issuer
    * @return the result of the handover
-   * @throws DocumentationUnitHandoverException if the XML export fails
+   * @throws HandoverException if the XML export fails
    */
   @Override
   public HandoverMail handOver(
@@ -74,14 +75,55 @@ public class HandoverMailService implements MailService {
     try {
       xml = xmlExporter.transformToXml(getTestDocumentationUnit(documentationUnit));
     } catch (ParserConfigurationException | TransformerException ex) {
-      throw new DocumentationUnitHandoverException("Couldn't generate xml.", ex);
+      throw new HandoverException("Couldn't generate xml for documentationUnit.", ex);
     }
 
     String mailSubject = generateMailSubject(documentationUnit);
 
     HandoverMail handoverMail =
         generateXmlHandoverMail(
-            documentationUnit.uuid(), receiverAddress, mailSubject, xml, issuerAddress);
+            documentationUnit.uuid(),
+            receiverAddress,
+            mailSubject,
+            List.of(xml),
+            issuerAddress,
+            HandoverEntityType.DOCUMENTATION_UNIT);
+    generateAndSendMail(handoverMail);
+    if (!handoverMail.success()) {
+      return handoverMail;
+    }
+    return repository.save(handoverMail);
+  }
+
+  /**
+   * Hands over all references of an edition as XML to jDV via email.
+   *
+   * @param edition the edition to hand over
+   * @param receiverAddress the email address of the receiver
+   * @param issuerAddress the email address of the issuer
+   * @return the result of the handover
+   * @throws HandoverException if the XML export fails
+   */
+  @Override
+  public HandoverMail handOver(
+      LegalPeriodicalEdition edition, String receiverAddress, String issuerAddress) {
+    List<XmlTransformationResult> xml;
+    try {
+      xml = xmlExporter.transformToXml(edition);
+    } catch (ParserConfigurationException | TransformerException ex) {
+      throw new HandoverException("Couldn't generate xml for edition.", ex);
+    }
+
+    String mailSubject = generateMailSubject(edition);
+
+    HandoverMail handoverMail =
+        generateXmlHandoverMail(
+            edition.id(),
+            receiverAddress,
+            mailSubject,
+            xml,
+            issuerAddress,
+            HandoverEntityType.EDITION);
     generateAndSendMail(handoverMail);
     if (!handoverMail.success()) {
       return handoverMail;
@@ -106,14 +148,14 @@ public class HandoverMailService implements MailService {
    *
    * @param documentationUnit the documentation unit
    * @return the XML export result, containing the XML and possibly errors
-   * @throws DocumentationUnitHandoverException if the XML export fails
+   * @throws HandoverException if the XML export fails
    */
   @Override
   public XmlTransformationResult getXmlPreview(DocumentationUnit documentationUnit) {
     try {
       return xmlExporter.transformToXml(documentationUnit);
     } catch (ParserConfigurationException | TransformerException ex) {
-      throw new DocumentationUnitHandoverException("Couldn't generate xml.", ex);
+      throw new HandoverException("Couldn't generate xml for documentation unit.", ex);
     }
   }
 
@@ -125,36 +167,38 @@ public class HandoverMailService implements MailService {
    */
   @Override
   public List<XmlTransformationResult> getXmlPreview(LegalPeriodicalEdition edition) {
-    // TODO
-    return List.of();
+    try {
+      return xmlExporter.transformToXml(edition);
+    } catch (ParserConfigurationException | TransformerException ex) {
+      throw new HandoverException("Couldn't generate xml for edtion.", ex);
+    }
   }
 
   private String generateMailSubject(DocumentationUnit documentationUnit) {
     if (documentationUnit.documentNumber() == null) {
-      throw new DocumentationUnitHandoverException(
-          "No document number has set in the document unit.");
+      throw new HandoverException("No document number has set in the document unit.");
     }
+    return generateMailSubject(documentationUnit.documentNumber(), "N");
+  }
 
+  private String generateMailSubject(LegalPeriodicalEdition edition) {
+    if (edition.id() == null) {
+      throw new HandoverException("No id has been set in the edition.");
+    }
+    return generateMailSubject("edition-" + edition.id(), "F");
+  }
+
+  private String generateMailSubject(String vg, String dt) {
     String deliveryDate =
         LocalDate.now(Clock.system(ZoneId.of("Europe/Berlin"))).format(DATE_FORMATTER);
 
-    String subject = "id=juris";
-    subject += " name=" + jurisUsername;
-    subject += " da=R";
-    subject += " df=X";
-    subject += " dt=N";
-    subject += " mod=T";
-    subject += " ld=" + deliveryDate;
-    subject += " vg=";
-    subject += documentationUnit.documentNumber();
-
-    return subject;
+    return "id=juris name=%s da=R df=X dt=%s mod=T ld=%s vg=%s"
+        .formatted(jurisUsername, dt, deliveryDate, vg);
   }
 
-  private void generateAndSendMail(HandoverMail handoverMail)
-      throws DocumentationUnitHandoverException {
+  private void generateAndSendMail(HandoverMail handoverMail) throws HandoverException {
     if (handoverMail == null) {
-      throw new DocumentationUnitHandoverException("No xml mail is set");
+      throw new HandoverException("No xml mail is set");
     }
 
     if (!handoverMail.success()) {
@@ -162,7 +206,7 @@ public class HandoverMailService implements MailService {
     }
 
     if (handoverMail.receiverAddress() == null) {
-      throw new DocumentationUnitHandoverException("No receiver mail address is set");
+      throw new HandoverException("No receiver mail address is set");
     }
 
     mailSender.sendMail(
@@ -182,16 +226,21 @@ public class HandoverMailService implements MailService {
   }
 
   private HandoverMail generateXmlHandoverMail(
-      UUID documentationUnitId,
+      UUID entityId,
       String receiverAddress,
       String mailSubject,
-      XmlTransformationResult xml,
-      String issuerAddress) {
+      List<XmlTransformationResult> xml,
+      String issuerAddress,
+      HandoverEntityType entityType) {
     var xmlHandoverMailBuilder =
         HandoverMail.builder()
-            .entityId(documentationUnitId)
-            .success(xml.success())
-            .statusMessages(xml.statusMessages());
+            .entityId(entityId)
+            .success(xml.stream().allMatch(XmlTransformationResult::success))
+            .statusMessages(
+                xml.stream()
+                    .map(XmlTransformationResult::statusMessages)
+                    .flatMap(List::stream)
+                    .toList());
 
     if (!xmlHandoverMailBuilder.build().isSuccess()) {
       return xmlHandoverMailBuilder.build();
@@ -200,12 +249,18 @@ public class HandoverMailService implements MailService {
     return xmlHandoverMailBuilder
         .receiverAddress(receiverAddress)
         .mailSubject(mailSubject)
-        .handoverDate(xml.creationDate())
+        .handoverDate(xml.get(0).creationDate())
         .issuerAddress(issuerAddress)
         .attachments(
-            Collections.singletonList(
-                MailAttachment.builder().fileName(xml.fileName()).fileContent(xml.xml()).build()))
-        .entityType(HandoverEntityType.DOCUMENTATION_UNIT)
+            xml.stream()
+                .map(
+                    xmlFile ->
+                        MailAttachment.builder()
+                            .fileName(xmlFile.fileName())
+                            .fileContent(xmlFile.xml())
+                            .build())
+                .toList())
+        .entityType(entityType)
         .build();
   }
 

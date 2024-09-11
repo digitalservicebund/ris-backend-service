@@ -88,15 +88,14 @@ public class LegalPeriodicalEditionController {
    */
   @PutMapping(value = "/{uuid}/handover", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public ResponseEntity<HandoverMail> handoverEditionAsMail(@PathVariable UUID uuid) {
-
-    // TODO
-    return ResponseEntity.ok(
-        HandoverMail.builder()
-            .entityId(uuid)
-            .entityType(HandoverEntityType.EDITION)
-            .success(false)
-            .build());
+  public ResponseEntity<HandoverMail> handoverEditionAsMail(
+      @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
+    try {
+      return ResponseEntity.ok(handoverService.handoverEditionAsMail(uuid, null));
+    } catch (IOException e) {
+      log.error("Error handing over edition '{}' as email", uuid, e);
+      return ResponseEntity.internalServerError().build();
+    }
   }
 
   /**

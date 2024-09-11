@@ -19,4 +19,5 @@ export default class EventRecord {
   public success?: boolean
   public receiverAddress?: string
   public mailSubject?: string
+  public fileName?: string // for edition preview
 }

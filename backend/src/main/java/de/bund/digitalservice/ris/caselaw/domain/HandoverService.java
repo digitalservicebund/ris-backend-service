@@ -73,6 +73,28 @@ public class HandoverService {
   }
 
   /**
+   * Handover a edition to the email service.
+   *
+   * @param editionId the UUID of the edition
+   * @param issuerAddress the email address of the issuer
+   * @return the handover result
+   * @throws IOException if the edition does not exist
+   */
+  public HandoverMail handoverEditionAsMail(UUID editionId, String issuerAddress)
+      throws IOException {
+    LegalPeriodicalEdition edition =
+        editionRepository
+            .findById(editionId)
+            .orElseThrow(() -> new IOException("Edition not found: " + editionId));
+
+    HandoverMail handoverMail = mailService.handOver(edition, recipientAddress, issuerAddress);
+    if (!handoverMail.success()) {
+      log.warn("Failed to send mail for edition {}", editionId);
+    }
+    return handoverMail;
+  }
+
+  /**
    * Create a preview juris xml for a documentation unit.
    *
    * @param documentUuid the UUID of the documentation unit
@@ -117,7 +139,7 @@ public class HandoverService {
         List<EventRecord> list =
             ListUtils.union(
                 mailService.getHandoverResult(entityId, entityType),
-                handoverReportRepository.getAllByDocumentationUnitUuid(entityId));
+                handoverReportRepository.getAllByEntityId(entityId));
         var migration = deltaMigrationRepository.getLatestMigration(entityId);
         if (migration != null) {
           list.add(

@@ -15,7 +15,25 @@ const errorMessage = ref<ResponseError>()
 const succeedMessage = ref<{ title: string; description: string }>()
 
 async function handoverEdition() {
-  HandoverEditionService.handoverEdition(store.edition!.id!)
+  const response = await HandoverEditionService.handoverEdition(
+    store.edition!.id!,
+  )
+  handoverResult.value = response.data
+  if (!eventLog.value) eventLog.value = []
+  if (response.data && response.data?.success) {
+    const handover = response.data
+    handover.date = formatDate(handover.date)
+    handover.xml = handover.xml ? handover.xml.replace(/[ \t]{2,}/g, "") : ""
+
+    eventLog.value.unshift(handover)
+
+    succeedMessage.value = {
+      title: "Email wurde versendet",
+      description: "",
+    }
+  } else {
+    errorMessage.value = response.error
+  }
 }
 
 function formatDate(date?: string): string {
@@ -43,10 +61,6 @@ onMounted(async () => {
     for (const item of eventLog.value) {
       item.date = formatDate(item.date)
       item.xml = item.xml ? item.xml : ""
-    }
-    succeedMessage.value = {
-      title: "Email wurde versendet",
-      description: "",
     }
   } else {
     errorMessage.value = response.error

@@ -1,12 +1,13 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
-import { render, fireEvent, screen } from "@testing-library/vue"
+import { render, fireEvent, screen, waitFor } from "@testing-library/vue"
 import { Stubs } from "@vue/test-utils/dist/types"
 import { createRouter, createWebHistory } from "vue-router"
 import HandoverEditionView from "@/components/HandoverEditionView.vue"
 import { EventRecordType } from "@/domain/eventRecord"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import Reference from "@/domain/reference"
+import featureToggleService from "@/services/featureToggleService"
 import handoverService from "@/services/handoverEditionService"
 
 const router = createRouter({
@@ -66,6 +67,13 @@ function renderComponent(
 }
 
 describe("HandoverEditionView:", () => {
+  beforeEach(() => {
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
+  })
+
   vi.spyOn(handoverService, "getPreview").mockImplementation(() =>
     Promise.resolve({
       status: 200,
@@ -94,7 +102,7 @@ describe("HandoverEditionView:", () => {
     describe("on press 'Fundstellen der Ausgabe an jDV übergeben'", () => {
       it("hands over successfully", async () => {
         const { emitted } = renderComponent()
-        const handoverButton = screen.getByRole("button", {
+        const handoverButton = await screen.findByRole("button", {
           name: "Fundstellen der Ausgabe an jDV übergeben",
         })
         await fireEvent.click(handoverButton)
@@ -131,7 +139,7 @@ describe("HandoverEditionView:", () => {
       it("renders error modal from frontend", async () => {
         renderComponent({ edition: new LegalPeriodicalEdition() })
 
-        const handoverButton = screen.getByRole("button", {
+        const handoverButton = await screen.findByRole("button", {
           name: "Fundstellen der Ausgabe an jDV übergeben",
         })
         await fireEvent.click(handoverButton)
@@ -184,7 +192,7 @@ describe("HandoverEditionView:", () => {
       })
     })
 
-    it("with stubbing", () => {
+    it("with stubbing", async () => {
       const { container } = renderComponent({
         props: {
           eventLog: [
@@ -208,9 +216,11 @@ describe("HandoverEditionView:", () => {
         },
       })
 
-      expect(container).toHaveTextContent(
-        `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltFundstellen der Ausgabe an jDV übergebenLetzte EreignisseXml Email Abgabe - 01.02.2000ÜBERE-Mail an: receiver address Betreff: mail subjectALS`,
-      )
+      await waitFor(() => {
+        expect(container).toHaveTextContent(
+          `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltXML VorschauFundstellen der Ausgabe an jDV übergebenLetzte EreignisseXml Email Abgabe - 01.02.2000ÜBERE-Mail an: receiver address Betreff: mail subjectALS`,
+        )
+      })
 
       const codeSnippet = screen.queryByTestId("code-snippet")
 
