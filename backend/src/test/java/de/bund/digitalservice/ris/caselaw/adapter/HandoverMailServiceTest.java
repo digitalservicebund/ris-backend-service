@@ -117,6 +117,7 @@ class HandoverMailServiceTest {
     documentationUnit =
         DocumentationUnit.builder().uuid(TEST_UUID).documentNumber("test-document-number").build();
     when(xmlExporter.transformToXml(any(DocumentationUnit.class))).thenReturn(FORMATTED_XML);
+    // TODO
 
     when(repository.save(EXPECTED_BEFORE_SAVE)).thenReturn(SAVED_XML_MAIL);
   }
@@ -189,7 +190,7 @@ class HandoverMailServiceTest {
         Assertions.assertThrows(
             HandoverException.class,
             () -> service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
-    Assertions.assertEquals("Couldn't generate xml.", ex.getMessage());
+    Assertions.assertEquals("Couldn't generate xml for documentationUnit.", ex.getMessage());
 
     verify(repository, times(0)).save(any(HandoverMail.class));
     verify(mailSender, times(0))
