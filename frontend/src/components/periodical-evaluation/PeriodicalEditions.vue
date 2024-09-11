@@ -31,7 +31,8 @@ const emptyResponse: ResponseError = {
 const router = useRouter()
 const selectedLegalPeriodical = ref<LegalPeriodical>()
 const currentEditions = ref<LegalPeriodicalEdition[]>()
-const { getQueryFromRoute, pushQueryToRoute, route } = useQuery<"q">()
+const { getQueryFromRoute, pushQueryToRoute, route, resetQuery } =
+  useQuery<"q">()
 const query = ref(getQueryFromRoute())
 const searchResponseError = ref<ResponseError | undefined>(emptyResponse)
 const isLoading = ref(false)
@@ -126,6 +127,7 @@ watch(
       debouncedPushQueryToRoute({ q: newFilter.uuid })
     } else {
       currentEditions.value = []
+      resetQuery()
     }
   },
   { deep: true },
