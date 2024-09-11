@@ -218,7 +218,7 @@ describe("HandoverEditionView:", () => {
 
       await waitFor(() => {
         expect(container).toHaveTextContent(
-          `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltXML VorschauFundstellen der Ausgabe an jDV übergebenLetzte EreignisseXml Email Abgabe - 01.02.2000ÜBERE-Mail an: receiver address Betreff:  mail subjectALS`,
+          `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltXML VorschauFundstellen der Ausgabe an jDV übergebenLetzte EreignisseXml Email Abgabe - 01.02.2000ÜBERE-Mail an: receiver address Betreff: mail subjectALS`,
         )
       })
 
