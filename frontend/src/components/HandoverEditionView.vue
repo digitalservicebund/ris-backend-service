@@ -6,6 +6,7 @@ import { InfoStatus } from "@/components/enumInfoStatus"
 import InfoModal from "@/components/InfoModal.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import EventRecord, { EventRecordType } from "@/domain/eventRecord"
+import FeatureToggleService from "@/services/featureToggleService"
 import HandoverEditionService from "@/services/handoverEditionService"
 import { ResponseError } from "@/services/httpClient"
 import { useEditionStore } from "@/stores/editionStore"
@@ -35,6 +36,7 @@ const isFirstTimeHandover = computed(() => {
 const preview = ref<EventRecord[]>()
 const frontendError = ref()
 const previewError = ref()
+const featureToggle = ref()
 const errorMessage = computed(
   () => frontendError.value ?? previewError.value ?? props.errorMessage,
 )
@@ -49,6 +51,9 @@ onMounted(async () => {
   } else if (previewResponse.data) {
     preview.value = previewResponse.data
   }
+  featureToggle.value = (
+    await FeatureToggleService.isEnabled("neuris.evaluation-handover")
+  ).data
 })
 
 function handoverEdition() {
@@ -140,6 +145,7 @@ const referencesMissing = computed(() => {
       :status="InfoStatus.SUCCEED"
     />
     <TextButton
+      v-if="featureToggle"
       aria-label="Fundstellen der Ausgabe an jDV übergeben"
       button-type="secondary"
       class="w-fit"
