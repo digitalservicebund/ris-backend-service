@@ -77,7 +77,7 @@ async function addEdition() {
     legalPeriodical: { uuid: legalPeriodical?.value?.value.uuid },
   })
   const response = await LegalPeriodicalEditionService.save(edition)
-  editionStore.edition = response.data
+  editionStore.edition = new LegalPeriodicalEdition({ ...response.data })
   await router.push({
     name: "caselaw-periodical-evaluation-editionId-edition",
     params: { editionId: response.data?.id },
