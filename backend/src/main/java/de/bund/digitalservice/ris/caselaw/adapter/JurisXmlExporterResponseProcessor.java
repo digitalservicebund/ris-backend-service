@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepositor
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.MailStoreFactory;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.domain.export.juris.response.ImportMessageWrapper;
 import de.bund.digitalservice.ris.domain.export.juris.response.MessageWrapper;
 import de.bund.digitalservice.ris.domain.export.juris.response.StatusImporterException;
@@ -163,11 +164,14 @@ public class JurisXmlExporterResponseProcessor {
     Matcher editionMatcher = Pattern.compile("edition-" + UUID_REGEX).matcher(identifier);
     if (docNumberMatcher.find()) {
       String documentNumber = docNumberMatcher.group(1);
-      Optional<DocumentationUnit> docUnit =
-          documentationUnitRepository.findByDocumentNumber(documentNumber);
-      if (docUnit.isPresent()) {
-        return docUnit.get().uuid();
+      try {
+        DocumentationUnit docUnit =
+            documentationUnitRepository.findByDocumentNumber(documentNumber);
+        return docUnit.uuid();
+      } catch (DocumentationUnitNotExistsException ignored) {
+        return null;
       }
+
     } else if (editionMatcher.find()) {
       Optional<LegalPeriodicalEdition> edition =
           editionRepository.findById(UUID.fromString(editionMatcher.group(1)));
