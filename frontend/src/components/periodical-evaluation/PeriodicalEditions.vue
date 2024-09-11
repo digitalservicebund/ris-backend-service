@@ -29,7 +29,7 @@ const emptyResponse: ResponseError = {
 }
 
 const router = useRouter()
-const filter = ref<LegalPeriodical>()
+const selectedLegalPeriodical = ref<LegalPeriodical>()
 const currentEditions = ref<LegalPeriodicalEdition[]>()
 const { getQueryFromRoute, pushQueryToRoute, route } = useQuery<"q">()
 const query = ref(getQueryFromRoute())
@@ -85,18 +85,18 @@ async function addEdition() {
 
 const legalPeriodical = computed({
   get: () =>
-    filter.value?.abbreviation
+    selectedLegalPeriodical.value?.abbreviation
       ? {
-          label: filter.value.abbreviation,
-          value: filter.value,
+          label: selectedLegalPeriodical.value.abbreviation,
+          value: selectedLegalPeriodical.value,
         }
       : undefined,
   set: (newValue) => {
     const legalPeriodical = { ...newValue } as LegalPeriodical
     if (newValue) {
-      filter.value = legalPeriodical
+      selectedLegalPeriodical.value = legalPeriodical
     } else {
-      filter.value = undefined
+      selectedLegalPeriodical.value = undefined
       searchResponseError.value = emptyResponse
     }
   },
@@ -105,7 +105,7 @@ const legalPeriodical = computed({
 async function handleDeleteEdition(edition: LegalPeriodicalEdition) {
   if (edition?.id) {
     await LegalPeriodicalEditionService.delete(edition.id)
-    await getEditions(filter.value?.uuid?.toString() || "")
+    await getEditions(selectedLegalPeriodical.value?.uuid?.toString() || "")
   }
 }
 
@@ -119,7 +119,7 @@ watch(route, () => {
 })
 
 watch(
-  filter,
+  selectedLegalPeriodical,
   async (newFilter) => {
     if (newFilter && newFilter.uuid) {
       await getEditions(newFilter.uuid)
