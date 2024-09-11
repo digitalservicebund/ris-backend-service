@@ -107,6 +107,8 @@ jobs:
                   -H "xc-token: ${{ secrets.E2E_TEST_METRICS_TOKEN }}" \
                   -H "Content-Type: application/json" \
                   -d "{\"test\": \"${test_title}\", \"file\": \"${test_file}\", \"status\": \"${test_status}\", \"githubRunId\": \"${{ github.run_id }}\", \"browser\": \"${{ inputs.browser }}\"}"
+            echo "file: '$test_file' title: '$test_title' status: '$test_status'"
+            echo "title: '${test_title}' file: '${test_file}' status: '${test_status}'"
           done
         working-directory: ./frontend
       - name: Upload json reports
