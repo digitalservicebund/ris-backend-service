@@ -70,13 +70,17 @@ export function useCaseLawMenuItems(
           },
         ]
       : []),
-    {
-      label: "Fundstellen",
-      route: {
-        ...baseRoute,
-        name: "caselaw-documentUnit-documentNumber-references",
-      },
-    },
+    ...(isInternalUser
+      ? [
+          {
+            label: "Fundstellen",
+            route: {
+              ...baseRoute,
+              name: "caselaw-documentUnit-documentNumber-references",
+            },
+          },
+        ]
+      : []),
     {
       label: "Übergabe an jDV",
       route: {
