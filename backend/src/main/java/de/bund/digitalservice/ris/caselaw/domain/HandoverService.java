@@ -58,8 +58,8 @@ public class HandoverService {
    * @return the handover result
    * @throws DocumentationUnitNotExistsException if the documentation unit does not exist
    */
-  public HandoverMail handoverAsMail(UUID documentationUnitId, String issuerAddress)
-      throws DocumentationUnitNotExistsException {
+  public HandoverMail handoverDocumentationUnitAsMail(
+      UUID documentationUnitId, String issuerAddress) throws DocumentationUnitNotExistsException {
 
     DocumentationUnit documentationUnit = repository.findByUuid(documentationUnitId);
 
@@ -77,7 +77,7 @@ public class HandoverService {
    *
    * @param editionId the UUID of the edition
    * @param issuerAddress the email address of the issuer
-   * @return the handover result
+   * @return the handover result or null if the edition has no references
    * @throws IOException if the edition does not exist
    */
   public HandoverMail handoverEditionAsMail(UUID editionId, String issuerAddress)
@@ -129,29 +129,19 @@ public class HandoverService {
    * @return the event log
    */
   public List<EventRecord> getEventLog(UUID entityId, HandoverEntityType entityType) {
-    switch (entityType) {
-      case EDITION -> {
-        return mailService.getHandoverResult(entityId, entityType).stream()
-            .map(mail -> (EventRecord) mail)
-            .toList();
-      }
-      case DOCUMENTATION_UNIT -> {
-        List<EventRecord> list =
-            ListUtils.union(
-                mailService.getHandoverResult(entityId, entityType),
-                handoverReportRepository.getAllByEntityId(entityId));
-        var migration = deltaMigrationRepository.getLatestMigration(entityId);
-        if (migration != null) {
-          list.add(
-              migration.xml() != null
-                  ? migration.toBuilder().xml(prettifyXml(migration.xml())).build()
-                  : migration);
-        }
-        list.sort(Comparator.comparing(EventRecord::getDate).reversed());
-        return list;
-      }
-      default -> throw new IllegalArgumentException("Unsupported entity type: " + entityType);
+    List<EventRecord> list =
+        ListUtils.union(
+            mailService.getHandoverResult(entityId, entityType),
+            handoverReportRepository.getAllByEntityId(entityId));
+    var migration = deltaMigrationRepository.getLatestMigration(entityId);
+    if (migration != null) {
+      list.add(
+          migration.xml() != null
+              ? migration.toBuilder().xml(prettifyXml(migration.xml())).build()
+              : migration);
     }
+    list.sort(Comparator.comparing(EventRecord::getDate).reversed());
+    return list;
   }
 
   /**

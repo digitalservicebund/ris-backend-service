@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 public class HandoverReportDTO {
   @Id @GeneratedValue private UUID id;
 
-  @Column(name = "document_unit_id")
+  @Column(name = "entity_id")
   private UUID entityId;
 
   private String content;

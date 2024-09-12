@@ -51,6 +51,7 @@ public class HandoverMailDTO {
   private String issuerAddress;
 
   // One-to-many relationship for attachments
+  @Builder.Default
   @OneToMany(mappedBy = "handoverMail", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<HandoverMailAttachmentDTO> attachments = new ArrayList<>();
 

@@ -307,7 +307,7 @@ class DocumentationUnitControllerTest {
   @Test
   void testHandoverAsEmail() throws DocumentationUnitNotExistsException {
     when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
-    when(handoverService.handoverAsMail(TEST_UUID, ISSUER_ADDRESS))
+    when(handoverService.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS))
         .thenReturn(
             HandoverMail.builder()
                 .entityId(TEST_UUID)
@@ -349,13 +349,13 @@ class DocumentationUnitControllerTest {
                 .handoverDate(Instant.parse("2020-01-01T01:01:01Z"))
                 .build());
 
-    verify(handoverService).handoverAsMail(TEST_UUID, ISSUER_ADDRESS);
+    verify(handoverService).handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS);
   }
 
   @Test
   void testHandoverAsEmail_withServiceThrowsException() throws DocumentationUnitNotExistsException {
     when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
-    when(handoverService.handoverAsMail(TEST_UUID, ISSUER_ADDRESS))
+    when(handoverService.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS))
         .thenThrow(DocumentationUnitNotExistsException.class);
 
     risWebClient
@@ -366,7 +366,7 @@ class DocumentationUnitControllerTest {
         .expectStatus()
         .is5xxServerError();
 
-    verify(handoverService).handoverAsMail(TEST_UUID, ISSUER_ADDRESS);
+    verify(handoverService).handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS);
   }
 
   @Test

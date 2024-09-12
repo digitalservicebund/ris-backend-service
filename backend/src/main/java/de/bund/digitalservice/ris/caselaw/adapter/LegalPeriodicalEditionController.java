@@ -91,7 +91,7 @@ public class LegalPeriodicalEditionController {
   public ResponseEntity<HandoverMail> handoverEditionAsMail(
       @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
     try {
-      return ResponseEntity.ok(handoverService.handoverEditionAsMail(uuid, null));
+      return ResponseEntity.ok(handoverService.handoverEditionAsMail(uuid, oidcUser.getEmail()));
     } catch (IOException e) {
       log.error("Error handing over edition '{}' as email", uuid, e);
       return ResponseEntity.internalServerError().build();

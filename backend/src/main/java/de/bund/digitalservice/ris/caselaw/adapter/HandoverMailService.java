@@ -242,8 +242,8 @@ public class HandoverMailService implements MailService {
                     .flatMap(List::stream)
                     .toList());
 
-    if (!xmlHandoverMailBuilder.build().isSuccess()) {
-      return xmlHandoverMailBuilder.build();
+    if (!xmlHandoverMailBuilder.build().isSuccess() || xml.isEmpty()) {
+      return xmlHandoverMailBuilder.success(false).build();
     }
 
     return xmlHandoverMailBuilder

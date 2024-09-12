@@ -17,9 +17,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
@@ -64,10 +68,38 @@ class HandoverServiceTest {
             .build();
     when(mailService.handOver(eq(DocumentationUnit.builder().build()), anyString(), anyString()))
         .thenReturn(handoverMail);
-    var mailResponse = service.handoverAsMail(TEST_UUID, ISSUER_ADDRESS);
+    var mailResponse = service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS);
     assertThat(mailResponse).usingRecursiveComparison().isEqualTo(handoverMail);
     verify(repository).findByUuid(TEST_UUID);
     verify(mailService).handOver(eq(DocumentationUnit.builder().build()), anyString(), anyString());
+  }
+
+  @Test
+  void testEditionHandoverByEmail() throws IOException {
+    when(editionRepository.findById(TEST_UUID))
+        .thenReturn(Optional.of(LegalPeriodicalEdition.builder().build()));
+    HandoverMail handoverMail =
+        HandoverMail.builder()
+            .entityId(TEST_UUID)
+            .entityType(HandoverEntityType.EDITION)
+            .receiverAddress("receiver address")
+            .mailSubject("subject")
+            .attachments(
+                List.of(
+                    MailAttachment.builder().fileName("filename 1").fileContent("xml1").build(),
+                    MailAttachment.builder().fileName("filename 2").fileContent("xml2").build()))
+            .success(true)
+            .statusMessages(List.of("status messages"))
+            .handoverDate(Instant.now())
+            .build();
+    when(mailService.handOver(
+            eq(LegalPeriodicalEdition.builder().build()), anyString(), anyString()))
+        .thenReturn(handoverMail);
+    var mailResponse = service.handoverEditionAsMail(TEST_UUID, ISSUER_ADDRESS);
+    assertThat(mailResponse).usingRecursiveComparison().isEqualTo(handoverMail);
+    verify(editionRepository).findById(TEST_UUID);
+    verify(mailService)
+        .handOver(eq(LegalPeriodicalEdition.builder().build()), anyString(), anyString());
   }
 
   @Test
@@ -78,14 +110,26 @@ class HandoverServiceTest {
 
     Assertions.assertThrows(
         DocumentationUnitNotExistsException.class,
-        () -> service.handoverAsMail(TEST_UUID, ISSUER_ADDRESS));
+        () -> service.handoverDocumentationUnitAsMail(TEST_UUID, ISSUER_ADDRESS));
     verify(repository).findByUuid(TEST_UUID);
     verify(mailService, never())
         .handOver(eq(DocumentationUnit.builder().build()), anyString(), anyString());
   }
 
   @Test
-  void testGetLastXmlHandoverMailForDocumentationUnit() {
+  void testHandoverEditionByEmail_withoutEditionForUuid() {
+
+    when(editionRepository.findById(TEST_UUID)).thenReturn(Optional.empty());
+
+    Assertions.assertThrows(
+        IOException.class, () -> service.handoverEditionAsMail(TEST_UUID, ISSUER_ADDRESS));
+    verify(editionRepository).findById(TEST_UUID);
+    verify(mailService, never())
+        .handOver(eq(LegalPeriodicalEdition.builder().build()), anyString(), anyString());
+  }
+
+  @Test
+  void testGetLastHandoverMailForDocumentationUnit() {
     HandoverMail handoverMail =
         HandoverMail.builder()
             .entityId(TEST_UUID)
@@ -123,7 +167,7 @@ class HandoverServiceTest {
   }
 
   @Test
-  void testGetLastXmlHandoverMailForEdition() {
+  void testGetLastHandoverMailForEdition() {
     HandoverMail handoverMail =
         HandoverMail.builder()
             .entityId(TEST_UUID)
@@ -166,22 +210,30 @@ class HandoverServiceTest {
     verify(deltaMigrationRepository).getLatestMigration(TEST_UUID);
   }
 
-  @Test
-  void testGetLastHandoverReport() {
-    HandoverReport report = new HandoverReport(TEST_UUID, "<html></html>", Instant.now());
-    when(handoverReportRepository.getAllByEntityId(TEST_UUID)).thenReturn(List.of(report));
-    when(mailService.getHandoverResult(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT))
-        .thenReturn(List.of());
-    when(deltaMigrationRepository.getLatestMigration(TEST_UUID)).thenReturn(null);
-
-    var events = service.getEventLog(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT);
-    assertThat(events.get(0)).usingRecursiveComparison().isEqualTo(report);
-
-    verify(mailService).getHandoverResult(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT);
+  static Stream<Arguments> provideEntityTypes() {
+    return Stream.of(
+        Arguments.of(HandoverEntityType.DOCUMENTATION_UNIT),
+        Arguments.of(HandoverEntityType.EDITION));
   }
 
-  @Test
-  void testGetSortedEventLog() {
+  @ParameterizedTest
+  @MethodSource("provideEntityTypes")
+  void testGetLastHandoverReport(HandoverEntityType entityType) {
+    HandoverReport report = new HandoverReport(TEST_UUID, "<html></html>", Instant.now());
+
+    when(handoverReportRepository.getAllByEntityId(TEST_UUID)).thenReturn(List.of(report));
+    when(mailService.getHandoverResult(TEST_UUID, entityType)).thenReturn(List.of());
+    when(deltaMigrationRepository.getLatestMigration(TEST_UUID)).thenReturn(null);
+
+    var events = service.getEventLog(TEST_UUID, entityType);
+
+    assertThat(events.get(0)).usingRecursiveComparison().isEqualTo(report);
+    verify(mailService).getHandoverResult(TEST_UUID, entityType);
+  }
+
+  @ParameterizedTest
+  @MethodSource("provideEntityTypes")
+  void testGetSortedEventLog(HandoverEntityType entityType) {
     Instant newest = Instant.now();
     Instant secondNewest = newest.minusSeconds(61);
     Instant thirdNewest = secondNewest.minusSeconds(61);
@@ -193,7 +245,7 @@ class HandoverServiceTest {
     HandoverMail xml1 =
         HandoverMail.builder()
             .entityId(TEST_UUID)
-            .entityType(HandoverEntityType.DOCUMENTATION_UNIT)
+            .entityType(entityType)
             .receiverAddress("receiver address")
             .mailSubject("subject")
             .mailSubject("subject")
@@ -209,7 +261,7 @@ class HandoverServiceTest {
     HandoverMail xml2 =
         HandoverMail.builder()
             .entityId(TEST_UUID)
-            .entityType(HandoverEntityType.DOCUMENTATION_UNIT)
+            .entityType(entityType)
             .receiverAddress("receiver address")
             .mailSubject("subject")
             .mailSubject("subject")
@@ -224,18 +276,17 @@ class HandoverServiceTest {
 
     when(handoverReportRepository.getAllByEntityId(TEST_UUID))
         .thenReturn(List.of(report2, report1));
-    when(mailService.getHandoverResult(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT))
-        .thenReturn(List.of(xml2, xml1));
+    when(mailService.getHandoverResult(TEST_UUID, entityType)).thenReturn(List.of(xml2, xml1));
     when(deltaMigrationRepository.getLatestMigration(TEST_UUID)).thenReturn(deltaMigration);
 
-    List<EventRecord> list = service.getEventLog(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT);
+    List<EventRecord> list = service.getEventLog(TEST_UUID, entityType);
     assertThat(list).hasSize(5);
     assertThat(list.get(0)).usingRecursiveComparison().isEqualTo(report1);
     assertThat(list.get(1)).usingRecursiveComparison().isEqualTo(xml1);
     assertThat(list.get(2)).usingRecursiveComparison().isEqualTo(report2);
     assertThat(list.get(3)).usingRecursiveComparison().isEqualTo(xml2);
     assertThat(list.get(4)).usingRecursiveComparison().isEqualTo(deltaMigration);
-    verify(mailService).getHandoverResult(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT);
+    verify(mailService).getHandoverResult(TEST_UUID, entityType);
   }
 
   @Test

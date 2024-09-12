@@ -285,7 +285,7 @@ public class DocumentationUnitController {
 
     try {
       HandoverMail handoverMail =
-          handoverService.handoverAsMail(uuid, userService.getEmail(oidcUser));
+          handoverService.handoverDocumentationUnitAsMail(uuid, userService.getEmail(oidcUser));
       return ResponseEntity.ok(handoverMail);
     } catch (DocumentationUnitNotExistsException | HandoverException e) {
       log.error("Error handing over documentation unit '{}' as email", uuid, e);

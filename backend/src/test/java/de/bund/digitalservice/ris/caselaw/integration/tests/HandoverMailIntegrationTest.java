@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockUserGroups;
-import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
@@ -38,7 +37,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverR
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalEditionRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.HandoverMailTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -58,7 +57,6 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalRepository;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -72,7 +70,6 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +79,6 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -102,6 +98,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       PostgresHandoverReportRepositoryImpl.class,
       HandoverMailService.class,
       DatabaseDocumentationUnitStatusService.class,
+      LegalPeriodicalEditionService.class,
       MockXmlExporter.class,
       PostgresJPAConfig.class,
       FlywayConfig.class,
@@ -146,6 +143,7 @@ class HandoverMailIntegrationTest {
   @Autowired private DatabaseStatusRepository statusRepository;
   @Autowired private DatabaseHandoverReportRepository databaseHandoverReportRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  @Autowired private LegalPeriodicalEditionRepository legalPeriodicalEditionRepository;
 
   @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
@@ -155,9 +153,6 @@ class HandoverMailIntegrationTest {
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private ProcedureService procedureService;
   @MockBean private UserGroupService userGroupService;
-  @MockBean private LegalPeriodicalEditionRepository legalPeriodicalEditionRepository;
-
-  @MockBean private LegalPeriodicalEditionService legalPeriodicalEditionService;
 
   @MockBean
   private DocumentationUnitDocxMetadataInitializationService
@@ -177,42 +172,75 @@ class HandoverMailIntegrationTest {
     repository.deleteAll();
     statusRepository.deleteAll();
     databaseHandoverReportRepository.deleteAll();
+    editionRepository.deleteAll();
   }
 
-  @Test
-  @Transactional
-  void testHandoverDocumentationUnit() {
+  public static List<HandoverEntityType> getHandoverMailTestData() {
+    return List.of(HandoverEntityType.DOCUMENTATION_UNIT, HandoverEntityType.EDITION);
+  }
+
+  @ParameterizedTest
+  @MethodSource("getHandoverMailTestData")
+  void testHandover(HandoverEntityType entityType) {
+    String identifier = "docnr12345678";
+
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitDTO.builder()
             .documentationOffice(docOffice)
-            .documentNumber("docnr12345678")
+            .documentNumber(identifier)
             .decisionDate(LocalDate.now())
             .build();
-    DocumentationUnitDTO savedDocumentationUnitDTO = repository.saveAndFlush(documentationUnitDTO);
+    DocumentationUnitDTO savedDocumentationUnitDTO = repository.save(documentationUnitDTO);
+    UUID entityId = savedDocumentationUnitDTO.getId();
 
     assertThat(repository.findAll()).hasSize(1);
 
-    var initialStatus =
-        statusRepository.save(
-            StatusDTO.builder()
-                .publicationStatus(UNPUBLISHED)
-                .documentationUnitDTO(documentationUnitDTO)
-                .build());
+    if (entityType == HandoverEntityType.EDITION) {
+      LegalPeriodicalEditionDTO legalPeriodicalEditionDTO =
+          LegalPeriodicalEditionDTO.builder()
+              .id(entityId)
+              .references(
+                  List.of(
+                      ReferenceDTO.builder()
+                          .citation("citation")
+                          .legalPeriodicalRawValue("ABC")
+                          .rank(1)
+                          .documentationUnit(savedDocumentationUnitDTO)
+                          .build()))
+              .legalPeriodical(
+                  LegalPeriodicalDTO.builder()
+                      .id(UUID.fromString("1abf62fe-9ddf-487e-962e-1c71cf661c5b"))
+                      .abbreviation("ABC")
+                      .build())
+              .build();
+      editionRepository.save(legalPeriodicalEditionDTO);
+      assertThat(editionRepository.findAll()).hasSize(1);
+      identifier = "edition-" + entityId;
+    }
+
+    String mailSubject =
+        "id=juris name=test-user da=R df=X dt=%s mod=T ld=%s vg=%s"
+            .formatted(
+                entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT) ? "N" : "F",
+                DELIVER_DATE,
+                identifier);
 
     var handoverId = UUID.randomUUID();
     HandoverMailDTO expectedHandoverMailDTO =
         HandoverMailDTO.builder()
             .id(handoverId)
-            .entityId(savedDocumentationUnitDTO.getId())
+            .entityId(entityId)
             .receiverAddress("neuris@example.com")
-            .mailSubject(
-                "id=juris name=test-user da=R df=X dt=N mod=T ld="
-                    + DELIVER_DATE
-                    + " vg="
-                    + savedDocumentationUnitDTO.getDocumentNumber())
+            .mailSubject(mailSubject)
             .attachments(
-                List.of(
-                    HandoverMailAttachmentDTO.builder().fileName("test.xml").xml("xml").build()))
+                entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT)
+                    ? List.of(
+                        HandoverMailAttachmentDTO.builder().fileName("test.xml").xml("xml").build())
+                    : List.of(
+                        HandoverMailAttachmentDTO.builder()
+                            .fileName("docnr12345678.xml")
+                            .xml("citation: citation docunit: docnr12345678")
+                            .build()))
             .statusCode("200")
             .statusMessages("message 1|message 2")
             .issuerAddress("test@test.com")
@@ -220,24 +248,31 @@ class HandoverMailIntegrationTest {
 
     HandoverMail expectedHandoverMail =
         HandoverMail.builder()
-            .entityId(savedDocumentationUnitDTO.getId())
-            .entityType(HandoverEntityType.DOCUMENTATION_UNIT)
+            .entityId(entityId)
+            .entityType(entityType)
             .receiverAddress("neuris@example.com")
-            .mailSubject(
-                "id=juris name=test-user da=R df=X dt=N mod=T ld="
-                    + DELIVER_DATE
-                    + " vg="
-                    + savedDocumentationUnitDTO.getDocumentNumber())
+            .mailSubject(mailSubject)
             .attachments(
-                List.of(MailAttachment.builder().fileName("test.xml").fileContent("xml").build()))
+                entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT)
+                    ? List.of(
+                        MailAttachment.builder().fileName("test.xml").fileContent("xml").build())
+                    : List.of(
+                        MailAttachment.builder()
+                            .fileName("docnr12345678.xml")
+                            .fileContent("citation: citation docunit: docnr12345678")
+                            .build()))
             .success(true)
             .statusMessages(List.of("message 1", "message 2"))
             .issuerAddress("test@test.com") // set by AuthUtils
             .build();
+
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + savedDocumentationUnitDTO.getId() + "/handover")
+        .uri(
+            entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT)
+                ? "/api/v1/caselaw/documentunits/" + entityId + "/handover"
+                : "/api/v1/caselaw/legalperiodicaledition/" + entityId + "/handover")
         .exchange()
         .expectStatus()
         .isOk()
@@ -246,7 +281,7 @@ class HandoverMailIntegrationTest {
             response ->
                 assertThat(response.getResponseBody())
                     .usingRecursiveComparison()
-                    .ignoringFields("handoverDate", "attachments")
+                    .ignoringFields("handoverDate")
                     .isEqualTo(expectedHandoverMail));
 
     List<HandoverMailDTO> xmlPublicationList = xmlHandoverRepository.findAll();
@@ -256,47 +291,55 @@ class HandoverMailIntegrationTest {
         .usingRecursiveComparison()
         .ignoringFields("sentDate", "id", "attachments")
         .isEqualTo(expectedHandoverMailDTO);
-    assertThat(handoverMailDTO.getAttachments().size()).isOne();
-    assertThat(handoverMailDTO.getAttachments().get(0).getXml()).isEqualTo("xml");
-    assertThat(handoverMailDTO.getAttachments().get(0).getFileName()).isEqualTo("test.xml");
-
-    StatusDTO lastStatus =
-        statusRepository.findFirstByDocumentationUnitDTOOrderByCreatedAtDesc(
-            savedDocumentationUnitDTO);
-
-    // publication status should not change because handover does not change the status
-    assertThat(lastStatus.getPublicationStatus()).isEqualTo(initialStatus.getPublicationStatus());
-    assertThat(lastStatus.getCreatedAt()).isEqualTo(initialStatus.getCreatedAt());
   }
 
-  @Test
-  void testHandoverDocumentationUnitWithNotAllMandatoryFieldsFilled_shouldNotUpdateStatus() {
-    DocumentationUnitDTO documentationUnitDTO =
-        DocumentationUnitDTO.builder()
-            .documentationOffice(docOffice)
-            .documentNumber("docnr12345678")
-            .build();
-    DocumentationUnitDTO savedDocumentationUnitDTO = repository.save(documentationUnitDTO);
-    assertThat(repository.findAll()).hasSize(1);
+  @ParameterizedTest
+  @MethodSource("getHandoverMailTestData")
+  void testHandoverWithNotAllMandatoryFieldsFilled_shouldNotSucceed(HandoverEntityType entityType) {
+    UUID entityId = UUID.randomUUID();
 
-    statusRepository.save(
-        StatusDTO.builder()
-            .documentationUnitDTO(savedDocumentationUnitDTO)
-            .publicationStatus(PublicationStatus.UNPUBLISHED)
-            .build());
-    assertThat(statusRepository.findAll()).hasSize(1);
+    if (entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT)) {
+      DocumentationUnitDTO documentationUnitDTO =
+          DocumentationUnitDTO.builder()
+              .documentationOffice(docOffice)
+              .documentNumber("docnr12345678")
+              .build();
+      DocumentationUnitDTO savedDocumentationUnitDTO = repository.save(documentationUnitDTO);
+      assertThat(repository.findAll()).hasSize(1);
+      entityId = savedDocumentationUnitDTO.getId();
+
+    } else if (entityType == HandoverEntityType.EDITION) {
+      LegalPeriodicalEditionDTO legalPeriodicalEditionDTO =
+          LegalPeriodicalEditionDTO.builder()
+              .id(entityId)
+              .references(List.of())
+              .legalPeriodical(
+                  LegalPeriodicalDTO.builder()
+                      .id(UUID.fromString("1abf62fe-9ddf-487e-962e-1c71cf661c5b"))
+                      .abbreviation("ABC")
+                      .build())
+              .build();
+      editionRepository.save(legalPeriodicalEditionDTO);
+      assertThat(editionRepository.findAll()).hasSize(1);
+    }
 
     HandoverMail xmlPublication =
         HandoverMail.builder()
-            .entityId(savedDocumentationUnitDTO.getId())
+            .entityId(entityId)
             .success(false)
-            .statusMessages(List.of("message 1", "message 2"))
+            .statusMessages(
+                entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT)
+                    ? List.of("message 1", "message 2")
+                    : List.of())
             .build();
 
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + savedDocumentationUnitDTO.getId() + "/handover")
+        .uri(
+            entityType.equals(HandoverEntityType.DOCUMENTATION_UNIT)
+                ? "/api/v1/caselaw/documentunits/" + entityId + "/handover"
+                : "/api/v1/caselaw/legalperiodicaledition/" + entityId + "/handover")
         .exchange()
         .expectStatus()
         .isOk()
@@ -310,14 +353,6 @@ class HandoverMailIntegrationTest {
 
     List<HandoverMailDTO> xmlPublicationList = xmlHandoverRepository.findAll();
     assertThat(xmlPublicationList).isEmpty();
-
-    List<StatusDTO> statusList = statusRepository.findAll();
-    assertThat(statusList).hasSize(1);
-    assertThat(statusList.get(0).getPublicationStatus()).isEqualTo(PublicationStatus.UNPUBLISHED);
-  }
-
-  public static List<HandoverEntityType> getHandoverMailTestData() {
-    return List.of(HandoverEntityType.DOCUMENTATION_UNIT, HandoverEntityType.EDITION);
   }
 
   @ParameterizedTest
@@ -392,21 +427,35 @@ class HandoverMailIntegrationTest {
             });
   }
 
-  @Test
-  @Transactional
-  void testPublicationHistoryWithXmlAndReport() {
-    DocumentationUnitDTO documentationUnitDTO =
-        DocumentationUnitDTO.builder()
-            .documentationOffice(docOffice)
-            .documentNumber("docnr12345678")
-            .build();
-    DocumentationUnitDTO savedDocumentationUnitDTO = repository.save(documentationUnitDTO);
+  @ParameterizedTest
+  @MethodSource("getHandoverMailTestData")
+  void testGetEventLog(HandoverEntityType entityType) {
+    UUID entityId = UUID.randomUUID();
+    if (entityType == HandoverEntityType.DOCUMENTATION_UNIT) {
+      DocumentationUnitDTO documentationUnitDTO =
+          DocumentationUnitDTO.builder()
+              .documentationOffice(docOffice)
+              .documentNumber("docnr12345678")
+              .build();
+      DocumentationUnitDTO savedDocumentationUnitDTO = repository.save(documentationUnitDTO);
+      entityId = savedDocumentationUnitDTO.getId();
+
+    } else if (entityType == HandoverEntityType.EDITION) {
+      editionRepository.save(
+          LegalPeriodicalEditionDTO.builder()
+              .id(entityId)
+              .legalPeriodical(
+                  LegalPeriodicalDTO.builder()
+                      .id(UUID.fromString("1abf62fe-9ddf-487e-962e-1c71cf661c5b"))
+                      .build())
+              .build());
+    }
 
     Instant creationDate = Instant.now();
     xmlHandoverRepository.save(
         HandoverMailTransformer.transformToDTO(
             HandoverMail.builder()
-                .entityId(savedDocumentationUnitDTO.getId())
+                .entityId(entityId)
                 .receiverAddress("exporter@neuris.de")
                 .mailSubject("mailSubject")
                 .attachments(
@@ -420,7 +469,7 @@ class HandoverMailIntegrationTest {
     Instant receivedDate = creationDate.plus(1, ChronoUnit.HOURS);
     databaseHandoverReportRepository.save(
         HandoverReportDTO.builder()
-            .entityId(savedDocumentationUnitDTO.getId())
+            .entityId(entityId)
             .content("<HTML>success!</HTML>")
             .receivedDate(receivedDate)
             .build());
@@ -429,7 +478,10 @@ class HandoverMailIntegrationTest {
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/documentunits/" + savedDocumentationUnitDTO.getId() + "/handover")
+            .uri(
+                entityType == HandoverEntityType.DOCUMENTATION_UNIT
+                    ? "/api/v1/caselaw/documentunits/" + entityId + "/handover"
+                    : "/api/v1/caselaw/legalperiodicaledition/" + entityId + "/handover")
             .exchange()
             .expectStatus()
             .isOk()

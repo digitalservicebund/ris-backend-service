@@ -34,6 +34,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.junit.Assert;
@@ -41,6 +42,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -330,26 +334,23 @@ class HandoverMailServiceTest {
             TEST_UUID.toString());
   }
 
-  @Test
-  void testGetLastDocumentationUnitHandoverXmlMail() {
-    List<HandoverMail> list = List.of(DOC_UNIT_SAVED_MAIL);
-    when(repository.getHandoversByEntity(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT))
-        .thenReturn(list);
-
-    var response = service.getHandoverResult(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT);
-    assertThat(response.get(0)).usingRecursiveComparison().isEqualTo(DOC_UNIT_SAVED_MAIL);
-
-    verify(repository).getHandoversByEntity(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT);
+  // Method providing the parameters for the test
+  static Stream<Arguments> provideEntityTypes() {
+    return Stream.of(
+        Arguments.of(HandoverEntityType.DOCUMENTATION_UNIT),
+        Arguments.of(HandoverEntityType.EDITION));
   }
 
-  @Test
-  void testGetLastEditionHandoverXmlMail() {
+  @ParameterizedTest
+  @MethodSource("provideEntityTypes")
+  void testGetLastHandoverXmlMail(HandoverEntityType entityType) {
     List<HandoverMail> list = List.of(DOC_UNIT_SAVED_MAIL);
-    when(repository.getHandoversByEntity(TEST_UUID, HandoverEntityType.EDITION)).thenReturn(list);
 
-    var response = service.getHandoverResult(TEST_UUID, HandoverEntityType.EDITION);
+    when(repository.getHandoversByEntity(TEST_UUID, entityType)).thenReturn(list);
+
+    var response = service.getHandoverResult(TEST_UUID, entityType);
+
     assertThat(response.get(0)).usingRecursiveComparison().isEqualTo(DOC_UNIT_SAVED_MAIL);
-
-    verify(repository).getHandoversByEntity(TEST_UUID, HandoverEntityType.EDITION);
+    verify(repository).getHandoversByEntity(TEST_UUID, entityType);
   }
 }
