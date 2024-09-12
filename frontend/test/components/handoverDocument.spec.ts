@@ -176,13 +176,13 @@ describe("HandoverView:", () => {
           },
           texts: {
             outline: "Outline",
-            otherLongText: "Other Longtext",
+            otherHeadnote: "Other Headnote",
           },
         }),
       })
       expect(
         await screen.findByText(
-          'Die Rubriken "Gliederung" und "Sonstiger Langtext" sind befüllt. Es darf nur eine der beiden Rubriken befüllt sein.',
+          'Die Rubriken "Gliederung" und "Sonstiger Orientierungssatz" sind befüllt. Es darf nur eine der beiden Rubriken befüllt sein.',
         ),
       ).toBeInTheDocument()
 

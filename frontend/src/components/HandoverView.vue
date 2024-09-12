@@ -72,7 +72,7 @@ function handoverDocumentUnit() {
     }
   } else if (isOutlineInvalid.value) {
     frontendError.value = {
-      title: "Gliederung und Sonstiger Langtext sind befüllt.",
+      title: "Gliederung und Sonstiger Orientierungssatz sind befüllt.",
       description: "Die Dokumentationseinheit kann nicht übergeben werden.",
     }
   } else {
@@ -210,8 +210,8 @@ const fieldsMissing = computed(() => {
 
 const isOutlineInvalid = computed(
   () =>
-    // Outline is written into otherLongText in jdv -> Only one of the fields may be filled at the same time
-    store.documentUnit?.texts.outline && store.documentUnit.texts.otherLongText,
+    // Outline is written into otherHeadnote in jdv -> Only one of the fields may be filled at the same time
+    store.documentUnit?.texts.outline && store.documentUnit.texts.otherHeadnote,
 )
 </script>
 
@@ -340,8 +340,8 @@ const isOutlineInvalid = computed(
             </div>
           </div>
           <div v-if="isOutlineInvalid">
-            Die Rubriken "Gliederung" und "Sonstiger Langtext" sind befüllt. Es
-            darf nur eine der beiden Rubriken befüllt sein.
+            Die Rubriken "Gliederung" und "Sonstiger Orientierungssatz" sind
+            befüllt. Es darf nur eine der beiden Rubriken befüllt sein.
           </div>
           <RouterLink :to="categoriesRoute">
             <TextButton

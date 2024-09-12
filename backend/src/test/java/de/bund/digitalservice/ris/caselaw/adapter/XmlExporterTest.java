@@ -187,6 +187,8 @@ class XmlExporterTest {
         .decisionName("decision name")
         .dissentingOpinion("dissenting opinion")
         .otherLongText("other long text")
+        // outline is missing here because otherHeadnote and outline must not be filled both at the
+        // same time
         .build();
   }
 
