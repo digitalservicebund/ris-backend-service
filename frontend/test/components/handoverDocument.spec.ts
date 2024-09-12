@@ -156,6 +156,42 @@ describe("HandoverView:", () => {
       expect(screen.queryByText("XML Vorschau")).not.toBeInTheDocument()
     })
 
+    it("should show error message with invalid outline", async () => {
+      renderComponent({
+        documentUnit: new DocumentUnit("123", {
+          documentNumber: "foo",
+          coreData: {
+            fileNumbers: ["foo"],
+            court: {
+              type: "type",
+              location: "location",
+              label: "label",
+            },
+            decisionDate: "2022-02-01",
+            legalEffect: "legalEffect",
+            documentType: {
+              jurisShortcut: "ca",
+              label: "category",
+            },
+          },
+          texts: {
+            outline: "Outline",
+            otherLongText: "Other Longtext",
+          },
+        }),
+      })
+      expect(
+        await screen.findByText(
+          'Die Rubriken "Gliederung" und "Sonstiger Langtext" sind befüllt. Es darf nur eine der beiden Rubriken befüllt sein.',
+        ),
+      ).toBeInTheDocument()
+
+      expect(
+        await screen.findByLabelText("Rubriken bearbeiten"),
+      ).toBeInTheDocument()
+      expect(screen.queryByText("XML Vorschau")).not.toBeInTheDocument()
+    })
+
     it("'Rubriken bearbeiten' button links back to categories", async () => {
       render(HandoverView, {
         global: {
