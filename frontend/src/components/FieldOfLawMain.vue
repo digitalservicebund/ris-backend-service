@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import * as Sentry from "@sentry/vue"
 import { computed, h, ref } from "vue"
 import FieldOfLawSelectionList from "./FieldOfLawSelectionList.vue"
 import FieldOfLawTree from "./FieldOfLawTree.vue"
@@ -16,7 +17,19 @@ const store = useDocumentUnitStore()
 const localModelValue = computed({
   get: () => store.documentUnit!.contentRelatedIndexing.fieldsOfLaw,
   set: (newValues) => {
-    store.documentUnit!.contentRelatedIndexing.fieldsOfLaw = newValues
+    store.documentUnit!.contentRelatedIndexing.fieldsOfLaw = newValues?.filter(
+      (value) => {
+        if (Object.keys(value).length === 0) {
+          Sentry.captureMessage(
+            "FieldOfLaw list contains empty objects",
+            "error",
+          )
+          return false
+        } else {
+          return true
+        }
+      },
+    )
   },
 })
 

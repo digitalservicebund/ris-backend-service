@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import * as Sentry from "@sentry/vue"
 import { ref, watch } from "vue"
 import IconClear from "~icons/ic/baseline-clear"
 
@@ -25,12 +26,21 @@ const emit = defineEmits<{
 function deleteChip(index: number, value: string) {
   if (props.readOnly) return
 
-  const temp: string[] = props.modelValue
+  let temp: string[] = props.modelValue
     ? [...props.modelValue]
         .map((item, itemIndex) => ({ item, itemIndex }))
         .filter(({ item, itemIndex }) => item !== value && itemIndex != index)
         .map(({ item }) => item)
     : []
+
+  temp = temp.filter((value) => {
+    if (!value) {
+      Sentry.captureMessage("Chip list contains empty string.", "error")
+      return false
+    } else {
+      return true
+    }
+  })
 
   emit("update:modelValue", temp)
   emit("chipDeleted", index, value)

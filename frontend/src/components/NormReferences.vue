@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import * as Sentry from "@sentry/vue"
 import { computed, h } from "vue"
 import { withSummarizer } from "@/components/DataSetSummary.vue"
 import EditableList from "@/components/EditableList.vue"
@@ -17,7 +18,19 @@ const store = useDocumentUnitStore()
 const norms = computed({
   get: () => store.documentUnit!.contentRelatedIndexing.norms,
   set: (newValues) => {
-    store.documentUnit!.contentRelatedIndexing.norms = newValues
+    store.documentUnit!.contentRelatedIndexing.norms = newValues?.filter(
+      (value) => {
+        if (Object.keys(value).length === 0) {
+          Sentry.captureMessage(
+            "NormReference list contains empty objects",
+            "error",
+          )
+          return false
+        } else {
+          return true
+        }
+      },
+    )
   },
 })
 
