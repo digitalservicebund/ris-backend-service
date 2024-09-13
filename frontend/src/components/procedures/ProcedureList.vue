@@ -16,7 +16,6 @@ import { Procedure } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { UserGroup } from "@/domain/userGroup"
 import documentationUnitService from "@/services/documentUnitService"
-import FeatureToggleService from "@/services/featureToggleService"
 import { ResponseError, ServiceResponse } from "@/services/httpClient"
 import service from "@/services/procedureService"
 import userGroupsService from "@/services/userGroupsService"
@@ -33,7 +32,6 @@ const { getQueryFromRoute, pushQueryToRoute, route } = useQuery<"q">()
 const query = ref(getQueryFromRoute())
 const responseError = ref()
 const userGroups = ref<UserGroup[]>([])
-const featureToggle = ref()
 const isInternalUser = useInternalUser()
 const assignError = ref<ResponseError>()
 
@@ -229,11 +227,6 @@ onMounted(() => {
   updateProcedures(0, query.value)
   getUserGroups()
 })
-onMounted(async () => {
-  featureToggle.value = (
-    await FeatureToggleService.isEnabled("neuris.assign-procedure")
-  ).data
-})
 </script>
 
 <template>
@@ -303,7 +296,7 @@ onMounted(async () => {
                 </div>
               </div>
               <DropdownInput
-                v-if="featureToggle && isInternalUser"
+                v-if="isInternalUser"
                 v-model="procedure.userGroupId"
                 aria-label="dropdown input"
                 class="ml-auto w-auto"

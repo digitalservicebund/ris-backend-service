@@ -1,12 +1,11 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import { afterEach, beforeEach, expect, vi } from "vitest"
+import { afterEach, expect, vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import ProcedureList from "@/components/procedures/ProcedureList.vue"
 import useQuery from "@/composables/useQueryFromRoute"
 import { Procedure } from "@/domain/documentUnit"
-import featureToggleService from "@/services/featureToggleService"
 import service from "@/services/procedureService"
 import userGroupsService from "@/services/userGroupsService"
 
@@ -139,12 +138,6 @@ async function renderComponent(options?: { procedures: Procedure[][] }) {
 }
 
 describe("ProcedureList", () => {
-  beforeEach(() => {
-    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
-      status: 200,
-      data: true,
-    })
-  })
   afterEach(() => {
     vi.resetAllMocks()
   })
