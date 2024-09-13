@@ -92,11 +92,10 @@ const handleKeyDown = (event: KeyboardEvent) => {
     return // Do nothing if the user is typing in an input field or editable area
   }
 
-  switch (event.key.toLowerCase()) {
-    case "[": // Ctrl + [
+  switch (event.key) {
+    case "<": // Ctrl + [
       event.preventDefault()
-      const expanded = extraContentSidePanel.value?.togglePanel()
-      toggleNavigationPanel(expanded)
+      toggleNavigationPanel(extraContentSidePanel.value?.togglePanel())
       break
     case "n": // Ctrl + N
       event.preventDefault()
