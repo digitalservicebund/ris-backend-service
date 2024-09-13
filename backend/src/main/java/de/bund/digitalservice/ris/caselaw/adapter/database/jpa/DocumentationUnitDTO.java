@@ -283,4 +283,7 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @OrderBy("rank")
   @Builder.Default
   private List<JobProfileDTO> jobProfiles = new ArrayList<>();
+
+  @Column(name = "legislative_mandate")
+  private boolean hasLegislativeMandate;
 }

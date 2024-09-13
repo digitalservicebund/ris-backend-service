@@ -38,6 +38,7 @@ export type ContentRelatedIndexing = {
   activeCitations?: ActiveCitation[]
   fieldsOfLaw?: FieldOfLaw[]
   jobProfiles?: string[]
+  hasLegislativeMandate?: boolean
 }
 
 export type DocumentType = {

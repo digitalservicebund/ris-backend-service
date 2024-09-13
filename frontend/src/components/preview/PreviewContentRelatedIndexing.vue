@@ -49,6 +49,9 @@ const hasJobProfiles = computed(() => {
     contentRelatedIndexing.value.jobProfiles?.length > 0
   )
 })
+const hasLegislativeMandate = computed(() => {
+  return contentRelatedIndexing.value.hasLegislativeMandate
+})
 </script>
 
 <template>
@@ -127,6 +130,10 @@ const hasJobProfiles = computed(() => {
           {{ jobProfile }}
         </div>
       </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="hasLegislativeMandate">
+      <PreviewCategory>Gesetzgebungsauftrag</PreviewCategory>
+      <PreviewContent>Ja</PreviewContent>
     </PreviewRow>
   </FlexContainer>
 </template>

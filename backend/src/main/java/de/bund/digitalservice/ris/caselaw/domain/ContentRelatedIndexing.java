@@ -10,4 +10,5 @@ public record ContentRelatedIndexing(
     List<String> jobProfiles,
     List<FieldOfLaw> fieldsOfLaw,
     List<NormReference> norms,
-    List<ActiveCitation> activeCitations) {}
+    List<ActiveCitation> activeCitations,
+    boolean hasLegislativeMandate) {}

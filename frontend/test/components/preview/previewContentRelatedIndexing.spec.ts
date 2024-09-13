@@ -66,6 +66,7 @@ describe("preview content related indexing", () => {
         },
       ],
       jobProfiles: ["Handwerker", "Elektriker"],
+      hasLegislativeMandate: true,
     })
 
     expect(await screen.findByText("Schlagwörter")).toBeInTheDocument()
@@ -73,6 +74,7 @@ describe("preview content related indexing", () => {
     expect(await screen.findByText("Aktivzitierung")).toBeInTheDocument()
     expect(await screen.findByText("Sachgebiete")).toBeInTheDocument()
     expect(await screen.findByText("Berufsbild")).toBeInTheDocument()
+    expect(await screen.findByText("Gesetzgebungsauftrag")).toBeInTheDocument()
   })
 
   test("renders multiple keywords and nothing else", async () => {
@@ -89,6 +91,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
     expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()
     expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
   })
 
   test("renders multiple norms and single norms and nothing else", async () => {
@@ -123,6 +126,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()
     expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
     expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
   })
 
   test("renders multiple active citations and nothing else", async () => {
@@ -169,6 +173,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
     expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
     expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
   })
 
   test("renders multiple fields of law and nothing else", async () => {
@@ -237,6 +242,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
     expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()
     expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
   })
 
   test("renders multiple job profiles and nothing else", async () => {
@@ -255,6 +261,34 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
     expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()
     expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
+  })
+
+  test("renders legislative mandate and nothing else", async () => {
+    renderComponent({
+      keywords: [],
+      norms: [],
+      activeCitations: [],
+      fieldsOfLaw: [],
+      jobProfiles: [],
+      hasLegislativeMandate: true,
+    })
+
+    expect(await screen.findByText("Gesetzgebungsauftrag")).toBeInTheDocument()
+    expect(await screen.findByText("Ja")).toBeInTheDocument()
+    expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
+    expect(screen.queryByText("Normen")).not.toBeInTheDocument()
+    expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()
+    expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
+    expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
+  })
+
+  test("renders no legislative mandate when it is false", async () => {
+    renderComponent({
+      hasLegislativeMandate: false,
+    })
+
+    expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
   })
 
   test("renders nothing when elements are empty", async () => {
@@ -264,12 +298,14 @@ describe("preview content related indexing", () => {
       activeCitations: [],
       fieldsOfLaw: [],
       jobProfiles: [],
+      hasLegislativeMandate: undefined,
     })
     expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
     expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()
     expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
     expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
   })
 
   test("renders nothing when elements are undefined", async () => {
@@ -279,11 +315,13 @@ describe("preview content related indexing", () => {
       activeCitations: undefined,
       fieldsOfLaw: undefined,
       jobProfiles: undefined,
+      hasLegislativeMandate: undefined,
     })
     expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
     expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()
     expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
     expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
+    expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
   })
 })

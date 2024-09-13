@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import ActiveCitations from "@/components/ActiveCitations.vue"
 import FieldOfLawMain from "@/components/FieldOfLawMain.vue"
-import JobProfiles from "@/components/JobProfiles.vue"
 import KeyWords from "@/components/KeyWords.vue"
 import Norms from "@/components/NormReferences.vue"
+import OtherCategories from "@/components/OtherCategories.vue"
 </script>
 
 <template>
@@ -15,6 +15,6 @@ import Norms from "@/components/NormReferences.vue"
     <FieldOfLawMain />
     <Norms />
     <ActiveCitations />
-    <JobProfiles />
+    <OtherCategories />
   </div>
 </template>

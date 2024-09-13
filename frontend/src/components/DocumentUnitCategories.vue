@@ -12,6 +12,7 @@ import PreviousDecisions from "@/components/PreviousDecisions.vue"
 import { useProvideCourtType } from "@/composables/useCourtType"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useScrollToHash } from "@/composables/useScrollToHash"
+import constitutionalCourtTypes from "@/data/constitutionalCourtTypes.json"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const route = useRoute()
@@ -19,22 +20,13 @@ const store = useDocumentUnitStore()
 const { documentUnit } = storeToRefs(store)
 const courtTypeRef = ref<string>(documentUnit.value!.coreData.court?.type ?? "")
 
-const courtTypesWithLegalForce = [
-  "BVerfG",
-  "VerfGH",
-  "VerfG",
-  "StGH",
-  "VGH",
-  "OVG",
-]
-
 /**
  * Determines whether legal forces should be deleted based on the court type and presence of a selected court.
  * @returns boolean
  */
 const shouldDeleteLegalForces = computed(() => {
   return (
-    !courtTypesWithLegalForce.includes(courtTypeRef.value) ||
+    !constitutionalCourtTypes.items.includes(courtTypeRef.value) ||
     !documentUnit.value!.coreData.court
   )
 })

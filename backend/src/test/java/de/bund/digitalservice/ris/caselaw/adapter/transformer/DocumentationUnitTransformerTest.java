@@ -1067,6 +1067,28 @@ class DocumentationUnitTransformerTest {
         .containsExactly("job profile");
   }
 
+  @Test
+  void testTransformToDomain_withLegislativeMandate_shouldLegislativeMandateBeTrue() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder().hasLegislativeMandate(true).build();
+
+    DocumentationUnit documentationUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentationUnit.contentRelatedIndexing().hasLegislativeMandate()).isTrue();
+  }
+
+  @Test
+  void testTransformToDomain_withoutLegislativeMandate_shouldLegislativeMandateBeFalse() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder().hasLegislativeMandate(false).build();
+
+    DocumentationUnit documentationUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentationUnit.contentRelatedIndexing().hasLegislativeMandate()).isFalse();
+  }
+
   private DocumentationUnit.DocumentationUnitBuilder generateSimpleDocumentationUnitBuilder() {
     return DocumentationUnit.builder()
         .previousDecisions(Collections.emptyList())

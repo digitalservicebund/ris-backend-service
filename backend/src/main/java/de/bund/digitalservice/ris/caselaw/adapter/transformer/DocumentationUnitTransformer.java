@@ -116,6 +116,7 @@ public class DocumentationUnitTransformer {
       addActiveCitations(builder, contentRelatedIndexing);
       addNormReferences(builder, contentRelatedIndexing);
       addJobProfiles(builder, contentRelatedIndexing);
+      builder.hasLegislativeMandate(contentRelatedIndexing.hasLegislativeMandate());
     }
 
     if (updatedDomainObject.texts() != null) {
@@ -583,6 +584,9 @@ public class DocumentationUnitTransformer {
           documentationUnitDTO.getJobProfiles().stream().map(JobProfileDTO::getValue).toList();
       contentRelatedIndexingBuilder.jobProfiles(jobProfiles);
     }
+
+    contentRelatedIndexingBuilder.hasLegislativeMandate(
+        documentationUnitDTO.isHasLegislativeMandate());
 
     ContentRelatedIndexing contentRelatedIndexing = contentRelatedIndexingBuilder.build();
 

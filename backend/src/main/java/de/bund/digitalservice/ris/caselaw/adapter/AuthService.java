@@ -75,6 +75,8 @@ public class AuthService {
           "/contentRelatedIndexing/fieldsOfLaw",
           "/contentRelatedIndexing/norms",
           "/contentRelatedIndexing/activeCitations",
+          "/contentRelatedIndexing/jobProfiles",
+          "/contentRelatedIndexing/hasLegislativeMandate",
           "/texts/decisionName",
           "/texts/headline",
           "/texts/guidingPrinciple",
