@@ -395,6 +395,7 @@ watch(
         @update-page="updatePage"
       >
         <SearchResultList
+          allow-multiple-links
           :is-loading="isLoading"
           :search-results="searchResults"
           @link-decision="addReference"

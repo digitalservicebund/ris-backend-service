@@ -7,9 +7,10 @@ import RelatedDocumentation from "@/domain/relatedDocumentation"
 import errorMessages from "@/i18n/errors.json"
 import IconAdd from "~icons/ic/baseline-add"
 
-defineProps<{
+const { allowMultipleLinks = false } = defineProps<{
   searchResults?: SearchResults<RelatedDocumentation>
   isLoading: boolean
+  allowMultipleLinks?: boolean
 }>()
 
 const emits =
@@ -58,7 +59,7 @@ export type SearchResults<Type extends RelatedDocumentation> = {
             aria-label="Treffer übernehmen"
             class="mr-16"
             data-testid="add-decision-button"
-            :disabled="searchResult.isLinked"
+            :disabled="!allowMultipleLinks && searchResult.isLinked"
             :icon="IconAdd"
             size="small"
             @click.stop="emits('linkDecision', searchResult.decision)"
