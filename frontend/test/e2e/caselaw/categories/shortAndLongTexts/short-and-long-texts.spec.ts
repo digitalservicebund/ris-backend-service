@@ -355,6 +355,10 @@ test.describe("short and long texts", () => {
           testId: "Sonstiger Langtext",
           value: "Sonstiger Langtext Test Text",
         },
+        {
+          testId: "Gliederung",
+          value: "Gliederung Test Text",
+        },
       ]
 
       for (let index = 0; index < testCases.length; index++) {
@@ -382,6 +386,20 @@ test.describe("short and long texts", () => {
           const innerText = await textField.innerText()
           // eslint-disable-next-line playwright/no-conditional-expect
           expect(innerText).toContain("Test")
+        }
+
+        // Outline (Gliederung) and OtherHeadLine (Sonst O-Satz) must not be filled at the same time
+        // eslint-disable-next-line playwright/no-conditional-in-test
+        if (testId == "Gliederung") {
+          const textField = page.locator(
+            `[data-testid='Sonstiger Orientierungssatz']`,
+          )
+          await textField.click()
+          await page.keyboard.press("ControlOrMeta+A")
+          await page.keyboard.press("Backspace")
+          const innerText = await textField.innerText()
+          // eslint-disable-next-line playwright/no-conditional-expect
+          expect(innerText).toContain("")
         }
 
         await save(page)
