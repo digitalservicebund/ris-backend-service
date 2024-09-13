@@ -82,12 +82,13 @@ function selectPreview() {
  * Pushes the state to the route as a query parameter.
  * @param expand optional boolean to enforce expanding or collapsing
  */
-function togglePanel(expand?: boolean) {
+function togglePanel(expand?: boolean): boolean {
   isExpanded.value = expand === undefined ? !isExpanded.value : expand
   pushQueryToRoute({
     ...route.query,
     showAttachmentPanel: isExpanded.value.toString(),
   })
+  return isExpanded.value
 }
 
 /**

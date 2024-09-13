@@ -80,30 +80,40 @@ async function attachmentsUploaded(anySuccessful: boolean) {
 }
 
 const handleKeyDown = (event: KeyboardEvent) => {
-  if (event.ctrlKey) {
-    switch (event.key.toLowerCase()) {
-      case "[": // Ctrl + [
-        event.preventDefault()
-        extraContentSidePanel.value?.togglePanel(!showNavigationPanelRef.value)
-        toggleNavigationPanel(!showNavigationPanelRef.value)
-        break
-      case "n": // Ctrl + N
-        event.preventDefault()
-        extraContentSidePanel.value?.togglePanel(true)
-        extraContentSidePanel.value?.selectNotes()
-        break
-      case "d": // Ctrl + D
-        event.preventDefault()
-        extraContentSidePanel.value?.togglePanel(true)
-        extraContentSidePanel.value?.selectAttachments()
-        break
-      case "v": // Ctrl + V
-        extraContentSidePanel.value?.togglePanel(true)
-        extraContentSidePanel.value?.selectPreview()
-        break
-      default:
-        break
-    }
+  // List of tag names where shortcuts should be disabled
+  const tagName = (event.target as HTMLElement).tagName.toLowerCase()
+
+  // Check if the active element is an input, textarea, or any element with contenteditable
+  if (
+    ["input", "textarea", "select"].includes(tagName) ||
+    (event.target as HTMLElement).isContentEditable
+  ) {
+    if (event.key === "Escape") (event.target as HTMLElement).blur() // Remove focus from the input field
+    return // Do nothing if the user is typing in an input field or editable area
+  }
+
+  switch (event.key.toLowerCase()) {
+    case "[": // Ctrl + [
+      event.preventDefault()
+      const expanded = extraContentSidePanel.value?.togglePanel()
+      toggleNavigationPanel(expanded)
+      break
+    case "n": // Ctrl + N
+      event.preventDefault()
+      extraContentSidePanel.value?.togglePanel(true)
+      extraContentSidePanel.value?.selectNotes()
+      break
+    case "d": // Ctrl + D
+      event.preventDefault()
+      extraContentSidePanel.value?.togglePanel(true)
+      extraContentSidePanel.value?.selectAttachments()
+      break
+    case "v": // Ctrl + V
+      extraContentSidePanel.value?.togglePanel(true)
+      extraContentSidePanel.value?.selectPreview()
+      break
+    default:
+      break
   }
 }
 
