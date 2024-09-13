@@ -108,7 +108,13 @@ function onAttachmentDeleted(index: number) {
  * Exposes the functions "togglePanel", "selectAttachments" and "onAttachmentDeleted", so that they can be accessed from the parent component.
  * This is required to have smooth and explicit interactions between the DocumentUnitAttachments component and this component through their shared parent.
  */
-defineExpose({ togglePanel, selectAttachments, onAttachmentDeleted })
+defineExpose({
+  togglePanel,
+  selectAttachments,
+  onAttachmentDeleted,
+  selectNotes,
+  selectPreview,
+})
 
 /**
  * Checks whether the panel should be expanded when it is mounted.

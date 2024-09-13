@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { useHead } from "@unhead/vue"
 import { storeToRefs } from "pinia"
-import { onMounted, ref, Ref } from "vue"
+import { onMounted, onBeforeUnmount, ref, Ref } from "vue"
 import { useRoute } from "vue-router"
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
@@ -42,8 +42,9 @@ const extraContentSidePanel = ref<InstanceType<
   typeof ExtraContentSidePanel
 > | null>(null)
 
-const toggleNavigationPanel = () => {
-  showNavigationPanelRef.value = !showNavigationPanelRef.value
+function toggleNavigationPanel(expand?: boolean) {
+  showNavigationPanelRef.value =
+    expand === undefined ? !showNavigationPanelRef.value : expand
   pushQueryToRoute({
     ...route.query,
     showNavigationPanel: showNavigationPanelRef.value.toString(),
@@ -78,7 +79,41 @@ async function attachmentsUploaded(anySuccessful: boolean) {
   }
 }
 
+const handleKeyDown = (event: KeyboardEvent) => {
+  if (event.ctrlKey) {
+    switch (event.key.toLowerCase()) {
+      case "[": // Ctrl + [
+        event.preventDefault()
+        extraContentSidePanel.value?.togglePanel(!showNavigationPanelRef.value)
+        toggleNavigationPanel(!showNavigationPanelRef.value)
+        break
+      case "n": // Ctrl + N
+        event.preventDefault()
+        extraContentSidePanel.value?.togglePanel(true)
+        extraContentSidePanel.value?.selectNotes()
+        break
+      case "d": // Ctrl + D
+        event.preventDefault()
+        extraContentSidePanel.value?.togglePanel(true)
+        extraContentSidePanel.value?.selectAttachments()
+        break
+      case "v": // Ctrl + V
+        extraContentSidePanel.value?.togglePanel(true)
+        extraContentSidePanel.value?.selectPreview()
+        break
+      default:
+        break
+    }
+  }
+}
+
+onBeforeUnmount(() => {
+  // Remove the event listener when the component is unmounted
+  window.removeEventListener("keydown", handleKeyDown)
+})
+
 onMounted(async () => {
+  window.addEventListener("keydown", handleKeyDown)
   await requestDocumentUnitFromServer()
 })
 </script>
