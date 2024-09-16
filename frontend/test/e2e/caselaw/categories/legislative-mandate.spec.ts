@@ -2,6 +2,7 @@ import { expect, Page } from "@playwright/test"
 import {
   navigateToCategories,
   navigateToHandover,
+  navigateToPreview,
   save,
   waitForInputValue,
 } from "../e2e-utils"
@@ -62,6 +63,14 @@ test.describe(
 
       await addCourtType(page, "BVerfG")
 
+      await test.step("check legislative mandate is visible in preview", async () => {
+        await navigateToPreview(
+          page,
+          prefilledDocumentUnit.documentNumber as string,
+        )
+        await expect(page.getByText("Gesetzgebungsauftrag")).toBeVisible()
+      })
+
       await test.step("XML preview should display 'Gesetzgebungsauftrag' in 'paratrubriken'", async () => {
         await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
         await page.getByText("XML Vorschau").click()
@@ -87,6 +96,14 @@ test.describe(
         await checkBox.uncheck()
         await expect(checkBox).not.toBeChecked()
         await save(page)
+      })
+
+      await test.step("check legislative mandate is not visible in preview", async () => {
+        await navigateToPreview(
+          page,
+          prefilledDocumentUnit.documentNumber as string,
+        )
+        await expect(page.getByText("Gesetzgebungsauftrag")).toBeHidden()
       })
 
       await test.step("XML preview should not display 'Gesetzgebungsauftrag' in 'paratrubriken'", async () => {
