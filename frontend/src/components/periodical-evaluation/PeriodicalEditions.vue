@@ -30,7 +30,7 @@ const emptyResponse: ResponseError = {
 
 const router = useRouter()
 const selectedLegalPeriodical = ref<LegalPeriodical>()
-const currentEditions = ref<LegalPeriodicalEdition[]>([])
+const currentEditions = ref<LegalPeriodicalEdition[]>()
 const { pushQueryToRoute, route, resetQuery } = useQuery<"q">()
 const searchResponseError = ref<ResponseError | undefined>(emptyResponse)
 const isLoading = ref(false)
@@ -92,7 +92,7 @@ const legalPeriodical = computed({
 async function handleDeleteEdition(edition: LegalPeriodicalEdition) {
   if (edition?.id) {
     const response = await LegalPeriodicalEditionService.delete(edition.id)
-    if (!response.error) {
+    if (!response.error && currentEditions.value) {
       currentEditions.value = currentEditions.value.filter(
         (item) => item.id !== edition.id,
       )
