@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { computed } from "vue"
+import Tooltip from "./Tooltip.vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import ActiveCitation from "@/domain/activeCitation"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import PreviousDecision from "@/domain/previousDecision"
-import Tooltip from "@/routes/kitchensink/index/tooltip.vue"
 import IconBaselineContentCopy from "~icons/ic/baseline-content-copy"
 import IconBaselineDescription from "~icons/ic/baseline-description"
 import IconError from "~icons/ic/baseline-error"
