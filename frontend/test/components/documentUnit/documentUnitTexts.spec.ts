@@ -34,5 +34,6 @@ describe("Texts", () => {
     screen.getByText("Entscheidungsgründe")
     screen.getByText("Abweichende Meinung")
     screen.getByText("Sonstiger Langtext")
+    screen.getByText("Gliederung")
   })
 })

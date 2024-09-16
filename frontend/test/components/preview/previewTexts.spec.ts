@@ -64,6 +64,7 @@ describe("preview texts", () => {
         "Entscheidungsgründe",
         "Abweichende Meinung",
         "Sonstiger Langtext",
+        "Gliederung",
       ],
     ],
     [
@@ -80,6 +81,7 @@ describe("preview texts", () => {
         "Entscheidungsgründe",
         "Abweichende Meinung",
         "Sonstiger Langtext",
+        "Gliederung",
       ],
     ],
     [
@@ -96,6 +98,7 @@ describe("preview texts", () => {
         "Entscheidungsgründe",
         "Abweichende Meinung",
         "Sonstiger Langtext",
+        "Gliederung",
       ],
     ],
     [
@@ -112,6 +115,7 @@ describe("preview texts", () => {
         "Entscheidungsgründe",
         "Abweichende Meinung",
         "Sonstiger Langtext",
+        "Gliederung",
       ],
     ],
     [
@@ -128,6 +132,7 @@ describe("preview texts", () => {
         "Entscheidungsgründe",
         "Abweichende Meinung",
         "Sonstiger Langtext",
+        "Gliederung",
       ],
     ],
     [
@@ -144,6 +149,7 @@ describe("preview texts", () => {
         "Entscheidungsgründe",
         "Abweichende Meinung",
         "Sonstiger Langtext",
+        "Gliederung",
       ],
     ],
     [
@@ -160,6 +166,7 @@ describe("preview texts", () => {
         "Entscheidungsgründe",
         "Abweichende Meinung",
         "Sonstiger Langtext",
+        "Gliederung",
       ],
     ],
     [
@@ -176,6 +183,7 @@ describe("preview texts", () => {
         "Entscheidungsgründe",
         "Abweichende Meinung",
         "Sonstiger Langtext",
+        "Gliederung",
       ],
     ],
     [
@@ -192,6 +200,7 @@ describe("preview texts", () => {
         "Tatbestand",
         "Abweichende Meinung",
         "Sonstiger Langtext",
+        "Gliederung",
       ],
     ],
     [
@@ -208,6 +217,7 @@ describe("preview texts", () => {
         "Tatbestand",
         "Entscheidungsgründe",
         "Abweichende Meinung",
+        "Gliederung",
       ],
     ],
     [
