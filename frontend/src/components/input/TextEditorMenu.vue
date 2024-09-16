@@ -42,7 +42,7 @@ const buttons = computed(() => [
   {
     type: "expand",
     icon: IconExpand,
-    ariaLabel: "fullview",
+    ariaLabel: "Erweitern",
     group: "display",
     isCollapsable: false,
     callback: () => emit("onEditorExpandedChanged", !props.editorExpanded),
@@ -50,7 +50,7 @@ const buttons = computed(() => [
   {
     type: "invisible-characters",
     icon: IconParagraph,
-    ariaLabel: "invisible-characters",
+    ariaLabel: "Nicht-druckbare Zeichen",
     group: "display",
     isCollapsable: false,
     callback: () =>
@@ -62,7 +62,8 @@ const buttons = computed(() => [
   {
     type: "bold",
     icon: IconBold,
-    ariaLabel: "bold",
+    ariaLabel: "Fett",
+    shortcut: "Strg + b",
     group: "format",
     isCollapsable: false,
     callback: () => props.editor.chain().focus().toggleMark("bold").run(),
@@ -70,7 +71,8 @@ const buttons = computed(() => [
   {
     type: "italic",
     icon: IconItalic,
-    ariaLabel: "italic",
+    ariaLabel: "Kursiv",
+    shortcut: "Strg + i",
     group: "format",
     isCollapsable: false,
     callback: () => props.editor.chain().focus().toggleMark("italic").run(),
@@ -78,7 +80,8 @@ const buttons = computed(() => [
   {
     type: "underline",
     icon: IconUnderline,
-    ariaLabel: "underline",
+    ariaLabel: "Unterstrichen",
+    shortcut: "Strg + u",
     group: "format",
     isCollapsable: false,
     callback: () => props.editor.chain().focus().toggleMark("underline").run(),
@@ -86,7 +89,8 @@ const buttons = computed(() => [
   {
     type: "strike",
     icon: IconStrikethrough,
-    ariaLabel: "strike",
+    ariaLabel: "Durchgestrichen",
+    shortcut: "Strg + ⇧ + u",
     group: "format",
     isCollapsable: false,
     callback: () => props.editor.chain().focus().toggleMark("strike").run(),
@@ -94,7 +98,8 @@ const buttons = computed(() => [
   {
     type: "superscript",
     icon: IconSuperscript,
-    ariaLabel: "superscript",
+    ariaLabel: "Tiefgestellt",
+    shortcut: "Strg + .",
     group: "format",
     isCollapsable: false,
     callback: () =>
@@ -103,7 +108,8 @@ const buttons = computed(() => [
   {
     type: "subscript",
     icon: IconSubscript,
-    ariaLabel: "subscript",
+    ariaLabel: "Hochgestellt",
+    shortcut: "Strg + ,",
     group: "format",
     isCollapsable: false,
     callback: () => props.editor.chain().focus().toggleMark("subscript").run(),
@@ -111,31 +117,33 @@ const buttons = computed(() => [
   {
     type: "left",
     icon: IconAlignLeft,
-    ariaLabel: "left",
-    group: "alignment",
+    ariaLabel: "Linksbündig",
+    group: "Ausrichtung",
     isCollapsable: true,
     callback: () => props.editor.chain().focus().setTextAlign("left").run(),
   },
   {
     type: "center",
     icon: IconAlignCenter,
-    ariaLabel: "center",
-    group: "alignment",
+    ariaLabel: "Zentriert",
+    shortcut: "Strg + ⇧ + e",
+    group: "Ausrichtung",
     isCollapsable: true,
     callback: () => props.editor.chain().focus().setTextAlign("center").run(),
   },
   {
     type: "right",
     icon: IconAlignRight,
-    ariaLabel: "right",
-    group: "alignment",
+    ariaLabel: "Rechtsbündig",
+    group: "Ausrichtung",
     isCollapsable: true,
     callback: () => props.editor.chain().focus().setTextAlign("right").run(),
   },
   {
     type: "bulletList",
     icon: IconUnorderedList,
-    ariaLabel: "bulletList",
+    ariaLabel: "Aufzählungsliste",
+    shortcut: "Strg + ⇧ + 7",
     group: "indent",
     isCollapsable: false,
     callback: () => props.editor.chain().focus().toggleBulletList().run(),
@@ -143,7 +151,8 @@ const buttons = computed(() => [
   {
     type: "orderedList",
     icon: IconOrderedList,
-    ariaLabel: "orderedList",
+    ariaLabel: "Nummerierte Liste",
+    shortcut: "Strg + ⇧ + 8",
     group: "indent",
     isCollapsable: false,
     callback: () => props.editor.chain().focus().toggleOrderedList().run(),
@@ -151,7 +160,7 @@ const buttons = computed(() => [
   {
     type: "outdent",
     icon: IndentDecrease,
-    ariaLabel: "outdent",
+    ariaLabel: "Einzug verringern",
     group: "indent",
     isCollapsable: false,
     callback: () => props.editor.chain().focus().outdent().run(),
@@ -159,7 +168,7 @@ const buttons = computed(() => [
   {
     type: "indent",
     icon: IndentIncrease,
-    ariaLabel: "indent",
+    ariaLabel: "Einzug vergrößern",
     group: "indent",
     isCollapsable: false,
     callback: () => props.editor.chain().focus().indent().run(),
@@ -167,7 +176,8 @@ const buttons = computed(() => [
   {
     type: "blockquote",
     icon: IconBlockquote,
-    ariaLabel: "blockquote",
+    ariaLabel: "Zitat einfügen",
+    shortcut: "Strg + ⇧ + B",
     group: "blockquote",
     isCollapsable: false,
     callback: () => props.editor.chain().focus().toggleBlockquote().run(),
@@ -175,7 +185,7 @@ const buttons = computed(() => [
   {
     type: "deleteBorderNumber",
     icon: MaterialSymbolsDeleteSweepOutline,
-    ariaLabel: "deleteBorderNumber",
+    ariaLabel: "Randnummer entfernen",
     group: "borderNumber",
     isCollapsable: false,
     callback: () => props.editor.chain().focus().removeBorderNumbers().run(),
@@ -186,7 +196,8 @@ const fixButtons = [
   {
     type: "undo",
     icon: IconUndo,
-    ariaLabel: "undo",
+    ariaLabel: "Rückgängig machen",
+    shortcut: "Strg + z",
     group: "arrow",
     isCollapsable: false,
     callback: () => props.editor.chain().focus().undo().run(),
@@ -194,7 +205,8 @@ const fixButtons = [
   {
     type: "redo",
     icon: IconRedo,
-    ariaLabel: "redo",
+    ariaLabel: "Wiederherstellen",
+    shortcut: "Strg + ⇧ + z",
     group: "arrow",
     isCollapsable: false,
     callback: () => props.editor.chain().focus().redo().run(),
@@ -207,9 +219,9 @@ const editorButtons = computed(() =>
 
     if (button.group === "alignment") {
       isActive = props.editor.isActive({ textAlign: button.type })
-    } else if (button.ariaLabel === "invisible-characters") {
+    } else if (button.type === "invisible-characters") {
       isActive = selectActiveState(props.editor.view.state)
-    } else if (button.ariaLabel === "fullview") {
+    } else if (button.type === "expand") {
       isActive = props.editorExpanded
     } else {
       isActive = props.editor.isActive(button.type)

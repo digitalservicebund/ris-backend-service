@@ -612,7 +612,7 @@ export async function copyPasteTextFromAttachmentIntoEditor(
   await editor.click()
   await page.keyboard.press(`${modifier}+KeyV`)
   await page
-    .locator(`[aria-label='invisible-characters']:not([disabled])`)
+    .locator(`[aria-label='Nicht-druckbare Zeichen']:not([disabled])`)
     .click()
 }
 

@@ -49,7 +49,7 @@ describe("text editor toolbar", async () => {
       await userEvent.click(editorField.firstElementChild!)
       expect(editorField.firstElementChild).toHaveFocus()
       await userEvent.tab({ shift: true })
-      const firstButton = screen.getByLabelText("fullview")
+      const firstButton = screen.getByLabelText("Erweitern")
       expect(firstButton).toHaveFocus()
     })
 
@@ -60,16 +60,16 @@ describe("text editor toolbar", async () => {
       await userEvent.click(editorField.firstElementChild!)
       expect(editorField.firstElementChild).toHaveFocus()
       await userEvent.tab({ shift: true })
-      const firstButton = screen.getByLabelText("fullview")
+      const firstButton = screen.getByLabelText("Erweitern")
       expect(firstButton).toHaveFocus()
 
       await userEvent.keyboard("{ArrowRight}")
-      const secondButton = screen.getByLabelText("invisible-characters")
+      const secondButton = screen.getByLabelText("Nicht-druckbare Zeichen")
       expect(secondButton).toHaveFocus()
 
       // navigate to last button (arrow right 18 times)
       await userEvent.keyboard("{ArrowRight>18/}")
-      const lastButton = screen.getByLabelText("redo")
+      const lastButton = screen.getByLabelText("Wiederherstellen")
       expect(lastButton).toHaveFocus()
 
       // go one step further to the right --> should do nothing
@@ -78,7 +78,7 @@ describe("text editor toolbar", async () => {
 
       // navigate to the left --> should go to previous button
       await userEvent.keyboard("{ArrowLeft}")
-      const secondLastButton = screen.getByLabelText("undo")
+      const secondLastButton = screen.getByLabelText("Rückgängig machen")
       expect(secondLastButton).toHaveFocus()
     })
 
@@ -89,7 +89,7 @@ describe("text editor toolbar", async () => {
       await userEvent.click(editorField.firstElementChild!)
       expect(editorField.firstElementChild).toHaveFocus()
       await userEvent.tab({ shift: true })
-      const firstButton = screen.getByLabelText("fullview")
+      const firstButton = screen.getByLabelText("Erweitern")
       expect(firstButton).toHaveFocus()
 
       // When the first button is focused, ArrowLeft does not move focus
@@ -98,7 +98,7 @@ describe("text editor toolbar", async () => {
 
       // From the first button you can move immediately to the next one
       await userEvent.keyboard("{ArrowRight}")
-      const secondButton = screen.getByLabelText("invisible-characters")
+      const secondButton = screen.getByLabelText("Nicht-druckbare Zeichen")
       expect(secondButton).toHaveFocus()
 
       await userEvent.keyboard("{ArrowLeft}")
@@ -113,7 +113,7 @@ describe("text editor toolbar", async () => {
       await userEvent.tab({ shift: true })
       await userEvent.keyboard("{ArrowRight}")
       await userEvent.keyboard("{ArrowRight}")
-      const thirdButton = screen.getByLabelText("bold")
+      const thirdButton = screen.getByLabelText("Fett")
       expect(thirdButton).toHaveFocus()
 
       // When clicking enter on a text edit button, the focus moves to the editor
@@ -141,7 +141,7 @@ describe("text editor toolbar", async () => {
 
       // Tab back focuses the toolbar buttons
       await userEvent.tab({ shift: true })
-      const firstButton = screen.getByLabelText("fullview")
+      const firstButton = screen.getByLabelText("Erweitern")
       expect(firstButton).toHaveFocus()
     })
   })

@@ -25,13 +25,15 @@ test.describe(
       const inputField = page.locator("[data-testid='Gründe']")
       await inputField.click()
       await page.keyboard.type("This is a bullet list")
-      await page.locator(`[aria-label='bulletList']:not([disabled])`).click()
+      await page
+        .locator(`[aria-label='Aufzählungsliste']:not([disabled])`)
+        .click()
       await page.keyboard.press("Enter")
       await page.keyboard.type("Second bullet list item")
 
       // hide invisible characters
       await page
-        .locator(`[aria-label='invisible-characters']:not([disabled])`)
+        .locator(`[aria-label='Nicht-druckbare Zeichen']:not([disabled])`)
         .click()
 
       const inputFieldInnerHTML = await inputField.innerHTML()
@@ -58,13 +60,15 @@ test.describe(
       const inputField = page.locator("[data-testid='Gründe']")
       await inputField.click()
       await page.keyboard.type("This is an ordered list")
-      await page.locator(`[aria-label='orderedList']:not([disabled])`).click()
+      await page
+        .locator(`[aria-label='Nummerierte Liste']:not([disabled])`)
+        .click()
       await page.keyboard.press("Enter")
       await page.keyboard.type("Second ordered list item")
 
       // hide invisible characters
       await page
-        .locator(`[aria-label='invisible-characters']:not([disabled])`)
+        .locator(`[aria-label='Nicht-druckbare Zeichen']:not([disabled])`)
         .click()
 
       const inputFieldInnerHTML = await inputField.innerHTML()
@@ -94,21 +98,27 @@ test.describe(
       await inputField.click()
       // hide invisible characters
       await page
-        .locator(`[aria-label='invisible-characters']:not([disabled])`)
+        .locator(`[aria-label='Nicht-druckbare Zeichen']:not([disabled])`)
         .click()
 
       await page.keyboard.type("This is a list")
-      await page.locator(`[aria-label='bulletList']:not([disabled])`).click()
+      await page
+        .locator(`[aria-label='Aufzählungsliste']:not([disabled])`)
+        .click()
 
       let inputFieldInnerHTML = await inputField.innerHTML()
       // Check text styling
       expect(inputFieldInnerHTML).toContain(bulletList)
 
-      await page.locator(`[aria-label='orderedList']:not([disabled])`).click()
+      await page
+        .locator(`[aria-label='Nummerierte Liste']:not([disabled])`)
+        .click()
       inputFieldInnerHTML = await inputField.innerHTML()
       expect(inputFieldInnerHTML).toContain(orderedList)
 
-      await page.locator(`[aria-label='orderedList']:not([disabled])`).click()
+      await page
+        .locator(`[aria-label='Nummerierte Liste']:not([disabled])`)
+        .click()
       inputFieldInnerHTML = await inputField.innerHTML()
       expect(inputFieldInnerHTML).toContain(noList)
     })
@@ -127,7 +137,7 @@ test.describe(
       await inputField.click()
       // hide invisible characters
       await page
-        .locator(`[aria-label='invisible-characters']:not([disabled])`)
+        .locator(`[aria-label='Nicht-druckbare Zeichen']:not([disabled])`)
         .click()
 
       const modifier = await getModifier(page)

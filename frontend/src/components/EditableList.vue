@@ -1,6 +1,7 @@
 <script lang="ts" setup generic="T extends ListItem">
 import type { Component, Ref } from "vue"
 import { ref, watch, computed } from "vue"
+import Tooltip from "./Tooltip.vue"
 import DataSetSummary from "@/components/DataSetSummary.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import ListItem from "@/domain/editableListItem"
@@ -170,25 +171,27 @@ watch(
         class="group flex gap-8 py-16"
       >
         <component :is="summaryComponent" :data="entry" />
-        <button
-          id="editable-list-select-button"
-          class="flex h-32 w-32 items-center justify-center text-blue-800 hover:bg-blue-100 focus:shadow-[inset_0_0_0_0.125rem] focus:shadow-blue-800 focus:outline-none"
-          :data-testid="`list-entry-${index}`"
-          @click="
-            () => {
-              toggleDisplayDefaultValue(false)
-              setEditEntry(entry)
-            }
-          "
-          @keypress.enter="
-            () => {
-              toggleDisplayDefaultValue(false)
-              setEditEntry(entry)
-            }
-          "
-        >
-          <IconArrowDown />
-        </button>
+        <Tooltip text="Aufklappen">
+          <button
+            id="editable-list-select-button"
+            class="flex h-32 w-32 items-center justify-center text-blue-800 hover:bg-blue-100 focus:shadow-[inset_0_0_0_0.125rem] focus:shadow-blue-800 focus:outline-none"
+            :data-testid="`list-entry-${index}`"
+            @click="
+              () => {
+                toggleDisplayDefaultValue(false)
+                setEditEntry(entry)
+              }
+            "
+            @keypress.enter="
+              () => {
+                toggleDisplayDefaultValue(false)
+                setEditEntry(entry)
+              }
+            "
+          >
+            <IconArrowDown />
+          </button>
+        </Tooltip>
       </div>
 
       <component
