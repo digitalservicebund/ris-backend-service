@@ -672,6 +672,7 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDTO_withSameParticipatingJudges_shouldMakeJudgesDistinct() {
+    // Arrange
     ParticipatingJudge participatingJudge = ParticipatingJudge.builder().name("Judge A").build();
     DocumentationUnit documentationUnit =
         generateSimpleDocumentationUnitBuilder()
@@ -681,10 +682,12 @@ class DocumentationUnitTransformerTest {
                     .build())
             .build();
 
+    // Act
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitTransformer.transformToDTO(
             DocumentationUnitDTO.builder().build(), documentationUnit);
 
+    // Assert
     assertThat(documentationUnitDTO.getParticipatingJudges()).hasSize(1);
     assertThat(documentationUnitDTO.getParticipatingJudges())
         .extracting("name")
@@ -1116,6 +1119,7 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDomain_withParticipatingJudges_shouldAddParticipatingJudges() {
+    // Arrange
     ParticipatingJudgeDTO participatingJudgeA =
         ParticipatingJudgeDTO.builder().name("Judge A").referencedOpinions("Opinion A").build();
     ParticipatingJudgeDTO participatingJudgeB =
@@ -1126,9 +1130,11 @@ class DocumentationUnitTransformerTest {
             .participatingJudges(List.of(participatingJudgeA, participatingJudgeB))
             .build();
 
+    // Act
     DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
+    // Assert
     assertThat(documentationUnit.contentRelatedIndexing().participatingJudges()).hasSize(2);
     assertThat(documentationUnit.contentRelatedIndexing().participatingJudges().get(0).id())
         .isEqualTo(participatingJudgeA.getId());
@@ -1157,12 +1163,11 @@ class DocumentationUnitTransformerTest {
 
   @Test
   void testTransformToDomain_withoutParticipatingJudges_shouldAddEmptyList() {
-
-    DocumentationUnitDTO documentationUnitDTO = generateSimpleDTOBuilder().build();
-
+    // Act
     DocumentationUnit documentationUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+        DocumentationUnitTransformer.transformToDomain(generateSimpleDTOBuilder().build());
 
+    // Assert
     assertThat(documentationUnit.contentRelatedIndexing().participatingJudges()).isEmpty();
   }
 
