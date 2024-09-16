@@ -47,7 +47,7 @@ function scrollToTop() {
 <template>
   <ExpandableContent
     v-model:is-expanded="isExpanded"
-    class="border-gray-400 bg-white p-32"
+    class="border-gray-400 bg-white"
     :class="{
       'hover:border-blue-500 hover:bg-blue-200': !isExpanded,
       'border-b': borderBottom,

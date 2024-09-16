@@ -47,7 +47,7 @@ watch(
 <template>
   <div
     aria-label="Stammdaten"
-    class="core-data flex flex-col gap-24 bg-white p-32"
+    class="core-data flex flex-col gap-24 bg-white p-24"
   >
     <h2 class="ds-heading-03-bold">Stammdaten</h2>
     <NestedComponent aria-label="Fehlerhaftes Gericht" class="w-full">

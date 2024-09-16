@@ -211,7 +211,7 @@ watch(
       v-if="!editEntry"
       aria-label="Weitere Angabe"
       button-type="tertiary"
-      class="mt-24 first:mt-0"
+      class="my-24 first:mt-0"
       :icon="IconAdd"
       label="Weitere Angabe"
       size="small"

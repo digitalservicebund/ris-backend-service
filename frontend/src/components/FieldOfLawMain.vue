@@ -83,8 +83,8 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
     title="Sachgebiete"
   >
     <div class="w-full">
-      <div class="flex flex-row">
-        <div class="flex flex-1 flex-col bg-white p-32">
+      <div class="flex flex-row gap-24">
+        <div class="flex flex-1 flex-col">
           <FieldOfLawSearch
             @do-show-norms="showNorms = true"
             @linked-field:select="setSelectedNode"
@@ -92,7 +92,7 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
             @node:unselect="removeSelectedNode"
           />
         </div>
-        <div class="flex-1 bg-white p-32">
+        <div class="flex-1">
           <FieldOfLawTree
             v-if="localModelValue"
             v-model="localModelValue"

@@ -5,10 +5,10 @@ import { useRoute } from "vue-router"
 import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContentRelatedIndexing.vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 import DocumentUnitTexts from "@/components/DocumentUnitTexts.vue"
-import EnsuingDecisions from "@/components/EnsuingDecisions.vue"
 import { DocumentUnitCatagoriesEnum } from "@/components/enumDocumentUnitCatagories"
 import FlexItem from "@/components/FlexItem.vue"
-import PreviousDecisions from "@/components/PreviousDecisions.vue"
+import ProceedingDecisions from "@/components/ProceedingDecisions.vue"
+
 import { useProvideCourtType } from "@/composables/useCourtType"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useScrollToHash } from "@/composables/useScrollToHash"
@@ -69,18 +69,15 @@ const isInternalUser = useInternalUser()
 </script>
 
 <template>
-  <FlexItem class="w-full flex-1 grow flex-col p-24">
+  <FlexItem class="w-full flex-1 grow flex-col gap-24 p-24">
     <DocumentUnitCoreData
       v-if="isInternalUser"
       :id="DocumentUnitCatagoriesEnum.CORE_DATA"
       v-model="coreData"
-      class="mb-24"
     />
-    <PreviousDecisions :id="DocumentUnitCatagoriesEnum.PROCEEDINGS_DECISIONS" />
-    <EnsuingDecisions class="mb-24" />
+    <ProceedingDecisions />
     <DocumentUnitContentRelatedIndexing
       :id="DocumentUnitCatagoriesEnum.CONTENT_RELATED_INDEXING"
-      class="mb-24"
     />
     <DocumentUnitTexts :id="DocumentUnitCatagoriesEnum.TEXTS" />
   </FlexItem>

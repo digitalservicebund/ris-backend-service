@@ -17,17 +17,13 @@ const keywords = computed({
 </script>
 
 <template>
-  <div class="p-32">
-    <h2 class="ds-heading-03-reg mb-24">Schlagwörter</h2>
-    <div class="flex flex-row">
-      <div class="flex-1">
-        <KeywordsChipsInput
-          id="keywords"
-          v-model="keywords"
-          aria-label="Schlagwörter"
-          :error="errorMessage"
-        ></KeywordsChipsInput>
-      </div>
-    </div>
+  <div>
+    <h2 class="ds-heading-03-reg mb-16">Schlagwörter</h2>
+    <KeywordsChipsInput
+      id="keywords"
+      v-model="keywords"
+      aria-label="Schlagwörter"
+      :error="errorMessage"
+    ></KeywordsChipsInput>
   </div>
 </template>
