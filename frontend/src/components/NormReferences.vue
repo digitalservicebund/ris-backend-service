@@ -135,7 +135,7 @@ function renderSingleNorm(singleNorm: SingleNorm): string {
 const NormsSummary = withSummarizer(decisionSummarizer)
 </script>
 <template>
-  <div aria-label="Norm">
+  <div aria-label="Norm" class="border-b-1 border-blue-300">
     <h2 class="ds-label-01-bold mb-16">Normen</h2>
     <div class="flex flex-row">
       <div class="flex-1">

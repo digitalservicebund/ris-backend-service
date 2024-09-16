@@ -160,15 +160,12 @@ watch(
       v-for="(entry, index) in mergedValues"
       :key="index"
       aria-label="Listen Eintrag"
-      class="border-b-1 border-blue-300"
-      :class="
-        index == 0 ? 'first:border-t-1' : 'first:border-t-0 last:border-b-0'
-      "
     >
       <div
         v-if="!isSelected(entry)"
         :key="index"
-        class="group flex gap-8 py-16"
+        class="group flex gap-8 border-b-1 border-blue-300 py-16"
+        :class="{ 'border-t-1': index == 0 }"
       >
         <component :is="summaryComponent" :data="entry" />
         <Tooltip text="Aufklappen">
@@ -199,6 +196,7 @@ watch(
         v-if="isSelected(entry)"
         v-model="modelValueList[index]"
         class="py-24"
+        :class="{ 'pt-0': index == 0 }"
         :is-saved="isSaved(modelValue, modelValueList[index])"
         :model-value-list="modelValueList"
         @add-entry="updateModel"
