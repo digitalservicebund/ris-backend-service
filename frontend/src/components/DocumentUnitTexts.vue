@@ -35,41 +35,6 @@ const data = computed(() => {
   ).filter(isEditableByUser)
 })
 
-const isShortText = (textCategoryName: string) =>
-  [
-    "decisionName",
-    "headline",
-    "guidingPrinciple",
-    "headnote",
-    "otherHeadnote",
-  ].includes(textCategoryName)
-
-const isLongText = (textCategoryName: string) =>
-  ["tenor", "reasons", "caseFacts", "decisionReasons"].includes(
-    textCategoryName,
-  )
-
-const textCategories = computed(() =>
-  data.value
-    ? [
-        {
-          headline: "Kurztexte",
-          texts: data.value.filter((text) => isShortText(text.name)),
-        },
-        {
-          headline: "Langtexte",
-          texts: data.value.filter((text) => isLongText(text.name)),
-        },
-        {
-          headline: "Weitere Langtexte",
-          texts: data.value.filter(
-            (text) => !isShortText(text.name) && !isLongText(text.name),
-          ),
-        },
-      ].filter((category) => category.texts.length > 0)
-    : [],
-)
-
 const updateValueByTextId = async (id: keyof Texts, updatedText?: string) => {
   if (StringsUtil.isEmpty(updatedText)) {
     store.documentUnit!.texts[id] = undefined
@@ -87,46 +52,35 @@ const updateValueByTextId = async (id: keyof Texts, updatedText?: string) => {
 </script>
 
 <template>
-  <div class="core-data mb-16 flex flex-col bg-white p-32">
-    <h2 class="ds-heading-03-bold mb-24">Kurz- & Langtexte</h2>
+  <div class="core-data mb-16 flex flex-col gap-24 bg-white p-32">
+    <h2 class="ds-heading-03-bold">Kurz- & Langtexte</h2>
 
-    <template
-      v-for="(textCategory, index) in textCategories"
-      :key="textCategory.headline"
-    >
-      <h3 class="ds-heading-03-reg mb-16">{{ textCategory.headline }}</h3>
+    <div class="flex flex-col gap-24">
+      <div v-for="item in data" :key="item.id" class="">
+        <label class="ds-label-02-reg mb-4" :for="item.id">{{
+          item.label
+        }}</label>
 
-      <div class="flex flex-col gap-24">
-        <div v-for="item in textCategory.texts" :key="item.id">
-          <label class="ds-label-02-reg mb-4" :for="item.id">{{
-            item.label
-          }}</label>
+        <TextEditor
+          v-if="item.fieldType == TextAreaInput"
+          :id="item.id"
+          :aria-label="item.aria"
+          class="shadow-blue focus-within:shadow-focus hover:shadow-hover"
+          editable
+          :field-size="item.fieldSize"
+          :value="item.value"
+          @update-value="updateValueByTextId(item.id, $event)"
+        />
 
-          <TextEditor
-            v-if="item.fieldType == TextAreaInput"
-            :id="item.id"
-            :aria-label="item.aria"
-            class="shadow-blue focus-within:shadow-focus hover:shadow-hover"
-            editable
-            :field-size="item.fieldSize"
-            :value="item.value"
-            @update-value="updateValueByTextId(item.id, $event)"
-          />
-
-          <TextInput
-            v-else-if="item.fieldType == TextInput"
-            :id="item.id"
-            :aria-label="item.aria"
-            :model-value="item.value"
-            size="medium"
-            @update:model-value="updateValueByTextId(item.id, $event)"
-          />
-        </div>
+        <TextInput
+          v-else-if="item.fieldType == TextInput"
+          :id="item.id"
+          :aria-label="item.aria"
+          :model-value="item.value"
+          size="medium"
+          @update:model-value="updateValueByTextId(item.id, $event)"
+        />
       </div>
-      <hr
-        v-if="index < textCategories.length - 1"
-        class="my-24 border-blue-400"
-      />
-    </template>
+    </div>
   </div>
 </template>
