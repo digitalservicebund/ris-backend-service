@@ -14,7 +14,7 @@ import TableHeader from "@/components/TableHeader.vue"
 import TableRow from "@/components/TableRow.vue"
 import TableView from "@/components/TableView.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
-import useQuery, { Query } from "@/composables/useQueryFromRoute"
+import useQuery from "@/composables/useQueryFromRoute"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -30,28 +30,12 @@ const emptyResponse: ResponseError = {
 
 const router = useRouter()
 const selectedLegalPeriodical = ref<LegalPeriodical>()
-const currentEditions = ref<LegalPeriodicalEdition[]>()
-const { getQueryFromRoute, pushQueryToRoute, route, resetQuery } =
-  useQuery<"q">()
-const query = ref(getQueryFromRoute())
+const currentEditions = ref<LegalPeriodicalEdition[]>([])
+const { pushQueryToRoute, route, resetQuery } = useQuery<"q">()
 const searchResponseError = ref<ResponseError | undefined>(emptyResponse)
 const isLoading = ref(false)
 const editionStore = useEditionStore()
 const isInternalUser = useInternalUser()
-
-/**
- * Sets a timeout before pushing the search query to the route,
- * in order to only change the url params when the user input pauses.
- */
-const debouncedPushQueryToRoute = (() => {
-  let timeoutId: number | null = null
-
-  return (currentQuery: Query<string>) => {
-    if (timeoutId != null) window.clearTimeout(timeoutId)
-
-    timeoutId = window.setTimeout(() => pushQueryToRoute(currentQuery), 500)
-  }
-})()
 
 /**
  * Loads all editions of a legal periodical
@@ -78,9 +62,11 @@ async function addEdition() {
   })
   const response = await LegalPeriodicalEditionService.save(edition)
   editionStore.edition = new LegalPeriodicalEdition({ ...response.data })
+
   await router.push({
     name: "caselaw-periodical-evaluation-editionId-edition",
-    params: { editionId: response.data?.id },
+    params: { editionId: editionStore.edition.id },
+    query: {},
   })
 }
 
@@ -105,26 +91,21 @@ const legalPeriodical = computed({
 
 async function handleDeleteEdition(edition: LegalPeriodicalEdition) {
   if (edition?.id) {
-    await LegalPeriodicalEditionService.delete(edition.id)
-    await getEditions(selectedLegalPeriodical.value?.uuid?.toString() || "")
+    const response = await LegalPeriodicalEditionService.delete(edition.id)
+    if (!response.error) {
+      currentEditions.value = currentEditions.value.filter(
+        (item) => item.id !== edition.id,
+      )
+    }
   }
 }
-
-/**
- * Get query from url and set local query value
- */
-watch(route, () => {
-  const currentQuery = getQueryFromRoute()
-  if (JSON.stringify(query.value) != JSON.stringify(currentQuery))
-    query.value = currentQuery
-})
 
 watch(
   selectedLegalPeriodical,
   async (newFilter) => {
     if (newFilter && newFilter.uuid) {
       await getEditions(newFilter.uuid)
-      debouncedPushQueryToRoute({ q: newFilter.uuid })
+      pushQueryToRoute({ q: newFilter.uuid })
     } else {
       currentEditions.value = []
       resetQuery()
@@ -133,9 +114,13 @@ watch(
   { deep: true },
 )
 
+/**
+ * Check if there is an edition id param and load edition if present
+ */
 onMounted(() => {
-  if (query.value.q) {
-    getEditions(query.value.q)
+  const legalPeriodicalId = route.query.q as string
+  if (legalPeriodicalId) {
+    getEditions(legalPeriodicalId)
   }
 })
 </script>
