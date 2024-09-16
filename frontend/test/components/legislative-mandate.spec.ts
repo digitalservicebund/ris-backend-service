@@ -20,10 +20,12 @@ describe("legislative mandate", () => {
 
   afterEach(() => void vi.resetAllMocks())
   test("should have checkbox unchecked when legislative mandate is false", async () => {
+    // Arrange
     const headline = "Gesetzgebungsauftrag"
     const label = "Gesetzgebungsauftrag vorhanden"
-
     mockSessionStore(false)
+
+    // Act
     render(LegislativeMandate, {
       props: {
         headline: headline,
@@ -31,15 +33,19 @@ describe("legislative mandate", () => {
       },
     })
 
+    // Assert
     expect(screen.getByText(headline)).toBeInTheDocument()
     expect(screen.getByText(label)).toBeInTheDocument()
     expect(screen.getByTestId("legislative-mandate")).not.toBeChecked()
   })
 
   test("should have checkbox checked when legislative mandate is true", async () => {
+    // Arrange
     const headline = "Gesetzgebungsauftrag"
     const label = "Gesetzgebungsauftrag vorhanden"
     mockSessionStore(true)
+
+    // Act
     render(LegislativeMandate, {
       props: {
         headline: "Gesetzgebungsauftrag",
@@ -47,6 +53,7 @@ describe("legislative mandate", () => {
       },
     })
 
+    // Assert
     expect(screen.getByText(headline)).toBeInTheDocument()
     expect(screen.getByText(label)).toBeInTheDocument()
     expect(screen.getByTestId("legislative-mandate")).toBeChecked()

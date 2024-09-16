@@ -3,14 +3,15 @@ import CategoryWrapper from "@/components/CategoryWrapper.vue"
 
 describe("category wrapper", () => {
   test("should display button instead of category component", async () => {
-    const label = "Test label"
+    // Act
     render(CategoryWrapper, {
       props: {
-        label: label,
+        label: "Test label",
         shouldShowButton: true,
       },
     })
 
+    // Assert
     expect(screen.getByTestId("category-wrapper-button")).toBeInTheDocument()
     expect(
       screen.queryByTestId("category-wrapper-component"),
@@ -18,10 +19,10 @@ describe("category wrapper", () => {
   })
 
   test("should display category component instead of button", async () => {
-    const label = "Test label"
+    // Act
     render(CategoryWrapper, {
       props: {
-        label: label,
+        label: "Test label",
         shouldShowButton: false,
       },
       slots: {
@@ -29,6 +30,7 @@ describe("category wrapper", () => {
       },
     })
 
+    // Assert
     expect(
       screen.queryByTestId("category-wrapper-button"),
     ).not.toBeInTheDocument()
