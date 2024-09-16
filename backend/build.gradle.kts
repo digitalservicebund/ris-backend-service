@@ -190,7 +190,7 @@ dependencies {
 //        exclude(group = "org.slf4j", module = "slf4j-simple")
 //    }
     // for local development:
-     implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.8.59.jar"))
+     implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.10.5.jar"))
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 

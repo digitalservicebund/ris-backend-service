@@ -53,7 +53,8 @@ class XmlExporterTest {
             .documentNumber("document number")
             .previousDecisions(generatePreviousDecisions())
             .ensuingDecisions(generateEnsuingDecisions())
-            .texts(generateTexts())
+            .shortTexts(generateShortTexts())
+            .longTexts(generateLongTexts())
             .status(generateStatus())
             .contentRelatedIndexing(generateContentRelatedIndexing())
             .build();
@@ -186,7 +187,7 @@ class XmlExporterTest {
         .build();
   }
 
-  private LongTexts generateTexts() {
+  private LongTexts generateLongTexts() {
     return LongTexts.builder()
         .tenor("tenor")
         .reasons("reasons")

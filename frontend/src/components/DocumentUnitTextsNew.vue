@@ -4,6 +4,8 @@ import DocumentUnitShortTexts from "@/components/DocumentUnitShortTexts.vue"
 </script>
 
 <template>
-  <DocumentUnitShortTexts />
-  <DocumentUnitLongTexts />
+  <div class="flex flex-col bg-white p-32">
+    <DocumentUnitShortTexts />
+    <DocumentUnitLongTexts />
+  </div>
 </template>

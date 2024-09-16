@@ -1,6 +1,8 @@
 <script lang="ts" setup>
-import { computed } from "vue"
+import { computed, ref } from "vue"
+import CategoryWrapper from "@/components/CategoryWrapper.vue"
 import DocumentUnitTextField from "@/components/DocumentUnitTextField.vue"
+import TextInput from "@/components/input/TextInput.vue"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import StringsUtil from "@/utils/stringsUtil"
 
@@ -14,10 +16,39 @@ const store = useDocumentUnitStore()
 //   )
 // })
 //todo: validate border number links
+//todo: manage read-only for externals
+//todo: manage collapsed/expanded state
 const shortTexts = computed(() => {
   if (store.documentUnit == undefined) return null
   return store.documentUnit.shortTexts
 })
+
+const updateDecisionName = async (text?: string) => {
+  if (StringsUtil.isEmpty(text)) {
+    store.documentUnit!.shortTexts.decisionName = undefined
+  } else {
+    store.documentUnit!.shortTexts.decisionName = hasContent(text) ? text : ""
+  }
+}
+
+const decisionName = computed({
+  get: () => store.documentUnit?.shortTexts.decisionName,
+  set: (newValue) => {
+    if (StringsUtil.isEmpty(newValue)) {
+      store.documentUnit!.shortTexts.decisionName = undefined
+    } else {
+      store.documentUnit!.shortTexts.decisionName = hasContent(newValue)
+        ? newValue
+        : ""
+    }
+  },
+})
+
+const hasDecisionName = ref<boolean>(
+  store.documentUnit?.shortTexts?.decisionName
+    ? store.documentUnit?.shortTexts?.decisionName?.length > 0
+    : false,
+)
 
 const updateHeadline = async (text?: string) => {
   if (StringsUtil.isEmpty(text)) {
@@ -65,41 +96,76 @@ function hasContent(text?: string) {
 </script>
 
 <template>
-  <h2 class="ds-heading-03-bold">Kurztexte</h2>
+  <h2 class="ds-heading-03-bold mb-16">Kurztexte</h2>
   <div class="flex flex-col gap-24">
-    <!--add decision name -->
+    <CategoryWrapper
+      label="Entscheidungsname"
+      :should-show-button="!hasDecisionName"
+    >
+      <div class="flex flex-col">
+        <label class="ds-label-02-reg mb-4" for="'decisionName'">
+          Entscheidungsname
+        </label>
 
-    <DocumentUnitTextField
-      field-size="small"
-      label="Titelzeile"
-      name="headline"
-      :value="shortTexts?.headline"
-      @update-value="updateHeadline"
-    />
+        <TextInput
+          id="decisionName"
+          aria-label="decisionName"
+          :model-value="decisionName"
+          size="medium"
+          @update:model-value="updateDecisionName"
+        />
+      </div>
+    </CategoryWrapper>
 
-    <DocumentUnitTextField
-      field-size="medium"
-      label="Leitsatz"
-      name="guidingPrinciple"
-      :value="shortTexts?.guidingPrinciple"
-      @update-value="updateGuidingPrinciple"
-    />
+    <CategoryWrapper label="Titelzeile" should-show-button>
+      <DocumentUnitTextField
+        field-size="small"
+        label="Titelzeile"
+        name="headline"
+        :value="shortTexts?.headline"
+        @update-value="updateHeadline"
+      />
+    </CategoryWrapper>
 
-    <DocumentUnitTextField
-      field-size="medium"
-      label="Orientierungssatz"
-      name="headnote"
-      :value="shortTexts?.headnote"
-      @update-value="updateHeadnote"
-    />
+    <CategoryWrapper label="Titelzeile" should-show-button>
+      <DocumentUnitTextField
+        field-size="small"
+        label="Titelzeile"
+        name="headline"
+        :value="shortTexts?.headline"
+        @update-value="updateHeadline"
+      />
+    </CategoryWrapper>
 
-    <DocumentUnitTextField
-      collapsed-by-default
-      field-size="medium"
-      label="Sonstiger Orientierungssatz"
-      name="otherHeadnote"
-      :value="shortTexts?.otherHeadnote"
-      @update-value="updateOtherHeadnote"
-    />
+    <CategoryWrapper label="Leitsatz" should-show-button>
+      <DocumentUnitTextField
+        field-size="medium"
+        label="Leitsatz"
+        name="guidingPrinciple"
+        :value="shortTexts?.guidingPrinciple"
+        @update-value="updateGuidingPrinciple"
+      />
+    </CategoryWrapper>
+
+    <CategoryWrapper label="Orientierungssatz" should-show-button>
+      <DocumentUnitTextField
+        field-size="medium"
+        label="Orientierungssatz"
+        name="headnote"
+        :value="shortTexts?.headnote"
+        @update-value="updateHeadnote"
+      />
+    </CategoryWrapper>
+
+    <CategoryWrapper label="Sonstiger Orientierungssatz" should-show-button>
+      <DocumentUnitTextField
+        collapsed-by-default
+        field-size="medium"
+        label="Sonstiger Orientierungssatz"
+        name="otherHeadnote"
+        :value="shortTexts?.otherHeadnote"
+        @update-value="updateOtherHeadnote"
+      />
+    </CategoryWrapper>
   </div>
 </template>
