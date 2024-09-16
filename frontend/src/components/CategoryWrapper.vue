@@ -21,10 +21,11 @@ function toggle() {
     v-if="shouldShowButton"
     button-type="tertiary"
     :class="classes"
+    data-testId="category-wrapper-button"
     :icon="IconAdd"
     :label="label"
     size="small"
     @click="toggle"
   />
-  <slot v-else />
+  <div v-else data-testId="category-wrapper-component"><slot /></div>
 </template>
