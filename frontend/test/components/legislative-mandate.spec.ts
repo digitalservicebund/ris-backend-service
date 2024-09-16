@@ -5,10 +5,12 @@ import LegislativeMandate from "@/components/LegislativeMandate.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
-function mockSessionStore(hasLegislativeMandate: boolean) {
+function mockSessionStore(value: { legislativeMandate: boolean }) {
   const mockedSessionStore = useDocumentUnitStore()
   mockedSessionStore.documentUnit = new DocumentUnit("q834", {
-    contentRelatedIndexing: { hasLegislativeMandate: hasLegislativeMandate },
+    contentRelatedIndexing: {
+      hasLegislativeMandate: value.legislativeMandate,
+    },
   })
 
   return mockedSessionStore
@@ -23,7 +25,7 @@ describe("legislative mandate", () => {
     // Arrange
     const headline = "Gesetzgebungsauftrag"
     const label = "Gesetzgebungsauftrag vorhanden"
-    mockSessionStore(false)
+    mockSessionStore({ legislativeMandate: false })
 
     // Act
     render(LegislativeMandate, {
@@ -43,7 +45,7 @@ describe("legislative mandate", () => {
     // Arrange
     const headline = "Gesetzgebungsauftrag"
     const label = "Gesetzgebungsauftrag vorhanden"
-    mockSessionStore(true)
+    mockSessionStore({ legislativeMandate: true })
 
     // Act
     render(LegislativeMandate, {

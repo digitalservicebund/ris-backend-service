@@ -13,10 +13,12 @@ vi.mock("@/composables/useCourtType", () => {
     useInjectCourtType: () => courtTypeRef,
   }
 })
-function mockSessionStore(hasLegislativeMandate: boolean) {
+function mockSessionStore(value: { legislativeMandate: boolean }) {
   const mockedSessionStore = useDocumentUnitStore()
   mockedSessionStore.documentUnit = new DocumentUnit("q834", {
-    contentRelatedIndexing: { hasLegislativeMandate: hasLegislativeMandate },
+    contentRelatedIndexing: {
+      hasLegislativeMandate: value.legislativeMandate,
+    },
   })
 
   return mockedSessionStore
@@ -30,7 +32,7 @@ describe("other categories", () => {
   test("should not display legislative mandate when it is false and courtType is non-constitutional", async () => {
     // Arrange
     courtTypeRef = ref("BAG")
-    mockSessionStore(false)
+    mockSessionStore({ legislativeMandate: false })
 
     // Act
     render(OtherCategories)
@@ -46,7 +48,7 @@ describe("other categories", () => {
   test("should display legislative mandate button when it is false and courtType is constitutional", async () => {
     // Arrange
     courtTypeRef = ref("BVerfG")
-    mockSessionStore(false)
+    mockSessionStore({ legislativeMandate: false })
 
     // Act
     render(OtherCategories)
@@ -62,7 +64,7 @@ describe("other categories", () => {
   test("should display checked legislative mandate when it is true and has constitutional courtType", async () => {
     // Arrange
     courtTypeRef = ref("BVerfG")
-    mockSessionStore(true)
+    mockSessionStore({ legislativeMandate: true })
 
     // Act
     render(OtherCategories)
@@ -78,7 +80,7 @@ describe("other categories", () => {
   test("should display checked legislative mandate when it is true and has non-constitutional courtType", async () => {
     // Arrange
     courtTypeRef = ref("BAG")
-    mockSessionStore(true)
+    mockSessionStore({ legislativeMandate: true })
 
     // Act
     render(OtherCategories)
