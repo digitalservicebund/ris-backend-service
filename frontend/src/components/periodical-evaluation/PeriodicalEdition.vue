@@ -60,6 +60,7 @@ async function saveEdition() {
     await router.push({
       name: "caselaw-periodical-evaluation-editionId-references",
       params: { editionId: edition?.value?.id },
+      query: {},
     })
   }
 }

@@ -209,6 +209,9 @@ test.describe(
             ).toBeHidden()
             await page.reload()
             await expect(
+              page.getByTestId("periodical-evaluation-title"),
+            ).toBeVisible()
+            await expect(
               page.getByText(name + "WdG0" + formattedDate),
             ).toBeHidden()
           })
