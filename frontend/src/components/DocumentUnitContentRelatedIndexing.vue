@@ -8,7 +8,7 @@ import OtherCategories from "@/components/OtherCategories.vue"
 
 <template>
   <div class="flex flex-col gap-24 bg-white p-24">
-    <h2 class="ds-heading-03-bold">Inhaltliche Erschließung</h2>
+    <h2 class="ds-subhead">Inhaltliche Erschließung</h2>
     <KeyWords />
     <FieldOfLawMain />
     <Norms />

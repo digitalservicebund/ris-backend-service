@@ -12,13 +12,10 @@ interface Props {
   title: string
   dataSet: any // eslint-disable-line @typescript-eslint/no-explicit-any
   summaryComponent?: Component
-  fallbackText?: string
-  borderBottom?: boolean
 }
 
 withDefaults(defineProps<Props>(), {
   summaryComponent: DataSetSummary,
-  fallbackText: undefined,
   borderBottom: false,
 })
 
@@ -48,10 +45,6 @@ function scrollToTop() {
   <ExpandableContent
     v-model:is-expanded="isExpanded"
     class="border-gray-400 bg-white"
-    :class="{
-      'hover:border-blue-500 hover:bg-blue-200': !isExpanded,
-      'border-b': borderBottom,
-    }"
   >
     <template #open-icon>
       <IconExpandMore />
@@ -62,15 +55,10 @@ function scrollToTop() {
     </template>
 
     <template #header>
-      <div id="expandableHeader" class="flex w-full flex-col gap-24">
-        <h2 class="ds-heading-03-reg">
+      <div id="expandableHeader" class="flex w-full flex-col">
+        <h2 class="ds-label-01-bold">
           {{ title }}
         </h2>
-        <span
-          v-if="dataSet?.length === 0 && fallbackText !== undefined"
-          class="ds-label-02-reg text-start"
-          >{{ fallbackText }}</span
-        >
         <Component :is="summaryComponent" v-if="!isExpanded" :data="dataSet" />
       </div>
     </template>

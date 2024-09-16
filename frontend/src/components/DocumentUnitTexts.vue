@@ -53,7 +53,7 @@ const updateValueByTextId = async (id: keyof Texts, updatedText?: string) => {
 
 <template>
   <div class="core-data mb-16 flex flex-col gap-24 bg-white p-24">
-    <h2 class="ds-heading-03-bold">Kurz- & Langtexte</h2>
+    <h2 class="ds-subhead">Kurz- & Langtexte</h2>
     <div class="flex flex-col gap-24">
       <div v-for="item in data" :key="item.id" class="">
         <label class="ds-label-02-reg mb-4" :for="item.id">{{

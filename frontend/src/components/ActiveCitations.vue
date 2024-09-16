@@ -20,7 +20,7 @@ const defaultValue = new ActiveCitation() as ActiveCitation
 
 <template>
   <div aria-label="Aktivzitierung">
-    <h2 class="ds-heading-03-reg mb-16">Aktivzitierung</h2>
+    <h2 class="ds-label-01-bold mb-16">Aktivzitierung</h2>
     <div class="flex flex-row">
       <div class="flex-1">
         <EditableList

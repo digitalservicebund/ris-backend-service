@@ -6,7 +6,7 @@ import PreviousDecisions from "@/components/PreviousDecisions.vue"
 
 <template>
   <div class="flex flex-col gap-24 bg-white p-24">
-    <h2 class="ds-heading-03-bold">Rechtszug</h2>
+    <h2 class="ds-subhead">Rechtszug</h2>
     <PreviousDecisions :id="DocumentUnitCatagoriesEnum.PROCEEDINGS_DECISIONS" />
     <EnsuingDecisions />
   </div>

@@ -49,7 +49,7 @@ watch(
     aria-label="Stammdaten"
     class="core-data flex flex-col gap-24 bg-white p-24"
   >
-    <h2 class="ds-heading-03-bold">Stammdaten</h2>
+    <h2 class="ds-subhead">Stammdaten</h2>
     <NestedComponent aria-label="Fehlerhaftes Gericht" class="w-full">
       <InputField id="court" v-slot="slotProps" label="Gericht *">
         <ComboboxInput
