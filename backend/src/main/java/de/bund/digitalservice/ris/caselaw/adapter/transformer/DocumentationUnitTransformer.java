@@ -15,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ParticipatingJudgeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
@@ -29,6 +30,7 @@ import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -117,6 +119,7 @@ public class DocumentationUnitTransformer {
       addNormReferences(builder, contentRelatedIndexing);
       addJobProfiles(builder, contentRelatedIndexing);
       builder.hasLegislativeMandate(contentRelatedIndexing.hasLegislativeMandate());
+      addParticipatingJudges(builder, contentRelatedIndexing);
     }
 
     if (updatedDomainObject.texts() != null) {
@@ -259,6 +262,29 @@ public class DocumentationUnitTransformer {
     }
 
     builder.jobProfiles(jobProfileDTOs);
+  }
+
+  private static void addParticipatingJudges(
+      DocumentationUnitDTOBuilder builder, ContentRelatedIndexing contentRelatedIndexing) {
+    if (contentRelatedIndexing.participatingJudges() == null) {
+      return;
+    }
+
+    List<ParticipatingJudgeDTO> participatingJudgeDTOS = new ArrayList<>();
+    List<ParticipatingJudge> participatingJudges =
+        contentRelatedIndexing.participatingJudges().stream().distinct().toList();
+
+    for (int i = 0; i < participatingJudges.size(); i++) {
+      ParticipatingJudgeDTO dto =
+          ParticipatingJudgeDTO.builder()
+              .referencedOpinions(participatingJudges.get(i).referencedOpinions())
+              .name(participatingJudges.get(i).name())
+              .rank(i + 1L)
+              .build();
+      participatingJudgeDTOS.add(dto);
+    }
+
+    builder.participatingJudges(participatingJudgeDTOS);
   }
 
   private static void addEnsuingAndPendingDecisions(
@@ -587,6 +613,20 @@ public class DocumentationUnitTransformer {
 
     contentRelatedIndexingBuilder.hasLegislativeMandate(
         documentationUnitDTO.isHasLegislativeMandate());
+
+    if (documentationUnitDTO.getParticipatingJudges() != null) {
+      List<ParticipatingJudge> participatingJudges =
+          documentationUnitDTO.getParticipatingJudges().stream()
+              .map(
+                  dto ->
+                      ParticipatingJudge.builder()
+                          .id(dto.getId())
+                          .name(dto.getName())
+                          .referencedOpinions(dto.getReferencedOpinions())
+                          .build())
+              .toList();
+      contentRelatedIndexingBuilder.participatingJudges(participatingJudges);
+    }
 
     ContentRelatedIndexing contentRelatedIndexing = contentRelatedIndexingBuilder.build();
 

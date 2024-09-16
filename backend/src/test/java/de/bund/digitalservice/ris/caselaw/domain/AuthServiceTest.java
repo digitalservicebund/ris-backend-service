@@ -295,6 +295,7 @@ class AuthServiceTest {
         "/contentRelatedIndexing/activeCitations",
         "/contentRelatedIndexing/jobProfiles",
         "/contentRelatedIndexing/hasLegislativeMandate",
+        "/contentRelatedIndexing/participatingJudges",
         "/texts/decisionName",
         "/texts/headline",
         "/texts/guidingPrinciple",

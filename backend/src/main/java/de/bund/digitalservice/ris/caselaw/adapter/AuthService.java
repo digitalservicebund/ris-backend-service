@@ -77,6 +77,7 @@ public class AuthService {
           "/contentRelatedIndexing/activeCitations",
           "/contentRelatedIndexing/jobProfiles",
           "/contentRelatedIndexing/hasLegislativeMandate",
+          "/contentRelatedIndexing/participatingJudges",
           "/texts/decisionName",
           "/texts/headline",
           "/texts/guidingPrinciple",

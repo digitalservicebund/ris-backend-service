@@ -20,6 +20,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNo
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ParticipatingJudgeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
@@ -41,6 +42,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalForceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.Region;
 import java.time.Instant;
 import java.time.Year;
@@ -669,6 +671,29 @@ class DocumentationUnitTransformerTest {
   }
 
   @Test
+  void testTransformToDTO_withSameParticipatingJudges_shouldMakeJudgesDistinct() {
+    ParticipatingJudge participatingJudge = ParticipatingJudge.builder().name("Judge A").build();
+    DocumentationUnit documentationUnit =
+        generateSimpleDocumentationUnitBuilder()
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .participatingJudges(List.of(participatingJudge, participatingJudge))
+                    .build())
+            .build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(
+            DocumentationUnitDTO.builder().build(), documentationUnit);
+
+    assertThat(documentationUnitDTO.getParticipatingJudges()).hasSize(1);
+    assertThat(documentationUnitDTO.getParticipatingJudges())
+        .extracting("name")
+        .containsExactly("Judge A");
+    assertThat(documentationUnitDTO.getParticipatingJudges().get(0).getReferencedOpinions())
+        .isNull();
+  }
+
+  @Test
   void testTransformToDomain_withDocumentationUnitDTOIsNull_shouldReturnEmptyDocumentationUnit() {
 
     assertThatThrownBy(() -> DocumentationUnitTransformer.transformToDomain(null))
@@ -1089,6 +1114,58 @@ class DocumentationUnitTransformerTest {
     assertThat(documentationUnit.contentRelatedIndexing().hasLegislativeMandate()).isFalse();
   }
 
+  @Test
+  void testTransformToDomain_withParticipatingJudges_shouldAddParticipatingJudges() {
+    ParticipatingJudgeDTO participatingJudgeA =
+        ParticipatingJudgeDTO.builder().name("Judge A").referencedOpinions("Opinion A").build();
+    ParticipatingJudgeDTO participatingJudgeB =
+        ParticipatingJudgeDTO.builder().name("Judge B").referencedOpinions("Opinion B").build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder()
+            .participatingJudges(List.of(participatingJudgeA, participatingJudgeB))
+            .build();
+
+    DocumentationUnit documentationUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentationUnit.contentRelatedIndexing().participatingJudges()).hasSize(2);
+    assertThat(documentationUnit.contentRelatedIndexing().participatingJudges().get(0).id())
+        .isEqualTo(participatingJudgeA.getId());
+    assertThat(documentationUnit.contentRelatedIndexing().participatingJudges().get(0).name())
+        .isEqualTo(participatingJudgeA.getName());
+    assertThat(
+            documentationUnit
+                .contentRelatedIndexing()
+                .participatingJudges()
+                .get(0)
+                .referencedOpinions())
+        .isEqualTo(participatingJudgeA.getReferencedOpinions());
+    assertThat(documentationUnit.contentRelatedIndexing().participatingJudges().get(1).id())
+        .isEqualTo(participatingJudgeB.getId());
+
+    assertThat(documentationUnit.contentRelatedIndexing().participatingJudges().get(1).name())
+        .isEqualTo(participatingJudgeB.getName());
+    assertThat(
+            documentationUnit
+                .contentRelatedIndexing()
+                .participatingJudges()
+                .get(1)
+                .referencedOpinions())
+        .isEqualTo(participatingJudgeB.getReferencedOpinions());
+  }
+
+  @Test
+  void testTransformToDomain_withoutParticipatingJudges_shouldAddEmptyList() {
+
+    DocumentationUnitDTO documentationUnitDTO = generateSimpleDTOBuilder().build();
+
+    DocumentationUnit documentationUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentationUnit.contentRelatedIndexing().participatingJudges()).isEmpty();
+  }
+
   private DocumentationUnit.DocumentationUnitBuilder generateSimpleDocumentationUnitBuilder() {
     return DocumentationUnit.builder()
         .previousDecisions(Collections.emptyList())
@@ -1103,6 +1180,8 @@ class DocumentationUnitTransformerTest {
                 .norms(Collections.emptyList())
                 .activeCitations(Collections.emptyList())
                 .jobProfiles(Collections.emptyList())
+                .hasLegislativeMandate(false)
+                .participatingJudges(Collections.emptyList())
                 .build())
         .references(Collections.emptyList());
   }
