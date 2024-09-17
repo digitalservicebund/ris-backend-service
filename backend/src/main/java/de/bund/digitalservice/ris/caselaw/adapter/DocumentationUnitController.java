@@ -286,7 +286,8 @@ public class DocumentationUnitController {
     try {
       HandoverMail handoverMail =
           handoverService.handoverDocumentationUnitAsMail(uuid, userService.getEmail(oidcUser));
-      if (!handoverMail.isSuccess()) {
+      if (handoverMail == null || !handoverMail.isSuccess()) {
+        log.warn("Failed to send mail for documentation unit {}", uuid);
         return ResponseEntity.unprocessableEntity().body(handoverMail);
       }
       return ResponseEntity.ok(handoverMail);

@@ -272,7 +272,13 @@ class DocumentationUnitControllerAuthTest {
         .expectStatus()
         .isForbidden();
 
-    risWebTestClient.withLogin(docOffice2Group).put().uri(uri).exchange().expectStatus().isOk();
+    risWebTestClient
+        .withLogin(docOffice2Group)
+        .put()
+        .uri(uri)
+        .exchange()
+        .expectStatus()
+        .is4xxClientError();
   }
 
   @Test

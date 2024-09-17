@@ -48,7 +48,7 @@ onMounted(async () => {
   featureToggle.value = (
     await FeatureToggleService.isEnabled("neuris.evaluation-handover")
   ).data
-  if (referencesMissing.value || !store.edition) return
+  if (!numberOfReferences.value || !store.edition) return
   const previewResponse = await HandoverEditionService.getPreview(
     store.edition.id!,
   )
@@ -60,7 +60,7 @@ onMounted(async () => {
 })
 
 function handoverEdition() {
-  if (referencesMissing.value) {
+  if (!numberOfReferences.value) {
     frontendError.value = {
       title: "Es sind noch keine Fundstellen vermerkt.",
       description: "Die Ausgabe kann nicht übergeben werden.",
@@ -81,8 +81,8 @@ function getHeader(item: EventRecord) {
   }
 }
 
-const referencesMissing = computed(() => {
-  return !store.edition?.references?.length
+const numberOfReferences = computed(() => {
+  return store.edition?.references?.length
 })
 </script>
 
@@ -92,31 +92,23 @@ const referencesMissing = computed(() => {
     class="flex-start flex max-w-[80rem] flex-col justify-start gap-40"
   >
     <h1 class="ds-heading-02-reg">Übergabe an jDV</h1>
-    <div aria-label="Plausibilitätsprüfung" class="flex flex-row gap-16">
-      <div class="w-[15.625rem]">
-        <p class="ds-subhead">Plausibilitätsprüfung</p>
+    <div aria-label="Datenprüfung" class="flex flex-row">
+      <div v-if="!numberOfReferences" class="flex flex-row items-center gap-8">
+        <IconErrorOutline class="text-red-800" />
+        <p class="flexds-body-01-reg">
+          Es wurden noch keine Fundstellen hinzugefügt
+        </p>
       </div>
-      <div v-if="referencesMissing" class="flex flex-row gap-8">
-        <div>
-          <IconErrorOutline class="text-red-800" />
-        </div>
-        <div class="flex flex-col gap-32">
-          <div>
-            <p class="ds-body-01-reg">
-              Es wurden noch keine Fundstellen hinzugefügt
-            </p>
-          </div>
-        </div>
-      </div>
-      <div v-else class="flex flex-row gap-8">
+      <div v-else class="flex flex-row items-center gap-8">
         <IconCheck class="text-green-700" />
-        <p class="ds-body-01-reg">Alle Pflichtfelder sind korrekt ausgefüllt</p>
+        <p class="ds-body-01-reg">
+          Die Ausgabe enthält {{ numberOfReferences }} Fundstellen
+        </p>
       </div>
     </div>
-    <div class="border-b-1 border-b-gray-400"></div>
 
     <ExpandableContent
-      v-if="!referencesMissing && preview && preview.length > 0"
+      v-if="numberOfReferences > 0 && preview && preview.length > 0"
       as-column
       class="border-b-1 border-r-1 border-gray-400 bg-white p-10"
       :data-set="preview"
@@ -203,6 +195,7 @@ const referencesMissing = computed(() => {
                 v-for="(attachment, attachmentIndex) in (item as HandoverMail)
                   .attachments"
                 :key="attachmentIndex"
+                class="mb-16"
                 :title="attachment.fileName!"
                 :xml="attachment.fileContent!"
               />

@@ -8,7 +8,7 @@ import EventRecord, {
 } from "@/domain/eventRecord"
 import errorMessages from "@/i18n/errors.json"
 
-interface HandoverService {
+interface HandoverDocumentationUnitService {
   handoverDocument(
     documentUnitUuid: string,
   ): Promise<ServiceResponse<HandoverMail>>
@@ -16,7 +16,7 @@ interface HandoverService {
   getPreview(documentUnitUuid: string): Promise<ServiceResponse<Preview>>
 }
 
-const service: HandoverService = {
+const service: HandoverDocumentationUnitService = {
   async handoverDocument(documentUnitUuid: string) {
     const response = await httpClient.put<string, HandoverMail>(
       `caselaw/documentunits/${documentUnitUuid}/handover`,
