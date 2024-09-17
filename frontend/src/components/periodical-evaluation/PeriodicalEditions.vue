@@ -2,6 +2,7 @@
 import { computed, ref, watch, onMounted } from "vue"
 import { useRouter } from "vue-router"
 import DateUtil from "../../utils/dateUtil"
+import Tooltip from "../Tooltip.vue"
 import CellHeaderItem from "@/components/CellHeaderItem.vue"
 import CellItem from "@/components/CellItem.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
@@ -186,17 +187,19 @@ onMounted(() => {
           </CellItem>
           <CellItem class="flex">
             <div class="float-end flex">
-              <router-link
-                v-if="isInternalUser"
-                class="cursor-pointer border-2 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
-                target="_blank"
-                :to="{
-                  name: 'caselaw-periodical-evaluation-editionId-references',
-                  params: { editionId: edition.id },
-                }"
-              >
-                <IconEdit class="text-blue-800" />
-              </router-link>
+              <Tooltip v-if="isInternalUser" text="Bearbeiten">
+                <router-link
+                  class="flex cursor-pointer border-2 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
+                  target="_blank"
+                  :to="{
+                    name: 'caselaw-periodical-evaluation-editionId-references',
+                    params: { editionId: edition.id },
+                  }"
+                >
+                  <IconEdit class="text-blue-800" />
+                </router-link>
+              </Tooltip>
+
               <div
                 v-else
                 aria-label="Ausgabe kann nicht editiert werden"
@@ -204,15 +207,19 @@ onMounted(() => {
               >
                 <IconEdit />
               </div>
-              <button
+              <Tooltip
                 v-if="edition.references?.length == 0 && isInternalUser"
-                aria-label="Ausgabe löschen"
-                class="cursor-pointer border-2 border-l-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
-                @click="handleDeleteEdition(edition)"
-                @keyup.enter="handleDeleteEdition(edition)"
+                text="Löschen"
               >
-                <IconDelete class="text-blue-800" />
-              </button>
+                <button
+                  aria-label="Ausgabe löschen"
+                  class="flex cursor-pointer border-2 border-l-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
+                  @click="handleDeleteEdition(edition)"
+                  @keyup.enter="handleDeleteEdition(edition)"
+                >
+                  <IconDelete class="text-blue-800" />
+                </button>
+              </Tooltip>
 
               <div
                 v-else

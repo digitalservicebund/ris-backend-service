@@ -1,14 +1,14 @@
-import EventRecord from "@/domain/eventRecord"
-import service from "@/services/handoverService"
+import { HandoverMail } from "@/domain/eventRecord"
+import service from "@/services/handoverDocumentationUnitService"
 
 // TODO as stated in https://vitest.dev/api/vi.html#vi-mock, the vi.mock is the same for all tests. This should be refactored
-describe("handoverService", () => {
+describe("handoverDocumentationUnitService", () => {
   it("returns error message if event report contains error but status is success", async () => {
     vi.mock("@/services/httpClient", () => {
-      const testXml: EventRecord = { success: false }
+      const testXml: HandoverMail = new HandoverMail({ success: false })
       return {
         default: {
-          put: vi.fn().mockReturnValue({ status: 200, data: testXml }),
+          put: vi.fn().mockReturnValue({ status: 422, data: testXml }),
         },
       }
     })

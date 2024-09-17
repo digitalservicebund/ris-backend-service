@@ -1,13 +1,16 @@
-import EventRecord from "@/domain/eventRecord"
+import { HandoverMail } from "@/domain/eventRecord"
 import service from "@/services/handoverEditionService"
 
-describe("handoverService", () => {
+describe("handoverDocumentationUnitService", () => {
   it("returns error message if event report contains error but status is success", async () => {
     vi.mock("@/services/httpClient", () => {
-      const testXml: EventRecord = { success: false }
+      const testXml: HandoverMail = new HandoverMail({
+        success: false,
+        date: "2021-01-01",
+      })
       return {
         default: {
-          put: vi.fn().mockReturnValue({ status: 200, data: testXml }),
+          put: vi.fn().mockReturnValue({ status: 422, data: testXml }),
         },
       }
     })

@@ -62,14 +62,7 @@ public class HandoverService {
       UUID documentationUnitId, String issuerAddress) throws DocumentationUnitNotExistsException {
 
     DocumentationUnit documentationUnit = repository.findByUuid(documentationUnitId);
-
-    HandoverMail handoverMail =
-        mailService.handOver(documentationUnit, recipientAddress, issuerAddress);
-    if (!handoverMail.success()) {
-      log.warn("Failed to send mail for documentation unit {}", documentationUnitId);
-    }
-
-    return handoverMail;
+    return mailService.handOver(documentationUnit, recipientAddress, issuerAddress);
   }
 
   /**

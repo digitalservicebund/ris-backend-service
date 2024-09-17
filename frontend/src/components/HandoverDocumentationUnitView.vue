@@ -10,12 +10,16 @@ import ActiveCitation, { activeCitationLabels } from "@/domain/activeCitation"
 import EnsuingDecision, {
   ensuingDecisionFieldLabels,
 } from "@/domain/ensuingDecision"
-import EventRecord, { EventRecordType } from "@/domain/eventRecord"
+import EventRecord, {
+  EventRecordType,
+  HandoverMail,
+  Preview,
+} from "@/domain/eventRecord"
 import PreviousDecision, {
   previousDecisionFieldLabels,
 } from "@/domain/previousDecision"
 import { fieldLabels } from "@/fields/caselaw"
-import handoverService from "@/services/handoverService"
+import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import IconCheck from "~icons/ic/baseline-check"
@@ -25,7 +29,6 @@ import IconKeyboardArrowUp from "~icons/ic/baseline-keyboard-arrow-up"
 import IconHandover from "~icons/ic/outline-campaign"
 
 const props = defineProps<{
-  handoverResult?: EventRecord
   eventLog?: EventRecord[]
   errorMessage?: ResponseError
   succeedMessage?: { title: string; description: string }
@@ -45,7 +48,7 @@ const isFirstTimeHandover = computed(() => {
   return !props.eventLog || props.eventLog.length === 0
 })
 
-const preview = ref<EventRecord>()
+const preview = ref<Preview>()
 const frontendError = ref()
 const previewError = ref()
 const errorMessage = computed(
@@ -54,7 +57,7 @@ const errorMessage = computed(
 
 onMounted(async () => {
   if (fieldsMissing.value || isOutlineInvalid.value) return
-  const previewResponse = await handoverService.getPreview(
+  const previewResponse = await handoverDocumentationUnitService.getPreview(
     store.documentUnit!.uuid,
   )
   if (previewResponse.error) {
@@ -143,13 +146,13 @@ function getMissingEnsuingDecisionFields(ensuingDecision: EnsuingDecision) {
 function getHeader(item: EventRecord) {
   switch (item.type) {
     case EventRecordType.HANDOVER_REPORT:
-      return "Juris Protokoll - " + item.date
+      return "Juris Protokoll - " + item.getDate()
     case EventRecordType.HANDOVER:
-      return "Xml Email Abgabe - " + item.date
+      return "Xml Email Abgabe - " + item.getDate()
     case EventRecordType.MIGRATION:
-      return "Letzter Import/Delta Migration - " + item.date
+      return "Letzter Import/Delta Migration - " + item.getDate()
     default:
-      return "Unbekanntes Ereignis - " + item.date
+      return "Unbekanntes Ereignis - " + item.getDate()
   }
 }
 
@@ -385,7 +388,7 @@ const isOutlineInvalid = computed(
       :title="errorMessage.title"
     />
     <InfoModal
-      v-if="succeedMessage"
+      v-else-if="succeedMessage"
       aria-label="Erfolg der jDV Übergabe"
       class="mt-8"
       v-bind="succeedMessage"
@@ -427,32 +430,36 @@ const isOutlineInvalid = computed(
             <div
               v-if="item.type == EventRecordType.HANDOVER_REPORT"
               class="p-20"
-              v-html="item.content"
+              v-html="item.getContent()"
             />
-            <div v-else-if="item.type == EventRecordType.HANDOVER">
+            <div v-else-if="item instanceof HandoverMail">
               <div class="ds-label-section pt-20 text-gray-900">ÜBER</div>
               <div class="ds-label-02-reg">
                 <div>
                   <span class="ds-label-02-bold">E-Mail an:</span>
-                  {{ item.receiverAddress }}
+                  {{ (item as HandoverMail).receiverAddress }}
                 </div>
                 <div>
                   <span class="ds-label-02-bold"> Betreff: </span>
-                  {{ item.mailSubject }}
+                  {{ (item as HandoverMail).mailSubject }}
                 </div>
               </div>
               <div class="ds-label-section text-gray-900">ALS</div>
               <CodeSnippet
-                v-if="item.attachments?.[0]"
+                v-if="(item as HandoverMail).attachments?.[0]"
                 title="XML"
-                :xml="item.attachments?.[0].fileContent!"
+                :xml="(item as HandoverMail).attachments?.[0].fileContent!"
               />
             </div>
             <div
               v-else-if="item.type == EventRecordType.MIGRATION"
               class="p-20"
             >
-              <CodeSnippet v-if="!!item?.xml" title="XML" :xml="item.xml" />
+              <CodeSnippet
+                v-if="item.getContent()"
+                title="XML"
+                :xml="item.getContent()"
+              />
             </div>
           </ExpandableContent>
         </div>
@@ -460,4 +467,4 @@ const isOutlineInvalid = computed(
     </div>
   </div>
 </template>
-@/services/handoverService @/domain/eventRecord
+@/services/handoverDocumentationUnitService @/domain/eventRecord

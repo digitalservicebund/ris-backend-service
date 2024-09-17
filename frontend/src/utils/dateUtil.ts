@@ -7,4 +7,8 @@ export default class DateUtil {
     const parsedDate = dayjs(date, "YYYY-MM-DD", true)
     return parsedDate.isValid() ? parsedDate.format("DD.MM.YYYY") : undefined
   }
+
+  public static formatDateTime(date: string | Date): string {
+    return dayjs(date).format("DD.MM.YYYY [um] HH:mm [Uhr]")
+  }
 }

@@ -3,7 +3,7 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import EditionHandover from "@/components/EditionHandover.vue"
-import { EventRecordType } from "@/domain/eventRecord"
+import { HandoverMail, HandoverReport, Preview } from "@/domain/eventRecord"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import Reference from "@/domain/reference"
 import handoverEditionService from "@/services/handoverEditionService"
@@ -46,11 +46,7 @@ describe("Edition Handover", () => {
   vi.spyOn(handoverEditionService, "getEventLog").mockImplementation(() =>
     Promise.resolve({
       status: 200,
-      data: [
-        {
-          type: EventRecordType.HANDOVER_REPORT,
-        },
-      ],
+      data: [new HandoverReport({})],
     }),
   )
   test("renders successfully", async () => {
@@ -94,30 +90,23 @@ describe("Edition Handover", () => {
     vi.spyOn(handoverEditionService, "getEventLog").mockImplementation(() =>
       Promise.resolve({
         status: 200,
-        data: [
-          {
-            type: EventRecordType.HANDOVER_REPORT,
-          },
-        ],
+        data: [new HandoverReport({})],
       }),
     )
     vi.spyOn(handoverEditionService, "handoverEdition").mockImplementation(() =>
       Promise.resolve({
         status: 200,
-        data: {
-          type: EventRecordType.HANDOVER_REPORT,
-          success: true,
-        },
+        data: new HandoverMail({ success: true }),
       }),
     )
     vi.spyOn(handoverEditionService, "getPreview").mockImplementation(() =>
       Promise.resolve({
         status: 200,
         data: [
-          {
+          new Preview({
             xml: "<xml>all good</xml>",
             success: true,
-          },
+          }),
         ],
       }),
     )

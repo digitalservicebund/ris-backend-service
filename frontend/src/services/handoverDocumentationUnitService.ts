@@ -1,18 +1,24 @@
 import httpClient, { ServiceResponse } from "./httpClient"
-import EventRecord from "@/domain/eventRecord"
+import EventRecord, {
+  DeltaMigration,
+  EventRecordType,
+  HandoverMail,
+  HandoverReport,
+  Preview,
+} from "@/domain/eventRecord"
 import errorMessages from "@/i18n/errors.json"
 
-interface HandoverService {
+interface HandoverDocumentationUnitService {
   handoverDocument(
     documentUnitUuid: string,
-  ): Promise<ServiceResponse<EventRecord>>
+  ): Promise<ServiceResponse<HandoverMail>>
   getEventLog(documentUnitUuid: string): Promise<ServiceResponse<EventRecord[]>>
-  getPreview(documentUnitUuid: string): Promise<ServiceResponse<EventRecord>>
+  getPreview(documentUnitUuid: string): Promise<ServiceResponse<Preview>>
 }
 
-const service: HandoverService = {
+const service: HandoverDocumentationUnitService = {
   async handoverDocument(documentUnitUuid: string) {
-    const response = await httpClient.put<string, EventRecord>(
+    const response = await httpClient.put<string, HandoverMail>(
       `caselaw/documentunits/${documentUnitUuid}/handover`,
       {
         headers: { "Content-Type": "text/plain" },
@@ -64,11 +70,25 @@ const service: HandoverService = {
           }
         : undefined
 
+    const eventLog: EventRecord[] = []
+    if (response.data) {
+      for (const event of response.data) {
+        if (event.type === EventRecordType.HANDOVER) {
+          eventLog.push(new HandoverMail(event))
+        } else if (event.type === EventRecordType.HANDOVER_REPORT) {
+          eventLog.push(new HandoverReport(event))
+        } else if (event.type === EventRecordType.MIGRATION) {
+          eventLog.push(new DeltaMigration(event))
+        }
+      }
+    }
+    response.data = eventLog
+
     return response
   },
 
   async getPreview(documentUnitUuid: string) {
-    const response = await httpClient.get<EventRecord>(
+    const response = await httpClient.get<HandoverMail>(
       `caselaw/documentunits/${documentUnitUuid}/preview-xml`,
     )
 

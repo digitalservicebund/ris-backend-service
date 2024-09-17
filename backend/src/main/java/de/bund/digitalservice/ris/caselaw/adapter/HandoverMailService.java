@@ -88,10 +88,10 @@ public class HandoverMailService implements MailService {
             List.of(xml),
             issuerAddress,
             HandoverEntityType.DOCUMENTATION_UNIT);
-    generateAndSendMail(handoverMail);
     if (!handoverMail.success()) {
       return handoverMail;
     }
+    generateAndSendMail(handoverMail);
     return repository.save(handoverMail);
   }
 
@@ -176,7 +176,7 @@ public class HandoverMailService implements MailService {
 
   private String generateMailSubject(DocumentationUnit documentationUnit) {
     if (documentationUnit.documentNumber() == null) {
-      throw new HandoverException("No document number has set in the document unit.");
+      throw new HandoverException("No document number has been set in the document unit.");
     }
     return generateMailSubject(documentationUnit.documentNumber(), "N");
   }
