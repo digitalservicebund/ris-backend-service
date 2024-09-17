@@ -3,6 +3,7 @@ import { computed, ref } from "vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
 import JobProfiles from "@/components/JobProfiles.vue"
 import LegislativeMandate from "@/components/LegislativeMandate.vue"
+import ParticipatingJudges from "@/components/ParticipatingJudges.vue"
 import { useInjectCourtType } from "@/composables/useCourtType"
 import constitutionalCourtTypes from "@/data/constitutionalCourtTypes.json"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -24,6 +25,12 @@ const shouldDisplayLegislativeMandateCategory = computed(() => {
     hasLegislativeMandate.value
   )
 })
+const hasParticipatingJudges = ref<boolean>(
+  store.documentUnit?.contentRelatedIndexing?.participatingJudges
+    ? store.documentUnit?.contentRelatedIndexing?.participatingJudges?.length >
+        0
+    : false,
+)
 </script>
 
 <template>
@@ -42,6 +49,12 @@ const shouldDisplayLegislativeMandateCategory = computed(() => {
           headline="Gesetzgebungsauftrag"
           label="Gesetzgebungsauftrag vorhanden"
         />
+      </CategoryWrapper>
+      <CategoryWrapper
+        label="Mitwirkende Richter"
+        :should-show-button="!hasParticipatingJudges"
+      >
+        <ParticipatingJudges label="Mitwirkende Richter" />
       </CategoryWrapper>
     </div>
   </div>

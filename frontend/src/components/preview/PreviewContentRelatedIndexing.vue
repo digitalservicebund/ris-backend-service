@@ -52,6 +52,12 @@ const hasJobProfiles = computed(() => {
 const hasLegislativeMandate = computed(() => {
   return contentRelatedIndexing.value.hasLegislativeMandate
 })
+const hasParticipatingJudges = computed(() => {
+  return (
+    contentRelatedIndexing.value.participatingJudges &&
+    contentRelatedIndexing.value.participatingJudges?.length > 0
+  )
+})
 </script>
 
 <template>
@@ -134,6 +140,19 @@ const hasLegislativeMandate = computed(() => {
     <PreviewRow v-if="hasLegislativeMandate">
       <PreviewCategory>Gesetzgebungsauftrag</PreviewCategory>
       <PreviewContent>Ja</PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="hasParticipatingJudges">
+      <PreviewCategory>Mitwirkende Richter</PreviewCategory>
+      <PreviewContent>
+        <div
+          v-for="(
+            participatingJudge, index
+          ) in contentRelatedIndexing.participatingJudges"
+          :key="index"
+        >
+          {{ participatingJudge.renderDecision }}
+        </div>
+      </PreviewContent>
     </PreviewRow>
   </FlexContainer>
 </template>

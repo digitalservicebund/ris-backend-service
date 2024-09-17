@@ -9,6 +9,7 @@ import Reference from "./reference"
 import SingleNorm from "./singleNorm"
 import Attachment from "@/domain/attachment"
 import LegalForce from "@/domain/legalForce"
+import ParticipatingJudge from "@/domain/participatingJudge"
 import { PublicationStatus } from "@/domain/publicationStatus"
 
 export type CoreData = {
@@ -39,6 +40,7 @@ export type ContentRelatedIndexing = {
   fieldsOfLaw?: FieldOfLaw[]
   jobProfiles?: string[]
   hasLegislativeMandate?: boolean
+  participatingJudges?: ParticipatingJudge[]
 }
 
 export type DocumentType = {
