@@ -33,16 +33,9 @@ async function validateRequiredInput() {
 }
 
 async function addParticipatingJudge() {
-  if (
-    !validationStore.getByMessage("Kein valides Datum").length &&
-    !validationStore.getByMessage("Unvollständiges Datum").length &&
-    !validationStore.getByMessage("Das Datum darf nicht in der Zukunft liegen")
-      .length
-  ) {
-    await validateRequiredInput()
-    emit("update:modelValue", participatingJudge.value as ParticipatingJudge)
-    emit("addEntry")
-  }
+  await validateRequiredInput()
+  emit("update:modelValue", participatingJudge.value as ParticipatingJudge)
+  emit("addEntry")
 }
 
 watch(
