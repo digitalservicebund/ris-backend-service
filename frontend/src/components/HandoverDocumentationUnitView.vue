@@ -388,7 +388,7 @@ const isOutlineInvalid = computed(
       :title="errorMessage.title"
     />
     <InfoModal
-      v-if="succeedMessage"
+      v-else-if="succeedMessage"
       aria-label="Erfolg der jDV Übergabe"
       class="mt-8"
       v-bind="succeedMessage"
