@@ -108,7 +108,12 @@ const numberOfReferences = computed(() => {
     </div>
 
     <ExpandableContent
-      v-if="numberOfReferences > 0 && preview && preview.length > 0"
+      v-if="
+        numberOfReferences &&
+        numberOfReferences > 0 &&
+        preview &&
+        preview.length > 0
+      "
       as-column
       class="border-b-1 border-r-1 border-gray-400 bg-white p-10"
       :data-set="preview"
