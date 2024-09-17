@@ -50,7 +50,13 @@ watch(
     class="core-data flex flex-col gap-24 bg-white p-24"
   >
     <h2 class="ds-subhead">Stammdaten</h2>
-    <NestedComponent aria-label="Fehlerhaftes Gericht" class="w-full">
+    <NestedComponent
+      aria-label="Fehlerhaftes Gericht"
+      class="w-full"
+      :is-open="
+        modelValue.deviatingCourts && modelValue.deviatingCourts.length > 0
+      "
+    >
       <InputField id="court" v-slot="slotProps" label="Gericht *">
         <ComboboxInput
           id="court"
@@ -77,6 +83,10 @@ watch(
       <NestedComponent
         aria-label="Abweichendes Aktenzeichen"
         class="w-full min-w-0"
+        :is-open="
+          modelValue.deviatingFileNumbers &&
+          modelValue.deviatingFileNumbers.length > 0
+        "
       >
         <InputField id="fileNumber" label="Aktenzeichen *">
           <ChipsInput
@@ -102,6 +112,10 @@ watch(
       <NestedComponent
         aria-label="Abweichendes Entscheidungsdatum"
         class="w-full"
+        :is-open="
+          modelValue.deviatingDecisionDates &&
+          modelValue.deviatingDecisionDates.length > 0
+        "
       >
         <InputField
           id="decisionDate"
@@ -169,7 +183,13 @@ watch(
     </div>
 
     <div class="flex flex-row gap-24">
-      <NestedComponent aria-label="Abweichender ECLI" class="w-full">
+      <NestedComponent
+        aria-label="Abweichender ECLI"
+        class="w-full"
+        :is-open="
+          modelValue.deviatingEclis && modelValue.deviatingEclis.length > 0
+        "
+      >
         <InputField id="ecli" class="flex-col" label="ECLI">
           <TextInput
             id="ecli"
@@ -191,7 +211,14 @@ watch(
         </template>
       </NestedComponent>
 
-      <NestedComponent aria-label="Vorgangshistorie" class="w-full">
+      <NestedComponent
+        aria-label="Vorgangshistorie"
+        class="w-full"
+        :is-open="
+          descendingPreviousProcedures &&
+          descendingPreviousProcedures.length > 0
+        "
+      >
         <InputField id="procedure" class="flex-col" label="Vorgang">
           <ComboboxInput
             id="procedure"
