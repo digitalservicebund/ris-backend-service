@@ -64,10 +64,9 @@ const closeTooltip = () => {
     <div
       v-if="tooltipVisible"
       class="ds-label-03-reg absolute left-[50%] top-[110%] z-20 w-max max-w-[18em] translate-x-[-50%] rounded bg-gray-900 px-8 py-4 text-center text-white"
-      role="tooltip"
     >
-      {{ props.text }}<br v-if="props.shortcut" />
-      {{ props.shortcut }}
+      {{ text }}
+      <div v-if="shortcut">{{ shortcut }}</div>
     </div>
   </div>
 </template>
