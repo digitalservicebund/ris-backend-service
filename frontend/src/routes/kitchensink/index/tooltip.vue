@@ -18,7 +18,10 @@ import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
       <Tooltip
         text="Tooltips shouldn’t really exceed one line, but sometimes it’s unavoidable"
       >
-        <TextButton button-type="primary" label="Hover me, I have a shortcut" />
+        <TextButton
+          button-type="primary"
+          label="Hover me, I have a long tooltip"
+        />
       </Tooltip>
     </div>
   </KitchensinkPage>

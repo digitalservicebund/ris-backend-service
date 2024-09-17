@@ -4,9 +4,9 @@ import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitHandover from "@/components/DocumentUnitHandover.vue"
 import DocumentUnit from "@/domain/documentUnit"
-import { EventRecordType } from "@/domain/eventRecord"
+import { HandoverMail, HandoverReport, Preview } from "@/domain/eventRecord"
 import documentUnitService from "@/services/documentUnitService"
-import handoverService from "@/services/handoverService"
+import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
 import routes from "~/test-helper/routes"
 
 function renderComponent() {
@@ -46,15 +46,12 @@ function renderComponent() {
   }
 }
 describe("Document Unit Handover", () => {
-  vi.spyOn(handoverService, "getEventLog").mockImplementation(() =>
-    Promise.resolve({
-      status: 200,
-      data: [
-        {
-          type: EventRecordType.HANDOVER_REPORT,
-        },
-      ],
-    }),
+  vi.spyOn(handoverDocumentationUnitService, "getEventLog").mockImplementation(
+    () =>
+      Promise.resolve({
+        status: 200,
+        data: [new HandoverReport()],
+      }),
   )
   test("renders successfully", async () => {
     renderComponent()
@@ -71,7 +68,10 @@ describe("Document Unit Handover", () => {
   })
 
   test("renders error", async () => {
-    vi.spyOn(handoverService, "getEventLog").mockImplementation(() =>
+    vi.spyOn(
+      handoverDocumentationUnitService,
+      "getEventLog",
+    ).mockImplementation(() =>
       Promise.resolve({
         status: 300,
         error: {
@@ -94,34 +94,34 @@ describe("Document Unit Handover", () => {
   })
 
   test.skip("renders handover result", async () => {
-    vi.spyOn(handoverService, "getEventLog").mockImplementation(() =>
+    vi.spyOn(
+      handoverDocumentationUnitService,
+      "getEventLog",
+    ).mockImplementation(() =>
       Promise.resolve({
         status: 300,
-        data: [
-          {
-            type: EventRecordType.HANDOVER_REPORT,
-          },
-        ],
+        data: [new HandoverReport()],
       }),
     )
 
-    vi.spyOn(handoverService, "handoverDocument").mockImplementation(() =>
+    vi.spyOn(
+      handoverDocumentationUnitService,
+      "handoverDocument",
+    ).mockImplementation(() =>
       Promise.resolve({
         status: 200,
-        data: {
-          type: EventRecordType.HANDOVER_REPORT,
-          success: true,
-        },
+        data: new HandoverMail({ success: true }),
       }),
     )
-    vi.spyOn(handoverService, "getPreview").mockImplementation(() =>
-      Promise.resolve({
-        status: 200,
-        data: {
-          xml: "<xml>all good</xml>",
-          success: true,
-        },
-      }),
+    vi.spyOn(handoverDocumentationUnitService, "getPreview").mockImplementation(
+      () =>
+        Promise.resolve({
+          status: 200,
+          data: new Preview({
+            xml: "<xml>all good</xml>",
+            success: true,
+          }),
+        }),
     )
     vi.spyOn(documentUnitService, "getByDocumentNumber").mockImplementation(
       () =>

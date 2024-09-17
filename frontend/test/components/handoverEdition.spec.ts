@@ -4,11 +4,11 @@ import { render, fireEvent, screen, waitFor } from "@testing-library/vue"
 import { Stubs } from "@vue/test-utils/dist/types"
 import { createRouter, createWebHistory } from "vue-router"
 import HandoverEditionView from "@/components/HandoverEditionView.vue"
-import { EventRecordType } from "@/domain/eventRecord"
+import { EventRecordType, HandoverMail, Preview } from "@/domain/eventRecord"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import Reference from "@/domain/reference"
 import featureToggleService from "@/services/featureToggleService"
-import handoverService from "@/services/handoverEditionService"
+import handoverDocumentationUnitService from "@/services/handoverEditionService"
 
 const router = createRouter({
   history: createWebHistory(),
@@ -74,16 +74,17 @@ describe("HandoverEditionView:", () => {
     })
   })
 
-  vi.spyOn(handoverService, "getPreview").mockImplementation(() =>
-    Promise.resolve({
-      status: 200,
-      data: [
-        {
-          xml: "<xml>all good</xml>",
-          success: true,
-        },
-      ],
-    }),
+  vi.spyOn(handoverDocumentationUnitService, "getPreview").mockImplementation(
+    () =>
+      Promise.resolve({
+        status: 200,
+        data: [
+          new Preview({
+            xml: "<xml>all good</xml>",
+            success: true,
+          }),
+        ],
+      }),
   )
 
   describe("renders preview", () => {
@@ -113,14 +114,6 @@ describe("HandoverEditionView:", () => {
       it("renders error modal from backend", async () => {
         renderComponent({
           props: {
-            handoverResult: {
-              xml: "xml",
-              statusMessages: ["error message 1", "error message 2"],
-              success: false,
-              receiverAddress: "receiver address",
-              mailSubject: "mail subject",
-              date: undefined,
-            },
             errorMessage: {
               title: "error message title",
               description: "error message description",
@@ -160,7 +153,7 @@ describe("HandoverEditionView:", () => {
         renderComponent({
           props: {
             eventLog: [
-              {
+              new HandoverMail({
                 type: EventRecordType.HANDOVER,
                 attachments: [
                   {
@@ -174,13 +167,13 @@ describe("HandoverEditionView:", () => {
                 receiverAddress: "receiver address",
                 mailSubject: "mail subject",
                 date: "01.02.2000",
-              },
+              }),
             ],
           },
         })
         // TODO multiple
         expect(screen.getByLabelText("Letzte Ereignisse")).toHaveTextContent(
-          `Letzte EreignisseXml Email Abgabe - 01.02.2000ÜBERE-Mail an: receiver address Betreff: mail subjectALSfile.xml1<?xml version="1.0"?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>`,
+          `Letzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrÜBERE-Mail an: receiver address Betreff: mail subjectALSfile.xml1<?xml version="1.0"?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>`,
         )
       })
 
@@ -196,7 +189,7 @@ describe("HandoverEditionView:", () => {
       const { container } = renderComponent({
         props: {
           eventLog: [
-            {
+            new HandoverMail({
               type: EventRecordType.HANDOVER,
               attachments: [
                 { fileContent: "xml content", fileName: "file.xml" },
@@ -206,7 +199,7 @@ describe("HandoverEditionView:", () => {
               receiverAddress: "receiver address",
               mailSubject: "mail subject",
               date: "01.02.2000",
-            },
+            }),
           ],
         },
         stubs: {
@@ -218,7 +211,7 @@ describe("HandoverEditionView:", () => {
 
       await waitFor(() => {
         expect(container).toHaveTextContent(
-          `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltXML VorschauFundstellen der Ausgabe an jDV übergebenLetzte EreignisseXml Email Abgabe - 01.02.2000ÜBERE-Mail an: receiver address Betreff: mail subjectALS`,
+          `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltXML VorschauFundstellen der Ausgabe an jDV übergebenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrÜBERE-Mail an: receiver address Betreff: mail subjectALS`,
         )
       })
 

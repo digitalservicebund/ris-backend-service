@@ -73,7 +73,7 @@ public class JurisStub implements MailStoreFactory, HttpMailSender {
     if (isPublication(subject)) {
       String documentNumber = getDocumentNumber(subject);
       if (documentNumber == null) {
-        LOGGER.warn("Document number could found in subject: {}", subject);
+        LOGGER.warn("Document number could not be found in subject: {}", subject);
         return;
       }
       addMessage(
@@ -87,7 +87,7 @@ public class JurisStub implements MailStoreFactory, HttpMailSender {
     } else if (isEdition(subject)) {
       UUID editionId = getEditionId(subject);
       if (editionId == null) {
-        LOGGER.warn("EditionId could found in subject: {}", subject);
+        LOGGER.warn("EditionId could not be found in subject: {}", subject);
         return;
       }
       // TODO

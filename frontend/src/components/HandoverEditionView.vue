@@ -5,7 +5,11 @@ import CodeSnippet from "@/components/CodeSnippet.vue"
 import { InfoStatus } from "@/components/enumInfoStatus"
 import InfoModal from "@/components/InfoModal.vue"
 import TextButton from "@/components/input/TextButton.vue"
-import EventRecord, { EventRecordType } from "@/domain/eventRecord"
+import EventRecord, {
+  EventRecordType,
+  HandoverMail,
+  Preview,
+} from "@/domain/eventRecord"
 import FeatureToggleService from "@/services/featureToggleService"
 import HandoverEditionService from "@/services/handoverEditionService"
 import { ResponseError } from "@/services/httpClient"
@@ -17,7 +21,6 @@ import IconKeyboardArrowUp from "~icons/ic/baseline-keyboard-arrow-up"
 import IconHandover from "~icons/ic/outline-campaign"
 
 const props = defineProps<{
-  handoverResult?: EventRecord
   eventLog?: EventRecord[]
   errorMessage?: ResponseError
   succeedMessage?: { title: string; description: string }
@@ -33,7 +36,7 @@ const isFirstTimeHandover = computed(() => {
   return !props.eventLog || props.eventLog.length === 0
 })
 
-const preview = ref<EventRecord[]>()
+const preview = ref<Preview[]>()
 const frontendError = ref()
 const previewError = ref()
 const featureToggle = ref()
@@ -70,11 +73,11 @@ function handoverEdition() {
 function getHeader(item: EventRecord) {
   switch (item.type) {
     case EventRecordType.HANDOVER_REPORT:
-      return "Juris Protokoll - " + item.date
+      return "Juris Protokoll - " + item.getDate()
     case EventRecordType.HANDOVER:
-      return "Xml Email Abgabe - " + item.date
+      return "Xml Email Abgabe - " + item.getDate()
     default:
-      return "Unbekanntes Ereignis - " + item.date
+      return "Unbekanntes Ereignis - " + item.getDate()
   }
 }
 
@@ -181,26 +184,26 @@ const referencesMissing = computed(() => {
             <div
               v-if="item.type == EventRecordType.HANDOVER_REPORT"
               class="p-20"
-              v-html="item.content"
+              v-html="item.getContent()"
             />
             <div v-else-if="item.type == EventRecordType.HANDOVER">
               <div class="ds-label-section pt-20 text-gray-900">ÜBER</div>
               <div class="ds-label-02-reg">
                 <div>
                   <span class="ds-label-02-bold">E-Mail an:</span>
-                  {{ item.receiverAddress }}
+                  {{ (item as HandoverMail).receiverAddress }}
                 </div>
                 <div>
                   <span class="ds-label-02-bold"> Betreff: </span>
-                  {{ item.mailSubject }}
+                  {{ (item as HandoverMail).mailSubject }}
                 </div>
               </div>
               <div class="ds-label-section text-gray-900">ALS</div>
               <CodeSnippet
-                v-for="(attachment, attachmentIndex) in item.attachments"
+                v-for="(attachment, attachmentIndex) in (item as HandoverMail)
+                  .attachments"
                 :key="attachmentIndex"
                 :title="attachment.fileName!"
-                :v-for="item?.attachments"
                 :xml="attachment.fileContent!"
               />
             </div>
@@ -210,4 +213,4 @@ const referencesMissing = computed(() => {
     </div>
   </div>
 </template>
-@/services/handoverService @/domain/eventRecord
+@/services/handoverDocumentationUnitService @/domain/eventRecord

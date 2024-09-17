@@ -88,10 +88,10 @@ public class HandoverMailService implements MailService {
             List.of(xml),
             issuerAddress,
             HandoverEntityType.DOCUMENTATION_UNIT);
-    generateAndSendMail(handoverMail);
     if (!handoverMail.success()) {
       return handoverMail;
     }
+    generateAndSendMail(handoverMail);
     return repository.save(handoverMail);
   }
 
