@@ -212,7 +212,7 @@ describe("Norm references", () => {
     ])
 
     expect(screen.getByLabelText("Listen Eintrag")).toHaveTextContent(
-      "1000g-BefV1000g-BefV, § 1231000g-BefV, § 345, 01.01.2022, 02-02-2022",
+      "1000g-BefV 1000g-BefV, § 123 1000g-BefV, § 345, 01.01.2022, 02-02-2022",
     )
   })
 
@@ -234,7 +234,7 @@ describe("Norm references", () => {
     ])
 
     expect(screen.getByLabelText("Listen Eintrag")).toHaveTextContent(
-      "1000g-BefV1000g-BefV, § 1231000g-BefV, § 345, 01.01.2022, 02-02-2022",
+      "1000g-BefV 1000g-BefV, § 123 1000g-BefV, § 345, 01.01.2022, 02-02-2022",
     )
   })
 
@@ -246,17 +246,6 @@ describe("Norm references", () => {
     ])
 
     expect(screen.getByText("Mehrdeutiger Verweis")).toBeInTheDocument()
-  })
-
-  it("render error badge, when required fields missing", async () => {
-    renderComponent([
-      new NormReference({
-        singleNorms: [new SingleNorm({ singleNorm: "§ 123" })],
-      }),
-    ])
-
-    // Todo:
-    // add check for error badge when implemented
   })
 
   describe("legal force", () => {
@@ -281,11 +270,11 @@ describe("Norm references", () => {
       ])
 
       expect(screen.getByLabelText("Listen Eintrag")).toHaveTextContent(
-        "1000g-BefV, § 345, 01.01.2022, 02-02-2022|Nichtig (Brandenburg)",
+        "1000g-BefV, § 345, 01.01.2022, 02-02-2022 | Nichtig (Brandenburg)",
       )
     })
 
-    it("render summary with legal force but without type and region", () => {
+    it("render summary with legal force but without missing data error", () => {
       renderComponent([
         generateNormReference({
           normAbbreviation: {
@@ -297,7 +286,7 @@ describe("Norm references", () => {
               dateOfRelevance: "02-02-2022",
               dateOfVersion: "2022",
               legalForce: new LegalForce({
-                type: undefined,
+                type: { abbreviation: "nichtig" },
                 region: undefined,
               }),
             }),
@@ -306,7 +295,7 @@ describe("Norm references", () => {
       ])
 
       expect(screen.getByLabelText("Listen Eintrag")).toHaveTextContent(
-        "1000g-BefV, § 345, 01.01.2022, 02-02-2022|Fehlende Daten",
+        "1000g-BefV, § 345, 01.01.2022, 02-02-2022 | Nichtig Fehlende Daten",
       )
     })
   })
