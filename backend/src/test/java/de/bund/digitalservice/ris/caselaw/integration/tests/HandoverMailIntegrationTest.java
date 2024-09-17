@@ -342,7 +342,7 @@ class HandoverMailIntegrationTest {
                 : "/api/v1/caselaw/legalperiodicaledition/" + entityId + "/handover")
         .exchange()
         .expectStatus()
-        .isOk()
+        .is4xxClientError()
         .expectBody(HandoverMail.class)
         .consumeWith(
             response ->
