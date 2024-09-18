@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue"
-import CategoryWrapper from "@/components/CategoryWrapper.vue"
-import DocumentUnitTextField from "@/components/texts/DocumentUnitTextField.vue"
+import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import TextEditorUtil from "@/utils/textEditorUtil"
@@ -57,38 +56,29 @@ const outline = computed({
   <div class="border-t-1 border-blue-300 pb-24">
     <h2 class="ds-label-01-bold mb-16 mt-24">Weitere Langtexte</h2>
     <div class="flex flex-col gap-24">
-      <CategoryWrapper
+      <TextEditorCategory
+        id="otherLongText"
+        v-model="otherLongText"
+        :editable="isInternalUser"
         label="Sonstiger Langtext"
         :should-show-button="!hasOtherLongtext"
-      >
-        <DocumentUnitTextField
-          id="otherLongText"
-          v-model="otherLongText"
-          :editable="isInternalUser"
-          label="Sonstiger Langtext"
-        />
-      </CategoryWrapper>
+      />
 
-      <CategoryWrapper
+      <TextEditorCategory
+        id="dissentingOpinion"
+        v-model="dissentingOpinion"
+        :editable="isInternalUser"
         label="Abweichende Meinung"
         :should-show-button="!hasDissentingOpinion"
-      >
-        <DocumentUnitTextField
-          id="dissentingOpinion"
-          v-model="dissentingOpinion"
-          :editable="isInternalUser"
-          label="Abweichende Meinung"
-        />
-      </CategoryWrapper>
+      />
 
-      <CategoryWrapper label="Gliederung" :should-show-button="!hasOutline">
-        <DocumentUnitTextField
-          id="outline"
-          v-model="outline"
-          :editable="isInternalUser"
-          label="Gliederung"
-        />
-      </CategoryWrapper>
+      <TextEditorCategory
+        id="outline"
+        v-model="outline"
+        :editable="isInternalUser"
+        label="Gliederung"
+        :should-show-button="!hasOutline"
+      />
     </div>
   </div>
 </template>

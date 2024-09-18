@@ -2,7 +2,7 @@ export default class TextEditorUtil {
   public static getEditorContentIfPresent(
     value: string | undefined,
   ): string | undefined {
-    if (value == undefined || value.trim().length > 0) return undefined
+    if (value == undefined || value.trim().length == 0) return undefined
     const divElem = document.createElement("div")
     divElem.innerHTML = value
     const hasImgElem = divElem.getElementsByTagName("img").length > 0

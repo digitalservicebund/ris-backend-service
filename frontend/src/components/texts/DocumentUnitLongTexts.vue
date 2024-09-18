@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue"
-import CategoryWrapper from "@/components/CategoryWrapper.vue"
-import DocumentUnitTextField from "@/components/texts/DocumentUnitTextField.vue"
+import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import TextEditorUtil from "@/utils/textEditorUtil"
 
@@ -68,32 +67,33 @@ const decisionReasons = computed({
   <div aria-label="Langtexte" class="border-t-1 border-blue-300 pb-24">
     <h2 class="ds-label-01-bold mb-16 mt-24">Langtexte</h2>
     <div class="flex flex-col gap-24">
-      <CategoryWrapper label="Tenor" :should-show-button="!hasTenor">
-        <DocumentUnitTextField id="tenor" v-model="tenor" label="Tenor" />
-      </CategoryWrapper>
+      <TextEditorCategory
+        id="tenor"
+        v-model="tenor"
+        label="Tenor"
+        :should-show-button="!hasTenor"
+      />
 
-      <CategoryWrapper label="Gründe" :should-show-button="!hasReasons">
-        <DocumentUnitTextField id="reasons" v-model="reasons" label="Gründe" />
-      </CategoryWrapper>
+      <TextEditorCategory
+        id="reasons"
+        v-model="reasons"
+        label="Gründe"
+        :should-show-button="!hasReasons"
+      />
 
-      <CategoryWrapper label="Tatbestand" :should-show-button="!hasCaseFacts">
-        <DocumentUnitTextField
-          id="caseFacts"
-          v-model="caseFacts"
-          label="Tatbestand"
-        />
-      </CategoryWrapper>
+      <TextEditorCategory
+        id="caseFacts"
+        v-model="caseFacts"
+        label="Tatbestand"
+        :should-show-button="!hasCaseFacts"
+      />
 
-      <CategoryWrapper
+      <TextEditorCategory
+        id="decisionReasons"
+        v-model="decisionReasons"
         label="Entscheidungsgründe"
         :should-show-button="!hasDecisionReasons"
-      >
-        <DocumentUnitTextField
-          id="decisionReasons"
-          v-model="decisionReasons"
-          label="Entscheidungsgründe"
-        />
-      </CategoryWrapper>
+      />
     </div>
   </div>
 </template>

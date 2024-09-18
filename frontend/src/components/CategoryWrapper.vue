@@ -9,10 +9,15 @@ const props = defineProps<{
   shouldShowButton: boolean
 }>()
 
+const emit = defineEmits<{
+  toggled: [value: boolean]
+}>()
+
 const shouldShowButton = ref<boolean>(props.shouldShowButton)
 
 function toggle() {
   shouldShowButton.value = !shouldShowButton.value
+  emit("toggled", shouldShowButton.value)
 }
 </script>
 

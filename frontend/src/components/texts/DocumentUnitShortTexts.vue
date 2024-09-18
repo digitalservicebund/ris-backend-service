@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue"
-import CategoryWrapper from "@/components/CategoryWrapper.vue"
-import TextInput from "@/components/input/TextInput.vue"
-import DocumentUnitTextField from "@/components/texts/DocumentUnitTextField.vue"
+import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
+import TextInputCategory from "@/components/texts/TextInputCategory.vue"
 import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLinks"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import TextEditorUtil from "@/utils/textEditorUtil"
@@ -90,69 +89,46 @@ const otherHeadnote = computed({
   <div aria-label="Kurztexte" class="pb-24">
     <h2 class="ds-label-01-bold mb-16">Kurztexte</h2>
     <div class="flex flex-col gap-24">
-      <CategoryWrapper
+      <TextInputCategory
+        id="decisionName"
+        v-model="decisionName"
+        editable
         label="Entscheidungsname"
         :should-show-button="!hasDecisionName"
-      >
-        <div class="flex flex-col">
-          <label class="ds-label-02-reg mb-4" for="'decisionName'">
-            Entscheidungsname
-          </label>
+      />
 
-          <TextInput
-            id="decisionName"
-            v-model="decisionName"
-            aria-label="decisionName"
-            size="medium"
-          />
-        </div>
-      </CategoryWrapper>
+      <TextEditorCategory
+        id="headline"
+        v-model="headline"
+        editable
+        field-size="small"
+        label="Titelzeile"
+        :should-show-button="!hasHeadline"
+      />
 
-      <CategoryWrapper label="Titelzeile" :should-show-button="!hasHeadline">
-        <DocumentUnitTextField
-          id="headline"
-          v-model="headline"
-          editable
-          field-size="small"
-          label="Titelzeile"
-        />
-      </CategoryWrapper>
-
-      <CategoryWrapper
+      <TextEditorCategory
+        id="guidingPrinciple"
+        v-model="guidingPrinciple"
+        editable
         label="Leitsatz"
         :should-show-button="!hasGuidingPrinciple"
-      >
-        <DocumentUnitTextField
-          id="guidingPrinciple"
-          v-model="guidingPrinciple"
-          editable
-          label="Leitsatz"
-        />
-      </CategoryWrapper>
+      />
 
-      <CategoryWrapper
+      <TextEditorCategory
+        id="headnote"
+        v-model="headnote"
+        editable
         label="Orientierungssatz"
         :should-show-button="!hasHeadnote"
-      >
-        <DocumentUnitTextField
-          id="headnote"
-          v-model="headnote"
-          editable
-          label="Orientierungssatz"
-        />
-      </CategoryWrapper>
+      />
 
-      <CategoryWrapper
+      <TextEditorCategory
+        id="otherHeadnote"
+        v-model="otherHeadnote"
+        editable
         label="Sonstiger Orientierungssatz"
         :should-show-button="!hasOtherHeadnote"
-      >
-        <DocumentUnitTextField
-          id="otherHeadnote"
-          v-model="otherHeadnote"
-          editable
-          label="Sonstiger Orientierungssatz"
-        />
-      </CategoryWrapper>
+      />
     </div>
   </div>
 </template>
