@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue"
 import { useRoute } from "vue-router"
+import Tooltip from "./Tooltip.vue"
 import AttachmentView from "@/components/AttachmentView.vue"
 import FileNavigator from "@/components/FileNavigator.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
@@ -149,35 +150,42 @@ onMounted(() => {
       @update:is-expanded="togglePanel"
     >
       <FlexContainer class="m-24 ml-16 items-center -space-x-2 px-8">
-        <TextButton
-          id="note"
-          aria-label="Notiz anzeigen"
-          button-type="tertiary"
-          :class="selectedPanelContent === 'note' ? 'bg-blue-200' : ''"
-          :icon="IconStickyNote"
-          size="small"
-          @click="() => selectNotes()"
-        />
+        <Tooltip shortcut="n" text="Notiz">
+          <TextButton
+            id="note"
+            aria-label="Notiz anzeigen"
+            button-type="tertiary"
+            class="flex"
+            :class="selectedPanelContent === 'note' ? 'bg-blue-200' : ''"
+            :icon="IconStickyNote"
+            size="small"
+            @click="() => selectNotes()"
+          />
+        </Tooltip>
 
-        <TextButton
-          id="attachments"
-          aria-label="Dokumente anzeigen"
-          button-type="tertiary"
-          :class="selectedPanelContent === 'attachments' ? 'bg-blue-200' : ''"
-          :icon="IconAttachFile"
-          size="small"
-          @click="() => selectAttachments()"
-        />
+        <Tooltip shortcut="d" text="Datei">
+          <TextButton
+            id="attachments"
+            aria-label="Dokumente anzeigen"
+            button-type="tertiary"
+            :class="selectedPanelContent === 'attachments' ? 'bg-blue-200' : ''"
+            :icon="IconAttachFile"
+            size="small"
+            @click="() => selectAttachments()"
+          />
+        </Tooltip>
 
-        <TextButton
-          id="preview"
-          aria-label="Vorschau anzeigen"
-          button-type="tertiary"
-          :class="selectedPanelContent === 'preview' ? 'bg-blue-200' : ''"
-          :icon="IconPreview"
-          size="small"
-          @click="() => selectPreview()"
-        />
+        <Tooltip shortcut="v" text="Vorschau">
+          <TextButton
+            id="preview"
+            aria-label="Vorschau anzeigen"
+            button-type="tertiary"
+            :class="selectedPanelContent === 'preview' ? 'bg-blue-200' : ''"
+            :icon="IconPreview"
+            size="small"
+            @click="() => selectPreview()"
+          />
+        </Tooltip>
 
         <div class="flex-grow" />
 

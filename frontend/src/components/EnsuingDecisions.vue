@@ -18,11 +18,8 @@ const ensuingDecisions = computed({
 const defaultValue = new EnsuingDecision() as EnsuingDecision
 </script>
 <template>
-  <div
-    aria-label="Nachgehende Entscheidung"
-    class="flex flex-col bg-white p-32"
-  >
-    <h2 class="ds-heading-03-reg mb-24">Nachgehende Entscheidungen</h2>
+  <div aria-label="Nachgehende Entscheidung" class="border-b-1 border-blue-300">
+    <h2 class="ds-label-01-bold mb-16">Nachgehende Entscheidungen</h2>
     <div class="flex flex-row">
       <div class="flex-1">
         <EditableList

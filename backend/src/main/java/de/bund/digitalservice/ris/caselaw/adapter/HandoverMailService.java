@@ -17,10 +17,13 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -88,10 +91,10 @@ public class HandoverMailService implements MailService {
             List.of(xml),
             issuerAddress,
             HandoverEntityType.DOCUMENTATION_UNIT);
-    generateAndSendMail(handoverMail);
     if (!handoverMail.success()) {
       return handoverMail;
     }
+    generateAndSendMail(handoverMail);
     return repository.save(handoverMail);
   }
 
@@ -176,7 +179,7 @@ public class HandoverMailService implements MailService {
 
   private String generateMailSubject(DocumentationUnit documentationUnit) {
     if (documentationUnit.documentNumber() == null) {
-      throw new HandoverException("No document number has set in the document unit.");
+      throw new HandoverException("No document number has been set in the document unit.");
     }
     return generateMailSubject(documentationUnit.documentNumber(), "N");
   }
@@ -209,19 +212,18 @@ public class HandoverMailService implements MailService {
       throw new HandoverException("No receiver mail address is set");
     }
 
+    for (MailAttachment attachment : handoverMail.attachments()) {
+      if (attachment.fileContent() == null) {
+        throw new HandoverException("No file content is set for attachment");
+      }
+    }
+
     mailSender.sendMail(
         senderAddress,
         handoverMail.receiverAddress(),
         handoverMail.mailSubject(),
         "neuris",
-        handoverMail.attachments().stream()
-            .map(
-                attachment ->
-                    MailAttachment.builder()
-                        .fileName(attachment.fileName())
-                        .fileContent(attachment.fileContent())
-                        .build())
-            .toList(),
+        handoverMail.attachments(),
         handoverMail.entityId().toString());
   }
 
@@ -251,17 +253,41 @@ public class HandoverMailService implements MailService {
         .mailSubject(mailSubject)
         .handoverDate(xml.get(0).creationDate())
         .issuerAddress(issuerAddress)
-        .attachments(
-            xml.stream()
-                .map(
-                    xmlFile ->
-                        MailAttachment.builder()
-                            .fileName(xmlFile.fileName())
-                            .fileContent(xmlFile.xml())
-                            .build())
-                .toList())
+        .attachments(renameAndCreateMailAttachments(xml))
         .entityType(entityType)
         .build();
+  }
+
+  public static List<MailAttachment> renameAndCreateMailAttachments(
+      List<XmlTransformationResult> xmlFiles) {
+    // Step 1: Group by fileName
+    Map<String, List<XmlTransformationResult>> groupedByFileName =
+        xmlFiles.stream().collect(Collectors.groupingBy(XmlTransformationResult::fileName));
+
+    // Step 2: Prepare the list of MailAttachment with renamed duplicates
+    List<MailAttachment> renamedAttachments = new ArrayList<>();
+
+    // Step 3: Iterate over each group of xmlFiles and rename duplicates if necessary
+    for (Map.Entry<String, List<XmlTransformationResult>> entry : groupedByFileName.entrySet()) {
+      String fileName = entry.getKey();
+      List<XmlTransformationResult> filesWithSameName = entry.getValue();
+
+      if (filesWithSameName.size() > 1) {
+        // If there are duplicates, rename them
+        for (int i = 0; i < filesWithSameName.size(); i++) {
+          String[] fileNameParts = fileName.split("\\.");
+          String newFileName = fileNameParts[0] + "_" + (i + 1) + "." + fileNameParts[1];
+          XmlTransformationResult xmlFile = filesWithSameName.get(i);
+          renamedAttachments.add(new MailAttachment(newFileName, xmlFile.xml()));
+        }
+      } else {
+        // No duplicates, keep original file name
+        XmlTransformationResult xmlFile = filesWithSameName.get(0);
+        renamedAttachments.add(new MailAttachment(xmlFile.fileName(), xmlFile.xml()));
+      }
+    }
+
+    return renamedAttachments;
   }
 
   private DocumentationUnit getTestDocumentationUnit(DocumentationUnit documentationUnit) {

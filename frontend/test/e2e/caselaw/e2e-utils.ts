@@ -96,7 +96,7 @@ export const navigateToPeriodicalEdition = async (
   page: Page,
   editionId: string,
 ) => {
-  await test.step("Navigate to 'Periodika'", async () => {
+  await test.step("Navigate to 'Periodikumauswertung > Ausgabe'", async () => {
     const baseUrl = `/caselaw/periodical-evaluation/${editionId}/edition`
 
     await page.goto(baseUrl)
@@ -108,11 +108,23 @@ export const navigateToPeriodicalReferences = async (
   page: Page,
   editionId: string,
 ) => {
-  await test.step("Navigate to 'Periodika'", async () => {
+  await test.step("Navigate to 'Periodikumauswertung > Fundstellen'", async () => {
     const baseUrl = `/caselaw/periodical-evaluation/${editionId}/references`
 
     await page.goto(baseUrl)
     await expect(page.getByTestId("references-title")).toBeVisible()
+  })
+}
+
+export const navigateToPeriodicalHandover = async (
+  page: Page,
+  editionId: string,
+) => {
+  await test.step("Navigate to 'Periodikumauswertung > Übergabe an jDV'", async () => {
+    const baseUrl = `/caselaw/periodical-evaluation/${editionId}/handover`
+
+    await page.goto(baseUrl)
+    await expect(page.getByTestId("handover-title")).toBeVisible()
   })
 }
 
@@ -612,7 +624,7 @@ export async function copyPasteTextFromAttachmentIntoEditor(
   await editor.click()
   await page.keyboard.press(`${modifier}+KeyV`)
   await page
-    .locator(`[aria-label='invisible-characters']:not([disabled])`)
+    .locator(`[aria-label='Nicht-druckbare Zeichen']:not([disabled])`)
     .click()
 }
 

@@ -338,7 +338,7 @@ onMounted(() => {
       />
     </div>
 
-    <div class="bg-blue-200">
+    <div v-if="isLoading || searchResults" class="bg-blue-200">
       <Pagination
         navigation-position="bottom"
         :page="searchResultsCurrentPage"

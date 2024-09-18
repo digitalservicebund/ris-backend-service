@@ -1,16 +1,21 @@
 import httpClient, { ServiceResponse } from "./httpClient"
-import EventRecord from "@/domain/eventRecord"
+import EventRecord, {
+  EventRecordType,
+  HandoverMail,
+  HandoverReport,
+  Preview,
+} from "@/domain/eventRecord"
 import errorMessages from "@/i18n/errors.json"
 
 interface HandoverEditionService {
-  handoverEdition(editionId: string): Promise<ServiceResponse<EventRecord>>
+  handoverEdition(editionId: string): Promise<ServiceResponse<HandoverMail>>
   getEventLog(editionId: string): Promise<ServiceResponse<EventRecord[]>>
-  getPreview(editionId: string): Promise<ServiceResponse<EventRecord[]>>
+  getPreview(editionId: string): Promise<ServiceResponse<Preview[]>>
 }
 
 const service: HandoverEditionService = {
   async handoverEdition(editionId: string) {
-    const response = await httpClient.put<string, EventRecord>(
+    const response = await httpClient.put<string, HandoverMail>(
       `caselaw/legalperiodicaledition/${editionId}/handover`,
       {
         headers: { "Content-Type": "text/plain" },
@@ -62,11 +67,22 @@ const service: HandoverEditionService = {
           }
         : undefined
 
+    const eventLog: EventRecord[] = []
+    if (response.data) {
+      for (const event of response.data) {
+        if (event.type === EventRecordType.HANDOVER) {
+          eventLog.push(new HandoverMail(event))
+        } else if (event.type === EventRecordType.HANDOVER_REPORT) {
+          eventLog.push(new HandoverReport(event))
+        }
+      }
+    }
+    response.data = eventLog
     return response
   },
 
   async getPreview(editionId?: string) {
-    const response = await httpClient.get<EventRecord[]>(
+    const response = await httpClient.get<Preview[]>(
       `caselaw/legalperiodicaledition/${editionId}/preview-xml`,
     )
 

@@ -3,13 +3,13 @@ import { userEvent } from "@testing-library/user-event"
 import { render, fireEvent, screen } from "@testing-library/vue"
 import { Stubs } from "@vue/test-utils/dist/types"
 import { createRouter, createWebHistory } from "vue-router"
-import HandoverView from "@/components/HandoverView.vue"
+import HandoverDocumentationUnitView from "@/components/HandoverDocumentationUnitView.vue"
 import DocumentUnit from "@/domain/documentUnit"
-import { EventRecordType } from "@/domain/eventRecord"
+import { EventRecordType, HandoverMail, Preview } from "@/domain/eventRecord"
 import LegalForce from "@/domain/legalForce"
 import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
-import handoverService from "@/services/handoverService"
+import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
 
 const router = createRouter({
   history: createWebHistory(),
@@ -38,7 +38,7 @@ function renderComponent(
 
   return {
     user,
-    ...render(HandoverView, {
+    ...render(HandoverDocumentationUnitView, {
       props: options.props ?? {},
       global: {
         plugins: [
@@ -63,15 +63,16 @@ function renderComponent(
   }
 }
 
-describe("HandoverView:", () => {
-  vi.spyOn(handoverService, "getPreview").mockImplementation(() =>
-    Promise.resolve({
-      status: 200,
-      data: {
-        xml: "<xml>all good</xml>",
-        success: true,
-      },
-    }),
+describe("HandoverDocumentationUnitView:", () => {
+  vi.spyOn(handoverDocumentationUnitService, "getPreview").mockImplementation(
+    () =>
+      Promise.resolve({
+        status: 200,
+        data: new Preview({
+          xml: "<xml>all good</xml>",
+          success: true,
+        }),
+      }),
   )
 
   describe("renders plausibility check", () => {
@@ -193,7 +194,7 @@ describe("HandoverView:", () => {
     })
 
     it("'Rubriken bearbeiten' button links back to categories", async () => {
-      render(HandoverView, {
+      render(HandoverDocumentationUnitView, {
         global: {
           plugins: [router],
         },
@@ -241,14 +242,15 @@ describe("HandoverView:", () => {
     it("renders error modal from backend", async () => {
       renderComponent({
         props: {
-          handoverResult: {
-            xml: "xml",
+          handoverResult: new HandoverMail({
+            type: EventRecordType.HANDOVER,
+            attachments: [{ fileContent: "xml" }],
             statusMessages: ["error message 1", "error message 2"],
             success: false,
             receiverAddress: "receiver address",
             mailSubject: "mail subject",
             date: undefined,
-          },
+          }),
           errorMessage: {
             title: "error message title",
             description: "error message description",
@@ -288,7 +290,7 @@ describe("HandoverView:", () => {
       renderComponent({
         props: {
           eventLog: [
-            {
+            new HandoverMail({
               type: EventRecordType.HANDOVER,
               attachments: [
                 {
@@ -302,12 +304,12 @@ describe("HandoverView:", () => {
               receiverAddress: "receiver address",
               mailSubject: "mail subject",
               date: "01.02.2000",
-            },
+            }),
           ],
         },
       })
       expect(screen.getByLabelText("Letzte Ereignisse")).toHaveTextContent(
-        `Letzte EreignisseXml Email Abgabe - 01.02.2000ÜBERE-Mail an: receiver address Betreff: mail subjectALSXML1<?xml version="1.0"?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>`,
+        `Letzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrÜBERE-Mail an: receiver address Betreff: mail subjectALSXML1<?xml version="1.0"?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>`,
       )
     })
 
@@ -354,7 +356,7 @@ describe("HandoverView:", () => {
     const { container } = renderComponent({
       props: {
         eventLog: [
-          {
+          new HandoverMail({
             type: EventRecordType.HANDOVER,
             attachments: [{ fileContent: "xml content", fileName: "file.xml" }],
             statusMessages: ["success"],
@@ -362,7 +364,7 @@ describe("HandoverView:", () => {
             receiverAddress: "receiver address",
             mailSubject: "mail subject",
             date: "01.02.2000",
-          },
+          }),
         ],
       },
       documentUnit: new DocumentUnit("123", {
@@ -385,7 +387,7 @@ describe("HandoverView:", () => {
     })
 
     expect(container).toHaveTextContent(
-      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltDokumentationseinheit an jDV übergebenLetzte EreignisseXml Email Abgabe - 01.02.2000ÜBERE-Mail an: receiver address Betreff: mail subjectALS`,
+      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltDokumentationseinheit an jDV übergebenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrÜBERE-Mail an: receiver address Betreff: mail subjectALS`,
     )
 
     const codeSnippet = screen.queryByTestId("code-snippet")

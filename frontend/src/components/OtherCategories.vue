@@ -27,8 +27,8 @@ const shouldDisplayLegislativeMandateCategory = computed(() => {
 </script>
 
 <template>
-  <div aria-label="Weitere Rubriken" class="bg-white p-32">
-    <h2 class="ds-heading-03-reg mb-16">Weitere Rubriken</h2>
+  <div aria-label="Weitere Rubriken">
+    <h2 class="ds-label-01-bold mb-16">Weitere Rubriken</h2>
     <div class="flex flex-col gap-24">
       <CategoryWrapper label="Berufsbild" :should-show-button="!hasJobProfiles">
         <JobProfiles label="Berufsbild" />

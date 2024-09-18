@@ -19,10 +19,12 @@ const defaultValue = new PreviousDecision() as PreviousDecision
 </script>
 
 <template>
-  <div class="flex flex-col gap-24 bg-white p-32 pb-0">
-    <h2 class="ds-heading-03-bold">Rechtszug</h2>
-    <div aria-label="Vorgehende Entscheidung">
-      <h2 class="ds-heading-03-reg mb-24">Vorgehende Entscheidungen</h2>
+  <div>
+    <div
+      aria-label="Vorgehende Entscheidung"
+      class="border-b-1 border-blue-300"
+    >
+      <h2 class="ds-label-01-bold mb-16">Vorgehende Entscheidungen</h2>
       <div class="flex flex-row">
         <div class="flex-1">
           <EditableList

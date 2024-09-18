@@ -1,6 +1,7 @@
 <script lang="ts" setup generic="T extends ListItem">
 import type { Component, Ref } from "vue"
 import { ref, watch, computed } from "vue"
+import Tooltip from "./Tooltip.vue"
 import DataSetSummary from "@/components/DataSetSummary.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import ListItem from "@/domain/editableListItem"
@@ -159,36 +160,35 @@ watch(
       v-for="(entry, index) in mergedValues"
       :key="index"
       aria-label="Listen Eintrag"
-      class="border-b-1 border-blue-300"
-      :class="
-        index == 0 ? 'first:border-t-1' : 'first:border-t-0 last:border-b-0'
-      "
     >
       <div
         v-if="!isSelected(entry)"
         :key="index"
-        class="group flex gap-8 py-16"
+        class="group flex gap-8 border-b-1 border-blue-300 py-16"
+        :class="{ 'border-t-1': index == 0 }"
       >
         <component :is="summaryComponent" :data="entry" />
-        <button
-          id="editable-list-select-button"
-          class="flex h-32 w-32 items-center justify-center text-blue-800 hover:bg-blue-100 focus:shadow-[inset_0_0_0_0.125rem] focus:shadow-blue-800 focus:outline-none"
-          :data-testid="`list-entry-${index}`"
-          @click="
-            () => {
-              toggleDisplayDefaultValue(false)
-              setEditEntry(entry)
-            }
-          "
-          @keypress.enter="
-            () => {
-              toggleDisplayDefaultValue(false)
-              setEditEntry(entry)
-            }
-          "
-        >
-          <IconArrowDown />
-        </button>
+        <Tooltip text="Aufklappen">
+          <button
+            id="editable-list-select-button"
+            class="flex h-32 w-32 items-center justify-center text-blue-800 hover:bg-blue-100 focus:shadow-[inset_0_0_0_0.125rem] focus:shadow-blue-800 focus:outline-none"
+            :data-testid="`list-entry-${index}`"
+            @click="
+              () => {
+                toggleDisplayDefaultValue(false)
+                setEditEntry(entry)
+              }
+            "
+            @keypress.enter="
+              () => {
+                toggleDisplayDefaultValue(false)
+                setEditEntry(entry)
+              }
+            "
+          >
+            <IconArrowDown />
+          </button>
+        </Tooltip>
       </div>
 
       <component
@@ -196,6 +196,7 @@ watch(
         v-if="isSelected(entry)"
         v-model="modelValueList[index]"
         class="py-24"
+        :class="{ 'pt-0': index == 0 }"
         :is-saved="isSaved(modelValue, modelValueList[index])"
         :model-value-list="modelValueList"
         @add-entry="updateModel"
@@ -208,7 +209,7 @@ watch(
       v-if="!editEntry"
       aria-label="Weitere Angabe"
       button-type="tertiary"
-      class="mt-24 first:mt-0"
+      class="my-24 first:mt-0"
       :icon="IconAdd"
       label="Weitere Angabe"
       size="small"

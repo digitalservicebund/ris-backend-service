@@ -72,7 +72,7 @@ test.describe("short and long texts", () => {
       guidingPrincipleInput.locator("[class='ProseMirror-trailingBreak']"),
     ).toHaveCount(1)
     await page
-      .locator(`[aria-label='invisible-characters']:not([disabled])`)
+      .locator(`[aria-label='Nicht-druckbare Zeichen']:not([disabled])`)
       .click()
     await expect(
       guidingPrincipleInput.locator("[class='ProseMirror-trailingBreak']"),
@@ -112,7 +112,7 @@ test.describe("short and long texts", () => {
       await page.keyboard.press("Shift+Tab")
       const firstButton = page
         .getByLabel("Leitsatz Button Leiste")
-        .getByLabel("fullview")
+        .getByLabel("Erweitern")
       await expect(firstButton).toBeFocused()
 
       // Navigate to bold button with arrow keys
@@ -122,7 +122,7 @@ test.describe("short and long texts", () => {
       await page.keyboard.press("ArrowLeft")
       const boldButton = page
         .getByLabel("Leitsatz Button Leiste")
-        .getByLabel("bold")
+        .getByLabel("Fett")
       await expect(boldButton).toBeFocused()
 
       // Pressing enter moves focus to the editor
@@ -162,7 +162,7 @@ test.describe("short and long texts", () => {
       await page.keyboard.press("ArrowRight")
       const leftButton = page
         .getByLabel("Leitsatz Button Leiste")
-        .getByLabel("left")
+        .getByLabel("Linksbündig")
       await expect(leftButton).toBeFocused()
 
       // Close submenu with ESC

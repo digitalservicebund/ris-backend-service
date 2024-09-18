@@ -101,8 +101,8 @@ class HandoverMailServiceTest {
           .mailSubject(EDITION_MAIL_SUBJECT)
           .attachments(
               List.of(
-                  MailAttachment.builder().fileName("test1.xml").fileContent("xml 1").build(),
-                  MailAttachment.builder().fileName("test2.xml").fileContent("xml 2").build()))
+                  MailAttachment.builder().fileName("test2.xml").fileContent("xml 2").build(),
+                  MailAttachment.builder().fileName("test1.xml").fileContent("xml 1").build()))
           .success(true)
           .statusMessages(List.of("succeed", "succeed"))
           .handoverDate(CREATED_DATE)
@@ -118,6 +118,9 @@ class HandoverMailServiceTest {
               "xml 2", true, List.of("succeed"), "test2.xml", CREATED_DATE));
 
   private DocumentationUnit documentationUnit;
+
+  private final LegalPeriodical legalPeriodical =
+      LegalPeriodical.builder().abbreviation("ABC").build();
 
   private LegalPeriodicalEdition edition;
 
@@ -137,7 +140,7 @@ class HandoverMailServiceTest {
   void setUp() throws ParserConfigurationException, TransformerException {
     documentationUnit =
         DocumentationUnit.builder().uuid(TEST_UUID).documentNumber("test-document-number").build();
-    LegalPeriodical legalPeriodical = LegalPeriodical.builder().abbreviation("ABC").build();
+
     edition =
         LegalPeriodicalEdition.builder()
             .legalPeriodical(legalPeriodical)
@@ -221,7 +224,85 @@ class HandoverMailServiceTest {
   }
 
   @Test
-  void testSend_withValidationError() throws ParserConfigurationException, TransformerException {
+  void testSendEditionWithTwoReferecesForSameDocUnit()
+      throws ParserConfigurationException, TransformerException {
+    var editionWithTwoReferencesForSameDocUnit =
+        LegalPeriodicalEdition.builder()
+            .legalPeriodical(legalPeriodical)
+            .id(TEST_UUID)
+            .references(
+                List.of(
+                    Reference.builder()
+                        .citation("2004, 1")
+                        .legalPeriodical(LegalPeriodical.builder().abbreviation("ABC").build())
+                        .documentationUnit(
+                            RelatedDocumentationUnit.builder()
+                                .documentNumber("document-number-1")
+                                .build())
+                        .build(),
+                    Reference.builder()
+                        .citation("2004, 2")
+                        .legalPeriodical(LegalPeriodical.builder().abbreviation("ABC").build())
+                        .documentationUnit(
+                            RelatedDocumentationUnit.builder()
+                                .documentNumber("document-number-1")
+                                .build())
+                        .build()))
+            .build();
+
+    var savedEditionWithNumberedAttachments =
+        HandoverMail.builder()
+            .entityId(TEST_UUID)
+            .entityType(HandoverEntityType.EDITION)
+            .receiverAddress(RECEIVER_ADDRESS)
+            .mailSubject(EDITION_MAIL_SUBJECT)
+            .attachments(
+                List.of(
+                    MailAttachment.builder()
+                        .fileName("document-number-1_1.xml")
+                        .fileContent("xml 1")
+                        .build(),
+                    MailAttachment.builder()
+                        .fileName("document-number-1_2.xml")
+                        .fileContent("xml 2")
+                        .build()))
+            .success(true)
+            .statusMessages(List.of("succeed", "succeed"))
+            .handoverDate(CREATED_DATE)
+            .issuerAddress(ISSUER_ADDRESS)
+            .build();
+
+    when(xmlExporter.transformToXml(editionWithTwoReferencesForSameDocUnit))
+        .thenReturn(
+            List.of(
+                new XmlTransformationResult(
+                    "xml 1", true, List.of("succeed"), "document-number-1.xml", CREATED_DATE),
+                new XmlTransformationResult(
+                    "xml 2", true, List.of("succeed"), "document-number-1.xml", CREATED_DATE)));
+
+    when(repository.save(savedEditionWithNumberedAttachments))
+        .thenReturn(savedEditionWithNumberedAttachments);
+
+    var response =
+        service.handOver(editionWithTwoReferencesForSameDocUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS);
+
+    assertThat(response).usingRecursiveComparison().isEqualTo(savedEditionWithNumberedAttachments);
+
+    verify(xmlExporter).transformToXml(editionWithTwoReferencesForSameDocUnit);
+    verify(repository).save(savedEditionWithNumberedAttachments);
+    verify(mailSender)
+        .sendMail(
+            SENDER_ADDRESS,
+            RECEIVER_ADDRESS,
+            EDITION_SAVED_MAIL.mailSubject(),
+            "neuris",
+            savedEditionWithNumberedAttachments.attachments(),
+            EDITION_SAVED_MAIL.entityId().toString());
+  }
+
+  @Test
+  void testSendDocumentationUnit_withValidationError()
+      throws ParserConfigurationException, TransformerException {
     var xmlWithValidationError =
         new XmlTransformationResult(
             "xml", false, List.of("status-message"), "test.xml", CREATED_DATE);
@@ -244,7 +325,31 @@ class HandoverMailServiceTest {
   }
 
   @Test
-  void testSend_withExceptionFromXmlExporter()
+  void testSendEdition_withValidationError()
+      throws ParserConfigurationException, TransformerException {
+    var xmlWithValidationError =
+        new XmlTransformationResult(
+            "xml", false, List.of("status-message"), "test.xml", CREATED_DATE);
+    var expected =
+        HandoverMail.builder()
+            .entityId(TEST_UUID)
+            .statusMessages(List.of("status-message"))
+            .success(false)
+            .build();
+
+    when(xmlExporter.transformToXml(any(LegalPeriodicalEdition.class)))
+        .thenReturn(List.of(xmlWithValidationError));
+
+    var response = service.handOver(edition, RECEIVER_ADDRESS, ISSUER_ADDRESS);
+    assertThat(response).usingRecursiveComparison().isEqualTo(expected);
+
+    verify(repository, times(0)).save(any(HandoverMail.class));
+    verify(mailSender, times(0))
+        .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
+  }
+
+  @Test
+  void testSendDocumentationUnit_withExceptionFromXmlExporter()
       throws ParserConfigurationException, TransformerException {
     when(xmlExporter.transformToXml(any(DocumentationUnit.class)))
         .thenThrow(ParserConfigurationException.class);
@@ -261,7 +366,24 @@ class HandoverMailServiceTest {
   }
 
   @Test
-  void testSend_withoutDocumentNumber() {
+  void testSendEdition_withExceptionFromXmlExporter()
+      throws ParserConfigurationException, TransformerException {
+    when(xmlExporter.transformToXml(any(LegalPeriodicalEdition.class)))
+        .thenThrow(ParserConfigurationException.class);
+
+    HandoverException ex =
+        Assertions.assertThrows(
+            HandoverException.class,
+            () -> service.handOver(edition, RECEIVER_ADDRESS, ISSUER_ADDRESS));
+    Assertions.assertEquals("Couldn't generate xml for edition.", ex.getMessage());
+
+    verify(repository, times(0)).save(any(HandoverMail.class));
+    verify(mailSender, times(0))
+        .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
+  }
+
+  @Test
+  void testSendDocumentationUnit_withoutDocumentNumber() {
     documentationUnit = documentationUnit.toBuilder().documentNumber(null).build();
 
     // Call the method and check for the exception
@@ -271,7 +393,25 @@ class HandoverMailServiceTest {
             () -> service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
 
     assertThat(throwable.getMessage())
-        .isEqualTo("No document number has set in the document unit.");
+        .isEqualTo("No document number has been set in the document unit.");
+
+    // Verify that repository.save and mailSender.sendMail were not called
+    verify(repository, times(0)).save(any(HandoverMail.class));
+    verify(mailSender, times(0))
+        .sendMail(anyString(), anyString(), anyString(), anyString(), any(List.class), anyString());
+  }
+
+  @Test
+  void testSendEdition_withoutEditionId() {
+    edition = edition.toBuilder().id(null).build();
+
+    // Call the method and check for the exception
+    Throwable throwable =
+        Assert.assertThrows(
+            HandoverException.class,
+            () -> service.handOver(edition, RECEIVER_ADDRESS, ISSUER_ADDRESS));
+
+    assertThat(throwable.getMessage()).isEqualTo("No id has been set in the edition.");
 
     // Verify that repository.save and mailSender.sendMail were not called
     verify(repository, times(0)).save(any(HandoverMail.class));

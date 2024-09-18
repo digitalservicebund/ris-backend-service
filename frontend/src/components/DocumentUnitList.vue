@@ -2,6 +2,7 @@
 import dayjs from "dayjs"
 import { computed, ref } from "vue"
 import DocumentUnitListEntry from "../domain/documentUnitListEntry"
+import Tooltip from "./Tooltip.vue"
 import CellHeaderItem from "@/components/CellHeaderItem.vue"
 import CellItem from "@/components/CellItem.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
@@ -125,44 +126,51 @@ function onDelete() {
             <FlexItem class="flex-grow"
               >{{ listEntry.documentNumber }}
             </FlexItem>
-            <FlexItem
-              v-if="listEntry.hasAttachments"
-              class="flex-end text-blue-800"
-              data-testid="file-attached-icon"
-            >
+
+            <Tooltip v-if="listEntry.hasAttachments" text="Anhang vorhanden">
               <IconAttachedFile
                 aria-label="Anhang vorhanden"
-                class="h-20 w-20"
+                class="flex-end h-20 w-20 text-blue-800"
+                data-testid="file-attached-icon"
               />
-            </FlexItem>
-            <FlexItem v-else class="flex-end text-gray-500">
+            </Tooltip>
+            <Tooltip v-else text="Kein Anhang vorhanden">
               <IconAttachedFile
                 aria-label="Kein Anhang vorhanden"
-                class="h-20 w-20"
+                class="flex-end h-20 w-20 text-gray-500"
               />
-            </FlexItem>
-            <FlexItem
+            </Tooltip>
+
+            <Tooltip
               v-if="listEntry.hasHeadnoteOrPrinciple"
-              class="flex-end text-blue-800"
-              data-testid="headnote-principle-icon"
+              text="Langtext vorhanden"
             >
-              <IconSubject aria-label="Langtext vorhanden" class="h-20 w-20" />
-            </FlexItem>
-            <span v-else class="text-gray-500"
-              ><IconSubject
+              <IconSubject
+                aria-label="Langtext vorhanden"
+                class="flex-end flex h-20 w-20 text-blue-800"
+                data-testid="headnote-principle-icon"
+              />
+            </Tooltip>
+            <Tooltip v-else text="Kein Langtext vorhanden">
+              <IconSubject
                 aria-label="Kein Langtext vorhanden"
-                class="h-20 w-20"
-            /></span>
-            <FlexItem
-              v-if="listEntry.hasNote"
-              class="flex-end text-blue-800"
-              data-testid="note-icon"
-            >
-              <IconNote aria-label="Notiz vorhanden" class="h-20 w-20" />
-            </FlexItem>
-            <span v-else class="text-gray-500"
-              ><IconNote aria-label="Keine Notiz vorhanden" class="h-20 w-20"
-            /></span>
+                class="h-20 w-20 text-gray-500"
+              />
+            </Tooltip>
+
+            <Tooltip v-if="listEntry.hasNote" text="Notiz vorhanden">
+              <IconNote
+                aria-label="Notiz vorhanden"
+                class="flex-end flex h-20 w-20 text-blue-800"
+                data-testid="note-icon"
+              />
+            </Tooltip>
+            <Tooltip v-else text="Keine Notiz vorhanden">
+              <IconNote
+                aria-label="Keine Notiz vorhanden"
+                class="h-20 w-20 text-gray-500"
+              />
+            </Tooltip>
           </FlexContainer>
         </CellItem>
         <CellItem>
@@ -208,18 +216,19 @@ function onDelete() {
         </CellItem>
         <CellItem class="flex">
           <div class="float-end flex">
-            <router-link
-              v-if="listEntry.isEditable"
-              aria-label="Dokumentationseinheit bearbeiten"
-              class="cursor-pointer border-2 border-r-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
-              target="_blank"
-              :to="{
-                name: 'caselaw-documentUnit-documentNumber-categories',
-                params: { documentNumber: listEntry.documentNumber },
-              }"
-            >
-              <IconEdit />
-            </router-link>
+            <Tooltip v-if="listEntry.isEditable" text="Bearbeiten">
+              <router-link
+                aria-label="Dokumentationseinheit bearbeiten"
+                class="flex cursor-pointer border-2 border-r-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
+                target="_blank"
+                :to="{
+                  name: 'caselaw-documentUnit-documentNumber-categories',
+                  params: { documentNumber: listEntry.documentNumber },
+                }"
+              >
+                <IconEdit />
+              </router-link>
+            </Tooltip>
             <div
               v-else
               aria-label="Dokumentationseinheit bearbeiten"
@@ -228,42 +237,45 @@ function onDelete() {
               <IconEdit />
             </div>
 
-            <router-link
-              aria-label="Dokumentationseinheit ansehen"
-              class="cursor-pointer border-2 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
-              target="_blank"
-              :to="{
-                name: 'caselaw-documentUnit-documentNumber-preview',
-                params: { documentNumber: listEntry.documentNumber },
-              }"
-            >
-              <IconView />
-            </router-link>
-            <button
-              v-if="listEntry.isDeletable"
-              aria-label="Dokumentationseinheit löschen"
-              class="cursor-pointer border-2 border-l-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
-              @click="
-                setSelectedDocumentUnitListEntry(
-                  documentUnitListEntries?.find(
-                    (entry) => entry.uuid == listEntry.uuid,
-                  ) as DocumentUnitListEntry,
-                )
-              "
-              @keyup.enter="
-                setSelectedDocumentUnitListEntry(
-                  documentUnitListEntries?.find(
-                    (entry) => entry.uuid == listEntry.uuid,
-                  ) as DocumentUnitListEntry,
-                )
-              "
-            >
-              <IconDelete />
-            </button>
+            <Tooltip text="Vorschau">
+              <router-link
+                aria-label="Dokumentationseinheit ansehen"
+                class="flex cursor-pointer border-2 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
+                target="_blank"
+                :to="{
+                  name: 'caselaw-documentUnit-documentNumber-preview',
+                  params: { documentNumber: listEntry.documentNumber },
+                }"
+              >
+                <IconView />
+              </router-link>
+            </Tooltip>
+            <Tooltip v-if="listEntry.isDeletable" text="Löschen">
+              <button
+                aria-label="Dokumentationseinheit löschen"
+                class="flex cursor-pointer border-2 border-l-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
+                @click="
+                  setSelectedDocumentUnitListEntry(
+                    documentUnitListEntries?.find(
+                      (entry) => entry.uuid == listEntry.uuid,
+                    ) as DocumentUnitListEntry,
+                  )
+                "
+                @keyup.enter="
+                  setSelectedDocumentUnitListEntry(
+                    documentUnitListEntries?.find(
+                      (entry) => entry.uuid == listEntry.uuid,
+                    ) as DocumentUnitListEntry,
+                  )
+                "
+              >
+                <IconDelete />
+              </button>
+            </Tooltip>
             <div
               v-else
               aria-label="Dokumentationseinheit löschen"
-              class="border-2 border-l-0 border-solid border-gray-600 p-4 text-gray-600"
+              class="flex border-2 border-l-0 border-solid border-gray-600 p-4 text-gray-600"
             >
               <IconDelete />
             </div>

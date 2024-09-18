@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue"
+import Tooltip from "./Tooltip.vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import ActiveCitation from "@/domain/activeCitation"
@@ -52,14 +53,16 @@ function copySummary() {
         label="Fehlende Daten"
       />
     </div>
-    <button
-      v-if="data instanceof ActiveCitation"
-      class="flex h-32 w-32 items-center justify-center text-blue-800 hover:bg-blue-100 focus:shadow-[inset_0_0_0_0.125rem] focus:shadow-blue-800 focus:outline-none"
-      data-testid="copy-summary"
-      @click="copySummary"
-      @keypress.enter="copySummary"
-    >
-      <IconBaselineContentCopy />
-    </button>
+    <Tooltip text="Kopieren">
+      <button
+        v-if="data instanceof ActiveCitation"
+        class="flex h-32 w-32 items-center justify-center text-blue-800 hover:bg-blue-100 focus:shadow-[inset_0_0_0_0.125rem] focus:shadow-blue-800 focus:outline-none"
+        data-testid="copy-summary"
+        @click="copySummary"
+        @keypress.enter="copySummary"
+      >
+        <IconBaselineContentCopy />
+      </button>
+    </Tooltip>
   </div>
 </template>

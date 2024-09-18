@@ -76,46 +76,48 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
 </script>
 
 <template>
-  <ExpandableDataSet
-    v-if="localModelValue"
-    :data-set="localModelValue"
-    :summary-component="SelectedFieldsOfLawSummary"
-    title="Sachgebiete"
-  >
-    <div class="w-full">
-      <div class="flex flex-row">
-        <div class="flex flex-1 flex-col bg-white p-32">
-          <FieldOfLawSearch
-            @do-show-norms="showNorms = true"
-            @linked-field:select="setSelectedNode"
-            @node:select="setSelectedNode"
-            @node:unselect="removeSelectedNode"
-          />
+  <div class="border-b-1 border-blue-300 pb-24">
+    <ExpandableDataSet
+      v-if="localModelValue"
+      :data-set="localModelValue"
+      :summary-component="SelectedFieldsOfLawSummary"
+      title="Sachgebiete"
+    >
+      <div class="w-full">
+        <div class="flex flex-row gap-24">
+          <div class="flex flex-1 flex-col">
+            <FieldOfLawSearch
+              @do-show-norms="showNorms = true"
+              @linked-field:select="setSelectedNode"
+              @node:select="setSelectedNode"
+              @node:unselect="removeSelectedNode"
+            />
+          </div>
+          <div class="flex-1">
+            <FieldOfLawTree
+              v-if="localModelValue"
+              v-model="localModelValue"
+              :selected-node="selectedNode"
+              :show-norms="showNorms"
+              @linked-field:select="setSelectedNode"
+              @node:select="addFeldOfLaw"
+              @node:unselect="removeFieldOfLaw"
+              @selected-node:reset="removeSelectedNode"
+              @toggle-show-norms="showNorms = !showNorms"
+            ></FieldOfLawTree>
+          </div>
         </div>
-        <div class="flex-1 bg-white p-32">
-          <FieldOfLawTree
-            v-if="localModelValue"
+        <hr class="w-full border-blue-700" />
+        <div class="bg-white p-20">
+          <h1 class="ds-heading-03-reg pb-8">Ausgewählte Sachgebiete</h1>
+          <FieldOfLawDirectInputSearch @add-to-list="addFeldOfLaw" />
+          <FieldOfLawSelectionList
             v-model="localModelValue"
-            :selected-node="selectedNode"
-            :show-norms="showNorms"
-            @linked-field:select="setSelectedNode"
-            @node:select="addFeldOfLaw"
-            @node:unselect="removeFieldOfLaw"
-            @selected-node:reset="removeSelectedNode"
-            @toggle-show-norms="showNorms = !showNorms"
-          ></FieldOfLawTree>
+            @node:remove="removeFieldOfLaw"
+            @node:select="setSelectedNode"
+          ></FieldOfLawSelectionList>
         </div>
       </div>
-      <hr class="w-full border-blue-700" />
-      <div class="bg-white p-20">
-        <h1 class="ds-heading-03-reg pb-8">Ausgewählte Sachgebiete</h1>
-        <FieldOfLawDirectInputSearch @add-to-list="addFeldOfLaw" />
-        <FieldOfLawSelectionList
-          v-model="localModelValue"
-          @node:remove="removeFieldOfLaw"
-          @node:select="setSelectedNode"
-        ></FieldOfLawSelectionList>
-      </div>
-    </div>
-  </ExpandableDataSet>
+    </ExpandableDataSet>
+  </div>
 </template>

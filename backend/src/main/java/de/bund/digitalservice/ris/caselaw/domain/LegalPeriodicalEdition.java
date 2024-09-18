@@ -8,7 +8,7 @@ import lombok.Builder;
 import org.hibernate.annotations.CreationTimestamp;
 
 /** A legal periodical edition (Ausgabe eines Periodikums für die Periodikaauswertung). */
-@Builder
+@Builder(toBuilder = true)
 public record LegalPeriodicalEdition(
     UUID id,
     LegalPeriodical legalPeriodical,
