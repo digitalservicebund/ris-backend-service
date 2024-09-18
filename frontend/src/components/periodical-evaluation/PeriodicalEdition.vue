@@ -134,13 +134,6 @@ async function saveEdition() {
           label="Fortfahren"
           @click="saveEdition"
         ></TextButton>
-        <TextButton
-          aria-label="Abbrechen"
-          button-type="ghost"
-          label="Abbrechen"
-          size="small"
-          @click.stop="$router.push({ name: 'caselaw-periodical-evaluation' })"
-        />
       </FlexContainer>
     </div>
   </div>
