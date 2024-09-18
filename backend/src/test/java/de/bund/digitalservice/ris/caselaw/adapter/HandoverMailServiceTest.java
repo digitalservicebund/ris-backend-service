@@ -101,8 +101,8 @@ class HandoverMailServiceTest {
           .mailSubject(EDITION_MAIL_SUBJECT)
           .attachments(
               List.of(
-                  MailAttachment.builder().fileName("test1.xml").fileContent("xml 1").build(),
-                  MailAttachment.builder().fileName("test2.xml").fileContent("xml 2").build()))
+                  MailAttachment.builder().fileName("test2.xml").fileContent("xml 2").build(),
+                  MailAttachment.builder().fileName("test1.xml").fileContent("xml 1").build()))
           .success(true)
           .statusMessages(List.of("succeed", "succeed"))
           .handoverDate(CREATED_DATE)
