@@ -1,40 +1,39 @@
 <script lang="ts" setup>
-import TextEditor from "../components/input/TextEditor.vue"
+import TextEditor from "../input/TextEditor.vue"
 import { TextAreaInputAttributes } from "@/components/input/types"
 
 interface Props {
-  name?: string
-  label?: string
-  value?: string
-  fieldSize: TextAreaInputAttributes["fieldSize"]
+  id: string
+  label: string
+  modelValue?: string
+  editable: boolean
+  fieldSize?: TextAreaInputAttributes["fieldSize"]
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  name: undefined,
-  label: undefined,
-  value: undefined,
+  modelValue: undefined,
   fieldSize: "medium",
 })
 
-const emit = defineEmits<{
-  "update-value": [value: string]
+defineEmits<{
+  "update:modelValue": [value: string]
 }>()
 </script>
 
 <template>
   <div class="flex flex-col">
-    <label class="ds-label-02-reg mb-4" :for="props.name">{{
+    <label class="ds-label-02-reg mb-4" :for="props.id">{{
       props.label
     }}</label>
 
     <TextEditor
-      :id="props.name"
+      :id="props.id"
       :aria-label="props.label"
       class="shadow-blue focus-within:shadow-focus hover:shadow-hover"
-      editable
+      :editable="editable"
       :field-size="props.fieldSize"
-      :value="props.value"
-      @update-value="emit('update-value', $event)"
+      :value="props.modelValue"
+      @update-value="$emit('update:modelValue', $event)"
     />
   </div>
 </template>

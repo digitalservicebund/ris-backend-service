@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import DocumentUnitLongTexts from "@/components/DocumentUnitLongTexts.vue"
-import DocumentUnitShortTexts from "@/components/DocumentUnitShortTexts.vue"
+import DocumentUnitLongTexts from "@/components/texts/DocumentUnitLongTexts.vue"
+import DocumentUnitShortTexts from "@/components/texts/DocumentUnitShortTexts.vue"
 </script>
 
 <template>

@@ -1,11 +1,11 @@
 import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
-import DocumentUnitTexts from "@/components/DocumentUnitTexts.vue"
+import DocumentUnitTextsNew from "@/components/texts/DocumentUnitTexts.vue"
 import DocumentUnit from "@/domain/documentUnit"
 
 describe("Texts", () => {
   test("renders all text fields with labels", async () => {
-    render(DocumentUnitTexts, {
+    render(DocumentUnitTextsNew, {
       global: {
         plugins: [
           [
