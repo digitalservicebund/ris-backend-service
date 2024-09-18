@@ -4,6 +4,7 @@ import CategoryWrapper from "@/components/CategoryWrapper.vue"
 import DocumentUnitTextField from "@/components/texts/DocumentUnitTextField.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import TextEditorUtil from "@/utils/textEditorUtil"
 
 const store = useDocumentUnitStore()
 
@@ -36,48 +37,34 @@ const hasDecisionReasons = ref<boolean>(
 const tenor = computed({
   get: () => store.documentUnit?.longTexts.tenor,
   set: (newValue) => {
-    store.documentUnit!.longTexts.tenor = hasContent(newValue)
-      ? newValue
-      : undefined
+    store.documentUnit!.longTexts.tenor =
+      TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const reasons = computed({
   get: () => store.documentUnit?.longTexts.reasons,
   set: (newValue) => {
-    store.documentUnit!.longTexts.reasons = hasContent(newValue)
-      ? newValue
-      : undefined
+    store.documentUnit!.longTexts.reasons =
+      TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const caseFacts = computed({
   get: () => store.documentUnit?.longTexts.caseFacts,
   set: (newValue) => {
-    store.documentUnit!.longTexts.caseFacts = hasContent(newValue)
-      ? newValue
-      : undefined
+    store.documentUnit!.longTexts.caseFacts =
+      TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const decisionReasons = computed({
   get: () => store.documentUnit?.longTexts.decisionReasons,
   set: (newValue) => {
-    store.documentUnit!.longTexts.decisionReasons = hasContent(newValue)
-      ? newValue
-      : undefined
+    store.documentUnit!.longTexts.decisionReasons =
+      TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
-
-function hasContent(text?: string) {
-  const divElem = document.createElement("div")
-  if (text == undefined) text = ""
-  divElem.innerHTML = text
-  const hasImgElem = divElem.getElementsByTagName("img").length > 0
-  const hasTable = divElem.getElementsByTagName("table").length > 0
-  const hasInnerText = divElem.innerText.trimEnd().length > 0
-  return hasInnerText || hasImgElem || hasTable
-}
 </script>
 
 <template>

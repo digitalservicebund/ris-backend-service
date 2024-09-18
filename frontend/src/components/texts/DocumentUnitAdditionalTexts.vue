@@ -4,6 +4,7 @@ import CategoryWrapper from "@/components/CategoryWrapper.vue"
 import DocumentUnitTextField from "@/components/texts/DocumentUnitTextField.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import TextEditorUtil from "@/utils/textEditorUtil"
 
 const store = useDocumentUnitStore()
 
@@ -30,39 +31,26 @@ const hasOutline = ref<boolean>(
 const otherLongText = computed({
   get: () => store.documentUnit?.longTexts.otherLongText,
   set: (newValue) => {
-    store.documentUnit!.longTexts.otherLongText = hasContent(newValue)
-      ? newValue
-      : undefined
+    store.documentUnit!.longTexts.otherLongText =
+      TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const dissentingOpinion = computed({
   get: () => store.documentUnit?.longTexts.dissentingOpinion,
   set: (newValue) => {
-    store.documentUnit!.longTexts.dissentingOpinion = hasContent(newValue)
-      ? newValue
-      : undefined
+    store.documentUnit!.longTexts.dissentingOpinion =
+      TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const outline = computed({
   get: () => store.documentUnit?.longTexts.outline,
   set: (newValue) => {
-    store.documentUnit!.longTexts.outline = hasContent(newValue)
-      ? newValue
-      : undefined
+    store.documentUnit!.longTexts.outline =
+      TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
-
-function hasContent(text?: string) {
-  const divElem = document.createElement("div")
-  if (text == undefined) text = ""
-  divElem.innerHTML = text
-  const hasImgElem = divElem.getElementsByTagName("img").length > 0
-  const hasTable = divElem.getElementsByTagName("table").length > 0
-  const hasInnerText = divElem.innerText.trimEnd().length > 0
-  return hasInnerText || hasImgElem || hasTable
-}
 </script>
 
 <template>

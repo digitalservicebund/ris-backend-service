@@ -5,6 +5,7 @@ import TextInput from "@/components/input/TextInput.vue"
 import DocumentUnitTextField from "@/components/texts/DocumentUnitTextField.vue"
 import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLinks"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import TextEditorUtil from "@/utils/textEditorUtil"
 
 const store = useDocumentUnitStore()
 
@@ -41,18 +42,16 @@ const hasOtherHeadnote = ref<boolean>(
 const decisionName = computed({
   get: () => store.documentUnit?.shortTexts.decisionName,
   set: (newValue) => {
-    store.documentUnit!.shortTexts.decisionName = hasContent(newValue)
-      ? newValue
-      : undefined
+    store.documentUnit!.shortTexts.decisionName =
+      TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const headline = computed({
   get: () => store.documentUnit?.shortTexts.headline,
   set: (newValue) => {
-    store.documentUnit!.shortTexts.headline = hasContent(newValue)
-      ? newValue
-      : undefined
+    store.documentUnit!.shortTexts.headline =
+      TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
@@ -65,39 +64,26 @@ const guidingPrinciple = computed({
         )
       : undefined,
   set: (newValue) => {
-    store.documentUnit!.shortTexts.guidingPrinciple = hasContent(newValue)
-      ? newValue
-      : undefined
+    store.documentUnit!.shortTexts.guidingPrinciple =
+      TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const headnote = computed({
   get: () => store.documentUnit?.shortTexts.headnote,
   set: (newValue) => {
-    store.documentUnit!.shortTexts.headnote = hasContent(newValue)
-      ? newValue
-      : undefined
+    store.documentUnit!.shortTexts.headnote =
+      TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
 
 const otherHeadnote = computed({
   get: () => store.documentUnit?.shortTexts.otherHeadnote,
   set: (newValue) => {
-    store.documentUnit!.shortTexts.otherHeadnote = hasContent(newValue)
-      ? newValue
-      : undefined
+    store.documentUnit!.shortTexts.otherHeadnote =
+      TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
-
-function hasContent(text?: string) {
-  const divElem = document.createElement("div")
-  if (text == undefined) text = ""
-  divElem.innerHTML = text
-  const hasImgElem = divElem.getElementsByTagName("img").length > 0
-  const hasTable = divElem.getElementsByTagName("table").length > 0
-  const hasInnerText = divElem.innerText.trimEnd().length > 0
-  return hasInnerText || hasImgElem || hasTable
-}
 </script>
 
 <template>
