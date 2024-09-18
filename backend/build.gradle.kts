@@ -186,7 +186,7 @@ dependencies {
     implementation("com.icegreen:greenmail:2.1.0-rc-1")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.5") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.6") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:

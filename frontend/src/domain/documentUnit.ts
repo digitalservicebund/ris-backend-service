@@ -33,6 +33,8 @@ export type CoreData = {
 }
 
 export type ContentRelatedIndexing = {
+  dismissalTypes?: string[]
+  dismissalGrounds?: string[]
   keywords?: string[]
   norms?: NormReference[]
   activeCitations?: ActiveCitation[]
