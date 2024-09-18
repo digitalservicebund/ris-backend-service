@@ -42,7 +42,7 @@ test.describe("court", () => {
 
     await page.reload()
 
-    // If deviating data is available, it is automatically expanded
+    await page.locator("[aria-label='Fehlerhaftes Gericht anzeigen']").click()
     await expect(page.getByText("abc").first()).toBeVisible()
   })
 
@@ -66,7 +66,7 @@ test.describe("court", () => {
     await save(page)
     await page.reload()
 
-    // If deviating data is available, it is automatically expanded
+    await page.locator("[aria-label='Fehlerhaftes Gericht anzeigen']").click()
     await expect(page.getByText("IncorrectCourt1")).toBeVisible()
     await expect(page.getByText("IncorrectCourt2")).toBeVisible()
 
@@ -77,7 +77,7 @@ test.describe("court", () => {
     await save(page)
     await page.reload()
 
-    // If deviating data is available, it is automatically expanded
+    await page.locator("[aria-label='Fehlerhaftes Gericht anzeigen']").click()
     await expect(page.getByText("IncorrectCourt1")).toHaveCount(0)
     await expect(page.getByText("IncorrectCourt2")).toBeVisible()
   })

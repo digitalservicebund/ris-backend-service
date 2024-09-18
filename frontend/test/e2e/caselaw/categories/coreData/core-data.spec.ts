@@ -42,7 +42,7 @@ test.describe("core data", () => {
 
     await page.reload()
 
-    // If deviating data is available, it is automatically expanded
+    await page.locator("[aria-label='Abweichender ECLI anzeigen']").click()
     await expect(page.getByText("two").first()).toBeVisible()
     await expect(page.getByText("three").first()).toBeVisible()
 
@@ -81,7 +81,9 @@ test.describe("core data", () => {
     await save(page)
     await page.reload()
 
-    // If deviating data is available, it is automatically expanded
+    await page
+      .locator("[aria-label='Abweichendes Aktenzeichen anzeigen']")
+      .click()
     await expect(page.getByText("three").first()).toBeVisible()
     await page
       .locator("[aria-label='Abweichendes Aktenzeichen schließen']")

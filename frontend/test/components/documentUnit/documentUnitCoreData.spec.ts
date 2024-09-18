@@ -55,6 +55,8 @@ describe("Core Data", () => {
     })
 
     renderComponent({ modelValue: documentUnit.coreData })
+    await screen.findByLabelText("Abweichendes Entscheidungsdatum anzeigen")
+    screen.getByLabelText("Abweichendes Entscheidungsdatum anzeigen").click()
     expect(await screen.findByTestId("deviating-decision-dates")).toBeVisible()
 
     const chipList = screen.getAllByRole("listitem")

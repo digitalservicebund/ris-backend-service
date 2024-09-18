@@ -95,7 +95,12 @@ test.describe("previous decisions", () => {
       .getByLabel("Vorgehende Entscheidung", { exact: true })
       .getByTestId("list-entry-0")
       .click()
-    // If deviating data is available, it is automatically expanded
+    page.getByLabel("Nachgehende Entscheidung", { exact: true })
+    await page
+      .locator(
+        "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung anzeigen']",
+      )
+      .click()
     await expect(
       page.locator(
         "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung']",
@@ -115,7 +120,12 @@ test.describe("previous decisions", () => {
       .getByLabel("Vorgehende Entscheidung", { exact: true })
       .getByTestId("list-entry-0")
       .click()
-    // If deviating data is available, it is automatically expanded
+    // if 'Abweichendes Aktenzeichen' input filled, the nested input is expanded
+    await page
+      .locator(
+        "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung anzeigen']",
+      )
+      .click()
     await expect(
       page.locator(
         "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung']",

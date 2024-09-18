@@ -49,9 +49,8 @@ test.describe("procedure", () => {
       }).toPass()
 
       await save(page)
-      await page.reload()
 
-      // If deviating data is available, it is automatically expanded
+      await page.getByLabel("Vorgangshistorie anzeigen").click()
       await expect(page.getByText("Vorgangshistorie")).toBeVisible()
       await expect(
         page
