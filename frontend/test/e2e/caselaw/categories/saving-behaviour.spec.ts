@@ -173,7 +173,8 @@ test.describe("saving behaviour", () => {
     async ({ page, documentNumber }) => {
       await navigateToCategories(page, documentNumber)
 
-      const { promise: lock, resolve: releaseLock } = Promise.withResolvers()
+      const { promise: lock, resolve: releaseLock } =
+        Promise.withResolvers<void>()
 
       // We want to simulate behavior during an ongoing save request, so we delay the request.
       await page.route("**/api/v1/caselaw/documentunits/*", async (route) => {
