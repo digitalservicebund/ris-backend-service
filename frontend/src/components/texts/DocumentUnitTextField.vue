@@ -6,7 +6,6 @@ interface Props {
   id: string
   label: string
   modelValue?: string
-  editable: boolean
   fieldSize?: TextAreaInputAttributes["fieldSize"]
 }
 
@@ -30,7 +29,7 @@ defineEmits<{
       :id="props.id"
       :aria-label="props.label"
       class="shadow-blue focus-within:shadow-focus hover:shadow-hover"
-      :editable="editable"
+      editable
       :field-size="props.fieldSize"
       :value="props.modelValue"
       @update-value="$emit('update:modelValue', $event)"

@@ -54,39 +54,41 @@ const outline = computed({
 </script>
 
 <template>
-  <h2 class="ds-label-01-bold mb-16 mt-24">Weitere Langtexte</h2>
-  <div class="flex flex-col gap-24">
-    <CategoryWrapper
-      label="Sonstiger Langtext"
-      :should-show-button="!hasOtherLongtext"
-    >
-      <DocumentUnitTextField
-        id="otherLongText"
-        v-model="otherLongText"
-        :editable="isInternalUser"
+  <div class="border-t-1 border-blue-300 pb-24">
+    <h2 class="ds-label-01-bold mb-16 mt-24">Weitere Langtexte</h2>
+    <div class="flex flex-col gap-24">
+      <CategoryWrapper
         label="Sonstiger Langtext"
-      />
-    </CategoryWrapper>
+        :should-show-button="!hasOtherLongtext"
+      >
+        <DocumentUnitTextField
+          id="otherLongText"
+          v-model="otherLongText"
+          :editable="isInternalUser"
+          label="Sonstiger Langtext"
+        />
+      </CategoryWrapper>
 
-    <CategoryWrapper
-      label="Abweichende Meinung"
-      :should-show-button="!hasDissentingOpinion"
-    >
-      <DocumentUnitTextField
-        id="dissentingOpinion"
-        v-model="dissentingOpinion"
-        :editable="isInternalUser"
+      <CategoryWrapper
         label="Abweichende Meinung"
-      />
-    </CategoryWrapper>
+        :should-show-button="!hasDissentingOpinion"
+      >
+        <DocumentUnitTextField
+          id="dissentingOpinion"
+          v-model="dissentingOpinion"
+          :editable="isInternalUser"
+          label="Abweichende Meinung"
+        />
+      </CategoryWrapper>
 
-    <CategoryWrapper label="Gliederung" :should-show-button="!hasOutline">
-      <DocumentUnitTextField
-        id="outline"
-        v-model="outline"
-        :editable="isInternalUser"
-        label="Gliederung"
-      />
-    </CategoryWrapper>
+      <CategoryWrapper label="Gliederung" :should-show-button="!hasOutline">
+        <DocumentUnitTextField
+          id="outline"
+          v-model="outline"
+          :editable="isInternalUser"
+          label="Gliederung"
+        />
+      </CategoryWrapper>
+    </div>
   </div>
 </template>

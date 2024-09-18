@@ -87,7 +87,7 @@ const otherHeadnote = computed({
 </script>
 
 <template>
-  <div aria-label="Kurztexte" class="border-b-1 border-blue-300 pb-24">
+  <div aria-label="Kurztexte" class="pb-24">
     <h2 class="ds-label-01-bold mb-16">Kurztexte</h2>
     <div class="flex flex-col gap-24">
       <CategoryWrapper

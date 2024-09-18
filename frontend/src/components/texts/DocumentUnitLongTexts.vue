@@ -2,13 +2,10 @@
 import { computed, ref } from "vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
 import DocumentUnitTextField from "@/components/texts/DocumentUnitTextField.vue"
-import { useInternalUser } from "@/composables/useInternalUser"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import TextEditorUtil from "@/utils/textEditorUtil"
 
 const store = useDocumentUnitStore()
-
-const isInternalUser = useInternalUser()
 
 const hasTenor = ref<boolean>(
   store.documentUnit?.longTexts?.tenor
@@ -68,32 +65,21 @@ const decisionReasons = computed({
 </script>
 
 <template>
-  <div aria-label="Langtexte" class="border-b-1 border-blue-300 pb-24">
+  <div aria-label="Langtexte" class="border-t-1 border-blue-300 pb-24">
     <h2 class="ds-label-01-bold mb-16 mt-24">Langtexte</h2>
     <div class="flex flex-col gap-24">
       <CategoryWrapper label="Tenor" :should-show-button="!hasTenor">
-        <DocumentUnitTextField
-          id="tenor"
-          v-model="tenor"
-          :editable="isInternalUser"
-          label="Tenor"
-        />
+        <DocumentUnitTextField id="tenor" v-model="tenor" label="Tenor" />
       </CategoryWrapper>
 
       <CategoryWrapper label="Gründe" :should-show-button="!hasReasons">
-        <DocumentUnitTextField
-          id="reasons"
-          v-model="reasons"
-          :editable="isInternalUser"
-          label="Gründe"
-        />
+        <DocumentUnitTextField id="reasons" v-model="reasons" label="Gründe" />
       </CategoryWrapper>
 
       <CategoryWrapper label="Tatbestand" :should-show-button="!hasCaseFacts">
         <DocumentUnitTextField
           id="caseFacts"
           v-model="caseFacts"
-          :editable="isInternalUser"
           label="Tatbestand"
         />
       </CategoryWrapper>
@@ -105,7 +91,6 @@ const decisionReasons = computed({
         <DocumentUnitTextField
           id="decisionReasons"
           v-model="decisionReasons"
-          :editable="isInternalUser"
           label="Entscheidungsgründe"
         />
       </CategoryWrapper>

@@ -2,13 +2,16 @@
 import DocumentUnitAdditionalTexts from "@/components/texts/DocumentUnitAdditionalTexts.vue"
 import DocumentUnitLongTexts from "@/components/texts/DocumentUnitLongTexts.vue"
 import DocumentUnitShortTexts from "@/components/texts/DocumentUnitShortTexts.vue"
+import { useInternalUser } from "@/composables/useInternalUser"
+
+const isInternalUser = useInternalUser()
 </script>
 
 <template>
-  <div class="flex flex-col bg-white p-24">
-    <h2 class="ds-subhead mb-24">Kurz- und Langtexte</h2>
+  <div class="flex flex-col bg-white px-24">
+    <h2 class="ds-subhead my-24">Kurz- und Langtexte</h2>
     <DocumentUnitShortTexts />
-    <DocumentUnitLongTexts />
-    <DocumentUnitAdditionalTexts />
+    <DocumentUnitLongTexts v-if="isInternalUser" />
+    <DocumentUnitAdditionalTexts v-if="isInternalUser" />
   </div>
 </template>
