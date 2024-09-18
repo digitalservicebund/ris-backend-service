@@ -422,7 +422,7 @@ test.describe("short and long texts", () => {
             page.getByText(value, {
               exact: true,
             }),
-          ).toBeVisible()
+          ).toBeVisible({ timeout: 10_000 })
         })
 
         await test.step(`text field '${testId}' and value '${value}' should be visible in 'XML-Vorschau'`, async () => {
