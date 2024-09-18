@@ -42,9 +42,11 @@ const closeTooltip = () => {
   <div
     class="relative"
     @blur="closeTooltip"
+    @click="closeTooltip"
     @focus="openTooltip"
     @focusin="openTooltip"
     @focusout="closeTooltip"
+    @keydown="closeTooltip"
     @mouseenter="openTooltip"
     @mouseleave="closeTooltip"
     @touchstart="openTooltip"
