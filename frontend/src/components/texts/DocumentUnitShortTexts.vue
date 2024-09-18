@@ -101,70 +101,72 @@ function hasContent(text?: string) {
 </script>
 
 <template>
-  <h2 class="ds-heading-03-bold mb-16">Kurztexte</h2>
-  <div class="flex flex-col gap-24">
-    <CategoryWrapper
-      label="Entscheidungsname"
-      :should-show-button="!hasDecisionName"
-    >
-      <div class="flex flex-col">
-        <label class="ds-label-02-reg mb-4" for="'decisionName'">
-          Entscheidungsname
-        </label>
+  <div aria-label="Kurztexte" class="border-b-1 border-blue-300 pb-24">
+    <h2 class="ds-label-01-bold mb-16">Kurztexte</h2>
+    <div class="flex flex-col gap-24">
+      <CategoryWrapper
+        label="Entscheidungsname"
+        :should-show-button="!hasDecisionName"
+      >
+        <div class="flex flex-col">
+          <label class="ds-label-02-reg mb-4" for="'decisionName'">
+            Entscheidungsname
+          </label>
 
-        <TextInput
-          id="decisionName"
-          v-model="decisionName"
-          aria-label="decisionName"
-          size="medium"
+          <TextInput
+            id="decisionName"
+            v-model="decisionName"
+            aria-label="decisionName"
+            size="medium"
+          />
+        </div>
+      </CategoryWrapper>
+
+      <CategoryWrapper label="Titelzeile" :should-show-button="!hasHeadline">
+        <DocumentUnitTextField
+          id="headline"
+          v-model="headline"
+          editable
+          field-size="small"
+          label="Titelzeile"
         />
-      </div>
-    </CategoryWrapper>
+      </CategoryWrapper>
 
-    <CategoryWrapper label="Titelzeile" :should-show-button="!hasHeadline">
-      <DocumentUnitTextField
-        id="headline"
-        v-model="headline"
-        editable
-        field-size="small"
-        label="Titelzeile"
-      />
-    </CategoryWrapper>
-
-    <CategoryWrapper
-      label="Leitsatz"
-      :should-show-button="!hasGuidingPrinciple"
-    >
-      <DocumentUnitTextField
-        id="guidingPrinciple"
-        v-model="guidingPrinciple"
-        editable
+      <CategoryWrapper
         label="Leitsatz"
-      />
-    </CategoryWrapper>
+        :should-show-button="!hasGuidingPrinciple"
+      >
+        <DocumentUnitTextField
+          id="guidingPrinciple"
+          v-model="guidingPrinciple"
+          editable
+          label="Leitsatz"
+        />
+      </CategoryWrapper>
 
-    <CategoryWrapper
-      label="Orientierungssatz"
-      :should-show-button="!hasHeadnote"
-    >
-      <DocumentUnitTextField
-        id="headnote"
-        v-model="headnote"
-        editable
+      <CategoryWrapper
         label="Orientierungssatz"
-      />
-    </CategoryWrapper>
+        :should-show-button="!hasHeadnote"
+      >
+        <DocumentUnitTextField
+          id="headnote"
+          v-model="headnote"
+          editable
+          label="Orientierungssatz"
+        />
+      </CategoryWrapper>
 
-    <CategoryWrapper
-      label="Sonstiger Orientierungssatz"
-      :should-show-button="!hasOtherHeadnote"
-    >
-      <DocumentUnitTextField
-        id="otherHeadnote"
-        v-model="otherHeadnote"
-        editable
+      <CategoryWrapper
         label="Sonstiger Orientierungssatz"
-      />
-    </CategoryWrapper>
+        :should-show-button="!hasOtherHeadnote"
+      >
+        <DocumentUnitTextField
+          id="otherHeadnote"
+          v-model="otherHeadnote"
+          editable
+          label="Sonstiger Orientierungssatz"
+        />
+      </CategoryWrapper>
+    </div>
   </div>
 </template>
