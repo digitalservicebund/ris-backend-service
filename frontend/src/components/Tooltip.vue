@@ -1,14 +1,12 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-import { ref, onMounted, watch, onUnmounted } from "vue"
+import { ref, onMounted, onUnmounted } from "vue"
 
 interface Props {
-  isVisible?: boolean
   text: string
   shortcut?: string
 }
-const props = withDefaults(defineProps<Props>(), {
-  isVisible: false,
+withDefaults(defineProps<Props>(), {
   shortcut: undefined,
 })
 
@@ -18,19 +16,10 @@ const handleKeyDown = (e: KeyboardEvent) => {
   }
 }
 
-const tooltipVisible = ref(props.isVisible)
+const tooltipVisible = ref(false)
 
+// Add the keydown event listener when the component is mounted
 onMounted(() => {
-  tooltipVisible.value = props.isVisible
-
-  watch(
-    () => props.isVisible,
-    (newValue) => {
-      tooltipVisible.value = newValue
-    },
-  )
-
-  // Add the keydown event listener when the component is mounted
   window.addEventListener("keydown", handleKeyDown)
 })
 
@@ -64,6 +53,7 @@ const closeTooltip = () => {
     <div
       v-if="tooltipVisible"
       class="ds-label-03-reg absolute left-[50%] top-[110%] z-20 w-max max-w-[18em] translate-x-[-50%] rounded bg-gray-900 px-8 py-4 text-center text-white"
+      role="tooltip"
     >
       {{ text }}
       <div v-if="shortcut">{{ shortcut }}</div>
