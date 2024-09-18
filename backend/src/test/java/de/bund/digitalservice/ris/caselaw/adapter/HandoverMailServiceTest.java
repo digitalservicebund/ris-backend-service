@@ -119,6 +119,9 @@ class HandoverMailServiceTest {
 
   private DocumentationUnit documentationUnit;
 
+  private final LegalPeriodical legalPeriodical =
+      LegalPeriodical.builder().abbreviation("ABC").build();
+
   private LegalPeriodicalEdition edition;
 
   @Autowired private HandoverMailService service;
@@ -137,7 +140,7 @@ class HandoverMailServiceTest {
   void setUp() throws ParserConfigurationException, TransformerException {
     documentationUnit =
         DocumentationUnit.builder().uuid(TEST_UUID).documentNumber("test-document-number").build();
-    LegalPeriodical legalPeriodical = LegalPeriodical.builder().abbreviation("ABC").build();
+
     edition =
         LegalPeriodicalEdition.builder()
             .legalPeriodical(legalPeriodical)
@@ -217,6 +220,83 @@ class HandoverMailServiceTest {
             EDITION_SAVED_MAIL.mailSubject(),
             "neuris",
             EDITION_SAVED_MAIL.attachments(),
+            EDITION_SAVED_MAIL.entityId().toString());
+  }
+
+  @Test
+  void testSendEditionWithTwoReferecesForSameDocUnit()
+      throws ParserConfigurationException, TransformerException {
+    var editionWithTwoReferencesForSameDocUnit =
+        LegalPeriodicalEdition.builder()
+            .legalPeriodical(legalPeriodical)
+            .id(TEST_UUID)
+            .references(
+                List.of(
+                    Reference.builder()
+                        .citation("2004, 1")
+                        .legalPeriodical(LegalPeriodical.builder().abbreviation("ABC").build())
+                        .documentationUnit(
+                            RelatedDocumentationUnit.builder()
+                                .documentNumber("document-number-1")
+                                .build())
+                        .build(),
+                    Reference.builder()
+                        .citation("2004, 2")
+                        .legalPeriodical(LegalPeriodical.builder().abbreviation("ABC").build())
+                        .documentationUnit(
+                            RelatedDocumentationUnit.builder()
+                                .documentNumber("document-number-1")
+                                .build())
+                        .build()))
+            .build();
+
+    var savedEditionWithNumberedAttachments =
+        HandoverMail.builder()
+            .entityId(TEST_UUID)
+            .entityType(HandoverEntityType.EDITION)
+            .receiverAddress(RECEIVER_ADDRESS)
+            .mailSubject(EDITION_MAIL_SUBJECT)
+            .attachments(
+                List.of(
+                    MailAttachment.builder()
+                        .fileName("document-number-1_1.xml")
+                        .fileContent("xml 1")
+                        .build(),
+                    MailAttachment.builder()
+                        .fileName("document-number-1_2.xml")
+                        .fileContent("xml 2")
+                        .build()))
+            .success(true)
+            .statusMessages(List.of("succeed", "succeed"))
+            .handoverDate(CREATED_DATE)
+            .issuerAddress(ISSUER_ADDRESS)
+            .build();
+
+    when(xmlExporter.transformToXml(editionWithTwoReferencesForSameDocUnit))
+        .thenReturn(
+            List.of(
+                new XmlTransformationResult(
+                    "xml 1", true, List.of("succeed"), "document-number-1.xml", CREATED_DATE),
+                new XmlTransformationResult(
+                    "xml 2", true, List.of("succeed"), "document-number-1.xml", CREATED_DATE)));
+
+    when(repository.save(savedEditionWithNumberedAttachments))
+        .thenReturn(savedEditionWithNumberedAttachments);
+
+    var response =
+        service.handOver(editionWithTwoReferencesForSameDocUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS);
+
+    assertThat(response).usingRecursiveComparison().isEqualTo(savedEditionWithNumberedAttachments);
+
+    verify(xmlExporter).transformToXml(editionWithTwoReferencesForSameDocUnit);
+    verify(repository).save(savedEditionWithNumberedAttachments);
+    verify(mailSender)
+        .sendMail(
+            SENDER_ADDRESS,
+            RECEIVER_ADDRESS,
+            EDITION_SAVED_MAIL.mailSubject(),
+            "neuris",
+            savedEditionWithNumberedAttachments.attachments(),
             EDITION_SAVED_MAIL.entityId().toString());
   }
 
