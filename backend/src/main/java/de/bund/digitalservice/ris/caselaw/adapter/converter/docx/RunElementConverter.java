@@ -91,6 +91,11 @@ public class RunElementConverter {
         RunTextElement runTextElement = new RunTextElement();
         runTextElement.setText("\u00AD");
         paragraphElement.addRunElement(runTextElement);
+        //         carriage return = line break
+      } else if (declaredType == R.Cr.class) {
+        RunTextElement runTextElement = new RunTextElement();
+        runTextElement.setText("<br/>");
+        paragraphElement.addRunElement(runTextElement);
       } else {
         LOGGER.error("unknown run element: {}", declaredType.getName());
         paragraphElement.addRunElement(new ErrorRunElement(declaredType.getName()));
