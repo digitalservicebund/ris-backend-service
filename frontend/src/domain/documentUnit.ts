@@ -154,7 +154,7 @@ export default class DocumentUnit {
         )
 
     if (data.attachments != undefined && data.attachments.length > 0) {
-      data.attachments.map(
+      data.attachments = data.attachments.map(
         (attachment: Attachment) => new Attachment({ ...attachment }),
       )
     }
