@@ -6,6 +6,7 @@ import Icons from "unplugin-icons/vite"
 import { defineConfig } from "vite"
 import EnvironmentPlugin from "vite-plugin-environment"
 import Pages from "vite-plugin-pages"
+import vueDevTools from "vite-plugin-vue-devtools"
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -40,6 +41,7 @@ export default defineConfig({
     Icons({
       scale: 1.3333, // ~24px at the current default font size of 18px
     }),
+    vueDevTools(),
   ],
   test: {
     setupFiles: ["test/setup.ts"],

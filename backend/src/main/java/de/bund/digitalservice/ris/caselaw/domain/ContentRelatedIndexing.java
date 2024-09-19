@@ -11,4 +11,6 @@ public record ContentRelatedIndexing(
     List<FieldOfLaw> fieldsOfLaw,
     List<NormReference> norms,
     List<ActiveCitation> activeCitations,
+    List<String> dismissalGrounds,
+    List<String> dismissalTypes,
     boolean hasLegislativeMandate) {}

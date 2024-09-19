@@ -91,7 +91,9 @@ const numberOfReferences = computed(() => {
     v-if="store.edition"
     class="flex-start flex max-w-[80rem] flex-col justify-start gap-40"
   >
-    <h1 class="ds-heading-02-reg">Übergabe an jDV</h1>
+    <h1 class="ds-heading-02-reg" data-testid="handover-title">
+      Übergabe an jDV
+    </h1>
     <div aria-label="Datenprüfung" class="flex flex-row">
       <div v-if="!numberOfReferences" class="flex flex-row items-center gap-8">
         <IconErrorOutline class="text-red-800" />

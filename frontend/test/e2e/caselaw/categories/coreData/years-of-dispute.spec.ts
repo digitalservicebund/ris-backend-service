@@ -151,7 +151,7 @@ test.describe(
           await navigateToPreview(page, documentNumber)
           for (const year of testData) {
             await expect(
-              page.getByTestId("preview").getByText(year),
+              page.getByTestId("preview").getByText(year, { exact: true }),
             ).toBeVisible()
           }
         })
