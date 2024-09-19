@@ -92,6 +92,7 @@ jobs:
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
           format: "sarif"
           output: "trivy-results.sarif"
+          github-pat: ${{ secrets.GITHUB_TOKEN }}
       - name: Check trivy results
         run: |
           if grep -qE 'HIGH|CRITICAL' trivy-results.sarif; then
