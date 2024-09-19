@@ -245,8 +245,7 @@ onMounted(() => {
           class="w-full"
           :is-open="
             previousDecision.hasForeignSource ||
-            (previousDecision.deviatingFileNumber !== undefined &&
-              previousDecision.deviatingFileNumber !== '')
+            !!previousDecision.deviatingFileNumber
           "
         >
           <InputField
