@@ -196,21 +196,23 @@ onMounted(() => {
           :current-index="currentAttachmentIndex"
           @select="handleOnSelectAttachment"
         ></FileNavigator>
-        <router-link
-          v-if="selectedPanelContent === 'preview'"
-          aria-label="Vorschau in neuem Tab öffnen"
-          target="_blank"
-          :to="{
-            name: 'caselaw-documentUnit-documentNumber-preview',
-            params: { documentNumber: store.documentUnit!.documentNumber },
-          }"
-        >
-          <TextButton
-            button-type="ghost"
-            :icon="IconOpenInNewTab"
-            size="small"
-          />
-        </router-link>
+        <Tooltip text="In neuem Tab öffnen">
+          <router-link
+            v-if="selectedPanelContent === 'preview'"
+            aria-label="Vorschau in neuem Tab öffnen"
+            target="_blank"
+            :to="{
+              name: 'caselaw-documentUnit-documentNumber-preview',
+              params: { documentNumber: store.documentUnit!.documentNumber },
+            }"
+          >
+            <TextButton
+              button-type="ghost"
+              :icon="IconOpenInNewTab"
+              size="small"
+            />
+          </router-link>
+        </Tooltip>
       </FlexContainer>
 
       <div class="m-24">
