@@ -429,8 +429,11 @@ test.describe("short and long texts", () => {
 
         await test.step(`text field '${testId}' and value '${value}' should be visible in 'XML-Vorschau'`, async () => {
           await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
-          await page.getByText("XML Vorschau").click()
           const xmlPreview = page.getByTitle("XML Vorschau")
+          await expect(xmlPreview).toBeVisible()
+          const button = page.getByRole("button", { name: "aufklappen" })
+          await expect(button).toBeVisible()
+          await button.click()
           const innerText = await xmlPreview.innerText()
           expect(innerText).toContain(value)
         })
