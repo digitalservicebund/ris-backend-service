@@ -74,26 +74,28 @@ onMounted(() => {
   <div class="flex flex-col gap-24">
     <div class="flex justify-between gap-24">
       <InputField
+        id="participatingJudgeNameInput"
         v-slot="slotProps"
         label="Richter *"
         :validation-error="validationStore.getByField('name')"
       >
         <TextInput
-          id="participatingJudgeName"
+          id="participatingJudgeNameTextInput"
           v-model="participatingJudge.name"
           aria-label="Name des Richters"
           :has-error="slotProps.hasError"
-          :readonly="participatingJudge.hasForeignSource"
           size="medium"
           @focus="validationStore.remove('name')"
         ></TextInput>
       </InputField>
-      <InputField label="Art der Mitwirkung">
+      <InputField
+        id="participatingJudgeReferencedOpinionsInput"
+        label="Art der Mitwirkung"
+      >
         <TextInput
-          id="participatingJudgeReferencedOpinions"
+          id="participatingJudgeReferencedOpinionsTextInput"
           v-model="participatingJudge.referencedOpinions"
           aria-label="Art der Mitwirkung"
-          :readonly="participatingJudge.hasForeignSource"
           size="medium"
         ></TextInput>
       </InputField>
