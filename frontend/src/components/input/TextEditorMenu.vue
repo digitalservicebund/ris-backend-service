@@ -90,7 +90,7 @@ const buttons = computed(() => [
     type: "strike",
     icon: IconStrikethrough,
     ariaLabel: "Durchgestrichen",
-    shortcut: "Strg + ⇧ + u",
+    shortcut: "Strg + ⇧ + s",
     group: "format",
     isCollapsable: false,
     callback: () => props.editor.chain().focus().toggleMark("strike").run(),
@@ -118,6 +118,7 @@ const buttons = computed(() => [
     type: "left",
     icon: IconAlignLeft,
     ariaLabel: "Linksbündig",
+    shortcut: "Strg + ⇧ + l",
     group: "Ausrichtung",
     isCollapsable: true,
     callback: () => props.editor.chain().focus().setTextAlign("left").run(),
@@ -135,27 +136,28 @@ const buttons = computed(() => [
     type: "right",
     icon: IconAlignRight,
     ariaLabel: "Rechtsbündig",
+    shortcut: "Strg + ⇧ + r",
     group: "Ausrichtung",
     isCollapsable: true,
     callback: () => props.editor.chain().focus().setTextAlign("right").run(),
   },
   {
-    type: "bulletList",
-    icon: IconUnorderedList,
-    ariaLabel: "Aufzählungsliste",
-    shortcut: "Strg + ⇧ + 7",
-    group: "indent",
-    isCollapsable: false,
-    callback: () => props.editor.chain().focus().toggleBulletList().run(),
-  },
-  {
     type: "orderedList",
     icon: IconOrderedList,
     ariaLabel: "Nummerierte Liste",
-    shortcut: "Strg + ⇧ + 8",
+    shortcut: "Strg + ⇧ + 7",
     group: "indent",
     isCollapsable: false,
     callback: () => props.editor.chain().focus().toggleOrderedList().run(),
+  },
+  {
+    type: "bulletList",
+    icon: IconUnorderedList,
+    ariaLabel: "Aufzählungsliste",
+    shortcut: "Strg + ⇧ + 8",
+    group: "indent",
+    isCollapsable: false,
+    callback: () => props.editor.chain().focus().toggleBulletList().run(),
   },
   {
     type: "outdent",
@@ -239,7 +241,6 @@ const maxButtonEntries = computed(() =>
     ? Math.floor((props.containerWidth - 100) / buttonSize)
     : Number.MAX_VALUE,
 )
-
 const { collapsedButtons } = useCollapsingMenuBar(
   editorButtons,
   maxButtonEntries,

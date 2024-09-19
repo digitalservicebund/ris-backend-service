@@ -3,19 +3,9 @@ import { describe, it, expect } from "vitest"
 import Tooltip from "@/components/Tooltip.vue"
 
 describe("Tooltip", () => {
-  it("renders tooltip text correctly when visible", async () => {
-    // Render component with isVisible prop as true
-    render(Tooltip, {
-      props: { text: "This is a tooltip", isVisible: true },
-    })
-
-    // Tooltip should be visible on the screen
-    expect(screen.getByRole("tooltip")).toHaveTextContent("This is a tooltip")
-  })
-
   it("tooltip is hidden by default when isVisible is false", () => {
     render(Tooltip, {
-      props: { text: "This is a tooltip", isVisible: false },
+      props: { text: "This is a tooltip" },
     })
 
     // Tooltip should not be visible initially
@@ -72,10 +62,19 @@ describe("Tooltip", () => {
 
   it("closes the tooltip when the Escape key is pressed", async () => {
     render(Tooltip, {
-      props: { text: "Escape tooltip", isVisible: true },
+      props: { text: "Escape tooltip" },
+      slots: { default: "Hover over me" },
     })
 
-    // Tooltip should be initially visible
+    const target = screen.getByText("Hover over me")
+
+    // Initially the tooltip should not be visible
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument()
+
+    // Fire focus event to show the tooltip
+    await fireEvent.focus(target)
+
+    // Tooltip should now be visible
     expect(screen.getByRole("tooltip")).toBeInTheDocument()
 
     // Fire Escape key event to hide the tooltip
@@ -90,9 +89,20 @@ describe("Tooltip", () => {
       props: {
         text: "Tooltip with shortcut",
         shortcut: "Ctrl+C",
-        isVisible: true,
       },
+      slots: { default: "Hover over me" },
     })
+
+    const target = screen.getByText("Hover over me")
+
+    // Initially the tooltip should not be visible
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument()
+
+    // Fire focus event to show the tooltip
+    await fireEvent.focus(target)
+
+    // Tooltip should now be visible
+    expect(screen.getByRole("tooltip")).toBeInTheDocument()
 
     // Check both the tooltip text and shortcut
     expect(screen.getByRole("tooltip")).toHaveTextContent(

@@ -90,23 +90,25 @@ export interface EditorButton {
         v-if="showDropdown"
         class="absolute z-50 mt-1 flex flex-row items-center border-1 border-solid border-blue-800 bg-white"
       >
-        <button
-          v-for="(childButton, index) in childButtons"
-          :key="index"
-          ref="children"
-          :aria-label="childButton.ariaLabel"
-          class="hover:bg-blue-20 z-50 cursor-pointer items-center p-8 text-blue-900 focus:shadow-focus focus:outline-none disabled:bg-transparent disabled:text-gray-600"
-          :class="{
-            'bg-blue-200': isActive,
-          }"
-          :disabled="disabled"
-          :tabindex="tabIndex"
-          @click="emits('toggle', childButton)"
-          @keydown.m="emits('toggle', childButton)"
-          @mousedown.prevent=""
-        >
-          <component :is="childButton.icon" />
-        </button>
+        <div v-for="(childButton, index) in childButtons" :key="index">
+          <Tooltip :shortcut="childButton.shortcut" :text="ariaLabel">
+            <button
+              ref="children"
+              :aria-label="childButton.ariaLabel"
+              class="hover:bg-blue-20 z-50 cursor-pointer items-center p-8 text-blue-900 focus:shadow-focus focus:outline-none disabled:bg-transparent disabled:text-gray-600"
+              :class="{
+                'bg-blue-200': isActive,
+              }"
+              :disabled="disabled"
+              :tabindex="tabIndex"
+              @click="emits('toggle', childButton)"
+              @keydown.m="emits('toggle', childButton)"
+              @mousedown.prevent=""
+            >
+              <component :is="childButton.icon" />
+            </button>
+          </Tooltip>
+        </div>
       </div>
     </div>
   </Tooltip>
