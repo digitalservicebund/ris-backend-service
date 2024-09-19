@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test"
 import {
+  getModifier,
   navigateToCategories,
   navigateToHandover,
   navigateToPreview,
@@ -365,14 +366,15 @@ test.describe("short and long texts", () => {
         const testId = testCases[index].testId
         const value = testCases[index].value
         const selector = `[data-testid='${testId}']`
+        const modifier = await getModifier(page)
 
         await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
 
         await test.step(`text field '${testId}' should be filled with value '${value}'`, async () => {
           const textField = page.locator(selector)
           await textField.click()
-          await page.keyboard.press("ControlOrMeta+A")
-          await page.keyboard.press("Backspace")
+          await page.keyboard.press(`${modifier}+KeyA`)
+          await page.keyboard.press(`${modifier}+Backspace`)
           await page.keyboard.type(value)
           const innerText = await textField.innerText()
           expect(innerText).toContain(value)
@@ -395,8 +397,8 @@ test.describe("short and long texts", () => {
             `[data-testid='Sonstiger Orientierungssatz']`,
           )
           await textField.click()
-          await page.keyboard.press("ControlOrMeta+A")
-          await page.keyboard.press("Backspace")
+          await page.keyboard.press(`${modifier}+KeyA`)
+          await page.keyboard.press(`${modifier}+Backspace`)
           const innerText = await textField.innerText()
           // eslint-disable-next-line playwright/no-conditional-expect
           expect(innerText).toContain("")
@@ -422,7 +424,7 @@ test.describe("short and long texts", () => {
             page.getByText(value, {
               exact: true,
             }),
-          ).toBeVisible({ timeout: 10_000 })
+          ).toBeVisible()
         })
 
         await test.step(`text field '${testId}' and value '${value}' should be visible in 'XML-Vorschau'`, async () => {
