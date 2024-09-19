@@ -146,6 +146,7 @@ onMounted(() => {
       :is-expanded="isExpanded"
       label="Seitenpanel"
       :opening-direction="OpeningDirection.LEFT"
+      shortcut="<"
       tabindex="0"
       @update:is-expanded="togglePanel"
     >
