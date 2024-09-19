@@ -33,6 +33,8 @@ export type CoreData = {
 }
 
 export type ContentRelatedIndexing = {
+  dismissalTypes?: string[]
+  dismissalGrounds?: string[]
   keywords?: string[]
   norms?: NormReference[]
   activeCitations?: ActiveCitation[]
@@ -164,7 +166,7 @@ export default class DocumentUnit {
         )
 
     if (data.attachments != undefined && data.attachments.length > 0) {
-      data.attachments.map(
+      data.attachments = data.attachments.map(
         (attachment: Attachment) => new Attachment({ ...attachment }),
       )
     }

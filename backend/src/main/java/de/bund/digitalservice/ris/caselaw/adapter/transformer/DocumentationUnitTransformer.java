@@ -5,6 +5,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalGroundsDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalTypesDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO.DocumentationUnitDTOBuilder;
@@ -117,6 +119,8 @@ public class DocumentationUnitTransformer {
       addActiveCitations(builder, contentRelatedIndexing);
       addNormReferences(builder, contentRelatedIndexing);
       addJobProfiles(builder, contentRelatedIndexing);
+      addDismissalGrounds(builder, contentRelatedIndexing);
+      addDismissalTypes(builder, contentRelatedIndexing);
       builder.hasLegislativeMandate(contentRelatedIndexing.hasLegislativeMandate());
     }
 
@@ -262,6 +266,42 @@ public class DocumentationUnitTransformer {
     }
 
     builder.jobProfiles(jobProfileDTOs);
+  }
+
+  private static void addDismissalGrounds(
+      DocumentationUnitDTOBuilder builder, ContentRelatedIndexing contentRelatedIndexing) {
+    if (contentRelatedIndexing.dismissalGrounds() == null) {
+      return;
+    }
+
+    List<DismissalGroundsDTO> dismissalGroundsDTOS = new ArrayList<>();
+    List<String> dismissalGrounds =
+        contentRelatedIndexing.dismissalGrounds().stream().distinct().toList();
+
+    for (int i = 0; i < dismissalGrounds.size(); i++) {
+      dismissalGroundsDTOS.add(
+          DismissalGroundsDTO.builder().value(dismissalGrounds.get(i)).rank(i + 1L).build());
+    }
+
+    builder.dismissalGrounds(dismissalGroundsDTOS);
+  }
+
+  private static void addDismissalTypes(
+      DocumentationUnitDTOBuilder builder, ContentRelatedIndexing contentRelatedIndexing) {
+    if (contentRelatedIndexing.dismissalTypes() == null) {
+      return;
+    }
+
+    List<DismissalTypesDTO> dismissalTypesDTOS = new ArrayList<>();
+    List<String> dismissalTypes =
+        contentRelatedIndexing.dismissalTypes().stream().distinct().toList();
+
+    for (int i = 0; i < dismissalTypes.size(); i++) {
+      dismissalTypesDTOS.add(
+          DismissalTypesDTO.builder().value(dismissalTypes.get(i)).rank(i + 1L).build());
+    }
+
+    builder.dismissalTypes(dismissalTypesDTOS);
   }
 
   private static void addEnsuingAndPendingDecisions(
@@ -586,6 +626,22 @@ public class DocumentationUnitTransformer {
       List<String> jobProfiles =
           documentationUnitDTO.getJobProfiles().stream().map(JobProfileDTO::getValue).toList();
       contentRelatedIndexingBuilder.jobProfiles(jobProfiles);
+    }
+
+    if (documentationUnitDTO.getDismissalGrounds() != null) {
+      List<String> dismissalGrounds =
+          documentationUnitDTO.getDismissalGrounds().stream()
+              .map(DismissalGroundsDTO::getValue)
+              .toList();
+      contentRelatedIndexingBuilder.dismissalGrounds(dismissalGrounds);
+    }
+
+    if (documentationUnitDTO.getDismissalTypes() != null) {
+      List<String> dismissalTypes =
+          documentationUnitDTO.getDismissalTypes().stream()
+              .map(DismissalTypesDTO::getValue)
+              .toList();
+      contentRelatedIndexingBuilder.dismissalTypes(dismissalTypes);
     }
 
     contentRelatedIndexingBuilder.hasLegislativeMandate(

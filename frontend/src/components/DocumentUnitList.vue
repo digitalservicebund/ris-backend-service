@@ -50,6 +50,17 @@ const popupModalText = computed(
     `Möchten Sie die Dokumentationseinheit ${selectedDocumentUnitListEntry?.value?.documentNumber} wirklich dauerhaft löschen?`,
 )
 
+const attachmentText = (listEntry: DocumentUnitListEntry) =>
+  listEntry.hasAttachments ? "Anhang vorhanden" : "Kein Anhang vorhanden"
+
+const headNoteOrPrincipleText = (listEntry: DocumentUnitListEntry) =>
+  listEntry.hasHeadnoteOrPrinciple
+    ? "Langtext vorhanden"
+    : "Kein Langtext vorhanden"
+
+const noteText = (listEntry: DocumentUnitListEntry) =>
+  listEntry.hasNote ? "Notiz vorhanden" : "Keine Notiz vorhanden"
+
 /**
  * Stops propagation of scrolling event, and toggles the showModal value
  */
@@ -127,48 +138,36 @@ function onDelete() {
               >{{ listEntry.documentNumber }}
             </FlexItem>
 
-            <Tooltip v-if="listEntry.hasAttachments" text="Anhang vorhanden">
+            <Tooltip :text="attachmentText(listEntry)">
               <IconAttachedFile
-                aria-label="Anhang vorhanden"
-                class="flex-end h-20 w-20 text-blue-800"
+                :aria-label="attachmentText(listEntry)"
+                class="flex-end h-20 w-20"
+                :class="
+                  listEntry.hasAttachments ? 'text-blue-800' : 'text-gray-500'
+                "
                 data-testid="file-attached-icon"
               />
             </Tooltip>
-            <Tooltip v-else text="Kein Anhang vorhanden">
-              <IconAttachedFile
-                aria-label="Kein Anhang vorhanden"
-                class="flex-end h-20 w-20 text-gray-500"
-              />
-            </Tooltip>
 
-            <Tooltip
-              v-if="listEntry.hasHeadnoteOrPrinciple"
-              text="Langtext vorhanden"
-            >
+            <Tooltip :text="headNoteOrPrincipleText(listEntry)">
               <IconSubject
-                aria-label="Langtext vorhanden"
-                class="flex-end flex h-20 w-20 text-blue-800"
+                :aria-label="headNoteOrPrincipleText(listEntry)"
+                class="flex-end flex h-20 w-20"
+                :class="
+                  listEntry.hasHeadnoteOrPrinciple
+                    ? 'text-blue-800'
+                    : 'text-gray-500'
+                "
                 data-testid="headnote-principle-icon"
               />
             </Tooltip>
-            <Tooltip v-else text="Kein Langtext vorhanden">
-              <IconSubject
-                aria-label="Kein Langtext vorhanden"
-                class="h-20 w-20 text-gray-500"
-              />
-            </Tooltip>
 
-            <Tooltip v-if="listEntry.hasNote" text="Notiz vorhanden">
+            <Tooltip :text="noteText(listEntry)">
               <IconNote
-                aria-label="Notiz vorhanden"
-                class="flex-end flex h-20 w-20 text-blue-800"
+                :aria-label="noteText(listEntry)"
+                class="flex-end flex h-20 w-20"
+                :class="listEntry.hasNote ? 'text-blue-800' : 'text-gray-500'"
                 data-testid="note-icon"
-              />
-            </Tooltip>
-            <Tooltip v-else text="Keine Notiz vorhanden">
-              <IconNote
-                aria-label="Keine Notiz vorhanden"
-                class="h-20 w-20 text-gray-500"
               />
             </Tooltip>
           </FlexContainer>

@@ -294,6 +294,8 @@ class AuthServiceTest {
         "/contentRelatedIndexing/norms",
         "/contentRelatedIndexing/activeCitations",
         "/contentRelatedIndexing/jobProfiles",
+        "/contentRelatedIndexing/dismissalTypes",
+        "/contentRelatedIndexing/dismissalGrounds",
         "/contentRelatedIndexing/hasLegislativeMandate",
         "/texts/decisionName",
         "/texts/headline",

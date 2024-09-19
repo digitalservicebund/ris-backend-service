@@ -162,7 +162,7 @@ dependencies {
     // CVE-2024-26308
     implementation("org.apache.commons:commons-compress:1.27.1")
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:4.28.1")
+    implementation("com.google.protobuf:protobuf-java:4.28.2")
     // CVE-2023-52428 in spring-boot-starter-oauth2-client:3.2.3
     implementation("com.nimbusds:nimbus-jose-jwt:9.41.1")
     // CVE-2023-31582
@@ -174,7 +174,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.1")
 
-    implementation(platform("software.amazon.awssdk:bom:2.28.3"))
+    implementation(platform("software.amazon.awssdk:bom:2.28.4"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -186,9 +186,9 @@ dependencies {
     implementation("com.icegreen:greenmail:2.1.0-rc-1")
 
     // package served by private repo, requires authentication:
-//    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.58") {
-//        exclude(group = "org.slf4j", module = "slf4j-simple")
-//    }
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.6") {
+        exclude(group = "org.slf4j", module = "slf4j-simple")
+    }
     // for local development:
      implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.10.5.jar"))
     // or with local gradle project (look also into settings.gradle.kts)

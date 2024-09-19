@@ -8,7 +8,7 @@ const props = defineProps<{
 }>()
 
 const { saveIsInProgress, triggerSave, lastSaveError, formattedLastSavedOn } =
-  useSaveToRemote(10000)
+  useSaveToRemote(10000000000)
 
 const getErrorDetails = () =>
   lastSaveError.value?.title ? ": " + lastSaveError.value.title : ""
