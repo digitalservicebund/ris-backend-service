@@ -20,10 +20,7 @@ const defaultValue = new PreviousDecision() as PreviousDecision
 
 <template>
   <div>
-    <div
-      aria-label="Vorgehende Entscheidung"
-      class="border-b-1 border-blue-300"
-    >
+    <div aria-label="Vorgehende Entscheidung">
       <h2 class="ds-label-01-bold mb-16">Vorgehende Entscheidungen</h2>
       <div class="flex flex-row">
         <div class="flex-1">
