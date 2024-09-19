@@ -33,7 +33,7 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@0a40ce6f61952eeee640a8940ea8050407c06cb5
+        uses: actions/setup-java@40b9536ce5efadffec365e30f26f62a3640d2548
         with:
           java-version: "17.0"
           distribution: "temurin"
@@ -73,7 +73,7 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@0a40ce6f61952eeee640a8940ea8050407c06cb5
+        uses: actions/setup-java@40b9536ce5efadffec365e30f26f62a3640d2548
         with:
           java-version: "17.0"
           distribution: "temurin"
@@ -154,7 +154,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK
-        uses: actions/setup-java@0a40ce6f61952eeee640a8940ea8050407c06cb5
+        uses: actions/setup-java@40b9536ce5efadffec365e30f26f62a3640d2548
         with:
           java-version: "17.0"
           distribution: "temurin"
@@ -712,7 +712,7 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@0a40ce6f61952eeee640a8940ea8050407c06cb5
+        uses: actions/setup-java@40b9536ce5efadffec365e30f26f62a3640d2548
         with:
           java-version: "17.0"
           distribution: "temurin"
@@ -748,7 +748,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK
-        uses: actions/setup-java@0a40ce6f61952eeee640a8940ea8050407c06cb5
+        uses: actions/setup-java@40b9536ce5efadffec365e30f26f62a3640d2548
         with:
           java-version: "17.0"
           distribution: "temurin"
