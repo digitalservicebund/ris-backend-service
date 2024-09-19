@@ -67,6 +67,8 @@ describe("preview content related indexing", () => {
         },
       ],
       jobProfiles: ["Handwerker", "Elektriker"],
+      dismissalGrounds: ["Betriebsbedingte Kündigung"],
+      dismissalTypes: ["Einführung neuer Technologien"],
       hasLegislativeMandate: true,
       participatingJudges: [
         new ParticipatingJudge({
@@ -85,6 +87,8 @@ describe("preview content related indexing", () => {
     expect(await screen.findByText("Normen")).toBeInTheDocument()
     expect(await screen.findByText("Aktivzitierung")).toBeInTheDocument()
     expect(await screen.findByText("Sachgebiete")).toBeInTheDocument()
+    expect(await screen.findByText("Kündigungsgründe")).toBeInTheDocument()
+    expect(await screen.findByText("Kündigungsarten")).toBeInTheDocument()
     expect(await screen.findByText("Berufsbild")).toBeInTheDocument()
     expect(await screen.findByText("Gesetzgebungsauftrag")).toBeInTheDocument()
     expect(await screen.findByText("Mitwirkende Richter")).toBeInTheDocument()
@@ -96,6 +100,8 @@ describe("preview content related indexing", () => {
       norms: [],
       activeCitations: [],
       fieldsOfLaw: [],
+      dismissalGrounds: [],
+      dismissalTypes: [],
       jobProfiles: [],
       hasLegislativeMandate: false,
       participatingJudges: [],
@@ -107,6 +113,8 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
     expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()
     expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Mitwirkende Richter")).not.toBeInTheDocument()
   })
@@ -133,6 +141,8 @@ describe("preview content related indexing", () => {
       activeCitations: [],
       fieldsOfLaw: [],
       jobProfiles: [],
+      dismissalGrounds: [],
+      dismissalTypes: [],
       hasLegislativeMandate: false,
       participatingJudges: [],
     })
@@ -145,6 +155,8 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()
     expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
     expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Mitwirkende Richter")).not.toBeInTheDocument()
   })
@@ -180,6 +192,8 @@ describe("preview content related indexing", () => {
       ],
       fieldsOfLaw: [],
       jobProfiles: [],
+      dismissalGrounds: [],
+      dismissalTypes: [],
       hasLegislativeMandate: false,
       participatingJudges: [],
     })
@@ -195,6 +209,8 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
     expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
     expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Mitwirkende Richter")).not.toBeInTheDocument()
   })
@@ -249,6 +265,8 @@ describe("preview content related indexing", () => {
         },
       ],
       jobProfiles: [],
+      dismissalGrounds: [],
+      dismissalTypes: [],
       hasLegislativeMandate: false,
       participatingJudges: [],
     })
@@ -267,6 +285,8 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Normen")).not.toBeInTheDocument()
     expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()
     expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Mitwirkende Richter")).not.toBeInTheDocument()
   })
@@ -278,6 +298,8 @@ describe("preview content related indexing", () => {
       activeCitations: [],
       fieldsOfLaw: [],
       jobProfiles: ["foo", "bar"],
+      dismissalGrounds: [],
+      dismissalTypes: [],
       hasLegislativeMandate: false,
       participatingJudges: [],
     })
@@ -290,6 +312,8 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()
     expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("Mitwirkende Richter")).not.toBeInTheDocument()
   })
 
@@ -300,6 +324,8 @@ describe("preview content related indexing", () => {
       activeCitations: [],
       fieldsOfLaw: [],
       jobProfiles: [],
+      dismissalGrounds: [],
+      dismissalTypes: [],
       hasLegislativeMandate: true,
       participatingJudges: [],
     })
@@ -311,7 +337,31 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()
     expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
     expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("Mitwirkende Richter")).not.toBeInTheDocument()
+  })
+
+  test("renders dismissal inputs and nothing else", async () => {
+    renderComponent({
+      keywords: [],
+      norms: [],
+      activeCitations: [],
+      fieldsOfLaw: [],
+      jobProfiles: [],
+      dismissalGrounds: ["ground"],
+      dismissalTypes: ["type"],
+      hasLegislativeMandate: false,
+    })
+
+    expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
+    expect(screen.queryByText("Normen")).not.toBeInTheDocument()
+    expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()
+    expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
+    expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
+    expect(await screen.findByText("Kündigungsgründe")).toBeInTheDocument()
+    expect(await screen.findByText("Kündigungsarten")).toBeInTheDocument()
   })
 
   test("renders no legislative mandate when it is false", async () => {
@@ -362,6 +412,8 @@ describe("preview content related indexing", () => {
       activeCitations: [],
       fieldsOfLaw: [],
       jobProfiles: [],
+      dismissalGrounds: [],
+      dismissalTypes: [],
       hasLegislativeMandate: undefined,
       participatingJudges: [],
     })
@@ -371,6 +423,8 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
     expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("Mitwirkende Richter")).not.toBeInTheDocument()
   })
 
@@ -382,6 +436,8 @@ describe("preview content related indexing", () => {
       fieldsOfLaw: undefined,
       jobProfiles: undefined,
       hasLegislativeMandate: undefined,
+      dismissalGrounds: undefined,
+      dismissalTypes: undefined,
       participatingJudges: undefined,
     })
     expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
@@ -390,6 +446,8 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
     expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("Mitwirkende Richter")).not.toBeInTheDocument()
   })
 })

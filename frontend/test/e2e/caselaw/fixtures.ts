@@ -4,6 +4,7 @@ import utc from "dayjs/plugin/utc"
 import DocumentUnit from "../../../src/domain/documentUnit"
 import { navigateToCategories } from "./e2e-utils"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
+import RelatedDocumentation from "@/domain/relatedDocumentation"
 import { generateString } from "~/test-helper/dataGenerators"
 
 dayjs.extend(utc)
@@ -19,6 +20,7 @@ type MyFixtures = {
   pageWithExternalUser: Page
   prefilledDocumentUnitBgh: DocumentUnit
   edition: LegalPeriodicalEdition
+  editionWithReference: LegalPeriodicalEdition
 }
 
 export const caselawTest = test.extend<MyFixtures>({
@@ -274,6 +276,99 @@ export const caselawTest = test.extend<MyFixtures>({
 
     const edition = await editionResponse.json()
     await use(edition)
+
+    const deleteResponse = await request.delete(
+      `/api/v1/caselaw/legalperiodicaledition/${edition.id}`,
+      {
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
+
+    if (!deleteResponse.ok()) {
+      throw Error(`Edition with number ${edition.id} couldn't be deleted:
+      ${deleteResponse.status()} ${deleteResponse.statusText()}`)
+    }
+  },
+
+  editionWithReference: async (
+    { request, context, prefilledDocumentUnit },
+    use,
+  ) => {
+    const cookies = await context.cookies()
+    const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+
+    const legalPeriodicalSearchResponse = await request.get(
+      `api/v1/caselaw/legalperiodicals?q=MMG`,
+    )
+
+    const legalPeriodical = (
+      (await legalPeriodicalSearchResponse.json()) as LegalPeriodicalEdition[]
+    ).at(0)
+
+    const editionResponse = await request.put(
+      `api/v1/caselaw/legalperiodicaledition`,
+      {
+        data: {
+          legalPeriodical: legalPeriodical,
+          id: crypto.randomUUID(),
+          prefix: "2024, ",
+          suffix: ", Heft 1",
+          name: "2024, " + generateString(),
+          references: [
+            {
+              id: crypto.randomUUID(),
+              citation: "2024, 1-11, Heft 1",
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical,
+              documentationUnit: new RelatedDocumentation({
+                documentNumber: prefilledDocumentUnit.documentNumber,
+                uuid: prefilledDocumentUnit.uuid,
+              }),
+            },
+            {
+              id: crypto.randomUUID(),
+              citation: "2024, 12-22, Heft 1",
+              referenceSupplement: "L",
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical,
+              documentationUnit: new RelatedDocumentation({
+                documentNumber: prefilledDocumentUnit.documentNumber,
+                uuid: prefilledDocumentUnit.uuid,
+              }),
+            },
+          ],
+        },
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
+
+    const edition = await editionResponse.json()
+    if (!editionResponse.ok()) {
+      throw Error(`Edition couldn't be created:
+      ${editionResponse.status()} ${editionResponse.statusText()}`)
+    }
+    await use(edition)
+
+    // delete references to be able to delete
+    const response = await request.put(
+      `api/v1/caselaw/legalperiodicaledition`,
+      {
+        data: {
+          legalPeriodical: edition.legalPeriodical,
+          id: edition.id,
+          prefix: edition.prefix,
+          suffix: edition.suffix,
+          name: "NAME",
+          references: [],
+        },
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
+    await response.json()
+    if (!response.ok()) {
+      throw Error(`References in Edition with number ${edition.id} couldn't be deleted:
+      ${response.status()} ${response.statusText()}`)
+    }
 
     const deleteResponse = await request.delete(
       `/api/v1/caselaw/legalperiodicaledition/${edition.id}`,

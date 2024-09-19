@@ -243,7 +243,10 @@ onMounted(() => {
         <NestedComponent
           aria-label="Abweichendes Aktenzeichen Vorgehende Entscheidung"
           class="w-full"
-          :is-open="previousDecision.hasForeignSource"
+          :is-open="
+            previousDecision.hasForeignSource ||
+            !!previousDecision.deviatingFileNumber
+          "
         >
           <InputField
             id="fileNumber"

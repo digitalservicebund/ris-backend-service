@@ -49,6 +49,20 @@ const hasJobProfiles = computed(() => {
     contentRelatedIndexing.value.jobProfiles?.length > 0
   )
 })
+
+const hasDismissalGrounds = computed(() => {
+  return (
+    contentRelatedIndexing.value.dismissalGrounds &&
+    contentRelatedIndexing.value.dismissalGrounds?.length > 0
+  )
+})
+
+const hasDismissalTypes = computed(() => {
+  return (
+    contentRelatedIndexing.value.dismissalTypes &&
+    contentRelatedIndexing.value.dismissalTypes?.length > 0
+  )
+})
 const hasLegislativeMandate = computed(() => {
   return contentRelatedIndexing.value.hasLegislativeMandate
 })
@@ -123,6 +137,28 @@ const hasParticipatingJudges = computed(() => {
           :key="index"
         >
           {{ activeCitation.renderDecision }}
+        </div>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="hasDismissalTypes">
+      <PreviewCategory>Kündigungsarten</PreviewCategory>
+      <PreviewContent data-testid="Kündigungsarten">
+        <div
+          v-for="dismissalType in contentRelatedIndexing.dismissalTypes"
+          :key="dismissalType"
+        >
+          {{ dismissalType }}
+        </div>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="hasDismissalGrounds">
+      <PreviewCategory>Kündigungsgründe</PreviewCategory>
+      <PreviewContent data-testid="Kündigungsgründe">
+        <div
+          v-for="dismissalGround in contentRelatedIndexing.dismissalGrounds"
+          :key="dismissalGround"
+        >
+          {{ dismissalGround }}
         </div>
       </PreviewContent>
     </PreviewRow>

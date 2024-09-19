@@ -39,7 +39,7 @@ onMounted(async () => {
     <h1 class="ds-heading-02-reg" data-testid="references-title">
       Fundstellen
     </h1>
-    <div aria-label="Fundstellen">
+    <div aria-label="Fundstellen" class="mr-10">
       <EditableList
         v-model="references"
         :default-value="defaultValue"

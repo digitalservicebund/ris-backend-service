@@ -109,6 +109,17 @@ class DocxParagraphDocxConverterTest {
   }
 
   @Test
+  void testConvert_withCr() {
+    P paragraph = new P();
+    R run = new R();
+    JAXBElement<R.Cr> element = new JAXBElement<>(new QName("cr"), R.Cr.class, new R.Cr());
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+    var result = converter.convert(paragraph);
+    assertThat(result.toHtmlString()).isEqualTo("<p><br/></p>");
+  }
+
+  @Test
   void testConvert_withUnknownElement() {
 
     var result = converter.convert(new Object());

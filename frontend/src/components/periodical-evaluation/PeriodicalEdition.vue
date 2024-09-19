@@ -69,7 +69,7 @@ async function saveEdition() {
 <template>
   <div class="flex h-full w-full flex-col space-y-24 bg-gray-100 p-24">
     <h1 class="ds-heading-02-reg" data-testid="edition-title">Ausgabe</h1>
-    <div class="mb-24 flex flex-col gap-24 bg-white p-32">
+    <div v-if="edition" class="mb-24 flex flex-col gap-24 bg-white p-32">
       <InputField
         id="legalPeriodical"
         label="Periodikum *"
@@ -134,13 +134,6 @@ async function saveEdition() {
           label="Fortfahren"
           @click="saveEdition"
         ></TextButton>
-        <TextButton
-          aria-label="Abbrechen"
-          button-type="ghost"
-          label="Abbrechen"
-          size="small"
-          @click.stop="$router.push({ name: 'caselaw-periodical-evaluation' })"
-        />
       </FlexContainer>
     </div>
   </div>

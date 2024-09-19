@@ -10,6 +10,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalGroundsDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalTypesDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO.DocumentationUnitDTOBuilder;
@@ -671,6 +673,42 @@ class DocumentationUnitTransformerTest {
   }
 
   @Test
+  void testTransformToDTO_withSameDismissalTypes_shouldMakeDismissalTypesDistinct() {
+    DocumentationUnit documentationUnit =
+        generateSimpleDocumentationUnitBuilder()
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder().dismissalTypes(List.of("type", "type")).build())
+            .build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(
+            DocumentationUnitDTO.builder().build(), documentationUnit);
+
+    assertThat(documentationUnitDTO.getDismissalTypes())
+        .extracting("value")
+        .containsExactly("type");
+  }
+
+  @Test
+  void testTransformToDTO_withSameDismissalGrounds_shouldMakeDismissalGroundsDistinct() {
+    DocumentationUnit documentationUnit =
+        generateSimpleDocumentationUnitBuilder()
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .dismissalGrounds(List.of("ground", "ground"))
+                    .build())
+            .build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(
+            DocumentationUnitDTO.builder().build(), documentationUnit);
+
+    assertThat(documentationUnitDTO.getDismissalGrounds())
+        .extracting("value")
+        .containsExactly("ground");
+  }
+
+  @Test
   void testTransformToDTO_withSameParticipatingJudges_shouldMakeJudgesDistinct() {
     // Arrange
     ParticipatingJudge participatingJudge = ParticipatingJudge.builder().name("Judge A").build();
@@ -1096,6 +1134,33 @@ class DocumentationUnitTransformerTest {
   }
 
   @Test
+  void testTransformToDomain_withDismissalTypes_shouldAddDismissalTypes() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder()
+            .dismissalTypes(List.of(DismissalTypesDTO.builder().value("type").build()))
+            .build();
+
+    DocumentationUnit documentationUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentationUnit.contentRelatedIndexing().dismissalTypes()).containsExactly("type");
+  }
+
+  @Test
+  void testTransformToDomain_withDismissalGrounds_shouldAddDismissalGrounds() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder()
+            .dismissalGrounds(List.of(DismissalGroundsDTO.builder().value("ground").build()))
+            .build();
+
+    DocumentationUnit documentationUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentationUnit.contentRelatedIndexing().dismissalGrounds())
+        .containsExactly("ground");
+  }
+
+  @Test
   void testTransformToDomain_withLegislativeMandate_shouldLegislativeMandateBeTrue() {
     DocumentationUnitDTO documentationUnitDTO =
         generateSimpleDTOBuilder().hasLegislativeMandate(true).build();
@@ -1185,6 +1250,8 @@ class DocumentationUnitTransformerTest {
                 .norms(Collections.emptyList())
                 .activeCitations(Collections.emptyList())
                 .jobProfiles(Collections.emptyList())
+                .dismissalGrounds(Collections.emptyList())
+                .dismissalTypes(Collections.emptyList())
                 .hasLegislativeMandate(false)
                 .participatingJudges(Collections.emptyList())
                 .build())
