@@ -63,12 +63,14 @@ async function addEdition() {
   })
   const response = await LegalPeriodicalEditionService.save(edition)
 
-  editionStore.edition = undefined
-  await router.push({
-    name: "caselaw-periodical-evaluation-editionId-edition",
-    params: { editionId: response.data.id },
-    query: {},
-  })
+  if (response.data) {
+    editionStore.edition = undefined
+    await router.push({
+      name: "caselaw-periodical-evaluation-editionId-edition",
+      params: { editionId: response.data.id },
+      query: {},
+    })
+  }
 }
 
 const legalPeriodical = computed({
