@@ -3,6 +3,7 @@ import { computed } from "vue"
 import TextEditor from "../components/input/TextEditor.vue"
 import TextAreaInput from "@/components/input/TextAreaInput.vue"
 import TextInput from "@/components/input/TextInput.vue"
+import TitleElement from "@/components/TitleElement.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useValidBorderNumbers } from "@/composables/useValidBorderNumbers"
 import { Texts } from "@/domain/documentUnit"
@@ -53,7 +54,7 @@ const updateValueByTextId = async (id: keyof Texts, updatedText?: string) => {
 
 <template>
   <div class="core-data mb-16 flex flex-col gap-24 bg-white p-24">
-    <h2 class="ds-subhead">Kurz- & Langtexte</h2>
+    <TitleElement>Kurz- & Langtexte</TitleElement>
     <div class="flex flex-col gap-24">
       <div v-for="item in data" :key="item.id" class="">
         <label class="ds-label-02-reg mb-4" :for="item.id">{{
