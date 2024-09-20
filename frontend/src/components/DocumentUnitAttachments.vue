@@ -145,7 +145,7 @@ const attachments = computed({
     class="w-full flex-1 grow p-24"
     data-testid="document-unit-attachments"
   >
-    <div class="flex flex-col gap-24">
+    <div class="flex w-full flex-1 grow flex-col gap-24">
       <PopupModal
         v-if="showDeleteModal"
         :aria-label="deleteModalHeaderText"
