@@ -4182,9 +4182,9 @@ class PatchUpdateIntegrationTest {
     private static List<JsonPatchOperation> getAllowedOperations() {
       JsonNode decisionName = new TextNode("decisionName");
       JsonNode newHeadline = new TextNode("newHeadline");
-      String firstAllowedPath = "/texts/decisionName";
-      String secondAllowedPath = "/texts/headline";
-      String thirdAllowedPath = "/texts/guidingPrinciple";
+      String firstAllowedPath = "/shortTexts/decisionName";
+      String secondAllowedPath = "/shortTexts/headline";
+      String thirdAllowedPath = "/shortTexts/guidingPrinciple";
       return List.of(
           new AddOperation(firstAllowedPath, decisionName),
           new ReplaceOperation(secondAllowedPath, newHeadline),
@@ -4195,8 +4195,8 @@ class PatchUpdateIntegrationTest {
     private static List<JsonPatchOperation> getAtLeastOneProhibitedOperation() {
       JsonNode decisionName = new TextNode("decisionName");
       JsonNode newHeadline = new TextNode("newHeadline");
-      String firstAllowedPath = "/texts/decisionName";
-      String secondAllowedPath = "/texts/headline";
+      String firstAllowedPath = "/shortTexts/decisionName";
+      String secondAllowedPath = "/shortTexts/headline";
       String prohibitedPath = "/coreData/court";
       return List.of(
           new AddOperation(firstAllowedPath, decisionName),
