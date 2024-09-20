@@ -9,6 +9,7 @@ import DropdownInput from "@/components/input/DropdownInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import NestedComponent from "@/components/NestedComponents.vue"
+import TitleElement from "@/components/TitleElement.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
 import { CoreData } from "@/domain/documentUnit"
@@ -49,13 +50,11 @@ watch(
     aria-label="Stammdaten"
     class="core-data flex flex-col gap-24 bg-white p-24"
   >
-    <h2 class="ds-subhead">Stammdaten</h2>
+    <TitleElement>Stammdaten</TitleElement>
     <NestedComponent
       aria-label="Fehlerhaftes Gericht"
       class="w-full"
-      :is-open="
-        modelValue.deviatingCourts && modelValue.deviatingCourts.length > 0
-      "
+      :is-open="!!modelValue.deviatingCourts?.length"
     >
       <InputField id="court" v-slot="slotProps" label="Gericht *">
         <ComboboxInput
@@ -83,10 +82,7 @@ watch(
       <NestedComponent
         aria-label="Abweichendes Aktenzeichen"
         class="w-full min-w-0"
-        :is-open="
-          modelValue.deviatingFileNumbers &&
-          modelValue.deviatingFileNumbers.length > 0
-        "
+        :is-open="!!modelValue.deviatingFileNumbers?.length"
       >
         <InputField id="fileNumber" label="Aktenzeichen *">
           <ChipsInput
@@ -112,10 +108,7 @@ watch(
       <NestedComponent
         aria-label="Abweichendes Entscheidungsdatum"
         class="w-full"
-        :is-open="
-          modelValue.deviatingDecisionDates &&
-          modelValue.deviatingDecisionDates.length > 0
-        "
+        :is-open="!!modelValue.deviatingDecisionDates?.length"
       >
         <InputField
           id="decisionDate"
@@ -186,9 +179,7 @@ watch(
       <NestedComponent
         aria-label="Abweichender ECLI"
         class="w-full"
-        :is-open="
-          modelValue.deviatingEclis && modelValue.deviatingEclis.length > 0
-        "
+        :is-open="!!modelValue.deviatingEclis?.length"
       >
         <InputField id="ecli" class="flex-col" label="ECLI">
           <TextInput
@@ -214,10 +205,7 @@ watch(
       <NestedComponent
         aria-label="Vorgangshistorie"
         class="w-full"
-        :is-open="
-          descendingPreviousProcedures &&
-          descendingPreviousProcedures.length > 0
-        "
+        :is-open="!!descendingPreviousProcedures?.length"
       >
         <InputField id="procedure" class="flex-col" label="Vorgang">
           <ComboboxInput

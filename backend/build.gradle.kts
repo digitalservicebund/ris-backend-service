@@ -9,7 +9,7 @@ import org.flywaydb.gradle.task.FlywayMigrateTask
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.3.3"
+    id("org.springframework.boot") version "3.3.4"
     id("io.spring.dependency-management") version "1.1.6"
     id("com.diffplug.spotless") version "6.25.0"
     id("org.sonarqube") version "5.1.0.4882"
@@ -174,7 +174,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.1")
 
-    implementation(platform("software.amazon.awssdk:bom:2.28.4"))
+    implementation(platform("software.amazon.awssdk:bom:2.28.5"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 

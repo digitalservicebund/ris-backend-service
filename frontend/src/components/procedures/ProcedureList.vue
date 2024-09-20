@@ -261,7 +261,7 @@ onMounted(() => {
           v-for="(procedure, index) in procedures"
           :key="index"
           aria-label="Vorgang Listenelement"
-          class="border-b-1 border-blue-300 bg-white px-24 py-20"
+          class="border-b-1 border-blue-300 bg-white p-24"
           :class="{
             'my-24': currentlyExpanded.includes(index),
             'hover:bg-blue-100': !currentlyExpanded.includes(index),
@@ -315,6 +315,7 @@ onMounted(() => {
           </template>
 
           <ProcedureDetail
+            class="mt-24"
             :procedure="procedure"
             :response-error="responseError"
             @delete-document-unit="handleDeleteDocumentationUnit"

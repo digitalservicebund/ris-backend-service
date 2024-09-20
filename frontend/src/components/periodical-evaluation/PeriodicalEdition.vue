@@ -7,6 +7,7 @@ import FlexContainer from "@/components/FlexContainer.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
+import TitleElement from "@/components/TitleElement.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
@@ -68,8 +69,8 @@ async function saveEdition() {
 
 <template>
   <div class="flex h-full w-full flex-col space-y-24 bg-gray-100 p-24">
-    <h1 class="ds-heading-02-reg" data-testid="edition-title">Ausgabe</h1>
-    <div class="mb-24 flex flex-col gap-24 bg-white p-32">
+    <div v-if="edition" class="mb-24 flex flex-col gap-24 bg-white p-24">
+      <TitleElement>Ausgabe</TitleElement>
       <InputField
         id="legalPeriodical"
         label="Periodikum *"

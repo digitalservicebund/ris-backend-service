@@ -104,6 +104,7 @@ watch(newChipText, (is) => {
 
     <ChipsList
       v-model:focused-item="focusedChip"
+      class="mb-24"
       :model-value="modelValue"
       @chip-deleted="onDeleteChip"
       @previous-clicked-on-first="focusInput"

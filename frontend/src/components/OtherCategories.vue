@@ -37,8 +37,7 @@ const shouldDisplayLegislativeMandateCategory = computed(() => {
 const shouldDisplayDismissalAttributes = computed(
   () =>
     laborCourtTypes.items.includes(courtTypeRef.value) ||
-    !!store.documentUnit?.contentRelatedIndexing?.dismissalTypes?.length ||
-    !!store.documentUnit?.contentRelatedIndexing?.dismissalGrounds?.length,
+    hasDismissalInput.value,
 )
 </script>
 

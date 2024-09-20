@@ -2,6 +2,7 @@
 import DocumentUnitAdditionalTexts from "@/components/texts/DocumentUnitAdditionalTexts.vue"
 import DocumentUnitLongTexts from "@/components/texts/DocumentUnitLongTexts.vue"
 import DocumentUnitShortTexts from "@/components/texts/DocumentUnitShortTexts.vue"
+import TitleElement from "@/components/TitleElement.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 
 const isInternalUser = useInternalUser()
@@ -9,7 +10,7 @@ const isInternalUser = useInternalUser()
 
 <template>
   <div class="flex flex-col bg-white px-24">
-    <h2 class="ds-subhead my-24">Kurz- & Langtexte</h2>
+    <TitleElement>Kurz- & Langtexte</TitleElement>
     <DocumentUnitShortTexts />
     <DocumentUnitLongTexts v-if="isInternalUser" />
     <DocumentUnitAdditionalTexts v-if="isInternalUser" />

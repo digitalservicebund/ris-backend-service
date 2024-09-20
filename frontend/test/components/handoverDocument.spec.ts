@@ -307,7 +307,7 @@ describe("HandoverDocumentationUnitView:", () => {
         },
       })
       expect(screen.getByLabelText("Letzte Ereignisse")).toHaveTextContent(
-        `Letzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrÜBERE-Mail an: receiver address Betreff: mail subjectALSXML1<?xml version="1.0"?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>`,
+        `Letzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subjectXML1<?xml version="1.0"?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>`,
       )
     })
 
@@ -385,7 +385,7 @@ describe("HandoverDocumentationUnitView:", () => {
     })
 
     expect(container).toHaveTextContent(
-      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltDokumentationseinheit an jDV übergebenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrÜBERE-Mail an: receiver address Betreff: mail subjectALS`,
+      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltDokumentationseinheit an jDV übergebenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subject`,
     )
 
     const codeSnippet = screen.queryByTestId("code-snippet")
