@@ -5,20 +5,17 @@ import DecisionSummary from "@/components/DecisionSummary.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import ActiveCitation from "@/domain/activeCitation"
 import EnsuingDecision from "@/domain/ensuingDecision"
+import ParticipatingJudge from "@/domain/participatingJudge"
 import PreviousDecision from "@/domain/previousDecision"
 import IconBaselineContentCopy from "~icons/ic/baseline-content-copy"
-import IconBaselineDescription from "~icons/ic/baseline-description"
 import IconError from "~icons/ic/baseline-error"
-import IconOutlineDescription from "~icons/ic/outline-description"
 
 const props = defineProps<{
-  data: ActiveCitation | EnsuingDecision | PreviousDecision
+  data: ActiveCitation | EnsuingDecision | PreviousDecision | ParticipatingJudge
 }>()
 
 const iconComponent = computed(() => {
-  return props.data?.hasForeignSource
-    ? IconBaselineDescription
-    : IconOutlineDescription
+  return props.data.getIcon
 })
 
 const showErrorBadge = computed(() => {

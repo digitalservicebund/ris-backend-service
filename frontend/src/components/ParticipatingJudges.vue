@@ -19,7 +19,7 @@ const participatingJudges = computed({
   },
 })
 
-const defaultValue = new ParticipatingJudge()
+const defaultValue = new ParticipatingJudge() as ParticipatingJudge
 </script>
 
 <template>

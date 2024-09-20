@@ -157,6 +157,13 @@ export default class DocumentUnit {
           (activeCitations) => new ActiveCitation({ ...activeCitations }),
         )
 
+    if (data.contentRelatedIndexing?.participatingJudges)
+      data.contentRelatedIndexing.participatingJudges =
+        data.contentRelatedIndexing.participatingJudges.map(
+          (participatingJudge) =>
+            new ParticipatingJudge({ ...participatingJudge }),
+        )
+
     if (data.attachments != undefined && data.attachments.length > 0) {
       data.attachments = data.attachments.map(
         (attachment: Attachment) => new Attachment({ ...attachment }),

@@ -1,4 +1,5 @@
 import EditableListItem from "./editableListItem"
+import IcBaselinePerson from "~icons/ic/baseline-person"
 
 export default class ParticipatingJudge implements EditableListItem {
   public id?: string
@@ -19,8 +20,8 @@ export default class ParticipatingJudge implements EditableListItem {
   get renderDecision(): string {
     return [
       ...(this.name ? [this.name] : []),
-      ...(this.referencedOpinions ? [`${this.referencedOpinions}`] : []),
-    ].join(", ")
+      ...(this.referencedOpinions ? [`(${this.referencedOpinions})`] : []),
+    ].join(" ")
   }
 
   get hasMissingRequiredFields(): boolean {
@@ -45,6 +46,14 @@ export default class ParticipatingJudge implements EditableListItem {
 
   get nameIsSet(): boolean {
     return !!this.name
+  }
+
+  get getIcon() {
+    return IcBaselinePerson
+  }
+
+  get hasForeignSource() {
+    return false
   }
 
   private fieldIsEmpty(

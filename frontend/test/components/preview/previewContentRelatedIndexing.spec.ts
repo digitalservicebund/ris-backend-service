@@ -352,6 +352,7 @@ describe("preview content related indexing", () => {
       dismissalGrounds: ["ground"],
       dismissalTypes: ["type"],
       hasLegislativeMandate: false,
+      participatingJudges: [],
     })
 
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
@@ -362,6 +363,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
     expect(await screen.findByText("Kündigungsgründe")).toBeInTheDocument()
     expect(await screen.findByText("Kündigungsarten")).toBeInTheDocument()
+    expect(screen.queryByText("Mitwirkende Richter")).not.toBeInTheDocument()
   })
 
   test("renders no legislative mandate when it is false", async () => {
@@ -379,6 +381,8 @@ describe("preview content related indexing", () => {
       activeCitations: [],
       fieldsOfLaw: [],
       jobProfiles: [],
+      dismissalGrounds: [],
+      dismissalTypes: [],
       hasLegislativeMandate: false,
       participatingJudges: [
         new ParticipatingJudge({
@@ -394,7 +398,7 @@ describe("preview content related indexing", () => {
 
     expect(await screen.findByText("Mitwirkende Richter")).toBeInTheDocument()
     expect(
-      await screen.findByText("Mustermann, abweichende Meinung"),
+      await screen.findByText("Mustermann (abweichende Meinung)"),
     ).toBeInTheDocument()
     expect(await screen.findByText("Schmidt")).toBeInTheDocument()
     expect(screen.queryByText("Schlagwörter")).not.toBeInTheDocument()
@@ -402,6 +406,8 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Aktivzitierung")).not.toBeInTheDocument()
     expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
     expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
+    expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
   })
 
