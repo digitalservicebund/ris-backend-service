@@ -47,7 +47,13 @@ const decisionName = computed({
 })
 
 const headline = computed({
-  get: () => store.documentUnit?.shortTexts.headline,
+  get: () =>
+    store.documentUnit?.shortTexts.headline
+      ? useValidBorderNumberLinks(
+          store.documentUnit!.shortTexts.headline,
+          store.documentUnit.borderNumbers,
+        )
+      : undefined,
   set: (newValue) => {
     store.documentUnit!.shortTexts.headline =
       TextEditorUtil.getEditorContentIfPresent(newValue)

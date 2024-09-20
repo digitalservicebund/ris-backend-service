@@ -3,10 +3,10 @@ import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewLongTexts from "@/components/preview/PreviewLongTexts.vue"
 import { LongTexts } from "@/domain/documentUnit"
 
-function renderComponent(texts: LongTexts) {
+function renderComponent(longTexts: LongTexts) {
   return render(PreviewLongTexts, {
     props: {
-      texts: texts,
+      longTexts: longTexts,
     },
     global: {
       provide: {

@@ -3,10 +3,10 @@ import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewShortTexts from "@/components/preview/PreviewShortTexts.vue"
 import { ShortTexts } from "@/domain/documentUnit"
 
-function renderComponent(texts: ShortTexts) {
+function renderComponent(shortTexts: ShortTexts) {
   return render(PreviewShortTexts, {
     props: {
-      texts: texts,
+      shortTexts: shortTexts,
       validBorderNumbers: [],
     },
     global: {

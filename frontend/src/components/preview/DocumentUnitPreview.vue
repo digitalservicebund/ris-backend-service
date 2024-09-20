@@ -46,9 +46,9 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
     <PreviewContentRelatedIndexing />
     <PreviewReferences :references="documentUnit.references as Reference[]" />
     <PreviewShortTexts
-      :texts="documentUnit.shortTexts"
+      :short-texts="documentUnit.shortTexts"
       :valid-border-numbers="documentUnit.borderNumbers"
     />
-    <PreviewLongTexts :texts="documentUnit.longTexts" />
+    <PreviewLongTexts :long-texts="documentUnit.longTexts" />
   </FlexContainer>
 </template>
