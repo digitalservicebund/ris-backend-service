@@ -186,94 +186,88 @@ watch(
 </script>
 
 <template>
-  <div class="flex h-full flex-col space-y-24 py-16">
-    <div class="flex flex-col gap-24">
-      <div class="flex flex-col gap-24">
-        <div class="flex justify-between gap-24">
-          <div id="citationInputField" class="flex-1">
-            <InputField
-              v-if="!isSaved"
-              id="citation"
-              v-slot="slotProps"
-              label="Zitatstelle *"
-              :validation-error="validationStore.getByField('citation')"
-            >
-              <div class="flex flex-grow flex-row gap-16">
-                <TextInput
-                  id="citation prefix"
-                  v-model="prefix"
-                  aria-label="Zitatstelle Präfix"
-                  placeholder="Präfix"
-                  read-only
-                  size="medium"
-                ></TextInput>
-                <TextInput
-                  id="citation"
-                  v-model="reference.citation"
-                  aria-label="Zitatstelle *"
-                  :has-error="slotProps.hasError"
-                  placeholder="Variable"
-                  size="medium"
-                  @blur="validateRequiredInput(reference)"
-                  @focus="validationStore.remove('citation')"
-                ></TextInput>
-                <TextInput
-                  id="citation suffix"
-                  v-model="suffix"
-                  aria-label="Zitatstelle Suffix"
-                  placeholder="Suffix"
-                  read-only
-                  size="medium"
-                ></TextInput>
-              </div>
-            </InputField>
-
-            <InputField
-              v-else
-              id="citation"
-              v-slot="slotProps"
-              label="Zitatstelle *"
-              :validation-error="validationStore.getByField('citation')"
-            >
-              <div class="flex flex-grow flex-row gap-16">
-                <TextInput
-                  id="citation"
-                  v-model="reference.citation"
-                  aria-label="Zitatstelle *"
-                  :has-error="slotProps.hasError"
-                  size="medium"
-                  @blur="validateRequiredInput(reference)"
-                  @focus="validationStore.remove('citation')"
-                ></TextInput>
-              </div>
-            </InputField>
-
-            <div v-if="legalPeriodical" class="ds-label-03-reg pt-4">
-              Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}
-            </div>
-          </div>
-
-          <InputField
-            id="referenceSupplement"
-            v-slot="slotProps"
-            class="flex-1"
-            label="Klammernzusatz"
-          >
+  <div class="flex flex-col gap-24">
+    <div class="flex justify-between gap-24">
+      <div id="citationInputField" class="flex-1">
+        <InputField
+          v-if="!isSaved"
+          id="citation"
+          v-slot="slotProps"
+          label="Zitatstelle *"
+          :validation-error="validationStore.getByField('citation')"
+        >
+          <div class="flex flex-grow flex-row gap-16">
             <TextInput
-              id="referenceSupplement"
-              v-model="reference.referenceSupplement"
-              aria-label="Klammernzusatz"
-              :has-error="slotProps.hasError"
+              id="citation prefix"
+              v-model="prefix"
+              aria-label="Zitatstelle Präfix"
+              placeholder="Präfix"
+              read-only
               size="medium"
             ></TextInput>
-          </InputField>
+            <TextInput
+              id="citation"
+              v-model="reference.citation"
+              aria-label="Zitatstelle *"
+              :has-error="slotProps.hasError"
+              placeholder="Variable"
+              size="medium"
+              @blur="validateRequiredInput(reference)"
+              @focus="validationStore.remove('citation')"
+            ></TextInput>
+            <TextInput
+              id="citation suffix"
+              v-model="suffix"
+              aria-label="Zitatstelle Suffix"
+              placeholder="Suffix"
+              read-only
+              size="medium"
+            ></TextInput>
+          </div>
+        </InputField>
+
+        <InputField
+          v-else
+          id="citation"
+          v-slot="slotProps"
+          label="Zitatstelle *"
+          :validation-error="validationStore.getByField('citation')"
+        >
+          <div class="flex flex-grow flex-row gap-16">
+            <TextInput
+              id="citation"
+              v-model="reference.citation"
+              aria-label="Zitatstelle *"
+              :has-error="slotProps.hasError"
+              size="medium"
+              @blur="validateRequiredInput(reference)"
+              @focus="validationStore.remove('citation')"
+            ></TextInput>
+          </div>
+        </InputField>
+
+        <div v-if="legalPeriodical" class="ds-label-03-reg pt-4">
+          Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}
         </div>
       </div>
+
+      <InputField
+        id="referenceSupplement"
+        v-slot="slotProps"
+        class="flex-1"
+        label="Klammernzusatz"
+      >
+        <TextInput
+          id="referenceSupplement"
+          v-model="reference.referenceSupplement"
+          aria-label="Klammernzusatz"
+          :has-error="slotProps.hasError"
+          size="medium"
+        ></TextInput>
+      </InputField>
     </div>
+
     <div class="flex flex-col gap-24">
-      <div v-if="!isSaved" class="ds-heading-03-reg pt-24">
-        Entscheidung hinzufügen
-      </div>
       <div class="flex justify-between gap-24">
         <InputField
           id="courtInput"
@@ -388,7 +382,7 @@ watch(
         @click.stop="modelValue && emit('removeEntry', modelValue)"
       />
     </div>
-    <div class="bg-blue-200">
+    <div v-if="isLoading || searchResults" class="bg-blue-200">
       <Pagination
         navigation-position="bottom"
         :page="searchResultsCurrentPage"
