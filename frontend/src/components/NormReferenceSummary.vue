@@ -61,7 +61,7 @@ const props = defineProps<{
           />
         </div>
 
-        <div v-if="data.singleNorms" class="flex flex-col gap-24">
+        <div v-if="!!data.singleNorms?.length" class="flex flex-col gap-24">
           <div v-for="(singleNorm, index) in data.singleNorms" :key="index">
             <div v-if="!singleNorm.isEmpty" class="flex flex-row items-center">
               <component :is="IconArrowRight" class="mr-8" />
