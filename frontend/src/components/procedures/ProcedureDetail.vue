@@ -28,10 +28,7 @@ const isLoading = computed(
 </script>
 
 <template>
-  <div
-    v-if="procedure.documentationUnitCount > 0"
-    class="pb-12 pl-24 pr-48 pt-36"
-  >
+  <div v-if="procedure.documentationUnitCount > 0">
     <DocumentUnitList
       class="grow"
       :document-unit-list-entries="procedure.documentUnits"
