@@ -29,7 +29,7 @@ test.describe(
         },
         tag: ["@RISDEV-4709"],
       },
-      async ({ page, edition, editionWithReference }) => {
+      async ({ page, edition, editionWithReferences }) => {
         await test.step("navigate to periodical references", async () => {
           await navigateToPeriodicalReferences(page, edition.id ?? "")
 
@@ -61,7 +61,7 @@ test.describe(
         await test.step("handover possible when all required fields filled", async () => {
           await navigateToPeriodicalHandover(
             page,
-            editionWithReference.id ?? "",
+            editionWithReferences.id ?? "",
           )
 
           await expect(
@@ -97,19 +97,19 @@ test.describe(
               "id=juris name=invalid-user da=R df=X dt=F mod=T ld=" +
                 formattedDate +
                 " vg=edition-" +
-                editionWithReference.id,
+                editionWithReferences.id,
             ),
           ).toBeVisible()
 
           await expect(
             page.getByText(
-              editionWithReference.references?.[0]?.documentationUnit
+              editionWithReferences.references?.[0]?.documentationUnit
                 ?.documentNumber + "_1.XML",
             ),
           ).toBeVisible()
           await expect(
             page.getByText(
-              editionWithReference.references?.[1]?.documentationUnit
+              editionWithReferences.references?.[1]?.documentationUnit
                 ?.documentNumber + "_1.XML",
             ),
           ).toBeVisible()

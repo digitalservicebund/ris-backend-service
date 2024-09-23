@@ -1,4 +1,4 @@
-import { expect, Locator, Page } from "@playwright/test"
+import { expect, Locator, Page, Request } from "@playwright/test"
 import { caselawTest as test } from "./fixtures"
 import { DocumentUnitCatagoriesEnum } from "@/components/enumDocumentUnitCatagories"
 import SingleNorm from "@/domain/singleNorm"
@@ -110,8 +110,7 @@ export const navigateToPeriodicalReferences = async (
 ) => {
   await test.step("Navigate to 'Periodikumauswertung > Fundstellen'", async () => {
     const baseUrl = `/caselaw/periodical-evaluation/${editionId}/references`
-
-    await page.goto(baseUrl)
+    await getRequest(baseUrl, page)
     await expect(page.getByTestId("references-title")).toBeVisible()
   })
 }
@@ -634,6 +633,12 @@ export async function getModifier(page: Page): Promise<string> {
     .includes("mac")
     ? "Meta"
     : "Control"
+}
+
+export async function getRequest(url: string, page: Page): Promise<Request> {
+  const requestFinishedPromise = page.waitForEvent("requestfinished")
+  await page.goto(url)
+  return await requestFinishedPromise
 }
 
 export async function clickCategoryButton(testId: string, page: Page) {
