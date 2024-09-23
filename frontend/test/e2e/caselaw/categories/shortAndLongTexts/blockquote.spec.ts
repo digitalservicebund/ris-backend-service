@@ -1,5 +1,9 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories, save } from "../../e2e-utils"
+import {
+  clickCategoryButton,
+  navigateToCategories,
+  save,
+} from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 import { navigateToHandover } from "~/e2e/caselaw/e2e-utils"
 
@@ -23,6 +27,8 @@ test.describe(
       await test.step("open document categories", async () => {
         await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
       })
+
+      await clickCategoryButton("Gründe", page)
 
       await test.step("add text to 'Gründe'", async () => {
         await inputField.click()
@@ -72,6 +78,8 @@ test.describe(
       await test.step("open document categories", async () => {
         await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
       })
+
+      await clickCategoryButton("Gründe", page)
 
       await test.step("add text to 'Gründe'", async () => {
         await inputField.click()
@@ -131,6 +139,8 @@ test.describe(
         await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
       })
 
+      await clickCategoryButton("Gründe", page)
+
       await test.step("add text to 'Gründe'", async () => {
         await inputField.click()
         await page.keyboard.type("Abschnitt")
@@ -183,6 +193,8 @@ test.describe(
       await test.step("open document categories", async () => {
         await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
       })
+
+      await clickCategoryButton("Gründe", page)
 
       await test.step("add text to 'Gründe'", async () => {
         await inputField.click()

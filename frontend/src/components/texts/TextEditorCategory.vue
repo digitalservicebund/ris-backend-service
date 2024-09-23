@@ -14,7 +14,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: undefined,
-  fieldSize: "medium",
+  fieldSize: "big",
 })
 
 defineEmits<{

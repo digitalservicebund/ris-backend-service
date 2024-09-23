@@ -64,8 +64,8 @@ const decisionReasons = computed({
 </script>
 
 <template>
-  <div aria-label="Langtexte" class="border-t-1 border-blue-300 pb-24">
-    <h2 class="ds-label-01-bold mb-16 mt-24">Langtexte</h2>
+  <div aria-label="Langtexte">
+    <h2 class="ds-label-01-bold mb-16">Langtexte</h2>
     <div class="flex flex-col gap-24">
       <TextEditorCategory
         id="tenor"

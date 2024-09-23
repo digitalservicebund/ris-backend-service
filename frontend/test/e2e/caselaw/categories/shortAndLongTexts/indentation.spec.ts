@@ -1,5 +1,9 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories, save } from "../../e2e-utils"
+import {
+  clickCategoryButton,
+  navigateToCategories,
+  save,
+} from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 import { navigateToHandover } from "~/e2e/caselaw/e2e-utils"
 
@@ -24,6 +28,7 @@ test.describe(
 
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
 
+      await clickCategoryButton("Gründe", page)
       const inputField = page.locator("[data-testid='Gründe']")
       await inputField.click()
       await page.keyboard.type("Abschnitt mit Einzug 0")
@@ -77,6 +82,7 @@ test.describe(
 
       await navigateToCategories(page, documentNumber)
 
+      await clickCategoryButton("Gründe", page)
       const inputField = page.locator("[data-testid='Gründe']")
       await inputField.click()
       await page

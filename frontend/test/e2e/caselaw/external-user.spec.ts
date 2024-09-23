@@ -1,5 +1,6 @@
 import { expect, Page } from "@playwright/test"
 import {
+  clickCategoryButton,
   deleteProcedure,
   navigateToCategories,
   navigateToProcedures,
@@ -173,6 +174,7 @@ test.describe(
         await assignUserGroupToProcedure(page, procedureName)
 
         await test.step("Assigned external user can edit and save Entscheidungsname", async () => {
+          await clickCategoryButton("Entscheidungsname", pageWithExternalUser)
           await pageWithExternalUser
             .getByLabel("Entscheidungsname")
             .fill("ein Name")
@@ -210,6 +212,7 @@ test.describe(
         await assignUserGroupToProcedure(page, procedureName)
 
         await test.step("Assigned external user can edit and save Entscheidungsname", async () => {
+          await clickCategoryButton("Entscheidungsname", pageWithExternalUser)
           await pageWithExternalUser
             .getByLabel("Entscheidungsname")
             .fill("ein Name")

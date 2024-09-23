@@ -53,8 +53,8 @@ const outline = computed({
 </script>
 
 <template>
-  <div class="border-t-1 border-blue-300 pb-24">
-    <h2 class="ds-label-01-bold mb-16 mt-24">Weitere Langtexte</h2>
+  <div aria-label="Weitere Langtexte">
+    <h2 class="ds-label-01-bold mb-16">Weitere Langtexte</h2>
     <div class="flex flex-col gap-24">
       <TextEditorCategory
         id="otherLongText"
@@ -72,13 +72,15 @@ const outline = computed({
         :should-show-button="!hasDissentingOpinion"
       />
 
-      <TextEditorCategory
-        id="outline"
-        v-model="outline"
-        :editable="isInternalUser"
-        label="Gliederung"
-        :should-show-button="!hasOutline"
-      />
+      <div class="gap-0">
+        <TextEditorCategory
+          id="outline"
+          v-model="outline"
+          :editable="isInternalUser"
+          label="Gliederung"
+          :should-show-button="!hasOutline"
+        />
+      </div>
     </div>
   </div>
 </template>

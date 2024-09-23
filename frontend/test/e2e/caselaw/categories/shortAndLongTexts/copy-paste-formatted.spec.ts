@@ -4,6 +4,7 @@ import {
   uploadTestfile,
   navigateToCategories,
   copyPasteTextFromAttachmentIntoEditor,
+  clickCategoryButton,
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 
@@ -47,6 +48,7 @@ test("copy-paste text with different styles and alignments from side panel", asy
 
   await test.step("copy and paste document text into text editor field, check that the style is applied", async () => {
     const attachmentLocator = page.getByText("centered").locator("..")
+    await clickCategoryButton("Leitsatz", page)
     const inputField = page.locator("[data-testid='Leitsatz']")
     await copyPasteTextFromAttachmentIntoEditor(
       page,
@@ -108,6 +110,7 @@ test(
       const attachmentLocator = page
         .getByText("Text", { exact: true })
         .locator("..")
+      await clickCategoryButton("Leitsatz", page)
       const inputField = page.locator("[data-testid='Leitsatz']")
       await copyPasteTextFromAttachmentIntoEditor(
         page,
@@ -168,6 +171,7 @@ test(
       const attachmentLocator = page
         .getByText("Text", { exact: true })
         .locator("..")
+      await clickCategoryButton("Leitsatz", page)
       const inputField = page.locator("[data-testid='Leitsatz']")
       await copyPasteTextFromAttachmentIntoEditor(
         page,

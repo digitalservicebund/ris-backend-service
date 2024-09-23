@@ -9,7 +9,7 @@ const isInternalUser = useInternalUser()
 </script>
 
 <template>
-  <div class="flex flex-col bg-white px-24">
+  <div class="flex flex-col gap-24 bg-white p-24">
     <TitleElement>Kurz- & Langtexte</TitleElement>
     <DocumentUnitShortTexts />
     <DocumentUnitLongTexts v-if="isInternalUser" />
