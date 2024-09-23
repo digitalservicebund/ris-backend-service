@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import { ref, computed, watch, nextTick } from "vue"
+import Checkbox from "@/components/input/CheckboxInput.vue"
+import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
@@ -8,13 +10,10 @@ const store = useDocumentUnitStore()
 const keywordsLength = computed(
   () => store.documentUnit!.contentRelatedIndexing.keywords?.length,
 )
-
-const localKeywords = ref()
 const editMode = ref(true)
+const sortAlphabetically = ref(false)
 
-const keywords = computed(
-  () => store.documentUnit!.contentRelatedIndexing.keywords,
-)
+const localKeywords = ref(store.documentUnit!.contentRelatedIndexing.keywords)
 
 const keywordsString = computed({
   get: () => store.documentUnit!.contentRelatedIndexing.keywords?.join("\n"), // Join array with newlines for textarea
@@ -28,8 +27,16 @@ const keywordsString = computed({
 })
 
 const addKeywords = () => {
-  store.documentUnit!.contentRelatedIndexing.keywords = localKeywords.value
+  if (sortAlphabetically.value && localKeywords.value) {
+    localKeywords.value = localKeywords.value.sort((a: string, b: string) =>
+      a.localeCompare(b),
+    )
+  }
+  store.documentUnit!.contentRelatedIndexing.keywords = [
+    ...new Set(localKeywords.value),
+  ] as string[] //remove duplicates
   editMode.value = false
+  sortAlphabetically.value = false
 }
 const cancelEdit = () => {
   editMode.value = false
@@ -75,6 +82,18 @@ watch(
           @input="adjustTextareaHeight($event.target as HTMLTextAreaElement)"
         ></textarea>
       </div>
+      <InputField
+        id="sortAlphabetically"
+        label="Alphabetisch sortieren"
+        :label-position="LabelPosition.RIGHT"
+      >
+        <Checkbox
+          id="sortAlphabetically"
+          v-model="sortAlphabetically"
+          aria-label="Alphabetisch sortieren"
+          class="ds-checkbox-mini bg-white"
+        />
+      </InputField>
       <div class="flex w-full flex-row">
         <div class="flex gap-16">
           <TextButton
@@ -98,7 +117,8 @@ watch(
         <label class="ds-label-02-reg">Schlagwörter</label>
         <ul class="m-0 flex flex-row gap-8 p-0">
           <li
-            v-for="(chip, i) in keywords"
+            v-for="(chip, i) in store.documentUnit!.contentRelatedIndexing
+              .keywords"
             :key="i"
             class="rounded-full bg-blue-300"
             data-testid="chip"
