@@ -35,7 +35,7 @@ test.describe(
 
       await test.step("reload page and check that input field and content are visible", async () => {
         await page.reload()
-        await expect(page.getByTestId("job-profiles")).toBeVisible()
+        await expect(page.getByTestId("Berufsbild")).toBeVisible()
         await expect(page.getByText(firstJobProfile)).toBeVisible()
       })
 
@@ -80,7 +80,7 @@ test.describe(
 
       await test.step("reload page and check that both job profiles are visible", async () => {
         await page.reload()
-        await expect(page.getByTestId("job-profiles")).toBeVisible()
+        await expect(page.getByTestId("Berufsbild")).toBeVisible()
         await expect(page.getByText(firstJobProfile)).toBeVisible()
         await expect(page.getByText(secondJobProfile)).toBeVisible()
       })
@@ -102,7 +102,7 @@ test.describe(
 
       await test.step("reload page and check that input field and content are correct", async () => {
         await page.reload()
-        await expect(page.getByTestId("job-profiles")).toBeVisible()
+        await expect(page.getByTestId("Berufsbild")).toBeVisible()
         await expect(page.getByText(firstJobProfile)).toBeHidden()
         await expect(page.getByText(secondJobProfile)).toBeVisible()
       })

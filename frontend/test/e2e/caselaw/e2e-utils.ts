@@ -640,6 +640,6 @@ export async function clickCategoryButton(testId: string, page: Page) {
   await test.step(`click '${testId}' button to open category`, async () => {
     const button = page.getByRole("button", { name: testId, exact: true })
     await button.click()
-    await expect(page.getByLabel(testId)).toBeVisible()
+    await expect(page.getByTestId(testId)).toBeVisible()
   })
 }

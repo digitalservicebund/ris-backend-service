@@ -50,7 +50,7 @@ const headline = computed({
   get: () =>
     store.documentUnit?.shortTexts.headline
       ? useValidBorderNumberLinks(
-          store.documentUnit!.shortTexts.headline,
+          store.documentUnit.shortTexts.headline,
           store.documentUnit.borderNumbers,
         )
       : undefined,
@@ -98,6 +98,7 @@ const otherHeadnote = computed({
       <TextInputCategory
         id="decisionName"
         v-model="decisionName"
+        data-testId="Entscheidungsname"
         editable
         label="Entscheidungsname"
         :should-show-button="!hasDecisionName"
