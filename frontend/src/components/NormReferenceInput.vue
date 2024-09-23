@@ -115,6 +115,7 @@ async function addNormReference() {
  */
 async function removeNormReference() {
   singleNorms.value = []
+  norm.value.normAbbreviation = undefined
   emit("removeEntry")
 }
 
@@ -135,8 +136,8 @@ function removeSingleNormEntry(index: number) {
 
 function cancelEdit() {
   if (new NormReference({ ...props.modelValue }).isEmpty) {
-    emit("removeEntry")
-    singleNorms.value = []
+    removeNormReference()
+    addSingleNormEntry()
   }
   emit("cancelEdit")
 }
@@ -186,7 +187,7 @@ watch(
     if (singleNorms.value?.length == 0 || !singleNorms.value)
       addSingleNormEntry()
   },
-  { immediate: true },
+  { immediate: true, deep: true },
 )
 </script>
 

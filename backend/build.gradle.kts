@@ -38,6 +38,7 @@ repositories {
             password = System.getenv("GH_PACKAGES_REPOSITORY_TOKEN")
         }
     }
+    //  mavenLocal() // for local testing of library when publishing to maven local.
 }
 
 sourceSets {
@@ -174,7 +175,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.1")
 
-    implementation(platform("software.amazon.awssdk:bom:2.28.5"))
+    implementation(platform("software.amazon.awssdk:bom:2.28.6"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -186,7 +187,7 @@ dependencies {
     implementation("com.icegreen:greenmail:2.1.0-rc-1")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.6") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.9") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
