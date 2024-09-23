@@ -35,11 +35,11 @@ const addKeywords = () => {
   store.documentUnit!.contentRelatedIndexing.keywords = [
     ...new Set(localKeywords.value),
   ] as string[] //remove duplicates
-  editMode.value = false
+  if (!!localKeywords.value?.length) editMode.value = false
   sortAlphabetically.value = false
 }
 const cancelEdit = () => {
-  editMode.value = false
+  if (!!localKeywords.value?.length) editMode.value = false
 }
 
 const toggleEditMode = () => {
@@ -69,13 +69,14 @@ watch(
 <template>
   <div>
     <h2 class="ds-label-01-bold mb-16">Schlagwörter</h2>
-
+    <!-- Edit mode -->
     <div v-if="editMode" class="flex flex-col gap-24">
       <div class="flex flex-col gap-8">
         <label class="ds-label-02-reg mb-4">Schlagwörter</label>
         <textarea
           id="keywords"
           v-model="keywordsString"
+          aria-label="Schlagwörter Input"
           class="ds-input h-auto resize-none overflow-hidden p-20"
           placeholder="Geben Sie jeden Wert in eigene Zeile ein"
           :rows="keywordsLength"
@@ -97,6 +98,7 @@ watch(
       <div class="flex w-full flex-row">
         <div class="flex gap-16">
           <TextButton
+            aria-label="Schlagwörter übernehmen"
             button-type="primary"
             label="Übernehmen"
             size="small"
@@ -112,6 +114,7 @@ watch(
         </div>
       </div>
     </div>
+    <!-- Display mode -->
     <div v-else class="flex flex-col gap-16">
       <div class="flex flex-col gap-8">
         <label class="ds-label-02-reg">Schlagwörter</label>
@@ -133,6 +136,7 @@ watch(
         </ul>
       </div>
       <TextButton
+        aria-label="Schlagwörter bearbeiten"
         button-type="tertiary"
         label="Schlagwörter bearbeiten"
         size="small"
