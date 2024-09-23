@@ -229,9 +229,7 @@ test.describe(
       },
     )
 
-    // Flaky
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip(
+    test(
       "Periodical edition reference editing",
       {
         annotation: {
@@ -241,7 +239,7 @@ test.describe(
         },
       },
       async ({ context, page, edition, prefilledDocumentUnit }) => {
-        const fileNumer = prefilledDocumentUnit.coreData.fileNumbers?.[0] || ""
+        const fileNumber = prefilledDocumentUnit.coreData.fileNumbers?.[0] || ""
 
         await navigateToPeriodicalReferences(page, edition.id || "")
 
@@ -270,7 +268,7 @@ test.describe(
         await test.step("A docunit can be added as reference by entering citation and search fields", async () => {
           await fillInput(page, "Gericht", "AG Aachen")
           await page.getByText("AG Aachen").click()
-          await fillInput(page, "Aktenzeichen", fileNumer)
+          await fillInput(page, "Aktenzeichen", fileNumber)
           await fillInput(page, "Entscheidungsdatum", "31.12.2019")
           await fillInput(page, "Dokumenttyp", "AnU")
           await page.getByText("Anerkenntnisurteil").click()
@@ -278,7 +276,7 @@ test.describe(
           await page.getByText("Suchen").click()
           await expect(
             page.getByText(
-              `AG Aachen, 31.12.2019, ${fileNumer}, Anerkenntnisurteil, Unveröffentlicht`,
+              `AG Aachen, 31.12.2019, ${fileNumber}, Anerkenntnisurteil, Unveröffentlicht`,
             ),
           ).toBeVisible()
           await expect(
@@ -295,7 +293,7 @@ test.describe(
 
         await test.step("A reference is added to the editable list after being added", async () => {
           const decisionElement = page.getByText(
-            "AG Aachen, 31.12.2019, " + fileNumer + ", Anerkenntnisurteil",
+            "AG Aachen, 31.12.2019, " + fileNumber + ", Anerkenntnisurteil",
           )
           await expect(decisionElement).toBeVisible()
 
@@ -326,7 +324,7 @@ test.describe(
           ).toBeVisible()
         })
 
-        await test.step("When editing a reference, the citation is a single input containing the joimed value of prefix, citation and suffix ", async () => {
+        await test.step("When editing a reference, the citation is a single input containing the joined value of prefix, citation and suffix ", async () => {
           await page.getByTestId("list-entry-0").click()
           await expect(page.getByLabel("Zitatstelle *")).toHaveValue(
             "2024, 5, Heft 1",
@@ -341,7 +339,7 @@ test.describe(
             page.locator("[aria-label='Gericht']"),
           ).not.toBeEditable()
 
-          await expect(page.getByLabel("Aktenzeichen")).toHaveValue(fileNumer)
+          await expect(page.getByLabel("Aktenzeichen")).toHaveValue(fileNumber)
           await expect(
             page.locator("[aria-label='Aktenzeichen']"),
           ).not.toBeEditable()
@@ -378,26 +376,31 @@ test.describe(
 
         await test.step("Changes to the citation are visible in the documentation unit's preview ", async () => {
           await previewTab.reload()
-          // TODO should be fixed
-          if (false)
-            await expect(
-              previewTab.getByText("MMG 2021, 2, Heft 1 (L)", { exact: true }),
-            ).toBeVisible()
+          await expect(
+            previewTab.getByText("MMG 2021, 2, Heft 1 (L)", { exact: true }),
+          ).toBeVisible()
         })
 
         await test.step("The edition can't be deleted as long as it has references", async () => {
           await navigateToPeriodicalEvaluation(page)
+
           await fillInput(page, "Periodikum", "MMG")
           await page
             .getByText("MMG | Medizin Mensch Gesellschaft", { exact: true })
             .click()
 
+          const line = page.getByText(
+            (edition.name || "") + "MMG1" + formattedDate,
+          )
+
+          await expect(line).toBeVisible()
           // delete button should not be clickable
           await expect(
-            page.locator("[aria-label='Ausgabe löschen']"),
+            line.locator("[aria-label='Ausgabe löschen']"),
           ).toBeHidden()
+
           await expect(
-            page
+            line
               .locator("[aria-label='Ausgabe kann nicht gelöscht werden']")
               .first(),
           ).toBeVisible()
@@ -443,7 +446,7 @@ test.describe(
         },
       },
       async ({ context, page, edition, prefilledDocumentUnitBgh }) => {
-        const fileNumer =
+        const fileNumber =
           prefilledDocumentUnitBgh.coreData.fileNumbers?.[0] || ""
 
         await test.step("A docunit of another docoffice can be added as reference", async () => {
@@ -454,14 +457,14 @@ test.describe(
 
           await fillInput(page, "Gericht", "AG Aachen")
           await page.getByText("AG Aachen").click()
-          await fillInput(page, "Aktenzeichen", fileNumer)
+          await fillInput(page, "Aktenzeichen", fileNumber)
           await fillInput(page, "Entscheidungsdatum", "31.12.2019")
           await fillInput(page, "Dokumenttyp", "AnU")
           await page.getByText("Anerkenntnisurteil").click()
           await page.getByText("Suchen").click()
           await expect(
             page.getByText(
-              `AG Aachen, 31.12.2019, ${fileNumer}, Anerkenntnisurteil, Veröffentlicht`,
+              `AG Aachen, 31.12.2019, ${fileNumber}, Anerkenntnisurteil, Veröffentlicht`,
             ),
           ).toBeVisible()
           await expect(
