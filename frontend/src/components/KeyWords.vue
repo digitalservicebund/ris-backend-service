@@ -32,7 +32,7 @@ const cancelEdit = () => {
 const adjustTextareaHeight = (textarea: HTMLTextAreaElement | null) => {
   if (textarea) {
     textarea.style.height = "auto" // Reset height first to recalculate based on content
-    textarea.style.height = `${textarea.scrollHeight + 40}px ` // Set the height to match content
+    textarea.style.height = `${textarea.scrollHeight}px ` // Set the height to match content
   }
 }
 
@@ -47,23 +47,23 @@ watch(keywords, async () => {
 <template>
   <div>
     <h2 class="ds-label-01-bold mb-16">Schlagwörter</h2>
+
     <div class="flex flex-col gap-24">
       <div>
         <label class="ds-label-02-reg mb-4">Schlagwörter</label>
         <textarea
           id="keywords"
           v-model="keywords"
-          class="ds-input !h-auto p-20"
+          class="ds-input h-auto resize-none overflow-hidden p-20"
           placeholder="Geben Sie jeden Wert in eigene Zeile ein"
           :rows="keywordsLength"
+          @input="adjustTextareaHeight($event.target as HTMLTextAreaElement)"
         ></textarea>
       </div>
       <div class="flex w-full flex-row">
         <div class="flex gap-16">
           <TextButton
-            aria-label="Fundstelle speichern"
             button-type="primary"
-            :disabled="keywordsLength == 0"
             label="Übernehmen"
             size="small"
             @click.stop="addKeywords"
