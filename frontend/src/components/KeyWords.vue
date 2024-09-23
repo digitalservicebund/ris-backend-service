@@ -17,7 +17,7 @@ const keywords = computed({
 </script>
 
 <template>
-  <div class="border-b-1 border-blue-300">
+  <div>
     <h2 class="ds-label-01-bold mb-16">Schlagwörter</h2>
     <KeywordsChipsInput
       id="keywords"
