@@ -6,10 +6,10 @@ import IconAdd from "~icons/material-symbols/add"
 const props = defineProps<{
   classes?: string
   label: string
-  shouldShowButton: boolean
+  shouldShowButton?: boolean
 }>()
 
-const shouldShowButton = ref<boolean>(props.shouldShowButton)
+const shouldShowButton = ref<boolean>(props.shouldShowButton ?? true)
 
 function toggle() {
   shouldShowButton.value = !shouldShowButton.value

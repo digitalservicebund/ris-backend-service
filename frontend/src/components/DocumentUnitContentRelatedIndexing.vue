@@ -12,7 +12,7 @@ import TitleElement from "@/components/TitleElement.vue"
 <template>
   <div class="flex flex-col gap-24 bg-white p-24">
     <TitleElement>Inhaltliche Erschließung</TitleElement>
-    <CategoryWrapper label="Schlagwörter" should-show-button>
+    <CategoryWrapper label="Schlagwörter">
       <KeyWords />
     </CategoryWrapper>
     <FieldOfLawMain />
