@@ -10,8 +10,13 @@ const keywordsLength = computed(
 )
 
 const localKeywords = ref()
+const editMode = ref(true)
 
-const keywords = computed({
+const keywords = computed(
+  () => store.documentUnit!.contentRelatedIndexing.keywords,
+)
+
+const keywordsString = computed({
   get: () => store.documentUnit!.contentRelatedIndexing.keywords?.join("\n"), // Join array with newlines for textarea
   set: (newValues: string) => {
     // Split the text by newline, trim each line, filter out empty lines, and set back into the array
@@ -24,9 +29,14 @@ const keywords = computed({
 
 const addKeywords = () => {
   store.documentUnit!.contentRelatedIndexing.keywords = localKeywords.value
+  editMode.value = false
 }
 const cancelEdit = () => {
-  // todo: switch to displaymode
+  editMode.value = false
+}
+
+const toggleEditMode = () => {
+  editMode.value = !editMode.value
 }
 
 const adjustTextareaHeight = (textarea: HTMLTextAreaElement | null) => {
@@ -37,23 +47,28 @@ const adjustTextareaHeight = (textarea: HTMLTextAreaElement | null) => {
 }
 
 // Watch the `keywords` value to adjust the height when content changes
-watch(keywords, async () => {
-  await nextTick() // Wait for the content update
-  const textarea = document.querySelector("textarea")
-  adjustTextareaHeight(textarea as HTMLTextAreaElement)
-})
+watch(
+  keywordsString,
+  async () => {
+    await nextTick() // Wait for the content update
+    const textarea = document.querySelector("textarea")
+    adjustTextareaHeight(textarea as HTMLTextAreaElement)
+    editMode.value = !keywordsLength.value
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
   <div>
     <h2 class="ds-label-01-bold mb-16">Schlagwörter</h2>
 
-    <div class="flex flex-col gap-24">
-      <div>
+    <div v-if="editMode" class="flex flex-col gap-24">
+      <div class="flex flex-col gap-8">
         <label class="ds-label-02-reg mb-4">Schlagwörter</label>
         <textarea
           id="keywords"
-          v-model="keywords"
+          v-model="keywordsString"
           class="ds-input h-auto resize-none overflow-hidden p-20"
           placeholder="Geben Sie jeden Wert in eigene Zeile ein"
           :rows="keywordsLength"
@@ -77,6 +92,32 @@ watch(keywords, async () => {
           />
         </div>
       </div>
+    </div>
+    <div v-else class="flex flex-col gap-16">
+      <div class="flex flex-col gap-8">
+        <label class="ds-label-02-reg">Schlagwörter</label>
+        <ul class="m-0 flex flex-row gap-8 p-0">
+          <li
+            v-for="(chip, i) in keywords"
+            :key="i"
+            class="rounded-full bg-blue-300"
+            data-testid="chip"
+            tabindex="0"
+          >
+            <span
+              class="overflow-hidden text-ellipsis whitespace-nowrap px-8 py-6 text-18"
+              data-testid="chip-value"
+              >{{ chip }}
+            </span>
+          </li>
+        </ul>
+      </div>
+      <TextButton
+        button-type="tertiary"
+        label="Schlagwörter bearbeiten"
+        size="small"
+        @click.stop="toggleEditMode"
+      />
     </div>
   </div>
 </template>
