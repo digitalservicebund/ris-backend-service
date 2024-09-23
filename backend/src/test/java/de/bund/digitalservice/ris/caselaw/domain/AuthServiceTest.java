@@ -297,11 +297,11 @@ class AuthServiceTest {
         "/contentRelatedIndexing/dismissalTypes",
         "/contentRelatedIndexing/dismissalGrounds",
         "/contentRelatedIndexing/hasLegislativeMandate",
-        "/texts/decisionName",
-        "/texts/headline",
-        "/texts/guidingPrinciple",
-        "/texts/headnote",
-        "/texts/otherHeadnote",
+        "/shortTexts/decisionName",
+        "/shortTexts/headline",
+        "/shortTexts/guidingPrinciple",
+        "/shortTexts/headnote",
+        "/shortTexts/otherHeadnote",
         "/note",
         "/version"
       })
@@ -338,13 +338,13 @@ class AuthServiceTest {
         "/coreData/legalEffect",
         "/coreData/leadingDecisionNormReferences",
         "/coreData/yearsOfDispute",
-        "/texts/tenor",
-        "/texts/reasons",
-        "/texts/caseFacts",
-        "/texts/decisionReasons",
-        "/texts/dissentingOpinion",
-        "/texts/otherLongText",
-        "/texts/outline",
+        "/longTexts/tenor",
+        "/longTexts/reasons",
+        "/longTexts/caseFacts",
+        "/longTexts/decisionReasons",
+        "/longTexts/dissentingOpinion",
+        "/longTexts/otherLongText",
+        "/longTexts/outline",
         "/references"
       })
   void test_isPatchAllowedForExternalUsers_withProhibitedPath_shouldReturnFalse(String path) {

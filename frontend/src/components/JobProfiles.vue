@@ -19,7 +19,7 @@ const jobProfiles = computed({
 
 <template>
   <div class="gap-0">
-    <div class="ds-label-02-reg mb-4" data-testId="job-profiles">
+    <div class="ds-label-02-reg mb-4" data-testId="Berufsbild">
       {{ label }}
     </div>
     <ChipsInput

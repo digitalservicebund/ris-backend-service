@@ -26,11 +26,12 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
+import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
-import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -123,7 +124,7 @@ public class DocumentationUnitTransformer {
       builder.hasLegislativeMandate(contentRelatedIndexing.hasLegislativeMandate());
     }
 
-    if (updatedDomainObject.texts() != null) {
+    if (updatedDomainObject.longTexts() != null) {
       addTexts(updatedDomainObject, builder);
     } else {
       builder
@@ -166,24 +167,26 @@ public class DocumentationUnitTransformer {
 
   private static void addTexts(
       DocumentationUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
-    Texts texts = updatedDomainObject.texts();
+    ShortTexts shortTexts = updatedDomainObject.shortTexts();
+    LongTexts longTexts = updatedDomainObject.longTexts();
 
     builder
-        .headline(texts.headline())
-        .guidingPrinciple(texts.guidingPrinciple())
-        .headnote(texts.headnote())
-        .otherHeadnote(texts.otherHeadnote())
-        .tenor(texts.tenor())
-        .grounds(texts.reasons())
-        .caseFacts(texts.caseFacts())
-        .decisionGrounds(texts.decisionReasons())
-        .dissentingOpinion(texts.dissentingOpinion())
-        .otherLongText(texts.otherLongText())
-        .outline(texts.outline());
+        .headline(shortTexts.headline())
+        .guidingPrinciple(shortTexts.guidingPrinciple())
+        .headnote(shortTexts.headnote())
+        .otherHeadnote(shortTexts.otherHeadnote())
+        .tenor(longTexts.tenor())
+        .grounds(longTexts.reasons())
+        .caseFacts(longTexts.caseFacts())
+        .decisionGrounds(longTexts.decisionReasons())
+        .dissentingOpinion(longTexts.dissentingOpinion())
+        .otherLongText(longTexts.otherLongText())
+        .outline(longTexts.outline());
 
-    if (texts.decisionName() != null) {
+    if (shortTexts.decisionName() != null) {
       // Todo multiple decision names?
-      builder.decisionNames(List.of(DecisionNameDTO.builder().value(texts.decisionName()).build()));
+      builder.decisionNames(
+          List.of(DecisionNameDTO.builder().value(shortTexts.decisionName()).build()));
     } else {
       builder.decisionNames(Collections.emptyList());
     }
@@ -646,8 +649,8 @@ public class DocumentationUnitTransformer {
 
     ContentRelatedIndexing contentRelatedIndexing = contentRelatedIndexingBuilder.build();
 
-    Texts texts =
-        Texts.builder()
+    ShortTexts shortTexts =
+        ShortTexts.builder()
             // TODO multiple decisionNames
             .decisionName(
                 (documentationUnitDTO.getDecisionNames() == null
@@ -658,6 +661,10 @@ public class DocumentationUnitTransformer {
             .guidingPrinciple(documentationUnitDTO.getGuidingPrinciple())
             .headnote(documentationUnitDTO.getHeadnote())
             .otherHeadnote(documentationUnitDTO.getOtherHeadnote())
+            .build();
+
+    LongTexts longTexts =
+        LongTexts.builder()
             .tenor(documentationUnitDTO.getTenor())
             .reasons(documentationUnitDTO.getGrounds())
             .caseFacts(documentationUnitDTO.getCaseFacts())
@@ -682,7 +689,8 @@ public class DocumentationUnitTransformer {
         .uuid(documentationUnitDTO.getId())
         .documentNumber(documentationUnitDTO.getDocumentNumber())
         .coreData(coreData)
-        .texts(texts)
+        .shortTexts(shortTexts)
+        .longTexts(longTexts)
         .borderNumbers(borderNumbers)
         .contentRelatedIndexing(contentRelatedIndexing);
 

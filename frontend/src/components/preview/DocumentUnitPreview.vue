@@ -9,10 +9,11 @@ import {
 } from "@/components/preview/constants"
 import PreviewContentRelatedIndexing from "@/components/preview/PreviewContentRelatedIndexing.vue"
 import PreviewCoreData from "@/components/preview/PreviewCoreData.vue"
+import PreviewLongTexts from "@/components/preview/PreviewLongTexts.vue"
 import PreviewNote from "@/components/preview/PreviewNote.vue"
 import PreviewProceedingDecisions from "@/components/preview/PreviewProceedingDecisions.vue"
 import PreviewReferences from "@/components/preview/PreviewReferences.vue"
-import PreviewTexts from "@/components/preview/PreviewTexts.vue"
+import PreviewShortTexts from "@/components/preview/PreviewShortTexts.vue"
 import Reference from "@/domain/reference"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
@@ -44,9 +45,10 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
     <PreviewProceedingDecisions />
     <PreviewContentRelatedIndexing />
     <PreviewReferences :references="documentUnit.references as Reference[]" />
-    <PreviewTexts
-      :texts="documentUnit.texts"
+    <PreviewShortTexts
+      :short-texts="documentUnit.shortTexts"
       :valid-border-numbers="documentUnit.borderNumbers"
     />
+    <PreviewLongTexts :long-texts="documentUnit.longTexts" />
   </FlexContainer>
 </template>

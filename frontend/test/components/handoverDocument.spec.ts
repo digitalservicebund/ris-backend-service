@@ -175,10 +175,8 @@ describe("HandoverDocumentationUnitView:", () => {
               label: "category",
             },
           },
-          texts: {
-            outline: "Outline",
-            otherHeadnote: "Other Headnote",
-          },
+          shortTexts: { otherHeadnote: "Other Headnote" },
+          longTexts: { outline: "Outline" },
         }),
       })
       expect(
