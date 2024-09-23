@@ -56,7 +56,7 @@ function scrollToTop() {
 
     <template #header>
       <div id="expandableHeader" class="flex w-full flex-col">
-        <h2 class="ds-label-01-bold mb-16">
+        <h2 class="ds-label-01-bold" :class="{ 'mb-16': !!dataSet?.length }">
           {{ title }}
         </h2>
         <Component :is="summaryComponent" v-if="!isExpanded" :data="dataSet" />
