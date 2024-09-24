@@ -509,7 +509,7 @@ export async function fillNormInputs(
 ): Promise<void> {
   if (values?.normAbbreviation) {
     await fillInput(page, "RIS-Abkürzung", values.normAbbreviation)
-    await page.getByText(values.normAbbreviation, { exact: true }).click()
+    await page.getByLabel("dropdown-option").first().click()
     await waitForInputValue(
       page,
       "[aria-label='RIS-Abkürzung']",
