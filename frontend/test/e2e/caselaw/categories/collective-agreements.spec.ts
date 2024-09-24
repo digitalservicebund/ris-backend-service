@@ -3,6 +3,7 @@ import {
   navigateToCategories,
   navigateToHandover,
   navigateToPreview,
+  save,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 
@@ -38,6 +39,8 @@ test.describe(
             .getByTestId("chips-input_collectiveAgreements")
             .getByTestId("chip-value"),
         ).toHaveText("Stehende Bühnen")
+
+        await save(page)
       })
 
       await test.step("XML preview should display 'Tarifvertrag' fields in 'paratrubriken'", async () => {
