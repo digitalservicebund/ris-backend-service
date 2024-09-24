@@ -396,6 +396,17 @@ watch(
         />
       </Pagination>
     </div>
+    <div v-if="searchResults?.length == 0">
+      Demnächst können Sie hier eine neue Entscheidung anlegen. Vorausgewählte
+      Dokstelle:
+      <ComboboxInput
+        id="responsibleDocOffice"
+        v-model="relatedDocumentationUnit.court.responsibleDocOffice"
+        aria-label="zuständige Dokumentationsstelle"
+        data-testid="documentation-office-combobox"
+        :item-service="ComboboxItemService.getDocumentationOffices"
+      ></ComboboxInput>
+    </div>
   </div>
 </template>
 @/stores/editionStore

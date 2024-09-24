@@ -15,6 +15,8 @@ public class DocumentationOfficeTransformer {
                 DocumentationOffice.builder()
                     .uuid(dto.getId())
                     .abbreviation(dto.getAbbreviation())
+                    // TODO workaround
+                    .label(dto.getAbbreviation())
                     .build())
         .orElse(null);
   }
