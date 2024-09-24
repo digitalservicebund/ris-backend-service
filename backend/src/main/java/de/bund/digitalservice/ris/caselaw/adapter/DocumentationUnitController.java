@@ -21,7 +21,6 @@ import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
-import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitPatchException;
 import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
 import java.time.Duration;
@@ -117,16 +116,20 @@ public class DocumentationUnitController {
       @PathVariable UUID uuid,
       @RequestBody byte[] bytes,
       @RequestHeader HttpHeaders httpHeaders) {
-    var docx2html =
-        converterService.getConvertedObject(
-            attachmentService
-                .attachFileToDocumentationUnit(uuid, ByteBuffer.wrap(bytes), httpHeaders)
-                .s3path());
-    documentationUnitDocxMetadataInitializationService.initializeCoreData(uuid, docx2html);
-    if (docx2html == null) {
+
+    var attachmentPath =
+        attachmentService
+            .attachFileToDocumentationUnit(uuid, ByteBuffer.wrap(bytes), httpHeaders)
+            .s3path();
+    try {
+      var docx2html = converterService.getConvertedObject(attachmentPath);
+      documentationUnitDocxMetadataInitializationService.initializeCoreData(uuid, docx2html);
+      return ResponseEntity.status(HttpStatus.OK).body(docx2html);
+
+    } catch (Exception e) {
+      attachmentService.deleteByS3Path(attachmentPath);
       return ResponseEntity.unprocessableEntity().build();
     }
-    return ResponseEntity.status(HttpStatus.OK).body(docx2html);
   }
 
   @DeleteMapping(value = "/{uuid}/file/{s3Path}")
@@ -264,7 +267,7 @@ public class DocumentationUnitController {
       return ResponseEntity.ok().body(newPatch);
     } catch (DocumentationUnitNotExistsException e) {
       return ResponseEntity.internalServerError().build();
-    } catch (DocumentationUnitPatchException e) {
+    } catch (Exception e) {
       log.error("Error by updating documentation unit '{}/{}'", uuid, documentNumber, e);
       return ResponseEntity.internalServerError().build();
     }
