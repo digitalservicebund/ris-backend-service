@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test"
 import {
+  clickCategoryButton,
   copyPasteTextFromAttachmentIntoEditor,
   navigateToAttachments,
   navigateToCategories,
@@ -52,6 +53,7 @@ test.describe(
 
         await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
         await page.getByLabel("Navigation schließen").click()
+        await clickCategoryButton("Gründe", page)
         const editor = page.locator("[data-testid='Gründe']")
 
         await test.step("copy text with special hyphen from side panel into reasons", async () => {

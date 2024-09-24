@@ -23,7 +23,8 @@ function renderComponent(previousDecisions?: PreviousDecision[]) {
                   documentUnit: new DocumentUnit("foo", {
                     documentNumber: "1234567891234",
                     coreData: {},
-                    texts: {},
+                    shortTexts: {},
+                    longTexts: {},
                     previousDecisions: previousDecisions ?? [],
                   }),
                 },

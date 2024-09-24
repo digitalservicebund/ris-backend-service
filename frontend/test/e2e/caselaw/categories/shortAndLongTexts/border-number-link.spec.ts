@@ -6,6 +6,7 @@ import {
   uploadTestfile,
   copyPasteTextFromAttachmentIntoEditor,
   getModifier,
+  clickCategoryButton,
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 
@@ -61,6 +62,7 @@ test("create and validate border number links", async ({
     .locator("..")
     .locator("..")
   const inputField = page.locator("[data-testid='Gründe']")
+  await clickCategoryButton("Gründe", page)
   await copyPasteTextFromAttachmentIntoEditor(
     page,
     attachmentLocator,
@@ -79,6 +81,7 @@ test("create and validate border number links", async ({
   expect(inputFieldInnerHTML).toContain(thirdReason)
 
   // Create valid and invalid border number links in Leitsatz
+  await clickCategoryButton("Leitsatz", page)
   const guidingPrincipleInput = page.locator("[data-testid='Leitsatz']")
   await guidingPrincipleInput.click()
   await page.keyboard.type(`#1# #4# #99999# #1000000# #not a border number#`)

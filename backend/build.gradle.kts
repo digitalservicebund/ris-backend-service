@@ -173,9 +173,9 @@ dependencies {
 
     implementation("com.sendinblue:sib-api-v3-sdk:7.0.0")
     // CVE-2022-4244
-    implementation("org.codehaus.plexus:plexus-utils:4.0.1")
+    implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.28.6"))
+    implementation(platform("software.amazon.awssdk:bom:2.28.7"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -187,11 +187,11 @@ dependencies {
     implementation("com.icegreen:greenmail:2.1.0-rc-1")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.9") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.12") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
-//    implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.10.0.jar"))
+    // implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.10.10.jar"))
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
@@ -214,7 +214,7 @@ dependencies {
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
     // => CVE-2023-2976
-    implementation("com.google.guava:guava:33.3.0-jre")
+    implementation("com.google.guava:guava:33.3.1-jre")
 
     implementation("io.getunleash:unleash-client-java:9.2.4")
     implementation("org.apache.commons:commons-text:1.12.0")

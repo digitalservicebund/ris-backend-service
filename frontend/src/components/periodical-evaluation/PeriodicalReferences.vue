@@ -33,10 +33,10 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="p-24">
+  <div class="flex w-full p-24">
     <div
       v-if="!responseError"
-      class="flex h-full w-full flex-col gap-24 bg-white p-24"
+      class="flex w-full flex-col gap-24 bg-white p-24"
     >
       <TitleElement data-testid="references-title">Fundstellen</TitleElement>
 

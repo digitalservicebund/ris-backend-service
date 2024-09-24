@@ -215,7 +215,8 @@ const fieldsMissing = computed(() => {
 const isOutlineInvalid = computed(
   () =>
     // Outline is written into otherHeadnote in jdv -> Only one of the fields may be filled at the same time
-    store.documentUnit?.texts.outline && store.documentUnit.texts.otherHeadnote,
+    store.documentUnit?.longTexts.outline &&
+    store.documentUnit.shortTexts.otherHeadnote,
 )
 </script>
 

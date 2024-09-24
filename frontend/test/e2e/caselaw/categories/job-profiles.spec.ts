@@ -1,5 +1,10 @@
 import { expect, Page } from "@playwright/test"
-import { navigateToCategories, navigateToHandover, save } from "../e2e-utils"
+import {
+  clickCategoryButton,
+  navigateToCategories,
+  navigateToHandover,
+  save,
+} from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 
 test.describe(
@@ -24,13 +29,13 @@ test.describe(
           page.getByRole("button", { name: "Berufsbild" }),
         ).toBeVisible()
       })
-      await page.getByRole("button", { name: "Berufsbild" }).click()
+      await clickCategoryButton("Berufsbild", page)
 
       await addFirstJobProfile(page)
 
       await test.step("reload page and check that input field and content are visible", async () => {
         await page.reload()
-        await expect(page.getByTestId("job-profiles")).toBeVisible()
+        await expect(page.getByTestId("Berufsbild")).toBeVisible()
         await expect(page.getByText(firstJobProfile)).toBeVisible()
       })
 
@@ -45,8 +50,7 @@ test.describe(
           page.getByRole("button", { name: "Berufsbild" }),
         ).toBeVisible()
       })
-      await page.getByRole("button", { name: "Berufsbild" }).click()
-
+      await clickCategoryButton("Berufsbild", page)
       await addFirstJobProfile(page)
 
       await test.step("XML preview should display 'Berufsbild' in 'paratrubriken'", async () => {
@@ -70,13 +74,13 @@ test.describe(
 
     test("add multiple job profiles", async ({ page, documentNumber }) => {
       await navigateToCategories(page, documentNumber)
-      await page.getByRole("button", { name: "Berufsbild" }).click()
+      await clickCategoryButton("Berufsbild", page)
 
       await addTwoJobProfiles(page)
 
       await test.step("reload page and check that both job profiles are visible", async () => {
         await page.reload()
-        await expect(page.getByTestId("job-profiles")).toBeVisible()
+        await expect(page.getByTestId("Berufsbild")).toBeVisible()
         await expect(page.getByText(firstJobProfile)).toBeVisible()
         await expect(page.getByText(secondJobProfile)).toBeVisible()
       })
@@ -84,8 +88,7 @@ test.describe(
 
     test("delete job profile", async ({ page, documentNumber }) => {
       await navigateToCategories(page, documentNumber)
-      await page.getByRole("button", { name: "Berufsbild" }).click()
-
+      await clickCategoryButton("Berufsbild", page)
       await addTwoJobProfiles(page)
 
       await test.step("delete first entry", async () => {
@@ -99,7 +102,7 @@ test.describe(
 
       await test.step("reload page and check that input field and content are correct", async () => {
         await page.reload()
-        await expect(page.getByTestId("job-profiles")).toBeVisible()
+        await expect(page.getByTestId("Berufsbild")).toBeVisible()
         await expect(page.getByText(firstJobProfile)).toBeHidden()
         await expect(page.getByText(secondJobProfile)).toBeVisible()
       })

@@ -4,6 +4,7 @@ import {
   navigateToCategories,
   save,
   fillPreviousDecisionInputs,
+  clickCategoryButton,
 } from "../../e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "../../e2e/caselaw/fixtures"
 
@@ -178,6 +179,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
 
   test("text editor", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
+    await clickCategoryButton("Leitsatz", page)
     const editorField = page.locator("[data-testid='Leitsatz'] >> div")
     await editorField.click()
     await editorField.type("this is text")
