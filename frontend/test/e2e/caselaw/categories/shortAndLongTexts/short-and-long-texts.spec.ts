@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test"
 import {
+  clickCategoryButton,
   getModifier,
   navigateToCategories,
   navigateToHandover,
@@ -25,6 +26,7 @@ test.describe("short and long texts", () => {
       await navigateToCategories(page, documentNumber, {
         category: DocumentUnitCatagoriesEnum.TEXTS,
       })
+      await clickCategoryButton("Entscheidungsname", page)
       const inputText = "Family-Karte"
       const selector = "[aria-label='Entscheidungsname']"
       await page.locator(selector).fill(inputText)
@@ -41,6 +43,7 @@ test.describe("short and long texts", () => {
     await navigateToCategories(page, documentNumber)
 
     // small
+    await clickCategoryButton("Titelzeile", page)
     const smallEditor = page.locator("[data-testid='Titelzeile']")
     const smallEditorHeight = await smallEditor.evaluate((element) =>
       window.getComputedStyle(element).getPropertyValue("height"),
@@ -48,6 +51,7 @@ test.describe("short and long texts", () => {
     expect(parseInt(smallEditorHeight)).toBeGreaterThanOrEqual(60)
 
     //medium
+    await clickCategoryButton("Leitsatz", page)
     const mediumEditor = page.locator("[data-testid='Leitsatz']")
     const mediumEditorHeight = await mediumEditor.evaluate((element) =>
       window.getComputedStyle(element).getPropertyValue("height"),
@@ -55,6 +59,7 @@ test.describe("short and long texts", () => {
     expect(parseInt(mediumEditorHeight)).toBeGreaterThanOrEqual(120)
 
     //large
+    await clickCategoryButton("Gründe", page)
     const largeEditor = page.locator("[data-testid='Gründe']")
     const largeEditorHeight = await largeEditor.evaluate((element) =>
       window.getComputedStyle(element).getPropertyValue("height"),
@@ -65,6 +70,7 @@ test.describe("short and long texts", () => {
   test("toggle invisible characters", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
+    await clickCategoryButton("Leitsatz", page)
     const guidingPrincipleInput = page.locator("[data-testid='Leitsatz']")
     await guidingPrincipleInput.click()
     await page.keyboard.type(`this is a test paragraph`)
@@ -93,6 +99,7 @@ test.describe("short and long texts", () => {
     async ({ page, documentNumber }) => {
       await navigateToCategories(page, documentNumber)
 
+      await clickCategoryButton("Leitsatz", page)
       const guidingPrincipleInput = page.locator(
         "[data-testid='Leitsatz'] > div.tiptap",
       )
@@ -188,43 +195,59 @@ test.describe("short and long texts", () => {
       })
 
       await test.step("Tenor ist nicht sichtbar", async () => {
-        const tenor = pageWithExternalUser.getByTestId("Tenor")
-        await expect(tenor).toBeHidden()
+        const button = pageWithExternalUser.getByRole("button", {
+          name: "Tenor",
+          exact: true,
+        })
+        await expect(button).toBeHidden()
       })
 
       await test.step("Tatbestand ist nicht sichtbar", async () => {
-        const caseFacts = pageWithExternalUser.getByTestId("Tatbestand")
-        await expect(caseFacts).toBeHidden()
+        const button = pageWithExternalUser.getByRole("button", {
+          name: "Tatbestand",
+          exact: true,
+        })
+        await expect(button).toBeHidden()
       })
 
       await test.step("Entscheidungsgründe sind nicht sichtbar", async () => {
-        const decisionReasons = pageWithExternalUser.getByTestId(
-          "Entscheidungsgründe",
-        )
-        await expect(decisionReasons).toBeHidden()
+        const button = pageWithExternalUser.getByRole("button", {
+          name: "Entscheidungsgründe",
+          exact: true,
+        })
+        await expect(button).toBeHidden()
       })
 
       await test.step("Gründe sind nicht sichtbar", async () => {
-        const reasons = pageWithExternalUser.getByTestId("Gründe")
-        await expect(reasons).toBeHidden()
+        const button = pageWithExternalUser.getByRole("button", {
+          name: "Gründe",
+          exact: true,
+        })
+        await expect(button).toBeHidden()
       })
 
       await test.step("Abweichende Meinung ist nicht sichtbar", async () => {
-        const dissentingOpinion = pageWithExternalUser.getByTestId(
-          "Abweichende Meinung",
-        )
-        await expect(dissentingOpinion).toBeHidden()
+        const button = pageWithExternalUser.getByRole("button", {
+          name: "Abweichende Meinung",
+          exact: true,
+        })
+        await expect(button).toBeHidden()
       })
 
       await test.step("Sonstiger Langtext ist nicht sichtbar", async () => {
-        const otherLongText =
-          pageWithExternalUser.getByTestId("Sonstiger Langtext")
-        await expect(otherLongText).toBeHidden()
+        const button = pageWithExternalUser.getByRole("button", {
+          name: "Sonstiger Langtext",
+          exact: true,
+        })
+        await expect(button).toBeHidden()
       })
 
       await test.step("Gliederung ist nicht sichtbar", async () => {
-        const outline = pageWithExternalUser.getByTestId("Gliederung")
-        await expect(outline).toBeHidden()
+        const button = pageWithExternalUser.getByRole("button", {
+          name: "Gliederung",
+          exact: true,
+        })
+        await expect(button).toBeHidden()
       })
     },
   )
@@ -246,42 +269,49 @@ test.describe("short and long texts", () => {
       })
 
       await test.step("Tenor ist bearbeitbar", async () => {
+        await clickCategoryButton("Tenor", page)
         const tenor = page.getByTestId("Tenor")
         const inputFieldInnerHTML = await tenor.innerHTML()
         expect(inputFieldInnerHTML).toContain(editable)
       })
 
       await test.step("Tatbestand ist bearbeitbar", async () => {
+        await clickCategoryButton("Tatbestand", page)
         const caseFacts = page.getByTestId("Tatbestand")
         const inputFieldInnerHTML = await caseFacts.innerHTML()
         expect(inputFieldInnerHTML).toContain(editable)
       })
 
       await test.step("Entscheidungsgründe sind bearbeitbar", async () => {
+        await clickCategoryButton("Entscheidungsgründe", page)
         const decisionReasons = page.getByTestId("Entscheidungsgründe")
         const inputFieldInnerHTML = await decisionReasons.innerHTML()
         expect(inputFieldInnerHTML).toContain(editable)
       })
 
       await test.step("Gründe sind bearbeitbar", async () => {
+        await clickCategoryButton("Gründe", page)
         const reasons = page.getByTestId("Gründe")
         const inputFieldInnerHTML = await reasons.innerHTML()
         expect(inputFieldInnerHTML).toContain(editable)
       })
 
       await test.step("Sonstiger Langtext ist bearbeitbar", async () => {
+        await clickCategoryButton("Sonstiger Langtext", page)
         const otherLongText = page.getByTestId("Sonstiger Langtext")
         const inputFieldInnerHTML = await otherLongText.innerHTML()
         expect(inputFieldInnerHTML).toContain(editable)
       })
 
       await test.step("Gliederung ist bearbeitbar", async () => {
+        await clickCategoryButton("Gliederung", page)
         const outline = page.getByTestId("Gliederung")
         const inputFieldInnerHTML = await outline.innerHTML()
         expect(inputFieldInnerHTML).toContain(editable)
       })
 
       await test.step("Abweichende Meinung ist bearbeitbar", async () => {
+        await clickCategoryButton("Abweichende Meinung", page)
         const dissentingOpinion = page.getByTestId("Abweichende Meinung")
         const inputFieldInnerHTML = await dissentingOpinion.innerHTML()
         expect(inputFieldInnerHTML).toContain(editable)
@@ -370,6 +400,18 @@ test.describe("short and long texts", () => {
 
         await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
 
+        // Leitsatz and Orientierungssatz are prefilled. Entscheidungsgründe is filled for Tatbestand.
+        // Therefore, the button doesn't need to be clicked.
+        // eslint-disable-next-line playwright/no-conditional-in-test
+        if (
+          // eslint-disable-next-line playwright/no-conditional-in-test
+          testId != "Leitsatz" &&
+          testId != "Orientierungssatz" &&
+          testId != "Entscheidungsgründe"
+        ) {
+          await clickCategoryButton(testId, page)
+        }
+
         await test.step(`text field '${testId}' should be filled with value '${value}'`, async () => {
           const textField = page.locator(selector)
           await textField.click()
@@ -380,8 +422,10 @@ test.describe("short and long texts", () => {
           expect(innerText).toContain(value)
         })
 
+        // Tatbestand can only be filled when Entscheidungsgründe is given.
         // eslint-disable-next-line playwright/no-conditional-in-test
         if (testId == "Tatbestand") {
+          await clickCategoryButton("Entscheidungsgründe", page)
           const textField = page.locator(`[data-testid='Entscheidungsgründe']`)
           await textField.click()
           await page.keyboard.type("Test")

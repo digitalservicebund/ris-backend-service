@@ -9,6 +9,7 @@ import DropdownInput from "@/components/input/DropdownInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import NestedComponent from "@/components/NestedComponents.vue"
+import TitleElement from "@/components/TitleElement.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
 import { CoreData } from "@/domain/documentUnit"
@@ -49,7 +50,7 @@ watch(
     aria-label="Stammdaten"
     class="core-data flex flex-col gap-24 bg-white p-24"
   >
-    <h2 class="ds-subhead">Stammdaten</h2>
+    <TitleElement>Stammdaten</TitleElement>
     <NestedComponent
       aria-label="Fehlerhaftes Gericht"
       class="w-full"

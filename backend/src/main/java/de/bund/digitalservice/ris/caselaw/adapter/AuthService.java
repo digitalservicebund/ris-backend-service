@@ -79,12 +79,11 @@ public class AuthService {
           "/contentRelatedIndexing/dismissalGrounds",
           "/contentRelatedIndexing/dismissalTypes",
           "/contentRelatedIndexing/hasLegislativeMandate",
-          "/contentRelatedIndexing/participatingJudges",
-          "/texts/decisionName",
-          "/texts/headline",
-          "/texts/guidingPrinciple",
-          "/texts/headnote",
-          "/texts/otherHeadnote",
+          "/shortTexts/decisionName",
+          "/shortTexts/headline",
+          "/shortTexts/guidingPrinciple",
+          "/shortTexts/headnote",
+          "/shortTexts/otherHeadnote",
           "/note",
           "/version");
 

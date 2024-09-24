@@ -1,4 +1,4 @@
-import { expect } from "@playwright/test"
+import { expect, Page } from "@playwright/test"
 import dayjs from "dayjs"
 import {
   fillInput,
@@ -50,19 +50,36 @@ test.describe(
             ),
           ).toBeVisible()
           await expect(page.locator(".table > td")).toHaveCount(1) // only header
+          await expect(
+            page.getByText(
+              "Ausgabe" +
+                "Periodikum" +
+                "Anzahl der Fundstellen" +
+                "Hinzugefügt",
+            ),
+          ).toBeVisible()
           await expect(page.locator(".table > tr")).toHaveCount(0)
+        })
+
+        await test.step("The dropdown indicates the periodical type (amtlich/nichtamtlich)", async () => {
+          await fillInput(page, "Periodikum", "ABl AHK")
+          await expect(
+            page.getByText("ABl AHK | ABl AHK" + "amtlich", {
+              exact: true,
+            }),
+          ).toBeVisible()
         })
 
         await test.step("A periodical can be selected using a combo box.", async () => {
           await fillInput(page, "Periodikum", "MMG")
-          await expect(
-            page.getByText("MMG | Medizin Mensch Gesellschaft", {
+          const periodical = page.getByText(
+            "MMG | Medizin Mensch Gesellschaft" + "nicht amtlich",
+            {
               exact: true,
-            }),
-          ).toBeVisible()
-          await page
-            .getByText("MMG | Medizin Mensch Gesellschaft", { exact: true })
-            .click()
+            },
+          )
+          await expect(periodical).toBeVisible()
+          await periodical.click()
           await waitForInputValue(page, "[aria-label='Periodikum']", "MMG")
         })
 
@@ -70,7 +87,7 @@ test.describe(
           await expect(page.locator(".table > tr >> nth=0")).toBeVisible()
 
           await expect(
-            page.getByText((edition.name || "") + "MMG0" + formattedDate),
+            page.getByText((edition.name || "") + "MMG" + "0" + formattedDate),
           ).toBeVisible()
         })
 
@@ -109,7 +126,7 @@ test.describe(
           await expect(page.locator(".table > tr >> nth=0")).toBeVisible()
           const pagePromise = page.context().waitForEvent("page")
           const line = page.getByText(
-            (edition.name || "") + "MMG0" + formattedDate,
+            (edition.name || "") + "MMG" + "0" + formattedDate,
           )
           await line.locator("a").click()
           const newTab = await pagePromise
@@ -239,7 +256,7 @@ test.describe(
         },
       },
       async ({ context, page, edition, prefilledDocumentUnit }) => {
-        const fileNumer = prefilledDocumentUnit.coreData.fileNumbers?.[0] || ""
+        const fileNumber = prefilledDocumentUnit.coreData.fileNumbers?.[0] || ""
 
         await navigateToPeriodicalReferences(page, edition.id || "")
 
@@ -266,19 +283,13 @@ test.describe(
         await test.step("Citation input is validated when input is left", async () => {})
 
         await test.step("A docunit can be added as reference by entering citation and search fields", async () => {
-          await fillInput(page, "Gericht", "AG Aachen")
-          await page.getByText("AG Aachen").click()
-          await fillInput(page, "Aktenzeichen", fileNumer)
-          await fillInput(page, "Entscheidungsdatum", "31.12.2019")
-          await fillInput(page, "Dokumenttyp", "AnU")
-          await page.getByText("Anerkenntnisurteil").click()
-
-          await page.getByText("Suchen").click()
+          await searchForDocUnitWithFileNumber(page, fileNumber)
           await expect(
             page.getByText(
-              `AG Aachen, 31.12.2019, ${fileNumer}, Anerkenntnisurteil, Unveröffentlicht`,
+              `AG Aachen, 31.12.2019, ${fileNumber}, Anerkenntnisurteil, Unveröffentlicht`,
             ),
           ).toBeVisible()
+          await expect(page.getByText("Bereits hinzugefügt")).toBeHidden()
           await expect(
             page.locator("[aria-label='Listen Eintrag']"),
           ).toHaveCount(1)
@@ -291,18 +302,37 @@ test.describe(
           ).toHaveCount(2)
         })
 
+        await test.step("A docunit can be added to an edition multiple times", async () => {
+          await searchForDocUnitWithFileNumber(page, fileNumber)
+          await expect(
+            page.getByRole("link", {
+              name: `AG Aachen, 31.12.2019, ${fileNumber}, Anerkenntnisurteil, Unveröffentlicht`,
+            }),
+          ).toBeVisible()
+          await expect(page.getByText("Bereits hinzugefügt")).toBeVisible()
+          await fillInput(page, "Zitatstelle *", "99")
+          await page.getByLabel("Treffer übernehmen").click()
+          await expect(
+            page.locator("[aria-label='Listen Eintrag']"),
+          ).toHaveCount(3)
+        })
+
         await test.step("A reference is added to the editable list after being added", async () => {
           const decisionElement = page.getByText(
-            "AG Aachen, 31.12.2019, " + fileNumer + ", Anerkenntnisurteil",
+            "AG Aachen, 31.12.2019, " + fileNumber + ", Anerkenntnisurteil",
           )
-          await expect(decisionElement).toBeVisible()
+          await expect(decisionElement).toHaveCount(2)
+
+          // Assert that both elements are visible
+          await expect(decisionElement.nth(0)).toBeVisible()
+          await expect(decisionElement.nth(1)).toBeVisible()
 
           await expect(
             page.getByText("MMG 2024, 5, Heft 1 (LT)", { exact: true }),
           ).toBeVisible()
         })
 
-        await test.step("The form is cleared afer adding a reference ", async () => {
+        await test.step("The form is cleared after adding a reference ", async () => {
           await expect(page.getByLabel("Zitatstelle *")).toBeEmpty()
           await expect(page.getByLabel("Klammernzusatz")).toBeEmpty()
           await expect(page.getByLabel("Gericht")).toBeEmpty()
@@ -324,7 +354,7 @@ test.describe(
           ).toBeVisible()
         })
 
-        await test.step("When editing a reference, the citation is a single input containing the joimed value of prefix, citation and suffix ", async () => {
+        await test.step("When editing a reference, the citation is a single input containing the joined value of prefix, citation and suffix ", async () => {
           await page.getByTestId("list-entry-0").click()
           await expect(page.getByLabel("Zitatstelle *")).toHaveValue(
             "2024, 5, Heft 1",
@@ -339,7 +369,7 @@ test.describe(
             page.locator("[aria-label='Gericht']"),
           ).not.toBeEditable()
 
-          await expect(page.getByLabel("Aktenzeichen")).toHaveValue(fileNumer)
+          await expect(page.getByLabel("Aktenzeichen")).toHaveValue(fileNumber)
           await expect(
             page.locator("[aria-label='Aktenzeichen']"),
           ).not.toBeEditable()
@@ -376,26 +406,31 @@ test.describe(
 
         await test.step("Changes to the citation are visible in the documentation unit's preview ", async () => {
           await previewTab.reload()
-          // TODO should be fixed
-          if (false)
-            await expect(
-              previewTab.getByText("MMG 2021, 2, Heft 1 (L)", { exact: true }),
-            ).toBeVisible()
+          await expect(
+            previewTab.getByText("MMG 2021, 2, Heft 1 (L)", { exact: true }),
+          ).toBeVisible()
         })
 
         await test.step("The edition can't be deleted as long as it has references", async () => {
           await navigateToPeriodicalEvaluation(page)
+
           await fillInput(page, "Periodikum", "MMG")
           await page
             .getByText("MMG | Medizin Mensch Gesellschaft", { exact: true })
             .click()
 
+          const line = page.getByText(
+            (edition.name || "") + "MMG" + "2" + formattedDate,
+          )
+
+          await expect(line).toBeVisible()
           // delete button should not be clickable
           await expect(
-            page.locator("[aria-label='Ausgabe löschen']"),
+            line.locator("[aria-label='Ausgabe löschen']"),
           ).toBeHidden()
+
           await expect(
-            page
+            line
               .locator("[aria-label='Ausgabe kann nicht gelöscht werden']")
               .first(),
           ).toBeVisible()
@@ -403,6 +438,8 @@ test.describe(
 
         await test.step("A reference can be deleted", async () => {
           await navigateToPeriodicalReferences(page, edition.id || "")
+          await page.getByTestId("list-entry-0").click()
+          await page.locator("[aria-label='Eintrag löschen']").click()
           await page.getByTestId("list-entry-0").click()
           await page.locator("[aria-label='Eintrag löschen']").click()
 
@@ -441,7 +478,7 @@ test.describe(
         },
       },
       async ({ context, page, edition, prefilledDocumentUnitBgh }) => {
-        const fileNumer =
+        const fileNumber =
           prefilledDocumentUnitBgh.coreData.fileNumbers?.[0] || ""
 
         await test.step("A docunit of another docoffice can be added as reference", async () => {
@@ -450,16 +487,10 @@ test.describe(
           await fillInput(page, "Zitatstelle *", "12")
           await fillInput(page, "Klammernzusatz", "L")
 
-          await fillInput(page, "Gericht", "AG Aachen")
-          await page.getByText("AG Aachen").click()
-          await fillInput(page, "Aktenzeichen", fileNumer)
-          await fillInput(page, "Entscheidungsdatum", "31.12.2019")
-          await fillInput(page, "Dokumenttyp", "AnU")
-          await page.getByText("Anerkenntnisurteil").click()
-          await page.getByText("Suchen").click()
+          await searchForDocUnitWithFileNumber(page, fileNumber)
           await expect(
             page.getByText(
-              `AG Aachen, 31.12.2019, ${fileNumer}, Anerkenntnisurteil, Veröffentlicht`,
+              `AG Aachen, 31.12.2019, ${fileNumber}, Anerkenntnisurteil, Veröffentlicht`,
             ),
           ).toBeVisible()
           await expect(
@@ -510,5 +541,19 @@ test.describe(
         })
       },
     )
+
+    async function searchForDocUnitWithFileNumber(
+      page: Page,
+      fileNumber: string,
+    ) {
+      await fillInput(page, "Gericht", "AG Aachen")
+      await page.getByText("AG Aachen", { exact: true }).click()
+      await fillInput(page, "Aktenzeichen", fileNumber)
+      await fillInput(page, "Entscheidungsdatum", "31.12.2019")
+      await fillInput(page, "Dokumenttyp", "AnU")
+      await page.getByText("Anerkenntnisurteil", { exact: true }).click()
+
+      await page.getByText("Suchen").click()
+    }
   },
 )

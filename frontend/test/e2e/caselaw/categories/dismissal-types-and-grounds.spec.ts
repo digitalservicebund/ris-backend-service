@@ -86,7 +86,7 @@ test.describe(
             "13\n" +
             "        <zuordnung>\n" +
             "14\n" +
-            "            <aspekt>Kündigungsart</aspekt>\n" +
+            "            <aspekt>Kündigungsgrund</aspekt>\n" +
             "15\n" +
             "            <begriff>Betriebsbedingte Kündigung</begriff>\n" +
             "16\n" +

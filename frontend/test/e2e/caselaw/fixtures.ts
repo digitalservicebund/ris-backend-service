@@ -20,7 +20,7 @@ type MyFixtures = {
   pageWithExternalUser: Page
   prefilledDocumentUnitBgh: DocumentUnit
   edition: LegalPeriodicalEdition
-  editionWithReference: LegalPeriodicalEdition
+  editionWithReferences: LegalPeriodicalEdition
 }
 
 export const caselawTest = test.extend<MyFixtures>({
@@ -72,7 +72,7 @@ export const caselawTest = test.extend<MyFixtures>({
             decisionDate: "2019-12-31",
             appraisalBody: "1. Senat, 2. Kammer",
           },
-          texts: {
+          shortTexts: {
             headnote: "testHeadnote",
             guidingPrinciple: "guidingPrinciple",
           },
@@ -226,7 +226,7 @@ export const caselawTest = test.extend<MyFixtures>({
             decisionDate: "2019-12-31",
             appraisalBody: "1. Senat, 2. Kammer",
           },
-          texts: {
+          shortTexts: {
             headnote: "testHeadnote",
             guidingPrinciple: "guidingPrinciple",
           },
@@ -290,7 +290,7 @@ export const caselawTest = test.extend<MyFixtures>({
     }
   },
 
-  editionWithReference: async (
+  editionWithReferences: async (
     { request, context, prefilledDocumentUnit },
     use,
   ) => {

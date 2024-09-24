@@ -66,9 +66,9 @@ import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
-import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
@@ -278,7 +278,7 @@ class DocumentationUnitIntegrationTest {
                     .fileNumbers(List.of("AkteX"))
                     .documentationOffice(docOffice)
                     .build())
-            .texts(Texts.builder().decisionName("decisionName").build())
+            .shortTexts(ShortTexts.builder().decisionName("decisionName").build())
             .build();
 
     risWebTestClient

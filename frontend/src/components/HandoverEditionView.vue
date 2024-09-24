@@ -5,6 +5,7 @@ import CodeSnippet from "@/components/CodeSnippet.vue"
 import { InfoStatus } from "@/components/enumInfoStatus"
 import InfoModal from "@/components/InfoModal.vue"
 import TextButton from "@/components/input/TextButton.vue"
+import TitleElement from "@/components/TitleElement.vue"
 import EventRecord, {
   EventRecordType,
   HandoverMail,
@@ -87,127 +88,131 @@ const numberOfReferences = computed(() => {
 </script>
 
 <template>
-  <div
-    v-if="store.edition"
-    class="flex-start flex max-w-[80rem] flex-col justify-start gap-40"
-  >
-    <h1 class="ds-heading-02-reg" data-testid="handover-title">
-      Übergabe an jDV
-    </h1>
-    <div aria-label="Datenprüfung" class="flex flex-row">
-      <div v-if="!numberOfReferences" class="flex flex-row items-center gap-8">
-        <IconErrorOutline class="text-red-800" />
-        <p class="flexds-body-01-reg">
-          Es wurden noch keine Fundstellen hinzugefügt
-        </p>
+  <div v-if="store.edition">
+    <div class="flex flex-col gap-24 bg-white p-24">
+      <TitleElement data-testid="handover-title">Übergabe an jDV</TitleElement>
+      <div aria-label="Datenprüfung" class="flex flex-row">
+        <div
+          v-if="!numberOfReferences"
+          class="flex flex-row items-center gap-8"
+        >
+          <IconErrorOutline class="text-red-800" />
+          <p class="flexds-body-01-reg">
+            Es wurden noch keine Fundstellen hinzugefügt
+          </p>
+        </div>
+        <div v-else class="flex flex-row items-center gap-8">
+          <IconCheck class="text-green-700" />
+          <p class="ds-body-01-reg">
+            Die Ausgabe enthält {{ numberOfReferences }} Fundstellen
+          </p>
+        </div>
       </div>
-      <div v-else class="flex flex-row items-center gap-8">
-        <IconCheck class="text-green-700" />
-        <p class="ds-body-01-reg">
-          Die Ausgabe enthält {{ numberOfReferences }} Fundstellen
-        </p>
-      </div>
-    </div>
+      <div class="border-b-1 border-b-gray-400"></div>
 
-    <ExpandableContent
-      v-if="
-        numberOfReferences &&
-        numberOfReferences > 0 &&
-        preview &&
-        preview.length > 0
-      "
-      as-column
-      class="border-b-1 border-r-1 border-gray-400 bg-white p-10"
-      :data-set="preview"
-      header="XML Vorschau"
-      header-class="font-bold"
-      :is-expanded="false"
-      title="XML Vorschau"
-    >
-      <CodeSnippet
-        v-for="(item, index) in preview"
-        :key="index"
-        class="mb-16"
-        :title="item.fileName!"
-        :xml="item.xml!"
+      <ExpandableContent
+        v-if="
+          numberOfReferences &&
+          numberOfReferences > 0 &&
+          preview &&
+          preview.length > 0
+        "
+        as-column
+        class="border-b-1 border-gray-400 pb-24"
+        :data-set="preview"
+        header="XML Vorschau"
+        header-class="font-bold"
+        :is-expanded="false"
+        title="XML Vorschau"
+      >
+        <CodeSnippet
+          v-for="(item, index) in preview"
+          :key="index"
+          class="mb-16"
+          title=""
+          :xml="item.xml!"
+        />
+      </ExpandableContent>
+      <InfoModal
+        v-if="errorMessage"
+        aria-label="Fehler bei jDV Übergabe"
+        class="mt-8"
+        :description="errorMessage.description"
+        :title="errorMessage.title"
       />
-    </ExpandableContent>
-    <InfoModal
-      v-if="errorMessage"
-      aria-label="Fehler bei jDV Übergabe"
-      class="mt-8"
-      :description="errorMessage.description"
-      :title="errorMessage.title"
-    />
-    <InfoModal
-      v-else-if="succeedMessage"
-      aria-label="Erfolg der jDV Übergabe"
-      class="mt-8"
-      v-bind="succeedMessage"
-      :status="InfoStatus.SUCCEED"
-    />
-    <TextButton
-      v-if="featureToggle"
-      aria-label="Fundstellen der Ausgabe an jDV übergeben"
-      button-type="secondary"
-      class="w-fit"
-      :icon="IconHandover"
-      label="Fundstellen der Ausgabe an jDV übergeben"
-      @click="handoverEdition"
-    />
-    <div aria-label="Letzte Ereignisse" class="flex flex-col gap-24">
-      <h2 class="ds-heading-03-reg">Letzte Ereignisse</h2>
-      <p v-if="isFirstTimeHandover">
-        Diese Ausgabe wurde bisher nicht an die jDV übergeben
-      </p>
-      <div v-else class="flex flex-col gap-24">
-        <div v-for="(item, index) in eventLog" :key="index">
-          <ExpandableContent
-            as-column
-            class="border-b-1 border-r-1 border-gray-400 bg-white p-10"
-            :data-set="item"
-            :header="getHeader(item)"
-            header-class="font-bold"
-            :is-expanded="index == 0"
-            :title="item.type"
-          >
-            <template #open-icon>
-              <IconKeyboardArrowDown />
-            </template>
+      <InfoModal
+        v-else-if="succeedMessage"
+        aria-label="Erfolg der jDV Übergabe"
+        class="mt-8"
+        v-bind="succeedMessage"
+        :status="InfoStatus.SUCCEED"
+      />
+      <TextButton
+        v-if="featureToggle"
+        aria-label="Fundstellen der Ausgabe an jDV übergeben"
+        button-type="secondary"
+        class="w-fit"
+        :icon="IconHandover"
+        label="Fundstellen der Ausgabe an jDV übergeben"
+        @click="handoverEdition"
+      />
+      <div aria-label="Letzte Ereignisse">
+        <h2 class="ds-label-01-bold mb-16">Letzte Ereignisse</h2>
+        <div class="flex flex-col gap-24">
+          <p v-if="isFirstTimeHandover">
+            Diese Ausgabe wurde bisher nicht an die jDV übergeben
+          </p>
+          <div v-else class="flex flex-col gap-24">
+            <div v-for="(item, index) in eventLog" :key="index">
+              <ExpandableContent
+                as-column
+                class="border-b-1 border-r-1 border-gray-400 bg-white p-10"
+                :data-set="item"
+                :header="getHeader(item)"
+                header-class="font-bold"
+                :is-expanded="index == 0"
+                :title="item.type"
+              >
+                <template #open-icon>
+                  <IconKeyboardArrowDown />
+                </template>
 
-            <template #close-icon>
-              <IconKeyboardArrowUp />
-            </template>
+                <template #close-icon>
+                  <IconKeyboardArrowUp />
+                </template>
 
-            <!-- eslint-disable vue/no-v-html -->
-            <div
-              v-if="item.type == EventRecordType.HANDOVER_REPORT"
-              class="p-20"
-              v-html="item.getContent()"
-            />
-            <div v-else-if="item.type == EventRecordType.HANDOVER">
-              <div class="ds-label-section pt-20 text-gray-900">ÜBER</div>
-              <div class="ds-label-02-reg">
-                <div>
-                  <span class="ds-label-02-bold">E-Mail an:</span>
-                  {{ (item as HandoverMail).receiverAddress }}
+                <!-- eslint-disable vue/no-v-html -->
+                <div
+                  v-if="item.type == EventRecordType.HANDOVER_REPORT"
+                  class="p-20"
+                  v-html="item.getContent()"
+                />
+                <div v-else-if="item.type == EventRecordType.HANDOVER">
+                  <div class="ds-label-section pt-20 text-gray-900">ÜBER</div>
+                  <div class="ds-label-02-reg">
+                    <div>
+                      <span class="ds-label-02-bold">E-Mail an:</span>
+                      {{ (item as HandoverMail).receiverAddress }}
+                    </div>
+                    <div>
+                      <span class="ds-label-02-bold"> Betreff: </span>
+                      {{ (item as HandoverMail).mailSubject }}
+                    </div>
+                  </div>
+                  <div class="ds-label-section text-gray-900">ALS</div>
+                  <CodeSnippet
+                    v-for="(attachment, attachmentIndex) in (
+                      item as HandoverMail
+                    ).attachments"
+                    :key="attachmentIndex"
+                    class="mb-16"
+                    :title="attachment.fileName!"
+                    :xml="attachment.fileContent!"
+                  />
                 </div>
-                <div>
-                  <span class="ds-label-02-bold"> Betreff: </span>
-                  {{ (item as HandoverMail).mailSubject }}
-                </div>
-              </div>
-              <div class="ds-label-section text-gray-900">ALS</div>
-              <CodeSnippet
-                v-for="(attachment, attachmentIndex) in (item as HandoverMail)
-                  .attachments"
-                :key="attachmentIndex"
-                class="mb-16"
-                :title="attachment.fileName!"
-                :xml="attachment.fileContent!"
-              />
+              </ExpandableContent>
             </div>
-          </ExpandableContent>
+          </div>
         </div>
       </div>
     </div>

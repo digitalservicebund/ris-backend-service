@@ -15,7 +15,7 @@ function defineTextEntry(
     ...(fieldType == TextAreaInput && { fieldSize }),
   }
 }
-export const texts = [
+export const shortTextFields = [
   defineTextEntry("decisionName", "Entscheidungsname", TextInput),
   defineTextEntry("headline", "Titelzeile", TextAreaInput, "small"),
   defineTextEntry("guidingPrinciple", "Leitsatz", TextAreaInput),
@@ -25,6 +25,9 @@ export const texts = [
     "Sonstiger Orientierungssatz",
     TextAreaInput,
   ),
+]
+
+export const longTextFields = [
   defineTextEntry("tenor", "Tenor", TextAreaInput),
   defineTextEntry("reasons", "Gründe", TextAreaInput),
   defineTextEntry("caseFacts", "Tatbestand", TextAreaInput),

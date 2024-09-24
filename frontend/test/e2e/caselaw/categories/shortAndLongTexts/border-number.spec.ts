@@ -4,6 +4,7 @@ import {
   navigateToAttachments,
   uploadTestfile,
   copyPasteTextFromAttachmentIntoEditor,
+  clickCategoryButton,
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 
@@ -76,6 +77,8 @@ test.describe(
         .locator("..")
         .locator("..")
         .locator("..")
+
+      await clickCategoryButton("Gründe", page)
       const editor = page.locator("[data-testid='Gründe']")
       let inputFieldInnerText = await editor.innerText()
 
