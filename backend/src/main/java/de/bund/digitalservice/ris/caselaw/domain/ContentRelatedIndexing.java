@@ -13,4 +13,5 @@ public record ContentRelatedIndexing(
     List<ActiveCitation> activeCitations,
     List<String> dismissalGrounds,
     List<String> dismissalTypes,
+    List<String> collectiveAgreements,
     boolean hasLegislativeMandate) {}

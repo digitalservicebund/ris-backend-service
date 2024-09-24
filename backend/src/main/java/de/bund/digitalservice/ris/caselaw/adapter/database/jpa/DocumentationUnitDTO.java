@@ -296,6 +296,12 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @Builder.Default
   private List<DismissalTypesDTO> dismissalTypes = new ArrayList<>();
 
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id", nullable = false)
+  @OrderBy("rank")
+  @Builder.Default
+  private List<CollectiveAgreementDTO> collectiveAgreements = new ArrayList<>();
+
   @Column(name = "legislative_mandate")
   private boolean hasLegislativeMandate;
 }

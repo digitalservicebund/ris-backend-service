@@ -78,6 +78,7 @@ public class AuthService {
           "/contentRelatedIndexing/jobProfiles",
           "/contentRelatedIndexing/dismissalGrounds",
           "/contentRelatedIndexing/dismissalTypes",
+          "/contentRelatedIndexing/collectiveAgreements",
           "/contentRelatedIndexing/hasLegislativeMandate",
           "/shortTexts/decisionName",
           "/shortTexts/headline",
