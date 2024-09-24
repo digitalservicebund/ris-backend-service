@@ -4,9 +4,9 @@ import { ComboboxInputModelType, ComboboxItem } from "@/components/input/types"
 import { Page } from "@/components/Pagination.vue"
 import { CitationType } from "@/domain/citationType"
 import DocumentationOffice from "@/domain/documentationOffice"
-import { Court, Procedure, DocumentType } from "@/domain/documentUnit"
+import { Court, DocumentType, Procedure } from "@/domain/documentUnit"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
-import { LegalForceType, LegalForceRegion } from "@/domain/legalForce"
+import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import errorMessages from "@/i18n/errors.json"
@@ -96,7 +96,7 @@ function formatDropdownItems(
     }
     case Endpoint.documentationOffices: {
       return (responseData as DocumentationOffice[]).map((item) => ({
-        label: item.label,
+        label: item.abbreviation,
         value: item,
       }))
     }

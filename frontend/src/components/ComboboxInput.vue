@@ -1,12 +1,12 @@
 <script setup lang="ts" generic="T extends InputModelProps">
 import * as Sentry from "@sentry/vue"
 import {
+  computed,
   onBeforeUnmount,
   onMounted,
   ref,
-  watch,
-  computed,
   shallowRef,
+  watch,
 } from "vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import {
@@ -233,6 +233,10 @@ watch(
   props,
   () => {
     inputText.value = props.modelValue?.label
+      ? props.modelValue.label
+      : props.modelValue?.abbreviation
+        ? props.modelValue?.abbreviation
+        : ""
   },
   { immediate: true },
 )

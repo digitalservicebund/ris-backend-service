@@ -4,4 +4,4 @@ import java.util.UUID;
 import lombok.Builder;
 
 @Builder
-public record DocumentationOffice(String abbreviation, UUID uuid, String label) {}
+public record DocumentationOffice(String abbreviation, UUID uuid) {}
