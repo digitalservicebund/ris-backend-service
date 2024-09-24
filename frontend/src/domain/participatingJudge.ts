@@ -52,10 +52,6 @@ export default class ParticipatingJudge implements EditableListItem {
     return IcBaselinePerson
   }
 
-  get hasForeignSource() {
-    return false
-  }
-
   private fieldIsEmpty(
     value: ParticipatingJudge[(typeof ParticipatingJudge.fields)[number]],
   ): boolean {

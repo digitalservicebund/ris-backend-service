@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue"
+import CategoryWrapper from "@/components/CategoryWrapper.vue"
+import ParticipatingJudges from "@/components/ParticipatingJudges.vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -50,6 +52,12 @@ const outline = computed({
       TextEditorUtil.getEditorContentIfPresent(newValue)
   },
 })
+
+const hasParticipatingJudges = ref<boolean>(
+  store.documentUnit?.longTexts?.participatingJudges
+    ? store.documentUnit?.longTexts?.participatingJudges?.length > 0
+    : false,
+)
 </script>
 
 <template>
@@ -71,6 +79,13 @@ const outline = computed({
         label="Abweichende Meinung"
         :should-show-button="!hasDissentingOpinion"
       />
+
+      <CategoryWrapper
+        label="Mitwirkende Richter"
+        :should-show-button="!hasParticipatingJudges"
+      >
+        <ParticipatingJudges label="Mitwirkende Richter" />
+      </CategoryWrapper>
 
       <div class="gap-0">
         <TextEditorCategory

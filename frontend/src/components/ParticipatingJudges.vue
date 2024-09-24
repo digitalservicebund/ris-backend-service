@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue"
-import DocumentUnitDecisionSummary from "@/components/DocumentUnitDecisionSummary.vue"
+import DefaultSummary from "@/components/DefaultSummary.vue"
 import EditableList from "@/components/EditableList.vue"
 import ParticipatingJudgesInput from "@/components/ParticipatingJudgesInput.vue"
 import ParticipatingJudge from "@/domain/participatingJudge"
@@ -13,9 +13,9 @@ defineProps<{
 const store = useDocumentUnitStore()
 
 const participatingJudges = computed({
-  get: () => store.documentUnit!.contentRelatedIndexing.participatingJudges,
+  get: () => store.documentUnit!.longTexts.participatingJudges,
   set: (newValues) => {
-    store.documentUnit!.contentRelatedIndexing.participatingJudges = newValues
+    store.documentUnit!.longTexts.participatingJudges = newValues
   },
 })
 
@@ -31,7 +31,7 @@ const defaultValue = new ParticipatingJudge() as ParticipatingJudge
           v-model="participatingJudges"
           :default-value="defaultValue"
           :edit-component="ParticipatingJudgesInput"
-          :summary-component="DocumentUnitDecisionSummary"
+          :summary-component="DefaultSummary"
         />
       </div>
     </div>

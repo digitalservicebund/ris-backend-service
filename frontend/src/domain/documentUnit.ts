@@ -42,7 +42,6 @@ export type ContentRelatedIndexing = {
   fieldsOfLaw?: FieldOfLaw[]
   jobProfiles?: string[]
   hasLegislativeMandate?: boolean
-  participatingJudges?: ParticipatingJudge[]
 }
 
 export type DocumentType = {
@@ -81,6 +80,7 @@ export type LongTexts = {
   caseFacts?: string
   decisionReasons?: string
   dissentingOpinion?: string
+  participatingJudges?: ParticipatingJudge[]
   otherLongText?: string
   outline?: string
 }
@@ -134,6 +134,12 @@ export default class DocumentUnit {
         delete data.longTexts[longTextsField]
     }
 
+    if (data.longTexts?.participatingJudges)
+      data.longTexts.participatingJudges =
+        data.longTexts.participatingJudges.map(
+          (judge) => new ParticipatingJudge({ ...judge }),
+        )
+
     if (data.previousDecisions)
       data.previousDecisions = data.previousDecisions.map(
         (decision) => new PreviousDecision({ ...decision }),
@@ -165,13 +171,6 @@ export default class DocumentUnit {
       data.contentRelatedIndexing.activeCitations =
         data.contentRelatedIndexing.activeCitations.map(
           (activeCitations) => new ActiveCitation({ ...activeCitations }),
-        )
-
-    if (data.contentRelatedIndexing?.participatingJudges)
-      data.contentRelatedIndexing.participatingJudges =
-        data.contentRelatedIndexing.participatingJudges.map(
-          (participatingJudge) =>
-            new ParticipatingJudge({ ...participatingJudge }),
         )
 
     if (data.attachments != undefined && data.attachments.length > 0) {

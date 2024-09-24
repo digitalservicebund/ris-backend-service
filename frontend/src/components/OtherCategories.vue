@@ -4,7 +4,6 @@ import CategoryWrapper from "@/components/CategoryWrapper.vue"
 import DismissalInputs from "@/components/DismissalInputs.vue"
 import JobProfiles from "@/components/JobProfiles.vue"
 import LegislativeMandate from "@/components/LegislativeMandate.vue"
-import ParticipatingJudges from "@/components/ParticipatingJudges.vue"
 import { useInjectCourtType } from "@/composables/useCourtType"
 import constitutionalCourtTypes from "@/data/constitutionalCourtTypes.json"
 import laborCourtTypes from "@/data/laborCourtTypes.json"
@@ -40,13 +39,6 @@ const shouldDisplayDismissalAttributes = computed(
     laborCourtTypes.items.includes(courtTypeRef.value) ||
     hasDismissalInput.value,
 )
-
-const hasParticipatingJudges = ref<boolean>(
-  store.documentUnit?.contentRelatedIndexing?.participatingJudges
-    ? store.documentUnit?.contentRelatedIndexing?.participatingJudges?.length >
-        0
-    : false,
-)
 </script>
 
 <template>
@@ -72,12 +64,6 @@ const hasParticipatingJudges = ref<boolean>(
           headline="Gesetzgebungsauftrag"
           label="Gesetzgebungsauftrag vorhanden"
         />
-      </CategoryWrapper>
-      <CategoryWrapper
-        label="Mitwirkende Richter"
-        :should-show-button="!hasParticipatingJudges"
-      >
-        <ParticipatingJudges label="Mitwirkende Richter" />
       </CategoryWrapper>
     </div>
   </div>
