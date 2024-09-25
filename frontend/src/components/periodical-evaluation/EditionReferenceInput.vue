@@ -196,6 +196,7 @@ const responsibleDocOffice = computed({
     }
     return undefined
   },
+  set: () => {},
 })
 </script>
 
