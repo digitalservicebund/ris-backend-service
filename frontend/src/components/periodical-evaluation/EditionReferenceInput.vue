@@ -189,8 +189,8 @@ const responsibleDocOffice = computed({
     if (relatedDocumentationUnit?.value.court) {
       return {
         label:
-          relatedDocumentationUnt?.value.court.responsibleDocOffice
-            ?.abbreviation,
+          relatedDocumentationUnit?.value.court.responsibleDocOffice
+            ?.abbreviation ?? "",
         value: relatedDocumentationUnit?.value.court.responsibleDocOffice,
       }
     }
