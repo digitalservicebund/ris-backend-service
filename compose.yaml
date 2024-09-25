@@ -1,11 +1,13 @@
 services:
   initialization:
-    image: ghcr.io/digitalservicebund/ris-data-migration:e54e9e1d87421609eb0de0c7c1f38ed302beb9bd
+    image: ghcr.io/digitalservicebund/ris-data-migration:8aa7040a81aa9270e5414ef737d7f7e70ba77287
     depends_on:
       - postgres14
+    platform: linux/amd64
     environment:
-      - SPRING_PROFILES_ACTIVE=dev
-      - RIS_MIGRATION_CLI_MODE=true
+      - SPRING_PROFILES_ACTIVE=incremental,dev
+      - RIS_MIGRATION_RUNNER=incremental
+      - RIS_MIGRATION_CLI_MODE=false
       - RIS_MIGRATION_DB_HOST=host.docker.internal
       - RIS_MIGRATION_DB_PORT=5432
       - RIS_MIGRATION_DB_NAME=neuris
@@ -18,8 +20,6 @@ services:
       - RIS_MIGRATION_S3_BUCKET=s3://neuris-migration-juris-data
       - RIS_MIGRATION_S3_DATA_VERSION=2024-08 # TODO maybe remove and use the latest instead?
       - RIS_MIGRATION_S3_FIRST_DAILY_VERSION=2024-07-31 # TODO maybe remove and use the latest instead?
-    command: [ "refdata", "seed" ]
-
 
   traefik:
     image: traefik:v3.1
