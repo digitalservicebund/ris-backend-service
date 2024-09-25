@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.util.List;
 import lombok.Builder;
@@ -14,5 +13,5 @@ public record ContentRelatedIndexing(
     List<ActiveCitation> activeCitations,
     List<String> dismissalGrounds,
     List<String> dismissalTypes,
-    boolean hasLegislativeMandate,
-    List<ParticipatingJudge> participatingJudges) {}
+    List<String> collectiveAgreements,
+    boolean hasLegislativeMandate) {}

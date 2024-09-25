@@ -167,4 +167,60 @@ describe("other categories", () => {
       expect(screen.getByText("Kündigungsgründe")).toBeInTheDocument()
     })
   })
+
+  describe("CollectiveAgreements", () => {
+    test("should display collective agreements button when it is undefined", async () => {
+      // Arrange
+      courtTypeRef = ref("BGH")
+      mockSessionStore({ collectiveAgreements: undefined })
+
+      // Act
+      render(OtherCategories)
+
+      // Assert
+      expect(
+        screen.getByRole("button", { name: "Tarifvertrag" }),
+      ).toBeInTheDocument()
+      expect(
+        screen.queryByRole("textbox", { name: "Tarifvertrag" }),
+      ).not.toBeInTheDocument()
+    })
+
+    test("should display collective agreements button when it is empty", async () => {
+      // Arrange
+      courtTypeRef = ref("BAG")
+      mockSessionStore({ collectiveAgreements: [] })
+
+      // Act
+      render(OtherCategories)
+
+      // Assert
+      expect(
+        screen.getByRole("button", { name: "Tarifvertrag" }),
+      ).toBeInTheDocument()
+      expect(
+        screen.queryByRole("textbox", { name: "Tarifvertrag" }),
+      ).not.toBeInTheDocument()
+    })
+
+    test("should display collective agreements when it is not empty", async () => {
+      // Arrange
+      courtTypeRef = ref("BFH")
+      mockSessionStore({ collectiveAgreements: ["Stehende Bühnen"] })
+
+      // Act
+      render(OtherCategories)
+
+      // Assert
+
+      expect(
+        screen.getByRole("textbox", { name: "Tarifvertrag" }),
+      ).toBeInTheDocument()
+      expect(screen.getByText("Stehende Bühnen")).toBeInTheDocument()
+
+      expect(
+        screen.queryByRole("button", { name: "Tarifvertrag" }),
+      ).not.toBeInTheDocument()
+    })
+  })
 })

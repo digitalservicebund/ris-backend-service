@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue"
+import { computed } from "vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
 import TextInputCategory from "@/components/texts/TextInputCategory.vue"
 import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLinks"
@@ -7,36 +7,6 @@ import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import TextEditorUtil from "@/utils/textEditorUtil"
 
 const store = useDocumentUnitStore()
-
-const hasDecisionName = ref<boolean>(
-  store.documentUnit?.shortTexts?.decisionName
-    ? store.documentUnit?.shortTexts?.decisionName?.length > 0
-    : false,
-)
-
-const hasHeadline = ref<boolean>(
-  store.documentUnit?.shortTexts?.headline
-    ? store.documentUnit?.shortTexts?.headline?.length > 0
-    : false,
-)
-
-const hasGuidingPrinciple = ref<boolean>(
-  store.documentUnit?.shortTexts?.guidingPrinciple
-    ? store.documentUnit?.shortTexts?.guidingPrinciple?.length > 0
-    : false,
-)
-
-const hasHeadnote = ref<boolean>(
-  store.documentUnit?.shortTexts?.headnote
-    ? store.documentUnit?.shortTexts?.headnote?.length > 0
-    : false,
-)
-
-const hasOtherHeadnote = ref<boolean>(
-  store.documentUnit?.shortTexts?.otherHeadnote
-    ? store.documentUnit?.shortTexts?.otherHeadnote?.length > 0
-    : false,
-)
 
 const decisionName = computed({
   get: () => store.documentUnit?.shortTexts.decisionName,
@@ -75,7 +45,13 @@ const guidingPrinciple = computed({
 })
 
 const headnote = computed({
-  get: () => store.documentUnit?.shortTexts.headnote,
+  get: () =>
+    store.documentUnit?.shortTexts.headnote
+      ? useValidBorderNumberLinks(
+          store.documentUnit?.shortTexts.headnote,
+          store.documentUnit.borderNumbers,
+        )
+      : undefined,
   set: (newValue) => {
     store.documentUnit!.shortTexts.headnote =
       TextEditorUtil.getEditorContentIfPresent(newValue)
@@ -83,7 +59,13 @@ const headnote = computed({
 })
 
 const otherHeadnote = computed({
-  get: () => store.documentUnit?.shortTexts.otherHeadnote,
+  get: () =>
+    store.documentUnit?.shortTexts.otherHeadnote
+      ? useValidBorderNumberLinks(
+          store.documentUnit?.shortTexts.otherHeadnote,
+          store.documentUnit.borderNumbers,
+        )
+      : undefined,
   set: (newValue) => {
     store.documentUnit!.shortTexts.otherHeadnote =
       TextEditorUtil.getEditorContentIfPresent(newValue)
@@ -101,7 +83,9 @@ const otherHeadnote = computed({
         data-testId="Entscheidungsname"
         editable
         label="Entscheidungsname"
-        :should-show-button="!hasDecisionName"
+        :should-show-button="
+          !store.documentUnit?.shortTexts?.decisionName?.length
+        "
       />
 
       <TextEditorCategory
@@ -110,7 +94,7 @@ const otherHeadnote = computed({
         editable
         field-size="small"
         label="Titelzeile"
-        :should-show-button="!hasHeadline"
+        :should-show-button="!store.documentUnit?.shortTexts?.headline?.length"
       />
 
       <TextEditorCategory
@@ -118,7 +102,9 @@ const otherHeadnote = computed({
         v-model="guidingPrinciple"
         editable
         label="Leitsatz"
-        :should-show-button="!hasGuidingPrinciple"
+        :should-show-button="
+          !store.documentUnit?.shortTexts?.guidingPrinciple?.length
+        "
       />
 
       <TextEditorCategory
@@ -126,7 +112,7 @@ const otherHeadnote = computed({
         v-model="headnote"
         editable
         label="Orientierungssatz"
-        :should-show-button="!hasHeadnote"
+        :should-show-button="!store.documentUnit?.shortTexts?.headnote?.length"
       />
 
       <TextEditorCategory
@@ -134,7 +120,9 @@ const otherHeadnote = computed({
         v-model="otherHeadnote"
         editable
         label="Sonstiger Orientierungssatz"
-        :should-show-button="!hasOtherHeadnote"
+        :should-show-button="
+          !store.documentUnit?.shortTexts?.otherHeadnote?.length
+        "
       />
     </div>
   </div>

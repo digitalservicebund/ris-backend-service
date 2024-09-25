@@ -60,7 +60,7 @@ public class S3AttachmentService implements AttachmentService {
 
     checkDocx(byteBuffer);
 
-    putObjectIntoBucket(fileUuid.toString(), byteBuffer, httpHeaders);
+    var result = putObjectIntoBucket(fileUuid.toString(), byteBuffer, httpHeaders);
 
     AttachmentDTO attachmentDTO =
         AttachmentDTO.builder()

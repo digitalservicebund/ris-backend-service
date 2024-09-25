@@ -38,7 +38,7 @@ const chips = computed<string[]>({
 
   set: (newValue: string[]) => {
     if (!newValue || newValue.length === 0) {
-      emit("update:modelValue", undefined)
+      emit("update:modelValue", [])
       return
     }
 

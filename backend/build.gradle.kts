@@ -19,7 +19,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.51.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "10.18.0"
+    id("org.flywaydb.flyway") version "10.18.1"
 }
 
 group = "de.bund.digitalservice"
@@ -173,9 +173,9 @@ dependencies {
 
     implementation("com.sendinblue:sib-api-v3-sdk:7.0.0")
     // CVE-2022-4244
-    implementation("org.codehaus.plexus:plexus-utils:4.0.1")
+    implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.28.7"))
+    implementation(platform("software.amazon.awssdk:bom:2.28.8"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -187,7 +187,7 @@ dependencies {
     implementation("com.icegreen:greenmail:2.1.0-rc-1")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.12") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.13") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
@@ -220,10 +220,10 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.12.0")
     implementation("org.jsoup:jsoup:1.18.1")
 
-    val flywayCore = "org.flywaydb:flyway-core:10.18.0"
+    val flywayCore = "org.flywaydb:flyway-core:10.18.1"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.18.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.18.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")

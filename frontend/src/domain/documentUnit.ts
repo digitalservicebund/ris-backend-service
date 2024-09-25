@@ -34,6 +34,7 @@ export type CoreData = {
 }
 
 export type ContentRelatedIndexing = {
+  collectiveAgreements?: string[]
   dismissalTypes?: string[]
   dismissalGrounds?: string[]
   keywords?: string[]

@@ -50,6 +50,13 @@ const hasJobProfiles = computed(() => {
   )
 })
 
+const hasCollectiveAgreements = computed(() => {
+  return (
+    contentRelatedIndexing.value.collectiveAgreements &&
+    contentRelatedIndexing.value.collectiveAgreements?.length > 0
+  )
+})
+
 const hasDismissalGrounds = computed(() => {
   return (
     contentRelatedIndexing.value.dismissalGrounds &&
@@ -131,6 +138,17 @@ const hasLegislativeMandate = computed(() => {
           :key="index"
         >
           {{ activeCitation.renderDecision }}
+        </div>
+      </PreviewContent>
+    </PreviewRow>
+    <PreviewRow v-if="hasCollectiveAgreements">
+      <PreviewCategory>Tarifvertrag</PreviewCategory>
+      <PreviewContent data-testid="Tarifvertrag">
+        <div
+          v-for="collectiveAgreement in contentRelatedIndexing.collectiveAgreements"
+          :key="collectiveAgreement"
+        >
+          {{ collectiveAgreement }}
         </div>
       </PreviewContent>
     </PreviewRow>

@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingEcliDTO;
@@ -711,6 +712,25 @@ class DocumentationUnitTransformerTest {
   }
 
   @Test
+  void testTransformToDTO_withSameCollectiveAgreements_shouldMakeCollectiveAgreementsDistinct() {
+    DocumentationUnit documentationUnit =
+        generateSimpleDocumentationUnitBuilder()
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .collectiveAgreements(List.of("agreement", "agreement"))
+                    .build())
+            .build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(
+            DocumentationUnitDTO.builder().build(), documentationUnit);
+
+    assertThat(documentationUnitDTO.getCollectiveAgreements())
+        .extracting("value")
+        .containsExactly("agreement");
+  }
+
+  @Test
   void testTransformToDTO_withSameParticipatingJudges_shouldMakeJudgesDistinct() {
     // Arrange
     ParticipatingJudge participatingJudge = ParticipatingJudge.builder().name("Judge A").build();
@@ -1136,6 +1156,21 @@ class DocumentationUnitTransformerTest {
   }
 
   @Test
+  void testTransformToDomain_withCollectiveAgreements_shouldAddCollectiveAgreements() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder()
+            .collectiveAgreements(
+                List.of(CollectiveAgreementDTO.builder().value("agreement").build()))
+            .build();
+
+    DocumentationUnit documentationUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentationUnit.contentRelatedIndexing().collectiveAgreements())
+        .containsExactly("agreement");
+  }
+
+  @Test
   void testTransformToDomain_withDismissalTypes_shouldAddDismissalTypes() {
     DocumentationUnitDTO documentationUnitDTO =
         generateSimpleDTOBuilder()
@@ -1255,8 +1290,8 @@ class DocumentationUnitTransformerTest {
                 .jobProfiles(Collections.emptyList())
                 .dismissalGrounds(Collections.emptyList())
                 .dismissalTypes(Collections.emptyList())
+                .collectiveAgreements(Collections.emptyList())
                 .hasLegislativeMandate(false)
-                .participatingJudges(Collections.emptyList())
                 .build())
         .references(Collections.emptyList());
   }

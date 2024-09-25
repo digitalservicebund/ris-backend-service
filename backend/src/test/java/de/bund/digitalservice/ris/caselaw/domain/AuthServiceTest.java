@@ -296,6 +296,7 @@ class AuthServiceTest {
         "/contentRelatedIndexing/jobProfiles",
         "/contentRelatedIndexing/dismissalTypes",
         "/contentRelatedIndexing/dismissalGrounds",
+        "/contentRelatedIndexing/collectiveAgreements",
         "/contentRelatedIndexing/hasLegislativeMandate",
         "/shortTexts/decisionName",
         "/shortTexts/headline",
