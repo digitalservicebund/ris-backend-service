@@ -185,38 +185,42 @@ async function addReference(decision: RelatedDocumentation) {
 async function createNewFromSearch(openDocunit: boolean = false) {
   isLoading.value = true
   createNewFromSearchResponseError.value = undefined
-  const createResponse = await documentUnitService.createNew()
-  if (createResponse.error) {
-    createNewFromSearchResponseError.value = createResponse.error
-    isLoading.value = false
-    return
+  await validateRequiredInput(reference.value)
+  if (validationStore.isValid()) {
+    const createResponse = await documentUnitService.createNew()
+    if (createResponse.error) {
+      createNewFromSearchResponseError.value = createResponse.error
+      isLoading.value = false
+      return
+    }
+
+    const docUnit = createResponse.data
+    docUnit.coreData.fileNumbers = relatedDocumentationUnit.value.fileNumber
+      ? [relatedDocumentationUnit.value.fileNumber]
+      : []
+    docUnit.coreData.decisionDate = relatedDocumentationUnit.value.decisionDate
+    docUnit.coreData.court = relatedDocumentationUnit.value.court
+    await docunitStore.loadDocumentUnit(docUnit.documentNumber!)
+    docunitStore.documentUnit = docUnit
+
+    const updateResponse = await docunitStore.updateDocumentUnit()
+
+    if (updateResponse.error) {
+      createNewFromSearchResponseError.value = updateResponse.error
+      if (docUnit?.uuid) await documentUnitService.delete(docUnit.uuid)
+      isLoading.value = false
+      return
+    }
+    if (openDocunit) {
+      await router.push({
+        name: "caselaw-documentUnit-documentNumber-categories",
+        params: { documentNumber: createResponse.data.documentNumber },
+      })
+    }
+
+    addReference(new RelatedDocumentation({ ...createResponse.data }))
   }
 
-  const docUnit = createResponse.data
-  docUnit.coreData.fileNumbers = relatedDocumentationUnit.value.fileNumber
-    ? [relatedDocumentationUnit.value.fileNumber]
-    : []
-  docUnit.coreData.decisionDate = relatedDocumentationUnit.value.decisionDate
-  docUnit.coreData.court = relatedDocumentationUnit.value.court
-  await docunitStore.loadDocumentUnit(docUnit.documentNumber!)
-  docunitStore.documentUnit = docUnit
-
-  const updateResponse = await docunitStore.updateDocumentUnit()
-
-  if (updateResponse.error) {
-    createNewFromSearchResponseError.value = updateResponse.error
-    if (docUnit?.uuid) await documentUnitService.delete(docUnit.uuid)
-    isLoading.value = false
-    return
-  }
-  if (openDocunit) {
-    await router.push({
-      name: "caselaw-documentUnit-documentNumber-categories",
-      params: { documentNumber: createResponse.data.documentNumber },
-    })
-  }
-
-  addReference(new RelatedDocumentation({ ...createResponse.data }))
   isLoading.value = false
 }
 
