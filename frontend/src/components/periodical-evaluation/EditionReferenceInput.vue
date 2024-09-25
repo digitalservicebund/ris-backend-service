@@ -11,7 +11,6 @@ import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
-import DocumentationOffice from "@/domain/documentationOffice"
 import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -196,13 +195,6 @@ const responsibleDocOffice = computed({
       }
     }
     return undefined
-  },
-  set: (newValue) => {
-    if (newValue) {
-      relatedDocumentationUnit.value.court.responsibleDocOffice = {
-        ...newValue,
-      } as DocumentationOffice
-    }
   },
 })
 </script>
