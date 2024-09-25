@@ -136,7 +136,7 @@ onMounted(() => {
           Periodika
         </h1>
       </FlexContainer>
-      <FlexContainer align-items="items-end" flex-direction="flex-row">
+      <FlexContainer>
         <div
           class="flex flex-grow flex-col gap-16 bg-blue-200 p-16"
           role="search"
@@ -146,7 +146,7 @@ onMounted(() => {
               id="legalPeriodical"
               v-model="legalPeriodical"
               aria-label="Periodikum"
-              class="max-w-[672px]"
+              class="flex-shrink flex-grow-0 basis-1/2"
               clear-on-choosing-item
               :has-error="false"
               :item-service="ComboboxItemService.getLegalPeriodicals"

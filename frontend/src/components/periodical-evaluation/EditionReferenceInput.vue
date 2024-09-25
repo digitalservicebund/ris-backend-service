@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue"
+import { ref, computed, watch, onMounted } from "vue"
+import { useRouter } from "vue-router"
 import { ValidationError } from "../input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
@@ -15,6 +16,9 @@ import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
+import FeatureToggleService from "@/services/featureToggleService"
+import { ResponseError } from "@/services/httpClient"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useEditionStore } from "@/stores/editionStore"
 import StringsUtil from "@/utils/stringsUtil"
 
@@ -31,15 +35,19 @@ const emit = defineEmits<{
 }>()
 
 const store = useEditionStore()
+const docunitStore = useDocumentUnitStore()
+const router = useRouter()
 const lastSavedModelValue = ref(new Reference({ ...props.modelValue }))
 const reference = ref<Reference>(new Reference({ ...props.modelValue }))
 const validationStore = useValidationStore()
 const pageNumber = ref<number>(0)
 const itemsPerPage = ref<number>(15)
 const isLoading = ref(false)
+const featureToggle = ref()
 
 const searchResultsCurrentPage = ref<Page<RelatedDocumentation>>()
 const searchResults = ref<SearchResults<RelatedDocumentation>>()
+const createNewFromSearchResponseError = ref<ResponseError | undefined>()
 
 const legalPeriodical = computed(() =>
   store.edition && store.edition?.legalPeriodical
@@ -69,6 +77,21 @@ const suffix = computed({
   set: (newValue) => {
     store.edition!.suffix = newValue
   },
+})
+
+const responsibleDocOffice = computed({
+  get: () => {
+    if (relatedDocumentationUnit?.value.court) {
+      return {
+        label:
+          relatedDocumentationUnit?.value.court.responsibleDocOffice
+            ?.abbreviation ?? "",
+        value: relatedDocumentationUnit?.value.court.responsibleDocOffice,
+      }
+    }
+    return undefined
+  },
+  set: () => {},
 })
 
 function buildCitation(): string | undefined {
@@ -159,6 +182,44 @@ async function addReference(decision: RelatedDocumentation) {
   }
 }
 
+async function createNewFromSearch(openDocunit: boolean = false) {
+  isLoading.value = true
+  createNewFromSearchResponseError.value = undefined
+  const createResponse = await documentUnitService.createNew()
+  if (createResponse.error) {
+    createNewFromSearchResponseError.value = createResponse.error
+    isLoading.value = false
+    return
+  }
+
+  const docUnit = createResponse.data
+  docUnit.coreData.fileNumbers = relatedDocumentationUnit.value.fileNumber
+    ? [relatedDocumentationUnit.value.fileNumber]
+    : []
+  docUnit.coreData.decisionDate = relatedDocumentationUnit.value.decisionDate
+  docUnit.coreData.court = relatedDocumentationUnit.value.court
+  await docunitStore.loadDocumentUnit(docUnit.documentNumber!)
+  docunitStore.documentUnit = docUnit
+
+  const updateResponse = await docunitStore.updateDocumentUnit()
+
+  if (updateResponse.error) {
+    createNewFromSearchResponseError.value = updateResponse.error
+    if (docUnit?.uuid) await documentUnitService.delete(docUnit.uuid)
+    isLoading.value = false
+    return
+  }
+  if (openDocunit) {
+    await router.push({
+      name: "caselaw-documentUnit-documentNumber-categories",
+      params: { documentNumber: createResponse.data.documentNumber },
+    })
+  }
+
+  addReference(new RelatedDocumentation({ ...createResponse.data }))
+  isLoading.value = false
+}
+
 watch(
   () => store.edition?.legalPeriodical,
   (legalPeriodical) => {
@@ -184,19 +245,10 @@ watch(
   },
 )
 
-const responsibleDocOffice = computed({
-  get: () => {
-    if (relatedDocumentationUnit?.value.court) {
-      return {
-        label:
-          relatedDocumentationUnit?.value.court.responsibleDocOffice
-            ?.abbreviation ?? "",
-        value: relatedDocumentationUnit?.value.court.responsibleDocOffice,
-      }
-    }
-    return undefined
-  },
-  set: () => {},
+onMounted(async () => {
+  featureToggle.value = (
+    await FeatureToggleService.isEnabled("neuris.new-from-search")
+  ).data
 })
 </script>
 
@@ -411,16 +463,50 @@ const responsibleDocOffice = computed({
         />
       </Pagination>
     </div>
-    <div v-if="searchResults?.length == 0">
-      Demnächst können Sie hier eine neue Entscheidung anlegen. Vorausgewählte
-      Dokstelle:
-      <ComboboxInput
+
+    <div
+      v-if="searchResults && featureToggle"
+      class="flex flex-col gap-24 bg-blue-200 p-24"
+    >
+      <div>
+        <p class="ds-label-01-bold">
+          Nicht die passende Entscheidung gefunden?
+        </p>
+        <p>
+          Wollen Sie die Daten übernehmen und eine neue Entscheidung erstellen?
+        </p>
+      </div>
+      <InputField
         id="responsibleDocOffice"
-        v-model="responsibleDocOffice"
-        aria-label="zuständige Dokumentationsstelle"
-        data-testid="documentation-office-combobox"
-        :item-service="ComboboxItemService.getDocumentationOffices"
-      ></ComboboxInput>
+        label="Zuständige Dokumentationsstelle *"
+        :validation-error="validationStore.getByField('citationType')"
+      >
+        <ComboboxInput
+          id="responsibleDocOffice"
+          v-model="responsibleDocOffice"
+          aria-label="zuständige Dokumentationsstelle"
+          class="flex-shrink flex-grow-0 basis-1/2"
+          data-testid="documentation-office-combobox"
+          :item-service="ComboboxItemService.getDocumentationOffices"
+        ></ComboboxInput>
+      </InputField>
+
+      <div class="flex flex-row gap-8">
+        <TextButton
+          aria-label="Ok"
+          button-type="primary"
+          label="Ok"
+          size="small"
+          @click="() => createNewFromSearch()"
+        />
+        <TextButton
+          aria-label="Ok"
+          button-type="tertiary"
+          label="Ok und Dokumentationseinheit direkt bearbeiten"
+          size="small"
+          @click="() => createNewFromSearch(true)"
+        />
+      </div>
     </div>
   </div>
 </template>
