@@ -186,12 +186,12 @@ watch(
 
 const responsibleDocOffice = computed({
   get: () => {
-    if (relatedDocumentationUnit.value.court) {
+    if (relatedDocumentationUnit?.value.court) {
       return {
         label:
           relatedDocumentationUnt?.value.court.responsibleDocOffice
-            .abbreviation,
-        value: relatedDocumentationUnit.value.court.responsibleDocOffice,
+            ?.abbreviation,
+        value: relatedDocumentationUnit?.value.court.responsibleDocOffice,
       }
     }
     return undefined
