@@ -59,7 +59,7 @@ const service: DocumentUnitService = {
   },
 
   async createNew() {
-    const response = await httpClient.put<DocumentUnit>(
+    const response = await httpClient.put<undefined, DocumentUnit>(
       "caselaw/documentunits/new",
     )
     if (response.status >= 300) {
