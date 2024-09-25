@@ -52,10 +52,19 @@ public class DocumentationUnitService {
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
-  public DocumentationUnit generateNewDocumentationUnit(DocumentationOffice documentationOffice)
+  public DocumentationUnit generateNewDocumentationUnit(
+      DocumentationOffice userDocOffice, DocumentationUnitCreationParameters parameters)
       throws DocumentationUnitException {
-    var documentNumber = generateDocumentNumber(documentationOffice);
-    return repository.createNewDocumentationUnit(documentNumber, documentationOffice);
+
+    if (parameters == null) {
+      parameters =
+          DocumentationUnitCreationParameters.builder().documentationOffice(userDocOffice).build();
+    } else if (parameters.documentationOffice() == null) {
+      parameters = parameters.toBuilder().documentationOffice(userDocOffice).build();
+    }
+
+    var documentNumber = generateDocumentNumber(parameters.documentationOffice());
+    return repository.createNewDocumentationUnit(documentNumber, userDocOffice, parameters);
   }
 
   private String generateDocumentNumber(DocumentationOffice documentationOffice) {

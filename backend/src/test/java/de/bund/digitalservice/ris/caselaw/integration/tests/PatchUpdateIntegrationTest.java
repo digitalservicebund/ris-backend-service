@@ -4242,7 +4242,7 @@ class PatchUpdateIntegrationTest {
     RisEntityExchangeResult<DocumentationUnit> result =
         risWebTestClient
             .withDefaultLogin()
-            .get()
+            .put()
             .uri("/api/v1/caselaw/documentunits/new")
             .exchange()
             .expectStatus()

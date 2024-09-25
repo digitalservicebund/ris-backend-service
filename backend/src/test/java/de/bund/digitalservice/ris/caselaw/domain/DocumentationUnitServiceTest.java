@@ -14,14 +14,17 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatu
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseStatusRepository;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberFormatterException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberPatternException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import jakarta.validation.Validator;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +71,12 @@ class DocumentationUnitServiceTest {
     DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
     DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
 
-    when(repository.createNewDocumentationUnit("nextDocumentNumber", documentationOffice))
+    when(repository.createNewDocumentationUnit(
+            "nextDocumentNumber",
+            documentationOffice,
+            DocumentationUnitCreationParameters.builder()
+                .documentationOffice(documentationOffice)
+                .build()))
         .thenReturn(documentationUnit);
     when(documentNumberService.generateDocumentNumber(documentationOffice.abbreviation()))
         .thenReturn("nextDocumentNumber");
@@ -76,10 +84,52 @@ class DocumentationUnitServiceTest {
     // The chicken-egg-problem is, that we are dictating what happens when
     // repository.save(), so we can't just use a captor at the same time
 
-    Assertions.assertNotNull(service.generateNewDocumentationUnit(documentationOffice));
+    Assertions.assertNotNull(service.generateNewDocumentationUnit(documentationOffice, null));
 
     verify(documentNumberService).generateDocumentNumber(documentationOffice.abbreviation());
-    verify(repository).createNewDocumentationUnit("nextDocumentNumber", documentationOffice);
+    verify(repository)
+        .createNewDocumentationUnit(
+            "nextDocumentNumber",
+            documentationOffice,
+            DocumentationUnitCreationParameters.builder()
+                .documentationOffice(documentationOffice)
+                .build());
+  }
+
+  @Test
+  void testGenerateNewDocumentationUnitWithParameters()
+      throws DocumentationUnitExistsException,
+          DocumentNumberPatternException,
+          DocumentNumberFormatterException {
+    DocumentationOffice userDocumentationOffice =
+        DocumentationOffice.builder().abbreviation("BAG").build();
+    DocumentationOffice designatedDocumentationOffice =
+        DocumentationOffice.builder().abbreviation("BGH").build();
+    DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
+    DocumentationUnitCreationParameters parameters =
+        DocumentationUnitCreationParameters.builder()
+            .documentationOffice(designatedDocumentationOffice)
+            .fileNumber("fileNumber")
+            .court(Court.builder().type("BGH").build())
+            .decisionDate(LocalDate.now())
+            .documentType(DocumentType.builder().label("Bes").build())
+            .build();
+    when(repository.createNewDocumentationUnit(
+            "nextDocumentNumber", userDocumentationOffice, parameters))
+        .thenReturn(documentationUnit);
+    when(documentNumberService.generateDocumentNumber(designatedDocumentationOffice.abbreviation()))
+        .thenReturn("nextDocumentNumber");
+    // Can we use a captor to check if the document number was correctly created?
+    // The chicken-egg-problem is, that we are dictating what happens when
+    // repository.save(), so we can't just use a captor at the same time
+
+    Assertions.assertNotNull(
+        service.generateNewDocumentationUnit(userDocumentationOffice, parameters));
+
+    verify(documentNumberService)
+        .generateDocumentNumber(designatedDocumentationOffice.abbreviation());
+    verify(repository)
+        .createNewDocumentationUnit("nextDocumentNumber", userDocumentationOffice, parameters);
   }
 
   @Test
