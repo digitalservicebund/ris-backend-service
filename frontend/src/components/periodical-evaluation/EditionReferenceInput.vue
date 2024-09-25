@@ -114,8 +114,6 @@ function updateDateFormatValidation(
 }
 
 async function search() {
-  isLoading.value = true
-
   const response = await documentUnitService.searchByRelatedDocumentation(
     relatedDocumentationUnit.value,
     {
@@ -143,7 +141,6 @@ async function search() {
       }
     })
   }
-  isLoading.value = false
 }
 
 async function updatePage(page: number) {
