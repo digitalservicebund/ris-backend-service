@@ -233,10 +233,6 @@ watch(
   props,
   () => {
     inputText.value = props.modelValue?.label
-      ? props.modelValue.label
-      : props.modelValue?.abbreviation
-        ? props.modelValue?.abbreviation
-        : ""
   },
   { immediate: true },
 )

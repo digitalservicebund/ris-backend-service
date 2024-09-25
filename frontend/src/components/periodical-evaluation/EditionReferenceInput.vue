@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, watch } from "vue"
+import { computed, ref, watch } from "vue"
 import { ValidationError } from "../input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
@@ -11,6 +11,7 @@ import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
+import DocumentationOffice from "@/domain/documentationOffice"
 import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -183,6 +184,27 @@ watch(
       : new RelatedDocumentation()
   },
 )
+
+const responsibleDocOffice = computed({
+  get: () => {
+    if (relatedDocumentationUnit.value.court) {
+      return {
+        label:
+          relatedDocumentationUnit.value.court.responsibleDocOffice
+            .abbreviation,
+        value: relatedDocumentationUnit.value.court.responsibleDocOffice,
+      }
+    }
+    return undefined
+  },
+  set: (newValue) => {
+    if (newValue) {
+      relatedDocumentationUnit.value.court.responsibleDocOffice = {
+        ...newValue,
+      } as DocumentationOffice
+    }
+  },
+})
 </script>
 
 <template>
@@ -401,7 +423,7 @@ watch(
       Dokstelle:
       <ComboboxInput
         id="responsibleDocOffice"
-        v-model="relatedDocumentationUnit.court.responsibleDocOffice"
+        v-model="responsibleDocOffice"
         aria-label="zuständige Dokumentationsstelle"
         data-testid="documentation-office-combobox"
         :item-service="ComboboxItemService.getDocumentationOffices"
