@@ -1,4 +1,14 @@
 export default class TextEditorUtil {
+  /**
+   * Checks if the provided HTML string contains meaningful content.
+   *
+   * @param value - The HTML string or undefined.
+   * @returns The string if it contains text, images, or tables; otherwise undefined.
+   *
+   * 1. Example: "<p>&nbsp;</p>" will return undefined.
+   * 2. Example: "<p></p><p></p><p></p>" will return undefined.
+   * 3. Example: "<p>            </p>" will return undefined.
+   */
   public static getEditorContentIfPresent(
     value: string | undefined,
   ): string | undefined {

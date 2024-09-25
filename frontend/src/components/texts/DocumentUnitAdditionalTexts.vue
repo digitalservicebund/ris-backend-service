@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue"
+import { computed } from "vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
+import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLinks"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import TextEditorUtil from "@/utils/textEditorUtil"
 
@@ -9,26 +10,14 @@ const store = useDocumentUnitStore()
 
 const isInternalUser = useInternalUser()
 
-const hasOtherLongtext = ref<boolean>(
-  store.documentUnit?.longTexts?.otherLongText
-    ? store.documentUnit?.longTexts?.otherLongText?.length > 0
-    : false,
-)
-
-const hasDissentingOpinion = ref<boolean>(
-  store.documentUnit?.longTexts?.dissentingOpinion
-    ? store.documentUnit?.longTexts?.dissentingOpinion?.length > 0
-    : false,
-)
-
-const hasOutline = ref<boolean>(
-  store.documentUnit?.longTexts?.outline
-    ? store.documentUnit?.longTexts?.outline?.length > 0
-    : false,
-)
-
 const otherLongText = computed({
-  get: () => store.documentUnit?.longTexts.otherLongText,
+  get: () =>
+    store.documentUnit?.longTexts.otherLongText
+      ? useValidBorderNumberLinks(
+          store.documentUnit?.longTexts.otherLongText,
+          store.documentUnit.borderNumbers,
+        )
+      : undefined,
   set: (newValue) => {
     store.documentUnit!.longTexts.otherLongText =
       TextEditorUtil.getEditorContentIfPresent(newValue)
@@ -36,7 +25,13 @@ const otherLongText = computed({
 })
 
 const dissentingOpinion = computed({
-  get: () => store.documentUnit?.longTexts.dissentingOpinion,
+  get: () =>
+    store.documentUnit?.longTexts.dissentingOpinion
+      ? useValidBorderNumberLinks(
+          store.documentUnit?.longTexts.dissentingOpinion,
+          store.documentUnit.borderNumbers,
+        )
+      : undefined,
   set: (newValue) => {
     store.documentUnit!.longTexts.dissentingOpinion =
       TextEditorUtil.getEditorContentIfPresent(newValue)
@@ -44,7 +39,13 @@ const dissentingOpinion = computed({
 })
 
 const outline = computed({
-  get: () => store.documentUnit?.longTexts.outline,
+  get: () =>
+    store.documentUnit?.longTexts.outline
+      ? useValidBorderNumberLinks(
+          store.documentUnit?.longTexts.outline,
+          store.documentUnit.borderNumbers,
+        )
+      : undefined,
   set: (newValue) => {
     store.documentUnit!.longTexts.outline =
       TextEditorUtil.getEditorContentIfPresent(newValue)
@@ -61,7 +62,9 @@ const outline = computed({
         v-model="otherLongText"
         :editable="isInternalUser"
         label="Sonstiger Langtext"
-        :should-show-button="!hasOtherLongtext"
+        :should-show-button="
+          !store.documentUnit?.longTexts?.otherLongText?.length
+        "
       />
 
       <TextEditorCategory
@@ -69,7 +72,9 @@ const outline = computed({
         v-model="dissentingOpinion"
         :editable="isInternalUser"
         label="Abweichende Meinung"
-        :should-show-button="!hasDissentingOpinion"
+        :should-show-button="
+          !store.documentUnit?.longTexts?.dissentingOpinion?.length
+        "
       />
 
       <div class="gap-0">
@@ -78,7 +83,7 @@ const outline = computed({
           v-model="outline"
           :editable="isInternalUser"
           label="Gliederung"
-          :should-show-button="!hasOutline"
+          :should-show-button="!store.documentUnit?.longTexts?.outline?.length"
         />
       </div>
     </div>

@@ -1,37 +1,20 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue"
+import { computed } from "vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
+import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLinks"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import TextEditorUtil from "@/utils/textEditorUtil"
 
 const store = useDocumentUnitStore()
 
-const hasTenor = ref<boolean>(
-  store.documentUnit?.longTexts?.tenor
-    ? store.documentUnit?.longTexts?.tenor?.length > 0
-    : false,
-)
-
-const hasReasons = ref<boolean>(
-  store.documentUnit?.longTexts?.reasons
-    ? store.documentUnit?.longTexts?.reasons?.length > 0
-    : false,
-)
-
-const hasCaseFacts = ref<boolean>(
-  store.documentUnit?.longTexts?.caseFacts
-    ? store.documentUnit?.longTexts?.caseFacts?.length > 0
-    : false,
-)
-
-const hasDecisionReasons = ref<boolean>(
-  store.documentUnit?.longTexts?.decisionReasons
-    ? store.documentUnit?.longTexts?.decisionReasons?.length > 0
-    : false,
-)
-
 const tenor = computed({
-  get: () => store.documentUnit?.longTexts.tenor,
+  get: () =>
+    store.documentUnit?.longTexts.tenor
+      ? useValidBorderNumberLinks(
+          store.documentUnit?.longTexts.tenor,
+          store.documentUnit.borderNumbers,
+        )
+      : undefined,
   set: (newValue) => {
     store.documentUnit!.longTexts.tenor =
       TextEditorUtil.getEditorContentIfPresent(newValue)
@@ -39,7 +22,13 @@ const tenor = computed({
 })
 
 const reasons = computed({
-  get: () => store.documentUnit?.longTexts.reasons,
+  get: () =>
+    store.documentUnit?.longTexts.reasons
+      ? useValidBorderNumberLinks(
+          store.documentUnit?.longTexts.reasons,
+          store.documentUnit.borderNumbers,
+        )
+      : undefined,
   set: (newValue) => {
     store.documentUnit!.longTexts.reasons =
       TextEditorUtil.getEditorContentIfPresent(newValue)
@@ -47,7 +36,13 @@ const reasons = computed({
 })
 
 const caseFacts = computed({
-  get: () => store.documentUnit?.longTexts.caseFacts,
+  get: () =>
+    store.documentUnit?.longTexts.caseFacts
+      ? useValidBorderNumberLinks(
+          store.documentUnit?.longTexts.caseFacts,
+          store.documentUnit.borderNumbers,
+        )
+      : undefined,
   set: (newValue) => {
     store.documentUnit!.longTexts.caseFacts =
       TextEditorUtil.getEditorContentIfPresent(newValue)
@@ -55,7 +50,13 @@ const caseFacts = computed({
 })
 
 const decisionReasons = computed({
-  get: () => store.documentUnit?.longTexts.decisionReasons,
+  get: () =>
+    store.documentUnit?.longTexts.decisionReasons
+      ? useValidBorderNumberLinks(
+          store.documentUnit?.longTexts.decisionReasons,
+          store.documentUnit.borderNumbers,
+        )
+      : undefined,
   set: (newValue) => {
     store.documentUnit!.longTexts.decisionReasons =
       TextEditorUtil.getEditorContentIfPresent(newValue)
@@ -71,28 +72,30 @@ const decisionReasons = computed({
         id="tenor"
         v-model="tenor"
         label="Tenor"
-        :should-show-button="!hasTenor"
+        :should-show-button="!store.documentUnit?.longTexts?.tenor?.length"
       />
 
       <TextEditorCategory
         id="reasons"
         v-model="reasons"
         label="Gründe"
-        :should-show-button="!hasReasons"
+        :should-show-button="!store.documentUnit?.longTexts?.reasons?.length"
       />
 
       <TextEditorCategory
         id="caseFacts"
         v-model="caseFacts"
         label="Tatbestand"
-        :should-show-button="!hasCaseFacts"
+        :should-show-button="!store.documentUnit?.longTexts?.caseFacts?.length"
       />
 
       <TextEditorCategory
         id="decisionReasons"
         v-model="decisionReasons"
         label="Entscheidungsgründe"
-        :should-show-button="!hasDecisionReasons"
+        :should-show-button="
+          !store.documentUnit?.longTexts?.decisionReasons?.length
+        "
       />
     </div>
   </div>
