@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, watch } from "vue"
+import { computed, ref, watch } from "vue"
 import { ValidationError } from "../input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
@@ -183,6 +183,21 @@ watch(
       : new RelatedDocumentation()
   },
 )
+
+const responsibleDocOffice = computed({
+  get: () => {
+    if (relatedDocumentationUnit?.value.court) {
+      return {
+        label:
+          relatedDocumentationUnit?.value.court.responsibleDocOffice
+            ?.abbreviation ?? "",
+        value: relatedDocumentationUnit?.value.court.responsibleDocOffice,
+      }
+    }
+    return undefined
+  },
+  set: () => {},
+})
 </script>
 
 <template>
@@ -395,6 +410,17 @@ watch(
           @link-decision="addReference"
         />
       </Pagination>
+    </div>
+    <div v-if="searchResults?.length == 0">
+      Demnächst können Sie hier eine neue Entscheidung anlegen. Vorausgewählte
+      Dokstelle:
+      <ComboboxInput
+        id="responsibleDocOffice"
+        v-model="responsibleDocOffice"
+        aria-label="zuständige Dokumentationsstelle"
+        data-testid="documentation-office-combobox"
+        :item-service="ComboboxItemService.getDocumentationOffices"
+      ></ComboboxInput>
     </div>
   </div>
 </template>
