@@ -231,12 +231,6 @@ jobs:
         uses: sigstore/cosign-installer@4959ce089c160fddf62f7b42464195ba1a56d382
       - name: Sign the published Docker image
         run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
-      - name: Download cosign vulnerability scan record
-        uses: actions/download-artifact@v4
-        with:
-          name: "vuln-backend.json"
-      - name: Attest vulnerability scan
-        run: cosign attest --yes --replace --predicate vuln-backend.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
       - id: set-version
         run: echo "version=$CONTAINER_IMAGE_VERSION" >> "$GITHUB_OUTPUT"
       - name: Send status to Slack
@@ -285,12 +279,6 @@ jobs:
         uses: sigstore/cosign-installer@4959ce089c160fddf62f7b42464195ba1a56d382
       - name: Sign the published Docker image
         run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
-      - name: Download cosign vulnerability scan record
-        uses: actions/download-artifact@v4
-        with:
-          name: "vuln-frontend.json"
-      - name: Attest vulnerability scan
-        run: cosign attest --yes --replace --predicate vuln-frontend.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
       - id: set-version
         run: echo "version=$CONTAINER_IMAGE_VERSION" >> "$GITHUB_OUTPUT"
       - name: Send status to Slack
