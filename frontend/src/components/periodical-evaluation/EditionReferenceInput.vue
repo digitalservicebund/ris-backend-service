@@ -218,7 +218,12 @@ async function createNewFromSearch(openDocunit: boolean = false) {
       })
     }
 
-    addReference(new RelatedDocumentation({ ...createResponse.data }))
+    addReference(
+      new RelatedDocumentation({
+        ...createResponse.data,
+        referenceFound: true,
+      }),
+    )
   }
 
   isLoading.value = false
