@@ -193,10 +193,15 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
   test("schlagwörter", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Schlagwörter']").fill("one")
-    await page.keyboard.press("Enter")
+    const button = page
+      .getByTestId("category-wrapper-button")
+      .getByText(/Schlagwörter/)
+    await expect(button).toBeVisible()
+    await button.click()
 
-    await page.locator("[aria-label='Schlagwörter']").fill("two")
+    await page.getByLabel("Schlagwörter Input").type("one")
+    await page.keyboard.press("Enter")
+    await page.getByLabel("Schlagwörter Input").type("two")
     await page.keyboard.press("Enter")
 
     const accessibilityScanResults = await useAxeBuilder(page)

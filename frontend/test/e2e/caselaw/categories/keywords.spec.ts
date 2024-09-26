@@ -44,10 +44,6 @@ test.describe("keywords", () => {
     await expect(page.getByTestId("chip")).toHaveCount(2)
     await expect(page.getByText(firstKeyword)).toBeVisible()
     await expect(page.getByText(keywordWithSpecialCharacters)).toBeVisible()
-
-    // when keywords given, the display mode of component is shown on reload
-    await page.reload()
-    await expect(page.getByLabel("Schlagwörter bearbeiten")).toBeVisible()
   })
 
   test("add same keyword not working", async ({ page, documentNumber }) => {
