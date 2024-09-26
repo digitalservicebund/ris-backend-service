@@ -17,7 +17,7 @@ const emit = defineEmits<{
   toggleSorting: [value: boolean]
 }>()
 
-const localModelValue = ref(props.modelValue ?? [])
+const localModelValue = ref(props.modelValue)
 const sortAlphabetically = computed({
   get: () => props.sortAlphabetically,
 

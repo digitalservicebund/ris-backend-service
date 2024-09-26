@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, computed, onMounted } from "vue"
-import ListInputDisplayMode from "@/components/input/listInput/ListInputDisplay.vue"
-import ListInputEditMode from "@/components/input/listInput/ListInputEditMode.vue"
+import ListInputDisplay from "@/components/input/listInput/ListInputDisplay.vue"
+import ListInputEdit from "@/components/input/listInput/ListInputEdit.vue"
 
 const props = defineProps<{
   label: string
@@ -49,7 +49,7 @@ onMounted(() => {
 
 <template>
   <div>
-    <ListInputEditMode
+    <ListInputEdit
       v-if="editMode"
       v-model="listInputValue"
       :label="label"
@@ -58,7 +58,7 @@ onMounted(() => {
       @toggle="toggleEditMode"
       @toggle-sorting="sortAlphabetically = !sortAlphabetically"
     />
-    <ListInputDisplayMode
+    <ListInputDisplay
       v-else
       v-model="list"
       :label="label"
