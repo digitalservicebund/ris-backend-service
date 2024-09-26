@@ -25,7 +25,7 @@ public class ReferenceTransformer {
         .citation(referenceDTO.getCitation())
         .footnote(referenceDTO.getFootnote())
         .documentationUnit(
-            RelatedDocumentationUnitTransformer.transformFromDTO(
+            RelatedDocumentationUnitTransformer.transformToDomain(
                 referenceDTO.getDocumentationUnit()))
         .build();
   }
