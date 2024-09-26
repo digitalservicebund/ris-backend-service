@@ -1,10 +1,11 @@
 import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
-import DocumentUnitTextsNew from "@/components/texts/DocumentUnitTexts.vue"
+import DocumentUnitTexts from "@/components/texts/DocumentUnitTexts.vue"
 import DocumentUnit, { LongTexts, ShortTexts } from "@/domain/documentUnit"
+import ParticipatingJudge from "@/domain/participatingJudge"
 
 function renderComponent(shortTexts?: ShortTexts, longTexts?: LongTexts) {
-  return render(DocumentUnitTextsNew, {
+  return render(DocumentUnitTexts, {
     global: {
       plugins: [
         [
@@ -57,6 +58,9 @@ describe("Texts", () => {
       screen.getByRole("button", { name: "Abweichende Meinung" }),
     ).toBeVisible()
     expect(
+      screen.getByRole("button", { name: "Mitwirkende Richter" }),
+    ).toBeVisible()
+    expect(
       screen.getByRole("button", { name: "Sonstiger Langtext" }),
     ).toBeVisible()
     expect(screen.getByRole("button", { name: "Gliederung" })).toBeVisible()
@@ -77,6 +81,11 @@ describe("Texts", () => {
         caseFacts: "case facts",
         decisionReasons: "decision reasons",
         dissentingOpinion: "dissenting opinion",
+        participatingJudges: [
+          new ParticipatingJudge({
+            name: "participating judges",
+          }),
+        ],
         otherLongText: "other long text",
         outline: "outline",
       },
@@ -101,6 +110,7 @@ describe("Texts", () => {
     expect(
       screen.getByLabelText("Abweichende Meinung Button Leiste"),
     ).toBeVisible()
+    expect(screen.getByLabelText("Mitwirkende Richter")).toBeVisible()
     expect(
       screen.getByLabelText("Sonstiger Langtext Button Leiste"),
     ).toBeVisible()

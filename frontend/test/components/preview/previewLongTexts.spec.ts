@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/vue"
 import { previewLayoutInjectionKey } from "@/components/preview/constants"
 import PreviewLongTexts from "@/components/preview/PreviewLongTexts.vue"
 import { LongTexts } from "@/domain/documentUnit"
+import ParticipatingJudge from "@/domain/participatingJudge"
 
 function renderComponent(longTexts: LongTexts) {
   return render(PreviewLongTexts, {
@@ -23,6 +24,12 @@ describe("preview long texts", () => {
       caseFacts: "casefacts",
       decisionReasons: "decision reasons",
       dissentingOpinion: "dissenting opinion",
+      participatingJudges: [
+        new ParticipatingJudge({
+          name: "Mustermann",
+          referencedOpinions: "abweichende Meinung",
+        }),
+      ],
       otherLongText: "other long text",
       outline: "outline",
     })
@@ -32,6 +39,7 @@ describe("preview long texts", () => {
     expect(await screen.findByText("Tatbestand")).toBeInTheDocument()
     expect(await screen.findByText("Entscheidungsgründe")).toBeInTheDocument()
     expect(await screen.findByText("Abweichende Meinung")).toBeInTheDocument()
+    expect(await screen.findByText("Mitwirkende Richter")).toBeInTheDocument()
     expect(await screen.findByText("Sonstiger Langtext")).toBeInTheDocument()
     expect(await screen.findByText("Gliederung")).toBeInTheDocument()
   })
@@ -45,6 +53,7 @@ describe("preview long texts", () => {
         "Tatbestand",
         "Entscheidungsgründe",
         "Abweichende Meinung",
+        "Mitwirkende Richter",
         "Sonstiger Langtext",
         "Gliederung",
       ],
@@ -57,6 +66,7 @@ describe("preview long texts", () => {
         "Tatbestand",
         "Entscheidungsgründe",
         "Abweichende Meinung",
+        "Mitwirkende Richter",
         "Sonstiger Langtext",
         "Gliederung",
       ],
@@ -69,6 +79,7 @@ describe("preview long texts", () => {
         "Gründe",
         "Entscheidungsgründe",
         "Abweichende Meinung",
+        "Mitwirkende Richter",
         "Sonstiger Langtext",
         "Gliederung",
       ],
@@ -81,6 +92,7 @@ describe("preview long texts", () => {
         "Gründe",
         "Tatbestand",
         "Abweichende Meinung",
+        "Mitwirkende Richter",
         "Sonstiger Langtext",
         "Gliederung",
       ],
@@ -94,6 +106,7 @@ describe("preview long texts", () => {
         "Tatbestand",
         "Entscheidungsgründe",
         "Abweichende Meinung",
+        "Mitwirkende Richter",
         "Gliederung",
       ],
     ],
@@ -106,6 +119,7 @@ describe("preview long texts", () => {
         "Tatbestand",
         "Entscheidungsgründe",
         "Abweichende Meinung",
+        "Mitwirkende Richter",
         "Sonstiger Langtext",
       ],
     ],
@@ -117,6 +131,27 @@ describe("preview long texts", () => {
         "Gründe",
         "Tatbestand",
         "Entscheidungsgründe",
+        "Mitwirkende Richter",
+        "Sonstiger Langtext",
+        "Gliederung",
+      ],
+    ],
+    [
+      "Mitwirkende Richter",
+      {
+        participatingJudges: [
+          new ParticipatingJudge({
+            name: "Mustermann",
+            referencedOpinions: "abweichende Meinung",
+          }),
+        ],
+      },
+      [
+        "Tenor",
+        "Gründe",
+        "Tatbestand",
+        "Entscheidungsgründe",
+        "bweichende Meinung",
         "Sonstiger Langtext",
         "Gliederung",
       ],

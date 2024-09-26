@@ -9,6 +9,7 @@ import Reference from "./reference"
 import SingleNorm from "./singleNorm"
 import Attachment from "@/domain/attachment"
 import LegalForce from "@/domain/legalForce"
+import ParticipatingJudge from "@/domain/participatingJudge"
 import { PublicationStatus } from "@/domain/publicationStatus"
 
 export type CoreData = {
@@ -81,6 +82,7 @@ export type LongTexts = {
   caseFacts?: string
   decisionReasons?: string
   dissentingOpinion?: string
+  participatingJudges?: ParticipatingJudge[]
   otherLongText?: string
   outline?: string
 }
@@ -141,6 +143,12 @@ export default class DocumentUnit {
       if (data.longTexts && data.longTexts[longTextsField] === null)
         delete data.longTexts[longTextsField]
     }
+
+    if (data.longTexts?.participatingJudges)
+      data.longTexts.participatingJudges =
+        data.longTexts.participatingJudges.map(
+          (judge) => new ParticipatingJudge({ ...judge }),
+        )
 
     if (data.previousDecisions)
       data.previousDecisions = data.previousDecisions.map(
