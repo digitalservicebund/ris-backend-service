@@ -32,12 +32,14 @@ test.describe(
       await page.getByRole("button", { name: "Tarifvertrag" }).click()
 
       await test.step("enter collective agreement", async () => {
-        await page.getByLabel("Tarifvertrag").fill("Stehende Bühnen")
-        await page.keyboard.press("Enter")
+        await page
+          .getByTestId("Tarifvertrag_ListInputEdit")
+          .fill("Stehende Bühnen")
+
+        await page.getByLabel("Tarifvertrag übernehmen").click()
+
         await expect(
-          page
-            .getByTestId("chips-input_collectiveAgreements")
-            .getByTestId("chip-value"),
+          page.getByTestId("ListInputDisplay_Tarifvertrag_Stehende Bühnen"),
         ).toHaveText("Stehende Bühnen")
 
         await save(page)

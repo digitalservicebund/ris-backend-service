@@ -37,9 +37,7 @@ describe("List input display mode", () => {
     expect(screen.getAllByTestId("chip")).toHaveLength(3)
 
     // Assert that the correct values are rendered in each chip
-    const chips = screen
-      .getAllByTestId("chip-value")
-      .map((chip) => chip.textContent)
+    const chips = screen.getAllByTestId("chip").map((chip) => chip.textContent)
     expect(chips[0]).toBe("one")
     expect(chips[1]).toBe("two")
     expect(chips[2]).toBe("three")

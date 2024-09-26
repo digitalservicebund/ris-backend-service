@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { computed } from "vue"
 import ChipsInput from "@/components/input/ChipsInput.vue"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
@@ -8,13 +7,6 @@ defineProps<{
 }>()
 
 const store = useDocumentUnitStore()
-
-const jobProfiles = computed({
-  get: () => store.documentUnit!.contentRelatedIndexing.jobProfiles,
-  set: (newValues) => {
-    store.documentUnit!.contentRelatedIndexing.jobProfiles = newValues
-  },
-})
 </script>
 
 <template>
@@ -24,7 +16,7 @@ const jobProfiles = computed({
     </div>
     <ChipsInput
       id="jobProfiles"
-      v-model="jobProfiles"
+      v-model="store.documentUnit!.contentRelatedIndexing.jobProfiles"
       aria-label="Berufsbild"
     ></ChipsInput>
   </div>

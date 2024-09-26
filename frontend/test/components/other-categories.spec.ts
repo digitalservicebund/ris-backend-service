@@ -182,7 +182,7 @@ describe("other categories", () => {
         screen.getByRole("button", { name: "Tarifvertrag" }),
       ).toBeInTheDocument()
       expect(
-        screen.queryByRole("textbox", { name: "Tarifvertrag" }),
+        screen.queryByRole("textbox", { name: "Tarifvertrag Input" }),
       ).not.toBeInTheDocument()
     })
 
@@ -199,7 +199,7 @@ describe("other categories", () => {
         screen.getByRole("button", { name: "Tarifvertrag" }),
       ).toBeInTheDocument()
       expect(
-        screen.queryByRole("textbox", { name: "Tarifvertrag" }),
+        screen.queryByRole("textbox", { name: "Tarifvertrag Input" }),
       ).not.toBeInTheDocument()
     })
 
@@ -214,9 +214,8 @@ describe("other categories", () => {
       // Assert
 
       expect(
-        screen.getByRole("textbox", { name: "Tarifvertrag" }),
-      ).toBeInTheDocument()
-      expect(screen.getByText("Stehende Bühnen")).toBeInTheDocument()
+        screen.getByRole("textbox", { name: "Tarifvertrag Input" }),
+      ).toHaveValue("Stehende Bühnen")
 
       expect(
         screen.queryByRole("button", { name: "Tarifvertrag" }),

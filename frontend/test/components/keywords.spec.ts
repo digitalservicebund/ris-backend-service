@@ -143,9 +143,7 @@ describe("Keywords", () => {
     expect(
       await screen.findByLabelText("Schlagwörter bearbeiten"),
     ).toBeVisible()
-    const chips = screen
-      .getAllByTestId("chip-value")
-      .map((chip) => chip.textContent)
+    const chips = screen.getAllByTestId("chip").map((chip) => chip.textContent)
     expect(chips[0]).toBe("one")
     expect(chips[1]).toBe("two")
     expect(chips[2]).toBe("three")
@@ -155,7 +153,7 @@ describe("Keywords", () => {
     await user.click(screen.getByLabelText("Schlagwörter übernehmen"))
 
     const chipsSorted = screen
-      .getAllByTestId("chip-value")
+      .getAllByTestId("chip")
       .map((chip) => chip.textContent)
     expect(chipsSorted[0]).toBe("one")
     expect(chipsSorted[1]).toBe("three")
