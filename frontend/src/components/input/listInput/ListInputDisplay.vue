@@ -16,7 +16,7 @@ const emit = defineEmits<{
     <div class="flex flex-col gap-16">
       <div class="flex flex-col gap-8">
         <span class="ds-label-02-reg mb-4">{{ label }}</span>
-        <ul class="m-0 flex flex-row gap-8 p-0">
+        <ul class="m-0 flex flex-row flex-wrap gap-8 p-0">
           <li
             v-for="(chip, i) in modelValue"
             :key="modelValue[i]"
