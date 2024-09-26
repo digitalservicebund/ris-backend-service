@@ -3,6 +3,7 @@ import { computed, onMounted, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import { ValidationError } from "../input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
+import InfoModal from "@/components/InfoModal.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
@@ -20,7 +21,6 @@ import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 import FeatureToggleService from "@/services/featureToggleService"
 import { ResponseError } from "@/services/httpClient"
-import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useEditionStore } from "@/stores/editionStore"
 import StringsUtil from "@/utils/stringsUtil"
 
@@ -37,7 +37,6 @@ const emit = defineEmits<{
 }>()
 
 const store = useEditionStore()
-const docunitStore = useDocumentUnitStore()
 const router = useRouter()
 const lastSavedModelValue = ref(new Reference({ ...props.modelValue }))
 const reference = ref<Reference>(new Reference({ ...props.modelValue }))
@@ -203,24 +202,27 @@ async function createNewFromSearch(openDocunit: boolean = false) {
       createNewFromSearchResponseError.value = createResponse.error
       isLoading.value = false
       return
+    } else {
+      if (openDocunit) {
+        await router.push({
+          name: "caselaw-documentUnit-documentNumber-categories",
+          params: { documentNumber: createResponse.data.documentNumber },
+        })
+      }
+      addReference(
+        new RelatedDocumentation({
+          uuid: createResponse.data.uuid,
+          fileNumber: createResponse.data.coreData.deviatingFileNumbers
+            ? createResponse.data.coreData.deviatingFileNumbers[0]
+            : undefined,
+          decisionDate: createResponse.data.coreData.decisionDate,
+          court: createResponse.data.coreData.court,
+          documentType: createResponse.data.coreData.documentType,
+          documentNumber: createResponse.data.documentNumber,
+          referenceFound: true,
+        }),
+      )
     }
-    const docUnit = createResponse.data
-    await docunitStore.loadDocumentUnit(docUnit.documentNumber!)
-    docunitStore.documentUnit = docUnit
-
-    if (openDocunit) {
-      await router.push({
-        name: "caselaw-documentUnit-documentNumber-categories",
-        params: { documentNumber: createResponse.data.documentNumber },
-      })
-    }
-
-    addReference(
-      new RelatedDocumentation({
-        ...createResponse.data,
-        referenceFound: true,
-      }),
-    )
   }
 
   isLoading.value = false
@@ -496,6 +498,12 @@ onMounted(async () => {
           :item-service="ComboboxItemService.getDocumentationOffices"
         ></ComboboxInput>
       </InputField>
+      <div v-if="createNewFromSearchResponseError" class="mb-24">
+        <InfoModal
+          :description="createNewFromSearchResponseError.description"
+          :title="createNewFromSearchResponseError.title"
+        />
+      </div>
 
       <div class="flex flex-row gap-8">
         <TextButton
