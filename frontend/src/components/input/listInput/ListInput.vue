@@ -5,7 +5,7 @@ import ListInputEdit from "@/components/input/listInput/ListInputEdit.vue"
 
 const props = defineProps<{
   label: string
-  modelValue: string[]
+  modelValue: string[] | undefined
 }>()
 
 const emit = defineEmits<{
@@ -13,7 +13,7 @@ const emit = defineEmits<{
   reset: []
 }>()
 
-const list = ref(props.modelValue)
+const list = ref(props.modelValue ?? [])
 const editMode = ref(true)
 const sortAlphabetically = ref(false)
 
@@ -24,13 +24,13 @@ const sortAlphabetically = ref(false)
  *        and sorts alphabetically if the option is enabled.
  * @returns {string} The joined string of list items separated by newlines.
  */
-const listInputValue = computed({
-  get: () => (props.modelValue ? props.modelValue.join("\n") : ""),
+const listInputValue = computed<string>({
+  get: () => list.value.join("\n"),
   set: (newValues: string) => {
     list.value = newValues
       .split("\n")
-      .map((listitem) => listitem.trim())
-      .filter((listitem) => listitem !== "")
+      .map((listItem) => listItem.trim())
+      .filter((listItem) => listItem !== "")
 
     // Sort alphabetically if the option is set
     if (sortAlphabetically.value && list.value) {
@@ -69,7 +69,7 @@ function toggleEditMode() {
  * Initializes the edit mode based on whether the list is empty or not.
  */
 onMounted(() => {
-  editMode.value = !props.modelValue.length
+  editMode.value = !props.modelValue?.length
 })
 </script>
 
@@ -78,7 +78,7 @@ onMounted(() => {
     v-if="editMode"
     v-model="listInputValue"
     :label="label"
-    :list-item-count="modelValue.length"
+    :list-item-count="modelValue?.length ?? 0"
     :sort-alphabetically="sortAlphabetically"
     @toggle="toggleEditMode"
     @toggle-sorting="sortAlphabetically = !sortAlphabetically"
