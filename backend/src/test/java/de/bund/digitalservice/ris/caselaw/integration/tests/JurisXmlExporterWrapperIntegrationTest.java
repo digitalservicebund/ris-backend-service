@@ -44,7 +44,7 @@ class JurisXmlExporterWrapperIntegrationTest {
         CoreData.builder()
             .fileNumbers(List.of("fileNumber1", "fileNumber2"))
             .deviatingFileNumbers(List.of("deviatingFileNumber1", "deviatingFileNumber2"))
-            .court(new Court(UUID.randomUUID(), "courtType", null, null, null))
+            .court(new Court(UUID.randomUUID(), "courtType", null, null, null, null))
             .ecli("ecli")
             .deviatingEclis(List.of("dev-ecli-1", "dev-ecli-2"))
             .documentType(
@@ -63,7 +63,9 @@ class JurisXmlExporterWrapperIntegrationTest {
         List.of(
             PreviousDecision.builder()
                 .uuid(UUID.randomUUID())
-                .court(new Court(UUID.randomUUID(), "courtType", "courtPlace", "courtLabel", null))
+                .court(
+                    new Court(
+                        UUID.randomUUID(), "courtType", "courtPlace", "courtLabel", null, null))
                 .decisionDate(LocalDate.parse("2020-05-06"))
                 .dateKnown(true)
                 .fileNumber("fileNumber")

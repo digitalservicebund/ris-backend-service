@@ -1,6 +1,6 @@
 import httpClient, {
-  ServiceResponse,
   FailedValidationServerResponse,
+  ServiceResponse,
 } from "./httpClient"
 import { DocumentUnitSearchParameter } from "@/components/DocumentUnitSearchEntryForm.vue"
 import { Page } from "@/components/Pagination.vue"
@@ -59,7 +59,7 @@ const service: DocumentUnitService = {
   },
 
   async createNew() {
-    const response = await httpClient.get<DocumentUnit>(
+    const response = await httpClient.put<undefined, DocumentUnit>(
       "caselaw/documentunits/new",
     )
     if (response.status >= 300) {

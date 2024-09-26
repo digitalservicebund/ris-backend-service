@@ -9,9 +9,7 @@ import {
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
-// Fails on pipeline
-// eslint-disable-next-line playwright/no-skipped-test
-test.describe.skip("norm", () => {
+test.describe("norm", () => {
   test("renders all fields", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
     await expect(page.getByRole("heading", { name: "Normen" })).toBeVisible()

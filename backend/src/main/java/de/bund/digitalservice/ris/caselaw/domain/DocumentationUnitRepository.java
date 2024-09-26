@@ -32,12 +32,14 @@ public interface DocumentationUnitRepository {
   /**
    * Create a new documentation unit with the given document number and documentation office
    *
-   * @param documentNumber the document number to use
-   * @param documentationOffice the documentation office
+   * @param parameters the documentation unit creation parameters
+   * @param docNumber the documentation unit creation parameters
    * @return the new documentation unit
    */
   DocumentationUnit createNewDocumentationUnit(
-      String documentNumber, DocumentationOffice documentationOffice);
+      String docNumber,
+      DocumentationOffice userDocOffice,
+      DocumentationUnitCreationParameters parameters);
 
   /**
    * Save a documentation unit

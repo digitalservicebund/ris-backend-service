@@ -48,7 +48,7 @@ export type SearchResults<Type extends RelatedDocumentation> = {
       class="p-24"
       flex-direction="flex-col"
     >
-      <p class="font-bold">Passende Suchergebnisse:</p>
+      <p class="ds-label-01-bold">Passende Suchergebnisse:</p>
       <FlexContainer
         v-for="searchResult in searchResults"
         :key="searchResult.decision.uuid"

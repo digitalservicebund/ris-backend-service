@@ -56,6 +56,7 @@ export type Court = {
   location?: string
   label: string
   revoked?: string
+  responsibleDocOffice?: DocumentationOffice
 }
 
 export type Procedure = {

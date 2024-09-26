@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitT
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParameters;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
@@ -81,13 +82,36 @@ public class DocumentationUnitController {
         documentationUnitDocxMetadataInitializationService;
   }
 
+  /**
+   * @deprecated Because the creation can't be a HTTP GET and adding a documentation unit with
+   *     parameters should be possible. Use {@link
+   *     #generateNewDocumentationUnit(OidcUser,DocumentationUnitCreationParameters)} instead
+   * @param oidcUser the logged-in user
+   * @return the created documentation unit
+   */
+  @Deprecated(forRemoval = true)
   @GetMapping(value = "new", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated() and @userIsInternal.apply(#oidcUser)")
   public ResponseEntity<DocumentationUnit> generateNewDocumentationUnit(
       @AuthenticationPrincipal OidcUser oidcUser) {
     var docOffice = userService.getDocumentationOffice(oidcUser);
     try {
-      var documentationUnit = service.generateNewDocumentationUnit(docOffice);
+      var documentationUnit = service.generateNewDocumentationUnit(docOffice, null);
+      return ResponseEntity.status(HttpStatus.CREATED).body(documentationUnit);
+    } catch (DocumentationUnitException e) {
+      log.error("error in generate new documentation unit", e);
+      return ResponseEntity.internalServerError().body(DocumentationUnit.builder().build());
+    }
+  }
+
+  @PutMapping(value = "new", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("isAuthenticated() and @userIsInternal.apply(#oidcUser)")
+  public ResponseEntity<DocumentationUnit> generateNewDocumentationUnit(
+      @AuthenticationPrincipal OidcUser oidcUser,
+      @RequestBody(required = false) DocumentationUnitCreationParameters parameters) {
+    var userDocOffice = userService.getDocumentationOffice(oidcUser);
+    try {
+      var documentationUnit = service.generateNewDocumentationUnit(userDocOffice, parameters);
       return ResponseEntity.status(HttpStatus.CREATED).body(documentationUnit);
     } catch (DocumentationUnitException e) {
       log.error("error in generate new documentation unit", e);

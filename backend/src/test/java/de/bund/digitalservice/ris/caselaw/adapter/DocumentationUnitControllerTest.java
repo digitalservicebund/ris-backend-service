@@ -119,7 +119,7 @@ class DocumentationUnitControllerTest {
   @Test
   void testGenerateNewDocumentationUnit_withInternalUser_shouldSucceed() {
     // userService.getDocumentationOffice is mocked in @BeforeEach
-    when(service.generateNewDocumentationUnit(docOffice))
+    when(service.generateNewDocumentationUnit(docOffice, null))
         .thenReturn(
             DocumentationUnit.builder()
                 .coreData(CoreData.builder().documentationOffice(docOffice).build())
@@ -127,14 +127,14 @@ class DocumentationUnitControllerTest {
 
     risWebClient
         .withDefaultLogin()
-        .get()
+        .put()
         .uri("/api/v1/caselaw/documentunits/new")
         .exchange()
         .expectStatus()
         .isCreated()
         .expectBody(DocumentationUnit.class);
 
-    verify(service, times(1)).generateNewDocumentationUnit(docOffice);
+    verify(service, times(1)).generateNewDocumentationUnit(docOffice, null);
     verify(userService, times(1)).getDocumentationOffice(any(OidcUser.class));
   }
 
@@ -176,13 +176,13 @@ class DocumentationUnitControllerTest {
 
     risWebClient
         .withExternalLogin()
-        .get()
+        .put()
         .uri("/api/v1/caselaw/documentunits/new")
         .exchange()
         .expectStatus()
         .isForbidden();
 
-    verify(service, times(0)).generateNewDocumentationUnit(docOffice);
+    verify(service, times(0)).generateNewDocumentationUnit(docOffice, null);
     verify(userService, times(0)).getDocumentationOffice(any(OidcUser.class));
   }
 
