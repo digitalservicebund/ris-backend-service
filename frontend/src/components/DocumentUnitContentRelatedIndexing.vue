@@ -20,8 +20,12 @@ const hasKeywords = ref<boolean>(
 <template>
   <div class="flex flex-col gap-24 bg-white p-24">
     <TitleElement>Inhaltliche Erschließung</TitleElement>
-    <CategoryWrapper label="Schlagwörter" :should-show-button="!hasKeywords">
-      <KeyWords />
+    <CategoryWrapper
+      v-slot="slotProps"
+      label="Schlagwörter"
+      :should-show-button="!hasKeywords"
+    >
+      <KeyWords @reset="slotProps.reset" />
     </CategoryWrapper>
     <FieldOfLawMain />
     <Norms />

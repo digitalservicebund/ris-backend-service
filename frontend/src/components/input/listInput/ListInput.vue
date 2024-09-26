@@ -10,6 +10,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   "update:modelValue": [value: string[]]
+  reset: []
 }>()
 
 const list = ref(props.modelValue)
@@ -25,7 +26,6 @@ const listInputValue = computed({
       .map((listitem) => listitem.trim())
       .filter((listitem) => listitem !== "")
 
-    // sort alphabetically if option set
     if (sortAlphabetically.value && list.value) {
       list.value = list.value.sort((a: string, b: string) => a.localeCompare(b))
     }
@@ -33,7 +33,10 @@ const listInputValue = computed({
     list.value = [...new Set(list.value)] as string[] //remove duplicates
 
     emit("update:modelValue", list.value)
-    if (!!list.value?.length) editMode.value = false
+    // when list empty, why emit reset to show category wrapper again
+    if (!!list.value?.length) {
+      editMode.value = false
+    } else emit("reset")
     sortAlphabetically.value = false
   },
 })
