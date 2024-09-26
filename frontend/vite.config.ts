@@ -41,7 +41,7 @@ export default defineConfig({
     Icons({
       scale: 1.3333, // ~24px at the current default font size of 18px
     }),
-    vueDevTools(),
+    vueDevTools({ launchEditor: "idea" }),
   ],
   test: {
     setupFiles: ["test/setup.ts"],
