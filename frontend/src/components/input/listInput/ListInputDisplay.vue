@@ -19,7 +19,7 @@ const emit = defineEmits<{
         <ul class="m-0 flex flex-row gap-8 p-0">
           <li
             v-for="(chip, i) in modelValue"
-            :key="i"
+            :key="modelValue[i]"
             class="rounded-full bg-blue-300"
             data-testid="chip"
           >
