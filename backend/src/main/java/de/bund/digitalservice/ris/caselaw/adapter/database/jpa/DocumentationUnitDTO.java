@@ -272,7 +272,7 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @OneToMany(
       mappedBy = "documentationUnit",
       cascade = CascadeType.ALL,
-      fetch = FetchType.LAZY,
+      fetch = FetchType.EAGER,
       orphanRemoval = true)
   @Builder.Default
   @OrderBy("rank")
