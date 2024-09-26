@@ -67,6 +67,21 @@ public class UserGroupsConfig {
             .isInternal(true)
             .build(),
         UserGroupFromConfig.builder()
+            .docOfficeAbbreviation("BVerwG")
+            .userGroupPathName("/caselaw/BVerwG/Intern")
+            .isInternal(true)
+            .build(),
+        UserGroupFromConfig.builder()
+            .docOfficeAbbreviation("BVerwG")
+            .userGroupPathName("/caselaw/BVerwG/Extern/ErsterDienstleister")
+            .isInternal(false)
+            .build(),
+        UserGroupFromConfig.builder()
+            .docOfficeAbbreviation("BVerwG")
+            .userGroupPathName("/caselaw/BVerwG/Extern/ZweiterDienstleister")
+            .isInternal(false)
+            .build(),
+        UserGroupFromConfig.builder()
             .docOfficeAbbreviation("OVGNW")
             .userGroupPathName("/caselaw/OVG_NRW")
             .isInternal(true)
