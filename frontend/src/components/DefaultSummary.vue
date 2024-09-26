@@ -3,13 +3,14 @@ import { computed } from "vue"
 import IconBadge from "@/components/IconBadge.vue"
 import ParticipatingJudge from "@/domain/participatingJudge"
 import IconError from "~icons/ic/baseline-error"
+import IcBaselinePerson from "~icons/ic/baseline-person"
 
 const props = defineProps<{
   data: ParticipatingJudge
 }>()
 
 const iconComponent = computed(() => {
-  return props.data.getIcon
+  return IcBaselinePerson
 })
 
 const showErrorBadge = computed(() => {

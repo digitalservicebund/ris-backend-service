@@ -1,5 +1,4 @@
 import EditableListItem from "./editableListItem"
-import IcBaselinePerson from "~icons/ic/baseline-person"
 
 export default class ParticipatingJudge implements EditableListItem {
   public id?: string
@@ -46,10 +45,6 @@ export default class ParticipatingJudge implements EditableListItem {
 
   get nameIsSet(): boolean {
     return !!this.name
-  }
-
-  get getIcon() {
-    return IcBaselinePerson
   }
 
   private fieldIsEmpty(

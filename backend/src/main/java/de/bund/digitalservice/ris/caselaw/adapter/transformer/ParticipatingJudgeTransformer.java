@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ParticipatingJudgeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -28,18 +27,17 @@ public class ParticipatingJudgeTransformer {
     if (judges == null || judges.isEmpty()) {
       return Collections.emptyList();
     }
-    List<ParticipatingJudge> participatingJudges = judges.stream().distinct().toList();
-    List<ParticipatingJudgeDTO> result = new ArrayList<>();
-    for (int i = 0; i < participatingJudges.size(); i++) {
-      result.add(
-          ParticipatingJudgeDTO.builder()
-              .id(participatingJudges.get(i).id())
-              .name(participatingJudges.get(i).name())
-              .referencedOpinions(participatingJudges.get(i).referencedOpinions())
-              .rank(i + 1L)
-              .build());
-    }
-    return result;
+    return judges.stream()
+        .distinct()
+        .map(
+            judge ->
+                ParticipatingJudgeDTO.builder()
+                    .id(judge.id())
+                    .name(judge.name())
+                    .referencedOpinions(judge.referencedOpinions())
+                    .rank(judges.indexOf(judge) + 1L)
+                    .build())
+        .toList();
   }
 
   /**
