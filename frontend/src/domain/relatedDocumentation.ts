@@ -5,8 +5,6 @@ import {
   PublicationState,
   PublicationStatus,
 } from "@/domain/publicationStatus"
-import IconBaselineDescription from "~icons/ic/baseline-description"
-import IconOutlineDescription from "~icons/ic/outline-description"
 
 export default class RelatedDocumentation {
   public uuid?: string
@@ -21,12 +19,6 @@ export default class RelatedDocumentation {
 
   get hasForeignSource(): boolean {
     return this.documentNumber != null && !!this.referenceFound
-  }
-
-  get getIcon() {
-    return this.hasForeignSource
-      ? IconBaselineDescription
-      : IconOutlineDescription
   }
 
   constructor(data: Partial<RelatedDocumentation> = {}) {

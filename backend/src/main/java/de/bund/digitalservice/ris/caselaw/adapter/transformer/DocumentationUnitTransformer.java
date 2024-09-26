@@ -182,8 +182,6 @@ public class DocumentationUnitTransformer {
         .caseFacts(longTexts.caseFacts())
         .decisionGrounds(longTexts.decisionReasons())
         .dissentingOpinion(longTexts.dissentingOpinion())
-        .participatingJudges(
-            ParticipatingJudgeTransformer.transformToDTO(longTexts.participatingJudges()))
         .otherLongText(longTexts.otherLongText())
         .outline(longTexts.outline());
 
@@ -700,9 +698,6 @@ public class DocumentationUnitTransformer {
             .caseFacts(documentationUnitDTO.getCaseFacts())
             .decisionReasons(documentationUnitDTO.getDecisionGrounds())
             .dissentingOpinion(documentationUnitDTO.getDissentingOpinion())
-            .participatingJudges(
-                ParticipatingJudgeTransformer.transformToDomain(
-                    documentationUnitDTO.getParticipatingJudges()))
             .otherLongText(documentationUnitDTO.getOtherLongText())
             .outline(documentationUnitDTO.getOutline())
             .build();

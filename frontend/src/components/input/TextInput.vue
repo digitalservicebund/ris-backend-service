@@ -12,7 +12,6 @@ interface Props {
   hasError?: boolean
   size?: "regular" | "medium" | "small"
   type?: InputHTMLAttributes["type"]
-  dataTestId?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -20,7 +19,6 @@ const props = withDefaults(defineProps<Props>(), {
   placeholder: undefined,
   size: "regular",
   type: "text",
-  dataTestId: "",
 })
 
 const emit = defineEmits<{
@@ -63,7 +61,6 @@ defineExpose({ focusInput, inputRef })
     :aria-label="ariaLabel"
     class="ds-input"
     :class="conditionalClasses"
-    :data-testId="dataTestId"
     :placeholder="placeholder"
     :readonly="readOnly"
     :tabindex="tabindex"

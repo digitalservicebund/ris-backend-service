@@ -1,7 +1,5 @@
 <script lang="ts" setup>
 import { computed } from "vue"
-import CategoryWrapper from "@/components/CategoryWrapper.vue"
-import ParticipatingJudges from "@/components/ParticipatingJudges.vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLinks"
@@ -78,15 +76,6 @@ const outline = computed({
           !store.documentUnit?.longTexts?.dissentingOpinion?.length
         "
       />
-
-      <CategoryWrapper
-        label="Mitwirkende Richter"
-        :should-show-button="
-          !store.documentUnit?.longTexts?.participatingJudges?.length
-        "
-      >
-        <ParticipatingJudges label="Mitwirkende Richter" />
-      </CategoryWrapper>
 
       <div class="gap-0">
         <TextEditorCategory

@@ -234,14 +234,6 @@ test.describe("short and long texts", () => {
         await expect(button).toBeHidden()
       })
 
-      await test.step("Mitwirkende Richter ist nicht sichtbar", async () => {
-        const button = pageWithExternalUser.getByRole("button", {
-          name: "Mitwirkende Richter",
-          exact: true,
-        })
-        await expect(button).toBeHidden()
-      })
-
       await test.step("Sonstiger Langtext ist nicht sichtbar", async () => {
         const button = pageWithExternalUser.getByRole("button", {
           name: "Sonstiger Langtext",
@@ -323,17 +315,6 @@ test.describe("short and long texts", () => {
         const dissentingOpinion = page.getByTestId("Abweichende Meinung")
         const inputFieldInnerHTML = await dissentingOpinion.innerHTML()
         expect(inputFieldInnerHTML).toContain(editable)
-      })
-
-      await test.step("Mitwirkende Richter ist bearbeitbar", async () => {
-        await clickCategoryButton("Mitwirkende Richter", page)
-        const nameInput = page.getByTestId("participating-judge-name")
-        const referenceOpinionsInput = page.getByTestId(
-          "participating-judge-reference-opinions",
-        )
-
-        await expect(nameInput).toBeEditable()
-        await expect(referenceOpinionsInput).toBeEditable()
       })
     },
   )

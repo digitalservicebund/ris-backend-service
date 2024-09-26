@@ -304,10 +304,4 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
 
   @Column(name = "legislative_mandate")
   private boolean hasLegislativeMandate;
-
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-  @JoinColumn(name = "documentation_unit_id", nullable = false)
-  @OrderBy("rank")
-  @Builder.Default
-  private List<ParticipatingJudgeDTO> participatingJudges = new ArrayList<>();
 }
