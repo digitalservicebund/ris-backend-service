@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from "vue"
-import EditionEvaluationReference from "./EditionReferenceInput.vue"
+import EditionReferenceInput from "./EditionReferenceInput.vue"
 import EditableList from "@/components/EditableList.vue"
 import ErrorPage from "@/components/PageError.vue"
 import EditionReferenceSummary from "@/components/periodical-evaluation/EditionReferenceSummary.vue"
@@ -44,7 +44,7 @@ onMounted(async () => {
         <EditableList
           v-model="references"
           :default-value="defaultValue"
-          :edit-component="EditionEvaluationReference"
+          :edit-component="EditionReferenceInput"
           :summary-component="EditionReferenceSummary"
         />
       </div>

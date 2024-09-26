@@ -55,8 +55,8 @@ const attachmentText = (listEntry: DocumentUnitListEntry) =>
 
 const headNoteOrPrincipleText = (listEntry: DocumentUnitListEntry) =>
   listEntry.hasHeadnoteOrPrinciple
-    ? "Langtext vorhanden"
-    : "Kein Langtext vorhanden"
+    ? "Kurztext vorhanden"
+    : "Kein Kurztext vorhanden"
 
 const noteText = (listEntry: DocumentUnitListEntry) =>
   listEntry.hasNote ? "Notiz vorhanden" : "Keine Notiz vorhanden"

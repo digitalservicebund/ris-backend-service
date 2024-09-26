@@ -159,8 +159,8 @@ describe("documentUnit list", () => {
     expect(screen.getByLabelText("Keine Notiz vorhanden")).toBeVisible()
 
     // expect Headnote or Principal
-    expect(screen.getByLabelText("Langtext vorhanden")).toBeVisible()
-    expect(screen.getByLabelText("Kein Langtext vorhanden")).toBeVisible()
+    expect(screen.getByLabelText("Kurztext vorhanden")).toBeVisible()
+    expect(screen.getByLabelText("Kein Kurztext vorhanden")).toBeVisible()
 
     // expect Attachment
     expect(screen.getByLabelText("Anhang vorhanden")).toBeVisible()
