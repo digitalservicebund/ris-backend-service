@@ -54,11 +54,12 @@ const listInputValue = computed({
 })
 
 /**
- * Toggles the edit mode, when `true`, it shows the editable list,
- * when `false` it shows the display list. Emit reset if the list is empty,
- * to show the category wrapper again.
+ * Emit reset if the list is empty, to show the category wrapper again.
+ * Otherwise toggles between edit mode and display mode.
  */
 function toggleEditMode() {
+  // Reset sorting option
+  sortAlphabetically.value = false
   if (!!list.value?.length) {
     editMode.value = !editMode.value
   } else emit("reset")
