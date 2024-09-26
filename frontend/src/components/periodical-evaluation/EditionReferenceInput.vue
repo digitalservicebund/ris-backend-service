@@ -200,8 +200,7 @@ async function createNewFromSearch(openDocunit: boolean = false) {
 
     const createResponse = await documentUnitService.createNew(parameters)
     if (createResponse.error) {
-      createNewFromSearchResponseError.value = updateResponse.error
-      if (docUnit?.uuid) await documentUnitService.delete(docUnit.uuid)
+      createNewFromSearchResponseError.value = createResponse.error
       isLoading.value = false
       return
     }
