@@ -98,12 +98,14 @@ describe("List input edit mode", () => {
     expect(emitted()["update:modelValue"]).toBeFalsy()
   })
 
-  test('click on "Abbrechen" with no input does nothing', async () => {
+  test('click on "Abbrechen" with no input emits toggle event', async () => {
     const { user, emitted } = renderComponent()
 
     await user.click(screen.getByLabelText("Abbrechen"))
 
-    expect(emitted().toggle).toBeFalsy()
+    expect(emitted().toggle).toBeTruthy()
+    expect(emitted().toggle).toHaveLength(1)
+    expect(emitted()["update:modelValue"]).toBeFalsy()
   })
 
   test("click on sort alphabetically, emits event", async () => {
