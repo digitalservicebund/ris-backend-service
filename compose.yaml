@@ -14,12 +14,12 @@ services:
       - RIS_MIGRATION_DB_USER=test
       - RIS_MIGRATION_DB_PASSWORD=test
       - RIS_MIGRATION_DB_SCHEMA=incremental_migration
-      - RIS_MIGRATION_S3_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} # TODO Use OTC entry in 1PW
-      - RIS_MIGRATION_S3_SECRET=${AWS_ACCESS_KEY_ID} # TODO Use OTC entry in 1PW
+      - RIS_MIGRATION_S3_ACCESS_KEY=${AWS_ACCESS_KEY_ID} # TODO Use OTC entry in 1PW
+      - RIS_MIGRATION_S3_SECRET=${AWS_SECRET_ACCESS_KEY} # TODO Use OTC entry in 1PW
       - RIS_MIGRATION_S3_ENDPOINT=https://obs.eu-de.otc.t-systems.com
-      - RIS_MIGRATION_S3_BUCKET=s3://neuris-migration-juris-data
-      - RIS_MIGRATION_S3_DATA_VERSION=2024-08 # TODO maybe remove and use the latest instead?
-      - RIS_MIGRATION_S3_FIRST_DAILY_VERSION=2024-07-31 # TODO maybe remove and use the latest instead?
+      - RIS_MIGRATION_S3_BUCKET=neuris-migration-juris-data
+      - RIS_MIGRATION_S3_DATA_VERSION=2024-09 # TODO maybe remove and use the latest instead?
+      - RIS_MIGRATION_S3_FIRST_DAILY_VERSION=2024-08-31 # TODO maybe remove and use the latest instead?
 
   traefik:
     image: traefik:v3.1
