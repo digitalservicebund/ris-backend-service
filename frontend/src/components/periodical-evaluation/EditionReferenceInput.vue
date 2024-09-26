@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, watch, onMounted } from "vue"
+import { computed, onMounted, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import { ValidationError } from "../input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
@@ -12,6 +12,8 @@ import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
+import DocumentationOffice from "@/domain/documentationOffice"
+import { DocumentationUnitParameters } from "@/domain/documentUnit"
 import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -187,30 +189,25 @@ async function createNewFromSearch(openDocunit: boolean = false) {
   createNewFromSearchResponseError.value = undefined
   await validateRequiredInput(reference.value)
   if (validationStore.isValid()) {
-    const createResponse = await documentUnitService.createNew()
+    const parameters = {
+      fileNumber: relatedDocumentationUnit.value.fileNumber,
+      documentationOffice: responsibleDocOffice.value
+        ?.value as DocumentationOffice,
+      decisionDate: relatedDocumentationUnit.value.decisionDate,
+      court: relatedDocumentationUnit.value.court,
+      documentType: relatedDocumentationUnit.value.documentType,
+    } as DocumentationUnitParameters
+
+    const createResponse = await documentUnitService.createNew(parameters)
     if (createResponse.error) {
       createNewFromSearchResponseError.value = createResponse.error
       isLoading.value = false
       return
     }
-
     const docUnit = createResponse.data
-    docUnit.coreData.fileNumbers = relatedDocumentationUnit.value.fileNumber
-      ? [relatedDocumentationUnit.value.fileNumber]
-      : []
-    docUnit.coreData.decisionDate = relatedDocumentationUnit.value.decisionDate
-    docUnit.coreData.court = relatedDocumentationUnit.value.court
     await docunitStore.loadDocumentUnit(docUnit.documentNumber!)
     docunitStore.documentUnit = docUnit
 
-    const updateResponse = await docunitStore.updateDocumentUnit()
-
-    if (updateResponse.error) {
-      createNewFromSearchResponseError.value = updateResponse.error
-      if (docUnit?.uuid) await documentUnitService.delete(docUnit.uuid)
-      isLoading.value = false
-      return
-    }
     if (openDocunit) {
       await router.push({
         name: "caselaw-documentUnit-documentNumber-categories",

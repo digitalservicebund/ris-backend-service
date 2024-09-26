@@ -83,27 +83,13 @@ public class DocumentationUnitController {
   }
 
   /**
-   * @deprecated Because the creation can't be a HTTP GET and adding a documentation unit with
-   *     parameters should be possible. Use {@link
-   *     #generateNewDocumentationUnit(OidcUser,DocumentationUnitCreationParameters)} instead
+   * Generate a new documentation unit with optional parameters.
+   *
    * @param oidcUser the logged-in user
-   * @return the created documentation unit
+   * @param parameters the parameters for the new documentation unit (optional)
+   * @return the new documentation unit or an empty response with status code 500 if the creation
+   *     failed
    */
-  @Deprecated(forRemoval = true)
-  @GetMapping(value = "new", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("isAuthenticated() and @userIsInternal.apply(#oidcUser)")
-  public ResponseEntity<DocumentationUnit> generateNewDocumentationUnit(
-      @AuthenticationPrincipal OidcUser oidcUser) {
-    var docOffice = userService.getDocumentationOffice(oidcUser);
-    try {
-      var documentationUnit = service.generateNewDocumentationUnit(docOffice, null);
-      return ResponseEntity.status(HttpStatus.CREATED).body(documentationUnit);
-    } catch (DocumentationUnitException e) {
-      log.error("error in generate new documentation unit", e);
-      return ResponseEntity.internalServerError().body(DocumentationUnit.builder().build());
-    }
-  }
-
   @PutMapping(value = "new", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated() and @userIsInternal.apply(#oidcUser)")
   public ResponseEntity<DocumentationUnit> generateNewDocumentationUnit(

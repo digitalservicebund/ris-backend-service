@@ -76,7 +76,7 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
 </script>
 
 <template>
-  <div class="border-b-1 border-blue-300 pb-24">
+  <div class="border-b-1 border-t-1 border-blue-300 py-24">
     <ExpandableDataSet
       v-if="localModelValue"
       :data-set="localModelValue"

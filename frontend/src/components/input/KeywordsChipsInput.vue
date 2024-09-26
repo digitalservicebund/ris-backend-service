@@ -91,7 +91,6 @@ watch(newChipText, (is) => {
       ref="chipsInput"
       v-model="newChipText"
       :aria-label="ariaLabel ?? ''"
-      class="mb-24"
       size="medium"
       @blur="handleOnBlur"
       @keydown.enter.stop="addChip"
@@ -104,7 +103,7 @@ watch(newChipText, (is) => {
 
     <ChipsList
       v-model:focused-item="focusedChip"
-      class="mb-24"
+      class="mt-24"
       :model-value="modelValue"
       @chip-deleted="onDeleteChip"
       @previous-clicked-on-first="focusInput"
