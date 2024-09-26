@@ -1,6 +1,6 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import ListInput from "@/components/input/ListInput.vue"
+import ListInput from "@/components/input/listInput/ListInput.vue"
 
 function renderComponent(
   options: {

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue"
-import ListInput from "@/components/input/ListInput.vue"
+import ListInput from "@/components/input/listInput/ListInput.vue"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const store = useDocumentUnitStore()
