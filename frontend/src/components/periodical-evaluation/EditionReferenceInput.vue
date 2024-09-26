@@ -490,13 +490,15 @@ onMounted(async () => {
         <TextButton
           aria-label="Ok"
           button-type="primary"
+          :disabled="!responsibleDocOffice"
           label="Ok"
           size="small"
           @click="() => createNewFromSearch()"
         />
         <TextButton
-          aria-label="Ok"
+          aria-label="Ok und Dokumentationseinheit direkt bearbeiten"
           button-type="tertiary"
+          :disabled="!responsibleDocOffice"
           label="Ok und Dokumentationseinheit direkt bearbeiten"
           size="small"
           @click="() => createNewFromSearch(true)"
