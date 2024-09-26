@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ParticipatingJudgeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -19,12 +20,15 @@ public class ParticipatingJudgeTransformer {
    * Transforms a List of {@link ParticipatingJudge} domain objects into a List of {@link
    * ParticipatingJudgeDTO} (Data Transfer Object).
    *
-   * @param participatingJudges The {@link ParticipatingJudge} to be transformed.
+   * @param judges The {@link ParticipatingJudge} to be transformed.
    * @return The list {@link List<ParticipatingJudgeDTO>} of DTO representing the transformed domain
    *     objects.
    */
-  public static List<ParticipatingJudgeDTO> transformToDTO(
-      List<ParticipatingJudge> participatingJudges) {
+  public static List<ParticipatingJudgeDTO> transformToDTO(List<ParticipatingJudge> judges) {
+    if (judges == null || judges.isEmpty()) {
+      return Collections.emptyList();
+    }
+    List<ParticipatingJudge> participatingJudges = judges.stream().distinct().toList();
     List<ParticipatingJudgeDTO> result = new ArrayList<>();
     for (int i = 0; i < participatingJudges.size(); i++) {
       result.add(
@@ -55,6 +59,7 @@ public class ParticipatingJudgeTransformer {
                     .name(participatingJudge.getName())
                     .referencedOpinions(participatingJudge.getReferencedOpinions())
                     .build())
+        .distinct()
         .toList();
   }
 }

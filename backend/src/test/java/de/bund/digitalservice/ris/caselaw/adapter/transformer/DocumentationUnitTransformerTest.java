@@ -736,8 +736,8 @@ class DocumentationUnitTransformerTest {
     ParticipatingJudge participatingJudge = ParticipatingJudge.builder().name("Judge A").build();
     DocumentationUnit documentationUnit =
         generateSimpleDocumentationUnitBuilder()
-            .contentRelatedIndexing(
-                ContentRelatedIndexing.builder()
+            .longTexts(
+                LongTexts.builder()
                     .participatingJudges(List.of(participatingJudge, participatingJudge))
                     .build())
             .build();
@@ -1237,29 +1237,19 @@ class DocumentationUnitTransformerTest {
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
     // Assert
-    assertThat(documentationUnit.contentRelatedIndexing().participatingJudges()).hasSize(2);
-    assertThat(documentationUnit.contentRelatedIndexing().participatingJudges().get(0).id())
+    assertThat(documentationUnit.longTexts().participatingJudges()).hasSize(2);
+    assertThat(documentationUnit.longTexts().participatingJudges().get(0).id())
         .isEqualTo(participatingJudgeA.getId());
-    assertThat(documentationUnit.contentRelatedIndexing().participatingJudges().get(0).name())
+    assertThat(documentationUnit.longTexts().participatingJudges().get(0).name())
         .isEqualTo(participatingJudgeA.getName());
-    assertThat(
-            documentationUnit
-                .contentRelatedIndexing()
-                .participatingJudges()
-                .get(0)
-                .referencedOpinions())
+    assertThat(documentationUnit.longTexts().participatingJudges().get(0).referencedOpinions())
         .isEqualTo(participatingJudgeA.getReferencedOpinions());
-    assertThat(documentationUnit.contentRelatedIndexing().participatingJudges().get(1).id())
+    assertThat(documentationUnit.longTexts().participatingJudges().get(1).id())
         .isEqualTo(participatingJudgeB.getId());
 
-    assertThat(documentationUnit.contentRelatedIndexing().participatingJudges().get(1).name())
+    assertThat(documentationUnit.longTexts().participatingJudges().get(1).name())
         .isEqualTo(participatingJudgeB.getName());
-    assertThat(
-            documentationUnit
-                .contentRelatedIndexing()
-                .participatingJudges()
-                .get(1)
-                .referencedOpinions())
+    assertThat(documentationUnit.longTexts().participatingJudges().get(1).referencedOpinions())
         .isEqualTo(participatingJudgeB.getReferencedOpinions());
   }
 
@@ -1270,7 +1260,7 @@ class DocumentationUnitTransformerTest {
         DocumentationUnitTransformer.transformToDomain(generateSimpleDTOBuilder().build());
 
     // Assert
-    assertThat(documentationUnit.contentRelatedIndexing().participatingJudges()).isEmpty();
+    assertThat(documentationUnit.longTexts().participatingJudges()).isEmpty();
   }
 
   private DocumentationUnit.DocumentationUnitBuilder generateSimpleDocumentationUnitBuilder() {

@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
 
@@ -13,4 +14,10 @@ public record LongTexts(
     String dissentingOpinion,
     List<ParticipatingJudge> participatingJudges,
     String otherLongText,
-    String outline) {}
+    String outline) {
+  public LongTexts {
+    if (participatingJudges == null) {
+      participatingJudges = new ArrayList<>();
+    }
+  }
+}
