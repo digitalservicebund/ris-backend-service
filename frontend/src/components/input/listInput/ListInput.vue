@@ -17,34 +17,56 @@ const list = ref(props.modelValue)
 const editMode = ref(true)
 const sortAlphabetically = ref(false)
 
+/**
+ * Computed property to manage the list input value.
+ * - Get: Joins the array into a newline-separated string for textarea display.
+ * - Set: Updates the list based on the textarea input, trims, filters out empty values, removes duplicates,
+ *        and sorts alphabetically if the option is enabled.
+ * @returns {string} The joined string of list items separated by newlines.
+ */
 const listInputValue = computed({
-  get: () => (props.modelValue ? props.modelValue.join("\n") : ""), // Join array with newlines for textarea
+  get: () => (props.modelValue ? props.modelValue.join("\n") : ""),
   set: (newValues: string) => {
-    // split the text by newline, trim each line, filter out empty lines, and set back into the array
     list.value = newValues
       .split("\n")
       .map((listitem) => listitem.trim())
       .filter((listitem) => listitem !== "")
 
+    // Sort alphabetically if the option is set
     if (sortAlphabetically.value && list.value) {
       list.value = list.value.sort((a: string, b: string) => a.localeCompare(b))
     }
 
-    list.value = [...new Set(list.value)] as string[] //remove duplicates
+    // Remove duplicates
+    list.value = [...new Set(list.value)] as string[]
 
+    // Emit the updated value
     emit("update:modelValue", list.value)
-    // when list empty, why emit reset to show category wrapper again
+
+    // Emit reset if the list is empty, to show the category wrapper again.
     if (!!list.value?.length) {
       editMode.value = false
     } else emit("reset")
+
+    // Reset sorting option
     sortAlphabetically.value = false
   },
 })
 
+/**
+ * Toggles the edit mode, when `true`, it shows the editable list,
+ * when `false` it shows the display list. Emit reset if the list is empty,
+ * to show the category wrapper again.
+ */
 function toggleEditMode() {
-  editMode.value = !editMode.value
+  if (!!list.value?.length) {
+    editMode.value = !editMode.value
+  } else emit("reset")
 }
 
+/**
+ * Initializes the edit mode based on whether the list is empty or not.
+ */
 onMounted(() => {
   editMode.value = !props.modelValue.length
 })

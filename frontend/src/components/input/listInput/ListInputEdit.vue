@@ -18,26 +18,44 @@ const emit = defineEmits<{
 }>()
 
 const localModelValue = ref(props.modelValue)
+
+/**
+ * Computed property to manage sorting alphabetically.
+ * - Get: Retrieves the value of `sortAlphabetically` from the list input.
+ * - Set: Emits the `toggleSorting` event when the checkbox is toggled.
+ * @returns {boolean} The current state of the `sortAlphabetically` option.
+ */
 const sortAlphabetically = computed({
   get: () => props.sortAlphabetically,
-
   set: (value) => {
     emit("toggleSorting", value)
   },
 })
 
+/**
+ * Cancels the edit mode and toggles back to the display mode, if there is content.
+ * When no content, this resets the list input to show the category wrapper.
+ */
 const cancelEdit = () => {
-  if (!!localModelValue.value?.length) emit("toggle")
+  emit("toggle")
 }
 
+/**
+ * Adjusts the height of the textarea dynamically based on its content.
+ * - Resets the height to `auto` and then sets it based on the content's scroll height.
+ * @param {HTMLTextAreaElement | null} textarea - The textarea element whose height is to be adjusted.
+ */
 const adjustTextareaHeight = (textarea: HTMLTextAreaElement | null) => {
   if (textarea) {
-    textarea.style.height = "auto" // Reset height first to recalculate based on content
-    textarea.style.height = `${textarea.scrollHeight}px ` // Set the height to match content
+    textarea.style.height = "auto"
+    textarea.style.height = `${textarea.scrollHeight}px `
   }
 }
 
-// Watch the `textAreaInput` value to adjust the height when content changes
+/**
+ * Watches the `localModelValue` to adjust the textarea height when the content changes.
+ * - Uses `nextTick` to wait for the DOM to be rendered before adjusting the height.
+ */
 watch(
   localModelValue,
   async () => {
