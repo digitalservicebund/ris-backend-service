@@ -76,6 +76,7 @@ onMounted(() => {
       <InputField
         id="participatingJudgeNameInput"
         v-slot="slotProps"
+        data-testId="participating-judge-name"
         label="Richter *"
         :validation-error="validationStore.getByField('name')"
       >
@@ -83,6 +84,7 @@ onMounted(() => {
           id="participatingJudgeNameTextInput"
           v-model="participatingJudge.name"
           aria-label="Name des Richters"
+          data-testId="participating-judge-name-input"
           :has-error="slotProps.hasError"
           size="medium"
           @focus="validationStore.remove('name')"
@@ -90,12 +92,14 @@ onMounted(() => {
       </InputField>
       <InputField
         id="participatingJudgeReferencedOpinionsInput"
+        data-testId="participating-judge-reference-opinions"
         label="Art der Mitwirkung"
       >
         <TextInput
           id="participatingJudgeReferencedOpinionsTextInput"
           v-model="participatingJudge.referencedOpinions"
           aria-label="Art der Mitwirkung"
+          data-testId="participating-judge-reference-opinions-input"
           size="medium"
         ></TextInput>
       </InputField>

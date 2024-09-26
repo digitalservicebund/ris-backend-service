@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ComputedRef } from "vue"
+import { computed } from "vue"
 import PreviewCategory from "@/components/preview/PreviewCategory.vue"
 import PreviewContent from "@/components/preview/PreviewContent.vue"
 import PreviewRow from "@/components/preview/PreviewRow.vue"
@@ -9,12 +9,12 @@ const props = defineProps<{
   references: Reference[] | undefined
 }>()
 
-const primaryReferences: ComputedRef<Reference[] | undefined> = computed(() =>
+const primaryReferences = computed(() =>
   props.references?.filter(
     (reference) => reference.legalPeriodical?.primaryReference,
   ),
 )
-const secondaryReferences: ComputedRef<Reference[] | undefined> = computed(() =>
+const secondaryReferences = computed(() =>
   props.references?.filter(
     (reference) => !reference.legalPeriodical?.primaryReference,
   ),

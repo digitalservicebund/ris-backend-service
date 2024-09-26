@@ -24,7 +24,11 @@ const defaultValue = new ParticipatingJudge() as ParticipatingJudge
 
 <template>
   <div class="ds-label-02-reg mb-16">{{ label }}</div>
-  <div aria-label="Mitwirkende Richter" class="border-b-1 border-blue-300">
+  <div
+    aria-label="Mitwirkende Richter"
+    class="border-b-1 border-blue-300"
+    data-testId="Mitwirkende Richter"
+  >
     <div class="flex flex-row">
       <div class="flex-1">
         <EditableList
