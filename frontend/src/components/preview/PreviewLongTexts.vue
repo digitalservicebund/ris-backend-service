@@ -83,6 +83,17 @@ defineProps<{
       />
     </PreviewContent>
   </PreviewRow>
+  <PreviewRow v-if="longTexts.participatingJudges">
+    <PreviewCategory>Mitwirkende Richter</PreviewCategory>
+    <PreviewContent>
+      <div
+        v-for="(participatingJudge, index) in longTexts.participatingJudges"
+        :key="index"
+      >
+        {{ participatingJudge.renderDecision }}
+      </div>
+    </PreviewContent>
+  </PreviewRow>
   <PreviewRow v-if="longTexts.outline">
     <PreviewCategory>Gliederung</PreviewCategory>
     <PreviewContent>

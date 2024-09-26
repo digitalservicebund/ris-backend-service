@@ -91,6 +91,8 @@ describe("preview content related indexing", () => {
       fieldsOfLaw: [],
       dismissalGrounds: [],
       dismissalTypes: [],
+      jobProfiles: [],
+      hasLegislativeMandate: false,
       collectiveAgreements: [],
     })
 
@@ -102,6 +104,7 @@ describe("preview content related indexing", () => {
     expect(screen.queryByText("Sachgebiete")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsgründe")).not.toBeInTheDocument()
     expect(screen.queryByText("Kündigungsarten")).not.toBeInTheDocument()
+    expect(screen.queryByText("Berufsbild")).not.toBeInTheDocument()
     expect(screen.queryByText("Tarifvertrag")).not.toBeInTheDocument()
     expect(screen.queryByText("Gesetzgebungsauftrag")).not.toBeInTheDocument()
   })
@@ -130,6 +133,7 @@ describe("preview content related indexing", () => {
       jobProfiles: [],
       dismissalGrounds: [],
       dismissalTypes: [],
+      hasLegislativeMandate: false,
       collectiveAgreements: [],
     })
 
@@ -180,6 +184,7 @@ describe("preview content related indexing", () => {
       jobProfiles: [],
       dismissalGrounds: [],
       dismissalTypes: [],
+      hasLegislativeMandate: false,
       collectiveAgreements: [],
     })
 
@@ -252,6 +257,7 @@ describe("preview content related indexing", () => {
       jobProfiles: [],
       dismissalGrounds: [],
       dismissalTypes: [],
+      hasLegislativeMandate: false,
       collectiveAgreements: [],
     })
 
@@ -285,6 +291,7 @@ describe("preview content related indexing", () => {
       dismissalGrounds: [],
       collectiveAgreements: [],
       dismissalTypes: [],
+      hasLegislativeMandate: false,
     })
 
     expect(await screen.findByText("Berufsbild")).toBeInTheDocument()

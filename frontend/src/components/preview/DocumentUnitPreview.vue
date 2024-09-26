@@ -14,6 +14,7 @@ import PreviewNote from "@/components/preview/PreviewNote.vue"
 import PreviewProceedingDecisions from "@/components/preview/PreviewProceedingDecisions.vue"
 import PreviewReferences from "@/components/preview/PreviewReferences.vue"
 import PreviewShortTexts from "@/components/preview/PreviewShortTexts.vue"
+import { LongTexts } from "@/domain/documentUnit"
 import Reference from "@/domain/reference"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
@@ -49,6 +50,6 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
       :short-texts="documentUnit.shortTexts"
       :valid-border-numbers="documentUnit.borderNumbers"
     />
-    <PreviewLongTexts :long-texts="documentUnit.longTexts" />
+    <PreviewLongTexts :long-texts="documentUnit.longTexts as LongTexts" />
   </FlexContainer>
 </template>
