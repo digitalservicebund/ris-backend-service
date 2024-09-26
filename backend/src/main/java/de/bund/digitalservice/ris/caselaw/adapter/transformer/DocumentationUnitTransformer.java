@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionNameDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
@@ -121,6 +122,7 @@ public class DocumentationUnitTransformer {
       addJobProfiles(builder, contentRelatedIndexing);
       addDismissalGrounds(builder, contentRelatedIndexing);
       addDismissalTypes(builder, contentRelatedIndexing);
+      addCollectiveAgreements(builder, contentRelatedIndexing);
       builder.hasLegislativeMandate(contentRelatedIndexing.hasLegislativeMandate());
     }
 
@@ -302,6 +304,24 @@ public class DocumentationUnitTransformer {
     }
 
     builder.dismissalTypes(dismissalTypesDTOS);
+  }
+
+  private static void addCollectiveAgreements(
+      DocumentationUnitDTOBuilder builder, ContentRelatedIndexing contentRelatedIndexing) {
+    if (contentRelatedIndexing.collectiveAgreements() == null) {
+      return;
+    }
+
+    List<CollectiveAgreementDTO> collectiveAgreementDTOS = new ArrayList<>();
+    List<String> collectiveAgreements =
+        contentRelatedIndexing.collectiveAgreements().stream().distinct().toList();
+
+    for (int i = 0; i < collectiveAgreements.size(); i++) {
+      collectiveAgreementDTOS.add(
+          CollectiveAgreementDTO.builder().value(collectiveAgreements.get(i)).rank(i + 1L).build());
+    }
+
+    builder.collectiveAgreements(collectiveAgreementDTOS);
   }
 
   private static void addEnsuingAndPendingDecisions(
@@ -642,6 +662,14 @@ public class DocumentationUnitTransformer {
               .map(DismissalTypesDTO::getValue)
               .toList();
       contentRelatedIndexingBuilder.dismissalTypes(dismissalTypes);
+    }
+
+    if (documentationUnitDTO.getCollectiveAgreements() != null) {
+      List<String> collectiveAgreements =
+          documentationUnitDTO.getCollectiveAgreements().stream()
+              .map(CollectiveAgreementDTO::getValue)
+              .toList();
+      contentRelatedIndexingBuilder.collectiveAgreements(collectiveAgreements);
     }
 
     contentRelatedIndexingBuilder.hasLegislativeMandate(

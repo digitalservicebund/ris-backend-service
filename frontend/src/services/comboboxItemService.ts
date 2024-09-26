@@ -3,9 +3,10 @@ import httpClient, { ServiceResponse } from "./httpClient"
 import { ComboboxInputModelType, ComboboxItem } from "@/components/input/types"
 import { Page } from "@/components/Pagination.vue"
 import { CitationType } from "@/domain/citationType"
-import { Court, Procedure, DocumentType } from "@/domain/documentUnit"
+import DocumentationOffice from "@/domain/documentationOffice"
+import { Court, DocumentType, Procedure } from "@/domain/documentUnit"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
-import { LegalForceType, LegalForceRegion } from "@/domain/legalForce"
+import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import errorMessages from "@/i18n/errors.json"
@@ -20,6 +21,7 @@ enum Endpoint {
   legalForceRegions = `region/applicable`,
   legalForceTypes = `legalforcetype`,
   legalPeriodicals = `legalperiodicals`,
+  documentationOffices = `documentationoffices`,
 }
 
 function formatDropdownItems(
@@ -92,6 +94,12 @@ function formatDropdownItems(
         sideInformation: item.primaryReference ? "amtlich" : "nicht amtlich",
       }))
     }
+    case Endpoint.documentationOffices: {
+      return (responseData as DocumentationOffice[]).map((item) => ({
+        label: item.abbreviation,
+        value: item,
+      }))
+    }
   }
 }
 
@@ -159,6 +167,8 @@ const service: ComboboxItemService = {
     await fetchFromEndpoint(Endpoint.legalForceRegions, filter),
   getLegalPeriodicals: async (filter?: string) =>
     await fetchFromEndpoint(Endpoint.legalPeriodicals, filter),
+  getDocumentationOffices: async (filter?: string) =>
+    await fetchFromEndpoint(Endpoint.documentationOffices, filter),
 }
 
 export default service

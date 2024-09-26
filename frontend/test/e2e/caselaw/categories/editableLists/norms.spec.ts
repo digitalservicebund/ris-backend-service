@@ -42,11 +42,11 @@ test.describe("norm", () => {
     // edit entry
     await container.getByTestId("list-entry-0").click()
     await fillNormInputs(page, {
-      normAbbreviation: "PBefGRVZustBehV NW",
+      normAbbreviation: "PBefGZustV HE",
     })
 
     await container.getByLabel("Norm speichern").click()
-    await expect(container.getByText("PBefGRVZustBehV NW")).toBeVisible()
+    await expect(container.getByText("PBefGZustV HE")).toBeVisible()
 
     // the second list item is a default list entry
     await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)

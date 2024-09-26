@@ -3,28 +3,27 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
-@Builder
-@NoArgsConstructor
+@Getter
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder(toBuilder = true)
 @Entity
-@Table(name = "documentation_office", schema = "incremental_migration")
-public class DocumentationOfficeDTO {
+@Table(name = "jurisdiction_type", schema = "incremental_migration")
+public class JurisdictionTypeDTO {
   @Id private UUID id;
 
-  @Column(name = "abbreviation")
-  private String abbreviation;
+  @Column private String label;
 
-  @OneToOne
-  @JoinColumn(name = "jurisdiction_type_id")
-  private JurisdictionTypeDTO jurisdictionType;
+  @OneToOne(mappedBy = "jurisdictionType")
+  private DocumentationOfficeDTO documentationOffice;
 }

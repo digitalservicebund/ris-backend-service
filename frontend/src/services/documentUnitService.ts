@@ -1,10 +1,12 @@
 import httpClient, {
-  ServiceResponse,
   FailedValidationServerResponse,
+  ServiceResponse,
 } from "./httpClient"
 import { DocumentUnitSearchParameter } from "@/components/DocumentUnitSearchEntryForm.vue"
 import { Page } from "@/components/Pagination.vue"
-import DocumentUnit from "@/domain/documentUnit"
+import DocumentUnit, {
+  DocumentationUnitParameters,
+} from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import { RisJsonPatch } from "@/domain/risJsonPatch"
@@ -16,7 +18,9 @@ interface DocumentUnitService {
     documentNumber: string,
   ): Promise<ServiceResponse<DocumentUnit>>
 
-  createNew(): Promise<ServiceResponse<DocumentUnit>>
+  createNew(
+    params?: DocumentationUnitParameters,
+  ): Promise<ServiceResponse<DocumentUnit>>
 
   update(
     documentUnitUuid: string,
@@ -58,9 +62,19 @@ const service: DocumentUnitService = {
     return response
   },
 
-  async createNew() {
-    const response = await httpClient.get<DocumentUnit>(
+  async createNew(parameters?: DocumentationUnitParameters) {
+    const response = await httpClient.put<
+      DocumentationUnitParameters,
+      DocumentUnit
+    >(
       "caselaw/documentunits/new",
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      },
+      parameters,
     )
     if (response.status >= 300) {
       response.error = {

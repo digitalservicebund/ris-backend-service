@@ -18,6 +18,7 @@ import com.gravity9.jsonpatch.JsonPatch;
 import com.gravity9.jsonpatch.JsonPatchOperation;
 import com.gravity9.jsonpatch.ReplaceOperation;
 import de.bund.digitalservice.ris.caselaw.DocumentationUnitControllerTestConfig;
+import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverterException;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
@@ -45,6 +46,10 @@ import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -61,6 +66,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -113,7 +119,7 @@ class DocumentationUnitControllerTest {
   @Test
   void testGenerateNewDocumentationUnit_withInternalUser_shouldSucceed() {
     // userService.getDocumentationOffice is mocked in @BeforeEach
-    when(service.generateNewDocumentationUnit(docOffice))
+    when(service.generateNewDocumentationUnit(docOffice, null))
         .thenReturn(
             DocumentationUnit.builder()
                 .coreData(CoreData.builder().documentationOffice(docOffice).build())
@@ -121,15 +127,46 @@ class DocumentationUnitControllerTest {
 
     risWebClient
         .withDefaultLogin()
-        .get()
+        .put()
         .uri("/api/v1/caselaw/documentunits/new")
         .exchange()
         .expectStatus()
         .isCreated()
         .expectBody(DocumentationUnit.class);
 
-    verify(service, times(1)).generateNewDocumentationUnit(docOffice);
+    verify(service, times(1)).generateNewDocumentationUnit(docOffice, null);
     verify(userService, times(1)).getDocumentationOffice(any(OidcUser.class));
+  }
+
+  @Test
+  void testAttachUnsupportedFile_shouldDeleteOnFail()
+      throws IOException, DocumentationUnitNotExistsException {
+    var attachment = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
+    when(docxConverterService.getConvertedObject(any())).thenThrow(DocxConverterException.class);
+
+    when(attachmentService.attachFileToDocumentationUnit(
+            eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class)))
+        .thenReturn(Attachment.builder().s3path("fooPath").build());
+
+    when(service.getByUuid(TEST_UUID))
+        .thenReturn(
+            DocumentationUnit.builder()
+                .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                .build());
+
+    risWebClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file")
+        .contentType(
+            MediaType.parseMediaType(
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+        .bodyAsByteArray(attachment)
+        .exchange()
+        .expectStatus()
+        .is4xxClientError();
+
+    verify(attachmentService).deleteByS3Path(any());
   }
 
   @Test
@@ -139,13 +176,13 @@ class DocumentationUnitControllerTest {
 
     risWebClient
         .withExternalLogin()
-        .get()
+        .put()
         .uri("/api/v1/caselaw/documentunits/new")
         .exchange()
         .expectStatus()
         .isForbidden();
 
-    verify(service, times(0)).generateNewDocumentationUnit(docOffice);
+    verify(service, times(0)).generateNewDocumentationUnit(docOffice, null);
     verify(userService, times(0)).getDocumentationOffice(any(OidcUser.class));
   }
 

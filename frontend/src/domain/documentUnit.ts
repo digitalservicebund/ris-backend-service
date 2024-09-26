@@ -33,6 +33,7 @@ export type CoreData = {
 }
 
 export type ContentRelatedIndexing = {
+  collectiveAgreements?: string[]
   dismissalTypes?: string[]
   dismissalGrounds?: string[]
   keywords?: string[]
@@ -54,6 +55,7 @@ export type Court = {
   location?: string
   label: string
   revoked?: string
+  responsibleDocOffice?: DocumentationOffice
 }
 
 export type Procedure = {
@@ -81,6 +83,14 @@ export type LongTexts = {
   dissentingOpinion?: string
   otherLongText?: string
   outline?: string
+}
+
+export type DocumentationUnitParameters = {
+  documentationOffice: DocumentationOffice
+  documentType?: DocumentType
+  decisionDate: string
+  fileNumber: string
+  court: Court
 }
 
 export default class DocumentUnit {

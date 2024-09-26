@@ -1817,7 +1817,7 @@ class PatchUpdateIntegrationTest {
                       + "{\"id\":\""
                       + court1Id
                       + "\",\"type\":\"LG\","
-                      + "\"location\":\"Detmold\",\"label\":\"LG Detmold\",\"revoked\":null}},"
+                      + "\"location\":\"Detmold\",\"label\":\"LG Detmold\",\"revoked\":null,\"responsibleDocOffice\":null}},"
                       + "{\"op\":\"replace\",\"path\":\"/coreData/region\",\"value\":\"NW\"}]"));
       TestTransaction.end();
 
@@ -1881,7 +1881,7 @@ class PatchUpdateIntegrationTest {
                       + "{\"id\":\""
                       + court1Id
                       + "\",\"type\":\"LG\","
-                      + "\"location\":\"Detmold\",\"label\":\"LG Detmold\",\"revoked\":null}},"
+                      + "\"location\":\"Detmold\",\"label\":\"LG Detmold\",\"revoked\":null,\"responsibleDocOffice\":null}},"
                       + "{\"op\":\"replace\",\"path\":\"/coreData/region\",\"value\":\"NW\"}]"));
       TestTransaction.end();
     }
@@ -1961,7 +1961,7 @@ class PatchUpdateIntegrationTest {
                       + "{\"id\":\""
                       + court1Id
                       + "\",\"type\":\"LG\","
-                      + "\"location\":\"Detmold\",\"label\":\"LG Detmold\",\"revoked\":null}},"
+                      + "\"location\":\"Detmold\",\"label\":\"LG Detmold\",\"revoked\":null,\"responsibleDocOffice\":null}},"
                       + "{\"op\":\"replace\",\"path\":\"/coreData/region\",\"value\":\"NW\"}]"));
       TestTransaction.end();
 
@@ -2028,7 +2028,7 @@ class PatchUpdateIntegrationTest {
                       + "{\"id\":\""
                       + court1Id
                       + "\",\"type\":\"LG\","
-                      + "\"location\":\"Detmold\",\"label\":\"LG Detmold\",\"revoked\":null}},"
+                      + "\"location\":\"Detmold\",\"label\":\"LG Detmold\",\"revoked\":null,\"responsibleDocOffice\":null}},"
                       + "{\"op\":\"replace\",\"path\":\"/coreData/region\",\"value\":\"NW\"}]"),
               Tuple.tuple(
                   1L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser2\"}]"));
@@ -2089,7 +2089,7 @@ class PatchUpdateIntegrationTest {
                       + "{\"id\":\""
                       + court1Id
                       + "\",\"type\":\"LG\","
-                      + "\"location\":\"Detmold\",\"label\":\"LG Detmold\",\"revoked\":null}},"
+                      + "\"location\":\"Detmold\",\"label\":\"LG Detmold\",\"revoked\":null,\"responsibleDocOffice\":null}},"
                       + "{\"op\":\"replace\",\"path\":\"/coreData/region\",\"value\":\"NW\"}]"),
               Tuple.tuple(
                   1L, "[{\"op\":\"add\",\"path\":\"/coreData/ecli\",\"value\":\"ecliUser2\"}]"));
@@ -2171,7 +2171,7 @@ class PatchUpdateIntegrationTest {
                       + "{\"id\":\""
                       + court1Id
                       + "\",\"type\":\"LG\","
-                      + "\"location\":\"Detmold\",\"label\":\"LG Detmold\",\"revoked\":null}},"
+                      + "\"location\":\"Detmold\",\"label\":\"LG Detmold\",\"revoked\":null,\"responsibleDocOffice\":null}},"
                       + "{\"op\":\"replace\",\"path\":\"/coreData/region\",\"value\":\"NW\"}]"));
       TestTransaction.end();
 
@@ -2246,7 +2246,7 @@ class PatchUpdateIntegrationTest {
                       + "{\"id\":\""
                       + court1Id
                       + "\",\"type\":\"LG\","
-                      + "\"location\":\"Detmold\",\"label\":\"LG Detmold\",\"revoked\":null}},"
+                      + "\"location\":\"Detmold\",\"label\":\"LG Detmold\",\"revoked\":null,\"responsibleDocOffice\":null}},"
                       + "{\"op\":\"replace\",\"path\":\"/coreData/region\",\"value\":\"NW\"}]"));
       TestTransaction.end();
     }
@@ -4242,7 +4242,7 @@ class PatchUpdateIntegrationTest {
     RisEntityExchangeResult<DocumentationUnit> result =
         risWebTestClient
             .withDefaultLogin()
-            .get()
+            .put()
             .uri("/api/v1/caselaw/documentunits/new")
             .exchange()
             .expectStatus()

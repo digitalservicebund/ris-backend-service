@@ -186,7 +186,7 @@ class DocumentationUnitIntegrationTest {
 
     risWebTestClient
         .withDefaultLogin()
-        .get()
+        .put()
         .uri("/api/v1/caselaw/documentunits/new")
         .exchange()
         .expectStatus()
@@ -212,7 +212,7 @@ class DocumentationUnitIntegrationTest {
 
     risWebTestClient
         .withDefaultLogin()
-        .get()
+        .put()
         .uri("/api/v1/caselaw/documentunits/new")
         .exchange()
         .expectStatus()
@@ -245,7 +245,7 @@ class DocumentationUnitIntegrationTest {
 
     risWebTestClient
         .withDefaultLogin()
-        .get()
+        .put()
         .uri("/api/v1/caselaw/documentunits/new")
         .exchange()
         .expectStatus()
@@ -1064,7 +1064,7 @@ class DocumentationUnitIntegrationTest {
 
     risWebTestClient
         .withDefaultLogin()
-        .get()
+        .put()
         .uri("/api/v1/caselaw/documentunits/new")
         .exchange()
         .expectStatus()
@@ -1086,7 +1086,7 @@ class DocumentationUnitIntegrationTest {
         .thenReturn(Map.of("DS", "ZZREYYYY*****"));
     risWebTestClient
         .withDefaultLogin()
-        .get()
+        .put()
         .uri("/api/v1/caselaw/documentunits/new")
         .exchange()
         .expectStatus()
@@ -1097,7 +1097,7 @@ class DocumentationUnitIntegrationTest {
   void testGenerateNewDocumentationUnit_withExternalUser_shouldBeForbidden() {
     risWebTestClient
         .withExternalLogin()
-        .get()
+        .put()
         .uri("/api/v1/caselaw/documentunits/new")
         .exchange()
         .expectStatus()
