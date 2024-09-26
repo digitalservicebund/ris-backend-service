@@ -138,6 +138,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                             FileNumberDTO.builder()
                                 .value(parameters.fileNumber())
                                 .documentationUnit(documentationUnitDTO)
+                                .rank(1L)
                                 .build()))
                 .documentType(
                     parameters.documentType() == null

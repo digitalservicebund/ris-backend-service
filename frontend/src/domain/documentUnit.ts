@@ -85,6 +85,14 @@ export type LongTexts = {
   outline?: string
 }
 
+export type DocumentationUnitParameters = {
+  documentationOffice: DocumentationOffice
+  documentType?: DocumentType
+  decisionDate: string
+  fileNumber: string
+  court: Court
+}
+
 export default class DocumentUnit {
   readonly uuid: string
   readonly id?: string
