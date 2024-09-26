@@ -32,5 +32,7 @@ function toggle() {
     size="small"
     @click="toggle"
   />
-  <div v-else data-testId="category-wrapper-component"><slot /></div>
+  <div v-else data-testId="category-wrapper-component">
+    <slot :reset="toggle" />
+  </div>
 </template>
