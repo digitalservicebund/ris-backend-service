@@ -74,21 +74,19 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <ListInputEdit
-      v-if="editMode"
-      v-model="listInputValue"
-      :label="label"
-      :list-item-count="modelValue.length"
-      :sort-alphabetically="sortAlphabetically"
-      @toggle="toggleEditMode"
-      @toggle-sorting="sortAlphabetically = !sortAlphabetically"
-    />
-    <ListInputDisplay
-      v-else
-      v-model="list"
-      :label="label"
-      @toggle="toggleEditMode"
-    />
-  </div>
+  <ListInputEdit
+    v-if="editMode"
+    v-model="listInputValue"
+    :label="label"
+    :list-item-count="modelValue.length"
+    :sort-alphabetically="sortAlphabetically"
+    @toggle="toggleEditMode"
+    @toggle-sorting="sortAlphabetically = !sortAlphabetically"
+  />
+  <ListInputDisplay
+    v-else
+    v-model="list"
+    :label="label"
+    @toggle="toggleEditMode"
+  />
 </template>

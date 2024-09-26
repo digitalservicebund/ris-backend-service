@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import { computed } from "vue"
-import ChipsInput from "@/components/input/ChipsInput.vue"
+import ListInput from "@/components/input/listInput/ListInput.vue"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 defineProps<{
@@ -8,24 +7,14 @@ defineProps<{
 }>()
 
 const store = useDocumentUnitStore()
-
-const collectiveAgreements = computed({
-  get: () => store.documentUnit!.contentRelatedIndexing.collectiveAgreements,
-  set: (newValues) => {
-    store.documentUnit!.contentRelatedIndexing.collectiveAgreements = newValues
-  },
-})
 </script>
 
 <template>
   <div class="gap-0">
-    <div class="ds-label-02-reg mb-4" data-testId="collective-agreements">
-      {{ label }}
-    </div>
-    <ChipsInput
+    <ListInput
       id="collectiveAgreements"
-      v-model="collectiveAgreements"
-      :aria-label="label"
-    ></ChipsInput>
+      v-model="store.documentUnit!.contentRelatedIndexing.collectiveAgreements"
+      :label="label"
+    ></ListInput>
   </div>
 </template>
