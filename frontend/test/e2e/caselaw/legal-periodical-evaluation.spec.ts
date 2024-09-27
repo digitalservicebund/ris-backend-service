@@ -454,17 +454,19 @@ test.describe(
         await test.step("Changes to the citation are visible in the documentation unit's preview ", async () => {
           await previewTab.reload()
           await expect(
-            previewTab.getByText("MMG 2021, 2, Heft 1 (L)"),
-          ).toHaveCount(1)
+            previewTab.getByText("MMG 2021, 2, Heft 1 (L)", { exact: true }),
+          ).toHaveCount(1, { timeout: 10_000 })
           await expect(
-            previewTab.getByText("MMG 2024, 99, Heft 1"),
+            previewTab.getByText("MMG 2024, 99, Heft 1", { exact: true }),
           ).toHaveCount(1)
         })
 
         await test.step("Unchanged citation is unchanged in preview ", async () => {
           await secondPreviewTab.reload()
           await expect(
-            secondPreviewTab.getByText("MMG 2024, 104, Heft 1"),
+            secondPreviewTab.getByText("MMG 2024, 104, Heft 1", {
+              exact: true,
+            }),
           ).toHaveCount(1)
         })
 
@@ -495,31 +497,17 @@ test.describe(
 
         await test.step("A reference can be deleted", async () => {
           await navigateToPeriodicalReferences(page, edition.id || "")
-          await page.getByTestId("list-entry-0").click()
-          const saveRequest0 = page.waitForRequest(
-            "**/api/v1/caselaw/legalperiodicaledition",
-            { timeout: 2_000 },
-          )
-          await page.locator("[aria-label='Eintrag löschen']").click()
-          await saveRequest0
+          for (let i = 0; i < 3; i++) {
+            await page.getByTestId("list-entry-0").click()
+            const saveRequest = page.waitForRequest(
+              "**/api/v1/caselaw/legalperiodicaledition",
+              { timeout: 2_000 },
+            )
+            await page.locator("[aria-label='Eintrag löschen']").click()
+            await saveRequest
+          }
 
-          await page.getByTestId("list-entry-0").click()
-          const saveRequest1 = page.waitForRequest(
-            "**/api/v1/caselaw/legalperiodicaledition",
-            { timeout: 2_000 },
-          )
-          await page.locator("[aria-label='Eintrag löschen']").click()
-          await saveRequest1
-
-          await page.getByTestId("list-entry-0").click()
-          const saveRequest = page.waitForRequest(
-            "**/api/v1/caselaw/legalperiodicaledition",
-            { timeout: 2_000 },
-          )
-          await page.locator("[aria-label='Eintrag löschen']").click()
-          await saveRequest
           await page.getByTestId("list-entry-0").isHidden()
-
           await expect(
             page.locator("[aria-label='Eintrag löschen']"),
           ).toBeHidden()

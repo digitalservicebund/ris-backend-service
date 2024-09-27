@@ -37,6 +37,7 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
         .toList();
   }
 
+  @Transactional(transactionManager = "jpaTransactionManager")
   public LegalPeriodicalEdition save(LegalPeriodicalEdition legalPeriodicalEdition) {
 
     List<ReferenceDTO> referenceDTOS = new ArrayList<>();
