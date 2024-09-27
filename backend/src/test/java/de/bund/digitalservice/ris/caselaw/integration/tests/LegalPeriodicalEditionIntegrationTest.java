@@ -207,7 +207,6 @@ class LegalPeriodicalEditionIntegrationTest {
   }
 
   @Test
-  // @Transactional(transactionManager = "jpaTransactionManager") does not work
   void testGetLegalPeriodicalEditionsWithReferences() {
     var legalPeriodical =
         legalPeriodicalRepository.findAllBySearchStr(Optional.of("ABC")).stream()
@@ -316,8 +315,8 @@ class LegalPeriodicalEditionIntegrationTest {
     Assertions.assertFalse(editionList.isEmpty(), "List should not be empty");
     Assertions.assertEquals("2024 Sonderheft 1", editionList.get(0).name());
     Assertions.assertEquals(2, editionList.get(0).references().size());
-    Assertions.assertEquals("New Citation", editionList.get(0).references().get(0).citation());
-    Assertions.assertEquals("New Reference", editionList.get(0).references().get(1).citation());
+    Assertions.assertEquals("New Reference", editionList.get(0).references().get(0).citation());
+    Assertions.assertEquals("New Citation", editionList.get(0).references().get(1).citation());
 
     assertThat(documentationUnitRepository.findByDocumentNumber("DOC_NUMBER").get().getReferences())
         .hasSize(4)

@@ -189,6 +189,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         }
       }
     }
+
+    // TODO delete references?
     // ---
 
     // Transform non-database-related properties
