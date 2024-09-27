@@ -205,10 +205,11 @@ async function createNewFromSearch(openDocunit: boolean = false) {
       return
     } else {
       if (openDocunit) {
-        await router.push({
+        const routeData = router.resolve({
           name: "caselaw-documentUnit-documentNumber-categories",
           params: { documentNumber: createResponse.data.documentNumber },
         })
+        window.open(routeData.href, "_blank")
       }
       addReference(
         new RelatedDocumentation({
