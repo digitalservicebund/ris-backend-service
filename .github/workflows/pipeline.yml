@@ -364,20 +364,8 @@ jobs:
       group: deploy-staging
       cancel-in-progress: true
     needs: [ deploy-staging, prep-playwright-tests ]
-    strategy:
-      fail-fast: false
-      matrix:
-        subproject: [ caselaw, shared ]
-        browser: [ chromium, firefox ]
-        mode: [ e2e ]
-        include:
-          - mode: a11y
-            browser: a11y
-    uses: ./.github/workflows/_playwright-test.yml
-    with:
-      subproject: ${{ matrix.subproject}}
-      browser: ${{ matrix.browser }}
-      mode: ${{ matrix.mode }}
+    # We do not include the matrix directly, so that the concurrency group does not apply to each matrix job individually
+    uses: ./.github/workflows/e2e_matrix.yml
     secrets: inherit
 
   query-performance-tests:
