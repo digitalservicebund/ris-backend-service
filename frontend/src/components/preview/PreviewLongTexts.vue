@@ -83,7 +83,7 @@ defineProps<{
       />
     </PreviewContent>
   </PreviewRow>
-  <PreviewRow v-if="longTexts.participatingJudges">
+  <PreviewRow v-if="longTexts.participatingJudges?.length">
     <PreviewCategory>Mitwirkende Richter</PreviewCategory>
     <PreviewContent>
       <div

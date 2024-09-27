@@ -151,7 +151,7 @@ describe("preview long texts", () => {
         "Gründe",
         "Tatbestand",
         "Entscheidungsgründe",
-        "bweichende Meinung",
+        "Abweichende Meinung",
         "Sonstiger Langtext",
         "Gliederung",
       ],
