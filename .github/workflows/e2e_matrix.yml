@@ -1,3 +1,6 @@
+on:
+  workflow_call:
+
 jobs:
   e2e-matrix:
     strategy:
