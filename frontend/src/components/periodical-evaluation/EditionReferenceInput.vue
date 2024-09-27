@@ -172,6 +172,7 @@ async function addReference(decision: RelatedDocumentation) {
     legalPeriodicalRawValue: reference.value.legalPeriodicalRawValue,
     documentationUnit: new RelatedDocumentation({ ...decision }),
   })
+  console.log(newReference)
 
   lastSavedModelValue.value = newReference
 
@@ -212,13 +213,14 @@ async function createNewFromSearch(openDocunit: boolean = false) {
       addReference(
         new RelatedDocumentation({
           uuid: createResponse.data.uuid,
-          fileNumber: createResponse.data.coreData.deviatingFileNumbers
-            ? createResponse.data.coreData.deviatingFileNumbers[0]
+          fileNumber: createResponse.data.coreData.fileNumbers
+            ? createResponse.data.coreData.fileNumbers[0]
             : undefined,
           decisionDate: createResponse.data.coreData.decisionDate,
           court: createResponse.data.coreData.court,
           documentType: createResponse.data.coreData.documentType,
           documentNumber: createResponse.data.documentNumber,
+          status: createResponse.data.status,
           referenceFound: true,
         }),
       )
