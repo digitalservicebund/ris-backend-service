@@ -292,7 +292,9 @@ jobs:
   deploy-staging:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-    concurrency: deploy-staging
+    concurrency:
+      group: deploy-staging
+      cancel-in-progress: true
     environment: staging
     needs:
       - push-frontend-image-to-registry
@@ -330,6 +332,9 @@ jobs:
   prep-playwright-tests:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
+    concurrency:
+      group: deploy-staging
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node
@@ -355,6 +360,9 @@ jobs:
 
   e2e-tests:
     if: ${{ github.ref == 'refs/heads/main' }}
+    concurrency:
+      group: deploy-staging
+      cancel-in-progress: true
     needs: [ deploy-staging, prep-playwright-tests ]
     strategy:
       fail-fast: false
@@ -374,6 +382,9 @@ jobs:
 
   query-performance-tests:
     if: ${{ github.ref == 'refs/heads/main' }}
+    concurrency:
+      group: deploy-staging
+      cancel-in-progress: true
     needs: [ e2e-tests, prep-playwright-tests ]
     uses: ./.github/workflows/_playwright-test.yml
     with:
