@@ -52,10 +52,11 @@ const shouldDisplayDismissalAttributes = computed(
     <h2 class="ds-label-01-bold mb-16">Weitere Rubriken</h2>
     <div class="flex flex-col gap-24">
       <CategoryWrapper
+        v-slot="slotProps"
         label="Tarifvertrag"
         :should-show-button="!hasCollectiveAgreement"
       >
-        <CollectiveAgreements label="Tarifvertrag" />
+        <CollectiveAgreements label="Tarifvertrag" @reset="slotProps.reset" />
       </CategoryWrapper>
       <CategoryWrapper
         v-if="shouldDisplayDismissalAttributes"

@@ -6,6 +6,10 @@ defineProps<{
   label: string
 }>()
 
+const emit = defineEmits<{
+  reset: []
+}>()
+
 const store = useDocumentUnitStore()
 </script>
 
@@ -15,6 +19,7 @@ const store = useDocumentUnitStore()
       id="collectiveAgreements"
       v-model="store.documentUnit!.contentRelatedIndexing.collectiveAgreements"
       :label="label"
+      @reset="emit('reset')"
     ></ListInput>
   </div>
 </template>
