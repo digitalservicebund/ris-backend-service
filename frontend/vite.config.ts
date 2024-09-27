@@ -28,6 +28,9 @@ export default defineConfig({
     vue(),
     Pages({
       dirs: "src/routes",
+      // We disable lazy loading as it leads to problems when an old user sessions requests resources that were
+      // removed with a new deployment. see https://stackoverflow.com/q/69300341/4694994
+      importMode: "sync",
     }),
     EnvironmentPlugin({
       BACKEND_HOST: "",
