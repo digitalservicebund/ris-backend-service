@@ -40,10 +40,16 @@ const shouldDisplayLegislativeMandateCategory = computed(() => {
   )
 })
 
+const isLaborCourt = computed(() =>
+  laborCourtTypes.items.includes(courtTypeRef.value),
+)
+
 const shouldDisplayDismissalAttributes = computed(
-  () =>
-    laborCourtTypes.items.includes(courtTypeRef.value) ||
-    hasDismissalInput.value,
+  () => isLaborCourt.value || hasDismissalInput.value,
+)
+
+const shouldDisplayCollectiveAgreements = computed(
+  () => isLaborCourt.value || hasCollectiveAgreement.value,
 )
 </script>
 
@@ -52,6 +58,7 @@ const shouldDisplayDismissalAttributes = computed(
     <h2 class="ds-label-01-bold mb-16">Weitere Rubriken</h2>
     <div class="flex flex-col gap-24">
       <CategoryWrapper
+        v-if="shouldDisplayCollectiveAgreements"
         v-slot="slotProps"
         label="Tarifvertrag"
         :should-show-button="!hasCollectiveAgreement"

@@ -4,6 +4,7 @@ import {
   navigateToHandover,
   navigateToPreview,
   save,
+  waitForInputValue,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 
@@ -23,6 +24,24 @@ test.describe(
       prefilledDocumentUnit,
     }) => {
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
+
+      await test.step("check button is not displayed without labor court", async () => {
+        await expect(
+          page.getByRole("button", { name: "Tarifvertrag" }),
+        ).toBeHidden()
+      })
+
+      await test.step("Select BAG (labor court)", async () => {
+        await page.locator("[aria-label='Gericht']").fill("BAG")
+        await waitForInputValue(page, "[aria-label='Gericht']", "BAG")
+        await expect(
+          page.locator("button").filter({ hasText: /^BAG$/ }),
+        ).toBeVisible()
+        await page.locator("button").filter({ hasText: /^BAG$/ }).click()
+        await waitForInputValue(page, "[aria-label='Gericht']", "BAG")
+
+        await save(page)
+      })
 
       await test.step("check button is displayed when field is empty", async () => {
         await expect(
@@ -53,13 +72,13 @@ test.describe(
         expect(innerText).toBeDefined()
         expect(innerText).toContain(
           "<paratrubriken>\n" +
-            "14\n" +
+            "13\n" +
             "        <zuordnung>\n" +
-            "15\n" +
+            "14\n" +
             "            <aspekt>Tarifvertrag</aspekt>\n" +
-            "16\n" +
+            "15\n" +
             "            <begriff>Stehende Bühnen</begriff>\n" +
-            "17\n" +
+            "16\n" +
             "        </zuordnung>\n",
         )
       })

@@ -169,26 +169,26 @@ describe("other categories", () => {
   })
 
   describe("CollectiveAgreements", () => {
-    test("should display collective agreements button when it is undefined", async () => {
+    test("should not display collective agreements button when it is empty and not a labor court", async () => {
       // Arrange
-      courtTypeRef = ref("BGH")
-      mockSessionStore({ collectiveAgreements: undefined })
+      courtTypeRef = ref("BVerfG")
+      mockSessionStore({ collectiveAgreements: [] })
 
       // Act
       render(OtherCategories)
 
       // Assert
       expect(
-        screen.getByRole("button", { name: "Tarifvertrag" }),
-      ).toBeInTheDocument()
+        screen.queryByRole("button", { name: "Tarifvertrag" }),
+      ).not.toBeInTheDocument()
       expect(
         screen.queryByRole("textbox", { name: "Tarifvertrag Input" }),
       ).not.toBeInTheDocument()
     })
 
-    test("should display collective agreements button when it is empty", async () => {
+    test("should display collective agreements button when it is empty and labor court", async () => {
       // Arrange
-      courtTypeRef = ref("BAG")
+      courtTypeRef = ref("LArbG")
       mockSessionStore({ collectiveAgreements: [] })
 
       // Act
@@ -203,16 +203,15 @@ describe("other categories", () => {
       ).not.toBeInTheDocument()
     })
 
-    test("should display collective agreements when it is not empty", async () => {
+    test("should display collective agreements when it is not empty without labor court", async () => {
       // Arrange
-      courtTypeRef = ref("BFH")
+      courtTypeRef = ref("BVerfG")
       mockSessionStore({ collectiveAgreements: ["Stehende Bühnen"] })
 
       // Act
       render(OtherCategories)
 
       // Assert
-
       expect(
         screen.getByRole("textbox", { name: "Tarifvertrag Input" }),
       ).toHaveValue("Stehende Bühnen")
