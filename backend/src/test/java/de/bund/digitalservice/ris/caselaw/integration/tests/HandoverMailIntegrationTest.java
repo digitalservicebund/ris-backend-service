@@ -202,6 +202,7 @@ class HandoverMailIntegrationTest {
               .references(
                   List.of(
                       ReferenceDTO.builder()
+                          .id(UUID.randomUUID())
                           .citation("citation")
                           .legalPeriodicalRawValue("ABC")
                           .rank(1)

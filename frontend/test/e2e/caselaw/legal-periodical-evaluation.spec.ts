@@ -2,10 +2,10 @@ import { expect, Page } from "@playwright/test"
 import dayjs from "dayjs"
 import {
   fillInput,
-  waitForInputValue,
   navigateToPeriodicalEvaluation,
-  navigateToPreview,
   navigateToPeriodicalReferences,
+  navigateToPreview,
+  waitForInputValue,
 } from "./e2e-utils"
 import { caselawTest as test } from "./fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
@@ -247,7 +247,7 @@ test.describe(
     )
 
     // eslint-disable-next-line playwright/no-skipped-test
-    test.skip(
+    test(
       "Periodical edition reference editing",
       {
         annotation: {
@@ -256,8 +256,16 @@ test.describe(
             "https://digitalservicebund.atlassian.net/browse/RISDEV-4560",
         },
       },
-      async ({ context, page, edition, prefilledDocumentUnit }) => {
+      async ({
+        context,
+        page,
+        edition,
+        prefilledDocumentUnit,
+        secondPrefilledDocumentUnit,
+      }) => {
         const fileNumber = prefilledDocumentUnit.coreData.fileNumbers?.[0] || ""
+        const secondFileNumber =
+          secondPrefilledDocumentUnit.coreData.fileNumbers?.[0] || ""
 
         await navigateToPeriodicalReferences(page, edition.id || "")
 
@@ -284,7 +292,7 @@ test.describe(
         await test.step("Citation input is validated when input is left", async () => {})
 
         await test.step("A docunit can be added as reference by entering citation and search fields", async () => {
-          await searchForDocUnitWithFileNumber(page, fileNumber)
+          await searchForDocUnitWithFileNumber(page, fileNumber, "31.12.2019")
           await expect(
             page.getByText(
               `AG Aachen, 31.12.2019, ${fileNumber}, Anerkenntnisurteil, Unveröffentlicht`,
@@ -304,7 +312,7 @@ test.describe(
         })
 
         await test.step("A docunit can be added to an edition multiple times", async () => {
-          await searchForDocUnitWithFileNumber(page, fileNumber)
+          await searchForDocUnitWithFileNumber(page, fileNumber, "31.12.2019")
           await expect(
             page.getByRole("link", {
               name: `AG Aachen, 31.12.2019, ${fileNumber}, Anerkenntnisurteil, Unveröffentlicht`,
@@ -333,6 +341,29 @@ test.describe(
           ).toBeVisible()
         })
 
+        await test.step("Other docUnits can be added to an edition", async () => {
+          await searchForDocUnitWithFileNumber(
+            page,
+            secondFileNumber,
+            "01.01.2020",
+          )
+          await expect(
+            page.getByText(
+              `AG Aachen, 01.01.2020, ${secondFileNumber}, Anerkenntnisurteil, Unveröffentlicht`,
+            ),
+          ).toBeVisible()
+
+          await fillInput(page, "Zitatstelle *", "104")
+          await page.getByLabel("Treffer übernehmen").click()
+          await expect(
+            page.locator("[aria-label='Listen Eintrag']"),
+          ).toHaveCount(4)
+
+          await expect(
+            page.getByText("MMG 2024, 104, Heft 1", { exact: true }),
+          ).toBeVisible()
+        })
+
         await test.step("The form is cleared after adding a reference ", async () => {
           await expect(page.getByLabel("Zitatstelle *")).toBeEmpty()
           await expect(page.getByLabel("Klammernzusatz")).toBeEmpty()
@@ -349,10 +380,25 @@ test.describe(
           prefilledDocumentUnit.documentNumber || "",
         )
 
+        // open documentation unit preview in new tab
+        const secondPreviewTab = await context.newPage()
+        await navigateToPreview(
+          secondPreviewTab,
+          secondPrefilledDocumentUnit.documentNumber || "",
+        )
+
         await test.step("An added citation is visible in the documentation unit's preview ", async () => {
           await expect(
             previewTab.getByText("MMG 2024, 5, Heft 1 (LT)", { exact: true }),
-          ).toBeVisible()
+          ).toHaveCount(1)
+          await expect(
+            previewTab.getByText("MMG 2024, 99, Heft 1", { exact: true }),
+          ).toHaveCount(1)
+          await expect(
+            secondPreviewTab.getByText("MMG 2024, 104, Heft 1", {
+              exact: true,
+            }),
+          ).toHaveCount(1)
         })
 
         await test.step("When editing a reference, the citation is a single input containing the joined value of prefix, citation and suffix ", async () => {
@@ -409,7 +455,19 @@ test.describe(
           await previewTab.reload()
           await expect(
             previewTab.getByText("MMG 2021, 2, Heft 1 (L)", { exact: true }),
-          ).toBeVisible()
+          ).toHaveCount(1, { timeout: 10_000 })
+          await expect(
+            previewTab.getByText("MMG 2024, 99, Heft 1", { exact: true }),
+          ).toHaveCount(1)
+        })
+
+        await test.step("Unchanged citation is unchanged in preview ", async () => {
+          await secondPreviewTab.reload()
+          await expect(
+            secondPreviewTab.getByText("MMG 2024, 104, Heft 1", {
+              exact: true,
+            }),
+          ).toHaveCount(1)
         })
 
         await test.step("The edition can't be deleted as long as it has references", async () => {
@@ -421,7 +479,7 @@ test.describe(
             .click()
 
           const line = page.getByText(
-            (edition.name || "") + "MMG" + "2" + formattedDate,
+            (edition.name || "") + "MMG" + "3" + formattedDate,
           )
 
           await expect(line).toBeVisible()
@@ -439,11 +497,17 @@ test.describe(
 
         await test.step("A reference can be deleted", async () => {
           await navigateToPeriodicalReferences(page, edition.id || "")
-          await page.getByTestId("list-entry-0").click()
-          await page.locator("[aria-label='Eintrag löschen']").click()
-          await page.getByTestId("list-entry-0").click()
-          await page.locator("[aria-label='Eintrag löschen']").click()
+          for (let i = 0; i < 3; i++) {
+            await page.getByTestId("list-entry-0").click()
+            const saveRequest = page.waitForRequest(
+              "**/api/v1/caselaw/legalperiodicaledition",
+              { timeout: 2_000 },
+            )
+            await page.locator("[aria-label='Eintrag löschen']").click()
+            await saveRequest
+          }
 
+          await page.getByTestId("list-entry-0").isHidden()
           await expect(
             page.locator("[aria-label='Eintrag löschen']"),
           ).toBeHidden()
@@ -488,7 +552,7 @@ test.describe(
           await fillInput(page, "Zitatstelle *", "12")
           await fillInput(page, "Klammernzusatz", "L")
 
-          await searchForDocUnitWithFileNumber(page, fileNumber)
+          await searchForDocUnitWithFileNumber(page, fileNumber, "31.12.2019")
           await expect(
             page.getByText(
               `AG Aachen, 31.12.2019, ${fileNumber}, Anerkenntnisurteil, Veröffentlicht`,
@@ -546,11 +610,12 @@ test.describe(
     async function searchForDocUnitWithFileNumber(
       page: Page,
       fileNumber: string,
+      date: string,
     ) {
       await fillInput(page, "Gericht", "AG Aachen")
       await page.getByText("AG Aachen", { exact: true }).click()
       await fillInput(page, "Aktenzeichen", fileNumber)
-      await fillInput(page, "Entscheidungsdatum", "31.12.2019")
+      await fillInput(page, "Entscheidungsdatum", date)
       await fillInput(page, "Dokumenttyp", "AnU")
       await page.getByText("Anerkenntnisurteil", { exact: true }).click()
 
