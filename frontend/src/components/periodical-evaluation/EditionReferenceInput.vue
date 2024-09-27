@@ -80,20 +80,20 @@ const suffix = computed({
   },
 })
 
+const docOffice = ref<DocumentationOffice>()
+
 const responsibleDocOffice = computed({
   get: () =>
-    relatedDocumentationUnit?.value.court?.responsibleDocOffice
+    docOffice.value
       ? {
-          label:
-            relatedDocumentationUnit?.value.court?.responsibleDocOffice
-              .abbreviation,
-          value: relatedDocumentationUnit?.value.court?.responsibleDocOffice,
+          label: docOffice.value.abbreviation,
+          value: docOffice.value,
         }
       : undefined,
   set: (newValue) => {
-    const docOffice = { ...newValue } as DocumentationOffice
-    if (newValue && relatedDocumentationUnit.value.court) {
-      relatedDocumentationUnit.value.court.responsibleDocOffice = docOffice
+    const newDocOffice = { ...newValue } as DocumentationOffice
+    if (newValue) {
+      docOffice.value = newDocOffice
     }
   },
 })
@@ -119,6 +119,7 @@ function updateDateFormatValidation(
 
 async function search() {
   isLoading.value = true
+  createNewFromSearchResponseError.value = undefined
 
   const response = await documentUnitService.searchByRelatedDocumentation(
     relatedDocumentationUnit.value,
@@ -194,8 +195,7 @@ async function createNewFromSearch(openDocunit: boolean = false) {
   if (validationStore.isValid()) {
     const parameters = {
       fileNumber: relatedDocumentationUnit.value.fileNumber,
-      documentationOffice: responsibleDocOffice.value
-        ?.value as DocumentationOffice,
+      documentationOffice: docOffice.value,
       decisionDate: relatedDocumentationUnit.value.decisionDate,
       court: relatedDocumentationUnit.value.court,
       documentType: relatedDocumentationUnit.value.documentType,
@@ -256,6 +256,13 @@ watch(
     relatedDocumentationUnit.value = props.modelValue?.documentationUnit
       ? new RelatedDocumentation({ ...props.modelValue.documentationUnit })
       : new RelatedDocumentation()
+  },
+)
+
+watch(
+  () => relatedDocumentationUnit.value.court,
+  () => {
+    docOffice.value = relatedDocumentationUnit.value.court?.responsibleDocOffice
   },
 )
 
