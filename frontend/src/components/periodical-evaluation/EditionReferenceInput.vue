@@ -81,18 +81,21 @@ const suffix = computed({
 })
 
 const responsibleDocOffice = computed({
-  get: () => {
-    if (relatedDocumentationUnit?.value.court) {
-      return {
-        label:
-          relatedDocumentationUnit?.value.court.responsibleDocOffice
-            ?.abbreviation ?? "",
-        value: relatedDocumentationUnit?.value.court.responsibleDocOffice,
-      }
+  get: () =>
+    relatedDocumentationUnit?.value.court?.responsibleDocOffice
+      ? {
+          label:
+            relatedDocumentationUnit?.value.court?.responsibleDocOffice
+              .abbreviation,
+          value: relatedDocumentationUnit?.value.court?.responsibleDocOffice,
+        }
+      : undefined,
+  set: (newValue) => {
+    const docOffice = { ...newValue } as DocumentationOffice
+    if (newValue && relatedDocumentationUnit.value.court) {
+      relatedDocumentationUnit.value.court.responsibleDocOffice = docOffice
     }
-    return undefined
   },
-  set: () => {},
 })
 
 function buildCitation(): string | undefined {
@@ -501,12 +504,6 @@ onMounted(async () => {
           :item-service="ComboboxItemService.getDocumentationOffices"
         ></ComboboxInput>
       </InputField>
-      <div v-if="createNewFromSearchResponseError" class="mb-24">
-        <InfoModal
-          :description="createNewFromSearchResponseError.description"
-          :title="createNewFromSearchResponseError.title"
-        />
-      </div>
 
       <div class="flex flex-row gap-8">
         <TextButton
@@ -526,6 +523,12 @@ onMounted(async () => {
           @click="() => createNewFromSearch(true)"
         />
       </div>
+    </div>
+    <div v-if="createNewFromSearchResponseError">
+      <InfoModal
+        :description="createNewFromSearchResponseError.description"
+        :title="createNewFromSearchResponseError.title"
+      />
     </div>
   </div>
 </template>
