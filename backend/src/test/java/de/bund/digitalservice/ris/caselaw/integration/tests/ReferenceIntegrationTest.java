@@ -42,6 +42,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -125,7 +126,6 @@ class ReferenceIntegrationTest {
 
   @Test
   void testReferencesCanBeSaved() {
-
     DocumentationUnitDTO dto =
         repository.save(
             DocumentationUnitDTO.builder()
@@ -156,6 +156,7 @@ class ReferenceIntegrationTest {
             .primaryReference(true)
             .build();
 
+    UUID referenceId = UUID.randomUUID();
     DocumentationUnit documentationUnitFromFrontend =
         DocumentationUnit.builder()
             .uuid(dto.getId())
@@ -164,6 +165,7 @@ class ReferenceIntegrationTest {
             .references(
                 List.of(
                     Reference.builder()
+                        .id(referenceId)
                         .citation("2024, S.3")
                         .referenceSupplement("Klammerzusatz")
                         .footnote("footnote")
@@ -192,8 +194,8 @@ class ReferenceIntegrationTest {
                   .isEqualTo(DEFAULT_DOCUMENT_NUMBER);
               assertThat(response.getResponseBody().references()).hasSize(1);
               assertThat(response.getResponseBody().references())
-                  .extracting("citation", "referenceSupplement", "footnote")
-                  .containsExactly(tuple("2024, S.3", "Klammerzusatz", "footnote"));
+                  .extracting("citation", "referenceSupplement", "footnote", "id")
+                  .containsExactly(tuple("2024, S.3", "Klammerzusatz", "footnote", referenceId));
               assertThat(response.getResponseBody().references())
                   .extracting("legalPeriodical")
                   .usingRecursiveComparison()
