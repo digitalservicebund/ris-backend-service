@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { computed } from "vue"
 import DefaultSummary from "@/components/DefaultSummary.vue"
 import EditableList from "@/components/EditableList.vue"
 import ParticipatingJudgesInput from "@/components/ParticipatingJudgesInput.vue"
@@ -12,14 +11,7 @@ defineProps<{
 
 const store = useDocumentUnitStore()
 
-const participatingJudges = computed({
-  get: () => store.documentUnit!.longTexts.participatingJudges,
-  set: (newValues) => {
-    store.documentUnit!.longTexts.participatingJudges = newValues
-  },
-})
-
-const defaultValue = new ParticipatingJudge() as ParticipatingJudge
+const defaultValue = new ParticipatingJudge()
 </script>
 
 <template>
@@ -32,7 +24,7 @@ const defaultValue = new ParticipatingJudge() as ParticipatingJudge
     <div class="flex flex-row">
       <div class="flex-1">
         <EditableList
-          v-model="participatingJudges"
+          v-model="store.documentUnit!.longTexts.participatingJudges"
           :default-value="defaultValue"
           :edit-component="ParticipatingJudgesInput"
           :summary-component="DefaultSummary"

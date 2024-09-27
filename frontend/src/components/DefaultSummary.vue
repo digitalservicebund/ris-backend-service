@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import IconBadge from "@/components/IconBadge.vue"
-import ParticipatingJudge from "@/domain/participatingJudge"
+import EditableListItem from "@/domain/editableListItem"
 import IconError from "~icons/ic/baseline-error"
 import IcBaselinePerson from "~icons/ic/baseline-person"
 
 const props = defineProps<{
-  data: ParticipatingJudge
+  data: EditableListItem
 }>()
 
 const iconComponent = computed(() => {
