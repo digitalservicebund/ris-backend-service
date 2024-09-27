@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue"
+import { computed } from "vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
 import CollectiveAgreements from "@/components/CollectiveAgreements.vue"
 import DismissalInputs from "@/components/DismissalInputs.vue"
@@ -13,24 +13,27 @@ import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 const store = useDocumentUnitStore()
 const courtTypeRef = useInjectCourtType()
 
-const hasCollectiveAgreement = ref<boolean>(
-  !!store.documentUnit?.contentRelatedIndexing?.collectiveAgreements &&
+const hasCollectiveAgreement = computed<boolean>(
+  () =>
+    !!store.documentUnit?.contentRelatedIndexing?.collectiveAgreements &&
     store.documentUnit?.contentRelatedIndexing?.collectiveAgreements?.length >
       0,
 )
-const hasDismissalInput = ref<boolean>(
-  (!!store.documentUnit?.contentRelatedIndexing?.dismissalTypes &&
-    store.documentUnit?.contentRelatedIndexing?.dismissalTypes?.length > 0) ||
+const hasDismissalInput = computed<boolean>(
+  () =>
+    (!!store.documentUnit?.contentRelatedIndexing?.dismissalTypes &&
+      store.documentUnit?.contentRelatedIndexing?.dismissalTypes?.length > 0) ||
     (!!store.documentUnit?.contentRelatedIndexing?.dismissalGrounds &&
       store.documentUnit?.contentRelatedIndexing?.dismissalGrounds?.length > 0),
 )
-const hasJobProfiles = ref<boolean>(
+const hasJobProfiles = computed<boolean>(() =>
   store.documentUnit?.contentRelatedIndexing?.jobProfiles
     ? store.documentUnit?.contentRelatedIndexing?.jobProfiles?.length > 0
     : false,
 )
-const hasLegislativeMandate = ref<boolean>(
-  store.documentUnit?.contentRelatedIndexing?.hasLegislativeMandate == true,
+const hasLegislativeMandate = computed<boolean>(
+  () =>
+    store.documentUnit?.contentRelatedIndexing?.hasLegislativeMandate == true,
 )
 
 const shouldDisplayLegislativeMandateCategory = computed(() => {
