@@ -11,7 +11,7 @@ const store = useDocumentUnitStore()
 
 <template>
   <div class="gap-0">
-    <div class="ds-label-02-reg mb-4" data-testId="Berufsbild">
+    <div class="ds-label-02-reg mb-4" data-testid="Berufsbild">
       {{ label }}
     </div>
     <ChipsInput

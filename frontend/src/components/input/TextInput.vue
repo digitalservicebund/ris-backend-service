@@ -63,7 +63,7 @@ defineExpose({ focusInput, inputRef })
     :aria-label="ariaLabel"
     class="ds-input"
     :class="conditionalClasses"
-    :data-testId="dataTestId"
+    :data-testid="dataTestId"
     :placeholder="placeholder"
     :readonly="readOnly"
     :tabindex="tabindex"

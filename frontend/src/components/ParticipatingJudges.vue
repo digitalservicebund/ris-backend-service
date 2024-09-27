@@ -27,7 +27,7 @@ const defaultValue = new ParticipatingJudge() as ParticipatingJudge
   <div
     aria-label="Mitwirkende Richter"
     class="border-b-1 border-blue-300"
-    data-testId="Mitwirkende Richter"
+    data-testid="Mitwirkende Richter"
   >
     <div class="flex flex-row">
       <div class="flex-1">

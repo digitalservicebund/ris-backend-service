@@ -80,7 +80,7 @@ const otherHeadnote = computed({
       <TextInputCategory
         id="decisionName"
         v-model="decisionName"
-        data-testId="Entscheidungsname"
+        data-testid="Entscheidungsname"
         editable
         label="Entscheidungsname"
         :should-show-button="
