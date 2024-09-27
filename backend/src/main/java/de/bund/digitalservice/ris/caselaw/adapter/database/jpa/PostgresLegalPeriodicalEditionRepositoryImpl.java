@@ -55,7 +55,7 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
                   .findFirst();
           var newReference = ReferenceTransformer.transformToDTO(reference);
           newReference.setDocumentationUnit(docUnit.get());
-          newReference.setRank(docUnit.get().getReferences().size());
+          newReference.setRank(docUnit.get().getReferences().size() + 1);
           existingReference.ifPresent(referenceDTO -> newReference.setRank(referenceDTO.getRank()));
           referenceDTOS.add(newReference);
         }

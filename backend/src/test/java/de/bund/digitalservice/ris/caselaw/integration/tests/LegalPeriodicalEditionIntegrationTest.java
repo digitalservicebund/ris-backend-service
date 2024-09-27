@@ -265,6 +265,8 @@ class LegalPeriodicalEditionIntegrationTest {
                         .build()))
             .build());
 
+    UUID newReferenceId = UUID.randomUUID();
+
     var edition =
         repository.save(
             LegalPeriodicalEdition.builder()
@@ -279,6 +281,16 @@ class LegalPeriodicalEditionIntegrationTest {
                             .id(existingReferenceId)
                             .citation("New Citation")
                             .legalPeriodicalRawValue("B")
+                            .documentationUnit(
+                                RelatedDocumentationUnit.builder()
+                                    .uuid(docUnit.getId())
+                                    .documentNumber("DOC_NUMBER")
+                                    .build())
+                            .build(),
+                        Reference.builder()
+                            .id(newReferenceId)
+                            .citation("New Reference")
+                            .legalPeriodicalRawValue("D")
                             .documentationUnit(
                                 RelatedDocumentationUnit.builder()
                                     .uuid(docUnit.getId())
@@ -303,17 +315,25 @@ class LegalPeriodicalEditionIntegrationTest {
 
     Assertions.assertFalse(editionList.isEmpty(), "List should not be empty");
     Assertions.assertEquals("2024 Sonderheft 1", editionList.get(0).name());
-    Assertions.assertEquals(1, editionList.get(0).references().size());
+    Assertions.assertEquals(2, editionList.get(0).references().size());
     Assertions.assertEquals("New Citation", editionList.get(0).references().get(0).citation());
+    Assertions.assertEquals("New Reference", editionList.get(0).references().get(1).citation());
 
     assertThat(documentationUnitRepository.findByDocumentNumber("DOC_NUMBER").get().getReferences())
-        .hasSize(3)
+        .hasSize(4)
         .anySatisfy(
             referenceDTO -> {
               assertThat(referenceDTO.getId()).isEqualTo(existingReferenceId);
               assertThat(referenceDTO.getCitation()).isEqualTo("New Citation");
               assertThat(referenceDTO.getRank()).isEqualTo(2);
+            })
+        .anySatisfy(
+            referenceDTO -> {
+              assertThat(referenceDTO.getId()).isEqualTo(newReferenceId);
+              assertThat(referenceDTO.getCitation()).isEqualTo("New Reference");
+              assertThat(referenceDTO.getRank()).isEqualTo(4);
             });
+    ;
 
     // clean up
     repository.save(edition.toBuilder().references(List.of()).build());
