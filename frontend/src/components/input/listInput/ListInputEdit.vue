@@ -83,12 +83,12 @@ watch(
       ></textarea>
     </div>
     <InputField
-      id="sortAlphabetically"
+      :id="`sortAlphabetically_${label}`"
       label="Alphabetisch sortieren"
       :label-position="LabelPosition.RIGHT"
     >
       <Checkbox
-        id="sortAlphabetically"
+        :id="`sortAlphabetically_${label}`"
         v-model="sortAlphabetically"
         aria-label="Alphabetisch sortieren"
         class="ds-checkbox-mini bg-white"
