@@ -421,11 +421,30 @@ onMounted(async () => {
       <div>
         <div class="flex gap-16">
           <TextButton
+            v-if="!modelValue?.hasForeignSource"
             aria-label="Nach Entscheidung suchen"
             button-type="primary"
             label="Suchen"
             size="small"
             @click="search"
+          />
+          <TextButton
+            v-if="!lastSavedModelValue.isEmpty"
+            aria-label="Fundstelle vermerken"
+            button-type="tertiary"
+            data-testid="previous-decision-save-button"
+            :disabled="reference.isEmpty"
+            label="Übernehmen"
+            size="small"
+            @click.stop="addReference(relatedDocumentationUnit)"
+          />
+          <TextButton
+            v-if="!lastSavedModelValue.isEmpty"
+            aria-label="Abbrechen"
+            button-type="ghost"
+            label="Abbrechen"
+            size="small"
+            @click.stop="emit('cancelEdit')"
           />
         </div>
       </div>
