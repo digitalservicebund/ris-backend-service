@@ -342,7 +342,9 @@ onMounted(async () => {
         id="referenceSupplement"
         v-slot="slotProps"
         class="flex-1"
-        label="Klammernzusatz"
+        label="Klammernzusatz *"
+        :validation-error="validationStore.getByField('referenceSupplement')"
+        @focus="validationStore.remove('referenceSupplement')"
       >
         <TextInput
           id="referenceSupplement"

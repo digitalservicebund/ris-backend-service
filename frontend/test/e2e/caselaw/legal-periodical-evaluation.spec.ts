@@ -320,6 +320,7 @@ test.describe(
           ).toBeVisible()
           await expect(page.getByText("Bereits hinzugefügt")).toBeVisible()
           await fillInput(page, "Zitatstelle *", "99")
+          await fillInput(page, "Klammernzusatz", "LT")
           await page.getByLabel("Treffer übernehmen").click()
           await expect(
             page.locator("[aria-label='Listen Eintrag']"),
@@ -354,13 +355,15 @@ test.describe(
           ).toBeVisible()
 
           await fillInput(page, "Zitatstelle *", "104")
+          await fillInput(page, "Klammernzusatz", "LT")
+
           await page.getByLabel("Treffer übernehmen").click()
           await expect(
             page.locator("[aria-label='Listen Eintrag']"),
           ).toHaveCount(4)
 
           await expect(
-            page.getByText("MMG 2024, 104, Heft 1", { exact: true }),
+            page.getByText("MMG 2024, 104, Heft 1 (LT)", { exact: true }),
           ).toBeVisible()
         })
 
@@ -392,10 +395,10 @@ test.describe(
             previewTab.getByText("MMG 2024, 5, Heft 1 (LT)", { exact: true }),
           ).toHaveCount(1)
           await expect(
-            previewTab.getByText("MMG 2024, 99, Heft 1", { exact: true }),
+            previewTab.getByText("MMG 2024, 99, Heft 1 (LT)", { exact: true }),
           ).toHaveCount(1)
           await expect(
-            secondPreviewTab.getByText("MMG 2024, 104, Heft 1", {
+            secondPreviewTab.getByText("MMG 2024, 104, Heft 1 (LT)", {
               exact: true,
             }),
           ).toHaveCount(1)
@@ -457,14 +460,14 @@ test.describe(
             previewTab.getByText("MMG 2021, 2, Heft 1 (L)", { exact: true }),
           ).toHaveCount(1, { timeout: 10_000 })
           await expect(
-            previewTab.getByText("MMG 2024, 99, Heft 1", { exact: true }),
+            previewTab.getByText("MMG 2024, 99, Heft 1 (LT)", { exact: true }),
           ).toHaveCount(1)
         })
 
         await test.step("Unchanged citation is unchanged in preview ", async () => {
           await secondPreviewTab.reload()
           await expect(
-            secondPreviewTab.getByText("MMG 2024, 104, Heft 1", {
+            secondPreviewTab.getByText("MMG 2024, 104, Heft 1 (LT)", {
               exact: true,
             }),
           ).toHaveCount(1)
@@ -537,7 +540,7 @@ test.describe(
             previewTab.getByText("MMG 2021, 2, Heft 1 (L)", { exact: true }),
           ).toBeHidden()
           await expect(
-            previewTab.getByText("MMG 2024, 99, Heft 1", { exact: true }),
+            previewTab.getByText("MMG 2024, 99, Heft 1 (LT)", { exact: true }),
           ).toBeHidden()
         })
       },
@@ -605,6 +608,19 @@ test.describe(
           await expect(
             previewTab.getByText("MMG 2022, 11, Heft 3 (LT)", { exact: true }),
           ).toBeVisible()
+        })
+
+        await test.step("Ensure reference cant be saved with empty Klammernzusatz (referenceSupplement)", async () => {
+          await page.getByTestId("list-entry-0").click()
+          await expect(page.getByLabel("Zitatstelle *")).toHaveValue(
+            "2022, 11, Heft 3",
+          )
+          await fillInput(page, "Klammernzusatz", "")
+          await page.getByLabel("Fundstelle vermerken").click()
+          await expect(
+            page.getByText("Pflichtfeld nicht befüllt"),
+            "Empty Klammernzusatz is not allowed",
+          ).toHaveCount(1)
         })
 
         await test.step("Deleted citations disappear from the other docoffice's documentation unit's preview ", async () => {

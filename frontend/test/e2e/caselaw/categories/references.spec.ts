@@ -6,8 +6,8 @@ import {
   navigateToReferences,
   fillInput,
   waitForInputValue,
-} from "./e2e-utils"
-import { caselawTest as test } from "./fixtures"
+} from "../e2e-utils"
+import { caselawTest as test } from "../fixtures"
 
 test.describe(
   "references",
@@ -229,6 +229,17 @@ test.describe(
           await fillInput(page, "Zitatstelle", "2024, 10-12")
           await page.locator("[aria-label='Fundstelle speichern']").click()
           await expect(page.getByText("Pflichtfeld nicht befüllt")).toBeHidden()
+        })
+        await test.step("Add 'Periodikum' with empty Klammernzusatz (referenceSupplement)", async () => {
+          await fillInput(page, "Periodikum", "wdg")
+          await fillInput(page, "Zitatstelle", "2024, 10-12")
+          await fillInput(page, "Klammernzusatz", "")
+
+          await page.locator("[aria-label='Fundstelle speichern']").click()
+          await expect(
+            page.getByText("Pflichtfeld nicht befüllt"),
+            "Should not count empty reference supplement error",
+          ).toHaveCount(1)
         })
       },
     )
