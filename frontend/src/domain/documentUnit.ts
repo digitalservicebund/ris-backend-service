@@ -88,11 +88,11 @@ export type LongTexts = {
 }
 
 export type DocumentationUnitParameters = {
-  documentationOffice: DocumentationOffice
+  documentationOffice?: DocumentationOffice
   documentType?: DocumentType
-  decisionDate: string
-  fileNumber: string
-  court: Court
+  decisionDate?: string
+  fileNumber?: string
+  court?: Court
 }
 
 export default class DocumentUnit {
