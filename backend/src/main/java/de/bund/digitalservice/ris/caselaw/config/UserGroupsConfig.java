@@ -33,7 +33,7 @@ public class UserGroupsConfig {
             .build(),
         UserGroupFromConfig.builder()
             .docOfficeAbbreviation("BGH")
-            .userGroupPathName("/caselaw/BGH/Extern/Busenks")
+            .userGroupPathName("/caselaw/BGH/Extern/Innodata")
             .isInternal(false)
             .build(),
         UserGroupFromConfig.builder()
