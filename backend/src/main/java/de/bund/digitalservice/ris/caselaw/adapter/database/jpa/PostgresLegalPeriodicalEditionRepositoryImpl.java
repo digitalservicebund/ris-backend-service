@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -54,7 +55,7 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
       LegalPeriodicalEdition legalPeriodicalEdition) {
     var oldEdition = repository.findById(legalPeriodicalEdition.id());
     if (oldEdition.isPresent()) {
-      // Ensure it's removed from DocumentationUnitDTO's references
+      // Ensure it's removed from DocumentationUnit's references
       for (ReferenceDTO reference : oldEdition.get().getReferences()) {
         // skip all existing references
         if (legalPeriodicalEdition.references().stream()
@@ -83,17 +84,29 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
       var docUnit =
           documentationUnitRepository.findByDocumentNumber(
               reference.documentationUnit().getDocumentNumber());
-      if (docUnit.isPresent()) {
-        var existingReference =
-            docUnit.get().getReferences().stream()
-                .filter(referenceDTO -> referenceDTO.getId().equals(reference.id()))
-                .findFirst();
-        var newReference = ReferenceTransformer.transformToDTO(reference);
-        newReference.setDocumentationUnit(docUnit.get());
-        newReference.setRank(docUnit.get().getReferences().size() + 1);
-        existingReference.ifPresent(referenceDTO -> newReference.setRank(referenceDTO.getRank()));
-        referenceDTOS.add(newReference);
+      if (docUnit.isEmpty()) {
+        // don't add references to non-existing documentation units
+        continue;
       }
+
+      var newReference = ReferenceTransformer.transformToDTO(reference);
+      newReference.setDocumentationUnit(docUnit.get());
+
+      // keep rank for existing references and set to max rank +1 for new references
+      newReference.setRank(
+          docUnit.get().getReferences().stream()
+              .filter(referenceDTO -> referenceDTO.getId().equals(reference.id()))
+              .findFirst()
+              .map(ReferenceDTO::getRank)
+              .orElseGet(
+                  () ->
+                      docUnit.get().getReferences().stream()
+                              .map(ReferenceDTO::getRank)
+                              .max(Comparator.naturalOrder())
+                              .orElse(0)
+                          + 1));
+
+      referenceDTOS.add(newReference);
     }
     return referenceDTOS;
   }
