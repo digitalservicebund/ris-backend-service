@@ -99,8 +99,8 @@ defineProps<{
     <PreviewCategory>Mitwirkende Richter</PreviewCategory>
     <PreviewContent>
       <div
-        v-for="(participatingJudge, index) in longTexts.participatingJudges"
-        :key="longTexts.participatingJudges[index].id"
+        v-for="participatingJudge in longTexts.participatingJudges"
+        :key="participatingJudge.id"
       >
         {{ participatingJudge.renderDecision }}
       </div>
