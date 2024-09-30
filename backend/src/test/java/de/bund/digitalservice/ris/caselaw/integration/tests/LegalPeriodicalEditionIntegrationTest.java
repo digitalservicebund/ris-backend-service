@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatReflectiveOperationException;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
@@ -108,6 +109,18 @@ class LegalPeriodicalEditionIntegrationTest {
                   List<String> groups = user.getAttribute("groups");
                   return Objects.requireNonNull(groups).get(0).equals("/DS");
                 }));
+  }
+
+  @Test
+  void testFindLegalPeriodical_byAbbreviationOrTitle_shouldSucceed() {
+    Assertions.assertNotNull(
+        legalPeriodicalRepository.findAllBySearchStr(Optional.of("A&G")).stream().findFirst(),
+        "Expected a legal periodical by abbreviation but none was found");
+
+    Assertions.assertNotNull(
+        legalPeriodicalRepository.findAllBySearchStr(Optional.of("Arbeit & Gesundheit")).stream()
+            .findFirst(),
+        "Expected a legal periodical by title but none was found");
   }
 
   @Test

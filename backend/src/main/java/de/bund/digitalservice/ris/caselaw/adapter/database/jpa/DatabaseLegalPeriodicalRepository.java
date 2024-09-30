@@ -14,10 +14,11 @@ public interface DatabaseLegalPeriodicalRepository extends JpaRepository<LegalPe
 
   @Query(
       """
-  SELECT ct FROM LegalPeriodicalDTO ct
-  WHERE LOWER(ct.abbreviation) LIKE COALESCE(concat(LOWER(:searchStr), '%'), '%')
-  ORDER BY ct.abbreviation
-  LIMIT 15
-""")
+                SELECT ct FROM LegalPeriodicalDTO ct
+                WHERE (LOWER(ct.abbreviation) LIKE COALESCE(concat(LOWER(:searchStr), '%'), '%')
+                   OR LOWER(ct.title) LIKE COALESCE(concat(LOWER(:searchStr), '%'), '%'))
+                ORDER BY ct.abbreviation
+                LIMIT 15
+              """)
   List<LegalPeriodicalDTO> findBySearchStr(@Param("searchStr") Optional<String> searchStr);
 }
