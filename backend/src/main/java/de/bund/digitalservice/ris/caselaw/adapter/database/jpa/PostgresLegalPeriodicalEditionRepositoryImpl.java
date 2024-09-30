@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,32 +41,61 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
   @Transactional(transactionManager = "jpaTransactionManager")
   public LegalPeriodicalEdition save(LegalPeriodicalEdition legalPeriodicalEdition) {
 
-    List<ReferenceDTO> referenceDTOS = new ArrayList<>();
-    if (legalPeriodicalEdition.references() != null) {
-
-      // save references
-      for (Reference reference : legalPeriodicalEdition.references()) {
-        var docUnit =
-            documentationUnitRepository.findByDocumentNumber(
-                reference.documentationUnit().getDocumentNumber());
-        if (docUnit.isPresent()) {
-          var existingReference =
-              docUnit.get().getReferences().stream()
-                  .filter(referenceDTO -> referenceDTO.getId().equals(reference.id()))
-                  .findFirst();
-          var newReference = ReferenceTransformer.transformToDTO(reference);
-          newReference.setDocumentationUnit(docUnit.get());
-          newReference.setRank(docUnit.get().getReferences().size() + 1);
-          existingReference.ifPresent(referenceDTO -> newReference.setRank(referenceDTO.getRank()));
-          referenceDTOS.add(newReference);
-        }
-      }
-    }
+    List<ReferenceDTO> referenceDTOS = createReferenceDTOs(legalPeriodicalEdition);
+    deleteDocUnitLinksForDeletedReferences(legalPeriodicalEdition);
 
     var edition = LegalPeriodicalEditionTransformer.transformToDTO(legalPeriodicalEdition);
-    edition.setReferences(referenceDTOS);
+    edition.setReferences(referenceDTOS); // Add the new references
 
     return LegalPeriodicalEditionTransformer.transformToDomain(repository.save(edition));
+  }
+
+  private void deleteDocUnitLinksForDeletedReferences(
+      LegalPeriodicalEdition legalPeriodicalEdition) {
+    var oldEdition = repository.findById(legalPeriodicalEdition.id());
+    if (oldEdition.isPresent()) {
+      // Ensure it's removed from DocumentationUnitDTO's references
+      for (ReferenceDTO reference : oldEdition.get().getReferences()) {
+        // skip all existing references
+        if (legalPeriodicalEdition.references().stream()
+            .anyMatch(newReference -> newReference.id().equals(reference.getId()))) {
+          continue;
+        }
+        // delete all deleted references
+        documentationUnitRepository
+            .findById(reference.getDocumentationUnit().getId())
+            .ifPresent(
+                docUnit -> {
+                  docUnit.getReferences().remove(reference);
+                  documentationUnitRepository.save(docUnit);
+                });
+      }
+    }
+  }
+
+  @NotNull
+  private List<ReferenceDTO> createReferenceDTOs(LegalPeriodicalEdition legalPeriodicalEdition) {
+    List<ReferenceDTO> referenceDTOS = new ArrayList<>();
+    if (legalPeriodicalEdition.references() == null) {
+      return referenceDTOS;
+    }
+    for (Reference reference : legalPeriodicalEdition.references()) {
+      var docUnit =
+          documentationUnitRepository.findByDocumentNumber(
+              reference.documentationUnit().getDocumentNumber());
+      if (docUnit.isPresent()) {
+        var existingReference =
+            docUnit.get().getReferences().stream()
+                .filter(referenceDTO -> referenceDTO.getId().equals(reference.id()))
+                .findFirst();
+        var newReference = ReferenceTransformer.transformToDTO(reference);
+        newReference.setDocumentationUnit(docUnit.get());
+        newReference.setRank(docUnit.get().getReferences().size() + 1);
+        existingReference.ifPresent(referenceDTO -> newReference.setRank(referenceDTO.getRank()));
+        referenceDTOS.add(newReference);
+      }
+    }
+    return referenceDTOS;
   }
 
   @Override

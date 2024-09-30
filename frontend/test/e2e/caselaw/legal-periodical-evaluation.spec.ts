@@ -523,10 +523,22 @@ test.describe(
 
         await test.step("Deleted citations disappear from the documentation unit's preview ", async () => {
           await previewTab.reload()
+          await expect(previewTab.getByText(fileNumber)).toBeVisible()
           await expect(
             previewTab.getByText("MMG 2021, 2, Heft 1 (L)", { exact: true }),
           ).toBeHidden()
           await expect(previewTab.getByText("Fundstellen")).toBeHidden()
+
+          await secondPreviewTab.reload()
+          await expect(
+            secondPreviewTab.getByText(secondFileNumber),
+          ).toBeVisible()
+          await expect(
+            previewTab.getByText("MMG 2021, 2, Heft 1 (L)", { exact: true }),
+          ).toBeHidden()
+          await expect(
+            previewTab.getByText("MMG 2024, 99, Heft 1", { exact: true }),
+          ).toBeHidden()
         })
       },
     )
