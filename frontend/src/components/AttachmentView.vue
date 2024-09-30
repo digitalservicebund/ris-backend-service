@@ -53,6 +53,7 @@ watch(
     </div>
     <FlexItem v-else class="max-h-[70vh] min-h-[63vh] overflow-scroll">
       <TextEditor
+        aria-label="Dokumentenvorschau"
         data-testid="text-editor"
         element-id="text-editor"
         field-size="max"

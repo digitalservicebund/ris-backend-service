@@ -132,20 +132,24 @@ const editor = new Editor({
 const containerWidth = ref<number>()
 
 const editorExpanded = ref(false)
-const editorSize = computed(() => {
-  if (editorExpanded.value) return "h-640"
+const editorStyleClasses = computed(() => {
+  const attachmentViewStyle =
+    props.ariaLabel === "Dokumentenvorschau" ? "attachment-view" : ""
 
-  switch (props.fieldSize) {
-    case "max":
-      return "h-full"
-    case "big":
-      return "h-320"
-    case "medium":
-      return "h-160"
-    case "small":
-      return "h-96"
+  if (editorExpanded.value) {
+    return `h-640 ${attachmentViewStyle}`
   }
-  return undefined
+
+  const fieldSizeClasses: Record<string, string> = {
+    max: "h-full",
+    big: "h-320",
+    medium: "h-160",
+    small: "h-96",
+  }
+
+  return fieldSizeClasses[props.fieldSize]
+    ? fieldSizeClasses[props.fieldSize] + attachmentViewStyle
+    : undefined
 })
 
 watch(
@@ -219,7 +223,7 @@ const resizeObserver = new ResizeObserver((entries) => {
     <hr v-if="editable" class="ml-8 mr-8 border-blue-300" />
     <div>
       <EditorContent
-        :class="editorSize"
+        :class="editorStyleClasses"
         :data-testid="ariaLabel"
         :editor="editor"
       />

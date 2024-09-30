@@ -19,7 +19,7 @@ export const BorderNumber = Node.create({
     return [{ tag: "border-number" }]
   },
   renderHTML() {
-    return ["border-number", { style: "display: flex; margin-bottom: 10px" }, 0]
+    return ["border-number", {}, 0]
   },
   addCommands() {
     return {
@@ -42,11 +42,7 @@ export const BorderNumberNumber = Node.create({
     return [{ tag: "number" }]
   },
   renderHTML() {
-    return [
-      "number",
-      { style: "padding-left: 10px; min-width: 40px; editable: false" },
-      0,
-    ]
+    return ["number", {}, 0]
   },
 })
 
