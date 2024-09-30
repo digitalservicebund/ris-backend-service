@@ -10,6 +10,7 @@ lefthook-local.yml
 *.iws
 *.iml
 *.ipr
+/.idea/runConfigurations/
 
 ### VS Code ###
 **/.vscode/*.code-workspace
