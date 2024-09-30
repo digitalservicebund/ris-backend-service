@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from "vue"
 import TextEditor from "@/components/input/TextEditor.vue"
 import PreviewCategory from "@/components/preview/PreviewCategory.vue"
 import PreviewContent from "@/components/preview/PreviewContent.vue"
@@ -11,36 +12,46 @@ const props = defineProps<{
   validBorderNumbers: string[]
 }>()
 
-const decisionName = props.shortTexts.decisionName
-  ? useValidBorderNumberLinks(
-      props.shortTexts.decisionName,
-      props.validBorderNumbers,
-    )
-  : undefined
-const headline = props.shortTexts.headline
-  ? useValidBorderNumberLinks(
-      props.shortTexts.headline,
-      props.validBorderNumbers,
-    )
-  : undefined
-const guidingPrinciple = props.shortTexts.guidingPrinciple
-  ? useValidBorderNumberLinks(
-      props.shortTexts.guidingPrinciple,
-      props.validBorderNumbers,
-    )
-  : undefined
-const headnote = props.shortTexts.headnote
-  ? useValidBorderNumberLinks(
-      props.shortTexts.headnote,
-      props.validBorderNumbers,
-    )
-  : undefined
-const otherHeadnote = props.shortTexts.otherHeadnote
-  ? useValidBorderNumberLinks(
-      props.shortTexts.otherHeadnote,
-      props.validBorderNumbers,
-    )
-  : undefined
+const decisionName = computed(() =>
+  props.shortTexts.decisionName
+    ? useValidBorderNumberLinks(
+        props.shortTexts.decisionName,
+        props.validBorderNumbers,
+      )
+    : undefined,
+)
+const headline = computed(() =>
+  props.shortTexts.headline
+    ? useValidBorderNumberLinks(
+        props.shortTexts.headline,
+        props.validBorderNumbers,
+      )
+    : undefined,
+)
+const guidingPrinciple = computed(() =>
+  props.shortTexts.guidingPrinciple
+    ? useValidBorderNumberLinks(
+        props.shortTexts.guidingPrinciple,
+        props.validBorderNumbers,
+      )
+    : undefined,
+)
+const headnote = computed(() =>
+  props.shortTexts.headnote
+    ? useValidBorderNumberLinks(
+        props.shortTexts.headnote,
+        props.validBorderNumbers,
+      )
+    : undefined,
+)
+const otherHeadnote = computed(() =>
+  props.shortTexts.otherHeadnote
+    ? useValidBorderNumberLinks(
+        props.shortTexts.otherHeadnote,
+        props.validBorderNumbers,
+      )
+    : undefined,
+)
 </script>
 
 <template>

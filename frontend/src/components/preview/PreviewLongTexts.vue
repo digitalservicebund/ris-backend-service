@@ -11,6 +11,18 @@ defineProps<{
 </script>
 
 <template>
+  <PreviewRow v-if="longTexts.outline">
+    <PreviewCategory>Gliederung</PreviewCategory>
+    <PreviewContent>
+      <TextEditor
+        id="previewOutline"
+        aria-label="Gliederung"
+        field-size="max"
+        preview
+        :value="longTexts.outline"
+      />
+    </PreviewContent>
+  </PreviewRow>
   <PreviewRow v-if="longTexts.tenor">
     <PreviewCategory>Tenor</PreviewCategory>
     <PreviewContent>
@@ -88,22 +100,10 @@ defineProps<{
     <PreviewContent>
       <div
         v-for="(participatingJudge, index) in longTexts.participatingJudges"
-        :key="index"
+        :key="longTexts.participatingJudges[index].id"
       >
         {{ participatingJudge.renderDecision }}
       </div>
-    </PreviewContent>
-  </PreviewRow>
-  <PreviewRow v-if="longTexts.outline">
-    <PreviewCategory>Gliederung</PreviewCategory>
-    <PreviewContent>
-      <TextEditor
-        id="previewOutline"
-        aria-label="Gliederung"
-        field-size="max"
-        preview
-        :value="longTexts.outline"
-      />
     </PreviewContent>
   </PreviewRow>
 </template>
