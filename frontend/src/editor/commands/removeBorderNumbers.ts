@@ -1,6 +1,8 @@
 import { CommandProps } from "@tiptap/core"
 import { Node as ProseMirrorNode } from "prosemirror-model"
 import { Transaction, TextSelection } from "prosemirror-state"
+import { nextTick } from "vue"
+import BorderNumberService from "@/services/borderNumberService"
 
 /**
  * Main command handler to remove borderNumber nodes.
@@ -20,6 +22,8 @@ function removeBorderNumbers({ state, dispatch }: CommandProps): boolean {
     doc,
     borderNumberPositions,
   )
+
+  void nextTick().then(() => BorderNumberService.makeBorderNumbersSequential())
 
   if (modified && dispatch) {
     adjustSelection(
