@@ -140,15 +140,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                                 .documentationUnit(documentationUnitDTO)
                                 .rank(1L)
                                 .build()))
-                .documentType(
-                    parameters.documentType() == null
-                        ? null
-                        : DocumentTypeTransformer.transformToDTO(parameters.documentType()))
+                .documentType(DocumentTypeTransformer.transformToDTO(parameters.documentType()))
                 .decisionDate(parameters.decisionDate() == null ? null : parameters.decisionDate())
-                .court(
-                    parameters.court() == null
-                        ? null
-                        : CourtTransformer.transformToDTO(parameters.court()))
+                .court(CourtTransformer.transformToDTO(parameters.court()))
                 .build());
 
     return DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
