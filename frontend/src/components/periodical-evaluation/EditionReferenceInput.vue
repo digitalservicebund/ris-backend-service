@@ -38,7 +38,6 @@ const emit = defineEmits<{
 
 const store = useEditionStore()
 const router = useRouter()
-const lastSavedModelValue = ref(new Reference({ ...props.modelValue }))
 const reference = ref<Reference>(new Reference({ ...props.modelValue }))
 const validationStore = useValidationStore()
 const pageNumber = ref<number>(0)
@@ -166,7 +165,7 @@ async function validateRequiredInput(toValidateReference: Reference) {
 
 async function addReference(decision: RelatedDocumentation) {
   validationStore.reset()
-  relatedDocumentationUnit.value = new RelatedDocumentation({ ...decision })
+
   const newReference: Reference = new Reference({
     id: reference.value.id,
     citation: props.isSaved ? reference.value.citation : buildCitation(),
@@ -176,9 +175,6 @@ async function addReference(decision: RelatedDocumentation) {
     legalPeriodicalRawValue: reference.value.legalPeriodicalRawValue,
     documentationUnit: new RelatedDocumentation({ ...decision }),
   })
-  console.log(newReference)
-
-  lastSavedModelValue.value = newReference
 
   await validateRequiredInput(newReference)
 
@@ -192,45 +188,48 @@ async function createNewFromSearch(openDocunit: boolean = false) {
   isLoading.value = true
   createNewFromSearchResponseError.value = undefined
   await validateRequiredInput(reference.value)
-  if (validationStore.isValid()) {
-    const parameters = {
-      fileNumber: relatedDocumentationUnit.value.fileNumber,
-      documentationOffice: docOffice.value,
-      decisionDate: relatedDocumentationUnit.value.decisionDate,
-      court: relatedDocumentationUnit.value.court,
-      documentType: relatedDocumentationUnit.value.documentType,
-    } as DocumentationUnitParameters
 
-    const createResponse = await documentUnitService.createNew(parameters)
-    if (createResponse.error) {
-      createNewFromSearchResponseError.value = createResponse.error
-      isLoading.value = false
-      return
-    } else {
-      if (openDocunit) {
-        const routeData = router.resolve({
-          name: "caselaw-documentUnit-documentNumber-categories",
-          params: { documentNumber: createResponse.data.documentNumber },
-        })
-        window.open(routeData.href, "_blank")
-      }
-      addReference(
-        new RelatedDocumentation({
-          uuid: createResponse.data.uuid,
-          fileNumber: createResponse.data.coreData.fileNumbers
-            ? createResponse.data.coreData.fileNumbers[0]
-            : undefined,
-          decisionDate: createResponse.data.coreData.decisionDate,
-          court: createResponse.data.coreData.court,
-          documentType: createResponse.data.coreData.documentType,
-          documentNumber: createResponse.data.documentNumber,
-          status: createResponse.data.status,
-          referenceFound: true,
-        }),
-      )
-    }
+  if (!validationStore.isValid()) {
+    isLoading.value = false
+    return
   }
 
+  const parameters = {
+    fileNumber: relatedDocumentationUnit.value.fileNumber,
+    documentationOffice: docOffice.value,
+    decisionDate: relatedDocumentationUnit.value.decisionDate,
+    court: relatedDocumentationUnit.value.court,
+    documentType: relatedDocumentationUnit.value.documentType,
+  } as DocumentationUnitParameters
+
+  const createResponse = await documentUnitService.createNew(parameters)
+  if (createResponse.error) {
+    createNewFromSearchResponseError.value = createResponse.error
+    isLoading.value = false
+    return
+  }
+  if (openDocunit) {
+    const routeData = router.resolve({
+      name: "caselaw-documentUnit-documentNumber-categories",
+      params: { documentNumber: createResponse.data.documentNumber },
+    })
+    window.open(routeData.href, "_blank")
+  }
+
+  await addReference(
+    new RelatedDocumentation({
+      uuid: createResponse.data.uuid,
+      fileNumber: createResponse.data.coreData.fileNumbers
+        ? createResponse.data.coreData.fileNumbers[0]
+        : undefined,
+      decisionDate: createResponse.data.coreData.decisionDate,
+      court: createResponse.data.coreData.court,
+      documentType: createResponse.data.coreData.documentType,
+      documentNumber: createResponse.data.documentNumber,
+      status: createResponse.data.status,
+      referenceFound: true,
+    }),
+  )
   isLoading.value = false
 }
 
@@ -434,7 +433,7 @@ onMounted(async () => {
       <div>
         <div class="flex gap-16">
           <TextButton
-            v-if="!modelValue?.hasForeignSource"
+            v-if="!isSaved"
             aria-label="Nach Entscheidung suchen"
             button-type="primary"
             label="Suchen"
@@ -442,7 +441,7 @@ onMounted(async () => {
             @click="search"
           />
           <TextButton
-            v-if="!lastSavedModelValue.isEmpty"
+            v-if="isSaved"
             aria-label="Fundstelle vermerken"
             button-type="tertiary"
             data-testid="previous-decision-save-button"
@@ -452,7 +451,7 @@ onMounted(async () => {
             @click.stop="addReference(relatedDocumentationUnit)"
           />
           <TextButton
-            v-if="!lastSavedModelValue.isEmpty"
+            v-if="isSaved"
             aria-label="Abbrechen"
             button-type="ghost"
             label="Abbrechen"
@@ -484,6 +483,8 @@ onMounted(async () => {
         />
       </Pagination>
     </div>
+
+    <!--TODO extract component -->
 
     <div
       v-if="searchResults && featureToggle"
