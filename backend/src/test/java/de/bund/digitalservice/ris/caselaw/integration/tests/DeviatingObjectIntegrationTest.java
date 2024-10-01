@@ -136,16 +136,8 @@ class DeviatingObjectIntegrationTest {
         dto.toBuilder()
             .deviatingFileNumbers(
                 List.of(
-                    DeviatingFileNumberDTO.builder()
-                        .rank(1L)
-                        .documentationUnit(dto)
-                        .value("dfn1")
-                        .build(),
-                    DeviatingFileNumberDTO.builder()
-                        .rank(2L)
-                        .documentationUnit(dto)
-                        .value("dfn2")
-                        .build()))
+                    DeviatingFileNumberDTO.builder().rank(1L).value("dfn1").build(),
+                    DeviatingFileNumberDTO.builder().rank(2L).value("dfn2").build()))
             .build());
   }
 

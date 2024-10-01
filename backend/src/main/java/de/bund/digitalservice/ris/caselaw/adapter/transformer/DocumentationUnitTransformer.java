@@ -455,7 +455,6 @@ public class DocumentationUnitTransformer {
           DeviatingFileNumberDTO.builder()
               .value(StringUtils.normalizeSpace(deviatingFileNumbers.get(i)))
               .rank(i + 1L)
-              .documentationUnit(currentDto)
               .build());
     }
 

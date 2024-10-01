@@ -889,20 +889,16 @@ class DocumentationUnitIntegrationTest {
                 .documentNumber("documentNumber")
                 .decisionDate(LocalDate.parse("2021-01-02"))
                 .documentationOffice(documentationOffice)
+                .fileNumbers(
+                    List.of(
+                        FileNumberDTO.builder().value("Vf. 19-VIII-22 (e.A.)").rank(1L).build()))
+                .deviatingFileNumbers(
+                    List.of(
+                        DeviatingFileNumberDTO.builder()
+                            .value("Vf.19-VIII-22 ea")
+                            .rank(1L)
+                            .build()))
                 .build());
-
-    repository.save(
-        dto.toBuilder()
-            .fileNumbers(
-                List.of(FileNumberDTO.builder().value("Vf. 19-VIII-22 (e.A.)").rank(1L).build()))
-            .deviatingFileNumbers(
-                List.of(
-                    DeviatingFileNumberDTO.builder()
-                        .documentationUnit(dto)
-                        .value("Vf.19-VIII-22 ea")
-                        .rank(1L)
-                        .build()))
-            .build());
 
     DocumentationUnitSearchInput searchInput =
         DocumentationUnitSearchInput.builder().fileNumber("Vf.").build();

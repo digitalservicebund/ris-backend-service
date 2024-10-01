@@ -291,11 +291,7 @@ class DocumentationUnitSearchIntegrationTest {
                   i < 4
                       ? List.of()
                       : List.of(
-                          DeviatingFileNumberDTO.builder()
-                              .value("ABC 34/" + i)
-                              .documentationUnit(doc)
-                              .rank(0L)
-                              .build()))
+                          DeviatingFileNumberDTO.builder().value("ABC 34/" + i).rank(0L).build()))
               .build());
     }
 
