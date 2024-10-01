@@ -304,7 +304,6 @@ onMounted(async () => {
         class="flex-1"
         label="Klammernzusatz *"
         :validation-error="validationStore.getByField('referenceSupplement')"
-        @focus="validationStore.remove('referenceSupplement')"
       >
         <TextInput
           id="referenceSupplement"
@@ -312,6 +311,8 @@ onMounted(async () => {
           aria-label="Klammernzusatz"
           :has-error="slotProps.hasError"
           size="medium"
+          @blur="validateRequiredInput(reference)"
+          @focus="validationStore.remove('referenceSupplement')"
         ></TextInput>
       </InputField>
     </div>
