@@ -32,7 +32,9 @@ describe("List input", () => {
     // renders label
     expect(screen.getByText("Liste", { exact: true })).toBeInTheDocument()
     expect(
-      screen.getByPlaceholderText("Geben Sie jeden Wert in eigene Zeile ein"),
+      screen.getByPlaceholderText(
+        "Geben Sie jeden Wert in eine eigene Zeile ein",
+      ),
     ).toBeInTheDocument()
     expect(screen.queryByLabelText("Liste bearbeiten")).not.toBeInTheDocument()
   })
@@ -47,7 +49,9 @@ describe("List input", () => {
     expect(await screen.findByLabelText("Liste bearbeiten")).toBeVisible()
     expect(screen.getAllByTestId("chip").length).toBe(2)
     expect(
-      screen.queryByPlaceholderText("Geben Sie jeden Wert in eigene Zeile ein"),
+      screen.queryByPlaceholderText(
+        "Geben Sie jeden Wert in eine eigene Zeile ein",
+      ),
     ).not.toBeInTheDocument()
   })
 
