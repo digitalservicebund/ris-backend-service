@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.CourtTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitListItemTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalEffectTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
@@ -11,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParame
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
+import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType;
@@ -112,8 +114,19 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         DocumentationUnitDTO.builder()
             .documentNumber(documentNumber)
             .documentationOffice(documentationOfficeDTO)
-            .legalEffect(LegalEffectDTO.KEINE_ANGABE)
+            .legalEffect(
+                LegalEffectTransformer.transformToDTO(
+                    LegalEffect.deriveFrom(parameters.court(), true)
+                        .orElse(LegalEffect.NOT_SPECIFIED)))
             .version(0L)
+            .fileNumbers(
+                parameters.fileNumber() == null
+                    ? Collections.emptyList()
+                    : Collections.singletonList(
+                        FileNumberDTO.builder().value(parameters.fileNumber()).rank(1L).build()))
+            .documentType(DocumentTypeTransformer.transformToDTO(parameters.documentType()))
+            .decisionDate(parameters.decisionDate())
+            .court(CourtTransformer.transformToDTO(parameters.court()))
             .build();
 
     documentationUnitDTO
@@ -127,24 +140,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                 .build());
 
     repository.save(documentationUnitDTO);
-
-    documentationUnitDTO =
-        repository.save(
-            documentationUnitDTO.toBuilder()
-                .fileNumbers(
-                    parameters.fileNumber() == null
-                        ? Collections.emptyList()
-                        : Collections.singletonList(
-                            FileNumberDTO.builder()
-                                .value(parameters.fileNumber())
-                                .documentationUnit(documentationUnitDTO)
-                                .rank(1L)
-                                .build()))
-                .documentType(DocumentTypeTransformer.transformToDTO(parameters.documentType()))
-                .decisionDate(parameters.decisionDate() == null ? null : parameters.decisionDate())
-                .court(CourtTransformer.transformToDTO(parameters.court()))
-                .build());
-
     return DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
   }
 
@@ -184,7 +179,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       }
     }
 
-    // TODO delete references?
     // ---
 
     // Transform non-database-related properties

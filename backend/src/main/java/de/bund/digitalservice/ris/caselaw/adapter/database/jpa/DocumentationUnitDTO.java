@@ -75,11 +75,8 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
 
   @Column private String ecli;
 
-  @OneToMany(
-      mappedBy = "documentationUnit",
-      cascade = CascadeType.ALL,
-      fetch = FetchType.LAZY,
-      orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
   @OrderBy("rank")
   private List<FileNumberDTO> fileNumbers = new ArrayList<>();

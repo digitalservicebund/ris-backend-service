@@ -302,8 +302,7 @@ class DocumentationUnitIntegrationTest {
     assertThat(list).hasSize(1);
     assertThat(list.get(0).getDocumentNumber()).isEqualTo("1234567890123");
 
-    List<FileNumberDTO> fileNumberEntries =
-        fileNumberRepository.findAllByDocumentationUnit(list.get(0));
+    List<FileNumberDTO> fileNumberEntries = fileNumberRepository.findAll();
     assertThat(fileNumberEntries).hasSize(1);
     assertThat(fileNumberEntries.get(0).getValue()).isEqualTo("AkteX");
   }
@@ -780,22 +779,10 @@ class DocumentationUnitIntegrationTest {
                   .decisionDate(decisionDates.get(i))
                   .documentationOffice(
                       DocumentationOfficeDTO.builder().id(docOfficeIds.get(i)).build())
+                  .fileNumbers(
+                      List.of(
+                          FileNumberDTO.builder().value(fileNumbers.get(i)).rank((long) i).build()))
                   .build());
-
-      dto = repository.findById(dto.getId()).get();
-
-      repository.save(
-          dto.toBuilder()
-              .fileNumbers(
-                  List.of(
-                      FileNumberDTO.builder()
-                          .documentationUnit(dto)
-                          .value(fileNumbers.get(i))
-                          .rank((long) i)
-                          .build()))
-              .build());
-
-      dto = repository.findById(dto.getId()).get();
 
       repository.save(
           dto.toBuilder()
@@ -907,12 +894,7 @@ class DocumentationUnitIntegrationTest {
     repository.save(
         dto.toBuilder()
             .fileNumbers(
-                List.of(
-                    FileNumberDTO.builder()
-                        .documentationUnit(dto)
-                        .value("Vf. 19-VIII-22 (e.A.)")
-                        .rank(1L)
-                        .build()))
+                List.of(FileNumberDTO.builder().value("Vf. 19-VIII-22 (e.A.)").rank(1L).build()))
             .deviatingFileNumbers(
                 List.of(
                     DeviatingFileNumberDTO.builder()

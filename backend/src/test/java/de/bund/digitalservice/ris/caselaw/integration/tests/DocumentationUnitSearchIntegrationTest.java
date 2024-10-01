@@ -150,13 +150,7 @@ class DocumentationUnitSearchIntegrationTest {
     migrationDto =
         repository.save(
             migrationDto.toBuilder()
-                .fileNumbers(
-                    List.of(
-                        FileNumberDTO.builder()
-                            .value("AkteM")
-                            .documentationUnit(migrationDto)
-                            .rank(0L)
-                            .build()))
+                .fileNumbers(List.of(FileNumberDTO.builder().value("AkteM").rank(0L).build()))
                 .build());
     DocumentationUnitDTO newNeurisDto =
         repository.save(
@@ -167,13 +161,7 @@ class DocumentationUnitSearchIntegrationTest {
     newNeurisDto =
         repository.save(
             newNeurisDto.toBuilder()
-                .fileNumbers(
-                    List.of(
-                        FileNumberDTO.builder()
-                            .value("AkteY")
-                            .documentationUnit(newNeurisDto)
-                            .rank(0L)
-                            .build()))
+                .fileNumbers(List.of(FileNumberDTO.builder().value("AkteY").rank(0L).build()))
                 .build());
 
     statusRepository.save(
@@ -297,12 +285,7 @@ class DocumentationUnitSearchIntegrationTest {
                   // even indices get a fileNumber
                   i % 2 == 1
                       ? List.of()
-                      : List.of(
-                          FileNumberDTO.builder()
-                              .value("AB 34/" + i)
-                              .documentationUnit(doc)
-                              .rank(0L)
-                              .build()))
+                      : List.of(FileNumberDTO.builder().value("AB 34/" + i).rank(0L).build()))
               // index 4+ get a deviating fileNumber
               .deviatingFileNumbers(
                   i < 4

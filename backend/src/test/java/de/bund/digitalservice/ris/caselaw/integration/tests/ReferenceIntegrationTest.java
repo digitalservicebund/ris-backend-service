@@ -133,9 +133,7 @@ class ReferenceIntegrationTest {
                 .documentNumber(DEFAULT_DOCUMENT_NUMBER)
                 .build());
 
-    var fileNumber = createTestFileNumberDTO();
-    fileNumber.setDocumentationUnit(dto);
-    dto.setFileNumbers(List.of(fileNumber));
+    dto.setFileNumbers(List.of(createTestFileNumberDTO()));
 
     LegalPeriodicalDTO legalPeriodical =
         legalPeriodicalRepository.save(

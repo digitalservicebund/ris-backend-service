@@ -1383,8 +1383,7 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       DocumentationUnitDTO dto = repository.findById(documentationUnit.uuid()).get();
-      dto.getFileNumbers()
-          .add(FileNumberDTO.builder().value("initialFileNumber").documentationUnit(dto).build());
+      dto.getFileNumbers().add(FileNumberDTO.builder().value("initialFileNumber").build());
       repository.save(dto);
       TestTransaction.end();
 
@@ -1484,8 +1483,7 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       DocumentationUnitDTO dto = repository.findById(documentationUnit.uuid()).get();
-      dto.getFileNumbers()
-          .add(FileNumberDTO.builder().value("initialFileNumber").documentationUnit(dto).build());
+      dto.getFileNumbers().add(FileNumberDTO.builder().value("initialFileNumber").build());
       repository.save(dto);
       TestTransaction.end();
 
@@ -1637,8 +1635,7 @@ class PatchUpdateIntegrationTest {
 
       TestTransaction.start();
       DocumentationUnitDTO dto = repository.findById(documentationUnit.uuid()).get();
-      dto.getFileNumbers()
-          .add(FileNumberDTO.builder().value("initialFileNumber").documentationUnit(dto).build());
+      dto.getFileNumbers().add(FileNumberDTO.builder().value("initialFileNumber").build());
       repository.save(dto);
       TestTransaction.end();
 

@@ -16,7 +16,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
@@ -90,7 +89,7 @@ public class DocumentationUnitTransformer {
           .court(CourtTransformer.transformToDTO(coreData.court()));
 
       addInputTypes(builder, coreData);
-      addFileNumbers(currentDto, builder, coreData);
+      addFileNumbers(builder, coreData);
       addDeviationCourts(builder, coreData);
       addDeviatingDecisionDates(builder, coreData);
       addDeviatingFileNumbers(currentDto, builder, coreData);
@@ -399,16 +398,7 @@ public class DocumentationUnitTransformer {
         LegalEffect.deriveFrom(
             updatedDomainObject, courtWasAdded || courtWasDeleted || courtHasChanged);
 
-    LegalEffectDTO legalEffectDTO = LegalEffectDTO.FALSCHE_ANGABE;
-    if (legalEffect != null) {
-      switch (legalEffect) {
-        case NO -> legalEffectDTO = LegalEffectDTO.NEIN;
-        case YES -> legalEffectDTO = LegalEffectDTO.JA;
-        case NOT_SPECIFIED -> legalEffectDTO = LegalEffectDTO.KEINE_ANGABE;
-      }
-    }
-
-    builder.legalEffect(legalEffectDTO);
+    builder.legalEffect(LegalEffectTransformer.transformToDTO(legalEffect));
   }
 
   private static void addLeadingDecisionNormReferences(
@@ -527,8 +517,7 @@ public class DocumentationUnitTransformer {
     builder.inputTypes(inputTypeDTOs);
   }
 
-  private static void addFileNumbers(
-      DocumentationUnitDTO currentDto, DocumentationUnitDTOBuilder builder, CoreData coreData) {
+  private static void addFileNumbers(DocumentationUnitDTOBuilder builder, CoreData coreData) {
     if (coreData.fileNumbers() == null) {
       return;
     }
@@ -541,7 +530,6 @@ public class DocumentationUnitTransformer {
           FileNumberDTO.builder()
               .value(StringUtils.normalizeSpace(fileNumbers.get(i)))
               .rank(i + 1L)
-              .documentationUnit(currentDto)
               .build());
     }
 
@@ -563,7 +551,8 @@ public class DocumentationUnitTransformer {
     log.debug(
         "transfer database documentation unit '{}' to domain object", documentationUnitDTO.getId());
 
-    LegalEffect legalEffect = getLegalEffectForDomain(documentationUnitDTO);
+    LegalEffect legalEffect =
+        LegalEffectTransformer.transformToDomain(documentationUnitDTO.getLegalEffect());
 
     DocumentationUnit.DocumentationUnitBuilder builder =
         DocumentationUnit.builder()
@@ -795,22 +784,6 @@ public class DocumentationUnitTransformer {
             .toList());
 
     return normReferences;
-  }
-
-  private static LegalEffect getLegalEffectForDomain(DocumentationUnitDTO documentationUnitDTO) {
-    LegalEffect legalEffect = null;
-
-    if (documentationUnitDTO.getLegalEffect() != null) {
-      if (documentationUnitDTO.getLegalEffect() == LegalEffectDTO.NEIN) {
-        legalEffect = LegalEffect.NO;
-      } else if (documentationUnitDTO.getLegalEffect() == LegalEffectDTO.JA) {
-        legalEffect = LegalEffect.YES;
-      } else if (documentationUnitDTO.getLegalEffect() == LegalEffectDTO.KEINE_ANGABE) {
-        legalEffect = LegalEffect.NOT_SPECIFIED;
-      }
-    }
-
-    return legalEffect;
   }
 
   private static void addOriginalFileDocuments(
