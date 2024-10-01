@@ -34,7 +34,7 @@ export function addBorderNumbers({ state, dispatch }: CommandProps): boolean {
       node.type === paragraphNodeType && node.content.size != 0
 
     if (isParagraphWithContent) {
-      const numberNode = numberNodeType.create({}, schema.text("1"))
+      const numberNode = numberNodeType.create({}, schema.text("0"))
       const contentNode = contentNodeType.create({}, node.content)
       const borderNumberNode = borderNumberNodeType.create({}, [
         numberNode,
