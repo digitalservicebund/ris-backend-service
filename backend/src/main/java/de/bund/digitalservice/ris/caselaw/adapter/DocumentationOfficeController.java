@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -20,9 +21,15 @@ public class DocumentationOfficeController {
     this.service = service;
   }
 
+  /**
+   * Returns documentation office objects in a list with optional search string.
+   *
+   * @return all documentation offices containing the search string in their abbreviation
+   */
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public List<DocumentationOffice> getDocumentationOffices() {
-    return service.getAll();
+  public List<DocumentationOffice> getDocumentationOffices(
+      @RequestParam(value = "q", required = false) String searchStr) {
+    return service.getDocumentationOffices(searchStr);
   }
 }

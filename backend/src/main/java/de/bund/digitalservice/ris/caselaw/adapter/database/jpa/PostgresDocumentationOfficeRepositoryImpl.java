@@ -16,8 +16,15 @@ public class PostgresDocumentationOfficeRepositoryImpl implements DocumentationO
   }
 
   @Override
-  public List<DocumentationOffice> findAll() {
-    return repository.findAll().stream()
+  public List<DocumentationOffice> findBySearchStr(String searchStr) {
+    return repository.findByAbbreviationStartsWith(searchStr).stream()
+        .map(DocumentationOfficeTransformer::transformToDomain)
+        .toList();
+  }
+
+  @Override
+  public List<DocumentationOffice> findAllOrderByAbbreviationAsc() {
+    return repository.findAllByOrderByAbbreviationAsc().stream()
         .map(DocumentationOfficeTransformer::transformToDomain)
         .toList();
   }
