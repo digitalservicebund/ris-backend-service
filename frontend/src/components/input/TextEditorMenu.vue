@@ -6,6 +6,7 @@ import TextEditorButton, {
   EditorButton,
 } from "@/components/input/TextEditorButton.vue"
 import { useCollapsingMenuBar } from "@/composables/useCollapsingMenuBar"
+import IcSharpAddBox from "~icons/ic/sharp-add-box"
 import MaterialSymbolsDeleteSweepOutline from "~icons/ic/sharp-delete-sweep"
 import IconExpand from "~icons/ic/sharp-expand"
 import IconAlignCenter from "~icons/ic/sharp-format-align-center"
@@ -185,9 +186,17 @@ const buttons = computed(() => [
     callback: () => props.editor.chain().focus().toggleBlockquote().run(),
   },
   {
-    type: "deleteBorderNumber",
+    type: "addBorderNumbers",
+    icon: IcSharpAddBox,
+    ariaLabel: "Randnummern hinzufügen",
+    group: "borderNumber",
+    isCollapsable: false,
+    callback: () => props.editor.chain().focus().addBorderNumbers().run(),
+  },
+  {
+    type: "removeBorderNumbers",
     icon: MaterialSymbolsDeleteSweepOutline,
-    ariaLabel: "Randnummer entfernen",
+    ariaLabel: "Randnummern entfernen",
     group: "borderNumber",
     isCollapsable: false,
     callback: () => props.editor.chain().focus().removeBorderNumbers().run(),

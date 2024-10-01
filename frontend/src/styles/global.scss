@@ -38,25 +38,4 @@
   blockquote {
     margin-left: 40px;
   }
-
-  border-number {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-  }
-
-  /* stylelint-disable-next-line selector-type-no-unknown */
-  border-number number {
-    display: flex;
-    min-width: 40px;
-    justify-content: center;
-    margin-right: 12px;
-    background: #dce8ef;
-    line-height: 1;
-  }
-
-  /* stylelint-disable-next-line selector-type-no-unknown */
-  #attachment-view border-number number {
-    background: transparent;
-  }
 }

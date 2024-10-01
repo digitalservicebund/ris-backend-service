@@ -1,0 +1,17 @@
+border-number {
+  display: flex;
+  align-items: baseline;
+}
+
+border-number number {
+  display: flex;
+  min-width: 40px;
+  justify-content: center;
+  margin-right: 12px;
+  background: #dce8ef;
+  line-height: 1;
+}
+
+#attachment-view border-number number {
+  background: transparent;
+}

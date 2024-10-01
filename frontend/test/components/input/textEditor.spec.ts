@@ -161,7 +161,7 @@ describe("text editor", async () => {
     expect(screen.getByLabelText("Einzug verringern")).toBeInTheDocument()
     expect(screen.getByLabelText("Einzug vergrößern")).toBeInTheDocument()
     expect(screen.getByLabelText("Zitat einfügen")).toBeInTheDocument()
-    expect(screen.getByLabelText("Randnummer entfernen")).toBeInTheDocument()
+    expect(screen.getByLabelText("Randnummern entfernen")).toBeInTheDocument()
     expect(screen.getByLabelText("Rückgängig machen")).toBeInTheDocument()
     expect(screen.getByLabelText("Wiederherstellen")).toBeInTheDocument()
   })
