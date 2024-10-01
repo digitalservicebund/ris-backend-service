@@ -15,11 +15,11 @@ import { ResponseError } from "@/services/httpClient"
 
 const props = defineProps<{
   parameters?: DocumentationUnitParameters
-  isValid: boolean
+  validateRequiredInput: () => boolean
 }>()
+
 const emit = defineEmits<{
   createdDocumentationUnit: [value: DocumentUnit]
-  validateRequiredInput: [void]
 }>()
 
 const router = useRouter()
@@ -48,10 +48,12 @@ const responsibleDocOffice = computed({
 async function createNewFromSearch(openDocunit: boolean = false) {
   createNewFromSearchResponseError.value = undefined
 
-  if (!props.isValid) {
-    emit("validateRequiredInput")
+  const isValid = props.validateRequiredInput()
+
+  if (!isValid) {
     return
   }
+
   const createResponse = await documentUnitService.createNew(props.parameters)
   if (createResponse.error) {
     createNewFromSearchResponseError.value = createResponse.error

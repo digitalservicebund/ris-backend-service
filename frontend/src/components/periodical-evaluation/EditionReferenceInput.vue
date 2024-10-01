@@ -138,11 +138,14 @@ async function updatePage(page: number) {
   await search()
 }
 
-function validateRequiredInput(toValidateReference: Reference) {
+function validateRequiredInput(toValidateReference: Reference): boolean {
   if (toValidateReference.missingRequiredFields?.length) {
     toValidateReference.missingRequiredFields.forEach((missingField) => {
       validationStore.add("Pflichtfeld nicht befüllt", missingField)
     })
+    return false
+  } else {
+    return true
   }
 }
 
@@ -448,10 +451,9 @@ onMounted(async () => {
     </div>
     <CreateNewDialogue
       v-if="searchResults && featureToggle"
-      :is-valid="!reference.missingRequiredFields?.length"
       :parameters="createDocumentationUnitParameters"
+      :validate-required-input="validateRequiredInput(reference)"
       @created-documentation-unit="addReferenceWithCreatedDocunit"
-      @validate-required-input="validateRequiredInput(reference)"
     />
   </div>
 </template>
