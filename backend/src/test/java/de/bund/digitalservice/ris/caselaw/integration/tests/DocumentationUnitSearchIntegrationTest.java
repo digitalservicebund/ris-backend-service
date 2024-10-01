@@ -271,16 +271,11 @@ class DocumentationUnitSearchIntegrationTest {
   @Test
   void testForCompleteResultListWhenSearchingForFileNumberOrDocumentNumber() {
     for (int i = 0; i < 10; i++) {
-      DocumentationUnitDTO doc =
-          repository.save(
-              DocumentationUnitDTO.builder()
-                  // index 0-4 get a "AB" docNumber
-                  .documentNumber((i <= 4 ? "AB" : "GE") + "123456780" + i)
-                  .documentationOffice(docOfficeDTO)
-                  .build());
-
       repository.save(
-          doc.toBuilder()
+          DocumentationUnitDTO.builder()
+              // index 0-4 get a "AB" docNumber
+              .documentNumber((i <= 4 ? "AB" : "GE") + "123456780" + i)
+              .documentationOffice(docOfficeDTO)
               .fileNumbers(
                   // even indices get a fileNumber
                   i % 2 == 1
