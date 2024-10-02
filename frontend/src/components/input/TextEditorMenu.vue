@@ -54,7 +54,7 @@ const isFeatureEnabled = await FeatureToggleService.isEnabled(
 const shouldShowAddBorderNumbersButton =
   isInternalUser &&
   borderNumberCategories.includes(props.ariaLabel) &&
-  isFeatureEnabled
+  isFeatureEnabled.data
 
 const buttons = computed(() => {
   const buttons = [

@@ -3,15 +3,11 @@ import { NodeType } from "prosemirror-model"
 import { TextSelection } from "prosemirror-state"
 import { nextTick } from "vue"
 import BorderNumberService from "@/services/borderNumberService"
-import FeatureToggleService from "@/services/featureToggleService"
 
 /**
  * Main command handler to add borderNumber nodes (with default value "0").
  */
-export async function addBorderNumbers({
-  state,
-  dispatch,
-}: CommandProps): boolean {
+export function addBorderNumbers({ state, dispatch }: CommandProps): boolean {
   const { tr, selection, schema } = state
   const { from: initialFrom, to: initialTo } = selection
 
@@ -77,15 +73,7 @@ export async function addBorderNumbers({
     }
   })
 
-  const isRecalculationEnabled = await FeatureToggleService.isEnabled(
-    "neuris.border-number-editor",
-  )
-
-  if (isRecalculationEnabled) {
-    void nextTick().then(() =>
-      BorderNumberService.makeBorderNumbersSequential(),
-    )
-  }
+  void nextTick().then(() => BorderNumberService.makeBorderNumbersSequential())
 
   // If changes were made, dispatch the transaction
   if (modified && dispatch) {
