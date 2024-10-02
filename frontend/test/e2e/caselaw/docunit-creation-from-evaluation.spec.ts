@@ -28,7 +28,7 @@ test.describe(
         },
       },
       async ({ page, edition }) => {
-        await navigateToPeriodicalReferences(page, edition.id)
+        await navigateToPeriodicalReferences(page, edition.id ?? "")
 
         await fillInput(page, "Zitatstelle *", "12")
         await fillInput(page, "Klammernzusatz", "L")
