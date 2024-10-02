@@ -1,9 +1,6 @@
-import { CommandProps } from "@tiptap/core"
 import { Node } from "@tiptap/vue-3"
-import { addBorderNumbers } from "@/editor/commands/addBorderNumbers"
-import removeBorderNumbers from "@/editor/commands/removeBorderNumbers"
-import { handleBackspace } from "@/editor/shortcuts/handleBackspace"
 import "../styles/border-numbers.css"
+import { handleBackspace } from "@/editor/shortcuts/handleBackspace"
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -35,16 +32,6 @@ export const BorderNumber = Node.create({
   },
   renderHTML() {
     return ["border-number", {}, 0]
-  },
-  addCommands() {
-    return {
-      removeBorderNumbers:
-        (isFeatureEnabled) =>
-        ({ state, dispatch }: CommandProps) => {
-          return removeBorderNumbers({ state, dispatch }, isFeatureEnabled)
-        },
-      addBorderNumbers: () => addBorderNumbers,
-    }
   },
   addKeyboardShortcuts() {
     return {

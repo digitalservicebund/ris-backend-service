@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { commands } from "@guardian/prosemirror-invisibles"
+import { CommandProps } from "@tiptap/core"
 import { Blockquote } from "@tiptap/extension-blockquote"
 import { Bold } from "@tiptap/extension-bold"
 import { Color } from "@tiptap/extension-color"
@@ -27,6 +28,8 @@ import {
 } from "@/editor/borderNumber"
 import { BorderNumberLink } from "@/editor/borderNumberLink"
 import { CustomBulletList } from "@/editor/bulletList"
+import { addBorderNumbers } from "@/editor/commands/addBorderNumbers"
+import removeBorderNumbers from "@/editor/commands/removeBorderNumbers"
 import { FontSize } from "@/editor/fontSize"
 import { CustomImage } from "@/editor/image"
 import { Indent } from "@/editor/indent"
@@ -36,6 +39,7 @@ import { CustomOrderedList } from "@/editor/orderedList"
 import { CustomParagraph } from "@/editor/paragraph"
 import { CustomSubscript, CustomSuperscript } from "@/editor/scriptText"
 import { TableStyle } from "@/editor/tableStyle"
+import FeatureToggleService from "@/services/featureToggleService"
 
 interface Props {
   value?: string
@@ -60,6 +64,7 @@ const emit = defineEmits<{
 const editorElement = ref<HTMLElement>()
 const hasFocus = ref(false)
 const isHovered = ref(false)
+const featureToggle = ref()
 
 const editor = new Editor({
   editorProps: {
@@ -75,7 +80,17 @@ const editor = new Editor({
     Document,
     CustomParagraph,
     Text,
-    BorderNumber,
+    BorderNumber.extend({
+      // Todo: Commands can be moved back to borderNumber.ts once the feature toggle has been removed
+      addCommands() {
+        return {
+          removeBorderNumbers: () => (commandProps: CommandProps) => {
+            return removeBorderNumbers(commandProps, featureToggle.value)
+          },
+          addBorderNumbers: () => addBorderNumbers,
+        }
+      },
+    }),
     BorderNumberNumber,
     BorderNumberContent,
     BorderNumberLink,
@@ -184,9 +199,12 @@ watch(
 
 const ariaLabel = props.ariaLabel ? props.ariaLabel : null
 
-onMounted(() => {
+onMounted(async () => {
   const editorContainer = document.querySelector(".editor")
   if (editorContainer != null) resizeObserver.observe(editorContainer)
+  featureToggle.value = (
+    await FeatureToggleService.isEnabled("neuris.border-number-editor")
+  ).data
 })
 
 const resizeObserver = new ResizeObserver((entries) => {
