@@ -93,7 +93,7 @@ watch(
       <ComboboxInput
         id="responsibleDocOffice"
         v-model="responsibleDocOffice"
-        aria-label="zuständige Dokumentationsstelle"
+        aria-label="Zuständige Dokumentationsstelle"
         class="flex-shrink flex-grow-0 basis-1/2"
         data-testid="documentation-office-combobox"
         :item-service="ComboboxItemService.getDocumentationOffices"
@@ -102,7 +102,7 @@ watch(
 
     <div class="flex flex-row gap-8">
       <TextButton
-        aria-label="Ok"
+        aria-label="Dokumentationseinheit erstellen"
         button-type="primary"
         :disabled="!responsibleDocOffice"
         label="Ok"
@@ -110,7 +110,7 @@ watch(
         @click="() => createNewFromSearch()"
       />
       <TextButton
-        aria-label="Ok und Dokumentationseinheit direkt bearbeiten"
+        aria-label="Dokumentationseinheit erstellen und direkt bearbeiten"
         button-type="tertiary"
         :disabled="!responsibleDocOffice"
         label="Ok und Dokumentationseinheit direkt bearbeiten"
