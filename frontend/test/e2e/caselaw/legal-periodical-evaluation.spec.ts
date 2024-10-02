@@ -165,9 +165,11 @@ test.describe(
           )
           await expect(newLegalPeriodicalEvaluation).toBeVisible()
           await newLegalPeriodicalEvaluation.click()
+
+          // Wait until the page is fully loaded
+          await page.waitForLoadState("load")
           await page.waitForURL(
             /\/caselaw\/periodical-evaluation\/[0-9a-fA-F\-]{36}\/edition/,
-            { timeout: 5_000 },
           )
         })
 

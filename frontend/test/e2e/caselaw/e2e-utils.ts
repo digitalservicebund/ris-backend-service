@@ -637,7 +637,9 @@ export async function getModifier(page: Page): Promise<string> {
 
 export async function getRequest(url: string, page: Page): Promise<Request> {
   const requestFinishedPromise = page.waitForEvent("requestfinished")
-  await page.goto(url)
+  // waitUntil, because timeout NS_ERROR_FAILURE is a common issue in Firefox
+  await page.goto(url, { waitUntil: "domcontentloaded" })
+
   return await requestFinishedPromise
 }
 
