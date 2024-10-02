@@ -50,12 +50,12 @@ export function addBorderNumbers({ state, dispatch }: CommandProps): boolean {
       console.log("currentPos + nodeSize: ", currentPos + node.nodeSize)
 
       // Replace the paragraph node with the <border-number> node
-      numberOfAddedBorderNumbers++
       tr.replaceWith(currentPos, currentPos + node.nodeSize, borderNumberNode)
 
-      // Track the size difference caused by the replacement
-      const addedNodeSize = borderNumberNode.nodeSize - node.nodeSize - 1
-      shift += addedNodeSize
+      const addedNodeSize = borderNumberNode.nodeSize - node.nodeSize // ***CHANGE: Properly calculate size difference***
+
+      // Adjust shift to account for the new node size
+      shift += addedNodeSize // ***CHANGE: Shift is adjusted by the actual difference***
 
       // Update the newFrom and newTo based on the added node sizes
       if (pos < initialFrom) {
@@ -64,6 +64,9 @@ export function addBorderNumbers({ state, dispatch }: CommandProps): boolean {
       } else if (pos < initialTo) {
         updatedTo += addedNodeSize
       }
+
+      // Increment the count of added borderNumbers
+      numberOfAddedBorderNumbers++
       modified = true
     }
   })
@@ -78,7 +81,7 @@ export function addBorderNumbers({ state, dispatch }: CommandProps): boolean {
     const textSelection = TextSelection.create(
       tr.doc,
       updatedFrom,
-      updatedTo + numberOfAddedBorderNumbers,
+      updatedTo - numberOfAddedBorderNumbers,
     )
 
     // Set the new selection and dispatch the transaction
