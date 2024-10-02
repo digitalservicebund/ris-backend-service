@@ -165,7 +165,7 @@ dependencies {
     // CVE-2022-3171
     implementation("com.google.protobuf:protobuf-java:4.28.2")
     // CVE-2023-52428 in spring-boot-starter-oauth2-client:3.2.3
-    implementation("com.nimbusds:nimbus-jose-jwt:9.41.1")
+    implementation("com.nimbusds:nimbus-jose-jwt:9.41.2")
     // CVE-2023-31582
     implementation("org.bitbucket.b_c:jose4j:0.9.6")
 
@@ -175,7 +175,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.28.12"))
+    implementation(platform("software.amazon.awssdk:bom:2.28.13"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -205,8 +205,8 @@ dependencies {
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.13.4")
-    implementation("io.micrometer:micrometer-core:1.13.4")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.13.5")
+    implementation("io.micrometer:micrometer-core:1.13.5")
 
     implementation(platform("io.sentry:sentry-bom:8.0.0-alpha.4"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
