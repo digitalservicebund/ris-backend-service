@@ -48,7 +48,7 @@ test.describe(
           ).toBeVisible()
           await waitForInputValue(
             page,
-            "[aria-label='zuständige Dokumentationsstelle']",
+            "[aria-label='Zuständige Dokumentationsstelle']",
             "BGH",
           )
 
@@ -58,7 +58,7 @@ test.describe(
           await page.getByText("Suchen").click()
           await waitForInputValue(
             page,
-            "[aria-label='zuständige Dokumentationsstelle']",
+            "[aria-label='Zuständige Dokumentationsstelle']",
             "BVerwG",
           )
         })
@@ -69,7 +69,7 @@ test.describe(
           await page.getByText("Suchen").click()
           await waitForInputValue(
             page,
-            "[aria-label='zuständige Dokumentationsstelle']",
+            "[aria-label='Zuständige Dokumentationsstelle']",
             "",
           )
         })
@@ -84,10 +84,10 @@ test.describe(
           await expect(page.getByText("BAG")).toBeVisible()
           await expect(page.getByText("BFH")).toBeVisible()
 
-          await fillInput(page, "zuständige Dokumentationsstelle", "bv")
+          await fillInput(page, "Zuständige Dokumentationsstelle", "bv")
           await waitForInputValue(
             page,
-            "[aria-label='zuständige Dokumentationsstelle']",
+            "[aria-label='Zuständige Dokumentationsstelle']",
             "bv",
           )
 
@@ -100,7 +100,7 @@ test.describe(
 
           await waitForInputValue(
             page,
-            "[aria-label='zuständige Dokumentationsstelle']",
+            "[aria-label='Zuständige Dokumentationsstelle']",
             "BVerfG",
           )
         })
