@@ -1,3 +1,4 @@
+import { CommandProps } from "@tiptap/core"
 import { Node } from "@tiptap/vue-3"
 import { addBorderNumbers } from "@/editor/commands/addBorderNumbers"
 import removeBorderNumbers from "@/editor/commands/removeBorderNumbers"
@@ -37,7 +38,11 @@ export const BorderNumber = Node.create({
   },
   addCommands() {
     return {
-      removeBorderNumbers: () => removeBorderNumbers,
+      removeBorderNumbers:
+        (isFeatureEnabled) =>
+        ({ state, dispatch }: CommandProps) => {
+          return removeBorderNumbers({ state, dispatch }, isFeatureEnabled)
+        },
       addBorderNumbers: () => addBorderNumbers,
     }
   },

@@ -226,7 +226,12 @@ const buttons = computed(() => {
       ariaLabel: "Randnummern entfernen",
       group: "borderNumber",
       isCollapsable: false,
-      callback: () => props.editor.chain().focus().removeBorderNumbers().run(),
+      callback: () =>
+        props.editor
+          .chain()
+          .focus()
+          .removeBorderNumbers(featureToggle.value)
+          .run(),
     })
   }
 

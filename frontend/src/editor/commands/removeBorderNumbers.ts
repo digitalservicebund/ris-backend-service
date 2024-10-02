@@ -3,12 +3,14 @@ import { Node as ProseMirrorNode, NodeType } from "prosemirror-model"
 import { Transaction, TextSelection } from "prosemirror-state"
 import { nextTick } from "vue"
 import BorderNumberService from "@/services/borderNumberService"
-import FeatureToggleService from "@/services/featureToggleService"
 
 /**
  * Main command handler to remove borderNumber nodes.
  */
-function removeBorderNumbers({ state, dispatch }: CommandProps): boolean {
+function removeBorderNumbers(
+  { state, dispatch }: CommandProps,
+  isFeatureEnabled: boolean,
+): boolean {
   const { selection, doc, tr, schema } = state
   const { from, to } = selection
   const borderNumberNodeType: NodeType = schema.nodes.borderNumber
@@ -26,15 +28,11 @@ function removeBorderNumbers({ state, dispatch }: CommandProps): boolean {
     borderNumberPositions,
   )
 
-  const isRecalculationEnabled = void nextTick().then(() =>
-    FeatureToggleService.isEnabled("neuris.border-number-editor"),
-  )
-
-  if (isRecalculationEnabled) {
-    void nextTick().then(() =>
-      BorderNumberService.makeBorderNumbersSequential(),
-    )
-  }
+  void nextTick().then(() => {
+    if (isFeatureEnabled) {
+      BorderNumberService.makeBorderNumbersSequential()
+    }
+  })
 
   if (modified && dispatch) {
     adjustSelection(
