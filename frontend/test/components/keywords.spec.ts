@@ -38,7 +38,9 @@ describe("Keywords", () => {
     renderComponent()
 
     expect(
-      screen.getByPlaceholderText("Geben Sie jeden Wert in eigene Zeile ein"),
+      screen.getByPlaceholderText(
+        "Geben Sie jeden Wert in eine eigene Zeile ein",
+      ),
     ).toBeInTheDocument()
   })
 
@@ -48,7 +50,9 @@ describe("Keywords", () => {
       await screen.findByLabelText("Schlagwörter bearbeiten"),
     ).toBeVisible()
     expect(
-      screen.queryByPlaceholderText("Geben Sie jeden Wert in eigene Zeile ein"),
+      screen.queryByPlaceholderText(
+        "Geben Sie jeden Wert in eine eigene Zeile ein",
+      ),
     ).not.toBeInTheDocument()
   })
 

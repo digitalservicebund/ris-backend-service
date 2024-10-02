@@ -122,30 +122,15 @@ class DeviatingObjectIntegrationTest {
   }
 
   private DocumentationUnitDTO prepareDocumentationUnitDTOWithDeviatingFileNumbers() {
-    DocumentationUnitDTO dto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(
-                    documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-                .build());
-
-    dto = repository.findById(dto.getId()).get();
-
     return repository.save(
-        dto.toBuilder()
+        DocumentationUnitDTO.builder()
+            .documentNumber("1234567890123")
+            .documentationOffice(
+                documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
             .deviatingFileNumbers(
                 List.of(
-                    DeviatingFileNumberDTO.builder()
-                        .rank(1L)
-                        .documentationUnit(dto)
-                        .value("dfn1")
-                        .build(),
-                    DeviatingFileNumberDTO.builder()
-                        .rank(2L)
-                        .documentationUnit(dto)
-                        .value("dfn2")
-                        .build()))
+                    DeviatingFileNumberDTO.builder().rank(1L).value("dfn1").build(),
+                    DeviatingFileNumberDTO.builder().rank(2L).value("dfn2").build()))
             .build());
   }
 

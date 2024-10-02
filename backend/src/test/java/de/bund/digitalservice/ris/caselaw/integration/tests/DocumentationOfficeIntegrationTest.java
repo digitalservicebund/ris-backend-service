@@ -65,7 +65,7 @@ class DocumentationOfficeIntegrationTest {
   @MockBean private ProcedureService procedureService;
 
   @Test
-  void testGetAllDocumentTypes() {
+  void testGetAllOffices() {
     risWebTestClient
         .withDefaultLogin()
         .get()
@@ -79,6 +79,24 @@ class DocumentationOfficeIntegrationTest {
               assertThat(response.getResponseBody())
                   .extracting("abbreviation")
                   .containsExactly("BGH", "CC-RIS", "DS");
+            });
+  }
+
+  @Test
+  void testGetFilteredOffices() {
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentationoffices?q=B")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(new TypeReference<List<DocumentationOffice>>() {})
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody())
+                  .extracting("abbreviation")
+                  .containsExactly("BGH");
             });
   }
 }

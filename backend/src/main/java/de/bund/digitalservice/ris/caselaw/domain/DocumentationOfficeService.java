@@ -13,7 +13,17 @@ public class DocumentationOfficeService {
     this.documentationOfficeRepository = documentationOfficeRepository;
   }
 
-  public List<DocumentationOffice> getAll() {
-    return documentationOfficeRepository.findAll();
+  /**
+   * Returns documentation office objects in a list with optional search string.
+   *
+   * @param searchStr An optional search string, which filters the list.
+   * @return all documentation offices containing the search string in their abbreviation
+   */
+  public List<DocumentationOffice> getDocumentationOffices(String searchStr) {
+    if (searchStr != null && !searchStr.trim().isBlank()) {
+      return documentationOfficeRepository.findBySearchStr(searchStr);
+    }
+
+    return documentationOfficeRepository.findAllOrderByAbbreviationAsc();
   }
 }

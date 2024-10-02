@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, watch, nextTick } from "vue"
+import { computed, nextTick, ref, watch } from "vue"
 import Checkbox from "@/components/input/CheckboxInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
@@ -77,7 +77,7 @@ watch(
         :aria-label="`${label} Input`"
         class="ds-input h-auto resize-none overflow-hidden p-20"
         :data-testid="`${label}_ListInputEdit`"
-        placeholder="Geben Sie jeden Wert in eigene Zeile ein"
+        placeholder="Geben Sie jeden Wert in eine eigene Zeile ein"
         :rows="listItemCount"
         @input="adjustTextareaHeight($event.target as HTMLTextAreaElement)"
       ></textarea>

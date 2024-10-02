@@ -134,7 +134,7 @@ class DocumentationUnitControllerTest {
         .isCreated()
         .expectBody(DocumentationUnit.class);
 
-    verify(service, times(1)).generateNewDocumentationUnit(docOffice, null);
+    verify(service, times(1)).generateNewDocumentationUnit(docOffice, Optional.empty());
     verify(userService, times(1)).getDocumentationOffice(any(OidcUser.class));
   }
 

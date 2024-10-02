@@ -150,13 +150,7 @@ class DocumentationUnitSearchIntegrationTest {
     migrationDto =
         repository.save(
             migrationDto.toBuilder()
-                .fileNumbers(
-                    List.of(
-                        FileNumberDTO.builder()
-                            .value("AkteM")
-                            .documentationUnit(migrationDto)
-                            .rank(0L)
-                            .build()))
+                .fileNumbers(List.of(FileNumberDTO.builder().value("AkteM").rank(0L).build()))
                 .build());
     DocumentationUnitDTO newNeurisDto =
         repository.save(
@@ -167,13 +161,7 @@ class DocumentationUnitSearchIntegrationTest {
     newNeurisDto =
         repository.save(
             newNeurisDto.toBuilder()
-                .fileNumbers(
-                    List.of(
-                        FileNumberDTO.builder()
-                            .value("AkteY")
-                            .documentationUnit(newNeurisDto)
-                            .rank(0L)
-                            .build()))
+                .fileNumbers(List.of(FileNumberDTO.builder().value("AkteY").rank(0L).build()))
                 .build());
 
     statusRepository.save(
@@ -283,36 +271,22 @@ class DocumentationUnitSearchIntegrationTest {
   @Test
   void testForCompleteResultListWhenSearchingForFileNumberOrDocumentNumber() {
     for (int i = 0; i < 10; i++) {
-      DocumentationUnitDTO doc =
-          repository.save(
-              DocumentationUnitDTO.builder()
-                  // index 0-4 get a "AB" docNumber
-                  .documentNumber((i <= 4 ? "AB" : "GE") + "123456780" + i)
-                  .documentationOffice(docOfficeDTO)
-                  .build());
-
       repository.save(
-          doc.toBuilder()
+          DocumentationUnitDTO.builder()
+              // index 0-4 get a "AB" docNumber
+              .documentNumber((i <= 4 ? "AB" : "GE") + "123456780" + i)
+              .documentationOffice(docOfficeDTO)
               .fileNumbers(
                   // even indices get a fileNumber
                   i % 2 == 1
                       ? List.of()
-                      : List.of(
-                          FileNumberDTO.builder()
-                              .value("AB 34/" + i)
-                              .documentationUnit(doc)
-                              .rank(0L)
-                              .build()))
+                      : List.of(FileNumberDTO.builder().value("AB 34/" + i).rank(0L).build()))
               // index 4+ get a deviating fileNumber
               .deviatingFileNumbers(
                   i < 4
                       ? List.of()
                       : List.of(
-                          DeviatingFileNumberDTO.builder()
-                              .value("ABC 34/" + i)
-                              .documentationUnit(doc)
-                              .rank(0L)
-                              .build()))
+                          DeviatingFileNumberDTO.builder().value("ABC 34/" + i).rank(0L).build()))
               .build());
     }
 

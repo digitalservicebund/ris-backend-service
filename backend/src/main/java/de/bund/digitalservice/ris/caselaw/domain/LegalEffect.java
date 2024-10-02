@@ -1,8 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public enum LegalEffect {
   YES("Ja"),
@@ -52,13 +54,18 @@ public enum LegalEffect {
       return null;
     }
 
+    return deriveFrom(documentationUnit.coreData().court(), courtHasChanged)
+        .orElse(of(documentationUnit.coreData().legalEffect()));
+  }
+
+  public static Optional<LegalEffect> deriveFrom(Court court, boolean courtHasChanged) {
     if (courtHasChanged
-        && documentationUnit.coreData().court() != null
-        && documentationUnit.coreData().court().type() != null
-        && autoYesCourtTypes.contains(documentationUnit.coreData().court().type())) {
-      return YES;
+        && court != null
+        && court.type() != null
+        && autoYesCourtTypes.contains(court.type())) {
+      return Optional.of(YES);
     }
 
-    return of(documentationUnit.coreData().legalEffect());
+    return Optional.empty();
   }
 }

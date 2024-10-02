@@ -94,7 +94,7 @@ public class DocumentationUnitController {
   @PreAuthorize("isAuthenticated() and @userIsInternal.apply(#oidcUser)")
   public ResponseEntity<DocumentationUnit> generateNewDocumentationUnit(
       @AuthenticationPrincipal OidcUser oidcUser,
-      @RequestBody(required = false) DocumentationUnitCreationParameters parameters) {
+      @RequestBody(required = false) Optional<DocumentationUnitCreationParameters> parameters) {
     var userDocOffice = userService.getDocumentationOffice(oidcUser);
     try {
       var documentationUnit = service.generateNewDocumentationUnit(userDocOffice, parameters);

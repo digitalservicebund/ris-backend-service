@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from "vue"
-import { useRouter } from "vue-router"
 import { ValidationError } from "../input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import InfoModal from "@/components/InfoModal.vue"
+import CreateNewDialogue from "@/components/CreateNewDialogue.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
@@ -13,8 +12,9 @@ import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
-import DocumentationOffice from "@/domain/documentationOffice"
-import { DocumentationUnitParameters } from "@/domain/documentUnit"
+import DocumentUnit, {
+  DocumentationUnitParameters,
+} from "@/domain/documentUnit"
 import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -37,7 +37,6 @@ const emit = defineEmits<{
 }>()
 
 const store = useEditionStore()
-const router = useRouter()
 const reference = ref<Reference>(new Reference({ ...props.modelValue }))
 const validationStore = useValidationStore()
 const pageNumber = ref<number>(0)
@@ -79,23 +78,7 @@ const suffix = computed({
   },
 })
 
-const docOffice = ref<DocumentationOffice>()
-
-const responsibleDocOffice = computed({
-  get: () =>
-    docOffice.value
-      ? {
-          label: docOffice.value.abbreviation,
-          value: docOffice.value,
-        }
-      : undefined,
-  set: (newValue) => {
-    const newDocOffice = { ...newValue } as DocumentationOffice
-    if (newValue) {
-      docOffice.value = newDocOffice
-    }
-  },
-})
+const createDocumentationUnitParameters = ref<DocumentationUnitParameters>()
 
 function buildCitation(): string | undefined {
   if (StringsUtil.isEmpty(reference.value.citation)) {
@@ -155,7 +138,7 @@ async function updatePage(page: number) {
   await search()
 }
 
-async function validateRequiredInput(toValidateReference: Reference) {
+function validateRequiredInput(toValidateReference: Reference) {
   if (toValidateReference.missingRequiredFields?.length) {
     toValidateReference.missingRequiredFields.forEach((missingField) => {
       validationStore.add("Pflichtfeld nicht befüllt", missingField)
@@ -163,7 +146,7 @@ async function validateRequiredInput(toValidateReference: Reference) {
   }
 }
 
-async function addReference(decision: RelatedDocumentation) {
+function addReference(decision: RelatedDocumentation) {
   validationStore.reset()
 
   const newReference: Reference = new Reference({
@@ -176,7 +159,7 @@ async function addReference(decision: RelatedDocumentation) {
     documentationUnit: new RelatedDocumentation({ ...decision }),
   })
 
-  await validateRequiredInput(newReference)
+  validateRequiredInput(newReference)
 
   if (validationStore.isValid()) {
     emit("update:modelValue", newReference)
@@ -184,53 +167,22 @@ async function addReference(decision: RelatedDocumentation) {
   }
 }
 
-async function createNewFromSearch(openDocunit: boolean = false) {
-  isLoading.value = true
-  createNewFromSearchResponseError.value = undefined
-  await validateRequiredInput(reference.value)
-
-  if (!validationStore.isValid()) {
-    isLoading.value = false
-    return
-  }
-
-  const parameters = {
-    fileNumber: relatedDocumentationUnit.value.fileNumber,
-    documentationOffice: docOffice.value,
-    decisionDate: relatedDocumentationUnit.value.decisionDate,
-    court: relatedDocumentationUnit.value.court,
-    documentType: relatedDocumentationUnit.value.documentType,
-  } as DocumentationUnitParameters
-
-  const createResponse = await documentUnitService.createNew(parameters)
-  if (createResponse.error) {
-    createNewFromSearchResponseError.value = createResponse.error
-    isLoading.value = false
-    return
-  }
-  if (openDocunit) {
-    const routeData = router.resolve({
-      name: "caselaw-documentUnit-documentNumber-categories",
-      params: { documentNumber: createResponse.data.documentNumber },
-    })
-    window.open(routeData.href, "_blank")
-  }
-
-  await addReference(
+function addReferenceWithCreatedDocunit(docUnit: DocumentUnit) {
+  if (!docUnit) return
+  addReference(
     new RelatedDocumentation({
-      uuid: createResponse.data.uuid,
-      fileNumber: createResponse.data.coreData.fileNumbers
-        ? createResponse.data.coreData.fileNumbers[0]
+      uuid: docUnit.uuid,
+      fileNumber: docUnit.coreData.fileNumbers
+        ? docUnit.coreData.fileNumbers[0]
         : undefined,
-      decisionDate: createResponse.data.coreData.decisionDate,
-      court: createResponse.data.coreData.court,
-      documentType: createResponse.data.coreData.documentType,
-      documentNumber: createResponse.data.documentNumber,
-      status: createResponse.data.status,
+      decisionDate: docUnit.coreData.decisionDate,
+      court: docUnit.coreData.court,
+      documentType: docUnit.coreData.documentType,
+      documentNumber: docUnit.documentNumber,
+      status: docUnit.status,
       referenceFound: true,
     }),
   )
-  isLoading.value = false
 }
 
 watch(
@@ -259,10 +211,18 @@ watch(
 )
 
 watch(
-  () => relatedDocumentationUnit.value.court,
+  () => relatedDocumentationUnit.value,
   () => {
-    docOffice.value = relatedDocumentationUnit.value.court?.responsibleDocOffice
+    createDocumentationUnitParameters.value = {
+      documentationOffice:
+        relatedDocumentationUnit.value.court?.responsibleDocOffice,
+      documentType: relatedDocumentationUnit.value.documentType,
+      decisionDate: relatedDocumentationUnit.value.decisionDate,
+      fileNumber: relatedDocumentationUnit.value.fileNumber,
+      court: relatedDocumentationUnit.value.court,
+    }
   },
+  { deep: true },
 )
 
 onMounted(async () => {
@@ -344,7 +304,6 @@ onMounted(async () => {
         class="flex-1"
         label="Klammernzusatz *"
         :validation-error="validationStore.getByField('referenceSupplement')"
-        @focus="validationStore.remove('referenceSupplement')"
       >
         <TextInput
           id="referenceSupplement"
@@ -352,6 +311,8 @@ onMounted(async () => {
           aria-label="Klammernzusatz"
           :has-error="slotProps.hasError"
           size="medium"
+          @blur="validateRequiredInput(reference)"
+          @focus="validationStore.remove('referenceSupplement')"
         ></TextInput>
       </InputField>
     </div>
@@ -485,61 +446,13 @@ onMounted(async () => {
         />
       </Pagination>
     </div>
-
-    <!--TODO extract component -->
-
-    <div
+    <CreateNewDialogue
       v-if="searchResults && featureToggle"
-      class="flex flex-col gap-24 bg-blue-200 p-24"
-    >
-      <div>
-        <p class="ds-label-01-bold">
-          Nicht die passende Entscheidung gefunden?
-        </p>
-        <p>
-          Wollen Sie die Daten übernehmen und eine neue Entscheidung erstellen?
-        </p>
-      </div>
-      <InputField
-        id="responsibleDocOffice"
-        label="Zuständige Dokumentationsstelle *"
-        :validation-error="validationStore.getByField('citationType')"
-      >
-        <ComboboxInput
-          id="responsibleDocOffice"
-          v-model="responsibleDocOffice"
-          aria-label="zuständige Dokumentationsstelle"
-          class="flex-shrink flex-grow-0 basis-1/2"
-          data-testid="documentation-office-combobox"
-          :item-service="ComboboxItemService.getDocumentationOffices"
-        ></ComboboxInput>
-      </InputField>
-
-      <div class="flex flex-row gap-8">
-        <TextButton
-          aria-label="Ok"
-          button-type="primary"
-          :disabled="!responsibleDocOffice"
-          label="Ok"
-          size="small"
-          @click="() => createNewFromSearch()"
-        />
-        <TextButton
-          aria-label="Ok und Dokumentationseinheit direkt bearbeiten"
-          button-type="tertiary"
-          :disabled="!responsibleDocOffice"
-          label="Ok und Dokumentationseinheit direkt bearbeiten"
-          size="small"
-          @click="() => createNewFromSearch(true)"
-        />
-      </div>
-    </div>
-    <div v-if="createNewFromSearchResponseError">
-      <InfoModal
-        :description="createNewFromSearchResponseError.description"
-        :title="createNewFromSearchResponseError.title"
-      />
-    </div>
+      :is-valid="!reference.missingRequiredFields?.length"
+      :parameters="createDocumentationUnitParameters"
+      @created-documentation-unit="addReferenceWithCreatedDocunit"
+      @validate-required-input="validateRequiredInput(reference)"
+    />
   </div>
 </template>
 @/stores/editionStore

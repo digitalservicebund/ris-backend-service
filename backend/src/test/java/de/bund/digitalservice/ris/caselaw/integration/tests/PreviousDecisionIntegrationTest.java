@@ -632,13 +632,7 @@ class PreviousDecisionIntegrationTest {
     if (fileNumbers != null) {
       documentationUnitDTO.setFileNumbers(
           fileNumbers.stream()
-              .map(
-                  fn ->
-                      FileNumberDTO.builder()
-                          .value(fn)
-                          .rank(1L)
-                          .documentationUnit(DocumentationUnitDTO.builder().id(docUnitId).build())
-                          .build())
+              .map(fn -> FileNumberDTO.builder().value(fn).rank(1L).build())
               .toList());
     }
 
