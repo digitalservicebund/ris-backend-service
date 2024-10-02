@@ -1,10 +1,24 @@
 /* eslint-disable testing-library/no-node-access */
 import { render, screen, fireEvent } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
+import { vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import TextEditor from "@/components/input/TextEditor.vue"
+import featureToggleService from "@/services/featureToggleService"
+
+vi.mock("@/composables/useInternalUser", () => {
+  return {
+    useInternalUser: () => true,
+  }
+})
 
 describe("text editor", async () => {
+  beforeEach(() => {
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
+  })
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   global.ResizeObserver = require("resize-observer-polyfill")
   const router = createRouter({
@@ -36,7 +50,7 @@ describe("text editor", async () => {
     render(TextEditor, {
       props: {
         value: "Test Value",
-        ariaLabel: "Test Editor Feld",
+        ariaLabel: "Gründe",
       },
       global: { plugins: [router] },
     })
@@ -44,7 +58,7 @@ describe("text editor", async () => {
     await flushPromises()
 
     expect(screen.getByText("Test Value")).toBeInTheDocument()
-    expect(screen.getByTestId("Test Editor Feld")).toBeInTheDocument()
+    expect(screen.getByTestId("Gründe")).toBeInTheDocument()
   })
 
   test.each([
@@ -66,7 +80,7 @@ describe("text editor", async () => {
     render(TextEditor, {
       props: {
         value: "Test Value",
-        ariaLabel: "Test Editor Feld",
+        ariaLabel: "Gründe",
         editable: true,
       },
       global: { plugins: [router] },
@@ -74,15 +88,13 @@ describe("text editor", async () => {
 
     await flushPromises()
 
-    const editorField = screen.getByTestId("Test Editor Feld")
+    const editorField = screen.getByTestId("Gründe")
 
     if (editorField.firstElementChild !== null) {
       await fireEvent.focus(editorField.firstElementChild)
     }
 
-    expect(
-      screen.getByLabelText("Test Editor Feld Button Leiste"),
-    ).toBeInTheDocument()
+    expect(screen.getByLabelText("Gründe Button Leiste")).toBeInTheDocument()
     expect(screen.getByLabelText("Erweitern")).toBeEnabled()
     expect(screen.getByLabelText("Rückgängig machen")).toBeEnabled()
     expect(screen.getByLabelText("Wiederherstellen")).toBeEnabled()
@@ -92,7 +104,7 @@ describe("text editor", async () => {
     render(TextEditor, {
       props: {
         value: "Test Value",
-        ariaLabel: "Test Editor Feld",
+        ariaLabel: "Gründe",
         editable: true,
       },
       global: { plugins: [router] },
@@ -100,15 +112,13 @@ describe("text editor", async () => {
 
     await flushPromises()
 
-    const editorField = screen.getByTestId("Test Editor Feld")
+    const editorField = screen.getByTestId("Gründe")
 
     if (editorField.firstElementChild !== null) {
       await fireEvent.blur(editorField.firstElementChild)
     }
 
-    expect(
-      screen.getByLabelText("Test Editor Feld Button Leiste"),
-    ).toBeInTheDocument()
+    expect(screen.getByLabelText("Gründe Button Leiste")).toBeInTheDocument()
     expect(screen.getByLabelText("Erweitern")).toBeDisabled()
     expect(screen.getByLabelText("Rückgängig machen")).toBeDisabled()
     expect(screen.getByLabelText("Wiederherstellen")).toBeDisabled()
@@ -131,7 +141,7 @@ describe("text editor", async () => {
     render(TextEditor, {
       props: {
         value: "Test Value",
-        ariaLabel: "Test Editor Feld",
+        ariaLabel: "Gründe",
         editable: true,
       },
       global: { plugins: [router] },
@@ -139,7 +149,7 @@ describe("text editor", async () => {
 
     await flushPromises()
 
-    const editorField = screen.getByTestId("Test Editor Feld")
+    const editorField = screen.getByTestId("Gründe")
 
     if (editorField.firstElementChild !== null) {
       await fireEvent.focus(editorField.firstElementChild)

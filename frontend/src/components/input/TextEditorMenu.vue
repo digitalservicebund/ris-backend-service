@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { commands, selectActiveState } from "@guardian/prosemirror-invisibles"
 import { Editor } from "@tiptap/vue-3"
-import { computed, ref } from "vue"
+import { computed, onMounted, ref } from "vue"
 import TextEditorButton, {
   EditorButton,
 } from "@/components/input/TextEditorButton.vue"
@@ -48,13 +48,15 @@ const borderNumberCategories = [
   "Sonstiger Langtext",
   "Abweichende Meinung",
 ]
-const isFeatureEnabled = await FeatureToggleService.isEnabled(
-  "neuris.border-number-editor",
+
+const featureToggle = ref()
+
+const shouldShowAddBorderNumbersButton = computed(
+  () =>
+    isInternalUser &&
+    borderNumberCategories.includes(props.ariaLabel) &&
+    featureToggle.value,
 )
-const shouldShowAddBorderNumbersButton =
-  isInternalUser &&
-  borderNumberCategories.includes(props.ariaLabel) &&
-  isFeatureEnabled.data
 
 const buttons = computed(() => {
   const buttons = [
@@ -207,7 +209,7 @@ const buttons = computed(() => {
     },
   ]
 
-  if (shouldShowAddBorderNumbersButton) {
+  if (shouldShowAddBorderNumbersButton.value) {
     buttons.push({
       type: "addBorderNumbers",
       icon: IcSharpAddBox,
@@ -330,6 +332,11 @@ const focusCurrentButton = () => {
 }
 
 const ariaLabel = props.ariaLabel ? props.ariaLabel : null
+onMounted(async () => {
+  featureToggle.value = (
+    await FeatureToggleService.isEnabled("neuris.border-number-editor")
+  ).data
+})
 </script>
 
 <template>
