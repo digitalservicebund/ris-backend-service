@@ -39,6 +39,42 @@ function makeBorderNumbersSequentialForCategory(
 }
 
 /**
+ * Ensures that border numbers in this text are sequential and start with given number
+ *
+ * @param longText text to be validated
+ * @param nextExpectedBorderNumber The first border number in this text should start with this number
+ */
+function validateBorderNumbersForCategory(
+  longText: string,
+  nextExpectedBorderNumber: number,
+):
+  | { isValid: true; nextBorderNumber: number }
+  | {
+      isValid: false
+      firstInvalidBorderNumber: string
+      expectedBorderNumber: number
+    } {
+  const textXml = new DOMParser().parseFromString(longText, "text/html")
+  const borderNumbers = textXml.getElementsByTagName("border-number")
+  for (const borderNumber of borderNumbers) {
+    const [numberElement] = <HTMLCollectionOf<HTMLElement>>(
+      borderNumber.getElementsByTagName("number")
+    )
+    // innerText is not available in JSDom
+    const borderNumberContent = (numberElement.innerHTML ?? "").trim()
+    if (`${nextExpectedBorderNumber}` !== borderNumberContent) {
+      return {
+        isValid: false,
+        firstInvalidBorderNumber: borderNumberContent,
+        expectedBorderNumber: nextExpectedBorderNumber,
+      }
+    }
+    nextExpectedBorderNumber++
+  }
+  return { isValid: true, nextBorderNumber: nextExpectedBorderNumber }
+}
+
+/**
  * Update all links in given text according to the updated border numbers.
  * @param text short- or longtext to be updated
  * @param updatedBorderNumbers border numbers that have been changed from (key) -> to (value)
@@ -126,7 +162,8 @@ const borderNumberService = {
       }
     }
 
-    if (allUpdatedBorderNumbers.size) {
+    const hasUpdatedAnyBorderNumber = allUpdatedBorderNumbers.size > 0
+    if (hasUpdatedAnyBorderNumber) {
       updateBorderNumberLinks(
         documentUnit.value as DocumentUnit,
         allUpdatedBorderNumbers,
@@ -134,14 +171,62 @@ const borderNumberService = {
     }
 
     // Dissenting opinion should start from 0 again and not influence any other long-texts or links.
-    if (documentUnit.value!.longTexts.dissentingOpinion) {
+    const dissentingOpinion = documentUnit.value!.longTexts.dissentingOpinion
+    if (dissentingOpinion) {
       const { updatedText } = makeBorderNumbersSequentialForCategory(
-        documentUnit.value!.longTexts.dissentingOpinion,
+        dissentingOpinion,
         1,
       )
       documentUnit.value!.longTexts.dissentingOpinion = updatedText
     }
   },
+
+  /**
+   * Validates that all border numbers are sequential in the texts where we expect border numbers.
+   * Dissenting opinion is expected to start from 1 independent of other texts.
+   */
+  validateBorderNumbers: (): BorderNumberValidationResult => {
+    const { documentUnit } = storeToRefs(useDocumentUnitStore())
+    let nextExpectedBorderNumber = 1
+    for (const category of orderedCategoriesWithBorderNumbers) {
+      const longText = documentUnit.value!.longTexts[category]
+      if (longText) {
+        const validationResult = validateBorderNumbersForCategory(
+          longText,
+          nextExpectedBorderNumber,
+        )
+        if (!validationResult.isValid) {
+          return { ...validationResult, invalidCategory: category }
+        } else {
+          nextExpectedBorderNumber = validationResult.nextBorderNumber
+        }
+      }
+    }
+
+    const dissentingOpinion = documentUnit.value!.longTexts.dissentingOpinion
+    if (dissentingOpinion) {
+      const validationResult = validateBorderNumbersForCategory(
+        dissentingOpinion,
+        1,
+      )
+      if (!validationResult.isValid) {
+        return { ...validationResult, invalidCategory: "dissentingOpinion" }
+      }
+    }
+
+    return { isValid: true }
+  },
 }
 
+export type BorderNumberValidationResult =
+  | { isValid: true }
+  | {
+      isValid: false
+      /** The category in which the inconsistent border number was found */
+      invalidCategory: LongTextKeys
+      /** This is the text we found in the border number */
+      firstInvalidBorderNumber: string
+      /** This is the expected text/position of the border number */
+      expectedBorderNumber: number
+    }
 export default borderNumberService

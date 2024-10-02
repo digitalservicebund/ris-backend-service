@@ -86,6 +86,16 @@ export type LongTexts = {
   otherLongText?: string
   outline?: string
 }
+export const longTextLabels: { [longTextKey in keyof LongTexts]: string } = {
+  tenor: "Tenor",
+  reasons: "Gründe",
+  caseFacts: "Tatbestand",
+  decisionReasons: "Entscheidungsgründe",
+  dissentingOpinion: "Abweichende Meinung",
+  participatingJudges: "Teilnehmende Richter",
+  otherLongText: "Sonstiger Langtext",
+  outline: "Gliederung",
+}
 
 export type DocumentationUnitParameters = {
   documentationOffice?: DocumentationOffice

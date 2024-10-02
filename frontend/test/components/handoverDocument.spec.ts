@@ -208,6 +208,47 @@ describe("HandoverDocumentationUnitView:", () => {
     })
   })
 
+  it("should show error message with invalid border numbers", async () => {
+    renderComponent({
+      documentUnit: new DocumentUnit("123", {
+        documentNumber: "foo",
+        coreData: {
+          fileNumbers: ["foo"],
+          court: {
+            type: "type",
+            location: "location",
+            label: "label",
+          },
+          decisionDate: "2022-02-01",
+          legalEffect: "legalEffect",
+          documentType: {
+            jurisShortcut: "ca",
+            label: "category",
+          },
+        },
+        longTexts: {
+          otherLongText: "<border-number><number>4</number></border-number>",
+        },
+      }),
+      stubs: {
+        CodeSnippet: {
+          template: '<div data-testid="code-snippet"/>',
+        },
+      },
+    })
+    expect(
+      await screen.findByLabelText("Randnummernprüfung"),
+    ).toHaveTextContent(
+      "Randnummernprüfung " +
+        "Die Reihenfolge der Randnummern ist nicht korrekt. " +
+        "Rubrik" +
+        "Sonstiger Langtext " +
+        "Erwartete Randnummer 1 " +
+        "Tatsächliche Randnummer 4" +
+        "Randnummern neu berechnen",
+    )
+  })
+
   describe("on press 'Dokumentationseinheit an jDV übergeben'", () => {
     it("hands over successfully", async () => {
       const { emitted } = renderComponent({
@@ -376,6 +417,9 @@ describe("HandoverDocumentationUnitView:", () => {
             label: "category",
           },
         },
+        longTexts: {
+          reasons: "<border-number><number>1</number></border-number>",
+        },
       }),
       stubs: {
         CodeSnippet: {
@@ -385,7 +429,7 @@ describe("HandoverDocumentationUnitView:", () => {
     })
 
     expect(container).toHaveTextContent(
-      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltDokumentationseinheit an jDV übergebenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subject`,
+      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltRandnummernprüfungDie Reihenfolge der Randnummern ist korrektDokumentationseinheit an jDV übergebenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subject`,
     )
 
     const codeSnippet = screen.queryByTestId("code-snippet")
