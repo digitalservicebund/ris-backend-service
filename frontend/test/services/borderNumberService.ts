@@ -1,6 +1,7 @@
 import { createTestingPinia } from "@pinia/testing"
 import { setActivePinia } from "pinia"
 import DocumentUnit, { LongTexts, ShortTexts } from "@/domain/documentUnit"
+import ParticipatingJudge from "@/domain/participatingJudge"
 import borderNumberService from "@/services/borderNumberService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
@@ -94,10 +95,11 @@ describe("borderNumberService", () => {
     )
   })
 
-  it("should update an existing border link if changed", () => {
+  it("should update existing border links if referenced border number changed", () => {
     const store = mockDocUnitStore({
       longTexts: {
         reasons: `${borderNumber(1)}${borderNumber(3)}`,
+        otherLongText: `${borderNumber(1)}${borderNumberLink(3)}`,
       },
       shortTexts: {
         headline: `${borderNumberLink(3)}`,
@@ -107,6 +109,10 @@ describe("borderNumberService", () => {
 
     expect(store.documentUnit?.shortTexts.headline).toEqual(
       `${borderNumberLink(2)}`,
+    )
+
+    expect(store.documentUnit?.longTexts.otherLongText).toEqual(
+      `${borderNumber(3)}${borderNumberLink(2)}`,
     )
   })
 
@@ -124,5 +130,25 @@ describe("borderNumberService", () => {
     expect(store.documentUnit?.shortTexts.headline).toEqual(
       `${borderNumberLink(1)}${borderNumberLink(2)}`,
     )
+  })
+
+  it("should not change border numbers in other longtexts", () => {
+    const judge = new ParticipatingJudge({ name: "judge" })
+    const store = mockDocUnitStore({
+      longTexts: {
+        reasons: `${borderNumber(1)}${borderNumber(3)}`,
+        tenor: `${borderNumber(13)}${borderNumber(30)}`,
+        participatingJudges: [judge],
+      },
+    })
+    borderNumberService.makeBorderNumbersSequential()
+
+    expect(store.documentUnit?.longTexts.reasons).toEqual(
+      `${borderNumber(1)}${borderNumber(2)}`,
+    )
+    expect(store.documentUnit?.longTexts.tenor).toEqual(
+      `${borderNumber(13)}${borderNumber(30)}`,
+    )
+    expect(store.documentUnit?.longTexts.participatingJudges).toEqual([judge])
   })
 })

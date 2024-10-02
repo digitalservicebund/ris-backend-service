@@ -11,6 +11,12 @@ const orderedCategoriesWithBorderNumbers: LongTextKeys[] = [
   "otherLongText",
 ]
 
+/**
+ * Will take all border numbers in the long text and renumber them sequentially starting from the given number.
+ *
+ * @param longText text for which the border numbers will be updated
+ * @param nextBorderNumber The first border number in this text will start with this number
+ */
 function makeBorderNumbersSequentialForCategory(
   longText: string,
   nextBorderNumber: number,
@@ -19,13 +25,13 @@ function makeBorderNumbersSequentialForCategory(
   const textXml = new DOMParser().parseFromString(longText, "text/html")
   const borderNumbers = textXml.getElementsByTagName("border-number")
   for (const borderNumber of borderNumbers) {
-    const [number] = borderNumber.getElementsByTagName(
-      "number",
-    ) as HTMLCollectionOf<HTMLElement>
+    const [numberElement] = <HTMLCollectionOf<HTMLElement>>(
+      borderNumber.getElementsByTagName("number")
+    )
     // innerText is not available in JSDom
-    const previousValue = (number.innerHTML ?? "").trim()
-    number.innerHTML = `${nextBorderNumber}`
-    updatedBorderNumbers.set(previousValue, nextBorderNumber)
+    const previousLinkTarget = (numberElement.innerHTML ?? "").trim()
+    numberElement.innerHTML = `${nextBorderNumber}`
+    updatedBorderNumbers.set(previousLinkTarget, nextBorderNumber)
     nextBorderNumber++
   }
   const updatedText = textXml.body.innerHTML
@@ -58,6 +64,11 @@ function updateBorderNumberLinksForText(
   return textXml.body.innerHTML
 }
 
+/**
+ * Iterates over all short and long texts to update the border number links.
+ * @param documentUnit of which border numbers were already updated
+ * @param updatedBorderNumbers border numbers that have been changed from (key) -> to (value)
+ */
 function updateBorderNumberLinks(
   documentUnit: DocumentUnit,
   updatedBorderNumbers: Map<string, number>,
@@ -88,8 +99,13 @@ function updateBorderNumberLinks(
 }
 
 const borderNumberService = {
+  /**
+   * Updates the border numbers of all long texts with border numbers see {@linkcode orderedCategoriesWithBorderNumbers}
+   * and makes them sequential.
+   *
+   * Updates all existing border number links that reference a border number that was updated previously.
+   */
   makeBorderNumbersSequential: () => {
-    performance.mark("border-number-start")
     const { documentUnit } = storeToRefs(useDocumentUnitStore())
     let nextBorderNumberCount = 1
     let allUpdatedBorderNumbers = new Map<string, number>()
@@ -110,13 +126,14 @@ const borderNumberService = {
       }
     }
 
-    performance.mark("border-number-links-start")
+    if (allUpdatedBorderNumbers.size) {
+      updateBorderNumberLinks(
+        documentUnit.value as DocumentUnit,
+        allUpdatedBorderNumbers,
+      )
+    }
 
-    updateBorderNumberLinks(
-      documentUnit.value as DocumentUnit,
-      allUpdatedBorderNumbers,
-    )
-
+    // Dissenting opinion should start from 0 again and not influence any other long-texts or links.
     if (documentUnit.value!.longTexts.dissentingOpinion) {
       const { updatedText } = makeBorderNumbersSequentialForCategory(
         documentUnit.value!.longTexts.dissentingOpinion,
@@ -124,21 +141,6 @@ const borderNumberService = {
       )
       documentUnit.value!.longTexts.dissentingOpinion = updatedText
     }
-    performance.mark("border-number-finished")
-    // console.log(
-    //   performance.measure(
-    //     "calculate border numbers",
-    //     "border-number-start",
-    //     "border-number-links-start",
-    //   ),
-    // )
-    // console.log(
-    //   performance.measure(
-    //     "calculate border links",
-    //     "border-number-links-start",
-    //     "border-number-finished",
-    //   ),
-    // )
   },
 }
 
