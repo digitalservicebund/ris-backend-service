@@ -1,11 +1,17 @@
 import { CommandProps } from "@tiptap/core"
 import { NodeType } from "prosemirror-model"
 import { TextSelection } from "prosemirror-state"
+import { nextTick } from "vue"
+import BorderNumberService from "@/services/borderNumberService"
+import FeatureToggleService from "@/services/featureToggleService"
 
 /**
  * Main command handler to add borderNumber nodes (with default value "0").
  */
-export function addBorderNumbers({ state, dispatch }: CommandProps): boolean {
+export async function addBorderNumbers({
+  state,
+  dispatch,
+}: CommandProps): boolean {
   const { tr, selection, schema } = state
   const { from: initialFrom, to: initialTo } = selection
 
@@ -52,10 +58,10 @@ export function addBorderNumbers({ state, dispatch }: CommandProps): boolean {
       // Replace the paragraph node with the <border-number> node
       tr.replaceWith(currentPos, currentPos + node.nodeSize, borderNumberNode)
 
-      const addedNodeSize = borderNumberNode.nodeSize - node.nodeSize // ***CHANGE: Properly calculate size difference***
+      const addedNodeSize = borderNumberNode.nodeSize - node.nodeSize
 
       // Adjust shift to account for the new node size
-      shift += addedNodeSize // ***CHANGE: Shift is adjusted by the actual difference***
+      shift += addedNodeSize
 
       // Update the newFrom and newTo based on the added node sizes
       if (pos < initialFrom) {
@@ -70,6 +76,16 @@ export function addBorderNumbers({ state, dispatch }: CommandProps): boolean {
       modified = true
     }
   })
+
+  const isRecalculationEnabled = await FeatureToggleService.isEnabled(
+    "neuris.border-number-editor",
+  )
+
+  if (isRecalculationEnabled) {
+    void nextTick().then(() =>
+      BorderNumberService.makeBorderNumbersSequential(),
+    )
+  }
 
   // If changes were made, dispatch the transaction
   if (modified && dispatch) {
