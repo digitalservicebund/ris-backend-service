@@ -248,7 +248,6 @@ test.describe(
       },
     )
 
-    // eslint-disable-next-line playwright/no-skipped-test
     test(
       "Periodical edition reference editing",
       {

@@ -105,7 +105,9 @@ test.describe(
       },
     )
 
-    test(
+    // TODO cleanup after test is missing
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
       "Allow creation from periodical evaluation",
       {
         tag: "@RISDEV-4829",
