@@ -17,7 +17,7 @@ public class PostgresDocumentationOfficeRepositoryImpl implements DocumentationO
 
   @Override
   public List<DocumentationOffice> findBySearchStr(String searchStr) {
-    return repository.findByAbbreviationStartsWith(searchStr).stream()
+    return repository.findByAbbreviationStartsWithIgnoreCase(searchStr).stream()
         .map(DocumentationOfficeTransformer::transformToDomain)
         .toList();
   }

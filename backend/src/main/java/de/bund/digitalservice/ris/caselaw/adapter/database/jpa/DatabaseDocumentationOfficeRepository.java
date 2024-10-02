@@ -11,7 +11,7 @@ public interface DatabaseDocumentationOfficeRepository
 
   DocumentationOfficeDTO findByAbbreviation(String abbreviation);
 
-  List<DocumentationOfficeDTO> findByAbbreviationStartsWith(String abbreviation);
+  List<DocumentationOfficeDTO> findByAbbreviationStartsWithIgnoreCase(String abbreviation);
 
   List<DocumentationOfficeDTO> findAllByOrderByAbbreviationAsc();
 }
