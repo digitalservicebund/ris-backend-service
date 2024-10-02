@@ -138,14 +138,18 @@ async function updatePage(page: number) {
   await search()
 }
 
-function validateRequiredInput(toValidateReference: Reference): boolean {
-  if (toValidateReference.missingRequiredFields?.length) {
-    toValidateReference.missingRequiredFields.forEach((missingField) => {
+function validateRequiredInput(referenceToValidate?: Reference): boolean {
+  // Use the provided referenceToValidate if available, otherwise use the local reference
+  const referenceToCheck = referenceToValidate || reference.value
+
+  // Check for missing required fields
+  if (referenceToCheck.missingRequiredFields?.length) {
+    referenceToCheck.missingRequiredFields.forEach((missingField: string) => {
       validationStore.add("Pflichtfeld nicht befüllt", missingField)
     })
-    return false
+    return false // Validation failed
   } else {
-    return true
+    return true // Validation passed
   }
 }
 
@@ -452,7 +456,7 @@ onMounted(async () => {
     <CreateNewFromSearch
       v-if="searchResults && featureToggle"
       :parameters="createDocumentationUnitParameters"
-      :validate-required-input="validateRequiredInput(reference)"
+      :validate-required-input="() => validateRequiredInput(reference)"
       @created-documentation-unit="addReferenceWithCreatedDocunit"
     />
   </div>
