@@ -19,6 +19,7 @@ export function addBorderNumbers({ state, dispatch }: CommandProps): boolean {
 
   let updatedFrom = initialFrom
   let updatedTo = initialTo
+  let numberOfAddedBorderNumbers = 0
   console.log("initialFrom: ", initialFrom)
   console.log("initialTo: ", initialTo)
 
@@ -49,6 +50,7 @@ export function addBorderNumbers({ state, dispatch }: CommandProps): boolean {
       console.log("currentPos + nodeSize: ", currentPos + node.nodeSize)
 
       // Replace the paragraph node with the <border-number> node
+      numberOfAddedBorderNumbers++
       tr.replaceWith(currentPos, currentPos + node.nodeSize, borderNumberNode)
 
       // Track the size difference caused by the replacement
@@ -71,22 +73,12 @@ export function addBorderNumbers({ state, dispatch }: CommandProps): boolean {
     console.log("---final--------")
     console.log("newFrom: ", updatedFrom)
     console.log("newTo: ", updatedTo)
-    // Adjust the selection to point inside the borderNumberContent node
-    const resolvedNewFrom = tr.doc.resolve(updatedFrom)
-    const resolvedNewTo = tr.doc.resolve(updatedTo)
-    console.log("resolvedNewFrom: ", resolvedNewFrom)
-    console.log("resolvedNewTo: ", resolvedNewTo)
-    // Adjust selection to be inside the borderNumberContent node (first valid position)
-    const contentPosFrom = resolvedNewFrom.start(resolvedNewFrom.depth)
-    const contentPosTo = resolvedNewTo.start(resolvedNewTo.depth)
-    console.log("contentPosFrom: ", contentPosFrom)
-    console.log("contentPosTo: ", contentPosTo)
 
     // Create a new selection inside the contentNode of borderNumber
     const textSelection = TextSelection.create(
       tr.doc,
-      resolvedNewFrom.pos,
-      resolvedNewTo.pos,
+      updatedFrom,
+      updatedTo + numberOfAddedBorderNumbers,
     )
 
     // Set the new selection and dispatch the transaction

@@ -119,7 +119,7 @@ function adjustSelection(
  */
 function calculateFromPos(from: number, borderNumberSizes: number[]) {
   const result = from - borderNumberSizes[borderNumberSizes.length - 1]
-  if (result <= 0) {
+  if (result < 0) {
     return 1
   }
   return result
