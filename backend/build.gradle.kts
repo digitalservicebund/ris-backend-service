@@ -20,6 +20,7 @@ plugins {
     id("com.github.ben-manes.versions") version "0.51.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
     id("org.flywaydb.flyway") version "10.18.2"
+    id("io.sentry.jvm.gradle") version "4.11.0"
 }
 
 group = "de.bund.digitalservice"
@@ -207,10 +208,6 @@ dependencies {
 
     implementation("io.micrometer:micrometer-registry-prometheus:1.13.5")
     implementation("io.micrometer:micrometer-core:1.13.5")
-
-    implementation(platform("io.sentry:sentry-bom:8.0.0-alpha.4"))
-    implementation("io.sentry:sentry-spring-boot-starter-jakarta")
-    implementation("io.sentry:sentry-logback")
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
     // => CVE-2023-2976
