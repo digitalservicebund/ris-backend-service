@@ -7,6 +7,7 @@ import TextEditorButton, {
 } from "@/components/input/TextEditorButton.vue"
 import { useCollapsingMenuBar } from "@/composables/useCollapsingMenuBar"
 import { useInternalUser } from "@/composables/useInternalUser"
+import FeatureToggleService from "@/services/featureToggleService"
 import IcSharpAddBox from "~icons/ic/sharp-add-box"
 import MaterialSymbolsDeleteSweepOutline from "~icons/ic/sharp-delete-sweep"
 import IconExpand from "~icons/ic/sharp-expand"
@@ -47,8 +48,13 @@ const borderNumberCategories = [
   "Sonstiger Langtext",
   "Abweichende Meinung",
 ]
+const isFeatureEnabled = await FeatureToggleService.isEnabled(
+  "neuris.border-number-editor",
+)
 const shouldShowAddBorderNumbersButton =
-  isInternalUser && borderNumberCategories.includes(props.ariaLabel)
+  isInternalUser &&
+  borderNumberCategories.includes(props.ariaLabel) &&
+  isFeatureEnabled
 
 const buttons = computed(() => {
   const buttons = [
