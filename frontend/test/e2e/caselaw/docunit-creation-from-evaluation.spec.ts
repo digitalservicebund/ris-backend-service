@@ -9,9 +9,6 @@ import { caselawTest as test } from "./fixtures"
 
 const formattedDate = dayjs().format("DD.MM.YYYY")
 
-/* eslint-disable playwright/no-conditional-expect */
-/* eslint-disable playwright/no-conditional-in-test */
-
 test.describe(
   "Creation of new documentation units from periodical evaluation",
   {
@@ -196,14 +193,11 @@ test.describe(
             page.locator("[aria-label='Listen Eintrag']"),
           ).toHaveCount(2)
 
-          // TODO fix
-          if (false) {
-            await expect(
-              page.getByText(
-                "BGH, " + formattedDate + ", 1C 123/45, Anerkenntnisurteil",
-              ),
-            ).toBeVisible()
-          }
+          await expect(
+            page.getByText(
+              "BGH, " + formattedDate + ", 1C 123/45, Anerkenntnisurteil",
+            ),
+          ).toBeVisible()
 
           await expect(
             page.getByText(
@@ -219,29 +213,24 @@ test.describe(
         })
 
         await test.step("The new documentation unit is created with search input fields court, decision date, file number and document type", async () => {
-          // TODO fix
-          if (false) {
-            await expect(newtab.locator("[aria-label='Gericht']")).toHaveValue(
-              "BGH",
-            )
-            await expect(
-              newtab.locator("[aria-label='Entscheidungsdatum']"),
-            ).toHaveValue(formattedDate)
-            await expect(
-              newtab.locator("[aria-label='Aktenzeichen']"),
-            ).toHaveValue("1C 123/45")
-            await expect(
-              newtab.locator("[aria-label='Dokumenttyp']"),
-            ).toHaveValue("AnU")
-          }
+          await expect(newtab.locator("[aria-label='Gericht']")).toHaveValue(
+            "BGH",
+          )
+          await expect(
+            newtab.locator("[aria-label='Entscheidungsdatum']"),
+          ).toHaveValue(formattedDate)
+          await expect(
+            newtab.locator("[aria-label='Aktenzeichen']"),
+          ).toHaveValue("1C 123/45")
+          await expect(
+            newtab.locator("[aria-label='Dokumenttyp']"),
+          ).toHaveValue("AnU")
         })
 
         await test.step("Legal effect (Rechtskraft) is initialized based on the court", async () => {
-          if (false) {
-            await expect(
-              newtab.locator("[aria-label='Rechtskraft']"),
-            ).toHaveValue("Ja")
-          }
+          await expect(
+            newtab.locator("[aria-label='Rechtskraft']"),
+          ).toHaveValue("Ja")
         })
 
         await test.step("Legal effect (Rechtskraft) is set to unknown without court", async () => {
@@ -259,61 +248,52 @@ test.describe(
           await expect(secondTab).toHaveURL(
             /\/caselaw\/documentunit\/[A-Z0-9]{13}\/categories$/,
           )
-          // TODO fix
-          if (false) {
-            await expect(
-              secondTab.locator("[aria-label='Rechtskraft']"),
-            ).toHaveValue("Keine Angabe")
-          }
+          await expect(
+            secondTab.locator("[aria-label='Rechtskraft']"),
+          ).toHaveValue("Keine Angabe")
         })
 
         await test.step("The new documentation unit has the status unpublished", async () => {
-          // TODO fix
-          if (false) {
-            await expect(newtab.getByText("Unveröffentlicht")).toBeVisible()
+          await expect(newtab.getByText("Unveröffentlicht")).toBeVisible()
 
-            await expect(
-              page.getByText(
-                "BGH, " +
-                  formattedDate +
-                  ", 1C 123/45, Anerkenntnisurteil, Unveröffentlicht",
-              ),
-            ).toBeVisible()
-          }
+          await expect(
+            page.getByText(
+              "BGH, " +
+                formattedDate +
+                ", 1C 123/45, Anerkenntnisurteil, Unveröffentlicht",
+            ),
+          ).toBeVisible()
         })
 
         await test.step("The reference is visible in the documentation unit edit view and preview", async () => {
           await newtab.keyboard.down("v")
 
-          // TODO fix
-          if (false) {
-            await expect(page.getByText("Sekundäre Fundstellen")).toBeVisible()
-            await expect(
-              newtab.getByText(
-                edition.legalPeriodical?.abbreviation +
-                  " " +
-                  edition.prefix +
-                  "12" +
-                  edition.suffix +
-                  " (L)",
-                { exact: true },
-              ),
-            ).toBeVisible()
+          await expect(page.getByText("Sekundäre Fundstellen")).toBeVisible()
+          await expect(
+            newtab.getByText(
+              edition.legalPeriodical?.abbreviation +
+                " " +
+                edition.prefix +
+                "12" +
+                edition.suffix +
+                " (L)",
+              { exact: true },
+            ),
+          ).toBeVisible()
 
-            await newtab.locator("[aria-label='Fundstellen']").click()
-            await expect(page.getByText("Fundstellen bearbeiten")).toBeVisible()
-            await expect(
-              newtab.getByText(
-                edition.legalPeriodical?.abbreviation +
-                  " " +
-                  edition.prefix +
-                  "12" +
-                  edition.suffix +
-                  " (L)",
-                { exact: true },
-              ),
-            ).toBeVisible()
-          }
+          await newtab.locator("[aria-label='Fundstellen']").click()
+          await expect(page.getByText("Fundstellen bearbeiten")).toBeVisible()
+          await expect(
+            newtab.getByText(
+              edition.legalPeriodical?.abbreviation +
+                " " +
+                edition.prefix +
+                "12" +
+                edition.suffix +
+                " (L)",
+              { exact: true },
+            ),
+          ).toBeVisible()
         })
       },
     )
