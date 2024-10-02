@@ -23,12 +23,23 @@ const emit = defineEmits<{
 }>()
 
 const router = useRouter()
+
+/**
+ * Reactive reference to store any response error when creating a new document unit
+ */
 const createNewFromSearchResponseError = ref<ResponseError | undefined>()
 
+/**
+ * Reference to the currently selected responsible documentation office.
+ * If passed through props, it initializes with the responsible office from the parameters.
+ */
 const docOffice = ref<DocumentationOffice | undefined>(
   props.parameters?.court?.responsibleDocOffice,
 )
 
+/**
+ * Computed property to handle the responsible documentation office selection for the combobox input.
+ */
 const responsibleDocOffice = computed({
   get: () =>
     docOffice.value
@@ -45,6 +56,13 @@ const responsibleDocOffice = computed({
   },
 })
 
+/**
+ * Handles creating a new documentation unit.
+ * It first checks the validity of required inputs via `validateRequiredInput`.
+ * If valid, it proceeds to create the document unit and optionally opens the newly created document.
+ * @param {boolean} [openDocunit=false] - Whether to open the newly created documentation unit in a new tab.
+ * @returns {Promise<void>}
+ */
 async function createNewFromSearch(openDocunit: boolean = false) {
   createNewFromSearchResponseError.value = undefined
 
@@ -53,12 +71,12 @@ async function createNewFromSearch(openDocunit: boolean = false) {
   if (!isValid) {
     return
   }
-
   const createResponse = await documentUnitService.createNew(props.parameters)
   if (createResponse.error) {
     createNewFromSearchResponseError.value = createResponse.error
     return
   }
+
   if (openDocunit) {
     const routeData = router.resolve({
       name: "caselaw-documentUnit-documentNumber-categories",
@@ -66,9 +84,13 @@ async function createNewFromSearch(openDocunit: boolean = false) {
     })
     window.open(routeData.href, "_blank")
   }
+
   emit("createdDocumentationUnit", createResponse.data)
 }
 
+/**
+ * Watches for changes in the `parameters` prop and updates the local `docOffice` value accordingly.
+ */
 watch(
   () => props.parameters,
   () => {
@@ -97,7 +119,7 @@ watch(
         class="flex-shrink flex-grow-0 basis-1/2"
         data-testid="documentation-office-combobox"
         :item-service="ComboboxItemService.getDocumentationOffices"
-      ></ComboboxInput>
+      />
     </InputField>
 
     <div class="flex flex-row gap-8">
@@ -119,6 +141,7 @@ watch(
       />
     </div>
   </div>
+
   <div v-if="createNewFromSearchResponseError">
     <InfoModal
       :description="createNewFromSearchResponseError.description"
