@@ -28,7 +28,7 @@ import {
 } from "@/editor/borderNumber"
 import { BorderNumberLink } from "@/editor/borderNumberLink"
 import { CustomBulletList } from "@/editor/bulletList"
-import { addBorderNumbers } from "@/editor/commands/addBorderNumbers"
+import addBorderNumbers from "@/editor/commands/addBorderNumbers"
 import removeBorderNumbers from "@/editor/commands/removeBorderNumbers"
 import { FontSize } from "@/editor/fontSize"
 import { CustomImage } from "@/editor/image"
