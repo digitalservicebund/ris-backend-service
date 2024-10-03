@@ -3,6 +3,7 @@ border-number {
   align-items: baseline;
 }
 
+/* stylelint-disable-next-line selector-type-no-unknown */
 border-number number {
   display: flex;
   min-width: 40px;
@@ -12,6 +13,8 @@ border-number number {
   line-height: 1;
 }
 
+/* stylelint-disable-next-line selector-type-no-unknown */
 #attachment-view border-number number {
   background: transparent;
+  margin-right: 4px;
 }

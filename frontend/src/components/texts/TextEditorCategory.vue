@@ -41,7 +41,7 @@ async function focusEditor() {
       <TextEditor
         :id="id"
         :aria-label="label"
-        class="shadow-blue focus-within:shadow-focus hover:shadow-hover"
+        class="p-2 shadow-blue focus-within:p-4 focus-within:shadow-focus hover:p-4 hover:shadow-hover"
         editable
         :field-size="fieldSize"
         :value="modelValue"
