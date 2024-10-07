@@ -24,7 +24,7 @@ public class CustomTracesSamplerCallback implements TracesSamplerCallback {
 
     String url = request.getRequestURI();
 
-    if (url.startsWith("/actuator")) {
+    if (url.startsWith("/actuator") || request.getMethod().equals("PATCH")) {
       return 0d;
     } else {
       return null;
