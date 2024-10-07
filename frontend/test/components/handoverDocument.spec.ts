@@ -9,6 +9,7 @@ import { EventRecordType, HandoverMail, Preview } from "@/domain/eventRecord"
 import LegalForce from "@/domain/legalForce"
 import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
+import featureToggleService from "@/services/featureToggleService"
 import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
 
 const router = createRouter({
@@ -64,16 +65,20 @@ function renderComponent(
 }
 
 describe("HandoverDocumentationUnitView:", () => {
-  vi.spyOn(handoverDocumentationUnitService, "getPreview").mockImplementation(
-    () =>
-      Promise.resolve({
-        status: 200,
-        data: new Preview({
-          xml: "<xml>all good</xml>",
-          success: true,
-        }),
+  beforeEach(() => {
+    vi.spyOn(handoverDocumentationUnitService, "getPreview").mockResolvedValue({
+      status: 200,
+      data: new Preview({
+        xml: "<xml>all good</xml>",
+        success: true,
       }),
-  )
+    })
+
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
+  })
 
   describe("renders plausibility check", () => {
     it("with all required fields filled", async () => {
@@ -391,7 +396,7 @@ describe("HandoverDocumentationUnitView:", () => {
     expect(codeSnippet?.getAttribute("xml")).toBe("<xml>all good</xml>")
   })
 
-  it("with stubbing", () => {
+  it("with stubbing", async () => {
     const { container } = renderComponent({
       props: {
         eventLog: [
@@ -428,8 +433,11 @@ describe("HandoverDocumentationUnitView:", () => {
       },
     })
 
+    // Wait for feature flag to be set in onMounted
+    await new Promise((resolve) => setTimeout(resolve, 0))
+
     expect(container).toHaveTextContent(
-      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltRandnummernprüfungDie Reihenfolge der Randnummern ist korrektDokumentationseinheit an jDV übergebenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subject`,
+      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltRandnummernprüfungDie Reihenfolge der Randnummern ist korrektXML VorschauDokumentationseinheit an jDV übergebenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subject`,
     )
 
     const codeSnippet = screen.queryByTestId("code-snippet")

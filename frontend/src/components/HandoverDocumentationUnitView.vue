@@ -23,6 +23,7 @@ import PreviousDecision, {
 } from "@/domain/previousDecision"
 import { fieldLabels } from "@/fields/caselaw"
 import borderNumberService from "@/services/borderNumberService"
+import FeatureToggleService from "@/services/featureToggleService"
 import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -58,7 +59,13 @@ const errorMessage = computed(
   () => frontendError.value ?? previewError.value ?? props.errorMessage,
 )
 
+const borderNumberValidationFeatureToggle = ref(false)
+
 onMounted(async () => {
+  borderNumberValidationFeatureToggle.value =
+    (await FeatureToggleService.isEnabled("neuris.border-number-editor"))
+      .data ?? false
+
   if (fieldsMissing.value || isOutlineInvalid.value) return
   await fetchPreview()
 })
@@ -85,7 +92,10 @@ function handoverDocumentUnit() {
       title: "Gliederung und Sonstiger Orientierungssatz sind befüllt.",
       description: "Die Dokumentationseinheit kann nicht übergeben werden.",
     }
-  } else if (!borderNumberValidationResult.value.isValid) {
+  } else if (
+    borderNumberValidationFeatureToggle.value &&
+    !borderNumberValidationResult.value.isValid
+  ) {
     // If there are invalid border numbers, you need to confirm a modal before handing over
     showHandoverModal.value = true
   } else {
@@ -386,7 +396,11 @@ const isOutlineInvalid = computed<boolean>(
           <p>Alle Pflichtfelder sind korrekt ausgefüllt</p>
         </div>
       </div>
-      <div aria-label="Randnummernprüfung" class="flex flex-col">
+      <div
+        v-if="borderNumberValidationFeatureToggle"
+        aria-label="Randnummernprüfung"
+        class="flex flex-col"
+      >
         <h2 class="ds-label-01-bold mb-16">Randnummernprüfung</h2>
 
         <div v-if="!borderNumberValidationResult.isValid">
