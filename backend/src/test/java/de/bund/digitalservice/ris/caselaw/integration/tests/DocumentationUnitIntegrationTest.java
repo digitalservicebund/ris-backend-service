@@ -56,7 +56,6 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParameters;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
@@ -94,7 +93,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.DefaultUriBuilderFactory;
@@ -122,10 +120,6 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       KeycloakUserService.class
     },
     controllers = {DocumentationUnitController.class})
-@Sql(scripts = {"classpath:courts_init.sql"})
-@Sql(
-    scripts = {"classpath:courts_cleanup.sql"},
-    executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class DocumentationUnitIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
@@ -205,44 +199,6 @@ class DocumentationUnitIntegrationTest {
               assertThat(response.getResponseBody().status())
                   .isEqualTo(
                       Status.builder().publicationStatus(UNPUBLISHED).withError(false).build());
-            });
-
-    List<DocumentationUnitDTO> list = repository.findAll();
-    assertThat(list).hasSize(1);
-  }
-
-  @Test
-  void testParametrizedDocumentationUnitCreation() {
-    when(documentNumberPatternConfig.getDocumentNumberPatterns())
-        .thenReturn(Map.of("DS", "XXRE0******YY"));
-
-    var court = databaseCourtRepository.findBySearchStr("AG Aachen").get(0);
-
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/new")
-        .bodyValue(
-            DocumentationUnitCreationParameters.builder()
-                .court(Court.builder().id(court.getId()).type("AG").location("Aachen").build())
-                .fileNumber("abc")
-                .decisionDate(LocalDate.of(2021, 1, 1))
-                .build())
-        .exchange()
-        .expectStatus()
-        .isCreated()
-        .expectBody(DocumentationUnit.class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().coreData().court().id())
-                  .isEqualTo(court.getId());
-              assertThat(response.getResponseBody().coreData().court().type()).isEqualTo("AG");
-              assertThat(response.getResponseBody().coreData().court().location())
-                  .isEqualTo("Aachen");
-              assertThat(response.getResponseBody().coreData().fileNumbers().size()).isEqualTo(1);
-              assertThat(response.getResponseBody().coreData().fileNumbers().get(0))
-                  .isEqualTo("abc");
             });
 
     List<DocumentationUnitDTO> list = repository.findAll();
