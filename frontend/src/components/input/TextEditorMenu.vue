@@ -214,7 +214,7 @@ const buttons = computed(() => {
     buttons.push({
       type: "addBorderNumbers",
       icon: IcSharpAddBox,
-      ariaLabel: "Randnummern hinzufügen",
+      ariaLabel: "Randnummern neu erstellen",
       group: "borderNumber",
       isCollapsable: false,
       callback: () => props.editor.chain().focus().addBorderNumbers().run(),
