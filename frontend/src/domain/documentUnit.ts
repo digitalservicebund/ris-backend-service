@@ -76,7 +76,9 @@ export type ShortTexts = {
   otherHeadnote?: string
 }
 
-export const shortTextLabels: { [shortTextKey in keyof ShortTexts]: string } = {
+export const shortTextLabels: {
+  [shortTextKey in keyof Required<ShortTexts>]: string
+} = {
   decisionName: "Entscheidungsname",
   headline: "Titelzeile",
   guidingPrinciple: "Leitsatz",
@@ -94,7 +96,9 @@ export type LongTexts = {
   otherLongText?: string
   outline?: string
 }
-export const longTextLabels: { [longTextKey in keyof LongTexts]: string } = {
+export const longTextLabels: {
+  [longTextKey in keyof Required<LongTexts>]: string
+} = {
   tenor: "Tenor",
   reasons: "Gründe",
   caseFacts: "Tatbestand",
