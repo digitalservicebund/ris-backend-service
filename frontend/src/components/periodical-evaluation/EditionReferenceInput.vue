@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, watch } from "vue"
 import { ValidationError } from "../input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import CreateNewDialogue from "@/components/CreateNewDialogue.vue"
+import CreateNewFromSearch from "@/components/CreateNewFromSearch.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
@@ -138,11 +138,18 @@ async function updatePage(page: number) {
   await search()
 }
 
-function validateRequiredInput(toValidateReference: Reference) {
-  if (toValidateReference.missingRequiredFields?.length) {
-    toValidateReference.missingRequiredFields.forEach((missingField) => {
+function validateRequiredInput(referenceToValidate?: Reference): boolean {
+  // Use the provided referenceToValidate if available, otherwise use the local reference
+  const referenceToCheck = referenceToValidate || reference.value
+
+  // Check for missing required fields
+  if (referenceToCheck.missingRequiredFields?.length) {
+    referenceToCheck.missingRequiredFields.forEach((missingField: string) => {
       validationStore.add("Pflichtfeld nicht befüllt", missingField)
     })
+    return false // Validation failed
+  } else {
+    return true // Validation passed
   }
 }
 
@@ -446,12 +453,11 @@ onMounted(async () => {
         />
       </Pagination>
     </div>
-    <CreateNewDialogue
+    <CreateNewFromSearch
       v-if="searchResults && featureToggle"
-      :is-valid="!reference.missingRequiredFields?.length"
       :parameters="createDocumentationUnitParameters"
+      :validate-required-input="() => validateRequiredInput(reference)"
       @created-documentation-unit="addReferenceWithCreatedDocunit"
-      @validate-required-input="validateRequiredInput(reference)"
     />
   </div>
 </template>
