@@ -170,7 +170,7 @@ const borderNumberService = {
       )
     }
 
-    // Dissenting opinion should start from 0 again and not influence any other long-texts or links.
+    // Dissenting opinion should start from 1 again and not influence any other long-texts or links.
     const dissentingOpinion = documentUnit.value!.longTexts.dissentingOpinion
     if (dissentingOpinion) {
       const { updatedText } = makeBorderNumbersSequentialForCategory(

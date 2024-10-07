@@ -57,6 +57,7 @@ watch(
         data-testid="text-editor"
         element-id="text-editor"
         field-size="max"
+        plain-border-numbers
         :value="fileAsHTML?.html"
       />
     </FlexItem>

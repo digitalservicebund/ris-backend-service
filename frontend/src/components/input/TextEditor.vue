@@ -46,6 +46,8 @@ interface Props {
   editable?: boolean
   preview?: boolean
   ariaLabel?: string
+  /* If true, the color formatting of border numbers is disabled */
+  plainBorderNumbers?: boolean
   fieldSize?: TextAreaInputAttributes["fieldSize"]
 }
 
@@ -53,6 +55,7 @@ const props = withDefaults(defineProps<Props>(), {
   value: undefined,
   editable: false,
   preview: false,
+  plainBorderNumbers: false,
   ariaLabel: "Editor Feld",
   fieldSize: "medium",
 })
@@ -64,7 +67,7 @@ const emit = defineEmits<{
 const editorElement = ref<HTMLElement>()
 const hasFocus = ref(false)
 const isHovered = ref(false)
-const featureToggle = ref()
+const featureToggle = ref(false)
 
 const editor = new Editor({
   editorProps: {
@@ -148,22 +151,23 @@ const containerWidth = ref<number>()
 
 const editorExpanded = ref(false)
 const editorStyleClasses = computed(() => {
-  const attachmentViewStyle =
-    props.ariaLabel === "Dokumentenvorschau" ? "attachment-view" : ""
+  const plainBorderNumberStyle = props.plainBorderNumbers
+    ? "plain-border-number"
+    : ""
 
   if (editorExpanded.value) {
-    return `h-640 ${attachmentViewStyle}`
+    return `h-640 ${plainBorderNumberStyle}`
   }
 
-  const fieldSizeClasses: Record<string, string> = {
+  const fieldSizeClasses = {
     max: "h-full",
     big: "h-320",
     medium: "h-160",
     small: "h-96",
-  }
+  } as const
 
   return fieldSizeClasses[props.fieldSize]
-    ? fieldSizeClasses[props.fieldSize] + attachmentViewStyle
+    ? `${fieldSizeClasses[props.fieldSize]} ${plainBorderNumberStyle}`
     : undefined
 })
 
@@ -202,9 +206,9 @@ const ariaLabel = props.ariaLabel ? props.ariaLabel : null
 onMounted(async () => {
   const editorContainer = document.querySelector(".editor")
   if (editorContainer != null) resizeObserver.observe(editorContainer)
-  featureToggle.value = (
-    await FeatureToggleService.isEnabled("neuris.border-number-editor")
-  ).data
+  featureToggle.value =
+    (await FeatureToggleService.isEnabled("neuris.border-number-editor"))
+      .data ?? false
 })
 
 const resizeObserver = new ResizeObserver((entries) => {
