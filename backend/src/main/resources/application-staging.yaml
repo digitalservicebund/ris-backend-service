@@ -16,6 +16,7 @@ database:
   seed: true
 
 sentry:
+  dsn: ${SENTRY_DSN}
   environment: staging
   traces-sample-rate: 0.01
 
