@@ -267,6 +267,7 @@ test.describe(
         const fileNumber = prefilledDocumentUnit.coreData.fileNumbers?.[0] || ""
         const secondFileNumber =
           secondPrefilledDocumentUnit.coreData.fileNumbers?.[0] || ""
+        const suffix = edition.suffix || ""
 
         await navigateToPeriodicalReferences(page, edition.id || "")
 
@@ -275,7 +276,7 @@ test.describe(
             "2024, ",
           )
           await expect(page.getByLabel("Zitatstelle Suffix")).toHaveValue(
-            ", Heft 1",
+            suffix,
           )
         })
 
@@ -330,7 +331,7 @@ test.describe(
 
         await test.step("A reference is added to the editable list after being added", async () => {
           const decisionElement = page.getByText(
-            "AG Aachen, 31.12.2019, " + fileNumber + ", Anerkenntnisurteil",
+            `AG Aachen, 31.12.2019, ${fileNumber}, Anerkenntnisurteil`,
           )
           await expect(decisionElement).toHaveCount(2)
 
@@ -339,7 +340,7 @@ test.describe(
           await expect(decisionElement.nth(1)).toBeVisible()
 
           await expect(
-            page.getByText("MMG 2024, 5, Heft 1 (LT)", { exact: true }),
+            page.getByText(`MMG 2024, 5${suffix} (LT)`, { exact: true }),
           ).toBeVisible()
         })
 
@@ -364,7 +365,7 @@ test.describe(
           ).toHaveCount(4)
 
           await expect(
-            page.getByText("MMG 2024, 104, Heft 1 (LT)", { exact: true }),
+            page.getByText(`MMG 2024, 104${suffix} (LT)`, { exact: true }),
           ).toBeVisible()
         })
 
@@ -393,22 +394,22 @@ test.describe(
 
         await test.step("An added citation is visible in the documentation unit's preview ", async () => {
           await expect(
-            previewTab.getByText("MMG 2024, 5, Heft 1 (LT)", { exact: true }),
+            previewTab.getByText(`MMG 2024, 5${suffix} (LT)`, { exact: true }),
           ).toHaveCount(1)
           await expect(
-            previewTab.getByText("MMG 2024, 99, Heft 1 (LT)", { exact: true }),
+            previewTab.getByText(`MMG 2024, 99${suffix} (LT)`, { exact: true }),
           ).toHaveCount(1)
           await expect(
-            secondPreviewTab.getByText("MMG 2024, 104, Heft 1 (LT)", {
+            secondPreviewTab.getByText(`MMG 2024, 104${suffix} (LT)`, {
               exact: true,
             }),
           ).toHaveCount(1)
         })
 
-        await test.step("When editing a reference, the citation is a single input containing the joined value of prefix, citation and suffix ", async () => {
+        await test.step("When editing a reference, the citation is a single input containing the joined value of prefix, citation and suffix", async () => {
           await page.getByTestId("list-entry-0").click()
           await expect(page.getByLabel("Zitatstelle *")).toHaveValue(
-            "2024, 5, Heft 1",
+            `2024, 5${suffix}`,
           )
           await expect(page.getByLabel("Klammernzusatz")).toHaveValue("LT")
 
@@ -446,29 +447,29 @@ test.describe(
             page.getByText("Pflichtfeld nicht befüllt"),
           ).toBeVisible()
 
-          await fillInput(page, "Zitatstelle *", "2021, 2, Heft 1")
+          await fillInput(page, "Zitatstelle *", `2021, 2${suffix}`)
           await fillInput(page, "Klammernzusatz", "L")
           await page.getByLabel("Fundstelle vermerken", { exact: true }).click()
 
           await expect(
-            page.getByText("MMG 2021, 2, Heft 1 (L)", { exact: true }),
+            page.getByText(`MMG 2021, 2${suffix} (L)`, { exact: true }),
           ).toBeVisible()
         })
 
         await test.step("Changes to the citation are visible in the documentation unit's preview ", async () => {
           await previewTab.reload()
           await expect(
-            previewTab.getByText("MMG 2021, 2, Heft 1 (L)", { exact: true }),
+            previewTab.getByText(`MMG 2021, 2${suffix} (L)`, { exact: true }),
           ).toHaveCount(1, { timeout: 10_000 })
           await expect(
-            previewTab.getByText("MMG 2024, 99, Heft 1 (LT)", { exact: true }),
+            previewTab.getByText(`MMG 2024, 99${suffix} (LT)`, { exact: true }),
           ).toHaveCount(1)
         })
 
         await test.step("Unchanged citation is unchanged in preview ", async () => {
           await secondPreviewTab.reload()
           await expect(
-            secondPreviewTab.getByText("MMG 2024, 104, Heft 1 (LT)", {
+            secondPreviewTab.getByText(`MMG 2024, 104${suffix} (LT)`, {
               exact: true,
             }),
           ).toHaveCount(1)
@@ -501,11 +502,12 @@ test.describe(
 
         await test.step("A reference can be deleted", async () => {
           await navigateToPeriodicalReferences(page, edition.id || "")
-          for (let i = 0; i < 3; i++) {
+
+          while (await page.getByTestId("list-entry-0").isVisible()) {
             await page.getByTestId("list-entry-0").click()
-            const saveRequest = page.waitForRequest(
+            const saveRequest = page.waitForResponse(
               "**/api/v1/caselaw/legalperiodicaledition",
-              { timeout: 2_000 },
+              { timeout: 5_000 },
             )
             await page.locator("[aria-label='Eintrag löschen']").click()
             await saveRequest
@@ -518,30 +520,39 @@ test.describe(
           await expect(
             page.locator("[aria-label='Listen Eintrag']"),
           ).toHaveCount(1)
+          await expect(
+            page.getByText(`MMG 2021, 2${suffix} (L)`, { exact: true }),
+          ).toBeHidden()
 
           await page.reload()
+          await page.getByTestId("list-entry-0").isHidden()
           await expect(
             page.locator("[aria-label='Listen Eintrag']"),
           ).toHaveCount(1)
+          await expect(
+            page.getByText(`MMG 2021, 2${suffix} (L)`, { exact: true }),
+          ).toBeHidden()
         })
 
         await test.step("Deleted citations disappear from the documentation unit's preview ", async () => {
           await previewTab.reload()
           await expect(previewTab.getByText(fileNumber)).toBeVisible()
           await expect(
-            previewTab.getByText("MMG 2021, 2, Heft 1 (L)", { exact: true }),
+            previewTab.getByText(`MMG 2021, 2${suffix} (L)`, { exact: true }),
           ).toBeHidden()
-          await expect(previewTab.getByText("Fundstellen")).toBeHidden()
+          await expect(
+            previewTab.getByText("Fundstellen", { exact: true }),
+          ).toBeHidden()
 
           await secondPreviewTab.reload()
           await expect(
             secondPreviewTab.getByText(secondFileNumber),
           ).toBeVisible()
           await expect(
-            previewTab.getByText("MMG 2021, 2, Heft 1 (L)", { exact: true }),
+            previewTab.getByText(`MMG 2021, 2${suffix} (L)`, { exact: true }),
           ).toBeHidden()
           await expect(
-            previewTab.getByText("MMG 2024, 99, Heft 1 (LT)", { exact: true }),
+            previewTab.getByText(`MMG 2024, 99${suffix} (LT)`, { exact: true }),
           ).toBeHidden()
         })
       },
@@ -592,7 +603,7 @@ test.describe(
 
         await test.step("An added citation is visible in the other docoffice's documentation unit's preview ", async () => {
           await expect(
-            previewTab.getByText("MMG 2024, 12, Heft 1 (L)", { exact: true }),
+            previewTab.getByText(`MMG 2024, 12${suffix} (L)`, { exact: true }),
           ).toBeVisible()
         })
 
