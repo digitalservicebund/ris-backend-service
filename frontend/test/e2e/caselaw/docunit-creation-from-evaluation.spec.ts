@@ -4,8 +4,10 @@ import {
   fillInput,
   navigateToPeriodicalReferences,
   waitForInputValue,
+  deleteDocumentUnit,
 } from "./e2e-utils"
 import { caselawTest as test } from "./fixtures"
+import { generateString } from "~/test-helper/dataGenerators"
 
 const formattedDate = dayjs().format("DD.MM.YYYY")
 
@@ -122,10 +124,8 @@ test.describe(
       },
     )
 
-    // TODO cleanup after test is missing
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip(
-      "Allow creation from periodical evaluation",
+    test(
+      "Allow creation from periodical evaluation for own docunit",
       {
         tag: "@RISDEV-4829",
         annotation: {
@@ -134,161 +134,129 @@ test.describe(
             "https://digitalservicebund.atlassian.net/browse/RISDEV-4829",
         },
       },
-      async ({ page, edition }) => {
-        await navigateToPeriodicalReferences(page, edition.id ?? "")
-        await searchForDocUnitWithFileNumber(page, "1C 123/45", formattedDate)
+      async ({ pageWithBghUser, edition }) => {
+        await navigateToPeriodicalReferences(pageWithBghUser, edition.id ?? "")
+        const randomFileNumber = generateString()
+        let documentNumber = ""
+        await searchForDocUnitWithFileNumber(
+          pageWithBghUser,
+          randomFileNumber,
+          formattedDate,
+          "AG Aachen",
+        )
 
         await test.step("Mandatory fields citation (Zitatstelle) and reference Supplement (Klammernzusatz) are being validated before creation of new documentation unit", async () => {
-          await fillInput(page, "Gericht", "AG Aachen")
-          await page.getByText("AG Aachen").click()
-          await fillInput(page, "Zuständige Dokumentationsstelle", "DS")
-          await page.getByText("DS", { exact: true }).click()
-          await waitForInputValue(
-            page,
-            "[aria-label='Zuständige Dokumentationsstelle']",
-            "DS",
-          )
-
-          await page
+          await pageWithBghUser
             .getByText("Ok und Dokumentationseinheit direkt bearbeiten")
             .click()
 
           await expect(
-            page.locator("[aria-label='Listen Eintrag']"),
+            pageWithBghUser.locator("[aria-label='Listen Eintrag']"),
           ).toHaveCount(1)
 
-          await expect(page.getByText("Pflichtfeld nicht befüllt")).toHaveCount(
-            2,
-          )
+          await expect(
+            pageWithBghUser.getByText("Pflichtfeld nicht befüllt"),
+          ).toHaveCount(2)
 
-          await fillInput(page, "Zitatstelle *", "12")
-          await expect(page.getByText("Pflichtfeld nicht befüllt")).toHaveCount(
-            1,
-          )
+          await fillInput(pageWithBghUser, "Zitatstelle *", "12")
+          await expect(
+            pageWithBghUser.getByText("Pflichtfeld nicht befüllt"),
+          ).toHaveCount(1)
 
-          await page
+          await pageWithBghUser
             .getByText("Ok und Dokumentationseinheit direkt bearbeiten")
             .click()
 
           await expect(
-            page.locator("[aria-label='Listen Eintrag']"),
+            pageWithBghUser.locator("[aria-label='Listen Eintrag']"),
           ).toHaveCount(1)
 
-          await fillInput(page, "Klammernzusatz", "L")
+          await fillInput(pageWithBghUser, "Klammernzusatz", "L")
 
-          await expect(page.getByText("Pflichtfeld nicht befüllt")).toBeHidden()
+          await expect(
+            pageWithBghUser.getByText("Pflichtfeld nicht befüllt"),
+          ).toBeHidden()
         })
 
-        const newtab =
-          await test.step("The new documentation unit can be created and opened in a new tab", async () => {
-            const pagePromise = page.context().waitForEvent("page")
-            await page
-              .getByText("Ok und Dokumentationseinheit direkt bearbeiten")
-              .click()
-            const newTab = await pagePromise
-            await expect(newTab).toHaveURL(
-              /\/caselaw\/documentunit\/[A-Z0-9]{13}\/categories$/,
-            )
-            return newTab
-          })
+        await test.step("The new documentation unit can be created and opened in a new tab with correct data", async () => {
+          const pagePromise = pageWithBghUser.context().waitForEvent("page")
+          await pageWithBghUser
+            .getByText("Ok und Dokumentationseinheit direkt bearbeiten")
+            .click()
+          const newTab = await pagePromise
+          await expect(newTab).toHaveURL(
+            /\/caselaw\/documentunit\/[A-Z0-9]{13}\/categories$/,
+          )
+          documentNumber = /caselaw\/documentunit\/(.*)\/categories/g.exec(
+            newTab.url(),
+          )?.[1] as string
+          await expect(newTab.locator("[aria-label='Gericht']")).toHaveValue(
+            "AG Aachen",
+          )
+          await expect(
+            newTab.locator("[aria-label='Entscheidungsdatum']"),
+          ).toHaveValue(formattedDate)
+          await expect(newTab.getByTestId("chip-value")).toHaveText(
+            randomFileNumber,
+          )
+          await expect(
+            newTab.locator("[aria-label='Dokumenttyp']"),
+          ).toHaveValue("Anerkenntnisurteil")
+
+          // Todo: RISDEV-4999
+          // await expect(
+          //   newTab.locator("[aria-label='Rechtskraft']"),
+          // ).toHaveValue("Ja")
+
+          await newTab.keyboard.down("v")
+
+          await expect(newTab.getByText("Sekundäre Fundstellen")).toBeVisible()
+          await expect(
+            newTab.getByText(
+              edition.legalPeriodical?.abbreviation +
+                " " +
+                edition.prefix +
+                "12" +
+                edition.suffix +
+                " (L)",
+              { exact: true },
+            ),
+          ).toBeVisible()
+
+          await newTab.locator("[aria-label='Fundstellen']").click()
+          await expect(newTab.getByText("Fundstellen bearbeiten")).toBeVisible()
+          await expect(
+            newTab
+              .getByLabel("Listen Eintrag")
+              .getByText(
+                edition.legalPeriodical?.abbreviation +
+                  " " +
+                  edition.prefix +
+                  "12" +
+                  edition.suffix +
+                  " (L)",
+                { exact: true },
+              ),
+          ).toBeVisible()
+        })
 
         await test.step("The new documentation unit is added to the list of references", async () => {
           await expect(
-            page.locator("[aria-label='Listen Eintrag']"),
+            pageWithBghUser.locator("[aria-label='Listen Eintrag']"),
           ).toHaveCount(2)
 
           await expect(
-            page.getByText(
-              "BGH, " + formattedDate + ", 1C 123/45, Anerkenntnisurteil",
-            ),
-          ).toBeVisible()
-
-          await expect(
-            page.getByText(
-              edition.legalPeriodical?.abbreviation +
-                " " +
-                edition.prefix +
-                "12" +
-                edition.suffix +
-                " (L)",
-              { exact: true },
-            ),
-          ).toBeVisible()
-        })
-
-        await test.step("The new documentation unit is created with search input fields court, decision date, file number and document type", async () => {
-          await expect(newtab.locator("[aria-label='Gericht']")).toHaveValue(
-            "BGH",
-          )
-          await expect(
-            newtab.locator("[aria-label='Entscheidungsdatum']"),
-          ).toHaveValue(formattedDate)
-          await expect(
-            newtab.locator("[aria-label='Aktenzeichen']"),
-          ).toHaveValue("1C 123/45")
-          await expect(
-            newtab.locator("[aria-label='Dokumenttyp']"),
-          ).toHaveValue("AnU")
-        })
-
-        await test.step("Legal effect (Rechtskraft) is initialized based on the court", async () => {
-          await expect(
-            newtab.locator("[aria-label='Rechtskraft']"),
-          ).toHaveValue("Ja")
-        })
-
-        await test.step("Legal effect (Rechtskraft) is set to unknown without court", async () => {
-          await fillInput(page, "Zitatstelle *", "18")
-          await fillInput(page, "Klammernzusatz", "L")
-          await page.getByText("Suchen").click()
-          await fillInput(page, "Zuständige Dokumentationsstelle", "DS")
-          await page.getByText("DS", { exact: true }).click()
-
-          const pagePromise = page.context().waitForEvent("page")
-          await page
-            .getByText("Ok und Dokumentationseinheit direkt bearbeiten")
-            .click()
-          const secondTab = await pagePromise
-          await expect(secondTab).toHaveURL(
-            /\/caselaw\/documentunit\/[A-Z0-9]{13}\/categories$/,
-          )
-          await expect(
-            secondTab.locator("[aria-label='Rechtskraft']"),
-          ).toHaveValue("Keine Angabe")
-        })
-
-        await test.step("The new documentation unit has the status unpublished", async () => {
-          await expect(newtab.getByText("Unveröffentlicht")).toBeVisible()
-
-          await expect(
-            page.getByText(
-              "BGH, " +
+            pageWithBghUser.getByText(
+              "AG Aachen, " +
                 formattedDate +
-                ", 1C 123/45, Anerkenntnisurteil, Unveröffentlicht",
-            ),
-          ).toBeVisible()
-        })
-
-        await test.step("The reference is visible in the documentation unit edit view and preview", async () => {
-          await newtab.keyboard.down("v")
-
-          await expect(page.getByText("Sekundäre Fundstellen")).toBeVisible()
-          await expect(
-            newtab.getByText(
-              edition.legalPeriodical?.abbreviation +
-                " " +
-                edition.prefix +
-                "12" +
-                edition.suffix +
-                " (L)",
-              { exact: true },
+                ", " +
+                randomFileNumber +
+                ", Anerkenntnisurteil, Unveröffentlicht",
             ),
           ).toBeVisible()
 
-          await newtab.locator("[aria-label='Fundstellen']").click()
-          await expect(page.getByText("Fundstellen bearbeiten")).toBeVisible()
           await expect(
-            newtab.getByText(
+            pageWithBghUser.getByText(
               edition.legalPeriodical?.abbreviation +
                 " " +
                 edition.prefix +
@@ -299,6 +267,8 @@ test.describe(
             ),
           ).toBeVisible()
         })
+
+        await deleteDocumentUnit(pageWithBghUser, documentNumber)
       },
     )
 
