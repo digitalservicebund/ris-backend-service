@@ -33,6 +33,16 @@ test.describe(
       async ({ page, edition }) => {
         await navigateToPeriodicalReferences(page, edition.id ?? "")
 
+        await test.step("After searching, a documentation unit can be created", async () => {
+          await expect(
+            page.getByText("Zuständige Dokumentationsstelle *"),
+          ).toBeHidden()
+          await page.getByText("Suchen").click()
+          await expect(
+            page.getByText("Zuständige Dokumentationsstelle *"),
+          ).toBeVisible()
+        })
+
         await fillInput(page, "Zitatstelle *", "12")
         await fillInput(page, "Klammernzusatz", "L")
 
@@ -58,7 +68,7 @@ test.describe(
           )
         })
 
-        await test.step("Foregn courts are not assigned to a responsible doc office", async () => {
+        await test.step("Foreign courts are not assigned to a responsible doc office", async () => {
           await fillInput(page, "Gericht", "Arbeits- und Sozialgericht Wien")
           await page.getByText("Arbeits- und Sozialgericht Wien").click()
           await page.getByText("Suchen").click()
@@ -116,16 +126,7 @@ test.describe(
       },
       async ({ page, edition }) => {
         await navigateToPeriodicalReferences(page, edition.id ?? "")
-
-        await test.step("After searching, a documentation unit can be created", async () => {
-          await expect(
-            page.getByText("Zuständige Dokumentationsstelle *"),
-          ).toBeHidden()
-          await searchForDocUnitWithFileNumber(page, "1C 123/45", formattedDate)
-          await expect(
-            page.getByText("Zuständige Dokumentationsstelle *"),
-          ).toBeVisible()
-        })
+        await searchForDocUnitWithFileNumber(page, "1C 123/45", formattedDate)
 
         await test.step("Mandatory fields citation (Zitatstelle), reference Supplement (Klammernzusatz) and documentation office are being validated before creation of new documentation unit", async () => {
           await expect(
