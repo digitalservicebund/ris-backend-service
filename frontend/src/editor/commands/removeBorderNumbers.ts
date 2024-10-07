@@ -12,17 +12,17 @@ function removeBorderNumbers(
   isFeatureEnabled: boolean,
 ): boolean {
   const { selection, doc, tr, schema } = state
-  const { from, to } = selection
+  const { from: initialFrom, to: initialTo } = selection
   const borderNumberNodeType: NodeType = schema.nodes.borderNumber
 
   const borderNumberPositions = findBorderNumberPositions(
     doc,
-    from,
-    to,
+    initialFrom,
+    initialTo,
     borderNumberNodeType,
   )
 
-  const { modified, borderNumberSizes } = processBorderNumbers(
+  const { modified, firstBorderNumberSize } = processBorderNumbers(
     tr,
     doc,
     borderNumberPositions,
@@ -35,15 +35,8 @@ function removeBorderNumbers(
   })
 
   if (modified && dispatch) {
-    const totalSizeOfRemovedNodes = borderNumberSizes.reduce(
-      (acc, size) => acc + size,
-      0,
-    )
-
-    const selection = TextSelection.create(
-      tr.doc,
-      Math.max(1, from - totalSizeOfRemovedNodes),
-    )
+    const updatedFrom = initialFrom - firstBorderNumberSize
+    const selection = TextSelection.create(tr.doc, Math.max(1, updatedFrom))
     tr.setSelection(selection)
     dispatch(tr)
     return true
@@ -57,13 +50,13 @@ function removeBorderNumbers(
  */
 function findBorderNumberPositions(
   doc: ProseMirrorNode,
-  from: number,
-  to: number,
+  initialFrom: number,
+  initialTo: number,
   borderNumberType: NodeType,
 ): number[] {
   const borderNumberPositions: number[] = []
 
-  doc.nodesBetween(from, to, (node, pos) => {
+  doc.nodesBetween(initialFrom, initialTo, (node, pos) => {
     if (node.type === borderNumberType) {
       borderNumberPositions.push(pos)
     }
@@ -79,9 +72,9 @@ function processBorderNumbers(
   tr: Transaction,
   doc: ProseMirrorNode,
   borderNumberPositions: number[],
-): { modified: boolean; borderNumberSizes: number[] } {
+): { modified: boolean; firstBorderNumberSize: number } {
   let modified = false
-  const borderNumberSizes: number[] = []
+  let firstBorderNumberSize: number = 0
 
   // Traverse in reverse order to avoid shifting positions
   borderNumberPositions.toReversed().forEach((pos) => {
@@ -89,7 +82,6 @@ function processBorderNumbers(
 
     if (borderNumberNode) {
       const contentNode = borderNumberNode.child(1)
-      borderNumberSizes.push(borderNumberNode.nodeSize - contentNode.nodeSize)
 
       if (isNodeEmpty(contentNode)) {
         tr.delete(pos, pos + borderNumberNode.nodeSize)
@@ -98,10 +90,12 @@ function processBorderNumbers(
       }
 
       modified = true
+
+      firstBorderNumberSize = borderNumberNode.nodeSize - contentNode.nodeSize
     }
   })
 
-  return { modified, borderNumberSizes }
+  return { modified, firstBorderNumberSize }
 }
 
 /**

@@ -1,11 +1,10 @@
 import { CommandProps } from "@tiptap/core"
-import { Dispatch } from "@tiptap/vue-3"
 import {
   Node as ProsemirrorNode,
   NodeType,
   Schema as ProsemirrorSchema,
 } from "prosemirror-model"
-import { TextSelection, Transaction } from "prosemirror-state"
+import { TextSelection } from "prosemirror-state"
 import { nextTick } from "vue"
 import BorderNumberService from "@/services/borderNumberService"
 
@@ -39,11 +38,16 @@ function addBorderNumbers({ state, dispatch }: CommandProps): boolean {
 
       tr.replaceWith(currentPos, currentPos + node.nodeSize, borderNumberNode)
 
+      console.log(borderNumberNode.firstChild?.nodeSize)
       const addedNodeSize = borderNumberNode.nodeSize - node.nodeSize
       shift += addedNodeSize
 
-      if (pos < initialFrom) {
-        updatedFrom += addedNodeSize
+      const isFirstBorderNumber = pos < initialFrom
+      if (isFirstBorderNumber) {
+        /** This solution is not perfect. The tr.doc only contains the default "0".
+        The recalculated border numbers are not part of the tr.doc, hence the actual number of digits
+        (after the recalculation) is unknown and therefore the actual addedNodeSize. **/
+        updatedFrom = initialFrom + addedNodeSize
       }
 
       modified = true
@@ -52,8 +56,11 @@ function addBorderNumbers({ state, dispatch }: CommandProps): boolean {
 
   void nextTick().then(() => BorderNumberService.makeBorderNumbersSequential())
 
-  handlePostModification(modified, dispatch, tr, updatedFrom)
-
+  if (modified && dispatch) {
+    const textSelection = TextSelection.create(tr.doc, Math.max(1, updatedFrom))
+    tr.setSelection(textSelection)
+    dispatch(tr)
+  }
   return modified
 }
 
@@ -100,22 +107,6 @@ function createBorderNumberNode(
   const contentNode = contentNodeType.create({}, paragraphNode)
 
   return borderNumberNodeType.create({}, [numberNode, contentNode])
-}
-
-/**
- * Handles actions that need to occur after modifying the document.
- */
-function handlePostModification(
-  modified: boolean,
-  dispatch: Dispatch,
-  tr: Transaction,
-  updatedFrom: number,
-): void {
-  if (modified && dispatch) {
-    const textSelection = TextSelection.create(tr.doc, updatedFrom - 2)
-    tr.setSelection(textSelection)
-    dispatch(tr)
-  }
 }
 
 export default addBorderNumbers
