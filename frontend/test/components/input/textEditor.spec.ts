@@ -4,11 +4,13 @@ import { flushPromises } from "@vue/test-utils"
 import { vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import TextEditor from "@/components/input/TextEditor.vue"
+import { longTextLabels } from "@/domain/documentUnit"
 import featureToggleService from "@/services/featureToggleService"
 
+let isUserInternal = true
 vi.mock("@/composables/useInternalUser", () => {
   return {
-    useInternalUser: () => true,
+    useInternalUser: () => isUserInternal,
   }
 })
 
@@ -171,8 +173,94 @@ describe("text editor", async () => {
     expect(screen.getByLabelText("Einzug verringern")).toBeInTheDocument()
     expect(screen.getByLabelText("Einzug vergrößern")).toBeInTheDocument()
     expect(screen.getByLabelText("Zitat einfügen")).toBeInTheDocument()
+    expect(
+      screen.getByLabelText("Randnummern neu erstellen"),
+    ).toBeInTheDocument()
     expect(screen.getByLabelText("Randnummern entfernen")).toBeInTheDocument()
     expect(screen.getByLabelText("Rückgängig machen")).toBeInTheDocument()
     expect(screen.getByLabelText("Wiederherstellen")).toBeInTheDocument()
+  })
+
+  it("hides add and remove border number button when user is external", async () => {
+    isUserInternal = false
+    render(TextEditor, {
+      props: {
+        value: "Test Value",
+        ariaLabel: "Gründe",
+        editable: true,
+      },
+      global: { plugins: [router] },
+    })
+
+    await flushPromises()
+
+    const editorField = screen.getByTestId("Gründe")
+
+    if (editorField.firstElementChild !== null) {
+      await fireEvent.focus(editorField.firstElementChild)
+    }
+
+    expect(screen.queryByText("Randnummern entfernen")).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("Randnummern neu erstellen"),
+    ).not.toBeInTheDocument()
+  })
+
+  it.each([
+    longTextLabels.tenor,
+    longTextLabels.participatingJudges,
+    longTextLabels.outline,
+  ])("hides add border number button for category %s", async (category) => {
+    isUserInternal = true
+    render(TextEditor, {
+      props: {
+        value: "Test Value",
+        ariaLabel: category,
+        editable: true,
+      },
+      global: { plugins: [router] },
+    })
+
+    await flushPromises()
+
+    const editorField = screen.getByTestId(category!)
+
+    if (editorField.firstElementChild !== null) {
+      await fireEvent.focus(editorField.firstElementChild)
+    }
+
+    expect(
+      screen.queryByText("Randnummern neu erstellen"),
+    ).not.toBeInTheDocument()
+  })
+
+  it.each([
+    longTextLabels.reasons,
+    longTextLabels.caseFacts,
+    longTextLabels.decisionReasons,
+    longTextLabels.dissentingOpinion,
+    longTextLabels.otherLongText,
+  ])("shows add border number button for category %s", async (category) => {
+    isUserInternal = true
+    render(TextEditor, {
+      props: {
+        value: "Test Value",
+        ariaLabel: category,
+        editable: true,
+      },
+      global: { plugins: [router] },
+    })
+
+    await flushPromises()
+
+    const editorField = screen.getByTestId(category!)
+
+    if (editorField.firstElementChild !== null) {
+      await fireEvent.focus(editorField.firstElementChild)
+    }
+
+    expect(
+      screen.getByLabelText("Randnummern neu erstellen"),
+    ).toBeInTheDocument()
   })
 })
