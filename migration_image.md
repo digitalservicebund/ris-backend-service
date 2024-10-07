@@ -2,7 +2,10 @@
 
 > **Work in progress - import through Docker image**
 
-To pull the `ris-data-migration` image, log in to the GitHub Package Repository using your username and a credential
+The following job is importing the minimally required data (refdata and juris tables)
+
+To be able to pull the `ris-data-migration` image, log in to the GitHub Package Repository using your username and a
+credential
 token stored in 1Password (1PW):
 
 ```shell
