@@ -603,7 +603,9 @@ test.describe(
 
         await test.step("An added citation is visible in the other docoffice's documentation unit's preview ", async () => {
           await expect(
-            previewTab.getByText(`MMG 2024, 12${suffix} (L)`, { exact: true }),
+            previewTab.getByText(`MMG 2024, 12${edition.suffix} (L)`, {
+              exact: true,
+            }),
           ).toBeVisible()
         })
 
