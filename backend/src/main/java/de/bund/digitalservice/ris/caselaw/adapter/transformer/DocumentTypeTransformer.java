@@ -19,6 +19,8 @@ public class DocumentTypeTransformer {
   }
 
   public static DocumentTypeDTO transformToDTO(DocumentType documentType) {
-    return documentType == null ? null : DocumentTypeDTO.builder().id(documentType.uuid()).build();
+    return documentType == null
+        ? null
+        : DocumentTypeDTO.builder().id(documentType.uuid()).label(documentType.label()).build();
   }
 }
