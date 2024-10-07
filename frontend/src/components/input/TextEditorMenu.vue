@@ -7,6 +7,7 @@ import TextEditorButton, {
 } from "@/components/input/TextEditorButton.vue"
 import { useCollapsingMenuBar } from "@/composables/useCollapsingMenuBar"
 import { useInternalUser } from "@/composables/useInternalUser"
+import { longTextLabels } from "@/domain/documentUnit"
 import FeatureToggleService from "@/services/featureToggleService"
 import IcSharpAddBox from "~icons/ic/sharp-add-box"
 import MaterialSymbolsDeleteSweepOutline from "~icons/ic/sharp-delete-sweep"
@@ -42,11 +43,11 @@ const props = defineProps<Props>()
 const emit = defineEmits<{ onEditorExpandedChanged: [boolean] }>()
 const isInternalUser = useInternalUser()
 const borderNumberCategories = [
-  "Gründe",
-  "Tatbestand",
-  "Entscheidungsgründe",
-  "Sonstiger Langtext",
-  "Abweichende Meinung",
+  longTextLabels.reasons,
+  longTextLabels.caseFacts,
+  longTextLabels.decisionReasons,
+  longTextLabels.otherLongText,
+  longTextLabels.dissentingOpinion,
 ]
 
 const featureToggle = ref()

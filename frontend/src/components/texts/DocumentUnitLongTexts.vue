@@ -2,6 +2,7 @@
 import { computed } from "vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
 import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLinks"
+import { longTextLabels } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import TextEditorUtil from "@/utils/textEditorUtil"
 
@@ -71,28 +72,28 @@ const decisionReasons = computed({
       <TextEditorCategory
         id="tenor"
         v-model="tenor"
-        label="Tenor"
+        :label="longTextLabels.tenor"
         :should-show-button="!store.documentUnit?.longTexts?.tenor?.length"
       />
 
       <TextEditorCategory
         id="reasons"
         v-model="reasons"
-        label="Gründe"
+        :label="longTextLabels.reasons"
         :should-show-button="!store.documentUnit?.longTexts?.reasons?.length"
       />
 
       <TextEditorCategory
         id="caseFacts"
         v-model="caseFacts"
-        label="Tatbestand"
+        :label="longTextLabels.caseFacts"
         :should-show-button="!store.documentUnit?.longTexts?.caseFacts?.length"
       />
 
       <TextEditorCategory
         id="decisionReasons"
         v-model="decisionReasons"
-        label="Entscheidungsgründe"
+        :label="longTextLabels.decisionReasons"
         :should-show-button="
           !store.documentUnit?.longTexts?.decisionReasons?.length
         "

@@ -3,6 +3,7 @@ import { computed } from "vue"
 import TextEditorCategory from "@/components/texts/TextEditorCategory.vue"
 import TextInputCategory from "@/components/texts/TextInputCategory.vue"
 import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLinks"
+import { shortTextLabels } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import TextEditorUtil from "@/utils/textEditorUtil"
 
@@ -80,9 +81,9 @@ const otherHeadnote = computed({
       <TextInputCategory
         id="decisionName"
         v-model="decisionName"
-        data-testid="Entscheidungsname"
+        :data-testid="shortTextLabels.decisionName"
         editable
-        label="Entscheidungsname"
+        :label="shortTextLabels.decisionName"
         :should-show-button="
           !store.documentUnit?.shortTexts?.decisionName?.length
         "
@@ -93,7 +94,7 @@ const otherHeadnote = computed({
         v-model="headline"
         editable
         field-size="small"
-        label="Titelzeile"
+        :label="shortTextLabels.headline"
         :should-show-button="!store.documentUnit?.shortTexts?.headline?.length"
       />
 
@@ -101,7 +102,7 @@ const otherHeadnote = computed({
         id="guidingPrinciple"
         v-model="guidingPrinciple"
         editable
-        label="Leitsatz"
+        :label="shortTextLabels.guidingPrinciple"
         :should-show-button="
           !store.documentUnit?.shortTexts?.guidingPrinciple?.length
         "
@@ -111,7 +112,7 @@ const otherHeadnote = computed({
         id="headnote"
         v-model="headnote"
         editable
-        label="Orientierungssatz"
+        :label="shortTextLabels.headnote"
         :should-show-button="!store.documentUnit?.shortTexts?.headnote?.length"
       />
 
@@ -119,7 +120,7 @@ const otherHeadnote = computed({
         id="otherHeadnote"
         v-model="otherHeadnote"
         editable
-        label="Sonstiger Orientierungssatz"
+        :label="shortTextLabels.otherHeadnote"
         :should-show-button="
           !store.documentUnit?.shortTexts?.otherHeadnote?.length
         "
