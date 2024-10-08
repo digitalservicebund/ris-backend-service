@@ -5,7 +5,7 @@ import PreviewCategory from "@/components/preview/PreviewCategory.vue"
 import PreviewContent from "@/components/preview/PreviewContent.vue"
 import PreviewRow from "@/components/preview/PreviewRow.vue"
 import { useValidBorderNumberLinks } from "@/composables/useValidBorderNumberLinks"
-import { ShortTexts } from "@/domain/documentUnit"
+import { shortTextLabels, ShortTexts } from "@/domain/documentUnit"
 
 const props = defineProps<{
   shortTexts: ShortTexts
@@ -56,11 +56,11 @@ const otherHeadnote = computed(() =>
 
 <template>
   <PreviewRow v-if="decisionName">
-    <PreviewCategory>Entscheidungsname</PreviewCategory>
+    <PreviewCategory>{{ shortTextLabels.decisionName }}</PreviewCategory>
     <PreviewContent>
       <TextEditor
         id="previewDecisionName"
-        aria-label="Entscheidungsname"
+        :aria-label="shortTextLabels.decisionName"
         field-size="max"
         preview
         :value="decisionName"
@@ -68,11 +68,11 @@ const otherHeadnote = computed(() =>
     </PreviewContent>
   </PreviewRow>
   <PreviewRow v-if="headline">
-    <PreviewCategory>Titelzeile</PreviewCategory>
+    <PreviewCategory>{{ shortTextLabels.headline }}</PreviewCategory>
     <PreviewContent>
       <TextEditor
         id="previewHeadline"
-        aria-label="Titelzeile"
+        :aria-label="shortTextLabels.headline"
         field-size="max"
         preview
         :value="headline"
@@ -80,11 +80,11 @@ const otherHeadnote = computed(() =>
     </PreviewContent>
   </PreviewRow>
   <PreviewRow v-if="guidingPrinciple">
-    <PreviewCategory>Leitsatz</PreviewCategory>
+    <PreviewCategory>{{ shortTextLabels.guidingPrinciple }}</PreviewCategory>
     <PreviewContent>
       <TextEditor
         id="previewGuidingPrinciple"
-        aria-label="Leitsatz"
+        :aria-label="shortTextLabels.guidingPrinciple"
         field-size="max"
         preview
         :value="guidingPrinciple"
@@ -92,11 +92,11 @@ const otherHeadnote = computed(() =>
     </PreviewContent>
   </PreviewRow>
   <PreviewRow v-if="headnote">
-    <PreviewCategory>Orientierungssatz</PreviewCategory>
+    <PreviewCategory>{{ shortTextLabels.headnote }}</PreviewCategory>
     <PreviewContent>
       <TextEditor
         id="previewHeadnote"
-        aria-label="Orientierungssatz"
+        :aria-label="shortTextLabels.headnote"
         field-size="max"
         preview
         :value="headnote"
@@ -104,11 +104,11 @@ const otherHeadnote = computed(() =>
     </PreviewContent>
   </PreviewRow>
   <PreviewRow v-if="otherHeadnote">
-    <PreviewCategory>Sonstiger Orientierungssatz</PreviewCategory>
+    <PreviewCategory>{{ shortTextLabels.otherHeadnote }}</PreviewCategory>
     <PreviewContent>
       <TextEditor
         id="previewItherHeadnote"
-        aria-label="Sonstiger Orientierungssatz"
+        :aria-label="shortTextLabels.otherHeadnote"
         field-size="max"
         preview
         :value="otherHeadnote"

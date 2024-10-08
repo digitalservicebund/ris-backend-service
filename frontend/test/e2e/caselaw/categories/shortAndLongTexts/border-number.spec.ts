@@ -152,7 +152,7 @@ test.describe(
       async function clickBorderNumberButton() {
         await test.step("Click border number button to delete border numbers from selection", async () => {
           await page
-            .locator(`[aria-label='Randnummer entfernen']:not([disabled])`)
+            .locator(`[aria-label='Randnummern entfernen']:not([disabled])`)
             .click()
         })
       }

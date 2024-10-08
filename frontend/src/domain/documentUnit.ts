@@ -76,6 +76,16 @@ export type ShortTexts = {
   otherHeadnote?: string
 }
 
+export const shortTextLabels: {
+  [shortTextKey in keyof Required<ShortTexts>]: string
+} = {
+  decisionName: "Entscheidungsname",
+  headline: "Titelzeile",
+  guidingPrinciple: "Leitsatz",
+  headnote: "Orientierungssatz",
+  otherHeadnote: "Sonstiger Orientierungssatz",
+}
+
 export type LongTexts = {
   tenor?: string
   reasons?: string
@@ -85,6 +95,18 @@ export type LongTexts = {
   participatingJudges?: ParticipatingJudge[]
   otherLongText?: string
   outline?: string
+}
+export const longTextLabels: {
+  [longTextKey in keyof Required<LongTexts>]: string
+} = {
+  tenor: "Tenor",
+  reasons: "Gründe",
+  caseFacts: "Tatbestand",
+  decisionReasons: "Entscheidungsgründe",
+  dissentingOpinion: "Abweichende Meinung",
+  participatingJudges: "Mitwirkende Richter",
+  otherLongText: "Sonstiger Langtext",
+  outline: "Gliederung",
 }
 
 export type DocumentationUnitParameters = {

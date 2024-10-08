@@ -1,11 +1,15 @@
 <script lang="ts" setup>
 import { commands, selectActiveState } from "@guardian/prosemirror-invisibles"
 import { Editor } from "@tiptap/vue-3"
-import { computed, ref } from "vue"
+import { computed, onMounted, ref } from "vue"
 import TextEditorButton, {
   EditorButton,
 } from "@/components/input/TextEditorButton.vue"
 import { useCollapsingMenuBar } from "@/composables/useCollapsingMenuBar"
+import { useInternalUser } from "@/composables/useInternalUser"
+import { longTextLabels } from "@/domain/documentUnit"
+import FeatureToggleService from "@/services/featureToggleService"
+import IcSharpAddBox from "~icons/ic/sharp-add-box"
 import MaterialSymbolsDeleteSweepOutline from "~icons/ic/sharp-delete-sweep"
 import IconExpand from "~icons/ic/sharp-expand"
 import IconAlignCenter from "~icons/ic/sharp-format-align-center"
@@ -37,162 +41,198 @@ interface Props {
 const props = defineProps<Props>()
 
 const emit = defineEmits<{ onEditorExpandedChanged: [boolean] }>()
+const isInternalUser = useInternalUser()
+const borderNumberCategories = [
+  longTextLabels.reasons,
+  longTextLabels.caseFacts,
+  longTextLabels.decisionReasons,
+  longTextLabels.otherLongText,
+  longTextLabels.dissentingOpinion,
+]
 
-const buttons = computed(() => [
-  {
-    type: "expand",
-    icon: IconExpand,
-    ariaLabel: "Erweitern",
-    group: "display",
-    isCollapsable: false,
-    callback: () => emit("onEditorExpandedChanged", !props.editorExpanded),
-  },
-  {
-    type: "invisible-characters",
-    icon: IconParagraph,
-    ariaLabel: "Nicht-druckbare Zeichen",
-    group: "display",
-    isCollapsable: false,
-    callback: () =>
-      commands.toggleActiveState()(
-        props.editor.state,
-        props.editor.view.dispatch,
-      ),
-  },
-  {
-    type: "bold",
-    icon: IconBold,
-    ariaLabel: "Fett",
-    shortcut: "Strg + b",
-    group: "format",
-    isCollapsable: false,
-    callback: () => props.editor.chain().focus().toggleMark("bold").run(),
-  },
-  {
-    type: "italic",
-    icon: IconItalic,
-    ariaLabel: "Kursiv",
-    shortcut: "Strg + i",
-    group: "format",
-    isCollapsable: false,
-    callback: () => props.editor.chain().focus().toggleMark("italic").run(),
-  },
-  {
-    type: "underline",
-    icon: IconUnderline,
-    ariaLabel: "Unterstrichen",
-    shortcut: "Strg + u",
-    group: "format",
-    isCollapsable: false,
-    callback: () => props.editor.chain().focus().toggleMark("underline").run(),
-  },
-  {
-    type: "strike",
-    icon: IconStrikethrough,
-    ariaLabel: "Durchgestrichen",
-    shortcut: "Strg + ⇧ + s",
-    group: "format",
-    isCollapsable: false,
-    callback: () => props.editor.chain().focus().toggleMark("strike").run(),
-  },
-  {
-    type: "superscript",
-    icon: IconSuperscript,
-    ariaLabel: "Tiefgestellt",
-    shortcut: "Strg + .",
-    group: "format",
-    isCollapsable: false,
-    callback: () =>
-      props.editor.chain().focus().toggleMark("superscript").run(),
-  },
-  {
-    type: "subscript",
-    icon: IconSubscript,
-    ariaLabel: "Hochgestellt",
-    shortcut: "Strg + ,",
-    group: "format",
-    isCollapsable: false,
-    callback: () => props.editor.chain().focus().toggleMark("subscript").run(),
-  },
-  {
-    type: "left",
-    icon: IconAlignLeft,
-    ariaLabel: "Linksbündig",
-    shortcut: "Strg + ⇧ + l",
-    group: "Ausrichtung",
-    isCollapsable: true,
-    callback: () => props.editor.chain().focus().setTextAlign("left").run(),
-  },
-  {
-    type: "center",
-    icon: IconAlignCenter,
-    ariaLabel: "Zentriert",
-    shortcut: "Strg + ⇧ + e",
-    group: "Ausrichtung",
-    isCollapsable: true,
-    callback: () => props.editor.chain().focus().setTextAlign("center").run(),
-  },
-  {
-    type: "right",
-    icon: IconAlignRight,
-    ariaLabel: "Rechtsbündig",
-    shortcut: "Strg + ⇧ + r",
-    group: "Ausrichtung",
-    isCollapsable: true,
-    callback: () => props.editor.chain().focus().setTextAlign("right").run(),
-  },
-  {
-    type: "orderedList",
-    icon: IconOrderedList,
-    ariaLabel: "Nummerierte Liste",
-    shortcut: "Strg + ⇧ + 7",
-    group: "indent",
-    isCollapsable: false,
-    callback: () => props.editor.chain().focus().toggleOrderedList().run(),
-  },
-  {
-    type: "bulletList",
-    icon: IconUnorderedList,
-    ariaLabel: "Aufzählungsliste",
-    shortcut: "Strg + ⇧ + 8",
-    group: "indent",
-    isCollapsable: false,
-    callback: () => props.editor.chain().focus().toggleBulletList().run(),
-  },
-  {
-    type: "outdent",
-    icon: IndentDecrease,
-    ariaLabel: "Einzug verringern",
-    group: "indent",
-    isCollapsable: false,
-    callback: () => props.editor.chain().focus().outdent().run(),
-  },
-  {
-    type: "indent",
-    icon: IndentIncrease,
-    ariaLabel: "Einzug vergrößern",
-    group: "indent",
-    isCollapsable: false,
-    callback: () => props.editor.chain().focus().indent().run(),
-  },
-  {
-    type: "blockquote",
-    icon: IconBlockquote,
-    ariaLabel: "Zitat einfügen",
-    shortcut: "Strg + ⇧ + B",
-    group: "blockquote",
-    isCollapsable: false,
-    callback: () => props.editor.chain().focus().toggleBlockquote().run(),
-  },
-  {
-    type: "deleteBorderNumber",
-    icon: MaterialSymbolsDeleteSweepOutline,
-    ariaLabel: "Randnummer entfernen",
-    group: "borderNumber",
-    isCollapsable: false,
-    callback: () => props.editor.chain().focus().removeBorderNumbers().run(),
-  },
-])
+const featureToggle = ref()
+
+const shouldShowAddBorderNumbersButton = computed(
+  () =>
+    isInternalUser &&
+    borderNumberCategories.includes(props.ariaLabel) &&
+    featureToggle.value,
+)
+
+const buttons = computed(() => {
+  const buttons = [
+    {
+      type: "expand",
+      icon: IconExpand,
+      ariaLabel: "Erweitern",
+      group: "display",
+      isCollapsable: false,
+      callback: () => emit("onEditorExpandedChanged", !props.editorExpanded),
+    },
+    {
+      type: "invisible-characters",
+      icon: IconParagraph,
+      ariaLabel: "Nicht-druckbare Zeichen",
+      group: "display",
+      isCollapsable: false,
+      callback: () =>
+        commands.toggleActiveState()(
+          props.editor.state,
+          props.editor.view.dispatch,
+        ),
+    },
+    {
+      type: "bold",
+      icon: IconBold,
+      ariaLabel: "Fett",
+      shortcut: "Strg + b",
+      group: "format",
+      isCollapsable: false,
+      callback: () => props.editor.chain().focus().toggleMark("bold").run(),
+    },
+    {
+      type: "italic",
+      icon: IconItalic,
+      ariaLabel: "Kursiv",
+      shortcut: "Strg + i",
+      group: "format",
+      isCollapsable: false,
+      callback: () => props.editor.chain().focus().toggleMark("italic").run(),
+    },
+    {
+      type: "underline",
+      icon: IconUnderline,
+      ariaLabel: "Unterstrichen",
+      shortcut: "Strg + u",
+      group: "format",
+      isCollapsable: false,
+      callback: () =>
+        props.editor.chain().focus().toggleMark("underline").run(),
+    },
+    {
+      type: "strike",
+      icon: IconStrikethrough,
+      ariaLabel: "Durchgestrichen",
+      shortcut: "Strg + ⇧ + s",
+      group: "format",
+      isCollapsable: false,
+      callback: () => props.editor.chain().focus().toggleMark("strike").run(),
+    },
+    {
+      type: "superscript",
+      icon: IconSuperscript,
+      ariaLabel: "Tiefgestellt",
+      shortcut: "Strg + .",
+      group: "format",
+      isCollapsable: false,
+      callback: () =>
+        props.editor.chain().focus().toggleMark("superscript").run(),
+    },
+    {
+      type: "subscript",
+      icon: IconSubscript,
+      ariaLabel: "Hochgestellt",
+      shortcut: "Strg + ,",
+      group: "format",
+      isCollapsable: false,
+      callback: () =>
+        props.editor.chain().focus().toggleMark("subscript").run(),
+    },
+    {
+      type: "left",
+      icon: IconAlignLeft,
+      ariaLabel: "Linksbündig",
+      shortcut: "Strg + ⇧ + l",
+      group: "Ausrichtung",
+      isCollapsable: true,
+      callback: () => props.editor.chain().focus().setTextAlign("left").run(),
+    },
+    {
+      type: "center",
+      icon: IconAlignCenter,
+      ariaLabel: "Zentriert",
+      shortcut: "Strg + ⇧ + e",
+      group: "Ausrichtung",
+      isCollapsable: true,
+      callback: () => props.editor.chain().focus().setTextAlign("center").run(),
+    },
+    {
+      type: "right",
+      icon: IconAlignRight,
+      ariaLabel: "Rechtsbündig",
+      shortcut: "Strg + ⇧ + r",
+      group: "Ausrichtung",
+      isCollapsable: true,
+      callback: () => props.editor.chain().focus().setTextAlign("right").run(),
+    },
+    {
+      type: "orderedList",
+      icon: IconOrderedList,
+      ariaLabel: "Nummerierte Liste",
+      shortcut: "Strg + ⇧ + 7",
+      group: "indent",
+      isCollapsable: false,
+      callback: () => props.editor.chain().focus().toggleOrderedList().run(),
+    },
+    {
+      type: "bulletList",
+      icon: IconUnorderedList,
+      ariaLabel: "Aufzählungsliste",
+      shortcut: "Strg + ⇧ + 8",
+      group: "indent",
+      isCollapsable: false,
+      callback: () => props.editor.chain().focus().toggleBulletList().run(),
+    },
+    {
+      type: "outdent",
+      icon: IndentDecrease,
+      ariaLabel: "Einzug verringern",
+      group: "indent",
+      isCollapsable: false,
+      callback: () => props.editor.chain().focus().outdent().run(),
+    },
+    {
+      type: "indent",
+      icon: IndentIncrease,
+      ariaLabel: "Einzug vergrößern",
+      group: "indent",
+      isCollapsable: false,
+      callback: () => props.editor.chain().focus().indent().run(),
+    },
+    {
+      type: "blockquote",
+      icon: IconBlockquote,
+      ariaLabel: "Zitat einfügen",
+      shortcut: "Strg + ⇧ + B",
+      group: "blockquote",
+      isCollapsable: false,
+      callback: () => props.editor.chain().focus().toggleBlockquote().run(),
+    },
+  ]
+
+  if (shouldShowAddBorderNumbersButton.value) {
+    buttons.push({
+      type: "addBorderNumbers",
+      icon: IcSharpAddBox,
+      ariaLabel: "Randnummern neu erstellen",
+      group: "borderNumber",
+      isCollapsable: false,
+      callback: () => props.editor.chain().focus().addBorderNumbers().run(),
+    })
+  }
+  if (isInternalUser) {
+    buttons.push({
+      type: "removeBorderNumbers",
+      icon: MaterialSymbolsDeleteSweepOutline,
+      ariaLabel: "Randnummern entfernen",
+      group: "borderNumber",
+      isCollapsable: false,
+      callback: () => props.editor.chain().focus().removeBorderNumbers().run(),
+    })
+  }
+
+  return buttons
+})
 
 const fixButtons = [
   {
@@ -293,6 +333,11 @@ const focusCurrentButton = () => {
 }
 
 const ariaLabel = props.ariaLabel ? props.ariaLabel : null
+onMounted(async () => {
+  featureToggle.value = (
+    await FeatureToggleService.isEnabled("neuris.border-number-editor")
+  ).data
+})
 </script>
 
 <template>

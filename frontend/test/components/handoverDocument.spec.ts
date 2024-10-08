@@ -9,6 +9,7 @@ import { EventRecordType, HandoverMail, Preview } from "@/domain/eventRecord"
 import LegalForce from "@/domain/legalForce"
 import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
+import featureToggleService from "@/services/featureToggleService"
 import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
 
 const router = createRouter({
@@ -64,16 +65,20 @@ function renderComponent(
 }
 
 describe("HandoverDocumentationUnitView:", () => {
-  vi.spyOn(handoverDocumentationUnitService, "getPreview").mockImplementation(
-    () =>
-      Promise.resolve({
-        status: 200,
-        data: new Preview({
-          xml: "<xml>all good</xml>",
-          success: true,
-        }),
+  beforeEach(() => {
+    vi.spyOn(handoverDocumentationUnitService, "getPreview").mockResolvedValue({
+      status: 200,
+      data: new Preview({
+        xml: "<xml>all good</xml>",
+        success: true,
       }),
-  )
+    })
+
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
+  })
 
   describe("renders plausibility check", () => {
     it("with all required fields filled", async () => {
@@ -206,6 +211,47 @@ describe("HandoverDocumentationUnitView:", () => {
         "caselaw-documentUnit-documentNumber-categories",
       )
     })
+  })
+
+  it("should show error message with invalid border numbers", async () => {
+    renderComponent({
+      documentUnit: new DocumentUnit("123", {
+        documentNumber: "foo",
+        coreData: {
+          fileNumbers: ["foo"],
+          court: {
+            type: "type",
+            location: "location",
+            label: "label",
+          },
+          decisionDate: "2022-02-01",
+          legalEffect: "legalEffect",
+          documentType: {
+            jurisShortcut: "ca",
+            label: "category",
+          },
+        },
+        longTexts: {
+          otherLongText: "<border-number><number>4</number></border-number>",
+        },
+      }),
+      stubs: {
+        CodeSnippet: {
+          template: '<div data-testid="code-snippet"/>',
+        },
+      },
+    })
+    expect(
+      await screen.findByLabelText("Randnummernprüfung"),
+    ).toHaveTextContent(
+      "Randnummernprüfung " +
+        "Die Reihenfolge der Randnummern ist nicht korrekt. " +
+        "Rubrik" +
+        "Sonstiger Langtext " +
+        "Erwartete Randnummer 1 " +
+        "Tatsächliche Randnummer 4" +
+        "Randnummern neu berechnen",
+    )
   })
 
   describe("on press 'Dokumentationseinheit an jDV übergeben'", () => {
@@ -350,7 +396,7 @@ describe("HandoverDocumentationUnitView:", () => {
     expect(codeSnippet?.getAttribute("xml")).toBe("<xml>all good</xml>")
   })
 
-  it("with stubbing", () => {
+  it("with stubbing", async () => {
     const { container } = renderComponent({
       props: {
         eventLog: [
@@ -376,6 +422,9 @@ describe("HandoverDocumentationUnitView:", () => {
             label: "category",
           },
         },
+        longTexts: {
+          reasons: "<border-number><number>1</number></border-number>",
+        },
       }),
       stubs: {
         CodeSnippet: {
@@ -384,8 +433,11 @@ describe("HandoverDocumentationUnitView:", () => {
       },
     })
 
+    // Wait for feature flag to be set in onMounted
+    await new Promise((resolve) => setTimeout(resolve, 0))
+
     expect(container).toHaveTextContent(
-      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltDokumentationseinheit an jDV übergebenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subject`,
+      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltRandnummernprüfungDie Reihenfolge der Randnummern ist korrektXML VorschauDokumentationseinheit an jDV übergebenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subject`,
     )
 
     const codeSnippet = screen.queryByTestId("code-snippet")
