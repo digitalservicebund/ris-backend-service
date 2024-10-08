@@ -50,8 +50,8 @@ import org.springframework.stereotype.Service;
  *       OidcUser} roles.
  *   <li>{@link #userHasWriteAccessByProcedureId()}: Checks if a user has write access to a {@link
  *       Procedure} by its {@link UUID}.
- *   <li>{@link #userHasSameDocumentationOffice()}: Checks if a user has the same {@link
- *       DocumentationOffice} as the {@link DocumentationUnit} by its {@link UUID}
+ *   <li>{@link #userHasWriteAccess()}: Checks if a user has the same {@link DocumentationOffice} as
+ *       the {@link DocumentationUnit} by its {@link UUID}
  *   <li>{@link #isAssignedViaProcedure()}: Checks if a {@link Procedure} associated with a {@link
  *       DocumentationUnit} is assigned to the current {@link OidcUser}
  *   <li>{@link #isPatchAllowedForExternalUsers()}: Checks if a {@link RisJsonPatch} operation is
@@ -196,11 +196,11 @@ public class AuthService {
    *     the user has the same {@link DocumentationOffice}, otherwise {@link Boolean#FALSE false}.
    */
   @Bean
-  public Function<UUID, Boolean> userHasSameDocumentationOffice() {
+  public Function<UUID, Boolean> userHasWriteAccess() {
     return uuid -> {
       try {
         return Optional.ofNullable(documentationUnitService.getByUuid(uuid))
-            .map(this::userHasSameDocOfficeAsDocument)
+            .map(this::userHasWriteAccess)
             .orElse(false);
       } catch (DocumentationUnitNotExistsException e) {
         return false;
@@ -264,14 +264,39 @@ public class AuthService {
     return procedure.userGroupId() != null && procedure.userGroupId().equals(userGroupIdOfUser);
   }
 
+  private boolean userHasWriteAccess(DocumentationUnit documentationUnit) {
+    return userHasSameDocOfficeAsDocumentSource(documentationUnit)
+            && docUnitIsPending(documentationUnit)
+        || userHasSameDocOfficeAsDocument(documentationUnit)
+            && !docUnitIsPending(documentationUnit);
+  }
+
   private boolean userHasReadAccess(DocumentationUnit documentationUnit) {
-    List<PublicationStatus> published =
-        List.of(PublicationStatus.PUBLISHED, PublicationStatus.PUBLISHING);
     // legacy documents are published
     return documentationUnit.status() == null
-        || (documentationUnit.status().publicationStatus() != null
-            && published.contains(documentationUnit.status().publicationStatus()))
-        || userHasSameDocOfficeAsDocument(documentationUnit);
+        || docUnitHasPublishState(documentationUnit)
+        || (userHasSameDocOfficeAsDocumentSource(documentationUnit)
+            && docUnitIsPending(documentationUnit))
+        || (userHasSameDocOfficeAsDocument(documentationUnit)
+            && !docUnitIsPending(documentationUnit));
+  }
+
+  private boolean docUnitHasPublishState(DocumentationUnit documentationUnit) {
+    List<PublicationStatus> published =
+        List.of(PublicationStatus.PUBLISHED, PublicationStatus.PUBLISHING);
+    return documentationUnit.status().publicationStatus() != null
+        && published.contains(documentationUnit.status().publicationStatus());
+  }
+
+  private boolean userHasSameDocOfficeAsDocumentSource(DocumentationUnit documentationUnit) {
+    Optional<OidcUser> oidcUser = getOidcUser();
+    if (oidcUser.isPresent()) {
+      DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidcUser.get());
+      return documentationUnit.status().publicationStatus() != null
+          && documentationUnit.coreData().creatingDocOffice() != null
+          && documentationUnit.coreData().creatingDocOffice().equals(documentationOffice);
+    }
+    return false;
   }
 
   private boolean userHasSameDocOfficeAsDocument(DocumentationUnit documentationUnit) {
@@ -281,6 +306,13 @@ public class AuthService {
       return documentationUnit.coreData().documentationOffice().equals(documentationOffice);
     }
     return false;
+  }
+
+  private boolean docUnitIsPending(DocumentationUnit documentationUnit) {
+    return documentationUnit
+        .status()
+        .publicationStatus()
+        .equals(PublicationStatus.EXTERNAL_HANDOVER_PENDING);
   }
 
   private boolean userHasSameDocOfficeAsProcedure(DocumentationOffice documentationOffice) {

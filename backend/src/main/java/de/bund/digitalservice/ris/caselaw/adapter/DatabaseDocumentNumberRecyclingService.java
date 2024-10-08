@@ -120,7 +120,11 @@ public class DatabaseDocumentNumberRecyclingService implements DocumentNumberRec
   private Optional<StatusDTO> getUnpublishedStatus(List<StatusDTO> status) {
     if (status != null
         && status.size() == 1
-        && (status.get(0).getPublicationStatus().equals(PublicationStatus.UNPUBLISHED))) {
+        && (status.get(0).getPublicationStatus().equals(PublicationStatus.UNPUBLISHED)
+            || status
+                .get(0)
+                .getPublicationStatus()
+                .equals(PublicationStatus.EXTERNAL_HANDOVER_PENDING))) {
       return Optional.of(status.get(0));
     }
     return Optional.empty();

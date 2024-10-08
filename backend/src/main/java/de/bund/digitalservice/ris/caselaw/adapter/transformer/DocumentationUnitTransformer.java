@@ -559,7 +559,7 @@ public class DocumentationUnitTransformer {
             .version(documentationUnitDTO.getVersion());
     CoreDataBuilder coreDataBuilder =
         CoreData.builder()
-            .court(CourtTransformer.transformToDomain((documentationUnitDTO.getCourt())))
+            .court(CourtTransformer.transformToDomain(documentationUnitDTO.getCourt()))
             .procedure(
                 ProcedureTransformer.transformFirstToDomain(documentationUnitDTO.getProcedures()))
             .previousProcedures(
@@ -568,6 +568,9 @@ public class DocumentationUnitTransformer {
             .documentationOffice(
                 DocumentationOfficeTransformer.transformToDomain(
                     documentationUnitDTO.getDocumentationOffice()))
+            .creatingDocOffice(
+                DocumentationOfficeTransformer.transformToDomain(
+                    documentationUnitDTO.getCreatingDocumentationOffice()))
             // TODO multiple regions
             .region(
                 documentationUnitDTO.getRegions() == null

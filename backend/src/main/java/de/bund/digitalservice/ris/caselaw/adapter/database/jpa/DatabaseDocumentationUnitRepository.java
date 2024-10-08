@@ -40,7 +40,10 @@ public interface DatabaseDocumentationUnitRepository
      """
           + SELECT_STATUS_WHERE_LATEST
           + """
-       AND status.publicationStatus = :status AND (:status IN ('PUBLISHED', 'PUBLISHING') OR documentationUnit.documentationOffice.id = :documentationOfficeId)))
+       AND status.publicationStatus = :status
+       AND (:status IN ('PUBLISHED', 'PUBLISHING')
+        OR documentationUnit.documentationOffice.id = :documentationOfficeId
+        OR (status.publicationStatus = 'EXTERNAL_HANDOVER_PENDING' AND documentationUnit.creatingDocumentationOffice.id = :documentationOfficeId))))
      )
    AND (:withErrorOnly = FALSE OR documentationUnit.documentationOffice.id = :documentationOfficeId AND EXISTS (
    """

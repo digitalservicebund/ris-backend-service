@@ -18,4 +18,15 @@ public class DocumentationOfficeTransformer {
                     .build())
         .orElse(null);
   }
+
+  public static DocumentationOfficeDTO transformToDTO(DocumentationOffice documentationOffice) {
+    return Optional.ofNullable(documentationOffice)
+        .map(
+            dto ->
+                DocumentationOfficeDTO.builder()
+                    .id(dto.uuid())
+                    .abbreviation(dto.abbreviation())
+                    .build())
+        .orElse(null);
+  }
 }
