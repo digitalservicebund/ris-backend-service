@@ -167,7 +167,7 @@ const editorStyleClasses = computed(() => {
   } as const
 
   return fieldSizeClasses[props.fieldSize]
-    ? `${fieldSizeClasses[props.fieldSize]} ${plainBorderNumberStyle}`
+    ? `${fieldSizeClasses[props.fieldSize]} ${plainBorderNumberStyle} p-4`
     : undefined
 })
 

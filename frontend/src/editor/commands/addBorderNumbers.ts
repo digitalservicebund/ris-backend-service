@@ -38,7 +38,6 @@ function addBorderNumbers({ state, dispatch }: CommandProps): boolean {
 
       tr.replaceWith(currentPos, currentPos + node.nodeSize, borderNumberNode)
 
-      console.log(borderNumberNode.firstChild?.nodeSize)
       const addedNodeSize = borderNumberNode.nodeSize - node.nodeSize
       shift += addedNodeSize
 
