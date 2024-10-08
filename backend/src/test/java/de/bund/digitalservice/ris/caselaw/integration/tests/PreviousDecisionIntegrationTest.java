@@ -504,7 +504,22 @@ class PreviousDecisionIntegrationTest {
             "EF",
             "DS",
             Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
-
+    var du3 =
+        createDocumentationUnit(
+            date,
+            List.of("AkteZ"),
+            "EF",
+            "CC-RIS",
+            Status.builder()
+                .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+                .build());
+    var du4 =
+        createDocumentationUnit(
+            date,
+            List.of("AkteZ"),
+            "EF",
+            "CC-RIS",
+            Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build());
     var du5 =
         createDocumentationUnit(
             date,
@@ -521,7 +536,8 @@ class PreviousDecisionIntegrationTest {
     assertThat(content).hasSize(3);
     assertThat(content)
         .extracting(RelatedDocumentationUnit::getUuid)
-        .containsExactlyInAnyOrder(du1.getId(), du2.getId(), du5.getId());
+        .doesNotContain(du4.getId())
+        .containsExactlyInAnyOrder(du1.getId(), du2.getId(), du3.getId(), du5.getId());
   }
 
   private LocalDate prepareDocumentationUnitDTOs() {

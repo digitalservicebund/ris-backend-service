@@ -170,6 +170,10 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @JoinColumn(name = "documentation_office_id", referencedColumnName = "id")
   private DocumentationOfficeDTO documentationOffice;
 
+  @ManyToOne(optional = false)
+  @JoinColumn(name = "creating_documentation_office_id", referencedColumnName = "id")
+  private DocumentationOfficeDTO creatingDocumentationOffice;
+
   @OneToMany(mappedBy = "documentationUnitDTO", cascade = CascadeType.ALL)
   @Builder.Default
   @OrderBy("createdAt desc")

@@ -18,6 +18,8 @@ import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
@@ -92,15 +94,18 @@ class DatabaseDocumentNumberRecyclingServiceTest {
         service.findDeletedDocumentNumber(DEFAULT_DOCUMENTATION_OFFICE, Year.now()).isEmpty());
   }
 
-  @Test
-  void shouldSaveIfOnly_unpublished() {
+  @ParameterizedTest
+  @EnumSource(
+      value = PublicationStatus.class,
+      names = {"UNPUBLISHED", "EXTERNAL_HANDOVER_PENDING"})
+  void shouldSaveIfOnly_unpublished(PublicationStatus publicationStatus) {
     var documentationUnitDTO =
         DocumentationUnitDTO.builder()
             .id(UUID.randomUUID())
             .documentNumber(generateDefaultDocumentNumber())
             .build();
 
-    var unpublished = generateStatus(documentationUnitDTO, PublicationStatus.UNPUBLISHED);
+    var unpublished = generateStatus(documentationUnitDTO, publicationStatus);
 
     when(statusRepository.findAllByDocumentationUnitDTO_Id(documentationUnitDTO.getId()))
         .thenReturn(List.of(unpublished));

@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.CourtTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitListItemTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalEffectTransformer;
@@ -128,6 +129,10 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             .documentType(DocumentTypeTransformer.transformToDTO(parameters.documentType()))
             .decisionDate(parameters.decisionDate())
             .court(CourtTransformer.transformToDTO(parameters.court()))
+            .creatingDocumentationOffice(
+                userDocOffice.uuid().equals(parameters.documentationOffice().uuid())
+                    ? null
+                    : DocumentationOfficeTransformer.transformToDTO(userDocOffice))
             .build();
 
     documentationUnitDTO
@@ -136,7 +141,10 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             StatusDTO.builder()
                 .createdAt(Instant.now())
                 .documentationUnitDTO(documentationUnitDTO)
-                .publicationStatus(PublicationStatus.UNPUBLISHED)
+                .publicationStatus(
+                    userDocOffice.uuid().equals(parameters.documentationOffice().uuid())
+                        ? PublicationStatus.UNPUBLISHED
+                        : PublicationStatus.EXTERNAL_HANDOVER_PENDING)
                 .withError(false)
                 .build());
 
@@ -570,9 +578,12 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         item ->
             DocumentationUnitListItemTransformer.transformToDomain(item).toBuilder()
                 .isDeletable(
-                    hasSameDocumentationOffice(item, documentationOffice) && isInternalUser)
+                    (hasSameDocumentationOffice(item, documentationOffice)
+                            || isCreatorOfPending(item, documentationOffice))
+                        && isInternalUser)
                 .isEditable(
-                    hasSameDocumentationOffice(item, documentationOffice)
+                    (hasSameDocumentationOffice(item, documentationOffice)
+                            || isCreatorOfPending(item, documentationOffice))
                         && (isInternalUser || isUserAssigned(assignedProcedures, item)))
                 .build());
   }
@@ -580,6 +591,15 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private boolean hasSameDocumentationOffice(
       DocumentationUnitListItemDTO item, DocumentationOffice documentationOffice) {
     return item.getDocumentationOffice().getId().equals(documentationOffice.uuid());
+  }
+
+  private boolean isCreatorOfPending(
+      DocumentationUnitListItemDTO item, DocumentationOffice documentationOffice) {
+    return item.getStatus()
+            .get(0)
+            .getPublicationStatus()
+            .equals(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+        && item.getCreatingDocumentationOffice().getId().equals(documentationOffice.uuid());
   }
 
   private boolean isUserAssigned(

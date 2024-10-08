@@ -39,6 +39,7 @@ const dropdownItems: DropdownItem[] = [
   { label: "Dublette", value: PublicationState.DUPLICATED },
   { label: "Gesperrt", value: PublicationState.LOCKED },
   { label: "Löschen", value: PublicationState.DELETING },
+  { label: "Fremdanlage", value: PublicationState.EXTERNAL_HANDOVER_PENDING },
 ]
 
 const myDocOfficeOnly = computed({

@@ -176,22 +176,21 @@ class AuthServiceTest {
   }
 
   @Test
-  void test_userHasSameDocumentationOffice_withoutDocumentationUnit_shouldReturnFalse()
+  void test_userHasWriteAccess_withoutDocumentationUnit_shouldReturnFalse()
       throws DocumentationUnitNotExistsException {
     // Arrange
     UUID uuid = UUID.randomUUID();
     when(documentationUnitService.getByUuid(uuid)).thenReturn(null);
 
     // Act
-    Function<UUID, Boolean> result = service.userHasSameDocumentationOffice();
+    Function<UUID, Boolean> result = service.userHasWriteAccess();
 
     // Assert
     assertThat(result.apply(uuid)).isFalse();
   }
 
   @Test
-  void test_userHasSameDocumentationOffice_withSameDocumentationOffice_shouldReturnTrue()
-      throws DocumentationUnitNotExistsException {
+  void test_userHasWriteAccess_shouldReturnTrue() throws DocumentationUnitNotExistsException {
 
     // Arrange
     UUID uuid = UUID.randomUUID();
@@ -207,7 +206,7 @@ class AuthServiceTest {
     when(userService.getDocumentationOffice(oidcUser)).thenReturn(documentationOffice);
 
     // Act
-    Function<UUID, Boolean> result = service.userHasSameDocumentationOffice();
+    Function<UUID, Boolean> result = service.userHasWriteAccess();
 
     // Assert
     assertThat(result.apply(uuid)).isTrue();

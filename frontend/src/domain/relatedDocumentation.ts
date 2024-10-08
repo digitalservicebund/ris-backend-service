@@ -51,6 +51,8 @@ export default class RelatedDocumentation {
         return Label.LOCKED
       case PublicationState.DELETING:
         return Label.DELETING
+      case PublicationState.EXTERNAL_HANDOVER_PENDING:
+        return Label.EXTERNAL_HANDOVER_PENDING
       default:
         return ""
     }
