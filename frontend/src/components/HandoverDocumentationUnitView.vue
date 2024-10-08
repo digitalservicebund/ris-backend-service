@@ -464,7 +464,7 @@ const isOutlineInvalid = computed<boolean>(
         </div>
         <div v-else class="flex flex-row gap-8">
           <template v-if="showRecalculatingBorderNumbersFakeDelay">
-            <LoadingSpinner :size="24" />
+            <LoadingSpinner size="small" />
             <p>Die Randnummern werden neu berechnet</p>
           </template>
           <template v-else>
