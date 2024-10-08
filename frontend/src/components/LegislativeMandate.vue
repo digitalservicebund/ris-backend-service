@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import CheckboxInput from "@/components/input/CheckboxInput.vue"
+import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 defineProps<{
@@ -22,13 +23,21 @@ const hasLegislativeMandate = computed({
   <div class="gap-0">
     <div class="ds-label-02-reg mb-16">{{ headline }}</div>
     <div class="flex flex-row">
-      <CheckboxInput
-        v-model="hasLegislativeMandate"
-        aria-label="Gesetzgebungsauftrag"
-        data-testid="legislative-mandate"
-        size="small"
-      />
-      <div class="ds-label-01-reg ml-12 content-center">{{ label }}</div>
+      <InputField
+        id="legislativeMandate"
+        v-slot="{ id }"
+        :label="label"
+        label-class="ds-label-01-reg"
+        :label-position="LabelPosition.RIGHT"
+      >
+        <CheckboxInput
+          :id="id"
+          v-model="hasLegislativeMandate"
+          aria-label="Gesetzgebungsauftrag"
+          data-testid="legislative-mandate"
+          size="small"
+        />
+      </InputField>
     </div>
   </div>
 </template>
