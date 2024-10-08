@@ -33,6 +33,16 @@ test.describe(
       async ({ page, edition }) => {
         await navigateToPeriodicalReferences(page, edition.id ?? "")
 
+        await test.step("After searching, a documentation unit can be created", async () => {
+          await expect(
+            page.getByText("Zuständige Dokumentationsstelle *"),
+          ).toBeHidden()
+          await page.getByText("Suchen").click()
+          await expect(
+            page.getByText("Zuständige Dokumentationsstelle *"),
+          ).toBeVisible()
+        })
+
         await fillInput(page, "Zitatstelle *", "12")
         await fillInput(page, "Klammernzusatz", "L")
 
@@ -58,7 +68,7 @@ test.describe(
           )
         })
 
-        await test.step("Foregn courts are not assigned to a responsible doc office", async () => {
+        await test.step("Foreign courts are not assigned to a responsible doc office", async () => {
           await fillInput(page, "Gericht", "Arbeits- und Sozialgericht Wien")
           await page.getByText("Arbeits- und Sozialgericht Wien").click()
           await page.getByText("Suchen").click()
@@ -67,6 +77,12 @@ test.describe(
             "[aria-label='Zuständige Dokumentationsstelle']",
             "",
           )
+        })
+
+        await test.step("Documentation Office is a mandatory field for doc unit creation", async () => {
+          await expect(
+            page.getByText("Ok und Dokumentationseinheit direkt bearbeiten"),
+          ).toBeDisabled()
         })
 
         await test.step("DocOffice can be changed manually", async () => {
@@ -98,6 +114,10 @@ test.describe(
             "[aria-label='Zuständige Dokumentationsstelle']",
             "BVerfG",
           )
+
+          await expect(
+            page.getByText("Ok und Dokumentationseinheit direkt bearbeiten"),
+          ).toBeEnabled()
         })
       },
     )
@@ -116,22 +136,9 @@ test.describe(
       },
       async ({ page, edition }) => {
         await navigateToPeriodicalReferences(page, edition.id ?? "")
+        await searchForDocUnitWithFileNumber(page, "1C 123/45", formattedDate)
 
-        await test.step("After searching, a documentation unit can be created", async () => {
-          await expect(
-            page.getByText("Zuständige Dokumentationsstelle *"),
-          ).toBeHidden()
-          await searchForDocUnitWithFileNumber(page, "1C 123/45", formattedDate)
-          await expect(
-            page.getByText("Zuständige Dokumentationsstelle *"),
-          ).toBeVisible()
-        })
-
-        await test.step("Mandatory fields citation (Zitatstelle), reference Supplement (Klammernzusatz) and documentation office are being validated before creation of new documentation unit", async () => {
-          await expect(
-            page.getByText("Ok und Dokumentationseinheit direkt bearbeiten"),
-          ).toBeDisabled()
-
+        await test.step("Mandatory fields citation (Zitatstelle) and reference Supplement (Klammernzusatz) are being validated before creation of new documentation unit", async () => {
           await fillInput(page, "Gericht", "AG Aachen")
           await page.getByText("AG Aachen").click()
           await fillInput(page, "Zuständige Dokumentationsstelle", "DS")
@@ -141,9 +148,6 @@ test.describe(
             "[aria-label='Zuständige Dokumentationsstelle']",
             "DS",
           )
-          await expect(
-            page.getByText("Ok und Dokumentationseinheit direkt bearbeiten"),
-          ).toBeEnabled()
 
           await page
             .getByText("Ok und Dokumentationseinheit direkt bearbeiten")

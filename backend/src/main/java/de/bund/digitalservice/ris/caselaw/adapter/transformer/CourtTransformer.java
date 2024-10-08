@@ -39,7 +39,7 @@ public class CourtTransformer {
   public static CourtDTO transformToDTO(Court court) {
     if (court == null) return null;
 
-    return CourtDTO.builder().id(court.id()).build();
+    return CourtDTO.builder().id(court.id()).type(court.type()).location(court.location()).build();
   }
 
   private static String extractRevoked(String additional) {

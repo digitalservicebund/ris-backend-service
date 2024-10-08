@@ -102,6 +102,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   }
 
   @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
   public DocumentationUnit createNewDocumentationUnit(
       String documentNumber,
       DocumentationOffice userDocOffice,
@@ -139,8 +140,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                 .withError(false)
                 .build());
 
-    repository.save(documentationUnitDTO);
-    return DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+    DocumentationUnitDTO savedDocUnit = repository.save(documentationUnitDTO);
+    return DocumentationUnitTransformer.transformToDomain(savedDocUnit);
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")

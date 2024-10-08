@@ -280,7 +280,7 @@ export const caselawTest = test.extend<MyFixtures>({
           legalPeriodical: legalPeriodical,
           id: crypto.randomUUID(),
           prefix: "2024, ",
-          suffix: ", Heft 1",
+          suffix: ", Heft " + generateString(),
           name: "2024, " + generateString(),
         },
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
