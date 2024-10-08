@@ -35,6 +35,7 @@ function renderComponent(
                   }),
                 },
               },
+              stubActions: false, // To use the store functions in extraContentSidePanelStore
             }),
           ],
         ],

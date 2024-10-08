@@ -1,7 +1,8 @@
+import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DecisionSummary from "@/components/DecisionSummary.vue"
-import { Court, DocumentType } from "@/domain/documentUnit"
+import DocumentUnit, { Court, DocumentType } from "@/domain/documentUnit"
 import PreviousDecision from "@/domain/previousDecision"
 import routes from "~/test-helper/routes"
 
@@ -39,7 +40,20 @@ function renderComponent(options?: {
 
   return render(DecisionSummary, {
     props,
-    global: { plugins: [router] },
+    global: {
+      plugins: [
+        createTestingPinia({
+          initialState: {
+            docunitStore: {
+              documentUnit: new DocumentUnit("foo", {
+                documentNumber: "1234567891234",
+              }),
+            },
+          },
+        }),
+        [router],
+      ],
+    },
   })
 }
 
