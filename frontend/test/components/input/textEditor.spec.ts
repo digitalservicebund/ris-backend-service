@@ -7,13 +7,6 @@ import TextEditor from "@/components/input/TextEditor.vue"
 import { longTextLabels } from "@/domain/documentUnit"
 import featureToggleService from "@/services/featureToggleService"
 
-let isUserInternal = true
-vi.mock("@/composables/useInternalUser", () => {
-  return {
-    useInternalUser: () => isUserInternal,
-  }
-})
-
 describe("text editor", async () => {
   beforeEach(() => {
     vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
@@ -181,37 +174,11 @@ describe("text editor", async () => {
     expect(screen.getByLabelText("Wiederherstellen")).toBeInTheDocument()
   })
 
-  it("hides add and remove border number button when user is external", async () => {
-    isUserInternal = false
-    render(TextEditor, {
-      props: {
-        value: "Test Value",
-        ariaLabel: "Gründe",
-        editable: true,
-      },
-      global: { plugins: [router] },
-    })
-
-    await flushPromises()
-
-    const editorField = screen.getByTestId("Gründe")
-
-    if (editorField.firstElementChild !== null) {
-      await fireEvent.focus(editorField.firstElementChild)
-    }
-
-    expect(screen.queryByText("Randnummern entfernen")).not.toBeInTheDocument()
-    expect(
-      screen.queryByText("Randnummern neu erstellen"),
-    ).not.toBeInTheDocument()
-  })
-
   it.each([
     longTextLabels.tenor,
     longTextLabels.participatingJudges,
     longTextLabels.outline,
   ])("hides add border number button for category %s", async (category) => {
-    isUserInternal = true
     render(TextEditor, {
       props: {
         value: "Test Value",
@@ -241,7 +208,6 @@ describe("text editor", async () => {
     longTextLabels.dissentingOpinion,
     longTextLabels.otherLongText,
   ])("shows add border number button for category %s", async (category) => {
-    isUserInternal = true
     render(TextEditor, {
       props: {
         value: "Test Value",

@@ -6,7 +6,6 @@ import TextEditorButton, {
   EditorButton,
 } from "@/components/input/TextEditorButton.vue"
 import { useCollapsingMenuBar } from "@/composables/useCollapsingMenuBar"
-import { useInternalUser } from "@/composables/useInternalUser"
 import { longTextLabels } from "@/domain/documentUnit"
 import FeatureToggleService from "@/services/featureToggleService"
 import IcSharpAddBox from "~icons/ic/sharp-add-box"
@@ -41,7 +40,6 @@ interface Props {
 const props = defineProps<Props>()
 
 const emit = defineEmits<{ onEditorExpandedChanged: [boolean] }>()
-const isInternalUser = useInternalUser()
 const borderNumberCategories = [
   longTextLabels.reasons,
   longTextLabels.caseFacts,
@@ -53,10 +51,7 @@ const borderNumberCategories = [
 const featureToggle = ref()
 
 const shouldShowAddBorderNumbersButton = computed(
-  () =>
-    isInternalUser &&
-    borderNumberCategories.includes(props.ariaLabel) &&
-    featureToggle.value,
+  () => borderNumberCategories.includes(props.ariaLabel) && featureToggle.value,
 )
 
 const buttons = computed(() => {
@@ -220,16 +215,14 @@ const buttons = computed(() => {
       callback: () => props.editor.chain().focus().addBorderNumbers().run(),
     })
   }
-  if (isInternalUser) {
-    buttons.push({
-      type: "removeBorderNumbers",
-      icon: MaterialSymbolsDeleteSweepOutline,
-      ariaLabel: "Randnummern entfernen",
-      group: "borderNumber",
-      isCollapsable: false,
-      callback: () => props.editor.chain().focus().removeBorderNumbers().run(),
-    })
-  }
+  buttons.push({
+    type: "removeBorderNumbers",
+    icon: MaterialSymbolsDeleteSweepOutline,
+    ariaLabel: "Randnummern entfernen",
+    group: "borderNumber",
+    isCollapsable: false,
+    callback: () => props.editor.chain().focus().removeBorderNumbers().run(),
+  })
 
   return buttons
 })
