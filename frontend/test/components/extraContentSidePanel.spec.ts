@@ -1,13 +1,13 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import { ComponentPropsOptions } from "@vue/runtime-core"
 import { describe } from "vitest"
 import { createRouter, createWebHistory, Router } from "vue-router"
 import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
 import Attachment from "@/domain/attachment"
 import DocumentUnit from "@/domain/documentUnit"
 import Reference from "@/domain/reference"
+import { SelectablePanelContent } from "@/types/panelContentMode"
 
 let router: Router
 
@@ -16,14 +16,16 @@ function renderComponent(
     note?: string
     attachments?: Attachment[]
     references?: Reference[]
-    props: ComponentPropsOptions<P>
+    enabledPanels?: SelectablePanelContent[]
   } = {},
 ) {
   const user = userEvent.setup()
   return {
     user,
     ...render(ExtraContentSidePanel, {
-      props: options.props ?? {},
+      props: options.enabledPanels
+        ? { enabledPanels: options.enabledPanels }
+        : {},
       global: {
         plugins: [
           [router],
@@ -283,9 +285,7 @@ describe("ExtraContentSidePanel", () => {
           renderComponent({
             note: "",
             attachments: [],
-            props: {
-              enabledPanels: enabledPanels,
-            },
+            enabledPanels: enabledPanels as SelectablePanelContent[],
           })
 
           screen.getByLabelText("Seitenpanel öffnen").click()

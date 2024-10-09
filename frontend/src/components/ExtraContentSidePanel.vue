@@ -20,7 +20,7 @@ import IconPreview from "~icons/ic/outline-remove-red-eye"
 import IconStickyNote from "~icons/ic/outline-sticky-note-2"
 
 const props = defineProps<{
-  enabledPanels?: [SelectablePanelContent]
+  enabledPanels?: SelectablePanelContent[]
 }>()
 
 const store = useExtraContentSidePanelStore()
