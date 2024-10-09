@@ -19,6 +19,7 @@ class DocumentationUnitListItemTransformerTest {
     List<StatusDTO> statusList =
         List.of(
             StatusDTO.builder()
+                .createdAt(Instant.now())
                 .publicationStatus(PublicationStatus.PUBLISHED)
                 .withError(false)
                 .build());

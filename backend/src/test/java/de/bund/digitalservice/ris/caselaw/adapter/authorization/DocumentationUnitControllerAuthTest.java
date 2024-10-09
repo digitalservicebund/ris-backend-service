@@ -26,6 +26,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -38,6 +39,8 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -281,26 +284,18 @@ class DocumentationUnitControllerAuthTest {
         .is4xxClientError();
   }
 
-  @Test
-  void testGetEvents() throws DocumentationUnitNotExistsException {
-    mockDocumentationUnit(docOffice1, null, Status.builder().publicationStatus(PUBLISHED).build());
+  @ParameterizedTest
+  @EnumSource(
+      value = PublicationStatus.class,
+      names = {"UNPUBLISHED", "PUBLISHED"})
+  void testGetEvents(PublicationStatus status) throws DocumentationUnitNotExistsException {
+    mockDocumentationUnit(docOffice1, null, Status.builder().publicationStatus(status).build());
     when(handoverService.getEventLog(TEST_UUID, HandoverEntityType.DOCUMENTATION_UNIT))
         .thenReturn(List.of());
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/handover";
 
     risWebTestClient.withLogin(docOffice1Group).get().uri(uri).exchange().expectStatus().isOk();
-
-    risWebTestClient
-        .withLogin(docOffice2Group)
-        .get()
-        .uri(uri)
-        .exchange()
-        .expectStatus()
-        .isForbidden();
-
-    mockDocumentationUnit(
-        docOffice1, null, Status.builder().publicationStatus(UNPUBLISHED).build());
 
     risWebTestClient
         .withLogin(docOffice2Group)
@@ -318,7 +313,7 @@ class DocumentationUnitControllerAuthTest {
     DocumentationUnit docUnit =
         DocumentationUnit.builder()
             .uuid(TEST_UUID)
-            .status(status)
+            .status(status != null ? status : Status.builder().publicationStatus(PUBLISHED).build())
             .attachments(Collections.singletonList(Attachment.builder().s3path(s3path).build()))
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
             .build();

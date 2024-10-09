@@ -133,20 +133,17 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                 userDocOffice.uuid().equals(parameters.documentationOffice().uuid())
                     ? null
                     : DocumentationOfficeTransformer.transformToDTO(userDocOffice))
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(
+                            userDocOffice.uuid().equals(parameters.documentationOffice().uuid())
+                                ? PublicationStatus.UNPUBLISHED
+                                : PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+                        .withError(false)
+                        .build()))
             .build();
-
-    documentationUnitDTO
-        .getStatus()
-        .add(
-            StatusDTO.builder()
-                .createdAt(Instant.now())
-                .documentationUnitDTO(documentationUnitDTO)
-                .publicationStatus(
-                    userDocOffice.uuid().equals(parameters.documentationOffice().uuid())
-                        ? PublicationStatus.UNPUBLISHED
-                        : PublicationStatus.EXTERNAL_HANDOVER_PENDING)
-                .withError(false)
-                .build());
 
     DocumentationUnitDTO savedDocUnit = repository.save(documentationUnitDTO);
     return DocumentationUnitTransformer.transformToDomain(savedDocUnit);

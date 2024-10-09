@@ -200,6 +200,7 @@ class AuthServiceTest {
         .thenReturn(
             DocumentationUnit.builder()
                 .coreData(CoreData.builder().documentationOffice(documentationOffice).build())
+                .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
                 .build());
     when(securityContext.getAuthentication()).thenReturn(authentication);
     when(authentication.getPrincipal()).thenReturn(oidcUser);

@@ -21,7 +21,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserGroupRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
@@ -48,6 +47,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -104,7 +104,6 @@ class DocumentationUnitSearchIntegrationTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentationUnitRepository repository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
-  @Autowired private DatabaseStatusRepository statusRepository;
   @Autowired private DatabaseProcedureRepository procedureRepository;
   @Autowired private DatabaseUserGroupRepository userGroupRepository;
 
@@ -145,11 +144,12 @@ class DocumentationUnitSearchIntegrationTest {
                 .id(UUID.randomUUID())
                 .documentNumber("MIGR202200012")
                 .documentationOffice(docOfficeDTO)
-                .build());
-    // TODO can't the file number be set in the first save()?
-    migrationDto =
-        repository.save(
-            migrationDto.toBuilder()
+                .status(
+                    List.of(
+                        StatusDTO.builder()
+                            .createdAt(Instant.now())
+                            .publicationStatus(PublicationStatus.PUBLISHED)
+                            .build()))
                 .fileNumbers(List.of(FileNumberDTO.builder().value("AkteM").rank(0L).build()))
                 .build());
     DocumentationUnitDTO newNeurisDto =
@@ -157,23 +157,14 @@ class DocumentationUnitSearchIntegrationTest {
             DocumentationUnitDTO.builder()
                 .documentNumber("NEUR202300008")
                 .documentationOffice(docOfficeDTO)
-                .build());
-    newNeurisDto =
-        repository.save(
-            newNeurisDto.toBuilder()
+                .status(
+                    List.of(
+                        StatusDTO.builder()
+                            .createdAt(Instant.now())
+                            .publicationStatus(PublicationStatus.PUBLISHED)
+                            .build()))
                 .fileNumbers(List.of(FileNumberDTO.builder().value("AkteY").rank(0L).build()))
                 .build());
-
-    statusRepository.save(
-        StatusDTO.builder()
-            .documentationUnitDTO(migrationDto)
-            .publicationStatus(PublicationStatus.PUBLISHED)
-            .build());
-    statusRepository.save(
-        StatusDTO.builder()
-            .documentationUnitDTO(newNeurisDto)
-            .publicationStatus(PublicationStatus.PUBLISHED)
-            .build());
 
     Slice<DocumentationUnitListItem> responseBody =
         risWebTestClient
@@ -216,6 +207,12 @@ class DocumentationUnitSearchIntegrationTest {
               .documentNumber(RandomStringUtils.randomAlphabetic(13))
               .decisionDate(date)
               .documentationOffice(docOfficeDTO)
+              .status(
+                  List.of(
+                      StatusDTO.builder()
+                          .createdAt(Instant.now())
+                          .publicationStatus(PublicationStatus.PUBLISHED)
+                          .build()))
               .build());
     }
 
@@ -247,11 +244,23 @@ class DocumentationUnitSearchIntegrationTest {
         DocumentationUnitDTO.builder()
             .documentNumber("1234567801")
             .documentationOffice(docOfficeDTO)
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build());
     repository.save(
         DocumentationUnitDTO.builder()
             .documentNumber("1234567802")
             .documentationOffice(docOfficeDTO)
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build());
 
     risWebTestClient
@@ -287,6 +296,12 @@ class DocumentationUnitSearchIntegrationTest {
                       ? List.of()
                       : List.of(
                           DeviatingFileNumberDTO.builder().value("ABC 34/" + i).rank(0L).build()))
+              .status(
+                  List.of(
+                      StatusDTO.builder()
+                          .createdAt(Instant.now())
+                          .publicationStatus(PublicationStatus.PUBLISHED)
+                          .build()))
               .build());
     }
 
@@ -364,6 +379,12 @@ class DocumentationUnitSearchIntegrationTest {
         DocumentationUnitDTO.builder()
             .documentNumber("AB1234567802")
             .documentationOffice(docOfficeDTO)
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build());
 
     risWebTestClient
@@ -388,6 +409,12 @@ class DocumentationUnitSearchIntegrationTest {
         DocumentationUnitDTO.builder()
             .documentNumber("AB1234567802")
             .documentationOffice(docOfficeDTO)
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build());
 
     risWebTestClient
@@ -417,6 +444,12 @@ class DocumentationUnitSearchIntegrationTest {
         DocumentationUnitDTO.builder()
             .documentNumber("AB1234567802")
             .documentationOffice(docOfficeDTO)
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build());
 
     risWebTestClient

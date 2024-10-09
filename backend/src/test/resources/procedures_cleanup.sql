@@ -7,3 +7,5 @@ delete from
 delete from
   incremental_migration.documentation_office_user_group;
 
+delete from
+  incremental_migration.status;

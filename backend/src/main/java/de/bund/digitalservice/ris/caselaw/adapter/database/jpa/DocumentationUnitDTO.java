@@ -16,6 +16,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -174,10 +175,17 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @JoinColumn(name = "creating_documentation_office_id", referencedColumnName = "id")
   private DocumentationOfficeDTO creatingDocumentationOffice;
 
-  @OneToMany(mappedBy = "documentationUnitDTO", cascade = CascadeType.ALL)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
+  @NotEmpty
   @OrderBy("createdAt desc")
   private List<StatusDTO> status = new ArrayList<>();
+
+  // Helper method to add an attachment and set the bidirectional relationship
+  public void addStatus(StatusDTO newStatus) {
+    status.add(newStatus);
+  }
 
   // Gericht
   @ManyToOne

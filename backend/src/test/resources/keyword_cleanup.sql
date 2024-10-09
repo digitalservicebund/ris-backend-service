@@ -6,3 +6,6 @@ delete from
 
 delete from
   incremental_migration.keyword;
+
+delete from
+    incremental_migration.status;

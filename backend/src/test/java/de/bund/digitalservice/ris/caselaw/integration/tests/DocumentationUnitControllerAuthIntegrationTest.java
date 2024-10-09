@@ -19,7 +19,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
@@ -100,7 +99,6 @@ class DocumentationUnitControllerAuthIntegrationTest {
 
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentationUnitRepository repository;
-  @Autowired private DatabaseStatusRepository statusRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
@@ -337,17 +335,26 @@ class DocumentationUnitControllerAuthIntegrationTest {
             .id(documentationUnitUuid)
             .documentNumber(documentNumber)
             .documentationOffice(documentationOffice)
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build());
   }
 
   private void saveToStatusRepository(
       DocumentationUnitDTO documentationUnitDTO, Instant createdAt, Status status) {
-    statusRepository.save(
-        StatusDTO.builder()
-            .documentationUnitDTO(documentationUnitDTO)
-            .publicationStatus(status.publicationStatus())
-            .withError(status.withError())
-            .createdAt(createdAt)
+    repository.save(
+        documentationUnitDTO.toBuilder()
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .publicationStatus(status.publicationStatus())
+                        .withError(status.withError())
+                        .createdAt(createdAt)
+                        .build()))
             .build());
   }
 }
