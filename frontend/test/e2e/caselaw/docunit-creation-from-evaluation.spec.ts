@@ -37,11 +37,11 @@ test.describe(
 
         await test.step("After searching, a documentation unit can be created", async () => {
           await expect(
-            page.getByText("Zuständige Dokumentationsstelle *"),
+            page.getByText("Dokumentationsstelle zuweisen *"),
           ).toBeHidden()
           await page.getByText("Suchen").click()
           await expect(
-            page.getByText("Zuständige Dokumentationsstelle *"),
+            page.getByText("Dokumentationsstelle zuweisen *"),
           ).toBeVisible()
         })
 
@@ -83,7 +83,7 @@ test.describe(
 
         await test.step("Documentation Office is a mandatory field for doc unit creation", async () => {
           await expect(
-            page.getByText("Ok und Dokumentationseinheit direkt bearbeiten"),
+            page.getByText("Übernehmen und weiter bearbeiten"),
           ).toBeDisabled()
         })
 
@@ -118,7 +118,7 @@ test.describe(
           )
 
           await expect(
-            page.getByText("Ok und Dokumentationseinheit direkt bearbeiten"),
+            page.getByText("Übernehmen und weiter bearbeiten"),
           ).toBeEnabled()
         })
       },
@@ -147,7 +147,7 @@ test.describe(
 
         await test.step("Mandatory fields citation (Zitatstelle) and reference Supplement (Klammernzusatz) are being validated before creation of new documentation unit", async () => {
           await pageWithBghUser
-            .getByText("Ok und Dokumentationseinheit direkt bearbeiten")
+            .getByText("Übernehmen und weiter bearbeiten")
             .click()
 
           await expect(
@@ -164,7 +164,7 @@ test.describe(
           ).toHaveCount(1)
 
           await pageWithBghUser
-            .getByText("Ok und Dokumentationseinheit direkt bearbeiten")
+            .getByText("Übernehmen und weiter bearbeiten")
             .click()
 
           await expect(
@@ -181,7 +181,7 @@ test.describe(
         await test.step("The new documentation unit can be created and opened in a new tab with correct data", async () => {
           const pagePromise = pageWithBghUser.context().waitForEvent("page")
           await pageWithBghUser
-            .getByText("Ok und Dokumentationseinheit direkt bearbeiten")
+            .getByText("Übernehmen und weiter bearbeiten")
             .click()
           const newTab = await pagePromise
           await expect(newTab).toHaveURL(
