@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -62,6 +63,7 @@ class DocumentationUnitStatusServiceTest {
             .withError(true)
             .build();
     DocumentationUnit.builder().uuid(TEST_UUID).build();
+
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitDTO.builder()
             .id(TEST_UUID)
@@ -70,11 +72,22 @@ class DocumentationUnitStatusServiceTest {
                 new ArrayList<>(
                     List.of(
                         StatusDTO.builder()
+                            .publicationStatus(PublicationStatus.DUPLICATED)
+                            .withError(true)
+                            .createdAt(Instant.now().minus(2, ChronoUnit.DAYS))
+                            .build(),
+                        StatusDTO.builder()
                             .publicationStatus(PublicationStatus.PUBLISHED)
                             .withError(true)
                             .createdAt(Instant.now())
+                            .build(),
+                        StatusDTO.builder()
+                            .publicationStatus(PublicationStatus.UNPUBLISHED)
+                            .withError(true)
+                            .createdAt(Instant.now().minus(1, ChronoUnit.DAYS))
                             .build())))
             .build();
+
     ArgumentCaptor<DocumentationUnitDTO> captor =
         ArgumentCaptor.forClass(DocumentationUnitDTO.class);
 
@@ -96,7 +109,7 @@ class DocumentationUnitStatusServiceTest {
   }
 
   @Test
-  void getLatestStatus() {
+  void getLatestStatus() throws DocumentationUnitNotExistsException {
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitDTO.builder()
             .id(TEST_UUID)

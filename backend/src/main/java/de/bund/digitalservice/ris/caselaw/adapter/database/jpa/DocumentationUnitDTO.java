@@ -182,11 +182,6 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @OrderBy("createdAt desc")
   private List<StatusDTO> status = new ArrayList<>();
 
-  // Helper method to add an attachment and set the bidirectional relationship
-  public void addStatus(StatusDTO newStatus) {
-    status.add(newStatus);
-  }
-
   // Gericht
   @ManyToOne
   @JoinColumn(name = "court_id", referencedColumnName = "id")

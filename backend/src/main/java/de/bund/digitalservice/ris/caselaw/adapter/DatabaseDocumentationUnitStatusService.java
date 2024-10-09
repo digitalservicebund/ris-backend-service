@@ -37,17 +37,16 @@ public class DatabaseDocumentationUnitStatusService implements DocumentationUnit
     DocumentationUnitDTO docUnit =
         databaseDocumentationUnitRepository
             .findByDocumentNumber(documentNumber)
-            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
-
-    docUnit.toBuilder()
-        .status(
-            List.of(
-                StatusDTO.builder()
-                    .createdAt(Instant.now())
-                    .publicationStatus(status.publicationStatus())
-                    .withError(status.withError())
-                    .build()))
-        .build();
+            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber))
+            .toBuilder()
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(status.publicationStatus())
+                        .withError(status.withError())
+                        .build()))
+            .build();
 
     databaseDocumentationUnitRepository.save(docUnit);
   }
@@ -59,18 +58,13 @@ public class DatabaseDocumentationUnitStatusService implements DocumentationUnit
    * @return the most recent publication status of the documentation unit
    */
   @Override
-  public PublicationStatus getLatestStatus(String documentNumber) {
-    var docUnit = databaseDocumentationUnitRepository.findByDocumentNumber(documentNumber);
-    if (docUnit.isEmpty()) {
-      return null;
-    }
-    List<StatusDTO> status = docUnit.get().getStatus();
-    status.sort((s1, s2) -> s2.getCreatedAt().compareTo(s1.getCreatedAt()));
-    var mostRecentStatus = status.get(0);
-    if (mostRecentStatus == null) {
-      return null;
-    }
-
-    return mostRecentStatus.getPublicationStatus();
+  public PublicationStatus getLatestStatus(String documentNumber)
+      throws DocumentationUnitNotExistsException {
+    return databaseDocumentationUnitRepository
+        .findByDocumentNumber(documentNumber)
+        .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber))
+        .getStatus()
+        .getFirst()
+        .getPublicationStatus();
   }
 }
