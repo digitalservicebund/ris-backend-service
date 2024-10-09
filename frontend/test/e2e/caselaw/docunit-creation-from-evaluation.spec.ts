@@ -1,12 +1,12 @@
 import { expect, Page } from "@playwright/test"
 import dayjs from "dayjs"
 import {
+  deleteDocumentUnit,
   fillInput,
-  navigateToPeriodicalReferences,
-  waitForInputValue,
-  deleteDocumentUnitByDocumentNumber,
-  navigateToSearch,
   getRequest,
+  navigateToPeriodicalReferences,
+  navigateToSearch,
+  waitForInputValue,
 } from "./e2e-utils"
 import { caselawTest as test } from "./fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
@@ -290,10 +290,7 @@ test.describe(
           await expect(listEntry).toContainText("Unveröffentlicht")
         })
 
-        await deleteDocumentUnitByDocumentNumber(
-          pageWithBghUser,
-          documentNumber,
-        )
+        await deleteDocumentUnit(pageWithBghUser, documentNumber)
       },
     )
 
@@ -449,7 +446,7 @@ test.describe(
           await expect(listEntry).toContainText("Fremdanlage")
         })
 
-        await deleteDocumentUnitByDocumentNumber(page, documentNumber)
+        await deleteDocumentUnit(page, documentNumber)
       },
     )
 
@@ -555,7 +552,7 @@ test.describe(
           ).toHaveValue("Keine Angabe")
         })
 
-        await deleteDocumentUnitByDocumentNumber(page, documentNumber)
+        await deleteDocumentUnit(page, documentNumber)
       },
     )
 

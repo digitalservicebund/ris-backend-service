@@ -207,6 +207,7 @@ public class DocumentationUnitController {
   }
 
   @DeleteMapping(value = "/{uuid}")
+  @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")
   public ResponseEntity<String> deleteByUuid(
       @AuthenticationPrincipal OidcUser oidcUser, @PathVariable UUID uuid) {
 
@@ -218,17 +219,6 @@ public class DocumentationUnitController {
     }
   }
 
-  @DeleteMapping(value = "/test/{documentNumber}")
-  public ResponseEntity<String> deleteByDocumentNumber(
-          @AuthenticationPrincipal OidcUser oidcUser, @PathVariable String documentNumber) {
-
-    try {
-      var str = service.deleteByDocumentNumber(documentNumber);
-      return ResponseEntity.status(HttpStatus.OK).body(str);
-    } catch (DocumentationUnitNotExistsException | DocumentationUnitDeletionException ex) {
-      return ResponseEntity.internalServerError().body(ex.getMessage());
-    }
-  }
   @PutMapping(
       value = "/{uuid}",
       consumes = MediaType.APPLICATION_JSON_VALUE,

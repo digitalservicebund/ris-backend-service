@@ -170,7 +170,7 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @JoinColumn(name = "documentation_office_id", referencedColumnName = "id")
   private DocumentationOfficeDTO documentationOffice;
 
-  @ManyToOne(optional = false)
+  @ManyToOne()
   @JoinColumn(name = "creating_documentation_office_id", referencedColumnName = "id")
   private DocumentationOfficeDTO creatingDocumentationOffice;
 

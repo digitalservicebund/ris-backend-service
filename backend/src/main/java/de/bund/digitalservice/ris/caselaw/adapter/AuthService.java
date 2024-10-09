@@ -265,20 +265,16 @@ public class AuthService {
   }
 
   private boolean userHasWriteAccess(DocumentationUnit documentationUnit) {
-    return userHasSameDocOfficeAsDocumentSource(documentationUnit)
-            && docUnitIsPending(documentationUnit)
-        || userHasSameDocOfficeAsDocument(documentationUnit)
-            && !docUnitIsPending(documentationUnit);
+    return docUnitIsPending(documentationUnit)
+        ? userHasSameDocOfficeAsDocumentCreator(documentationUnit)
+        : userHasSameDocOfficeAsDocument(documentationUnit);
   }
 
   private boolean userHasReadAccess(DocumentationUnit documentationUnit) {
     // legacy documents are published
     return documentationUnit.status() == null
         || docUnitHasPublishState(documentationUnit)
-        || (userHasSameDocOfficeAsDocumentSource(documentationUnit)
-            && docUnitIsPending(documentationUnit))
-        || (userHasSameDocOfficeAsDocument(documentationUnit)
-            && !docUnitIsPending(documentationUnit));
+        || userHasWriteAccess(documentationUnit);
   }
 
   private boolean docUnitHasPublishState(DocumentationUnit documentationUnit) {
@@ -288,7 +284,7 @@ public class AuthService {
         && published.contains(documentationUnit.status().publicationStatus());
   }
 
-  private boolean userHasSameDocOfficeAsDocumentSource(DocumentationUnit documentationUnit) {
+  private boolean userHasSameDocOfficeAsDocumentCreator(DocumentationUnit documentationUnit) {
     Optional<OidcUser> oidcUser = getOidcUser();
     if (oidcUser.isPresent()) {
       DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidcUser.get());

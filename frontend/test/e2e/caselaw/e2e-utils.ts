@@ -249,20 +249,6 @@ export async function deleteDocumentUnit(page: Page, documentNumber: string) {
   expect(deleteResponse.ok()).toBeTruthy()
 }
 
-export async function deleteDocumentUnitByDocumentNumber(
-  page: Page,
-  documentNumber: string,
-) {
-  const cookies = await page.context().cookies()
-  const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
-
-  const deleteResponse = await page.request.delete(
-    `/api/v1/caselaw/documentunits/test/${documentNumber}`,
-    { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
-  )
-  expect(deleteResponse.ok()).toBeTruthy()
-}
-
 export async function deleteProcedure(page: Page, uuid: string) {
   const cookies = await page.context().cookies()
   const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
