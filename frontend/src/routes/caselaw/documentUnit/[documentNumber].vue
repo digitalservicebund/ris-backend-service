@@ -64,7 +64,10 @@ async function attachmentIndexSelected(index: number) {
 
 async function attachmentIndexDeleted(index: number) {
   await requestDocumentUnitFromServer()
-  extraContentSidePanelStore.onAttachmentDeleted(index)
+  extraContentSidePanelStore.onAttachmentDeleted(
+    index,
+    documentUnit.value ? documentUnit.value.attachments.length - 1 : 0,
+  )
 }
 
 async function attachmentsUploaded(anySuccessful: boolean) {

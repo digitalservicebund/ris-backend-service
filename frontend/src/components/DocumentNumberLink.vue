@@ -19,10 +19,12 @@ const props = withDefaults(defineProps<Props>(), {
 const documentUnitStore = useDocumentUnitStore()
 const extraContentSidePanelStore = useExtraContentSidePanelStore()
 
-function openSidePanel(documentUnitNumber: string) {
-  documentUnitStore.loadDocumentUnit(documentUnitNumber)
-  extraContentSidePanelStore.togglePanel(true)
-  extraContentSidePanelStore.setSidePanelMode("preview")
+function openSidePanel(documentUnitNumber?: string) {
+  if (documentUnitNumber) {
+    documentUnitStore.loadDocumentUnit(documentUnitNumber)
+    extraContentSidePanelStore.togglePanel(true)
+    extraContentSidePanelStore.setSidePanelMode("preview")
+  }
 }
 </script>
 

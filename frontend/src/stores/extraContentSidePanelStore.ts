@@ -2,6 +2,7 @@ import { defineStore } from "pinia"
 import { ref } from "vue"
 import { useRoute } from "vue-router"
 import useQuery from "@/composables/useQueryFromRoute"
+import { SelectablePanelContent } from "@/types/panelContentMode"
 
 export const useExtraContentSidePanelStore = defineStore(
   "extraSidePanelStore",
@@ -12,7 +13,6 @@ export const useExtraContentSidePanelStore = defineStore(
 
     const { pushQueryToRoute } = useQuery()
     const route = useRoute()
-    type SelectablePanelContent = "note" | "attachments" | "preview"
 
     function setSidePanelMode(mode: SelectablePanelContent) {
       panelMode.value = mode
@@ -55,14 +55,14 @@ export const useExtraContentSidePanelStore = defineStore(
      * Adjusts the local attachment index reference if necessary.
      * If all attachments have been deleted, switches to display the note instead.
      * @param index the deleted attachment index
+     * @param attachmentsSize
      */
-    function onAttachmentDeleted(index: number) {
+    function onAttachmentDeleted(index: number, attachmentsSize: number) {
       if (currentAttachmentIndex.value >= index) {
-        currentAttachmentIndex.value =
-          documentUnitStore.documentUnit!.attachments.length - 1
+        currentAttachmentIndex.value = attachmentsSize - 1
       }
-      if (documentUnitStore.documentUnit!.attachments.length === 0) {
-        selectNotes()
+      if (attachmentsSize === 0) {
+        setSidePanelMode("note")
       }
     }
 

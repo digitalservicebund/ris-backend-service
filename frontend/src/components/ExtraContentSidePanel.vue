@@ -13,7 +13,7 @@ import DocumentUnitPreview from "@/components/preview/DocumentUnitPreview.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
-
+import { SelectablePanelContent } from "@/types/panelContentMode"
 import IconAttachFile from "~icons/ic/baseline-attach-file"
 import IconOpenInNewTab from "~icons/ic/outline-open-in-new"
 import IconPreview from "~icons/ic/outline-remove-red-eye"
@@ -82,7 +82,7 @@ function selectPreview() {
  * @param expand optional boolean to enforce expanding or collapsing
  */
 function togglePanel(expand?: boolean): boolean {
-  store.togglePanel(expand)
+  return store.togglePanel(expand)
 }
 
 /**
@@ -118,7 +118,7 @@ function setDefaultState() {
  **/
 watch(store, () => {
   if (props.enabledPanels) {
-    if (!props.enabledPanels.includes(store.panelMode)) {
+    if (!props.enabledPanels.includes(store.panelMode!)) {
       store.setSidePanelMode(props.enabledPanels[0])
     }
   }
