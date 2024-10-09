@@ -1,10 +1,19 @@
 /* eslint-disable testing-library/no-node-access */
 import { render, screen, fireEvent } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
+import { vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import TextEditor from "@/components/input/TextEditor.vue"
+import { longTextLabels } from "@/domain/documentUnit"
+import featureToggleService from "@/services/featureToggleService"
 
 describe("text editor", async () => {
+  beforeEach(() => {
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
+  })
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   global.ResizeObserver = require("resize-observer-polyfill")
   const router = createRouter({
@@ -36,7 +45,7 @@ describe("text editor", async () => {
     render(TextEditor, {
       props: {
         value: "Test Value",
-        ariaLabel: "Test Editor Feld",
+        ariaLabel: "Gründe",
       },
       global: { plugins: [router] },
     })
@@ -44,7 +53,7 @@ describe("text editor", async () => {
     await flushPromises()
 
     expect(screen.getByText("Test Value")).toBeInTheDocument()
-    expect(screen.getByTestId("Test Editor Feld")).toBeInTheDocument()
+    expect(screen.getByTestId("Gründe")).toBeInTheDocument()
   })
 
   test.each([
@@ -66,7 +75,7 @@ describe("text editor", async () => {
     render(TextEditor, {
       props: {
         value: "Test Value",
-        ariaLabel: "Test Editor Feld",
+        ariaLabel: "Gründe",
         editable: true,
       },
       global: { plugins: [router] },
@@ -74,15 +83,13 @@ describe("text editor", async () => {
 
     await flushPromises()
 
-    const editorField = screen.getByTestId("Test Editor Feld")
+    const editorField = screen.getByTestId("Gründe")
 
     if (editorField.firstElementChild !== null) {
       await fireEvent.focus(editorField.firstElementChild)
     }
 
-    expect(
-      screen.getByLabelText("Test Editor Feld Button Leiste"),
-    ).toBeInTheDocument()
+    expect(screen.getByLabelText("Gründe Button Leiste")).toBeInTheDocument()
     expect(screen.getByLabelText("Erweitern")).toBeEnabled()
     expect(screen.getByLabelText("Rückgängig machen")).toBeEnabled()
     expect(screen.getByLabelText("Wiederherstellen")).toBeEnabled()
@@ -92,7 +99,7 @@ describe("text editor", async () => {
     render(TextEditor, {
       props: {
         value: "Test Value",
-        ariaLabel: "Test Editor Feld",
+        ariaLabel: "Gründe",
         editable: true,
       },
       global: { plugins: [router] },
@@ -100,15 +107,13 @@ describe("text editor", async () => {
 
     await flushPromises()
 
-    const editorField = screen.getByTestId("Test Editor Feld")
+    const editorField = screen.getByTestId("Gründe")
 
     if (editorField.firstElementChild !== null) {
       await fireEvent.blur(editorField.firstElementChild)
     }
 
-    expect(
-      screen.getByLabelText("Test Editor Feld Button Leiste"),
-    ).toBeInTheDocument()
+    expect(screen.getByLabelText("Gründe Button Leiste")).toBeInTheDocument()
     expect(screen.getByLabelText("Erweitern")).toBeDisabled()
     expect(screen.getByLabelText("Rückgängig machen")).toBeDisabled()
     expect(screen.getByLabelText("Wiederherstellen")).toBeDisabled()
@@ -131,7 +136,7 @@ describe("text editor", async () => {
     render(TextEditor, {
       props: {
         value: "Test Value",
-        ariaLabel: "Test Editor Feld",
+        ariaLabel: "Gründe",
         editable: true,
       },
       global: { plugins: [router] },
@@ -139,7 +144,7 @@ describe("text editor", async () => {
 
     await flushPromises()
 
-    const editorField = screen.getByTestId("Test Editor Feld")
+    const editorField = screen.getByTestId("Gründe")
 
     if (editorField.firstElementChild !== null) {
       await fireEvent.focus(editorField.firstElementChild)
@@ -161,8 +166,67 @@ describe("text editor", async () => {
     expect(screen.getByLabelText("Einzug verringern")).toBeInTheDocument()
     expect(screen.getByLabelText("Einzug vergrößern")).toBeInTheDocument()
     expect(screen.getByLabelText("Zitat einfügen")).toBeInTheDocument()
-    expect(screen.getByLabelText("Randnummer entfernen")).toBeInTheDocument()
+    expect(
+      screen.getByLabelText("Randnummern neu erstellen"),
+    ).toBeInTheDocument()
+    expect(screen.getByLabelText("Randnummern entfernen")).toBeInTheDocument()
     expect(screen.getByLabelText("Rückgängig machen")).toBeInTheDocument()
     expect(screen.getByLabelText("Wiederherstellen")).toBeInTheDocument()
+  })
+
+  it.each([
+    longTextLabels.tenor,
+    longTextLabels.participatingJudges,
+    longTextLabels.outline,
+  ])("hides add border number button for category %s", async (category) => {
+    render(TextEditor, {
+      props: {
+        value: "Test Value",
+        ariaLabel: category,
+        editable: true,
+      },
+      global: { plugins: [router] },
+    })
+
+    await flushPromises()
+
+    const editorField = screen.getByTestId(category!)
+
+    if (editorField.firstElementChild !== null) {
+      await fireEvent.focus(editorField.firstElementChild)
+    }
+
+    expect(
+      screen.queryByText("Randnummern neu erstellen"),
+    ).not.toBeInTheDocument()
+  })
+
+  it.each([
+    longTextLabels.reasons,
+    longTextLabels.caseFacts,
+    longTextLabels.decisionReasons,
+    longTextLabels.dissentingOpinion,
+    longTextLabels.otherLongText,
+  ])("shows add border number button for category %s", async (category) => {
+    render(TextEditor, {
+      props: {
+        value: "Test Value",
+        ariaLabel: category,
+        editable: true,
+      },
+      global: { plugins: [router] },
+    })
+
+    await flushPromises()
+
+    const editorField = screen.getByTestId(category!)
+
+    if (editorField.firstElementChild !== null) {
+      await fireEvent.focus(editorField.firstElementChild)
+    }
+
+    expect(
+      screen.getByLabelText("Randnummern neu erstellen"),
+    ).toBeInTheDocument()
   })
 })

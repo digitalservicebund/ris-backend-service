@@ -2,19 +2,32 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen, waitFor } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
+import { vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import TextEditor from "@/components/input/TextEditor.vue"
+import featureToggleService from "@/services/featureToggleService"
 import { mockDocumentForProsemirror } from "~/test-helper/prosemirror-document-mock"
 
 mockDocumentForProsemirror()
+vi.mock("@/composables/useInternalUser", () => {
+  return {
+    useInternalUser: () => true,
+  }
+})
 
 describe("text editor toolbar", async () => {
+  beforeEach(() => {
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
+  })
   const renderComponent = async () => {
     userEvent.setup()
     render(TextEditor, {
       props: {
         value: "Test Value",
-        ariaLabel: "Test Editor Feld",
+        ariaLabel: "Gründe",
         editable: true,
       },
       global: { plugins: [router] },
@@ -44,7 +57,7 @@ describe("text editor toolbar", async () => {
   describe("keyboard navigation", () => {
     test("shift tab in text editor should focus first button in menu", async () => {
       await renderComponent()
-      const editorField = screen.getByTestId("Test Editor Feld")
+      const editorField = screen.getByTestId("Gründe")
 
       await userEvent.click(editorField.firstElementChild!)
       expect(editorField.firstElementChild).toHaveFocus()
@@ -55,7 +68,7 @@ describe("text editor toolbar", async () => {
 
     test("arrow right should move focus to next button until last button", async () => {
       await renderComponent()
-      const editorField = screen.getByTestId("Test Editor Feld")
+      const editorField = screen.getByTestId("Gründe")
 
       await userEvent.click(editorField.firstElementChild!)
       expect(editorField.firstElementChild).toHaveFocus()
@@ -84,7 +97,7 @@ describe("text editor toolbar", async () => {
 
     test("arrow left should leave focus on first button", async () => {
       await renderComponent()
-      const editorField = screen.getByTestId("Test Editor Feld")
+      const editorField = screen.getByTestId("Gründe")
 
       await userEvent.click(editorField.firstElementChild!)
       expect(editorField.firstElementChild).toHaveFocus()
@@ -107,7 +120,7 @@ describe("text editor toolbar", async () => {
 
     test("enter should jump back to the editor input", async () => {
       await renderComponent()
-      const editorField = screen.getByTestId("Test Editor Feld")
+      const editorField = screen.getByTestId("Gründe")
 
       await userEvent.click(editorField.firstElementChild!)
       await userEvent.tab({ shift: true })
@@ -125,7 +138,7 @@ describe("text editor toolbar", async () => {
 
     test("tab into the editor should skip the menu tool bar", async () => {
       await renderComponent()
-      const editorField = screen.getByTestId("Test Editor Feld")
+      const editorField = screen.getByTestId("Gründe")
 
       // Add external input field to be focused first
       const inputField = editorField.ownerDocument.createElement("input")

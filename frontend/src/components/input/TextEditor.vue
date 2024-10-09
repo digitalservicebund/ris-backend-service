@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { commands } from "@guardian/prosemirror-invisibles"
+import { CommandProps } from "@tiptap/core"
 import { Blockquote } from "@tiptap/extension-blockquote"
 import { Bold } from "@tiptap/extension-bold"
 import { Color } from "@tiptap/extension-color"
@@ -27,6 +28,8 @@ import {
 } from "@/editor/borderNumber"
 import { BorderNumberLink } from "@/editor/borderNumberLink"
 import { CustomBulletList } from "@/editor/bulletList"
+import addBorderNumbers from "@/editor/commands/addBorderNumbers"
+import removeBorderNumbers from "@/editor/commands/removeBorderNumbers"
 import { FontSize } from "@/editor/fontSize"
 import { CustomImage } from "@/editor/image"
 import { Indent } from "@/editor/indent"
@@ -36,12 +39,15 @@ import { CustomOrderedList } from "@/editor/orderedList"
 import { CustomParagraph } from "@/editor/paragraph"
 import { CustomSubscript, CustomSuperscript } from "@/editor/scriptText"
 import { TableStyle } from "@/editor/tableStyle"
+import FeatureToggleService from "@/services/featureToggleService"
 
 interface Props {
   value?: string
   editable?: boolean
   preview?: boolean
   ariaLabel?: string
+  /* If true, the color formatting of border numbers is disabled */
+  plainBorderNumbers?: boolean
   fieldSize?: TextAreaInputAttributes["fieldSize"]
 }
 
@@ -49,6 +55,7 @@ const props = withDefaults(defineProps<Props>(), {
   value: undefined,
   editable: false,
   preview: false,
+  plainBorderNumbers: false,
   ariaLabel: "Editor Feld",
   fieldSize: "medium",
 })
@@ -60,6 +67,7 @@ const emit = defineEmits<{
 const editorElement = ref<HTMLElement>()
 const hasFocus = ref(false)
 const isHovered = ref(false)
+const featureToggle = ref(false)
 
 const editor = new Editor({
   editorProps: {
@@ -75,7 +83,17 @@ const editor = new Editor({
     Document,
     CustomParagraph,
     Text,
-    BorderNumber,
+    BorderNumber.extend({
+      // Todo: Commands can be moved back to borderNumber.ts once the feature toggle has been removed
+      addCommands() {
+        return {
+          removeBorderNumbers: () => (commandProps: CommandProps) => {
+            return removeBorderNumbers(commandProps, featureToggle.value)
+          },
+          addBorderNumbers: () => addBorderNumbers,
+        }
+      },
+    }),
     BorderNumberNumber,
     BorderNumberContent,
     BorderNumberLink,
@@ -132,20 +150,25 @@ const editor = new Editor({
 const containerWidth = ref<number>()
 
 const editorExpanded = ref(false)
-const editorSize = computed(() => {
-  if (editorExpanded.value) return "h-640"
+const editorStyleClasses = computed(() => {
+  const plainBorderNumberStyle = props.plainBorderNumbers
+    ? "plain-border-number"
+    : ""
 
-  switch (props.fieldSize) {
-    case "max":
-      return "h-full"
-    case "big":
-      return "h-320"
-    case "medium":
-      return "h-160"
-    case "small":
-      return "h-96"
+  if (editorExpanded.value) {
+    return `h-640 ${plainBorderNumberStyle}`
   }
-  return undefined
+
+  const fieldSizeClasses = {
+    max: "h-full",
+    big: "h-320",
+    medium: "h-160",
+    small: "h-96",
+  } as const
+
+  return fieldSizeClasses[props.fieldSize]
+    ? `${fieldSizeClasses[props.fieldSize]} ${plainBorderNumberStyle} p-4`
+    : undefined
 })
 
 watch(
@@ -180,9 +203,12 @@ watch(
 
 const ariaLabel = props.ariaLabel ? props.ariaLabel : null
 
-onMounted(() => {
+onMounted(async () => {
   const editorContainer = document.querySelector(".editor")
   if (editorContainer != null) resizeObserver.observe(editorContainer)
+  featureToggle.value =
+    (await FeatureToggleService.isEnabled("neuris.border-number-editor"))
+      .data ?? false
 })
 
 const resizeObserver = new ResizeObserver((entries) => {
@@ -219,7 +245,7 @@ const resizeObserver = new ResizeObserver((entries) => {
     <hr v-if="editable" class="ml-8 mr-8 border-blue-300" />
     <div>
       <EditorContent
-        :class="editorSize"
+        :class="editorStyleClasses"
         :data-testid="ariaLabel"
         :editor="editor"
       />

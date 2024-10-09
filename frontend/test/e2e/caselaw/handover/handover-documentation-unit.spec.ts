@@ -230,12 +230,9 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
   }) => {
     await navigateToHandover(page, documentNumber)
 
-    await page
-      .locator("[aria-label='Dokumentationseinheit an jDV übergeben']")
-      .click()
     await expect(
-      page.getByText("Es sind noch nicht alle Pflichtfelder befüllt."),
-    ).toBeVisible()
+      page.getByLabel("Dokumentationseinheit an jDV übergeben"),
+    ).toBeDisabled()
   })
 
   test("handover possible when all required fields filled", async ({

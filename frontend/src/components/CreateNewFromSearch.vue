@@ -103,14 +103,14 @@ watch(
 <template>
   <div class="flex flex-col gap-24 bg-blue-200 p-24">
     <div>
-      <p class="ds-label-01-bold">Nicht die passende Entscheidung gefunden?</p>
+      <p class="ds-label-01-bold">Keine passende Entscheidung gefunden?</p>
       <p>
-        Wollen Sie die Daten übernehmen und eine neue Entscheidung erstellen?
+        Übernehmen Sie die Stammdaten und erstellen Sie eine neue Entscheidung.
       </p>
     </div>
     <InputField
       id="responsibleDocOffice"
-      label="Zuständige Dokumentationsstelle *"
+      label="Dokumentationsstelle zuweisen *"
     >
       <ComboboxInput
         id="responsibleDocOffice"
@@ -127,7 +127,7 @@ watch(
         aria-label="Dokumentationseinheit erstellen"
         button-type="primary"
         :disabled="!responsibleDocOffice"
-        label="Ok"
+        label="Übernehmen"
         size="small"
         @click="() => createNewFromSearch()"
       />
@@ -135,7 +135,7 @@ watch(
         aria-label="Dokumentationseinheit erstellen und direkt bearbeiten"
         button-type="tertiary"
         :disabled="!responsibleDocOffice"
-        label="Ok und Dokumentationseinheit direkt bearbeiten"
+        label="Übernehmen und weiter bearbeiten"
         size="small"
         @click="() => createNewFromSearch(true)"
       />

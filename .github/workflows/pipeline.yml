@@ -35,7 +35,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@292cc14be88d32cccdd768342b8aa1296a4d8d46
         with:
-          java-version: "17.0"
+          java-version: "21.0"
           distribution: "temurin"
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@d156388eb19639ec20ade50009f3d199ce1e2808 # v4.1.0
@@ -75,7 +75,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@292cc14be88d32cccdd768342b8aa1296a4d8d46
         with:
-          java-version: "17.0"
+          java-version: "21.0"
           distribution: "temurin"
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@d156388eb19639ec20ade50009f3d199ce1e2808 # v4.1.0
@@ -112,7 +112,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@292cc14be88d32cccdd768342b8aa1296a4d8d46
         with:
-          java-version: "17.0"
+          java-version: "21.0"
           distribution: "temurin"
           cache: gradle
       - name: Grant execute permission for gradlew
@@ -302,7 +302,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@789f9970d8e65fd6c953442bc2c41f4cb7a5b2c4
+      - uses: chainguard-dev/actions/setup-gitsign@04b3d27d680c065e8aaaa71edabf37da0ad4ac3d
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -482,7 +482,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@789f9970d8e65fd6c953442bc2c41f4cb7a5b2c4
+      - uses: chainguard-dev/actions/setup-gitsign@04b3d27d680c065e8aaaa71edabf37da0ad4ac3d
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -523,7 +523,7 @@ jobs:
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@789f9970d8e65fd6c953442bc2c41f4cb7a5b2c4
+      - uses: chainguard-dev/actions/setup-gitsign@04b3d27d680c065e8aaaa71edabf37da0ad4ac3d
       - name: Deploy new images
         uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
@@ -578,7 +578,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@292cc14be88d32cccdd768342b8aa1296a4d8d46
         with:
-          java-version: "17.0"
+          java-version: "21.0"
           distribution: "temurin"
           cache: gradle
       - name: Setup Gradle
@@ -614,7 +614,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@292cc14be88d32cccdd768342b8aa1296a4d8d46
         with:
-          java-version: "17.0"
+          java-version: "21.0"
           distribution: "temurin"
           cache: gradle
       - name: Grant execute permission for gradlew

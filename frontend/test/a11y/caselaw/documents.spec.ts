@@ -73,12 +73,9 @@ test.describe("a11y of handover page (/caselaw/documentunit/{documentNumber}/han
 
   test("handover not possible", async ({ page, documentNumber }) => {
     await navigateToHandover(page, documentNumber)
-    await page
-      .locator("[aria-label='Dokumentationseinheit an jDV übergeben']")
-      .click()
     await expect(
-      page.getByText("Es sind noch nicht alle Pflichtfelder befüllt."),
-    ).toBeVisible()
+      page.getByLabel("Dokumentationseinheit an jDV übergeben"),
+    ).toBeDisabled()
 
     const accessibilityScanResults = await useAxeBuilder(page).analyze()
     expect(accessibilityScanResults.violations).toEqual([])

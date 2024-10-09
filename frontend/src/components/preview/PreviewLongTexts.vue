@@ -3,7 +3,7 @@ import TextEditor from "@/components/input/TextEditor.vue"
 import PreviewCategory from "@/components/preview/PreviewCategory.vue"
 import PreviewContent from "@/components/preview/PreviewContent.vue"
 import PreviewRow from "@/components/preview/PreviewRow.vue"
-import { LongTexts } from "@/domain/documentUnit"
+import { longTextLabels, LongTexts } from "@/domain/documentUnit"
 
 defineProps<{
   longTexts: LongTexts
@@ -12,11 +12,11 @@ defineProps<{
 
 <template>
   <PreviewRow v-if="longTexts.outline">
-    <PreviewCategory>Gliederung</PreviewCategory>
+    <PreviewCategory>{{ longTextLabels.outline }}</PreviewCategory>
     <PreviewContent>
       <TextEditor
         id="previewOutline"
-        aria-label="Gliederung"
+        :aria-label="longTextLabels.outline"
         field-size="max"
         preview
         :value="longTexts.outline"
@@ -24,11 +24,11 @@ defineProps<{
     </PreviewContent>
   </PreviewRow>
   <PreviewRow v-if="longTexts.tenor">
-    <PreviewCategory>Tenor</PreviewCategory>
+    <PreviewCategory>{{ longTextLabels.tenor }}</PreviewCategory>
     <PreviewContent>
       <TextEditor
         id="previewTenor"
-        aria-label="Tenor"
+        :aria-label="longTextLabels.tenor"
         field-size="max"
         preview
         :value="longTexts.tenor"
@@ -36,11 +36,11 @@ defineProps<{
     </PreviewContent>
   </PreviewRow>
   <PreviewRow v-if="longTexts.reasons">
-    <PreviewCategory>Gründe</PreviewCategory>
+    <PreviewCategory>{{ longTextLabels.reasons }}</PreviewCategory>
     <PreviewContent>
       <TextEditor
         id="previewReasons"
-        aria-label="Gründe"
+        :aria-label="longTextLabels.reasons"
         field-size="max"
         preview
         :value="longTexts.reasons"
@@ -48,11 +48,11 @@ defineProps<{
     </PreviewContent>
   </PreviewRow>
   <PreviewRow v-if="longTexts.caseFacts">
-    <PreviewCategory>Tatbestand</PreviewCategory>
+    <PreviewCategory>{{ longTextLabels.caseFacts }}</PreviewCategory>
     <PreviewContent>
       <TextEditor
         id="previewCaseFacts"
-        aria-label="Tatbestand"
+        :aria-label="longTextLabels.caseFacts"
         field-size="max"
         preview
         :value="longTexts.caseFacts"
@@ -60,11 +60,11 @@ defineProps<{
     </PreviewContent>
   </PreviewRow>
   <PreviewRow v-if="longTexts.decisionReasons">
-    <PreviewCategory>Entscheidungsgründe</PreviewCategory>
+    <PreviewCategory>{{ longTextLabels.decisionReasons }}</PreviewCategory>
     <PreviewContent>
       <TextEditor
         id="previewDecisionReasons"
-        aria-label="Entscheidungsgründe"
+        :aria-label="longTextLabels.decisionReasons"
         field-size="max"
         preview
         :value="longTexts.decisionReasons"
@@ -72,11 +72,11 @@ defineProps<{
     </PreviewContent>
   </PreviewRow>
   <PreviewRow v-if="longTexts.otherLongText">
-    <PreviewCategory>Sonstiger Langtext</PreviewCategory>
+    <PreviewCategory>{{ longTextLabels.otherLongText }}</PreviewCategory>
     <PreviewContent>
       <TextEditor
         id="previewOtherLongText"
-        aria-label="Sonstiger Langtext"
+        :aria-label="longTextLabels.otherLongText"
         field-size="max"
         preview
         :value="longTexts.otherLongText"
@@ -84,11 +84,11 @@ defineProps<{
     </PreviewContent>
   </PreviewRow>
   <PreviewRow v-if="longTexts.dissentingOpinion">
-    <PreviewCategory>Abweichende Meinung</PreviewCategory>
+    <PreviewCategory>{{ longTextLabels.dissentingOpinion }}</PreviewCategory>
     <PreviewContent>
       <TextEditor
         id="previewDissentingOpinion"
-        aria-label="Abweichende Meinung"
+        :aria-label="longTextLabels.dissentingOpinion"
         field-size="max"
         preview
         :value="longTexts.dissentingOpinion"
@@ -96,7 +96,7 @@ defineProps<{
     </PreviewContent>
   </PreviewRow>
   <PreviewRow v-if="longTexts.participatingJudges?.length">
-    <PreviewCategory>Mitwirkende Richter</PreviewCategory>
+    <PreviewCategory>{{ longTextLabels.participatingJudges }}</PreviewCategory>
     <PreviewContent>
       <div
         v-for="participatingJudge in longTexts.participatingJudges"
