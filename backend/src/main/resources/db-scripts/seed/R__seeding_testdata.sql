@@ -688,8 +688,8 @@ VALUES
   ),
   (
     gen_random_uuid (),
-    '2024-03-14 18:38:43.043877 +00:00',
-    'UNPUBLISHED',
+    '2024-03-13 18:38:43.043877 +00:00',
+    'PUBLISHED',
     false,
     (
       SELECT
@@ -699,7 +699,36 @@ VALUES
       WHERE
         document_number = 'YYTestDoc0015'
     )
-  );
+  ),
+  (
+    gen_random_uuid (),
+    '2024-03-14 18:38:43.043877 +00:00',
+    'UNPUBLISHED',
+    false,
+    (
+      SELECT
+          id
+      FROM
+          incremental_migration.documentation_unit
+      WHERE
+          document_number = 'YYTestDoc0015'
+    )
+  ),
+  (
+    gen_random_uuid (),
+    '2024-03-12 18:38:43.043877 +00:00',
+    'PUBLISHED',
+    false,
+    (
+      SELECT
+          id
+      FROM
+          incremental_migration.documentation_unit
+      WHERE
+          document_number = 'YYTestDoc0015'
+    )
+  )
+    ;
 
 UPDATE
   incremental_migration.documentation_unit
