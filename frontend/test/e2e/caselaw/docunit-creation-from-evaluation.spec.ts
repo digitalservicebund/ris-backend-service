@@ -127,7 +127,7 @@ test.describe(
     )
 
     test(
-      "Allow creation from periodical evaluation for own docunit",
+      "Allow creation from periodical evaluation for own docoffice",
       {
         tag: ["@RISDEV-4829"],
         annotation: {
@@ -298,7 +298,7 @@ test.describe(
     )
 
     test(
-      "Allow creation from periodical evaluation for foreign docunit",
+      "Allow creation from periodical evaluation for foreign docoffice",
       {
         tag: ["@RISDEV-4832"],
         annotation: {
@@ -433,7 +433,7 @@ test.describe(
           ).toBeVisible()
         })
 
-        // Todo: for both creating and foreign  office?
+        // Todo: for both creating and foreign  office? -> RISDEV-4982
         await test.step("The new documentation unit is visible in search with Fremdanlage status", async () => {
           await navigateToSearch(page)
 
