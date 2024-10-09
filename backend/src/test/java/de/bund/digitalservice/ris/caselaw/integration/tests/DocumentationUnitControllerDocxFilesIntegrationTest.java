@@ -35,6 +35,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigr
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentTypeRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -46,6 +47,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
@@ -56,6 +58,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -180,6 +183,12 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
             DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .status(
+                    List.of(
+                        StatusDTO.builder()
+                            .createdAt(Instant.now())
+                            .publicationStatus(PublicationStatus.PUBLISHED)
+                            .build()))
                 .build());
 
     risWebTestClient
@@ -209,6 +218,12 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
             DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .status(
+                    List.of(
+                        StatusDTO.builder()
+                            .createdAt(Instant.now())
+                            .publicationStatus(PublicationStatus.PUBLISHED)
+                            .build()))
                 .build());
 
     risWebTestClient
@@ -274,6 +289,12 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
             DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .status(
+                    List.of(
+                        StatusDTO.builder()
+                            .createdAt(Instant.now())
+                            .publicationStatus(PublicationStatus.PUBLISHED)
+                            .build()))
                 .build());
 
     risWebTestClient
@@ -313,6 +334,12 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
                 .documentNumber("1234567890123")
                 .ecli("oldEcli")
                 .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .status(
+                    List.of(
+                        StatusDTO.builder()
+                            .createdAt(Instant.now())
+                            .publicationStatus(PublicationStatus.PUBLISHED)
+                            .build()))
                 .build());
 
     risWebTestClient
@@ -354,6 +381,12 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
                 .judicialBody("1. Senat") // file has "2. Senat"
                 .court(null) // file has BFH
                 .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .status(
+                    List.of(
+                        StatusDTO.builder()
+                            .createdAt(Instant.now())
+                            .publicationStatus(PublicationStatus.PUBLISHED)
+                            .build()))
                 .build());
 
     databaseCourtRepository.save(
@@ -404,6 +437,12 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
             DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .status(
+                    List.of(
+                        StatusDTO.builder()
+                            .createdAt(Instant.now())
+                            .publicationStatus(PublicationStatus.PUBLISHED)
+                            .build()))
                 .build());
 
     attachmentRepository.save(
@@ -438,6 +477,12 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
             DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .status(
+                    List.of(
+                        StatusDTO.builder()
+                            .createdAt(Instant.now())
+                            .publicationStatus(PublicationStatus.PUBLISHED)
+                            .build()))
                 .build());
 
     risWebTestClient
@@ -476,6 +521,12 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
             DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .status(
+                    List.of(
+                        StatusDTO.builder()
+                            .createdAt(Instant.now())
+                            .publicationStatus(PublicationStatus.PUBLISHED)
+                            .build()))
                 .build());
 
     attachmentRepository.save(

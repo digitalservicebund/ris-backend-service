@@ -23,6 +23,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRep
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
@@ -38,8 +39,10 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
+import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
@@ -113,6 +116,7 @@ class DocumentationUnitControllerTest {
         .thenReturn(
             DocumentationUnit.builder()
                 .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
                 .build());
   }
 
@@ -123,6 +127,7 @@ class DocumentationUnitControllerTest {
         .thenReturn(
             DocumentationUnit.builder()
                 .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
                 .build());
 
     risWebClient
@@ -152,6 +157,7 @@ class DocumentationUnitControllerTest {
         .thenReturn(
             DocumentationUnit.builder()
                 .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
                 .build());
 
     risWebClient
@@ -192,6 +198,7 @@ class DocumentationUnitControllerTest {
         .thenReturn(
             DocumentationUnit.builder()
                 .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
                 .build());
 
     risWebClient
@@ -276,6 +283,12 @@ class DocumentationUnitControllerTest {
             .id(TEST_UUID)
             .documentNumber("ABCD202200001")
             .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("DS").build())
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
     DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
@@ -303,6 +316,12 @@ class DocumentationUnitControllerTest {
             .id(TEST_UUID)
             .documentNumber("ABCD202200001")
             .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("DS").build())
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
     DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
@@ -583,6 +602,7 @@ class DocumentationUnitControllerTest {
             DocumentationUnit.builder()
                 .attachments(Collections.singletonList(Attachment.builder().s3path("123").build()))
                 .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
                 .build());
     when(docxConverterService.getConvertedObject("123")).thenReturn(null);
 

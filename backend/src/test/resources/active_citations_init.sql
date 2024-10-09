@@ -55,6 +55,8 @@ values
     'dd315130-1fda-46d5-bccd-d587cf51c664'
   );
 
+
+
 insert into
   incremental_migration.documentation_unit (id, document_number, documentation_office_id)
 values
@@ -68,6 +70,22 @@ values
     'documentnr002',
     'ba90a851-3c54-4858-b4fa-7742ffbe8f05'
   );
+
+insert into
+    incremental_migration.status (id, documentation_unit_id, publication_status, with_error)
+values
+    (
+        '95988131-f355-414d-9da5-dcbcdbf4b98f',
+        '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
+        'PUBLISHED',
+     false
+    ),
+    (
+        '85988131-f355-414d-9da5-dcbcdbf4b98f',
+        'f13e7fe2-78a5-11ee-b962-0242ac120002',
+        'PUBLISHED',
+        false
+    );
 
 insert into
   incremental_migration.related_documentation (

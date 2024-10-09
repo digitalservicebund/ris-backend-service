@@ -155,7 +155,8 @@ public class DocumentationUnitService {
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
-  public String deleteByDocumentNumber(String documentNumber) throws DocumentationUnitNotExistsException {
+  public String deleteByDocumentNumber(String documentNumber)
+      throws DocumentationUnitNotExistsException {
 
     DocumentationUnit documentationUnit = repository.findByDocumentNumber(documentNumber);
 

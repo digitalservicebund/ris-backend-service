@@ -24,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -36,9 +37,11 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -131,6 +134,12 @@ class DeviatingObjectIntegrationTest {
                 List.of(
                     DeviatingFileNumberDTO.builder().rank(1L).value("dfn1").build(),
                     DeviatingFileNumberDTO.builder().rank(2L).value("dfn2").build()))
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build());
   }
 
@@ -329,6 +338,12 @@ class DeviatingObjectIntegrationTest {
                 List.of(
                     DeviatingEcliDTO.builder().rank(1L).value("decli1").build(),
                     DeviatingEcliDTO.builder().rank(2L).value("decli2").build()))
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
 
     repository.save(dto);
@@ -360,6 +375,12 @@ class DeviatingObjectIntegrationTest {
                 List.of(
                     DeviatingEcliDTO.builder().rank(1L).value("decli1").build(),
                     DeviatingEcliDTO.builder().rank(2L).value("decli2").build()))
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -404,6 +425,12 @@ class DeviatingObjectIntegrationTest {
                 List.of(
                     DeviatingEcliDTO.builder().rank(1L).value("decli1").build(),
                     DeviatingEcliDTO.builder().rank(2L).value("decli2").build()))
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -440,6 +467,12 @@ class DeviatingObjectIntegrationTest {
                 List.of(
                     DeviatingEcliDTO.builder().rank(1L).value("decli1").build(),
                     DeviatingEcliDTO.builder().rank(2L).value("decli2").build()))
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -483,6 +516,12 @@ class DeviatingObjectIntegrationTest {
                 List.of(
                     DeviatingEcliDTO.builder().rank(1L).value("decli1").build(),
                     DeviatingEcliDTO.builder().rank(2L).value("decli2").build()))
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -525,6 +564,12 @@ class DeviatingObjectIntegrationTest {
                 List.of(
                     DeviatingEcliDTO.builder().rank(1L).value("decli1").build(),
                     DeviatingEcliDTO.builder().rank(2L).value("decli2").build()))
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -569,6 +614,12 @@ class DeviatingObjectIntegrationTest {
                 List.of(
                     DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
                     DeviatingCourtDTO.builder().rank(2L).value("dc2").build()))
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
 
     repository.save(dto);
@@ -601,6 +652,12 @@ class DeviatingObjectIntegrationTest {
                 List.of(
                     DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
                     DeviatingCourtDTO.builder().rank(2L).value("dc2").build()))
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -645,6 +702,12 @@ class DeviatingObjectIntegrationTest {
                 List.of(
                     DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
                     DeviatingCourtDTO.builder().rank(2L).value("dc2").build()))
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -681,6 +744,12 @@ class DeviatingObjectIntegrationTest {
                 List.of(
                     DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
                     DeviatingCourtDTO.builder().rank(2L).value("dc2").build()))
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -725,6 +794,12 @@ class DeviatingObjectIntegrationTest {
                 List.of(
                     DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
                     DeviatingCourtDTO.builder().rank(2L).value("dc2").build()))
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -768,6 +843,12 @@ class DeviatingObjectIntegrationTest {
                 List.of(
                     DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
                     DeviatingCourtDTO.builder().rank(2L).value("dc2").build()))
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -813,6 +894,12 @@ class DeviatingObjectIntegrationTest {
                 List.of(
                     DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
                     DeviatingDateDTO.builder().rank(2L).value(LocalDate.of(2010, 9, 10)).build()))
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
 
     repository.save(dto);
@@ -846,6 +933,12 @@ class DeviatingObjectIntegrationTest {
                 List.of(
                     DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
                     DeviatingDateDTO.builder().rank(2L).value(LocalDate.of(2010, 9, 10)).build()))
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -899,6 +992,12 @@ class DeviatingObjectIntegrationTest {
                     DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
                     DeviatingDateDTO.builder().rank(2L).value(LocalDate.of(2010, 9, 10)).build(),
                     DeviatingDateDTO.builder().rank(3L).value(LocalDate.of(2010, 9, 10)).build()))
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -939,6 +1038,12 @@ class DeviatingObjectIntegrationTest {
                 List.of(
                     DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
                     DeviatingDateDTO.builder().rank(2L).value(LocalDate.of(2010, 9, 10)).build()))
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -983,6 +1088,12 @@ class DeviatingObjectIntegrationTest {
                 List.of(
                     DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
                     DeviatingDateDTO.builder().rank(2L).value(LocalDate.of(2010, 9, 10)).build()))
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -1026,6 +1137,12 @@ class DeviatingObjectIntegrationTest {
                 List.of(
                     DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
                     DeviatingDateDTO.builder().rank(2L).value(LocalDate.of(2010, 9, 10)).build()))
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);

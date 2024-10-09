@@ -15,3 +15,5 @@ delete from
 
 delete from
   incremental_migration.document_category;
+
+delete from incremental_migration.status;

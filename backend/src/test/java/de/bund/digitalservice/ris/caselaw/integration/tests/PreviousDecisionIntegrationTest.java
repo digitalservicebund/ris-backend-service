@@ -182,6 +182,12 @@ class PreviousDecisionIntegrationTest {
                         .deviatingFileNumber("deviatest")
                         .rank(1)
                         .build()))
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
     repository.save(parentDocumentationUnitDTO);
 
@@ -211,6 +217,12 @@ class PreviousDecisionIntegrationTest {
         DocumentationUnitDTO.builder()
             .documentationOffice(documentationOfficeDTO)
             .documentNumber("documntnumber")
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
     repository.save(parentDocumentationUnitDTO);
 
@@ -245,6 +257,12 @@ class PreviousDecisionIntegrationTest {
         DocumentationUnitDTO.builder()
             .documentationOffice(documentationOfficeDTO)
             .documentNumber("1234567890123")
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
     parentDocumentationUnitDTO = repository.save(parentDocumentationUnitDTO);
 
@@ -253,6 +271,12 @@ class PreviousDecisionIntegrationTest {
             .documentNumber("abcdefghjikl")
             .decisionDate(LocalDate.parse("2021-01-01"))
             .documentationOffice(documentationOfficeDTO)
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
     childDocumentationUnitDTO = repository.save(childDocumentationUnitDTO);
 
@@ -299,6 +323,12 @@ class PreviousDecisionIntegrationTest {
             .documentNumber("1234567890123")
             .previousDecisions(
                 List.of(PreviousDecisionDTO.builder().fileNumber("test").rank(1).build()))
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
     parentDocumentationUnitDTO = repository.save(parentDocumentationUnitDTO);
 
@@ -331,6 +361,12 @@ class PreviousDecisionIntegrationTest {
         DocumentationUnitDTO.builder()
             .documentNumber("xxx")
             .documentationOffice(documentationOfficeDTO)
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
     childDocumentationUnitDTO = repository.save(childDocumentationUnitDTO);
     final UUID childDocumentationUnitUuid = childDocumentationUnitDTO.getId();
@@ -339,6 +375,12 @@ class PreviousDecisionIntegrationTest {
         DocumentationUnitDTO.builder()
             .documentationOffice(documentationOfficeDTO)
             .documentNumber("1234567890123")
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
     parentDocumentationUnitDTO = repository.save(parentDocumentationUnitDTO);
 
@@ -509,6 +551,16 @@ class PreviousDecisionIntegrationTest {
             date,
             List.of("AkteZ"),
             "EF",
+            "DS",
+            Status.builder()
+                .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+                .build());
+
+    var du6 =
+        createDocumentationUnit(
+            date,
+            List.of("AkteZ"),
+            "EF",
             "CC-RIS",
             Status.builder()
                 .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
@@ -533,7 +585,7 @@ class PreviousDecisionIntegrationTest {
             .returnResult()
             .getResponseBody()
             .getContent();
-    assertThat(content).hasSize(3);
+    assertThat(content).hasSize(4);
     assertThat(content)
         .extracting(RelatedDocumentationUnit::getUuid)
         .doesNotContain(du4.getId())
@@ -623,34 +675,27 @@ class PreviousDecisionIntegrationTest {
             .decisionDate(decisionDate)
             .documentType(documentTypeDTO)
             .documentationOffice(documentOffice)
-            .build();
-    documentationUnitDTO = repository.save(documentationUnitDTO);
-
-    UUID docUnitId = documentationUnitDTO.getId();
-
-    documentationUnitDTO = repository.findById(docUnitId).get();
-
-    documentationUnitDTO =
-        documentationUnitDTO.toBuilder()
             .status(
                 status == null
-                    ? null
+                    ? List.of(
+                        StatusDTO.builder()
+                            .createdAt(Instant.now())
+                            .publicationStatus(PublicationStatus.PUBLISHED)
+                            .build())
                     : List.of(
                         StatusDTO.builder()
                             .id(UUID.randomUUID())
                             .publicationStatus(status.publicationStatus())
                             .withError(status.withError())
-                            .documentationUnitDTO(documentationUnitDTO)
                             .createdAt(Instant.now())
                             .build()))
+            .fileNumbers(
+                fileNumbers == null
+                    ? null
+                    : fileNumbers.stream()
+                        .map(fn -> FileNumberDTO.builder().value(fn).rank(1L).build())
+                        .toList())
             .build();
-
-    if (fileNumbers != null) {
-      documentationUnitDTO.setFileNumbers(
-          fileNumbers.stream()
-              .map(fn -> FileNumberDTO.builder().value(fn).rank(1L).build())
-              .toList());
-    }
 
     documentationUnitDTO = repository.save(documentationUnitDTO);
 

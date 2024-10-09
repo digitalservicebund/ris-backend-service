@@ -15,7 +15,7 @@ public interface DatabaseDocumentationUnitRepository
   Optional<DocumentationUnitDTO> findByDocumentNumber(String documentNumber);
 
   String SELECT_STATUS_WHERE_LATEST =
-      "SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.createdAt = (SELECT MAX(s.createdAt) FROM StatusDTO s WHERE s.documentationUnitDTO.id = documentationUnit.id)";
+      "SELECT 1 FROM documentationUnit.status status WHERE status.createdAt = (SELECT MAX(s.createdAt) FROM documentationUnit.status s)";
 
   String BASE_QUERY =
       """

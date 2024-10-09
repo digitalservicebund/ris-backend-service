@@ -22,7 +22,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseHandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalEditionRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseXmlHandoverMailRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
@@ -38,6 +37,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverR
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalEditionRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.HandoverMailTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -57,6 +57,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalRepository;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -140,7 +141,6 @@ class HandoverMailIntegrationTest {
   @Autowired private DatabaseLegalPeriodicalEditionRepository editionRepository;
   @Autowired private LegalPeriodicalRepository legalPeriodicalRepository;
   @Autowired private DatabaseXmlHandoverMailRepository xmlHandoverRepository;
-  @Autowired private DatabaseStatusRepository statusRepository;
   @Autowired private DatabaseHandoverReportRepository databaseHandoverReportRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private LegalPeriodicalEditionRepository legalPeriodicalEditionRepository;
@@ -170,7 +170,6 @@ class HandoverMailIntegrationTest {
   void cleanUp() {
     xmlHandoverRepository.deleteAll();
     repository.deleteAll();
-    statusRepository.deleteAll();
     databaseHandoverReportRepository.deleteAll();
     editionRepository.deleteAll();
   }
@@ -189,6 +188,12 @@ class HandoverMailIntegrationTest {
             .documentationOffice(docOffice)
             .documentNumber(identifier)
             .decisionDate(LocalDate.now())
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
             .build();
     DocumentationUnitDTO savedDocumentationUnitDTO = repository.save(documentationUnitDTO);
     UUID entityId = savedDocumentationUnitDTO.getId();
@@ -304,6 +309,12 @@ class HandoverMailIntegrationTest {
           DocumentationUnitDTO.builder()
               .documentationOffice(docOffice)
               .documentNumber("docnr12345678")
+              .status(
+                  List.of(
+                      StatusDTO.builder()
+                          .createdAt(Instant.now())
+                          .publicationStatus(PublicationStatus.PUBLISHED)
+                          .build()))
               .build();
       DocumentationUnitDTO savedDocumentationUnitDTO = repository.save(documentationUnitDTO);
       assertThat(repository.findAll()).hasSize(1);
@@ -368,6 +379,12 @@ class HandoverMailIntegrationTest {
                   DocumentationUnitDTO.builder()
                       .documentationOffice(docOffice)
                       .documentNumber("docnr12345678")
+                      .status(
+                          List.of(
+                              StatusDTO.builder()
+                                  .createdAt(Instant.now())
+                                  .publicationStatus(PublicationStatus.PUBLISHED)
+                                  .build()))
                       .build())
               .getId();
     } else if (entityType == HandoverEntityType.EDITION) {
@@ -437,6 +454,12 @@ class HandoverMailIntegrationTest {
           DocumentationUnitDTO.builder()
               .documentationOffice(docOffice)
               .documentNumber("docnr12345678")
+              .status(
+                  List.of(
+                      StatusDTO.builder()
+                          .createdAt(Instant.now())
+                          .publicationStatus(PublicationStatus.PUBLISHED)
+                          .build()))
               .build();
       DocumentationUnitDTO savedDocumentationUnitDTO = repository.save(documentationUnitDTO);
       entityId = savedDocumentationUnitDTO.getId();

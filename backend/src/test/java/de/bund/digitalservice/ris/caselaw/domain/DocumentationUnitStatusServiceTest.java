@@ -1,18 +1,18 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.Assert;
@@ -34,8 +34,6 @@ class DocumentationUnitStatusServiceTest {
 
   @SpyBean private DatabaseDocumentationUnitStatusService statusService;
 
-  @MockBean private DatabaseStatusRepository repository;
-
   @MockBean private DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
 
   @Test
@@ -50,9 +48,6 @@ class DocumentationUnitStatusServiceTest {
         () -> statusService.update(DOCUMENT_NUMBER, status));
 
     verify(databaseDocumentationUnitRepository, times(1)).findByDocumentNumber(DOCUMENT_NUMBER);
-    verify(repository, never())
-        .findFirstByDocumentationUnitDTOOrderByCreatedAtDesc(any(DocumentationUnitDTO.class));
-    verify(repository, never()).save(any(StatusDTO.class));
   }
 
   @Test
@@ -61,50 +56,66 @@ class DocumentationUnitStatusServiceTest {
           throws DocumentationUnitNotExistsException {
 
     Status status =
-        Status.builder().publicationStatus(PublicationStatus.PUBLISHED).withError(true).build();
-    DocumentationUnit.builder().uuid(TEST_UUID).build();
-    DocumentationUnitDTO documentationUnitDTO =
-        DocumentationUnitDTO.builder().id(TEST_UUID).documentNumber(DOCUMENT_NUMBER).build();
-
-    StatusDTO updatedStatus =
-        StatusDTO.builder()
-            .documentationUnitDTO(documentationUnitDTO)
+        Status.builder()
+            .createdAt(Instant.now())
             .publicationStatus(PublicationStatus.PUBLISHED)
             .withError(true)
             .build();
-    ArgumentCaptor<StatusDTO> captor = ArgumentCaptor.forClass(StatusDTO.class);
+    DocumentationUnit.builder().uuid(TEST_UUID).build();
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitDTO.builder()
+            .id(TEST_UUID)
+            .documentNumber(DOCUMENT_NUMBER)
+            .status(
+                new ArrayList<>(
+                    List.of(
+                        StatusDTO.builder()
+                            .publicationStatus(PublicationStatus.PUBLISHED)
+                            .withError(true)
+                            .createdAt(Instant.now())
+                            .build())))
+            .build();
+    ArgumentCaptor<DocumentationUnitDTO> captor =
+        ArgumentCaptor.forClass(DocumentationUnitDTO.class);
 
     when(databaseDocumentationUnitRepository.findByDocumentNumber(DOCUMENT_NUMBER))
         .thenReturn(Optional.of(documentationUnitDTO));
-    when(repository.save(any(StatusDTO.class))).thenReturn(updatedStatus);
 
     statusService.update(DOCUMENT_NUMBER, status);
 
-    verify(repository, times(1)).save(captor.capture());
-    assertThat(captor.getValue())
+    verify(databaseDocumentationUnitRepository, times(1)).save(captor.capture());
+    assertThat(captor.getValue().getStatus())
         .usingRecursiveComparison()
         .ignoringFields("createdAt")
-        .isEqualTo(updatedStatus);
+        .isEqualTo(
+            List.of(
+                StatusDTO.builder()
+                    .publicationStatus(PublicationStatus.PUBLISHED)
+                    .withError(true)
+                    .build()));
   }
 
   @Test
   void getLatestStatus() {
     DocumentationUnitDTO documentationUnitDTO =
-        DocumentationUnitDTO.builder().id(TEST_UUID).documentNumber(DOCUMENT_NUMBER).build();
-    StatusDTO statusDTO =
-        StatusDTO.builder().publicationStatus(PublicationStatus.PUBLISHED).build();
-    when(repository.findFirstByDocumentationUnitDTOOrderByCreatedAtDesc(documentationUnitDTO))
-        .thenReturn(statusDTO);
-    when(repository.findFirstByDocumentationUnitDTOOrderByCreatedAtDesc(documentationUnitDTO))
-        .thenReturn(statusDTO);
+        DocumentationUnitDTO.builder()
+            .id(TEST_UUID)
+            .documentNumber(DOCUMENT_NUMBER)
+            .status(
+                new ArrayList<>(
+                    List.of(
+                        StatusDTO.builder()
+                            .createdAt(Instant.now())
+                            .publicationStatus(PublicationStatus.PUBLISHED)
+                            .build())))
+            .build();
+
     when(databaseDocumentationUnitRepository.findByDocumentNumber(DOCUMENT_NUMBER))
         .thenReturn(Optional.of(documentationUnitDTO));
 
     var latestStatus = statusService.getLatestStatus(DOCUMENT_NUMBER);
     Assertions.assertEquals(PublicationStatus.PUBLISHED, latestStatus);
 
-    verify(repository, times(1))
-        .findFirstByDocumentationUnitDTOOrderByCreatedAtDesc(documentationUnitDTO);
     verify(databaseDocumentationUnitRepository, times(1)).findByDocumentNumber(DOCUMENT_NUMBER);
   }
 }
