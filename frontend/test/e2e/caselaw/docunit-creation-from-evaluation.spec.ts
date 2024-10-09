@@ -225,13 +225,7 @@ test.describe(
           // ).toHaveValue("Ja")
 
           await newTab.keyboard.down("v")
-          const referenceSummary =
-            edition.legalPeriodical?.abbreviation +
-            " " +
-            edition.prefix +
-            "12" +
-            edition.suffix +
-            " (L)"
+          const referenceSummary = `${edition.legalPeriodical?.abbreviation} ${edition.prefix}12${edition.suffix} (L)`
           await expect(newTab.getByText("Sekundäre Fundstellen")).toBeVisible()
           await expect(
             newTab.getByText(referenceSummary, { exact: true }),
@@ -253,22 +247,13 @@ test.describe(
 
           await expect(
             pageWithBghUser.getByText(
-              "AG Aachen, " +
-                formattedDate +
-                ", " +
-                randomFileNumber +
-                ", Anerkenntnisurteil, Unveröffentlicht",
+              `AG Aachen, ${formattedDate}, ${randomFileNumber}, Anerkenntnisurteil, Unveröffentlicht`,
             ),
           ).toBeVisible()
 
           await expect(
             pageWithBghUser.getByText(
-              edition.legalPeriodical?.abbreviation +
-                " " +
-                edition.prefix +
-                "12" +
-                edition.suffix +
-                " (L)",
+              `${edition.legalPeriodical?.abbreviation} ${edition.prefix}12${edition.suffix} (L)`,
               { exact: true },
             ),
           ).toBeVisible()
@@ -383,12 +368,7 @@ test.describe(
           await expect(newTab.getByText("Sekundäre Fundstellen")).toBeVisible()
           await expect(
             newTab.getByText(
-              edition.legalPeriodical?.abbreviation +
-                " " +
-                edition.prefix +
-                "12" +
-                edition.suffix +
-                " (L)",
+              `${edition.legalPeriodical?.abbreviation} ${edition.prefix}12${edition.suffix} (L)`,
               { exact: true },
             ),
           ).toBeVisible()
@@ -409,22 +389,13 @@ test.describe(
 
           await expect(
             page.getByText(
-              "AG Aachen, " +
-                formattedDate +
-                ", " +
-                randomFileNumber +
-                ", Anerkenntnisurteil, Fremdanlage",
+              `AG Aachen, ${formattedDate}, ${randomFileNumber}, Anerkenntnisurteil, Fremdanlage`,
             ),
           ).toBeVisible()
 
           await expect(
             page.getByText(
-              edition.legalPeriodical?.abbreviation +
-                " " +
-                edition.prefix +
-                "12" +
-                edition.suffix +
-                " (L)",
+              `${edition.legalPeriodical?.abbreviation} ${edition.prefix}12${edition.suffix} (L)`,
               { exact: true },
             ),
           ).toBeVisible()
