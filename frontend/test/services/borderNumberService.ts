@@ -251,4 +251,93 @@ describe("borderNumberService", () => {
       }
     })
   })
+
+  describe("validateBorderNumberLinks", () => {
+    it("should return valid for empty texts", () => {
+      mockDocUnitStore({})
+      const validationResult = borderNumberService.validateBorderNumberLinks()
+      expect(validationResult.isValid).toBe(true)
+    })
+
+    it("should return valid for texts without border numbers", () => {
+      mockDocUnitStore({
+        longTexts: {
+          reasons: `<p>Text</p><p><span>Nested</span></p>`,
+          tenor: `No Structure`,
+          participatingJudges: [new ParticipatingJudge({ name: "judge" })],
+          dissentingOpinion: "Some text",
+        },
+      })
+      const validationResult = borderNumberService.validateBorderNumberLinks()
+      expect(validationResult.isValid).toBe(true)
+    })
+
+    it("should return valid for texts with valid border numbers", () => {
+      mockDocUnitStore({
+        longTexts: {
+          reasons: `${borderNumber(1)}<p>${borderNumber(" 2 " as unknown as number)}</p>`,
+          decisionReasons: "Text ohne Randnummern",
+          otherLongText: `<ul><li>${borderNumber(3)}</li>${borderNumber(4)}</ul>`,
+          tenor: "Rubrik ohne Randnummern",
+          dissentingOpinion: `${borderNumber(1)}<p>${borderNumber(2)}</p>`,
+        },
+        shortTexts: {
+          headline: `${borderNumberLink(1)}${borderNumberLink(2)}`,
+          decisionName: `${borderNumberLink(3)}${borderNumberLink(4)}`,
+        },
+      })
+      const validationResult = borderNumberService.validateBorderNumberLinks()
+      expect(validationResult.isValid).toBe(true)
+    })
+
+    it("should allow for the same border number to be linked multiple times", () => {
+      mockDocUnitStore({
+        longTexts: {
+          reasons: `${borderNumber(1)}<p>${borderNumber(2)}</p>`,
+          dissentingOpinion: `${borderNumber(3)}`,
+        },
+        shortTexts: {
+          headline: `${borderNumberLink(1)}${borderNumberLink(2)}`,
+          decisionName: `${borderNumberLink(2)}${borderNumberLink(2)}`,
+        },
+      })
+      const validationResult = borderNumberService.validateBorderNumberLinks()
+      expect(validationResult.isValid).toBe(true)
+    })
+
+    it("should return invalid for non-existent border number", () => {
+      mockDocUnitStore({
+        shortTexts: {
+          headline: `${borderNumberLink(1)}`,
+        },
+      })
+      const validationResult = borderNumberService.validateBorderNumberLinks()
+      expect(validationResult.isValid).toBe(false)
+      if (!validationResult.isValid) {
+        expect(validationResult.invalidCategories).toEqual(["headline"])
+      }
+    })
+
+    it("should return invalid for multiple non-existent border number", () => {
+      mockDocUnitStore({
+        longTexts: {
+          reasons: `${borderNumberLink(1)}${borderNumber(3)}`,
+          otherLongText: `${borderNumberLink(1)}${borderNumberLink(2)}`,
+        },
+        shortTexts: {
+          headnote: `${borderNumberLink(1)}`,
+          headline: `${borderNumberLink(3)}`,
+        },
+      })
+      const validationResult = borderNumberService.validateBorderNumberLinks()
+      expect(validationResult.isValid).toBe(false)
+      if (!validationResult.isValid) {
+        expect(validationResult.invalidCategories).toEqual([
+          "reasons",
+          "otherLongText",
+          "headnote",
+        ])
+      }
+    })
+  })
 })

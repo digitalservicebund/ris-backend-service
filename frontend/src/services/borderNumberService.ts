@@ -134,6 +134,47 @@ function updateBorderNumberLinks(
   }
 }
 
+/**
+ * Returns all categories with invalid border number links.
+ */
+function getCategoriesWithInvalidLinks(
+  documentUnit: DocumentUnit,
+): (ShortTextKeys | LongTextKeys)[] {
+  const texts = [
+    ...Object.entries(documentUnit.longTexts).filter(
+      ([key, value]) => key !== "participatingJudges" && value,
+    ),
+    ...Object.entries(documentUnit.shortTexts).filter(([, value]) => value),
+  ] as [ShortTextKeys | LongTextKeys, string][] // cast needed because of participatingJudges
+
+  const borderNumbers = texts
+    .map(([, text]) => new DOMParser().parseFromString(text, "text/html"))
+    .flatMap((textXml) =>
+      [...textXml.getElementsByTagName("border-number")]
+        .map((borderNumber) =>
+          borderNumber.getElementsByTagName("number").item(0),
+        )
+        .filter((content) => !!content)
+        .map((borderNumberContent) => borderNumberContent.innerHTML.trim()),
+    )
+
+  const invalidCategories: (ShortTextKeys | LongTextKeys)[] = []
+  for (const [categoryName, text] of texts) {
+    const textXml = new DOMParser().parseFromString(text, "text/html")
+    const areLinksValid = [
+      ...textXml.getElementsByTagName("border-number-link"),
+    ]
+      .map((link) => link.getAttribute("nr"))
+      .filter((link): link is string => !!link)
+      .every((link) => borderNumbers.some((number) => number === link))
+
+    if (!areLinksValid) {
+      invalidCategories.push(categoryName)
+    }
+  }
+  return invalidCategories
+}
+
 const borderNumberService = {
   /**
    * Updates the border numbers of all long texts with border numbers see {@linkcode orderedCategoriesWithBorderNumbers}
@@ -216,6 +257,24 @@ const borderNumberService = {
 
     return { isValid: true }
   },
+
+  /**
+   * Validates that all border number links point to an existing border number.
+   * Returns all categories in which invalid links are found.
+   */
+  validateBorderNumberLinks: (): BorderNumberLinkValidationResult => {
+    const { documentUnit } = storeToRefs(useDocumentUnitStore())
+
+    const invalidCategories = getCategoriesWithInvalidLinks(
+      documentUnit.value as DocumentUnit,
+    )
+
+    if (invalidCategories.length > 0) {
+      return { isValid: false, invalidCategories }
+    } else {
+      return { isValid: true }
+    }
+  },
 }
 
 export type BorderNumberValidationResult =
@@ -228,5 +287,12 @@ export type BorderNumberValidationResult =
       firstInvalidBorderNumber: string
       /** This is the expected text/position of the border number */
       expectedBorderNumber: number
+    }
+export type BorderNumberLinkValidationResult =
+  | { isValid: true }
+  | {
+      isValid: false
+      /** The categories in which an invalid border number link was found */
+      invalidCategories: (LongTextKeys | ShortTextKeys)[]
     }
 export default borderNumberService

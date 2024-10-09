@@ -10,7 +10,7 @@ import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import ActiveCitation, { activeCitationLabels } from "@/domain/activeCitation"
-import { longTextLabels } from "@/domain/documentUnit"
+import { longTextLabels, shortTextLabels } from "@/domain/documentUnit"
 import EnsuingDecision, {
   ensuingDecisionFieldLabels,
 } from "@/domain/ensuingDecision"
@@ -67,11 +67,12 @@ onMounted(async () => {
     (await FeatureToggleService.isEnabled("neuris.border-number-editor"))
       .data ?? false
 
-  if (fieldsMissing.value || isOutlineInvalid.value) return
   await fetchPreview()
 })
 
 async function fetchPreview() {
+  if (fieldsMissing.value || isOutlineInvalid.value) return
+
   const previewResponse = await handoverDocumentationUnitService.getPreview(
     store.documentUnit!.uuid,
   )
@@ -95,7 +96,7 @@ function handoverDocumentUnit() {
     }
   } else if (
     borderNumberValidationFeatureToggle.value &&
-    !borderNumberValidationResult.value.isValid
+    !areBorderNumbersAndLinksValid.value
   ) {
     // If there are invalid border numbers, you need to confirm a modal before handing over
     showHandoverModal.value = true
@@ -200,6 +201,14 @@ function confirmHandoverDialog() {
 const borderNumberValidationResult = ref(
   borderNumberService.validateBorderNumbers(),
 )
+const borderNumberLinkValidationResult = ref(
+  borderNumberService.validateBorderNumberLinks(),
+)
+const areBorderNumbersAndLinksValid = computed<boolean>(
+  () =>
+    borderNumberValidationResult.value.isValid &&
+    borderNumberLinkValidationResult.value.isValid,
+)
 
 // We want to display the action with a fake delay (recalculation only takes a couple of ms)
 const showRecalculatingBorderNumbersFakeDelay = ref(false)
@@ -210,6 +219,9 @@ async function recalculateBorderNumbers() {
 
   borderNumberValidationResult.value =
     borderNumberService.validateBorderNumbers()
+  borderNumberLinkValidationResult.value =
+    borderNumberService.validateBorderNumberLinks()
+
   setTimeout(
     () => (showRecalculatingBorderNumbersFakeDelay.value = false),
     3_000,
@@ -413,7 +425,7 @@ const isOutlineInvalid = computed<boolean>(
       >
         <h2 class="ds-label-01-bold mb-16">Randnummernprüfung</h2>
 
-        <div v-if="!borderNumberValidationResult.isValid">
+        <div v-if="!areBorderNumbersAndLinksValid">
           <div class="flex flex-row gap-8">
             <IconErrorOutline class="text-red-800" />
 
@@ -451,9 +463,27 @@ const isOutlineInvalid = computed<boolean>(
                   </div>
                 </dl>
               </div>
+              <div v-if="!borderNumberLinkValidationResult.isValid">
+                Es gibt ungültige Randnummern-Verweise in folgenden Rubriken:
+                <ul class="list-disc">
+                  <li
+                    v-for="key in borderNumberLinkValidationResult.invalidCategories"
+                    :key="key"
+                  >
+                    {{
+                      shortTextLabels[key as keyof typeof shortTextLabels] ??
+                      longTextLabels[key as keyof typeof longTextLabels]
+                    }}
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
           <TextButton
+            v-if="
+              !borderNumberValidationResult.isValid &&
+              !showRecalculatingBorderNumbersFakeDelay
+            "
             aria-label="Randnummern neu berechnen"
             button-type="tertiary"
             class="w-fit"
@@ -462,15 +492,19 @@ const isOutlineInvalid = computed<boolean>(
             @click="recalculateBorderNumbers"
           />
         </div>
-        <div v-else class="flex flex-row gap-8">
-          <template v-if="showRecalculatingBorderNumbersFakeDelay">
-            <LoadingSpinner size="small" />
-            <p>Die Randnummern werden neu berechnet</p>
-          </template>
-          <template v-else>
-            <IconCheck class="text-green-700" />
-            <p>Die Reihenfolge der Randnummern ist korrekt</p>
-          </template>
+        <div
+          v-else-if="!showRecalculatingBorderNumbersFakeDelay"
+          class="flex flex-row gap-8"
+        >
+          <IconCheck class="text-green-700" />
+          <p>Die Reihenfolge der Randnummern ist korrekt</p>
+        </div>
+        <div
+          v-if="showRecalculatingBorderNumbersFakeDelay"
+          class="flex flex-row gap-8"
+        >
+          <LoadingSpinner size="small" />
+          <p>Die Randnummern werden neu berechnet</p>
         </div>
       </div>
       <div class="border-b-1 border-b-gray-400"></div>
