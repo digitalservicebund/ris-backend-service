@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from "vue"
-import { ValidationError } from "../input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import CreateNewFromSearch from "@/components/CreateNewFromSearch.vue"
 import { DisplayMode } from "@/components/enumDisplayMode"
@@ -8,8 +7,9 @@ import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
+import { ValidationError } from "@/components/input/types"
 import Pagination, { Page } from "@/components/Pagination.vue"
-import EditionReferenceSummary from "@/components/periodical-evaluation/EditionReferenceSummary.vue"
+import PeriodicalEditionReferenceSummary from "@/components/periodical-evaluation/references/PeriodicalEditionReferenceSummary.vue"
 import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
@@ -243,7 +243,7 @@ onMounted(async () => {
 
 <template>
   <div class="flex flex-col gap-24">
-    <EditionReferenceSummary
+    <PeriodicalEditionReferenceSummary
       :data="reference"
       data-testid="edition-reference-summary-edit-mode"
       hide-citation

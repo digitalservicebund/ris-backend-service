@@ -23,7 +23,6 @@ export const useEditionStore = defineStore("editionStore", () => {
         ...response.data,
       })
     }
-
     return response
   }
 

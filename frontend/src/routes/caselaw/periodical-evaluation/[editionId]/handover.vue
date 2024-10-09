@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import EditionHandover from "@/components/EditionHandover.vue"
+import EditionHandover from "@/components/periodical-evaluation/handover/PeriodicalEditionHandover.vue"
 </script>
 
 <template>

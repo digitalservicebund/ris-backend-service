@@ -193,8 +193,11 @@
   "LEGAL_PERIODICAL_EDITION_COULD_NOT_BE_SAVED": {
     "title": "Ausgabe konnte nicht gespeichert werden."
   },
-  "LEGAL_PERIODICAL_EDITIONS_COULD_NOT_BE_LOADED": {
+  "LEGAL_PERIODICAL_EDITION_COULD_NOT_BE_LOADED": {
     "title": "Ausgabe konnte nicht geladen werden."
+  },
+  "LEGAL_PERIODICAL_EDITIONS_COULD_NOT_BE_LOADED": {
+    "title": "Ausgaben konnten nicht geladen werden."
   },
   "LEGAL_PERIODICAL_EDITION_COULD_NOT_BE_DELETED": {
     "title": "Ausgabe konnte nicht gelöscht werden."
@@ -209,7 +212,7 @@
     "title": "Leider ist ein Fehler aufgetreten.",
     "description": "Die Ausgabe kann nicht übergeben werden."
   },
-  "EDITION_LOADING_HANDOVER_FAILED": {
+  "EDITION_LOADING_EVENT_LOG_FAILED": {
     "title": "Fehler beim Laden der Ereignisse",
     "description": "Die Ereignisse konnten nicht geladen werden."
   },

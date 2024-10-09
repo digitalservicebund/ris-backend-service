@@ -4,7 +4,7 @@ import { useRoute } from "vue-router"
 import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
 import NavbarSide from "@/components/NavbarSide.vue"
 import ErrorPage from "@/components/PageError.vue"
-import PeriodicalEditionInfoPanel from "@/components/periodical-evaluation/PeriodicalInfoPanel.vue"
+import PeriodicalEditionInfoPanel from "@/components/periodical-evaluation/PeriodicalEditionInfoPanel.vue"
 import { usePeriodicalEvaluationMenuItems } from "@/composables/usePeriodicalEvaluationMenuItems"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -30,13 +30,6 @@ const menuItems = usePeriodicalEvaluationMenuItems(
   store.edition?.id,
   route.query,
 )
-
-onMounted(async () => {
-  const response = await store.loadEdition()
-  if (response.error) {
-    responseError.value = response.error
-  }
-})
 
 const handleKeyDown = (event: KeyboardEvent) => {
   // List of tag names where shortcuts should be disabled
@@ -68,21 +61,30 @@ onBeforeUnmount(() => {
 
 onMounted(async () => {
   window.addEventListener("keydown", handleKeyDown)
+
+  const response = await store.loadEdition()
+  if (response.error) {
+    responseError.value = response.error
+  }
 })
 </script>
 
 <template>
   <div class="flex w-screen grow">
     <div
-      v-if="store.edition"
       class="sticky top-0 z-50 flex flex-col border-r-1 border-solid border-gray-400 bg-white"
     >
       <NavbarSide :is-child="false" :menu-items="menuItems" :route="route" />
     </div>
 
-    <div v-if="store.edition" class="flex w-full flex-col bg-gray-100">
+    <div class="flex w-full flex-col bg-gray-100">
       <PeriodicalEditionInfoPanel :subtitle="infoSubtitle" />
-      <div class="flex grow flex-row items-start">
+      <ErrorPage
+        v-if="responseError"
+        :error="responseError"
+        :title="responseError?.title"
+      />
+      <div v-else class="flex grow flex-row items-start">
         <router-view class="flex-1" />
         <ExtraContentSidePanel
           v-if="
@@ -92,11 +94,5 @@ onMounted(async () => {
         />
       </div>
     </div>
-
-    <ErrorPage
-      v-if="responseError"
-      :error="responseError"
-      :title="responseError?.title"
-    />
   </div>
 </template>

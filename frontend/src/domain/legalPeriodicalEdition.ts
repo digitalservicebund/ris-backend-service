@@ -11,7 +11,7 @@ export default class LegalPeriodicalEdition {
 
   static readonly requiredFields = ["name", "legalPeriodical"] as const
 
-  id?: string
+  id: string
   name?: string
   prefix?: string
   suffix?: string
@@ -20,14 +20,13 @@ export default class LegalPeriodicalEdition {
   createdAt?: Date
 
   constructor(data: Partial<LegalPeriodicalEdition> = {}) {
+    this.id = data.id ?? crypto.randomUUID()
     Object.assign(this, data)
 
     this.legalPeriodical = new LegalPeriodical({ ...this.legalPeriodical })
     this.references = this.references
       ? this.references.map((reference) => new Reference({ ...reference }))
       : []
-
-    this.id = this.id ?? crypto.randomUUID()
   }
 
   /**

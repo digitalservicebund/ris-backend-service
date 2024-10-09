@@ -7,10 +7,10 @@ import CellHeaderItem from "@/components/CellHeaderItem.vue"
 import CellItem from "@/components/CellItem.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
+import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
-import SearchResultStatus from "@/components/SearchResultStatus.vue"
 import TableHeader from "@/components/TableHeader.vue"
 import TableRow from "@/components/TableRow.vue"
 import TableView from "@/components/TableView.vue"
@@ -18,6 +18,7 @@ import { useInternalUser } from "@/composables/useInternalUser"
 import useQuery from "@/composables/useQueryFromRoute"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
+import errorMessages from "@/i18n/errors.json"
 import ComboboxItemService from "@/services/comboboxItemService"
 import { ResponseError } from "@/services/httpClient"
 import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
@@ -25,15 +26,20 @@ import { useEditionStore } from "@/stores/editionStore"
 import IconDelete from "~icons/ic/baseline-close"
 import IconEdit from "~icons/ic/outline-edit"
 
-const emptyResponse: ResponseError = {
-  title: "Wählen Sie ein Periodikum um die Ausgaben anzuzeigen.",
-}
+const emptyStatus = computed(() => {
+  if (!currentEditions.value) {
+    return "Wählen Sie ein Periodikum um die Ausgaben anzuzeigen."
+  } else if (currentEditions.value.length === 0) {
+    return errorMessages.SEARCH_RESULTS_NOT_FOUND.title
+  } else return undefined
+})
 
 const router = useRouter()
 const selectedLegalPeriodical = ref<LegalPeriodical>()
 const currentEditions = ref<LegalPeriodicalEdition[]>()
 const { pushQueryToRoute, route, resetQuery } = useQuery<"q">()
-const searchResponseError = ref<ResponseError | undefined>(emptyResponse)
+const searchResponseError = ref<ResponseError | undefined>()
+const saveResponseError = ref<ResponseError | undefined>()
 const isLoading = ref(false)
 const editionStore = useEditionStore()
 const isInternalUser = useInternalUser()
@@ -48,22 +54,27 @@ async function getEditions(legalPeriodicalId: string) {
     await LegalPeriodicalEditionService.getAllByLegalPeriodicalId(
       legalPeriodicalId,
     )
-  if (response.data) {
-    currentEditions.value = response.data
-  }
   if (response.error) {
     searchResponseError.value = response.error
+  } else if (response.data) {
+    currentEditions.value = response.data
   }
+
   isLoading.value = false
 }
 
 async function addEdition() {
+  saveResponseError.value = undefined
   const edition = new LegalPeriodicalEdition({
     legalPeriodical: { uuid: legalPeriodical?.value?.value.uuid },
   })
   const response = await LegalPeriodicalEditionService.save(edition)
 
-  if (response.data) {
+  if (response.error) {
+    saveResponseError.value = saveResponseError.value = {
+      title: "Neue Ausgabe konnte nicht erstellt werden",
+    }
+  } else if (response.data) {
     editionStore.edition = undefined
     await router.push({
       name: "caselaw-periodical-evaluation-editionId-edition",
@@ -87,7 +98,6 @@ const legalPeriodical = computed({
       selectedLegalPeriodical.value = legalPeriodical
     } else {
       selectedLegalPeriodical.value = undefined
-      searchResponseError.value = emptyResponse
     }
   },
 })
@@ -95,7 +105,9 @@ const legalPeriodical = computed({
 async function handleDeleteEdition(edition: LegalPeriodicalEdition) {
   if (edition?.id) {
     const response = await LegalPeriodicalEditionService.delete(edition.id)
-    if (!response.error && currentEditions.value) {
+    if (response.error) {
+      alert("Fehler beim Löschen der Ausgabe")
+    } else if (currentEditions.value) {
       currentEditions.value = currentEditions.value.filter(
         (item) => item.id !== edition.id,
       )
@@ -110,7 +122,7 @@ watch(
       await getEditions(newFilter.uuid)
       pushQueryToRoute({ q: newFilter.uuid })
     } else {
-      currentEditions.value = []
+      currentEditions.value = undefined
       resetQuery()
     }
   },
@@ -160,11 +172,17 @@ onMounted(() => {
             label="Neue Periodikumsauswertung"
             @click="addEdition"
           ></TextButton>
+          <div v-if="saveResponseError">
+            <InfoModal
+              :description="saveResponseError.description"
+              :title="saveResponseError.title"
+            />
+          </div>
         </div>
       </FlexContainer>
     </div>
 
-    <div class="flex h-full flex-col p-24">
+    <div class="flex h-full flex-col gap-24 p-24">
       <TableView class="relative table w-full border-separate">
         <TableHeader>
           <CellHeaderItem>Ausgabe</CellHeaderItem>
@@ -240,10 +258,23 @@ onMounted(() => {
       >
         <LoadingSpinner />
       </div>
-      <SearchResultStatus
-        v-if="!isLoading"
-        :response-error="searchResponseError"
-      />
+
+      <!-- Error State -->
+      <div v-if="searchResponseError">
+        <InfoModal
+          :description="searchResponseError.description"
+          :title="searchResponseError.title"
+        />
+      </div>
+
+      <!-- Empty State -->
+      <div
+        v-if="!searchResponseError && !isLoading"
+        class="my-112 grid justify-items-center"
+      >
+        <span class="mb-16">{{ emptyStatus }}</span>
+        <slot name="newlink" />
+      </div>
     </div>
   </div>
 </template>

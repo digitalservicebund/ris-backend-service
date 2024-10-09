@@ -11,7 +11,6 @@ import IconBadge from "@/components/IconBadge.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import PopupModal from "@/components/PopupModal.vue"
-import SearchResultStatus from "@/components/SearchResultStatus.vue"
 import TableHeader from "@/components/TableHeader.vue"
 import TableRow from "@/components/TableRow.vue"
 import TableView from "@/components/TableView.vue"
@@ -297,12 +296,13 @@ function onDelete() {
       />
     </div>
 
-    <SearchResultStatus
+    <!-- Empty State -->
+    <div
       v-if="emptyStatus && !searchResponseError && !isLoading"
-      id="emptySearchResult"
-      :response-error="{ title: emptyStatus }"
+      class="my-112 grid justify-items-center"
     >
+      <span class="mb-16">{{ emptyStatus }}</span>
       <slot name="newlink" />
-    </SearchResultStatus>
+    </div>
   </div>
 </template>

@@ -27,11 +27,9 @@ const service: LegalPeriodicalEditionService = {
 
     if (response.status >= 300) {
       response.error = {
-        title:
-          errorMessages.LEGAL_PERIODICAL_EDITIONS_COULD_NOT_BE_LOADED.title,
+        title: errorMessages.LEGAL_PERIODICAL_EDITION_COULD_NOT_BE_LOADED.title,
       }
     }
-
     return response
   },
 
@@ -50,12 +48,6 @@ const service: LegalPeriodicalEditionService = {
       response.error = {
         title:
           errorMessages.LEGAL_PERIODICAL_EDITIONS_COULD_NOT_BE_LOADED.title,
-      }
-    }
-
-    if (response.data?.length == 0) {
-      response.error = {
-        title: errorMessages.SEARCH_RESULTS_NOT_FOUND.title,
       }
     }
 
@@ -90,7 +82,8 @@ const service: LegalPeriodicalEditionService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: errorMessages.LEGAL_PERIODICAL_EDITION_COULD_NOT_BE_SAVED.title,
+        title:
+          errorMessages.LEGAL_PERIODICAL_EDITION_COULD_NOT_BE_DELETED.title,
       } as ResponseError
     }
     return response

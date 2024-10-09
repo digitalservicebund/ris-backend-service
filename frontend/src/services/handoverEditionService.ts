@@ -58,14 +58,12 @@ const service: HandoverEditionService = {
       `caselaw/legalperiodicaledition/${editionId}/handover`,
     )
 
-    response.error =
-      response.status >= 300
-        ? {
-            title: errorMessages.EDITION_LOADING_HANDOVER_FAILED.title,
-            description:
-              errorMessages.EDITION_LOADING_HANDOVER_FAILED.description,
-          }
-        : undefined
+    if (response.status >= 300) {
+      response.error = {
+        title: errorMessages.EDITION_LOADING_EVENT_LOG_FAILED.title,
+        description: errorMessages.EDITION_LOADING_EVENT_LOG_FAILED.description,
+      }
+    }
 
     const eventLog: EventRecord[] = []
     if (response.data) {

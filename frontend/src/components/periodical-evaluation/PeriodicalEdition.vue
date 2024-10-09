@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
-import { computed } from "vue"
+import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
+import InfoModal from "@/components/InfoModal.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
@@ -12,12 +13,14 @@ import { useValidationStore } from "@/composables/useValidationStore"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import ComboboxItemService from "@/services/comboboxItemService"
+import { ResponseError } from "@/services/httpClient"
 import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 import { useEditionStore } from "@/stores/editionStore"
 
 const router = useRouter()
 const store = useEditionStore()
 const { edition } = storeToRefs(store)
+const saveEditionError = ref<ResponseError | undefined>()
 
 const validationStore =
   useValidationStore<(typeof LegalPeriodicalEdition.fields)[number]>()
@@ -36,13 +39,13 @@ const legalPeriodical = computed({
       : undefined,
   set: (newValue) => {
     const legalPeriodical = { ...newValue } as LegalPeriodical
-    store.edition!.legalPeriodical = newValue ? legalPeriodical : undefined
+    if (edition.value)
+      edition.value.legalPeriodical = newValue ? legalPeriodical : undefined
   },
 })
 
 async function validateRequiredInput() {
   validationStore.reset()
-
   edition.value?.missingRequiredFields.forEach((missingField) =>
     validationStore.add("Pflichtfeld nicht befüllt", missingField),
   )
@@ -50,19 +53,22 @@ async function validateRequiredInput() {
 
 async function saveEdition() {
   validationStore.reset()
+  saveEditionError.value = undefined
   await validateRequiredInput()
   if (validationStore.isValid()) {
     const response = await LegalPeriodicalEditionService.save(
       edition.value as LegalPeriodicalEdition,
     )
-    if (response.data) {
+    if (response.error) {
+      saveEditionError.value = response.error
+    } else if (response.data) {
       edition.value = response.data as LegalPeriodicalEdition
+      await router.push({
+        name: "caselaw-periodical-evaluation-editionId-references",
+        params: { editionId: edition?.value?.id },
+        query: {},
+      })
     }
-    await router.push({
-      name: "caselaw-periodical-evaluation-editionId-references",
-      params: { editionId: edition?.value?.id },
-      query: {},
-    })
   }
 }
 </script>
@@ -73,6 +79,7 @@ async function saveEdition() {
       <TitleElement>Ausgabe</TitleElement>
       <InputField
         id="legalPeriodical"
+        v-slot="slotProps"
         label="Periodikum *"
         :validation-error="validationStore.getByField('legalPeriodical')"
       >
@@ -81,13 +88,14 @@ async function saveEdition() {
           v-model="legalPeriodical"
           aria-label="Periodikum"
           clear-on-choosing-item
-          :has-error="false"
+          :has-error="slotProps.hasError"
           :item-service="ComboboxItemService.getLegalPeriodicals"
           :read-only="edition?.references?.length! > 0"
         ></ComboboxInput>
       </InputField>
       <InputField
         id="name"
+        v-slot="slotProps"
         label="Name der Ausgabe *"
         :validation-error="validationStore.getByField('name')"
       >
@@ -96,6 +104,7 @@ async function saveEdition() {
           v-model="edition!.name"
           aria-label="Name der Ausgabe"
           class="ds-input-medium"
+          :has-error="slotProps.hasError"
           size="medium"
         ></TextInput>
       </InputField>
@@ -136,6 +145,13 @@ async function saveEdition() {
           @click="saveEdition"
         ></TextButton>
       </FlexContainer>
+
+      <div v-if="saveEditionError">
+        <InfoModal
+          :description="saveEditionError.description"
+          :title="saveEditionError.title"
+        />
+      </div>
     </div>
   </div>
 </template>

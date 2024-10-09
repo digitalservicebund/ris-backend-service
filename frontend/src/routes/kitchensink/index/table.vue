@@ -7,10 +7,8 @@ import SearchResultStatus from "@/components/SearchResultStatus.vue"
 import TableHeader from "@/components/TableHeader.vue"
 import TableRow from "@/components/TableRow.vue"
 import TableView from "@/components/TableView.vue"
-import errorMessages from "@/i18n/errors.json"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
-import { ResponseError } from "@/services/httpClient"
 
 const data = [
   {
@@ -19,9 +17,7 @@ const data = [
   },
   { name: "Roy", date: new Date(8.64e15).toDateString() },
 ]
-const searchResponseError = ref<ResponseError>(
-  errorMessages.SEARCH_RESULTS_NOT_FOUND,
-)
+const searchResultString = "Keine Ergebnisse gefunden."
 
 const isLoading = ref(true)
 </script>
@@ -50,9 +46,7 @@ const isLoading = ref(true)
           </TableHeader>
           <TableRow />
         </TableView>
-        <SearchResultStatus
-          :response-error="searchResponseError"
-        ></SearchResultStatus>
+        <SearchResultStatus :text="searchResultString"></SearchResultStatus>
       </div>
     </KitchensinkStory>
 
@@ -67,7 +61,7 @@ const isLoading = ref(true)
         </TableView>
         <SearchResultStatus
           v-if="!isLoading"
-          :response-error="searchResponseError"
+          :text="searchResultString"
         ></SearchResultStatus>
         <div
           v-if="isLoading"
