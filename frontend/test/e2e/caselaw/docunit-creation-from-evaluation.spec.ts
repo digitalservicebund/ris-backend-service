@@ -151,9 +151,7 @@ test.describe(
           )
 
           await expect(
-            pageWithBghUser.getByText(
-              "Ok und Dokumentationseinheit direkt bearbeiten",
-            ),
+            pageWithBghUser.getByText("Übernehmen und weiter bearbeiten"),
           ).toBeVisible()
 
           await expect(
@@ -304,7 +302,7 @@ test.describe(
           )
 
           await expect(
-            page.getByText("Ok und Dokumentationseinheit direkt bearbeiten"),
+            page.getByText("Übernehmen und weiter bearbeiten"),
           ).toBeVisible()
 
           await expect(
@@ -313,9 +311,7 @@ test.describe(
         })
 
         await test.step("Validation of required fields before creation new documentation unit from search parameters ", async () => {
-          await page
-            .getByText("Ok und Dokumentationseinheit direkt bearbeiten")
-            .click()
+          await page.getByText("Übernehmen und weiter bearbeiten").click()
 
           await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
 
@@ -327,9 +323,7 @@ test.describe(
           await expect(page.getByText("Pflichtfeld nicht befüllt")).toHaveCount(
             1,
           )
-          await page
-            .getByText("Ok und Dokumentationseinheit direkt bearbeiten")
-            .click()
+          await page.getByText("Übernehmen und weiter bearbeiten").click()
 
           await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
 
@@ -340,9 +334,7 @@ test.describe(
 
         await test.step("Created documentation unit for foreign docoffice is editable for creating docoffice", async () => {
           const pagePromise = page.context().waitForEvent("page")
-          await page
-            .getByText("Ok und Dokumentationseinheit direkt bearbeiten")
-            .click()
+          await page.getByText("Übernehmen und weiter bearbeiten").click()
           const newTab = await pagePromise
           await expect(newTab).toHaveURL(
             /\/caselaw\/documentunit\/[A-Z0-9]{13}\/categories$/,
@@ -446,7 +438,7 @@ test.describe(
           )
 
           await expect(
-            page.getByText("Ok und Dokumentationseinheit direkt bearbeiten"),
+            page.getByText("Übernehmen und weiter bearbeiten"),
           ).toBeVisible()
 
           await expect(
@@ -462,14 +454,12 @@ test.describe(
           ).toHaveValue("DS")
           await page.getByText("DS", { exact: true }).click()
           await expect(
-            page.getByText("Ok und Dokumentationseinheit direkt bearbeiten"),
+            page.getByText("Übernehmen und weiter bearbeiten"),
           ).toBeEnabled()
         })
 
         await test.step("Validation of required fields before creation new documentation unit from search parameters ", async () => {
-          await page
-            .getByText("Ok und Dokumentationseinheit direkt bearbeiten")
-            .click()
+          await page.getByText("Übernehmen und weiter bearbeiten").click()
 
           await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
 
@@ -481,9 +471,7 @@ test.describe(
           await expect(page.getByText("Pflichtfeld nicht befüllt")).toHaveCount(
             1,
           )
-          await page
-            .getByText("Ok und Dokumentationseinheit direkt bearbeiten")
-            .click()
+          await page.getByText("Übernehmen und weiter bearbeiten").click()
 
           await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
 
@@ -494,9 +482,7 @@ test.describe(
 
         await test.step("Create docunit, Rechtskraft is set to unknown, as no court was given", async () => {
           const pagePromise = page.context().waitForEvent("page")
-          await page
-            .getByText("Ok und Dokumentationseinheit direkt bearbeiten")
-            .click()
+          await page.getByText("Übernehmen und weiter bearbeiten").click()
           const newTab = await pagePromise
           await expect(newTab).toHaveURL(
             /\/caselaw\/documentunit\/[A-Z0-9]{13}\/categories$/,
