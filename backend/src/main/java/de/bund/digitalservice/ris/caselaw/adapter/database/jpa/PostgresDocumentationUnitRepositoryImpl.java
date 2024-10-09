@@ -601,4 +601,14 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         .stream()
         .collect(Collectors.groupingBy(RelatedDocumentationDTO::getType, Collectors.counting()));
   }
+
+  @Override
+  public List<UUID> getUnprocessedIds() {
+    return null;
+  }
+
+  @Override
+  public List<DocumentationUnitDTO> findByIdIn(List<UUID> ids) {
+    return null;
+  }
 }

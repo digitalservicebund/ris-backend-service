@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
@@ -127,4 +128,11 @@ ORDER BY documentationUnit.decisionDate DESC NULLS LAST
       Boolean myDocOfficeOnly,
       DocumentTypeDTO documentType,
       Pageable pageable);
+
+  @Query(
+      """
+          SELECT DISTINCT d.id FROM DocumentationUnitDTO d
+          LIMIT 100
+          """)
+  List<UUID> getUnprocessedIds();
 }
