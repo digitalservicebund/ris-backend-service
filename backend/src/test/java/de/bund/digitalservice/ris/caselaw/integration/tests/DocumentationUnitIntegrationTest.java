@@ -237,8 +237,8 @@ class DocumentationUnitIntegrationTest {
               assertThat(response.getResponseBody().coreData().court().type()).isEqualTo("AG");
               assertThat(response.getResponseBody().coreData().court().location())
                   .isEqualTo("Aachen");
-              assertThat(response.getResponseBody().coreData().fileNumbers().size()).isEqualTo(1);
-              assertThat(response.getResponseBody().coreData().fileNumbers().get(0))
+              assertThat(response.getResponseBody().coreData().fileNumbers()).hasSize(1);
+              assertThat(response.getResponseBody().coreData().fileNumbers().getFirst())
                   .isEqualTo("abc");
             });
 
@@ -946,29 +946,25 @@ class DocumentationUnitIntegrationTest {
 
   @Test
   void testSearchByFileNumber_withFileNumberAndDeviatingFileNumber_shouldOnlyReturnOneResult() {
-    DocumentationUnitDTO dto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .id(UUID.randomUUID())
-                .documentNumber("documentNumber")
-                .decisionDate(LocalDate.parse("2021-01-02"))
-                .documentationOffice(documentationOffice)
-                .fileNumbers(
-                    List.of(
-                        FileNumberDTO.builder().value("Vf. 19-VIII-22 (e.A.)").rank(1L).build()))
-                .deviatingFileNumbers(
-                    List.of(
-                        DeviatingFileNumberDTO.builder()
-                            .value("Vf.19-VIII-22 ea")
-                            .rank(1L)
-                            .build()))
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
+
+    repository.save(
+        DocumentationUnitDTO.builder()
+            .id(UUID.randomUUID())
+            .documentNumber("documentNumber")
+            .decisionDate(LocalDate.parse("2021-01-02"))
+            .documentationOffice(documentationOffice)
+            .fileNumbers(
+                List.of(FileNumberDTO.builder().value("Vf. 19-VIII-22 (e.A.)").rank(1L).build()))
+            .deviatingFileNumbers(
+                List.of(
+                    DeviatingFileNumberDTO.builder().value("Vf.19-VIII-22 ea").rank(1L).build()))
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
+            .build());
 
     DocumentationUnitSearchInput searchInput =
         DocumentationUnitSearchInput.builder().fileNumber("Vf.").build();

@@ -138,33 +138,33 @@ class DocumentationUnitSearchIntegrationTest {
 
   @Test
   void testForCorrectResponseWhenRequestingAll() {
-    DocumentationUnitDTO migrationDto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .id(UUID.randomUUID())
-                .documentNumber("MIGR202200012")
-                .documentationOffice(docOfficeDTO)
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .fileNumbers(List.of(FileNumberDTO.builder().value("AkteM").rank(0L).build()))
-                .build());
-    DocumentationUnitDTO newNeurisDto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("NEUR202300008")
-                .documentationOffice(docOfficeDTO)
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .fileNumbers(List.of(FileNumberDTO.builder().value("AkteY").rank(0L).build()))
-                .build());
+
+    repository.save(
+        DocumentationUnitDTO.builder()
+            .id(UUID.randomUUID())
+            .documentNumber("MIGR202200012")
+            .documentationOffice(docOfficeDTO)
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
+            .fileNumbers(List.of(FileNumberDTO.builder().value("AkteM").rank(0L).build()))
+            .build());
+
+    repository.save(
+        DocumentationUnitDTO.builder()
+            .documentNumber("NEUR202300008")
+            .documentationOffice(docOfficeDTO)
+            .status(
+                List.of(
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .build()))
+            .fileNumbers(List.of(FileNumberDTO.builder().value("AkteY").rank(0L).build()))
+            .build());
 
     Slice<DocumentationUnitListItem> responseBody =
         risWebTestClient

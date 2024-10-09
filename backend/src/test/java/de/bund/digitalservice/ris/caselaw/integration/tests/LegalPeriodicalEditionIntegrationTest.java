@@ -353,7 +353,6 @@ class LegalPeriodicalEditionIntegrationTest {
               assertThat(referenceDTO.getCitation()).isEqualTo("New Reference");
               assertThat(referenceDTO.getRank()).isEqualTo(4);
             });
-    ;
 
     // clean up
     repository.save(edition.toBuilder().references(List.of()).build());
