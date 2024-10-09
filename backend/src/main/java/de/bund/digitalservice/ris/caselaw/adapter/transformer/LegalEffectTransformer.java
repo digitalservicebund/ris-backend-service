@@ -5,6 +5,10 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 
 public class LegalEffectTransformer {
 
+  private LegalEffectTransformer() {
+    // Private constructor to prevent instantiation of this utility class.
+  }
+
   public static LegalEffectDTO transformToDTO(LegalEffect legalEffect) {
     LegalEffectDTO legalEffectDTO = LegalEffectDTO.FALSCHE_ANGABE;
     if (legalEffect != null) {

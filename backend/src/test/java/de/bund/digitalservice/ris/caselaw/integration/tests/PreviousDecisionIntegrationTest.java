@@ -555,16 +555,6 @@ class PreviousDecisionIntegrationTest {
             Status.builder()
                 .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
                 .build());
-
-    var du6 =
-        createDocumentationUnit(
-            date,
-            List.of("AkteZ"),
-            "EF",
-            "CC-RIS",
-            Status.builder()
-                .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
-                .build());
     var du4 =
         createDocumentationUnit(
             date,
@@ -579,6 +569,15 @@ class PreviousDecisionIntegrationTest {
             "EF",
             "CC-RIS",
             Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
+    var du6 =
+        createDocumentationUnit(
+            date,
+            List.of("AkteZ"),
+            "EF",
+            "CC-RIS",
+            Status.builder()
+                .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+                .build());
 
     List<PreviousDecision> content =
         simulateAPICall(PreviousDecision.builder().fileNumber("AkteZ").build())
@@ -588,7 +587,7 @@ class PreviousDecisionIntegrationTest {
     assertThat(content).hasSize(4);
     assertThat(content)
         .extracting(RelatedDocumentationUnit::getUuid)
-        .doesNotContain(du4.getId())
+        .doesNotContain(du4.getId(), du6.getId())
         .containsExactlyInAnyOrder(du1.getId(), du2.getId(), du3.getId(), du5.getId());
   }
 
