@@ -24,7 +24,7 @@ function addBorderNumbers({ state, dispatch }: CommandProps): boolean {
   let updatedFrom = initialFrom
 
   state.doc.nodesBetween(initialFrom, initialTo, (node, pos) => {
-    if (isBorderNumberContent(state, pos, contentNodeType)) {
+    if (hasBorderNumber(state, pos, schema)) {
       return
     }
 
@@ -45,7 +45,8 @@ function addBorderNumbers({ state, dispatch }: CommandProps): boolean {
       if (isFirstBorderNumber) {
         /** This solution is not perfect. The tr.doc only contains the default "0".
         The recalculated border numbers are not part of the tr.doc, hence the actual number of digits
-        (after the recalculation) is unknown and therefore the actual addedNodeSize. **/
+        (after the recalculation) is unknown and therefore the actual addedNodeSize. This might result in a
+         slightly shifted cursor position **/
         updatedFrom = initialFrom + addedNodeSize
       }
 
@@ -64,14 +65,32 @@ function addBorderNumbers({ state, dispatch }: CommandProps): boolean {
 }
 
 /**
- * Checks if the node at the given position is a border number content node.
+ * Checks whether the node at the given position or its parent is a borderNumber or
+ * borderNumberContent node, using the position to resolve the parent.
+ *
+ * @param state - The editor state.
+ * @param pos - The position of the node in the document.
+ * @param schema - The document schema to access node types.
+ * @returns True if the node or its parent is a borderNumber or borderNumberContent node, false otherwise.
  */
-function isBorderNumberContent(
+function hasBorderNumber(
   state: CommandProps["state"],
   pos: number,
-  contentNodeType: NodeType,
+  schema: ProsemirrorSchema,
 ): boolean {
-  return state.doc.resolve(pos).parent.type === contentNodeType
+  const resolvedPos = state.doc.resolve(pos)
+  const node = resolvedPos.nodeAfter
+  const parent = resolvedPos.parent
+
+  const borderNumberContentNodeType = schema.nodes.borderNumberContent
+  const borderNumberNodeType = schema.nodes.borderNumber
+
+  return (
+    node?.type === borderNumberContentNodeType ||
+    node?.type === borderNumberNodeType ||
+    parent.type === borderNumberContentNodeType ||
+    parent.type === borderNumberNodeType
+  )
 }
 
 /**
