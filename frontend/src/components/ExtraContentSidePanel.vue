@@ -96,9 +96,9 @@ function togglePanel(expand?: boolean): boolean {
 onMounted(() => {
   setDefaultState()
   if (route.query.showAttachmentPanel) {
-    togglePanel(route.query.showAttachmentPanel === "true")
+    store.isExpanded = route.query.showAttachmentPanel === "true"
   } else {
-    togglePanel(hasNote.value || hasAttachments.value)
+    store.isExpanded = hasNote.value || hasAttachments.value
   }
 })
 

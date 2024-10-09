@@ -70,7 +70,7 @@ async function attachmentIndexDeleted(index: number) {
 async function attachmentsUploaded(anySuccessful: boolean) {
   if (anySuccessful) {
     await requestDocumentUnitFromServer()
-    extraContentSidePanelStore.setSidePanelMode(true)
+    extraContentSidePanelStore.togglePanel(true)
     extraContentSidePanelStore.selectAttachments(
       documentUnit.value ? documentUnit.value.attachments.length - 1 : 0,
     )
