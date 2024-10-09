@@ -1,6 +1,7 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { ComponentPropsOptions } from "@vue/runtime-core"
 import { describe } from "vitest"
 import { createRouter, createWebHistory, Router } from "vue-router"
 import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
@@ -15,12 +16,14 @@ function renderComponent(
     note?: string
     attachments?: Attachment[]
     references?: Reference[]
+    props: ComponentPropsOptions<P>
   } = {},
 ) {
   const user = userEvent.setup()
   return {
     user,
     ...render(ExtraContentSidePanel, {
+      props: options.props ?? {},
       global: {
         plugins: [
           [router],
@@ -258,6 +261,50 @@ describe("ExtraContentSidePanel", () => {
 
       screen.getByLabelText("Notiz anzeigen").click()
       expect(await screen.findByDisplayValue("some note")).toBeVisible()
+    })
+
+    describe("Enable side panel content", async () => {
+      const testCases = [
+        {
+          enabledPanels: ["attachments"],
+          expectedHidden: ["note", "preview"],
+        },
+        {
+          enabledPanels: ["note"],
+          expectedHidden: ["attachments", "preview"],
+        },
+        {
+          enabledPanels: ["preview"],
+          expectedHidden: ["attachments", "note"],
+        },
+      ]
+      testCases.forEach(({ enabledPanels, expectedHidden }) =>
+        test(`panel enable ${enabledPanels} and hide ${expectedHidden}`, async () => {
+          renderComponent({
+            note: "",
+            attachments: [],
+            props: {
+              enabledPanels: enabledPanels,
+            },
+          })
+
+          screen.getByLabelText("Seitenpanel öffnen").click()
+
+          for (const contentType of enabledPanels) {
+            expect(
+              await screen.findByTestId(contentType + "-button"),
+              `${contentType} should be displayed`,
+            ).toBeVisible()
+          }
+
+          for (const contentType of expectedHidden) {
+            expect(
+              screen.queryByTestId(contentType + "-button"),
+              `${contentType} should be hidden`,
+            ).not.toBeInTheDocument()
+          }
+        }),
+      )
     })
   })
 })
