@@ -396,16 +396,16 @@ test.describe(
         })
 
         // Todo: for both creating and foreign  office? -> RISDEV-4982
-        await test.step("The new documentation unit is visible in search with Fremdanlage status", async () => {
+        await test.step("The new documentation unit is not visible to creating doc office in search with Fremdanlage status", async () => {
           await navigateToSearch(page)
 
           await page.getByLabel("Dokumentnummer Suche").fill(documentNumber)
-          // Todo: this is a bug, because without setting the status, the documentNumber could not be found
+
           const select = page.locator(`select[id="status"]`)
           await select.selectOption("Fremdanlage")
           await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
           const listEntry = page.getByTestId("listEntry")
-          await expect(listEntry).toHaveCount(1)
+          await expect(listEntry).toHaveCount(0)
 
           await expect(listEntry).toContainText(documentNumber)
           await expect(listEntry).toContainText("Fremdanlage")
