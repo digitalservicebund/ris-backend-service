@@ -467,6 +467,18 @@ test.describe("short and long texts", () => {
           expect(innerText).toContain("")
         }
 
+        // Casefacts (Tatbestand) and Reasons (Gründe) must not be filled at the same time
+        // eslint-disable-next-line playwright/no-conditional-in-test
+        if (testId == "Tatbestand") {
+          const textField = page.locator(`[data-testid='Gründe']`)
+          await textField.click()
+          await page.keyboard.press(`${modifier}+KeyA`)
+          await page.keyboard.press(`${modifier}+Backspace`)
+          const innerText = await textField.innerText()
+          // eslint-disable-next-line playwright/no-conditional-expect
+          expect(innerText).toContain("")
+        }
+
         await save(page)
 
         await test.step(`value '${value}' should be saved (be present after reload)`, async () => {
