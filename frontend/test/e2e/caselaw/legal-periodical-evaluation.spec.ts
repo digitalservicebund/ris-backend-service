@@ -1,7 +1,5 @@
 import { expect, Page } from "@playwright/test"
-import { screen } from "@testing-library/vue"
 import dayjs from "dayjs"
-import { aw } from "vitest/dist/chunks/reporters.DAfKSDh5"
 import {
   fillInput,
   navigateToPeriodicalEvaluation,
