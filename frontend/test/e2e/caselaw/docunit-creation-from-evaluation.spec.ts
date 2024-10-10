@@ -406,9 +406,6 @@ test.describe(
           await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
           const listEntry = page.getByTestId("listEntry")
           await expect(listEntry).toHaveCount(0)
-
-          await expect(listEntry).toContainText(documentNumber)
-          await expect(listEntry).toContainText("Fremdanlage")
         })
 
         await deleteDocumentUnit(page, documentNumber)
