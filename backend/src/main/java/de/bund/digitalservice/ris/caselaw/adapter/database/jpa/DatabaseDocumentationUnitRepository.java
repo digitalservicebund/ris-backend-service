@@ -14,12 +14,9 @@ public interface DatabaseDocumentationUnitRepository
     extends JpaRepository<DocumentationUnitDTO, UUID> {
   Optional<DocumentationUnitDTO> findByDocumentNumber(String documentNumber);
 
-  String SELECT_STATUS_WHERE_LATEST =
-      "SELECT 1 FROM documentationUnit.status status WHERE status.createdAt = (SELECT MAX(s.createdAt) FROM documentationUnit.status s)";
-
   String BASE_QUERY =
       """
-   (:documentNumber IS NULL OR upper(documentationUnit.documentNumber) like concat('%', upper(cast(:documentNumber as text)), '%'))
+   AND (:documentNumber IS NULL OR upper(documentationUnit.documentNumber) like concat('%', upper(cast(:documentNumber as text)), '%'))
    AND (:documentNumberToExclude IS NULL OR documentationUnit.documentNumber != :documentNumberToExclude)
    AND (:courtType IS NULL OR upper(court.type) like upper(cast(:courtType as text)))
    AND (:courtLocation IS NULL OR upper(court.location) like upper(cast(:courtLocation as text)))
@@ -28,29 +25,29 @@ public interface DatabaseDocumentationUnitRepository
        OR (cast(:decisionDateEnd as date) IS NOT NULL AND documentationUnit.decisionDate BETWEEN :decisionDate AND :decisionDateEnd))
    AND (:myDocOfficeOnly = FALSE OR (:myDocOfficeOnly = TRUE AND documentationUnit.documentationOffice.id = :documentationOfficeId))
    AND (cast(:documentType as uuid) IS NULL OR documentationUnit.documentType = :documentType)
-   AND
-     (
-        (:status IS NULL AND ((documentationUnit.documentationOffice.id = :documentationOfficeId OR EXISTS (
-   """
-          + SELECT_STATUS_WHERE_LATEST
-          + """
-        AND status.publicationStatus IN (de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED, de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING)))))
-     OR
-        (:status IS NOT NULL AND EXISTS (
-     """
-          + SELECT_STATUS_WHERE_LATEST
-          + """
-       AND status.publicationStatus = :status
-       AND (:status IN ('PUBLISHED', 'PUBLISHING')
-        OR documentationUnit.documentationOffice.id = :documentationOfficeId
-        OR (status.publicationStatus = 'EXTERNAL_HANDOVER_PENDING' AND documentationUnit.creatingDocumentationOffice.id = :documentationOfficeId))))
-     )
-   AND (:withErrorOnly = FALSE OR documentationUnit.documentationOffice.id = :documentationOfficeId AND EXISTS (
-   """
-          + SELECT_STATUS_WHERE_LATEST
-          + """
-        AND status.withError = TRUE))
-ORDER BY documentationUnit.decisionDate DESC NULLS LAST
+   AND (
+       (:status IS NULL AND (
+          documentationUnit.documentationOffice.id = :documentationOfficeId
+          OR
+          status.publicationStatus IN (de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED, de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING)
+        )
+      )
+      OR
+      (:status IS NOT NULL
+        AND status.publicationStatus = :status
+        AND (
+          :status IN ('PUBLISHED', 'PUBLISHING')
+          OR documentationUnit.documentationOffice.id = :documentationOfficeId
+          OR (status.publicationStatus = 'EXTERNAL_HANDOVER_PENDING' AND documentationUnit.creatingDocumentationOffice.id = :documentationOfficeId)
+        )
+      )
+   )
+   AND (
+    :withErrorOnly = FALSE
+    OR documentationUnit.documentationOffice.id = :documentationOfficeId
+    AND status.withError = TRUE
+   )
+  ORDER BY documentationUnit.decisionDate DESC NULLS LAST
 """;
 
   @Query(
@@ -58,7 +55,12 @@ ORDER BY documentationUnit.decisionDate DESC NULLS LAST
           """
   SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
   LEFT JOIN documentationUnit.court court
-  WHERE
+  LEFT JOIN documentationUnit.status status
+  WHERE status.createdAt = (
+    SELECT MAX(s.createdAt)
+    FROM StatusDTO s
+    WHERE s MEMBER OF documentationUnit.status
+  )
   """
               + BASE_QUERY)
   @SuppressWarnings("java:S107")
@@ -83,8 +85,13 @@ ORDER BY documentationUnit.decisionDate DESC NULLS LAST
   SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
   LEFT JOIN documentationUnit.court court
   LEFT JOIN documentationUnit.fileNumbers fileNumber
-  WHERE (upper(fileNumber.value) like upper(concat('%', :fileNumber,'%')))
-  AND
+  LEFT JOIN documentationUnit.status status
+  WHERE status.createdAt = (
+    SELECT MAX(s.createdAt)
+    FROM StatusDTO s
+    WHERE s MEMBER OF documentationUnit.status
+  )
+  AND (upper(fileNumber.value) like upper(concat('%', :fileNumber,'%')))
   """
               + BASE_QUERY)
   @SuppressWarnings("java:S107")
@@ -110,8 +117,13 @@ ORDER BY documentationUnit.decisionDate DESC NULLS LAST
   SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
   LEFT JOIN documentationUnit.court court
   LEFT JOIN documentationUnit.deviatingFileNumbers deviatingFileNumber
-  WHERE (upper(deviatingFileNumber.value) like upper(concat('%', :fileNumber,'%')))
-  AND
+  LEFT JOIN documentationUnit.status status
+  WHERE status.createdAt = (
+    SELECT MAX(s.createdAt)
+    FROM StatusDTO s
+    WHERE s MEMBER OF documentationUnit.status
+  )
+  AND (upper(deviatingFileNumber.value) like upper(concat('%', :fileNumber,'%')))
   """
               + BASE_QUERY)
   @SuppressWarnings("java:S107")

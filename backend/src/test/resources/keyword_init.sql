@@ -21,24 +21,27 @@ values
   );
 
 insert into
-    incremental_migration.status (id, documentation_unit_id, publication_status, with_error)
+    incremental_migration.status (id, documentation_unit_id, publication_status, created_at, with_error)
 values
     (
         '75988131-f355-414d-9da5-dcbcdbf4b98f',
         '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
         'PUBLISHED',
+        current_timestamp,
         false
     ),
     (
         '65988131-f355-414d-9da5-dcbcdbf4b98f',
         '89db7895-ca6f-4333-bcb3-83b18c8f3b49',
         'PUBLISHED',
+        current_timestamp,
         false
     ),
     (
         '55988131-f355-414d-9da5-dcbcdbf4b98f',
         '399c79a6-749b-11ee-b962-0242ac120002',
         'PUBLISHED',
+        current_timestamp,
         false
     );
 
