@@ -36,4 +36,7 @@ public class StatusDTO {
   @Column(name = "with_error")
   @NotNull
   private boolean withError;
+
+  @Column(insertable = false, updatable = false, name = "documentation_unit_id")
+  private UUID documentationUnitId;
 }
