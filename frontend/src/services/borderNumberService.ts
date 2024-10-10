@@ -215,9 +215,9 @@ function invalidateBorderNumberLinks(
         link.innerHTML = "entfernt"
       })
 
-    // This if-statement is needed for the compiler to know that group and corresponding categoryName match.
     if (group === "shortTexts") {
-      documentUnit[group][categoryName] = textXml.body.innerHTML
+      // This if-statement is needed for the compiler to know that group and corresponding categoryName match.
+      documentUnit[group][categoryName] = textXml.body?.innerHTML
     } else {
       documentUnit[group][categoryName] = textXml.body.innerHTML
     }
