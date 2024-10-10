@@ -34,10 +34,10 @@ test("create and validate border number links", async ({
   documentNumber,
 }) => {
   // Copy border numbers from side panel into reasons to have reference data
-  const documentOrigin = "Gründe:"
-  const firstReason = "First reason"
-  const secondReason = "Second reason"
-  const thirdReason = "Third reason"
+  const documentOrigin = "Headline:"
+  const firstReason = "First paragraph"
+  const secondReason = "Second paragraph"
+  const thirdReason = "Third paragraph"
 
   // upload file
   await uploadTestfile(page, "some-border-numbers.docx")
@@ -57,7 +57,7 @@ test("create and validate border number links", async ({
   await expect(originalFileParagraph).toBeVisible()
 
   const attachmentLocator = page
-    .getByText("Gründe:")
+    .getByText("Headline:")
     .locator("..")
     .locator("..")
     .locator("..")

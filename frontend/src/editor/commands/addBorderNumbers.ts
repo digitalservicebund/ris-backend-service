@@ -114,8 +114,10 @@ function createBorderNumberNode(
   const borderNumberNodeType = schema.nodes.borderNumber
   const numberNodeType = schema.nodes.borderNumberNumber
 
+  const originalAttributes = node.attrs || {}
+
   const paragraphNode = contentNodeType.schema.nodes.paragraph.create(
-    {},
+    originalAttributes,
     node.content,
   )
   const numberNode = numberNodeType.create(
