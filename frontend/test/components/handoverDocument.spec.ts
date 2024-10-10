@@ -195,6 +195,67 @@ describe("HandoverDocumentationUnitView:", () => {
       ).toBeInTheDocument()
       expect(screen.queryByText("XML Vorschau")).not.toBeInTheDocument()
     })
+    it("should show error message with invalid casefacts", async () => {
+      renderComponent({
+        documentUnit: new DocumentUnit("123", {
+          documentNumber: "foo",
+          coreData: {
+            fileNumbers: ["foo"],
+            court: {
+              type: "type",
+              location: "location",
+              label: "label",
+            },
+            decisionDate: "2022-02-01",
+            legalEffect: "legalEffect",
+            documentType: {
+              jurisShortcut: "ca",
+              label: "category",
+            },
+          },
+          longTexts: { reasons: "Reasons", caseFacts: "CaseFacts" },
+        }),
+      })
+      expect(
+        await screen.findByText(
+          'Die Rubriken "Gründe" und "Tatbestand" sind befüllt. Es darf nur eine der beiden Rubriken befüllt sein.',
+        ),
+      ).toBeInTheDocument()
+
+      expect(screen.getByText("Rubriken bearbeiten")).toBeInTheDocument()
+      expect(screen.queryByText("XML Vorschau")).not.toBeInTheDocument()
+    })
+
+    it("should show error message with invalid decisionReasons", async () => {
+      renderComponent({
+        documentUnit: new DocumentUnit("123", {
+          documentNumber: "foo",
+          coreData: {
+            fileNumbers: ["foo"],
+            court: {
+              type: "type",
+              location: "location",
+              label: "label",
+            },
+            decisionDate: "2022-02-01",
+            legalEffect: "legalEffect",
+            documentType: {
+              jurisShortcut: "ca",
+              label: "category",
+            },
+          },
+          longTexts: { reasons: "Reasons", decisionReasons: "decisionReasons" },
+        }),
+      })
+      expect(
+        await screen.findByText(
+          'Die Rubriken "Gründe" und "Entscheidungsgründe" sind befüllt. Es darf nur eine der beiden Rubriken befüllt sein.',
+        ),
+      ).toBeInTheDocument()
+
+      expect(screen.getByText("Rubriken bearbeiten")).toBeInTheDocument()
+      expect(screen.queryByText("XML Vorschau")).not.toBeInTheDocument()
+    })
 
     it("'Rubriken bearbeiten' button links back to categories", async () => {
       render(HandoverDocumentationUnitView, {

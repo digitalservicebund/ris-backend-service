@@ -71,7 +71,13 @@ onMounted(async () => {
 })
 
 async function fetchPreview() {
-  if (fieldsMissing.value || isOutlineInvalid.value) return
+  if (
+    fieldsMissing.value ||
+    isOutlineInvalid.value ||
+    isCaseFactsInvalid.value ||
+    isDecisionReasonsInvalid.value
+  )
+    return
 
   const previewResponse = await handoverDocumentationUnitService.getPreview(
     store.documentUnit!.uuid,
@@ -92,6 +98,16 @@ function handoverDocumentUnit() {
   } else if (isOutlineInvalid.value) {
     frontendError.value = {
       title: "Gliederung und Sonstiger Orientierungssatz sind befüllt.",
+      description: "Die Dokumentationseinheit kann nicht übergeben werden.",
+    }
+  } else if (isCaseFactsInvalid.value) {
+    frontendError.value = {
+      title: "Gründe und Tatbestand sind befüllt.",
+      description: "Die Dokumentationseinheit kann nicht übergeben werden.",
+    }
+  } else if (isDecisionReasonsInvalid.value) {
+    frontendError.value = {
+      title: "Gründe und Entscheidungsgründe sind befüllt.",
       description: "Die Dokumentationseinheit kann nicht übergeben werden.",
     }
   } else if (
@@ -278,6 +294,17 @@ const isOutlineInvalid = computed<boolean>(
     !!store.documentUnit?.longTexts.outline &&
     !!store.documentUnit.shortTexts.otherHeadnote,
 )
+
+const isCaseFactsInvalid = computed<boolean>(
+  () =>
+    !!store.documentUnit?.longTexts.reasons &&
+    !!store.documentUnit?.longTexts.caseFacts,
+)
+const isDecisionReasonsInvalid = computed<boolean>(
+  () =>
+    !!store.documentUnit?.longTexts.reasons &&
+    !!store.documentUnit?.longTexts.decisionReasons,
+)
 </script>
 
 <template>
@@ -288,11 +315,18 @@ const isOutlineInvalid = computed<boolean>(
       <div aria-label="Plausibilitätsprüfung" class="flex flex-col">
         <h2 class="ds-label-01-bold mb-16">Plausibilitätsprüfung</h2>
 
-        <div v-if="fieldsMissing || isOutlineInvalid">
+        <div
+          v-if="
+            fieldsMissing ||
+            isOutlineInvalid ||
+            isCaseFactsInvalid ||
+            isDecisionReasonsInvalid
+          "
+        >
           <div class="flex flex-row gap-8">
             <IconErrorOutline class="text-red-800" />
 
-            <div class="ds-body-01-reg flex flex-col gap-24">
+            <div class="ds-body-01-reg flex flex-col">
               <div v-if="fieldsMissing" class="flex flex-col gap-24">
                 <div>
                   <p>
@@ -397,9 +431,28 @@ const isOutlineInvalid = computed<boolean>(
                   </ul>
                 </div>
               </div>
-              <div v-if="isOutlineInvalid">
-                Die Rubriken "Gliederung" und "Sonstiger Orientierungssatz" sind
-                befüllt. Es darf nur eine der beiden Rubriken befüllt sein.
+              <div
+                v-if="
+                  isOutlineInvalid ||
+                  isCaseFactsInvalid ||
+                  isDecisionReasonsInvalid
+                "
+                class="mb-24 flex flex-col gap-8"
+              >
+                <div v-if="isOutlineInvalid">
+                  Die Rubriken "Gliederung" und "Sonstiger Orientierungssatz"
+                  sind befüllt.<br />
+                  Es darf nur eine der beiden Rubriken befüllt sein.
+                </div>
+                <div v-if="isCaseFactsInvalid">
+                  Die Rubriken "Gründe" und "Tatbestand" sind befüllt.<br />
+                  Es darf nur eine der beiden Rubriken befüllt sein.
+                </div>
+                <div v-if="isDecisionReasonsInvalid">
+                  Die Rubriken "Gründe" und "Entscheidungsgründe" sind
+                  befüllt.<br />
+                  Es darf nur eine der beiden Rubriken befüllt sein.
+                </div>
               </div>
             </div>
           </div>
@@ -513,6 +566,8 @@ const isOutlineInvalid = computed<boolean>(
         v-if="
           !fieldsMissing &&
           !isOutlineInvalid &&
+          !isCaseFactsInvalid &&
+          !isDecisionReasonsInvalid &&
           preview?.success &&
           !!preview?.xml
         "
@@ -555,7 +610,12 @@ const isOutlineInvalid = computed<boolean>(
         aria-label="Dokumentationseinheit an jDV übergeben"
         button-type="primary"
         class="w-fit"
-        :disabled="isOutlineInvalid || fieldsMissing"
+        :disabled="
+          isOutlineInvalid ||
+          fieldsMissing ||
+          isCaseFactsInvalid ||
+          isDecisionReasonsInvalid
+        "
         :icon="IconCheck"
         label="Dokumentationseinheit an jDV übergeben"
         size="medium"
