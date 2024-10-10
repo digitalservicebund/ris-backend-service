@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import DecisionSummary from "@/components/DecisionSummary.vue"
-import { DisplayMode } from "@/components/enumDisplayMode"
 import FlexContainer from "@/components/FlexContainer.vue"
 import Reference from "@/domain/reference"
 
@@ -24,10 +23,7 @@ const props = defineProps<{
         }"
       >
         <FlexContainer flex-direction="flex-row">
-          <DecisionSummary
-            :decision="props.data.documentationUnit"
-            :display-mode="DisplayMode.SIDEPANEL"
-          />
+          <DecisionSummary :decision="props.data.documentationUnit" />
         </FlexContainer>
       </RouterLink>
 

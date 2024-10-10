@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, watch } from "vue"
+import { computed, onMounted, ref } from "vue"
 import { useRoute } from "vue-router"
 import Tooltip from "./Tooltip.vue"
 import AttachmentView from "@/components/AttachmentView.vue"
@@ -11,34 +11,35 @@ import TextAreaInput from "@/components/input/TextAreaInput.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import DocumentUnitPreview from "@/components/preview/DocumentUnitPreview.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
+import useQuery from "@/composables/useQueryFromRoute"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
-import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
-import { SelectablePanelContent } from "@/types/panelContentMode"
 import IconAttachFile from "~icons/ic/baseline-attach-file"
 import IconOpenInNewTab from "~icons/ic/outline-open-in-new"
 import IconPreview from "~icons/ic/outline-remove-red-eye"
 import IconStickyNote from "~icons/ic/outline-sticky-note-2"
 
-const props = defineProps<{
-  enabledPanels?: SelectablePanelContent[]
-}>()
+const store = useDocumentUnitStore()
 
-const store = useExtraContentSidePanelStore()
-const documentUnitStore = useDocumentUnitStore()
+type SelectablePanelContent = "note" | "attachments" | "preview"
+const selectedPanelContent = ref<SelectablePanelContent>(
+  !store.documentUnit!.note && store.documentUnit!.hasAttachments
+    ? "attachments"
+    : "note",
+)
+const currentAttachmentIndex = ref(0)
+const isExpanded = ref(false)
 
 const route = useRoute()
+const { pushQueryToRoute } = useQuery()
 
 const hasNote = computed(() => {
-  return (
-    !!documentUnitStore.documentUnit!.note &&
-    documentUnitStore.documentUnit!.note.length > 0
-  )
+  return !!store.documentUnit!.note && store.documentUnit!.note.length > 0
 })
 
 const hasAttachments = computed(() => {
   return (
-    !!documentUnitStore.documentUnit!.attachments &&
-    documentUnitStore.documentUnit!.attachments.length > 0
+    !!store.documentUnit!.attachments &&
+    store.documentUnit!.attachments.length > 0
   )
 })
 
@@ -48,7 +49,14 @@ const hasAttachments = computed(() => {
  * @param index
  */
 const handleOnSelectAttachment = (index: number) => {
-  store.currentAttachmentIndex = index
+  currentAttachmentIndex.value = index
+}
+
+/**
+ * Sets the panel content to "note", so that the notes text input field is displayed in the panel.
+ */
+function selectNotes() {
+  selectedPanelContent.value = "note"
 }
 
 /**
@@ -58,21 +66,15 @@ const handleOnSelectAttachment = (index: number) => {
  * @param selectedIndex (optional) selected attachment index
  */
 function selectAttachments(selectedIndex?: number) {
-  store.selectAttachments(selectedIndex)
-}
-
-/**
- * Sets the panel content to "note", so that the notes text input field is displayed in the panel.
- */
-function selectNotes() {
-  store.setSidePanelMode("note")
+  if (selectedIndex !== undefined) currentAttachmentIndex.value = selectedIndex
+  selectedPanelContent.value = "attachments"
 }
 
 /**
  * Sets the panel content to "preview", so that the document preview is displayed in the panel.
  */
 function selectPreview() {
-  store.setSidePanelMode("preview")
+  selectedPanelContent.value = "preview"
 }
 
 /**
@@ -82,8 +84,39 @@ function selectPreview() {
  * @param expand optional boolean to enforce expanding or collapsing
  */
 function togglePanel(expand?: boolean): boolean {
-  return store.togglePanel(expand)
+  isExpanded.value = expand === undefined ? !isExpanded.value : expand
+  pushQueryToRoute({
+    ...route.query,
+    showAttachmentPanel: isExpanded.value.toString(),
+  })
+  return isExpanded.value
 }
+
+/**
+ * Adjusts the local attachment index reference if necessary.
+ * If all attachments have been deleted, switches to display the note instead.
+ * @param index the deleted attachment index
+ */
+function onAttachmentDeleted(index: number) {
+  if (currentAttachmentIndex.value >= index) {
+    currentAttachmentIndex.value = store.documentUnit!.attachments.length - 1
+  }
+  if (store.documentUnit!.attachments.length === 0) {
+    selectNotes()
+  }
+}
+
+/**
+ * Exposes the functions "togglePanel", "selectAttachments" and "onAttachmentDeleted", so that they can be accessed from the parent component.
+ * This is required to have smooth and explicit interactions between the DocumentUnitAttachments component and this component through their shared parent.
+ */
+defineExpose({
+  togglePanel,
+  selectAttachments,
+  onAttachmentDeleted,
+  selectNotes,
+  selectPreview,
+})
 
 /**
  * Checks whether the panel should be expanded when it is mounted.
@@ -94,33 +127,10 @@ function togglePanel(expand?: boolean): boolean {
  * Otherwise, it is collapsed by default.
  */
 onMounted(() => {
-  setDefaultState()
   if (route.query.showAttachmentPanel) {
-    store.isExpanded = route.query.showAttachmentPanel === "true"
+    isExpanded.value = route.query.showAttachmentPanel === "true"
   } else {
-    store.isExpanded = hasNote.value || hasAttachments.value
-  }
-})
-
-function setDefaultState() {
-  if (
-    !documentUnitStore.documentUnit!.note &&
-    documentUnitStore.documentUnit!.hasAttachments
-  ) {
-    selectAttachments()
-  } else {
-    selectNotes()
-  }
-}
-
-/**
- * Checks whether a selected side panel mode is excluded, and defaults to the first available panel if so.
- **/
-watch(store, () => {
-  if (props.enabledPanels) {
-    if (!props.enabledPanels.includes(store.panelMode!)) {
-      store.setSidePanelMode(props.enabledPanels[0])
-    }
+    isExpanded.value = hasNote.value || hasAttachments.value
   }
 })
 </script>
@@ -128,12 +138,12 @@ watch(store, () => {
 <template>
   <FlexItem
     class="h-full flex-col border-l-1 border-solid border-gray-400 bg-white"
-    :class="[store.isExpanded ? 'flex-1' : '', store.isExpanded ? 'w-1/2' : '']"
+    :class="[isExpanded ? 'flex-1' : '', isExpanded ? 'w-1/2' : '']"
     data-testid="attachment-view-side-panel"
   >
     <SideToggle
       class="sticky top-[4rem] z-20 max-h-fit"
-      :is-expanded="store.isExpanded"
+      :is-expanded="isExpanded"
       label="Seitenpanel"
       :opening-direction="OpeningDirection.LEFT"
       shortcut="<"
@@ -141,69 +151,59 @@ watch(store, () => {
       @update:is-expanded="togglePanel"
     >
       <FlexContainer class="m-24 ml-16 items-center -space-x-2 px-8">
-        <div v-if="!enabledPanels || enabledPanels.includes('note')">
-          <Tooltip shortcut="n" text="Notiz">
-            <TextButton
-              id="note"
-              aria-label="Notiz anzeigen"
-              button-type="tertiary"
-              class="flex"
-              :class="store.panelMode === 'note' ? 'bg-blue-200' : ''"
-              data-testid="note-button"
-              :icon="IconStickyNote"
-              size="small"
-              @click="() => selectNotes()"
-            />
-          </Tooltip>
-        </div>
-        <div v-if="!enabledPanels || enabledPanels.includes('attachments')">
-          <Tooltip shortcut="d" text="Datei">
-            <TextButton
-              id="attachments"
-              aria-label="Dokumente anzeigen"
-              button-type="tertiary"
-              :class="store.panelMode === 'attachments' ? 'bg-blue-200' : ''"
-              data-testid="attachments-button"
-              :icon="IconAttachFile"
-              size="small"
-              @click="() => selectAttachments()"
-            />
-          </Tooltip>
-        </div>
+        <Tooltip shortcut="n" text="Notiz">
+          <TextButton
+            id="note"
+            aria-label="Notiz anzeigen"
+            button-type="tertiary"
+            class="flex"
+            :class="selectedPanelContent === 'note' ? 'bg-blue-200' : ''"
+            :icon="IconStickyNote"
+            size="small"
+            @click="() => selectNotes()"
+          />
+        </Tooltip>
 
-        <div v-if="!enabledPanels || enabledPanels.includes('preview')">
-          <Tooltip shortcut="v" text="Vorschau">
-            <TextButton
-              id="preview"
-              aria-label="Vorschau anzeigen"
-              button-type="tertiary"
-              :class="store.panelMode === 'preview' ? 'bg-blue-200' : ''"
-              data-testid="preview-button"
-              :icon="IconPreview"
-              size="small"
-              @click="() => selectPreview()"
-            />
-          </Tooltip>
-        </div>
+        <Tooltip shortcut="d" text="Datei">
+          <TextButton
+            id="attachments"
+            aria-label="Dokumente anzeigen"
+            button-type="tertiary"
+            :class="selectedPanelContent === 'attachments' ? 'bg-blue-200' : ''"
+            :icon="IconAttachFile"
+            size="small"
+            @click="() => selectAttachments()"
+          />
+        </Tooltip>
+
+        <Tooltip shortcut="v" text="Vorschau">
+          <TextButton
+            id="preview"
+            aria-label="Vorschau anzeigen"
+            button-type="tertiary"
+            :class="selectedPanelContent === 'preview' ? 'bg-blue-200' : ''"
+            :icon="IconPreview"
+            size="small"
+            @click="() => selectPreview()"
+          />
+        </Tooltip>
 
         <div class="flex-grow" />
 
         <FileNavigator
-          v-if="store.panelMode === 'attachments'"
-          :attachments="documentUnitStore.documentUnit!.attachments"
-          :current-index="store.currentAttachmentIndex"
+          v-if="selectedPanelContent === 'attachments'"
+          :attachments="store.documentUnit!.attachments"
+          :current-index="currentAttachmentIndex"
           @select="handleOnSelectAttachment"
         ></FileNavigator>
         <Tooltip text="In neuem Tab öffnen">
           <router-link
-            v-if="store.panelMode === 'preview'"
+            v-if="selectedPanelContent === 'preview'"
             aria-label="Vorschau in neuem Tab öffnen"
             target="_blank"
             :to="{
               name: 'caselaw-documentUnit-documentNumber-preview',
-              params: {
-                documentNumber: documentUnitStore.documentUnit!.documentNumber,
-              },
+              params: { documentNumber: store.documentUnit!.documentNumber },
             }"
           >
             <TextButton
@@ -216,31 +216,27 @@ watch(store, () => {
       </FlexContainer>
 
       <div class="m-24">
-        <div v-if="store.panelMode === 'note'">
+        <div v-if="selectedPanelContent === 'note'">
           <InputField id="notesInput" v-slot="{ id }" label="Notiz">
             <TextAreaInput
               :id="id"
-              v-model="documentUnitStore.documentUnit!.note"
+              v-model="store.documentUnit!.note"
               aria-label="Notiz Eingabefeld"
               autosize
               custom-classes="max-h-[65vh]"
             />
           </InputField>
         </div>
-        <div v-if="store.panelMode === 'attachments'">
+        <div v-if="selectedPanelContent === 'attachments'">
           <AttachmentView
             v-if="
-              documentUnitStore.documentUnit!.uuid &&
-              documentUnitStore.documentUnit!.attachments &&
-              documentUnitStore.documentUnit!.attachments[
-                store.currentAttachmentIndex
-              ]?.s3path
+              store.documentUnit!.uuid &&
+              store.documentUnit!.attachments &&
+              store.documentUnit!.attachments[currentAttachmentIndex]?.s3path
             "
-            :document-unit-uuid="documentUnitStore.documentUnit!.uuid"
+            :document-unit-uuid="store.documentUnit!.uuid"
             :s3-path="
-              documentUnitStore.documentUnit!.attachments[
-                store.currentAttachmentIndex
-              ].s3path
+              store.documentUnit!.attachments[currentAttachmentIndex].s3path
             "
           />
           <div v-else class="ds-label-01-reg">
@@ -248,11 +244,11 @@ watch(store, () => {
           </div>
         </div>
         <FlexContainer
-          v-if="store.panelMode === 'preview'"
+          v-if="selectedPanelContent === 'preview'"
           class="max-h-[70vh] overflow-auto"
         >
           <DocumentUnitPreview
-            :document-unit="documentUnitStore.documentUnit!"
+            :document-unit="store.documentUnit!"
             layout="narrow"
           />
         </FlexContainer>

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import DecisionSummary from "@/components/DecisionSummary.vue"
-import { DisplayMode } from "@/components/enumDisplayMode"
 import FlexContainer from "@/components/FlexContainer.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
@@ -12,7 +11,6 @@ const { allowMultipleLinks = false } = defineProps<{
   searchResults?: SearchResults<RelatedDocumentation>
   isLoading: boolean
   allowMultipleLinks?: boolean
-  displayMode?: DisplayMode
 }>()
 
 const emits =
@@ -66,10 +64,7 @@ export type SearchResults<Type extends RelatedDocumentation> = {
             size="small"
             @click.stop="emits('linkDecision', searchResult.decision)"
           />
-          <DecisionSummary
-            :decision="searchResult.decision"
-            :display-mode="displayMode"
-          ></DecisionSummary>
+          <DecisionSummary :decision="searchResult.decision"></DecisionSummary>
           <span
             v-if="searchResult.isLinked"
             class="ds-label-02-reg ml-8 rounded-full bg-yellow-400 px-8 py-2"

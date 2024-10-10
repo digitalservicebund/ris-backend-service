@@ -3,7 +3,6 @@ import { computed, onMounted, ref, watch } from "vue"
 import { ValidationError } from "../input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import CreateNewFromSearch from "@/components/CreateNewFromSearch.vue"
-import { DisplayMode } from "@/components/enumDisplayMode"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
@@ -448,7 +447,6 @@ onMounted(async () => {
       >
         <SearchResultList
           allow-multiple-links
-          :display-mode="DisplayMode.SIDEPANEL"
           :is-loading="isLoading"
           :search-results="searchResults"
           @link-decision="addReference"

@@ -1,7 +1,6 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { fireEvent, render, screen } from "@testing-library/vue"
-import { createRouter, createWebHistory } from "vue-router"
 import ActiveCitations from "@/components/ActiveCitations.vue"
 import { ComboboxItem } from "@/components/input/types"
 import ActiveCitation from "@/domain/activeCitation"
@@ -9,15 +8,10 @@ import { CitationType } from "@/domain/citationType"
 import DocumentUnit, { Court, DocumentType } from "@/domain/documentUnit"
 import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
-import routes from "~/test-helper/routes"
 
 function renderComponent(activeCitations?: ActiveCitation[]) {
   const user = userEvent.setup()
 
-  const router = createRouter({
-    history: createWebHistory(),
-    routes: routes,
-  })
   return {
     user,
     ...render(ActiveCitations, {
@@ -38,7 +32,6 @@ function renderComponent(activeCitations?: ActiveCitation[]) {
               stubActions: false,
             }),
           ],
-          [router],
         ],
         stubs: { routerLink: { template: "<a><slot/></a>" } },
       },

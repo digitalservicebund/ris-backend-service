@@ -14,7 +14,6 @@ import { useCaseLawMenuItems } from "@/composables/useCaseLawMenuItems"
 import useQuery from "@/composables/useQueryFromRoute"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
-import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 
 const props = defineProps<{
   documentNumber: string
@@ -25,7 +24,6 @@ useHead({
 })
 
 const store = useDocumentUnitStore()
-const extraContentSidePanelStore = useExtraContentSidePanelStore()
 
 const route = useRoute()
 const menuItems = useCaseLawMenuItems(props.documentNumber, route.query)
@@ -39,6 +37,10 @@ const showNavigationPanelRef: Ref<boolean> = ref(
 )
 
 const responseError = ref<ResponseError>()
+
+const extraContentSidePanel = ref<InstanceType<
+  typeof ExtraContentSidePanel
+> | null>(null)
 
 function toggleNavigationPanel(expand?: boolean) {
   showNavigationPanelRef.value =
@@ -58,23 +60,20 @@ async function requestDocumentUnitFromServer() {
 }
 
 async function attachmentIndexSelected(index: number) {
-  extraContentSidePanelStore.togglePanel(true)
-  extraContentSidePanelStore.selectAttachments(index)
+  extraContentSidePanel.value?.togglePanel(true)
+  extraContentSidePanel.value?.selectAttachments(index)
 }
 
 async function attachmentIndexDeleted(index: number) {
   await requestDocumentUnitFromServer()
-  extraContentSidePanelStore.onAttachmentDeleted(
-    index,
-    documentUnit.value ? documentUnit.value.attachments.length - 1 : 0,
-  )
+  extraContentSidePanel.value?.onAttachmentDeleted(index)
 }
 
 async function attachmentsUploaded(anySuccessful: boolean) {
   if (anySuccessful) {
     await requestDocumentUnitFromServer()
-    extraContentSidePanelStore.togglePanel(true)
-    extraContentSidePanelStore.selectAttachments(
+    extraContentSidePanel.value?.togglePanel(true)
+    extraContentSidePanel.value?.selectAttachments(
       documentUnit.value ? documentUnit.value.attachments.length - 1 : 0,
     )
   }
@@ -96,21 +95,21 @@ const handleKeyDown = (event: KeyboardEvent) => {
   switch (event.key) {
     case "<": // Ctrl + [
       event.preventDefault()
-      toggleNavigationPanel(extraContentSidePanelStore.togglePanel())
+      toggleNavigationPanel(extraContentSidePanel.value?.togglePanel())
       break
     case "n": // Ctrl + N
       event.preventDefault()
-      extraContentSidePanelStore.togglePanel(true)
-      extraContentSidePanelStore.setSidePanelMode("note")
+      extraContentSidePanel.value?.togglePanel(true)
+      extraContentSidePanel.value?.selectNotes()
       break
     case "d": // Ctrl + D
       event.preventDefault()
-      extraContentSidePanelStore.togglePanel(true)
-      extraContentSidePanelStore.setSidePanelMode("attachments")
+      extraContentSidePanel.value?.togglePanel(true)
+      extraContentSidePanel.value?.selectAttachments()
       break
     case "v": // Ctrl + V
-      extraContentSidePanelStore.togglePanel(true)
-      extraContentSidePanelStore.setSidePanelMode("preview")
+      extraContentSidePanel.value?.togglePanel(true)
+      extraContentSidePanel.value?.selectPreview()
       break
     default:
       break
@@ -170,6 +169,7 @@ onMounted(async () => {
                 route.path.includes('preview')
               )
             "
+            ref="extraContentSidePanel"
           ></ExtraContentSidePanel>
           <router-view
             :validation-errors="validationErrors"
