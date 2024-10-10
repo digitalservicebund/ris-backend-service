@@ -92,18 +92,6 @@ export const navigateToPeriodicalEvaluation = async (page: Page) => {
   })
 }
 
-export const navigateToPeriodicalEdition = async (
-  page: Page,
-  editionId: string,
-) => {
-  await test.step("Navigate to 'Periodikumauswertung > Ausgabe'", async () => {
-    const baseUrl = `/caselaw/periodical-evaluation/${editionId}/edition`
-
-    await page.goto(baseUrl)
-    await expect(page.getByTestId("edition-title")).toBeVisible()
-  })
-}
-
 export const navigateToPeriodicalReferences = async (
   page: Page,
   editionId: string,

@@ -41,6 +41,8 @@ test.describe(
           await expect(
             page.getByText("Dokumentationsstelle zuweisen *"),
           ).toBeHidden()
+          await fillInput(page, "Gericht", "BGH")
+          await page.getByText("BGH").click()
           await page.getByText("Suchen").click()
           await expect(
             page.getByText("Dokumentationsstelle zuweisen *"),
