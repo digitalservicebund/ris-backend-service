@@ -7,6 +7,7 @@ import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
 import Attachment from "@/domain/attachment"
 import DocumentUnit from "@/domain/documentUnit"
 import Reference from "@/domain/reference"
+import { SelectablePanelContent } from "@/types/panelContentMode"
 
 let router: Router
 
@@ -15,12 +16,16 @@ function renderComponent(
     note?: string
     attachments?: Attachment[]
     references?: Reference[]
+    enabledPanels?: SelectablePanelContent[]
   } = {},
 ) {
   const user = userEvent.setup()
   return {
     user,
     ...render(ExtraContentSidePanel, {
+      props: options.enabledPanels
+        ? { enabledPanels: options.enabledPanels }
+        : {},
       global: {
         plugins: [
           [router],
@@ -35,6 +40,7 @@ function renderComponent(
                   }),
                 },
               },
+              stubActions: false, // To use the store functions in extraContentSidePanelStore
             }),
           ],
         ],
@@ -257,6 +263,48 @@ describe("ExtraContentSidePanel", () => {
 
       screen.getByLabelText("Notiz anzeigen").click()
       expect(await screen.findByDisplayValue("some note")).toBeVisible()
+    })
+
+    describe("Enable side panel content", async () => {
+      const testCases = [
+        {
+          enabledPanels: ["attachments"],
+          expectedHidden: ["note", "preview"],
+        },
+        {
+          enabledPanels: ["note"],
+          expectedHidden: ["attachments", "preview"],
+        },
+        {
+          enabledPanels: ["preview"],
+          expectedHidden: ["attachments", "note"],
+        },
+      ]
+      testCases.forEach(({ enabledPanels, expectedHidden }) =>
+        test(`panel enable ${enabledPanels} and hide ${expectedHidden}`, async () => {
+          renderComponent({
+            note: "",
+            attachments: [],
+            enabledPanels: enabledPanels as SelectablePanelContent[],
+          })
+
+          screen.getByLabelText("Seitenpanel öffnen").click()
+
+          for (const contentType of enabledPanels) {
+            expect(
+              await screen.findByTestId(contentType + "-button"),
+              `${contentType} should be displayed`,
+            ).toBeVisible()
+          }
+
+          for (const contentType of expectedHidden) {
+            expect(
+              screen.queryByTestId(contentType + "-button"),
+              `${contentType} should be hidden`,
+            ).not.toBeInTheDocument()
+          }
+        }),
+      )
     })
   })
 })
