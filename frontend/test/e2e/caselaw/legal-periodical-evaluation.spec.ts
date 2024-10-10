@@ -1,5 +1,7 @@
 import { expect, Page } from "@playwright/test"
+import { screen } from "@testing-library/vue"
 import dayjs from "dayjs"
+import { aw } from "vitest/dist/chunks/reporters.DAfKSDh5"
 import {
   fillInput,
   navigateToPeriodicalEvaluation,
@@ -289,6 +291,18 @@ test.describe(
           await expect(
             page.locator("[aria-label='Zitatstelle Suffix']"),
           ).not.toBeEditable()
+        })
+
+        await test.step("should open and close document preview in side panel", async () => {
+          await searchForDocUnitWithFileNumber(page, fileNumber, "31.12.2019")
+          await openSidePanelPreview(page, fileNumber)
+          await expect(page.getByLabel("Seitenpanel öffnen")).toBeHidden()
+          await expect(
+            page.locator("[aria-label='Vorschau anzeigen']"),
+          ).toBeVisible()
+          await page.getByLabel("Seitenpanel schließen").click()
+          await expect(page).toHaveURL(/showAttachmentPanel=false/)
+          await page.reload()
         })
 
         await test.step("Citation input is validated when input is left", async () => {})
@@ -648,6 +662,12 @@ test.describe(
         })
       },
     )
+
+    async function openSidePanelPreview(page: Page, fileNumber: string) {
+      await page.getByTestId(`document-number-link-${fileNumber}`).click()
+      await expect(page).toHaveURL(/showAttachmentPanel=true/)
+      await page.getByLabel("Vorschau anzeigen").click()
+    }
 
     async function searchForDocUnitWithFileNumber(
       page: Page,

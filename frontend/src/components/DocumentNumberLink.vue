@@ -31,7 +31,7 @@ function openSidePanel(documentUnitNumber?: string) {
 <template>
   <FlexContainer
     align-items="items-center"
-    :data-testid="'document-number-link-' + props.decision.documentNumber"
+    :data-testid="'document-number-link-' + props.decision.fileNumber"
   >
     <span class="ds-label-01-reg ml-8 mr-8">|</span>
     <div v-if="decision.hasForeignSource" class="pt-3">
