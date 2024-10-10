@@ -8,9 +8,9 @@ import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.time.Instant;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /** Service to handle the status of a document unit in the database. */
 @Service
@@ -32,21 +32,22 @@ public class DatabaseDocumentationUnitStatusService implements DocumentationUnit
    * @throws DocumentationUnitNotExistsException if the documentation unit does not exist
    */
   @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
   public void update(String documentNumber, Status status)
       throws DocumentationUnitNotExistsException {
+
     DocumentationUnitDTO docUnit =
         databaseDocumentationUnitRepository
             .findByDocumentNumber(documentNumber)
-            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber))
-            .toBuilder()
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(status.publicationStatus())
-                        .withError(status.withError())
-                        .build()))
-            .build();
+            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
+    docUnit
+        .getStatus()
+        .add(
+            StatusDTO.builder()
+                .createdAt(Instant.now())
+                .publicationStatus(status.publicationStatus())
+                .withError(status.withError())
+                .build());
 
     databaseDocumentationUnitRepository.save(docUnit);
   }
@@ -58,6 +59,7 @@ public class DatabaseDocumentationUnitStatusService implements DocumentationUnit
    * @return the most recent publication status of the documentation unit
    */
   @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
   public PublicationStatus getLatestStatus(String documentNumber)
       throws DocumentationUnitNotExistsException {
     return databaseDocumentationUnitRepository

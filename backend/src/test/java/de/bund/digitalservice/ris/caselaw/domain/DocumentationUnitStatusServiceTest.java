@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -56,36 +58,29 @@ class DocumentationUnitStatusServiceTest {
       testUpdate_withDocumentNumberAndDocumentationUnitFoundWithExistingStatus_shouldUpdateTheExistingStatus()
           throws DocumentationUnitNotExistsException {
 
-    Status status =
-        Status.builder()
-            .createdAt(Instant.now())
-            .publicationStatus(PublicationStatus.PUBLISHED)
-            .withError(true)
-            .build();
-    DocumentationUnit.builder().uuid(TEST_UUID).build();
+    var statusList =
+        List.of(
+            StatusDTO.builder()
+                .publicationStatus(PublicationStatus.DUPLICATED)
+                .withError(true)
+                .createdAt(Instant.now().minus(2, ChronoUnit.DAYS))
+                .build(),
+            StatusDTO.builder()
+                .publicationStatus(PublicationStatus.PUBLISHED)
+                .withError(true)
+                .createdAt(Instant.now())
+                .build(),
+            StatusDTO.builder()
+                .publicationStatus(PublicationStatus.UNPUBLISHED)
+                .withError(true)
+                .createdAt(Instant.now().minus(1, ChronoUnit.DAYS))
+                .build());
 
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitDTO.builder()
             .id(TEST_UUID)
             .documentNumber(DOCUMENT_NUMBER)
-            .status(
-                new ArrayList<>(
-                    List.of(
-                        StatusDTO.builder()
-                            .publicationStatus(PublicationStatus.DUPLICATED)
-                            .withError(true)
-                            .createdAt(Instant.now().minus(2, ChronoUnit.DAYS))
-                            .build(),
-                        StatusDTO.builder()
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .withError(true)
-                            .createdAt(Instant.now())
-                            .build(),
-                        StatusDTO.builder()
-                            .publicationStatus(PublicationStatus.UNPUBLISHED)
-                            .withError(true)
-                            .createdAt(Instant.now().minus(1, ChronoUnit.DAYS))
-                            .build())))
+            .status(new ArrayList<>(statusList))
             .build();
 
     ArgumentCaptor<DocumentationUnitDTO> captor =
@@ -93,19 +88,30 @@ class DocumentationUnitStatusServiceTest {
 
     when(databaseDocumentationUnitRepository.findByDocumentNumber(DOCUMENT_NUMBER))
         .thenReturn(Optional.of(documentationUnitDTO));
+    var timestamp = Instant.now();
 
-    statusService.update(DOCUMENT_NUMBER, status);
+    Status newStatus =
+        Status.builder()
+            .createdAt(timestamp)
+            .publicationStatus(PublicationStatus.PUBLISHED)
+            .withError(true)
+            .build();
+
+    statusService.update(DOCUMENT_NUMBER, newStatus);
 
     verify(databaseDocumentationUnitRepository, times(1)).save(captor.capture());
     assertThat(captor.getValue().getStatus())
         .usingRecursiveComparison()
-        .ignoringFields("createdAt")
+        .ignoringFields("id", "createdAt")
         .isEqualTo(
-            List.of(
-                StatusDTO.builder()
-                    .publicationStatus(PublicationStatus.PUBLISHED)
-                    .withError(true)
-                    .build()));
+            Stream.concat(
+                    statusList.stream(),
+                    Stream.of(
+                        StatusDTO.builder()
+                            .publicationStatus(PublicationStatus.PUBLISHED)
+                            .withError(true)
+                            .build()))
+                .collect(Collectors.toList()));
   }
 
   @Test
