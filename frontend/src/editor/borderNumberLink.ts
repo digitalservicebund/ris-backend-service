@@ -1,4 +1,5 @@
 import { Mark, markInputRule } from "@tiptap/core"
+import handleBackspace from "@/editor/shortcuts/handleBackspace"
 
 export const BorderNumberLink = Mark.create({
   name: "BorderNumberLink",
@@ -10,6 +11,11 @@ export const BorderNumberLink = Mark.create({
         tag: "border-number-link",
       },
     ]
+  },
+  addKeyboardShortcuts() {
+    return {
+      Backspace: ({ editor }) => handleBackspace(editor),
+    }
   },
 
   renderHTML({ mark }) {
