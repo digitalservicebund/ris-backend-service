@@ -38,7 +38,6 @@ public interface DatabaseDocumentationUnitRepository
         AND (
           :status IN ('PUBLISHED', 'PUBLISHING')
           OR documentationUnit.documentationOffice.id = :documentationOfficeId
-          OR (status.publicationStatus = 'EXTERNAL_HANDOVER_PENDING' AND documentationUnit.creatingDocumentationOffice.id = :documentationOfficeId)
         )
       )
    )
