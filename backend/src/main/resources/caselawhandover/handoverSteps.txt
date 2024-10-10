@@ -1,0 +1,4 @@
+Add Moxy in build.gradle.kts and libs.versions.toml
+Migrate code in java/de/bund/digitalservice/ris/search/caselawhandover/
+Migrate resources in resources/caselawhandover
+Migrate tests in java/de/bund/digitalservice/ris/search/caselawhandover
