@@ -8,14 +8,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.CaseLawDbEntityToLdmlMapper;
+import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
+import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +37,7 @@ class CaseLawLdmlExportTest {
   static DocumentationUnitRepository documentationUnitRepository;
   static CaseLawBucket caseLawBucket;
   static CaseLawPostgresToS3Exporter exporter;
-  static DocumentationUnitDTO testDocumentUnit;
+  static DocumentationUnit testDocumentUnit;
   static UUID testUUID;
 
   @BeforeAll
@@ -45,30 +46,35 @@ class CaseLawLdmlExportTest {
     caseLawBucket = mock(CaseLawBucket.class);
     exporter = new CaseLawPostgresToS3Exporter(documentationUnitRepository, caseLawBucket);
 
-    PreviousDecisionDTO related1 =
-        PreviousDecisionDTO.builder()
-            .date(LocalDate.of(2020, 1, 1))
-            .court(CourtDTO.builder().type("Test court type").build())
-            .documentType(DocumentTypeDTO.builder().abbreviation("Test decision type").build())
+    PreviousDecision related1 =
+        PreviousDecision.builder()
+            .decisionDate(LocalDate.of(2020, 1, 1))
+            .court(Court.builder().type("Test court type").build())
+            .documentType(DocumentType.builder().label("Test decision type").build())
             .fileNumber("Test file number")
             .documentNumber("Test document number 1")
             .build();
-    PreviousDecisionDTO related2 =
+    PreviousDecision related2 =
         related1.toBuilder().documentNumber("Test document number 2").build();
 
     testUUID = UUID.randomUUID();
     testDocumentUnit =
-        DocumentationUnitDTO.builder()
-            .id(testUUID)
-            .ecli("testecli")
-            .court(CourtDTO.builder().type("testCourtType").location("testCourtLocation").build())
-            .documentType(
-                DocumentTypeDTO.builder().abbreviation("testDocumentTypeAbbreviation").build())
-            .legalEffect(LegalEffectDTO.JA)
-            .fileNumbers(List.of(FileNumberDTO.builder().value("testFileNumber").build()))
+        DocumentationUnit.builder()
+            .uuid(testUUID)
+            .coreData(
+                CoreData.builder()
+                    .ecli("testecli")
+                    .court(
+                        Court.builder().type("testCourtType").location("testCourtLocation").build())
+                    .documentType(
+                        DocumentType.builder().label("testDocumentTypeAbbreviation").build())
+                    .legalEffect("ja")
+                    .fileNumbers(List.of("testFileNumber"))
+                    .decisionDate(LocalDate.of(2020, 1, 1))
+                    .build())
             .documentNumber("testDocumentNumber")
-            .decisionDate(LocalDate.of(2020, 1, 1))
-            .caseFacts("<p>Example content 1</p>")
+            .longTexts(LongTexts.builder().caseFacts("<p>Example content 1</p>").build())
+            .shortTexts(ShortTexts.builder().build())
             .previousDecisions(List.of(related1, related2))
             .build();
   }
@@ -91,8 +97,13 @@ class CaseLawLdmlExportTest {
   @Test
   @DisplayName("Invalid Case Law Ldml should fail validation 1")
   void xsdValidationFailure1() {
-    DocumentationUnitDTO invalidTestDocumentUnit =
-        testDocumentUnit.toBuilder().caseFacts("<p>Example <p>nested</p> content 1</p>").build();
+    DocumentationUnit invalidTestDocumentUnit =
+        testDocumentUnit.toBuilder()
+            .longTexts(
+                testDocumentUnit.longTexts().toBuilder()
+                    .caseFacts("<p>Example <p>nested</p> content 1</p>")
+                    .build())
+            .build();
     when(documentationUnitRepository.getUnprocessedIds()).thenReturn(List.of(UUID.randomUUID()));
     when(documentationUnitRepository.findByIdIn(anyList()))
         .thenReturn(List.of(invalidTestDocumentUnit));
@@ -104,8 +115,8 @@ class CaseLawLdmlExportTest {
   @Test
   @DisplayName("Invalid Case Law Ldml should fail validation 2")
   void xsdValidationFailure2() {
-    DocumentationUnitDTO invalidTestDocumentUnit =
-        testDocumentUnit.toBuilder().caseFacts(null).build();
+    DocumentationUnit invalidTestDocumentUnit =
+        testDocumentUnit.toBuilder().longTexts(null).build();
     when(documentationUnitRepository.getUnprocessedIds()).thenReturn(List.of(UUID.randomUUID()));
     when(documentationUnitRepository.findByIdIn(anyList()))
         .thenReturn(List.of(invalidTestDocumentUnit));
@@ -127,7 +138,7 @@ class CaseLawLdmlExportTest {
               </akn:docTitle>
            </akn:block>
            """;
-    Optional<CaseLawLdml> ldml = CaseLawDbEntityToLdmlMapper.getLDML(testDocumentUnit);
+    Optional<CaseLawLdml> ldml = CaseLawDbEntityToLdmlMapper.transformToLdml(testDocumentUnit);
     Assertions.assertTrue(ldml.isPresent());
     Optional<String> fileContent = exporter.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());
@@ -149,9 +160,14 @@ class CaseLawLdmlExportTest {
               </akn:opinion>
            </akn:block>
            """;
-    DocumentationUnitDTO dissentingCaseLaw =
-        testDocumentUnit.toBuilder().dissentingOpinion("<p>dissenting test</p>").build();
-    Optional<CaseLawLdml> ldml = CaseLawDbEntityToLdmlMapper.getLDML(dissentingCaseLaw);
+    DocumentationUnit dissentingCaseLaw =
+        testDocumentUnit.toBuilder()
+            .longTexts(
+                testDocumentUnit.longTexts().toBuilder()
+                    .dissentingOpinion("<p>dissenting test</p>")
+                    .build())
+            .build();
+    Optional<CaseLawLdml> ldml = CaseLawDbEntityToLdmlMapper.transformToLdml(dissentingCaseLaw);
     Assertions.assertTrue(ldml.isPresent());
     Optional<String> fileContent = exporter.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());
@@ -171,9 +187,12 @@ class CaseLawLdmlExportTest {
                </akn:embeddedStructure>
             </akn:block>
            """;
-    DocumentationUnitDTO headnoteCaseLaw =
-        testDocumentUnit.toBuilder().headnote("<p>headnote test</p>").build();
-    Optional<CaseLawLdml> ldml = CaseLawDbEntityToLdmlMapper.getLDML(headnoteCaseLaw);
+    DocumentationUnit headnoteCaseLaw =
+        testDocumentUnit.toBuilder()
+            .shortTexts(
+                testDocumentUnit.shortTexts().toBuilder().headnote("<p>headnote test</p>").build())
+            .build();
+    Optional<CaseLawLdml> ldml = CaseLawDbEntityToLdmlMapper.transformToLdml(headnoteCaseLaw);
     Assertions.assertTrue(ldml.isPresent());
     Optional<String> fileContent = exporter.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());
@@ -193,12 +212,19 @@ class CaseLawLdmlExportTest {
                </akn:embeddedStructure>
             </akn:block>
            """;
-    DocumentationUnitDTO otherHeadnoteCaseLaw =
-        testDocumentUnit.toBuilder().otherHeadnote("<p>other headnote test</p>").build();
-    Optional<CaseLawLdml> ldml = CaseLawDbEntityToLdmlMapper.getLDML(otherHeadnoteCaseLaw);
+    DocumentationUnit otherHeadnoteCaseLaw =
+        testDocumentUnit.toBuilder()
+            .shortTexts(
+                testDocumentUnit.shortTexts().toBuilder()
+                    .otherHeadnote("<p>other headnote test</p>")
+                    .build())
+            .build();
+    Optional<CaseLawLdml> ldml = CaseLawDbEntityToLdmlMapper.transformToLdml(otherHeadnoteCaseLaw);
     Assertions.assertTrue(ldml.isPresent());
     Optional<String> fileContent = exporter.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());
+    var bla = StringUtils.deleteWhitespace(fileContent.get());
+    var blub = StringUtils.deleteWhitespace(expected);
     Assertions.assertTrue(
         StringUtils.deleteWhitespace(fileContent.get())
             .contains(StringUtils.deleteWhitespace(expected)));
@@ -215,9 +241,12 @@ class CaseLawLdmlExportTest {
                </akn:embeddedStructure>
             </akn:block>
            """;
-    DocumentationUnitDTO groundsCaseLaw =
-        testDocumentUnit.toBuilder().grounds("<p>grounds test</p>").build();
-    Optional<CaseLawLdml> ldml = CaseLawDbEntityToLdmlMapper.getLDML(groundsCaseLaw);
+    DocumentationUnit groundsCaseLaw =
+        testDocumentUnit.toBuilder()
+            .longTexts(
+                testDocumentUnit.longTexts().toBuilder().reasons("<p>grounds test</p>").build())
+            .build();
+    Optional<CaseLawLdml> ldml = CaseLawDbEntityToLdmlMapper.transformToLdml(groundsCaseLaw);
     Assertions.assertTrue(ldml.isPresent());
     Optional<String> fileContent = exporter.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());
@@ -239,9 +268,14 @@ class CaseLawLdmlExportTest {
             </akn:block>
          </akn:decision>
          """;
-    DocumentationUnitDTO otherLongTextCaseLaw =
-        testDocumentUnit.toBuilder().otherLongText("<p>Other long text test</p>").build();
-    Optional<CaseLawLdml> ldml = CaseLawDbEntityToLdmlMapper.getLDML(otherLongTextCaseLaw);
+    DocumentationUnit otherLongTextCaseLaw =
+        testDocumentUnit.toBuilder()
+            .longTexts(
+                testDocumentUnit.longTexts().toBuilder()
+                    .otherLongText("<p>Other long text test</p>")
+                    .build())
+            .build();
+    Optional<CaseLawLdml> ldml = CaseLawDbEntityToLdmlMapper.transformToLdml(otherLongTextCaseLaw);
     Assertions.assertTrue(ldml.isPresent());
     Optional<String> fileContent = exporter.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());

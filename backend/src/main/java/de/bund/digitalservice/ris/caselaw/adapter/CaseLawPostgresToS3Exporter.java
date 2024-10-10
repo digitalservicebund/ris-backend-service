@@ -1,8 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.CaseLawDbEntityToLdmlMapper;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import jakarta.xml.bind.JAXB;
 import java.io.FileNotFoundException;
@@ -74,8 +74,8 @@ public class CaseLawPostgresToS3Exporter {
   }
 
   public void saveOneBatch(List<UUID> ids) {
-    for (DocumentationUnitDTO caselaw : documentationUnitRepository.findByIdIn(ids)) {
-      Optional<CaseLawLdml> ldml = CaseLawDbEntityToLdmlMapper.getLDML(caselaw);
+    for (DocumentationUnit documentationUnit : documentationUnitRepository.findByIdIn(ids)) {
+      Optional<CaseLawLdml> ldml = CaseLawDbEntityToLdmlMapper.transformToLdml(documentationUnit);
       if (ldml.isPresent()) {
         Optional<String> fileContent = ldmlToString(ldml.get());
         fileContent.ifPresent(s -> caseLawBucket.save(ldml.get().getUniqueId() + ".xml", s));

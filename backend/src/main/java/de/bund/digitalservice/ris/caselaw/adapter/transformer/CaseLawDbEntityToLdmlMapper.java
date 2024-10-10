@@ -29,23 +29,25 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RelatedDecision;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Title;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionNameDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingEcliDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RelatedDocumentationDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
+import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
+import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
+import de.bund.digitalservice.ris.caselaw.domain.Status;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import jakarta.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -57,212 +59,226 @@ public class CaseLawDbEntityToLdmlMapper {
 
   private CaseLawDbEntityToLdmlMapper() {}
 
-  public static Optional<CaseLawLdml> getLDML(DocumentationUnitDTO caseLaw) {
+  public static Optional<CaseLawLdml> transformToLdml(DocumentationUnit documentationUnit) {
     try {
-      return Optional.of(CaseLawLdml.builder().judgment(buildJudgment(caseLaw)).build());
+      return Optional.of(CaseLawLdml.builder().judgment(buildJudgment(documentationUnit)).build());
     } catch (ValidationException e) {
       logger.error("Case law validation failed: {}", e.getMessage());
       return Optional.empty();
     }
   }
 
-  private static Judgment buildJudgment(DocumentationUnitDTO caseLaw) throws ValidationException {
+  private static Judgment buildJudgment(DocumentationUnit documentationUnit)
+      throws ValidationException {
     return Judgment.builder()
-        .meta(buildMeta(caseLaw))
-        .judgmentBody(buildJudgmentBody(caseLaw))
-        .header(buildHeader(caseLaw))
+        .meta(buildMeta(documentationUnit))
+        .judgmentBody(buildJudgmentBody(documentationUnit))
+        .header(buildHeader(documentationUnit))
         .build();
   }
 
-  private static Header buildHeader(DocumentationUnitDTO caseLaw) throws ValidationException {
+  private static Header buildHeader(DocumentationUnit documentationUnit)
+      throws ValidationException {
     // Case law handover : define what the title should be if headline is null
     String title =
         ObjectUtils.defaultIfNull(
-            caseLaw.getHeadline(), "<p>" + caseLaw.getDocumentNumber() + "</p>");
+            nullSafeGet(documentationUnit.shortTexts(), ShortTexts::headline),
+            "<p>" + documentationUnit.documentNumber() + "</p>");
     validateNotNull(title, "Title missing");
+    String opinion = nullSafeGet(documentationUnit.longTexts(), LongTexts::dissentingOpinion);
     return new Header()
         .withBlock("title", Title.build(title))
-        .withBlock("opinions", Opinions.build(caseLaw.getDissentingOpinion()));
+        .withBlock("opinions", Opinions.build(opinion));
   }
 
-  private static JudgmentBody buildJudgmentBody(DocumentationUnitDTO caseLaw) {
+  private static JudgmentBody buildJudgmentBody(DocumentationUnit documentationUnit) {
 
     JudgmentBody.JudgmentBodyBuilder builder = JudgmentBody.builder();
 
+    var shortTexts = documentationUnit.shortTexts();
+    var longTexts = documentationUnit.longTexts();
     builder
-        .introduction(JaxbHtml.build(caseLaw.getGuidingPrinciple()))
-        .background(JaxbHtml.build(caseLaw.getCaseFacts()))
-        .decision(Decision.build(caseLaw.getTenor(), caseLaw.getOtherLongText()))
-        .arguments(JaxbHtml.build(caseLaw.getDecisionGrounds()));
+        .introduction(JaxbHtml.build(nullSafeGet(shortTexts, ShortTexts::guidingPrinciple)))
+        .background(JaxbHtml.build(nullSafeGet(longTexts, LongTexts::caseFacts)))
+        .decision(
+            Decision.build(
+                nullSafeGet(longTexts, LongTexts::tenor),
+                nullSafeGet(longTexts, LongTexts::otherLongText)))
+        .arguments(JaxbHtml.build(nullSafeGet(longTexts, LongTexts::decisionReasons)));
 
-    if (StringUtils.isNotEmpty(caseLaw.getHeadnote())
-        || StringUtils.isNotEmpty(caseLaw.getOtherHeadnote())
-        || StringUtils.isNotEmpty(caseLaw.getGrounds())) {
+    var headnote = nullSafeGet(shortTexts, ShortTexts::headnote);
+    var otherHeadnote = nullSafeGet(shortTexts, ShortTexts::otherHeadnote);
+    var reasons = nullSafeGet(longTexts, LongTexts::reasons);
+    if (StringUtils.isNotEmpty(headnote)
+        || StringUtils.isNotEmpty(otherHeadnote)
+        || StringUtils.isNotEmpty(reasons)) {
 
       builder
           .motivation(
               new Motivation()
                   .withBlock(
                       AknEmbeddedStructureInBlock.HeadNote.NAME,
-                      AknEmbeddedStructureInBlock.HeadNote.build(
-                          JaxbHtml.build(caseLaw.getHeadnote())))
+                      AknEmbeddedStructureInBlock.HeadNote.build(JaxbHtml.build(headnote)))
                   .withBlock(
                       AknEmbeddedStructureInBlock.OtherHeadNote.NAME,
                       AknEmbeddedStructureInBlock.OtherHeadNote.build(
-                          JaxbHtml.build(caseLaw.getOtherHeadnote())))
+                          JaxbHtml.build(otherHeadnote)))
                   .withBlock(
                       AknEmbeddedStructureInBlock.Grounds.NAME,
-                      AknEmbeddedStructureInBlock.Grounds.build(
-                          JaxbHtml.build(caseLaw.getGrounds()))))
+                      AknEmbeddedStructureInBlock.Grounds.build(JaxbHtml.build(reasons))))
           .build();
     }
 
     return builder.build();
   }
 
-  private static Meta buildMeta(DocumentationUnitDTO caseLaw) throws ValidationException {
-    validateNotNull(caseLaw.getCourt(), "Court missing");
-    validateNotNull(caseLaw.getCourt().getType(), "CourtType missing");
-    validateNotNull(caseLaw.getCourt().getLocation(), "CourtLocation missing");
-    validateNotNull(caseLaw.getDocumentType(), "DocumentType missing");
-    validateNotNull(caseLaw.getLegalEffect(), "LegalEffect missing");
-    validate(!caseLaw.getFileNumbers().isEmpty(), "FileNumber missing");
+  private static Meta buildMeta(DocumentationUnit documentationUnit) throws ValidationException {
+    if (documentationUnit.coreData() != null) {
+      validateNotNull(documentationUnit.coreData().court(), "Court missing");
+      if (documentationUnit.coreData().court() != null) {
+        validateNotNull(documentationUnit.coreData().court().type(), "CourtType missing");
+        validateNotNull(documentationUnit.coreData().court().location(), "CourtLocation missing");
+      }
+      validateNotNull(documentationUnit.coreData().documentType(), "DocumentType missing");
+      validateNotNull(documentationUnit.coreData().legalEffect(), "LegalEffect missing");
+      validate(!documentationUnit.coreData().fileNumbers().isEmpty(), "FileNumber missing");
+    } else {
+      throw new RuntimeException("Core data is null");
+    }
 
     Meta.MetaBuilder builder = Meta.builder();
 
     List<AknKeyword> keywords =
-        caseLaw.getDocumentationUnitKeywordDTOs().stream()
-            .map(documentationUnitKeywordDTO -> documentationUnitKeywordDTO.getKeyword().getValue())
-            .map(AknKeyword::new)
-            .toList();
+        documentationUnit.contentRelatedIndexing() == null
+            ? Collections.emptyList()
+            : documentationUnit.contentRelatedIndexing().keywords().stream()
+                .map(AknKeyword::new)
+                .toList();
+
     if (!keywords.isEmpty()) {
       builder.classification(Classification.builder().keyword(keywords).build());
     }
 
     return builder
-        .identification(buildIdentification(caseLaw))
-        .proprietary(Proprietary.builder().meta(buildRisMeta(caseLaw)).build())
+        .identification(buildIdentification(documentationUnit))
+        .proprietary(Proprietary.builder().meta(buildRisMeta(documentationUnit)).build())
         .build();
   }
 
-  private static RisMeta buildRisMeta(DocumentationUnitDTO caseLaw) {
-    List<RelatedDecision> previousDecision = new ArrayList<>();
-    List<RelatedDecision> ensuingDecision = new ArrayList<>();
-    for (RelatedDocumentationDTO current : caseLaw.getPreviousDecisions()) {
-      RelatedDecision decision =
-          RelatedDecision.builder()
-              .date(DateUtils.toDateString(current.getDate()))
-              .documentNumber(current.getDocumentNumber())
-              .fileNumber(current.getFileNumber())
-              .courtType(current.getCourt().getType())
-              .build();
-      previousDecision.add(decision);
-    }
-    for (RelatedDocumentationDTO current : caseLaw.getEnsuingDecisions()) {
-      RelatedDecision decision =
-          RelatedDecision.builder()
-              .date(DateUtils.toDateString(current.getDate()))
-              .documentNumber(current.getDocumentNumber())
-              .fileNumber(current.getFileNumber())
-              .courtType(current.getCourt().getType())
-              .build();
-      ensuingDecision.add(decision);
-    }
-    StatusDTO lastStatus = getLastStatus(caseLaw);
-
+  private static RisMeta buildRisMeta(DocumentationUnit documentationUnit) {
     RisMeta.RisMetaBuilder builder = RisMeta.builder();
 
-    List<String> legalForceLabel = new ArrayList<>();
-    caseLaw
-        .getNormReferences()
-        .forEach(
-            normReferenceDTO -> {
-              if (normReferenceDTO.getLegalForce() == null) {
-                return;
-              }
-
-              legalForceLabel.add(normReferenceDTO.getLegalForce().getLegalForceType().getLabel());
-            });
-    applyIfNotEmpty(legalForceLabel, builder::legalForce);
-    applyIfNotEmpty(
-        caseLaw.getDocumentationUnitFieldsOfLaw().stream()
-            .map(
-                documentationUnitFieldOfLawDTO ->
-                    documentationUnitFieldOfLawDTO.getFieldOfLaw().getText())
-            .toList(),
-        builder::fieldOfLaw);
-    applyIfNotEmpty(
-        caseLaw.getDeviatingDates().stream()
-            .map(deviationDate -> DateUtils.toDateString(deviationDate.getValue()))
-            .toList(),
-        builder::deviatingDate);
-    applyIfNotEmpty(
-        caseLaw.getDeviatingCourts().stream().map(DeviatingCourtDTO::getValue).toList(),
-        builder::deviatingCourt);
-    //    applyIfNotEmpty(
-    //        caseLaw.getDeviatingDocumentNumbers().stream()
-    //            .map(DeviatingDocumentNumber::getValue)
-    //            .toList(),
-    //        builder::deviatingDocumentNumber);
-    applyIfNotEmpty(
-        caseLaw.getDeviatingEclis().stream().map(DeviatingEcliDTO::getValue).toList(),
-        builder::deviatingEcli);
-    applyIfNotEmpty(
-        caseLaw.getDeviatingFileNumbers().stream().map(DeviatingFileNumberDTO::getValue).toList(),
-        builder::deviatingFileNumber);
-    applyIfNotEmpty(
-        caseLaw.getDecisionNames().stream().map(DecisionNameDTO::getValue).toList(),
-        builder::decisionName);
-    applyIfNotEmpty(
-        caseLaw.getFileNumbers().stream().map(FileNumberDTO::getValue).toList(),
-        builder::fileNumbers);
+    List<RelatedDecision> previousDecision = new ArrayList<>();
+    List<RelatedDecision> ensuingDecision = new ArrayList<>();
+    if (documentationUnit.previousDecisions() != null) {
+      for (PreviousDecision current : documentationUnit.previousDecisions()) {
+        RelatedDecision decision =
+            RelatedDecision.builder()
+                .date(DateUtils.toDateString(current.getDecisionDate()))
+                .documentNumber(current.getDocumentNumber())
+                .fileNumber(current.getFileNumber())
+                .courtType(nullSafeGet(current.getCourt(), Court::type))
+                .build();
+        previousDecision.add(decision);
+      }
+    }
+    if (documentationUnit.ensuingDecisions() != null) {
+      for (EnsuingDecision current : documentationUnit.ensuingDecisions()) {
+        RelatedDecision decision =
+            RelatedDecision.builder()
+                .date(DateUtils.toDateString(current.getDecisionDate()))
+                .documentNumber(current.getDocumentNumber())
+                .fileNumber(current.getFileNumber())
+                .courtType(nullSafeGet(current.getCourt(), Court::type))
+                .build();
+        ensuingDecision.add(decision);
+      }
+    }
     applyIfNotEmpty(previousDecision, builder::previousDecision);
     applyIfNotEmpty(ensuingDecision, builder::ensuingDecision);
-    applyIfNotEmpty(
-        caseLaw.getProcedures().stream()
-            .map(
-                documentationUnitProcedureDTO ->
-                    documentationUnitProcedureDTO.getProcedure().getLabel())
-            .toList(),
-        builder::procedure);
+
+    var contentRelatedIndexing = documentationUnit.contentRelatedIndexing();
+    if (contentRelatedIndexing != null) {
+      applyIfNotEmpty(
+          contentRelatedIndexing.norms().stream()
+              .flatMap(normReference -> normReference.singleNorms().stream())
+              .map(singleNorm -> singleNorm.legalForce().type().label())
+              .filter(Objects::nonNull)
+              .toList(),
+          builder::legalForce);
+      applyIfNotEmpty(
+          contentRelatedIndexing.fieldsOfLaw().stream().map(FieldOfLaw::text).toList(),
+          builder::fieldOfLaw);
+    }
+
+    var coreData = documentationUnit.coreData();
+    if (coreData != null) {
+      if (coreData.deviatingDecisionDates() != null) {
+        applyIfNotEmpty(
+            coreData.deviatingDecisionDates().stream().map(DateUtils::toDateString).toList(),
+            builder::deviatingDate);
+      }
+      applyIfNotEmpty(coreData.deviatingCourts(), builder::deviatingCourt);
+      //    applyIfNotEmpty(
+      //        caseLaw.getDeviatingDocumentNumbers().stream()
+      //            .map(DeviatingDocumentNumber::getValue)
+      //            .toList(),
+      //        builder::deviatingDocumentNumber);
+      applyIfNotEmpty(coreData.deviatingEclis(), builder::deviatingEcli);
+      applyIfNotEmpty(coreData.deviatingFileNumbers(), builder::deviatingFileNumber);
+      applyIfNotEmpty(coreData.fileNumbers(), builder::fileNumbers);
+      if (coreData.procedure() != null) {
+        applyIfNotEmpty(
+            Stream.of(coreData.procedure())
+                .map(Procedure::label)
+                .flatMap(it -> documentationUnit.coreData().previousProcedures().stream())
+                .toList(),
+            builder::procedure);
+      }
+
+      builder
+          .documentType(coreData.documentType().label())
+          .courtLocation(nullSafeGet(coreData.court(), Court::location))
+          .courtType(nullSafeGet(coreData.court(), Court::type))
+          .legalEffect(coreData.legalEffect())
+          .judicialBody(nullIfEmpty(coreData.appraisalBody()))
+          .documentationOffice(
+              nullSafeGet(coreData.documentationOffice(), DocumentationOffice::abbreviation));
+    }
+
+    var decisionName = nullSafeGet(documentationUnit.shortTexts(), ShortTexts::decisionName);
+    if (StringUtils.isNotEmpty(decisionName)) {
+      builder.decisionName(List.of(decisionName));
+    }
+
+    Status lastStatus = documentationUnit.status();
 
     return builder
-        .documentType(caseLaw.getDocumentType().getLabel())
-        .courtLocation(caseLaw.getCourt().getLocation())
-        .courtType(caseLaw.getCourt().getType())
-        .legalEffect(nullSafeGet(caseLaw.getLegalEffect(), LegalEffectDTO::toString))
-        .judicialBody(nullIfEmpty(caseLaw.getJudicialBody()))
         .publicationStatus(
             nullSafeGet(
-                nullSafeGet(lastStatus, StatusDTO::getPublicationStatus),
-                PublicationStatus::toString))
-        .error(lastStatus != null && lastStatus.isWithError())
-        .documentationOffice(
-            nullSafeGet(caseLaw.getDocumentationOffice(), DocumentationOfficeDTO::getAbbreviation))
+                nullSafeGet(lastStatus, Status::publicationStatus), PublicationStatus::toString))
+        .error(lastStatus != null && lastStatus.withError())
         .build();
   }
 
-  private static StatusDTO getLastStatus(DocumentationUnitDTO caselaw) {
-    if (!caselaw.getStatus().isEmpty()) {
-      return Collections.max(caselaw.getStatus(), Comparator.comparing(StatusDTO::getCreatedAt));
-    }
-    return null;
-  }
-
-  private static Identification buildIdentification(DocumentationUnitDTO caseLaw)
+  private static Identification buildIdentification(DocumentationUnit documentationUnit)
       throws ValidationException {
-    validateNotNull(caseLaw.getDocumentNumber(), "Unique identifier missing");
-    validateNotNull(caseLaw.getId(), "Caselaw UUID missing");
-    validateNotNull(caseLaw.getDecisionDate(), "DecisionDate missing");
+    validateNotNull(documentationUnit.documentNumber(), "Unique identifier missing");
+    validateNotNull(documentationUnit.uuid(), "Caselaw UUID missing");
+    validateNotNull(
+        nullSafeGet(documentationUnit.coreData(), CoreData::decisionDate), "DecisionDate missing");
 
     // Case law handover: When we always have an ecli, use that instead for the uniqueId
-    String uniqueId = caseLaw.getDocumentNumber();
-    FrbrDate frbrDate = new FrbrDate(DateUtils.toDateString(caseLaw.getDecisionDate()));
+    String uniqueId = documentationUnit.documentNumber();
+    FrbrDate frbrDate =
+        new FrbrDate(
+            DateUtils.toDateString(
+                nullSafeGet(documentationUnit.coreData(), CoreData::decisionDate)));
     FrbrAuthor frbrAuthor = new FrbrAuthor();
 
     FrbrElement work =
         FrbrElement.builder()
-            .frbrAlias(new FrbrAlias(caseLaw.getId().toString()))
+            .frbrAlias(new FrbrAlias(documentationUnit.uuid().toString()))
             .frbrDate(frbrDate)
             .frbrAuthor(frbrAuthor)
             .frbrCountry(new FrbrCountry())
