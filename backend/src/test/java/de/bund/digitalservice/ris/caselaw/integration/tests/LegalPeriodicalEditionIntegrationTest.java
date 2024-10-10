@@ -21,6 +21,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
@@ -33,6 +36,8 @@ import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Instant;
 import java.util.Arrays;
@@ -56,6 +61,7 @@ import org.testcontainers.junit.jupiter.Container;
 
 @RISIntegrationTest(
     imports = {
+      DocumentationUnitService.class,
       LegalPeriodicalEditionService.class,
       PostgresLegalPeriodicalEditionRepositoryImpl.class,
       PostgresLegalPeriodicalRepositoryImpl.class,
@@ -91,12 +97,16 @@ class LegalPeriodicalEditionIntegrationTest {
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private LegalPeriodicalRepository legalPeriodicalRepository;
   @Autowired private DatabaseDocumentationUnitRepository documentationUnitRepository;
+  @Autowired private DocumentationUnitService documentationUnitService;
 
   @MockBean private UserService userService;
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
-  @MockBean private DocumentationUnitService service;
   @MockBean private ProcedureService procedureService;
   @MockBean private HandoverService handoverService;
+  @MockBean private DocumentNumberService numberService;
+  @MockBean private DocumentNumberRecyclingService recyclingService;
+  @MockBean private AttachmentService attachmentService;
+  @MockBean private PatchMapperService patchMapperService;
 
   private static final String EDITION_ENDPOINT = "/api/v1/caselaw/legalperiodicaledition";
   private final DocumentationOffice docOffice = buildDSDocOffice();
@@ -222,7 +232,7 @@ class LegalPeriodicalEditionIntegrationTest {
   }
 
   @Test
-  void testGetLegalPeriodicalEditionsWithReferences() {
+  void testGetLegalPeriodicalEditionsWithReferences() throws DocumentationUnitNotExistsException {
     var legalPeriodical =
         legalPeriodicalRepository.findAllBySearchStr(Optional.of("ABC")).stream()
             .findAny()
@@ -339,19 +349,14 @@ class LegalPeriodicalEditionIntegrationTest {
     Assertions.assertEquals("New Reference", editionList.get(0).references().get(0).citation());
     Assertions.assertEquals("New Citation", editionList.get(0).references().get(1).citation());
 
-    assertThat(documentationUnitRepository.findByDocumentNumber("DOC_NUMBER").get().getReferences())
+    assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").references())
         .hasSize(4)
-        .anySatisfy(
-            referenceDTO -> {
-              assertThat(referenceDTO.getId()).isEqualTo(existingReferenceId);
-              assertThat(referenceDTO.getCitation()).isEqualTo("New Citation");
-              assertThat(referenceDTO.getRank()).isEqualTo(2);
-            })
-        .anySatisfy(
-            referenceDTO -> {
-              assertThat(referenceDTO.getId()).isEqualTo(newReferenceId);
-              assertThat(referenceDTO.getCitation()).isEqualTo("New Reference");
-              assertThat(referenceDTO.getRank()).isEqualTo(4);
+        .satisfies(
+            list -> {
+              assertThat(list.get(1).id()).isEqualTo(existingReferenceId);
+              assertThat(list.get(1).citation()).isEqualTo("New Citation");
+              assertThat(list.get(3).id()).isEqualTo(newReferenceId);
+              assertThat(list.get(3).citation()).isEqualTo("New Reference");
             });
 
     // clean up

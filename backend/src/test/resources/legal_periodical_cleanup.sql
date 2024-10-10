@@ -1,4 +1,7 @@
 delete
+from incremental_migration.reference;
+
+delete
 from incremental_migration.edition;
 
 delete

@@ -273,11 +273,7 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   private Set<YearOfDisputeDTO> yearsOfDispute = new HashSet<>();
 
   // Fundstellen
-  @OneToMany(
-      mappedBy = "documentationUnit",
-      cascade = CascadeType.ALL,
-      fetch = FetchType.EAGER,
-      orphanRemoval = true)
+  @OneToMany(mappedBy = "documentationUnit", cascade = CascadeType.ALL, orphanRemoval = true)
   @Builder.Default
   @OrderBy("rank")
   private List<ReferenceDTO> references = new ArrayList<>();

@@ -22,6 +22,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseHandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalEditionRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseXmlHandoverMailRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
@@ -140,6 +141,7 @@ class HandoverMailIntegrationTest {
   @Autowired private DatabaseDocumentationUnitRepository repository;
   @Autowired private DatabaseLegalPeriodicalEditionRepository editionRepository;
   @Autowired private LegalPeriodicalRepository legalPeriodicalRepository;
+  @Autowired private DatabaseLegalPeriodicalRepository dblegalPeriodicalRepository;
   @Autowired private DatabaseXmlHandoverMailRepository xmlHandoverRepository;
   @Autowired private DatabaseHandoverReportRepository databaseHandoverReportRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
@@ -172,6 +174,7 @@ class HandoverMailIntegrationTest {
     repository.deleteAll();
     databaseHandoverReportRepository.deleteAll();
     editionRepository.deleteAll();
+    dblegalPeriodicalRepository.deleteAll();
   }
 
   public static List<HandoverEntityType> getHandoverMailTestData() {
