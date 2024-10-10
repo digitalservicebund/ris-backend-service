@@ -33,7 +33,7 @@ function borderNumberLink(
   number: number | string,
   { valid }: { valid: boolean } = { valid: true },
 ) {
-  return `<border-number-link nr="${number}" isvalid="${valid}">${number}</border-number-link>`
+  return `<border-number-link nr="${number}" valid="${valid}">${number}</border-number-link>`
 }
 
 describe("borderNumberService", () => {

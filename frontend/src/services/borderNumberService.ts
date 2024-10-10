@@ -210,7 +210,7 @@ function invalidateBorderNumberLinks(
         numbersToBeInvalidated.includes(link.getAttribute("nr")!),
       )
       .forEach((link) => {
-        link.setAttribute("isValid", "false")
+        link.setAttribute("valid", "false")
         link.setAttribute("nr", "entfernt")
         link.innerHTML = "entfernt"
       })
