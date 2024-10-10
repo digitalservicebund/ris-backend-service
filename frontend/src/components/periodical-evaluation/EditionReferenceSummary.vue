@@ -6,6 +6,7 @@ import Reference from "@/domain/reference"
 
 const props = defineProps<{
   data: Reference
+  hideCitation?: boolean
 }>()
 </script>
 
@@ -31,7 +32,11 @@ const props = defineProps<{
         </FlexContainer>
       </RouterLink>
 
-      <div class="ds-label-01-reg mr-8">
+      <div
+        v-if="!hideCitation"
+        class="ds-label-01-reg mr-8"
+        data-testid="citation-summary"
+      >
         {{ props.data.renderDecision }}
       </div>
     </div>

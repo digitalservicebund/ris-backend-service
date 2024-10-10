@@ -419,7 +419,17 @@ test.describe(
         })
 
         await test.step("When editing a reference, the citation is a single input containing the joined value of prefix, citation and suffix", async () => {
+          await expect(
+            page.getByText(`MMG 2024, 5${suffix} (LT)`, { exact: true }),
+          ).toBeVisible()
+
           await page.getByTestId("list-entry-0").click()
+
+          await expect(
+            page.getByText(`MMG 2024, 5${suffix} (LT)`, { exact: true }),
+            "should not be hidden when entry extended",
+          ).toBeHidden()
+
           await expect(page.getByLabel("Zitatstelle *")).toHaveValue(
             `2024, 5${suffix}`,
           )
@@ -428,29 +438,20 @@ test.describe(
           await expect(page.getByLabel("Zitatstelle Präfix")).toBeHidden()
           await expect(page.getByLabel("Zitatstelle Suffix")).toBeHidden()
 
-          await expect(page.getByLabel("Gericht")).toHaveValue("AG Aachen")
           await expect(
-            page.locator("[aria-label='Gericht']"),
-          ).not.toBeEditable()
+            page
+              .getByTestId("edition-reference-summary-edit-mode")
+              .getByText(
+                `AG Aachen, 31.12.2019, ${fileNumber}, Anerkenntnisurteil, Unveröffentlicht`,
+              ),
+          ).toBeVisible()
 
-          await expect(page.getByLabel("Aktenzeichen")).toHaveValue(fileNumber)
           await expect(
-            page.locator("[aria-label='Aktenzeichen']"),
-          ).not.toBeEditable()
+            page.getByText("MMG 2024, 5, Heft uwkkf (LT)"),
+            "Should hide the summary when in edit mode",
+          ).toBeHidden()
 
-          await expect(page.getByLabel("Entscheidungsdatum")).toHaveValue(
-            "31.12.2019",
-          )
-          await expect(
-            page.locator("[aria-label='Entscheidungsdatum']"),
-          ).not.toBeEditable()
-
-          await expect(page.getByLabel("Dokumenttyp")).toHaveValue(
-            "Anerkenntnisurteil",
-          )
-          await expect(
-            page.locator("[aria-label='Dokumenttyp']"),
-          ).not.toBeEditable()
+          await expect(page.locator("[aria-label='Dokumenttyp']")).toBeHidden()
 
           // validate citation in edit mode (not allowed to be empty)
           await fillInput(page, "Zitatstelle *", "")

@@ -9,6 +9,7 @@ import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
+import EditionReferenceSummary from "@/components/periodical-evaluation/EditionReferenceSummary.vue"
 import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
@@ -242,6 +243,12 @@ onMounted(async () => {
 
 <template>
   <div class="flex flex-col gap-24">
+    <EditionReferenceSummary
+      :data="reference"
+      data-testid="edition-reference-summary-edit-mode"
+      hide-citation
+    />
+
     <div class="flex justify-between gap-24">
       <div id="citationInputField" class="flex-1">
         <InputField
@@ -325,7 +332,7 @@ onMounted(async () => {
       </InputField>
     </div>
 
-    <div class="flex flex-col gap-24">
+    <div v-if="!isSaved" id="documentationUnit" class="flex flex-col gap-24">
       <div class="flex justify-between gap-24">
         <InputField
           id="courtInput"
