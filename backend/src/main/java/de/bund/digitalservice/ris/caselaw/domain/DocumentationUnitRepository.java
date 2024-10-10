@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.util.List;
 import java.util.Map;
@@ -117,5 +116,5 @@ public interface DocumentationUnitRepository {
 
   List<UUID> getUnprocessedIds();
 
-  List<DocumentationUnitDTO> findByIdIn(List<UUID> ids);
+  List<DocumentationUnit> findByIdIn(List<UUID> ids);
 }

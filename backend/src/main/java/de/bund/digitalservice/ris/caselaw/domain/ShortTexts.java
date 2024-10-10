@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import lombok.Builder;
 
-@Builder
+@Builder(toBuilder = true)
 public record ShortTexts(
     String decisionName,
     String headline,

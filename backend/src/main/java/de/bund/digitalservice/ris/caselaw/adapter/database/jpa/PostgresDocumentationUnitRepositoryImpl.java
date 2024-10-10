@@ -608,7 +608,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   }
 
   @Override
-  public List<DocumentationUnitDTO> findByIdIn(List<UUID> ids) {
+  public List<DocumentationUnit> findByIdIn(List<UUID> ids) {
     return null;
   }
 }
