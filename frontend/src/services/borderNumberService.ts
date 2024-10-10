@@ -29,9 +29,9 @@ function makeBorderNumbersSequentialForCategory(
       borderNumber.getElementsByTagName("number")
     )
     // innerText is not available in JSDom
-    const previousLinkTarget = (numberElement.innerHTML ?? "").trim()
+    const originalLinkTarget = (numberElement.innerHTML ?? "").trim()
     numberElement.innerHTML = `${nextBorderNumber}`
-    updatedBorderNumbers.set(previousLinkTarget, nextBorderNumber)
+    updatedBorderNumbers.set(originalLinkTarget, nextBorderNumber)
     nextBorderNumber++
   }
   const updatedText = textXml.body.innerHTML
@@ -175,6 +175,55 @@ function getCategoriesWithInvalidLinks(
   return invalidCategories
 }
 
+type ParsedDocumentPerCategory =
+  | [group: "shortTexts", categoryName: ShortTextKeys, textXml: Document]
+  | [group: "longTexts", categoryName: LongTextKeys, textXml: Document]
+function getParsedDocumentPerCategory(
+  texts: ShortTexts | Omit<LongTexts, "participatingJudges">,
+  group: "shortTexts" | "longTexts",
+): ParsedDocumentPerCategory[] {
+  return Object.entries(texts)
+    .filter(([, text]) => !!text)
+    .map(([key, text]) => [
+      group,
+      key,
+      new DOMParser().parseFromString(text, "text/html"),
+    ]) as ParsedDocumentPerCategory[]
+}
+
+/**
+ * Returns all categories with invalid border number links.
+ */
+function invalidateBorderNumberLinks(
+  documentUnit: DocumentUnit,
+  numbersToBeInvalidated: string[],
+): void {
+  const { participatingJudges, ...longTexts } = documentUnit.longTexts
+  const texts = [
+    ...getParsedDocumentPerCategory(documentUnit.shortTexts, "shortTexts"),
+    ...getParsedDocumentPerCategory(longTexts, "longTexts"),
+  ]
+
+  for (const [group, categoryName, textXml] of texts) {
+    ;[...textXml.getElementsByTagName("border-number-link")]
+      .filter((link) =>
+        numbersToBeInvalidated.includes(link.getAttribute("nr")!),
+      )
+      .forEach((link) => {
+        link.setAttribute("isValid", "false")
+        link.setAttribute("nr", "entfernt")
+        link.innerHTML = "entfernt"
+      })
+
+    // This if-statement is needed for the compiler to know that group and corresponding categoryName match.
+    if (group === "shortTexts") {
+      documentUnit[group][categoryName] = textXml.body.innerHTML
+    } else {
+      documentUnit[group][categoryName] = textXml.body.innerHTML
+    }
+  }
+}
+
 const borderNumberService = {
   /**
    * Updates the border numbers of all long texts with border numbers see {@linkcode orderedCategoriesWithBorderNumbers}
@@ -185,6 +234,7 @@ const borderNumberService = {
   makeBorderNumbersSequential: () => {
     const { documentUnit } = storeToRefs(useDocumentUnitStore())
     let nextBorderNumberCount = 1
+    // key: original border number  -> value: new border number
     let allUpdatedBorderNumbers = new Map<string, number>()
     for (const category of orderedCategoriesWithBorderNumbers) {
       const longText = documentUnit.value!.longTexts[category]
@@ -274,6 +324,15 @@ const borderNumberService = {
     } else {
       return { isValid: true }
     }
+  },
+
+  invalidateBorderNumberLinks: (numbersToBeInvalidated: string[]): void => {
+    const { documentUnit } = storeToRefs(useDocumentUnitStore())
+
+    invalidateBorderNumberLinks(
+      documentUnit.value as DocumentUnit,
+      numbersToBeInvalidated,
+    )
   },
 }
 

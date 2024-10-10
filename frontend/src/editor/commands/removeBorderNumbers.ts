@@ -22,14 +22,14 @@ function removeBorderNumbers(
     borderNumberNodeType,
   )
 
-  const { modified, firstBorderNumberSize } = processBorderNumbers(
-    tr,
-    doc,
-    borderNumberPositions,
-  )
+  const { modified, firstBorderNumberSize, removedBorderNumbers } =
+    processBorderNumbers(tr, doc, borderNumberPositions)
 
   void nextTick().then(() => {
     if (isFeatureEnabled) {
+      if (removedBorderNumbers.length > 0) {
+        BorderNumberService.invalidateBorderNumberLinks(removedBorderNumbers)
+      }
       BorderNumberService.makeBorderNumbersSequential()
     }
   })
@@ -72,9 +72,14 @@ function processBorderNumbers(
   tr: Transaction,
   doc: ProseMirrorNode,
   borderNumberPositions: number[],
-): { modified: boolean; firstBorderNumberSize: number } {
+): {
+  modified: boolean
+  firstBorderNumberSize: number
+  removedBorderNumbers: string[]
+} {
   let modified = false
   let firstBorderNumberSize: number = 0
+  const removedBorderNumbers: string[] = []
 
   // Traverse in reverse order to avoid shifting positions
   borderNumberPositions.toReversed().forEach((pos) => {
@@ -92,10 +97,13 @@ function processBorderNumbers(
       modified = true
 
       firstBorderNumberSize = borderNumberNode.nodeSize - contentNode.nodeSize
+
+      const borderNumberNumberNode = borderNumberNode.child(0)
+      removedBorderNumbers.push(borderNumberNumberNode.textContent)
     }
   })
 
-  return { modified, firstBorderNumberSize }
+  return { modified, firstBorderNumberSize, removedBorderNumbers }
 }
 
 /**

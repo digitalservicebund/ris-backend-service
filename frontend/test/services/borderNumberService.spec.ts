@@ -1,6 +1,10 @@
 import { createTestingPinia } from "@pinia/testing"
 import { setActivePinia } from "pinia"
-import DocumentUnit, { LongTexts, ShortTexts } from "@/domain/documentUnit"
+import DocumentUnit, {
+  longTextLabels,
+  LongTexts,
+  ShortTexts,
+} from "@/domain/documentUnit"
 import ParticipatingJudge from "@/domain/participatingJudge"
 import borderNumberService from "@/services/borderNumberService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -21,12 +25,15 @@ function mockDocUnitStore({
   return mockedSessionStore
 }
 
-function borderNumber(number: number) {
+function borderNumber(number: number | string) {
   return `<border-number><number>${number}</number><content><span>Text</span></content></border-number>`
 }
 
-function borderNumberLink(number: number) {
-  return `<border-number-link nr="${number}">${number}</border-number-link>`
+function borderNumberLink(
+  number: number | string,
+  { valid }: { valid: boolean } = { valid: true },
+) {
+  return `<border-number-link nr="${number}" isvalid="${valid}">${number}</border-number-link>`
 }
 
 describe("borderNumberService", () => {
@@ -67,7 +74,7 @@ describe("borderNumberService", () => {
     it("should handle multiple long texts and border numbers", () => {
       const store = mockDocUnitStore({
         longTexts: {
-          reasons: `${borderNumber(0)}${borderNumber(" 10 " as unknown as number)}`,
+          reasons: `${borderNumber(0)}${borderNumber(" 10 ")}`,
           caseFacts: `${borderNumber(4)}${borderNumber(8)}`,
           decisionReasons: `${borderNumber(4)}${borderNumber(8)}`,
           otherLongText: `${borderNumber(2)}${borderNumber(5)}`,
@@ -177,7 +184,7 @@ describe("borderNumberService", () => {
     it("should return valid for texts with valid border numbers", () => {
       mockDocUnitStore({
         longTexts: {
-          reasons: `${borderNumber(1)}<p>${borderNumber(" 2 " as unknown as number)}</p>`,
+          reasons: `${borderNumber(1)}<p>${borderNumber(" 2 ")}</p>`,
           decisionReasons: "Text ohne Randnummern",
           otherLongText: `<ul><li>${borderNumber(3)}</li>${borderNumber(4)}</ul>`,
           tenor: "Rubrik ohne Randnummern",
@@ -208,7 +215,7 @@ describe("borderNumberService", () => {
     it("should return invalid for non-number border numbers", () => {
       mockDocUnitStore({
         longTexts: {
-          reasons: `${borderNumber("a" as unknown as number)}`,
+          reasons: `${borderNumber("a")}`,
         },
       })
       const validationResult = borderNumberService.validateBorderNumbers()
@@ -223,7 +230,7 @@ describe("borderNumberService", () => {
     it("should return invalid for empty border numbers", () => {
       mockDocUnitStore({
         longTexts: {
-          otherLongText: `${borderNumber("" as unknown as number)}`,
+          otherLongText: `${borderNumber("")}`,
         },
       })
       const validationResult = borderNumberService.validateBorderNumbers()
@@ -275,7 +282,7 @@ describe("borderNumberService", () => {
     it("should return valid for texts with valid border numbers", () => {
       mockDocUnitStore({
         longTexts: {
-          reasons: `${borderNumber(1)}<p>${borderNumber(" 2 " as unknown as number)}</p>`,
+          reasons: `${borderNumber(1)}<p>${borderNumber(" 2 ")}</p>`,
           decisionReasons: "Text ohne Randnummern",
           otherLongText: `<ul><li>${borderNumber(3)}</li>${borderNumber(4)}</ul>`,
           tenor: "Rubrik ohne Randnummern",
@@ -338,6 +345,80 @@ describe("borderNumberService", () => {
           "headnote",
         ])
       }
+    })
+  })
+
+  describe("invalidateBorderNumberLinks", () => {
+    it("should return valid for empty texts", () => {
+      const store = mockDocUnitStore({})
+      borderNumberService.invalidateBorderNumberLinks(["1", "2"])
+      expect(store.documentUnit).toEqual(store.documentUnit)
+    })
+
+    it("should not change different border number links", () => {
+      const store = mockDocUnitStore({
+        shortTexts: { headline: borderNumberLink(3) },
+      })
+      borderNumberService.invalidateBorderNumberLinks(["2"])
+      expect(store.documentUnit?.shortTexts.headline).toEqual(
+        borderNumberLink(3),
+      )
+    })
+
+    it("should invalidate affected border number links", () => {
+      const store = mockDocUnitStore({
+        shortTexts: { headline: borderNumberLink(2) },
+      })
+      borderNumberService.invalidateBorderNumberLinks(["2"])
+      expect(store.documentUnit?.shortTexts.headline).toEqual(
+        borderNumberLink("entfernt", { valid: false }),
+      )
+    })
+
+    it("should invalidate affected multiple border number links in all categories", () => {
+      const store = mockDocUnitStore({
+        shortTexts: {
+          headline: `${borderNumberLink(2)} Text ${borderNumberLink(2, { valid: false })}`,
+          headnote: `${borderNumberLink(5)}${borderNumberLink(6)}`,
+          decisionName: `${borderNumberLink(2)}${borderNumberLink(5)}`,
+          guidingPrinciple: borderNumberLink(2),
+          otherHeadnote: borderNumberLink(2),
+        },
+        longTexts: {
+          reasons: borderNumberLink(2),
+          otherLongText: borderNumberLink(2),
+          participatingJudges: [new ParticipatingJudge()],
+          dissentingOpinion: borderNumberLink(2),
+          decisionReasons: borderNumberLink(2),
+          caseFacts: borderNumberLink(2),
+          tenor: borderNumberLink(2),
+          outline: borderNumberLink(2),
+        },
+      })
+      borderNumberService.invalidateBorderNumberLinks(["2", "5"])
+      expect(store.documentUnit?.shortTexts.headline).toEqual(
+        `${borderNumberLink("entfernt", { valid: false })} Text ${borderNumberLink("entfernt", { valid: false })}`,
+      )
+      expect(store.documentUnit?.shortTexts.headnote).toEqual(
+        `${borderNumberLink("entfernt", { valid: false })}${borderNumberLink(6)}`,
+      )
+      expect(store.documentUnit?.shortTexts.decisionName).toEqual(
+        `${borderNumberLink("entfernt", { valid: false })}${borderNumberLink("entfernt", { valid: false })}`,
+      )
+      expect(store.documentUnit?.shortTexts.guidingPrinciple).toEqual(
+        borderNumberLink("entfernt", { valid: false }),
+      )
+      expect(store.documentUnit?.shortTexts.otherHeadnote).toEqual(
+        borderNumberLink("entfernt", { valid: false }),
+      )
+
+      Object.keys(longTextLabels).forEach(
+        (key) =>
+          key !== "participatingJudges" &&
+          expect(store.documentUnit?.longTexts[key as keyof LongTexts]).toEqual(
+            borderNumberLink("entfernt", { valid: false }),
+          ),
+      )
     })
   })
 })

@@ -38,6 +38,10 @@ describe("removeBorderNumbers command", () => {
       borderNumberService,
       "makeBorderNumbersSequential",
     ).mockImplementation(() => vi.fn())
+    vi.spyOn(
+      borderNumberService,
+      "invalidateBorderNumberLinks",
+    ).mockImplementation(() => vi.fn())
     dispatch.mockClear()
   })
   afterEach(() => vi.restoreAllMocks())
@@ -67,6 +71,9 @@ describe("removeBorderNumbers command", () => {
     expect(dispatch).toHaveBeenCalled()
     await nextTick()
     expect(borderNumberService.makeBorderNumbersSequential).toHaveBeenCalled()
+    expect(
+      borderNumberService.invalidateBorderNumberLinks,
+    ).toHaveBeenCalledWith(["1"])
   })
 
   it("should not modify the document if no borderNumber nodes are present", async () => {
@@ -95,6 +102,9 @@ describe("removeBorderNumbers command", () => {
     expect(dispatch).not.toHaveBeenCalled()
     await nextTick()
     expect(borderNumberService.makeBorderNumbersSequential).toHaveBeenCalled()
+    expect(
+      borderNumberService.invalidateBorderNumberLinks,
+    ).not.toHaveBeenCalled()
   })
 
   it("should remove an empty borderNumber node", async () => {
@@ -118,5 +128,8 @@ describe("removeBorderNumbers command", () => {
     expect(dispatch).toHaveBeenCalled()
     await nextTick()
     expect(borderNumberService.makeBorderNumbersSequential).toHaveBeenCalled()
+    expect(
+      borderNumberService.invalidateBorderNumberLinks,
+    ).toHaveBeenCalledWith(["1"])
   })
 })
