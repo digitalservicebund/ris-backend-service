@@ -1,36 +1,36 @@
 border-number {
-    display: flex;
-    align-items: baseline;
+  display: flex;
+  align-items: baseline;
 }
 
 /* stylelint-disable-next-line selector-type-no-unknown */
 border-number number {
-    display: flex;
-    min-width: 40px;
-    justify-content: center;
-    background: #dce8ef;
-    line-height: 1;
+  display: flex;
+  min-width: 40px;
+  justify-content: center;
+  background: #dce8ef;
+  line-height: 1;
 }
 
 /* stylelint-disable-next-line selector-type-no-unknown */
 #attachment-view border-number number {
-    background: transparent;
-    margin-right: 4px;
+  background: transparent;
+  margin-right: 4px;
 }
 
 /* stylelint-disable-next-line selector-type-no-unknown */
 border-number content {
-    position: relative;
-    padding-left: 12px; /* Space between the border and the text */
+  position: relative;
+  padding-left: 12px; /* Space between the border and the text */
 }
 
 /* stylelint-disable-next-line selector-type-no-unknown */
 border-number content::before {
-    content: "";
-    position: absolute;
-    top: 10px; /* Start of the line, leaving space at the top */
-    bottom: 10px; /* End of the line, leaving space at the bottom */
-    left: -4px; /* Line should overlap with border-number */
-    width: 4px;
-    background-color: #dce8ef;
+  content: "";
+  position: absolute;
+  top: 10px; /* Start of the line, leaving space at the top */
+  bottom: 10px; /* End of the line, leaving space at the bottom */
+  left: -4px; /* Line should overlap with border-number */
+  width: 4px;
+  background-color: #dce8ef;
 }
