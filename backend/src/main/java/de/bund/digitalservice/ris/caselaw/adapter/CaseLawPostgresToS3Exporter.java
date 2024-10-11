@@ -37,16 +37,16 @@ public class CaseLawPostgresToS3Exporter {
   private static final int EXPORT_BATCH_SIZE = 1000;
 
   private final DocumentationUnitRepository documentationUnitRepository;
-  private final CaseLawBucket caseLawBucket;
+  private final LdmlBucket ldmlBucket;
   private final Templates htmlToAknHtml;
 
   private Schema schema;
 
   @Autowired
   public CaseLawPostgresToS3Exporter(
-      DocumentationUnitRepository documentationUnitRepository, CaseLawBucket caseLawBucket) {
+      DocumentationUnitRepository documentationUnitRepository, LdmlBucket ldmlBucket) {
     this.documentationUnitRepository = documentationUnitRepository;
-    this.caseLawBucket = caseLawBucket;
+    this.ldmlBucket = ldmlBucket;
     this.htmlToAknHtml = XmlUtils.getTemplates("caselawhandover/htmlToAknHtml.xslt");
     try {
       this.schema =
@@ -78,7 +78,7 @@ public class CaseLawPostgresToS3Exporter {
       Optional<CaseLawLdml> ldml = CaseLawDbEntityToLdmlMapper.transformToLdml(documentationUnit);
       if (ldml.isPresent()) {
         Optional<String> fileContent = ldmlToString(ldml.get());
-        fileContent.ifPresent(s -> caseLawBucket.save(ldml.get().getUniqueId() + ".xml", s));
+        fileContent.ifPresent(s -> ldmlBucket.save(ldml.get().getUniqueId() + ".xml", s));
       }
     }
   }

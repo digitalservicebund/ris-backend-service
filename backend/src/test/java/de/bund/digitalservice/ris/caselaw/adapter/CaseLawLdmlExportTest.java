@@ -35,7 +35,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class CaseLawLdmlExportTest {
 
   static DocumentationUnitRepository documentationUnitRepository;
-  static CaseLawBucket caseLawBucket;
+  static LdmlBucket caseLawBucket;
   static CaseLawPostgresToS3Exporter exporter;
   static DocumentationUnit testDocumentUnit;
   static UUID testUUID;
@@ -43,7 +43,7 @@ class CaseLawLdmlExportTest {
   @BeforeAll
   static void setUpBeforeClass() {
     documentationUnitRepository = mock(DocumentationUnitRepository.class);
-    caseLawBucket = mock(CaseLawBucket.class);
+    caseLawBucket = mock(LdmlBucket.class);
     exporter = new CaseLawPostgresToS3Exporter(documentationUnitRepository, caseLawBucket);
 
     PreviousDecision related1 =

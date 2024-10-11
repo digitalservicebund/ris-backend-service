@@ -1,6 +1,7 @@
 otc:
   obs:
     bucket-name: local
+    ldml-bucket: local
 local:
   file-storage: .local-storage
 error:
