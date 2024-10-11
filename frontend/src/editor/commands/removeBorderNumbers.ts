@@ -1,6 +1,6 @@
 import { CommandProps } from "@tiptap/core"
 import { Node as ProseMirrorNode, NodeType } from "prosemirror-model"
-import { Transaction, TextSelection } from "prosemirror-state"
+import { Transaction, Selection } from "prosemirror-state"
 import { nextTick } from "vue"
 import BorderNumberService from "@/services/borderNumberService"
 
@@ -35,8 +35,8 @@ function removeBorderNumbers(
   })
 
   if (modified && dispatch) {
-    const updatedFrom = initialFrom - firstBorderNumberSize
-    const selection = TextSelection.create(tr.doc, Math.max(1, updatedFrom))
+    const updatedFrom = initialFrom - firstBorderNumberSize - 2
+    const selection = Selection.near(tr.doc.resolve(Math.max(1, updatedFrom)))
     tr.setSelection(selection)
     dispatch(tr)
     return true
@@ -91,7 +91,11 @@ function processBorderNumbers(
       if (isNodeEmpty(contentNode)) {
         tr.delete(pos, pos + borderNumberNode.nodeSize)
       } else {
-        tr.replaceWith(pos, pos + borderNumberNode.nodeSize, contentNode)
+        tr.replaceWith(
+          pos,
+          pos + borderNumberNode.nodeSize,
+          contentNode.content,
+        )
       }
 
       modified = true
@@ -110,7 +114,7 @@ function processBorderNumbers(
  * Utility function to check if a node is empty.
  */
 function isNodeEmpty(node: ProseMirrorNode): boolean {
-  return node.textContent.length === 0
+  return node.childCount === 0
 }
 
 export default removeBorderNumbers

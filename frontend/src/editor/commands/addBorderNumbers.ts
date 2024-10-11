@@ -4,7 +4,7 @@ import {
   NodeType,
   Schema as ProsemirrorSchema,
 } from "prosemirror-model"
-import { TextSelection } from "prosemirror-state"
+import { Selection } from "prosemirror-state"
 import { nextTick } from "vue"
 import BorderNumberService from "@/services/borderNumberService"
 
@@ -57,8 +57,8 @@ function addBorderNumbers({ state, dispatch }: CommandProps): boolean {
   void nextTick().then(() => BorderNumberService.makeBorderNumbersSequential())
 
   if (modified && dispatch) {
-    const textSelection = TextSelection.create(tr.doc, Math.max(1, updatedFrom))
-    tr.setSelection(textSelection)
+    const selection = Selection.near(tr.doc.resolve(Math.max(1, updatedFrom)))
+    tr.setSelection(selection)
     dispatch(tr)
   }
   return modified
