@@ -156,7 +156,7 @@ const editorStyleClasses = computed(() => {
     : ""
 
   if (editorExpanded.value) {
-    return `h-640 ${plainBorderNumberStyle}`
+    return `h-640 ${plainBorderNumberStyle} p-4`
   }
 
   const fieldSizeClasses = {
