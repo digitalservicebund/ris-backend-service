@@ -45,17 +45,9 @@ test.describe(
           await expect(
             page.getByText("Es wurden noch keine Fundstellen hinzugefügt"),
           ).toBeVisible()
-          await page
-            .locator("[aria-label='Fundstellen der Ausgabe an jDV übergeben']")
-            .click()
           await expect(
-            page.getByText("Die Ausgabe kann nicht übergeben werden."),
-          ).toBeVisible()
-          await expect(
-            page.locator(
-              "text=Diese Ausgabe wurde bisher nicht an die jDV übergeben",
-            ),
-          ).toBeVisible()
+            page.getByLabel("Fundstellen der Ausgabe an jDV übergeben"),
+          ).toBeDisabled()
         })
 
         await test.step("handover possible when all required fields filled", async () => {
