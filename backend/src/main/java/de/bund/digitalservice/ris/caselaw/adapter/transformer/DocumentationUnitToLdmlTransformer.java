@@ -53,11 +53,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class CaseLawDbEntityToLdmlMapper {
+public class DocumentationUnitToLdmlTransformer {
 
-  private static final Logger logger = LogManager.getLogger(CaseLawDbEntityToLdmlMapper.class);
+  private static final Logger logger =
+      LogManager.getLogger(DocumentationUnitToLdmlTransformer.class);
 
-  private CaseLawDbEntityToLdmlMapper() {}
+  private DocumentationUnitToLdmlTransformer() {}
 
   public static Optional<CaseLawLdml> transformToLdml(DocumentationUnit documentationUnit) {
     try {

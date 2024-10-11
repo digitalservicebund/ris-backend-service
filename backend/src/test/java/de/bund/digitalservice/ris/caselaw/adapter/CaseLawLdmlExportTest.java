@@ -8,7 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.CaseLawDbEntityToLdmlMapper;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitToLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
@@ -138,7 +138,8 @@ class CaseLawLdmlExportTest {
               </akn:docTitle>
            </akn:block>
            """;
-    Optional<CaseLawLdml> ldml = CaseLawDbEntityToLdmlMapper.transformToLdml(testDocumentUnit);
+    Optional<CaseLawLdml> ldml =
+        DocumentationUnitToLdmlTransformer.transformToLdml(testDocumentUnit);
     Assertions.assertTrue(ldml.isPresent());
     Optional<String> fileContent = exporter.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());
@@ -167,7 +168,8 @@ class CaseLawLdmlExportTest {
                     .dissentingOpinion("<p>dissenting test</p>")
                     .build())
             .build();
-    Optional<CaseLawLdml> ldml = CaseLawDbEntityToLdmlMapper.transformToLdml(dissentingCaseLaw);
+    Optional<CaseLawLdml> ldml =
+        DocumentationUnitToLdmlTransformer.transformToLdml(dissentingCaseLaw);
     Assertions.assertTrue(ldml.isPresent());
     Optional<String> fileContent = exporter.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());
@@ -192,7 +194,8 @@ class CaseLawLdmlExportTest {
             .shortTexts(
                 testDocumentUnit.shortTexts().toBuilder().headnote("<p>headnote test</p>").build())
             .build();
-    Optional<CaseLawLdml> ldml = CaseLawDbEntityToLdmlMapper.transformToLdml(headnoteCaseLaw);
+    Optional<CaseLawLdml> ldml =
+        DocumentationUnitToLdmlTransformer.transformToLdml(headnoteCaseLaw);
     Assertions.assertTrue(ldml.isPresent());
     Optional<String> fileContent = exporter.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());
@@ -219,7 +222,8 @@ class CaseLawLdmlExportTest {
                     .otherHeadnote("<p>other headnote test</p>")
                     .build())
             .build();
-    Optional<CaseLawLdml> ldml = CaseLawDbEntityToLdmlMapper.transformToLdml(otherHeadnoteCaseLaw);
+    Optional<CaseLawLdml> ldml =
+        DocumentationUnitToLdmlTransformer.transformToLdml(otherHeadnoteCaseLaw);
     Assertions.assertTrue(ldml.isPresent());
     Optional<String> fileContent = exporter.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());
@@ -246,7 +250,7 @@ class CaseLawLdmlExportTest {
             .longTexts(
                 testDocumentUnit.longTexts().toBuilder().reasons("<p>grounds test</p>").build())
             .build();
-    Optional<CaseLawLdml> ldml = CaseLawDbEntityToLdmlMapper.transformToLdml(groundsCaseLaw);
+    Optional<CaseLawLdml> ldml = DocumentationUnitToLdmlTransformer.transformToLdml(groundsCaseLaw);
     Assertions.assertTrue(ldml.isPresent());
     Optional<String> fileContent = exporter.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());
@@ -275,7 +279,8 @@ class CaseLawLdmlExportTest {
                     .otherLongText("<p>Other long text test</p>")
                     .build())
             .build();
-    Optional<CaseLawLdml> ldml = CaseLawDbEntityToLdmlMapper.transformToLdml(otherLongTextCaseLaw);
+    Optional<CaseLawLdml> ldml =
+        DocumentationUnitToLdmlTransformer.transformToLdml(otherLongTextCaseLaw);
     Assertions.assertTrue(ldml.isPresent());
     Optional<String> fileContent = exporter.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());

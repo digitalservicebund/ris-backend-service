@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.CaseLawDbEntityToLdmlMapper;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitToLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import jakarta.xml.bind.JAXB;
@@ -75,7 +75,8 @@ public class CaseLawPostgresToS3Exporter {
 
   public void saveOneBatch(List<UUID> ids) {
     for (DocumentationUnit documentationUnit : documentationUnitRepository.findByIdIn(ids)) {
-      Optional<CaseLawLdml> ldml = CaseLawDbEntityToLdmlMapper.transformToLdml(documentationUnit);
+      Optional<CaseLawLdml> ldml =
+          DocumentationUnitToLdmlTransformer.transformToLdml(documentationUnit);
       if (ldml.isPresent()) {
         Optional<String> fileContent = ldmlToString(ldml.get());
         fileContent.ifPresent(s -> ldmlBucket.save(ldml.get().getUniqueId() + ".xml", s));
