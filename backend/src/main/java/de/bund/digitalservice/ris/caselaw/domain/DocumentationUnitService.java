@@ -154,19 +154,6 @@ public class DocumentationUnitService {
     return "Dokumentationseinheit gelöscht: " + documentationUnitId;
   }
 
-  @Transactional(transactionManager = "jpaTransactionManager")
-  public String deleteByDocumentNumber(String documentNumber)
-      throws DocumentationUnitNotExistsException {
-
-    DocumentationUnit documentationUnit = repository.findByDocumentNumber(documentNumber);
-
-    log.debug("Deleting DocumentationUnitDTO " + documentNumber);
-
-    saveForRecycling(documentationUnit);
-    repository.delete(documentationUnit);
-    return "Dokumentationseinheit gelöscht: " + documentNumber;
-  }
-
   /**
    * Update a documenation unit with a {@link RisJsonPatch}.
    *

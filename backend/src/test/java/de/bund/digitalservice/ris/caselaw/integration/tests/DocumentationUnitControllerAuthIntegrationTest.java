@@ -166,7 +166,7 @@ class DocumentationUnitControllerAuthIntegrationTest {
     DocumentationUnitDTO documentationUnitDTO =
         createNewDocumentationUnitDTO(UUID.randomUUID(), docUnitOffice);
     for (int i = 0; i < publicationStatus.size(); i++) {
-      saveToStatusRepository(
+      saveStatus(
           documentationUnitDTO,
           Instant.now().plusSeconds(60 + i),
           Status.builder().publicationStatus(publicationStatus.get(i)).build());
@@ -219,7 +219,7 @@ class DocumentationUnitControllerAuthIntegrationTest {
     DocumentationUnitDTO documentationUnitDTO =
         createNewDocumentationUnitDTO(UUID.randomUUID(), docUnitOffice);
     for (int i = 0; i < publicationStatus.size(); i++) {
-      saveToStatusRepository(
+      saveStatus(
           documentationUnitDTO,
           Instant.now().plusSeconds(60 + i),
           Status.builder().publicationStatus(publicationStatus.get(i)).build());
@@ -253,7 +253,7 @@ class DocumentationUnitControllerAuthIntegrationTest {
   void testUnpublishedDocumentationUnitIsForbiddenForOtherOffice() {
     DocumentationUnitDTO documentationUnitDTO =
         createNewDocumentationUnitDTO(UUID.randomUUID(), ccRisOffice);
-    saveToStatusRepository(
+    saveStatus(
         documentationUnitDTO,
         Instant.now(),
         Status.builder().publicationStatus(UNPUBLISHED).build());
@@ -281,7 +281,7 @@ class DocumentationUnitControllerAuthIntegrationTest {
         .expectStatus()
         .isForbidden();
 
-    saveToStatusRepository(
+    saveStatus(
         documentationUnitDTO,
         Instant.now().plus(1, ChronoUnit.DAYS),
         Status.builder().publicationStatus(PUBLISHING).build());
@@ -299,7 +299,7 @@ class DocumentationUnitControllerAuthIntegrationTest {
                 assertThat(response.getResponseBody().uuid())
                     .isEqualTo(documentationUnitDTO.getId()));
 
-    saveToStatusRepository(
+    saveStatus(
         documentationUnitDTO,
         Instant.now().plus(2, ChronoUnit.DAYS),
         Status.builder().publicationStatus(PUBLISHED).build());
@@ -344,7 +344,7 @@ class DocumentationUnitControllerAuthIntegrationTest {
             .build());
   }
 
-  private void saveToStatusRepository(
+  private void saveStatus(
       DocumentationUnitDTO documentationUnitDTO, Instant createdAt, Status status) {
     repository.save(
         documentationUnitDTO.toBuilder()
