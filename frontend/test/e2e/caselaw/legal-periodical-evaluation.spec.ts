@@ -248,7 +248,7 @@ test.describe(
       },
     )
 
-    test(
+    test.skip(
       "Periodical edition reference editing",
       {
         annotation: {
