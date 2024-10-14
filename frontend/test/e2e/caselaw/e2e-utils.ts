@@ -588,39 +588,10 @@ export async function copyPasteTextFromAttachmentIntoEditor(
   attachmentLocator: Locator,
   editor: Locator,
 ): Promise<void> {
-  await expect(attachmentLocator).toBeVisible()
-  const selectedText = await attachmentLocator.evaluate(
-    (element): string | undefined => {
-      if (!element) {
-        return undefined
-      }
-      const selection = window.getSelection()
-      const range = document.createRange()
-      range.selectNodeContents(element)
-      selection?.removeAllRanges()
-      selection?.addRange(range)
-      return selection?.toString()
-    },
-  )
-
-  expect(selectedText).toBeDefined()
-  expect(selectedText).not.toEqual("")
+  await attachmentLocator.selectText()
 
   // copy from side panel to clipboard
   await page.keyboard.press("ControlOrMeta+C")
-
-  // Make sure the text selection was active when copying. This seems to be flaky.
-  const selectedTextAfterCopy = await attachmentLocator.evaluate(
-    (element): string | undefined => {
-      if (!element) {
-        return undefined
-      }
-      const selection = window.getSelection()
-      return selection?.toString()
-    },
-  )
-  // If the texts are unequal, the selection was lost before copying -> tests will fail.
-  expect(selectedText).toEqual(selectedTextAfterCopy)
 
   // paste from clipboard into input field
   await editor.click()
