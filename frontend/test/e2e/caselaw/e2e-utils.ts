@@ -589,27 +589,44 @@ export async function copyPasteTextFromAttachmentIntoEditor(
   editor: Locator,
 ): Promise<void> {
   await expect(attachmentLocator).toBeVisible()
-  await attachmentLocator.evaluate((element) => {
-    if (!element) {
-      throw new Error("No original file available.")
-    }
-    const selection = window.getSelection()
-    const elementChildsLength = element.childNodes.length
-    const range = document.createRange()
-    range.setStart(element.childNodes[0], 0)
-    range.setEnd(element.childNodes[elementChildsLength - 1], 0)
-    selection?.removeAllRanges()
-    selection?.addRange(range)
-  })
+  const selectedText = await attachmentLocator.evaluate(
+    (element): string | undefined => {
+      if (!element) {
+        return undefined
+      }
+      const selection = window.getSelection()
+      const range = document.createRange()
+      range.selectNodeContents(element)
+      selection?.removeAllRanges()
+      selection?.addRange(range)
+      return selection?.toString()
+    },
+  )
 
-  const modifier = await getModifier(page)
+  expect(selectedText).toBeDefined()
+  expect(selectedText).not.toEqual("")
 
   // copy from side panel to clipboard
-  await page.keyboard.press(`${modifier}+KeyC`)
+  await page.keyboard.press("ControlOrMeta+C")
+
+  // Make sure the text selection was active when copying. This seems to be flaky.
+  const selectedTextAfterCopy = await attachmentLocator.evaluate(
+    (element): string | undefined => {
+      if (!element) {
+        return undefined
+      }
+      const selection = window.getSelection()
+      return selection?.toString()
+    },
+  )
+  // If the texts are unequal, the selection was lost before copying -> tests will fail.
+  expect(selectedText).toEqual(selectedTextAfterCopy)
 
   // paste from clipboard into input field
   await editor.click()
-  await page.keyboard.press(`${modifier}+KeyV`)
+
+  await page.keyboard.press("ControlOrMeta+V")
+
   await page
     .locator(`[aria-label='Nicht-druckbare Zeichen']:not([disabled])`)
     .click()

@@ -57,13 +57,6 @@ test.describe(
       page,
       documentNumber,
     }) => {
-      // eslint-disable-next-line playwright/no-conditional-in-test
-      const modifier = (await page.evaluate(() => navigator.platform))
-        .toLowerCase()
-        .includes("mac")
-        ? "Meta"
-        : "Control"
-
       await test.step("Upload file with border Numbers", async () => {
         await uploadTestfile(page, "some-border-numbers.docx")
         await expect(page.getByText("some-border-numbers.docx")).toBeVisible()
@@ -89,7 +82,7 @@ test.describe(
         .locator("..")
 
       await clickCategoryButton("Gründe", page)
-      const editor = page.locator("[data-testid='Gründe']")
+      const editor = page.getByTestId("Gründe")
 
       await test.step("Copy border numbers from side panel into 'Gründe' to have reference data", async () => {
         await copyPasteTextFromAttachmentIntoEditor(
@@ -104,14 +97,14 @@ test.describe(
       await checkStyleOfFirstParagraph(editor)
 
       await test.step("Select all text", async () => {
-        await page.keyboard.press(`${modifier}+KeyA`)
+        await page.keyboard.press(`ControlOrMeta+A`)
       })
 
       await clickRemoveBorderNumberButton(page)
 
       await checkAllBorderNumbersAreRemoved(editor)
 
-      await reinsertAllBorderNumbers(page, modifier)
+      await reinsertAllBorderNumbers(page)
 
       await checkAllBorderNumbersAreVisible(editor)
 
@@ -127,7 +120,7 @@ test.describe(
 
       await checkOtherBorderNumbersAreRecalculated(editor)
 
-      await reinsertAllBorderNumbers(page, modifier)
+      await reinsertAllBorderNumbers(page)
 
       await checkAllBorderNumbersAreVisible(editor)
 
@@ -144,7 +137,7 @@ test.describe(
 
       await checkOtherBorderNumbersAreRecalculated(editor)
 
-      await reinsertAllBorderNumbers(page, modifier)
+      await reinsertAllBorderNumbers(page)
 
       await checkAllBorderNumbersAreVisible(editor)
 
@@ -162,7 +155,7 @@ test.describe(
 
       await checkOtherBorderNumbersAreRecalculated(editor)
 
-      await reinsertAllBorderNumbers(page, modifier)
+      await reinsertAllBorderNumbers(page)
 
       await checkAllBorderNumbersAreVisible(editor)
 
@@ -266,12 +259,6 @@ test.describe(
       page,
       documentNumber,
     }) => {
-      // eslint-disable-next-line playwright/no-conditional-in-test
-      const modifier = (await page.evaluate(() => navigator.platform))
-        .toLowerCase()
-        .includes("mac")
-        ? "Meta"
-        : "Control"
       await navigateToCategories(page, documentNumber)
 
       await clickCategoryButton("Gründe", page)
@@ -289,7 +276,7 @@ test.describe(
       await checkAllParagraphsAreVisible(editor)
 
       await test.step("Select all text", async () => {
-        await page.keyboard.press(`${modifier}+KeyA`)
+        await page.keyboard.press(`ControlOrMeta+A`)
       })
 
       await clickAddBorderNumberButton(page)
@@ -329,12 +316,6 @@ test.describe(
       page,
       documentNumber,
     }) => {
-      // eslint-disable-next-line playwright/no-conditional-in-test
-      const modifier = (await page.evaluate(() => navigator.platform))
-        .toLowerCase()
-        .includes("mac")
-        ? "Meta"
-        : "Control"
       await navigateToCategories(page, documentNumber)
 
       await clickCategoryButton("Gründe", page)
@@ -352,7 +333,7 @@ test.describe(
       await checkAllParagraphsAreVisible(editor)
 
       await test.step("Select all text", async () => {
-        await page.keyboard.press(`${modifier}+KeyA`)
+        await page.keyboard.press(`ControlOrMeta+A`)
       })
 
       await clickAddBorderNumberButton(page)
@@ -368,11 +349,10 @@ test.describe(
       })
 
       await test.step("Check the second border number is gone and third border number is recalculated", async () => {
-        const inputFieldInnerText = await editor.innerText()
-        expect(inputFieldInnerText).toContain("1\n\n" + firstParagraph)
-        expect(inputFieldInnerText).not.toContain("2\n\n" + secondParagraph)
-        expect(inputFieldInnerText).toContain(secondParagraph)
-        expect(inputFieldInnerText).toContain("2\n\n" + thirdParagraph)
+        await expect(editor.getByText(`1${firstParagraph}`)).toBeVisible()
+        await expect(editor.getByText(`2${secondParagraph}`)).toBeHidden()
+        await expect(editor.getByText(secondParagraph)).toBeVisible()
+        await expect(editor.getByText(`2${thirdParagraph}`)).toBeVisible()
       })
     })
   },
@@ -400,31 +380,26 @@ async function clickAddBorderNumberButton(page: Page) {
   })
 }
 
-async function reinsertAllBorderNumbers(
-  page: Page,
-  modifier: "Meta" | "Control",
-) {
+async function reinsertAllBorderNumbers(page: Page) {
   await test.step("Reinsert all border numbers", async () => {
-    await page.keyboard.press(`${modifier}+KeyA`)
-    await page.keyboard.press(`${modifier}+KeyV`)
+    await page.keyboard.press(`ControlOrMeta+A`)
+    await page.keyboard.press(`ControlOrMeta+V`)
   })
 }
 
 async function checkAllParagraphsAreVisible(editor: Locator) {
   await test.step("Check all paragraphs are visible and have correct sequence", async () => {
-    const inputFieldInnerText = await editor.innerText()
-    expect(inputFieldInnerText).toContain(firstParagraph)
-    expect(inputFieldInnerText).toContain(secondParagraph)
-    expect(inputFieldInnerText).toContain(thirdParagraph)
+    await expect(editor.getByText(firstParagraph)).toBeVisible()
+    await expect(editor.getByText(secondParagraph)).toBeVisible()
+    await expect(editor.getByText(thirdParagraph)).toBeVisible()
   })
 }
 
 async function checkAllBorderNumbersAreVisible(editor: Locator) {
   await test.step("Check all border numbers are visible and have correct sequence", async () => {
-    const inputFieldInnerText = await editor.innerText()
-    expect(inputFieldInnerText).toContain("1\n\n" + firstParagraph)
-    expect(inputFieldInnerText).toContain("2\n\n" + secondParagraph)
-    expect(inputFieldInnerText).toContain("3\n\n" + thirdParagraph)
+    await expect(editor.getByText(`1${firstParagraph}`)).toBeVisible()
+    await expect(editor.getByText(`2${secondParagraph}`)).toBeVisible()
+    await expect(editor.getByText(`3${thirdParagraph}`)).toBeVisible()
   })
 }
 
@@ -435,35 +410,30 @@ async function checkStyleOfFirstParagraph(editor: Locator) {
 
 async function checkFirstBorderNumberIsRemoved(editor: Locator) {
   await test.step("Check the first border Number is removed", async () => {
-    const inputFieldInnerText = await editor.innerText()
-    const inputFieldInnerHtml = await editor.innerHTML()
-    expect(inputFieldInnerText).not.toContain("1\n\n" + firstParagraph)
-    expect(inputFieldInnerText).toContain(firstParagraph)
-    expect(inputFieldInnerHtml).toContain(firstParagraphHtml)
+    await expect(editor.getByText(`1${firstParagraph}`)).toBeHidden()
+    await expect(editor.getByText(`${firstParagraph}`)).toBeVisible()
+    expect(await editor.innerHTML()).toContain(firstParagraphHtml)
   })
 }
 
 async function checkOtherBorderNumbersAreRecalculated(editor: Locator) {
   await test.step("Check the other border numbers are recalculated", async () => {
-    const inputFieldInnerText = await editor.innerText()
-    expect(inputFieldInnerText).toContain("1\n\n" + secondParagraph)
-    expect(inputFieldInnerText).toContain("2\n\n" + thirdParagraph)
+    await expect(editor.getByText(`1${secondParagraph}`)).toBeVisible()
+    await expect(editor.getByText(`2${thirdParagraph}`)).toBeVisible()
   })
 }
 
 async function checkOtherBorderNumbersAreNotRecalculated(editor: Locator) {
   await test.step("Check the other border numbers are not recalculated", async () => {
-    const inputFieldInnerText = await editor.innerText()
-    expect(inputFieldInnerText).toContain("2\n\n" + secondParagraph)
-    expect(inputFieldInnerText).toContain("3\n\n" + thirdParagraph)
+    await expect(editor.getByText(`2${secondParagraph}`)).toBeVisible()
+    await expect(editor.getByText(`3${thirdParagraph}`)).toBeVisible()
   })
 }
 
 async function checkAllBorderNumbersAreRemoved(editor: Locator) {
   await test.step("Check all border Numbers have gone", async () => {
-    const inputFieldInnerText = await editor.innerText()
-    expect(inputFieldInnerText).not.toContain("1\n\n" + firstParagraph)
-    expect(inputFieldInnerText).not.toContain("2\n\n" + secondParagraph)
-    expect(inputFieldInnerText).not.toContain("3\n\n" + thirdParagraph)
+    await expect(editor.getByText(`1${firstParagraph}`)).toBeHidden()
+    await expect(editor.getByText(`2${secondParagraph}`)).toBeHidden()
+    await expect(editor.getByText(`3${thirdParagraph}`)).toBeHidden()
   })
 }
