@@ -6,6 +6,7 @@ import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validate;
 import static de.bund.digitalservice.ris.caselaw.adapter.MappingUtils.validateNotNull;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
+import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknEmbeddedStructureInBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknKeyword;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
@@ -42,25 +43,41 @@ import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import jakarta.xml.bind.ValidationException;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.mapping.MappingException;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+@Slf4j
 public class DocumentationUnitToLdmlTransformer {
 
   private static final Logger logger =
       LogManager.getLogger(DocumentationUnitToLdmlTransformer.class);
+  private static DocumentBuilderFactory documentBuilderFactory;
 
   private DocumentationUnitToLdmlTransformer() {}
 
-  public static Optional<CaseLawLdml> transformToLdml(DocumentationUnit documentationUnit) {
+  public static Optional<CaseLawLdml> transformToLdml(
+      DocumentationUnit documentationUnit, DocumentBuilderFactory documentBuilderFactory) {
+    DocumentationUnitToLdmlTransformer.documentBuilderFactory = documentBuilderFactory;
+
     try {
       return Optional.of(CaseLawLdml.builder().judgment(buildJudgment(documentationUnit)).build());
     } catch (ValidationException e) {
@@ -85,11 +102,12 @@ public class DocumentationUnitToLdmlTransformer {
         ObjectUtils.defaultIfNull(
             nullSafeGet(documentationUnit.shortTexts(), ShortTexts::headline),
             "<p>" + documentationUnit.documentNumber() + "</p>");
+
     validateNotNull(title, "Title missing");
     String opinion = nullSafeGet(documentationUnit.longTexts(), LongTexts::dissentingOpinion);
     return new Header()
-        .withBlock("title", Title.build(title))
-        .withBlock("opinions", Opinions.build(opinion));
+        .withBlock("title", Title.build(htmlStringToObjectList(title)))
+        .withBlock("opinions", Opinions.build(htmlStringToObjectList(opinion)));
   }
 
   private static JudgmentBody buildJudgmentBody(DocumentationUnit documentationUnit) {
@@ -98,14 +116,20 @@ public class DocumentationUnitToLdmlTransformer {
 
     var shortTexts = documentationUnit.shortTexts();
     var longTexts = documentationUnit.longTexts();
+
     builder
-        .introduction(JaxbHtml.build(nullSafeGet(shortTexts, ShortTexts::guidingPrinciple)))
-        .background(JaxbHtml.build(nullSafeGet(longTexts, LongTexts::caseFacts)))
+        .introduction(
+            JaxbHtml.build(
+                htmlStringToObjectList(nullSafeGet(shortTexts, ShortTexts::guidingPrinciple))))
+        .background(
+            JaxbHtml.build(htmlStringToObjectList(nullSafeGet(longTexts, LongTexts::caseFacts))))
         .decision(
             Decision.build(
-                nullSafeGet(longTexts, LongTexts::tenor),
-                nullSafeGet(longTexts, LongTexts::otherLongText)))
-        .arguments(JaxbHtml.build(nullSafeGet(longTexts, LongTexts::decisionReasons)));
+                htmlStringToObjectList(nullSafeGet(longTexts, LongTexts::tenor)),
+                htmlStringToObjectList(nullSafeGet(longTexts, LongTexts::otherLongText))))
+        .arguments(
+            JaxbHtml.build(
+                htmlStringToObjectList(nullSafeGet(longTexts, LongTexts::decisionReasons))));
 
     var headnote = nullSafeGet(shortTexts, ShortTexts::headnote);
     var otherHeadnote = nullSafeGet(shortTexts, ShortTexts::otherHeadnote);
@@ -119,14 +143,16 @@ public class DocumentationUnitToLdmlTransformer {
               new Motivation()
                   .withBlock(
                       AknEmbeddedStructureInBlock.HeadNote.NAME,
-                      AknEmbeddedStructureInBlock.HeadNote.build(JaxbHtml.build(headnote)))
+                      AknEmbeddedStructureInBlock.HeadNote.build(
+                          JaxbHtml.build(htmlStringToObjectList(headnote))))
                   .withBlock(
                       AknEmbeddedStructureInBlock.OtherHeadNote.NAME,
                       AknEmbeddedStructureInBlock.OtherHeadNote.build(
-                          JaxbHtml.build(otherHeadnote)))
+                          JaxbHtml.build(htmlStringToObjectList(otherHeadnote))))
                   .withBlock(
                       AknEmbeddedStructureInBlock.Grounds.NAME,
-                      AknEmbeddedStructureInBlock.Grounds.build(JaxbHtml.build(reasons))))
+                      AknEmbeddedStructureInBlock.Grounds.build(
+                          JaxbHtml.build(htmlStringToObjectList(reasons)))))
           .build();
     }
 
@@ -313,5 +339,25 @@ public class DocumentationUnitToLdmlTransformer {
       return null;
     }
     return input;
+  }
+
+  private static List<Object> htmlStringToObjectList(String html) {
+    if (StringUtils.isBlank(html)) {
+      return Collections.emptyList();
+    }
+
+    try {
+      String wrapped = "<wrapper>" + html + "</wrapper>";
+
+      DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
+      Document doc = builder.parse(new InputSource(new StringReader(wrapped)));
+
+      NodeList childNodes = doc.getDocumentElement().getChildNodes();
+
+      return XmlUtilService.toList(childNodes).stream().map(e -> (Object) e).toList();
+    } catch (ParserConfigurationException | IOException | SAXException e) {
+      log.error("Xml transformation error.", e);
+      throw new MappingException(e.getMessage());
+    }
   }
 }

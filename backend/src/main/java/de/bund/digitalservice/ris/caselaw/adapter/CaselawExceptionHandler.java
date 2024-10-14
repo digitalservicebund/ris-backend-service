@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.ImportApiKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,14 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class CaselawExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler({ImportApiKeyException.class})
   public ResponseEntity<Object> handleImportApiKeyException(ImportApiKeyException ex) {
+
+    ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage());
+
+    return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler({LdmlTransformationException.class})
+  public ResponseEntity<Object> handleLdmlTransformationException(LdmlTransformationException ex) {
 
     ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage());
 

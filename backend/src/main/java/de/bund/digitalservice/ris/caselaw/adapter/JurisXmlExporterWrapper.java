@@ -13,13 +13,14 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 
 /** Wraps the Juris XML exporter to provide a common interface for XML export. */
 public class JurisXmlExporterWrapper implements XmlExporter {
   private final JurisXmlExporter jurisXmlExporter;
 
-  public JurisXmlExporterWrapper(ObjectMapper objectMapper) {
-    this.jurisXmlExporter = new JurisXmlExporter(objectMapper);
+  public JurisXmlExporterWrapper(ObjectMapper objectMapper, TransformerFactory transformerFactory) {
+    this.jurisXmlExporter = new JurisXmlExporter(objectMapper, transformerFactory);
   }
 
   /**

@@ -5,29 +5,24 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitT
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import jakarta.xml.bind.JAXB;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Optional;
-import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Templates;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mapping.MappingException;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.stereotype.Component;
-import org.springframework.util.ResourceUtils;
+import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
-@EnableAsync
-@Component
+@Service
 @Profile({"default"})
 public class CaseLawPostgresToS3Exporter {
 
@@ -35,25 +30,24 @@ public class CaseLawPostgresToS3Exporter {
   private static final int EXPORT_BATCH_SIZE = 1000;
 
   private final DocumentationUnitRepository documentationUnitRepository;
+  private final DocumentBuilderFactory documentBuilderFactory;
   private final LdmlBucket ldmlBucket;
   private final Templates htmlToAknHtml;
 
-  private Schema schema;
+  private final Schema schema;
 
   @Autowired
   public CaseLawPostgresToS3Exporter(
-      DocumentationUnitRepository documentationUnitRepository, LdmlBucket ldmlBucket) {
+      DocumentationUnitRepository documentationUnitRepository,
+      XmlUtilService xmlUtilService,
+      DocumentBuilderFactory documentBuilderFactory,
+      LdmlBucket ldmlBucket) {
+
     this.documentationUnitRepository = documentationUnitRepository;
+    this.documentBuilderFactory = documentBuilderFactory;
     this.ldmlBucket = ldmlBucket;
-    this.htmlToAknHtml = XmlUtils.getTemplates("caselawhandover/htmlToAknHtml.xslt");
-    try {
-      this.schema =
-          SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
-              .newSchema(
-                  ResourceUtils.getFile("classpath:caselawhandover/shared/akomantoso30.xsd"));
-    } catch (SAXException | FileNotFoundException e) {
-      logger.error("Failure during CaseLawPostgresToS3Exporter initialization", e);
-    }
+    this.htmlToAknHtml = xmlUtilService.getTemplates("caselawhandover/htmlToAknHtml.xslt");
+    this.schema = xmlUtilService.getSchema("caselawhandover/shared/akomantoso30.xsd");
   }
 
   //  @Async
@@ -68,13 +62,16 @@ public class CaseLawPostgresToS3Exporter {
       // Only process the first batch for now so dev environment only indexes 2000 entries
       saveOneBatch(documentationUnitsToTransform);
     }
+
     logger.info("Export caselaw process is done");
   }
 
   public void saveOneBatch(List<DocumentationUnit> documentationUnits) {
     for (DocumentationUnit documentationUnit : documentationUnits) {
       Optional<CaseLawLdml> ldml =
-          DocumentationUnitToLdmlTransformer.transformToLdml(documentationUnit);
+          DocumentationUnitToLdmlTransformer.transformToLdml(
+              documentationUnit, documentBuilderFactory);
+
       if (ldml.isPresent()) {
         Optional<String> fileContent = ldmlToString(ldml.get());
         fileContent.ifPresent(s -> ldmlBucket.save(ldml.get().getUniqueId() + ".xml", s));
@@ -85,8 +82,9 @@ public class CaseLawPostgresToS3Exporter {
   public Optional<String> ldmlToString(CaseLawLdml ldml) {
     StringWriter jaxbOutput = new StringWriter();
     JAXB.marshal(ldml, jaxbOutput);
+
     try {
-      String ldmlAsXmlString = XmlUtils.xsltTransform(htmlToAknHtml, jaxbOutput.toString());
+      String ldmlAsXmlString = XmlUtilService.xsltTransform(htmlToAknHtml, jaxbOutput.toString());
       schema.newValidator().validate(new StreamSource(new StringReader(ldmlAsXmlString)));
       return Optional.of(ldmlAsXmlString);
     } catch (SAXException | MappingException | IOException e) {

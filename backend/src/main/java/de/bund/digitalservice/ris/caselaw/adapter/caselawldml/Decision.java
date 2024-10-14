@@ -1,9 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.adapter.caselawldml;
 
 import jakarta.xml.bind.annotation.XmlElement;
+import java.util.List;
+import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 
 @NoArgsConstructor
 @Getter
@@ -12,20 +13,27 @@ public class Decision extends JaxbHtml {
   @XmlElement(name = "block", namespace = CaseLawLdml.AKN_NS)
   private AknEmbeddedStructureInBlock.OtherLongText otherLongText;
 
-  public Decision(String html, String otherLongText) {
+  public Decision(List<Object> html, List<Object> otherLongText) {
     super(html);
-    if (StringUtils.isBlank(html)) {
+
+    if (html == null || html.isEmpty() || html.stream().allMatch(Objects::isNull)) {
       this.setHtml(null);
     }
+
     this.otherLongText =
         AknEmbeddedStructureInBlock.OtherLongText.build(JaxbHtml.build(otherLongText));
   }
 
-  public static Decision build(String html, String otherLongText) {
+  public static Decision build(List<Object> html, List<Object> otherLongText) {
     // Lombok build() can't return null when one input is null
-    if (StringUtils.isEmpty(html) && StringUtils.isEmpty(otherLongText)) {
+    if ((html == null || html.isEmpty() || html.stream().allMatch(Objects::isNull))
+        && (otherLongText == null
+            || otherLongText.isEmpty()
+            || otherLongText.stream().allMatch(Objects::isNull))) {
+
       return null;
     }
+
     return new Decision(html, otherLongText);
   }
 }

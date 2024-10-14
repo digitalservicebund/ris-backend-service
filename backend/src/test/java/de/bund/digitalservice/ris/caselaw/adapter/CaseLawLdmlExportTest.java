@@ -20,6 +20,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import javax.xml.parsers.DocumentBuilderFactory;
+import net.sf.saxon.TransformerFactoryImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -35,6 +37,8 @@ class CaseLawLdmlExportTest {
 
   static DocumentationUnitRepository documentationUnitRepository;
   static LdmlBucket caseLawBucket;
+  static DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+  static XmlUtilService xmlUtilService = new XmlUtilService(new TransformerFactoryImpl());
   static CaseLawPostgresToS3Exporter exporter;
   static DocumentationUnit testDocumentUnit;
   static UUID testUUID;
@@ -43,7 +47,9 @@ class CaseLawLdmlExportTest {
   static void setUpBeforeClass() {
     documentationUnitRepository = mock(DocumentationUnitRepository.class);
     caseLawBucket = mock(LdmlBucket.class);
-    exporter = new CaseLawPostgresToS3Exporter(documentationUnitRepository, caseLawBucket);
+    exporter =
+        new CaseLawPostgresToS3Exporter(
+            documentationUnitRepository, xmlUtilService, documentBuilderFactory, caseLawBucket);
 
     PreviousDecision related1 =
         PreviousDecision.builder()
@@ -136,7 +142,8 @@ class CaseLawLdmlExportTest {
            </akn:block>
            """;
     Optional<CaseLawLdml> ldml =
-        DocumentationUnitToLdmlTransformer.transformToLdml(testDocumentUnit);
+        DocumentationUnitToLdmlTransformer.transformToLdml(
+            testDocumentUnit, documentBuilderFactory);
     Assertions.assertTrue(ldml.isPresent());
     Optional<String> fileContent = exporter.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());
@@ -166,7 +173,8 @@ class CaseLawLdmlExportTest {
                     .build())
             .build();
     Optional<CaseLawLdml> ldml =
-        DocumentationUnitToLdmlTransformer.transformToLdml(dissentingCaseLaw);
+        DocumentationUnitToLdmlTransformer.transformToLdml(
+            dissentingCaseLaw, documentBuilderFactory);
     Assertions.assertTrue(ldml.isPresent());
     Optional<String> fileContent = exporter.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());
@@ -192,7 +200,7 @@ class CaseLawLdmlExportTest {
                 testDocumentUnit.shortTexts().toBuilder().headnote("<p>headnote test</p>").build())
             .build();
     Optional<CaseLawLdml> ldml =
-        DocumentationUnitToLdmlTransformer.transformToLdml(headnoteCaseLaw);
+        DocumentationUnitToLdmlTransformer.transformToLdml(headnoteCaseLaw, documentBuilderFactory);
     Assertions.assertTrue(ldml.isPresent());
     Optional<String> fileContent = exporter.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());
@@ -220,7 +228,8 @@ class CaseLawLdmlExportTest {
                     .build())
             .build();
     Optional<CaseLawLdml> ldml =
-        DocumentationUnitToLdmlTransformer.transformToLdml(otherHeadnoteCaseLaw);
+        DocumentationUnitToLdmlTransformer.transformToLdml(
+            otherHeadnoteCaseLaw, documentBuilderFactory);
     Assertions.assertTrue(ldml.isPresent());
     Optional<String> fileContent = exporter.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());
@@ -247,7 +256,8 @@ class CaseLawLdmlExportTest {
             .longTexts(
                 testDocumentUnit.longTexts().toBuilder().reasons("<p>grounds test</p>").build())
             .build();
-    Optional<CaseLawLdml> ldml = DocumentationUnitToLdmlTransformer.transformToLdml(groundsCaseLaw);
+    Optional<CaseLawLdml> ldml =
+        DocumentationUnitToLdmlTransformer.transformToLdml(groundsCaseLaw, documentBuilderFactory);
     Assertions.assertTrue(ldml.isPresent());
     Optional<String> fileContent = exporter.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());
@@ -277,7 +287,8 @@ class CaseLawLdmlExportTest {
                     .build())
             .build();
     Optional<CaseLawLdml> ldml =
-        DocumentationUnitToLdmlTransformer.transformToLdml(otherLongTextCaseLaw);
+        DocumentationUnitToLdmlTransformer.transformToLdml(
+            otherLongTextCaseLaw, documentBuilderFactory);
     Assertions.assertTrue(ldml.isPresent());
     Optional<String> fileContent = exporter.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());

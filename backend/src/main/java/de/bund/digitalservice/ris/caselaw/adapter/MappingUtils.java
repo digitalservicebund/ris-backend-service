@@ -20,6 +20,7 @@ public class MappingUtils {
       selectors.remove();
       return document.text();
     }
+
     return StringUtils.EMPTY;
   }
 
@@ -27,6 +28,7 @@ public class MappingUtils {
     if (input == null) {
       return null;
     }
+
     return call.apply(input);
   }
 

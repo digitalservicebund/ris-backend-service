@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.caselawldml;
 
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +21,7 @@ public class Opinion {
   @XmlElement(name = "embeddedStructure", namespace = CaseLawLdml.AKN_NS)
   private JaxbHtml content;
 
-  public Opinion(String content) {
+  public Opinion(List<Object> content) {
     this.content = JaxbHtml.build(content);
   }
 }

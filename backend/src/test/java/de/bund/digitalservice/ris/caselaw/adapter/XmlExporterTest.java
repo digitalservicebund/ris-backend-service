@@ -32,6 +32,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
+import javax.xml.transform.TransformerFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,6 +45,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @Slf4j
 class XmlExporterTest {
   @Autowired private ObjectMapper objectMapper;
+  @Autowired private TransformerFactory transformerFactory;
 
   @Test
   void testExporter() throws XmlExporterException {
@@ -60,7 +62,8 @@ class XmlExporterTest {
             .build();
 
     String encryptedXml =
-        new JurisXmlExporterWrapper(objectMapper).generateEncryptedXMLString(documentationUnit);
+        new JurisXmlExporterWrapper(objectMapper, transformerFactory)
+            .generateEncryptedXMLString(documentationUnit);
 
     assertThat(encryptedXml)
         .isEqualTo(
