@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -87,8 +86,8 @@ class CaseLawLdmlExportTest {
   @Test
   @DisplayName("Should call caselaw bucket save once")
   void exportOneCaseLaw() {
-    when(documentationUnitRepository.getUnprocessedIds()).thenReturn(List.of(UUID.randomUUID()));
-    when(documentationUnitRepository.findByIdIn(anyList())).thenReturn(List.of(testDocumentUnit));
+    when(documentationUnitRepository.getRandomDocumentationUnits())
+        .thenReturn(List.of(testDocumentUnit));
 
     exporter.uploadCaseLaw();
     verify(caseLawBucket, times(1)).save(anyString(), anyString());
@@ -104,8 +103,7 @@ class CaseLawLdmlExportTest {
                     .caseFacts("<p>Example <p>nested</p> content 1</p>")
                     .build())
             .build();
-    when(documentationUnitRepository.getUnprocessedIds()).thenReturn(List.of(UUID.randomUUID()));
-    when(documentationUnitRepository.findByIdIn(anyList()))
+    when(documentationUnitRepository.getRandomDocumentationUnits())
         .thenReturn(List.of(invalidTestDocumentUnit));
 
     exporter.uploadCaseLaw();
@@ -117,8 +115,7 @@ class CaseLawLdmlExportTest {
   void xsdValidationFailure2() {
     DocumentationUnit invalidTestDocumentUnit =
         testDocumentUnit.toBuilder().longTexts(null).build();
-    when(documentationUnitRepository.getUnprocessedIds()).thenReturn(List.of(UUID.randomUUID()));
-    when(documentationUnitRepository.findByIdIn(anyList()))
+    when(documentationUnitRepository.getRandomDocumentationUnits())
         .thenReturn(List.of(invalidTestDocumentUnit));
 
     exporter.uploadCaseLaw();

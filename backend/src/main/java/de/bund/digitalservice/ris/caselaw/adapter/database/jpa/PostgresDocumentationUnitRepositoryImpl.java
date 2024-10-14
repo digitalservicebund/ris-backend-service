@@ -620,12 +620,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   }
 
   @Override
-  public List<UUID> getUnprocessedIds() {
-    return null;
-  }
-
-  @Override
-  public List<DocumentationUnit> findByIdIn(List<UUID> ids) {
-    return null;
+  public List<DocumentationUnit> getRandomDocumentationUnits() {
+    return repository.getRandomDocumentationUnits().stream()
+        .map(DocumentationUnitTransformer::transformToDomain)
+        .toList();
   }
 }

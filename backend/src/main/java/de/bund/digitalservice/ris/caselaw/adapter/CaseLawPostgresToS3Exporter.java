@@ -11,13 +11,11 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import javax.xml.XMLConstants;
 import javax.xml.transform.Templates;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import org.apache.commons.collections4.ListUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,19 +60,19 @@ public class CaseLawPostgresToS3Exporter {
   //  @EventListener(value = ApplicationReadyEvent.class)
   public void uploadCaseLaw() {
     logger.info("Export caselaw process has started");
-    List<UUID> idsToImport = documentationUnitRepository.getUnprocessedIds();
-    List<List<UUID>> idBatches = ListUtils.partition(idsToImport, EXPORT_BATCH_SIZE);
+    List<DocumentationUnit> documentationUnitsToTransform =
+        documentationUnitRepository.getRandomDocumentationUnits();
 
     // Case law handover: decide on LDML update strategy (frequency, incremental, etc.)
-    if (!idBatches.isEmpty()) {
+    if (!documentationUnitsToTransform.isEmpty()) {
       // Only process the first batch for now so dev environment only indexes 2000 entries
-      saveOneBatch(idBatches.get(0));
+      saveOneBatch(documentationUnitsToTransform);
     }
     logger.info("Export caselaw process is done");
   }
 
-  public void saveOneBatch(List<UUID> ids) {
-    for (DocumentationUnit documentationUnit : documentationUnitRepository.findByIdIn(ids)) {
+  public void saveOneBatch(List<DocumentationUnit> documentationUnits) {
+    for (DocumentationUnit documentationUnit : documentationUnits) {
       Optional<CaseLawLdml> ldml =
           DocumentationUnitToLdmlTransformer.transformToLdml(documentationUnit);
       if (ldml.isPresent()) {

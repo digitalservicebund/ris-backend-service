@@ -131,9 +131,9 @@ ORDER BY documentationUnit.decisionDate DESC NULLS LAST
 
   @Query(
       """
-          SELECT DISTINCT d.id FROM DocumentationUnitDTO d
+          SELECT DISTINCT d FROM DocumentationUnitDTO d
           ORDER BY RANDOM()
           LIMIT 100
           """)
-  List<UUID> getUnprocessedIds();
+  List<DocumentationUnitDTO> getRandomDocumentationUnits();
 }
