@@ -483,7 +483,12 @@ const isDecisionReasonsInvalid = computed<boolean>(
             <IconErrorOutline class="text-red-800" />
 
             <div class="ds-body-01-reg flex flex-col gap-24">
-              <div v-if="!borderNumberValidationResult.isValid">
+              <div
+                v-if="
+                  !borderNumberValidationResult.isValid &&
+                  !borderNumberValidationResult.hasError
+                "
+              >
                 Die Reihenfolge der Randnummern ist nicht korrekt.
                 <dl class="my-16">
                   <div class="grid grid-cols-3 gap-24 px-0">
@@ -530,16 +535,22 @@ const isDecisionReasonsInvalid = computed<boolean>(
                   </li>
                 </ul>
               </div>
+              <div v-if="borderNumberValidationResult.hasError">
+                Bei der Randnummernprüfung ist ein Fehler aufgetreten. Bitte
+                prüfen Sie die Randnummern manuell und informieren Sie den
+                Support.
+              </div>
             </div>
           </div>
           <TextButton
             v-if="
               !borderNumberValidationResult.isValid &&
+              !borderNumberValidationResult.hasError &&
               !showRecalculatingBorderNumbersFakeDelay
             "
             aria-label="Randnummern neu berechnen"
             button-type="tertiary"
-            class="w-fit"
+            class="mt-8 w-fit"
             label="Randnummern neu berechnen"
             size="small"
             @click="recalculateBorderNumbers"
@@ -614,7 +625,8 @@ const isDecisionReasonsInvalid = computed<boolean>(
           isOutlineInvalid ||
           fieldsMissing ||
           isCaseFactsInvalid ||
-          isDecisionReasonsInvalid
+          isDecisionReasonsInvalid ||
+          !preview?.success
         "
         :icon="IconCheck"
         label="Dokumentationseinheit an jDV übergeben"

@@ -49,6 +49,28 @@ describe("borderNumberService", () => {
       ).not.toThrow()
     })
 
+    it("should handle missing border-number number node", () => {
+      const errorLogSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => null)
+
+      mockDocUnitStore({
+        longTexts: {
+          reasons: `<border-number></border-number>${borderNumber(10)}`,
+        },
+      })
+
+      expect(() =>
+        borderNumberService.makeBorderNumbersSequential(),
+      ).not.toThrow()
+
+      expect(errorLogSpy).toHaveBeenCalledOnce()
+      expect(errorLogSpy).toHaveBeenCalledWith(
+        expect.stringContaining("Could not make border numbers sequential"),
+        expect.any(Error),
+      )
+    })
+
     it("should start border numbers with 1", () => {
       const store = mockDocUnitStore({
         longTexts: {
@@ -181,6 +203,28 @@ describe("borderNumberService", () => {
       expect(validationResult.isValid).toBe(true)
     })
 
+    it("should handle invalid border-number node", () => {
+      const errorLogSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => null)
+
+      mockDocUnitStore({
+        longTexts: {
+          reasons: `<border-number></border-number>${borderNumber(10)}`,
+        },
+      })
+
+      const validationResult = borderNumberService.validateBorderNumbers()
+      expect(validationResult.isValid).toBe(false)
+      expect(validationResult.hasError).toBe(true)
+
+      expect(errorLogSpy).toHaveBeenCalledOnce()
+      expect(errorLogSpy).toHaveBeenCalledWith(
+        expect.stringContaining("Could not validate border numbers"),
+        expect.any(Error),
+      )
+    })
+
     it("should return valid for texts with valid border numbers", () => {
       mockDocUnitStore({
         longTexts: {
@@ -205,7 +249,8 @@ describe("borderNumberService", () => {
       })
       const validationResult = borderNumberService.validateBorderNumbers()
       expect(validationResult.isValid).toBe(false)
-      if (!validationResult.isValid) {
+      expect(validationResult.hasError).toBe(false)
+      if (!validationResult.isValid && !validationResult.hasError) {
         expect(validationResult.invalidCategory).toBe("decisionReasons")
         expect(validationResult.firstInvalidBorderNumber).toBe("3")
         expect(validationResult.expectedBorderNumber).toBe(4)
@@ -220,7 +265,8 @@ describe("borderNumberService", () => {
       })
       const validationResult = borderNumberService.validateBorderNumbers()
       expect(validationResult.isValid).toBe(false)
-      if (!validationResult.isValid) {
+      expect(validationResult.hasError).toBe(false)
+      if (!validationResult.isValid && !validationResult.hasError) {
         expect(validationResult.invalidCategory).toBe("reasons")
         expect(validationResult.firstInvalidBorderNumber).toBe("a")
         expect(validationResult.expectedBorderNumber).toBe(1)
@@ -235,7 +281,8 @@ describe("borderNumberService", () => {
       })
       const validationResult = borderNumberService.validateBorderNumbers()
       expect(validationResult.isValid).toBe(false)
-      if (!validationResult.isValid) {
+      expect(validationResult.hasError).toBe(false)
+      if (!validationResult.isValid && !validationResult.hasError) {
         expect(validationResult.invalidCategory).toBe("otherLongText")
         expect(validationResult.firstInvalidBorderNumber).toBe("")
         expect(validationResult.expectedBorderNumber).toBe(1)
@@ -251,7 +298,8 @@ describe("borderNumberService", () => {
       })
       const validationResult = borderNumberService.validateBorderNumbers()
       expect(validationResult.isValid).toBe(false)
-      if (!validationResult.isValid) {
+      expect(validationResult.hasError).toBe(false)
+      if (!validationResult.isValid && !validationResult.hasError) {
         expect(validationResult.invalidCategory).toBe("dissentingOpinion")
         expect(validationResult.firstInvalidBorderNumber).toBe("3")
         expect(validationResult.expectedBorderNumber).toBe(1)
@@ -262,6 +310,19 @@ describe("borderNumberService", () => {
   describe("validateBorderNumberLinks", () => {
     it("should return valid for empty texts", () => {
       mockDocUnitStore({})
+      const validationResult = borderNumberService.validateBorderNumberLinks()
+      expect(validationResult.isValid).toBe(true)
+    })
+
+    it("should handle invalid html nodes", () => {
+      mockDocUnitStore({
+        longTexts: {
+          reasons: `<border-number></border-number>`,
+        },
+        shortTexts: {
+          headline: `<border-number-link></border-number-link>`,
+        },
+      })
       const validationResult = borderNumberService.validateBorderNumberLinks()
       expect(validationResult.isValid).toBe(true)
     })
@@ -351,6 +412,19 @@ describe("borderNumberService", () => {
   describe("invalidateBorderNumberLinks", () => {
     it("should return valid for empty texts", () => {
       const store = mockDocUnitStore({})
+      borderNumberService.invalidateBorderNumberLinks(["1", "2"])
+      expect(store.documentUnit).toEqual(store.documentUnit)
+    })
+
+    it("should handle invalid html nodes", () => {
+      const store = mockDocUnitStore({
+        longTexts: {
+          reasons: `<border-number></border-number>`,
+        },
+        shortTexts: {
+          headline: `<border-number-link></border-number-link>`,
+        },
+      })
       borderNumberService.invalidateBorderNumberLinks(["1", "2"])
       expect(store.documentUnit).toEqual(store.documentUnit)
     })

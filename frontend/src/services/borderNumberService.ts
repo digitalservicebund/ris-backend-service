@@ -232,43 +232,50 @@ const borderNumberService = {
    * Updates all existing border number links that reference a border number that was updated previously.
    */
   makeBorderNumbersSequential: () => {
-    const { documentUnit } = storeToRefs(useDocumentUnitStore())
-    let nextBorderNumberCount = 1
-    // key: original border number  -> value: new border number
-    let allUpdatedBorderNumbers = new Map<string, number>()
-    for (const category of orderedCategoriesWithBorderNumbers) {
-      const longText = documentUnit.value!.longTexts[category]
-      if (longText) {
-        const { nextBorderNumber, updatedText, updatedBorderNumbers } =
-          makeBorderNumbersSequentialForCategory(
-            longText,
-            nextBorderNumberCount,
-          )
-        nextBorderNumberCount = nextBorderNumber
-        documentUnit.value!.longTexts[category] = updatedText
-        allUpdatedBorderNumbers = new Map([
-          ...allUpdatedBorderNumbers,
-          ...updatedBorderNumbers,
-        ])
+    try {
+      const { documentUnit } = storeToRefs(useDocumentUnitStore())
+      let nextBorderNumberCount = 1
+      // key: original border number  -> value: new border number
+      let allUpdatedBorderNumbers = new Map<string, number>()
+      for (const category of orderedCategoriesWithBorderNumbers) {
+        const longText = documentUnit.value!.longTexts[category]
+        if (longText) {
+          const { nextBorderNumber, updatedText, updatedBorderNumbers } =
+            makeBorderNumbersSequentialForCategory(
+              longText,
+              nextBorderNumberCount,
+            )
+          nextBorderNumberCount = nextBorderNumber
+          documentUnit.value!.longTexts[category] = updatedText
+          allUpdatedBorderNumbers = new Map([
+            ...allUpdatedBorderNumbers,
+            ...updatedBorderNumbers,
+          ])
+        }
       }
-    }
 
-    const hasUpdatedAnyBorderNumber = allUpdatedBorderNumbers.size > 0
-    if (hasUpdatedAnyBorderNumber) {
-      updateBorderNumberLinks(
-        documentUnit.value as DocumentUnit,
-        allUpdatedBorderNumbers,
-      )
-    }
+      const hasUpdatedAnyBorderNumber = allUpdatedBorderNumbers.size > 0
+      if (hasUpdatedAnyBorderNumber) {
+        updateBorderNumberLinks(
+          documentUnit.value as DocumentUnit,
+          allUpdatedBorderNumbers,
+        )
+      }
 
-    // Dissenting opinion should start from 1 again and not influence any other long-texts or links.
-    const dissentingOpinion = documentUnit.value!.longTexts.dissentingOpinion
-    if (dissentingOpinion) {
-      const { updatedText } = makeBorderNumbersSequentialForCategory(
-        dissentingOpinion,
-        1,
+      // Dissenting opinion should start from 1 again and not influence any other long-texts or links.
+      const dissentingOpinion = documentUnit.value!.longTexts.dissentingOpinion
+      if (dissentingOpinion) {
+        const { updatedText } = makeBorderNumbersSequentialForCategory(
+          dissentingOpinion,
+          1,
+        )
+        documentUnit.value!.longTexts.dissentingOpinion = updatedText
+      }
+    } catch (e) {
+      console.error(
+        "Could not make border numbers sequential. Invalid HTML?",
+        e,
       )
-      documentUnit.value!.longTexts.dissentingOpinion = updatedText
     }
   },
 
@@ -277,35 +284,48 @@ const borderNumberService = {
    * Dissenting opinion is expected to start from 1 independent of other texts.
    */
   validateBorderNumbers: (): BorderNumberValidationResult => {
-    const { documentUnit } = storeToRefs(useDocumentUnitStore())
-    let nextExpectedBorderNumber = 1
-    for (const category of orderedCategoriesWithBorderNumbers) {
-      const longText = documentUnit.value!.longTexts[category]
-      if (longText) {
-        const validationResult = validateBorderNumbersForCategory(
-          longText,
-          nextExpectedBorderNumber,
-        )
-        if (!validationResult.isValid) {
-          return { ...validationResult, invalidCategory: category }
-        } else {
-          nextExpectedBorderNumber = validationResult.nextBorderNumber
+    try {
+      const { documentUnit } = storeToRefs(useDocumentUnitStore())
+      let nextExpectedBorderNumber = 1
+      for (const category of orderedCategoriesWithBorderNumbers) {
+        const longText = documentUnit.value!.longTexts[category]
+        if (longText) {
+          const validationResult = validateBorderNumbersForCategory(
+            longText,
+            nextExpectedBorderNumber,
+          )
+          if (!validationResult.isValid) {
+            return {
+              ...validationResult,
+              invalidCategory: category,
+              hasError: false,
+            }
+          } else {
+            nextExpectedBorderNumber = validationResult.nextBorderNumber
+          }
         }
       }
-    }
 
-    const dissentingOpinion = documentUnit.value!.longTexts.dissentingOpinion
-    if (dissentingOpinion) {
-      const validationResult = validateBorderNumbersForCategory(
-        dissentingOpinion,
-        1,
-      )
-      if (!validationResult.isValid) {
-        return { ...validationResult, invalidCategory: "dissentingOpinion" }
+      const dissentingOpinion = documentUnit.value!.longTexts.dissentingOpinion
+      if (dissentingOpinion) {
+        const validationResult = validateBorderNumbersForCategory(
+          dissentingOpinion,
+          1,
+        )
+        if (!validationResult.isValid) {
+          return {
+            ...validationResult,
+            invalidCategory: "dissentingOpinion",
+            hasError: false,
+          }
+        }
       }
-    }
 
-    return { isValid: true }
+      return { isValid: true, hasError: false }
+    } catch (e) {
+      console.error("Could not validate border numbers. Invalid HTML?", e)
+      return { isValid: false, hasError: true }
+    }
   },
 
   /**
@@ -337,9 +357,10 @@ const borderNumberService = {
 }
 
 export type BorderNumberValidationResult =
-  | { isValid: true }
+  | { isValid: true; hasError: false }
   | {
       isValid: false
+      hasError: false
       /** The category in which the inconsistent border number was found */
       invalidCategory: LongTextKeys
       /** This is the text we found in the border number */
@@ -347,6 +368,8 @@ export type BorderNumberValidationResult =
       /** This is the expected text/position of the border number */
       expectedBorderNumber: number
     }
+  | { isValid: false; hasError: true }
+
 export type BorderNumberLinkValidationResult =
   | { isValid: true }
   | {
@@ -354,4 +377,5 @@ export type BorderNumberLinkValidationResult =
       /** The categories in which an invalid border number link was found */
       invalidCategories: (LongTextKeys | ShortTextKeys)[]
     }
+
 export default borderNumberService
