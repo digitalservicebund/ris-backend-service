@@ -18,6 +18,12 @@ border-number number {
   background: transparent;
   margin-right: 4px;
 }
+
+/* stylelint-disable-next-line selector-type-no-unknown */
+#attachment-view border-number content {
+  padding-left: unset;
+}
+
 /* stylelint-disable-next-line selector-type-no-unknown */
 #attachment-view border-number content::before {
   background-color: unset;
