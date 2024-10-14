@@ -296,4 +296,136 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
       await expect(page.getByText("unveröffentlicht")).toBeVisible()
     },
   )
+
+  test(
+    "handover displays border number validation errors and cannot resolve them",
+    {
+      annotation: [
+        {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-4975",
+        },
+      ],
+      tag: ["@RISDEV-4975"],
+    },
+    async ({ page, prefilledDocumentUnit, request }) => {
+      await test.step("Befülle Langtexte mit invaliden Randnummern und Verlinkungen", async () => {
+        const cookies = await page.context().cookies()
+        const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+        await request.put(
+          `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
+          {
+            data: {
+              ...prefilledDocumentUnit,
+              longTexts: {
+                tenor: `<border-number-link nr='5'>5</border-number-link>
+ <border-number-link nr='1'>1</border-number-link>`,
+                caseFacts:
+                  "<border-number><number>3</number><content>Text</content></border-number>",
+                decisionReasons:
+                  "<border-number><number>5</number><content>Text</content></border-number>",
+                otherLongText:
+                  "<border-number><number>6</number><content>Text</content></border-number>",
+                dissentingOpinion:
+                  "<border-number><number>7</number><content>Text</content></border-number>",
+              },
+            },
+            headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+          },
+        )
+      })
+
+      await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
+
+      await expect(
+        page.getByText("Alle Pflichtfelder sind korrekt ausgefüllt"),
+      ).toBeVisible()
+
+      await test.step("Fehler in der Randnummerprüfung werden angezeigt", async () => {
+        await expect(
+          page.getByText("Die Reihenfolge der Randnummern ist nicht korrekt."),
+        ).toBeVisible()
+
+        await expect(page.getByText("RubrikTatbestand")).toBeVisible()
+        await expect(page.getByText("Erwartete Randnummer 1")).toBeVisible()
+        await expect(page.getByText("Tatsächliche Randnummer 3")).toBeVisible()
+      })
+
+      await test.step("Fehler in der Randnummer-Verlinkungs-Prüfung werden angezeigt", async () => {
+        await expect(
+          page
+            .getByText(
+              "Es gibt ungültige Randnummern-Verweise in folgenden Rubriken:",
+            )
+            .getByText("Tenor"),
+        ).toBeVisible()
+      })
+
+      await test.step("Übergabe ist möglich nachdem Randnummernwarnung bestätigt wurde", async () => {
+        await page
+          .locator("[aria-label='Dokumentationseinheit an jDV übergeben']")
+          .click()
+
+        await expect(
+          page.getByText("Warnung: Randnummern inkorrekt"),
+        ).toBeVisible()
+
+        await page.getByLabel("Trotzdem übergeben").click()
+
+        await expect(page.getByText("Email wurde versendet")).toBeVisible()
+        await expect(page.getByText("Xml Email Abgabe -")).toBeVisible()
+      })
+
+      await test.step("Randnummern können neu berechnet werden", async () => {
+        await page.getByLabel("Randnummern neu berechnen").click()
+
+        await expect(
+          page.getByText("Die Randnummern werden neu berechnet"),
+        ).toBeVisible()
+        await expect(
+          page.getByText("Die Reihenfolge der Randnummern ist korrekt"),
+          // The loading spinner is shown for 3s (artificial delay)
+        ).toBeVisible({ timeout: 5_000 })
+      })
+
+      await test.step("Neu berechnete Randnummern und Links werden in XML-Vorschau angezeigt ", async () => {
+        await page.getByTitle("XML Vorschau").getByLabel("Aufklappen").click()
+
+        const xmlPreviewText = await page.getByTitle("XML Vorschau").innerText()
+
+        expect(xmlPreviewText).toContain(
+          "30\n        <tenor>\n" +
+            "31\n            <body>\n" +
+            "32\n                <div>\n" +
+            '33\n                    <rdlink nr="2"/>\n' +
+            '34\n <rdlink nr="1"/>\n' +
+            "35\n                </div>\n" +
+            "36\n            </body>\n" +
+            "37\n        </tenor>\n" +
+            "38\n        <tatbestand>\n" +
+            "39\n            <body>\n" +
+            "40\n                <div>\n" +
+            "41\n                    <p>\n" +
+            '42\n                        <rd nr="1"/>Text',
+        )
+      })
+
+      await test.step("Randnummern und Links werden unter Rubriken korrekt angezeigt", async () => {
+        await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
+
+        await expect(page.getByTestId("Tatbestand")).toHaveText("1Text")
+        await expect(page.getByTestId("Entscheidungsgründe")).toHaveText(
+          "2Text",
+        )
+        await expect(page.getByTestId("Sonstiger Langtext")).toHaveText("3Text")
+        await expect(page.getByTestId("Abweichende Meinung")).toHaveText(
+          "1Text",
+        )
+
+        // The first border number link was changed from 5 -> 2, the second one left as is.
+        await expect(page.getByTestId("Tenor")).toHaveText("2 1")
+      })
+    },
+  )
 })
