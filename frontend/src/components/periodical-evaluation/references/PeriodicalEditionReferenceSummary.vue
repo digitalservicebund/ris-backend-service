@@ -11,7 +11,10 @@ const props = defineProps<{
 
 <template>
   <div class="flex w-full justify-between" data-testid="reference-list-summary">
-    <div class="flex flex-col">
+    <div
+      v-if="props.data.documentationUnit?.documentNumber"
+      class="flex flex-col"
+    >
       <FlexContainer flex-direction="flex-row">
         <DecisionSummary
           :decision="props.data.documentationUnit"
