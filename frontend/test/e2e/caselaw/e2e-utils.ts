@@ -632,14 +632,6 @@ export async function copyPasteTextFromAttachmentIntoEditor(
     .click()
 }
 
-export async function getModifier(page: Page): Promise<string> {
-  return (await page.evaluate(() => navigator.platform))
-    .toLowerCase()
-    .includes("mac")
-    ? "Meta"
-    : "Control"
-}
-
 export async function getRequest(url: string, page: Page): Promise<Request> {
   const requestFinishedPromise = page.waitForEvent("requestfinished")
   // waitUntil, because timeout NS_ERROR_FAILURE is a common issue in Firefox

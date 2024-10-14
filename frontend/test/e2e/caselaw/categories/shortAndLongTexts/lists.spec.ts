@@ -1,7 +1,6 @@
 import { expect } from "@playwright/test"
 import {
   clickCategoryButton,
-  getModifier,
   navigateToCategories,
   save,
 } from "../../e2e-utils"
@@ -149,20 +148,18 @@ test.describe(
         .locator(`[aria-label='Nicht-druckbare Zeichen']:not([disabled])`)
         .click()
 
-      const modifier = await getModifier(page)
-
       await page.keyboard.type("This is a list")
-      await page.keyboard.press(`${modifier}+Shift+8`)
+      await page.keyboard.press(`ControlOrMeta+Shift+8`)
 
       let inputFieldInnerHTML = await inputField.innerHTML()
       // Check text styling
       expect(inputFieldInnerHTML).toContain(bulletList)
 
-      await page.keyboard.press(`${modifier}+Shift+7`)
+      await page.keyboard.press(`ControlOrMeta+Shift+7`)
       inputFieldInnerHTML = await inputField.innerHTML()
       expect(inputFieldInnerHTML).toContain(orderedList)
 
-      await page.keyboard.press(`${modifier}+Shift+7`)
+      await page.keyboard.press(`ControlOrMeta+Shift+7`)
       inputFieldInnerHTML = await inputField.innerHTML()
       expect(inputFieldInnerHTML).toContain(noList)
     })

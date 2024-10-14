@@ -5,7 +5,6 @@ import {
   save,
   uploadTestfile,
   copyPasteTextFromAttachmentIntoEditor,
-  getModifier,
   clickCategoryButton,
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
@@ -117,13 +116,11 @@ test("create and validate border number links", async ({
     'font-bold text-red-900 bg-red-200 before:content-["⚠Rd_"]',
   )
 
-  const modifier = await getModifier(page)
-
   // Delete border numbers in reasons
   const reasons = page.locator("[data-testid='Gründe']")
   await reasons.click()
-  await page.keyboard.press(`${modifier}+KeyA`)
-  await page.keyboard.press(`${modifier}+Backspace`)
+  await page.keyboard.press(`ControlOrMeta+A`)
+  await page.keyboard.press(`ControlOrMeta+Backspace`)
 
   // save
   await save(page)
