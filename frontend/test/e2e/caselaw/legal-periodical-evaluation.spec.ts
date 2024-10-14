@@ -248,6 +248,7 @@ test.describe(
       },
     )
 
+    // Flaky
     // eslint-disable-next-line playwright/no-skipped-test
     test.skip(
       "Periodical edition reference editing",
@@ -329,9 +330,11 @@ test.describe(
         await test.step("A docunit can be added to an edition multiple times", async () => {
           await searchForDocUnitWithFileNumber(page, fileNumber, "31.12.2019")
           await expect(
-            page.getByRole("link", {
-              name: `AG Aachen, 31.12.2019, ${fileNumber}, Anerkenntnisurteil, Unveröffentlicht`,
-            }),
+            page
+              .getByTestId("reference-list-summary")
+              .getByText(
+                `AG Aachen, 31.12.2019, ${fileNumber}, Anerkenntnisurteil, Unveröffentlicht`,
+              ),
           ).toBeVisible()
           await expect(page.getByText("Bereits hinzugefügt")).toBeVisible()
           await fillInput(page, "Zitatstelle *", "99")

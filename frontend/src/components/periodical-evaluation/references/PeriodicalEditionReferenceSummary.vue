@@ -10,26 +10,14 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div class="flex w-full justify-between">
+  <div class="flex w-full justify-between" data-testid="reference-list-summary">
     <div class="flex flex-col">
-      <RouterLink
-        v-if="props.data.documentationUnit?.documentNumber"
-        tabindex="-1"
-        target="_blank"
-        :to="{
-          name: 'caselaw-documentUnit-documentNumber-preview',
-          params: {
-            documentNumber: props.data.documentationUnit?.documentNumber,
-          },
-        }"
-      >
-        <FlexContainer flex-direction="flex-row">
-          <DecisionSummary
-            :decision="props.data.documentationUnit"
-            :display-mode="DisplayMode.SIDEPANEL"
-          />
-        </FlexContainer>
-      </RouterLink>
+      <FlexContainer flex-direction="flex-row">
+        <DecisionSummary
+          :decision="props.data.documentationUnit"
+          :display-mode="DisplayMode.SIDEPANEL"
+        />
+      </FlexContainer>
 
       <div class="ds-label-01-reg mr-8" data-testid="citation-summary">
         {{ props.data.renderDecision }}
