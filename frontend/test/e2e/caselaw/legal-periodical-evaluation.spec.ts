@@ -440,7 +440,7 @@ test.describe(
 
           await expect(
             page
-              .getByTestId("edition-reference-summary-edit-mode")
+              .getByTestId("reference-input-summary")
               .getByText(
                 `AG Aachen, 31.12.2019, ${fileNumber}, Anerkenntnisurteil, Unveröffentlicht`,
               ),

@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import CreateNewFromSearch from "@/components/CreateNewFromSearch.vue"
+import DecisionSummary from "@/components/DecisionSummary.vue"
 import { DisplayMode } from "@/components/enumDisplayMode"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
@@ -9,7 +10,6 @@ import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import { ValidationError } from "@/components/input/types"
 import Pagination, { Page } from "@/components/Pagination.vue"
-import PeriodicalEditionReferenceSummary from "@/components/periodical-evaluation/references/PeriodicalEditionReferenceSummary.vue"
 import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
@@ -242,13 +242,16 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-24">
-    <PeriodicalEditionReferenceSummary
-      :data="reference"
-      data-testid="edition-reference-summary-edit-mode"
-      hide-citation
+  <div class="flex flex-col gap-24 border-b-1">
+    <DecisionSummary
+      v-if="
+        reference.documentationUnit &&
+        reference.documentationUnit?.documentNumber
+      "
+      data-testid="reference-input-summary"
+      :decision="reference.documentationUnit"
+      :display-mode="DisplayMode.SIDEPANEL"
     />
-
     <div class="flex justify-between gap-24">
       <div id="citationInputField" class="flex-1">
         <InputField
