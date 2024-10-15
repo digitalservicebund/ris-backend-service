@@ -15,15 +15,12 @@ import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import { SelectablePanelContent } from "@/types/panelContentMode"
 import IconAttachFile from "~icons/ic/baseline-attach-file"
-import IconEdit from "~icons/ic/outline-edit"
 import IconOpenInNewTab from "~icons/ic/outline-open-in-new"
 import IconPreview from "~icons/ic/outline-remove-red-eye"
 import IconStickyNote from "~icons/ic/outline-sticky-note-2"
 
 const props = defineProps<{
   enabledPanels?: SelectablePanelContent[]
-  showEditButton?: boolean
-  hidePanelModeBar?: boolean
 }>()
 
 const store = useExtraContentSidePanelStore()
@@ -145,7 +142,7 @@ watch(store, () => {
     >
       <FlexContainer class="m-24 ml-16 items-center -space-x-2 px-8">
         <div v-if="!enabledPanels || enabledPanels.includes('note')">
-          <Tooltip v-if="!hidePanelModeBar" shortcut="n" text="Notiz">
+          <Tooltip shortcut="n" text="Notiz">
             <TextButton
               id="note"
               aria-label="Notiz anzeigen"
@@ -160,7 +157,7 @@ watch(store, () => {
           </Tooltip>
         </div>
         <div v-if="!enabledPanels || enabledPanels.includes('attachments')">
-          <Tooltip v-if="!hidePanelModeBar" shortcut="d" text="Datei">
+          <Tooltip shortcut="d" text="Datei">
             <TextButton
               id="attachments"
               aria-label="Dokumente anzeigen"
@@ -175,7 +172,7 @@ watch(store, () => {
         </div>
 
         <div v-if="!enabledPanels || enabledPanels.includes('preview')">
-          <Tooltip v-if="!hidePanelModeBar" shortcut="v" text="Vorschau">
+          <Tooltip shortcut="v" text="Vorschau">
             <TextButton
               id="preview"
               aria-label="Vorschau anzeigen"
@@ -197,34 +194,6 @@ watch(store, () => {
           :current-index="store.currentAttachmentIndex"
           @select="handleOnSelectAttachment"
         ></FileNavigator>
-        <div v-if="showEditButton">
-          <Tooltip
-            v-if="documentUnitStore.documentUnit!.isEditable"
-            text="Bearbeiten"
-          >
-            <router-link
-              aria-label="Dokumentationseinheit bearbeiten"
-              target="_blank"
-              :to="{
-                name: 'caselaw-documentUnit-documentNumber-categories',
-                params: {
-                  documentNumber: documentUnitStore.documentUnit.documentNumber,
-                },
-              }"
-            >
-              <TextButton button-type="ghost" :icon="IconEdit" size="small" />
-            </router-link>
-          </Tooltip>
-          <div v-else aria-label="Dokumentationseinheit bearbeiten">
-            <TextButton
-              button-type="ghost"
-              disabled
-              :icon="IconEdit"
-              size="small"
-            />
-          </div>
-        </div>
-
         <Tooltip text="In neuem Tab öffnen">
           <router-link
             v-if="store.panelMode === 'preview'"
