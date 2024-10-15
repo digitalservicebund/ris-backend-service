@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
@@ -127,4 +128,17 @@ ORDER BY documentationUnit.decisionDate DESC NULLS LAST
       Boolean myDocOfficeOnly,
       DocumentTypeDTO documentType,
       Pageable pageable);
+
+  // temporarily needed for the ldml handover phase, can be removed once we integrate ldml
+  // generation into the doc-unit lifecycle
+  @Query(
+      value =
+          """
+          SELECT DISTINCT d.id FROM incremental_migration.documentation_unit d
+          JOIN incremental_migration.status s ON d.id = s.documentation_unit_id
+          where s.publication_status = 'PUBLISHED'
+          LIMIT 100
+          """,
+      nativeQuery = true)
+  List<UUID> getRandomDocumentationUnitIds();
 }

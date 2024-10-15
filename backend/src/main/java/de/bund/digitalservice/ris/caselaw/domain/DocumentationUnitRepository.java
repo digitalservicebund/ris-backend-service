@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
@@ -112,4 +113,6 @@ public interface DocumentationUnitRepository {
    *     links with this relation in the documentation unit with the given id
    */
   Map<RelatedDocumentationType, Long> getAllDocumentationUnitWhichLink(UUID documentationUnitId);
+
+  List<UUID> getRandomDocumentationUnitIds();
 }

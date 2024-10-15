@@ -618,4 +618,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
         .stream()
         .collect(Collectors.groupingBy(RelatedDocumentationDTO::getType, Collectors.counting()));
   }
+
+  @Override
+  public List<UUID> getRandomDocumentationUnitIds() {
+    return repository.getRandomDocumentationUnitIds();
+  }
 }

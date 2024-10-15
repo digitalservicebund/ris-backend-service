@@ -104,7 +104,8 @@ spotless {
             "**/dist/**",
             "**/static/**",
             "**/gradle.properties",
-            "**/gradle-wrapper.properties"
+            "**/gradle-wrapper.properties",
+            "**/jaxb.properties"
         )
         // spotless:off
         prettier(
@@ -183,12 +184,16 @@ dependencies {
     implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.0")
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
 
+    // caselaw tranformation to LDML for the communication with the portal
+    implementation("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.4")
+    implementation("net.sf.saxon:Saxon-HE:12.5")
+
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
     implementation("org.eclipse.angus:angus-mail:2.0.3")
     implementation("com.icegreen:greenmail:2.1.0")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.14") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.15") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:

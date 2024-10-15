@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.ImportApiKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,22 @@ public class CaselawExceptionHandler extends ResponseEntityExceptionHandler {
     ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage());
 
     return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler({LdmlTransformationException.class})
+  public ResponseEntity<Object> handleLdmlTransformationException(LdmlTransformationException ex) {
+
+    ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage());
+
+    return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler({BucketException.class})
+  public ResponseEntity<Object> handleBucketException(BucketException ex) {
+
+    ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+
+    return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @ExceptionHandler(AsyncRequestNotUsableException.class)

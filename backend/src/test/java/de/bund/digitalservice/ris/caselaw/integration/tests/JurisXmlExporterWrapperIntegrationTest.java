@@ -16,6 +16,7 @@ import de.bund.digitalservice.ris.domain.export.juris.JurisXmlExporter;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import org.docx4j.org.apache.xalan.processor.TransformerFactoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -38,7 +39,7 @@ class JurisXmlExporterWrapperIntegrationTest {
 
   @Test
   void test_validDocumentationUnit_shouldReturnEncryptedXMLString() throws Exception {
-    this.jurisXmlExporter = new JurisXmlExporter(objectMapper);
+    this.jurisXmlExporter = new JurisXmlExporter(objectMapper, new TransformerFactoryImpl());
 
     CoreData coreData =
         CoreData.builder()
@@ -93,7 +94,7 @@ class JurisXmlExporterWrapperIntegrationTest {
   @Test
   void test_invalidDocumentationUnitMissingMandatoryFields_shouldReturnEmptyString()
       throws Exception {
-    this.jurisXmlExporter = new JurisXmlExporter(objectMapper);
+    this.jurisXmlExporter = new JurisXmlExporter(objectMapper, new TransformerFactoryImpl());
 
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder().uuid(TEST_UUID).documentNumber(documentNr).build();

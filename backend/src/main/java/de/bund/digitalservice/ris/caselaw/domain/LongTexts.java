@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
 
-@Builder
+@Builder(toBuilder = true)
 public record LongTexts(
     String tenor,
     String reasons,
