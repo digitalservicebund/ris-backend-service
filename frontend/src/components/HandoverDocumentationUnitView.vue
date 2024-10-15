@@ -67,6 +67,9 @@ onMounted(async () => {
     (await FeatureToggleService.isEnabled("neuris.border-number-editor"))
       .data ?? false
 
+  // Save doc unit in case there are any unsaved local changes before fetching xml preview
+  await store.updateDocumentUnit()
+
   await fetchPreview()
 })
 
