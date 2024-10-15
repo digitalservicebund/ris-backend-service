@@ -129,11 +129,16 @@ ORDER BY documentationUnit.decisionDate DESC NULLS LAST
       DocumentTypeDTO documentType,
       Pageable pageable);
 
+  // temporarily needed for the ldml handover phase, can be removed once we integrate ldml
+  // generation into the doc-unit lifecycle
   @Query(
-      """
-          SELECT DISTINCT d FROM DocumentationUnitDTO d
-          ORDER BY RANDOM()
+      value =
+          """
+          SELECT DISTINCT d.id FROM incremental_migration.documentation_unit d
+          JOIN incremental_migration.status s ON d.id = s.documentation_unit_id
+          where s.publication_status = 'PUBLISHED'
           LIMIT 100
-          """)
-  List<DocumentationUnitDTO> getRandomDocumentationUnits();
+          """,
+      nativeQuery = true)
+  List<UUID> getRandomDocumentationUnitIds();
 }

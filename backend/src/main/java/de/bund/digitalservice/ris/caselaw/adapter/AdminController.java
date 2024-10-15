@@ -47,13 +47,9 @@ public class AdminController {
   }
 
   @PostMapping("/ldml")
-  public ResponseEntity<Void> createLdml(@RequestBody String documentNumber) {
-    if (documentNumber != null && !documentNumber.isEmpty()) {
-      // create ldml for specific document unit
-    } else {
-      // create 100(?) random ldml
-      caseLawPostgresToS3Exporter.uploadCaseLaw();
-    }
+  @PreAuthorize("isAuthenticated()")
+  public ResponseEntity<Void> createLdml() {
+    caseLawPostgresToS3Exporter.uploadCaseLaw();
     return ResponseEntity.ok().build();
   }
 }

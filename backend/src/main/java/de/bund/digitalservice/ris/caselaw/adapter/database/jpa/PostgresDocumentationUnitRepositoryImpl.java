@@ -620,9 +620,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   }
 
   @Override
-  public List<DocumentationUnit> getRandomDocumentationUnits() {
-    return repository.getRandomDocumentationUnits().stream()
-        .map(DocumentationUnitTransformer::transformToDomain)
-        .toList();
+  public List<UUID> getRandomDocumentationUnitIds() {
+    return repository.getRandomDocumentationUnitIds();
   }
 }

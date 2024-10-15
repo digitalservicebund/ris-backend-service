@@ -114,5 +114,5 @@ public interface DocumentationUnitRepository {
    */
   Map<RelatedDocumentationType, Long> getAllDocumentationUnitWhichLink(UUID documentationUnitId);
 
-  List<DocumentationUnit> getRandomDocumentationUnits();
+  List<UUID> getRandomDocumentationUnitIds();
 }

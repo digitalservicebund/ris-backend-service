@@ -1,10 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
@@ -15,16 +16,15 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
+@Slf4j
 public class S3Bucket {
 
-  private final Logger logger;
   private final S3Client s3Client;
   private final String bucketName;
 
-  public S3Bucket(S3Client s3Client, String bucketName, Logger logger) {
+  public S3Bucket(S3Client s3Client, String bucketName) {
     this.s3Client = s3Client;
     this.bucketName = bucketName;
-    this.logger = logger;
   }
 
   public List<String> getAllFilenames() {
@@ -57,11 +57,11 @@ public class S3Bucket {
       var response = s3Client.getObject(request);
       return Optional.of(response.readAllBytes());
     } catch (NoSuchKeyException e) {
-      logger.error(String.format("Object key %s does not exist", eli), e);
+      log.error(String.format("Object key %s does not exist", eli), e);
     } catch (S3Exception e) {
-      logger.error("AWS S3 encountered an issue: {}", e.awsErrorDetails().errorMessage());
+      log.error("AWS S3 encountered an issue: {}", e.awsErrorDetails().errorMessage());
     } catch (Exception e) {
-      logger.error("An error occurred: {}", e.getMessage());
+      log.error("An error occurred: {}", e.getMessage());
     }
     return Optional.empty();
   }
@@ -73,7 +73,12 @@ public class S3Bucket {
   public void save(String fileName, String fileContent) {
     PutObjectRequest putObjectRequest =
         PutObjectRequest.builder().bucket(bucketName).key(fileName).build();
-    s3Client.putObject(putObjectRequest, RequestBody.fromString(fileContent));
+    try {
+      s3Client.putObject(putObjectRequest, RequestBody.fromString(fileContent));
+    } catch (S3Exception e) {
+      log.error("File could not be saved to bucket.", e);
+      throw new BucketException("File could not be saved to bucket.", e);
+    }
   }
 
   public void close() {

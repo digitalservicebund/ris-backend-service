@@ -34,6 +34,7 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
@@ -229,7 +230,11 @@ public class DocumentationUnitToLdmlTransformer {
       applyIfNotEmpty(
           contentRelatedIndexing.norms().stream()
               .flatMap(normReference -> normReference.singleNorms().stream())
-              .map(singleNorm -> singleNorm.legalForce().type().label())
+              .map(
+                  singleNorm -> {
+                    var type = nullSafeGet(singleNorm.legalForce(), LegalForce::type);
+                    return type != null ? type.label() : null;
+                  })
               .filter(Objects::nonNull)
               .toList(),
           builder::legalForce);

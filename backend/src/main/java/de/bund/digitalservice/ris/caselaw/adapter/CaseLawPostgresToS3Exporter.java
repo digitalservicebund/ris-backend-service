@@ -4,26 +4,32 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitToLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import jakarta.xml.bind.JAXB;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Templates;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.mapping.MappingException;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
 @Service
-@Profile({"default"})
+@Slf4j
 public class CaseLawPostgresToS3Exporter {
 
   private static final Logger logger = LogManager.getLogger(CaseLawPostgresToS3Exporter.class);
@@ -54,29 +60,61 @@ public class CaseLawPostgresToS3Exporter {
   //  @EventListener(value = ApplicationReadyEvent.class)
   public void uploadCaseLaw() {
     logger.info("Export caselaw process has started");
-    List<DocumentationUnit> documentationUnitsToTransform =
-        documentationUnitRepository.getRandomDocumentationUnits();
+    List<DocumentationUnit> documentationUnitsToTransform = new ArrayList<>();
+
+    List<UUID> idsToTransform = documentationUnitRepository.getRandomDocumentationUnitIds();
+    idsToTransform.forEach(
+        id -> {
+          try {
+            documentationUnitsToTransform.add(documentationUnitRepository.findByUuid(id));
+          } catch (DocumentationUnitNotExistsException ignored) {
+            log.debug(ignored.getMessage());
+          }
+        });
 
     // Case law handover: decide on LDML update strategy (frequency, incremental, etc.)
+    Map<String, LocalDateTime> transformedDocUnits = new HashMap<>();
     if (!documentationUnitsToTransform.isEmpty()) {
       // Only process the first batch for now so dev environment only indexes 2000 entries
-      saveOneBatch(documentationUnitsToTransform);
+      for (DocumentationUnit documentationUnit : documentationUnitsToTransform) {
+        var documentNumber = transformAndSaveDocumentationUnit(documentationUnit);
+        if (documentNumber != null) {
+          transformedDocUnits.put(documentNumber, LocalDateTime.now());
+        }
+      }
+    }
+
+    if (!transformedDocUnits.isEmpty()) {
+      StringBuilder stringBuilder = new StringBuilder();
+      transformedDocUnits.forEach(
+          (documentNumber, localDateTime) -> {
+            stringBuilder.append(documentNumber);
+            stringBuilder.append(",");
+            stringBuilder.append(localDateTime);
+            stringBuilder.append(System.lineSeparator());
+          });
+
+      ldmlBucket.save(
+          "unprocessed_ids_" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".csv",
+          stringBuilder.toString());
     }
 
     logger.info("Export caselaw process is done");
   }
 
-  public void saveOneBatch(List<DocumentationUnit> documentationUnits) {
-    for (DocumentationUnit documentationUnit : documentationUnits) {
-      Optional<CaseLawLdml> ldml =
-          DocumentationUnitToLdmlTransformer.transformToLdml(
-              documentationUnit, documentBuilderFactory);
+  public String transformAndSaveDocumentationUnit(DocumentationUnit documentationUnit) {
+    Optional<CaseLawLdml> ldml =
+        DocumentationUnitToLdmlTransformer.transformToLdml(
+            documentationUnit, documentBuilderFactory);
 
-      if (ldml.isPresent()) {
-        Optional<String> fileContent = ldmlToString(ldml.get());
-        fileContent.ifPresent(s -> ldmlBucket.save(ldml.get().getUniqueId() + ".xml", s));
+    if (ldml.isPresent()) {
+      Optional<String> fileContent = ldmlToString(ldml.get());
+      if (fileContent.isPresent()) {
+        ldmlBucket.save(ldml.get().getUniqueId() + ".xml", fileContent.get());
+        return ldml.get().getUniqueId();
       }
     }
+    return null;
   }
 
   public Optional<String> ldmlToString(CaseLawLdml ldml) {

@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -15,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.LocalDate;
 import java.util.List;
@@ -91,17 +93,18 @@ class CaseLawLdmlExportTest {
 
   @Test
   @DisplayName("Should call caselaw bucket save once")
-  void exportOneCaseLaw() {
-    when(documentationUnitRepository.getRandomDocumentationUnits())
-        .thenReturn(List.of(testDocumentUnit));
+  void exportOneCaseLaw() throws DocumentationUnitNotExistsException {
+    when(documentationUnitRepository.getRandomDocumentationUnitIds())
+        .thenReturn(List.of(UUID.randomUUID()));
+    when(documentationUnitRepository.findByUuid(any())).thenReturn(testDocumentUnit);
 
     exporter.uploadCaseLaw();
-    verify(caseLawBucket, times(1)).save(anyString(), anyString());
+    verify(caseLawBucket, times(2)).save(anyString(), anyString());
   }
 
   @Test
   @DisplayName("Invalid Case Law Ldml should fail validation 1")
-  void xsdValidationFailure1() {
+  void xsdValidationFailure1() throws DocumentationUnitNotExistsException {
     DocumentationUnit invalidTestDocumentUnit =
         testDocumentUnit.toBuilder()
             .longTexts(
@@ -109,8 +112,9 @@ class CaseLawLdmlExportTest {
                     .caseFacts("<p>Example <p>nested</p> content 1</p>")
                     .build())
             .build();
-    when(documentationUnitRepository.getRandomDocumentationUnits())
-        .thenReturn(List.of(invalidTestDocumentUnit));
+    when(documentationUnitRepository.getRandomDocumentationUnitIds())
+        .thenReturn(List.of(UUID.randomUUID()));
+    when(documentationUnitRepository.findByUuid(any())).thenReturn(invalidTestDocumentUnit);
 
     exporter.uploadCaseLaw();
     verify(caseLawBucket, times(0)).save(anyString(), anyString());
@@ -118,11 +122,12 @@ class CaseLawLdmlExportTest {
 
   @Test
   @DisplayName("Invalid Case Law Ldml should fail validation 2")
-  void xsdValidationFailure2() {
+  void xsdValidationFailure2() throws DocumentationUnitNotExistsException {
     DocumentationUnit invalidTestDocumentUnit =
         testDocumentUnit.toBuilder().longTexts(null).build();
-    when(documentationUnitRepository.getRandomDocumentationUnits())
-        .thenReturn(List.of(invalidTestDocumentUnit));
+    when(documentationUnitRepository.getRandomDocumentationUnitIds())
+        .thenReturn(List.of(UUID.randomUUID()));
+    when(documentationUnitRepository.findByUuid(any())).thenReturn(invalidTestDocumentUnit);
 
     exporter.uploadCaseLaw();
     verify(caseLawBucket, times(0)).save(anyString(), anyString());
