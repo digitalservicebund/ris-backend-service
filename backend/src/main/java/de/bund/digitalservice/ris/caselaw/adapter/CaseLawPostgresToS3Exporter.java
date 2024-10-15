@@ -33,7 +33,6 @@ import org.xml.sax.SAXException;
 public class CaseLawPostgresToS3Exporter {
 
   private static final Logger logger = LogManager.getLogger(CaseLawPostgresToS3Exporter.class);
-  private static final int EXPORT_BATCH_SIZE = 1000;
 
   private final DocumentationUnitRepository documentationUnitRepository;
   private final DocumentBuilderFactory documentBuilderFactory;

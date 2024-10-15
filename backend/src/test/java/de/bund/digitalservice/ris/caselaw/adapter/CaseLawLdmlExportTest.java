@@ -238,8 +238,6 @@ class CaseLawLdmlExportTest {
     Assertions.assertTrue(ldml.isPresent());
     Optional<String> fileContent = exporter.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());
-    var bla = StringUtils.deleteWhitespace(fileContent.get());
-    var blub = StringUtils.deleteWhitespace(expected);
     Assertions.assertTrue(
         StringUtils.deleteWhitespace(fileContent.get())
             .contains(StringUtils.deleteWhitespace(expected)));
