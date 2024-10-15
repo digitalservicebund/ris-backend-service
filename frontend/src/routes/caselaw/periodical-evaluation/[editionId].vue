@@ -91,6 +91,8 @@ onMounted(async () => {
             documentUnitStore.documentUnit && route.path.includes('references')
           "
           :enabled-panels="['preview']"
+          hide-panel-mode-bar
+          show-edit-button
         />
       </div>
     </div>

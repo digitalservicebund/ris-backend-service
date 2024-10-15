@@ -133,6 +133,7 @@ export default class DocumentUnit {
   public borderNumbers: string[] = []
   public note: string = ""
   public references?: Reference[]
+  public isEditable: boolean = false
 
   static readonly requiredFields = [
     "fileNumbers",
