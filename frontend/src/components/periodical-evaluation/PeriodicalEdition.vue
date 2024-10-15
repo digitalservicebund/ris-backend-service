@@ -46,6 +46,7 @@ const legalPeriodical = computed({
 
 async function validateRequiredInput() {
   validationStore.reset()
+
   edition.value?.missingRequiredFields.forEach((missingField) =>
     validationStore.add("Pflichtfeld nicht befüllt", missingField),
   )
@@ -62,7 +63,7 @@ async function saveEdition() {
     if (response.error) {
       saveEditionError.value = response.error
     } else if (response.data) {
-      edition.value = response.data as LegalPeriodicalEdition
+      edition.value = new LegalPeriodicalEdition({ ...response.data })
       await router.push({
         name: "caselaw-periodical-evaluation-editionId-references",
         params: { editionId: edition?.value?.id },
