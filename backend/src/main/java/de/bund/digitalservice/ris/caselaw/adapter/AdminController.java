@@ -46,7 +46,7 @@ public class AdminController {
     return ResponseEntity.ok(environmentService.getEnvironment());
   }
 
-  @PostMapping("/ldml")
+  @GetMapping("/ldml")
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<Void> createLdml() {
     caseLawPostgresToS3Exporter.uploadCaseLaw();
