@@ -29,6 +29,7 @@ import {
 import { BorderNumberLink } from "@/editor/borderNumberLink"
 import { CustomBulletList } from "@/editor/bulletList"
 import addBorderNumbers from "@/editor/commands/addBorderNumbers"
+import { handleSelection } from "@/editor/commands/handleSelection"
 import removeBorderNumbers from "@/editor/commands/removeBorderNumbers"
 import { FontSize } from "@/editor/fontSize"
 import { CustomImage } from "@/editor/image"
@@ -91,6 +92,7 @@ const editor = new Editor({
             return removeBorderNumbers(commandProps, featureToggle.value)
           },
           addBorderNumbers: () => addBorderNumbers,
+          handleSelection: () => handleSelection,
         }
       },
     }),
@@ -145,6 +147,7 @@ const editor = new Editor({
   parseOptions: {
     preserveWhitespace: "full",
   },
+  onSelectionUpdate: () => editor.commands.handleSelection(),
 })
 
 const containerWidth = ref<number>()
