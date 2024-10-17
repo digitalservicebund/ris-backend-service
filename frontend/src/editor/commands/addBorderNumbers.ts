@@ -23,8 +23,7 @@ function addBorderNumbers({ state, dispatch }: CommandProps): boolean {
   state.doc.nodesBetween(initialFrom, initialTo, (node, pos, parent) => {
     const isTopLevelNode = parent && parent.type === state.schema.topNodeType
 
-    const isBorderNumberNode =
-      node.type === borderNumberNodeType || node.hasMarkup(borderNumberNodeType)
+    const isBorderNumberNode = node.type === borderNumberNodeType
 
     const isEmptyParagraph =
       node.type === paragraphNodeType &&
