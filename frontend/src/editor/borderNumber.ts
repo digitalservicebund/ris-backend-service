@@ -10,6 +10,9 @@ declare module "@tiptap/core" {
     addBorderNumbers: {
       addBorderNumbers: () => ReturnType
     }
+    handleSelection: {
+      handleSelection: () => ReturnType
+    }
     paragraph: {
       getParagraph: () => ReturnType
     }
