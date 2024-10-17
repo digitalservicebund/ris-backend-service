@@ -23,7 +23,14 @@ const defaultValue = new Reference() as Reference
 
 watch(references, async () => {
   const response = await store.updateEdition()
-  responseError.value = response.error ? response.error : undefined
+  if (response.error) {
+    const message =
+      "Fehler beim Speichern der Fundstellen. Bitte laden Sie die Seite neu."
+    alert(message)
+    responseError.value = {
+      title: message,
+    }
+  }
 })
 </script>
 
@@ -31,7 +38,7 @@ watch(references, async () => {
   <div class="flex w-full p-24">
     <div class="flex w-full flex-col gap-24 bg-white p-24">
       <TitleElement data-testid="references-title">Fundstellen</TitleElement>
-      <div v-if="responseError" class="mb-24">
+      <div v-if="responseError">
         <InfoModal
           :description="responseError.description"
           :title="responseError.title"

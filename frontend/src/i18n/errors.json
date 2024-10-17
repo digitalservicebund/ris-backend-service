@@ -191,16 +191,16 @@
     "title": "Keine Suchergebnisse gefunden"
   },
   "LEGAL_PERIODICAL_EDITION_COULD_NOT_BE_SAVED": {
-    "title": "Ausgabe konnte nicht gespeichert werden."
+    "title": "Ausgabe konnte nicht gespeichert werden. Bitte laden Sie die Seite neu."
   },
   "LEGAL_PERIODICAL_EDITION_COULD_NOT_BE_LOADED": {
-    "title": "Ausgabe konnte nicht geladen werden."
+    "title": "Ausgabe konnte nicht geladen werden. Bitte laden Sie die Seite neu."
   },
   "LEGAL_PERIODICAL_EDITIONS_COULD_NOT_BE_LOADED": {
-    "title": "Ausgaben konnten nicht geladen werden."
+    "title": "Ausgaben konnten nicht geladen werden. Bitte laden Sie die Seite neu."
   },
   "LEGAL_PERIODICAL_EDITION_COULD_NOT_BE_DELETED": {
-    "title": "Ausgabe konnte nicht gelöscht werden."
+    "title": "Ausgabe konnte nicht gelöscht werden. Bitte laden Sie die Seite neu."
   },
   "PROCEDURE_COULD_NOT_BE_ASSIGNED": {
     "title": "Vorgang konnte nicht zugewiesen werden. Bitte laden Sie die Seite neu."
@@ -214,10 +214,10 @@
   },
   "EDITION_LOADING_EVENT_LOG_FAILED": {
     "title": "Fehler beim Laden der Ereignisse",
-    "description": "Die Ereignisse konnten nicht geladen werden."
+    "description": "Bitte laden Sie die Seite neu."
   },
   "EDITION_LOADING_XML_PREVIEW": {
     "title": "Fehler beim Laden der XML-Vorschau",
-    "description": "Die XML-Vorschau konnte nicht geladen werden."
+    "description": "Bitte laden Sie die Seite neu."
   }
 }

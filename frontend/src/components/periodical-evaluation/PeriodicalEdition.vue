@@ -78,6 +78,12 @@ async function saveEdition() {
   <div class="flex h-full w-full flex-col space-y-24 bg-gray-100 p-24">
     <div v-if="edition" class="mb-24 flex flex-col gap-24 bg-white p-24">
       <TitleElement>Ausgabe</TitleElement>
+      <div v-if="saveEditionError">
+        <InfoModal
+          :description="saveEditionError.description"
+          :title="saveEditionError.title"
+        />
+      </div>
       <InputField
         id="legalPeriodical"
         v-slot="slotProps"
@@ -146,13 +152,6 @@ async function saveEdition() {
           @click="saveEdition"
         ></TextButton>
       </FlexContainer>
-
-      <div v-if="saveEditionError">
-        <InfoModal
-          :description="saveEditionError.description"
-          :title="saveEditionError.title"
-        />
-      </div>
     </div>
   </div>
 </template>

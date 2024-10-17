@@ -40,6 +40,7 @@ const currentEditions = ref<LegalPeriodicalEdition[]>()
 const { pushQueryToRoute, route, resetQuery } = useQuery<"q">()
 const searchResponseError = ref<ResponseError | undefined>()
 const saveResponseError = ref<ResponseError | undefined>()
+const deleteResponseError = ref<ResponseError | undefined>()
 const isLoading = ref(false)
 const editionStore = useEditionStore()
 const isInternalUser = useInternalUser()
@@ -71,8 +72,9 @@ async function addEdition() {
   const response = await LegalPeriodicalEditionService.save(edition)
 
   if (response.error) {
-    saveResponseError.value = saveResponseError.value = {
-      title: "Neue Ausgabe konnte nicht erstellt werden",
+    saveResponseError.value = {
+      title:
+        "Neue Ausgabe konnte nicht erstellt werden. Bitte laden Sie die Seite neu.",
     }
   } else if (response.data) {
     editionStore.edition = undefined
@@ -103,10 +105,12 @@ const legalPeriodical = computed({
 })
 
 async function handleDeleteEdition(edition: LegalPeriodicalEdition) {
+  deleteResponseError.value = undefined
   if (edition?.id) {
     const response = await LegalPeriodicalEditionService.delete(edition.id)
     if (response.error) {
       alert("Fehler beim Löschen der Ausgabe")
+      deleteResponseError.value = response.error
     } else if (currentEditions.value) {
       currentEditions.value = currentEditions.value.filter(
         (item) => item.id !== edition.id,
@@ -141,8 +145,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <div class="gap-16 p-16">
+  <div class="flex flex-col gap-24 p-24">
+    <div>
       <FlexContainer class="pb-16" justify-content="justify-between">
         <h1 class="ds-heading-02-reg" data-testid="periodical-evaluation-title">
           Periodika
@@ -181,8 +185,15 @@ onMounted(() => {
         </div>
       </FlexContainer>
     </div>
+    <!-- Delete Error State -->
 
-    <div class="flex h-full flex-col gap-24 p-24">
+    <div class="flex h-full flex-col gap-24">
+      <div v-if="deleteResponseError">
+        <InfoModal
+          :description="deleteResponseError.description"
+          :title="deleteResponseError.title"
+        />
+      </div>
       <TableView class="relative table w-full border-separate">
         <TableHeader>
           <CellHeaderItem>Ausgabe</CellHeaderItem>
