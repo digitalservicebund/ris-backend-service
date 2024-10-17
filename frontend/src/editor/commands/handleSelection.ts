@@ -14,8 +14,14 @@ export function handleSelection({ state, dispatch }: CommandProps): boolean {
   const resolvedFrom = state.doc.resolve(from)
 
   const parentNode = resolvedFrom.node(resolvedFrom.depth - 1)
+  const isSelection = from !== to
 
-  if (parentNode && parentNode.type === borderNumberNodeType && dispatch) {
+  if (
+    isSelection &&
+    parentNode &&
+    parentNode.type === borderNumberNodeType &&
+    dispatch
+  ) {
     const startOfBorderNumber = resolvedFrom.start(resolvedFrom.depth - 1)
 
     const adjustedSelection = TextSelection.create(
