@@ -1,5 +1,6 @@
 import { CommandProps } from "@tiptap/core"
 import { Node as ProsemirrorNode, Fragment } from "prosemirror-model"
+import { Selection } from "prosemirror-state"
 import { nextTick } from "vue"
 import BorderNumberService from "@/services/borderNumberService"
 
@@ -58,6 +59,10 @@ function addBorderNumbers({ state, dispatch }: CommandProps): boolean {
   void nextTick().then(() => BorderNumberService.makeBorderNumbersSequential())
 
   if (modified && dispatch) {
+    // The exact number of digits of the calculated border number is unknown at this point.
+    // Hence, the cursor position might be shifted by 1 or 2.
+    const selection = Selection.near(tr.doc.resolve(initialFrom + 6))
+    tr.setSelection(selection)
     dispatch(tr)
   }
   return modified
