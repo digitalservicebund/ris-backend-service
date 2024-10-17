@@ -1,11 +1,11 @@
 import { expect } from "@playwright/test"
 import {
-  navigateToCategories,
+  clickCategoryButton,
+  copyPasteTextFromAttachmentIntoEditor,
   navigateToAttachments,
+  navigateToCategories,
   save,
   uploadTestfile,
-  copyPasteTextFromAttachmentIntoEditor,
-  clickCategoryButton,
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 
@@ -95,7 +95,7 @@ test("create and validate border number links", async ({
     .all()
 
   // only three of the input values should be rendered as borderNumberLinks
-  expect(locators).toHaveLength(3)
+  await expect(locators).toHaveCount(3)
 
   const validLink = locators[0]
   const invalidLink = locators[1]
