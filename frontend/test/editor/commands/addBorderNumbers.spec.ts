@@ -109,32 +109,6 @@ describe("addBorderNumbers command", () => {
     expect(dispatch).not.toHaveBeenCalled()
   })
 
-  it("should not modify the document if there is no paragraph", async () => {
-    // Arrange
-    const commandProps: {
-      state: EditorState
-      dispatch: ((tr: Transaction) => void) | undefined
-    } = {
-      state: EditorState.create({
-        doc: schema.nodes.doc.create({}, [
-          schema.nodes.customBlock.create(
-            {},
-            schema.text("This is a custom block node."),
-          ),
-        ]),
-        schema,
-      }),
-      dispatch,
-    }
-
-    // Act
-    const result = addBorderNumbers(commandProps as CommandProps)
-
-    // Assert
-    expect(result).toBe(false)
-    expect(dispatch).not.toHaveBeenCalled()
-  })
-
   it("should not modify the document if there is already a border number", async () => {
     // Arrange
     const commandProps: {

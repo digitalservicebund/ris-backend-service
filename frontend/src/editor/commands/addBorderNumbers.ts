@@ -61,7 +61,9 @@ function addBorderNumbers({ state, dispatch }: CommandProps): boolean {
   if (modified && dispatch) {
     // The exact number of digits of the calculated border number is unknown at this point.
     // Hence, the cursor position might be shifted by 1 or 2.
-    const selection = Selection.near(tr.doc.resolve(initialFrom + 6))
+    const selection = Selection.near(
+      tr.doc.resolve(Math.min(initialTo, initialFrom + 6)),
+    )
     tr.setSelection(selection)
     dispatch(tr)
   }
