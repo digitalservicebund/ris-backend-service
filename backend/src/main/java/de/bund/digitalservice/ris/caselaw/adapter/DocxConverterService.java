@@ -389,8 +389,13 @@ public class DocxConverterService implements ConverterService {
                                 relationship.getId(),
                                 new DocxImagePart(pngPart.getContentType(), pngPart.getBytes())));
               } else if (part instanceof BinaryPartAbstractImage imagePart) {
-                throw new DocxConverterException(
-                    "unknown image file format: " + imagePart.getClass().getName());
+                part.getSourceRelationships()
+                    .forEach(
+                        relationship ->
+                            images.put(
+                                relationship.getId(),
+                                new DocxImagePart("image/unknown", new byte[] {})));
+                log.warn("unknown image file format: " + imagePart.getClass().getName());
               }
             });
 
