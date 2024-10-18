@@ -95,7 +95,7 @@ test("create and validate border number links", async ({
     .all()
 
   // only three of the input values should be rendered as borderNumberLinks
-  await expect(locators).toHaveCount(3)
+  await expect(locators).toHaveLength(3)
 
   const validLink = locators[0]
   const invalidLink = locators[1]

@@ -64,7 +64,7 @@ test.describe(
 
         await test.step("Expect 15 years of dispute to be visible in same order", async () => {
           const chips = await page.getByTestId("chip").all()
-          await expect(chips).toHaveCount(15)
+          await expect(chips).toHaveLength(15)
           for (let i = 0; i < chips.length; i++) {
             const chipValue = chips[i].getByTestId("chip-value")
             await expect(chipValue).toHaveText(testData[i])
