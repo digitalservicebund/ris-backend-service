@@ -342,7 +342,7 @@
     |ris:procedures|ris:decisionNames|ris:decisionName|ris:deviatingFileNumbers|ris:deviatingFileNumber
     |ris:procedure|ris:deviatingDocumentNumbers|ris:deviatingDocumentNumber
     |@xsi:schemaLocation|@name|@source|@dictionary|@showAs|@value|@date|@href|@language|@class|@colspan|@rowspan
-    |@style|@alt|@height|@width|@src|@title|@xml:space">
+    |@style|@alt|@height|@width|@src|@title|@xml:space|@border">
         <xsl:copy>
             <xsl:apply-templates select="@* | node()"/>
         </xsl:copy>
