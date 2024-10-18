@@ -17,6 +17,7 @@ import TableView from "@/components/TableView.vue"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { ResponseError } from "@/services/httpClient"
 import IconAttachedFile from "~icons/ic/baseline-attach-file"
+import IconCheck from "~icons/ic/baseline-check"
 import IconDelete from "~icons/ic/baseline-close"
 import IconError from "~icons/ic/baseline-error"
 import IconSubject from "~icons/ic/baseline-subject"
@@ -214,7 +215,26 @@ function onDelete() {
         </CellItem>
         <CellItem class="flex">
           <div class="float-end flex">
-            <Tooltip v-if="listEntry.isEditable" text="Bearbeiten">
+            <Tooltip
+              v-if="
+                listEntry.status?.publicationStatus ==
+                'EXTERNAL_HANDOVER_PENDING'
+              "
+              text="Übernehmen"
+            >
+              <router-link
+                aria-label="Dokumentationseinheit übernehmen"
+                class="flex cursor-pointer border-2 border-r-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
+                target="_blank"
+                :to="{
+                  name: 'caselaw-documentUnit-documentNumber-categories',
+                  params: { documentNumber: listEntry.documentNumber },
+                }"
+              >
+                <IconCheck />
+              </router-link>
+            </Tooltip>
+            <Tooltip v-else-if="listEntry.isEditable" text="Bearbeiten">
               <router-link
                 aria-label="Dokumentationseinheit bearbeiten"
                 class="flex cursor-pointer border-2 border-r-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"

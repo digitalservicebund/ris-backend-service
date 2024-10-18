@@ -235,4 +235,35 @@ describe("documentUnit list", () => {
       screen.queryByRole("button", { name: "Dokumentationseinheit löschen" }),
     ).not.toBeInTheDocument()
   })
+
+  test("shows 'Übernehmen' icon instead if edit icon, if status equals EXTERNAL_HANDOVER_PENDING", async () => {
+    renderComponent({
+      documentUnitListEntries: [
+        {
+          id: "id",
+          uuid: "1",
+          documentNumber: "123",
+          decisionDate: "2022-02-10",
+          fileNumber: "",
+          documentType: { label: "Test", jurisShortcut: "T" },
+          court: { type: "typeA", location: "locB", label: "typeA locB" },
+          status: {
+            publicationStatus: PublicationState.EXTERNAL_HANDOVER_PENDING,
+            withError: false,
+          },
+        },
+      ],
+      activeUser: {
+        name: "fooUser",
+        documentationOffice: { abbreviation: "fooDocumentationOffice" },
+      },
+    })
+
+    expect(
+      screen.queryByRole("link", { name: "Dokumentationseinheit bearbeiten" }),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.getByRole("link", { name: "Dokumentationseinheit übernehmen" }),
+    ).toBeInTheDocument()
+  })
 })

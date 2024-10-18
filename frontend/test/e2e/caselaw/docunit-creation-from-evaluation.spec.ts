@@ -379,16 +379,6 @@ test.describe(
             ).toBeVisible()
           })
 
-          await test.step("Created documentation unit is not editable for foreign docoffice", async () => {
-            const url = `/caselaw/documentunit/${documentNumber}/categories`
-            await getRequest(url, pageWithBghUser)
-            await expect(
-              pageWithBghUser.getByText(
-                "Diese Dokumentationseinheit existiert nicht oder Sie haben keine Berechtigung.",
-              ),
-            ).toBeVisible()
-          })
-
           await test.step("The new documentation unit is added to the list of references", async () => {
             await expect(page.getByLabel("Listen Eintrag")).toHaveCount(2)
 
@@ -406,7 +396,7 @@ test.describe(
             ).toBeVisible()
           })
 
-          await test.step("The new documentation unit is not visible to creating doc office in search with Fremdanlage status", async () => {
+          await test.step("Created documentation unit is not visible to creating doc office in search with Fremdanlage status", async () => {
             await navigateToSearch(page)
 
             await page.getByLabel("Dokumentnummer Suche").fill(documentNumber)
@@ -416,6 +406,34 @@ test.describe(
             await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
             const listEntry = page.getByTestId("listEntry")
             await expect(listEntry).toHaveCount(0)
+          })
+
+          await test.step("Created documentation unit is visible with 'Übernehmen' button to foreign doc office in search with Fremdanlage status", async () => {
+            await navigateToSearch(pageWithBghUser)
+
+            await pageWithBghUser
+              .getByLabel("Dokumentnummer Suche")
+              .fill(documentNumber)
+
+            const select = pageWithBghUser.locator(`select[id="status"]`)
+            await select.selectOption("Fremdanlage")
+            await pageWithBghUser
+              .getByLabel("Nach Dokumentationseinheiten suchen")
+              .click()
+            const listEntry = pageWithBghUser.getByTestId("listEntry")
+            await expect(listEntry).toHaveCount(1)
+            await expect(
+              pageWithBghUser.getByLabel("Dokumentationseinheit übernehmen"),
+            ).toBeVisible()
+          })
+          await test.step("Created documentation unit is not editable for foreign docoffice, as long as it has not been taken over", async () => {
+            const url = `/caselaw/documentunit/${documentNumber}/categories`
+            await getRequest(url, pageWithBghUser)
+            await expect(
+              pageWithBghUser.getByText(
+                "Diese Dokumentationseinheit existiert nicht oder Sie haben keine Berechtigung.",
+              ),
+            ).toBeVisible()
           })
         } finally {
           await deleteDocumentUnit(page, documentNumber)
