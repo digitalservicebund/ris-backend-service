@@ -13,28 +13,33 @@ import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 const store = useDocumentUnitStore()
 const courtTypeRef = useInjectCourtType()
 
+const contentRelatedIndexing = computed({
+  get: () => store.documentUnit!.contentRelatedIndexing,
+  set: (newValues) => {
+    store.documentUnit!.contentRelatedIndexing = newValues
+  },
+})
+
 const hasCollectiveAgreement = computed<boolean>(
   () =>
-    !!store.documentUnit?.contentRelatedIndexing?.collectiveAgreements &&
-    store.documentUnit?.contentRelatedIndexing?.collectiveAgreements?.length >
-      0,
+    !!contentRelatedIndexing.value.collectiveAgreements &&
+    contentRelatedIndexing.value.collectiveAgreements?.length > 0,
 )
 const hasDismissalInput = computed<boolean>(
   () =>
-    (!!store.documentUnit?.contentRelatedIndexing?.dismissalTypes &&
-      store.documentUnit?.contentRelatedIndexing?.dismissalTypes?.length > 0) ||
-    (!!store.documentUnit?.contentRelatedIndexing?.dismissalGrounds &&
-      store.documentUnit?.contentRelatedIndexing?.dismissalGrounds?.length > 0),
+    (!!contentRelatedIndexing.value.dismissalTypes &&
+      contentRelatedIndexing.value.dismissalTypes?.length > 0) ||
+    (!!contentRelatedIndexing.value.dismissalGrounds &&
+      contentRelatedIndexing.value.dismissalGrounds?.length > 0),
 )
 const hasJobProfiles = computed<boolean>(() =>
-  store.documentUnit?.contentRelatedIndexing?.jobProfiles
-    ? store.documentUnit?.contentRelatedIndexing?.jobProfiles?.length > 0
+  contentRelatedIndexing.value.jobProfiles
+    ? contentRelatedIndexing.value.jobProfiles?.length > 0
     : false,
 )
-const hasLegislativeMandate = computed<boolean>(
-  () =>
-    store.documentUnit?.contentRelatedIndexing?.hasLegislativeMandate == true,
-)
+const hasLegislativeMandate = computed(() => {
+  return contentRelatedIndexing.value.hasLegislativeMandate
+})
 
 const shouldDisplayLegislativeMandateCategory = computed(() => {
   return (

@@ -87,7 +87,7 @@ const editor = new Editor({
     CustomParagraph,
     Text,
     BorderNumber.extend({
-      // Todo: Commands can be moved back to borderNumber.ts once the feature toggle has been removed
+      // Commands can be moved back to borderNumber.ts once the feature toggle has been removed
       addCommands() {
         return {
           removeBorderNumbers: () => (commandProps: CommandProps) => {

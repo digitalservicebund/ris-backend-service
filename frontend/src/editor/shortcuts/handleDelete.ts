@@ -18,9 +18,10 @@ export function handleDelete(
   const selectedBorderNumbers: string[] = []
 
   editor.state.doc.nodesBetween(from, to, (node, pos, parent) => {
-    if (node.type === borderNumberNumberNodeType) {
-      selectedBorderNumbers.push(node.textContent)
-    } else if (parent?.type === borderNumberNodeType && pos === 0) {
+    if (
+      node.type === borderNumberNumberNodeType ||
+      (parent?.type === borderNumberNodeType && pos === 0)
+    ) {
       selectedBorderNumbers.push(node.textContent)
     }
   })

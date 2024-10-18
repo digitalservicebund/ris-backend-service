@@ -19,9 +19,10 @@ function handleBackspace(editor: Editor, isFeatureEnabled: boolean): boolean {
   const selectedBorderNumbers: string[] = []
 
   doc.nodesBetween($from.pos, $to.pos, (node, pos, parent) => {
-    if (node.type === borderNumberNumberNodeType) {
-      selectedBorderNumbers.push(node.textContent)
-    } else if (parent?.type === borderNumberNodeType && pos === 0) {
+    if (
+      node.type === borderNumberNumberNodeType ||
+      (parent?.type === borderNumberNodeType && pos === 0)
+    ) {
       selectedBorderNumbers.push(node.textContent)
     }
   })
