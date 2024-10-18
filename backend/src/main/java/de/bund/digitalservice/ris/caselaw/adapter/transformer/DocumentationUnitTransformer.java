@@ -703,7 +703,9 @@ public class DocumentationUnitTransformer {
             documentationUnitDTO.getTenor(),
             documentationUnitDTO.getGrounds(),
             documentationUnitDTO.getCaseFacts(),
-            documentationUnitDTO.getDecisionGrounds());
+            documentationUnitDTO.getDecisionGrounds(),
+            documentationUnitDTO.getOtherLongText(),
+            documentationUnitDTO.getDissentingOpinion());
 
     addOriginalFileDocuments(documentationUnitDTO, builder);
     addPreviousDecisionsToDomain(documentationUnitDTO, builder);
