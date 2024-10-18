@@ -418,10 +418,10 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
         await expect(page.getByTestId("Entscheidungsgründe")).toHaveText(
           "2Text",
         )
-        await expect(page.getByTestId("Sonstiger Langtext")).toHaveText("3Text")
         await expect(page.getByTestId("Abweichende Meinung")).toHaveText(
-          "1Text",
+          "3Text",
         )
+        await expect(page.getByTestId("Sonstiger Langtext")).toHaveText("4Text")
 
         // The first border number link was changed from 5 -> 2, the second one left as is.
         await expect(page.getByTestId("Tenor")).toHaveText("2 1")

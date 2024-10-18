@@ -99,13 +99,12 @@ describe("borderNumberService", () => {
           reasons: `${borderNumber(0)}${borderNumber(" 10 ")}`,
           caseFacts: `${borderNumber(4)}${borderNumber(8)}`,
           decisionReasons: `${borderNumber(4)}${borderNumber(8)}`,
-          otherLongText: `${borderNumber(2)}${borderNumber(5)}`,
           dissentingOpinion: `${borderNumber(2)}${borderNumber(5)}`,
+          otherLongText: `${borderNumber(2)}${borderNumber(5)}`,
         },
       })
       borderNumberService.makeBorderNumbersSequential()
 
-      // Normal long texts are sequential
       expect(store.documentUnit?.longTexts.reasons).toEqual(
         `${borderNumber(1)}${borderNumber(2)}`,
       )
@@ -115,13 +114,11 @@ describe("borderNumberService", () => {
       expect(store.documentUnit?.longTexts.decisionReasons).toEqual(
         `${borderNumber(5)}${borderNumber(6)}`,
       )
-      expect(store.documentUnit?.longTexts.otherLongText).toEqual(
+      expect(store.documentUnit?.longTexts.dissentingOpinion).toEqual(
         `${borderNumber(7)}${borderNumber(8)}`,
       )
-
-      // dissenting opinion starts from 1 again
-      expect(store.documentUnit?.longTexts.dissentingOpinion).toEqual(
-        `${borderNumber(1)}${borderNumber(2)}`,
+      expect(store.documentUnit?.longTexts.otherLongText).toEqual(
+        `${borderNumber(9)}${borderNumber(10)}`,
       )
     })
 
@@ -228,11 +225,11 @@ describe("borderNumberService", () => {
     it("should return valid for texts with valid border numbers", () => {
       mockDocUnitStore({
         longTexts: {
+          tenor: "Rubrik ohne Randnummern",
           reasons: `${borderNumber(1)}<p>${borderNumber(" 2 ")}</p>`,
           decisionReasons: "Text ohne Randnummern",
-          otherLongText: `<ul><li>${borderNumber(3)}</li>${borderNumber(4)}</ul>`,
-          tenor: "Rubrik ohne Randnummern",
-          dissentingOpinion: `${borderNumber(1)}<p>${borderNumber(2)}</p>`,
+          dissentingOpinion: `${borderNumber(3)}<p>${borderNumber(4)}</p>`,
+          otherLongText: `<ul><li>${borderNumber(5)}</li>${borderNumber(6)}</ul>`,
         },
       })
       const validationResult = borderNumberService.validateBorderNumbers()
@@ -285,23 +282,6 @@ describe("borderNumberService", () => {
       if (!validationResult.isValid && !validationResult.hasError) {
         expect(validationResult.invalidCategory).toBe("otherLongText")
         expect(validationResult.firstInvalidBorderNumber).toBe("")
-        expect(validationResult.expectedBorderNumber).toBe(1)
-      }
-    })
-
-    it("should return invalid for invalid dissentingOpinion", () => {
-      mockDocUnitStore({
-        longTexts: {
-          reasons: `${borderNumber(1)}${borderNumber(2)}`,
-          dissentingOpinion: `${borderNumber(3)}${borderNumber(4)}`,
-        },
-      })
-      const validationResult = borderNumberService.validateBorderNumbers()
-      expect(validationResult.isValid).toBe(false)
-      expect(validationResult.hasError).toBe(false)
-      if (!validationResult.isValid && !validationResult.hasError) {
-        expect(validationResult.invalidCategory).toBe("dissentingOpinion")
-        expect(validationResult.firstInvalidBorderNumber).toBe("3")
         expect(validationResult.expectedBorderNumber).toBe(1)
       }
     })

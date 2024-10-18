@@ -136,6 +136,7 @@ watch(
         :status="InfoStatus.SUCCEED"
       />
       <TextButton
+        v-if="featureToggle"
         aria-label="Fundstellen der Ausgabe an jDV übergeben"
         button-type="secondary"
         class="w-fit"

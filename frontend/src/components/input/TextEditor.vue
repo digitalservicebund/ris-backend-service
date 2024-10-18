@@ -29,6 +29,7 @@ import {
 import { BorderNumberLink } from "@/editor/borderNumberLink"
 import { CustomBulletList } from "@/editor/bulletList"
 import addBorderNumbers from "@/editor/commands/addBorderNumbers"
+import { handleSelection } from "@/editor/commands/handleSelection"
 import removeBorderNumbers from "@/editor/commands/removeBorderNumbers"
 import { FontSize } from "@/editor/fontSize"
 import { CustomImage } from "@/editor/image"
@@ -38,6 +39,8 @@ import { CustomListItem } from "@/editor/listItem"
 import { CustomOrderedList } from "@/editor/orderedList"
 import { CustomParagraph } from "@/editor/paragraph"
 import { CustomSubscript, CustomSuperscript } from "@/editor/scriptText"
+import handleBackspace from "@/editor/shortcuts/handleBackspace"
+import { handleDelete } from "@/editor/shortcuts/handleDelete"
 import { TableStyle } from "@/editor/tableStyle"
 import FeatureToggleService from "@/services/featureToggleService"
 
@@ -84,13 +87,21 @@ const editor = new Editor({
     CustomParagraph,
     Text,
     BorderNumber.extend({
-      // Todo: Commands can be moved back to borderNumber.ts once the feature toggle has been removed
+      // Commands can be moved back to borderNumber.ts once the feature toggle has been removed
       addCommands() {
         return {
           removeBorderNumbers: () => (commandProps: CommandProps) => {
             return removeBorderNumbers(commandProps, featureToggle.value)
           },
           addBorderNumbers: () => addBorderNumbers,
+          handleSelection: () => handleSelection,
+        }
+      },
+      addKeyboardShortcuts() {
+        return {
+          Backspace: ({ editor }) =>
+            handleBackspace(editor, featureToggle.value),
+          Delete: ({ editor }) => handleDelete(editor, featureToggle.value),
         }
       },
     }),
@@ -145,6 +156,7 @@ const editor = new Editor({
   parseOptions: {
     preserveWhitespace: "full",
   },
+  onSelectionUpdate: () => editor.commands.handleSelection(),
 })
 
 const containerWidth = ref<number>()
