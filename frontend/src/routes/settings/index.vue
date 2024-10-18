@@ -1,24 +1,17 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import { ref, onMounted } from "vue"
+import CopyableLabel from "@/components/CopyableLabel.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import { ApiKey } from "@/domain/apiKey"
 import authService from "@/services/authService"
 
 const apiKey = ref<ApiKey>()
-const copyText = ref("Kopieren")
-const copied = ref(false)
-const copyButtonEnabled = ref(true)
 
 async function generateApiKey() {
   const response = await authService.generateImportApiKey()
-
   if (response.data) apiKey.value = response.data
-
-  copyText.value = "Kopieren"
-  copied.value = false
-  copyButtonEnabled.value = true
 }
 
 async function invalidateApiKey() {
@@ -26,37 +19,13 @@ async function invalidateApiKey() {
     const response = await authService.invalidateImportApiKey(
       apiKey.value?.apiKey,
     )
-
     if (response.data) apiKey.value = response.data
-
-    copyText.value = "Kopieren"
-    copied.value = false
-    copyButtonEnabled.value = false
-  }
-}
-
-function copyKey() {
-  if (apiKey.value) {
-    navigator.clipboard.writeText(apiKey.value.apiKey)
-
-    copyText.value = "Kopiert!"
-    copied.value = true
-    copyButtonEnabled.value = false
   }
 }
 
 onMounted(async () => {
   const response = await authService.getImportApiKey()
   if (response.data) apiKey.value = response.data
-
-  copyText.value = "Kopieren"
-  copied.value = false
-
-  if (apiKey.value?.valid) {
-    copyButtonEnabled.value = true
-  } else {
-    copyButtonEnabled.value = false
-  }
 })
 </script>
 
@@ -67,18 +36,11 @@ onMounted(async () => {
       <span class="ds-label-02-bold">API Key</span>
       <div v-if="apiKey">
         <div class="ds-body-01-reg mt-24">
-          {{ apiKey.apiKey }}
-          <TextButton
-            class=""
-            :class="
-              copied
-                ? 'disabled:bg-blue-200 disabled:text-blue-800 disabled:shadow-none'
-                : ''
-            "
-            :disabled="!copyButtonEnabled"
-            :label="copyText"
-            @click="copyKey"
-          ></TextButton>
+          <CopyableLabel
+            v-if="apiKey.valid"
+            name="API Key"
+            :text="apiKey.apiKey"
+          />
           <div
             v-if="apiKey.valid"
             class="ds-label-02-reg-italic mt-24 text-gray-900"
