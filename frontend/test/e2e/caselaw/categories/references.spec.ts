@@ -1,10 +1,10 @@
 import { expect } from "@playwright/test"
 import {
-  navigateToPreview,
-  navigateToHandover,
-  save,
-  navigateToReferences,
   fillInput,
+  navigateToHandover,
+  navigateToPreview,
+  navigateToReferences,
+  save,
   waitForInputValue,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
@@ -30,7 +30,7 @@ test.describe(
         },
       },
       async ({ page, documentNumber }) => {
-        await test.step("References is a new selectable menu item in a documentation unit ", async () => {
+        await test.step("References is a new selectable menu item in a documentation unit", async () => {
           await navigateToReferences(page, documentNumber)
         })
 

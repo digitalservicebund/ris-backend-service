@@ -162,7 +162,7 @@ test.describe(
             ).toHaveValue("BGH")
           })
 
-          await test.step("Validation of required fields before creation new documentation unit from search parameters ", async () => {
+          await test.step("Validation of required fields before creation new documentation unit from search parameters", async () => {
             await pageWithBghUser
               .getByText("Übernehmen und weiter bearbeiten")
               .click()
@@ -319,7 +319,7 @@ test.describe(
             ).toHaveValue("BGH")
           })
 
-          await test.step("Validation of required fields before creation new documentation unit from search parameters ", async () => {
+          await test.step("Validation of required fields before creation new documentation unit from search parameters", async () => {
             await page.getByText("Übernehmen und weiter bearbeiten").click()
 
             await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
@@ -468,7 +468,7 @@ test.describe(
           ).toBeEnabled()
         })
 
-        await test.step("Validation of required fields before creation new documentation unit from search parameters ", async () => {
+        await test.step("Validation of required fields before creation new documentation unit from search parameters", async () => {
           await page.getByText("Übernehmen und weiter bearbeiten").click()
 
           await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
