@@ -1,45 +1,72 @@
 import { Editor } from "@tiptap/core"
-import { MarkType } from "prosemirror-model"
+import { MarkType, NodeType } from "prosemirror-model"
 import { EditorState } from "prosemirror-state"
+import { nextTick } from "vue"
+import BorderNumberService from "@/services/borderNumberService"
 
 /**
  * Main handler for Backspace which removes borderNumber or borderNumberLink if needed.
  */
-function handleBackspace(editor: Editor): boolean {
-  const { state } = editor
-  const { selection, tr } = state
+function handleBackspace(editor: Editor, isFeatureEnabled: boolean): boolean {
+  const { state, schema } = editor
+  const { selection, tr, doc } = state
   const { $from, $to } = selection
 
-  const isCollapsedSelection = $from.pos === $to.pos
+  const borderNumberNumberNodeType: NodeType = schema.nodes.borderNumberNumber
+  const borderNumberNodeType: NodeType = schema.nodes.borderNumber
+  const borderNumberContentType: NodeType = schema.nodes.borderNumberContent
+  const borderNumberLinkType: MarkType = schema.marks.BorderNumberLink
+  const selectedBorderNumbers: string[] = []
+
+  doc.nodesBetween($from.pos, $to.pos, (node, pos, parent) => {
+    if (node.type === borderNumberNumberNodeType) {
+      selectedBorderNumbers.push(node.textContent)
+    } else if (parent?.type === borderNumberNodeType && pos === 0) {
+      selectedBorderNumbers.push(node.textContent)
+    }
+  })
+
+  const isSelection = $from.pos !== $to.pos
   const isBorderNumberContent =
-    $from.node($from.depth - 1)?.type.name === "borderNumberContent"
+    $from.node($from.depth - 1)?.type === borderNumberContentType
   const isCursorAtStart = $from.parentOffset === 0
   const isBorderNumberNumber =
-    $from.node($from.depth)?.type.name === "borderNumberNumber"
+    $from.node($from.depth)?.type === borderNumberNumberNodeType
 
-  // Check if the current paragraph is the first child of the borderNumberContent node
   const isFirstChild = $from.index($from.depth - 1) === 0
 
-  if (
-    (isCollapsedSelection &&
+  const isCursorBehindBorderNumberLink = state.doc.rangeHasMark(
+    $from.pos - 1,
+    $from.pos,
+    borderNumberLinkType,
+  )
+  const isCursorBehindOrInsideBorderNumberNumber =
+    (!isSelection &&
       isBorderNumberContent &&
       isFirstChild &&
       isCursorAtStart) ||
     isBorderNumberNumber
-  ) {
+
+  const isSelectionWithBorderNumbers =
+    isSelection && selectedBorderNumbers.length > 0
+
+  if (isCursorBehindOrInsideBorderNumberNumber) {
     return editor.commands.removeBorderNumbers()
   }
 
-  const markType = editor.schema.marks.BorderNumberLink
-  const hasBorderNumberLink = state.doc.rangeHasMark(
-    $from.pos - 1,
-    $from.pos,
-    markType,
-  )
+  if (isSelectionWithBorderNumbers) {
+    void nextTick().then(() => {
+      if (isFeatureEnabled) {
+        BorderNumberService.invalidateBorderNumberLinks(selectedBorderNumbers)
+        BorderNumberService.makeBorderNumbersSequential()
+      }
+    })
+    return false
+  }
 
-  if (hasBorderNumberLink) {
-    const start = calculateStart($from.pos, state, markType)
-    const end = calculateEnd($from.pos, state, markType)
+  if (isCursorBehindBorderNumberLink) {
+    const start = calculateStart($from.pos, state, borderNumberLinkType)
+    const end = calculateEnd($from.pos, state, borderNumberLinkType)
 
     tr.delete(start, end)
     editor.view.dispatch(tr)
@@ -49,17 +76,28 @@ function handleBackspace(editor: Editor): boolean {
   return false
 }
 
-function calculateStart(start: number, state: EditorState, markType: MarkType) {
-  while (start > 0 && state.doc.rangeHasMark(start - 1, start, markType)) {
+function calculateStart(
+  start: number,
+  state: EditorState,
+  borderNumberLinkType: MarkType,
+) {
+  while (
+    start > 0 &&
+    state.doc.rangeHasMark(start - 1, start, borderNumberLinkType)
+  ) {
     start--
   }
   return start
 }
 
-function calculateEnd(end: number, state: EditorState, markType: MarkType) {
+function calculateEnd(
+  end: number,
+  state: EditorState,
+  borderNumberLinkType: MarkType,
+) {
   while (
     end < state.doc.content.size &&
-    state.doc.rangeHasMark(end, end + 1, markType)
+    state.doc.rangeHasMark(end, end + 1, borderNumberLinkType)
   ) {
     end++
   }

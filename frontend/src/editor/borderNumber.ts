@@ -1,6 +1,5 @@
 import { Node } from "@tiptap/vue-3"
 import "../styles/border-numbers.css"
-import handleBackspace from "@/editor/shortcuts/handleBackspace"
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -38,11 +37,6 @@ export const BorderNumber = Node.create({
   },
   renderHTML() {
     return ["border-number", {}, 0]
-  },
-  addKeyboardShortcuts() {
-    return {
-      Backspace: ({ editor }) => handleBackspace(editor),
-    }
   },
 })
 

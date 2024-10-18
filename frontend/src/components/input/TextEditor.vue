@@ -39,6 +39,8 @@ import { CustomListItem } from "@/editor/listItem"
 import { CustomOrderedList } from "@/editor/orderedList"
 import { CustomParagraph } from "@/editor/paragraph"
 import { CustomSubscript, CustomSuperscript } from "@/editor/scriptText"
+import handleBackspace from "@/editor/shortcuts/handleBackspace"
+import { handleDelete } from "@/editor/shortcuts/handleDelete"
 import { TableStyle } from "@/editor/tableStyle"
 import FeatureToggleService from "@/services/featureToggleService"
 
@@ -93,6 +95,13 @@ const editor = new Editor({
           },
           addBorderNumbers: () => addBorderNumbers,
           handleSelection: () => handleSelection,
+        }
+      },
+      addKeyboardShortcuts() {
+        return {
+          Backspace: ({ editor }) =>
+            handleBackspace(editor, featureToggle.value),
+          Delete: ({ editor }) => handleDelete(editor, featureToggle.value),
         }
       },
     }),
