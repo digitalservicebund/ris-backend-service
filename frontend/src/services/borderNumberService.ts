@@ -8,7 +8,6 @@ const orderedCategoriesWithBorderNumbers: LongTextKeys[] = [
   "reasons",
   "caseFacts",
   "decisionReasons",
-  "dissentingOpinion",
   "otherLongText",
 ]
 
@@ -262,6 +261,16 @@ const borderNumberService = {
           allUpdatedBorderNumbers,
         )
       }
+
+      // Dissenting opinion should start from 1 again and not influence any other long-texts or links.
+      const dissentingOpinion = documentUnit.value!.longTexts.dissentingOpinion
+      if (dissentingOpinion) {
+        const { updatedText } = makeBorderNumbersSequentialForCategory(
+          dissentingOpinion,
+          1,
+        )
+        documentUnit.value!.longTexts.dissentingOpinion = updatedText
+      }
     } catch (e) {
       console.error(
         "Could not make border numbers sequential. Invalid HTML?",
@@ -272,6 +281,7 @@ const borderNumberService = {
 
   /**
    * Validates that all border numbers are sequential in the texts where we expect border numbers.
+   * Dissenting opinion is expected to start from 1 independent of other texts.
    */
   validateBorderNumbers: (): BorderNumberValidationResult => {
     try {
@@ -292,6 +302,21 @@ const borderNumberService = {
             }
           } else {
             nextExpectedBorderNumber = validationResult.nextBorderNumber
+          }
+        }
+      }
+
+      const dissentingOpinion = documentUnit.value!.longTexts.dissentingOpinion
+      if (dissentingOpinion) {
+        const validationResult = validateBorderNumbersForCategory(
+          dissentingOpinion,
+          1,
+        )
+        if (!validationResult.isValid) {
+          return {
+            ...validationResult,
+            invalidCategory: "dissentingOpinion",
+            hasError: false,
           }
         }
       }
