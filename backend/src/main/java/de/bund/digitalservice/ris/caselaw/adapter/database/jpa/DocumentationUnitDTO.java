@@ -130,7 +130,6 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @OneToMany(
       mappedBy = "documentationUnit",
       orphanRemoval = true,
-      fetch = FetchType.EAGER,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @OrderBy("rank")
   @Builder.Default
@@ -267,7 +266,7 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @Column private String note;
 
   // Streitjahr
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
   @OrderBy("rank")
