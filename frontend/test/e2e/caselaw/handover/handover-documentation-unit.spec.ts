@@ -389,7 +389,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
         ).toBeVisible({ timeout: 5_000 })
       })
 
-      await test.step("Neu berechnete Randnummern und Links werden in XML-Vorschau angezeigt ", async () => {
+      await test.step("Neu berechnete Randnummern und Links werden in XML-Vorschau angezeigt", async () => {
         await page.getByTitle("XML Vorschau").getByLabel("Aufklappen").click()
 
         const xmlPreviewText = await page.getByTitle("XML Vorschau").innerText()
