@@ -960,23 +960,15 @@ class DocumentationUnitTransformerTest {
   }
 
   @Test
-  void testTransformToDomain_shouldUseLatestStatus() {
+  void testTransformToDomain_shouldTransformStatus() {
     DocumentationUnitDTO documentationUnitDTO =
         generateSimpleDTOBuilder()
             .status(
-                List.of(
-                    // was published yesterday
-                    StatusDTO.builder()
-                        .createdAt(Instant.now().minus(1, java.time.temporal.ChronoUnit.DAYS))
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .withError(true)
-                        .build(),
-                    // was unpublished now
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.UNPUBLISHED)
-                        .withError(false)
-                        .build()))
+                StatusDTO.builder()
+                    .createdAt(Instant.now())
+                    .publicationStatus(PublicationStatus.UNPUBLISHED)
+                    .withError(false)
+                    .build())
             .build();
 
     DocumentationUnit documentationUnit =

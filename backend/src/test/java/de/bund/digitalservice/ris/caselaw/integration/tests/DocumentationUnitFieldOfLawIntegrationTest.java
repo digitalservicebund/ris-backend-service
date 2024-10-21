@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
@@ -17,13 +18,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitFieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -37,12 +36,10 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
-import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -128,19 +125,8 @@ class DocumentationUnitFieldOfLawIntegrationTest {
 
   @Test
   void testGetAllFieldsOfLawForDocumentationUnit_withoutFieldOfLawLinked_shouldReturnEmptyList() {
-    UUID documentationUnitUuid = UUID.randomUUID();
-    documentationUnitRepository.save(
-        DocumentationUnitDTO.builder()
-            .id(documentationUnitUuid)
-            .documentationOffice(documentationOfficeDTO)
-            .documentNumber("docnr12345678")
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build());
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        documentationUnitRepository, documentationOfficeDTO, "docnr12345678");
 
     risWebTestClient
         .withDefaultLogin()
@@ -159,20 +145,10 @@ class DocumentationUnitFieldOfLawIntegrationTest {
   @Test
   void
       testGetAllFieldsOfLawForDocumentationUnit_withFirstFieldOfLawLinked_shouldReturnListWithLinkedFieldOfLaw() {
-    DocumentationUnitDTO documentationUnitDTO =
-        documentationUnitRepository.save(
-            DocumentationUnitDTO.builder()
-                .documentationOffice(documentationOfficeDTO)
-                .documentNumber("docnr12345678")
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
 
-    documentationUnitDTO = documentationUnitRepository.findById(documentationUnitDTO.getId()).get();
+    var documentationUnitDTO =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            documentationUnitRepository, documentationOfficeDTO, "docnr12345678");
 
     DocumentationUnitFieldOfLawDTO documentationUnitFieldOfLawDTO =
         new DocumentationUnitFieldOfLawDTO();
@@ -203,20 +179,9 @@ class DocumentationUnitFieldOfLawIntegrationTest {
 
   @Test
   void testGetAllFieldsOfLawForDocumentationUnit_shouldReturnSortedList() {
-    DocumentationUnitDTO documentationUnitDTO =
-        documentationUnitRepository.save(
-            DocumentationUnitDTO.builder()
-                .documentationOffice(documentationOfficeDTO)
-                .documentNumber("docnr12345678")
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
-
-    documentationUnitDTO = documentationUnitRepository.findById(documentationUnitDTO.getId()).get();
+    var documentationUnitDTO =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            documentationUnitRepository, documentationOfficeDTO, "docnr12345678");
 
     DocumentationUnitFieldOfLawDTO documentationUnitFieldOfLawDTO1 =
         new DocumentationUnitFieldOfLawDTO();
@@ -276,18 +241,9 @@ class DocumentationUnitFieldOfLawIntegrationTest {
 
   @Test
   void testAddFieldsOfLawForDocumentationUnit_shouldReturnListWithAllLinkedFieldOfLaw() {
-    DocumentationUnitDTO documentationUnitDTO =
-        documentationUnitRepository.save(
-            DocumentationUnitDTO.builder()
-                .documentationOffice(documentationOfficeDTO)
-                .documentNumber("docnr12345678")
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
+    var documentationUnitDTO =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            documentationUnitRepository, documentationOfficeDTO, "docnr12345678");
 
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
@@ -328,18 +284,9 @@ class DocumentationUnitFieldOfLawIntegrationTest {
   @Test
   void
       testAddFieldsOfLawForDocumentationUnit_withNotExistingFieldOfLaw_shouldReturnListWithAllLinkedFieldOfLaw() {
-    DocumentationUnitDTO documentationUnitDTO =
-        documentationUnitRepository.save(
-            DocumentationUnitDTO.builder()
-                .documentationOffice(documentationOfficeDTO)
-                .documentNumber("docnr12345678")
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
+    var documentationUnitDTO =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            documentationUnitRepository, documentationOfficeDTO, "docnr12345678");
 
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
@@ -370,20 +317,9 @@ class DocumentationUnitFieldOfLawIntegrationTest {
 
   @Test
   void testRemoveFieldsOfLawForDocumentationUnit_shouldReturnListWithAllLinkedFieldOfLaw() {
-    DocumentationUnitDTO documentationUnitDTO =
-        documentationUnitRepository.save(
-            DocumentationUnitDTO.builder()
-                .documentationOffice(documentationOfficeDTO)
-                .documentNumber("docnr12345678")
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
-
-    documentationUnitDTO = documentationUnitRepository.findById(documentationUnitDTO.getId()).get();
+    var documentationUnitDTO =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            documentationUnitRepository, documentationOfficeDTO, "docnr12345678");
 
     DocumentationUnitFieldOfLawDTO documentationUnitFieldOfLawDTO =
         new DocumentationUnitFieldOfLawDTO();

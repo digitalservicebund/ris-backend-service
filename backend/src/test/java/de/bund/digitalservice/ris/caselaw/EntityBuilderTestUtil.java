@@ -1,20 +1,26 @@
 package de.bund.digitalservice.ris.caselaw;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
 /** A static test class for generating default, commonly used entities for testing purposes. */
 public class EntityBuilderTestUtil {
 
-  public static RelatedDocumentationUnit createTestRelatedDocument() {
+  private static final String DEFAULT_DOCUMENT_NUMBER = "1234567890126";
 
+  public static RelatedDocumentationUnit createTestRelatedDocument() {
     return RelatedDocumentationUnit.builder()
         .uuid(UUID.fromString("e8c6f756-d6b2-4fa4-b751-e88c7c53bde4"))
         .documentNumber("YYTestDoc0013")
@@ -75,5 +81,61 @@ public class EntityBuilderTestUtil {
         .abbreviation("LPA")
         .primaryReference(true)
         .build();
+  }
+
+  public static DocumentationUnitDTO createAndSavePublishedDocumentationUnit(
+      DatabaseDocumentationUnitRepository repository, DocumentationOfficeDTO documentationOffice) {
+    return createAndSavePublishedDocumentationUnit(
+        repository,
+        DocumentationUnitDTO.builder()
+            .documentNumber(DEFAULT_DOCUMENT_NUMBER)
+            .documentationOffice(documentationOffice),
+        null);
+  }
+
+  public static DocumentationUnitDTO createAndSavePublishedDocumentationUnit(
+      DatabaseDocumentationUnitRepository repository,
+      DocumentationOfficeDTO documentationOffice,
+      String documentNumber) {
+    return createAndSavePublishedDocumentationUnit(
+        repository,
+        DocumentationUnitDTO.builder()
+            .documentNumber(documentNumber)
+            .documentationOffice(documentationOffice),
+        null);
+  }
+
+  public static DocumentationUnitDTO createAndSavePublishedDocumentationUnit(
+      DatabaseDocumentationUnitRepository repository,
+      DocumentationUnitDTO.DocumentationUnitDTOBuilder builder) {
+    return createAndSavePublishedDocumentationUnit(repository, builder, null);
+  }
+
+  public static DocumentationUnitDTO createAndSavePublishedDocumentationUnit(
+      DatabaseDocumentationUnitRepository repository,
+      DocumentationUnitDTO.DocumentationUnitDTOBuilder builder,
+      PublicationStatus publicationStatus) {
+    return createAndSavePublishedDocumentationUnit(repository, builder, publicationStatus, false);
+  }
+
+  public static DocumentationUnitDTO createAndSavePublishedDocumentationUnit(
+      DatabaseDocumentationUnitRepository repository,
+      DocumentationUnitDTO.DocumentationUnitDTOBuilder builder,
+      PublicationStatus publicationStatus,
+      boolean errorStatus) {
+
+    DocumentationUnitDTO dto = repository.save(builder.build());
+
+    return repository.save(
+        dto.toBuilder()
+            .status(
+                StatusDTO.builder()
+                    .publicationStatus(
+                        publicationStatus != null ? publicationStatus : PublicationStatus.PUBLISHED)
+                    .createdAt(Instant.now())
+                    .withError(errorStatus)
+                    .documentationUnit(dto)
+                    .build())
+            .build());
   }
 }

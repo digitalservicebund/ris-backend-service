@@ -265,7 +265,7 @@ public class AuthService {
   }
 
   private boolean userHasWriteAccess(DocumentationUnit documentationUnit) {
-    return docUnitIsPending(documentationUnit)
+    return documentationUnit.status() != null && docUnitIsPending(documentationUnit)
         ? userHasSameDocOfficeAsDocumentCreator(documentationUnit)
         : userHasSameDocOfficeAsDocument(documentationUnit);
   }

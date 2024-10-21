@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.SliceTestImpl;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
@@ -31,7 +32,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigr
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.UserGroupDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -47,7 +47,6 @@ import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -139,32 +138,20 @@ class DocumentationUnitSearchIntegrationTest {
   @Test
   void testForCorrectResponseWhenRequestingAll() {
 
-    repository.save(
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
         DocumentationUnitDTO.builder()
             .id(UUID.randomUUID())
             .documentNumber("MIGR202200012")
             .documentationOffice(docOfficeDTO)
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .fileNumbers(List.of(FileNumberDTO.builder().value("AkteM").rank(0L).build()))
-            .build());
+            .fileNumbers(List.of(FileNumberDTO.builder().value("AkteM").rank(0L).build())));
 
-    repository.save(
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
         DocumentationUnitDTO.builder()
             .documentNumber("NEUR202300008")
             .documentationOffice(docOfficeDTO)
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .fileNumbers(List.of(FileNumberDTO.builder().value("AkteY").rank(0L).build()))
-            .build());
+            .fileNumbers(List.of(FileNumberDTO.builder().value("AkteY").rank(0L).build())));
 
     Slice<DocumentationUnitListItem> responseBody =
         risWebTestClient
@@ -202,18 +189,12 @@ class DocumentationUnitSearchIntegrationTest {
             LocalDate.of(2023, 6, 7));
 
     for (LocalDate date : dates) {
-      repository.save(
+      EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+          repository,
           DocumentationUnitDTO.builder()
               .documentNumber(RandomStringUtils.randomAlphabetic(13))
               .decisionDate(date)
-              .documentationOffice(docOfficeDTO)
-              .status(
-                  List.of(
-                      StatusDTO.builder()
-                          .createdAt(Instant.now())
-                          .publicationStatus(PublicationStatus.PUBLISHED)
-                          .build()))
-              .build());
+              .documentationOffice(docOfficeDTO));
     }
 
     Slice<DocumentationUnitListItem> responseBody =
@@ -240,28 +221,11 @@ class DocumentationUnitSearchIntegrationTest {
 
   @Test
   void testForCorrectPagination() {
-    repository.save(
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567801")
-            .documentationOffice(docOfficeDTO)
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build());
-    repository.save(
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567802")
-            .documentationOffice(docOfficeDTO)
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build());
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository, docOfficeDTO, "1234567801");
+
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository, docOfficeDTO, "1234567802");
 
     risWebTestClient
         .withDefaultLogin()
@@ -280,7 +244,8 @@ class DocumentationUnitSearchIntegrationTest {
   @Test
   void testForCompleteResultListWhenSearchingForFileNumberOrDocumentNumber() {
     for (int i = 0; i < 10; i++) {
-      repository.save(
+      EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+          repository,
           DocumentationUnitDTO.builder()
               // index 0-4 get a "AB" docNumber
               .documentNumber((i <= 4 ? "AB" : "GE") + "123456780" + i)
@@ -295,14 +260,7 @@ class DocumentationUnitSearchIntegrationTest {
                   i < 4
                       ? List.of()
                       : List.of(
-                          DeviatingFileNumberDTO.builder().value("ABC 34/" + i).rank(0L).build()))
-              .status(
-                  List.of(
-                      StatusDTO.builder()
-                          .createdAt(Instant.now())
-                          .publicationStatus(PublicationStatus.PUBLISHED)
-                          .build()))
-              .build());
+                          DeviatingFileNumberDTO.builder().value("ABC 34/" + i).rank(0L).build())));
     }
 
     risWebTestClient
@@ -375,17 +333,8 @@ class DocumentationUnitSearchIntegrationTest {
 
   @Test
   void testTrim() {
-    repository.save(
-        DocumentationUnitDTO.builder()
-            .documentNumber("AB1234567802")
-            .documentationOffice(docOfficeDTO)
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build());
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository, docOfficeDTO, "AB1234567802");
 
     risWebTestClient
         .withDefaultLogin()
@@ -405,17 +354,8 @@ class DocumentationUnitSearchIntegrationTest {
 
   @Test
   void testSearch_withInternalUser_shouldReturnEditableAndDeletableDocumentationUnit() {
-    repository.save(
-        DocumentationUnitDTO.builder()
-            .documentNumber("AB1234567802")
-            .documentationOffice(docOfficeDTO)
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build());
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository, docOfficeDTO, "AB1234567802");
 
     risWebTestClient
         .withDefaultLogin()
@@ -440,17 +380,8 @@ class DocumentationUnitSearchIntegrationTest {
   @Test
   void
       testSearch_withExternalUnassignedUser_shouldReturnNotEditableAndNotDeletableDocumentationUnit() {
-    repository.save(
-        DocumentationUnitDTO.builder()
-            .documentNumber("AB1234567802")
-            .documentationOffice(docOfficeDTO)
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build());
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository, docOfficeDTO, "AB1234567802");
 
     risWebTestClient
         .withExternalLogin()

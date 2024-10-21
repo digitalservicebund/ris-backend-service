@@ -6,15 +6,11 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DateUtil;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberFormatterException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberPatternException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitExistsException;
-import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
@@ -58,12 +54,6 @@ class DatabaseDocumentNumberGeneratorServiceTest {
         DocumentationUnitDTO.builder()
             .id(UUID.randomUUID())
             .documentNumber(nextDocumentNumber)
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
             .build();
 
     when(databaseDocumentationUnitRepository.findByDocumentNumber(nextDocumentNumber))
@@ -93,12 +83,6 @@ class DatabaseDocumentNumberGeneratorServiceTest {
         DocumentationUnitDTO.builder()
             .id(UUID.randomUUID())
             .documentNumber(nextDocumentNumber)
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
             .build();
 
     when(databaseDocumentationUnitRepository.findByDocumentNumber(nextDocumentNumber))

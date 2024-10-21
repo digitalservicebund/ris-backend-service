@@ -1,12 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitListItemDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit.RelatedDocumentationUnitBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
-import java.util.Comparator;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -51,14 +49,7 @@ public class DocumentationUnitListItemTransformer {
                     || documentationUnitListItemDTO.getFileNumbers().isEmpty()
                 ? null
                 : documentationUnitListItemDTO.getFileNumbers().get(0).getValue())
-        .status(
-            documentationUnitListItemDTO.getStatus() == null
-                    || documentationUnitListItemDTO.getStatus().isEmpty()
-                ? null
-                : StatusTransformer.transformToDomain(
-                    documentationUnitListItemDTO.getStatus().stream()
-                        .max(Comparator.comparing(StatusDTO::getCreatedAt))
-                        .orElse(null)))
+        .status(StatusTransformer.transformToDomain(documentationUnitListItemDTO.getStatus()))
         .hasNote(
             documentationUnitListItemDTO.getNote() != null
                 && !documentationUnitListItemDTO.getNote().isEmpty());
@@ -117,9 +108,6 @@ public class DocumentationUnitListItemTransformer {
   }
 
   private static Status getStatus(DocumentationUnitListItemDTO documentationUnitListItemDTO) {
-    return StatusTransformer.transformToDomain(
-        documentationUnitListItemDTO.getStatus().stream()
-            .max(Comparator.comparing(StatusDTO::getCreatedAt))
-            .orElse(null));
+    return StatusTransformer.transformToDomain(documentationUnitListItemDTO.getStatus());
   }
 }

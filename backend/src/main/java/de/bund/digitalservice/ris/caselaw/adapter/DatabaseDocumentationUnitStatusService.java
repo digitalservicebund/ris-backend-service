@@ -40,14 +40,13 @@ public class DatabaseDocumentationUnitStatusService implements DocumentationUnit
         databaseDocumentationUnitRepository
             .findByDocumentNumber(documentNumber)
             .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
-    docUnit
-        .getStatus()
-        .add(
-            StatusDTO.builder()
-                .createdAt(Instant.now())
-                .publicationStatus(status.publicationStatus())
-                .withError(status.withError())
-                .build());
+    docUnit.setStatus(
+        StatusDTO.builder()
+            .createdAt(Instant.now())
+            .publicationStatus(status.publicationStatus())
+            .withError(status.withError())
+            .documentationUnit(docUnit)
+            .build());
 
     databaseDocumentationUnitRepository.save(docUnit);
   }
@@ -66,7 +65,6 @@ public class DatabaseDocumentationUnitStatusService implements DocumentationUnit
         .findByDocumentNumber(documentNumber)
         .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber))
         .getStatus()
-        .getFirst()
         .getPublicationStatus();
   }
 }

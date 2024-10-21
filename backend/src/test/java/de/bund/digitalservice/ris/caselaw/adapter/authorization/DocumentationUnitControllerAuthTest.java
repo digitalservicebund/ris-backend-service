@@ -304,6 +304,17 @@ class DocumentationUnitControllerAuthTest {
         .exchange()
         .expectStatus()
         .isForbidden();
+
+    mockDocumentationUnit(
+        docOffice1, null, Status.builder().publicationStatus(UNPUBLISHED).build());
+
+    risWebTestClient
+        .withLogin(docOffice2Group)
+        .get()
+        .uri(uri)
+        .exchange()
+        .expectStatus()
+        .isForbidden();
   }
 
   private DocumentationUnit mockDocumentationUnit(
@@ -313,7 +324,7 @@ class DocumentationUnitControllerAuthTest {
     DocumentationUnit docUnit =
         DocumentationUnit.builder()
             .uuid(TEST_UUID)
-            .status(status != null ? status : Status.builder().publicationStatus(PUBLISHED).build())
+            .status(status == null ? Status.builder().publicationStatus(PUBLISHED).build() : status)
             .attachments(Collections.singletonList(Attachment.builder().s3path(s3path).build()))
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
             .build();
