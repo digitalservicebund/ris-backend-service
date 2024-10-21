@@ -89,17 +89,18 @@ test("create and validate border number links", async ({
   await save(page)
 
   // check valid border number link
-  const locators = await page
+  const locators = page
     .locator("[data-testid='Leitsatz']")
     .locator("border-number-link")
-    .all()
+
+  const locatorList = await locators.all()
 
   // only three of the input values should be rendered as borderNumberLinks
-  await expect(locators).toHaveLength(3)
+  await expect(locators).toHaveCount(3)
 
-  const validLink = locators[0]
-  const invalidLink = locators[1]
-  const invalidHighestNumberLink = locators[2]
+  const validLink = locatorList[0]
+  const invalidLink = locatorList[1]
+  const invalidHighestNumberLink = locatorList[2]
 
   await expect(validLink).toHaveAttribute("valid", "true")
   await expect(validLink).toHaveClass(
