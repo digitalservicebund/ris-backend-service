@@ -7,6 +7,7 @@ import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBL
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.SliceTestImpl;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
@@ -45,7 +46,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
@@ -118,20 +118,16 @@ class DocumentationUnitControllerAuthIntegrationTest {
 
   static Stream<Arguments> getUnauthorizedCases() {
     return Stream.of(
-        Arguments.of("CC-RIS", "/BGH", List.of(UNPUBLISHED)),
-        Arguments.of("BGH", "/CC-RIS", List.of(UNPUBLISHED)));
+        Arguments.of("CC-RIS", "/BGH", UNPUBLISHED), Arguments.of("BGH", "/CC-RIS", UNPUBLISHED));
   }
 
   static Stream<Arguments> getAuthorizedCases() {
     return Stream.of(
-        Arguments.of("CC-RIS", "/BGH", List.of(PUBLISHED)),
-        Arguments.of("CC-RIS", "/BGH", List.of(PUBLISHING)),
-        Arguments.of("BGH", "/BGH", List.of(UNPUBLISHED)),
-        Arguments.of("BGH", "/BGH", List.of(PUBLISHED)),
-        Arguments.of("BGH", "/BGH", List.of(UNPUBLISHED, PUBLISHED)),
-        Arguments.of("BGH", "/BGH", List.of(PUBLISHING)),
-        Arguments.of("BGH", "/BGH", List.of(UNPUBLISHED, PUBLISHING)),
-        Arguments.of("BGH", "/BGH", List.of(UNPUBLISHED, PUBLISHED, UNPUBLISHED)));
+        Arguments.of("CC-RIS", "/BGH", PUBLISHED),
+        Arguments.of("CC-RIS", "/BGH", PUBLISHING),
+        Arguments.of("BGH", "/BGH", UNPUBLISHED),
+        Arguments.of("BGH", "/BGH", PUBLISHED),
+        Arguments.of("BGH", "/BGH", PUBLISHING));
   }
 
   private DocumentationOfficeDTO ccRisOffice;
@@ -154,7 +150,7 @@ class DocumentationUnitControllerAuthIntegrationTest {
   @ParameterizedTest
   @MethodSource("getAuthorizedCases")
   void testGetAll_shouldBeAccessible(
-      String docUnitOfficeString, String userGroupPath, List<PublicationStatus> publicationStatus) {
+      String docUnitOfficeString, String userGroupPath, PublicationStatus publicationStatus) {
 
     DocumentationOfficeDTO docUnitOffice;
     if (docUnitOfficeString.equals(bghOffice.getAbbreviation())) {
@@ -164,13 +160,8 @@ class DocumentationUnitControllerAuthIntegrationTest {
     }
 
     DocumentationUnitDTO documentationUnitDTO =
-        createNewDocumentationUnitDTO(UUID.randomUUID(), docUnitOffice);
-    for (int i = 0; i < publicationStatus.size(); i++) {
-      saveStatus(
-          documentationUnitDTO,
-          Instant.now().plusSeconds(60 + i),
-          Status.builder().publicationStatus(publicationStatus.get(i)).build());
-    }
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, createNewDocumentationUnitDTO(docUnitOffice), publicationStatus);
 
     Slice<DocumentationUnitListItem> docUnitsSearchResult =
         risWebTestClient
@@ -189,7 +180,7 @@ class DocumentationUnitControllerAuthIntegrationTest {
             .filter(unit -> unit.uuid().equals(documentationUnitDTO.getId()))
             .findFirst()
             .get();
-    assertThat(docUnit.status().publicationStatus()).isEqualTo(getResultStatus(publicationStatus));
+    assertThat(docUnit.status().publicationStatus()).isEqualTo(publicationStatus);
 
     risWebTestClient
         .withLogin(userGroupPath)
@@ -205,9 +196,7 @@ class DocumentationUnitControllerAuthIntegrationTest {
   @ParameterizedTest
   @MethodSource("getUnauthorizedCases")
   void testGetAll_shouldNotBeAccessible(
-      String docUnitOfficeAbbreviation,
-      String userGroupPath,
-      List<PublicationStatus> publicationStatus) {
+      String docUnitOfficeAbbreviation, String userGroupPath, PublicationStatus publicationStatus) {
 
     DocumentationOfficeDTO docUnitOffice;
     if (docUnitOfficeAbbreviation.equals(bghOffice.getAbbreviation())) {
@@ -217,13 +206,8 @@ class DocumentationUnitControllerAuthIntegrationTest {
     }
 
     DocumentationUnitDTO documentationUnitDTO =
-        createNewDocumentationUnitDTO(UUID.randomUUID(), docUnitOffice);
-    for (int i = 0; i < publicationStatus.size(); i++) {
-      saveStatus(
-          documentationUnitDTO,
-          Instant.now().plusSeconds(60 + i),
-          Status.builder().publicationStatus(publicationStatus.get(i)).build());
-    }
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, createNewDocumentationUnitDTO(docUnitOffice), publicationStatus);
 
     Slice<DocumentationUnitListItem> docUnitsSearchResult =
         risWebTestClient
@@ -252,11 +236,8 @@ class DocumentationUnitControllerAuthIntegrationTest {
   @Test
   void testUnpublishedDocumentationUnitIsForbiddenForOtherOffice() {
     DocumentationUnitDTO documentationUnitDTO =
-        createNewDocumentationUnitDTO(UUID.randomUUID(), ccRisOffice);
-    saveStatus(
-        documentationUnitDTO,
-        Instant.now(),
-        Status.builder().publicationStatus(UNPUBLISHED).build());
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, createNewDocumentationUnitDTO(ccRisOffice), UNPUBLISHED);
 
     // Documentation Office 1
     risWebTestClient
@@ -326,22 +307,13 @@ class DocumentationUnitControllerAuthIntegrationTest {
     return publicationStatus.get(publicationStatus.size() - 1);
   }
 
-  private DocumentationUnitDTO createNewDocumentationUnitDTO(
-      UUID documentationUnitUuid, DocumentationOfficeDTO documentationOffice) {
+  private DocumentationUnitDTO.DocumentationUnitDTOBuilder createNewDocumentationUnitDTO(
+      DocumentationOfficeDTO documentationOffice) {
     String documentNumber =
         new Random().ints(13, 0, 10).mapToObj(Integer::toString).collect(Collectors.joining());
-    return repository.save(
-        DocumentationUnitDTO.builder()
-            .id(documentationUnitUuid)
-            .documentNumber(documentNumber)
-            .documentationOffice(documentationOffice)
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build());
+    return DocumentationUnitDTO.builder()
+        .documentNumber(documentNumber)
+        .documentationOffice(documentationOffice);
   }
 
   private void saveStatus(
@@ -349,12 +321,12 @@ class DocumentationUnitControllerAuthIntegrationTest {
     repository.save(
         documentationUnitDTO.toBuilder()
             .status(
-                List.of(
-                    StatusDTO.builder()
-                        .publicationStatus(status.publicationStatus())
-                        .withError(status.withError())
-                        .createdAt(createdAt)
-                        .build()))
+                StatusDTO.builder()
+                    .publicationStatus(status.publicationStatus())
+                    .withError(status.withError())
+                    .createdAt(createdAt)
+                    .documentationUnit(documentationUnitDTO)
+                    .build())
             .build());
   }
 }

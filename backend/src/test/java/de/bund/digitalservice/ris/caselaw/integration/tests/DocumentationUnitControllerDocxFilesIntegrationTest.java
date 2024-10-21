@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
+import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
@@ -28,6 +29,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresCourtRepositoryImpl;
@@ -35,7 +37,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigr
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentTypeRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -47,7 +48,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
@@ -58,7 +58,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -155,13 +154,12 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
   @MockBean private UserGroupService userGroupService;
 
   private final DocumentationOffice docOffice = buildDSDocOffice();
+  private DocumentationOfficeDTO dsDocOffice = null;
 
   @BeforeEach
   void setUp() {
-    documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()).getId();
-
+    dsDocOffice = documentationOfficeRepository.findByAbbreviation("DS");
     databaseDocumentCategoryRepository.save(DocumentCategoryDTO.builder().label("R").build());
-
     mockUserGroups(userGroupService);
   }
 
@@ -179,17 +177,8 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
     mockS3ClientToReturnFile(attachment);
 
     DocumentationUnitDTO dto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, dsDocOffice, "1234567890123");
 
     risWebTestClient
         .withDefaultLogin()
@@ -214,17 +203,8 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
     mockS3ClientToReturnFile(attachment);
 
     DocumentationUnitDTO documentationUnitDto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, dsDocOffice, "1234567890123");
 
     risWebTestClient
         .withDefaultLogin()
@@ -285,17 +265,8 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
     mockS3ClientToReturnFile(attachmentWithEcli);
 
     DocumentationUnitDTO dto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, dsDocOffice, "1234567890123");
 
     risWebTestClient
         .withDefaultLogin()
@@ -329,18 +300,12 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
     mockS3ClientToReturnFile(attachmentWithEcli);
 
     DocumentationUnitDTO dto =
-        repository.save(
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
             DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .ecli("oldEcli")
-                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
+                .documentationOffice(dsDocOffice));
 
     risWebTestClient
         .withDefaultLogin()
@@ -374,20 +339,14 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
     mockS3ClientToReturnFile(attachmentWithMetadata);
 
     DocumentationUnitDTO dto =
-        repository.save(
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
             DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .legalEffect(LegalEffectDTO.JA) // file has "Nein"
                 .judicialBody("1. Senat") // file has "2. Senat"
                 .court(null) // file has BFH
-                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
+                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS")));
 
     databaseCourtRepository.save(
         CourtDTO.builder().type("BFH").isForeignCourt(true).isSuperiorCourt(false).build());
@@ -433,17 +392,8 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
         .thenReturn(DeleteObjectResponse.builder().build());
 
     DocumentationUnitDTO dto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, dsDocOffice, "1234567890123");
 
     attachmentRepository.save(
         AttachmentDTO.builder()
@@ -473,17 +423,8 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
     mockS3ClientToReturnFile(attachment);
 
     DocumentationUnitDTO dto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, dsDocOffice, "1234567890123");
 
     risWebTestClient
         .withExternalLogin()
@@ -517,17 +458,8 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
         .thenReturn(DeleteObjectResponse.builder().build());
 
     DocumentationUnitDTO dto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, dsDocOffice, "1234567890123");
 
     attachmentRepository.save(
         AttachmentDTO.builder()

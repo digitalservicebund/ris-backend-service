@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
+import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.LegalPeriodicalEditionController;
@@ -17,7 +18,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresFieldOfLa
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalEditionRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -32,14 +32,12 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepositor
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalRepository;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -242,19 +240,12 @@ class LegalPeriodicalEditionIntegrationTest {
                         "Legal periodical not found, check legal_periodical_init.sql"));
 
     var existingReferenceId = UUID.randomUUID();
+
     var docUnit =
-        documentationUnitRepository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("DOC_NUMBER")
-                .documentationOffice(
-                    documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            documentationUnitRepository,
+            documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()),
+            "DOC_NUMBER");
 
     documentationUnitRepository.save(
         docUnit.toBuilder()

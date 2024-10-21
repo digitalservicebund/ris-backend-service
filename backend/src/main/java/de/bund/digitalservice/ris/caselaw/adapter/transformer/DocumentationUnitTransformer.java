@@ -18,7 +18,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -37,7 +36,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
@@ -802,14 +800,7 @@ public class DocumentationUnitTransformer {
   private static void addStatusToDomain(
       DocumentationUnitDTO documentationUnitDTO,
       DocumentationUnit.DocumentationUnitBuilder builder) {
-    if (documentationUnitDTO.getStatus() == null || documentationUnitDTO.getStatus().isEmpty()) {
-      return;
-    }
-    builder.status(
-        StatusTransformer.transformToDomain(
-            documentationUnitDTO.getStatus().stream()
-                .max(Comparator.comparing(StatusDTO::getCreatedAt))
-                .orElse(null)));
+    builder.status(StatusTransformer.transformToDomain(documentationUnitDTO.getStatus()));
   }
 
   private static void addPreviousDecisionsToDomain(

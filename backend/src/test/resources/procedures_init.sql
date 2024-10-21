@@ -55,6 +55,11 @@ values
         false
     );
 
+update incremental_migration.documentation_unit set current_status_id = '75988131-f355-414d-9da5-dcbcdbf4b98f' where id = '16f9ae5c-ea72-46d8-864c-ce9dd7cee4a3';
+update incremental_migration.documentation_unit set current_status_id = '65988131-f355-414d-9da5-dcbcdbf4b98f' where id = '26f9ae5c-ea72-46d8-864c-ce9dd7cee4a3';
+update incremental_migration.documentation_unit set current_status_id = '55988131-f355-414d-9da5-dcbcdbf4b98f' where id = '36f9ae5c-ea72-46d8-864c-ce9dd7cee4a3';
+update incremental_migration.documentation_unit set current_status_id = '45988131-f355-414d-9da5-dcbcdbf4b98f' where id = '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3';
+
 INSERT INTO
   incremental_migration.procedure (id, documentation_office_id, name, created_at, documentation_office_user_group_id)
 VALUES

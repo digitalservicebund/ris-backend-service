@@ -13,10 +13,10 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -176,11 +176,18 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   private DocumentationOfficeDTO creatingDocumentationOffice;
 
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-  @JoinColumn(name = "documentation_unit_id", nullable = false)
+  @JoinColumn(
+      name = "documentation_unit_id",
+      nullable = false,
+      insertable = false,
+      updatable = false)
   @Builder.Default
-  @NotEmpty
   @OrderBy("createdAt desc")
-  private List<StatusDTO> status = new ArrayList<>();
+  private List<StatusDTO> statusHistory = new ArrayList<>();
+
+  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  @JoinColumn(name = "current_status_id")
+  private StatusDTO status;
 
   // Gericht
   @ManyToOne

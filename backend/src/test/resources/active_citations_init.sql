@@ -89,6 +89,9 @@ values
         false
     );
 
+update incremental_migration.documentation_unit set current_status_id = '95988131-f355-414d-9da5-dcbcdbf4b98f' where id = '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3';
+update incremental_migration.documentation_unit set current_status_id = '85988131-f355-414d-9da5-dcbcdbf4b98f' where id = 'f13e7fe2-78a5-11ee-b962-0242ac120002';
+
 insert into
   incremental_migration.related_documentation (
     id,

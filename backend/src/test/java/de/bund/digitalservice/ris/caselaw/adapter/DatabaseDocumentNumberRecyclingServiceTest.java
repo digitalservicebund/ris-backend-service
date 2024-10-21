@@ -53,8 +53,9 @@ class DatabaseDocumentNumberRecyclingServiceTest {
         DocumentationUnitDTO.builder()
             .id(UUID.randomUUID())
             .documentNumber("KORE2" + Year.now() + "00037")
-            .status(List.of(generateStatus(PublicationStatus.UNPUBLISHED)))
             .build();
+
+    var unpublished = generateStatus(documentationUnitDTO, PublicationStatus.UNPUBLISHED);
 
     var outdatedDeletedId =
         DeletedDocumentationUnitDTO.builder()
@@ -63,11 +64,12 @@ class DatabaseDocumentNumberRecyclingServiceTest {
             .abbreviation(DEFAULT_DOCUMENTATION_OFFICE)
             .build();
 
-    when(documentationUnitRepository.findById(documentationUnitDTO.getId()))
-        .thenReturn(Optional.of(documentationUnitDTO));
-
     when(repository.findFirstByAbbreviationAndYear(DEFAULT_DOCUMENTATION_OFFICE, Year.now()))
         .thenReturn(Optional.of(outdatedDeletedId));
+    when(documentationUnitRepository.findById(documentationUnitDTO.getId()))
+        .thenReturn(
+            Optional.of(
+                DocumentationUnitDTO.builder().statusHistory(List.of(unpublished)).build()));
     when(repository.save(any())).thenReturn(generateDeletedDocumentationUnitDTO());
 
     var saved =
@@ -103,11 +105,15 @@ class DatabaseDocumentNumberRecyclingServiceTest {
         DocumentationUnitDTO.builder()
             .id(UUID.randomUUID())
             .documentNumber(generateDefaultDocumentNumber())
-            .status(List.of(generateStatus(publicationStatus)))
             .build();
 
     when(documentationUnitRepository.findById(documentationUnitDTO.getId()))
-        .thenReturn(Optional.of(documentationUnitDTO));
+        .thenReturn(
+            Optional.of(
+                DocumentationUnitDTO.builder()
+                    .status(generateStatus(documentationUnitDTO, publicationStatus))
+                    .statusHistory(List.of(generateStatus(documentationUnitDTO, publicationStatus)))
+                    .build()));
 
     when(repository.save(any())).thenReturn(generateDeletedDocumentationUnitDTO());
 
@@ -124,8 +130,11 @@ class DatabaseDocumentNumberRecyclingServiceTest {
   void shouldNotSaveIf_published() {
     var documentationUnitDTO = generateDocumentationUnitDto();
 
+    var published = generateStatus(documentationUnitDTO, PublicationStatus.PUBLISHED);
+
     when(documentationUnitRepository.findById(documentationUnitDTO.getId()))
-        .thenReturn(Optional.of(documentationUnitDTO));
+        .thenReturn(
+            Optional.of(DocumentationUnitDTO.builder().statusHistory(List.of(published)).build()));
 
     when(repository.save(any())).thenReturn(generateDeletedDocumentationUnitDTO());
 
@@ -142,15 +151,15 @@ class DatabaseDocumentNumberRecyclingServiceTest {
   void shouldNotSaveIf_multipleStatus() {
     var documentationUnitDto = generateDocumentationUnitDto();
 
-    documentationUnitDto.toBuilder()
-        .status(
-            List.of(
-                generateStatus(PublicationStatus.PUBLISHED),
-                generateStatus(PublicationStatus.UNPUBLISHED)))
-        .build();
+    var unpublished = generateStatus(documentationUnitDto, PublicationStatus.UNPUBLISHED);
+    var published = generateStatus(documentationUnitDto, PublicationStatus.PUBLISHED);
 
     when(documentationUnitRepository.findById(documentationUnitDto.getId()))
-        .thenReturn(Optional.of(documentationUnitDto));
+        .thenReturn(
+            Optional.of(
+                DocumentationUnitDTO.builder()
+                    .statusHistory(List.of(published, unpublished))
+                    .build()));
 
     when(repository.save(any())).thenReturn(generateDeletedDocumentationUnitDTO());
 
@@ -163,8 +172,10 @@ class DatabaseDocumentNumberRecyclingServiceTest {
     Assertions.assertTrue(saved.isEmpty());
   }
 
-  private static StatusDTO generateStatus(PublicationStatus publicationStatus) {
+  private static StatusDTO generateStatus(
+      DocumentationUnitDTO documentationUnitDTO, PublicationStatus publicationStatus) {
     return StatusDTO.builder()
+        .documentationUnit(documentationUnitDTO)
         .publicationStatus(publicationStatus)
         .createdAt(Instant.now())
         .withError(false)
@@ -175,12 +186,6 @@ class DatabaseDocumentNumberRecyclingServiceTest {
     return DocumentationUnitDTO.builder()
         .id(UUID.randomUUID())
         .documentNumber(generateDefaultDocumentNumber())
-        .status(
-            List.of(
-                StatusDTO.builder()
-                    .createdAt(Instant.now())
-                    .publicationStatus(PublicationStatus.PUBLISHED)
-                    .build()))
         .build();
   }
 

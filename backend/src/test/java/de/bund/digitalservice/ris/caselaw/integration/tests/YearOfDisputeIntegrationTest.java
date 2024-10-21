@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
 
+import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
@@ -21,7 +22,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -34,11 +34,9 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
-import java.time.Instant;
 import java.time.Year;
 import java.util.List;
 import java.util.Objects;
@@ -131,21 +129,11 @@ class YearOfDisputeIntegrationTest {
 
   @Test
   void testDuplicatedYearsAreNotAllowed() {
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, documentationOffice, DEFAULT_DOCUMENT_NUMBER);
 
     List<Year> years = List.of(Year.now(), Year.now());
-    DocumentationUnitDTO dto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .documentationOffice(documentationOffice)
-                .documentNumber(DEFAULT_DOCUMENT_NUMBER)
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
-
     DocumentationUnit documentationUnitFromFrontend =
         DocumentationUnit.builder()
             .uuid(dto.getId())
@@ -175,24 +163,15 @@ class YearOfDisputeIntegrationTest {
 
   @Test
   void testYearsSorting() {
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, documentationOffice, DEFAULT_DOCUMENT_NUMBER);
+
     var firstYear = Year.parse("2022");
     var secondYear = Year.parse("2010");
     var lastYear = Year.parse("2009");
 
     List<Year> years = List.of(firstYear, secondYear, lastYear);
-    DocumentationUnitDTO dto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber(DEFAULT_DOCUMENT_NUMBER)
-                .documentationOffice(documentationOffice)
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
-
     DocumentationUnit documentationUnitFromFrontend =
         DocumentationUnit.builder()
             .uuid(dto.getId())
@@ -226,21 +205,11 @@ class YearOfDisputeIntegrationTest {
 
   @Test
   void testFutureYearsAreNotAllowed() {
-    var futureYear = Year.now().plusYears(1);
-
     DocumentationUnitDTO dto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber(DEFAULT_DOCUMENT_NUMBER)
-                .documentationOffice(documentationOffice)
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, documentationOffice, DEFAULT_DOCUMENT_NUMBER);
 
+    var futureYear = Year.now().plusYears(1);
     DocumentationUnit documentationUnitFromFrontend =
         DocumentationUnit.builder()
             .uuid(dto.getId())
