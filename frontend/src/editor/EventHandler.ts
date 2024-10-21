@@ -1,5 +1,55 @@
 import { Extension } from "@tiptap/core"
-import { Plugin, PluginKey } from "@tiptap/pm/state"
+import { ResolvedPos, Slice } from "@tiptap/pm/model"
+import { EditorState, Plugin, PluginKey, Selection } from "@tiptap/pm/state"
+import { EditorView } from "@tiptap/pm/view"
+
+function hasBorderNumbersInInsertionData(data: DataTransfer | null) {
+  const pastedHTML = data?.getData("text/html")
+
+  if (pastedHTML) {
+    const doc = new DOMParser().parseFromString(pastedHTML, "text/html")
+
+    const borderNumberElements = doc.querySelectorAll("border-number")
+    return borderNumberElements.length > 0
+  } else {
+    return false
+  }
+}
+
+function isTopLevelEmptyParagraph(state: EditorState, $to: ResolvedPos) {
+  const paragraphNodeType = state.schema.nodes.paragraph
+
+  const node = $to.node(1)
+  const isEmptyParagraph =
+    node.type === paragraphNodeType &&
+    node.childCount === 0 &&
+    node.textContent?.trim() === ""
+  return isEmptyParagraph && $to.depth === 1
+}
+
+function pasteOnTopLevel(view: EditorView, slice: Slice) {
+  const { state, dispatch } = view
+  const { selection, tr } = state
+  const { $to } = selection
+
+  if (isTopLevelEmptyParagraph(state, $to)) {
+    // Continue with normal copy-paste, e.g., if completely empty editor field.
+    return false
+  }
+
+  // The depth of 1 represents the top-level nodes directly under the root.
+  // Example: If $from points to an <li> in an <ol>, we will get the end position of the <ol> element
+  const endPositionOfTopLevelNode = $to.end(1)
+  const textSelection = Selection.near(
+    tr.doc.resolve(endPositionOfTopLevelNode),
+  )
+  tr.setSelection(textSelection)
+    .scrollIntoView()
+    .insert(endPositionOfTopLevelNode, slice.content)
+
+  dispatch(tr)
+  return true
+}
 
 export const EventHandler = Extension.create({
   name: "eventHandler",
@@ -9,95 +59,22 @@ export const EventHandler = Extension.create({
       new Plugin({
         key: new PluginKey("eventHandler"),
         props: {
-          handlePaste: (view, event) => {
-            const { state } = view
-            const { selection } = state
-            const { from } = selection
-            const $from = state.doc.resolve(from)
-
-            const parent = $from.node($from.depth - 1)
-            const schema = state.schema
-            const borderNumberContentNodeType = schema.nodes.borderNumberContent
-
-            if (parent.type !== borderNumberContentNodeType) {
+          handlePaste: (view, event, slice) => {
+            if (!hasBorderNumbersInInsertionData(event.clipboardData)) {
+              // If there are no border numbers in the clipboard, we do not overwrite the default behavior
               return false
             }
 
-            const clipboardData = event.clipboardData
-            const pastedHTML = clipboardData?.getData("text/html")
-
-            if (pastedHTML) {
-              const parser = new DOMParser()
-              const doc = parser.parseFromString(pastedHTML, "text/html")
-
-              const borderNumberElements = doc.querySelectorAll("border-number")
-              if (borderNumberElements.length > 0) {
-                const borderNumberContentElements =
-                  doc.querySelectorAll("content")
-
-                if (borderNumberContentElements.length > 0) {
-                  Array.from(borderNumberContentElements)
-                    .reverse()
-                    .forEach((contentNode) => {
-                      this.editor.commands.insertContentAt(
-                        from,
-                        contentNode.outerHTML,
-                      )
-                    })
-
-                  return true
-                }
-
-                return false
-              }
-              return false
-            }
-            return false
+            return pasteOnTopLevel(view, slice)
           },
-          handleDrop: (view, event) => {
-            const { state } = view
-            const { selection } = state
-            const { from } = selection
-            const $from = state.doc.resolve(from)
 
-            const parent = $from.node($from.depth - 1)
-            const schema = state.schema
-            const borderNumberContentNodeType = schema.nodes.borderNumberContent
-
-            if (parent.type !== borderNumberContentNodeType) {
+          handleDrop: (view, event, slice) => {
+            if (!hasBorderNumbersInInsertionData(event.dataTransfer)) {
+              // If there are no border numbers in the dragged content, we do not overwrite the default behavior
               return false
             }
 
-            const dataTransfer = event.dataTransfer
-            const draggedHTML = dataTransfer?.getData("text/html")
-
-            if (draggedHTML) {
-              const parser = new DOMParser()
-              const doc = parser.parseFromString(draggedHTML, "text/html")
-
-              const borderNumberElements = doc.querySelectorAll("border-number")
-              if (borderNumberElements.length > 0) {
-                const borderNumberContentElements =
-                  doc.querySelectorAll("content")
-
-                if (borderNumberContentElements.length > 0) {
-                  Array.from(borderNumberContentElements)
-                    .reverse()
-                    .forEach((contentNode) => {
-                      this.editor.commands.insertContentAt(
-                        from,
-                        contentNode.outerHTML,
-                      )
-                    })
-
-                  return true
-                }
-
-                return false
-              }
-              return false
-            }
-            return false
+            return pasteOnTopLevel(view, slice)
           },
         },
       }),
