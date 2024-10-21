@@ -57,7 +57,11 @@ class DocumentationUnitServiceTest {
   @MockBean private AttachmentService attachmentService;
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private Validator validator;
+
   @MockBean private OidcUser oidcUser;
+  @MockBean private ProcedureService procedureService;
+  @MockBean private UserService userService;
+
   @Captor private ArgumentCaptor<DocumentationUnitSearchInput> searchInputCaptor;
   @Captor private ArgumentCaptor<RelatedDocumentationUnit> relatedDocumentationUnitCaptor;
 
