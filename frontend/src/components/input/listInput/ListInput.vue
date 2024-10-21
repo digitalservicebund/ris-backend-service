@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, onMounted } from "vue"
+import { ref, computed, onMounted, nextTick } from "vue"
 import ListInputDisplay from "@/components/input/listInput/ListInputDisplay.vue"
 import ListInputEdit from "@/components/input/listInput/ListInputEdit.vue"
 
@@ -43,26 +43,35 @@ const listInputValue = computed<string>({
     // Emit the updated value
     emit("update:modelValue", list.value)
 
-    // Emit reset if the list is empty, to show the category wrapper again.
-    if (!!list.value?.length) {
-      editMode.value = false
-    } else emit("reset")
+    toggleEditMode()
 
     // Reset sorting option
     sortAlphabetically.value = false
   },
 })
 
+const listInputDisplayRef = ref<InstanceType<typeof ListInputDisplay> | null>(
+  null,
+)
+
 /**
  * Emit reset if the list is empty, to show the category wrapper again.
- * Otherwise toggles between edit mode and display mode.
+ * Otherwise, toggles between edit mode and display mode.
  */
-function toggleEditMode() {
+async function toggleEditMode() {
   // Reset sorting option
   sortAlphabetically.value = false
   if (!!list.value?.length) {
     editMode.value = !editMode.value
   } else emit("reset")
+
+  if (!editMode.value) {
+    // Toggle from edit to display: As height of display mode can be less than edit mode -> scroll into view. RISUP-161
+    await nextTick()
+    listInputDisplayRef.value?.containerRef?.scrollIntoView({
+      block: "nearest",
+    })
+  }
 }
 
 /**
@@ -85,6 +94,7 @@ onMounted(() => {
   />
   <ListInputDisplay
     v-else
+    ref="listInputDisplayRef"
     v-model="list"
     :label="label"
     @toggle="toggleEditMode"
