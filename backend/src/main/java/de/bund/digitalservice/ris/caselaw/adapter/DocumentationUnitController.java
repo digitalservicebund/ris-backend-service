@@ -192,18 +192,14 @@ public class DocumentationUnitController {
   @GetMapping(value = "/{documentNumber}", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentNumber.apply(#documentNumber)")
   public ResponseEntity<DocumentationUnit> getByDocumentNumber(
-      @AuthenticationPrincipal OidcUser oidcUser, @NonNull @PathVariable String documentNumber) {
+      @NonNull @PathVariable String documentNumber) {
 
     if (documentNumber.length() != 13 && documentNumber.length() != 14) {
       throw new DocumentationUnitException("Die Dokumentennummer unterstützt nur 13-14 Zeichen");
     }
 
     try {
-      var documentationUnit = service.getByDocumentNumber(documentNumber);
-      return ResponseEntity.ok(
-          documentationUnit.toBuilder()
-              .isEditable(service.isUserCanEdit(oidcUser, documentationUnit))
-              .build());
+      return ResponseEntity.ok(service.getByDocumentNumber(documentNumber));
     } catch (DocumentationUnitNotExistsException e) {
       log.error("Documentation unit '{}' doesn't exist", documentNumber);
       return ResponseEntity.ok(DocumentationUnit.builder().build());
@@ -276,7 +272,6 @@ public class DocumentationUnitController {
       if (documentationUnit != null) {
         documentNumber = documentationUnit.documentNumber();
       }
-
       var newPatch = service.updateDocumentationUnit(uuid, patch);
 
       return ResponseEntity.ok().body(newPatch);

@@ -23,7 +23,5 @@ public interface ProcedureService {
 
   String unassignUserGroup(UUID procedureUUID);
 
-  List<Procedure> findAllByUserGroupId(UUID userGroupId);
-
   void delete(UUID procedureId);
 }

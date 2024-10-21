@@ -24,5 +24,4 @@ public record DocumentationUnit(
     String note,
     ContentRelatedIndexing contentRelatedIndexing,
     // Fundstellen
-    List<Reference> references,
-    boolean isEditable) {}
+    List<Reference> references) {}
