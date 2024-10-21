@@ -122,6 +122,14 @@ public class CaseLawPostgresToS3Exporter {
 
     try {
       String ldmlAsXmlString = XmlUtilService.xsltTransform(htmlToAknHtml, jaxbOutput.toString());
+      if (ldmlAsXmlString.contains("akn:unknownUseCaseDiscovered")) {
+        int hintStart = Math.max(0,ldmlAsXmlString.indexOf("akn:unknownUseCaseDiscovered")-10);
+        int hintEnd = Math.min(ldmlAsXmlString.length(), hintStart+60);
+        String hint = "\"..." + ldmlAsXmlString.substring(hintStart, hintEnd).replace("\n","") + "...\"";
+        logger.error("Invalid ldml produced for {}. A new unsupported attribute or elements was discovered."
+        + " It is either an error or needs to be added to the allow list. hint : {}", ldml.getUniqueId(), hint);
+        return Optional.empty();
+      }      
       schema.newValidator().validate(new StreamSource(new StringReader(ldmlAsXmlString)));
       return Optional.of(ldmlAsXmlString);
     } catch (SAXException | MappingException | IOException e) {
