@@ -52,4 +52,10 @@ public class AdminController {
     caseLawPostgresToS3Exporter.uploadCaseLaw();
     return ResponseEntity.ok().build();
   }
+
+  @GetMapping("/accountManagementUrl")
+  @PreAuthorize("isAuthenticated()")
+  public ResponseEntity<String> getAccountManagementUrl() {
+    return ResponseEntity.ok(environmentService.getAccountManagementUrl());
+  }
 }
