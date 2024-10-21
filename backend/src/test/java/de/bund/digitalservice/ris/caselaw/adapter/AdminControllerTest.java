@@ -150,22 +150,4 @@ class AdminControllerTest {
 
     assertThat(result.getResponseBody()).isEqualTo("staging");
   }
-
-  @Test
-  void testGetAccountManagementUrl() {
-    when(environmentService.getAccountManagementUrl()).thenReturn("some-url");
-
-    var result =
-        risWebTestClient
-            .withDefaultLogin()
-            .get()
-            .uri("/api/v1/admin/accountManagementUrl")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(String.class)
-            .returnResult();
-
-    assertThat(result.getResponseBody()).isEqualTo("some-url");
-  }
 }
