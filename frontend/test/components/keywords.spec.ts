@@ -4,6 +4,9 @@ import { render, screen } from "@testing-library/vue"
 import KeywordsComponent from "@/components/KeyWords.vue"
 import DocumentUnit from "@/domain/documentUnit"
 
+const scrollIntoViewMock = vi.fn()
+window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
+
 function renderComponent(keywords?: string[]) {
   const user = userEvent.setup()
 
