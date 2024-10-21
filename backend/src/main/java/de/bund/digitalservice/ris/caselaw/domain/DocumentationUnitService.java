@@ -12,6 +12,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -34,6 +35,8 @@ public class DocumentationUnitService {
   private final DocumentNumberRecyclingService documentNumberRecyclingService;
   private final PatchMapperService patchMapperService;
   private final Validator validator;
+  private final ProcedureService procedureService;
+  private final UserService userService;
 
   public DocumentationUnitService(
       DocumentationUnitRepository repository,
@@ -41,7 +44,9 @@ public class DocumentationUnitService {
       DocumentNumberRecyclingService documentNumberRecyclingService,
       Validator validator,
       AttachmentService attachmentService,
-      PatchMapperService patchMapperService) {
+      PatchMapperService patchMapperService,
+      ProcedureService procedureService,
+      UserService userService) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
@@ -49,6 +54,8 @@ public class DocumentationUnitService {
     this.validator = validator;
     this.attachmentService = attachmentService;
     this.patchMapperService = patchMapperService;
+    this.procedureService = procedureService;
+    this.userService = userService;
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -307,5 +314,45 @@ public class DocumentationUnitService {
     } catch (Exception e) {
       log.info("Did not save for recycling", e);
     }
+  }
+
+  public boolean isUserCanEdit(OidcUser oidcUser, DocumentationUnit documentationUnit) {
+    DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidcUser);
+
+    boolean isInternalUser = userService.isInternal(oidcUser);
+
+    List<Procedure> assignedProcedures;
+    var userGroup = userService.getUserGroup(oidcUser);
+
+    if (userGroup.isPresent() && !isInternalUser) {
+      assignedProcedures = procedureService.findAllByUserGroupId(userGroup.get().id());
+    } else {
+      assignedProcedures = List.of();
+    }
+
+    return (hasSameDocumentationOffice(documentationUnit, documentationOffice)
+            || isCreatorOfPending(documentationUnit, documentationOffice))
+        && (isInternalUser || isUserAssigned(assignedProcedures, documentationUnit));
+  }
+
+  private boolean isUserAssigned(List<Procedure> assignedProcedures, DocumentationUnit item) {
+    if (item.coreData().procedure() != null) {
+      var docUnitProcedureId = item.coreData().procedure().id();
+      return assignedProcedures.stream()
+          .anyMatch(procedure -> procedure.id().equals(docUnitProcedureId));
+    } else {
+      return false;
+    }
+  }
+
+  private boolean isCreatorOfPending(
+      DocumentationUnit item, DocumentationOffice documentationOffice) {
+    return item.status().publicationStatus().equals(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+        && item.coreData().documentationOffice().uuid().equals(documentationOffice.uuid());
+  }
+
+  private boolean hasSameDocumentationOffice(
+      DocumentationUnit item, DocumentationOffice documentationOffice) {
+    return item.coreData().documentationOffice().uuid().equals(documentationOffice.uuid());
   }
 }
