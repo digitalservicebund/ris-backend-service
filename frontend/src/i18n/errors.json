@@ -59,6 +59,10 @@
     "title": "Dokumentationseinheit konnte nicht aktualisiert werden.",
     "description": ""
   },
+  "DOCUMENT_UNIT_TAKEOVER_FAILED": {
+    "title": "Dokumentationseinheit konnte nicht übernommen werden.",
+    "description": ""
+  },
   "DOCUMENT_UNIT_DELETE_FAILED": {
     "title": "Dokumentationseinheit konnte nicht gelöscht werden.",
     "description": ""

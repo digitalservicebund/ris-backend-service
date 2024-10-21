@@ -8,20 +8,24 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParame
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
+import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.domain.export.juris.response.StatusImporterException;
 import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
 import java.time.Duration;
@@ -58,6 +62,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class DocumentationUnitController {
   private final DocumentationUnitService service;
+  private DocumentationUnitStatusService statusService;
   private final UserService userService;
   private final AttachmentService attachmentService;
   private final ConverterService converterService;
@@ -68,6 +73,7 @@ public class DocumentationUnitController {
   public DocumentationUnitController(
       DocumentationUnitService service,
       UserService userService,
+      DocumentationUnitStatusService statusService,
       AttachmentService attachmentService,
       ConverterService converterService,
       HandoverService handoverService,
@@ -75,6 +81,7 @@ public class DocumentationUnitController {
           documentationUnitDocxMetadataInitializationService) {
     this.service = service;
     this.userService = userService;
+    this.statusService = statusService;
     this.attachmentService = attachmentService;
     this.converterService = converterService;
     this.handoverService = handoverService;
@@ -102,6 +109,24 @@ public class DocumentationUnitController {
     } catch (DocumentationUnitException e) {
       log.error("error in generate new documentation unit", e);
       return ResponseEntity.internalServerError().body(DocumentationUnit.builder().build());
+    }
+  }
+
+  @PutMapping(value = "/{uuid}/takeover", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("@userHasSameDocOfficeAsDocument.apply(#uuid)")
+  public void takeOverDocumentationUnit(@PathVariable UUID uuid) {
+    try {
+
+      var documentationUnit = service.getByUuid(uuid);
+      statusService.update(
+          documentationUnit.documentNumber(),
+          Status.builder()
+              .publicationStatus(PublicationStatus.UNPUBLISHED)
+              .withError(false)
+              .build());
+
+    } catch (Exception e) {
+      throw new StatusImporterException("Could not update publicationStatus", e);
     }
   }
 
