@@ -103,7 +103,7 @@ test("create and validate border number links", async ({
 
   await expect(validLink).toHaveAttribute("valid", "true")
   await expect(validLink).toHaveClass(
-    'font-bold text-white bg-blue-700 before:content-["Rd_"]',
+    'font-bold text-white bg-blue-700 before:content-["Rd_"] ml-1 pr-1',
   )
 
   // check invalid border number links
