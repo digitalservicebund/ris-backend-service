@@ -134,7 +134,7 @@ public class CaseLawPostgresToS3Exporter {
             hint);
         return Optional.empty();
       }
-  
+
       schema.newValidator().validate(new StreamSource(new StringReader(ldmlAsXmlString)));
       return Optional.of(ldmlAsXmlString);
     } catch (SAXException | MappingException | IOException e) {
