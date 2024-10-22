@@ -125,8 +125,21 @@ async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
  */
 async function handleTakeOver(documentUnitListEntry: DocumentUnitListEntry) {
   const response = await service.takeOver(documentUnitListEntry.uuid as string)
+
   if (response.error) {
     alert(response.error.title)
+  } else {
+    if (documentUnitListEntries.value) {
+      const index = documentUnitListEntries.value.findIndex(
+        (entry) => entry.uuid === documentUnitListEntry.uuid,
+      )
+
+      if (index !== -1) {
+        // Replace the old entry with the updated one
+        documentUnitListEntries.value[index] =
+          response.data as DocumentUnitListEntry
+      }
+    }
   }
 }
 

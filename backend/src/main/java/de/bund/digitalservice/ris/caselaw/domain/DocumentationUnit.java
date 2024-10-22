@@ -25,4 +25,5 @@ public record DocumentationUnit(
     ContentRelatedIndexing contentRelatedIndexing,
     // Fundstellen
     List<Reference> references,
-    boolean isEditable) {}
+    boolean isEditable,
+    boolean isDeletable) {}
