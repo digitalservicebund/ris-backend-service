@@ -208,6 +208,12 @@ public class AuthService {
     };
   }
 
+  public boolean userHasWriteAccess(OidcUser oidcUser, DocumentationUnit documentationUnit) {
+    return documentationUnit.status() != null && docUnitIsPending(documentationUnit)
+        ? userHasSameDocOfficeAsDocumentCreator(oidcUser, documentationUnit)
+        : userHasSameDocOfficeAsDocument(oidcUser, documentationUnit);
+  }
+
   /**
    * Creates a Spring bean that checks if a {@link Procedure} associated with a {@link
    * DocumentationUnit} is assigned to the current {@link OidcUser}.
@@ -287,22 +293,30 @@ public class AuthService {
 
   private boolean userHasSameDocOfficeAsDocumentCreator(DocumentationUnit documentationUnit) {
     Optional<OidcUser> oidcUser = getOidcUser();
-    if (oidcUser.isPresent()) {
-      DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidcUser.get());
-      return documentationUnit.status().publicationStatus() != null
-          && documentationUnit.coreData().creatingDocOffice() != null
-          && documentationUnit.coreData().creatingDocOffice().equals(documentationOffice);
-    }
-    return false;
+    return oidcUser
+        .filter(user -> userHasSameDocOfficeAsDocumentCreator(user, documentationUnit))
+        .isPresent();
+  }
+
+  private boolean userHasSameDocOfficeAsDocumentCreator(
+      OidcUser oidcUser, DocumentationUnit documentationUnit) {
+    DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidcUser);
+    return documentationUnit.status().publicationStatus() != null
+        && documentationUnit.coreData().creatingDocOffice() != null
+        && documentationUnit.coreData().creatingDocOffice().equals(documentationOffice);
+  }
+
+  private boolean userHasSameDocOfficeAsDocument(
+      OidcUser oidUser, DocumentationUnit documentationUnit) {
+    DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidUser);
+    return documentationUnit.coreData().documentationOffice().equals(documentationOffice);
   }
 
   private boolean userHasSameDocOfficeAsDocument(DocumentationUnit documentationUnit) {
     Optional<OidcUser> oidcUser = getOidcUser();
-    if (oidcUser.isPresent()) {
-      DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidcUser.get());
-      return documentationUnit.coreData().documentationOffice().equals(documentationOffice);
-    }
-    return false;
+    return oidcUser
+        .filter(user -> userHasSameDocOfficeAsDocument(user, documentationUnit))
+        .isPresent();
   }
 
   private boolean docUnitIsPending(DocumentationUnit documentationUnit) {
