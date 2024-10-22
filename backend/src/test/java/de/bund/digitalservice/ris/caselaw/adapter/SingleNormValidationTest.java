@@ -13,9 +13,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.NormElement;
 import de.bund.digitalservice.ris.caselaw.domain.NormElementRepository;
-import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
-import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormCode;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
@@ -38,7 +36,6 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 @Import({
   DocumentationUnitService.class,
   SingleNormValidator.class,
-  ProcedureService.class,
   LocalValidatorFactoryBean.class,
 })
 class SingleNormValidationTest {
@@ -57,8 +54,6 @@ class SingleNormValidationTest {
   @MockBean private HandoverReportRepository handoverReportRepository;
   @MockBean AttachmentService attachmentService;
   @MockBean PatchMapperService patchMapperService;
-  @MockBean private ProcedureService procedureService;
-  @MockBean private UserService userService;
 
   @BeforeEach
   void setUp() {
