@@ -274,7 +274,6 @@ public class AuthService {
     // legacy documents are published
     return documentationUnit.status() == null
         || docUnitHasPublishState(documentationUnit)
-        || userHasSameDocOfficeAsDocument(documentationUnit)
         || userHasWriteAccess(documentationUnit);
   }
 
