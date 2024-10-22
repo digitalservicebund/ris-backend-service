@@ -248,6 +248,13 @@ public class DatabaseProcedureService implements ProcedureService {
     return "Die Zuweisung aus Vorgang '" + procedureDTO.get().getLabel() + "' wurde entfernt.";
   }
 
+  @Override
+  public List<Procedure> findAllByUserGroupId(UUID userGroupId) {
+    return repository.findAllByUserGroupDTO_Id(userGroupId).stream()
+        .map(ProcedureTransformer::transformToDomain)
+        .toList();
+  }
+
   /**
    * Retrieves the {@link DocumentationOffice} associated with a {@link ProcedureDTO procedure} by
    * its {@link UUID}.
