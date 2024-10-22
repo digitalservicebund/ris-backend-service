@@ -117,7 +117,8 @@ public class DocumentationUnitController {
 
   @PutMapping(value = "/{uuid}/takeover", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasSameDocOfficeAsDocument.apply(#uuid)")
-  public ResponseEntity<DocumentationUnit> takeOverDocumentationUnit(@AuthenticationPrincipal OidcUser oidcUser, @PathVariable UUID uuid) {
+  public ResponseEntity<DocumentationUnit> takeOverDocumentationUnit(
+      @AuthenticationPrincipal OidcUser oidcUser, @PathVariable UUID uuid) {
     try {
 
       var documentationUnit = service.getByUuid(uuid);
@@ -131,10 +132,10 @@ public class DocumentationUnitController {
       documentationUnit = service.getByUuid(uuid);
       // why do we need to explicitly set isEditable and isDeletable here?
       return ResponseEntity.ok(
-              documentationUnit.toBuilder()
-                      .isEditable(authService.userHasWriteAccess(oidcUser, documentationUnit))
-                      .isDeletable(authService.userHasWriteAccess(oidcUser, documentationUnit))
-                      .build());
+          documentationUnit.toBuilder()
+              .isEditable(authService.userHasWriteAccess(oidcUser, documentationUnit))
+              .isDeletable(authService.userHasWriteAccess(oidcUser, documentationUnit))
+              .build());
     } catch (Exception e) {
       throw new StatusImporterException("Could not update publicationStatus", e);
     }
