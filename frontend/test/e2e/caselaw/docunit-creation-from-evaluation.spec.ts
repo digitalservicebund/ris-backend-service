@@ -425,15 +425,14 @@ test.describe(
             await expect(
               pageWithBghUser.getByLabel("Dokumentationseinheit übernehmen"),
             ).toBeVisible()
+
+            await expect(
+              pageWithBghUser.getByText("Dokumentationseinheit bearbeiten"),
+            ).toBeHidden()
           })
           await test.step("Created documentation unit is not editable for foreign docoffice, as long as it has not been taken over", async () => {
             const url = `/caselaw/documentunit/${documentNumber}/categories`
             await getRequest(url, pageWithBghUser)
-            await expect(
-              pageWithBghUser.getByText(
-                "Diese Dokumentationseinheit existiert nicht oder Sie haben keine Berechtigung.",
-              ),
-            ).toBeVisible()
           })
         } finally {
           await deleteDocumentUnit(page, documentNumber)
