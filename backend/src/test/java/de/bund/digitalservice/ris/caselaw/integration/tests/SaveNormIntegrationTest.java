@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
 
+import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
@@ -25,7 +26,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -40,12 +40,10 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -148,18 +146,8 @@ class SaveNormIntegrationTest {
   @Test
   void testSaveNorm_withoutNorm() {
     DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567890123")
-            .documentationOffice(documentationOfficeDTO)
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build();
-
-    repository.save(dto);
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, documentationOfficeDTO);
 
     DocumentationUnit documentationUnitFromFrontend = generateDocumentationUnit(dto.getId());
 
@@ -183,8 +171,10 @@ class SaveNormIntegrationTest {
   @Test
   void testSaveNorm_withOneNormAndNoChange() {
     NormAbbreviationDTO normAbbreviation = addNormToDB(2352);
+
     DocumentationUnitDTO savedDocumentationUnitDTO =
-        repository.save(
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
             DocumentationUnitDTO.builder()
                 .documentNumber("1234567890124")
                 .documentationOffice(documentationOfficeDTO)
@@ -193,14 +183,7 @@ class SaveNormIntegrationTest {
                         NormReferenceDTO.builder()
                             .rank(1)
                             .normAbbreviation(normAbbreviation)
-                            .build()))
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
+                            .build())));
 
     DocumentationUnit documentationUnitFromFrontend =
         generateDocumentationUnit(savedDocumentationUnitDTO.getId());
@@ -246,17 +229,8 @@ class SaveNormIntegrationTest {
     var dbNormAbbreviation2 = addNormToDB(2);
 
     DocumentationUnitDTO dto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(documentationOfficeDTO)
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, documentationOfficeDTO, "1234567890123");
 
     DocumentationUnit documentationUnitFromFrontend = generateDocumentationUnit(dto.getId());
 

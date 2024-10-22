@@ -2,6 +2,9 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import ListInput from "@/components/input/listInput/ListInput.vue"
 
+const scrollIntoViewMock = vi.fn()
+window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
+
 function renderComponent(
   options: {
     props?: {
@@ -26,6 +29,10 @@ function renderComponent(
 }
 
 describe("List input", () => {
+  beforeEach(() => {
+    vi.resetAllMocks()
+  })
+
   test("if no model value, renders edit mode", async () => {
     renderComponent()
 
@@ -67,6 +74,7 @@ describe("List input", () => {
 
     await user.click(screen.getByLabelText("Liste bearbeiten"))
     expect(screen.getByLabelText("Liste Input")).toHaveValue("one\ntwo")
+    expect(scrollIntoViewMock).not.toHaveBeenCalled()
   })
 
   test('in edit mode, click on "Übernehmen" with input, emits new input, open display mode', async () => {
@@ -78,6 +86,8 @@ describe("List input", () => {
     expect(emitted()["update:modelValue"]).toEqual([[["one"]]])
     // renders display mode
     expect(await screen.findByLabelText("Liste bearbeiten")).toBeVisible()
+    // Display component will be scrolled into view
+    expect(scrollIntoViewMock).toHaveBeenCalledOnce()
   })
 
   test('in edit mode, click on "Übernehmen" adds new content to existing keywords correctly', async () => {
@@ -108,6 +118,7 @@ describe("List input", () => {
     await user.click(screen.getByLabelText("Liste übernehmen"))
     expect(screen.queryByLabelText("Liste bearbeiten")).not.toBeInTheDocument()
     expect(screen.getByLabelText("Liste Input")).toHaveValue("")
+    expect(scrollIntoViewMock).not.toHaveBeenCalled()
   })
 
   test('in edit mode, click on "Abbrechen" with input reverts to display mode without changes', async () => {
@@ -129,6 +140,7 @@ describe("List input", () => {
     expect(await screen.findByLabelText("Liste bearbeiten")).toBeVisible()
     expect(screen.getAllByTestId("chip").length).toBe(2)
     expect(screen.queryByText(/three/)).not.toBeInTheDocument()
+    expect(scrollIntoViewMock).toHaveBeenCalledOnce()
   })
 
   test('in edit mode, click on "Abbrechen" with no input stays in edit mode', async () => {
@@ -137,6 +149,7 @@ describe("List input", () => {
     await user.click(screen.getByLabelText("Abbrechen"))
 
     expect(screen.queryByLabelText("Liste bearbeiten")).not.toBeInTheDocument()
+    expect(scrollIntoViewMock).not.toHaveBeenCalled()
   })
 
   test("sort alphabetically", async () => {

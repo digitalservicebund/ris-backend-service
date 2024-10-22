@@ -29,7 +29,6 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfL
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -113,39 +112,48 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             parameters.documentationOffice().abbreviation());
 
     var documentationUnitDTO =
-        DocumentationUnitDTO.builder()
-            .documentNumber(documentNumber)
-            .documentationOffice(documentationOfficeDTO)
-            .legalEffect(
-                LegalEffectTransformer.transformToDTO(
-                    LegalEffect.deriveFrom(parameters.court(), true)
-                        .orElse(LegalEffect.NOT_SPECIFIED)))
-            .version(0L)
-            .fileNumbers(
-                parameters.fileNumber() == null
-                    ? Collections.emptyList()
-                    : Collections.singletonList(
-                        FileNumberDTO.builder().value(parameters.fileNumber()).rank(1L).build()))
-            .documentType(DocumentTypeTransformer.transformToDTO(parameters.documentType()))
-            .decisionDate(parameters.decisionDate())
-            .court(CourtTransformer.transformToDTO(parameters.court()))
-            .creatingDocumentationOffice(
-                userDocOffice.uuid().equals(parameters.documentationOffice().uuid())
-                    ? null
-                    : DocumentationOfficeTransformer.transformToDTO(userDocOffice))
-            .status(
-                List.of(
+        repository.save(
+            DocumentationUnitDTO.builder()
+                .documentNumber(documentNumber)
+                .documentationOffice(documentationOfficeDTO)
+                .legalEffect(
+                    LegalEffectTransformer.transformToDTO(
+                        LegalEffect.deriveFrom(parameters.court(), true)
+                            .orElse(LegalEffect.NOT_SPECIFIED)))
+                .version(0L)
+                .fileNumbers(
+                    parameters.fileNumber() == null
+                        ? new ArrayList<>()
+                        : new ArrayList<>(
+                            List.of(
+                                FileNumberDTO.builder()
+                                    .value(parameters.fileNumber())
+                                    .rank(1L)
+                                    .build())))
+                .documentType(DocumentTypeTransformer.transformToDTO(parameters.documentType()))
+                .decisionDate(parameters.decisionDate())
+                .court(CourtTransformer.transformToDTO(parameters.court()))
+                .creatingDocumentationOffice(
+                    userDocOffice.uuid().equals(parameters.documentationOffice().uuid())
+                        ? null
+                        : DocumentationOfficeTransformer.transformToDTO(userDocOffice))
+                .build());
+
+    DocumentationUnitDTO savedDocUnit =
+        repository.save(
+            documentationUnitDTO.toBuilder()
+                .status(
                     StatusDTO.builder()
                         .createdAt(Instant.now())
+                        .documentationUnit(documentationUnitDTO)
                         .publicationStatus(
                             userDocOffice.uuid().equals(parameters.documentationOffice().uuid())
                                 ? PublicationStatus.UNPUBLISHED
                                 : PublicationStatus.EXTERNAL_HANDOVER_PENDING)
                         .withError(false)
-                        .build()))
-            .build();
+                        .build())
+                .build());
 
-    DocumentationUnitDTO savedDocUnit = repository.save(documentationUnitDTO);
     return DocumentationUnitTransformer.transformToDomain(savedDocUnit);
   }
 
@@ -593,7 +601,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private boolean isCreatorOfPending(
       DocumentationUnitListItemDTO item, DocumentationOffice documentationOffice) {
     return item.getStatus()
-            .get(0)
             .getPublicationStatus()
             .equals(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
         && item.getCreatingDocumentationOffice().getId().equals(documentationOffice.uuid());

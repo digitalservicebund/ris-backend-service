@@ -155,7 +155,7 @@ dependencies {
     implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.3.3")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.3.4")
 
     // CVE-2024-22262
     implementation("org.springframework:spring-web:6.1.14")
@@ -177,7 +177,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.28.26"))
+    implementation(platform("software.amazon.awssdk:bom:2.28.27"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -201,9 +201,9 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.24")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.25")
     // for local development:
-    //  implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.24.jar"))
+    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.25.jar"))
 
     implementation("com.fasterxml.jackson.core:jackson-core:2.18.0")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.0")
@@ -234,7 +234,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.6.11")
-    testImplementation("org.springframework.security:spring-security-test:6.3.3")
+    testImplementation("org.springframework.security:spring-security-test:6.3.4")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.3.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")

@@ -5,13 +5,11 @@ import static de.bund.digitalservice.ris.caselaw.domain.DateUtil.getYear;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDeletedDocumentationIdsRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeletedDocumentationUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberPatternException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.time.Year;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -57,20 +55,23 @@ public class DatabaseDocumentNumberRecyclingService implements DocumentNumberRec
         throw new DocumentNumberPatternException("Pattern is invalid");
       }
 
-      var unpublishedStatus =
-          getUnpublishedStatus(
-                  documentationUnitRepository
-                      .findById(documentationUnitId)
-                      .orElseThrow(
-                          () -> new DocumentationUnitNotExistsException(documentationUnitId))
-                      .getStatus())
-              .orElseThrow(
-                  () -> new DocumentNumberPatternException("Status are empty or published"));
+      var docUnit =
+          documentationUnitRepository
+              .findById(documentationUnitId)
+              .orElseThrow(() -> new DocumentationUnitNotExistsException(documentationUnitId));
+
+      PublicationStatus status = docUnit.getStatus().getPublicationStatus();
+      if (docUnit.getStatusHistory().size() != 1
+          || !(status.equals(PublicationStatus.UNPUBLISHED)
+              || status.equals(PublicationStatus.EXTERNAL_HANDOVER_PENDING))) {
+        throw new DocumentNumberPatternException(
+            "Status is changed or neither unpublished nor pending");
+      }
 
       var deleted =
           DeletedDocumentationUnitDTO.builder()
               .documentNumber(documentationUnitNumber)
-              .year(getYear(unpublishedStatus.getCreatedAt()))
+              .year(getYear(docUnit.getStatus().getCreatedAt()))
               .abbreviation(documentationOfficeAbbreviation)
               .build();
 
@@ -119,17 +120,5 @@ public class DatabaseDocumentNumberRecyclingService implements DocumentNumberRec
   @Override
   public void delete(String documentNumber) {
     repository.deleteById(documentNumber);
-  }
-
-  private Optional<StatusDTO> getUnpublishedStatus(List<StatusDTO> status) {
-    if (status.size() == 1
-        && (status.get(0).getPublicationStatus().equals(PublicationStatus.UNPUBLISHED)
-            || status
-                .get(0)
-                .getPublicationStatus()
-                .equals(PublicationStatus.EXTERNAL_HANDOVER_PENDING))) {
-      return Optional.of(status.get(0));
-    }
-    return Optional.empty();
   }
 }

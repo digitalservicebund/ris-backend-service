@@ -4,11 +4,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
-import java.util.Comparator;
 
 public class RelatedDocumentationUnitTransformer {
   RelatedDocumentationUnitTransformer() {}
@@ -35,13 +33,7 @@ public class RelatedDocumentationUnitTransformer {
         .documentType(
             DocumentTypeTransformer.transformToDomain(documentationUnitDTO.getDocumentType()))
         .referenceFound(true)
-        .status(
-            documentationUnitDTO.getStatus() == null || documentationUnitDTO.getStatus().isEmpty()
-                ? null
-                : StatusTransformer.transformToDomain(
-                    documentationUnitDTO.getStatus().stream()
-                        .max(Comparator.comparing(StatusDTO::getCreatedAt))
-                        .orElse(null)))
+        .status(StatusTransformer.transformToDomain(documentationUnitDTO.getStatus()))
         .build();
   }
 

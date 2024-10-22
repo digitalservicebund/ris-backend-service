@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
 
+import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
@@ -24,7 +25,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -37,11 +37,9 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -120,12 +118,13 @@ class DeviatingObjectIntegrationTest {
             argThat(
                 (OidcUser user) -> {
                   List<String> groups = user.getAttribute("groups");
-                  return Objects.requireNonNull(groups).get(0).equals("/DS");
+                  return Objects.requireNonNull(groups).getFirst().equals("/DS");
                 }));
   }
 
   private DocumentationUnitDTO prepareDocumentationUnitDTOWithDeviatingFileNumbers() {
-    return repository.save(
+    return EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
         DocumentationUnitDTO.builder()
             .documentNumber("1234567890123")
             .documentationOffice(
@@ -133,14 +132,7 @@ class DeviatingObjectIntegrationTest {
             .deviatingFileNumbers(
                 List.of(
                     DeviatingFileNumberDTO.builder().rank(1L).value("dfn1").build(),
-                    DeviatingFileNumberDTO.builder().rank(2L).value("dfn2").build()))
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build());
+                    DeviatingFileNumberDTO.builder().rank(2L).value("dfn2").build())));
   }
 
   @AfterEach
@@ -326,10 +318,10 @@ class DeviatingObjectIntegrationTest {
   }
 
   // Deviating ECLI
-
   @Test
   void testReadOfDeviatingECLI() {
-    DocumentationUnitDTO dto =
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
         DocumentationUnitDTO.builder()
             .documentNumber("1234567890123")
             .documentationOffice(
@@ -337,16 +329,7 @@ class DeviatingObjectIntegrationTest {
             .deviatingEclis(
                 List.of(
                     DeviatingEcliDTO.builder().rank(1L).value("decli1").build(),
-                    DeviatingEcliDTO.builder().rank(2L).value("decli2").build()))
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build();
-
-    repository.save(dto);
+                    DeviatingEcliDTO.builder().rank(2L).value("decli2").build())));
 
     risWebTestClient
         .withDefaultLogin()
@@ -366,24 +349,17 @@ class DeviatingObjectIntegrationTest {
 
   @Test
   void testAddANewDeviatingEcliToAnExistingList() {
-    DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567890123")
-            .documentationOffice(
-                documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-            .deviatingEclis(
-                List.of(
-                    DeviatingEcliDTO.builder().rank(1L).value("decli1").build(),
-                    DeviatingEcliDTO.builder().rank(2L).value("decli2").build()))
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build();
-
-    DocumentationUnitDTO savedDTO = repository.save(dto);
+    var savedDTO =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(
+                    documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
+                .deviatingEclis(
+                    List.of(
+                        DeviatingEcliDTO.builder().rank(1L).value("decli1").build(),
+                        DeviatingEcliDTO.builder().rank(2L).value("decli2").build())));
 
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
@@ -416,24 +392,17 @@ class DeviatingObjectIntegrationTest {
 
   @Test
   void testAddADeviatingEcliTwiceToAnExistingList() {
-    DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567890123")
-            .documentationOffice(
-                documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-            .deviatingEclis(
-                List.of(
-                    DeviatingEcliDTO.builder().rank(1L).value("decli1").build(),
-                    DeviatingEcliDTO.builder().rank(2L).value("decli2").build()))
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build();
-
-    DocumentationUnitDTO savedDTO = repository.save(dto);
+    var savedDTO =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(
+                    documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
+                .deviatingEclis(
+                    List.of(
+                        DeviatingEcliDTO.builder().rank(1L).value("decli1").build(),
+                        DeviatingEcliDTO.builder().rank(2L).value("decli2").build())));
 
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
@@ -458,24 +427,17 @@ class DeviatingObjectIntegrationTest {
 
   @Test
   void testRemoveOneDeviatingEcliFromExistingList() {
-    DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567890123")
-            .documentationOffice(
-                documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-            .deviatingEclis(
-                List.of(
-                    DeviatingEcliDTO.builder().rank(1L).value("decli1").build(),
-                    DeviatingEcliDTO.builder().rank(2L).value("decli2").build()))
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build();
-
-    DocumentationUnitDTO savedDTO = repository.save(dto);
+    var savedDTO =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(
+                    documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
+                .deviatingEclis(
+                    List.of(
+                        DeviatingEcliDTO.builder().rank(1L).value("decli1").build(),
+                        DeviatingEcliDTO.builder().rank(2L).value("decli2").build())));
 
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
@@ -507,24 +469,17 @@ class DeviatingObjectIntegrationTest {
 
   @Test
   void testRemoveAllDeviatingEcliWithAEmplyListFromExistingList() {
-    DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567890123")
-            .documentationOffice(
-                documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-            .deviatingEclis(
-                List.of(
-                    DeviatingEcliDTO.builder().rank(1L).value("decli1").build(),
-                    DeviatingEcliDTO.builder().rank(2L).value("decli2").build()))
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build();
-
-    DocumentationUnitDTO savedDTO = repository.save(dto);
+    var savedDTO =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(
+                    documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
+                .deviatingEclis(
+                    List.of(
+                        DeviatingEcliDTO.builder().rank(1L).value("decli1").build(),
+                        DeviatingEcliDTO.builder().rank(2L).value("decli2").build())));
 
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
@@ -555,24 +510,17 @@ class DeviatingObjectIntegrationTest {
 
   @Test
   void testWithNullDontChangeTheExistingDeviatingEclis() {
-    DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567890123")
-            .documentationOffice(
-                documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-            .deviatingEclis(
-                List.of(
-                    DeviatingEcliDTO.builder().rank(1L).value("decli1").build(),
-                    DeviatingEcliDTO.builder().rank(2L).value("decli2").build()))
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build();
-
-    DocumentationUnitDTO savedDTO = repository.save(dto);
+    var savedDTO =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(
+                    documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
+                .deviatingEclis(
+                    List.of(
+                        DeviatingEcliDTO.builder().rank(1L).value("decli1").build(),
+                        DeviatingEcliDTO.builder().rank(2L).value("decli2").build())));
 
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
@@ -605,7 +553,8 @@ class DeviatingObjectIntegrationTest {
 
   @Test
   void testReadOfDeviatingCourts() {
-    DocumentationUnitDTO dto =
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
         DocumentationUnitDTO.builder()
             .documentNumber("1234567890123")
             .documentationOffice(
@@ -613,16 +562,7 @@ class DeviatingObjectIntegrationTest {
             .deviatingCourts(
                 List.of(
                     DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
-                    DeviatingCourtDTO.builder().rank(2L).value("dc2").build()))
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build();
-
-    repository.save(dto);
+                    DeviatingCourtDTO.builder().rank(2L).value("dc2").build())));
 
     risWebTestClient
         .withDefaultLogin()
@@ -643,24 +583,17 @@ class DeviatingObjectIntegrationTest {
 
   @Test
   void testAddANewDeviatingCourtToAnExistingList() {
-    DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567890123")
-            .documentationOffice(
-                documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-            .deviatingCourts(
-                List.of(
-                    DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
-                    DeviatingCourtDTO.builder().rank(2L).value("dc2").build()))
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build();
-
-    DocumentationUnitDTO savedDTO = repository.save(dto);
+    var savedDTO =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(
+                    documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
+                .deviatingCourts(
+                    List.of(
+                        DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
+                        DeviatingCourtDTO.builder().rank(2L).value("dc2").build())));
 
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
@@ -693,24 +626,17 @@ class DeviatingObjectIntegrationTest {
 
   @Test
   void testAddADeviatingCourtTwiceToAnExistingList() {
-    DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567890123")
-            .documentationOffice(
-                documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-            .deviatingCourts(
-                List.of(
-                    DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
-                    DeviatingCourtDTO.builder().rank(2L).value("dc2").build()))
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build();
-
-    DocumentationUnitDTO savedDTO = repository.save(dto);
+    var savedDTO =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(
+                    documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
+                .deviatingCourts(
+                    List.of(
+                        DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
+                        DeviatingCourtDTO.builder().rank(2L).value("dc2").build())));
 
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
@@ -735,24 +661,17 @@ class DeviatingObjectIntegrationTest {
 
   @Test
   void testRemoveOneDeviatingCourtFromExistingList() {
-    DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567890123")
-            .documentationOffice(
-                documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-            .deviatingCourts(
-                List.of(
-                    DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
-                    DeviatingCourtDTO.builder().rank(2L).value("dc2").build()))
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build();
-
-    DocumentationUnitDTO savedDTO = repository.save(dto);
+    var savedDTO =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(
+                    documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
+                .deviatingCourts(
+                    List.of(
+                        DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
+                        DeviatingCourtDTO.builder().rank(2L).value("dc2").build())));
 
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
@@ -785,24 +704,17 @@ class DeviatingObjectIntegrationTest {
 
   @Test
   void testRemoveAllDeviatingCourtWithAEmplyListFromExistingList() {
-    DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567890123")
-            .documentationOffice(
-                documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-            .deviatingCourts(
-                List.of(
-                    DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
-                    DeviatingCourtDTO.builder().rank(2L).value("dc2").build()))
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build();
-
-    DocumentationUnitDTO savedDTO = repository.save(dto);
+    var savedDTO =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(
+                    documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
+                .deviatingCourts(
+                    List.of(
+                        DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
+                        DeviatingCourtDTO.builder().rank(2L).value("dc2").build())));
 
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
@@ -834,24 +746,17 @@ class DeviatingObjectIntegrationTest {
 
   @Test
   void testWithNullDontChangeTheExistingDeviatingCourts() {
-    DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567890123")
-            .documentationOffice(
-                documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-            .deviatingCourts(
-                List.of(
-                    DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
-                    DeviatingCourtDTO.builder().rank(2L).value("dc2").build()))
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build();
-
-    DocumentationUnitDTO savedDTO = repository.save(dto);
+    var savedDTO =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(
+                    documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
+                .deviatingCourts(
+                    List.of(
+                        DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
+                        DeviatingCourtDTO.builder().rank(2L).value("dc2").build())));
 
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
@@ -885,7 +790,9 @@ class DeviatingObjectIntegrationTest {
 
   @Test
   void testReadOfDeviatingDates() {
-    DocumentationUnitDTO dto =
+
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
         DocumentationUnitDTO.builder()
             .documentNumber("1234567890123")
             .documentationOffice(
@@ -893,16 +800,7 @@ class DeviatingObjectIntegrationTest {
             .deviatingDates(
                 List.of(
                     DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
-                    DeviatingDateDTO.builder().rank(2L).value(LocalDate.of(2010, 9, 10)).build()))
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build();
-
-    repository.save(dto);
+                    DeviatingDateDTO.builder().rank(2L).value(LocalDate.of(2010, 9, 10)).build())));
 
     risWebTestClient
         .withDefaultLogin()
@@ -924,24 +822,20 @@ class DeviatingObjectIntegrationTest {
 
   @Test
   void testAddANewDeviatingDatesToAnExistingList() {
-    DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567890123")
-            .documentationOffice(
-                documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-            .deviatingDates(
-                List.of(
-                    DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
-                    DeviatingDateDTO.builder().rank(2L).value(LocalDate.of(2010, 9, 10)).build()))
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build();
-
-    DocumentationUnitDTO savedDTO = repository.save(dto);
+    var savedDTO =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(
+                    documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
+                .deviatingDates(
+                    List.of(
+                        DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
+                        DeviatingDateDTO.builder()
+                            .rank(2L)
+                            .value(LocalDate.of(2010, 9, 10))
+                            .build())));
 
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
@@ -982,25 +876,24 @@ class DeviatingObjectIntegrationTest {
 
   @Test
   void testAddADeviatingDateTwiceToAnExistingList() {
-    DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567890123")
-            .documentationOffice(
-                documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-            .deviatingDates(
-                List.of(
-                    DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
-                    DeviatingDateDTO.builder().rank(2L).value(LocalDate.of(2010, 9, 10)).build(),
-                    DeviatingDateDTO.builder().rank(3L).value(LocalDate.of(2010, 9, 10)).build()))
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build();
-
-    DocumentationUnitDTO savedDTO = repository.save(dto);
+    var savedDTO =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(
+                    documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
+                .deviatingDates(
+                    List.of(
+                        DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
+                        DeviatingDateDTO.builder()
+                            .rank(2L)
+                            .value(LocalDate.of(2010, 9, 10))
+                            .build(),
+                        DeviatingDateDTO.builder()
+                            .rank(3L)
+                            .value(LocalDate.of(2010, 9, 10))
+                            .build())));
 
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
@@ -1029,24 +922,20 @@ class DeviatingObjectIntegrationTest {
 
   @Test
   void testRemoveOneDeviatingDateFromExistingList() {
-    DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567890123")
-            .documentationOffice(
-                documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-            .deviatingDates(
-                List.of(
-                    DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
-                    DeviatingDateDTO.builder().rank(2L).value(LocalDate.of(2010, 9, 10)).build()))
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build();
-
-    DocumentationUnitDTO savedDTO = repository.save(dto);
+    var savedDTO =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(
+                    documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
+                .deviatingDates(
+                    List.of(
+                        DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
+                        DeviatingDateDTO.builder()
+                            .rank(2L)
+                            .value(LocalDate.of(2010, 9, 10))
+                            .build())));
 
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
@@ -1079,24 +968,20 @@ class DeviatingObjectIntegrationTest {
 
   @Test
   void testRemoveAllDeviatingDatesWithAEmplyListFromExistingList() {
-    DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567890123")
-            .documentationOffice(
-                documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-            .deviatingDates(
-                List.of(
-                    DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
-                    DeviatingDateDTO.builder().rank(2L).value(LocalDate.of(2010, 9, 10)).build()))
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build();
-
-    DocumentationUnitDTO savedDTO = repository.save(dto);
+    var savedDTO =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(
+                    documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
+                .deviatingDates(
+                    List.of(
+                        DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
+                        DeviatingDateDTO.builder()
+                            .rank(2L)
+                            .value(LocalDate.of(2010, 9, 10))
+                            .build())));
 
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()
@@ -1128,24 +1013,20 @@ class DeviatingObjectIntegrationTest {
 
   @Test
   void testWithNullDontChangeExistingDeviatingDates() {
-    DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567890123")
-            .documentationOffice(
-                documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-            .deviatingDates(
-                List.of(
-                    DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
-                    DeviatingDateDTO.builder().rank(2L).value(LocalDate.of(2010, 9, 10)).build()))
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build();
-
-    DocumentationUnitDTO savedDTO = repository.save(dto);
+    var savedDTO =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(
+                    documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
+                .deviatingDates(
+                    List.of(
+                        DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
+                        DeviatingDateDTO.builder()
+                            .rank(2L)
+                            .value(LocalDate.of(2010, 9, 10))
+                            .build())));
 
     DocumentationUnit documentationUnit =
         DocumentationUnit.builder()

@@ -11,13 +11,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -58,29 +53,16 @@ class DocumentationUnitStatusServiceTest {
       testUpdate_withDocumentNumberAndDocumentationUnitFoundWithExistingStatus_shouldUpdateTheExistingStatus()
           throws DocumentationUnitNotExistsException {
 
-    var statusList =
-        List.of(
-            StatusDTO.builder()
-                .publicationStatus(PublicationStatus.DUPLICATED)
-                .withError(true)
-                .createdAt(Instant.now().minus(2, ChronoUnit.DAYS))
-                .build(),
-            StatusDTO.builder()
-                .publicationStatus(PublicationStatus.PUBLISHED)
-                .withError(true)
-                .createdAt(Instant.now())
-                .build(),
-            StatusDTO.builder()
-                .publicationStatus(PublicationStatus.UNPUBLISHED)
-                .withError(true)
-                .createdAt(Instant.now().minus(1, ChronoUnit.DAYS))
-                .build());
-
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitDTO.builder()
             .id(TEST_UUID)
             .documentNumber(DOCUMENT_NUMBER)
-            .status(new ArrayList<>(statusList))
+            .status(
+                StatusDTO.builder()
+                    .publicationStatus(PublicationStatus.PUBLISHED)
+                    .withError(true)
+                    .createdAt(Instant.now())
+                    .build())
             .build();
 
     ArgumentCaptor<DocumentationUnitDTO> captor =
@@ -104,14 +86,11 @@ class DocumentationUnitStatusServiceTest {
         .usingRecursiveComparison()
         .ignoringFields("id", "createdAt")
         .isEqualTo(
-            Stream.concat(
-                    statusList.stream(),
-                    Stream.of(
-                        StatusDTO.builder()
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .withError(true)
-                            .build()))
-                .collect(Collectors.toList()));
+            StatusDTO.builder()
+                .publicationStatus(PublicationStatus.PUBLISHED)
+                .withError(true)
+                .documentationUnit(documentationUnitDTO)
+                .build());
   }
 
   @Test
@@ -121,12 +100,10 @@ class DocumentationUnitStatusServiceTest {
             .id(TEST_UUID)
             .documentNumber(DOCUMENT_NUMBER)
             .status(
-                new ArrayList<>(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build())))
+                StatusDTO.builder()
+                    .createdAt(Instant.now())
+                    .publicationStatus(PublicationStatus.PUBLISHED)
+                    .build())
             .build();
 
     when(databaseDocumentationUnitRepository.findByDocumentNumber(DOCUMENT_NUMBER))

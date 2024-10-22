@@ -46,7 +46,7 @@ class LegalPeriodicalEditionControllerTest {
   @MockBean private DocumentationUnitService documentationUnitService;
   @MockBean private ProcedureService procedureService;
 
-  private final String EDITION_ENDPOINT = "/api/v1/caselaw/legalperiodicaledition";
+  private static final String EDITION_ENDPOINT = "/api/v1/caselaw/legalperiodicaledition";
 
   @Test
   void testGetLegalPeriodicalEditionById_shouldReturnValue() {

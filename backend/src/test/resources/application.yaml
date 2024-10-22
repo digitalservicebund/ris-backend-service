@@ -12,6 +12,12 @@ spring:
       mode: always
   jpa:
     open-in-view: false
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: ${OAUTH2_CLIENT_ISSUER:}
 
 otc:
   obs:
