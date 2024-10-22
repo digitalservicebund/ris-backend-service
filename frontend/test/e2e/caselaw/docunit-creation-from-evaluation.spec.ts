@@ -3,7 +3,6 @@ import dayjs from "dayjs"
 import {
   deleteDocumentUnit,
   fillInput,
-  getRequest,
   navigateToPeriodicalReferences,
   navigateToSearch,
   waitForInputValue,
