@@ -385,7 +385,7 @@ test.describe(
           ).toBeVisible()
         })
 
-        await test.step("The form is cleared after adding a reference ", async () => {
+        await test.step("The form is cleared after adding a reference", async () => {
           await expect(page.getByLabel("Zitatstelle *")).toBeEmpty()
           await expect(page.getByLabel("Klammernzusatz")).toBeEmpty()
           await expect(page.getByLabel("Gericht")).toBeEmpty()
@@ -408,7 +408,7 @@ test.describe(
           secondPrefilledDocumentUnit.documentNumber || "",
         )
 
-        await test.step("An added citation is visible in the documentation unit's preview ", async () => {
+        await test.step("An added citation is visible in the documentation unit's preview", async () => {
           await expect(
             previewTab.getByText(`MMG 2024, 5${suffix} (LT)`, { exact: true }),
           ).toHaveCount(1)
@@ -473,7 +473,7 @@ test.describe(
           ).toBeVisible()
         })
 
-        await test.step("Changes to the citation are visible in the documentation unit's preview ", async () => {
+        await test.step("Changes to the citation are visible in the documentation unit's preview", async () => {
           await previewTab.reload()
           await expect(
             previewTab.getByText(`MMG 2021, 2${suffix} (L)`, { exact: true }),
@@ -483,7 +483,7 @@ test.describe(
           ).toHaveCount(1)
         })
 
-        await test.step("Unchanged citation is unchanged in preview ", async () => {
+        await test.step("Unchanged citation is unchanged in preview", async () => {
           await secondPreviewTab.reload()
           await expect(
             secondPreviewTab.getByText(`MMG 2024, 104${suffix} (LT)`, {
@@ -551,7 +551,7 @@ test.describe(
           ).toBeHidden()
         })
 
-        await test.step("Deleted citations disappear from the documentation unit's preview ", async () => {
+        await test.step("Deleted citations disappear from the documentation unit's preview", async () => {
           await previewTab.reload()
           await expect(previewTab.getByText(fileNumber)).toBeVisible()
           await expect(
@@ -618,7 +618,7 @@ test.describe(
           prefilledDocumentUnitBgh.documentNumber || "",
         )
 
-        await test.step("An added citation is visible in the other docoffice's documentation unit's preview ", async () => {
+        await test.step("An added citation is visible in the other docoffice's documentation unit's preview", async () => {
           await expect(
             previewTab.getByText(`MMG 2024, 12${edition.suffix} (L)`, {
               exact: true,
@@ -626,7 +626,7 @@ test.describe(
           ).toBeVisible()
         })
 
-        await test.step("Changes to the citation are visible in the other docoffice's documentation unit's preview ", async () => {
+        await test.step("Changes to the citation are visible in the other docoffice's documentation unit's preview", async () => {
           await page.getByTestId("list-entry-0").click()
           await expect(page.getByLabel("Zitatstelle *")).toHaveValue(
             "2022, 11, Heft 3",
@@ -654,7 +654,7 @@ test.describe(
           ).toHaveCount(1)
         })
 
-        await test.step("Deleted citations disappear from the other docoffice's documentation unit's preview ", async () => {
+        await test.step("Deleted citations disappear from the other docoffice's documentation unit's preview", async () => {
           await page.getByTestId("list-entry-0").click()
           await page.locator("[aria-label='Eintrag löschen']").click()
           await previewTab.reload()

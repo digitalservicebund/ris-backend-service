@@ -67,6 +67,7 @@ public class DocumentationUnitController {
   private final AttachmentService attachmentService;
   private final ConverterService converterService;
   private final HandoverService handoverService;
+  private final AuthService authService;
   private final DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
 
@@ -77,6 +78,7 @@ public class DocumentationUnitController {
       AttachmentService attachmentService,
       ConverterService converterService,
       HandoverService handoverService,
+      AuthService authService,
       DocumentationUnitDocxMetadataInitializationService
           documentationUnitDocxMetadataInitializationService) {
     this.service = service;
@@ -85,6 +87,7 @@ public class DocumentationUnitController {
     this.attachmentService = attachmentService;
     this.converterService = converterService;
     this.handoverService = handoverService;
+    this.authService = authService;
     this.documentationUnitDocxMetadataInitializationService =
         documentationUnitDocxMetadataInitializationService;
   }
@@ -217,14 +220,18 @@ public class DocumentationUnitController {
   @GetMapping(value = "/{documentNumber}", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentNumber.apply(#documentNumber)")
   public ResponseEntity<DocumentationUnit> getByDocumentNumber(
-      @NonNull @PathVariable String documentNumber) {
+      @AuthenticationPrincipal OidcUser oidcUser, @NonNull @PathVariable String documentNumber) {
 
     if (documentNumber.length() != 13 && documentNumber.length() != 14) {
       throw new DocumentationUnitException("Die Dokumentennummer unterstützt nur 13-14 Zeichen");
     }
 
     try {
-      return ResponseEntity.ok(service.getByDocumentNumber(documentNumber));
+      var documentationUnit = service.getByDocumentNumber(documentNumber);
+      return ResponseEntity.ok(
+          documentationUnit.toBuilder()
+              .isEditable(authService.userHasWriteAccess(oidcUser, documentationUnit))
+              .build());
     } catch (DocumentationUnitNotExistsException e) {
       log.error("Documentation unit '{}' doesn't exist", documentNumber);
       return ResponseEntity.ok(DocumentationUnit.builder().build());

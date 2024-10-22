@@ -3,7 +3,6 @@ import dayjs from "dayjs"
 import {
   deleteDocumentUnit,
   fillInput,
-  getRequest,
   navigateToPeriodicalReferences,
   navigateToSearch,
   waitForInputValue,
@@ -162,7 +161,7 @@ test.describe(
             ).toHaveValue("BGH")
           })
 
-          await test.step("Validation of required fields before creation new documentation unit from search parameters ", async () => {
+          await test.step("Validation of required fields before creation new documentation unit from search parameters", async () => {
             await pageWithBghUser
               .getByText("Übernehmen und weiter bearbeiten")
               .click()
@@ -319,7 +318,7 @@ test.describe(
             ).toHaveValue("BGH")
           })
 
-          await test.step("Validation of required fields before creation new documentation unit from search parameters ", async () => {
+          await test.step("Validation of required fields before creation new documentation unit from search parameters", async () => {
             await page.getByText("Übernehmen und weiter bearbeiten").click()
 
             await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
@@ -425,15 +424,10 @@ test.describe(
             await expect(
               pageWithBghUser.getByLabel("Dokumentationseinheit übernehmen"),
             ).toBeVisible()
-          })
-          await test.step("Created documentation unit is not editable for foreign docoffice, as long as it has not been taken over", async () => {
-            const url = `/caselaw/documentunit/${documentNumber}/categories`
-            await getRequest(url, pageWithBghUser)
+
             await expect(
-              pageWithBghUser.getByText(
-                "Diese Dokumentationseinheit existiert nicht oder Sie haben keine Berechtigung.",
-              ),
-            ).toBeVisible()
+              pageWithBghUser.getByText("Dokumentationseinheit bearbeiten"),
+            ).toBeHidden()
           })
         } finally {
           await deleteDocumentUnit(page, documentNumber)
@@ -486,7 +480,7 @@ test.describe(
           ).toBeEnabled()
         })
 
-        await test.step("Validation of required fields before creation new documentation unit from search parameters ", async () => {
+        await test.step("Validation of required fields before creation new documentation unit from search parameters", async () => {
           await page.getByText("Übernehmen und weiter bearbeiten").click()
 
           await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)

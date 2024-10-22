@@ -730,6 +730,68 @@ VALUES
   )
     ;
 
+UPDATE incremental_migration.documentation_unit SET current_status_id =
+(SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0001'))
+WHERE document_number = 'YYTestDoc0001';
+
+UPDATE incremental_migration.documentation_unit SET current_status_id =
+    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0002'))
+WHERE document_number = 'YYTestDoc0002';
+
+
+UPDATE incremental_migration.documentation_unit SET current_status_id =
+    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0003'))
+WHERE document_number = 'YYTestDoc0003';
+
+UPDATE incremental_migration.documentation_unit SET current_status_id =
+    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0004'))
+WHERE document_number = 'YYTestDoc0004';
+
+UPDATE incremental_migration.documentation_unit SET current_status_id =
+    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0005'))
+WHERE document_number = 'YYTestDoc0005';
+
+UPDATE incremental_migration.documentation_unit SET current_status_id =
+    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0006'))
+WHERE document_number = 'YYTestDoc0006';
+
+UPDATE incremental_migration.documentation_unit SET current_status_id =
+    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0007'))
+WHERE document_number = 'YYTestDoc0007';
+
+UPDATE incremental_migration.documentation_unit SET current_status_id =
+    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0008'))
+WHERE document_number = 'YYTestDoc0008';
+
+UPDATE incremental_migration.documentation_unit SET current_status_id =
+    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0009'))
+WHERE document_number = 'YYTestDoc0009';
+
+UPDATE incremental_migration.documentation_unit SET current_status_id =
+    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0010'))
+WHERE document_number = 'YYTestDoc0010';
+
+UPDATE incremental_migration.documentation_unit SET current_status_id =
+    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0011'))
+WHERE document_number = 'YYTestDoc0011';
+
+UPDATE incremental_migration.documentation_unit SET current_status_id =
+    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0012'))
+WHERE document_number = 'YYTestDoc0012';
+
+UPDATE incremental_migration.documentation_unit SET current_status_id =
+    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0013'))
+WHERE document_number = 'YYTestDoc0013';
+
+UPDATE incremental_migration.documentation_unit SET current_status_id =
+    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0014'))
+WHERE document_number = 'YYTestDoc0014';
+
+UPDATE incremental_migration.documentation_unit SET current_status_id =
+    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0015') ORDER BY created_at DESC LIMIT 1)
+WHERE document_number = 'YYTestDoc0015';
+
+
 UPDATE
   incremental_migration.documentation_unit
 SET

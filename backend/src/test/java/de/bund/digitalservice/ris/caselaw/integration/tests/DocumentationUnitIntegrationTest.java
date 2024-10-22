@@ -10,6 +10,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.SliceTestImpl;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
@@ -45,7 +46,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -74,7 +74,6 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.Docume
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.net.URI;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Year;
 import java.time.temporal.ChronoField;
@@ -302,19 +301,9 @@ class DocumentationUnitIntegrationTest {
 
   @Test
   void testForFileNumbersDbEntryAfterUpdateByUuid() {
-
     DocumentationUnitDTO dto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(documentationOffice)
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, documentationOffice, "1234567890123");
 
     DocumentationUnit documentationUnitFromFrontend =
         DocumentationUnit.builder()
@@ -374,7 +363,8 @@ class DocumentationUnitIntegrationTest {
                 .build());
 
     DocumentationUnitDTO dto =
-        repository.save(
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
             DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .leadingDecisionNormReferences(
@@ -384,14 +374,7 @@ class DocumentationUnitIntegrationTest {
                             .rank(1)
                             .build()))
                 .court(bghCourt)
-                .documentationOffice(documentationOffice)
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
+                .documentationOffice(documentationOffice));
 
     DocumentationUnit documentationUnitFromFrontend =
         DocumentationUnit.builder()
@@ -430,17 +413,8 @@ class DocumentationUnitIntegrationTest {
   @Test
   void testUpdateNormReferenceWithoutNormAbbreviationAndWithNormAbbreviationRawValue() {
     DocumentationUnitDTO dto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(documentationOffice)
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, documentationOffice, "1234567890123");
 
     List<SingleNorm> singleNorms = List.of(SingleNorm.builder().singleNorm("Art 7 S 1").build());
 
@@ -523,17 +497,8 @@ class DocumentationUnitIntegrationTest {
                 .build());
 
     DocumentationUnitDTO dto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(documentationOffice)
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, documentationOffice, "1234567890123");
 
     DocumentationUnit documentationUnitFromFrontend =
         DocumentationUnit.builder()
@@ -601,18 +566,10 @@ class DocumentationUnitIntegrationTest {
 
     // TODO find out why this is necessary when the whole test class is executed
     repository.deleteAll();
+
     DocumentationUnitDTO documentationUnitDto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(documentationOffice)
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, documentationOffice, "1234567890123");
 
     DocumentationUnit documentationUnitFromFrontend =
         DocumentationUnit.builder()
@@ -661,18 +618,12 @@ class DocumentationUnitIntegrationTest {
             DocumentTypeDTO.builder().abbreviation("test").multiple(true).build());
 
     DocumentationUnitDTO dto =
-        repository.save(
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository,
             DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentType(docType)
-                .documentationOffice(documentationOffice)
-                .status(
-                    List.of(
-                        StatusDTO.builder()
-                            .createdAt(Instant.now())
-                            .publicationStatus(PublicationStatus.PUBLISHED)
-                            .build()))
-                .build());
+                .documentationOffice(documentationOffice));
 
     assertThat(repository.findAll()).hasSize(1);
     assertThat(repository.findById(dto.getId())).isPresent();
@@ -724,18 +675,12 @@ class DocumentationUnitIntegrationTest {
                   .build());
 
       DocumentationUnitDTO dto =
-          repository.save(
+          EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+              repository,
               DocumentationUnitDTO.builder()
                   .documentNumber(randomDocNumber)
                   .court(court)
-                  .documentationOffice(office)
-                  .status(
-                      List.of(
-                          StatusDTO.builder()
-                              .publicationStatus(PUBLISHED)
-                              .createdAt(Instant.now())
-                              .build()))
-                  .build());
+                  .documentationOffice(office));
 
       repository.findById(dto.getId()).get();
     }
@@ -842,7 +787,9 @@ class DocumentationUnitIntegrationTest {
                   .isForeignCourt(false)
                   .jurisId(new Random().nextInt())
                   .build());
-      repository.save(
+
+      EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+          repository,
           DocumentationUnitDTO.builder()
               .id(UUID.randomUUID())
               .documentNumber(documentNumbers.get(i))
@@ -850,15 +797,10 @@ class DocumentationUnitIntegrationTest {
               .decisionDate(decisionDates.get(i))
               .documentationOffice(DocumentationOfficeDTO.builder().id(docOfficeIds.get(i)).build())
               .fileNumbers(
-                  List.of(FileNumberDTO.builder().value(fileNumbers.get(i)).rank((long) i).build()))
-              .status(
                   List.of(
-                      StatusDTO.builder()
-                          .publicationStatus(statuses.get(i))
-                          .createdAt(Instant.now())
-                          .withError(errorStatuses.get(i))
-                          .build()))
-              .build());
+                      FileNumberDTO.builder().value(fileNumbers.get(i)).rank((long) i).build())),
+          statuses.get(i),
+          errorStatuses.get(i));
     }
 
     // no search criteria
@@ -947,7 +889,8 @@ class DocumentationUnitIntegrationTest {
   @Test
   void testSearchByFileNumber_withFileNumberAndDeviatingFileNumber_shouldOnlyReturnOneResult() {
 
-    repository.save(
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
         DocumentationUnitDTO.builder()
             .id(UUID.randomUUID())
             .documentNumber("documentNumber")
@@ -957,14 +900,7 @@ class DocumentationUnitIntegrationTest {
                 List.of(FileNumberDTO.builder().value("Vf. 19-VIII-22 (e.A.)").rank(1L).build()))
             .deviatingFileNumbers(
                 List.of(
-                    DeviatingFileNumberDTO.builder().value("Vf.19-VIII-22 ea").rank(1L).build()))
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
-            .build());
+                    DeviatingFileNumberDTO.builder().value("Vf.19-VIII-22 ea").rank(1L).build())));
 
     DocumentationUnitSearchInput searchInput =
         DocumentationUnitSearchInput.builder().fileNumber("Vf.").build();
@@ -1040,15 +976,11 @@ class DocumentationUnitIntegrationTest {
         DocumentationUnitDTO.builder()
             .documentNumber("ZZRE202400001")
             .documentationOffice(documentationOffice)
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
             .build();
     repository.save(referencedDTO);
-    DocumentationUnitDTO dto =
+
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
         DocumentationUnitDTO.builder()
             .documentNumber("ZZRE202400002")
             .documentationOffice(documentationOffice)
@@ -1057,15 +989,8 @@ class DocumentationUnitIntegrationTest {
                     PreviousDecisionDTO.builder()
                         .documentNumber(referencedDTO.getDocumentNumber())
                         .rank(1)
-                        .build()))
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .publicationStatus(UNPUBLISHED)
-                        .createdAt(Instant.now())
-                        .build()))
-            .build();
-    repository.save(dto);
+                        .build())));
+
     when(documentNumberPatternConfig.hasValidPattern(anyString(), anyString())).thenReturn(true);
     risWebTestClient
         .withDefaultLogin()
@@ -1091,14 +1016,9 @@ class DocumentationUnitIntegrationTest {
         DocumentationUnitDTO.builder()
             .documentNumber("ZZRE202400001")
             .documentationOffice(documentationOffice)
-            .status(
-                List.of(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
-                        .publicationStatus(PublicationStatus.PUBLISHED)
-                        .build()))
             .build();
     repository.save(referencedDTO);
+
     DeletedDocumentationUnitDTO deletedDocumentationUnitDTO =
         DeletedDocumentationUnitDTO.builder()
             .abbreviation("DS")
@@ -1106,6 +1026,7 @@ class DocumentationUnitIntegrationTest {
             .year(Year.of(LocalDate.now().get(ChronoField.YEAR)))
             .build();
     deletedDocumentationIdsRepository.save(deletedDocumentationUnitDTO);
+
     when(documentNumberPatternConfig.getDocumentNumberPatterns())
         .thenReturn(Map.of("DS", "ZZREYYYY*****"));
     when(databaseDocumentNumberRepository.findById("DS"))

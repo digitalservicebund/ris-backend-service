@@ -15,6 +15,3 @@ delete from
 
 delete from
   incremental_migration.region;
-
-delete from
-    incremental_migration.status;

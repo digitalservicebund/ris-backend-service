@@ -30,7 +30,7 @@ test.describe(
         },
       },
       async ({ page, documentNumber }) => {
-        await test.step("References is a new selectable menu item in a documentation unit ", async () => {
+        await test.step("References is a new selectable menu item in a documentation unit", async () => {
           await navigateToReferences(page, documentNumber)
         })
 
