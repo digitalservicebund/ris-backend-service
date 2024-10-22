@@ -348,7 +348,7 @@ public class DocumentationUnitService {
   private boolean isCreatorOfPending(
       DocumentationUnit item, DocumentationOffice documentationOffice) {
     return item.status().publicationStatus().equals(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
-        && hasSameDocumentationOffice(item, documentationOffice);
+        && hasSameDocumentationOffice(item,documentationOffice);
   }
 
   private boolean hasSameDocumentationOffice(
