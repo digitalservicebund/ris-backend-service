@@ -90,7 +90,7 @@ public class DocumentationUnitTransformer {
       addFileNumbers(builder, coreData);
       addDeviationCourts(builder, coreData);
       addDeviatingDecisionDates(builder, coreData);
-      addDeviatingFileNumbers(currentDto, builder, coreData);
+      addDeviatingFileNumbers(builder, coreData);
       addDeviatingEclis(builder, coreData);
       addLegalEffect(currentDto, updatedDomainObject, builder);
       addLeadingDecisionNormReferences(updatedDomainObject, builder);
@@ -440,7 +440,7 @@ public class DocumentationUnitTransformer {
   }
 
   private static void addDeviatingFileNumbers(
-      DocumentationUnitDTO currentDto, DocumentationUnitDTOBuilder builder, CoreData coreData) {
+      DocumentationUnitDTOBuilder builder, CoreData coreData) {
     if (coreData.deviatingFileNumbers() == null) {
       return;
     }

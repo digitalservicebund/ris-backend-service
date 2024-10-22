@@ -44,7 +44,6 @@ import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -297,14 +296,6 @@ class DocumentationUnitControllerAuthIntegrationTest {
             response ->
                 assertThat(response.getResponseBody().uuid())
                     .isEqualTo(documentationUnitDTO.getId()));
-  }
-
-  private PublicationStatus getResultStatus(List<PublicationStatus> publicationStatus) {
-    if (publicationStatus.isEmpty()) {
-      return null;
-    }
-
-    return publicationStatus.get(publicationStatus.size() - 1);
   }
 
   private DocumentationUnitDTO.DocumentationUnitDTOBuilder createNewDocumentationUnitDTO(

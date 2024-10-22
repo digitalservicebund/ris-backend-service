@@ -118,7 +118,7 @@ class DeviatingObjectIntegrationTest {
             argThat(
                 (OidcUser user) -> {
                   List<String> groups = user.getAttribute("groups");
-                  return Objects.requireNonNull(groups).get(0).equals("/DS");
+                  return Objects.requireNonNull(groups).getFirst().equals("/DS");
                 }));
   }
 
@@ -553,17 +553,16 @@ class DeviatingObjectIntegrationTest {
 
   @Test
   void testReadOfDeviatingCourts() {
-    var savedDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository,
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(
-                    documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-                .deviatingCourts(
-                    List.of(
-                        DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
-                        DeviatingCourtDTO.builder().rank(2L).value("dc2").build())));
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DocumentationUnitDTO.builder()
+            .documentNumber("1234567890123")
+            .documentationOffice(
+                documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
+            .deviatingCourts(
+                List.of(
+                    DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
+                    DeviatingCourtDTO.builder().rank(2L).value("dc2").build())));
 
     risWebTestClient
         .withDefaultLogin()
@@ -791,20 +790,17 @@ class DeviatingObjectIntegrationTest {
 
   @Test
   void testReadOfDeviatingDates() {
-    var savedDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository,
-            DocumentationUnitDTO.builder()
-                .documentNumber("1234567890123")
-                .documentationOffice(
-                    documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-                .deviatingDates(
-                    List.of(
-                        DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
-                        DeviatingDateDTO.builder()
-                            .rank(2L)
-                            .value(LocalDate.of(2010, 9, 10))
-                            .build())));
+
+    EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DocumentationUnitDTO.builder()
+            .documentNumber("1234567890123")
+            .documentationOffice(
+                documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
+            .deviatingDates(
+                List.of(
+                    DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
+                    DeviatingDateDTO.builder().rank(2L).value(LocalDate.of(2010, 9, 10)).build())));
 
     risWebTestClient
         .withDefaultLogin()
