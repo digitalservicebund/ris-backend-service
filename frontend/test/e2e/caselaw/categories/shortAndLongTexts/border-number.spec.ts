@@ -328,8 +328,7 @@ test.describe(
       })
 
       await test.step("Add border number via shortcut", async () => {
-        // pressing alt and + produces the keycode ~ on Windows
-        await page.keyboard.press(`ControlOrMeta+Alt+~`)
+        await page.keyboard.press(`ControlOrMeta+Alt+.`)
         await expect(editor.getByText(`1${firstParagraph}`)).toBeVisible()
       })
 

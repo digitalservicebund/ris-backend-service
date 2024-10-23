@@ -102,13 +102,7 @@ const editor = new Editor({
           Backspace: ({ editor }) =>
             handleBackspace(editor, featureToggle.value),
           Delete: ({ editor }) => handleDelete(editor, featureToggle.value),
-          // ~ is the keycode for Alt++ on Windows
-          "Mod-Alt-~": ({ editor }) => editor.commands.addBorderNumbers(),
-          // ± is the keycode for Alt++ on Macbook
-          "Meta-Shift-±": ({ editor }) => {
-            console.log("short")
-            return editor.commands.addBorderNumbers()
-          },
+          "Mod-Alt-.": ({ editor }) => editor.commands.addBorderNumbers(),
           "Mod-Alt--": ({ editor }) => editor.commands.removeBorderNumbers(),
           "Mod-Alt-#": ({ editor }) =>
             commands.toggleActiveState()(editor.state, editor.view.dispatch),
