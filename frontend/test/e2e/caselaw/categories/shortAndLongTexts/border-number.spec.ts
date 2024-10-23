@@ -300,6 +300,48 @@ test.describe(
 )
 
 test.describe(
+  "Add/remove border numbers with shortcuts (Randnummern)",
+  {
+    annotation: [
+      {
+        type: "story",
+        description:
+          "https://digitalservicebund.atlassian.net/browse/RISDEV-5137",
+      },
+    ],
+    tag: ["@RISDEV-5137"],
+  },
+  () => {
+    test("add remove border numbers (Randnummern) via shortcuts", async ({
+      page,
+      documentNumber,
+    }) => {
+      await navigateToCategories(page, documentNumber)
+
+      await clickCategoryButton("Tatbestand", page)
+      const editor = page.locator("[data-testid='Tatbestand']")
+
+      await test.step("Add one paragraphs into Tatbestand", async () => {
+        await page.keyboard.insertText(firstParagraph)
+        await expect(editor.getByText(firstParagraph)).toBeVisible()
+        await editor.getByText(firstParagraph).click()
+      })
+
+      await test.step("Add border number via shortcut", async () => {
+        // pressing alt and + produces the keycode ~ on Windows
+        await page.keyboard.press(`ControlOrMeta+Alt+~`)
+        await expect(editor.getByText(`1${firstParagraph}`)).toBeVisible()
+      })
+
+      await test.step("Remove border number via shortcut", async () => {
+        await page.keyboard.press(`ControlOrMeta+Alt+-`)
+        await expect(editor.getByText(`1${firstParagraph}`)).toBeHidden()
+      })
+    })
+  },
+)
+
+test.describe(
   "Fuse border numbers (Randnummern)",
   {
     annotation: [
