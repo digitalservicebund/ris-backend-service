@@ -179,7 +179,7 @@ describe("Create new documentation unit from search", () => {
           title: "Arbeit & Gesundheit",
         },
       },
-    }
+    } as DocumentationUnitParameters
 
     renderComponent({ parameters, isValid: true })
 
