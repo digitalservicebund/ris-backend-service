@@ -31,7 +31,7 @@ import { CustomBulletList } from "@/editor/bulletList"
 import addBorderNumbers from "@/editor/commands/addBorderNumbers"
 import { handleSelection } from "@/editor/commands/handleSelection"
 import removeBorderNumbers from "@/editor/commands/removeBorderNumbers"
-import { EventHandler } from "@/editor/EventHandler"
+import { createEventHandler } from "@/editor/EventHandler"
 import { FontSize } from "@/editor/fontSize"
 import { CustomImage } from "@/editor/image"
 import { Indent } from "@/editor/indent"
@@ -118,7 +118,8 @@ const editor = new Editor({
     BorderNumberLink,
     Bold,
     Color,
-    EventHandler,
+    // TODO: After removing the featureToggle parameter, this should be exported directly as a constant
+    createEventHandler(featureToggle),
     FontSize,
     Italic,
     CustomListItem,
