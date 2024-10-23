@@ -395,23 +395,51 @@ test.describe(
         await expect(editor.getByText(`1${firstParagraph}`)).toBeVisible()
         await expect(editor.getByText(`4${secondParagraph}`)).toBeVisible()
       })
+    })
 
-      await test.step("Remove last border number and add an empty paragraph", async () => {
-        await editor.getByText(`4${secondParagraph}`).click()
-        // Move caret to end of input
-        await page.keyboard.press(`ControlOrMeta+End`)
-        await page.keyboard.press(`Enter`)
-        // Remove existing border number for empty paragraph
-        await page.keyboard.press(`ControlOrMeta+Alt+-`)
+    test("Paste a border number to an empty paragraph", async ({
+      page,
+      documentNumber,
+    }) => {
+      await navigateToCategories(page, documentNumber)
+
+      await clickCategoryButton("Entscheidungsgründe", page)
+      const editor = page.locator("[data-testid='Entscheidungsgründe']")
+
+      await test.step("Add two paragraphs into Entscheidungsgründe", async () => {
+        await page.keyboard.insertText(firstParagraph)
+        await page.keyboard.press("Enter")
+        await page.keyboard.insertText(secondParagraph)
+        await page.keyboard.press("Enter")
+        await expect(editor.getByText(firstParagraph)).toBeVisible()
+        await expect(editor.getByText(secondParagraph)).toBeVisible()
       })
 
-      await test.step("Paste paragraphs into empty paragraph at the end", async () => {
+      await test.step("Add border numbers to the paragraphs", async () => {
+        await page.keyboard.press(`ControlOrMeta+A`)
+        await page.keyboard.press(`ControlOrMeta+Alt+.`)
+      })
+
+      await test.step("Copy paragraphs with border numbers", async () => {
+        await page.keyboard.press(`ControlOrMeta+A`)
+        await page.keyboard.press(`ControlOrMeta+C`)
+      })
+
+      await test.step("Paste paragraphs into empty paragraph", async () => {
+        // Move caret to end of input
+        await editor.getByText(`2${secondParagraph}`).click()
+        await page.keyboard.press(`ControlOrMeta+End`)
         await page.keyboard.press(`ControlOrMeta+V`)
       })
 
-      await test.step("Check border numbers were inserted at the end and recalculated", async () => {
-        await expect(editor.getByText(`4${firstParagraph}`)).toBeVisible()
-        await expect(editor.getByText(`5${secondParagraph}`)).toBeVisible()
+      await test.step("Check border numbers were inserted after the first paragraph", async () => {
+        // We check the newly inserted paragraphs first, so that we don't run into strict mode violation.
+        // Before recalculation, we have two firstParagraph elements with border number 1
+        await expect(editor.getByText(`3${firstParagraph}`)).toBeVisible()
+        await expect(editor.getByText(`4${secondParagraph}`)).toBeVisible()
+
+        await expect(editor.getByText(`1${firstParagraph}`)).toBeVisible()
+        await expect(editor.getByText(`2${secondParagraph}`)).toBeVisible()
       })
     })
   },
@@ -501,6 +529,7 @@ async function clickAddBorderNumberButton(page: Page) {
 async function reinsertAllBorderNumbers(page: Page) {
   await test.step("Reinsert all border numbers", async () => {
     await page.keyboard.press(`ControlOrMeta+A`)
+    await page.keyboard.press(`Delete`)
     await page.keyboard.press(`ControlOrMeta+V`)
   })
 }
