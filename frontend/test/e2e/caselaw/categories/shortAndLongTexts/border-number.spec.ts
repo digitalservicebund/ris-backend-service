@@ -321,7 +321,7 @@ test.describe(
       await clickCategoryButton("Tatbestand", page)
       const editor = page.locator("[data-testid='Tatbestand']")
 
-      await test.step("Add one paragraphs into Tatbestand", async () => {
+      await test.step("Add one paragraph into Tatbestand", async () => {
         await page.keyboard.insertText(firstParagraph)
         await expect(editor.getByText(firstParagraph)).toBeVisible()
         await editor.getByText(firstParagraph).click()
@@ -335,6 +335,80 @@ test.describe(
       await test.step("Remove border number via shortcut", async () => {
         await page.keyboard.press(`ControlOrMeta+Alt+-`)
         await expect(editor.getByText(`1${firstParagraph}`)).toBeHidden()
+      })
+    })
+  },
+)
+
+test.describe(
+  "Copy/paste border-numbers on top-level only (Randnummern)",
+  {
+    annotation: [
+      {
+        type: "story",
+        description:
+          "https://digitalservicebund.atlassian.net/browse/RISDEV-5136",
+      },
+    ],
+    tag: ["@RISDEV-5136"],
+  },
+  () => {
+    test("Paste a border number within another border number", async ({
+      page,
+      documentNumber,
+    }) => {
+      await navigateToCategories(page, documentNumber)
+
+      await clickCategoryButton("Entscheidungsgründe", page)
+      const editor = page.locator("[data-testid='Entscheidungsgründe']")
+
+      await test.step("Add two paragraphs into Entscheidungsgründe", async () => {
+        await page.keyboard.insertText(firstParagraph)
+        await page.keyboard.press("Enter")
+        await page.keyboard.insertText(secondParagraph)
+        await expect(editor.getByText(firstParagraph)).toBeVisible()
+        await expect(editor.getByText(secondParagraph)).toBeVisible()
+      })
+
+      await test.step("Add border numbers to the paragraphs", async () => {
+        await page.keyboard.press(`ControlOrMeta+A`)
+        await page.keyboard.press(`ControlOrMeta+Alt+.`)
+      })
+
+      await test.step("Copy paragraphs with border numbers", async () => {
+        await page.keyboard.press(`ControlOrMeta+A`)
+        await page.keyboard.press(`ControlOrMeta+C`)
+      })
+
+      await test.step("Paste paragraphs into middle of first border number content", async () => {
+        const middleOfFirstParagraph = firstParagraph.slice(4)
+        await editor.getByText(middleOfFirstParagraph).click()
+        await page.keyboard.press(`ControlOrMeta+V`)
+      })
+
+      await test.step("Check border numbers were inserted after the first paragraph", async () => {
+        await expect(editor.getByText(`1${firstParagraph}`)).toBeVisible()
+        await expect(editor.getByText(`2${firstParagraph}`)).toBeVisible()
+        await expect(editor.getByText(`3${secondParagraph}`)).toBeVisible()
+        await expect(editor.getByText(`4${secondParagraph}`)).toBeVisible()
+      })
+
+      await test.step("Remove last border number and add an empty paragraph", async () => {
+        await editor.getByText(`4${secondParagraph}`).click()
+        // Move caret to end of input
+        await page.keyboard.press(`ControlOrMeta+End`)
+        await page.keyboard.press(`Enter`)
+        // Remove existing border number for empty paragraph
+        await page.keyboard.press(`ControlOrMeta+Alt+-`)
+      })
+
+      await test.step("Paste paragraphs into empty paragraph at the end", async () => {
+        await page.keyboard.press(`ControlOrMeta+V`)
+      })
+
+      await test.step("Check border numbers were inserted at the end and recalculated", async () => {
+        await expect(editor.getByText(`4${firstParagraph}`)).toBeVisible()
+        await expect(editor.getByText(`5${secondParagraph}`)).toBeVisible()
       })
     })
   },
