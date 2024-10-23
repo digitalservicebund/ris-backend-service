@@ -157,4 +157,35 @@ describe("Create new documentation unit from search", () => {
 
     expect(window.open).toHaveBeenCalled()
   })
+
+  it("create documentation unit with reference", async () => {
+    vi.spyOn(documentUnitService, "createNew").mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: new DocumentUnit("foo", {
+          documentNumber: "1234567891234",
+        }),
+      }),
+    )
+
+    const parameters = {
+      court: { label: "Test", responsibleDocOffice: docOffice },
+      reference: {
+        id: "f68eef21-a85c-4b90-8b2c-6ff5c16145d7",
+        citation: "11111",
+        referenceSupplement: "L",
+        legalPeriodical: {
+          uuid: "bad0cb85-3700-40fa-a112-b489aec9c124",
+          title: "Arbeit & Gesundheit",
+        },
+      },
+    }
+
+    renderComponent({ parameters, isValid: true })
+
+    const button = screen.getByLabelText("Dokumentationseinheit erstellen")
+    await fireEvent.click(button)
+
+    expect(documentUnitService.createNew).toHaveBeenCalledWith(parameters)
+  })
 })

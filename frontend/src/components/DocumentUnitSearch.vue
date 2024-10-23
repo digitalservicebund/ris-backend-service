@@ -126,7 +126,7 @@ async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
  */
 async function updatePage(page: number) {
   pageNumber.value = page
-  search()
+  await search()
 }
 
 /**
@@ -138,7 +138,7 @@ async function updatePage(page: number) {
 async function updateQuery(value: Query<DocumentUnitSearchParameter>) {
   searchQuery.value = value
   pageNumber.value = 0
-  search()
+  await search()
 }
 
 /**

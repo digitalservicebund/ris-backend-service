@@ -115,6 +115,7 @@ export type DocumentationUnitParameters = {
   decisionDate?: string
   fileNumber?: string
   court?: Court
+  reference?: Reference
 }
 
 export default class DocumentUnit {

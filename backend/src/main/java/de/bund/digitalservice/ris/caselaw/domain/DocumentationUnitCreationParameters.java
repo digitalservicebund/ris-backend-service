@@ -12,4 +12,5 @@ public record DocumentationUnitCreationParameters(
     Court court,
     DocumentType documentType,
     @PastOrPresent LocalDate decisionDate,
-    String fileNumber) {}
+    String fileNumber,
+    Reference reference) {}
