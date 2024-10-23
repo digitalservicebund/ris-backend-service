@@ -31,6 +31,12 @@ test.describe(
       })
       await page.getByRole("button", { name: "Mitwirkende Richter" }).click()
 
+      await test.step("Übernehmen is disabled if name is empty", async () => {
+        await expect(
+          page.getByLabel("Mitwirkenden Richter speichern"),
+        ).toBeDisabled()
+      })
+
       await test.step("enter participating judge name", async () => {
         await page
           .getByTestId("participating-judge-name-input")
