@@ -1,6 +1,7 @@
 <script lang="ts" setup>
+import { useScrollLock } from "@vueuse/core"
 import { storeToRefs } from "pinia"
-import { computed, Ref, ref } from "vue"
+import { computed, Ref, ref, watch } from "vue"
 import AttachmentList from "@/components/AttachmentList.vue"
 import FileUpload from "@/components/FileUpload.vue"
 import FlexItem from "@/components/FlexItem.vue"
@@ -107,24 +108,19 @@ async function upload(files: FileList) {
   }
 }
 
+const scrollLock = useScrollLock(document)
+watch(showDeleteModal, () => (scrollLock.value = showDeleteModal.value))
+
 function openDeleteModal() {
   const attachmentToBeDeleted =
     documentUnit.value!.attachments?.[deletingAttachmentIndex.value]?.name
   if (attachmentToBeDeleted != null) {
     showDeleteModal.value = true
-    const scrollLeft = document.documentElement.scrollLeft
-    const scrollTop = document.documentElement.scrollTop
-    window.onscroll = () => {
-      window.scrollTo(scrollLeft, scrollTop)
-    }
   }
 }
 
 function closeDeleteModal() {
   showDeleteModal.value = false
-  window.onscroll = () => {
-    return
-  }
 }
 
 const hasAttachments = computed<boolean>(() => {
