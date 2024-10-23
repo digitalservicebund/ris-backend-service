@@ -387,9 +387,12 @@ test.describe(
       })
 
       await test.step("Check border numbers were inserted after the first paragraph", async () => {
-        await expect(editor.getByText(`1${firstParagraph}`)).toBeVisible()
+        // We check the newly inserted paragraphs first, so that we don't run into strict mode violation.
+        // Before recalculation, we have two firstParagraph elements with border number 1
         await expect(editor.getByText(`2${firstParagraph}`)).toBeVisible()
         await expect(editor.getByText(`3${secondParagraph}`)).toBeVisible()
+
+        await expect(editor.getByText(`1${firstParagraph}`)).toBeVisible()
         await expect(editor.getByText(`4${secondParagraph}`)).toBeVisible()
       })
 
