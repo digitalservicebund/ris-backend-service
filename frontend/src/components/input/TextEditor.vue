@@ -103,6 +103,13 @@ const editor = new Editor({
           Backspace: ({ editor }) =>
             handleBackspace(editor, featureToggle.value),
           Delete: ({ editor }) => handleDelete(editor, featureToggle.value),
+          "Mod-Alt-.": ({ editor }) => editor.commands.addBorderNumbers(),
+          "Mod-Alt--": ({ editor }) => editor.commands.removeBorderNumbers(),
+          "Mod-Alt-#": ({ editor }) =>
+            commands.toggleActiveState()(editor.state, editor.view.dispatch),
+          // ‘ is the keycode for Alt+# on Macbook
+          "Mod-Alt-‘": ({ editor }) =>
+            commands.toggleActiveState()(editor.state, editor.view.dispatch),
         }
       },
     }),

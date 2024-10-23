@@ -68,6 +68,7 @@ const buttons = computed(() => {
       type: "invisible-characters",
       icon: IconParagraph,
       ariaLabel: "Nicht-druckbare Zeichen",
+      shortcut: "Strg + Alt + #",
       group: "display",
       isCollapsable: false,
       callback: () =>
@@ -210,6 +211,7 @@ const buttons = computed(() => {
       type: "addBorderNumbers",
       icon: IcSharpAddBox,
       ariaLabel: "Randnummern neu erstellen",
+      shortcut: "Strg + Alt + .",
       group: "borderNumber",
       isCollapsable: false,
       callback: () => props.editor.chain().focus().addBorderNumbers().run(),
@@ -219,6 +221,7 @@ const buttons = computed(() => {
     type: "removeBorderNumbers",
     icon: MaterialSymbolsDeleteSweepOutline,
     ariaLabel: "Randnummern entfernen",
+    shortcut: "Strg + Alt + -",
     group: "borderNumber",
     isCollapsable: false,
     callback: () => props.editor.chain().focus().removeBorderNumbers().run(),
