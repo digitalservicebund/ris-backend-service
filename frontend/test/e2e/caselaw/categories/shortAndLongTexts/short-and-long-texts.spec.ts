@@ -349,6 +349,11 @@ test.describe("short and long texts", () => {
         {
           type: "story",
           description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-4576",
+        },
+        {
+          type: "story",
+          description:
             "https://digitalservicebund.atlassian.net/browse/RISDEV-4572",
         },
         {
@@ -357,7 +362,7 @@ test.describe("short and long texts", () => {
             "https://digitalservicebund.atlassian.net/browse/RISDEV-4573",
         },
       ],
-      tag: ["@RISDEV-4570", "@RISDEV-4572", "@RISDEV-4573"],
+      tag: ["@RISDEV-4570", "@RISDEV-4572", "@RISDEV-4573", "@RISDEV-4576"],
     },
     async ({ page, prefilledDocumentUnit }) => {
       const testCases: {
