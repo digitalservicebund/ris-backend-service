@@ -176,7 +176,6 @@ function addReference(decision: RelatedDocumentation) {
   }
 }
 
-// TODO delete once the reference in creation parameters is processed
 function addReferenceWithCreatedDocunit(docUnit: DocumentUnit) {
   if (!docUnit) return
   addReference(
