@@ -8,17 +8,14 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParame
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
-import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
@@ -62,7 +59,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class DocumentationUnitController {
   private final DocumentationUnitService service;
-  private DocumentationUnitStatusService statusService;
   private final UserService userService;
   private final AttachmentService attachmentService;
   private final ConverterService converterService;
@@ -74,7 +70,6 @@ public class DocumentationUnitController {
   public DocumentationUnitController(
       DocumentationUnitService service,
       UserService userService,
-      DocumentationUnitStatusService statusService,
       AttachmentService attachmentService,
       ConverterService converterService,
       HandoverService handoverService,
@@ -83,7 +78,6 @@ public class DocumentationUnitController {
           documentationUnitDocxMetadataInitializationService) {
     this.service = service;
     this.userService = userService;
-    this.statusService = statusService;
     this.attachmentService = attachmentService;
     this.converterService = converterService;
     this.handoverService = handoverService;
@@ -120,22 +114,9 @@ public class DocumentationUnitController {
   public ResponseEntity<DocumentationUnit> takeOverDocumentationUnit(
       @AuthenticationPrincipal OidcUser oidcUser, @PathVariable UUID uuid) {
     try {
+      var updatedDocumentationUnit = service.takeOverDocumentationUnit(uuid, oidcUser);
 
-      var documentationUnit = service.getByUuid(uuid);
-      statusService.update(
-          documentationUnit.documentNumber(),
-          Status.builder()
-              .publicationStatus(PublicationStatus.UNPUBLISHED)
-              .withError(false)
-              .build());
-      // better way to no not fetch 2 times?
-      documentationUnit = service.getByUuid(uuid);
-      // why do we need to explicitly set isEditable and isDeletable here?
-      return ResponseEntity.ok(
-          documentationUnit.toBuilder()
-              .isEditable(authService.userHasWriteAccess(oidcUser, documentationUnit))
-              .isDeletable(authService.userHasWriteAccess(oidcUser, documentationUnit))
-              .build());
+      return ResponseEntity.ok(updatedDocumentationUnit);
     } catch (Exception e) {
       throw new StatusImporterException("Could not update publicationStatus", e);
     }

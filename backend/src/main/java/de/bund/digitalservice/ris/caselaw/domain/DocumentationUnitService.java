@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import static de.bund.digitalservice.ris.caselaw.domain.StringUtils.normalizeSpace;
 
 import com.gravity9.jsonpatch.JsonPatch;
+import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -17,6 +18,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -30,17 +32,22 @@ public class DocumentationUnitService {
 
   private final DocumentationUnitRepository repository;
   private final DocumentNumberService documentNumberService;
+
+  private final DocumentationUnitStatusService statusService;
   private final AttachmentService attachmentService;
   private final DocumentNumberRecyclingService documentNumberRecyclingService;
   private final PatchMapperService patchMapperService;
+  private final AuthService authService;
   private final Validator validator;
 
   public DocumentationUnitService(
       DocumentationUnitRepository repository,
       DocumentNumberService documentNumberService,
+      DocumentationUnitStatusService statusService,
       DocumentNumberRecyclingService documentNumberRecyclingService,
       Validator validator,
       AttachmentService attachmentService,
+      @Lazy AuthService authService,
       PatchMapperService patchMapperService) {
 
     this.repository = repository;
@@ -49,6 +56,8 @@ public class DocumentationUnitService {
     this.validator = validator;
     this.attachmentService = attachmentService;
     this.patchMapperService = patchMapperService;
+    this.statusService = statusService;
+    this.authService = authService;
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -111,6 +120,24 @@ public class DocumentationUnitService {
 
     return repository.searchByDocumentationUnitSearchInput(
         PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()), oidcUser, searchInput);
+  }
+
+  public DocumentationUnit takeOverDocumentationUnit(UUID uuid, OidcUser oidcUser)
+      throws DocumentationUnitNotExistsException {
+    DocumentationUnit documentationUnit = repository.findByUuid(uuid);
+
+    DocumentationUnit updatedDocumentationUnit =
+        statusService.update(
+            documentationUnit.documentNumber(),
+            Status.builder()
+                .publicationStatus(PublicationStatus.UNPUBLISHED)
+                .withError(false)
+                .build());
+
+    return updatedDocumentationUnit.toBuilder()
+        .isEditable(authService.userHasWriteAccess(oidcUser, documentationUnit))
+        .isDeletable(authService.userHasWriteAccess(oidcUser, documentationUnit))
+        .build();
   }
 
   public DocumentationUnit getByDocumentNumber(String documentNumber)
