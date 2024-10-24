@@ -14,9 +14,7 @@ import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
-import DocumentUnit, {
-  DocumentationUnitParameters,
-} from "@/domain/documentUnit"
+import { DocumentationUnitParameters } from "@/domain/documentUnit"
 import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -176,7 +174,6 @@ function addReference(decision: RelatedDocumentation) {
   }
 }
 
-// TODO delete once the reference in creation parameters is processed
 function addReferenceWithCreatedDocunit(docUnit: DocumentUnit) {
   if (!docUnit) return
   addReference(

@@ -1,21 +1,19 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.CourtTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitListItemTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalEffectTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ReferenceTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.StatusTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParameters;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
-import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
@@ -104,54 +102,38 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
   public DocumentationUnit createNewDocumentationUnit(
-      String documentNumber,
       DocumentationOffice userDocOffice,
-      DocumentationUnitCreationParameters parameters) {
-    var documentationOfficeDTO =
-        documentationOfficeRepository.findByAbbreviation(
-            parameters.documentationOffice().abbreviation());
+      DocumentationUnit docUnit,
+      Status status,
+      Reference source) {
 
     var documentationUnitDTO =
         repository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber(documentNumber)
-                .documentationOffice(documentationOfficeDTO)
-                .legalEffect(
-                    LegalEffectTransformer.transformToDTO(
-                        LegalEffect.deriveFrom(parameters.court(), true)
-                            .orElse(LegalEffect.NOT_SPECIFIED)))
-                .version(0L)
-                .fileNumbers(
-                    parameters.fileNumber() == null
-                        ? new ArrayList<>()
-                        : new ArrayList<>(
-                            List.of(
-                                FileNumberDTO.builder()
-                                    .value(parameters.fileNumber())
-                                    .rank(1L)
-                                    .build())))
-                .documentType(DocumentTypeTransformer.transformToDTO(parameters.documentType()))
-                .decisionDate(parameters.decisionDate())
-                .court(CourtTransformer.transformToDTO(parameters.court()))
-                .creatingDocumentationOffice(
-                    userDocOffice.uuid().equals(parameters.documentationOffice().uuid())
-                        ? null
-                        : DocumentationOfficeTransformer.transformToDTO(userDocOffice))
-                .build());
+            DocumentationUnitTransformer.transformToDTO(
+                DocumentationUnitDTO.builder().build(), docUnit));
 
+    // saving a second time is necessary because status and reference need a reference to a
+    // persisted documentation unit
     DocumentationUnitDTO savedDocUnit =
         repository.save(
             documentationUnitDTO.toBuilder()
                 .status(
-                    StatusDTO.builder()
-                        .createdAt(Instant.now())
+                    StatusTransformer.transformToDTO(status).toBuilder()
                         .documentationUnit(documentationUnitDTO)
-                        .publicationStatus(
-                            userDocOffice.uuid().equals(parameters.documentationOffice().uuid())
-                                ? PublicationStatus.UNPUBLISHED
-                                : PublicationStatus.EXTERNAL_HANDOVER_PENDING)
-                        .withError(false)
+                        .createdAt(Instant.now())
                         .build())
+                .source(
+                    new ArrayList<>(
+                        List.of(
+                            SourceDTO.builder()
+                                .rank(1)
+                                .value(source.legalPeriodical().abbreviation())
+                                .reference(
+                                    ReferenceTransformer.transformToDTO(source).toBuilder()
+                                        .rank(1)
+                                        .documentationUnit(documentationUnitDTO)
+                                        .build())
+                                .build())))
                 .build());
 
     return DocumentationUnitTransformer.transformToDomain(savedDocUnit);
