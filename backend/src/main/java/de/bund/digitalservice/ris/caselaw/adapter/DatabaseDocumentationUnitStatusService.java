@@ -3,6 +3,8 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
@@ -29,11 +31,12 @@ public class DatabaseDocumentationUnitStatusService implements DocumentationUnit
    *
    * @param documentNumber the document number of the documentation unit
    * @param status the new status
+   * @return the updated documentation unit
    * @throws DocumentationUnitNotExistsException if the documentation unit does not exist
    */
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public void update(String documentNumber, Status status)
+  public DocumentationUnit update(String documentNumber, Status status)
       throws DocumentationUnitNotExistsException {
 
     DocumentationUnitDTO docUnit =
@@ -48,7 +51,8 @@ public class DatabaseDocumentationUnitStatusService implements DocumentationUnit
             .documentationUnit(docUnit)
             .build());
 
-    databaseDocumentationUnitRepository.save(docUnit);
+    return DocumentationUnitTransformer.transformToDomain(
+        databaseDocumentationUnitRepository.save(docUnit));
   }
 
   /**
