@@ -68,6 +68,12 @@ public class DocumentationUnitTransformer {
 
     DocumentationUnitDTO.DocumentationUnitDTOBuilder builder =
         currentDto.toBuilder()
+            .documentationOffice(
+                DocumentationOfficeTransformer.transformToDTO(
+                    updatedDomainObject.coreData().documentationOffice()))
+            .creatingDocumentationOffice(
+                DocumentationOfficeTransformer.transformToDTO(
+                    updatedDomainObject.coreData().creatingDocOffice()))
             .id(updatedDomainObject.uuid())
             .documentNumber(updatedDomainObject.documentNumber())
             .note(updatedDomainObject.note())
