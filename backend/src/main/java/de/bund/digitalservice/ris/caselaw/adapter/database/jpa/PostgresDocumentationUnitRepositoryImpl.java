@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitListItemTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ReferenceTransformer;
@@ -110,7 +111,15 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     var documentationUnitDTO =
         repository.save(
             DocumentationUnitTransformer.transformToDTO(
-                DocumentationUnitDTO.builder().build(), docUnit));
+                DocumentationUnitDTO.builder()
+                    .documentationOffice(
+                        DocumentationOfficeTransformer.transformToDTO(
+                            docUnit.coreData().documentationOffice()))
+                    .creatingDocumentationOffice(
+                        DocumentationOfficeTransformer.transformToDTO(
+                            docUnit.coreData().creatingDocOffice()))
+                    .build(),
+                docUnit));
 
     // saving a second time is necessary because status and reference need a reference to a
     // persisted documentation unit
@@ -123,17 +132,19 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                         .createdAt(Instant.now())
                         .build())
                 .source(
-                    new ArrayList<>(
-                        List.of(
-                            SourceDTO.builder()
-                                .rank(1)
-                                .value(source.legalPeriodical().abbreviation())
-                                .reference(
-                                    ReferenceTransformer.transformToDTO(source).toBuilder()
-                                        .rank(1)
-                                        .documentationUnit(documentationUnitDTO)
-                                        .build())
-                                .build())))
+                    source == null
+                        ? new ArrayList<>()
+                        : new ArrayList<>(
+                            List.of(
+                                SourceDTO.builder()
+                                    .rank(1)
+                                    .value(source.legalPeriodical().abbreviation())
+                                    .reference(
+                                        ReferenceTransformer.transformToDTO(source).toBuilder()
+                                            .rank(1)
+                                            .documentationUnit(documentationUnitDTO)
+                                            .build())
+                                    .build())))
                 .build());
 
     return DocumentationUnitTransformer.transformToDomain(savedDocUnit);
