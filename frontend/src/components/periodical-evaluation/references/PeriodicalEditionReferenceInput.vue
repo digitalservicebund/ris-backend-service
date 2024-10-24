@@ -14,7 +14,9 @@ import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
-import { DocumentationUnitParameters } from "@/domain/documentUnit"
+import DocumentUnit, {
+  DocumentationUnitParameters,
+} from "@/domain/documentUnit"
 import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import ComboboxItemService from "@/services/comboboxItemService"
