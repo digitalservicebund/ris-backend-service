@@ -16,7 +16,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitSearchRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalForceTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseNormAbbreviationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseNormReferenceRepository;
@@ -126,9 +125,6 @@ class LegalForceIntegrationTest {
   @MockBean private PatchMapperService patchMapperService;
 
   private final DocumentationOffice docOffice = buildDSDocOffice();
-
-  @Autowired
-  private DatabaseDocumentationUnitSearchRepository databaseDocumentationUnitSearchRepository;
 
   @BeforeEach
   void setUp() {
