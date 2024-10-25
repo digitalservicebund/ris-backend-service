@@ -100,7 +100,12 @@ public class DocumentationUnitService {
             .build();
 
     return repository.createNewDocumentationUnit(
-        userDocOffice, docUnit, status, params.reference());
+        docUnit,
+        status,
+        params.reference(),
+        params.reference() != null && params.reference().legalPeriodical() != null
+            ? params.reference().legalPeriodical().abbreviation()
+            : null);
   }
 
   private String generateDocumentNumber(DocumentationOffice documentationOffice) {
