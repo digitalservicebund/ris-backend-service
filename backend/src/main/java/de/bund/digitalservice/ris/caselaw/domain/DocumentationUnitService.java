@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import static de.bund.digitalservice.ris.caselaw.domain.StringUtils.normalizeSpace;
 
 import com.gravity9.jsonpatch.JsonPatch;
-import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -152,9 +151,8 @@ public class DocumentationUnitService {
         repository.findByDocumentNumber(listItem.documentNumber());
 
     boolean hasWriteAccess = authService.userHasWriteAccess(oidcUser, documentationUnit);
-    boolean isInternalUser = authService.userIsInternal().apply(oidcUser);
-    boolean isAssignedProcedure =
-        authService.isAssignedViaProcedure().apply(documentationUnit.uuid());
+    boolean isInternalUser = authService.userIsInternal(oidcUser);
+    boolean isAssignedProcedure = authService.isAssignedViaProcedure(documentationUnit.uuid());
 
     return listItem.toBuilder()
         .isDeletable(hasWriteAccess && isInternalUser)
