@@ -147,10 +147,11 @@ async function handleDeleteDocumentationUnit(
     if (owningProcedure) {
       owningProcedure.documentationUnitCount -= 1
 
-      owningProcedure.documentUnits = updatedProcedure.documentUnits?.filter(
-        (documentationUnit) =>
-          documentationUnit.uuid != deletedDocumentationUnit.uuid,
-      )
+      docUnitsForProcedure.value[updatedProcedure.id!] =
+        docUnitsForProcedure.value[updatedProcedure.id!].filter(
+          (documentationUnit) =>
+            documentationUnit.uuid != deletedDocumentationUnit.uuid,
+        )
     }
   }
 }
