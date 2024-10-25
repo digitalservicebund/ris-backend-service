@@ -26,6 +26,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
@@ -98,6 +99,7 @@ class LegalPeriodicalEditionIntegrationTest {
   @Autowired private DocumentationUnitService documentationUnitService;
 
   @MockBean private UserService userService;
+  @MockBean private DocumentationUnitStatusService statusService;
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private ProcedureService procedureService;
   @MockBean private HandoverService handoverService;
