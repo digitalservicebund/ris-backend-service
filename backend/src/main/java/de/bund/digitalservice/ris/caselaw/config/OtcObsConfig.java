@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.config;
 
 import de.bund.digitalservice.ris.caselaw.adapter.S3MockClient;
+import de.bund.digitalservice.ris.caselaw.adapter.S3NoOpClient;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,6 +52,12 @@ public class OtcObsConfig {
         .endpointOverride(new URI(endpoint))
         .region(Region.of("eu-de"))
         .build();
+  }
+
+  @Bean(name = "ldmlS3Client")
+  @Profile({"production", "uat"})
+  public S3Client ldmlS3NoopClient() throws URISyntaxException {
+    return new S3NoOpClient();
   }
 
   @Bean(name = "docxS3Client")
