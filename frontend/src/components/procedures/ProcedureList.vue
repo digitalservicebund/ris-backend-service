@@ -2,7 +2,7 @@
 import { debouncedWatch } from "@vueuse/core"
 import { useRouteQuery } from "@vueuse/router"
 import dayjs from "dayjs"
-import { computed, onBeforeMount, ref } from "vue"
+import { computed, onBeforeMount, ref, watch } from "vue"
 import ProcedureDetail from "./ProcedureDetail.vue"
 import { InfoStatus } from "@/components/enumInfoStatus"
 import ExpandableContent from "@/components/ExpandableContent.vue"
@@ -187,16 +187,11 @@ const getCreatedAtDisplayText = (procedure: Procedure): string => {
   return "Erstellungsdatum unbekannt"
 }
 
-/**
- * Update procedures with local query value und update url after timeout
- */
-debouncedWatch(
-  [filter, currentPage],
-  async () => {
-    await updateProcedures()
-  },
-  { deep: true, debounce: 500 },
-)
+// Wait for the user input to be finished before requesting. (debounce after last keystroke)
+debouncedWatch(filter, () => updateProcedures(), { debounce: 500 })
+
+// When the page updates, the request should happen immediately.
+watch(currentPage, () => updateProcedures())
 
 onBeforeMount(() => {
   getUserGroups()
