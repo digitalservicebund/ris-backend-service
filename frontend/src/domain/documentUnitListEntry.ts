@@ -15,6 +15,8 @@ export default class DocumentUnitListEntry {
   hasNote?: boolean
   isDeletable?: boolean
   isEditable?: boolean
+  source?: string
+  creatingDocumentationOffice?: string
 
   constructor(data: Partial<DocumentUnitListEntry> = {}) {
     Object.assign(this, data)
