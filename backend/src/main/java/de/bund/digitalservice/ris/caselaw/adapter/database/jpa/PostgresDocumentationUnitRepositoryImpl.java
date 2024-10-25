@@ -103,10 +103,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
   public DocumentationUnit createNewDocumentationUnit(
-      DocumentationOffice userDocOffice,
-      DocumentationUnit docUnit,
-      Status status,
-      Reference source) {
+      DocumentationUnit docUnit, Status status, Reference createdFromReference, String source) {
 
     var documentationUnitDTO =
         repository.save(
@@ -138,9 +135,10 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                             List.of(
                                 SourceDTO.builder()
                                     .rank(1)
-                                    .value(source.legalPeriodical().abbreviation())
+                                    .value(source)
                                     .reference(
-                                        ReferenceTransformer.transformToDTO(source).toBuilder()
+                                        ReferenceTransformer.transformToDTO(createdFromReference)
+                                            .toBuilder()
                                             .rank(1)
                                             .documentationUnit(documentationUnitDTO)
                                             .build())
