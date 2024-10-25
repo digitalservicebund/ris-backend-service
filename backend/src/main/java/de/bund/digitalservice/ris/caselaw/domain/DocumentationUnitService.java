@@ -69,6 +69,7 @@ public class DocumentationUnitService {
 
     DocumentationUnit docUnit =
         DocumentationUnit.builder()
+            .version(0L)
             .documentNumber(generateDocumentNumber(params.documentationOffice()))
             .coreData(
                 CoreData.builder()

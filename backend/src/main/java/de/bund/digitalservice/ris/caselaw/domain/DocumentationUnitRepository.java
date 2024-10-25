@@ -33,8 +33,10 @@ public interface DocumentationUnitRepository {
   /**
    * Create a new documentation unit with the given document number and documentation office
    *
-   * @param parameters the documentation unit creation parameters
-   * @param docNumber the documentation unit creation parameters
+   * @param userDocOffice the documentation office of the creating user
+   * @param documentationUnit the documentation unit to create
+   * @param status the status of the new documentation unit
+   * @param source the source of the new documentation unit
    * @return the new documentation unit
    */
   DocumentationUnit createNewDocumentationUnit(
