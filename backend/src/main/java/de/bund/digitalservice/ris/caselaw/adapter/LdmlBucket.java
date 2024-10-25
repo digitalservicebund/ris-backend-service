@@ -10,7 +10,7 @@ public class LdmlBucket extends S3Bucket {
 
   public LdmlBucket(
       @Qualifier("ldmlS3Client") S3Client s3Client,
-      @Value("${s3.ldml.bucket-name:no-bucket}") String bucketName) {
+      @Value("${s3.file-storage.case-law.bucket-name:no-bucket}") String bucketName) {
     super(s3Client, bucketName);
   }
 }

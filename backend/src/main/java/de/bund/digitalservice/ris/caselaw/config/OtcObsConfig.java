@@ -23,10 +23,10 @@ public class OtcObsConfig {
   @Value("${otc.obs.secretAccessKey:test}")
   private String docxSecretAccessKey;
 
-  @Value("${s3.ldml.access-key-id:test}")
+  @Value("${s3.file-storage.case-law.access-key-id:test}")
   private String ldmlAccessKeyId;
 
-  @Value("${s3.ldml.secret-access-key:test}")
+  @Value("${s3.file-storage.case-law.secret-access-key:test}")
   private String ldmlSecretAccessKey;
 
   @Bean(name = "docxS3Client")
