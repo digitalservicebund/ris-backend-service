@@ -76,6 +76,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
@@ -92,7 +93,9 @@ class DocxConverterServiceTest {
 
   @Autowired DocxConverterService service;
 
-  @MockBean S3Client client;
+  @MockBean
+  @Qualifier("docxS3Client")
+  S3Client client;
 
   @SpyBean DocumentBuilderFactory documentBuilderFactory;
 

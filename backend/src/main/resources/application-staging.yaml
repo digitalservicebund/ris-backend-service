@@ -1,7 +1,6 @@
 otc:
   obs:
     bucket-name: neuris-document-storage-staging
-    ldml-bucket: neuris-search-ldml-cl-storage-staging
 
 error:
   nodes:
