@@ -1,7 +1,8 @@
 import { expect, Page } from "@playwright/test"
 import {
+  assignProcedureToDocUnit,
   clickCategoryButton,
-  deleteProcedure,
+  deleteAllProcedures,
   navigateToCategories,
   navigateToProcedures,
   navigateToSearch,
@@ -67,6 +68,7 @@ test.describe(
         const procedureName = await assignProcedureToDocUnit(
           page,
           documentNumber,
+          procedurePrefix,
         )
 
         await assignUserGroupToProcedure(page, procedureName)
@@ -120,7 +122,7 @@ test.describe(
         const procedureName = await assignProcedureToDocUnit(
           page,
           documentNumber,
-          testCaseInfix,
+          procedurePrefix + testCaseInfix,
         )
         await assignUserGroupToProcedure(page, procedureName)
 
@@ -128,12 +130,12 @@ test.describe(
         await assignProcedureToDocUnit(
           page,
           prefilledDocumentUnit.documentNumber!,
-          testCaseInfix,
+          procedurePrefix + testCaseInfix,
         )
         await assignProcedureToDocUnit(
           page,
           secondPrefilledDocumentUnit.documentNumber!,
-          testCaseInfix,
+          procedurePrefix + testCaseInfix,
         )
 
         await test.step("External user sees only the single procedure they are assigned to", async () => {
@@ -170,6 +172,7 @@ test.describe(
         const procedureName = await assignProcedureToDocUnit(
           page,
           documentNumber,
+          procedurePrefix,
         )
         await assignUserGroupToProcedure(page, procedureName)
 
@@ -208,6 +211,7 @@ test.describe(
         const procedureName = await assignProcedureToDocUnit(
           page,
           documentNumber,
+          procedurePrefix,
         )
         await assignUserGroupToProcedure(page, procedureName)
 
@@ -220,7 +224,7 @@ test.describe(
         })
 
         // Assignment to previous procedure is overwritten -> user (group) is not assigned to doc unit anymore
-        await assignProcedureToDocUnit(page, documentNumber)
+        await assignProcedureToDocUnit(page, documentNumber, procedurePrefix)
 
         await test.step("External user gets error when editing Entscheidungsname of unassigned doc unit", async () => {
           await pageWithExternalUser
@@ -245,6 +249,7 @@ test.describe(
         const procedureName = await assignProcedureToDocUnit(
           page,
           prefilledDocumentUnit.documentNumber!,
+          procedurePrefix,
         )
         await assignUserGroupToProcedure(page, procedureName)
 
@@ -294,35 +299,8 @@ test.describe(
     )
 
     test.afterAll(async ({ browser }) => {
-      const page = await browser.newPage()
-      const response = await page.request.get(
-        `/api/v1/caselaw/procedure?sz=50&pg=0&q=${procedurePrefix}&withDocUnits=false`,
-      )
-      const responseBody = await response.json()
-      for (const procedure of responseBody.content) {
-        const uuid = procedure.id
-        await deleteProcedure(page, uuid)
-      }
+      await deleteAllProcedures(browser, procedurePrefix)
     })
-
-    async function assignProcedureToDocUnit(
-      page: Page,
-      documentNumber: string,
-      testCaseInfix: string = "",
-    ) {
-      let procedureName = ""
-      await test.step("Internal user assigns new procedure to doc unit", async () => {
-        await navigateToCategories(page, documentNumber)
-        procedureName =
-          procedurePrefix + testCaseInfix + generateString({ length: 10 })
-        await page.locator("[aria-label='Vorgang']").fill(procedureName)
-        await page
-          .getByText(`${procedureName} neu erstellen`)
-          .click({ timeout: 5_000 })
-        await save(page)
-      })
-      return procedureName
-    }
 
     async function assignUserGroupToProcedure(
       page: Page,

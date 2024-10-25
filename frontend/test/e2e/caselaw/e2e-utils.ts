@@ -1,4 +1,5 @@
 import { expect, Locator, Page, Request } from "@playwright/test"
+import { Browser } from "playwright"
 import { caselawTest as test } from "./fixtures"
 import { DocumentUnitCatagoriesEnum } from "@/components/enumDocumentUnitCatagories"
 import SingleNorm from "@/domain/singleNorm"
@@ -617,4 +618,38 @@ export async function clickCategoryButton(testId: string, page: Page) {
     await button.click()
     await expect(page.getByTestId(testId)).toBeVisible()
   })
+}
+
+export async function assignProcedureToDocUnit(
+  page: Page,
+  documentNumber: string,
+  /** Needed to be able to delete all procedures with prefix afterward */
+  prefix: string,
+) {
+  let procedureName = ""
+  await test.step("Internal user assigns new procedure to doc unit", async () => {
+    await navigateToCategories(page, documentNumber)
+    procedureName = prefix + generateString({ length: 10 })
+    await page.locator("[aria-label='Vorgang']").fill(procedureName)
+    await page
+      .getByText(`${procedureName} neu erstellen`)
+      .click({ timeout: 5_000 })
+    await save(page)
+  })
+  return procedureName
+}
+
+export async function deleteAllProcedures(
+  browser: Browser,
+  procedurePrefix: string,
+) {
+  const page = await browser.newPage()
+  const response = await page.request.get(
+    `/api/v1/caselaw/procedure?sz=50&pg=0&q=${procedurePrefix}&withDocUnits=false`,
+  )
+  const responseBody = await response.json()
+  for (const procedure of responseBody.content) {
+    const uuid = procedure.id
+    await deleteProcedure(page, uuid)
+  }
 }
