@@ -124,7 +124,9 @@ async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
  * @param {DocumentUnitListEntry} documentUnitListEntry - The entry in the list to be updated
  */
 async function handleTakeOver(documentUnitListEntry: DocumentUnitListEntry) {
-  const response = await service.takeOver(documentUnitListEntry.uuid as string)
+  const response = await service.takeOver(
+    documentUnitListEntry.documentNumber as string,
+  )
 
   if (response.error) {
     alert(response.error.title)

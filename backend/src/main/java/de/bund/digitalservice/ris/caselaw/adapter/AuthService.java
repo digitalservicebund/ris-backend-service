@@ -227,6 +227,19 @@ public class AuthService {
     };
   }
 
+  @Bean
+  public Function<String, Boolean> userHasSameDocOfficeAsDocumentByDocumentNumber() {
+    return documentNumber -> {
+      try {
+        return Optional.ofNullable(documentationUnitService.getByDocumentNumber(documentNumber))
+            .map(this::userHasSameDocOfficeAsDocument)
+            .orElse(false);
+      } catch (DocumentationUnitNotExistsException e) {
+        return false;
+      }
+    };
+  }
+
   /**
    * Creates a Spring bean that checks if a {@link Procedure} associated with a {@link
    * DocumentationUnit} is assigned to the current {@link OidcUser}.

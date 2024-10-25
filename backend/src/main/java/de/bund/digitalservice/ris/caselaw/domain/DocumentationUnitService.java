@@ -118,25 +118,47 @@ public class DocumentationUnitService {
             .myDocOfficeOnly(myDocOfficeOnly.orElse(false))
             .build();
 
-    return repository.searchByDocumentationUnitSearchInput(
-        PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()), oidcUser, searchInput);
+    Slice<DocumentationUnitListItem> documentationUnitListItems =
+        repository.searchByDocumentationUnitSearchInput(
+            PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()),
+            oidcUser,
+            searchInput);
+
+    return documentationUnitListItems.map(
+        item -> {
+          try {
+            return addPermissions(oidcUser, item);
+          } catch (DocumentationUnitNotExistsException e) {
+            throw new RuntimeException(e);
+          }
+        });
   }
 
-  public DocumentationUnit takeOverDocumentationUnit(UUID uuid, OidcUser oidcUser)
+  public DocumentationUnitListItem takeOverDocumentationUnit(
+      String documentNumber, OidcUser oidcUser) throws DocumentationUnitNotExistsException {
+
+    statusService.update(
+        documentNumber,
+        Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).withError(false).build());
+
+    return addPermissions(
+        oidcUser, repository.findDocumentationUnitListItemByDocumentNumber(documentNumber));
+  }
+
+  private DocumentationUnitListItem addPermissions(
+      OidcUser oidcUser, DocumentationUnitListItem listItem)
       throws DocumentationUnitNotExistsException {
-    DocumentationUnit documentationUnit = repository.findByUuid(uuid);
+    DocumentationUnit documentationUnit =
+        repository.findByDocumentNumber(listItem.documentNumber());
 
-    DocumentationUnit updatedDocumentationUnit =
-        statusService.update(
-            documentationUnit.documentNumber(),
-            Status.builder()
-                .publicationStatus(PublicationStatus.UNPUBLISHED)
-                .withError(false)
-                .build());
+    boolean hasWriteAccess = authService.userHasWriteAccess(oidcUser, documentationUnit);
+    boolean isInternalUser = authService.userIsInternal().apply(oidcUser);
+    boolean isAssignedProcedure =
+        authService.isAssignedViaProcedure().apply(documentationUnit.uuid());
 
-    return updatedDocumentationUnit.toBuilder()
-        .isEditable(authService.userHasWriteAccess(oidcUser, documentationUnit))
-        .isDeletable(authService.userHasWriteAccess(oidcUser, documentationUnit))
+    return listItem.toBuilder()
+        .isDeletable(hasWriteAccess && isInternalUser)
+        .isEditable((hasWriteAccess && (isInternalUser || isAssignedProcedure)))
         .build();
   }
 

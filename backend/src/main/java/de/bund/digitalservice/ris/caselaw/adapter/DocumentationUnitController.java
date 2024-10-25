@@ -109,12 +109,12 @@ public class DocumentationUnitController {
     }
   }
 
-  @PutMapping(value = "/{uuid}/takeover", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasSameDocOfficeAsDocument.apply(#uuid)")
-  public ResponseEntity<DocumentationUnit> takeOverDocumentationUnit(
-      @AuthenticationPrincipal OidcUser oidcUser, @PathVariable UUID uuid) {
+  @PutMapping(value = "/{documentNumber}/takeover", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("@userHasSameDocOfficeAsDocumentByDocumentNumber.apply(#documentNumber)")
+  public ResponseEntity<DocumentationUnitListItem> takeOverDocumentationUnit(
+      @AuthenticationPrincipal OidcUser oidcUser, @PathVariable String documentNumber) {
     try {
-      var updatedDocumentationUnit = service.takeOverDocumentationUnit(uuid, oidcUser);
+      var updatedDocumentationUnit = service.takeOverDocumentationUnit(documentNumber, oidcUser);
 
       return ResponseEntity.ok(updatedDocumentationUnit);
     } catch (Exception e) {

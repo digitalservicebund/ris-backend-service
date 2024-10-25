@@ -95,6 +95,17 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
+  public DocumentationUnitListItem findDocumentationUnitListItemByDocumentNumber(
+      String documentNumber) throws DocumentationUnitNotExistsException {
+    DocumentationUnitListItemDTO documentationUnitListItemDTO =
+        repository
+            .findDocumentationUnitListItemByDocumentNumber(documentNumber)
+            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
+    return DocumentationUnitListItemTransformer.transformToDomain(documentationUnitListItemDTO);
+  }
+
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
   public DocumentationUnit findByUuid(UUID uuid) throws DocumentationUnitNotExistsException {
     var documentationUnit =
         repository.findById(uuid).orElseThrow(() -> new DocumentationUnitNotExistsException(uuid));
@@ -571,50 +582,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             null,
             documentationOfficeDTO);
 
-    var userGroup = userService.getUserGroup(oidcUser);
-    boolean isInternalUser = userService.isInternal(oidcUser);
-    List<ProcedureDTO> assignedProcedures;
-    if (userGroup.isPresent() && !isInternalUser) {
-      assignedProcedures = procedureRepository.findAllByUserGroupDTO_Id(userGroup.get().id());
-    } else {
-      assignedProcedures = List.of();
-    }
-    return allResults.map(
-        item ->
-            DocumentationUnitListItemTransformer.transformToDomain(item).toBuilder()
-                .isDeletable(
-                    (hasSameDocumentationOffice(item, documentationOffice)
-                            || isCreatorOfPending(item, documentationOffice))
-                        && isInternalUser)
-                .isEditable(
-                    (hasSameDocumentationOffice(item, documentationOffice)
-                            || isCreatorOfPending(item, documentationOffice))
-                        && (isInternalUser || isUserAssigned(assignedProcedures, item)))
-                .build());
-  }
-
-  private boolean hasSameDocumentationOffice(
-      DocumentationUnitListItemDTO item, DocumentationOffice documentationOffice) {
-    return item.getDocumentationOffice().getId().equals(documentationOffice.uuid());
-  }
-
-  private boolean isCreatorOfPending(
-      DocumentationUnitListItemDTO item, DocumentationOffice documentationOffice) {
-    return item.getStatus()
-            .getPublicationStatus()
-            .equals(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
-        && item.getCreatingDocumentationOffice().getId().equals(documentationOffice.uuid());
-  }
-
-  private boolean isUserAssigned(
-      List<ProcedureDTO> assignedProcedures, DocumentationUnitListItemDTO item) {
-    if (!item.getProcedures().isEmpty()) {
-      var docUnitProcedureId = item.getProcedures().get(0).getProcedure().getId();
-      return assignedProcedures.stream()
-          .anyMatch(procedure -> procedure.getId().equals(docUnitProcedureId));
-    } else {
-      return false;
-    }
+    return allResults.map(DocumentationUnitListItemTransformer::transformToDomain);
   }
 
   @Override

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.transaction.annotation.Transactional;
 
 /** Domain repository for documentation units */
 @NoRepositoryBean
@@ -20,6 +21,10 @@ public interface DocumentationUnitRepository {
    * @return the documentation unit found
    */
   DocumentationUnit findByDocumentNumber(String documentNumber)
+      throws DocumentationUnitNotExistsException;
+
+  @Transactional(transactionManager = "jpaTransactionManager")
+  DocumentationUnitListItem findDocumentationUnitListItemByDocumentNumber(String documentNumber)
       throws DocumentationUnitNotExistsException;
 
   /**
