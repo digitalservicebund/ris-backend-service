@@ -31,6 +31,7 @@ const currentPage = ref(0)
 const currentlyExpanded = ref<number[]>([])
 
 const filter = useRouteQuery<string>("q")
+const debouncedFilter = ref(filter.value)
 
 const userGroups = ref<UserGroup[]>([])
 const isInternalUser = useInternalUser()
@@ -46,7 +47,7 @@ const {
   abort: abortFetchingProcedures,
   canAbort: canAbortFetchingProcedures,
   execute: fetchProcedures,
-} = service.get(itemsPerPage, currentPage, filter)
+} = service.get(itemsPerPage, currentPage, debouncedFilter)
 const procedures = computed(() => procedurePage.value?.content)
 
 async function updateProcedures() {
@@ -189,10 +190,16 @@ const getCreatedAtDisplayText = (procedure: Procedure): string => {
 }
 
 // Wait for the user input to be finished before requesting. (debounce after last keystroke)
-debouncedWatch(filter, () => updateProcedures(), { debounce: 500 })
+debouncedWatch(
+  filter,
+  () => {
+    debouncedFilter.value = filter.value
+    currentPage.value = 0
+  },
+  { debounce: 500 },
+)
 
-// When the page updates, the request should happen immediately.
-watch(currentPage, () => updateProcedures())
+watch([currentPage, debouncedFilter], () => updateProcedures())
 
 onBeforeMount(() => {
   getUserGroups()

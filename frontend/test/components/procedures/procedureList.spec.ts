@@ -48,7 +48,7 @@ async function renderComponent(options?: { procedures: Procedure[][] }) {
       },
     ],
     size: 1,
-    number: 1,
+    number: 0,
     numberOfElements: 200,
     first: true,
     last: false,
@@ -217,14 +217,32 @@ describe("ProcedureList", () => {
   })
 
   it("resets currently expanded procedures on page change", async () => {
-    const { mockedGetDocumentUnits, user } = await renderComponent()
+    const { user } = await renderComponent()
 
-    expect(mockedGetDocumentUnits).not.toHaveBeenCalled()
+    expect(screen.queryByText("testABC")).not.toBeInTheDocument()
 
+    // Expand procedure to load doc units
     await user.click(await screen.findByTestId("icons-open-close"))
-    expect(mockedGetDocumentUnits).toHaveBeenCalledOnce()
+
+    expect(screen.getByText("testABC")).toBeInTheDocument()
+    expect(screen.getByText("Dokumentnummer")).toBeInTheDocument()
+
+    // Go to next page
     await user.click(await screen.findByLabelText("nächste Ergebnisse"))
-    expect(mockedGetDocumentUnits).toHaveBeenCalledOnce()
+
+    expect(screen.queryByText("testABC")).not.toBeInTheDocument()
+    expect(screen.queryByText("Dokumentnummer")).not.toBeInTheDocument()
+  })
+
+  it("show increment page count when going to next page", async () => {
+    const { user } = await renderComponent()
+
+    expect(screen.getByText("Seite 1:")).toBeInTheDocument()
+
+    // Go to next page
+    await user.click(await screen.findByLabelText("nächste Ergebnisse"))
+
+    expect(screen.getByText("Seite 2:")).toBeInTheDocument()
   })
 
   it("should fetch userGroups onBeforeMounted", async () => {
