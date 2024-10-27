@@ -58,6 +58,7 @@ class DocumentationUnitServiceTest {
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private Validator validator;
   @MockBean private OidcUser oidcUser;
+  @MockBean private AuthService authService;
   @Captor private ArgumentCaptor<DocumentationUnitSearchInput> searchInputCaptor;
   @Captor private ArgumentCaptor<RelatedDocumentationUnit> relatedDocumentationUnitCaptor;
 
@@ -224,13 +225,16 @@ class DocumentationUnitServiceTest {
   }
 
   @Test
-  void testSearchByDocumentationUnitListEntry() {
+  void testSearchByDocumentationUnitListEntry() throws DocumentationUnitNotExistsException {
     DocumentationUnitSearchInput documentationUnitSearchInput =
         DocumentationUnitSearchInput.builder().build();
     DocumentationUnitListItem documentationUnitListItem =
         DocumentationUnitListItem.builder().build();
     PageRequest pageRequest = PageRequest.of(0, 10);
-
+    when(authService.userIsInternal()).thenReturn(oidcUser -> true);
+    when(authService.isAssignedViaProcedure()).thenReturn(oidcUser -> true);
+    when(repository.findByDocumentNumber(any()))
+        .thenReturn(DocumentationUnit.builder().uuid(UUID.randomUUID()).build());
     when(repository.searchByDocumentationUnitSearchInput(
             pageRequest, oidcUser, documentationUnitSearchInput))
         .thenReturn(new PageImpl<>(List.of(documentationUnitListItem)));
@@ -252,11 +256,15 @@ class DocumentationUnitServiceTest {
   }
 
   @Test
-  void testSearchByDocumentationUnitListEntry_shouldNormalizeSpaces() {
+  void testSearchByDocumentationUnitListEntry_shouldNormalizeSpaces()
+      throws DocumentationUnitNotExistsException {
     DocumentationUnitListItem documentationUnitListItem =
         DocumentationUnitListItem.builder().build();
     PageRequest pageRequest = PageRequest.of(0, 10);
-
+    when(authService.userIsInternal()).thenReturn(oidcUser -> true);
+    when(authService.isAssignedViaProcedure()).thenReturn(oidcUser -> true);
+    when(repository.findByDocumentNumber(any()))
+        .thenReturn(DocumentationUnit.builder().uuid(UUID.randomUUID()).build());
     when(repository.searchByDocumentationUnitSearchInput(
             any(PageRequest.class), any(OidcUser.class), any(DocumentationUnitSearchInput.class)))
         .thenReturn(new PageImpl<>(List.of(documentationUnitListItem)));
