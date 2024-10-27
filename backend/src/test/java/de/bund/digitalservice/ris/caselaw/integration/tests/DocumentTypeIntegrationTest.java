@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentTypeController;
+import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentTypeRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
@@ -37,7 +37,7 @@ import org.testcontainers.junit.jupiter.Container;
       FlywayConfig.class,
       PostgresDocumentTypeRepositoryImpl.class,
       SecurityConfig.class,
-      AuthService.class,
+      OAuthService.class,
       TestConfig.class
     },
     controllers = {DocumentTypeController.class})

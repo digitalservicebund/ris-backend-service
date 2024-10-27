@@ -8,8 +8,8 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TES
 
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.LegalPeriodicalEditionController;
+import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
@@ -69,7 +69,7 @@ import org.testcontainers.junit.jupiter.Container;
       FlywayConfig.class,
       PostgresFieldOfLawRepositoryImpl.class,
       SecurityConfig.class,
-      AuthService.class,
+      OAuthService.class,
       TestConfig.class
     },
     controllers = {LegalPeriodicalEditionController.class})

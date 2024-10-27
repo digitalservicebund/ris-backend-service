@@ -7,6 +7,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ApiKeyTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ApiKey;
+import de.bund.digitalservice.ris.caselaw.domain.AuthService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
@@ -60,7 +61,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
-public class AuthService {
+public class OAuthService implements AuthService {
 
   private final UserService userService;
   private final DocumentationUnitService documentationUnitService;
@@ -88,7 +89,7 @@ public class AuthService {
           "/note",
           "/version");
 
-  public AuthService(
+  public OAuthService(
       UserService userService,
       DocumentationUnitService documentationUnitService,
       ProcedureService procedureService,

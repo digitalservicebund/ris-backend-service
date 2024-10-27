@@ -5,8 +5,8 @@ import static org.mockito.Mockito.doReturn;
 
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthController;
-import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
+import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -35,7 +35,7 @@ import org.testcontainers.junit.jupiter.Container;
       KeycloakUserService.class,
       SecurityConfig.class,
       TestConfig.class,
-      AuthService.class
+      OAuthService.class
     },
     controllers = {AuthController.class})
 class AuthIntegrationTest {

@@ -151,8 +151,9 @@ public class DocumentationUnitService {
         repository.findByDocumentNumber(listItem.documentNumber());
 
     boolean hasWriteAccess = authService.userHasWriteAccess(oidcUser, documentationUnit);
-    boolean isInternalUser = authService.userIsInternal(oidcUser);
-    boolean isAssignedProcedure = authService.isAssignedViaProcedure(documentationUnit.uuid());
+    boolean isInternalUser = authService.userIsInternal().apply(oidcUser);
+    boolean isAssignedProcedure =
+        authService.isAssignedViaProcedure().apply(documentationUnit.uuid());
 
     return listItem.toBuilder()
         .isDeletable(hasWriteAccess && isInternalUser)

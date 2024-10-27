@@ -31,10 +31,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = LegalPeriodicalEditionController.class)
-@Import({SecurityConfig.class, TestConfig.class, AuthService.class, KeycloakUserService.class})
+@Import({SecurityConfig.class, TestConfig.class, OAuthService.class, KeycloakUserService.class})
 class LegalPeriodicalEditionControllerTest {
   @Autowired private RisWebTestClient risWebTestClient;
-  @Autowired private AuthService authService;
+  @Autowired private OAuthService OAuthService;
   @Autowired private KeycloakUserService keycloakUserService;
   @MockBean private LegalPeriodicalEditionService service;
 

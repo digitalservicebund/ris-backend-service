@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
 import de.bund.digitalservice.ris.caselaw.TestConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.CitationTypeController;
+import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCitationTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresCitationTypeRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentTypeRepositoryImpl;
@@ -37,7 +37,7 @@ import org.testcontainers.junit.jupiter.Container;
       PostgresCitationTypeRepositoryImpl.class,
       PostgresDocumentTypeRepositoryImpl.class,
       SecurityConfig.class,
-      AuthService.class,
+      OAuthService.class,
       TestConfig.class,
     },
     controllers = {CitationTypeController.class})

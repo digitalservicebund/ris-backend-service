@@ -12,7 +12,7 @@ import com.gravity9.jsonpatch.JsonPatchOperation;
 import com.gravity9.jsonpatch.RemoveOperation;
 import com.gravity9.jsonpatch.ReplaceOperation;
 import com.gravity9.jsonpatch.TestOperation;
-import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
+import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -34,10 +34,10 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@Import({AuthService.class})
-class AuthServiceTest {
+@Import({OAuthService.class})
+class OAuthServiceTest {
 
-  @SpyBean private AuthService service;
+  @SpyBean private OAuthService service;
 
   @MockBean private DocumentationUnitService documentationUnitService;
   @MockBean private UserService userService;
