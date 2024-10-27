@@ -10,7 +10,7 @@ import SingleNorm from "./singleNorm"
 import Attachment from "@/domain/attachment"
 import LegalForce from "@/domain/legalForce"
 import ParticipatingJudge from "@/domain/participatingJudge"
-import { PublicationState, PublicationStatus } from "@/domain/publicationStatus"
+import { PublicationStatus } from "@/domain/publicationStatus"
 
 export type CoreData = {
   fileNumbers?: string[]
@@ -122,10 +122,7 @@ export default class DocumentUnit {
   readonly uuid: string
   readonly id?: string
   readonly documentNumber: string = ""
-  readonly status: PublicationStatus = {
-    publicationStatus: PublicationState.UNPUBLISHED,
-    withError: false,
-  }
+  readonly status?: PublicationStatus
   public version: number = 0
   public attachments: Attachment[] = []
   public coreData: CoreData = {}
