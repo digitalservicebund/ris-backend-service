@@ -46,6 +46,7 @@ import org.docx4j.openpackaging.parts.WordprocessingML.ImageJpegPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.ImagePngPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.MetafileEmfPart;
 import org.docx4j.wml.Style;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -69,7 +70,9 @@ public class DocxConverterService implements ConverterService {
   private String bucketName;
 
   public DocxConverterService(
-      S3Client client, DocumentBuilderFactory documentBuilderFactory, DocxConverter converter) {
+      @Qualifier("docxS3Client") S3Client client,
+      DocumentBuilderFactory documentBuilderFactory,
+      DocxConverter converter) {
     this.client = client;
     this.documentBuilderFactory = documentBuilderFactory;
     this.converter = converter;

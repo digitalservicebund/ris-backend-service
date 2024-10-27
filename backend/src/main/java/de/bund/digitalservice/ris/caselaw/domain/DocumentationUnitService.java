@@ -12,6 +12,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -64,6 +65,7 @@ public class DocumentationUnitService {
       DocumentationOffice userDocOffice, Optional<DocumentationUnitCreationParameters> parameters)
       throws DocumentationUnitException {
 
+    // default office is user office
     DocumentationUnitCreationParameters params =
         parameters.orElse(
             DocumentationUnitCreationParameters.builder()
@@ -73,8 +75,45 @@ public class DocumentationUnitService {
       params = params.toBuilder().documentationOffice(userDocOffice).build();
     }
 
-    var documentNumber = generateDocumentNumber(params.documentationOffice());
-    return repository.createNewDocumentationUnit(documentNumber, userDocOffice, params);
+    DocumentationUnit docUnit =
+        DocumentationUnit.builder()
+            .version(0L)
+            .documentNumber(generateDocumentNumber(params.documentationOffice()))
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(params.documentationOffice())
+                    .fileNumbers(params.fileNumber() == null ? null : List.of(params.fileNumber()))
+                    .documentType(params.documentType())
+                    .decisionDate(params.decisionDate())
+                    .court(params.court())
+                    .creatingDocOffice(
+                        params.documentationOffice() == null
+                                || userDocOffice.uuid().equals(params.documentationOffice().uuid())
+                            ? null
+                            : userDocOffice)
+                    .legalEffect(
+                        LegalEffect.deriveFrom(params.court(), true)
+                            .orElse(LegalEffect.NOT_SPECIFIED)
+                            .getLabel())
+                    .build())
+            .build();
+
+    Status status =
+        Status.builder()
+            .publicationStatus(
+                userDocOffice.uuid().equals(docUnit.coreData().documentationOffice().uuid())
+                    ? PublicationStatus.UNPUBLISHED
+                    : PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+            .withError(false)
+            .build();
+
+    return repository.createNewDocumentationUnit(
+        docUnit,
+        status,
+        params.reference(),
+        params.reference() != null && params.reference().legalPeriodical() != null
+            ? params.reference().legalPeriodical().abbreviation()
+            : null);
   }
 
   private String generateDocumentNumber(DocumentationOffice documentationOffice) {

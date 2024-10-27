@@ -229,6 +229,7 @@ watch(
       decisionDate: relatedDocumentationUnit.value.decisionDate,
       fileNumber: relatedDocumentationUnit.value.fileNumber,
       court: relatedDocumentationUnit.value.court,
+      reference: reference.value,
     }
   },
   { deep: true },

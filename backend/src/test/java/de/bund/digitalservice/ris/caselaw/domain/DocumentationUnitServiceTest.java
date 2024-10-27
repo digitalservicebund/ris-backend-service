@@ -19,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberPattern
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import jakarta.validation.Validator;
@@ -67,15 +68,11 @@ class DocumentationUnitServiceTest {
       throws DocumentationUnitExistsException,
           DocumentNumberPatternException,
           DocumentNumberFormatterException {
-    DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
+    DocumentationOffice documentationOffice =
+        DocumentationOffice.builder().uuid(UUID.randomUUID()).build();
     DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
 
-    when(repository.createNewDocumentationUnit(
-            "nextDocumentNumber",
-            documentationOffice,
-            DocumentationUnitCreationParameters.builder()
-                .documentationOffice(documentationOffice)
-                .build()))
+    when(repository.createNewDocumentationUnit(any(), any(), any(), any()))
         .thenReturn(documentationUnit);
     when(documentNumberService.generateDocumentNumber(documentationOffice.abbreviation()))
         .thenReturn("nextDocumentNumber");
@@ -89,11 +86,21 @@ class DocumentationUnitServiceTest {
     verify(documentNumberService).generateDocumentNumber(documentationOffice.abbreviation());
     verify(repository)
         .createNewDocumentationUnit(
-            "nextDocumentNumber",
-            documentationOffice,
-            DocumentationUnitCreationParameters.builder()
-                .documentationOffice(documentationOffice)
-                .build());
+            DocumentationUnit.builder()
+                .version(0L)
+                .documentNumber("nextDocumentNumber")
+                .coreData(
+                    CoreData.builder()
+                        .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
+                        .documentationOffice(documentationOffice)
+                        .build())
+                .build(),
+            Status.builder()
+                .publicationStatus(PublicationStatus.UNPUBLISHED)
+                .withError(false)
+                .build(),
+            null,
+            null);
   }
 
   @Test
@@ -102,9 +109,9 @@ class DocumentationUnitServiceTest {
           DocumentNumberPatternException,
           DocumentNumberFormatterException {
     DocumentationOffice userDocumentationOffice =
-        DocumentationOffice.builder().abbreviation("BAG").build();
+        DocumentationOffice.builder().abbreviation("BAG").uuid(UUID.randomUUID()).build();
     DocumentationOffice designatedDocumentationOffice =
-        DocumentationOffice.builder().abbreviation("BGH").build();
+        DocumentationOffice.builder().abbreviation("BGH").uuid(UUID.randomUUID()).build();
     DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
     DocumentationUnitCreationParameters parameters =
         DocumentationUnitCreationParameters.builder()
@@ -113,10 +120,15 @@ class DocumentationUnitServiceTest {
             .court(Court.builder().type("BGH").build())
             .decisionDate(LocalDate.now())
             .documentType(DocumentType.builder().label("Bes").build())
+            .reference(
+                Reference.builder()
+                    .legalPeriodical(LegalPeriodical.builder().abbreviation("BAG").build())
+                    .build())
             .build();
-    when(repository.createNewDocumentationUnit(
-            "nextDocumentNumber", userDocumentationOffice, parameters))
+
+    when(repository.createNewDocumentationUnit(any(), any(), any(), any()))
         .thenReturn(documentationUnit);
+
     when(documentNumberService.generateDocumentNumber(designatedDocumentationOffice.abbreviation()))
         .thenReturn("nextDocumentNumber");
     // Can we use a captor to check if the document number was correctly created?
@@ -129,7 +141,27 @@ class DocumentationUnitServiceTest {
     verify(documentNumberService)
         .generateDocumentNumber(designatedDocumentationOffice.abbreviation());
     verify(repository)
-        .createNewDocumentationUnit("nextDocumentNumber", userDocumentationOffice, parameters);
+        .createNewDocumentationUnit(
+            DocumentationUnit.builder()
+                .version(0L)
+                .documentNumber("nextDocumentNumber")
+                .coreData(
+                    CoreData.builder()
+                        .creatingDocOffice(userDocumentationOffice)
+                        .documentationOffice(designatedDocumentationOffice)
+                        .fileNumbers(List.of(parameters.fileNumber()))
+                        .court(parameters.court())
+                        .legalEffect(LegalEffect.YES.getLabel())
+                        .decisionDate(parameters.decisionDate())
+                        .documentType(parameters.documentType())
+                        .build())
+                .build(),
+            Status.builder()
+                .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+                .withError(false)
+                .build(),
+            parameters.reference(),
+            parameters.reference().legalPeriodical().abbreviation());
   }
 
   @Test

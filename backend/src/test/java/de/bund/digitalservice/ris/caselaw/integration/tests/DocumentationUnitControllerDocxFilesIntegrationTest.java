@@ -64,6 +64,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
@@ -139,7 +140,9 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
   @SpyBean private DocumentationUnitDocxMetadataInitializationService service;
   @Autowired private DocumentationUnitService documentationUnitService;
 
-  @MockBean private S3Client s3Client;
+  @MockBean
+  @Qualifier("docxS3Client")
+  private S3Client s3Client;
 
   @MockBean private MailService mailService;
 

@@ -165,7 +165,9 @@ public class DocumentationUnitToLdmlTransformer {
       validateNotNull(documentationUnit.coreData().court(), "Court missing");
       if (documentationUnit.coreData().court() != null) {
         validateNotNull(documentationUnit.coreData().court().type(), "CourtType missing");
-        validateNotNull(documentationUnit.coreData().court().location(), "CourtLocation missing");
+        // TODO: Figure out if court location needs to be present in LDML for superior courts
+        // validateNotNull(documentationUnit.coreData().court().location(), "CourtLocation
+        // missing");
       }
       validateNotNull(documentationUnit.coreData().documentType(), "DocumentType missing");
       validateNotNull(documentationUnit.coreData().legalEffect(), "LegalEffect missing");

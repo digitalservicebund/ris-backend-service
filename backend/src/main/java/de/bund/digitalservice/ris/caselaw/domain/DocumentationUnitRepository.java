@@ -38,14 +38,17 @@ public interface DocumentationUnitRepository {
   /**
    * Create a new documentation unit with the given document number and documentation office
    *
-   * @param parameters the documentation unit creation parameters
-   * @param docNumber the documentation unit creation parameters
+   * @param documentationUnit the documentation unit to create
+   * @param status the status of the new documentation unit
+   * @param createdFromReference the reference the documentation unit is created from
+   * @param source the source of the new documentation unit
    * @return the new documentation unit
    */
   DocumentationUnit createNewDocumentationUnit(
-      String docNumber,
-      DocumentationOffice userDocOffice,
-      DocumentationUnitCreationParameters parameters);
+      DocumentationUnit documentationUnit,
+      Status status,
+      Reference createdFromReference,
+      String source);
 
   /**
    * Save a documentation unit

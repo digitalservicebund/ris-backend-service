@@ -300,6 +300,154 @@ test.describe(
 )
 
 test.describe(
+  "Add/remove border numbers with shortcuts (Randnummern)",
+  {
+    annotation: [
+      {
+        type: "story",
+        description:
+          "https://digitalservicebund.atlassian.net/browse/RISDEV-5137",
+      },
+    ],
+    tag: ["@RISDEV-5137"],
+  },
+  () => {
+    test("add remove border numbers (Randnummern) via shortcuts", async ({
+      page,
+      documentNumber,
+    }) => {
+      await navigateToCategories(page, documentNumber)
+
+      await clickCategoryButton("Tatbestand", page)
+      const editor = page.locator("[data-testid='Tatbestand']")
+
+      await test.step("Add one paragraph into Tatbestand", async () => {
+        await page.keyboard.insertText(firstParagraph)
+        await expect(editor.getByText(firstParagraph)).toBeVisible()
+        await editor.getByText(firstParagraph).click()
+      })
+
+      await test.step("Add border number via shortcut", async () => {
+        await page.keyboard.press(`ControlOrMeta+Alt+.`)
+        await expect(editor.getByText(`1${firstParagraph}`)).toBeVisible()
+      })
+
+      await test.step("Remove border number via shortcut", async () => {
+        await page.keyboard.press(`ControlOrMeta+Alt+-`)
+        await expect(editor.getByText(`1${firstParagraph}`)).toBeHidden()
+      })
+    })
+  },
+)
+
+// Flaky: Sometimes the recalculation does not run after pasting.
+// eslint-disable-next-line playwright/no-skipped-test
+test.describe.skip(
+  "Copy/paste border-numbers on top-level only (Randnummern)",
+  {
+    annotation: [
+      {
+        type: "story",
+        description:
+          "https://digitalservicebund.atlassian.net/browse/RISDEV-5136",
+      },
+    ],
+    tag: ["@RISDEV-5136"],
+  },
+  () => {
+    test("Paste a border number within another border number", async ({
+      page,
+      documentNumber,
+    }) => {
+      await navigateToCategories(page, documentNumber)
+
+      await clickCategoryButton("Entscheidungsgründe", page)
+      const editor = page.locator("[data-testid='Entscheidungsgründe']")
+
+      await test.step("Add two paragraphs into Entscheidungsgründe", async () => {
+        await page.keyboard.insertText(firstParagraph)
+        await page.keyboard.press("Enter")
+        await page.keyboard.insertText(secondParagraph)
+        await expect(editor.getByText(firstParagraph)).toBeVisible()
+        await expect(editor.getByText(secondParagraph)).toBeVisible()
+      })
+
+      await test.step("Add border numbers to the paragraphs", async () => {
+        await page.keyboard.press(`ControlOrMeta+A`)
+        await page.keyboard.press(`ControlOrMeta+Alt+.`)
+      })
+
+      await test.step("Copy paragraphs with border numbers", async () => {
+        await page.keyboard.press(`ControlOrMeta+A`)
+        await page.keyboard.press(`ControlOrMeta+C`)
+      })
+
+      await test.step("Paste paragraphs into middle of first border number content", async () => {
+        const middleOfFirstParagraph = firstParagraph.slice(4)
+        await editor.getByText(middleOfFirstParagraph).click()
+        await page.keyboard.press(`ControlOrMeta+V`)
+      })
+
+      await test.step("Check border numbers were inserted after the first paragraph", async () => {
+        // We check the newly inserted paragraphs first, so that we don't run into strict mode violation.
+        // Before recalculation, we have two firstParagraph elements with border number 1
+        await expect(editor.getByText(`2${firstParagraph}`)).toBeVisible()
+        await expect(editor.getByText(`3${secondParagraph}`)).toBeVisible()
+
+        await expect(editor.getByText(`1${firstParagraph}`)).toBeVisible()
+        await expect(editor.getByText(`4${secondParagraph}`)).toBeVisible()
+      })
+    })
+
+    test("Paste a border number to an empty paragraph", async ({
+      page,
+      documentNumber,
+    }) => {
+      await navigateToCategories(page, documentNumber)
+
+      await clickCategoryButton("Entscheidungsgründe", page)
+      const editor = page.locator("[data-testid='Entscheidungsgründe']")
+
+      await test.step("Add two paragraphs into Entscheidungsgründe", async () => {
+        await page.keyboard.insertText(firstParagraph)
+        await page.keyboard.press("Enter")
+        await page.keyboard.insertText(secondParagraph)
+        await page.keyboard.press("Enter")
+        await expect(editor.getByText(firstParagraph)).toBeVisible()
+        await expect(editor.getByText(secondParagraph)).toBeVisible()
+      })
+
+      await test.step("Add border numbers to the paragraphs", async () => {
+        await page.keyboard.press(`ControlOrMeta+A`)
+        await page.keyboard.press(`ControlOrMeta+Alt+.`)
+      })
+
+      await test.step("Copy paragraphs with border numbers", async () => {
+        await page.keyboard.press(`ControlOrMeta+A`)
+        await page.keyboard.press(`ControlOrMeta+C`)
+      })
+
+      await test.step("Paste paragraphs into empty paragraph", async () => {
+        // Move caret to end of input
+        await editor.getByText(`2${secondParagraph}`).click()
+        await page.keyboard.press(`ControlOrMeta+End`)
+        await page.keyboard.press(`ControlOrMeta+V`)
+      })
+
+      await test.step("Check border numbers were inserted after the first paragraph", async () => {
+        // We check the newly inserted paragraphs first, so that we don't run into strict mode violation.
+        // Before recalculation, we have two firstParagraph elements with border number 1
+        await expect(editor.getByText(`3${firstParagraph}`)).toBeVisible()
+        await expect(editor.getByText(`4${secondParagraph}`)).toBeVisible()
+
+        await expect(editor.getByText(`1${firstParagraph}`)).toBeVisible()
+        await expect(editor.getByText(`2${secondParagraph}`)).toBeVisible()
+      })
+    })
+  },
+)
+
+test.describe(
   "Fuse border numbers (Randnummern)",
   {
     annotation: [
@@ -383,6 +531,7 @@ async function clickAddBorderNumberButton(page: Page) {
 async function reinsertAllBorderNumbers(page: Page) {
   await test.step("Reinsert all border numbers", async () => {
     await page.keyboard.press(`ControlOrMeta+A`)
+    await page.keyboard.press(`Delete`)
     await page.keyboard.press(`ControlOrMeta+V`)
   })
 }
