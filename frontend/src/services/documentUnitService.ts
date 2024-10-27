@@ -148,7 +148,6 @@ const service: DocumentUnitService = {
         title: errorMessages.DOCUMENT_UNIT_TAKEOVER_FAILED.title,
       }
     }
-    console.log("in service", response.data)
     return response
   },
 
