@@ -103,7 +103,7 @@
     "autoprefixer": "^10.4.20",
     "axe-playwright": "^2.0.3",
     "axios-mock-adapter": "^2.1.0",
-    "eslint": "^8.57.1",
+    "eslint": "^9.13.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jest-dom": "^5.4.0",
     "eslint-plugin-playwright": "^1.8.3",
