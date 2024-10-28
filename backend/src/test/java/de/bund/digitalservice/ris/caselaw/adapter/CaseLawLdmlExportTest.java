@@ -7,6 +7,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitToLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -44,14 +46,22 @@ class CaseLawLdmlExportTest {
   static LdmlExporterService exporter;
   static DocumentationUnit testDocumentUnit;
   static UUID testUUID;
+  static ObjectMapper objectMapper;
 
   @BeforeAll
-  static void setUpBeforeClass() {
+  static void setUpBeforeClass() throws JsonProcessingException {
     documentationUnitRepository = mock(DocumentationUnitRepository.class);
     caseLawBucket = mock(LdmlBucket.class);
+    objectMapper = mock(ObjectMapper.class);
     exporter =
         new LdmlExporterService(
-            documentationUnitRepository, xmlUtilService, documentBuilderFactory, caseLawBucket);
+            documentationUnitRepository,
+            xmlUtilService,
+            documentBuilderFactory,
+            caseLawBucket,
+            objectMapper);
+
+    when(objectMapper.writeValueAsString(any())).thenReturn("");
 
     PreviousDecision related1 =
         PreviousDecision.builder()

@@ -36,8 +36,8 @@ public class LdmlExporterService {
   private final DocumentationUnitRepository documentationUnitRepository;
   private final DocumentBuilderFactory documentBuilderFactory;
   private final LdmlBucket ldmlBucket;
+  private final ObjectMapper objectMapper;
   private final Templates htmlToAknHtml;
-
   private final Schema schema;
 
   @Autowired
@@ -45,11 +45,13 @@ public class LdmlExporterService {
       DocumentationUnitRepository documentationUnitRepository,
       XmlUtilService xmlUtilService,
       DocumentBuilderFactory documentBuilderFactory,
-      LdmlBucket ldmlBucket) {
+      LdmlBucket ldmlBucket,
+      ObjectMapper objectMapper) {
 
     this.documentationUnitRepository = documentationUnitRepository;
     this.documentBuilderFactory = documentBuilderFactory;
     this.ldmlBucket = ldmlBucket;
+    this.objectMapper = objectMapper;
     this.htmlToAknHtml = xmlUtilService.getTemplates("caselawhandover/htmlToAknHtml.xslt");
     this.schema = xmlUtilService.getSchema("caselawhandover/shared/akomantoso30.xsd");
   }
@@ -80,8 +82,6 @@ public class LdmlExporterService {
 
     if (!transformedDocUnits.isEmpty()) {
       Changelog changelog = new Changelog(transformedDocUnits, null);
-
-      ObjectMapper objectMapper = new ObjectMapper();
 
       try {
         String changelogString = objectMapper.writeValueAsString(changelog);
