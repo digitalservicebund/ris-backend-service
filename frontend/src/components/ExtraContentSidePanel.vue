@@ -213,11 +213,17 @@ watch(store, () => {
                 },
               }"
             >
-              <TextButton button-type="ghost" :icon="IconEdit" size="small" />
+              <TextButton
+                aria-label="edit-link-button"
+                button-type="ghost"
+                :icon="IconEdit"
+                size="small"
+              />
             </router-link>
           </Tooltip>
           <div v-else aria-label="Dokumentationseinheit bearbeiten">
             <TextButton
+              aria-label="edit-link-button"
               button-type="ghost"
               disabled
               :icon="IconEdit"
