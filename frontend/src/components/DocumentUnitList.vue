@@ -210,12 +210,14 @@ function onDelete() {
               listEntry.status?.publicationStatus ===
               PublicationState.EXTERNAL_HANDOVER_PENDING
             "
+            class="ds-body-reg-02"
           >
             {{
               " aus " +
               listEntry.source +
-              " von " +
-              listEntry.creatingDocumentationOffice
+              " (" +
+              listEntry.creatingDocumentationOffice +
+              ")"
             }}
           </span>
         </CellItem>

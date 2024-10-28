@@ -195,7 +195,12 @@ describe("documentUnit list", () => {
     ).toHaveLength(3)
 
     expect(screen.getByText("Fremdanlage")).toBeVisible()
-    expect(screen.getByText("aus NJW von DS")).toBeVisible()
+    expect(screen.getByText("aus NJW (DS)")).toBeVisible()
+
+    expect(screen.queryByText("should not show source")).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("should not show doc office"),
+    ).not.toBeInTheDocument()
   })
 
   test("delete emits event", async () => {
