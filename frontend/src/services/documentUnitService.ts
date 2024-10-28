@@ -29,6 +29,8 @@ interface DocumentUnitService {
 
   delete(documentUnitUuid: string): Promise<ServiceResponse<unknown>>
 
+  takeOver(documentNumber: string): Promise<ServiceResponse<unknown>>
+
   searchByRelatedDocumentation(
     query: RelatedDocumentation,
     requestParams?: { [key: string]: string } | undefined,
@@ -132,6 +134,18 @@ const service: DocumentUnitService = {
     if (response.status >= 300) {
       response.error = {
         title: errorMessages.DOCUMENT_UNIT_DELETE_FAILED.title,
+      }
+    }
+    return response
+  },
+
+  async takeOver(documentNumber: string) {
+    const response = await httpClient.put<string, DocumentUnit>(
+      `caselaw/documentunits/${documentNumber}/takeover`,
+    )
+    if (response.status >= 300) {
+      response.error = {
+        title: errorMessages.DOCUMENT_UNIT_TAKEOVER_FAILED.title,
       }
     }
     return response

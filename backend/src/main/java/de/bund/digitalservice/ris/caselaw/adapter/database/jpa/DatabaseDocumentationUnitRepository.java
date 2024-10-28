@@ -15,6 +15,9 @@ public interface DatabaseDocumentationUnitRepository
     extends JpaRepository<DocumentationUnitDTO, UUID> {
   Optional<DocumentationUnitDTO> findByDocumentNumber(String documentNumber);
 
+  Optional<DocumentationUnitListItemDTO> findDocumentationUnitListItemByDocumentNumber(
+      String documentNumber);
+
   String BASE_QUERY =
       """
   (:documentNumber IS NULL OR upper(documentationUnit.documentNumber) like concat('%', upper(cast(:documentNumber as text)), '%'))

@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -31,17 +32,22 @@ public class DocumentationUnitService {
 
   private final DocumentationUnitRepository repository;
   private final DocumentNumberService documentNumberService;
+
+  private final DocumentationUnitStatusService statusService;
   private final AttachmentService attachmentService;
   private final DocumentNumberRecyclingService documentNumberRecyclingService;
   private final PatchMapperService patchMapperService;
+  private final AuthService authService;
   private final Validator validator;
 
   public DocumentationUnitService(
       DocumentationUnitRepository repository,
       DocumentNumberService documentNumberService,
+      DocumentationUnitStatusService statusService,
       DocumentNumberRecyclingService documentNumberRecyclingService,
       Validator validator,
       AttachmentService attachmentService,
+      @Lazy AuthService authService,
       PatchMapperService patchMapperService) {
 
     this.repository = repository;
@@ -50,6 +56,8 @@ public class DocumentationUnitService {
     this.validator = validator;
     this.attachmentService = attachmentService;
     this.patchMapperService = patchMapperService;
+    this.statusService = statusService;
+    this.authService = authService;
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -148,8 +156,48 @@ public class DocumentationUnitService {
             .myDocOfficeOnly(myDocOfficeOnly.orElse(false))
             .build();
 
-    return repository.searchByDocumentationUnitSearchInput(
-        PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()), oidcUser, searchInput);
+    Slice<DocumentationUnitListItem> documentationUnitListItems =
+        repository.searchByDocumentationUnitSearchInput(
+            PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()),
+            oidcUser,
+            searchInput);
+
+    return documentationUnitListItems.map(
+        item -> {
+          try {
+            return addPermissions(oidcUser, item);
+          } catch (DocumentationUnitNotExistsException e) {
+            throw new RuntimeException(e);
+          }
+        });
+  }
+
+  public DocumentationUnitListItem takeOverDocumentationUnit(
+      String documentNumber, OidcUser oidcUser) throws DocumentationUnitNotExistsException {
+
+    statusService.update(
+        documentNumber,
+        Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).withError(false).build());
+
+    return addPermissions(
+        oidcUser, repository.findDocumentationUnitListItemByDocumentNumber(documentNumber));
+  }
+
+  private DocumentationUnitListItem addPermissions(
+      OidcUser oidcUser, DocumentationUnitListItem listItem)
+      throws DocumentationUnitNotExistsException {
+    DocumentationUnit documentationUnit =
+        repository.findByDocumentNumber(listItem.documentNumber());
+
+    boolean hasWriteAccess = authService.userHasWriteAccess(oidcUser, documentationUnit);
+    boolean isInternalUser = authService.userIsInternal().apply(oidcUser);
+    boolean isAssignedProcedure =
+        authService.isAssignedViaProcedure().apply(documentationUnit.uuid());
+
+    return listItem.toBuilder()
+        .isDeletable(hasWriteAccess && isInternalUser)
+        .isEditable((hasWriteAccess && (isInternalUser || isAssignedProcedure)))
+        .build();
   }
 
   public DocumentationUnit getByDocumentNumber(String documentNumber)

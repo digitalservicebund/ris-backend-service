@@ -202,7 +202,7 @@ describe("documentUnit list", () => {
     const confirmButton = screen.getByRole("button", { name: "Löschen" })
     expect(confirmButton).toBeInTheDocument()
     await user.click(confirmButton)
-    expect(emitted().deleteDocumentUnit).toBeTruthy()
+    expect(emitted().deleteDocumentationUnit).toBeTruthy()
   })
 
   test("disables edit and delete buttons if foreign documentation office", async () => {
@@ -263,7 +263,7 @@ describe("documentUnit list", () => {
       screen.queryByRole("link", { name: "Dokumentationseinheit bearbeiten" }),
     ).not.toBeInTheDocument()
     expect(
-      screen.getByRole("link", { name: "Dokumentationseinheit übernehmen" }),
+      screen.getByRole("button", { name: "Dokumentationseinheit übernehmen" }),
     ).toBeInTheDocument()
   })
 })

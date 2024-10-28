@@ -22,6 +22,9 @@ public interface DocumentationUnitRepository {
   DocumentationUnit findByDocumentNumber(String documentNumber)
       throws DocumentationUnitNotExistsException;
 
+  DocumentationUnitListItem findDocumentationUnitListItemByDocumentNumber(String documentNumber)
+      throws DocumentationUnitNotExistsException;
+
   /**
    * Find a documentation unit by its UUID
    *

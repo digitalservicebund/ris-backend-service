@@ -22,6 +22,7 @@ import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.domain.export.juris.response.StatusImporterException;
 import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
 import java.time.Duration;
@@ -62,7 +63,7 @@ public class DocumentationUnitController {
   private final AttachmentService attachmentService;
   private final ConverterService converterService;
   private final HandoverService handoverService;
-  private final AuthService authService;
+  private final OAuthService OAuthService;
   private final DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
 
@@ -72,7 +73,7 @@ public class DocumentationUnitController {
       AttachmentService attachmentService,
       ConverterService converterService,
       HandoverService handoverService,
-      AuthService authService,
+      OAuthService OAuthService,
       DocumentationUnitDocxMetadataInitializationService
           documentationUnitDocxMetadataInitializationService) {
     this.service = service;
@@ -80,7 +81,7 @@ public class DocumentationUnitController {
     this.attachmentService = attachmentService;
     this.converterService = converterService;
     this.handoverService = handoverService;
-    this.authService = authService;
+    this.OAuthService = OAuthService;
     this.documentationUnitDocxMetadataInitializationService =
         documentationUnitDocxMetadataInitializationService;
   }
@@ -105,6 +106,19 @@ public class DocumentationUnitController {
     } catch (DocumentationUnitException e) {
       log.error("error in generate new documentation unit", e);
       return ResponseEntity.internalServerError().body(DocumentationUnit.builder().build());
+    }
+  }
+
+  @PutMapping(value = "/{documentNumber}/takeover", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("@userHasSameDocOfficeAsDocumentByDocumentNumber.apply(#documentNumber)")
+  public ResponseEntity<DocumentationUnitListItem> takeOverDocumentationUnit(
+      @AuthenticationPrincipal OidcUser oidcUser, @PathVariable String documentNumber) {
+    try {
+      var updatedDocumentationUnit = service.takeOverDocumentationUnit(documentNumber, oidcUser);
+
+      return ResponseEntity.ok(updatedDocumentationUnit);
+    } catch (Exception e) {
+      throw new StatusImporterException("Could not update publicationStatus", e);
     }
   }
 
@@ -205,7 +219,7 @@ public class DocumentationUnitController {
       var documentationUnit = service.getByDocumentNumber(documentNumber);
       return ResponseEntity.ok(
           documentationUnit.toBuilder()
-              .isEditable(authService.userHasWriteAccess(oidcUser, documentationUnit))
+              .isEditable(OAuthService.userHasWriteAccess(oidcUser, documentationUnit))
               .build());
     } catch (DocumentationUnitNotExistsException e) {
       log.error("Documentation unit '{}' doesn't exist", documentNumber);

@@ -121,7 +121,7 @@ export type DocumentationUnitParameters = {
 export default class DocumentUnit {
   readonly uuid: string
   readonly id?: string
-  readonly documentNumber?: string
+  readonly documentNumber: string = ""
   readonly status?: PublicationStatus
   public version: number = 0
   public attachments: Attachment[] = []

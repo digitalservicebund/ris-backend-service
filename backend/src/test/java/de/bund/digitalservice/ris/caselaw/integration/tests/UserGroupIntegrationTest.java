@@ -9,9 +9,10 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TES
 import ch.qos.logback.classic.Level;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
-import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseUserGroupService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
+import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.UserGroupController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitProcedureRepository;
@@ -23,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.AuthService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
@@ -51,7 +53,8 @@ import org.testcontainers.junit.jupiter.Container;
       KeycloakUserService.class,
       DatabaseUserGroupService.class,
       SecurityConfig.class,
-      AuthService.class,
+      OAuthService.class,
+      DatabaseDocumentationUnitStatusService.class,
       TestConfig.class,
     },
     controllers = {UserGroupController.class})
@@ -79,6 +82,7 @@ class UserGroupIntegrationTest {
   @Autowired private DatabaseProcedureRepository repository;
   @Autowired private DatabaseDocumentationUnitProcedureRepository linkRepository;
   @Autowired private DatabaseUserGroupRepository userGroupRepository;
+  @Autowired private AuthService authService;
 
   @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean private DocumentNumberService numberService;

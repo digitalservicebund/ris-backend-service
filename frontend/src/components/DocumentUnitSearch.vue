@@ -120,6 +120,30 @@ async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
 }
 
 /**
+ * Updates the status from 'Fremdanlage' to 'Unveröffentlicht'
+ * @param {DocumentUnitListEntry} documentUnitListEntry - The entry in the list to be updated
+ */
+async function handleTakeOver(documentUnitListEntry: DocumentUnitListEntry) {
+  const response = await service.takeOver(
+    documentUnitListEntry.documentNumber as string,
+  )
+
+  if (response.error) {
+    alert(response.error.title)
+  } else if (documentUnitListEntries.value) {
+    const index = documentUnitListEntries.value.findIndex(
+      (entry) => entry.uuid === documentUnitListEntry.uuid,
+    )
+
+    if (index !== -1) {
+      // Replace the old entry with the updated one
+      documentUnitListEntries.value[index] =
+        response.data as DocumentUnitListEntry
+    }
+  }
+}
+
+/**
  * When using the navigation a new page number is set, the search is triggered,
  * with the given page number.
  * @param {number} page - The page to be updated
@@ -173,7 +197,7 @@ async function createFromSearchQuery() {
     : []
   docUnit.coreData.decisionDate = dateFromQuery.value
   docUnit.coreData.court = courtFromQuery.value
-  await store.loadDocumentUnit(docUnit.documentNumber!)
+  await store.loadDocumentUnit(docUnit.documentNumber)
   store.documentUnit = docUnit
 
   const updateResponse = await store.updateDocumentUnit()
@@ -255,7 +279,8 @@ const showDefaultLink = computed(() => {
         :empty-state="emptyStateLabel"
         :is-loading="isLoading"
         :search-response-error="searchResponseError"
-        @delete-document-unit="handleDelete"
+        @delete-documentation-unit="handleDelete"
+        @take-over-documentation-unit="handleTakeOver"
       >
         <template v-if="isInternalUser" #newlink>
           <TextButton
