@@ -186,13 +186,15 @@ public class DocumentationUnitService {
   private DocumentationUnitListItem addPermissions(
       OidcUser oidcUser, DocumentationUnitListItem listItem)
       throws DocumentationUnitNotExistsException {
-    DocumentationUnit documentationUnit =
-        repository.findByDocumentNumber(listItem.documentNumber());
 
-    boolean hasWriteAccess = authService.userHasWriteAccess(oidcUser, documentationUnit);
+    boolean hasWriteAccess =
+        authService.userHasWriteAccess(
+            oidcUser,
+            listItem.creatingDocumentationOffice(),
+            listItem.documentationOffice(),
+            listItem.status());
     boolean isInternalUser = authService.userIsInternal().apply(oidcUser);
-    boolean isAssignedProcedure =
-        authService.isAssignedViaProcedure().apply(documentationUnit.uuid());
+    boolean isAssignedProcedure = authService.isAssignedViaProcedure().apply(listItem.uuid());
 
     return listItem.toBuilder()
         .isDeletable(hasWriteAccess && isInternalUser)

@@ -59,8 +59,10 @@ public class DocumentationUnitListItemTransformer {
             documentationUnitListItemDTO.getCreatingDocumentationOffice() == null
                 ? null
                 : DocumentationOfficeTransformer.transformToDomain(
-                        documentationUnitListItemDTO.getCreatingDocumentationOffice())
-                    .abbreviation())
+                    documentationUnitListItemDTO.getCreatingDocumentationOffice()))
+        .documentationOffice(
+            DocumentationOfficeTransformer.transformToDomain(
+                documentationUnitListItemDTO.getDocumentationOffice()))
         .source(
             documentationUnitListItemDTO.getSource().stream()
                 .map(SourceDTO::getValue)

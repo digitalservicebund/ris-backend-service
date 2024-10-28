@@ -42,7 +42,8 @@ public record DocumentationUnitListItem(
     UUID referencedDocumentationUnitId,
     Status status,
     String source,
-    String creatingDocumentationOffice,
+    DocumentationOffice creatingDocumentationOffice,
+    DocumentationOffice documentationOffice,
     Boolean hasNote,
     Boolean isDeletable,
     Boolean isEditable) {}
