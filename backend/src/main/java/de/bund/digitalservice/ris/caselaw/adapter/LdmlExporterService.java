@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitToLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
@@ -11,9 +12,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,9 +29,9 @@ import org.xml.sax.SAXException;
 
 @Service
 @Slf4j
-public class CaseLawPostgresToS3Exporter {
+public class LdmlExporterService {
 
-  private static final Logger logger = LogManager.getLogger(CaseLawPostgresToS3Exporter.class);
+  private static final Logger logger = LogManager.getLogger(LdmlExporterService.class);
 
   private final DocumentationUnitRepository documentationUnitRepository;
   private final DocumentBuilderFactory documentBuilderFactory;
@@ -42,7 +41,7 @@ public class CaseLawPostgresToS3Exporter {
   private final Schema schema;
 
   @Autowired
-  public CaseLawPostgresToS3Exporter(
+  public LdmlExporterService(
       DocumentationUnitRepository documentationUnitRepository,
       XmlUtilService xmlUtilService,
       DocumentBuilderFactory documentBuilderFactory,
@@ -55,10 +54,8 @@ public class CaseLawPostgresToS3Exporter {
     this.schema = xmlUtilService.getSchema("caselawhandover/shared/akomantoso30.xsd");
   }
 
-  //  @Async
-  //  @EventListener(value = ApplicationReadyEvent.class)
-  public void uploadCaseLaw() {
-    logger.info("Export caselaw process has started");
+  public void exportMultipleRandomDocumentationUnits() {
+    logger.info("Export to LDML process has started");
     List<DocumentationUnit> documentationUnitsToTransform = new ArrayList<>();
 
     List<UUID> idsToTransform = documentationUnitRepository.getRandomDocumentationUnitIds();
@@ -71,34 +68,32 @@ public class CaseLawPostgresToS3Exporter {
           }
         });
 
-    // Case law handover: decide on LDML update strategy (frequency, incremental, etc.)
-    Map<String, LocalDateTime> transformedDocUnits = new HashMap<>();
+    List<String> transformedDocUnits = new ArrayList<>();
     if (!documentationUnitsToTransform.isEmpty()) {
-      // Only process the first batch for now so dev environment only indexes 2000 entries
       for (DocumentationUnit documentationUnit : documentationUnitsToTransform) {
         var documentNumber = transformAndSaveDocumentationUnit(documentationUnit);
         if (documentNumber != null) {
-          transformedDocUnits.put(documentNumber, LocalDateTime.now());
+          transformedDocUnits.add(documentNumber);
         }
       }
     }
 
     if (!transformedDocUnits.isEmpty()) {
-      StringBuilder stringBuilder = new StringBuilder();
-      transformedDocUnits.forEach(
-          (documentNumber, localDateTime) -> {
-            stringBuilder.append(documentNumber);
-            stringBuilder.append(",");
-            stringBuilder.append(localDateTime);
-            stringBuilder.append(System.lineSeparator());
-          });
+      Changelog changelog = new Changelog(transformedDocUnits, null);
 
-      ldmlBucket.save(
-          "unprocessed_ids_" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".csv",
-          stringBuilder.toString());
+      ObjectMapper objectMapper = new ObjectMapper();
+
+      try {
+        String changelogString = objectMapper.writeValueAsString(changelog);
+        ldmlBucket.save(
+            "changelogs/" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".json",
+            changelogString);
+      } catch (IOException e) {
+        log.error("Could not write changelog file. {}", e.getMessage());
+      }
     }
 
-    logger.info("Export caselaw process is done");
+    logger.info("Export to LDML process is done");
   }
 
   public String transformAndSaveDocumentationUnit(DocumentationUnit documentationUnit) {

@@ -19,16 +19,16 @@ public class AdminController {
 
   private final MailTrackingService mailTrackingService;
   private final EnvironmentService environmentService;
-  private final CaseLawPostgresToS3Exporter caseLawPostgresToS3Exporter;
+  private final LdmlExporterService ldmlExporterService;
 
   @Autowired
   public AdminController(
       MailTrackingService mailTrackingService,
       EnvironmentService environmentService,
-      CaseLawPostgresToS3Exporter caseLawPostgresToS3Exporter) {
+      LdmlExporterService ldmlExporterService) {
     this.mailTrackingService = mailTrackingService;
     this.environmentService = environmentService;
-    this.caseLawPostgresToS3Exporter = caseLawPostgresToS3Exporter;
+    this.ldmlExporterService = ldmlExporterService;
   }
 
   @PostMapping("/webhook")
@@ -49,7 +49,7 @@ public class AdminController {
   @GetMapping("/ldml")
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<Void> createLdml() {
-    caseLawPostgresToS3Exporter.uploadCaseLaw();
+    ldmlExporterService.exportMultipleRandomDocumentationUnits();
     return ResponseEntity.ok().build();
   }
 

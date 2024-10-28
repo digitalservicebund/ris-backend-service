@@ -41,7 +41,7 @@ class CaseLawLdmlExportTest {
   static LdmlBucket caseLawBucket;
   static DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
   static XmlUtilService xmlUtilService = new XmlUtilService(new TransformerFactoryImpl());
-  static CaseLawPostgresToS3Exporter exporter;
+  static LdmlExporterService exporter;
   static DocumentationUnit testDocumentUnit;
   static UUID testUUID;
 
@@ -50,7 +50,7 @@ class CaseLawLdmlExportTest {
     documentationUnitRepository = mock(DocumentationUnitRepository.class);
     caseLawBucket = mock(LdmlBucket.class);
     exporter =
-        new CaseLawPostgresToS3Exporter(
+        new LdmlExporterService(
             documentationUnitRepository, xmlUtilService, documentBuilderFactory, caseLawBucket);
 
     PreviousDecision related1 =
@@ -98,7 +98,7 @@ class CaseLawLdmlExportTest {
         .thenReturn(List.of(UUID.randomUUID()));
     when(documentationUnitRepository.findByUuid(any())).thenReturn(testDocumentUnit);
 
-    exporter.uploadCaseLaw();
+    exporter.exportMultipleRandomDocumentationUnits();
     verify(caseLawBucket, times(2)).save(anyString(), anyString());
   }
 
@@ -116,7 +116,7 @@ class CaseLawLdmlExportTest {
         .thenReturn(List.of(UUID.randomUUID()));
     when(documentationUnitRepository.findByUuid(any())).thenReturn(invalidTestDocumentUnit);
 
-    exporter.uploadCaseLaw();
+    exporter.exportMultipleRandomDocumentationUnits();
     verify(caseLawBucket, times(0)).save(anyString(), anyString());
   }
 
@@ -129,7 +129,7 @@ class CaseLawLdmlExportTest {
         .thenReturn(List.of(UUID.randomUUID()));
     when(documentationUnitRepository.findByUuid(any())).thenReturn(invalidTestDocumentUnit);
 
-    exporter.uploadCaseLaw();
+    exporter.exportMultipleRandomDocumentationUnits();
     verify(caseLawBucket, times(0)).save(anyString(), anyString());
   }
 
