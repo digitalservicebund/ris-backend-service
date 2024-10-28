@@ -1,4 +1,5 @@
 import DocumentUnit, { Court, DocumentType } from "./documentUnit"
+import DocumentationOffice from "@/domain/documentationOffice"
 
 export default class DocumentUnitListEntry {
   public id?: string
@@ -16,7 +17,7 @@ export default class DocumentUnitListEntry {
   isDeletable?: boolean
   isEditable?: boolean
   source?: string
-  creatingDocumentationOffice?: string
+  creatingDocumentationOffice?: DocumentationOffice
 
   constructor(data: Partial<DocumentUnitListEntry> = {}) {
     Object.assign(this, data)

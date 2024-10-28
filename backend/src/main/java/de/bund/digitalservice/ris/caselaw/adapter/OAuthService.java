@@ -15,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
+import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -210,9 +211,22 @@ public class OAuthService implements AuthService {
   }
 
   public boolean userHasWriteAccess(OidcUser oidcUser, DocumentationUnit documentationUnit) {
-    return documentationUnit.status() != null && docUnitIsPending(documentationUnit)
-        ? userHasSameDocOfficeAsDocumentCreator(oidcUser, documentationUnit)
-        : userHasSameDocOfficeAsDocument(oidcUser, documentationUnit);
+    return documentationUnit.status() != null && docUnitIsPending(documentationUnit.status())
+        ? userHasSameDocOfficeAsDocumentCreator(
+            oidcUser, documentationUnit.coreData().creatingDocOffice(), documentationUnit.status())
+        : userHasSameDocOfficeAsDocument(
+            oidcUser, documentationUnit.coreData().documentationOffice());
+  }
+
+  @Override
+  public boolean userHasWriteAccess(
+      OidcUser oidcUser,
+      DocumentationOffice creatingDocOffice,
+      DocumentationOffice documentationOffice,
+      Status status) {
+    return status != null && docUnitIsPending(status)
+        ? userHasSameDocOfficeAsDocumentCreator(oidcUser, creatingDocOffice, status)
+        : userHasSameDocOfficeAsDocument(oidcUser, documentationOffice);
   }
 
   @Bean
@@ -298,7 +312,7 @@ public class OAuthService implements AuthService {
   }
 
   private boolean userHasWriteAccess(DocumentationUnit documentationUnit) {
-    return documentationUnit.status() != null && docUnitIsPending(documentationUnit)
+    return documentationUnit.status() != null && docUnitIsPending(documentationUnit.status())
         ? userHasSameDocOfficeAsDocumentCreator(documentationUnit)
         : userHasSameDocOfficeAsDocument(documentationUnit);
   }
@@ -321,36 +335,41 @@ public class OAuthService implements AuthService {
   private boolean userHasSameDocOfficeAsDocumentCreator(DocumentationUnit documentationUnit) {
     Optional<OidcUser> oidcUser = getOidcUser();
     return oidcUser
-        .filter(user -> userHasSameDocOfficeAsDocumentCreator(user, documentationUnit))
+        .filter(
+            user ->
+                userHasSameDocOfficeAsDocumentCreator(
+                    user,
+                    documentationUnit.coreData().creatingDocOffice(),
+                    documentationUnit.status()))
         .isPresent();
   }
 
   private boolean userHasSameDocOfficeAsDocumentCreator(
-      OidcUser oidcUser, DocumentationUnit documentationUnit) {
+      OidcUser oidcUser, DocumentationOffice creatingDocOffice, Status status) {
     DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidcUser);
-    return documentationUnit.status().publicationStatus() != null
-        && documentationUnit.coreData().creatingDocOffice() != null
-        && documentationUnit.coreData().creatingDocOffice().equals(documentationOffice);
+    return status.publicationStatus() != null
+        && creatingDocOffice != null
+        && creatingDocOffice.equals(documentationOffice);
   }
 
   private boolean userHasSameDocOfficeAsDocument(
-      OidcUser oidUser, DocumentationUnit documentationUnit) {
-    DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidUser);
-    return documentationUnit.coreData().documentationOffice().equals(documentationOffice);
+      OidcUser oidUser, DocumentationOffice documentationOffice) {
+    DocumentationOffice userDocumentationOffice = userService.getDocumentationOffice(oidUser);
+    return documentationOffice.equals(userDocumentationOffice);
   }
 
   private boolean userHasSameDocOfficeAsDocument(DocumentationUnit documentationUnit) {
     Optional<OidcUser> oidcUser = getOidcUser();
     return oidcUser
-        .filter(user -> userHasSameDocOfficeAsDocument(user, documentationUnit))
+        .filter(
+            user ->
+                userHasSameDocOfficeAsDocument(
+                    user, documentationUnit.coreData().documentationOffice()))
         .isPresent();
   }
 
-  private boolean docUnitIsPending(DocumentationUnit documentationUnit) {
-    return documentationUnit
-        .status()
-        .publicationStatus()
-        .equals(PublicationStatus.EXTERNAL_HANDOVER_PENDING);
+  private boolean docUnitIsPending(Status status) {
+    return status.publicationStatus().equals(PublicationStatus.EXTERNAL_HANDOVER_PENDING);
   }
 
   private boolean userHasSameDocOfficeAsProcedure(DocumentationOffice documentationOffice) {
