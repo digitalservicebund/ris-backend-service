@@ -34,7 +34,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @Import({SecurityConfig.class, TestConfig.class, OAuthService.class, KeycloakUserService.class})
 class LegalPeriodicalEditionControllerTest {
   @Autowired private RisWebTestClient risWebTestClient;
-  @Autowired private OAuthService OAuthService;
+  @Autowired private OAuthService oAuthService;
   @Autowired private KeycloakUserService keycloakUserService;
   @MockBean private LegalPeriodicalEditionService service;
 

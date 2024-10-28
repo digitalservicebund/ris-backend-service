@@ -263,8 +263,8 @@ class DocumentationUnitServiceTest {
     DocumentationUnitListItem documentationUnitListItem =
         DocumentationUnitListItem.builder().build();
     PageRequest pageRequest = PageRequest.of(0, 10);
-    when(authService.userIsInternal()).thenReturn(oidcUser -> true);
-    when(authService.isAssignedViaProcedure()).thenReturn(oidcUser -> true);
+    when(authService.userIsInternal()).thenReturn(user -> true);
+    when(authService.isAssignedViaProcedure()).thenReturn(user -> true);
     when(repository.findByDocumentNumber(any()))
         .thenReturn(DocumentationUnit.builder().uuid(UUID.randomUUID()).build());
     when(repository.searchByDocumentationUnitSearchInput(
@@ -293,8 +293,8 @@ class DocumentationUnitServiceTest {
     DocumentationUnitListItem documentationUnitListItem =
         DocumentationUnitListItem.builder().build();
     PageRequest pageRequest = PageRequest.of(0, 10);
-    when(authService.userIsInternal()).thenReturn(oidcUser -> true);
-    when(authService.isAssignedViaProcedure()).thenReturn(oidcUser -> true);
+    when(authService.userIsInternal()).thenReturn(user -> true);
+    when(authService.isAssignedViaProcedure()).thenReturn(user -> true);
     when(repository.findByDocumentNumber(any()))
         .thenReturn(DocumentationUnit.builder().uuid(UUID.randomUUID()).build());
     when(repository.searchByDocumentationUnitSearchInput(
