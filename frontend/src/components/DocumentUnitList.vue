@@ -15,6 +15,7 @@ import TableHeader from "@/components/TableHeader.vue"
 import TableRow from "@/components/TableRow.vue"
 import TableView from "@/components/TableView.vue"
 import { useStatusBadge } from "@/composables/useStatusBadge"
+import { PublicationState } from "@/domain/publicationStatus"
 import { ResponseError } from "@/services/httpClient"
 import IconAttachedFile from "~icons/ic/baseline-attach-file"
 import IconCheck from "~icons/ic/baseline-check"
@@ -197,12 +198,28 @@ function onDelete() {
             listEntry.documentType ? listEntry.documentType.jurisShortcut : "-"
           }}
         </CellItem>
-        <CellItem class="min-w-176">
+        <CellItem class="flex min-w-176 flex-row">
           <IconBadge
             v-if="listEntry.status?.publicationStatus"
+            class="inline-flex"
             v-bind="useStatusBadge(listEntry.status).value"
             data-testid="publication-status"
           />
+          <span
+            v-if="
+              listEntry.status?.publicationStatus ===
+              PublicationState.EXTERNAL_HANDOVER_PENDING
+            "
+            class="ds-body-reg-02"
+          >
+            {{
+              " aus " +
+              listEntry.source +
+              " (" +
+              listEntry.creatingDocumentationOffice +
+              ")"
+            }}
+          </span>
         </CellItem>
         <CellItem>
           <IconBadge

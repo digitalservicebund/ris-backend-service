@@ -287,7 +287,7 @@ test.describe(
     test(
       "Allow creation from periodical evaluation for foreign docoffice",
       {
-        tag: ["@RISDEV-4832"],
+        tag: ["@RISDEV-4832", "@RSIDEV-4980"],
         annotation: {
           type: "story",
           description:
@@ -421,6 +421,7 @@ test.describe(
               .click()
             const listEntry = pageWithBghUser.getByTestId("listEntry")
             await expect(listEntry).toHaveCount(1)
+            await expect(listEntry).toContainText("Fremdanlage aus MMG (DS)")
             await expect(
               pageWithBghUser.getByLabel("Dokumentationseinheit übernehmen"),
             ).toBeVisible()

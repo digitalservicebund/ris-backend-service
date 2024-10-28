@@ -111,6 +111,8 @@ describe("documentUnit list", () => {
           hasNote: true,
           isDeletable: false,
           isEditable: false,
+          source: "should not show source",
+          creatingDocumentationOffice: "should not show doc office",
         },
         {
           id: "id",
@@ -131,6 +133,27 @@ describe("documentUnit list", () => {
           isDeletable: true,
           isEditable: true,
         },
+        {
+          id: "id",
+          uuid: "3",
+          documentNumber: "567",
+          decisionDate: "2024-02-10",
+          fileNumber: "",
+          appraisalBody: "1. Senat",
+          documentType: { label: "Urteil", jurisShortcut: "Urt" },
+          court: { type: "LG", location: "Berlin", label: "LG Berlin" },
+          status: {
+            publicationStatus: PublicationState.EXTERNAL_HANDOVER_PENDING,
+            withError: false,
+          },
+          hasAttachments: false,
+          hasHeadnoteOrPrinciple: false,
+          hasNote: false,
+          isDeletable: false,
+          isEditable: false,
+          source: "NJW",
+          creatingDocumentationOffice: "DS",
+        },
       ],
     })
 
@@ -139,7 +162,7 @@ describe("documentUnit list", () => {
       screen.getByRole("link", { name: "Dokumentationseinheit bearbeiten" }),
     ).toBeInTheDocument()
 
-    expect(screen.getAllByTestId("listEntry").length).toBe(2)
+    expect(screen.getAllByTestId("listEntry").length).toBe(3)
 
     //Spruchkörper visible
     expect(screen.getByText("cba")).toBeVisible()
@@ -155,21 +178,29 @@ describe("documentUnit list", () => {
     ).toBeVisible()
 
     // expect Notes
+    expect(screen.getAllByLabelText("Keine Notiz vorhanden")).toHaveLength(2)
     expect(screen.getByLabelText("Notiz vorhanden")).toBeVisible()
-    expect(screen.getByLabelText("Keine Notiz vorhanden")).toBeVisible()
 
     // expect Headnote or Principal
+    expect(screen.getAllByLabelText("Kein Kurztext vorhanden")).toHaveLength(2)
     expect(screen.getByLabelText("Kurztext vorhanden")).toBeVisible()
-    expect(screen.getByLabelText("Kein Kurztext vorhanden")).toBeVisible()
 
     // expect Attachment
+    expect(screen.getAllByLabelText("Kein Anhang vorhanden")).toHaveLength(2)
     expect(screen.getByLabelText("Anhang vorhanden")).toBeVisible()
-    expect(screen.getByLabelText("Kein Anhang vorhanden")).toBeVisible()
 
-    // expect two view links
+    // expect three view links
     expect(
       screen.getAllByRole("link", { name: "Dokumentationseinheit ansehen" }),
-    ).toHaveLength(2)
+    ).toHaveLength(3)
+
+    expect(screen.getByText("Fremdanlage")).toBeVisible()
+    expect(screen.getByText("aus NJW (DS)")).toBeVisible()
+
+    expect(screen.queryByText("should not show source")).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("should not show doc office"),
+    ).not.toBeInTheDocument()
   })
 
   test("delete emits event", async () => {
