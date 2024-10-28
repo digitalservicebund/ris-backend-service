@@ -3,7 +3,6 @@ services:
     image: ghcr.io/digitalservicebund/ris-data-migration:85748c60ed778b2c6ad78699f986e3cc21961079
     depends_on:
       - postgres14
-    platform: linux/amd64
     environment:
       - SPRING_PROFILES_ACTIVE=feature-development,dev
       - RIS_MIGRATION_RUNNER=feature-development
