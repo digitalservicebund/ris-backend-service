@@ -63,7 +63,7 @@ public class DocumentationUnitController {
   private final AttachmentService attachmentService;
   private final ConverterService converterService;
   private final HandoverService handoverService;
-  private final OAuthService OAuthService;
+  private final OAuthService oAuthService;
   private final DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
 
@@ -73,7 +73,7 @@ public class DocumentationUnitController {
       AttachmentService attachmentService,
       ConverterService converterService,
       HandoverService handoverService,
-      OAuthService OAuthService,
+      OAuthService oAuthService,
       DocumentationUnitDocxMetadataInitializationService
           documentationUnitDocxMetadataInitializationService) {
     this.service = service;
@@ -81,7 +81,7 @@ public class DocumentationUnitController {
     this.attachmentService = attachmentService;
     this.converterService = converterService;
     this.handoverService = handoverService;
-    this.OAuthService = OAuthService;
+    this.oAuthService = oAuthService;
     this.documentationUnitDocxMetadataInitializationService =
         documentationUnitDocxMetadataInitializationService;
   }
@@ -219,7 +219,7 @@ public class DocumentationUnitController {
       var documentationUnit = service.getByDocumentNumber(documentNumber);
       return ResponseEntity.ok(
           documentationUnit.toBuilder()
-              .isEditable(OAuthService.userHasWriteAccess(oidcUser, documentationUnit))
+              .isEditable(oAuthService.userHasWriteAccess(oidcUser, documentationUnit))
               .build());
     } catch (DocumentationUnitNotExistsException e) {
       log.error("Documentation unit '{}' doesn't exist", documentNumber);

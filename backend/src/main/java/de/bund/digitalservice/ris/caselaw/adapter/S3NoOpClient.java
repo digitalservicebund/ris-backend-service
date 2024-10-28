@@ -1,7 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -15,8 +13,6 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 public class S3NoOpClient implements S3Client {
-  private static final Logger LOGGER = LoggerFactory.getLogger(S3NoOpClient.class);
-
   @Override
   public String serviceName() {
     return null;
