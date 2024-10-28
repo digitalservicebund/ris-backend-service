@@ -70,7 +70,7 @@ function cancelEdit() {
 
 /**
  *
- * Removes a new list item, with the given entry, by propagating an updated list without the list item
+ * Removes a new list item, with the given entrsy, by propagating an updated list without the list item
  * at the given index to the parent component. Resets edited entry reset, to show list in summary mode.
  * @param entry
  */
@@ -162,7 +162,7 @@ watch(
       aria-label="Listen Eintrag"
     >
       <div
-        v-if="!isSelected(entry)"
+        v-if="!isSelected(entry as T)"
         :key="index"
         class="group flex gap-8 border-b-1 border-blue-300 py-16"
         :class="{ 'border-t-1': index == 0 }"
@@ -176,13 +176,13 @@ watch(
             @click="
               () => {
                 toggleDisplayDefaultValue(false)
-                setEditEntry(entry)
+                setEditEntry(entry as T)
               }
             "
             @keypress.enter="
               () => {
                 toggleDisplayDefaultValue(false)
-                setEditEntry(entry)
+                setEditEntry(entry as T)
               }
             "
           >
@@ -193,7 +193,7 @@ watch(
 
       <component
         :is="editComponent"
-        v-if="isSelected(entry)"
+        v-if="isSelected(entry as T)"
         v-model="modelValueList[index]"
         class="py-24"
         :class="{ 'pt-0': index == 0 }"
@@ -201,7 +201,7 @@ watch(
         :model-value-list="modelValueList"
         @add-entry="updateModel"
         @cancel-edit="cancelEdit"
-        @remove-entry="removeEntry(entry)"
+        @remove-entry="removeEntry(entry as T)"
       />
     </div>
 
