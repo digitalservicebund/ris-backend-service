@@ -80,7 +80,7 @@ ORDER BY documentationUnit.decisionDate DESC NULLS LAST
   SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
   LEFT JOIN documentationUnit.court court
   LEFT JOIN documentationUnit.fileNumbers fileNumber
-  WHERE (upper(fileNumber.value) like upper(concat('%', :fileNumber,'%')))
+  WHERE (upper(fileNumber.value) like upper(concat(:fileNumber,'%')))
   AND
   """
               + BASE_QUERY)
@@ -107,7 +107,7 @@ ORDER BY documentationUnit.decisionDate DESC NULLS LAST
   SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
   LEFT JOIN documentationUnit.court court
   LEFT JOIN documentationUnit.deviatingFileNumbers deviatingFileNumber
-  WHERE (upper(deviatingFileNumber.value) like upper(concat('%', :fileNumber,'%')))
+  WHERE (upper(deviatingFileNumber.value) like upper(concat(:fileNumber,'%')))
   AND
   """
               + BASE_QUERY)
