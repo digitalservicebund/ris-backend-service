@@ -17,15 +17,18 @@ function renderComponent(
     attachments?: Attachment[]
     references?: Reference[]
     enabledPanels?: SelectablePanelContent[]
+    showEditButton?: boolean
+    isEditable?: boolean
   } = {},
 ) {
   const user = userEvent.setup()
   return {
     user,
     ...render(ExtraContentSidePanel, {
-      props: options.enabledPanels
-        ? { enabledPanels: options.enabledPanels }
-        : {},
+      props: {
+        enabledPanels: options.enabledPanels || undefined,
+        showEditButton: options.showEditButton,
+      },
       global: {
         plugins: [
           [router],
@@ -37,6 +40,7 @@ function renderComponent(
                     documentNumber: "1234567891234",
                     note: options.note ?? "",
                     attachments: options.attachments ?? [],
+                    isEditable: options.isEditable || false,
                   }),
                 },
               },
@@ -306,5 +310,53 @@ describe("ExtraContentSidePanel", () => {
         }),
       )
     })
+  })
+
+  describe("test edit button link behaviour", async () => {
+    const testCases = [
+      {
+        showEditButton: true,
+        isEditable: true,
+      },
+      {
+        showEditButton: false,
+        isEditable: false,
+      },
+      {
+        showEditButton: true,
+        isEditable: false,
+      },
+    ]
+
+    testCases.forEach(({ showEditButton, isEditable }) =>
+      test(`edition button link display: ${showEditButton} and document unit is editable: ${isEditable}`, async () => {
+        renderComponent({
+          note: "some note",
+          attachments: [],
+          showEditButton: showEditButton,
+          isEditable: isEditable,
+        })
+
+        if (showEditButton) {
+          expect(
+            await screen.findByLabelText("Dokumentationseinheit bearbeiten"),
+          ).toBeVisible()
+
+          if (isEditable) {
+            expect(
+              await screen.findByLabelText("edit-link-button"),
+            ).toBeEnabled()
+          } else {
+            expect(
+              await screen.findByLabelText("edit-link-button"),
+            ).toBeDisabled()
+          }
+        } else {
+          expect(
+            screen.queryByLabelText("Dokumentationseinheit bearbeiten"),
+          ).not.toBeInTheDocument()
+        }
+      }),
+    )
   })
 })
