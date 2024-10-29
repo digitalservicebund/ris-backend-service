@@ -6,6 +6,8 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 public interface AuthService {
 
+  boolean userCanDelete(OidcUser oidcUser, DocumentationOffice documentationOffice, Status status);
+
   boolean userHasWriteAccess(
       OidcUser oidcUser,
       DocumentationOffice creatingDocOffice,

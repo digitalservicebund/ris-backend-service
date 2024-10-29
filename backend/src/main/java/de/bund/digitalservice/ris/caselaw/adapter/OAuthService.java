@@ -210,6 +210,19 @@ public class OAuthService implements AuthService {
     };
   }
 
+  @Bean
+  public Function<UUID, Boolean> userHasDeletePermissions() {
+    return uuid -> {
+      try {
+        return Optional.ofNullable(documentationUnitService.getByUuid(uuid))
+            .map(this::userHasDeletePermissions)
+            .orElse(false);
+      } catch (DocumentationUnitNotExistsException e) {
+        return false;
+      }
+    };
+  }
+
   public boolean userHasWriteAccess(OidcUser oidcUser, DocumentationUnit documentationUnit) {
     DocumentationOffice userDocumentationOffice = userService.getDocumentationOffice(oidcUser);
     return documentationUnit.status() != null && docUnitIsPending(documentationUnit.status())
@@ -231,6 +244,15 @@ public class OAuthService implements AuthService {
     return status != null && docUnitIsPending(status)
         ? userHasSameDocOfficeAsDocumentCreator(userDocumentationOffice, creatingDocOffice, status)
         : userHasSameDocOfficeAsDocument(userDocumentationOffice, documentationOffice);
+  }
+
+  @Override
+  public boolean userCanDelete(
+      OidcUser oidcUser, DocumentationOffice documentationOffice, Status status) {
+    DocumentationOffice userDocumentationOffice = userService.getDocumentationOffice(oidcUser);
+    return status != null
+        && docUnitIsPending(status)
+        && userHasSameDocOfficeAsDocument(userDocumentationOffice, documentationOffice);
   }
 
   @Bean
@@ -319,6 +341,12 @@ public class OAuthService implements AuthService {
     return documentationUnit.status() != null && docUnitIsPending(documentationUnit.status())
         ? userHasSameDocOfficeAsDocumentCreator(documentationUnit)
         : userHasSameDocOfficeAsDocument(documentationUnit);
+  }
+
+  private boolean userHasDeletePermissions(DocumentationUnit documentationUnit) {
+    return documentationUnit.status() != null
+        && docUnitIsPending(documentationUnit.status())
+        && userHasSameDocOfficeAsDocument(documentationUnit);
   }
 
   private boolean userHasReadAccess(DocumentationUnit documentationUnit) {
