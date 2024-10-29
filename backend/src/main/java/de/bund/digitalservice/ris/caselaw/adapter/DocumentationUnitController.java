@@ -63,6 +63,7 @@ public class DocumentationUnitController {
   private final AttachmentService attachmentService;
   private final ConverterService converterService;
   private final HandoverService handoverService;
+  private final LdmlExporterService ldmlExporterService;
   private final OAuthService oAuthService;
   private final DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
@@ -73,6 +74,7 @@ public class DocumentationUnitController {
       AttachmentService attachmentService,
       ConverterService converterService,
       HandoverService handoverService,
+      LdmlExporterService ldmlExporterService,
       OAuthService oAuthService,
       DocumentationUnitDocxMetadataInitializationService
           documentationUnitDocxMetadataInitializationService) {
@@ -81,6 +83,7 @@ public class DocumentationUnitController {
     this.attachmentService = attachmentService;
     this.converterService = converterService;
     this.handoverService = handoverService;
+    this.ldmlExporterService = ldmlExporterService;
     this.oAuthService = oAuthService;
     this.documentationUnitDocxMetadataInitializationService =
         documentationUnitDocxMetadataInitializationService;
@@ -415,6 +418,24 @@ public class DocumentationUnitController {
           singleNormValidationInfo.normAbbreviation(),
           singleNormValidationInfo.singleNorm(),
           ex);
+      return ResponseEntity.internalServerError().build();
+    }
+  }
+
+  /**
+   * Transforms the documentation unit to LDML and hands it over to the portal to be published.
+   *
+   * @param uuid UUID of the documentation unit
+   */
+  @PutMapping(value = "/{uuid}/publish")
+  @PreAuthorize("@userHasWriteAccess.apply(#uuid)")
+  public ResponseEntity<Void> publishDocumentationUnit(@PathVariable UUID uuid) {
+
+    try {
+      ldmlExporterService.publishDocumentationUnit(uuid);
+      return ResponseEntity.ok().build();
+    } catch (DocumentationUnitNotExistsException e) {
+      log.error("Error handing over documentation unit '{}' to portal", uuid, e);
       return ResponseEntity.internalServerError().build();
     }
   }

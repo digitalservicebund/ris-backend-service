@@ -82,6 +82,7 @@ class DocumentationUnitControllerTest {
   @MockBean private DocumentationUnitService service;
   @MockBean private DocumentationUnitDocxMetadataInitializationService docUnitAttachmentService;
   @MockBean private HandoverService handoverService;
+  @MockBean private LdmlExporterService ldmlExporterService;
   @MockBean private UserService userService;
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;

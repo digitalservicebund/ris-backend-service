@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitToLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
@@ -94,6 +95,40 @@ public class LdmlExporterService {
     }
 
     logger.info("Export to LDML process is done");
+  }
+
+  public void publishDocumentationUnit(UUID documentationUnitId)
+      throws DocumentationUnitNotExistsException {
+    DocumentationUnit documentationUnit =
+        documentationUnitRepository.findByUuid(documentationUnitId);
+    Optional<CaseLawLdml> ldml =
+        DocumentationUnitToLdmlTransformer.transformToLdml(
+            documentationUnit, documentBuilderFactory);
+
+    if (ldml.isPresent()) {
+      Optional<String> fileContent = ldmlToString(ldml.get());
+      if (fileContent.isPresent()) {
+        Changelog changelog = new Changelog(List.of(ldml.get().getUniqueId()), null);
+        String changelogJson = null;
+        try {
+          changelogJson = objectMapper.writeValueAsString(changelog);
+        } catch (IOException e) {
+          log.error("Could not write changelog file. {}", e.getMessage());
+        }
+
+        if (changelogJson != null) {
+          ldmlBucket.save(
+              "changelogs/" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".json",
+              changelogJson);
+          ldmlBucket.save(ldml.get().getUniqueId() + ".xml", fileContent.get());
+          log.info(
+              "LDML for documentation unit {} successfully published.", ldml.get().getUniqueId());
+        } else {
+          log.error("Could not publish documentation unit to portal.");
+          throw new PublishException("Could not publish documentation unit to portal.");
+        }
+      }
+    }
   }
 
   public String transformAndSaveDocumentationUnit(DocumentationUnit documentationUnit) {
