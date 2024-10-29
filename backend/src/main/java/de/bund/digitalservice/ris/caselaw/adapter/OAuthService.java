@@ -249,9 +249,10 @@ public class OAuthService implements AuthService {
   @Override
   public boolean userCanDelete(
       OidcUser oidcUser, DocumentationOffice documentationOffice, Status status) {
+    DocumentationOffice userDocumentationOffice = userService.getDocumentationOffice(oidcUser);
     return status != null
         && docUnitIsPending(status)
-        && userHasSameDocOfficeAsDocument(oidcUser, documentationOffice);
+        && userHasSameDocOfficeAsDocument(userDocumentationOffice, documentationOffice);
   }
 
   @Bean
