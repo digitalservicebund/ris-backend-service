@@ -228,8 +228,7 @@ public class DocumentationUnitController {
   }
 
   @DeleteMapping(value = "/{uuid}")
-  @PreAuthorize(
-      "@userIsInternal.apply(#oidcUser) and (@userHasWriteAccess.apply(#uuid) || @userHasDeletePermissions.apply(#uuid))")
+  @PreAuthorize("@userIsInternal.apply(#oidcUser) and @userHasWriteAccess.apply(#uuid)")
   public ResponseEntity<String> deleteByUuid(
       @AuthenticationPrincipal OidcUser oidcUser, @PathVariable UUID uuid) {
 
