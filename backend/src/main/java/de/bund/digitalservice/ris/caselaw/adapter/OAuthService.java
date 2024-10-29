@@ -224,11 +224,14 @@ public class OAuthService implements AuthService {
   }
 
   public boolean userHasWriteAccess(OidcUser oidcUser, DocumentationUnit documentationUnit) {
+    DocumentationOffice userDocumentationOffice = userService.getDocumentationOffice(oidcUser);
     return documentationUnit.status() != null && docUnitIsPending(documentationUnit.status())
         ? userHasSameDocOfficeAsDocumentCreator(
-            oidcUser, documentationUnit.coreData().creatingDocOffice(), documentationUnit.status())
+            userDocumentationOffice,
+            documentationUnit.coreData().creatingDocOffice(),
+            documentationUnit.status())
         : userHasSameDocOfficeAsDocument(
-            oidcUser, documentationUnit.coreData().documentationOffice());
+            userDocumentationOffice, documentationUnit.coreData().documentationOffice());
   }
 
   @Override
@@ -237,9 +240,10 @@ public class OAuthService implements AuthService {
       DocumentationOffice creatingDocOffice,
       DocumentationOffice documentationOffice,
       Status status) {
+    DocumentationOffice userDocumentationOffice = userService.getDocumentationOffice(oidcUser);
     return status != null && docUnitIsPending(status)
-        ? userHasSameDocOfficeAsDocumentCreator(oidcUser, creatingDocOffice, status)
-        : userHasSameDocOfficeAsDocument(oidcUser, documentationOffice);
+        ? userHasSameDocOfficeAsDocumentCreator(userDocumentationOffice, creatingDocOffice, status)
+        : userHasSameDocOfficeAsDocument(userDocumentationOffice, documentationOffice);
   }
 
   @Override
@@ -361,37 +365,43 @@ public class OAuthService implements AuthService {
 
   private boolean userHasSameDocOfficeAsDocumentCreator(DocumentationUnit documentationUnit) {
     Optional<OidcUser> oidcUser = getOidcUser();
+    DocumentationOffice userDocumentationOffice =
+        oidcUser.map(userService::getDocumentationOffice).orElse(null);
+
     return oidcUser
         .filter(
             user ->
                 userHasSameDocOfficeAsDocumentCreator(
-                    user,
+                    userDocumentationOffice,
                     documentationUnit.coreData().creatingDocOffice(),
                     documentationUnit.status()))
         .isPresent();
   }
 
   private boolean userHasSameDocOfficeAsDocumentCreator(
-      OidcUser oidcUser, DocumentationOffice creatingDocOffice, Status status) {
-    DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidcUser);
+      DocumentationOffice documentationOffice,
+      DocumentationOffice creatingDocOffice,
+      Status status) {
+    ;
     return status.publicationStatus() != null
         && creatingDocOffice != null
         && creatingDocOffice.equals(documentationOffice);
   }
 
   private boolean userHasSameDocOfficeAsDocument(
-      OidcUser oidUser, DocumentationOffice documentationOffice) {
-    DocumentationOffice userDocumentationOffice = userService.getDocumentationOffice(oidUser);
+      DocumentationOffice userDocumentationOffice, DocumentationOffice documentationOffice) {
     return documentationOffice.equals(userDocumentationOffice);
   }
 
   private boolean userHasSameDocOfficeAsDocument(DocumentationUnit documentationUnit) {
     Optional<OidcUser> oidcUser = getOidcUser();
+    DocumentationOffice userDocumentationOffice =
+        oidcUser.map(userService::getDocumentationOffice).orElse(null);
     return oidcUser
         .filter(
             user ->
                 userHasSameDocOfficeAsDocument(
-                    user, documentationUnit.coreData().documentationOffice()))
+                    userDocumentationOffice, documentationUnit.coreData().documentationOffice()))
         .isPresent();
   }
 
