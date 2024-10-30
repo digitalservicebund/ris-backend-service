@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitToLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
@@ -128,6 +129,9 @@ public class LdmlExporterService {
           throw new PublishException("Could not publish documentation unit to portal.");
         }
       }
+    } else {
+      throw new LdmlTransformationException(
+          "Could not transform documentation unit to LDML.", null);
     }
   }
 

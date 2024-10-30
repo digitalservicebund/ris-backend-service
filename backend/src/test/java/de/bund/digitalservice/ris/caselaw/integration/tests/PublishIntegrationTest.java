@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
@@ -65,6 +66,7 @@ import org.testcontainers.junit.jupiter.Container;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @RISIntegrationTest(
     imports = {
@@ -148,32 +150,7 @@ class PublishIntegrationTest {
 
   @Test
   void testPublishSuccessfully() {
-
-    CourtDTO court =
-        databaseCourtRepository.saveAndFlush(
-            CourtDTO.builder()
-                .type("AG")
-                .location("Aachen")
-                .isSuperiorCourt(false)
-                .isForeignCourt(false)
-                .jurisId(new Random().nextInt())
-                .build());
-
-    var docType =
-        databaseDocumentTypeRepository.saveAndFlush(
-            DocumentTypeDTO.builder().abbreviation("test").multiple(true).build());
-    DocumentationUnitDTO dto =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository,
-            DocumentationUnitDTO.builder()
-                .documentNumber(DEFAULT_DOCUMENT_NUMBER)
-                .documentType(docType)
-                .documentationOffice(documentationOffice)
-                .court(court)
-                .decisionDate(LocalDate.now())
-                .legalEffect(LegalEffectDTO.JA)
-                .fileNumbers(List.of(FileNumberDTO.builder().value("123").rank(0L).build()))
-                .grounds("lorem ipsum dolor sit amet"));
+    DocumentationUnitDTO dto = buildValidDocumentationUnit();
 
     risWebTestClient
         .withDefaultLogin()
@@ -190,5 +167,64 @@ class PublishIntegrationTest {
     var capturedRequests = captor.getAllValues();
     assertThat(capturedRequests.get(0).key()).contains("changelogs/");
     assertThat(capturedRequests.get(1).key()).isEqualTo("1234567890123.xml");
+  }
+
+  @Test
+  void testPublishFailsWithMissingMandatoryFields() {
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, documentationOffice);
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
+        .exchange()
+        .expectStatus()
+        .is4xxClientError();
+  }
+
+  @Test
+  void testPublishFailsWhenS3ClientThrowsException() {
+    DocumentationUnitDTO dto = buildValidDocumentationUnit();
+
+    when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
+        .thenThrow(S3Exception.class);
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
+        .exchange()
+        .expectStatus()
+        .is5xxServerError();
+  }
+
+  private DocumentationUnitDTO buildValidDocumentationUnit() {
+    CourtDTO court =
+        databaseCourtRepository.saveAndFlush(
+            CourtDTO.builder()
+                .type("AG")
+                .location("Aachen")
+                .isSuperiorCourt(false)
+                .isForeignCourt(false)
+                .jurisId(new Random().nextInt())
+                .build());
+
+    var docType =
+        databaseDocumentTypeRepository.saveAndFlush(
+            DocumentTypeDTO.builder().abbreviation("test").multiple(true).build());
+
+    return EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DocumentationUnitDTO.builder()
+            .documentNumber(DEFAULT_DOCUMENT_NUMBER)
+            .documentType(docType)
+            .documentationOffice(documentationOffice)
+            .court(court)
+            .decisionDate(LocalDate.now())
+            .legalEffect(LegalEffectDTO.JA)
+            .fileNumbers(List.of(FileNumberDTO.builder().value("123").rank(0L).build()))
+            .grounds("lorem ipsum dolor sit amet"));
   }
 }
