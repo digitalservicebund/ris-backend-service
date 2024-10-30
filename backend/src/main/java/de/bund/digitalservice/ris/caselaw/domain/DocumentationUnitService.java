@@ -113,6 +113,8 @@ public class DocumentationUnitService {
         params.reference(),
         params.reference() != null && params.reference().legalPeriodical() != null
             ? params.reference().legalPeriodical().abbreviation()
+                + " "
+                + params.reference().citation()
             : null);
   }
 
