@@ -19,9 +19,9 @@ const props = withDefaults(defineProps<Props>(), {
 const documentUnitStore = useDocumentUnitStore()
 const extraContentSidePanelStore = useExtraContentSidePanelStore()
 
-function openSidePanel(documentUnitNumber?: string) {
+async function openSidePanel(documentUnitNumber?: string) {
   if (documentUnitNumber) {
-    documentUnitStore.loadDocumentUnit(documentUnitNumber)
+    await documentUnitStore.loadDocumentUnit(documentUnitNumber)
     extraContentSidePanelStore.togglePanel(true)
     extraContentSidePanelStore.setSidePanelMode("preview")
   }

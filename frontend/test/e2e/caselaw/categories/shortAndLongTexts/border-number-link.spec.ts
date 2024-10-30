@@ -27,7 +27,6 @@ test.beforeEach(async ({ page, documentNumber }) => {
     5. Delete original border numbers in reasons
     6. Check validation state after save
 */
-// eslint-disable-next-line playwright/no-skipped-test
 test("create and validate border number links", async ({
   page,
   documentNumber,

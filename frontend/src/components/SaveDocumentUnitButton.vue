@@ -13,12 +13,12 @@ const { saveIsInProgress, triggerSave, lastSaveError, formattedLastSavedOn } =
 const getErrorDetails = () =>
   lastSaveError.value?.title ? ": " + lastSaveError.value.title : ""
 
-onBeforeUnmount(function () {
-  triggerSave()
+onBeforeUnmount(async function () {
+  await triggerSave()
   window.onbeforeunload = null
 })
 window.onbeforeunload = function () {
-  triggerSave()
+  void triggerSave()
 }
 </script>
 

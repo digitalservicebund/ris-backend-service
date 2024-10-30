@@ -11,7 +11,6 @@ import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 
 function renderComponent(options?: { modelValue?: NormReference }) {
-  // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
   const props = {
     modelValue: new NormReference({ ...options?.modelValue }),

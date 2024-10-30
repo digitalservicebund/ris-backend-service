@@ -11,7 +11,6 @@ import legalPeriodicalEditionService from "@/services/legalPeriodicalEditionServ
 import routes from "~/test-helper/routes"
 
 function renderComponent() {
-  // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
 
   const router = createRouter({

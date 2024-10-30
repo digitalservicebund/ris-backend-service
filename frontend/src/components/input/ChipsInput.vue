@@ -94,7 +94,7 @@ const focusInput = () => {
   chipsInput.value?.focus()
 }
 
-async function focusInputIfEmpty() {
+function focusInputIfEmpty() {
   if (props.modelValue?.length === 1) focusInput()
 }
 

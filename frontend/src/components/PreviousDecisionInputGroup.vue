@@ -103,7 +103,7 @@ async function search() {
 
 async function updatePage(page: number) {
   pageNumber.value = page
-  search()
+  await search()
 }
 
 async function validateRequiredInput() {
@@ -170,9 +170,9 @@ watch(
   },
 )
 
-onMounted(() => {
+onMounted(async () => {
   if (props.modelValue?.isEmpty !== undefined) {
-    validateRequiredInput()
+    await validateRequiredInput()
   }
   previousDecision.value = new PreviousDecision({ ...props.modelValue })
 })

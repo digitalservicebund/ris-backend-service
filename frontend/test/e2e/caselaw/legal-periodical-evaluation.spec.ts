@@ -12,7 +12,6 @@ import { generateString } from "~/test-helper/dataGenerators"
 
 const formattedDate = dayjs().format("DD.MM.YYYY")
 
-/* eslint-disable playwright/no-conditional-expect */
 /* eslint-disable playwright/no-conditional-in-test */
 
 test.describe(
@@ -169,7 +168,7 @@ test.describe(
           // Wait until the page is fully loaded
           await page.waitForLoadState("load")
           await page.waitForURL(
-            /\/caselaw\/periodical-evaluation\/[0-9a-fA-F\-]{36}\/edition/,
+            /\/caselaw\/periodical-evaluation\/[0-9a-fA-F-]{36}\/edition/,
           )
         })
 
@@ -197,7 +196,7 @@ test.describe(
             await page.getByLabel("Fortfahren").click()
 
             await page.waitForURL(
-              /\/caselaw\/periodical-evaluation\/[0-9a-fA-F\-]{36}\/references/,
+              /\/caselaw\/periodical-evaluation\/[0-9a-fA-F-]{36}\/references/,
               { timeout: 5_000 },
             )
 

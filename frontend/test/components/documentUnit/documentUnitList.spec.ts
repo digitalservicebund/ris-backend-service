@@ -17,7 +17,6 @@ function renderComponent(options?: {
   emptyState?: string
   activeUser?: User
 }) {
-  // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
 
   return {

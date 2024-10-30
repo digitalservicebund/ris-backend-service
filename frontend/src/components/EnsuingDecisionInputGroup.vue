@@ -101,10 +101,10 @@ async function search() {
 
 async function updatePage(page: number) {
   pageNumber.value = page
-  search()
+  await search()
 }
 
-async function validateRequiredInput() {
+function validateRequiredInput() {
   validationStore.reset()
   if (ensuingDecision.value.missingRequiredFields?.length) {
     ensuingDecision.value.missingRequiredFields.forEach((missingField) => {
@@ -113,7 +113,7 @@ async function validateRequiredInput() {
   }
 }
 
-async function addEnsuingDecision() {
+function addEnsuingDecision() {
   if (
     !validationStore.getByMessage("Kein valides Datum").length &&
     !validationStore.getByMessage("Unvollständiges Datum").length &&
@@ -126,7 +126,7 @@ async function addEnsuingDecision() {
   }
 }
 
-async function addEnsuingDecisionFromSearch(decision: RelatedDocumentation) {
+function addEnsuingDecisionFromSearch(decision: RelatedDocumentation) {
   ensuingDecision.value = new EnsuingDecision({
     ...decision,
     pending: ensuingDecision.value?.pending,
@@ -226,7 +226,8 @@ onMounted(() => {
             label="Entscheidungsdatum *"
             :validation-error="validationStore.getByField('decisionDate')"
             @update:validation-error="
-              (validationError) => updateDateFormatValidation(validationError)
+              (validationError: ValidationError | undefined) =>
+                updateDateFormatValidation(validationError)
             "
           >
             <DateInput
