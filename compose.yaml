@@ -1,6 +1,6 @@
 services:
   initialization:
-    image: ghcr.io/digitalservicebund/ris-data-migration:85748c60ed778b2c6ad78699f986e3cc21961079
+    image: ghcr.io/digitalservicebund/ris-data-migration:7365c89e5ea83932c1d5f1dd00a63ccfd4d6fe90
     depends_on:
       - postgres14
     environment:
@@ -153,7 +153,7 @@ services:
       timeout: 3s
 
   redis:
-    image: cgr.dev/chainguard/redis@sha256:156a5ea475908c3b4e488c37bb897197b235b66b98bd37a04bb0bbfcf61b72d0
+    image: cgr.dev/chainguard/redis@sha256:c1156e305ccdcec2ee6597f95ff1fc46fe2ce395a92c8a1389b7b4835dc795ff
     extra_hosts:
       - localhost:host-gateway
     container_name: redis

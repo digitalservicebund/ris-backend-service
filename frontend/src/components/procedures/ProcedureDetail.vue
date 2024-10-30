@@ -33,7 +33,7 @@ const isLoading = computed(
       :document-unit-list-entries="docUnits"
       :is-loading="isLoading"
       :search-response-error="responseError"
-      @delete-document-unit="emit('deleteDocumentUnit', $event, procedure)"
+      @delete-documentation-unit="emit('deleteDocumentUnit', $event, procedure)"
     >
     </DocumentUnitList>
   </div>

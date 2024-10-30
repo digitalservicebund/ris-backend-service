@@ -63,7 +63,8 @@ class DocumentationUnitListItemTransformerTest {
     assertThat(documentationUnitListItem.appraisalBody()).isEqualTo("1. Senat");
     assertThat(documentationUnitListItem.hasHeadnoteOrPrinciple()).isTrue();
     // source and creating doc office
-    assertThat(documentationUnitListItem.creatingDocumentationOffice()).isEqualTo("DS");
+    assertThat(documentationUnitListItem.creatingDocumentationOffice().abbreviation())
+        .isEqualTo("DS");
     assertThat(documentationUnitListItem.source()).isEqualTo("NJW, o");
     // status
     assertThat(documentationUnitListItem.status().publicationStatus())

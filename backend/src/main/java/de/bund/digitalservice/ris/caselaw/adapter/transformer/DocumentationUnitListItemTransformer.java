@@ -1,11 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitListItemDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit.RelatedDocumentationUnitBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
@@ -59,11 +59,21 @@ public class DocumentationUnitListItemTransformer {
             documentationUnitListItemDTO.getCreatingDocumentationOffice() == null
                 ? null
                 : DocumentationOfficeTransformer.transformToDomain(
-                        documentationUnitListItemDTO.getCreatingDocumentationOffice())
-                    .abbreviation())
+                    documentationUnitListItemDTO.getCreatingDocumentationOffice()))
+        .documentationOffice(
+            DocumentationOfficeTransformer.transformToDomain(
+                documentationUnitListItemDTO.getDocumentationOffice()))
         .source(
             documentationUnitListItemDTO.getSource().stream()
-                .map(SourceDTO::getValue)
+                .map(
+                    source ->
+                        Optional.ofNullable(source.getReference())
+                            .map(
+                                referenceDTO ->
+                                    referenceDTO.getLegalPeriodicalRawValue()
+                                        + " "
+                                        + referenceDTO.getCitation())
+                            .orElse(source.getValue()))
                 .collect(Collectors.joining(", ")));
     return builder.build();
   }

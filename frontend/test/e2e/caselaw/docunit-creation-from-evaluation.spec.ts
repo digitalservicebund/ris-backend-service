@@ -421,7 +421,9 @@ test.describe(
               .click()
             const listEntry = pageWithBghUser.getByTestId("listEntry")
             await expect(listEntry).toHaveCount(1)
-            await expect(listEntry).toContainText("Fremdanlage aus MMG (DS)")
+            await expect(listEntry).toContainText(
+              `Fremdanlage aus MMG ${edition.prefix}12${edition.suffix} (DS)`,
+            )
             await expect(
               pageWithBghUser.getByLabel("Dokumentationseinheit übernehmen"),
             ).toBeVisible()

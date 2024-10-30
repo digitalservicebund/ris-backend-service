@@ -110,7 +110,7 @@ public class DocumentationUnitController {
   }
 
   @PutMapping(value = "/{documentNumber}/takeover", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasSameDocOfficeAsDocumentByDocumentNumber.apply(#documentNumber)")
+  @PreAuthorize("@userHasSameDocOfficeAsDocument.apply(#documentNumber)")
   public ResponseEntity<DocumentationUnitListItem> takeOverDocumentationUnit(
       @AuthenticationPrincipal OidcUser oidcUser, @PathVariable String documentNumber) {
     try {
@@ -219,7 +219,11 @@ public class DocumentationUnitController {
       var documentationUnit = service.getByDocumentNumber(documentNumber);
       return ResponseEntity.ok(
           documentationUnit.toBuilder()
-              .isEditable(oAuthService.userHasWriteAccess(oidcUser, documentationUnit))
+              .isEditable(
+                  oAuthService.userHasWriteAccess(
+                      oidcUser,
+                      documentationUnit.coreData().creatingDocOffice(),
+                      documentationUnit.coreData().documentationOffice()))
               .build());
     } catch (DocumentationUnitNotExistsException e) {
       log.error("Documentation unit '{}' doesn't exist", documentNumber);

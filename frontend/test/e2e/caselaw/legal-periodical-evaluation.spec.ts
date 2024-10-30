@@ -247,9 +247,7 @@ test.describe(
       },
     )
 
-    // Flaky
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip(
+    test(
       "Periodical edition reference editing",
       {
         annotation: {
@@ -296,9 +294,7 @@ test.describe(
           await searchForDocUnitWithFileNumber(page, fileNumber, "31.12.2019")
           await openSidePanelPreview(page, fileNumber)
           await expect(page.getByLabel("Seitenpanel öffnen")).toBeHidden()
-          await expect(
-            page.locator("[aria-label='Vorschau anzeigen']"),
-          ).toBeVisible()
+
           await page.getByLabel("Seitenpanel schließen").click()
           await expect(page).toHaveURL(/showAttachmentPanel=false/)
           await page.reload()
@@ -515,9 +511,31 @@ test.describe(
               .first(),
           ).toBeVisible()
         })
+      },
+    )
+
+    test(
+      "Deletion of references",
+      {
+        tag: "@RISDEV-5146",
+      },
+      async ({
+        context,
+        page,
+        editionWithReferences,
+        prefilledDocumentUnit,
+        secondPrefilledDocumentUnit,
+      }) => {
+        const suffix = editionWithReferences.suffix || ""
 
         await test.step("A reference can be deleted", async () => {
-          await navigateToPeriodicalReferences(page, edition.id || "")
+          await navigateToPeriodicalReferences(
+            page,
+            editionWithReferences.id || "",
+          )
+
+          const count = await page.getByLabel("Listen Eintrag").count()
+          expect(count, "This test can not empty references").toBeGreaterThan(0)
 
           while (await page.getByTestId("list-entry-0").isVisible()) {
             await page.getByTestId("list-entry-0").click()
@@ -525,7 +543,9 @@ test.describe(
               "**/api/v1/caselaw/legalperiodicaledition",
               { timeout: 5_000 },
             )
-            await page.locator("[aria-label='Eintrag löschen']").click()
+
+            await page.getByText("Eintrag löschen").click()
+
             await saveRequest
           }
 
@@ -541,6 +561,10 @@ test.describe(
           ).toBeHidden()
 
           await page.reload()
+          await expect(
+            page.locator("[aria-label='Listen Eintrag']"),
+          ).toHaveCount(1)
+
           await page.getByTestId("list-entry-0").isHidden()
           await expect(
             page.locator("[aria-label='Listen Eintrag']"),
@@ -551,6 +575,26 @@ test.describe(
         })
 
         await test.step("Deleted citations disappear from the documentation unit's preview", async () => {
+          // open documentation unit preview in new tab
+
+          const previewTab = await context.newPage()
+          await navigateToPreview(
+            previewTab,
+            prefilledDocumentUnit.documentNumber || "",
+          )
+
+          const secondPreviewTab = await context.newPage()
+          await navigateToPreview(
+            secondPreviewTab,
+            secondPrefilledDocumentUnit.documentNumber || "",
+          )
+
+          const fileNumber =
+            prefilledDocumentUnit.coreData.fileNumbers?.[0] || ""
+
+          const secondFileNumber =
+            secondPrefilledDocumentUnit.coreData.fileNumbers?.[0] || ""
+
           await previewTab.reload()
           await expect(previewTab.getByText(fileNumber)).toBeVisible()
           await expect(
@@ -668,7 +712,6 @@ test.describe(
     async function openSidePanelPreview(page: Page, fileNumber: string) {
       await page.getByTestId(`document-number-link-${fileNumber}`).click()
       await expect(page).toHaveURL(/showAttachmentPanel=true/)
-      await page.getByLabel("Vorschau anzeigen").click()
     }
 
     async function searchForDocUnitWithFileNumber(

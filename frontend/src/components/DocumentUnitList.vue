@@ -216,7 +216,7 @@ function onDelete() {
               " aus " +
               listEntry.source +
               " (" +
-              listEntry.creatingDocumentationOffice +
+              listEntry.creatingDocumentationOffice?.abbreviation +
               ")"
             }}
           </span>

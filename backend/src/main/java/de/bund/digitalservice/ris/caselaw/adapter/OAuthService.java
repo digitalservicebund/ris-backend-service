@@ -128,6 +128,19 @@ public class OAuthService implements AuthService {
     };
   }
 
+  @Bean
+  public Function<String, Boolean> userHasSameDocOfficeAsDocument() {
+    return documentNumber -> {
+      try {
+        return Optional.ofNullable(documentationUnitService.getByDocumentNumber(documentNumber))
+            .map(this::userHasSameDocOfficeAsDocument)
+            .orElse(false);
+      } catch (DocumentationUnitNotExistsException e) {
+        return false;
+      }
+    };
+  }
+
   /**
    * Creates a Spring bean that checks if a user has read access to a {@link DocumentationUnit} by
    * its {@link UUID}.
@@ -209,38 +222,6 @@ public class OAuthService implements AuthService {
     };
   }
 
-  public boolean userHasWriteAccess(OidcUser oidcUser, DocumentationUnit documentationUnit) {
-    return documentationUnit.status() != null && docUnitIsPending(documentationUnit)
-        ? userHasSameDocOfficeAsDocumentCreator(oidcUser, documentationUnit)
-        : userHasSameDocOfficeAsDocument(oidcUser, documentationUnit);
-  }
-
-  @Bean
-  public Function<UUID, Boolean> userHasSameDocOfficeAsDocument() {
-    return uuid -> {
-      try {
-        return Optional.ofNullable(documentationUnitService.getByUuid(uuid))
-            .map(this::userHasSameDocOfficeAsDocument)
-            .orElse(false);
-      } catch (DocumentationUnitNotExistsException e) {
-        return false;
-      }
-    };
-  }
-
-  @Bean
-  public Function<String, Boolean> userHasSameDocOfficeAsDocumentByDocumentNumber() {
-    return documentNumber -> {
-      try {
-        return Optional.ofNullable(documentationUnitService.getByDocumentNumber(documentNumber))
-            .map(this::userHasSameDocOfficeAsDocument)
-            .orElse(false);
-      } catch (DocumentationUnitNotExistsException e) {
-        return false;
-      }
-    };
-  }
-
   /**
    * Creates a Spring bean that checks if a {@link Procedure} associated with a {@link
    * DocumentationUnit} is assigned to the current {@link OidcUser}.
@@ -298,16 +279,24 @@ public class OAuthService implements AuthService {
   }
 
   private boolean userHasWriteAccess(DocumentationUnit documentationUnit) {
-    return documentationUnit.status() != null && docUnitIsPending(documentationUnit)
-        ? userHasSameDocOfficeAsDocumentCreator(documentationUnit)
-        : userHasSameDocOfficeAsDocument(documentationUnit);
+    return userHasSameDocOfficeAsDocumentCreator(documentationUnit)
+        || userHasSameDocOfficeAsDocument(documentationUnit);
+  }
+
+  @Override
+  public boolean userHasWriteAccess(
+      OidcUser oidcUser,
+      DocumentationOffice creatingDocOffice,
+      DocumentationOffice documentationOffice) {
+    DocumentationOffice userDocumentationOffice = userService.getDocumentationOffice(oidcUser);
+    return userHasSameDocOfficeAsDocumentCreator(userDocumentationOffice, creatingDocOffice)
+        || userHasSameDocOfficeAsDocument(userDocumentationOffice, documentationOffice);
   }
 
   private boolean userHasReadAccess(DocumentationUnit documentationUnit) {
     // legacy documents are published
     return documentationUnit.status() == null
         || docUnitHasPublishState(documentationUnit)
-        || userHasSameDocOfficeAsDocument(documentationUnit)
         || userHasWriteAccess(documentationUnit);
   }
 
@@ -320,37 +309,37 @@ public class OAuthService implements AuthService {
 
   private boolean userHasSameDocOfficeAsDocumentCreator(DocumentationUnit documentationUnit) {
     Optional<OidcUser> oidcUser = getOidcUser();
+    DocumentationOffice userDocumentationOffice =
+        oidcUser.map(userService::getDocumentationOffice).orElse(null);
+
     return oidcUser
-        .filter(user -> userHasSameDocOfficeAsDocumentCreator(user, documentationUnit))
+        .filter(
+            user ->
+                userHasSameDocOfficeAsDocumentCreator(
+                    userDocumentationOffice, documentationUnit.coreData().creatingDocOffice()))
         .isPresent();
   }
 
   private boolean userHasSameDocOfficeAsDocumentCreator(
-      OidcUser oidcUser, DocumentationUnit documentationUnit) {
-    DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidcUser);
-    return documentationUnit.status().publicationStatus() != null
-        && documentationUnit.coreData().creatingDocOffice() != null
-        && documentationUnit.coreData().creatingDocOffice().equals(documentationOffice);
-  }
-
-  private boolean userHasSameDocOfficeAsDocument(
-      OidcUser oidUser, DocumentationUnit documentationUnit) {
-    DocumentationOffice documentationOffice = userService.getDocumentationOffice(oidUser);
-    return documentationUnit.coreData().documentationOffice().equals(documentationOffice);
+      DocumentationOffice userDocumentationOffice, DocumentationOffice creatingDocOffice) {
+    return creatingDocOffice != null && creatingDocOffice.equals(userDocumentationOffice);
   }
 
   private boolean userHasSameDocOfficeAsDocument(DocumentationUnit documentationUnit) {
     Optional<OidcUser> oidcUser = getOidcUser();
+    DocumentationOffice userDocumentationOffice =
+        oidcUser.map(userService::getDocumentationOffice).orElse(null);
     return oidcUser
-        .filter(user -> userHasSameDocOfficeAsDocument(user, documentationUnit))
+        .filter(
+            user ->
+                userHasSameDocOfficeAsDocument(
+                    userDocumentationOffice, documentationUnit.coreData().documentationOffice()))
         .isPresent();
   }
 
-  private boolean docUnitIsPending(DocumentationUnit documentationUnit) {
-    return documentationUnit
-        .status()
-        .publicationStatus()
-        .equals(PublicationStatus.EXTERNAL_HANDOVER_PENDING);
+  private boolean userHasSameDocOfficeAsDocument(
+      DocumentationOffice userDocumentationOffice, DocumentationOffice documentationOffice) {
+    return documentationOffice.equals(userDocumentationOffice);
   }
 
   private boolean userHasSameDocOfficeAsProcedure(DocumentationOffice documentationOffice) {
@@ -365,7 +354,6 @@ public class OAuthService implements AuthService {
 
   private Optional<OidcUser> getOidcUser() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
     if (authentication != null && authentication.getPrincipal() instanceof OidcUser principal) {
       return Optional.of(principal);
     }
@@ -448,7 +436,6 @@ public class OAuthService implements AuthService {
       log.error("Can't invalidate api key '{}' because it doesn't exist!", apiKey);
       throw new ImportApiKeyException("Can't invalidate api key because it doesn't exist!");
     }
-
     if (apiKeyOptional.get().getUserAccount() == null
         || !apiKeyOptional.get().getUserAccount().equals(oidcUser.getEmail())) {
 

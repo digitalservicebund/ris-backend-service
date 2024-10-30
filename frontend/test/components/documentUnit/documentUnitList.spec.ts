@@ -110,8 +110,6 @@ describe("documentUnit list", () => {
           hasNote: true,
           isDeletable: false,
           isEditable: false,
-          source: "should not show source",
-          creatingDocumentationOffice: "should not show doc office",
         },
         {
           id: "id",
@@ -151,7 +149,10 @@ describe("documentUnit list", () => {
           isDeletable: false,
           isEditable: false,
           source: "NJW",
-          creatingDocumentationOffice: "DS",
+          creatingDocumentationOffice: {
+            id: "creatingDocumentationOfficeId",
+            abbreviation: "DS",
+          },
         },
       ],
     })
