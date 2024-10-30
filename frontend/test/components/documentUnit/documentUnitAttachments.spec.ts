@@ -8,7 +8,6 @@ import DocumentUnit from "@/domain/documentUnit"
 import routes from "~/test-helper/routes"
 
 function renderComponent(attachments?: Attachment[]) {
-  // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
 
   const router = createRouter({

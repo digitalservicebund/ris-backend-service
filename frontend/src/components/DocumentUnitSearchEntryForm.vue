@@ -100,7 +100,7 @@ function hasValidationErrors() {
   return validationStore.getAll().length > 0
 }
 
-async function validateSearchInput() {
+function validateSearchInput() {
   //Startdatum fehlt
   if (
     query.value?.decisionDateEnd &&
@@ -275,7 +275,8 @@ export type DocumentUnitSearchParameter =
             @blur="validateSearchInput"
             @focus="resetErrors(id as DocumentUnitSearchParameter)"
             @update:validation-error="
-              (validationError) => handleLocalInputError(validationError, id)
+              (validationError: ValidationError | undefined) =>
+                handleLocalInputError(validationError, id)
             "
           ></DateInput>
         </InputField>
@@ -298,7 +299,8 @@ export type DocumentUnitSearchParameter =
             @blur="validateSearchInput"
             @focus="resetErrors(id as DocumentUnitSearchParameter)"
             @update:validation-error="
-              (validationError) => handleLocalInputError(validationError, id)
+              (validationError: ValidationError | undefined) =>
+                handleLocalInputError(validationError, id)
             "
           ></DateInput>
         </InputField>

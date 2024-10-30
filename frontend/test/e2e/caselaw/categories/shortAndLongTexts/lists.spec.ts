@@ -3,9 +3,9 @@ import {
   clickCategoryButton,
   navigateToCategories,
   save,
+  navigateToHandover,
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
-import { navigateToHandover } from "~/e2e/caselaw/e2e-utils"
 
 test.describe(
   "Create lists",

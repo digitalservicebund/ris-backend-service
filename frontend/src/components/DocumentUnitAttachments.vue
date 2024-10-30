@@ -74,8 +74,8 @@ const handleOnDelete = (index: number) => {
   openDeleteModal()
 }
 
-const deleteFile = (index: number) => {
-  handleDeleteAttachment(index)
+const deleteFile = async (index: number) => {
+  await handleDeleteAttachment(index)
   closeDeleteModal()
 }
 

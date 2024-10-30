@@ -24,7 +24,7 @@ const participatingJudge = ref(new ParticipatingJudge({ ...props.modelValue }))
 const validationStore =
   useValidationStore<(typeof ParticipatingJudge.fields)[number]>()
 
-async function validateRequiredInput() {
+function validateRequiredInput() {
   validationStore.reset()
 
   participatingJudge.value.missingRequiredFields.forEach((missingField) =>

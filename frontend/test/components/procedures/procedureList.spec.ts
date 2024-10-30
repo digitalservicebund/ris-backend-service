@@ -118,7 +118,7 @@ async function renderComponent(options?: { procedures: Procedure[][] }) {
         plugins: [router, createTestingPinia()],
       },
     }),
-    // eslint-disable-next-line testing-library/await-async-events
+
     user: userEvent.setup(),
     mockedGetProcedures,
     mockedGetDocumentUnits,

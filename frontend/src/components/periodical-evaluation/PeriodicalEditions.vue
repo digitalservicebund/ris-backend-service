@@ -136,10 +136,10 @@ watch(
 /**
  * Check if there is an edition id param and load edition if present
  */
-onMounted(() => {
+onMounted(async () => {
   const legalPeriodicalId = route.query.q as string
   if (legalPeriodicalId) {
-    getEditions(legalPeriodicalId)
+    await getEditions(legalPeriodicalId)
   }
 })
 </script>
