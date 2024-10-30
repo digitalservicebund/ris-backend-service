@@ -189,16 +189,11 @@ public class DocumentationUnitService {
 
     boolean hasWriteAccess =
         authService.userHasWriteAccess(
-            oidcUser,
-            listItem.creatingDocumentationOffice(),
-            listItem.documentationOffice(),
-            listItem.status());
-    boolean permissionToDelete =
-        authService.userCanDelete(oidcUser, listItem.documentationOffice(), listItem.status());
+            oidcUser, listItem.creatingDocumentationOffice(), listItem.documentationOffice());
     boolean isInternalUser = authService.userIsInternal().apply(oidcUser);
 
     return listItem.toBuilder()
-        .isDeletable((hasWriteAccess || permissionToDelete) && isInternalUser)
+        .isDeletable(hasWriteAccess && isInternalUser)
         .isEditable(
             (hasWriteAccess
                 && (isInternalUser || authService.isAssignedViaProcedure().apply(listItem.uuid()))))

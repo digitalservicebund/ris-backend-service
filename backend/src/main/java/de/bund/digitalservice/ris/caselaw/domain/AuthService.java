@@ -5,16 +5,12 @@ import java.util.function.Function;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 public interface AuthService {
+  Function<OidcUser, Boolean> userIsInternal();
 
-  boolean userCanDelete(OidcUser oidcUser, DocumentationOffice documentationOffice, Status status);
+  Function<UUID, Boolean> isAssignedViaProcedure();
 
   boolean userHasWriteAccess(
       OidcUser oidcUser,
       DocumentationOffice creatingDocOffice,
-      DocumentationOffice documentationOffice,
-      Status status);
-
-  Function<OidcUser, Boolean> userIsInternal();
-
-  Function<UUID, Boolean> isAssignedViaProcedure();
+      DocumentationOffice documentationOffice);
 }
