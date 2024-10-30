@@ -12,5 +12,6 @@ public interface AuthService {
   boolean userHasWriteAccess(
       OidcUser oidcUser,
       DocumentationOffice creatingDocOffice,
-      DocumentationOffice documentationOffice);
+      DocumentationOffice documentationOffice,
+      Status status);
 }

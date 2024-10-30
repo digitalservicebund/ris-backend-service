@@ -191,7 +191,10 @@ public class DocumentationUnitService {
 
     boolean hasWriteAccess =
         authService.userHasWriteAccess(
-            oidcUser, listItem.creatingDocumentationOffice(), listItem.documentationOffice());
+            oidcUser,
+            listItem.creatingDocumentationOffice(),
+            listItem.documentationOffice(),
+            listItem.status());
     boolean isInternalUser = authService.userIsInternal().apply(oidcUser);
 
     return listItem.toBuilder()

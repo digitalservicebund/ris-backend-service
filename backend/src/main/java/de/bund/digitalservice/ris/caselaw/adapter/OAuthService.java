@@ -15,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
+import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -279,18 +280,27 @@ public class OAuthService implements AuthService {
   }
 
   private boolean userHasWriteAccess(DocumentationUnit documentationUnit) {
-    return userHasSameDocOfficeAsDocumentCreator(documentationUnit)
-        || userHasSameDocOfficeAsDocument(documentationUnit);
+    return userHasSameDocOfficeAsDocument(documentationUnit)
+        || (documentationUnit.status() != null
+            && docUnitIsPending(documentationUnit.status())
+            && userHasSameDocOfficeAsDocumentCreator(documentationUnit));
+  }
+
+  private boolean docUnitIsPending(Status status) {
+    return status.publicationStatus().equals(PublicationStatus.EXTERNAL_HANDOVER_PENDING);
   }
 
   @Override
   public boolean userHasWriteAccess(
       OidcUser oidcUser,
       DocumentationOffice creatingDocOffice,
-      DocumentationOffice documentationOffice) {
+      DocumentationOffice documentationOffice,
+      Status status) {
     DocumentationOffice userDocumentationOffice = userService.getDocumentationOffice(oidcUser);
-    return userHasSameDocOfficeAsDocumentCreator(userDocumentationOffice, creatingDocOffice)
-        || userHasSameDocOfficeAsDocument(userDocumentationOffice, documentationOffice);
+    return userHasSameDocOfficeAsDocument(userDocumentationOffice, documentationOffice)
+        || (status != null
+            && docUnitIsPending(status)
+            && userHasSameDocOfficeAsDocumentCreator(userDocumentationOffice, creatingDocOffice));
   }
 
   private boolean userHasReadAccess(DocumentationUnit documentationUnit) {

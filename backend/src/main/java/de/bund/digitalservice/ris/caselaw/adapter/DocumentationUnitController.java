@@ -223,7 +223,8 @@ public class DocumentationUnitController {
                   oAuthService.userHasWriteAccess(
                       oidcUser,
                       documentationUnit.coreData().creatingDocOffice(),
-                      documentationUnit.coreData().documentationOffice()))
+                      documentationUnit.coreData().documentationOffice(),
+                      documentationUnit.status()))
               .build());
     } catch (DocumentationUnitNotExistsException e) {
       log.error("Documentation unit '{}' doesn't exist", documentNumber);
