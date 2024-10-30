@@ -81,7 +81,7 @@
     "@axe-core/playwright": "^4.10.0",
     "@digitalservice4germany/angie": "^1.2.0",
     "@digitalservice4germany/style-dictionary": "^2.0.0",
-    "@eslint/compat": "^1.2.1",
+    "@eslint/compat": "^1.2.2",
     "@eslint/js": "^9.13.0",
     "@iconify-json/ic": "^1.2.1",
     "@iconify-json/material-symbols": "^1.2.5",
