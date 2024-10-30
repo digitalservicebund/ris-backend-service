@@ -110,7 +110,8 @@ public class DocumentationUnitController {
   }
 
   @PutMapping(value = "/{documentNumber}/takeover", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasSameDocOfficeAsDocument.apply(#documentNumber)")
+  @PreAuthorize(
+      "@userIsInternal.apply(#oidcUser) and @userHasSameDocOfficeAsDocument.apply(#documentNumber)")
   public ResponseEntity<DocumentationUnitListItem> takeOverDocumentationUnit(
       @AuthenticationPrincipal OidcUser oidcUser, @PathVariable String documentNumber) {
     try {

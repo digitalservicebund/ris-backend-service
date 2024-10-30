@@ -1092,4 +1092,31 @@ class DocumentationUnitIntegrationTest {
         .expectStatus()
         .isForbidden();
   }
+
+  @Test
+  void testTakeOverDocumentationUnit_setsStatusAndPermissionsCorrectly() {
+    DocumentationOfficeDTO creatingDocumentationOffice =
+        documentationOfficeRepository.findByAbbreviation("BGH");
+    String documentNumber = "1234567890123";
+
+    EntityBuilderTestUtil.createAndSavePendingDocumentationUnit(
+        repository, documentationOffice, creatingDocumentationOffice, documentNumber);
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/1234567890123/takeover")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentationUnitListItem.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().status().publicationStatus())
+                  .isEqualTo(UNPUBLISHED);
+              assertThat(response.getResponseBody().isDeletable()).isTrue();
+              assertThat(response.getResponseBody().isEditable()).isTrue();
+            });
+  }
 }

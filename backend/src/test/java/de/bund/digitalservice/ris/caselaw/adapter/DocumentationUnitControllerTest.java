@@ -62,6 +62,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -603,5 +604,83 @@ class DocumentationUnitControllerTest {
     // once by the AuthService and once by the controller asking the service
     verify(service, times(2)).getByUuid(TEST_UUID);
     verify(docxConverterService).getConvertedObject("123");
+  }
+
+  @Test
+  void testTakeoverDocumentationUnit_withSameDocOfficeAsDocUnit_shouldSucceed()
+      throws DocumentationUnitNotExistsException {
+    DocumentationOffice documentationOffice =
+        DocumentationOffice.builder()
+            .uuid(UUID.fromString("ba90a851-3c54-4858-b4fa-7742ffbe8f05"))
+            .abbreviation("DS")
+            .build();
+    String documentNumber = "ABCD202200001";
+
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .documentNumber(documentNumber)
+            .status(
+                Status.builder()
+                    .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+                    .build())
+            .coreData(CoreData.builder().documentationOffice(documentationOffice).build())
+            .build();
+
+    when(service.getByDocumentNumber(documentNumber)).thenReturn(documentationUnit);
+
+    risWebClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/ABCD202200001/takeover")
+        .exchange()
+        .expectStatus()
+        .isOk();
+    verify(service, times(1)).takeOverDocumentationUnit(any(), any());
+  }
+
+  @Test
+  void testTakeoverDocumentationUnit_withExternalUser_shouldBeForbidden()
+      throws DocumentationUnitNotExistsException {
+    when(userService.isInternal(any(OidcUser.class))).thenReturn(false);
+
+    risWebClient
+        .withExternalLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/ABCD202200001/takeover")
+        .exchange()
+        .expectStatus()
+        .isForbidden();
+
+    verify(service, times(0)).takeOverDocumentationUnit("ABCD202200001", null);
+  }
+
+  @Test
+  void testTakeoverDocumentationUnit_withOtherDocOfficeAsDocUnit_shouldBeForbidden()
+      throws DocumentationUnitNotExistsException {
+    Mockito.reset(userService);
+    DocumentationOffice office = DocumentationOffice.builder().abbreviation("BGH").build();
+    when(userService.getDocumentationOffice(any())).thenReturn(office);
+    String documentNumber = "ABCD202200001";
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .documentNumber(documentNumber)
+            .status(
+                Status.builder()
+                    .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+                    .build())
+            .coreData(CoreData.builder().documentationOffice(office).build())
+            .build();
+
+    when(service.getByDocumentNumber(documentNumber)).thenReturn(documentationUnit);
+
+    risWebClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/ABCD202200001/takeover")
+        .exchange()
+        .expectStatus()
+        .isForbidden();
+
+    verify(service, times(0)).takeOverDocumentationUnit(documentNumber, null);
   }
 }
