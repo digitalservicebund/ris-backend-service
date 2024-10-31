@@ -22,12 +22,21 @@ function renderComponent(
   } = {},
 ) {
   const user = userEvent.setup()
+
+  const documentUnit = new DocumentUnit("foo", {
+    documentNumber: "1234567891234",
+    note: options.note ?? "",
+    attachments: options.attachments ?? [],
+    isEditable: options.isEditable || false,
+  })
+
   return {
     user,
     ...render(ExtraContentSidePanel, {
       props: {
         enabledPanels: options.enabledPanels || undefined,
         showEditButton: options.showEditButton,
+        documentUnit: documentUnit,
       },
       global: {
         plugins: [
@@ -36,12 +45,7 @@ function renderComponent(
             createTestingPinia({
               initialState: {
                 docunitStore: {
-                  documentUnit: new DocumentUnit("foo", {
-                    documentNumber: "1234567891234",
-                    note: options.note ?? "",
-                    attachments: options.attachments ?? [],
-                    isEditable: options.isEditable || false,
-                  }),
+                  documentUnit: documentUnit,
                 },
               },
               stubActions: false, // To use the store functions in extraContentSidePanelStore

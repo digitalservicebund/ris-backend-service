@@ -11,7 +11,7 @@ import TextAreaInput from "@/components/input/TextAreaInput.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import DocumentUnitPreview from "@/components/preview/DocumentUnitPreview.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
-import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import DocumentUnit from "@/domain/documentUnit"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import { SelectablePanelContent } from "@/types/panelContentMode"
 import IconAttachFile from "~icons/ic/baseline-attach-file"
@@ -24,24 +24,21 @@ const props = defineProps<{
   enabledPanels?: SelectablePanelContent[]
   showEditButton?: boolean
   hidePanelModeBar?: boolean
+  documentUnit?: DocumentUnit
 }>()
 
 const store = useExtraContentSidePanelStore()
-const documentUnitStore = useDocumentUnitStore()
 
 const route = useRoute()
 
 const hasNote = computed(() => {
-  return (
-    !!documentUnitStore.documentUnit!.note &&
-    documentUnitStore.documentUnit!.note.length > 0
-  )
+  return !!props.documentUnit!.note && props.documentUnit!.note.length > 0
 })
 
 const hasAttachments = computed(() => {
   return (
-    !!documentUnitStore.documentUnit!.attachments &&
-    documentUnitStore.documentUnit!.attachments.length > 0
+    !!props.documentUnit!.attachments &&
+    props.documentUnit!.attachments.length > 0
   )
 })
 
@@ -106,10 +103,7 @@ onMounted(() => {
 })
 
 function setDefaultState() {
-  if (
-    !documentUnitStore.documentUnit!.note &&
-    documentUnitStore.documentUnit!.hasAttachments
-  ) {
+  if (!props.documentUnit!.note && props.documentUnit!.hasAttachments) {
     selectAttachments()
   } else {
     selectNotes()
@@ -193,23 +187,19 @@ watch(store, () => {
 
         <FileNavigator
           v-if="store.panelMode === 'attachments'"
-          :attachments="documentUnitStore.documentUnit!.attachments"
+          :attachments="props.documentUnit!.attachments"
           :current-index="store.currentAttachmentIndex"
           @select="handleOnSelectAttachment"
         ></FileNavigator>
         <div v-if="showEditButton">
-          <Tooltip
-            v-if="documentUnitStore.documentUnit!.isEditable"
-            text="Bearbeiten"
-          >
+          <Tooltip v-if="props.documentUnit!.isEditable" text="Bearbeiten">
             <router-link
               aria-label="Dokumentationseinheit in einem neuen Tab bearbeiten"
               target="_blank"
               :to="{
                 name: 'caselaw-documentUnit-documentNumber-categories',
                 params: {
-                  documentNumber:
-                    documentUnitStore.documentUnit!.documentNumber,
+                  documentNumber: props.documentUnit!.documentNumber,
                 },
               }"
             >
@@ -243,7 +233,7 @@ watch(store, () => {
             :to="{
               name: 'caselaw-documentUnit-documentNumber-preview',
               params: {
-                documentNumber: documentUnitStore.documentUnit!.documentNumber,
+                documentNumber: props.documentUnit!.documentNumber,
               },
             }"
           >
@@ -261,7 +251,7 @@ watch(store, () => {
           <InputField id="notesInput" v-slot="{ id }" label="Notiz">
             <TextAreaInput
               :id="id"
-              v-model="documentUnitStore.documentUnit!.note"
+              v-model="props.documentUnit!.note"
               aria-label="Notiz Eingabefeld"
               autosize
               custom-classes="max-h-[65vh]"
@@ -271,17 +261,15 @@ watch(store, () => {
         <div v-if="store.panelMode === 'attachments'">
           <AttachmentView
             v-if="
-              documentUnitStore.documentUnit!.uuid &&
-              documentUnitStore.documentUnit!.attachments &&
-              documentUnitStore.documentUnit!.attachments[
-                store.currentAttachmentIndex
-              ]?.s3path
+              props.documentUnit!.uuid &&
+              props.documentUnit!.attachments &&
+              props.documentUnit!.attachments[store.currentAttachmentIndex]
+                ?.s3path
             "
-            :document-unit-uuid="documentUnitStore.documentUnit!.uuid"
+            :document-unit-uuid="props.documentUnit!.uuid"
             :s3-path="
-              documentUnitStore.documentUnit!.attachments[
-                store.currentAttachmentIndex
-              ].s3path
+              props.documentUnit!.attachments[store.currentAttachmentIndex]
+                .s3path
             "
           />
           <div v-else class="ds-label-01-reg">
@@ -293,7 +281,7 @@ watch(store, () => {
           class="max-h-[70vh] overflow-auto"
         >
           <DocumentUnitPreview
-            :document-unit="documentUnitStore.documentUnit!"
+            :document-unit="props.documentUnit!"
             layout="narrow"
           />
         </FlexContainer>

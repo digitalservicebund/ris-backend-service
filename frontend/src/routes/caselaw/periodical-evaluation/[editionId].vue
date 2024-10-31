@@ -1,11 +1,13 @@
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, onMounted, ref } from "vue"
+import { storeToRefs } from "pinia"
+import { computed, onBeforeUnmount, onMounted, Ref, ref } from "vue"
 import { useRoute } from "vue-router"
 import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
 import NavbarSide from "@/components/NavbarSide.vue"
 import ErrorPage from "@/components/PageError.vue"
 import PeriodicalEditionInfoPanel from "@/components/periodical-evaluation/PeriodicalEditionInfoPanel.vue"
 import { usePeriodicalEvaluationMenuItems } from "@/composables/usePeriodicalEvaluationMenuItems"
+import DocumentUnit from "@/domain/documentUnit"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useEditionStore } from "@/stores/editionStore"
@@ -19,6 +21,9 @@ const extraContentSidePanelStore = useExtraContentSidePanelStore()
 const responseError = ref<ResponseError>()
 const route = useRoute()
 
+const { documentUnit } = storeToRefs(documentUnitStore) as {
+  documentUnit: Ref<DocumentUnit | undefined>
+}
 const infoSubtitle = computed(() =>
   StringsUtil.mergeNonBlankStrings(
     [store.edition?.legalPeriodical?.abbreviation, store.edition?.name],
@@ -87,9 +92,8 @@ onMounted(async () => {
       <div v-else class="flex grow flex-row items-start">
         <router-view class="flex-1" />
         <ExtraContentSidePanel
-          v-if="
-            documentUnitStore.documentUnit && route.path.includes('references')
-          "
+          v-if="documentUnit && route.path.includes('references')"
+          :document-unit="documentUnit"
           :enabled-panels="['preview']"
           hide-panel-mode-bar
           show-edit-button
