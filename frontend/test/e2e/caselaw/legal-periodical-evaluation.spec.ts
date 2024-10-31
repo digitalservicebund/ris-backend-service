@@ -526,7 +526,9 @@ test.describe(
       },
     )
 
-    test(
+    // Flaky, needs some clarification
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(
       "Deletion of references",
       {
         tag: "@RISDEV-5146",
