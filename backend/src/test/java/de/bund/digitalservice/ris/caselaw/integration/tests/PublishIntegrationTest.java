@@ -113,7 +113,6 @@ class PublishIntegrationTest {
   @MockBean(name = "ldmlS3Client")
   private S3Client s3Client;
 
-  //    @MockBean private ObjectMapper objectMapper;
   @MockBean private UserService userService;
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
