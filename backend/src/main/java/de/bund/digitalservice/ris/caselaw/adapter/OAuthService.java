@@ -129,19 +129,6 @@ public class OAuthService implements AuthService {
     };
   }
 
-  @Bean
-  public Function<String, Boolean> userHasSameDocOfficeAsDocument() {
-    return documentNumber -> {
-      try {
-        return Optional.ofNullable(documentationUnitService.getByDocumentNumber(documentNumber))
-                .map(this::userHasSameDocOfficeAsDocument)
-                .orElse(false);
-      } catch (DocumentationUnitNotExistsException e) {
-        return false;
-      }
-    };
-  }
-
   /**
    * Creates a Spring bean that checks if a user has read access to a {@link DocumentationUnit} by
    * its {@link UUID}.
@@ -223,6 +210,27 @@ public class OAuthService implements AuthService {
     };
   }
 
+  @Bean
+  public Function<String, Boolean> userHasSameDocOfficeAsDocument() {
+    return documentNumber ->
+        getUserDocumentationOffice()
+            .flatMap(
+                userOffice -> {
+                  try {
+                    return Optional.ofNullable(
+                            documentationUnitService.getByDocumentNumber(documentNumber))
+                        .map(
+                            documentationUnit ->
+                                userHasSameDocOfficeAsDocument(
+                                    userOffice,
+                                    documentationUnit.coreData().documentationOffice()));
+                  } catch (DocumentationUnitNotExistsException e) {
+                    throw new RuntimeException(e);
+                  }
+                })
+            .orElse(false);
+  }
+
   /**
    * Creates a Spring bean that checks if a {@link Procedure} associated with a {@link
    * DocumentationUnit} is assigned to the current {@link OidcUser}.
@@ -279,25 +287,15 @@ public class OAuthService implements AuthService {
     return procedure.userGroupId() != null && procedure.userGroupId().equals(userGroupIdOfUser);
   }
 
-  private boolean docUnitIsPending(Status status) {
-    return status.publicationStatus().equals(PublicationStatus.EXTERNAL_HANDOVER_PENDING);
-  }
-
   private boolean userHasWriteAccess(DocumentationUnit documentationUnit) {
-    Optional<OidcUser> oidcUser = getOidcUser();
-    DocumentationOffice userDocumentationOffice =
-            oidcUser.map(userService::getDocumentationOffice).orElse(null);
-    return userHasSameDocOfficeAsDocument(userDocumentationOffice, documentationUnit.coreData().documentationOffice())
-            || (documentationUnit.status() != null
-            && docUnitIsPending(documentationUnit.status())
-            && userHasSameDocOfficeAsDocumentCreator(userDocumentationOffice, documentationUnit.coreData().creatingDocOffice()));
-  }
-
-  private boolean userHasSameDocOfficeAsDocument(DocumentationUnit documentationUnit) {
-    Optional<OidcUser> oidcUser = getOidcUser();
-    DocumentationOffice userDocumentationOffice =
-            oidcUser.map(userService::getDocumentationOffice).orElse(null);
-    return userHasSameDocOfficeAsDocument(userDocumentationOffice, documentationUnit.coreData().documentationOffice());
+    return getUserDocumentationOffice()
+        .map(
+            userOffice ->
+                    userHasSameDocOfficeAsDocument(userOffice, documentationUnit.coreData().documentationOffice())
+                    || (documentationUnit.status() != null
+                        && isPendingStatus(documentationUnit.status())
+                        && userHasSameDocOfficeAsDocumentCreator(userOffice, documentationUnit.coreData().creatingDocOffice())))
+        .orElse(false);
   }
 
   @Override
@@ -309,22 +307,25 @@ public class OAuthService implements AuthService {
     DocumentationOffice userDocumentationOffice = userService.getDocumentationOffice(oidcUser);
     return userHasSameDocOfficeAsDocument(userDocumentationOffice, documentationOffice)
         || (status != null
-            && docUnitIsPending(status)
+            && isPendingStatus(status)
             && userHasSameDocOfficeAsDocumentCreator(userDocumentationOffice, creatingDocOffice));
   }
 
   private boolean userHasReadAccess(DocumentationUnit documentationUnit) {
-    // legacy documents are published
     return documentationUnit.status() == null
-        || docUnitHasPublishState(documentationUnit)
+        || isPublishedStatus(documentationUnit.status())
         || userHasWriteAccess(documentationUnit);
   }
 
-  private boolean docUnitHasPublishState(DocumentationUnit documentationUnit) {
-    List<PublicationStatus> published =
-        List.of(PublicationStatus.PUBLISHED, PublicationStatus.PUBLISHING);
-    return documentationUnit.status().publicationStatus() != null
-        && published.contains(documentationUnit.status().publicationStatus());
+  private boolean isPublishedStatus(Status status) {
+    return status != null
+        && List.of(PublicationStatus.PUBLISHED, PublicationStatus.PUBLISHING)
+            .contains(status.publicationStatus());
+  }
+
+  private boolean isPendingStatus(Status status) {
+    return status != null
+        && PublicationStatus.EXTERNAL_HANDOVER_PENDING.equals(status.publicationStatus());
   }
 
   private boolean userHasSameDocOfficeAsDocumentCreator(
@@ -353,6 +354,10 @@ public class OAuthService implements AuthService {
       return Optional.of(principal);
     }
     return Optional.empty();
+  }
+
+  private Optional<DocumentationOffice> getUserDocumentationOffice() {
+    return getOidcUser().map(userService::getDocumentationOffice);
   }
 
   /**
