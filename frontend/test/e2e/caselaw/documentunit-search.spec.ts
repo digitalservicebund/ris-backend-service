@@ -233,6 +233,46 @@ test.describe("search", () => {
       .toBeGreaterThanOrEqual(1)
   })
 
+  test("search for file number", async ({ page }) => {
+    await navigateToSearch(page)
+
+    await test.step("search for file number case insensitive works", async () => {
+      await page.getByLabel("Aktenzeichen Suche").fill("FILEnumber1")
+      await page.getByLabel("Nur meine Dokstelle Filter").click()
+      await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+      await expect
+        .poll(async () => page.getByText("YYTestDoc0001").count())
+        .toBe(1)
+    })
+
+    await test.step("search for file number starting with", async () => {
+      await page.getByLabel("Aktenzeichen Suche").fill("fileNumber")
+      await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+      await expect
+        .poll(async () => page.getByText("YYTestDoc0001").count())
+        .toBe(1)
+      await expect
+        .poll(async () => page.locator(".table-row").count())
+        .toBeGreaterThanOrEqual(4)
+    })
+
+    await test.step("search for file number ending does not work by default", async () => {
+      await page.getByLabel("Aktenzeichen Suche").fill("Number1")
+      await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+      await expect(
+        page.getByText("Keine Suchergebnisse gefunden"),
+      ).toBeVisible()
+    })
+
+    await test.step("search for file ending with does work when adding '%'", async () => {
+      await page.getByLabel("Aktenzeichen Suche").fill("%number1")
+      await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+      await expect
+        .poll(async () => page.getByText("YYTestDoc0001").count())
+        .toBe(1)
+    })
+  })
+
   test("search for status", async ({ page }) => {
     await navigateToSearch(page)
 

@@ -821,6 +821,18 @@ class DocumentationUnitIntegrationTest {
     searchInput = DocumentationUnitSearchInput.builder().fileNumber("abc").build();
     assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("MNOP202300099");
 
+    // by fileNumber start
+    searchInput = DocumentationUnitSearchInput.builder().fileNumber("ab").build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("MNOP202300099");
+
+    // by fileNumber ending without wildcard (%) should not return anything
+    searchInput = DocumentationUnitSearchInput.builder().fileNumber("bc").build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).isEmpty();
+
+    // by fileNumber ending
+    searchInput = DocumentationUnitSearchInput.builder().fileNumber("%bc").build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("MNOP202300099");
+
     // by documentNumber & fileNumber
     searchInput =
         DocumentationUnitSearchInput.builder().fileNumber("abc").documentNumber("abc").build();
