@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { commands } from "@guardian/prosemirror-invisibles"
-import { CommandProps } from "@tiptap/core"
 import { Blockquote } from "@tiptap/extension-blockquote"
 import { Bold } from "@tiptap/extension-bold"
 import { Color } from "@tiptap/extension-color"
@@ -28,10 +27,7 @@ import {
 } from "@/editor/borderNumber"
 import { BorderNumberLink } from "@/editor/borderNumberLink"
 import { CustomBulletList } from "@/editor/bulletList"
-import addBorderNumbers from "@/editor/commands/addBorderNumbers"
-import { handleSelection } from "@/editor/commands/handleSelection"
-import removeBorderNumbers from "@/editor/commands/removeBorderNumbers"
-import { createEventHandler } from "@/editor/EventHandler"
+import { EventHandler } from "@/editor/EventHandler"
 import { FontSize } from "@/editor/fontSize"
 import { CustomImage } from "@/editor/image"
 import { Indent } from "@/editor/indent"
@@ -40,10 +36,7 @@ import { CustomListItem } from "@/editor/listItem"
 import { CustomOrderedList } from "@/editor/orderedList"
 import { CustomParagraph } from "@/editor/paragraph"
 import { CustomSubscript, CustomSuperscript } from "@/editor/scriptText"
-import handleBackspace from "@/editor/shortcuts/handleBackspace"
-import { handleDelete } from "@/editor/shortcuts/handleDelete"
 import { TableStyle } from "@/editor/tableStyle"
-import FeatureToggleService from "@/services/featureToggleService"
 
 interface Props {
   value?: string
@@ -71,7 +64,6 @@ const emit = defineEmits<{
 const editorElement = ref<HTMLElement>()
 const hasFocus = ref(false)
 const isHovered = ref(false)
-const featureToggle = ref(false)
 
 const editor = new Editor({
   editorProps: {
@@ -87,39 +79,13 @@ const editor = new Editor({
     Document,
     CustomParagraph,
     Text,
-    BorderNumber.extend({
-      // Commands can be moved back to borderNumber.ts once the feature toggle has been removed
-      addCommands() {
-        return {
-          removeBorderNumbers: () => (commandProps: CommandProps) => {
-            return removeBorderNumbers(commandProps, featureToggle.value)
-          },
-          addBorderNumbers: () => addBorderNumbers,
-          handleSelection: () => handleSelection,
-        }
-      },
-      addKeyboardShortcuts() {
-        return {
-          Backspace: ({ editor }) =>
-            handleBackspace(editor, featureToggle.value),
-          Delete: ({ editor }) => handleDelete(editor, featureToggle.value),
-          "Mod-Alt-.": ({ editor }) => editor.commands.addBorderNumbers(),
-          "Mod-Alt--": ({ editor }) => editor.commands.removeBorderNumbers(),
-          "Mod-Alt-#": ({ editor }) =>
-            commands.toggleActiveState()(editor.state, editor.view.dispatch),
-          // ‘ is the keycode for Alt+# on Macbook
-          "Mod-Alt-‘": ({ editor }) =>
-            commands.toggleActiveState()(editor.state, editor.view.dispatch),
-        }
-      },
-    }),
+    BorderNumber,
     BorderNumberNumber,
     BorderNumberContent,
     BorderNumberLink,
     Bold,
     Color,
-    // TODO: After removing the featureToggle parameter, this should be exported directly as a constant
-    createEventHandler(featureToggle),
+    EventHandler,
     FontSize,
     Italic,
     CustomListItem,
@@ -228,9 +194,6 @@ const ariaLabel = props.ariaLabel ? props.ariaLabel : null
 onMounted(async () => {
   const editorContainer = document.querySelector(".editor")
   if (editorContainer != null) resizeObserver.observe(editorContainer)
-  featureToggle.value =
-    (await FeatureToggleService.isEnabled("neuris.border-number-editor"))
-      .data ?? false
 })
 
 const resizeObserver = new ResizeObserver((entries) => {

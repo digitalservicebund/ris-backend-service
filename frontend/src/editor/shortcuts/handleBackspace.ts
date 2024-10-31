@@ -7,7 +7,7 @@ import BorderNumberService from "@/services/borderNumberService"
 /**
  * Main handler for Backspace which removes borderNumber or borderNumberLink if needed.
  */
-function handleBackspace(editor: Editor, isFeatureEnabled: boolean): boolean {
+function handleBackspace(editor: Editor): boolean {
   const { state, schema } = editor
   const { selection, tr, doc } = state
   const { $from, $to } = selection
@@ -57,10 +57,8 @@ function handleBackspace(editor: Editor, isFeatureEnabled: boolean): boolean {
 
   if (isSelectionWithBorderNumbers) {
     void nextTick().then(() => {
-      if (isFeatureEnabled) {
-        BorderNumberService.invalidateBorderNumberLinks(selectedBorderNumbers)
-        BorderNumberService.makeBorderNumbersSequential()
-      }
+      BorderNumberService.invalidateBorderNumberLinks(selectedBorderNumbers)
+      BorderNumberService.makeBorderNumbersSequential()
     })
     return false
   }

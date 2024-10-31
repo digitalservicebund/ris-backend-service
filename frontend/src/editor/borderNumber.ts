@@ -1,5 +1,12 @@
-import { Node } from "@tiptap/vue-3"
 import "../styles/border-numbers.css"
+import { commands } from "@guardian/prosemirror-invisibles"
+import { CommandProps } from "@tiptap/core"
+import { Node } from "@tiptap/vue-3"
+import addBorderNumbers from "@/editor/commands/addBorderNumbers"
+import { handleSelection } from "@/editor/commands/handleSelection"
+import removeBorderNumbers from "@/editor/commands/removeBorderNumbers"
+import handleBackspace from "@/editor/shortcuts/handleBackspace"
+import { handleDelete } from "@/editor/shortcuts/handleDelete"
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -37,6 +44,28 @@ export const BorderNumber = Node.create({
   },
   renderHTML() {
     return ["border-number", {}, 0]
+  },
+  addCommands() {
+    return {
+      removeBorderNumbers: () => (commandProps: CommandProps) => {
+        return removeBorderNumbers(commandProps)
+      },
+      addBorderNumbers: () => addBorderNumbers,
+      handleSelection: () => handleSelection,
+    }
+  },
+  addKeyboardShortcuts() {
+    return {
+      Backspace: ({ editor }) => handleBackspace(editor),
+      Delete: ({ editor }) => handleDelete(editor),
+      "Mod-Alt-.": ({ editor }) => editor.commands.addBorderNumbers(),
+      "Mod-Alt--": ({ editor }) => editor.commands.removeBorderNumbers(),
+      "Mod-Alt-#": ({ editor }) =>
+        commands.toggleActiveState()(editor.state, editor.view.dispatch),
+      // ‘ is the keycode for Alt+# on Macbook
+      "Mod-Alt-‘": ({ editor }) =>
+        commands.toggleActiveState()(editor.state, editor.view.dispatch),
+    }
   },
 })
 

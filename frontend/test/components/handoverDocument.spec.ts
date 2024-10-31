@@ -9,7 +9,6 @@ import { EventRecordType, HandoverMail, Preview } from "@/domain/eventRecord"
 import LegalForce from "@/domain/legalForce"
 import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
-import featureToggleService from "@/services/featureToggleService"
 import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
 
 const router = createRouter({
@@ -72,11 +71,6 @@ describe("HandoverDocumentationUnitView:", () => {
         xml: "<xml>all good</xml>",
         success: true,
       }),
-    })
-
-    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
-      status: 200,
-      data: true,
     })
   })
 
