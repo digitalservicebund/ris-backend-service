@@ -347,6 +347,13 @@ export const caselawTest = test.extend<MyFixtures>({
               documentationUnit: new RelatedDocumentation({
                 documentNumber: prefilledDocumentUnit.documentNumber,
                 uuid: prefilledDocumentUnit.uuid,
+                court: {
+                  type: "BGH",
+                  location: undefined,
+                  label: "BGH",
+                  revoked: undefined,
+                  responsibleDocOffice: undefined,
+                },
               }),
             },
           ],
