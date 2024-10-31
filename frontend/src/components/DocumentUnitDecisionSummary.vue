@@ -30,8 +30,8 @@ const showErrorBadge = computed(() => {
   return props.data?.hasMissingRequiredFields
 })
 
-function copySummary() {
-  if (props.data) navigator.clipboard.writeText(props.data.renderDecision)
+async function copySummary() {
+  if (props.data) await navigator.clipboard.writeText(props.data.renderDecision)
 }
 </script>
 

@@ -26,7 +26,7 @@ const sortAlphabetically = ref(false)
  */
 const listInputValue = computed<string>({
   get: () => list.value.join("\n"),
-  set: (newValues: string) => {
+  set: async (newValues: string) => {
     list.value = newValues
       .split("\n")
       .map((listItem) => listItem.trim())
@@ -43,7 +43,7 @@ const listInputValue = computed<string>({
     // Emit the updated value
     emit("update:modelValue", list.value)
 
-    toggleEditMode()
+    await toggleEditMode()
 
     // Reset sorting option
     sortAlphabetically.value = false
@@ -61,7 +61,7 @@ const listInputDisplayRef = ref<InstanceType<typeof ListInputDisplay> | null>(
 async function toggleEditMode() {
   // Reset sorting option
   sortAlphabetically.value = false
-  if (!!list.value?.length) {
+  if (list.value?.length) {
     editMode.value = !editMode.value
   } else emit("reset")
 

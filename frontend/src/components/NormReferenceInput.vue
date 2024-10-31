@@ -113,7 +113,7 @@ async function addNormReference() {
  * Emits to the editable list to removes the current norm reference and empties the local single norm list. The truthy
  * boolean value indicates, that the edit index should be resetted to undefined, ergo show all list items in summary mode.
  */
-async function removeNormReference() {
+function removeNormReference() {
   singleNorms.value = []
   norm.value.normAbbreviation = undefined
   emit("removeEntry")

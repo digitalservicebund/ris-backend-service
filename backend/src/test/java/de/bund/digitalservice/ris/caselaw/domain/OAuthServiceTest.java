@@ -117,7 +117,6 @@ class OAuthServiceTest {
   void testUserHasReadAccessByDocumentNumber_withStatusPending_withSameDocOffice_shouldReturnTrue()
       throws DocumentationUnitNotExistsException {
 
-    // Arrange
     SecurityContextHolder.setContext(securityContext);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     when(authentication.getPrincipal()).thenReturn(oidcUser);
@@ -136,10 +135,8 @@ class OAuthServiceTest {
         .thenReturn(documentationUnit);
     when(userService.getDocumentationOffice(any())).thenReturn(office);
 
-    // Act
     Function<String, Boolean> result = service.userHasReadAccessByDocumentNumber();
 
-    // Assert
     assertThat(result.apply(documentNumber)).isTrue();
   }
 
@@ -148,7 +145,6 @@ class OAuthServiceTest {
       testUserHasReadAccessByDocumentNumber_withStatusPending_withOtherDocOffice_shouldReturnFalse()
           throws DocumentationUnitNotExistsException {
 
-    // Arrange
     SecurityContextHolder.setContext(securityContext);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     when(authentication.getPrincipal()).thenReturn(oidcUser);
@@ -170,10 +166,8 @@ class OAuthServiceTest {
         .thenReturn(documentationUnit);
     when(userService.getDocumentationOffice(any())).thenReturn(office);
 
-    // Act
     Function<String, Boolean> result = service.userHasReadAccessByDocumentNumber();
 
-    // Assert
     assertThat(result.apply(documentNumber)).isFalse();
   }
 

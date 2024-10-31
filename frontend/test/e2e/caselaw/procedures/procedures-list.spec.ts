@@ -115,11 +115,11 @@ test.describe("Procedures search list (Vorgänge)", () => {
       await page.getByLabel("Löschen", { exact: true }).click()
     })
 
-    // await test.step("Show message for procedure without doc units", async () => {
-    //   await expect(
-    //     page.getByText("Keine Dokeinheiten sind zugewiesen."),
-    //   ).toBeVisible()
-    // })
+    await test.step("Show message for procedure without doc units", async () => {
+      await expect(
+        page.getByText("Keine Dokeinheiten sind zugewiesen."),
+      ).toBeVisible()
+    })
   })
 
   test("View, navigate and reset paged results", async ({

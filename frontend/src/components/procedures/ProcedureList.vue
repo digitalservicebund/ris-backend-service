@@ -201,8 +201,8 @@ debouncedWatch(
 
 watch([currentPage, debouncedFilter], () => updateProcedures())
 
-onBeforeMount(() => {
-  getUserGroups()
+onBeforeMount(async () => {
+  await getUserGroups()
 })
 </script>
 

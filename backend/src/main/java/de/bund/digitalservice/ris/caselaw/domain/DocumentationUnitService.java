@@ -113,6 +113,8 @@ public class DocumentationUnitService {
         params.reference(),
         params.reference() != null && params.reference().legalPeriodical() != null
             ? params.reference().legalPeriodical().abbreviation()
+                + " "
+                + params.reference().citation()
             : null);
   }
 
@@ -193,12 +195,10 @@ public class DocumentationUnitService {
             listItem.creatingDocumentationOffice(),
             listItem.documentationOffice(),
             listItem.status());
-    boolean permissionToDelete =
-        authService.userCanDelete(oidcUser, listItem.documentationOffice(), listItem.status());
     boolean isInternalUser = authService.userIsInternal().apply(oidcUser);
 
     return listItem.toBuilder()
-        .isDeletable((hasWriteAccess || permissionToDelete) && isInternalUser)
+        .isDeletable(hasWriteAccess && isInternalUser)
         .isEditable(
             (hasWriteAccess
                 && (isInternalUser || authService.isAssignedViaProcedure().apply(listItem.uuid()))))

@@ -12,7 +12,6 @@ import routes from "~/test-helper/routes"
 function renderComponent(
   { isInternal }: { isInternal: boolean } = { isInternal: true },
 ) {
-  // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
 
   const router = createRouter({

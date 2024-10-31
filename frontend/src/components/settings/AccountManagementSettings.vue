@@ -10,8 +10,8 @@ async function fetchUrl() {
   link.value = (await adminService.getAccountManagementUrl()).data
 }
 
-onMounted(() => {
-  fetchUrl()
+onMounted(async () => {
+  await fetchUrl()
 })
 </script>
 

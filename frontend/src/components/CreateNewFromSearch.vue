@@ -71,7 +71,11 @@ async function createNewFromSearch(openDocunit: boolean = false) {
   if (!isValid) {
     return
   }
-  const createResponse = await documentUnitService.createNew(props.parameters)
+
+  const createResponse = await documentUnitService.createNew({
+    ...props.parameters,
+    documentationOffice: docOffice.value,
+  })
   if (createResponse.error) {
     createNewFromSearchResponseError.value = createResponse.error
     return

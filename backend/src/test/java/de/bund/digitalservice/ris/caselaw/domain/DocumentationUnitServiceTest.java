@@ -122,6 +122,7 @@ class DocumentationUnitServiceTest {
             .documentType(DocumentType.builder().label("Bes").build())
             .reference(
                 Reference.builder()
+                    .citation("2024, 4")
                     .legalPeriodical(LegalPeriodical.builder().abbreviation("BAG").build())
                     .build())
             .build();
@@ -161,7 +162,9 @@ class DocumentationUnitServiceTest {
                 .withError(false)
                 .build(),
             parameters.reference(),
-            parameters.reference().legalPeriodical().abbreviation());
+            parameters.reference().legalPeriodical().abbreviation()
+                + " "
+                + parameters.reference().citation());
   }
 
   @Test

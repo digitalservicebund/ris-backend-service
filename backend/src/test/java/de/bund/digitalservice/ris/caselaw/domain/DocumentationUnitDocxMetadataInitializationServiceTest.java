@@ -176,6 +176,24 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
   }
 
   @Test
+  void testInitializeCoreData_shouldInitializeUniqueCourtByType() {
+    Map<DocxMetadataProperty, String> properties = Map.of(DocxMetadataProperty.COURT_TYPE, "BFH");
+    Docx2Html docx2html = new Docx2Html(null, List.of(), properties);
+
+    when(databaseCourtRepository.findOneByType("BFH"))
+        .thenReturn(Optional.of(CourtDTO.builder().type("BFH").build()));
+
+    service.initializeCoreData(TEST_UUID, docx2html);
+
+    ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
+        ArgumentCaptor.forClass(DocumentationUnit.class);
+    verify(repository, times(2)).save(documentationUnitCaptor.capture());
+    CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
+
+    assertEquals("BFH", savedCoreData.court().label());
+  }
+
+  @Test
   void testInitializeCoreData_shouldNotInitializeAmbiguousCourtType() {
     Map<DocxMetadataProperty, String> properties = Map.of(DocxMetadataProperty.COURT_TYPE, "AG");
     Docx2Html docx2html = new Docx2Html(null, List.of(), properties);
@@ -257,24 +275,6 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
     CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
 
     assertEquals("LG Bern", savedCoreData.court().label());
-  }
-
-  @Test
-  void testInitializeCoreData_withUniqueTypeOnly_shouldReturnCourt() {
-    Map<DocxMetadataProperty, String> properties = Map.of(DocxMetadataProperty.COURT_TYPE, "BFH");
-    Docx2Html docx2html = new Docx2Html(null, List.of(), properties);
-
-    when(databaseCourtRepository.findOneByTypeAndLocation("BFH", null))
-        .thenReturn(Optional.of(CourtDTO.builder().type("BFH").isSuperiorCourt(true).build()));
-
-    service.initializeCoreData(TEST_UUID, docx2html);
-
-    ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
-        ArgumentCaptor.forClass(DocumentationUnit.class);
-    verify(repository, times(2)).save(documentationUnitCaptor.capture());
-    CoreData savedCoreData = documentationUnitCaptor.getValue().coreData();
-
-    assertEquals("BFH", savedCoreData.court().label());
   }
 
   @Test

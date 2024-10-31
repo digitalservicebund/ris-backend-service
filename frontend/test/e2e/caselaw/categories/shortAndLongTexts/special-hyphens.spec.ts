@@ -6,9 +6,9 @@ import {
   navigateToCategories,
   save,
   uploadTestfile,
+  navigateToHandover,
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
-import { navigateToHandover } from "~/e2e/caselaw/e2e-utils"
 
 test.describe(
   "transform special hyphen characters correctly",

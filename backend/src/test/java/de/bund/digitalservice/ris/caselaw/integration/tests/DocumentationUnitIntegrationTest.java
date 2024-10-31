@@ -823,6 +823,18 @@ class DocumentationUnitIntegrationTest {
     searchInput = DocumentationUnitSearchInput.builder().fileNumber("abc").build();
     assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("MNOP202300099");
 
+    // by fileNumber start
+    searchInput = DocumentationUnitSearchInput.builder().fileNumber("ab").build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("MNOP202300099");
+
+    // by fileNumber ending without wildcard (%) should not return anything
+    searchInput = DocumentationUnitSearchInput.builder().fileNumber("bc").build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).isEmpty();
+
+    // by fileNumber ending
+    searchInput = DocumentationUnitSearchInput.builder().fileNumber("%bc").build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("MNOP202300099");
+
     // by documentNumber & fileNumber
     searchInput =
         DocumentationUnitSearchInput.builder().fileNumber("abc").documentNumber("abc").build();
@@ -1081,5 +1093,32 @@ class DocumentationUnitIntegrationTest {
         .exchange()
         .expectStatus()
         .isForbidden();
+  }
+
+  @Test
+  void testTakeOverDocumentationUnit_setsStatusAndPermissionsCorrectly() {
+    DocumentationOfficeDTO creatingDocumentationOffice =
+        documentationOfficeRepository.findByAbbreviation("BGH");
+    String documentNumber = "1234567890123";
+
+    EntityBuilderTestUtil.createAndSavePendingDocumentationUnit(
+        repository, documentationOffice, creatingDocumentationOffice, documentNumber);
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/1234567890123/takeover")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentationUnitListItem.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().status().publicationStatus())
+                  .isEqualTo(UNPUBLISHED);
+              assertThat(response.getResponseBody().isDeletable()).isTrue();
+              assertThat(response.getResponseBody().isEditable()).isTrue();
+            });
   }
 }

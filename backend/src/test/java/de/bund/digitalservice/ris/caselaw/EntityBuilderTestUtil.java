@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.caselaw;
 
+import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.EXTERNAL_HANDOVER_PENDING;
+
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
@@ -91,6 +93,20 @@ public class EntityBuilderTestUtil {
             .documentNumber(DEFAULT_DOCUMENT_NUMBER)
             .documentationOffice(documentationOffice),
         null);
+  }
+
+  public static DocumentationUnitDTO createAndSavePendingDocumentationUnit(
+      DatabaseDocumentationUnitRepository repository,
+      DocumentationOfficeDTO documentationOffice,
+      DocumentationOfficeDTO creatingDocumentationOffice,
+      String documentNumber) {
+    return createAndSavePublishedDocumentationUnit(
+        repository,
+        DocumentationUnitDTO.builder()
+            .documentNumber(documentNumber)
+            .documentationOffice(documentationOffice)
+            .creatingDocumentationOffice(creatingDocumentationOffice),
+        EXTERNAL_HANDOVER_PENDING);
   }
 
   public static DocumentationUnitDTO createAndSavePublishedDocumentationUnit(

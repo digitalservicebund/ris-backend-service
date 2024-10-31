@@ -34,10 +34,19 @@ describe("Create new documentation unit from search", () => {
     id: "123",
     abbreviation: "BVerfG",
   }
+
+  const dsDocOffice: DocumentationOffice = {
+    id: "456",
+    abbreviation: "DS",
+  }
   const dropdownItems: ComboboxItem[] = [
     {
       label: docOffice.abbreviation,
       value: docOffice,
+    },
+    {
+      label: dsDocOffice.abbreviation,
+      value: dsDocOffice,
     },
   ]
   vi.spyOn(comboboxItemService, "getDocumentationOffices").mockImplementation(
@@ -186,6 +195,43 @@ describe("Create new documentation unit from search", () => {
     const button = screen.getByLabelText("Dokumentationseinheit erstellen")
     await fireEvent.click(button)
 
-    expect(documentUnitService.createNew).toHaveBeenCalledWith(parameters)
+    expect(documentUnitService.createNew).toHaveBeenCalledWith({
+      ...parameters,
+      documentationOffice: docOffice,
+    })
+  })
+
+  it("create documentation unit with changed default doc office", async () => {
+    vi.spyOn(documentUnitService, "createNew").mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: new DocumentUnit("foo", {
+          documentNumber: "1234567891234",
+        }),
+      }),
+    )
+
+    const parameters = {
+      court: { label: "Test", responsibleDocOffice: docOffice },
+    } as DocumentationUnitParameters
+
+    await renderComponent({ parameters, isValid: true })
+
+    await fireEvent.focus(
+      await screen.findByLabelText("Zuständige Dokumentationsstelle"),
+    )
+
+    // change documentation office after it was set automatically
+    const dropdownItems = screen.getAllByLabelText("dropdown-option")
+    expect(dropdownItems[1]).toHaveTextContent("DS")
+    await fireEvent.click(dropdownItems[1])
+
+    const button = screen.getByLabelText("Dokumentationseinheit erstellen")
+    await fireEvent.click(button)
+
+    expect(documentUnitService.createNew).toHaveBeenCalledWith({
+      ...parameters,
+      documentationOffice: dsDocOffice,
+    })
   })
 })

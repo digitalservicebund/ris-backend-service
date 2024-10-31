@@ -19,6 +19,8 @@ public interface DatabaseCourtRepository extends JpaRepository<CourtDTO, UUID> {
 
   Optional<CourtDTO> findOneByTypeAndLocation(String type, String location);
 
+  Optional<CourtDTO> findOneByType(String type);
+
   /*
   The query gets all rows where searchStr is anywhere in the label.
   The CASE statements are used to order the results into 3 priority classes:
