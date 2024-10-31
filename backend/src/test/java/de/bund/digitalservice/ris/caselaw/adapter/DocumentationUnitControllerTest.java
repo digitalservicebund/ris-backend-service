@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,6 +24,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRep
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
@@ -604,5 +607,59 @@ class DocumentationUnitControllerTest {
     // once by the AuthService and once by the controller asking the service
     verify(service, times(2)).getByUuid(TEST_UUID);
     verify(docxConverterService).getConvertedObject("123");
+  }
+
+  @Test
+  void testPublish_withServiceThrowsDocumentationUnitNotExistsException()
+      throws DocumentationUnitNotExistsException {
+
+    doThrow(DocumentationUnitNotExistsException.class)
+        .when(ldmlExporterService)
+        .publishDocumentationUnit(TEST_UUID);
+
+    risWebClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
+        .exchange()
+        .expectStatus()
+        .is5xxServerError();
+
+    verify(ldmlExporterService).publishDocumentationUnit(TEST_UUID);
+  }
+
+  @Test
+  void testPublish_withServiceThrowsLdmlTransformationException()
+      throws DocumentationUnitNotExistsException {
+
+    doThrow(LdmlTransformationException.class)
+        .when(ldmlExporterService)
+        .publishDocumentationUnit(TEST_UUID);
+
+    risWebClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
+        .exchange()
+        .expectStatus()
+        .isBadRequest();
+
+    verify(ldmlExporterService).publishDocumentationUnit(TEST_UUID);
+  }
+
+  @Test
+  void testPublish_withServiceThrowsPublishException() throws DocumentationUnitNotExistsException {
+
+    doThrow(PublishException.class).when(ldmlExporterService).publishDocumentationUnit(TEST_UUID);
+
+    risWebClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
+        .exchange()
+        .expectStatus()
+        .is5xxServerError();
+
+    verify(ldmlExporterService).publishDocumentationUnit(TEST_UUID);
   }
 }

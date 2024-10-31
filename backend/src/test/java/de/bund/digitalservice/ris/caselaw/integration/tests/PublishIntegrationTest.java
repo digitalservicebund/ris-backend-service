@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
+import de.bund.digitalservice.ris.caselaw.adapter.CaselawExceptionHandler;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
@@ -112,6 +113,7 @@ class PublishIntegrationTest {
   @MockBean(name = "ldmlS3Client")
   private S3Client s3Client;
 
+  //    @MockBean private ObjectMapper objectMapper;
   @MockBean private UserService userService;
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
@@ -150,7 +152,9 @@ class PublishIntegrationTest {
 
   @Test
   void testPublishSuccessfully() {
-    DocumentationUnitDTO dto = buildValidDocumentationUnit();
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, buildValidDocumentationUnit());
 
     risWebTestClient
         .withDefaultLogin()
@@ -181,12 +185,39 @@ class PublishIntegrationTest {
         .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
         .exchange()
         .expectStatus()
-        .is4xxClientError();
+        .isBadRequest()
+        .expectBody(CaselawExceptionHandler.ApiError.class)
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody().message())
+                    .contains("Could not transform documentation unit to LDML."));
+  }
+
+  @Test
+  void testPublishFailsWhenLDMLValidationFails() {
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, buildValidDocumentationUnit().grounds(null));
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
+        .exchange()
+        .expectStatus()
+        .isBadRequest()
+        .expectBody(CaselawExceptionHandler.ApiError.class)
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody().message())
+                    .contains("Could not transform documentation unit to valid LDML."));
   }
 
   @Test
   void testPublishFailsWhenS3ClientThrowsException() {
-    DocumentationUnitDTO dto = buildValidDocumentationUnit();
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, buildValidDocumentationUnit());
 
     when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
         .thenThrow(S3Exception.class);
@@ -197,10 +228,15 @@ class PublishIntegrationTest {
         .uri("/api/v1/caselaw/documentunits/" + dto.getId() + "/publish")
         .exchange()
         .expectStatus()
-        .is5xxServerError();
+        .is5xxServerError()
+        .expectBody(CaselawExceptionHandler.ApiError.class)
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody().message())
+                    .contains("Could not save changelog to bucket."));
   }
 
-  private DocumentationUnitDTO buildValidDocumentationUnit() {
+  private DocumentationUnitDTO.DocumentationUnitDTOBuilder buildValidDocumentationUnit() {
     CourtDTO court =
         databaseCourtRepository.saveAndFlush(
             CourtDTO.builder()
@@ -215,16 +251,14 @@ class PublishIntegrationTest {
         databaseDocumentTypeRepository.saveAndFlush(
             DocumentTypeDTO.builder().abbreviation("test").multiple(true).build());
 
-    return EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-        repository,
-        DocumentationUnitDTO.builder()
-            .documentNumber(DEFAULT_DOCUMENT_NUMBER)
-            .documentType(docType)
-            .documentationOffice(documentationOffice)
-            .court(court)
-            .decisionDate(LocalDate.now())
-            .legalEffect(LegalEffectDTO.JA)
-            .fileNumbers(List.of(FileNumberDTO.builder().value("123").rank(0L).build()))
-            .grounds("lorem ipsum dolor sit amet"));
+    return DocumentationUnitDTO.builder()
+        .documentNumber(DEFAULT_DOCUMENT_NUMBER)
+        .documentType(docType)
+        .documentationOffice(documentationOffice)
+        .court(court)
+        .decisionDate(LocalDate.now())
+        .legalEffect(LegalEffectDTO.JA)
+        .fileNumbers(List.of(FileNumberDTO.builder().value("123").rank(0L).build()))
+        .grounds("lorem ipsum dolor sit amet");
   }
 }

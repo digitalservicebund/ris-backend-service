@@ -52,5 +52,5 @@ public class CaselawExceptionHandler extends ResponseEntityExceptionHandler {
     close the browser without waiting to the result of an api call. */
   }
 
-  private record ApiError(HttpStatus status, String message) {}
+  public record ApiError(HttpStatus status, String message) {}
 }
