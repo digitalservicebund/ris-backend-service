@@ -339,21 +339,29 @@ describe("ExtraContentSidePanel", () => {
 
         if (showEditButton) {
           expect(
-            await screen.findByLabelText("Dokumentationseinheit bearbeiten"),
+            await screen.findByLabelText(
+              "Dokumentationseinheit in einem neuen Tab bearbeiten",
+            ),
           ).toBeVisible()
 
           if (isEditable) {
             expect(
-              await screen.findByLabelText("edit-link-button"),
+              await screen.findByLabelText(
+                "Extra content side panel edit link button",
+              ),
             ).toBeEnabled()
           } else {
             expect(
-              await screen.findByLabelText("edit-link-button"),
+              await screen.findByLabelText(
+                "Extra content side panel edit link button",
+              ),
             ).toBeDisabled()
           }
         } else {
           expect(
-            screen.queryByLabelText("Dokumentationseinheit bearbeiten"),
+            screen.queryByLabelText(
+              "Dokumentationseinheit in einem neuen Tab bearbeiten",
+            ),
           ).not.toBeInTheDocument()
         }
       }),

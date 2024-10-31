@@ -292,12 +292,24 @@ test.describe(
 
         await test.step("should open and close document preview in side panel", async () => {
           await searchForDocUnitWithFileNumber(page, fileNumber, "31.12.2019")
-          await openSidePanelPreview(page, fileNumber)
+          await openExtraContentSidePanelPreview(page, fileNumber)
           await expect(page.getByLabel("Seitenpanel öffnen")).toBeHidden()
 
-          await page.getByLabel("Seitenpanel schließen").click()
-          await expect(page).toHaveURL(/showAttachmentPanel=false/)
+          await closeExtraContentSidePanelPreview(page)
           await page.reload()
+        })
+
+        await test.step("open editing from side panel", async () => {
+          await searchForDocUnitWithFileNumber(page, fileNumber, "31.12.2019")
+          await openExtraContentSidePanelPreview(page, fileNumber)
+
+          const newTabPromise = page.context().waitForEvent("page")
+          await openDocumentationUnitEditModeTabThroughSidePanel(page)
+          const newTab = await newTabPromise
+          expect(newTab.url()).toContain("/categories")
+          await newTab.close()
+          await closeExtraContentSidePanelPreview(page)
+          await page.reload() // to clean the search parameters.
         })
 
         await test.step("Citation input is validated when input is left", async () => {})
@@ -709,9 +721,32 @@ test.describe(
       },
     )
 
-    async function openSidePanelPreview(page: Page, fileNumber: string) {
+    async function openExtraContentSidePanelPreview(
+      page: Page,
+      fileNumber: string,
+    ) {
       await page.getByTestId(`document-number-link-${fileNumber}`).click()
       await expect(page).toHaveURL(/showAttachmentPanel=true/)
+    }
+
+    async function closeExtraContentSidePanelPreview(page: Page) {
+      await page.getByLabel("Seitenpanel schließen").click()
+      await expect(page).toHaveURL(/showAttachmentPanel=false/)
+    }
+
+    async function openDocumentationUnitEditModeTabThroughSidePanel(
+      page: Page,
+    ) {
+      await expect(
+        page,
+        "Opened content side panel is required to proceed",
+      ).toHaveURL(/showAttachmentPanel=true/)
+
+      await page
+        .getByRole("link", {
+          name: "Dokumentationseinheit in einem neuen Tab bearbeiten",
+        })
+        .click()
     }
 
     async function searchForDocUnitWithFileNumber(
