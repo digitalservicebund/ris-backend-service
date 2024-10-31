@@ -29,9 +29,12 @@ public class PostgresCourtRepositoryImpl implements CourtRepository {
     if (type == null) {
       return Optional.empty();
     }
-
-    Optional<CourtDTO> court = repository.findOneByTypeAndLocation(type, location);
-    return court.map(CourtTransformer::transformToDomain);
+    if (location == null) {
+      return repository.findOneByType(type).map(CourtTransformer::transformToDomain);
+    }
+    return repository
+        .findOneByTypeAndLocation(type, location)
+        .map(CourtTransformer::transformToDomain);
   }
 
   @Override
