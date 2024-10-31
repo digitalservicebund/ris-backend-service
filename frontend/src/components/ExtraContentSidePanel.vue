@@ -203,7 +203,7 @@ watch(store, () => {
             text="Bearbeiten"
           >
             <router-link
-              aria-label="Dokumentationseinheit bearbeiten"
+              aria-label="Dokumentationseinheit in einem neuen Tab bearbeiten"
               target="_blank"
               :to="{
                 name: 'caselaw-documentUnit-documentNumber-categories',
@@ -214,16 +214,19 @@ watch(store, () => {
               }"
             >
               <TextButton
-                aria-label="edit-link-button"
+                aria-label="Extra content side panel edit link button"
                 button-type="ghost"
                 :icon="IconEdit"
                 size="small"
               />
             </router-link>
           </Tooltip>
-          <div v-else aria-label="Dokumentationseinheit bearbeiten">
+          <div
+            v-else
+            aria-label="Dokumentationseinheit in einem neuen Tab bearbeiten"
+          >
             <TextButton
-              aria-label="edit-link-button"
+              aria-label="Extra content side panel edit link button"
               button-type="ghost"
               disabled
               :icon="IconEdit"
