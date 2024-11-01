@@ -190,13 +190,36 @@ describe("ExtraContentSidePanel", () => {
   })
 
   test("toggle panel open and closed", async () => {
-    renderComponent()
-
+    const { emitted } = renderComponent()
     expect(await screen.findByLabelText("Seitenpanel öffnen")).toBeVisible()
+    expect(
+      emitted()["sidePanelIsExpanded"][0],
+      "Shoud be mounted with isExpanded false",
+    ).toEqual([false])
+
+    // Opening side panel
     screen.getByLabelText("Seitenpanel öffnen").click()
     expect(await screen.findByLabelText("Seitenpanel schließen")).toBeVisible()
+    expect(
+      emitted()["sidePanelIsExpanded"],
+      "Did not emit when isExpanded changed to true",
+    ).toBeTruthy()
+    expect(
+      emitted()["sidePanelIsExpanded"][1],
+      "Should emit false when opened",
+    ).toEqual([true])
+
+    // Closing side panel
     screen.getByLabelText("Seitenpanel schließen").click()
     expect(await screen.findByLabelText("Seitenpanel öffnen")).toBeVisible()
+    expect(
+      emitted()["sidePanelIsExpanded"],
+      "Did not emit when isExpanded changed to false",
+    ).toBeTruthy()
+    expect(
+      emitted()["sidePanelIsExpanded"][2],
+      "Should emit false when closed",
+    ).toEqual([false])
   })
 
   describe("Select panel content", () => {
