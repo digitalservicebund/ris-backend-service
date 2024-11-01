@@ -24,6 +24,16 @@ export function handleSelection({ state, dispatch }: CommandProps): boolean {
   ) {
     const startOfBorderNumber = resolvedFrom.start(resolvedFrom.depth - 1)
 
+    /**
+     * `TextSelection` is used here for a range that spans both inline and block content.
+     * However, ProseMirror’s `TextSelection` only natively supports inline content and
+     * issues a warning when block content is included.
+     *
+     * The complexity required to fully resolve this as a mixed-content selection isn't
+     * justified for this case.
+     *
+     * Therefore, we intentionally ignore this warning. See {@link ../../main.ts}.
+     */
     const adjustedSelection = TextSelection.create(
       state.doc,
       startOfBorderNumber,
