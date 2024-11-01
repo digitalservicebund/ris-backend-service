@@ -6,6 +6,9 @@ import "@/styles/global.scss"
 import App from "./App.vue"
 import router from "./router"
 import useSessionStore from "./stores/sessionStore"
+import { filterConsoleWarnings } from "@/utils/filterConsoleWarnings"
+
+filterConsoleWarnings()
 
 const app = createApp(App)
 app.use(createHead())
