@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { ref } from "vue"
 import TextButton from "@/components/input/TextButton.vue"
 
 defineProps<{
@@ -10,14 +9,10 @@ defineProps<{
 const emit = defineEmits<{
   toggle: []
 }>()
-
-const containerRef = ref<HTMLElement | null>(null)
-
-defineExpose({ containerRef })
 </script>
 
 <template>
-  <div ref="containerRef" class="flex scroll-m-64 flex-col gap-16">
+  <div class="flex scroll-m-64 flex-col gap-16">
     <div class="flex flex-col gap-4">
       <span class="ds-label-02-reg">{{ label }}</span>
       <ul class="m-0 flex flex-row flex-wrap gap-8 p-0">
