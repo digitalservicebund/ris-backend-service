@@ -5,7 +5,7 @@ import uatFavicon from "@/assets/favicon-uat.svg"
 
 export const getFavicon = (env?: string) => {
   if (env == "staging") {
-    const isLocal = import.meta?.env?.MODE === "development"
+    const isLocal = import.meta.env?.MODE === "development"
     if (isLocal) {
       return localFavicon
     }
