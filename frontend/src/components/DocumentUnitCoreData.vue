@@ -33,8 +33,10 @@ const validationStore =
  * Our UI turns the chronological order of the list, so the latest previous procedure is first.
  */
 const descendingPreviousProcedures = computed(() =>
-  modelValue.value.previousProcedures?.toReversed(),
-)
+  modelValue.value.previousProcedures
+    ? modelValue.value.previousProcedures.toReversed()
+    : undefined,
+)DocumentUnitAttachments.vue
 
 watch(
   modelValue,
