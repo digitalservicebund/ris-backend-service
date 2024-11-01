@@ -32,7 +32,7 @@ export function handleSelection({ state, dispatch }: CommandProps): boolean {
      * The complexity required to fully resolve this as a mixed-content selection isn't
      * justified for this case.
      *
-     * Therefore, we intentionally ignore this warning. See {@link ../../main.ts}.
+     * Therefore, we intentionally ignore this warning. See {@link @/utils/filterConsoleWarnings}.
      */
     const adjustedSelection = TextSelection.create(
       state.doc,
