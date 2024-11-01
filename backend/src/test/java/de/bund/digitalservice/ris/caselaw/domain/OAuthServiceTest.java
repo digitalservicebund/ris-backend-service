@@ -141,9 +141,8 @@ class OAuthServiceTest {
   }
 
   @Test
-  void
-      testUserHasReadAccessByDocumentNumber_withStatusPending_withOtherDocOffice_shouldReturnFalse()
-          throws DocumentationUnitNotExistsException {
+  void testUserHasReadAccessByDocumentNumber_withOtherDocOffice_shouldReturnFalse()
+      throws DocumentationUnitNotExistsException {
 
     SecurityContextHolder.setContext(securityContext);
     when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -172,6 +171,137 @@ class OAuthServiceTest {
   }
 
   @Test
+  void
+      testUserHasReadAccessByDocumentNumber_withStatusPending_withCreatingDocOffice_shouldReturnTrue()
+          throws DocumentationUnitNotExistsException {
+
+    SecurityContextHolder.setContext(securityContext);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    when(authentication.getPrincipal()).thenReturn(oidcUser);
+    String documentNumber = "DOC12345";
+    DocumentationOffice office = DocumentationOffice.builder().abbreviation("BGH").build();
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .documentNumber(documentNumber)
+            .status(
+                Status.builder()
+                    .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+                    .build())
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
+                    .creatingDocOffice(DocumentationOffice.builder().abbreviation("BGH").build())
+                    .build())
+            .build();
+    when(documentationUnitService.getByDocumentNumber(documentNumber))
+        .thenReturn(documentationUnit);
+    when(userService.getDocumentationOffice(any())).thenReturn(office);
+
+    Function<String, Boolean> result = service.userHasReadAccessByDocumentNumber();
+
+    assertThat(result.apply(documentNumber)).isTrue();
+  }
+
+  @Test
+  void
+      testUserHasReadAccessByDocumentNumber_withStatusUnpublished_withCreatingDocOffice_shouldReturnFalse()
+          throws DocumentationUnitNotExistsException {
+
+    SecurityContextHolder.setContext(securityContext);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    when(authentication.getPrincipal()).thenReturn(oidcUser);
+    String documentNumber = "DOC12345";
+    DocumentationOffice office = DocumentationOffice.builder().abbreviation("BGH").build();
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .documentNumber(documentNumber)
+            .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
+                    .build())
+            .build();
+    when(documentationUnitService.getByDocumentNumber(documentNumber))
+        .thenReturn(documentationUnit);
+    when(userService.getDocumentationOffice(any())).thenReturn(office);
+
+    Function<String, Boolean> result = service.userHasReadAccessByDocumentNumber();
+
+    assertThat(result.apply(documentNumber)).isFalse();
+  }
+
+  @Test
+  void testUserHasReadAccessByDocumentationUnitId_withSameDocOffice_shouldReturnTrue()
+      throws DocumentationUnitNotExistsException {
+    // Arrange
+    UUID testUUID = UUID.randomUUID();
+    DocumentationUnit documentationUnit = DocumentationUnit.builder().uuid(testUUID).build();
+    when(documentationUnitService.getByUuid(testUUID)).thenReturn(documentationUnit);
+
+    // Act
+    Function<UUID, Boolean> result = service.userHasReadAccessByDocumentationUnitId();
+
+    // Assert
+    assertThat(result.apply(testUUID)).isTrue();
+  }
+
+  @Test
+  void testUserHasReadAccessByDocumentationUnitId_withOtherDocOffice_shouldReturnFalse()
+      throws DocumentationUnitNotExistsException {
+    // Arrange
+    UUID testUUID = UUID.randomUUID();
+    SecurityContextHolder.setContext(securityContext);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    when(authentication.getPrincipal()).thenReturn(oidcUser);
+
+    DocumentationOffice office = DocumentationOffice.builder().abbreviation("BGH").build();
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .uuid(testUUID)
+            .status(Status.builder().publicationStatus(PublicationStatus.DUPLICATED).build())
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
+                    .build())
+            .build();
+
+    when(userService.getDocumentationOffice(any())).thenReturn(office);
+    when(documentationUnitService.getByUuid(testUUID)).thenReturn(documentationUnit);
+
+    // Act
+    Function<UUID, Boolean> result = service.userHasReadAccessByDocumentationUnitId();
+
+    // Assert
+    assertThat(result.apply(testUUID)).isFalse();
+  }
+
+  @Test
+  public void
+      testUserHasReadAccessByDocumentationUnitId_withDocumentationUnitNotExistsException_returnsFalse()
+          throws DocumentationUnitNotExistsException {
+    UUID testUUID = UUID.randomUUID();
+
+    when(documentationUnitService.getByUuid(testUUID))
+        .thenThrow(new DocumentationUnitNotExistsException("Documentation unit not found"));
+
+    Function<UUID, Boolean> result = service.userHasReadAccessByDocumentationUnitId();
+
+    assertThat(result.apply(testUUID)).isFalse();
+  }
+
+  @Test
+  public void testUserHasReadAccessByDocumentationUnitId_withNoDocumentationUnit_returnsFalse()
+      throws DocumentationUnitNotExistsException {
+    UUID testUUID = UUID.randomUUID();
+
+    when(documentationUnitService.getByUuid(testUUID)).thenReturn(null);
+
+    Function<UUID, Boolean> result = service.userHasReadAccessByDocumentationUnitId();
+
+    assertThat(result.apply(testUUID)).isFalse();
+  }
+
+  @Test
   void testUserIsInternal_withInternalUser_shouldReturnTrue() {
     // Arrange
     when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
@@ -184,7 +314,7 @@ class OAuthServiceTest {
   }
 
   @Test
-  void TestUserIsInternal_withExternalUser_shouldReturnFalse() {
+  void testUserIsInternal_withExternalUser_shouldReturnFalse() {
     // Arrange
     when(oidcUser.getClaimAsStringList("roles")).thenReturn(List.of("External"));
 
@@ -234,7 +364,7 @@ class OAuthServiceTest {
   }
 
   @Test
-  void test_userHasWriteAccess_withoutDocumentationUnit_shouldReturnFalse()
+  void testUserHasWriteAccessByDocumentationUnit_withoutDocumentationUnit_shouldReturnFalse()
       throws DocumentationUnitNotExistsException {
     // Arrange
     UUID uuid = UUID.randomUUID();
@@ -248,7 +378,8 @@ class OAuthServiceTest {
   }
 
   @Test
-  void test_userHasWriteAccess_shouldReturnTrue() throws DocumentationUnitNotExistsException {
+  void testUserHasWriteAccessByDocumentationUnit_withPublishedStatus_shouldReturnTrue()
+      throws DocumentationUnitNotExistsException {
 
     // Arrange
     UUID uuid = UUID.randomUUID();
@@ -272,7 +403,350 @@ class OAuthServiceTest {
   }
 
   @Test
-  void test_isAssignedViaProcedure_withoutDocumentationUnit_shouldReturnFalse()
+  void testUserHasWriteAccessByDocumentationUnit_withSameDocOffice_shouldReturnTrue()
+      throws DocumentationUnitNotExistsException {
+
+    // Arrange
+    SecurityContextHolder.setContext(securityContext);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    when(authentication.getPrincipal()).thenReturn(oidcUser);
+    UUID testUUID = UUID.randomUUID();
+    DocumentationOffice office = DocumentationOffice.builder().abbreviation("DS").build();
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .uuid(testUUID)
+            .coreData(CoreData.builder().documentationOffice(office).build())
+            .build();
+    when(documentationUnitService.getByUuid(testUUID)).thenReturn(documentationUnit);
+    when(userService.getDocumentationOffice(any())).thenReturn(office);
+
+    // Act
+    Function<UUID, Boolean> result = service.userHasWriteAccess();
+
+    // Assert
+    assertThat(result.apply(testUUID)).isTrue();
+  }
+
+  @Test
+  void
+      testUserHasWriteAccessByDocumentationUnit_withStatusPending_withSameDocOffice_shouldReturnTrue()
+          throws DocumentationUnitNotExistsException {
+
+    // Arrange
+    SecurityContextHolder.setContext(securityContext);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    when(authentication.getPrincipal()).thenReturn(oidcUser);
+    UUID testUUID = UUID.randomUUID();
+    DocumentationOffice office = DocumentationOffice.builder().abbreviation("DS").build();
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .uuid(testUUID)
+            .status(
+                Status.builder()
+                    .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+                    .build())
+            .coreData(CoreData.builder().documentationOffice(office).build())
+            .build();
+    when(documentationUnitService.getByUuid(testUUID)).thenReturn(documentationUnit);
+    when(userService.getDocumentationOffice(any())).thenReturn(office);
+
+    // Act
+    Function<UUID, Boolean> result = service.userHasWriteAccess();
+
+    // Assert
+    assertThat(result.apply(testUUID)).isTrue();
+  }
+
+  @Test
+  void testUserHasWriteAccessByDocumentationUnit_withOtherDocOffice_shouldReturnFalse()
+      throws DocumentationUnitNotExistsException {
+
+    // Arrange
+    SecurityContextHolder.setContext(securityContext);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    when(authentication.getPrincipal()).thenReturn(oidcUser);
+    UUID testUUID = UUID.randomUUID();
+    DocumentationOffice office = DocumentationOffice.builder().abbreviation("BGH").build();
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .uuid(testUUID)
+            .status(
+                Status.builder()
+                    .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+                    .build())
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
+                    .build())
+            .build();
+    when(documentationUnitService.getByUuid(testUUID)).thenReturn(documentationUnit);
+    when(userService.getDocumentationOffice(any())).thenReturn(office);
+
+    // Act
+    Function<UUID, Boolean> result = service.userHasWriteAccess();
+
+    // Assert
+    assertThat(result.apply(testUUID)).isFalse();
+  }
+
+  @Test
+  void
+      testUserHasWriteAccessByDocumentationUnit_withStatusPending_withCreatingDocOffice_shouldReturnTrue()
+          throws DocumentationUnitNotExistsException {
+
+    // Arrange
+    SecurityContextHolder.setContext(securityContext);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    when(authentication.getPrincipal()).thenReturn(oidcUser);
+    UUID testUUID = UUID.randomUUID();
+    DocumentationOffice office = DocumentationOffice.builder().abbreviation("BGH").build();
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .uuid(testUUID)
+            .status(
+                Status.builder()
+                    .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+                    .build())
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
+                    .creatingDocOffice(DocumentationOffice.builder().abbreviation("BGH").build())
+                    .build())
+            .build();
+    when(documentationUnitService.getByUuid(testUUID)).thenReturn(documentationUnit);
+    when(userService.getDocumentationOffice(any())).thenReturn(office);
+
+    // Act
+    Function<UUID, Boolean> result = service.userHasWriteAccess();
+
+    // Assert
+    assertThat(result.apply(testUUID)).isTrue();
+  }
+
+  @Test
+  void
+      testUserHasWriteAccessByDocumentationUnit_withStatusUnpublished_withCreatingDocOffice_shouldReturnFalse()
+          throws DocumentationUnitNotExistsException {
+
+    // Arrange
+    SecurityContextHolder.setContext(securityContext);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    when(authentication.getPrincipal()).thenReturn(oidcUser);
+    UUID testUUID = UUID.randomUUID();
+    DocumentationOffice office = DocumentationOffice.builder().abbreviation("BGH").build();
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .uuid(testUUID)
+            .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
+                    .creatingDocOffice(DocumentationOffice.builder().abbreviation("BGH").build())
+                    .build())
+            .build();
+    when(documentationUnitService.getByUuid(testUUID)).thenReturn(documentationUnit);
+    when(userService.getDocumentationOffice(any())).thenReturn(office);
+
+    // Act
+    Function<UUID, Boolean> result = service.userHasWriteAccess();
+
+    // Assert
+    assertThat(result.apply(testUUID)).isFalse();
+  }
+
+  // ** Tests for @Override userHasWriteAccess(OidcUser, DocumentationOffice, DocumentationOffice,
+  // Status) **
+
+  @Test
+  public void
+      testUserHasWriteAccessWithParameters_withUnpublishedStatus_withSameDocOffice_returnsTrue() {
+    SecurityContextHolder.setContext(securityContext);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    when(authentication.getPrincipal()).thenReturn(oidcUser);
+    DocumentationOffice office = DocumentationOffice.builder().abbreviation("DS").build();
+    when(userService.getDocumentationOffice(any())).thenReturn(office);
+
+    assertThat(
+            service.userHasWriteAccess(
+                oidcUser,
+                office,
+                office,
+                Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build()))
+        .isTrue();
+  }
+
+  @Test
+  public void
+      testUserHasWriteAccessWithParameters_withPendingStatus_withSameDocOffice_returnsTrue() {
+    SecurityContextHolder.setContext(securityContext);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    when(authentication.getPrincipal()).thenReturn(oidcUser);
+    DocumentationOffice office = DocumentationOffice.builder().abbreviation("DS").build();
+    when(userService.getDocumentationOffice(any())).thenReturn(office);
+
+    assertThat(
+            service.userHasWriteAccess(
+                oidcUser,
+                office,
+                office,
+                Status.builder()
+                    .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+                    .build()))
+        .isTrue();
+  }
+
+  @Test
+  public void
+      testUserHasWriteAccessWithParameters_withUnpublishedStatus_withUserEqualsCreatingDocOffice_returnsFalse() {
+    SecurityContextHolder.setContext(securityContext);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    when(authentication.getPrincipal()).thenReturn(oidcUser);
+    DocumentationOffice office = DocumentationOffice.builder().abbreviation("DS").build();
+    DocumentationOffice creatingOffice = DocumentationOffice.builder().abbreviation("BGH").build();
+    when(userService.getDocumentationOffice(any())).thenReturn(creatingOffice);
+
+    assertThat(
+            service.userHasWriteAccess(
+                oidcUser,
+                creatingOffice,
+                office,
+                Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build()))
+        .isFalse();
+  }
+
+  @Test
+  public void
+      testUserHasWriteAccessWithParameters_withPendingStatus_withUserEqualsCreatingDocOffice_returnsTrue() {
+    SecurityContextHolder.setContext(securityContext);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    when(authentication.getPrincipal()).thenReturn(oidcUser);
+    DocumentationOffice office = DocumentationOffice.builder().abbreviation("DS").build();
+    DocumentationOffice creatingOffice = DocumentationOffice.builder().abbreviation("BGH").build();
+    when(userService.getDocumentationOffice(any())).thenReturn(creatingOffice);
+
+    assertThat(
+            service.userHasWriteAccess(
+                oidcUser,
+                creatingOffice,
+                office,
+                Status.builder()
+                    .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+                    .build()))
+        .isTrue();
+  }
+
+  @Test
+  public void
+      testUserHasWriteAccessWithParameters_withPendingStatus_withOtherDocOffice_returnsFalse() {
+    SecurityContextHolder.setContext(securityContext);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    when(authentication.getPrincipal()).thenReturn(oidcUser);
+    DocumentationOffice office = DocumentationOffice.builder().abbreviation("DS").build();
+    DocumentationOffice creatingOffice = DocumentationOffice.builder().abbreviation("BGH").build();
+    DocumentationOffice otherOffice = DocumentationOffice.builder().abbreviation("BSG").build();
+    when(userService.getDocumentationOffice(any())).thenReturn(otherOffice);
+
+    assertThat(
+            service.userHasWriteAccess(
+                oidcUser,
+                office,
+                office,
+                Status.builder()
+                    .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+                    .build()))
+        .isFalse();
+  }
+
+  @Test
+  public void
+      testUserHasWriteAccessWithParameters_withUnpublishedStatus_withOtherDocOffice_returnsFalse() {
+    SecurityContextHolder.setContext(securityContext);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    when(authentication.getPrincipal()).thenReturn(oidcUser);
+    DocumentationOffice office = DocumentationOffice.builder().abbreviation("DS").build();
+    DocumentationOffice otherOffice = DocumentationOffice.builder().abbreviation("BSG").build();
+    when(userService.getDocumentationOffice(any())).thenReturn(otherOffice);
+
+    assertThat(
+            service.userHasWriteAccess(
+                oidcUser,
+                office,
+                office,
+                Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build()))
+        .isFalse();
+  }
+
+  @Test
+  public void testUserHasWriteAccessWithParameters_withNullStatus_returnsFalse() {
+    SecurityContextHolder.setContext(securityContext);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    when(authentication.getPrincipal()).thenReturn(oidcUser);
+    DocumentationOffice office = DocumentationOffice.builder().abbreviation("BGH").build();
+    DocumentationOffice creatingOffice = DocumentationOffice.builder().abbreviation("DS").build();
+    when(userService.getDocumentationOffice(any())).thenReturn(creatingOffice);
+
+    assertThat(service.userHasWriteAccess(oidcUser, creatingOffice, office, null)).isFalse();
+  }
+
+  @Test
+  void testUserHasSameDocOfficeAsDocument_withStatusPending_withSameDocOffice_shouldReturnTrue()
+      throws DocumentationUnitNotExistsException {
+
+    SecurityContextHolder.setContext(securityContext);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    when(authentication.getPrincipal()).thenReturn(oidcUser);
+    String documentNumber = "DOC12345";
+    DocumentationOffice office = DocumentationOffice.builder().abbreviation("DS").build();
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .documentNumber(documentNumber)
+            .status(
+                Status.builder()
+                    .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+                    .build())
+            .coreData(CoreData.builder().documentationOffice(office).build())
+            .build();
+    when(documentationUnitService.getByDocumentNumber(documentNumber))
+        .thenReturn(documentationUnit);
+    when(userService.getDocumentationOffice(any())).thenReturn(office);
+
+    Function<String, Boolean> result = service.userHasSameDocOfficeAsDocument();
+
+    assertThat(result.apply(documentNumber)).isTrue();
+  }
+
+  @Test
+  void testUserHasSameDocOfficeAsDocument__withStatusPending_withOtherDocOffice_shouldReturnFalse()
+      throws DocumentationUnitNotExistsException {
+
+    SecurityContextHolder.setContext(securityContext);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    when(authentication.getPrincipal()).thenReturn(oidcUser);
+    String documentNumber = "DOC12345";
+    DocumentationOffice office = DocumentationOffice.builder().abbreviation("BGH").build();
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .documentNumber(documentNumber)
+            .status(
+                Status.builder()
+                    .publicationStatus(PublicationStatus.EXTERNAL_HANDOVER_PENDING)
+                    .build())
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(DocumentationOffice.builder().abbreviation("DS").build())
+                    .build())
+            .build();
+    when(documentationUnitService.getByDocumentNumber(documentNumber))
+        .thenReturn(documentationUnit);
+    when(userService.getDocumentationOffice(any())).thenReturn(office);
+
+    Function<String, Boolean> result = service.userHasSameDocOfficeAsDocument();
+
+    assertThat(result.apply(documentNumber)).isFalse();
+  }
+
+  @Test
+  void testIsAssignedViaProcedure_withoutDocumentationUnit_shouldReturnFalse()
       throws DocumentationUnitNotExistsException {
 
     // Arrange
@@ -287,7 +761,7 @@ class OAuthServiceTest {
   }
 
   @Test
-  void test_isAssignedViaProcedure_withAssignedProcedure_shouldReturnTrue()
+  void testIsAssignedViaProcedure_withAssignedProcedure_shouldReturnTrue()
       throws DocumentationUnitNotExistsException {
 
     // Arrange

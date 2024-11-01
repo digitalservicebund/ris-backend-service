@@ -291,10 +291,12 @@ public class OAuthService implements AuthService {
     return getUserDocumentationOffice()
         .map(
             userOffice ->
-                    userHasSameDocOfficeAsDocument(userOffice, documentationUnit.coreData().documentationOffice())
+                userHasSameDocOfficeAsDocument(
+                        userOffice, documentationUnit.coreData().documentationOffice())
                     || (documentationUnit.status() != null
                         && isPendingStatus(documentationUnit.status())
-                        && userHasSameDocOfficeAsDocumentCreator(userOffice, documentationUnit.coreData().creatingDocOffice())))
+                        && userHasSameDocOfficeAsDocumentCreator(
+                            userOffice, documentationUnit.coreData().creatingDocOffice())))
         .orElse(false);
   }
 
