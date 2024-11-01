@@ -5,7 +5,6 @@ import { flushPromises } from "@vue/test-utils"
 import { vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import TextEditor from "@/components/input/TextEditor.vue"
-import featureToggleService from "@/services/featureToggleService"
 import { mockDocumentForProsemirror } from "~/test-helper/prosemirror-document-mock"
 
 mockDocumentForProsemirror()
@@ -16,12 +15,6 @@ vi.mock("@/composables/useInternalUser", () => {
 })
 
 describe("text editor toolbar", async () => {
-  beforeEach(() => {
-    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
-      status: 200,
-      data: true,
-    })
-  })
   const renderComponent = async () => {
     userEvent.setup()
     render(TextEditor, {

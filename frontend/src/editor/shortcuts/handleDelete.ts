@@ -6,10 +6,7 @@ import BorderNumberService from "@/services/borderNumberService"
 /**
  * Main handler for Delete which triggers recalculation of border numbers if needed.
  */
-export function handleDelete(
-  editor: Editor,
-  isFeatureEnabled: boolean,
-): boolean {
+export function handleDelete(editor: Editor): boolean {
   const { schema, selection } = editor.state
   const { from, to } = selection
   const borderNumberNumberNodeType: NodeType = schema.nodes.borderNumberNumber
@@ -32,10 +29,8 @@ export function handleDelete(
 
   if (isSelectionWithBorderNumbers) {
     void nextTick().then(() => {
-      if (isFeatureEnabled) {
-        BorderNumberService.invalidateBorderNumberLinks(selectedBorderNumbers)
-        BorderNumberService.makeBorderNumbersSequential()
-      }
+      BorderNumberService.invalidateBorderNumberLinks(selectedBorderNumbers)
+      BorderNumberService.makeBorderNumbersSequential()
     })
   }
   return false

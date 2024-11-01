@@ -1,19 +1,11 @@
 /* eslint-disable testing-library/no-node-access */
 import { render, screen, fireEvent } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
-import { vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import TextEditor from "@/components/input/TextEditor.vue"
 import { longTextLabels } from "@/domain/documentUnit"
-import featureToggleService from "@/services/featureToggleService"
 
 describe("text editor", async () => {
-  beforeEach(() => {
-    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
-      status: 200,
-      data: true,
-    })
-  })
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   global.ResizeObserver = require("resize-observer-polyfill")
   const router = createRouter({

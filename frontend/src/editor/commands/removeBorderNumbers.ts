@@ -7,10 +7,7 @@ import BorderNumberService from "@/services/borderNumberService"
 /**
  * Main command handler to remove borderNumber nodes.
  */
-function removeBorderNumbers(
-  { state, dispatch }: CommandProps,
-  isFeatureEnabled: boolean,
-): boolean {
+function removeBorderNumbers({ state, dispatch }: CommandProps): boolean {
   const { selection, doc, tr, schema } = state
   const { from: initialFrom, to: initialTo } = selection
   const borderNumberNodeType: NodeType = schema.nodes.borderNumber
@@ -26,12 +23,10 @@ function removeBorderNumbers(
     processBorderNumbers(tr, doc, borderNumberPositions)
 
   void nextTick().then(() => {
-    if (isFeatureEnabled) {
-      if (removedBorderNumbers.length > 0) {
-        BorderNumberService.invalidateBorderNumberLinks(removedBorderNumbers)
-      }
-      BorderNumberService.makeBorderNumbersSequential()
+    if (removedBorderNumbers.length > 0) {
+      BorderNumberService.invalidateBorderNumberLinks(removedBorderNumbers)
     }
+    BorderNumberService.makeBorderNumbersSequential()
   })
 
   if (modified && dispatch) {

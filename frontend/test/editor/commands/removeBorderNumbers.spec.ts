@@ -60,7 +60,7 @@ describe("removeBorderNumbers command", () => {
     }
 
     // Act
-    const result = removeBorderNumbers(commandProps as CommandProps, true)
+    const result = removeBorderNumbers(commandProps as CommandProps)
 
     // Assert
     const dispatchedTransaction: Transaction = dispatch.mock.calls[0][0]
@@ -95,7 +95,7 @@ describe("removeBorderNumbers command", () => {
     }
 
     // Act
-    const result = removeBorderNumbers(commandProps as CommandProps, true)
+    const result = removeBorderNumbers(commandProps as CommandProps)
 
     // Assert
     expect(result).toBe(false)
@@ -121,7 +121,7 @@ describe("removeBorderNumbers command", () => {
     }
 
     // Act
-    const result = removeBorderNumbers(commandProps as CommandProps, true)
+    const result = removeBorderNumbers(commandProps as CommandProps)
 
     // Assert
     expect(result).toBe(true)
