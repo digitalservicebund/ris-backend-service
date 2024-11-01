@@ -36,7 +36,7 @@ const descendingPreviousProcedures = computed(() =>
   modelValue.value.previousProcedures
     ? modelValue.value.previousProcedures.toReversed()
     : undefined,
-)DocumentUnitAttachments.vue
+)
 
 watch(
   modelValue,
