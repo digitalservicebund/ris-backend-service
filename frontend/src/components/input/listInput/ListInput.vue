@@ -66,7 +66,7 @@ async function toggleEditMode() {
   } else emit("reset")
 
   if (!editMode.value) {
-    // Toggle from edit to display: As height of display mode can be less than edit mode -> scroll into view. RISUP-161
+    // Toggle from edit to display: As height of display mode can be less than edit mode -> scroll into view.
     await nextTick()
     listInputDisplayRef.value?.containerRef?.scrollIntoView({
       block: "nearest",
