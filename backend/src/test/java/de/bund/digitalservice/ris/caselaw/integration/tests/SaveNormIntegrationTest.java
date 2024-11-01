@@ -13,6 +13,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatu
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.LdmlExporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
@@ -107,6 +108,7 @@ class SaveNormIntegrationTest {
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private HandoverService handoverService;
   @MockBean private ProcedureService procedureService;
+  @MockBean private LdmlExporterService ldmlExporterService;
 
   @MockBean
   private DocumentationUnitDocxMetadataInitializationService

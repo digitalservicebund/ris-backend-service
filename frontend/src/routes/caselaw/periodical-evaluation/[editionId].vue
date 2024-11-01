@@ -1,6 +1,7 @@
 <script lang="ts" setup>
+import { useInterval } from "@vueuse/core"
 import { storeToRefs } from "pinia"
-import { computed, onBeforeUnmount, onMounted, Ref, ref } from "vue"
+import { computed, onBeforeUnmount, onMounted, Ref, ref, watch } from "vue"
 import { useRoute } from "vue-router"
 import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
 import NavbarSide from "@/components/NavbarSide.vue"
@@ -17,6 +18,14 @@ import StringsUtil from "@/utils/stringsUtil"
 const store = useEditionStore()
 const documentUnitStore = useDocumentUnitStore()
 const extraContentSidePanelStore = useExtraContentSidePanelStore()
+
+const {
+  counter: loadDocumentUnitTimer,
+  pause,
+  resume,
+} = useInterval(10_000, {
+  controls: true,
+})
 
 const responseError = ref<ResponseError>()
 const route = useRoute()
@@ -59,6 +68,28 @@ const handleKeyDown = (event: KeyboardEvent) => {
   }
 }
 
+/**
+ * Resumes the loading document unit timer if it is expanded on extra content side panel
+ * @param expanded
+ */
+function handleSidePanelIsExpanded(expanded: boolean) {
+  if (expanded) {
+    resume()
+  } else {
+    pause()
+  }
+}
+
+/**
+ * To make sure the latest version is displayed,
+ * when timer is resumed it will reload the documentation unit if in store.
+ */
+watch(loadDocumentUnitTimer, async () => {
+  if (documentUnit.value?.documentNumber) {
+    await documentUnitStore.loadDocumentUnit(documentUnit.value?.documentNumber)
+  }
+})
+
 onBeforeUnmount(() => {
   // Remove the event listener when the component is unmounted
   window.removeEventListener("keydown", handleKeyDown)
@@ -97,6 +128,7 @@ onMounted(async () => {
           :enabled-panels="['preview']"
           hide-panel-mode-bar
           show-edit-button
+          @side-panel-is-expanded="handleSidePanelIsExpanded"
         />
       </div>
     </div>

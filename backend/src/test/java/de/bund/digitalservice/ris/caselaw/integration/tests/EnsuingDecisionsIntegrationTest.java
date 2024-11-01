@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatu
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.LdmlExporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
@@ -105,6 +106,7 @@ class EnsuingDecisionsIntegrationTest {
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private HandoverService handoverService;
   @MockBean private ProcedureService procedureService;
+  @MockBean private LdmlExporterService ldmlExporterService;
 
   @MockBean
   private DocumentationUnitDocxMetadataInitializationService

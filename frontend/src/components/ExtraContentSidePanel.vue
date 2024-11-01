@@ -27,6 +27,10 @@ const props = defineProps<{
   documentUnit?: DocumentUnit
 }>()
 
+const emit = defineEmits<{
+  sidePanelIsExpanded: [boolean]
+}>()
+
 const store = useExtraContentSidePanelStore()
 
 const route = useRoute()
@@ -85,23 +89,6 @@ function togglePanel(expand?: boolean): boolean {
   return store.togglePanel(expand)
 }
 
-/**
- * Checks whether the panel should be expanded when it is mounted.
- * If the showAttachmentPanel query parameter is present in the route, its value is taken. This parameter is only present,
- * after the user first interacts with the panel, by expanding or collapsing it manually.
- * This ensures that their selection does not get overridden.
- * If the query is not present, the panel is expanded by default if either a note, an attachment or both are present.
- * Otherwise, it is collapsed by default.
- */
-onMounted(() => {
-  setDefaultState()
-  if (route.query.showAttachmentPanel) {
-    store.isExpanded = route.query.showAttachmentPanel === "true"
-  } else {
-    store.isExpanded = hasNote.value || hasAttachments.value
-  }
-})
-
 function setDefaultState() {
   if (!props.documentUnit!.note && props.documentUnit!.hasAttachments) {
     selectAttachments()
@@ -118,6 +105,24 @@ watch(store, () => {
     if (!props.enabledPanels.includes(store.panelMode!)) {
       store.setSidePanelMode(props.enabledPanels[0])
     }
+  }
+  emit("sidePanelIsExpanded", store.isExpanded)
+})
+
+/**
+ * Checks whether the panel should be expanded when it is mounted.
+ * If the showAttachmentPanel query parameter is present in the route, its value is taken. This parameter is only present,
+ * after the user first interacts with the panel, by expanding or collapsing it manually.
+ * This ensures that their selection does not get overridden.
+ * If the query is not present, the panel is expanded by default if either a note, an attachment or both are present.
+ * Otherwise, it is collapsed by default.
+ */
+onMounted(() => {
+  setDefaultState()
+  if (route.query.showAttachmentPanel) {
+    store.isExpanded = route.query.showAttachmentPanel === "true"
+  } else {
+    store.isExpanded = hasNote.value || hasAttachments.value
   }
 })
 </script>

@@ -2,7 +2,7 @@ import { Extension } from "@tiptap/core"
 import { ResolvedPos, Slice } from "@tiptap/pm/model"
 import { EditorState, Plugin, PluginKey, Selection } from "@tiptap/pm/state"
 import { EditorView } from "@tiptap/pm/view"
-import { nextTick, Ref } from "vue"
+import { nextTick } from "vue"
 import BorderNumberService from "@/services/borderNumberService"
 
 function hasBorderNumbersInInsertionData(data: DataTransfer | null) {
@@ -29,20 +29,12 @@ function isTopLevelEmptyParagraph(state: EditorState, $to: ResolvedPos) {
   return isEmptyParagraph && $to.depth === 1
 }
 
-function pasteOnTopLevel(
-  view: EditorView,
-  slice: Slice,
-  isBorderNumberRecalculationEnabled: Ref<boolean>,
-) {
+function pasteOnTopLevel(view: EditorView, slice: Slice) {
   const { state, dispatch } = view
   const { selection, tr } = state
   const { $to } = selection
 
-  void nextTick().then(
-    () =>
-      isBorderNumberRecalculationEnabled.value &&
-      BorderNumberService.makeBorderNumbersSequential(),
-  )
+  void nextTick().then(() => BorderNumberService.makeBorderNumbersSequential())
 
   if (isTopLevelEmptyParagraph(state, $to)) {
     // Continue with normal copy-paste, e.g., if completely empty editor field.
@@ -63,44 +55,33 @@ function pasteOnTopLevel(
   return true
 }
 
-export const createEventHandler = (
-  isBorderNumberRecalculationEnabled: Ref<boolean>,
-) =>
-  Extension.create({
-    name: "eventHandler",
+export const EventHandler = Extension.create({
+  name: "eventHandler",
 
-    addProseMirrorPlugins() {
-      return [
-        new Plugin({
-          key: new PluginKey("eventHandler"),
-          props: {
-            handlePaste: (view, event, slice) => {
-              if (!hasBorderNumbersInInsertionData(event.clipboardData)) {
-                // If there are no border numbers in the clipboard, we do not overwrite the default behavior
-                return false
-              }
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        key: new PluginKey("eventHandler"),
+        props: {
+          handlePaste: (view, event, slice) => {
+            if (!hasBorderNumbersInInsertionData(event.clipboardData)) {
+              // If there are no border numbers in the clipboard, we do not overwrite the default behavior
+              return false
+            }
 
-              return pasteOnTopLevel(
-                view,
-                slice,
-                isBorderNumberRecalculationEnabled,
-              )
-            },
-
-            handleDrop: (view, event, slice) => {
-              if (!hasBorderNumbersInInsertionData(event.dataTransfer)) {
-                // If there are no border numbers in the dragged content, we do not overwrite the default behavior
-                return false
-              }
-
-              return pasteOnTopLevel(
-                view,
-                slice,
-                isBorderNumberRecalculationEnabled,
-              )
-            },
+            return pasteOnTopLevel(view, slice)
           },
-        }),
-      ]
-    },
-  })
+
+          handleDrop: (view, event, slice) => {
+            if (!hasBorderNumbersInInsertionData(event.dataTransfer)) {
+              // If there are no border numbers in the dragged content, we do not overwrite the default behavior
+              return false
+            }
+
+            return pasteOnTopLevel(view, slice)
+          },
+        },
+      }),
+    ]
+  },
+})

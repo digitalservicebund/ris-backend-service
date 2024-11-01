@@ -2,6 +2,9 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitToLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
@@ -94,6 +97,66 @@ public class LdmlExporterService {
     }
 
     logger.info("Export to LDML process is done");
+  }
+
+  /**
+   * Publish the documentation unit by transforming it to valid LDML and putting the resulting XML
+   * file into a bucket together with a changelog file, specifying which documentation unit has been
+   * added or updated.
+   *
+   * @param documentationUnitId the id of the documentation unit that should be published
+   * @throws DocumentationUnitNotExistsException if the documentation unit with the given id could
+   *     not be found in the database
+   * @throws LdmlTransformationException if the documentation unit could not be transformed to valid
+   *     LDML
+   * @throws PublishException if the changelog file could not be created or either of the files
+   *     could not be saved in the bucket
+   */
+  public void publishDocumentationUnit(UUID documentationUnitId)
+      throws DocumentationUnitNotExistsException {
+    DocumentationUnit documentationUnit =
+        documentationUnitRepository.findByUuid(documentationUnitId);
+    Optional<CaseLawLdml> ldml =
+        DocumentationUnitToLdmlTransformer.transformToLdml(
+            documentationUnit, documentBuilderFactory);
+
+    if (ldml.isEmpty()) {
+      throw new LdmlTransformationException(
+          "Could not transform documentation unit to LDML.", null);
+    }
+
+    Optional<String> fileContent = ldmlToString(ldml.get());
+    if (fileContent.isEmpty()) {
+      throw new LdmlTransformationException(
+          "Could not transform documentation unit to valid LDML.", null);
+    }
+
+    Changelog changelog = new Changelog(List.of(ldml.get().getUniqueId()), null);
+    String changelogJson;
+    try {
+      changelogJson = objectMapper.writeValueAsString(changelog);
+    } catch (IOException e) {
+      log.error("Could not write changelog file. {}", e.getMessage());
+      throw new PublishException(
+          "Could not publish documentation unit to portal, because changelog file could not be created.",
+          null);
+    }
+
+    try {
+      ldmlBucket.save(
+          "changelogs/" + DateUtils.toDateTimeString(LocalDateTime.now()) + ".json", changelogJson);
+    } catch (BucketException e) {
+      log.error("Could not save changelog to bucket", e);
+      throw new PublishException("Could not save changelog to bucket.", e);
+    }
+
+    try {
+      ldmlBucket.save(ldml.get().getUniqueId() + ".xml", fileContent.get());
+      log.info("LDML for documentation unit {} successfully published.", ldml.get().getUniqueId());
+    } catch (BucketException e) {
+      log.error("Could not save LDML to bucket", e);
+      throw new PublishException("Could not save LDML to bucket.", e);
+    }
   }
 
   public String transformAndSaveDocumentationUnit(DocumentationUnit documentationUnit) {

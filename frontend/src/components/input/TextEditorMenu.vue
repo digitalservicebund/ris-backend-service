@@ -1,13 +1,12 @@
 <script lang="ts" setup>
 import { commands, selectActiveState } from "@guardian/prosemirror-invisibles"
 import { Editor } from "@tiptap/vue-3"
-import { computed, onMounted, ref } from "vue"
+import { computed, ref } from "vue"
 import TextEditorButton, {
   EditorButton,
 } from "@/components/input/TextEditorButton.vue"
 import { useCollapsingMenuBar } from "@/composables/useCollapsingMenuBar"
 import { longTextLabels } from "@/domain/documentUnit"
-import FeatureToggleService from "@/services/featureToggleService"
 import IcSharpAddBox from "~icons/ic/sharp-add-box"
 import MaterialSymbolsDeleteSweepOutline from "~icons/ic/sharp-delete-sweep"
 import IconExpand from "~icons/ic/sharp-expand"
@@ -48,10 +47,8 @@ const borderNumberCategories = [
   longTextLabels.dissentingOpinion,
 ]
 
-const featureToggle = ref()
-
-const shouldShowAddBorderNumbersButton = computed(
-  () => borderNumberCategories.includes(props.ariaLabel) && featureToggle.value,
+const shouldShowAddBorderNumbersButton = computed(() =>
+  borderNumberCategories.includes(props.ariaLabel),
 )
 
 const buttons = computed(() => {
@@ -329,11 +326,6 @@ const focusCurrentButton = () => {
 }
 
 const ariaLabel = props.ariaLabel ? props.ariaLabel : null
-onMounted(async () => {
-  featureToggle.value = (
-    await FeatureToggleService.isEnabled("neuris.border-number-editor")
-  ).data
-})
 </script>
 
 <template>

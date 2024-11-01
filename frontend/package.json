@@ -29,8 +29,8 @@
     "eslint:fix": "f() { eslint --fix --no-warn-ignored --max-warnings=0 ${@:-.}; }; f",
     "stylelint:check": "f() { stylelint ${@:-.}; }; f",
     "stylelint:fix": "f() { stylelint --fix ${@:-.}; }; f",
-    "style:check": "f() { vue-tsc --noEmit && npm run prettier:check $@ && npm run eslint:check $@ && npm run stylelint:check $@; }; f",
-    "style:fix": "f() { vue-tsc --noEmit && npm run prettier:fix $@ && npm run eslint:fix $@ && npm run stylelint:fix $@; }; f",
+    "style:check": "f() { npm run type:check && npm run prettier:check $@ && npm run eslint:check $@ && npm run stylelint:check $@; }; f",
+    "style:fix": "f() { npm run type:check && npm run prettier:fix $@ && npm run eslint:fix $@ && npm run stylelint:fix $@; }; f",
     "audit:licences": "license-checker --production --excludePrivatePackages --onlyAllow \"$(. ./parseAllowedLicences.sh)\" --csv --out ./frontend-licence-report.csv"
   },
   "dependencies": {

@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.DocumentationUnitControllerTestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
+import de.bund.digitalservice.ris.caselaw.adapter.LdmlExporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
@@ -66,6 +67,7 @@ class DocumentationUnitControllerAuthTest {
   @MockBean private KeycloakUserService userService;
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private AttachmentService attachmentService;
+  @MockBean private LdmlExporterService ldmlExporterService;
   @MockBean ClientRegistrationRepository clientRegistrationRepository;
   @MockBean DatabaseApiKeyRepository apiKeyRepository;
   @MockBean DatabaseDocumentationOfficeRepository officeRepository;
