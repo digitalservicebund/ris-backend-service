@@ -435,7 +435,7 @@ jobs:
           app: ris-staging
           argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
           argocd_server: ${{ secrets.ARGOCD_SERVER }}
-          argocd_sync_timeout: 240
+          argocd_sync_timeout: 300
       - name: Track deploy
         uses: digitalservicebund/track-deployment@5a2815e150e1268983aac5ca04c8c046ed1b614a # v1.0.0
         with:
@@ -616,7 +616,7 @@ jobs:
           app: ris-production
           argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
           argocd_server: ${{ secrets.ARGOCD_SERVER }}
-          argocd_sync_timeout: 240
+          argocd_sync_timeout: 300
       - name: Track deploy
         uses: digitalservicebund/track-deployment@5a2815e150e1268983aac5ca04c8c046ed1b614a # v1.0.0
         with:
@@ -658,7 +658,7 @@ jobs:
           app: ris-uat
           argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
           argocd_server: ${{ secrets.ARGOCD_SERVER }}
-          argocd_sync_timeout: 240
+          argocd_sync_timeout: 300
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
