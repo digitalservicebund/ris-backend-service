@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.ImportApiKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,14 @@ public class CaselawExceptionHandler extends ResponseEntityExceptionHandler {
     return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
   }
 
+  @ExceptionHandler({PublishException.class})
+  public ResponseEntity<Object> handlePublishException(PublishException ex) {
+
+    ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+
+    return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
   @ExceptionHandler({BucketException.class})
   public ResponseEntity<Object> handleBucketException(BucketException ex) {
 
@@ -43,5 +52,5 @@ public class CaselawExceptionHandler extends ResponseEntityExceptionHandler {
     close the browser without waiting to the result of an api call. */
   }
 
-  private record ApiError(HttpStatus status, String message) {}
+  public record ApiError(HttpStatus status, String message) {}
 }

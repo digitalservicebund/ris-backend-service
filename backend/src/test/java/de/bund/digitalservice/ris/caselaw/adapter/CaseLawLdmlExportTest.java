@@ -1,7 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -10,6 +13,9 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
+import de.bund.digitalservice.ris.caselaw.adapter.exception.PublishException;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitToLdmlTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
@@ -49,7 +55,7 @@ class CaseLawLdmlExportTest {
   static ObjectMapper objectMapper;
 
   @BeforeAll
-  static void setUpBeforeClass() throws JsonProcessingException {
+  static void setUpBeforeClass() {
     documentationUnitRepository = mock(DocumentationUnitRepository.class);
     caseLawBucket = mock(LdmlBucket.class);
     objectMapper = mock(ObjectMapper.class);
@@ -60,8 +66,6 @@ class CaseLawLdmlExportTest {
             documentBuilderFactory,
             caseLawBucket,
             objectMapper);
-
-    when(objectMapper.writeValueAsString(any())).thenReturn("");
 
     PreviousDecision related1 =
         PreviousDecision.builder()
@@ -97,8 +101,10 @@ class CaseLawLdmlExportTest {
   }
 
   @BeforeEach
-  void mockReset() {
+  void mockReset() throws JsonProcessingException {
     Mockito.reset(caseLawBucket);
+    Mockito.reset(objectMapper);
+    when(objectMapper.writeValueAsString(any())).thenReturn("");
   }
 
   @Test
@@ -141,6 +147,87 @@ class CaseLawLdmlExportTest {
 
     exporter.exportMultipleRandomDocumentationUnits();
     verify(caseLawBucket, times(0)).save(anyString(), anyString());
+  }
+
+  @Test
+  @DisplayName("Should publish single documentation unit succesfully")
+  void publishSuccessfully() throws DocumentationUnitNotExistsException {
+    UUID documentationUnitId = UUID.randomUUID();
+    when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
+
+    exporter.publishDocumentationUnit(documentationUnitId);
+
+    verify(caseLawBucket, times(2)).save(anyString(), anyString());
+  }
+
+  @Test
+  @DisplayName("Publish fails with transformation exception")
+  void failLdmlTransformation() throws DocumentationUnitNotExistsException {
+    DocumentationUnit invalidTestDocumentUnit =
+        testDocumentUnit.toBuilder().coreData(CoreData.builder().build()).build();
+    UUID documentationUnitId = UUID.randomUUID();
+    when(documentationUnitRepository.findByUuid(documentationUnitId))
+        .thenReturn(invalidTestDocumentUnit);
+
+    assertThatExceptionOfType(LdmlTransformationException.class)
+        .isThrownBy(() -> exporter.publishDocumentationUnit(documentationUnitId))
+        .withMessageContaining("Could not transform documentation unit to LDML.");
+    verify(caseLawBucket, times(0)).save(anyString(), anyString());
+  }
+
+  @Test
+  @DisplayName("Publish fails with missing judgement body")
+  void failMissingJudgementBody() throws DocumentationUnitNotExistsException {
+    DocumentationUnit invalidTestDocumentUnit =
+        testDocumentUnit.toBuilder().longTexts(null).build();
+    UUID documentationUnitId = UUID.randomUUID();
+    when(documentationUnitRepository.findByUuid(documentationUnitId))
+        .thenReturn(invalidTestDocumentUnit);
+
+    assertThatExceptionOfType(LdmlTransformationException.class)
+        .isThrownBy(() -> exporter.publishDocumentationUnit(documentationUnitId))
+        .withMessageContaining("Could not transform documentation unit to valid LDML.");
+    verify(caseLawBucket, times(0)).save(anyString(), anyString());
+  }
+
+  @Test
+  @DisplayName("Should fail when changelog file cannot be created")
+  void failChangelogFileFailure()
+      throws DocumentationUnitNotExistsException, JsonProcessingException {
+    UUID documentationUnitId = UUID.randomUUID();
+    when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
+    when(objectMapper.writeValueAsString(any())).thenThrow(JsonProcessingException.class);
+
+    assertThatExceptionOfType(PublishException.class)
+        .isThrownBy(() -> exporter.publishDocumentationUnit(documentationUnitId))
+        .withMessageContaining(
+            "Could not publish documentation unit to portal, because changelog file could not be created.");
+    verify(caseLawBucket, times(0)).save(anyString(), anyString());
+  }
+
+  @Test
+  @DisplayName("Should fail when changelog file cannot be saved to bucket")
+  void failWithBucketException() throws DocumentationUnitNotExistsException {
+    UUID documentationUnitId = UUID.randomUUID();
+    when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
+
+    doThrow(BucketException.class).when(caseLawBucket).save(contains("changelogs/"), anyString());
+
+    assertThatExceptionOfType(PublishException.class)
+        .isThrownBy(() -> exporter.publishDocumentationUnit(documentationUnitId))
+        .withMessageContaining("Could not save changelog to bucket");
+  }
+
+  @Test
+  @DisplayName("Should fail when ldml file cannot be saved to bucket")
+  void failWithBucketException2() throws DocumentationUnitNotExistsException {
+    UUID documentationUnitId = UUID.randomUUID();
+    when(documentationUnitRepository.findByUuid(documentationUnitId)).thenReturn(testDocumentUnit);
+    doThrow(BucketException.class).when(caseLawBucket).save(contains(".xml"), anyString());
+
+    assertThatExceptionOfType(PublishException.class)
+        .isThrownBy(() -> exporter.publishDocumentationUnit(documentationUnitId))
+        .withMessageContaining("Could not save LDML to bucket");
   }
 
   @Test
