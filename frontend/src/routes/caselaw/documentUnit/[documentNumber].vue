@@ -12,6 +12,7 @@ import ErrorPage from "@/components/PageError.vue"
 import SideToggle from "@/components/SideToggle.vue"
 import { useCaseLawMenuItems } from "@/composables/useCaseLawMenuItems"
 import useQuery from "@/composables/useQueryFromRoute"
+import DocumentUnit from "@/domain/documentUnit"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
@@ -27,11 +28,12 @@ useHead({
 const store = useDocumentUnitStore()
 const extraContentSidePanelStore = useExtraContentSidePanelStore()
 
+const { documentUnit } = storeToRefs(store) as {
+  documentUnit: Ref<DocumentUnit | undefined>
+}
 const route = useRoute()
 const menuItems = useCaseLawMenuItems(props.documentNumber, route.query)
 const { pushQueryToRoute } = useQuery()
-
-const { documentUnit } = storeToRefs(store)
 
 const validationErrors = ref<ValidationError[]>([])
 const showNavigationPanelRef: Ref<boolean> = ref(
@@ -150,7 +152,6 @@ onMounted(async () => {
       <DocumentUnitInfoPanel
         v-if="documentUnit && !route.path.includes('preview')"
         data-testid="document-unit-info-panel"
-        :document-unit="documentUnit"
         :heading="documentUnit?.documentNumber ?? ''"
       />
       <div class="flex grow flex-col items-start">
@@ -165,11 +166,13 @@ onMounted(async () => {
         >
           <ExtraContentSidePanel
             v-if="
+              documentUnit &&
               !(
                 route.path.includes('handover') ||
                 route.path.includes('preview')
               )
             "
+            :document-unit="documentUnit"
           ></ExtraContentSidePanel>
           <router-view
             :validation-errors="validationErrors"
