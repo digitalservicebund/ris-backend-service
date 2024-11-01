@@ -10,6 +10,7 @@ import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import { ValidationError } from "@/components/input/types"
 import Pagination, { Page } from "@/components/Pagination.vue"
+import PopupModal from "@/components/PopupModal.vue"
 import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
@@ -17,6 +18,7 @@ import { useValidationStore } from "@/composables/useValidationStore"
 import DocumentUnit, {
   DocumentationUnitParameters,
 } from "@/domain/documentUnit"
+import { PublicationState } from "@/domain/publicationStatus"
 import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -36,6 +38,7 @@ const emit = defineEmits<{
   addEntry: [void]
   cancelEdit: [void]
   removeEntry: [value: Reference]
+  deleteDocumentationUnit: [value: RelatedDocumentation]
 }>()
 
 const store = useEditionStore()
@@ -45,6 +48,7 @@ const pageNumber = ref<number>(0)
 const itemsPerPage = ref<number>(15)
 const isLoading = ref(false)
 const featureToggle = ref()
+const showModal = ref(false)
 
 const searchResultsCurrentPage = ref<Page<RelatedDocumentation>>()
 const searchResults = ref<SearchResults<RelatedDocumentation>>()
@@ -190,6 +194,7 @@ function addReferenceWithCreatedDocunit(docUnit: DocumentUnit) {
       documentNumber: docUnit.documentNumber,
       status: docUnit.status,
       referenceFound: true,
+      createdByReference: reference.value.id,
     }),
   )
 }
@@ -240,10 +245,48 @@ onMounted(async () => {
     await FeatureToggleService.isEnabled("neuris.new-from-search")
   ).data
 })
+
+/**
+ * Stops propagation of scrolling event, and toggles the showModal value
+ */
+function toggleDeletionConfirmationModal() {
+  showModal.value = !showModal.value
+  if (showModal.value) {
+    const scrollLeft = document.documentElement.scrollLeft
+    const scrollTop = document.documentElement.scrollTop
+    window.onscroll = () => {
+      window.scrollTo(scrollLeft, scrollTop)
+    }
+  } else {
+    window.onscroll = () => {
+      return
+    }
+  }
+}
+
+async function onDelete() {
+  await documentUnitService.delete(reference.value.documentationUnit?.uuid)
+  emit("removeEntry", reference.value)
+  toggleDeletionConfirmationModal()
+}
 </script>
 
 <template>
   <div class="flex flex-col gap-24 border-b-1">
+    <PopupModal
+      v-if="showModal"
+      aria-label="Dazugehörige Dokumentationseinheit löschen?"
+      cancel-button-text="Nur Fundstelle löschen"
+      cancel-button-type="tertiary"
+      confirm-button-type="destructive"
+      confirm-text="Dokumentationseinheit löschen"
+      content-text="Die dazugehörige Dokumentationseinheit existiert noch. Soll sie gelöscht werden?"
+      header-text="Dazugehörige Dokumentationseinheit löschen?"
+      @close-modal="
+        emit('removeEntry', modelValue) && toggleDeletionConfirmationModal
+      "
+      @confirm-action="onDelete"
+    />
     <DecisionSummary
       v-if="
         reference.documentationUnit &&
@@ -443,7 +486,20 @@ onMounted(async () => {
         </div>
       </div>
       <TextButton
-        v-if="isSaved"
+        v-if="
+          isSaved &&
+          reference?.documentationUnit?.status?.publicationStatus ===
+            PublicationState.UNPUBLISHED &&
+          reference?.documentationUnit?.createdByReference == reference.id
+        "
+        aria-label="Eintrag löschen"
+        button-type="destructive"
+        label="Eintrag löschen"
+        size="small"
+        @click.stop="toggleDeletionConfirmationModal"
+      />
+      <TextButton
+        v-else-if="isSaved"
         aria-label="Eintrag löschen"
         button-type="destructive"
         label="Eintrag löschen"

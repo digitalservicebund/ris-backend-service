@@ -28,6 +28,7 @@ public class RelatedDocumentationUnit {
   protected LocalDate decisionDate;
   protected String fileNumber;
   protected DocumentType documentType;
+  protected UUID createdByReference;
   protected boolean referenceFound;
 
   @Transient

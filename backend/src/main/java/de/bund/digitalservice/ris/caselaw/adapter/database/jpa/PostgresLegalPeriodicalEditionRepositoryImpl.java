@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
@@ -62,12 +63,21 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
             .anyMatch(newReference -> newReference.id().equals(reference.getId()))) {
           continue;
         }
-        // delete all deleted references
+        // delete all deleted references and possible source reference
         documentationUnitRepository
             .findById(reference.getDocumentationUnit().getId())
             .ifPresent(
                 docUnit -> {
                   docUnit.getReferences().remove(reference);
+                  if (Objects.requireNonNull(
+                          docUnit.getSource().stream()
+                              .findFirst()
+                              .map(SourceDTO::getReference)
+                              .orElse(null))
+                      .getId()
+                      .equals(reference.getId())) {
+                    docUnit.getSource().removeFirst();
+                  }
                   documentationUnitRepository.save(docUnit);
                 });
       }

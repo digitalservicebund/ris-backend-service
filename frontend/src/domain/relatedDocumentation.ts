@@ -15,6 +15,7 @@ export default class RelatedDocumentation {
   public decisionDate?: string
   public fileNumber?: string
   public documentType?: DocumentType
+  public createdByReference?: string
   public referenceFound?: boolean
 
   get hasForeignSource(): boolean {
