@@ -211,7 +211,11 @@ watch(
 </script>
 
 <template>
-  <div ref="containerRef" class="w-full scroll-m-64">
+  <div
+    ref="containerRef"
+    class="w-full scroll-m-64"
+    data-testid="editable-list-container"
+  >
     <div
       v-for="(entry, index) in mergedValues"
       :key="index"
