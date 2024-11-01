@@ -18,7 +18,7 @@
   "timezone": "Europe/Berlin",
   "automergeSchedule": [
     "before 5:30am every weekday",
-    "after 7:30am every weekday"
+    "after 7:30pm every weekday"
   ],
   "automergeType": "pr",
   "packageRules": [
