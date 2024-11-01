@@ -225,7 +225,7 @@ public class OAuthService implements AuthService {
                                     userOffice,
                                     documentationUnit.coreData().documentationOffice()));
                   } catch (DocumentationUnitNotExistsException e) {
-                    throw new RuntimeException(e);
+                    return Optional.of(false);
                   }
                 })
             .orElse(false);

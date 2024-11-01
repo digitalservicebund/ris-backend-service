@@ -276,7 +276,7 @@ class OAuthServiceTest {
   }
 
   @Test
-  public void
+  void
       testUserHasReadAccessByDocumentationUnitId_withDocumentationUnitNotExistsException_returnsFalse()
           throws DocumentationUnitNotExistsException {
     UUID testUUID = UUID.randomUUID();
@@ -290,7 +290,7 @@ class OAuthServiceTest {
   }
 
   @Test
-  public void testUserHasReadAccessByDocumentationUnitId_withNoDocumentationUnit_returnsFalse()
+  void testUserHasReadAccessByDocumentationUnitId_withNoDocumentationUnit_returnsFalse()
       throws DocumentationUnitNotExistsException {
     UUID testUUID = UUID.randomUUID();
 
@@ -558,8 +558,7 @@ class OAuthServiceTest {
   // Status) **
 
   @Test
-  public void
-      testUserHasWriteAccessWithParameters_withUnpublishedStatus_withSameDocOffice_returnsTrue() {
+  void testUserHasWriteAccessWithParameters_withUnpublishedStatus_withSameDocOffice_returnsTrue() {
     SecurityContextHolder.setContext(securityContext);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     when(authentication.getPrincipal()).thenReturn(oidcUser);
@@ -576,8 +575,7 @@ class OAuthServiceTest {
   }
 
   @Test
-  public void
-      testUserHasWriteAccessWithParameters_withPendingStatus_withSameDocOffice_returnsTrue() {
+  void testUserHasWriteAccessWithParameters_withPendingStatus_withSameDocOffice_returnsTrue() {
     SecurityContextHolder.setContext(securityContext);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     when(authentication.getPrincipal()).thenReturn(oidcUser);
@@ -596,7 +594,7 @@ class OAuthServiceTest {
   }
 
   @Test
-  public void
+  void
       testUserHasWriteAccessWithParameters_withUnpublishedStatus_withUserEqualsCreatingDocOffice_returnsFalse() {
     SecurityContextHolder.setContext(securityContext);
     when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -615,7 +613,7 @@ class OAuthServiceTest {
   }
 
   @Test
-  public void
+  void
       testUserHasWriteAccessWithParameters_withPendingStatus_withUserEqualsCreatingDocOffice_returnsTrue() {
     SecurityContextHolder.setContext(securityContext);
     when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -636,13 +634,11 @@ class OAuthServiceTest {
   }
 
   @Test
-  public void
-      testUserHasWriteAccessWithParameters_withPendingStatus_withOtherDocOffice_returnsFalse() {
+  void testUserHasWriteAccessWithParameters_withPendingStatus_withOtherDocOffice_returnsFalse() {
     SecurityContextHolder.setContext(securityContext);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     when(authentication.getPrincipal()).thenReturn(oidcUser);
     DocumentationOffice office = DocumentationOffice.builder().abbreviation("DS").build();
-    DocumentationOffice creatingOffice = DocumentationOffice.builder().abbreviation("BGH").build();
     DocumentationOffice otherOffice = DocumentationOffice.builder().abbreviation("BSG").build();
     when(userService.getDocumentationOffice(any())).thenReturn(otherOffice);
 
@@ -658,7 +654,7 @@ class OAuthServiceTest {
   }
 
   @Test
-  public void
+  void
       testUserHasWriteAccessWithParameters_withUnpublishedStatus_withOtherDocOffice_returnsFalse() {
     SecurityContextHolder.setContext(securityContext);
     when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -677,7 +673,7 @@ class OAuthServiceTest {
   }
 
   @Test
-  public void testUserHasWriteAccessWithParameters_withNullStatus_returnsFalse() {
+  void testUserHasWriteAccessWithParameters_withNullStatus_returnsFalse() {
     SecurityContextHolder.setContext(securityContext);
     when(securityContext.getAuthentication()).thenReturn(authentication);
     when(authentication.getPrincipal()).thenReturn(oidcUser);

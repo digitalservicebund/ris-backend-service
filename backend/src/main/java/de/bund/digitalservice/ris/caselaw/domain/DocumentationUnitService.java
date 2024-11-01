@@ -164,14 +164,7 @@ public class DocumentationUnitService {
             oidcUser,
             searchInput);
 
-    return documentationUnitListItems.map(
-        item -> {
-          try {
-            return addPermissions(oidcUser, item);
-          } catch (DocumentationUnitNotExistsException e) {
-            throw new RuntimeException(e);
-          }
-        });
+    return documentationUnitListItems.map(item -> addPermissions(oidcUser, item));
   }
 
   public DocumentationUnitListItem takeOverDocumentationUnit(
@@ -186,8 +179,7 @@ public class DocumentationUnitService {
   }
 
   private DocumentationUnitListItem addPermissions(
-      OidcUser oidcUser, DocumentationUnitListItem listItem)
-      throws DocumentationUnitNotExistsException {
+      OidcUser oidcUser, DocumentationUnitListItem listItem) {
 
     boolean hasWriteAccess =
         authService.userHasWriteAccess(
