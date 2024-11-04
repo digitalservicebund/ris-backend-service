@@ -34,6 +34,10 @@ if (import.meta.env.PROD) {
     tracesSampleRate: 0.1, // Capture 100% of the transactions, reduce in production!
     attachProps: true,
     logErrors: true,
+    ignoreErrors: [
+      // Irrelevant ProseMirror warning, see {@link filterConsoleWarnings} for details
+      "TextSelection endpoint not pointing into a node with inline content",
+    ],
   })
 }
 
