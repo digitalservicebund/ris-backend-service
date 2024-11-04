@@ -1,4 +1,4 @@
-import { expect } from "@playwright/test"
+import { expect, Page } from "@playwright/test"
 import {
   clickCategoryButton,
   navigateToCategories,
@@ -9,6 +9,7 @@ import {
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 import { DocumentUnitCatagoriesEnum } from "@/components/enumDocumentUnitCatagories"
+import DocumentUnit from "@/domain/documentUnit"
 
 test.describe("short and long texts", () => {
   test(
@@ -337,185 +338,325 @@ test.describe("short and long texts", () => {
     },
   )
 
+  // expects are in nested functions, which eslint does not recognise
+  // eslint-disable-next-line playwright/expect-expect
+  test("Titelzeile should be saved and displayed in preview and in 'XML-Vorschau'", async ({
+    page,
+    prefilledDocumentUnit,
+  }) => {
+    const testId = "Titelzeile"
+    const value = "Titelzeile Test Text"
+    const selector = `[data-testid='${testId}']`
+
+    await runTextCategoryTest(
+      page,
+      prefilledDocumentUnit,
+      testId,
+      value,
+      selector,
+    )
+  })
+
+  // eslint-disable-next-line playwright/expect-expect
+  test("Leitsatz should be saved and displayed in preview and in 'XML-Vorschau'", async ({
+    page,
+    secondPrefilledDocumentUnit,
+  }) => {
+    const testId = "Leitsatz"
+    const value = "Leitsatz Test Text"
+    const selector = `[data-testid='${testId}']`
+
+    await runTextCategoryTest(
+      page,
+      secondPrefilledDocumentUnit,
+      testId,
+      value,
+      selector,
+    )
+  })
+
+  // eslint-disable-next-line playwright/expect-expect
+  test("Orientierungssatz should be saved and displayed in preview and in 'XML-Vorschau'", async ({
+    page,
+    secondPrefilledDocumentUnit,
+  }) => {
+    const testId = "Orientierungssatz"
+    const value = "Orientierungssatz Test Text"
+    const selector = `[data-testid='${testId}']`
+
+    await runTextCategoryTest(
+      page,
+      secondPrefilledDocumentUnit,
+      testId,
+      value,
+      selector,
+    )
+  })
+
+  // eslint-disable-next-line playwright/expect-expect
   test(
-    "text editor input should be saved and displayed in preview and in 'XML-Vorschau'",
+    "Sonstiger Orientierungssatz should be saved and displayed in preview and in 'XML-Vorschau'",
     {
-      annotation: [
-        {
-          type: "story",
-          description:
-            "https://digitalservicebund.atlassian.net/browse/RISDEV-4570",
-        },
-        {
-          type: "story",
-          description:
-            "https://digitalservicebund.atlassian.net/browse/RISDEV-4576",
-        },
-        {
-          type: "story",
-          description:
-            "https://digitalservicebund.atlassian.net/browse/RISDEV-4572",
-        },
-        {
-          type: "story",
-          description:
-            "https://digitalservicebund.atlassian.net/browse/RISDEV-4573",
-        },
-      ],
-      tag: ["@RISDEV-4570", "@RISDEV-4572", "@RISDEV-4573", "@RISDEV-4576"],
+      tag: ["@RISDEV-4572"],
     },
     async ({ page, prefilledDocumentUnit }) => {
-      const testCases: {
-        testId: string
-        value: string
-      }[] = [
-        {
-          testId: "Titelzeile",
-          value: "Titelzeile Test Text",
-        },
-        {
-          testId: "Leitsatz",
-          value: "Leitsatz Test Text",
-        },
-        {
-          testId: "Orientierungssatz",
-          value: "Orientierungssatz Test Text",
-        },
-        {
-          testId: "Sonstiger Orientierungssatz",
-          value: "Sonstiger Orientierungssatz Test Text",
-        },
-        {
-          testId: "Tenor",
-          value: "Tenor Test Text",
-        },
-        {
-          testId: "Gründe",
-          value: "Gründe Test Text",
-        },
-        {
-          testId: "Tatbestand",
-          value: "Tatbestand Test Text",
-        },
-        {
-          testId: "Entscheidungsgründe",
-          value: "Entscheidungsgründe Test Text",
-        },
-        {
-          testId: "Abweichende Meinung",
-          value: "Abweichende Meinung Test Text",
-        },
-        {
-          testId: "Sonstiger Langtext",
-          value: "Sonstiger Langtext Test Text",
-        },
-        {
-          testId: "Gliederung",
-          value: "Gliederung Test Text",
-        },
-      ]
+      const testId = "Sonstiger Orientierungssatz"
+      const value = "Sonstiger Orientierungssatz Test Text"
+      const selector = `[data-testid='${testId}']`
 
-      for (let index = 0; index < testCases.length; index++) {
-        const testId = testCases[index].testId
-        const value = testCases[index].value
-        const selector = `[data-testid='${testId}']`
-
-        await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
-
-        // Leitsatz and Orientierungssatz are prefilled. Entscheidungsgründe is filled for Tatbestand.
-        // Therefore, the button doesn't need to be clicked.
-        // eslint-disable-next-line playwright/no-conditional-in-test
-        if (
-          // eslint-disable-next-line playwright/no-conditional-in-test
-          testId != "Leitsatz" &&
-          testId != "Orientierungssatz" &&
-          testId != "Entscheidungsgründe"
-        ) {
-          await clickCategoryButton(testId, page)
-        }
-
-        await test.step(`text field '${testId}' should be filled with value '${value}'`, async () => {
-          const textField = page.locator(selector)
-          await textField.click()
-          await page.keyboard.press(`ControlOrMeta+A`)
-          await page.keyboard.press(`ControlOrMeta+Backspace`)
-          await page.keyboard.type(value)
-          const innerText = await textField.innerText()
-          expect(innerText).toContain(value)
-        })
-
-        // Tatbestand can only be filled when Entscheidungsgründe is given.
-        // eslint-disable-next-line playwright/no-conditional-in-test
-        if (testId == "Tatbestand") {
-          await clickCategoryButton("Entscheidungsgründe", page)
-          const textField = page.locator(`[data-testid='Entscheidungsgründe']`)
-          await textField.click()
-          await page.keyboard.type("Test")
-          const innerText = await textField.innerText()
-          // eslint-disable-next-line playwright/no-conditional-expect
-          expect(innerText).toContain("Test")
-        }
-
-        // Outline (Gliederung) and OtherHeadLine (Sonst O-Satz) must not be filled at the same time
-        // eslint-disable-next-line playwright/no-conditional-in-test
-        if (testId == "Gliederung") {
-          const textField = page.locator(
-            `[data-testid='Sonstiger Orientierungssatz']`,
-          )
-          await textField.click()
-          await page.keyboard.press(`ControlOrMeta+A`)
-          await page.keyboard.press(`ControlOrMeta+Backspace`)
-          const innerText = await textField.innerText()
-          // eslint-disable-next-line playwright/no-conditional-expect
-          expect(innerText).toContain("")
-        }
-
-        // Casefacts (Tatbestand) and Reasons (Gründe) must not be filled at the same time
-        // eslint-disable-next-line playwright/no-conditional-in-test
-        if (testId == "Tatbestand") {
-          const textField = page.locator(`[data-testid='Gründe']`)
-          await textField.click()
-          await page.keyboard.press(`ControlOrMeta+A`)
-          await page.keyboard.press(`ControlOrMeta+Backspace`)
-          const innerText = await textField.innerText()
-          // eslint-disable-next-line playwright/no-conditional-expect
-          expect(innerText).toContain("")
-        }
-
-        await save(page)
-
-        await test.step(`value '${value}' should be saved (be present after reload)`, async () => {
-          await page.reload()
-          const textField = page.locator(selector)
-          const innerText = await textField.innerText()
-          expect(innerText).toContain(value)
-        })
-
-        await test.step(`text field '${testId}' and value '${value}' should be visible in preview`, async () => {
-          await navigateToPreview(
-            page,
-            prefilledDocumentUnit.documentNumber as string,
-          )
-
-          await expect(page.getByText(testId, { exact: true })).toBeVisible()
-          await expect(
-            page.getByText(value, {
-              exact: true,
-            }),
-          ).toBeVisible()
-        })
-
-        await test.step(`text field '${testId}' and value '${value}' should be visible in 'XML-Vorschau'`, async () => {
-          await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
-          const xmlPreview = page.getByTitle("XML Vorschau")
-          await expect(xmlPreview).toBeVisible()
-          const button = page.getByRole("button", { name: "aufklappen" })
-          await expect(button).toBeVisible()
-          await button.click()
-          const innerText = await xmlPreview.innerText()
-          expect(innerText).toContain(value)
-        })
-      }
+      await runTextCategoryTest(
+        page,
+        prefilledDocumentUnit,
+        testId,
+        value,
+        selector,
+      )
     },
   )
+
+  // eslint-disable-next-line playwright/expect-expect
+  test("Tenor should be saved and displayed in preview and in 'XML-Vorschau'", async ({
+    page,
+    prefilledDocumentUnit,
+  }) => {
+    const testId = "Tenor"
+    const value = "Tenor Test Text"
+    const selector = `[data-testid='${testId}']`
+
+    await runTextCategoryTest(
+      page,
+      prefilledDocumentUnit,
+      testId,
+      value,
+      selector,
+    )
+  })
+
+  // eslint-disable-next-line playwright/expect-expect
+  test("Gründe should be saved and displayed in preview and in 'XML-Vorschau'", async ({
+    page,
+    prefilledDocumentUnit,
+  }) => {
+    const testId = "Gründe"
+    const value = "Gründe Test Text"
+    const selector = `[data-testid='${testId}']`
+
+    await runTextCategoryTest(
+      page,
+      prefilledDocumentUnit,
+      testId,
+      value,
+      selector,
+    )
+  })
+
+  // eslint-disable-next-line playwright/expect-expect
+  test("Tatbestand should be saved and displayed in preview and in 'XML-Vorschau'", async ({
+    page,
+    secondPrefilledDocumentUnit,
+  }) => {
+    const testId = "Tatbestand"
+    const value = "Tatbestand Test Text"
+    const selector = `[data-testid='${testId}']`
+
+    await navigateToCategories(
+      page,
+      secondPrefilledDocumentUnit.documentNumber!,
+    )
+    await clickCategoryButton(testId, page)
+    await fillTextField(testId, value, page, selector)
+
+    //required for xml preview
+    await clickCategoryButton("Entscheidungsgründe", page)
+    await fillTextField(
+      "Entscheidungsgründe",
+      "Test",
+      page,
+      "[data-testid='Entscheidungsgründe']",
+    )
+
+    await save(page)
+    await checkWasSaved(value, page, selector)
+    await checkVisibleInPreview(
+      testId,
+      value,
+      page,
+      secondPrefilledDocumentUnit,
+    )
+    await checkVisibleInXMLPreview(
+      testId,
+      value,
+      page,
+      secondPrefilledDocumentUnit,
+    )
+  })
+
+  // eslint-disable-next-line playwright/expect-expect
+  test("Entscheidungsgründe should be saved and displayed in preview and in 'XML-Vorschau'", async ({
+    page,
+    prefilledDocumentUnit,
+  }) => {
+    const testId = "Entscheidungsgründe"
+    const value = "Entscheidungsgründe Test Text"
+    const selector = `[data-testid='${testId}']`
+
+    await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
+    await clickCategoryButton(testId, page)
+    await fillTextField(testId, value, page, selector)
+
+    //required for xml preview
+    await clickCategoryButton("Tatbestand", page)
+    await fillTextField(
+      "Tatbestand",
+      "Test",
+      page,
+      "[data-testid='Tatbestand']",
+    )
+
+    await save(page)
+    await checkWasSaved(value, page, selector)
+    await checkVisibleInPreview(testId, value, page, prefilledDocumentUnit)
+    await checkVisibleInXMLPreview(testId, value, page, prefilledDocumentUnit)
+  })
+
+  // eslint-disable-next-line playwright/expect-expect
+  test(
+    "Abweichende Meinung should be saved and displayed in preview and in 'XML-Vorschau'",
+    {
+      tag: ["@RISDEV-4570"],
+    },
+    async ({ page, secondPrefilledDocumentUnit }) => {
+      const testId = "Abweichende Meinung"
+      const value = "Abweichende Meinung Test Text"
+      const selector = `[data-testid='${testId}']`
+
+      await runTextCategoryTest(
+        page,
+        secondPrefilledDocumentUnit,
+        testId,
+        value,
+        selector,
+      )
+    },
+  )
+
+  // eslint-disable-next-line playwright/expect-expect
+  test(
+    "Sonstiger Langtext should be saved and displayed in preview and in 'XML-Vorschau'",
+    {
+      tag: ["@RISDEV-4573"],
+    },
+    async ({ page, prefilledDocumentUnit }) => {
+      const testId = "Sonstiger Langtext"
+      const value = "Sonstiger Langtext Test Text"
+      const selector = `[data-testid='${testId}']`
+
+      await runTextCategoryTest(
+        page,
+        prefilledDocumentUnit,
+        testId,
+        value,
+        selector,
+      )
+    },
+  )
+
+  // eslint-disable-next-line playwright/expect-expect
+  test(
+    "Gliederung should be saved and displayed in preview and in 'XML-Vorschau'",
+    {
+      tag: ["@RISDEV-4576"],
+    },
+    async ({ page, prefilledDocumentUnit }) => {
+      const testId = "Gliederung"
+      const value = "Gliederung Test Text"
+      const selector = `[data-testid='${testId}']`
+
+      await runTextCategoryTest(
+        page,
+        prefilledDocumentUnit,
+        testId,
+        value,
+        selector,
+      )
+    },
+  )
+
+  async function runTextCategoryTest(
+    page: Page,
+    prefilledDocumentUnit: DocumentUnit,
+    testId: string,
+    value: string,
+    selector: string,
+  ) {
+    await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
+    await clickCategoryButton(testId, page)
+    await fillTextField(testId, value, page, selector)
+    await save(page)
+    await checkWasSaved(value, page, selector)
+    await checkVisibleInPreview(testId, value, page, prefilledDocumentUnit)
+    await checkVisibleInXMLPreview(testId, value, page, prefilledDocumentUnit)
+  }
+
+  async function fillTextField(
+    testId: string,
+    value: string,
+    page: Page,
+    selector: string,
+  ) {
+    await test.step(`text field '${testId}' should be filled with value '${value}'`, async () => {
+      const textField = page.locator(selector)
+      await textField.click()
+      await page.keyboard.type(value)
+      const innerText = await textField.innerText()
+      expect(innerText).toContain(value)
+    })
+  }
+
+  async function checkWasSaved(value: string, page: Page, selector: string) {
+    await test.step(`value '${value}' should be saved (be present after reload)`, async () => {
+      await page.reload()
+      const textField = page.locator(selector)
+      const innerText = await textField.innerText()
+      expect(innerText).toContain(value)
+    })
+  }
+  async function checkVisibleInPreview(
+    testId: string,
+    value: string,
+    page: Page,
+    prefilledDocumentUnit: DocumentUnit,
+  ) {
+    await test.step(`text field '${testId}' and value '${value}' should be visible in preview`, async () => {
+      await navigateToPreview(
+        page,
+        prefilledDocumentUnit.documentNumber as string,
+      )
+
+      await expect(page.getByText(testId, { exact: true })).toBeVisible()
+      await expect(
+        page.getByText(value, {
+          exact: true,
+        }),
+      ).toBeVisible()
+    })
+  }
+
+  async function checkVisibleInXMLPreview(
+    testId: string,
+    value: string,
+    page: Page,
+    prefilledDocumentUnit: DocumentUnit,
+  ) {
+    await test.step(`text field '${testId}' and value '${value}' should be visible in 'XML-Vorschau'`, async () => {
+      await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
+      const xmlPreview = page.getByTitle("XML Vorschau")
+      await expect(xmlPreview).toBeVisible()
+      const button = page.getByRole("button", { name: "aufklappen" })
+      await expect(button).toBeVisible()
+      await button.click()
+      const innerText = await xmlPreview.innerText()
+      expect(innerText).toContain(value)
+    })
+  }
 })
