@@ -150,7 +150,29 @@ describe("Legal periodical edition evaluation", () => {
     ).toBeInTheDocument()
   })
 
-  test("deletes documentation unit created by reference", async () => {
+  test("deletes documentation unit created by reference when selected", async () => {
+    const user = await editReferenceWhichCreatedDocUnitOfOwnOffice()
+    await user.click(screen.getByLabelText("Eintrag löschen"))
+    const confirmButton = screen.getByRole("button", {
+      name: "Dokumentationseinheit löschen",
+    })
+    expect(confirmButton).toBeInTheDocument()
+    await user.click(confirmButton)
+    expect(documentUnitService.delete).toHaveBeenCalledWith("docunit-id")
+  })
+
+  test("does not delete documentation unit created by reference when selected", async () => {
+    const user = await editReferenceWhichCreatedDocUnitOfOwnOffice()
+    await user.click(screen.getByLabelText("Eintrag löschen"))
+    const cancelButton = screen.getByRole("button", {
+      name: "Nur Fundstelle löschen",
+    })
+    expect(cancelButton).toBeInTheDocument()
+    await user.click(cancelButton)
+    expect(documentUnitService.delete).not.toHaveBeenCalled()
+  })
+
+  async function editReferenceWhichCreatedDocUnitOfOwnOffice() {
     vi.spyOn(documentUnitService, "delete").mockImplementation(() =>
       Promise.resolve({
         status: 200,
@@ -186,12 +208,6 @@ describe("Legal periodical edition evaluation", () => {
     await screen.findByText("DOC123")
     await expect(screen.getByText("file123, Unveröffentlicht")).toBeVisible()
     await user.click(screen.getByTestId("list-entry-0"))
-    await user.click(screen.getByLabelText("Eintrag löschen"))
-    const confirmButton = screen.getByRole("button", {
-      name: "Dokumentationseinheit löschen",
-    })
-    expect(confirmButton).toBeInTheDocument()
-    await user.click(confirmButton)
-    expect(documentUnitService.delete).toHaveBeenCalledWith("docunit-id")
-  })
+    return user
+  }
 })
