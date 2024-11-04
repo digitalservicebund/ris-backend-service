@@ -18,6 +18,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresFieldOfLa
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalEditionRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -33,12 +36,15 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepositor
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalRepository;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -350,6 +356,114 @@ class LegalPeriodicalEditionIntegrationTest {
               assertThat(list.get(1).citation()).isEqualTo("New Citation");
               assertThat(list.get(3).id()).isEqualTo(newReferenceId);
               assertThat(list.get(3).citation()).isEqualTo("New Reference");
+            });
+
+    // clean up
+    repository.save(edition.toBuilder().references(List.of()).build());
+  }
+
+  @Test
+  void testGetLegalPeriodicalEditionsWithDocUnitCreatedByReference()
+      throws DocumentationUnitNotExistsException {
+    var legalPeriodical =
+        legalPeriodicalRepository.findAllBySearchStr(Optional.of("ABC")).stream()
+            .findAny()
+            .orElseThrow(
+                () ->
+                    new NoSuchElementException(
+                        "Legal periodical not found, check legal_periodical_init.sql"));
+
+    var referenceId = UUID.randomUUID();
+
+    // create skeleton doc unit to retrieve ID
+    var docUnit =
+        documentationUnitRepository.save(
+            DocumentationUnitDTO.builder()
+                .documentNumber("DOC_NUMBER")
+                .documentationOffice(
+                    documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
+                .build());
+
+    // add status and source
+    documentationUnitRepository.save(
+        docUnit.toBuilder()
+            .status(
+                StatusDTO.builder()
+                    .publicationStatus(PublicationStatus.UNPUBLISHED)
+                    .createdAt(Instant.now())
+                    .withError(false)
+                    .documentationUnit(docUnit)
+                    .build())
+            .source(
+                new ArrayList<>(
+                    List.of(
+                        SourceDTO.builder()
+                            .rank(1)
+                            .reference(
+                                ReferenceDTO.builder()
+                                    .id(referenceId)
+                                    .rank(1)
+                                    .legalPeriodicalRawValue("ABC")
+                                    .citation("ABC 2024, 3")
+                                    .documentationUnit(docUnit)
+                                    .legalPeriodical(
+                                        LegalPeriodicalTransformer.transformToDTO(legalPeriodical))
+                                    .build())
+                            .value("ABC 2024, 3")
+                            .build())))
+            .build());
+
+    UUID editionId = UUID.randomUUID();
+
+    // add reference via edition
+    var edition =
+        repository.save(
+            LegalPeriodicalEdition.builder()
+                .id(editionId)
+                .legalPeriodical(legalPeriodical)
+                .name("2024 Sonderheft 1")
+                .prefix("2024,")
+                .suffix("- Sonderheft 1")
+                .references(
+                    List.of(
+                        Reference.builder()
+                            .id(referenceId)
+                            .citation("ABC 2024, 3")
+                            .legalPeriodicalRawValue("ABC")
+                            .documentationUnit(
+                                RelatedDocumentationUnit.builder()
+                                    .uuid(docUnit.getId())
+                                    .documentNumber("DOC_NUMBER")
+                                    .createdByReference(referenceId)
+                                    .build())
+                            .build()))
+                .build());
+
+    var editionList =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri(EDITION_ENDPOINT + "/" + editionId)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(LegalPeriodicalEdition.class)
+            .returnResult()
+            .getResponseBody();
+
+    Assertions.assertNotNull(editionList, "Edition should not be null");
+    var firstEditionReferences = editionList.references();
+    Assertions.assertEquals(1, firstEditionReferences.size());
+    Assertions.assertEquals("ABC 2024, 3", firstEditionReferences.get(0).citation());
+    Assertions.assertEquals(
+        referenceId, firstEditionReferences.get(0).documentationUnit().getCreatedByReference());
+
+    assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").references())
+        .hasSize(1)
+        .satisfies(
+            list -> {
+              assertThat(list.get(0).id()).isEqualTo(referenceId);
+              assertThat(list.get(0).citation()).isEqualTo("ABC 2024, 3");
             });
 
     // clean up

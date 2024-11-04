@@ -39,6 +39,7 @@ public class RelatedDocumentationUnit {
         && court == null
         && decisionDate == null
         && fileNumber == null
-        && documentType == null;
+        && documentType == null
+        && createdByReference == null;
   }
 }

@@ -8,7 +8,6 @@ import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
@@ -69,13 +68,11 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
             .ifPresent(
                 docUnit -> {
                   docUnit.getReferences().remove(reference);
-                  if (Objects.requireNonNull(
-                          docUnit.getSource().stream()
-                              .findFirst()
-                              .map(SourceDTO::getReference)
-                              .orElse(null))
-                      .getId()
-                      .equals(reference.getId())) {
+                  if (docUnit.getSource().stream()
+                      .findFirst()
+                      .map(SourceDTO::getReference)
+                      .filter(ref -> ref.getId().equals(reference.getId()))
+                      .isPresent()) {
                     docUnit.getSource().removeFirst();
                   }
                   documentationUnitRepository.save(docUnit);
