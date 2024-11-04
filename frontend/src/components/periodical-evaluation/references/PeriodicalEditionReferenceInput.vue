@@ -38,7 +38,6 @@ const emit = defineEmits<{
   addEntry: [void]
   cancelEdit: [void]
   removeEntry: [value: Reference]
-  deleteDocumentationUnit: [value: RelatedDocumentation]
 }>()
 
 const store = useEditionStore()

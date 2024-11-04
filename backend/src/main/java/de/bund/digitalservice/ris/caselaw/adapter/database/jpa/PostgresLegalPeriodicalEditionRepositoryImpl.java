@@ -51,33 +51,33 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
     return LegalPeriodicalEditionTransformer.transformToDomain(repository.save(edition));
   }
 
-  private void deleteDocUnitLinksForDeletedReferences(
-      LegalPeriodicalEdition legalPeriodicalEdition) {
-    var oldEdition = repository.findById(legalPeriodicalEdition.id());
-    if (oldEdition.isPresent()) {
-      // Ensure it's removed from DocumentationUnit's references
-      for (ReferenceDTO reference : oldEdition.get().getReferences()) {
-        // skip all existing references
-        if (legalPeriodicalEdition.references().stream()
-            .anyMatch(newReference -> newReference.id().equals(reference.getId()))) {
-          continue;
-        }
-        // delete all deleted references and possible source reference
-        documentationUnitRepository
-            .findById(reference.getDocumentationUnit().getId())
-            .ifPresent(
-                docUnit -> {
-                  docUnit.getReferences().remove(reference);
-                  if (docUnit.getSource().stream()
-                      .findFirst()
-                      .map(SourceDTO::getReference)
-                      .filter(ref -> ref.getId().equals(reference.getId()))
-                      .isPresent()) {
-                    docUnit.getSource().removeFirst();
-                  }
-                  documentationUnitRepository.save(docUnit);
-                });
+  private void deleteDocUnitLinksForDeletedReferences(LegalPeriodicalEdition updatedEdition) {
+    var oldEdition = repository.findById(updatedEdition.id());
+    if (oldEdition.isEmpty()) {
+      return;
+    }
+    // Ensure it's removed from DocumentationUnit's references
+    for (ReferenceDTO reference : oldEdition.get().getReferences()) {
+      // skip all existing references
+      if (updatedEdition.references().stream()
+          .anyMatch(newReference -> newReference.id().equals(reference.getId()))) {
+        continue;
       }
+      // delete all deleted references and possible source reference
+      documentationUnitRepository
+          .findById(reference.getDocumentationUnit().getId())
+          .ifPresent(
+              docUnit -> {
+                docUnit.getReferences().remove(reference);
+                if (docUnit.getSource().stream()
+                    .findFirst()
+                    .map(SourceDTO::getReference)
+                    .filter(ref -> ref.getId().equals(reference.getId()))
+                    .isPresent()) {
+                  docUnit.getSource().removeFirst();
+                }
+                documentationUnitRepository.save(docUnit);
+              });
     }
   }
 

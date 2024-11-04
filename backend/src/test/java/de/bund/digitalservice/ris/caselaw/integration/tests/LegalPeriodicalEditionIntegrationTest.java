@@ -19,7 +19,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeri
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -36,14 +35,12 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepositor
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalRepository;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,11 +48,13 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -127,6 +126,11 @@ class LegalPeriodicalEditionIntegrationTest {
                   List<String> groups = user.getAttribute("groups");
                   return Objects.requireNonNull(groups).get(0).equals("/DS");
                 }));
+  }
+
+  @AfterEach
+  void tearDown() {
+    documentationUnitRepository.deleteAll();
   }
 
   @Test
@@ -375,25 +379,15 @@ class LegalPeriodicalEditionIntegrationTest {
 
     var referenceId = UUID.randomUUID();
 
-    // create skeleton doc unit to retrieve ID
     var docUnit =
-        documentationUnitRepository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("DOC_NUMBER")
-                .documentationOffice(
-                    documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-                .build());
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            documentationUnitRepository,
+            documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()),
+            "DOC_NUMBER");
 
     // add status and source
     documentationUnitRepository.save(
         docUnit.toBuilder()
-            .status(
-                StatusDTO.builder()
-                    .publicationStatus(PublicationStatus.UNPUBLISHED)
-                    .createdAt(Instant.now())
-                    .withError(false)
-                    .documentationUnit(docUnit)
-                    .build())
             .source(
                 new ArrayList<>(
                     List.of(
@@ -468,5 +462,105 @@ class LegalPeriodicalEditionIntegrationTest {
 
     // clean up
     repository.save(edition.toBuilder().references(List.of()).build());
+  }
+
+  @Test
+  void testCleanupDocUnitReferencesAndSourceWhenReferenceDeleted()
+      throws DocumentationUnitNotExistsException {
+    var legalPeriodical =
+        legalPeriodicalRepository.findAllBySearchStr(Optional.of("ABC")).stream()
+            .findAny()
+            .orElseThrow(
+                () ->
+                    new NoSuchElementException(
+                        "Legal periodical not found, check legal_periodical_init.sql"));
+
+    var referenceId = UUID.randomUUID();
+
+    // create skeleton doc unit to retrieve ID
+    var docUnit =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            documentationUnitRepository,
+            documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()),
+            "DOC_NUMBER");
+
+    // add status and source
+    documentationUnitRepository.save(
+        docUnit.toBuilder()
+            .fileNumbers(List.of(EntityBuilderTestUtil.createTestFileNumberDTO()))
+            .source(
+                new ArrayList<>(
+                    List.of(
+                        SourceDTO.builder()
+                            .rank(1)
+                            .reference(
+                                ReferenceDTO.builder()
+                                    .id(referenceId)
+                                    .rank(1)
+                                    .legalPeriodicalRawValue("ABC")
+                                    .citation("ABC 2024, 3")
+                                    .documentationUnit(docUnit)
+                                    .legalPeriodical(
+                                        LegalPeriodicalTransformer.transformToDTO(legalPeriodical))
+                                    .build())
+                            .value("ABC 2024, 3")
+                            .build())))
+            .build());
+
+    // add reference via edition
+    var edition =
+        repository.save(
+            LegalPeriodicalEdition.builder()
+                .id(UUID.randomUUID())
+                .legalPeriodical(legalPeriodical)
+                .name("2024 Sonderheft 1")
+                .prefix("2024,")
+                .suffix("- Sonderheft 1")
+                .references(
+                    List.of(
+                        Reference.builder()
+                            .id(referenceId)
+                            .citation("ABC 2024, 3")
+                            .legalPeriodicalRawValue("ABC")
+                            .documentationUnit(
+                                RelatedDocumentationUnit.builder()
+                                    .uuid(docUnit.getId())
+                                    .documentNumber("DOC_NUMBER")
+                                    .createdByReference(referenceId)
+                                    .build())
+                            .build()))
+                .build());
+
+    // delete reference
+    edition = repository.save(edition.toBuilder().references(List.of()).build());
+
+    var editionList =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri(EDITION_ENDPOINT + "/" + edition.id())
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(LegalPeriodicalEdition.class)
+            .returnResult()
+            .getResponseBody();
+
+    Assertions.assertNotNull(editionList, "Edition should not be null");
+    Assertions.assertEquals(0, editionList.references().size());
+
+    assertThat(
+            documentationUnitService
+                .searchLinkableDocumentationUnits(
+                    RelatedDocumentationUnit.builder().fileNumber("AB 34/1").build(),
+                    docOffice,
+                    Optional.empty(),
+                    Pageable.ofSize(1))
+                .iterator()
+                .next()
+                .getCreatedByReference())
+        .isEqualTo(null);
+
+    assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").references()).isEmpty();
   }
 }
