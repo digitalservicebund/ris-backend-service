@@ -8,7 +8,7 @@ defineProps<{
   contentText: string
   confirmText: string
   cancelButtonType?: string
-  cancelButtonText: string | "Abbrechen"
+  cancelButtonText?: string
   confirmButtonType?: string
 }>()
 
@@ -75,9 +75,9 @@ onMounted(() => {
           @click="$emit('confirmAction')"
         />
         <TextButton
-          :aria-label="cancelButtonText"
+          :aria-label="cancelButtonText || 'Abbrechen'"
           :button-type="cancelButtonType"
-          :label="cancelButtonText"
+          :label="cancelButtonText || 'Abbrechen'"
           size="small"
           @click="$emit('closeModal')"
         />

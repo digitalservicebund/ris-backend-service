@@ -264,10 +264,16 @@ function toggleDeletionConfirmationModal() {
   }
 }
 
-async function onDelete() {
-  await documentUnitService.delete(reference.value.documentationUnit?.uuid)
+function deleteReference() {
   emit("removeEntry", reference.value)
   toggleDeletionConfirmationModal()
+}
+
+async function deleteReferenceAndDocUnit() {
+  await documentUnitService.delete(
+    reference.value.documentationUnit?.uuid || "",
+  )
+  deleteReference()
 }
 </script>
 
@@ -275,17 +281,15 @@ async function onDelete() {
   <div class="flex flex-col gap-24 border-b-1">
     <PopupModal
       v-if="showModal"
-      aria-label="Dazugehörige Dokumentationseinheit löschen?"
+      aria-label="Eintrag löschen"
       cancel-button-text="Nur Fundstelle löschen"
       cancel-button-type="tertiary"
       confirm-button-type="destructive"
       confirm-text="Dokumentationseinheit löschen"
       content-text="Die dazugehörige Dokumentationseinheit existiert noch. Soll sie gelöscht werden?"
       header-text="Dazugehörige Dokumentationseinheit löschen?"
-      @close-modal="
-        emit('removeEntry', modelValue) && toggleDeletionConfirmationModal
-      "
-      @confirm-action="onDelete"
+      @close-modal="deleteReference"
+      @confirm-action="deleteReferenceAndDocUnit"
     />
     <DecisionSummary
       v-if="
