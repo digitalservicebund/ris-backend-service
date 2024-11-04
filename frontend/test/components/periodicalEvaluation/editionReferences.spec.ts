@@ -9,6 +9,7 @@ import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import documentUnitService from "@/services/documentUnitService"
+import featureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
 import service from "@/services/legalPeriodicalEditionService"
 import testRoutes from "~/test-helper/routes"
@@ -103,6 +104,10 @@ describe("Legal periodical edition evaluation", () => {
         }),
       }),
     )
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
   })
 
   it("reference supplement (Klammernzusatz) should display validation on blur and hide on focus", async () => {
