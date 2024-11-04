@@ -242,145 +242,160 @@ test.describe(
         const randomFileNumber = generateString()
         let documentNumber = ""
 
-        try {
-          await test.step("After searching, the responsible docoffice is evaluated and a documentation unit can be created", async () => {
-            await searchForDocUnit(
-              pageWithBghUser,
-              "AG Aachen",
-              formattedDate,
-              randomFileNumber,
-              "AnU",
-            )
+        await test.step("After searching, the responsible docoffice is evaluated and a documentation unit can be created", async () => {
+          await searchForDocUnit(
+            pageWithBghUser,
+            "AG Aachen",
+            formattedDate,
+            randomFileNumber,
+            "AnU",
+          )
 
-            await expect(
-              pageWithBghUser.getByText("Übernehmen und weiter bearbeiten"),
-            ).toBeVisible()
+          await expect(
+            pageWithBghUser.getByText("Übernehmen und weiter bearbeiten"),
+          ).toBeVisible()
 
-            await expect(
-              pageWithBghUser.getByLabel("Zuständige Dokumentationsstelle"),
-            ).toHaveValue("BGH")
-          })
+          await expect(
+            pageWithBghUser.getByLabel("Zuständige Dokumentationsstelle"),
+          ).toHaveValue("BGH")
+        })
 
-          await test.step("Validation of required fields before creation new documentation unit from search parameters", async () => {
-            await pageWithBghUser
-              .getByText("Übernehmen und weiter bearbeiten")
-              .click()
+        await test.step("Validation of required fields before creation new documentation unit from search parameters", async () => {
+          await pageWithBghUser
+            .getByText("Übernehmen und weiter bearbeiten")
+            .click()
 
-            await expect(
-              pageWithBghUser.getByLabel("Listen Eintrag"),
-            ).toHaveCount(1)
+          await expect(
+            pageWithBghUser.getByLabel("Listen Eintrag"),
+          ).toHaveCount(1)
 
-            await expect(
-              pageWithBghUser.getByText("Pflichtfeld nicht befüllt"),
-            ).toHaveCount(2)
+          await expect(
+            pageWithBghUser.getByText("Pflichtfeld nicht befüllt"),
+          ).toHaveCount(2)
 
-            await fillInput(pageWithBghUser, "Zitatstelle *", "12")
-            await expect(
-              pageWithBghUser.getByText("Pflichtfeld nicht befüllt"),
-            ).toHaveCount(1)
+          await fillInput(pageWithBghUser, "Zitatstelle *", "12")
+          await expect(
+            pageWithBghUser.getByText("Pflichtfeld nicht befüllt"),
+          ).toHaveCount(1)
 
-            await pageWithBghUser
-              .getByText("Übernehmen und weiter bearbeiten")
-              .click()
+          await pageWithBghUser
+            .getByText("Übernehmen und weiter bearbeiten")
+            .click()
 
-            await expect(
-              pageWithBghUser.getByLabel("Listen Eintrag"),
-            ).toHaveCount(1)
+          await expect(
+            pageWithBghUser.getByLabel("Listen Eintrag"),
+          ).toHaveCount(1)
 
-            await fillInput(pageWithBghUser, "Klammernzusatz", "L")
+          await fillInput(pageWithBghUser, "Klammernzusatz", "L")
 
-            await expect(
-              pageWithBghUser.getByText("Pflichtfeld nicht befüllt"),
-            ).toBeHidden()
-          })
+          await expect(
+            pageWithBghUser.getByText("Pflichtfeld nicht befüllt"),
+          ).toBeHidden()
+        })
 
-          await test.step("Created documentation unit opens up with in new tab with correct data and reference assigned", async () => {
-            const pagePromise = pageWithBghUser.context().waitForEvent("page")
-            await pageWithBghUser
-              .getByText("Übernehmen und weiter bearbeiten")
-              .click()
-            const newTab = await pagePromise
-            await expect(newTab).toHaveURL(
-              /\/caselaw\/documentunit\/[A-Z0-9]{13}\/categories$/,
-            )
-            documentNumber = /caselaw\/documentunit\/(.*)\/categories/g.exec(
-              newTab.url(),
-            )?.[1] as string
-            await expect(
-              newTab.getByLabel("Gericht", { exact: true }),
-            ).toHaveValue("AG Aachen")
-            await expect(
-              newTab.getByLabel("Entscheidungsdatum", { exact: true }),
-            ).toHaveValue(formattedDate)
-            await expect(newTab.getByTestId("chip-value")).toHaveText(
-              randomFileNumber,
-            )
-            await expect(
-              newTab.getByLabel("Dokumenttyp", { exact: true }),
-            ).toHaveValue("Anerkenntnisurteil")
+        const pagePromise = pageWithBghUser.context().waitForEvent("page")
+        await pageWithBghUser
+          .getByText("Übernehmen und weiter bearbeiten")
+          .click()
+        const newTab = await pagePromise
 
-            // Todo: RISDEV-4999
-            // await expect(
-            //   newTab.locator("[aria-label='Rechtskraft']"),
-            // ).toHaveValue("Ja")
+        await test.step("Created documentation unit opens up with in new tab with correct data and reference assigned", async () => {
+          await expect(newTab).toHaveURL(
+            /\/caselaw\/documentunit\/[A-Z0-9]{13}\/categories$/,
+          )
+          documentNumber = /caselaw\/documentunit\/(.*)\/categories/g.exec(
+            newTab.url(),
+          )?.[1] as string
+          await expect(
+            newTab.getByLabel("Gericht", { exact: true }),
+          ).toHaveValue("AG Aachen")
+          await expect(
+            newTab.getByLabel("Entscheidungsdatum", { exact: true }),
+          ).toHaveValue(formattedDate)
+          await expect(newTab.getByTestId("chip-value")).toHaveText(
+            randomFileNumber,
+          )
+          await expect(
+            newTab.getByLabel("Dokumenttyp", { exact: true }),
+          ).toHaveValue("Anerkenntnisurteil")
 
-            await newTab.keyboard.down("v")
-            const referenceSummary = `${edition.legalPeriodical?.abbreviation} ${edition.prefix}12${edition.suffix} (L)`
-            await expect(
-              newTab.getByText("Sekundäre Fundstellen"),
-            ).toBeVisible()
-            await expect(
-              newTab.getByText(referenceSummary, { exact: true }),
-            ).toBeVisible()
+          // Todo: RISDEV-4999
+          // await expect(
+          //   newTab.locator("[aria-label='Rechtskraft']"),
+          // ).toHaveValue("Ja")
 
-            await newTab.getByLabel("Fundstellen").click()
-            await expect(
-              newTab.getByText("Fundstellen bearbeiten"),
-            ).toBeVisible()
-            await expect(
-              newTab
-                .getByLabel("Listen Eintrag")
-                .getByText(referenceSummary, { exact: true }),
-            ).toBeVisible()
-          })
+          await newTab.keyboard.down("v")
+          const referenceSummary = `${edition.legalPeriodical?.abbreviation} ${edition.prefix}12${edition.suffix} (L)`
+          await expect(newTab.getByText("Sekundäre Fundstellen")).toBeVisible()
+          await expect(
+            newTab.getByText(referenceSummary, { exact: true }),
+          ).toBeVisible()
 
-          await test.step("The new documentation unit is added to the list of references", async () => {
-            await expect(
-              pageWithBghUser.getByLabel("Listen Eintrag"),
-            ).toHaveCount(2)
+          await newTab.getByLabel("Fundstellen").click()
+          await expect(newTab.getByText("Fundstellen bearbeiten")).toBeVisible()
+          await expect(
+            newTab
+              .getByLabel("Listen Eintrag")
+              .getByText(referenceSummary, { exact: true }),
+          ).toBeVisible()
+        })
 
-            await expect(
-              pageWithBghUser.getByText(
-                `AG Aachen, ${formattedDate}, ${randomFileNumber}, Anerkenntnisurteil, Unveröffentlicht`,
-              ),
-            ).toBeVisible()
+        await test.step("The new documentation unit is added to the list of references", async () => {
+          await expect(
+            pageWithBghUser.getByLabel("Listen Eintrag"),
+          ).toHaveCount(2)
 
-            await expect(
-              pageWithBghUser.getByText(
-                `${edition.legalPeriodical?.abbreviation} ${edition.prefix}12${edition.suffix} (L)`,
-                { exact: true },
-              ),
-            ).toBeVisible()
-          })
+          await expect(
+            pageWithBghUser.getByText(
+              `AG Aachen, ${formattedDate}, ${randomFileNumber}, Anerkenntnisurteil, Unveröffentlicht`,
+            ),
+          ).toBeVisible()
 
-          await test.step("The new documentation unit is visible in search with unpublished status", async () => {
-            await navigateToSearch(pageWithBghUser)
+          await expect(
+            pageWithBghUser.getByText(
+              `${edition.legalPeriodical?.abbreviation} ${edition.prefix}12${edition.suffix} (L)`,
+              { exact: true },
+            ),
+          ).toBeVisible()
+        })
 
-            await pageWithBghUser
-              .getByLabel("Dokumentnummer Suche")
-              .fill(documentNumber)
-            await pageWithBghUser
-              .getByLabel("Nach Dokumentationseinheiten suchen")
-              .click()
-            const listEntry = pageWithBghUser.getByTestId("listEntry")
-            await expect(listEntry).toHaveCount(1)
+        await test.step("The new documentation unit is visible in search with unpublished status", async () => {
+          await navigateToSearch(newTab)
 
-            await expect(listEntry).toContainText(documentNumber)
-            await expect(listEntry).toContainText("Unveröffentlicht")
-          })
-        } finally {
-          await deleteDocumentUnit(pageWithBghUser, documentNumber)
-        }
+          await newTab.getByLabel("Dokumentnummer Suche").fill(documentNumber)
+          await newTab.getByLabel("Nach Dokumentationseinheiten suchen").click()
+          const listEntry = newTab.getByTestId("listEntry")
+          await expect(listEntry).toHaveCount(1)
+
+          await expect(listEntry).toContainText(documentNumber)
+          await expect(listEntry).toContainText("Unveröffentlicht")
+        })
+
+        await test.step("The new documentation unit can be deleted with when deleting reference", async () => {
+          await pageWithBghUser.getByTestId("list-entry-0").click()
+
+          await pageWithBghUser.getByText("Eintrag löschen").click()
+          await pageWithBghUser
+            .locator('button:has-text("Dokumentationseinheit löschen")')
+            .click()
+
+          await expect(
+            pageWithBghUser.getByText(
+              `AG Aachen, ${formattedDate}, ${randomFileNumber}, Anerkenntnisurteil, Unveröffentlicht`,
+            ),
+          ).toBeHidden()
+
+          await expect(
+            pageWithBghUser.getByText(
+              `${edition.legalPeriodical?.abbreviation} ${edition.prefix}12${edition.suffix} (L)`,
+              { exact: true },
+            ),
+          ).toBeHidden()
+
+          await newTab.reload()
+          const listEntry = newTab.getByTestId("listEntry")
+          await expect(listEntry).toHaveCount(0)
+        })
       },
     )
 
