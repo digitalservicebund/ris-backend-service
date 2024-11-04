@@ -33,9 +33,7 @@ public class SourceDTO {
   @NotBlank
   private String value;
 
-  @OneToOne(
-      cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-      orphanRemoval = true)
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "reference_id")
   private ReferenceDTO reference;
 }

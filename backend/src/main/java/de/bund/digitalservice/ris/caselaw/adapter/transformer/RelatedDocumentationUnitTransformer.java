@@ -34,6 +34,13 @@ public class RelatedDocumentationUnitTransformer {
             DocumentTypeTransformer.transformToDomain(documentationUnitDTO.getDocumentType()))
         .referenceFound(true)
         .status(StatusTransformer.transformToDomain(documentationUnitDTO.getStatus()))
+        .createdByReference(
+            documentationUnitDTO.getSource().stream()
+                .findFirst()
+                .map(
+                    sourceDTO ->
+                        sourceDTO.getReference() == null ? null : sourceDTO.getReference().getId())
+                .orElse(null))
         .build();
   }
 

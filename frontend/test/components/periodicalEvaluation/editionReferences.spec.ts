@@ -3,15 +3,20 @@ import { userEvent } from "@testing-library/user-event"
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import PeriodicalEditionReferences from "@/components/periodical-evaluation/references/PeriodicalEditionReferences.vue"
+import DocumentUnit from "@/domain/documentUnit"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
+import Reference from "@/domain/reference"
+import RelatedDocumentation from "@/domain/relatedDocumentation"
+import documentUnitService from "@/services/documentUnitService"
+import featureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
 import service from "@/services/legalPeriodicalEditionService"
 import testRoutes from "~/test-helper/routes"
 
 const editionUUid = crypto.randomUUID()
 
-async function renderComponent() {
+async function renderComponent(options?: { references?: Reference[] }) {
   const user = userEvent.setup()
 
   const router = createRouter({
@@ -39,7 +44,7 @@ async function renderComponent() {
           name: "name",
           prefix: "präfix",
           suffix: "suffix",
-          references: [],
+          references: options?.references ?? [],
         }),
       },
     },
@@ -91,6 +96,18 @@ describe("Legal periodical edition evaluation", () => {
           }),
         }),
     )
+    vi.spyOn(documentUnitService, "delete").mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: new DocumentUnit("foo", {
+          documentNumber: "1234567891234",
+        }),
+      }),
+    )
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
   })
 
   it("reference supplement (Klammernzusatz) should display validation on blur and hide on focus", async () => {
@@ -145,4 +162,56 @@ describe("Legal periodical edition evaluation", () => {
       screen.getByLabelText("Klammernzusatz", { exact: true }),
     ).toBeInTheDocument()
   })
+
+  test("deletes documentation unit created by reference when selected", async () => {
+    const user = await editReferenceWhichCreatedDocUnitOfOwnOffice()
+    await user.click(screen.getByLabelText("Eintrag löschen"))
+    const confirmButton = screen.getByRole("button", {
+      name: "Dokumentationseinheit löschen",
+    })
+    expect(confirmButton).toBeInTheDocument()
+    await user.click(confirmButton)
+    expect(documentUnitService.delete).toHaveBeenCalledWith("docunit-id")
+  })
+
+  test("does not delete documentation unit created by reference when selected", async () => {
+    const user = await editReferenceWhichCreatedDocUnitOfOwnOffice()
+    await user.click(screen.getByLabelText("Eintrag löschen"))
+    const cancelButton = screen.getByRole("button", {
+      name: "Nur Fundstelle löschen",
+    })
+    expect(cancelButton).toBeInTheDocument()
+    await user.click(cancelButton)
+    expect(documentUnitService.delete).not.toHaveBeenCalled()
+  })
+
+  async function editReferenceWhichCreatedDocUnitOfOwnOffice() {
+    const { user } = await renderComponent({
+      references: [
+        {
+          id: "id",
+          citation: "123",
+          referenceSupplement: "supplement",
+          legalPeriodicalRawValue: "BDZ",
+          legalPeriodical: {
+            abbreviation: "BDZ",
+            citationStyle: "2024, Heft 1",
+          },
+          documentationUnit: {
+            uuid: "docunit-id",
+            documentNumber: "DOC123",
+            status: { publicationStatus: "UNPUBLISHED" },
+            fileNumber: "file123",
+            createdByReference: "id",
+            referenceFound: true,
+          } as RelatedDocumentation,
+        } as Reference,
+      ],
+    })
+
+    await screen.findByText("DOC123")
+    await expect(screen.getByText("file123, Unveröffentlicht")).toBeVisible()
+    await user.click(screen.getByTestId("list-entry-0"))
+    return user
+  }
 })
