@@ -413,13 +413,11 @@ class LegalPeriodicalEditionIntegrationTest {
                             .build())))
             .build());
 
-    UUID editionId = UUID.randomUUID();
-
     // add reference via edition
     var edition =
         repository.save(
             LegalPeriodicalEdition.builder()
-                .id(editionId)
+                .id(UUID.randomUUID())
                 .legalPeriodical(legalPeriodical)
                 .name("2024 Sonderheft 1")
                 .prefix("2024,")
@@ -443,7 +441,7 @@ class LegalPeriodicalEditionIntegrationTest {
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri(EDITION_ENDPOINT + "/" + editionId)
+            .uri(EDITION_ENDPOINT + "/" + edition.id())
             .exchange()
             .expectStatus()
             .isOk()
@@ -464,6 +462,8 @@ class LegalPeriodicalEditionIntegrationTest {
             list -> {
               assertThat(list.get(0).id()).isEqualTo(referenceId);
               assertThat(list.get(0).citation()).isEqualTo("ABC 2024, 3");
+              assertThat(list.get(0).documentationUnit().getCreatedByReference())
+                  .isEqualTo(referenceId);
             });
 
     // clean up
