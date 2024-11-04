@@ -230,7 +230,7 @@ test.describe(
     test(
       "Allow creation from periodical evaluation for own docoffice",
       {
-        tag: ["@RISDEV-4829"],
+        tag: ["@RISDEV-4829", "@RISDEV-5146"],
         annotation: {
           type: "story",
           description:
