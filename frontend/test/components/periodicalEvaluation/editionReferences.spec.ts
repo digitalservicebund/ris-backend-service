@@ -95,6 +95,14 @@ describe("Legal periodical edition evaluation", () => {
           }),
         }),
     )
+    vi.spyOn(documentUnitService, "delete").mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: new DocumentUnit("foo", {
+          documentNumber: "1234567891234",
+        }),
+      }),
+    )
   })
 
   it("reference supplement (Klammernzusatz) should display validation on blur and hide on focus", async () => {
@@ -173,15 +181,6 @@ describe("Legal periodical edition evaluation", () => {
   })
 
   async function editReferenceWhichCreatedDocUnitOfOwnOffice() {
-    vi.spyOn(documentUnitService, "delete").mockImplementation(() =>
-      Promise.resolve({
-        status: 200,
-        data: new DocumentUnit("foo", {
-          documentNumber: "1234567891234",
-        }),
-      }),
-    )
-
     const { user } = await renderComponent({
       references: [
         {
