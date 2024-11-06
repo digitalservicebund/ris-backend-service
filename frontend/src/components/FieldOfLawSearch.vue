@@ -4,6 +4,7 @@ import FieldOfLawListEntry from "@/components/FieldOfLawListEntry.vue"
 import FieldOfLawTree from "@/components/FieldOfLawTree.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextInput from "@/components/input/TextInput.vue"
+import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import errorMessages from "@/i18n/errors.json"
@@ -24,11 +25,13 @@ const normString = ref("")
 const results = ref<FieldOfLaw[]>()
 const currentPage = ref<Page<FieldOfLaw>>()
 const itemsPerPage = 10
+const isLoading = ref(false)
 
 async function submitSearch(page: number) {
   // if (StringsUtil.isEmpty(searchStr.value)) {
   //   return removeSelectedNode()
   // }
+  isLoading.value = true
 
   const response = await service.searchForFieldsOfLaw(
     page,
@@ -57,6 +60,7 @@ async function submitSearch(page: number) {
     results.value = undefined
     console.error("Error searching for Nodes")
   }
+  isLoading.value = false
 }
 
 function removeSelectedNode() {
@@ -75,7 +79,7 @@ watch(
 </script>
 
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col gap-16">
     <div class="flex flex-row gap-8">
       <InputField id="fieldOfLawDirectInput" label="Sachgebiet">
         <TextInput
@@ -106,6 +110,9 @@ watch(
       </InputField>
     </div>
 
+    <div v-if="isLoading" class="m-24 flex items-center justify-center">
+      <LoadingSpinner />
+    </div>
     <div v-if="currentPage">
       <Pagination
         navigation-position="bottom"
