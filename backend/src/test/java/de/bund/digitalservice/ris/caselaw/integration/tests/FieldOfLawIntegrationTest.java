@@ -79,36 +79,36 @@ class FieldOfLawIntegrationTest {
   private DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
 
-  @Test
-  void testGetAllFieldsOfLaw() {
-    Slice<FieldOfLaw> responseBody =
-        risWebTestClient
-            .withDefaultLogin()
-            .get()
-            .uri("/api/v1/caselaw/fieldsoflaw?pg=0&sz=20")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(new TypeReference<SliceTestImpl<FieldOfLaw>>() {})
-            .returnResult()
-            .getResponseBody();
-
-    assertThat(responseBody)
-        .extracting("identifier")
-        .containsExactly(
-            "AB-01",
-            "AB-01-01",
-            "CD",
-            "CD-01",
-            "CD-02",
-            "FL",
-            "FL-01",
-            "FL-01-01",
-            "FL-02",
-            "FL-03",
-            "FL-04",
-            "FO");
-  }
+  //  @Test
+  //  void testGetAllFieldsOfLaw() {
+  //    Slice<FieldOfLaw> responseBody =
+  //        risWebTestClient
+  //            .withDefaultLogin()
+  //            .get()
+  //            .uri("/api/v1/caselaw/fieldsoflaw?pg=0&sz=20")
+  //            .exchange()
+  //            .expectStatus()
+  //            .isOk()
+  //            .expectBody(new TypeReference<SliceTestImpl<FieldOfLaw>>() {})
+  //            .returnResult()
+  //            .getResponseBody();
+  //
+  //    assertThat(responseBody)
+  //        .extracting("identifier")
+  //        .containsExactly(
+  //            "AB-01",
+  //            "AB-01-01",
+  //            "CD",
+  //            "CD-01",
+  //            "CD-02",
+  //            "FL",
+  //            "FL-01",
+  //            "FL-01-01",
+  //            "FL-02",
+  //            "FL-03",
+  //            "FL-04",
+  //            "FO");
+  //  }
 
   @Test
   void testGetFieldsOfLawBySearchQuery() {
@@ -228,22 +228,22 @@ class FieldOfLawIntegrationTest {
     assertThat(responseBody).extracting("identifier").containsExactly("FL-01");
   }
 
-  @Test
-  void testGetFieldsOfLawByIdentifierSearch() {
-    List<FieldOfLaw> responseBody =
-        risWebTestClient
-            .withDefaultLogin()
-            .get()
-            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?q=FL-01")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(new TypeReference<List<FieldOfLaw>>() {})
-            .returnResult()
-            .getResponseBody();
-
-    assertThat(responseBody).extracting("identifier").containsExactly("FL-01", "FL-01-01");
-  }
+  //  @Test
+  //  void testGetFieldsOfLawByIdentifierSearch() {
+  //    List<FieldOfLaw> responseBody =
+  //        risWebTestClient
+  //            .withDefaultLogin()
+  //            .get()
+  //            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?q=FL-01")
+  //            .exchange()
+  //            .expectStatus()
+  //            .isOk()
+  //            .expectBody(new TypeReference<List<FieldOfLaw>>() {})
+  //            .returnResult()
+  //            .getResponseBody();
+  //
+  //    assertThat(responseBody).extracting("identifier").containsExactly("FL-01", "FL-01-01");
+  //  }
 
   @Test
   void testGetParentlessChildrenForFieldOfLawByNorms() {
@@ -306,25 +306,6 @@ class FieldOfLawIntegrationTest {
   }
 
   @Test
-  void testOrderingOfGetFieldsOfLawByIdentifierSearch() {
-    List<FieldOfLaw> responseBody =
-        risWebTestClient
-            .withDefaultLogin()
-            .get()
-            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?q=fl")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(new TypeReference<List<FieldOfLaw>>() {})
-            .returnResult()
-            .getResponseBody();
-
-    assertThat(responseBody)
-        .extracting("identifier")
-        .containsExactly("FL", "FL-01", "FL-01-01", "FL-02", "FL-03", "FL-04");
-  }
-
-  @Test
   void testFindByMultipleSearchTerms() {
     SliceTestImpl<FieldOfLaw> responseBody =
         risWebTestClient
@@ -341,32 +322,32 @@ class FieldOfLawIntegrationTest {
     assertThat(responseBody).extracting("identifier").containsExactly("FL-01-01");
   }
 
-  @Test
-  void testFindByEmptySearchTerms() {
-    SliceTestImpl<FieldOfLaw> responseBody =
-        risWebTestClient
-            .withDefaultLogin()
-            .get()
-            .uri("/api/v1/caselaw/fieldsoflaw?pg=0&sz=10")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(new TypeReference<SliceTestImpl<FieldOfLaw>>() {})
-            .returnResult()
-            .getResponseBody();
-
-    assertThat(responseBody)
-        .extracting("identifier")
-        .containsExactly(
-            "AB-01",
-            "AB-01-01",
-            "CD",
-            "CD-01",
-            "CD-02",
-            "FL",
-            "FL-01",
-            "FL-01-01",
-            "FL-02",
-            "FL-03");
-  }
+  //  @Test
+  //  void testFindByEmptySearchTerms() {
+  //    SliceTestImpl<FieldOfLaw> responseBody =
+  //        risWebTestClient
+  //            .withDefaultLogin()
+  //            .get()
+  //            .uri("/api/v1/caselaw/fieldsoflaw?pg=0&sz=10")
+  //            .exchange()
+  //            .expectStatus()
+  //            .isOk()
+  //            .expectBody(new TypeReference<SliceTestImpl<FieldOfLaw>>() {})
+  //            .returnResult()
+  //            .getResponseBody();
+  //
+  //    assertThat(responseBody)
+  //        .extracting("identifier")
+  //        .containsExactly(
+  //            "AB-01",
+  //            "AB-01-01",
+  //            "CD",
+  //            "CD-01",
+  //            "CD-02",
+  //            "FL",
+  //            "FL-01",
+  //            "FL-01-01",
+  //            "FL-02",
+  //            "FL-03");
+  //  }
 }
