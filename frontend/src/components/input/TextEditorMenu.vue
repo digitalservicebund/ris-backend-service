@@ -144,7 +144,11 @@ const buttons = computed(() => {
       group: "format",
       isCollapsable: false,
       callback: () =>
-        props.editor.chain().focus().toggleMark("subscript").run(),
+        props.editor
+          .chain()
+          .focus()
+          .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+          .run(),
     },
     {
       type: "subscript",
@@ -152,8 +156,7 @@ const buttons = computed(() => {
       ariaLabel: "Tabelle löschen",
       group: "format",
       isCollapsable: false,
-      callback: () =>
-        props.editor.chain().focus().toggleMark("subscript").run(),
+      callback: () => props.editor.chain().focus().deleteTable().run(),
     },
     {
       type: "subscript",
@@ -161,8 +164,7 @@ const buttons = computed(() => {
       ariaLabel: "Zeile löschen",
       group: "format",
       isCollapsable: false,
-      callback: () =>
-        props.editor.chain().focus().toggleMark("subscript").run(),
+      callback: () => props.editor.chain().focus().deleteRow().run(),
     },
     {
       type: "subscript",
@@ -170,8 +172,7 @@ const buttons = computed(() => {
       ariaLabel: "Spalte löschen",
       group: "format",
       isCollapsable: false,
-      callback: () =>
-        props.editor.chain().focus().toggleMark("subscript").run(),
+      callback: () => props.editor.chain().focus().deleteColumn().run(),
     },
     {
       type: "subscript",
@@ -179,8 +180,7 @@ const buttons = computed(() => {
       ariaLabel: "Zeile darunter einfügen",
       group: "format",
       isCollapsable: false,
-      callback: () =>
-        props.editor.chain().focus().toggleMark("subscript").run(),
+      callback: () => props.editor.chain().focus().addRowAfter().run(),
     },
     {
       type: "subscript",
@@ -188,8 +188,7 @@ const buttons = computed(() => {
       ariaLabel: "Spalte rechts einfügen",
       group: "format",
       isCollapsable: false,
-      callback: () =>
-        props.editor.chain().focus().toggleMark("subscript").run(),
+      callback: () => props.editor.chain().focus().addColumnAfter().run(),
     },
     {
       type: "left",
