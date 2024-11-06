@@ -13,7 +13,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -31,21 +30,33 @@ public class FieldOfLawService {
   }
 
   public Slice<FieldOfLaw> getFieldsOfLawBySearchQuery(
-      Optional<String> optionalSearchStr, Pageable pageable) {
+      Optional<String> optionalSearchStr, Optional<String> identifier, Pageable pageable) {
 
-    if (optionalSearchStr.isEmpty() || optionalSearchStr.get().isBlank()) {
-      return repository.findAllByOrderByIdentifierAsc(pageable);
+    if (identifier.isPresent() && identifier.get().isBlank()) {
+      identifier = Optional.empty();
+    }
+    if (optionalSearchStr.isPresent() && optionalSearchStr.get().isBlank()) {
+      optionalSearchStr = Optional.empty();
     }
 
-    return searchAndOrderByScore(optionalSearchStr.get().trim(), pageable);
+    if (optionalSearchStr.isEmpty() && identifier.isPresent()) {
+      return repository.findByIdentifier(identifier.get().trim(), pageable);
+    }
+
+    if (optionalSearchStr.isPresent()) {
+      return searchAndOrderByScore(optionalSearchStr, identifier, pageable);
+    } else {
+      return null;
+    }
   }
 
   private String[] splitSearchTerms(String searchStr) {
     return Arrays.stream(searchStr.split("\\s+")).map(String::trim).toArray(String[]::new);
   }
 
-  Slice<FieldOfLaw> searchAndOrderByScore(String searchStr, Pageable pageable) {
-    Matcher matcher = NORMS_PATTERN.matcher(searchStr);
+  Slice<FieldOfLaw> searchAndOrderByScore(
+      Optional<String> searchStr, Optional<String> identifier, Pageable pageable) {
+    Matcher matcher = NORMS_PATTERN.matcher(searchStr.orElse(""));
     String[] searchTerms;
     String normStr;
 
@@ -62,8 +73,12 @@ public class FieldOfLawService {
       }
     } else {
       normStr = null;
-      searchTerms = splitSearchTerms(searchStr);
-      unorderedList = repository.findBySearchTerms(searchTerms);
+      searchTerms = splitSearchTerms(searchStr.get());
+      if (identifier.isPresent()) {
+        unorderedList = repository.findByIdentifierAndSearchTerms(identifier.get(), searchTerms);
+      } else {
+        unorderedList = repository.findBySearchTerms(searchTerms);
+      }
     }
 
     if (unorderedList == null || unorderedList.isEmpty()) {
@@ -161,13 +176,6 @@ public class FieldOfLawService {
       if (normText.contains(normStr)) score += 5;
     }
     return score;
-  }
-
-  public List<FieldOfLaw> getFieldsOfLawByIdentifierSearch(Optional<String> optionalSearchStr) {
-    if (optionalSearchStr.isEmpty() || optionalSearchStr.get().isBlank()) {
-      return repository.findAllByOrderByIdentifierAsc(PageRequest.of(0, 30)).stream().toList();
-    }
-    return repository.findByIdentifierSearch(optionalSearchStr.get().trim());
   }
 
   public List<FieldOfLaw> getChildrenOfFieldOfLaw(String identifier) {

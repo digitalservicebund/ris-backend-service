@@ -26,16 +26,10 @@ public class FieldOfLawController {
   @PreAuthorize("isAuthenticated()")
   public Slice<FieldOfLaw> getFieldsOfLawBySearchQuery(
       @RequestParam("q") Optional<String> searchStr,
+      @RequestParam("identifier") Optional<String> identifier,
       @RequestParam("pg") int page,
       @RequestParam("sz") int size) {
-    return service.getFieldsOfLawBySearchQuery(searchStr, PageRequest.of(page, size));
-  }
-
-  @GetMapping(value = "/search-by-identifier", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("isAuthenticated()")
-  public List<FieldOfLaw> getFieldsOfLawByIdentifierSearch(
-      @RequestParam("q") Optional<String> searchStr) {
-    return service.getFieldsOfLawByIdentifierSearch(searchStr);
+    return service.getFieldsOfLawBySearchQuery(searchStr, identifier, PageRequest.of(page, size));
   }
 
   @GetMapping(value = "{identifier}/children", produces = MediaType.APPLICATION_JSON_VALUE)

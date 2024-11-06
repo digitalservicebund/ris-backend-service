@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue"
 import FieldOfLawListEntry from "@/components/FieldOfLawListEntry.vue"
-import TextButton from "@/components/input/TextButton.vue"
+import InputField from "@/components/input/InputField.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
@@ -18,19 +18,21 @@ const emit = defineEmits<{
 }>()
 
 const searchStr = ref("")
+const fieldOfLawString = ref("")
 const results = ref<FieldOfLaw[]>()
 const currentPage = ref<Page<FieldOfLaw>>()
 const itemsPerPage = 10
 
 async function submitSearch(page: number) {
-  if (StringsUtil.isEmpty(searchStr.value)) {
-    return removeSelectedNode()
-  }
+  // if (StringsUtil.isEmpty(searchStr.value)) {
+  //   return removeSelectedNode()
+  // }
 
   const response = await service.searchForFieldsOfLaw(
     page,
     itemsPerPage,
     searchStr.value,
+    fieldOfLawString.value,
   )
   if (response.data) {
     currentPage.value = response.data
@@ -70,47 +72,45 @@ watch(
 </script>
 
 <template>
-  <h1 class="ds-heading-03-reg pb-8">Suche</h1>
   <div class="flex flex-col">
-    <div class="pb-28">
-      <div class="flex flex-row items-stretch">
-        <div class="grow">
-          <TextInput
-            id="FieldOfLawSearchTextInput"
-            v-model="searchStr"
-            aria-label="Sachgebiete Suche"
-            full-height
-            size="medium"
-            @enter-released="submitSearch(0)"
-          />
-        </div>
-        <div class="pl-8">
-          <TextButton
-            aria-label="Sachgebietssuche ausführen"
-            button-type="secondary"
-            class="w-fit"
-            label="Suchen"
-            @click="submitSearch(0)"
-          />
-        </div>
-      </div>
+    <div class="flex flex-row gap-8">
+      <InputField id="fieldOfLawDirectInput" label="Sachgebiet">
+        <TextInput
+          id="fieldOfLawDirectInput"
+          v-model="fieldOfLawString"
+          aria-label="Sachgebiet Direkteingabe"
+          size="medium"
+          @enter-released="submitSearch(0)"
+        />
+      </InputField>
+      <InputField id="fieldOfLawDirectInput" label="Suche">
+        <TextInput
+          id="fieldOfLawSearch"
+          v-model="searchStr"
+          aria-label="Sachgebiete Suche"
+          size="medium"
+          @enter-released="submitSearch(0)"
+        />
+      </InputField>
     </div>
-    <Pagination
-      v-if="currentPage"
-      navigation-position="bottom"
-      :page="currentPage"
-      @update-page="submitSearch"
-    >
-      <FieldOfLawListEntry
-        v-for="(fieldOfLawNode, idx) in results"
-        :key="idx"
-        :field-of-law="fieldOfLawNode"
-        @linked-field:select="emit('linked-field:select', $event)"
-        @node:select="emit('node:select', fieldOfLawNode)"
-      />
-    </Pagination>
-    <div v-if="!currentPage?.content || currentPage?.content?.length == 0">
-      {{ errorMessages.SEARCH_RESULTS_NOT_FOUND.title }}
+
+    <div v-if="currentPage">
+      <Pagination
+        navigation-position="bottom"
+        :page="currentPage"
+        @update-page="submitSearch"
+      >
+        <FieldOfLawListEntry
+          v-for="(fieldOfLawNode, idx) in results"
+          :key="idx"
+          :field-of-law="fieldOfLawNode"
+          @linked-field:select="emit('linked-field:select', $event)"
+          @node:select="emit('node:select', fieldOfLawNode)"
+        />
+      </Pagination>
+      <div v-if="!currentPage?.content || currentPage?.content?.length == 0">
+        {{ errorMessages.SEARCH_RESULTS_NOT_FOUND.title }}
+      </div>
     </div>
   </div>
 </template>

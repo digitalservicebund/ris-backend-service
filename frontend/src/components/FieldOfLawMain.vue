@@ -1,11 +1,9 @@
 <script lang="ts" setup>
 import * as Sentry from "@sentry/vue"
 import { computed, h, ref } from "vue"
-import FieldOfLawSelectionList from "./FieldOfLawSelectionList.vue"
 import FieldOfLawTree from "./FieldOfLawTree.vue"
 import { withSummarizer } from "@/components/DataSetSummary.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
-import FieldOfLawDirectInputSearch from "@/components/FieldOfLawDirectInputSearch.vue"
 import FieldOfLawSearch from "@/components/FieldOfLawSearch.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -113,16 +111,6 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
               @toggle-show-norms="showNorms = !showNorms"
             ></FieldOfLawTree>
           </div>
-        </div>
-        <hr class="w-full border-blue-700" />
-        <div class="bg-white p-20">
-          <h1 class="ds-heading-03-reg pb-8">Ausgewählte Sachgebiete</h1>
-          <FieldOfLawDirectInputSearch @add-to-list="addFieldOfLaw" />
-          <FieldOfLawSelectionList
-            v-model="localModelValue"
-            @node:remove="removeFieldOfLaw"
-            @node:select="setSelectedNode"
-          ></FieldOfLawSelectionList>
         </div>
       </div>
     </ExpandableDataSet>

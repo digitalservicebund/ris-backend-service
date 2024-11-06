@@ -1,5 +1,5 @@
 import httpClient, { ServiceResponse } from "./httpClient"
-import { Page, PageableService } from "@/components/Pagination.vue"
+import { Page } from "@/components/Pagination.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import errorMessages from "@/i18n/errors.json"
 
@@ -20,7 +20,12 @@ interface FieldOfLawService {
 
   getTreeForIdentifier(identifier: string): Promise<ServiceResponse<FieldOfLaw>>
 
-  searchForFieldsOfLaw: PageableService<FieldOfLaw, string>
+  searchForFieldsOfLaw(
+    page: number,
+    size: number,
+    query?: string,
+    identifier?: string,
+  ): Promise<ServiceResponse<Page<FieldOfLaw>>>
 }
 
 const service: FieldOfLawService = {
@@ -92,10 +97,16 @@ const service: FieldOfLawService = {
     }
     return response
   },
-  async searchForFieldsOfLaw(page: number, size: number, query?: string) {
+  async searchForFieldsOfLaw(
+    page: number,
+    size: number,
+    query?: string,
+    identifier?: string,
+  ) {
+    // Todo: do not send query when not set
     const response = await httpClient.get<Page<FieldOfLaw>>(
       `caselaw/fieldsoflaw?pg=${page}&sz=${size}`,
-      { params: { q: query ?? "" } },
+      { params: { q: query ?? "", identifier: identifier ?? "" } },
     )
     if (response.status >= 300) {
       response.error = {

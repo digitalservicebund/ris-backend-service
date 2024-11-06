@@ -13,6 +13,8 @@ public interface DatabaseFieldOfLawRepository extends JpaRepository<FieldOfLawDT
 
   FieldOfLawDTO findByIdentifier(String identifier);
 
+  List<FieldOfLawDTO> findAllByIdentifier(String identifier);
+
   @Query(
       "select fol from FieldOfLawDTO fol where fol.parent is null and fol.notation = 'NEW' order by fol.identifier")
   List<FieldOfLawDTO> findAllByParentIsNullAndNotationOrderByIdentifier();

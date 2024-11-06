@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
@@ -129,6 +128,19 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
         .toList();
   }
 
+  @Override
+  @Transactional
+  public List<FieldOfLaw> findByIdentifierAndSearchTerms(String identifier, String[] searchTerms) {
+    List<FieldOfLawDTO> fieldOfLawList = repository.findAllByIdentifier(identifier);
+
+    return fieldOfLawList.stream()
+        .filter(Objects::nonNull)
+        .filter(fieldOfLawDTO -> returnTrueIfInTextOrIdentifier(fieldOfLawDTO, searchTerms))
+        .distinct()
+        .map(PostgresFieldOfLawRepositoryImpl::getWithNormsWithoutChildren)
+        .toList();
+  }
+
   public static boolean returnTrueIfInTextOrIdentifier(
       FieldOfLawDTO fieldOfLawDTO, String[] searchTerms) {
     if (searchTerms == null || searchTerms.length == 0) {
@@ -143,12 +155,10 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
   @Override
   @Transactional
-  public List<FieldOfLaw> findByIdentifierSearch(String searchStr) {
+  public Slice<FieldOfLaw> findByIdentifier(String searchStr, Pageable pageable) {
     return repository
-        .findAllByIdentifierStartsWithIgnoreCaseOrderByIdentifier(searchStr, PageRequest.of(0, 30))
-        .stream()
-        .map(PostgresFieldOfLawRepositoryImpl::getWithNormsWithoutChildren)
-        .toList();
+        .findAllByIdentifierStartsWithIgnoreCaseOrderByIdentifier(searchStr, pageable)
+        .map(PostgresFieldOfLawRepositoryImpl::getWithNormsWithoutChildren);
   }
 
   static FieldOfLaw getWithNormsWithoutChildren(FieldOfLawDTO fieldOfLawDTO) {

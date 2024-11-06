@@ -5,7 +5,6 @@ import { Page } from "@/components/Pagination.vue"
 import { CitationType } from "@/domain/citationType"
 import DocumentationOffice from "@/domain/documentationOffice"
 import { Court, DocumentType, Procedure } from "@/domain/documentUnit"
-import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
@@ -15,7 +14,6 @@ enum Endpoint {
   documentTypes = "documenttypes",
   courts = "courts",
   citationTypes = "citationtypes",
-  fieldOfLawSearchByIdentifier = "fieldsoflaw/search-by-identifier",
   risAbbreviations = `normabbreviation/search?pg=0&sz=15`,
   procedures = `procedure`,
   legalForceRegions = `region/applicable`,
@@ -41,13 +39,6 @@ function formatDropdownItems(
         label: item.label,
         value: item,
         additionalInformation: item.revoked,
-      }))
-    }
-    case Endpoint.fieldOfLawSearchByIdentifier: {
-      return (responseData as FieldOfLaw[]).map((item) => ({
-        label: item.identifier,
-        value: item,
-        additionalInformation: item.text,
       }))
     }
     case Endpoint.risAbbreviations: {
@@ -153,8 +144,6 @@ const service: ComboboxItemService = {
     await fetchFromEndpoint(Endpoint.courts, filter),
   getDocumentTypes: async (filter?: string) =>
     await fetchFromEndpoint(Endpoint.documentTypes, filter),
-  getFieldOfLawSearchByIdentifier: async (filter?: string) =>
-    await fetchFromEndpoint(Endpoint.fieldOfLawSearchByIdentifier, filter),
   getRisAbbreviations: async (filter?: string) =>
     await fetchFromEndpoint(Endpoint.risAbbreviations, filter),
   getCitationTypes: async (filter?: string) =>

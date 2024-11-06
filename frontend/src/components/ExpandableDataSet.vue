@@ -3,8 +3,6 @@ import type { Component } from "vue"
 import { ref } from "vue"
 import DataSetSummary from "@/components/DataSetSummary.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
-import TextButton from "@/components/input/TextButton.vue"
-import values from "@/data/values.json"
 import IconExpandLess from "~icons/ic/baseline-expand-less"
 import IconExpandMore from "~icons/ic/baseline-expand-more"
 
@@ -20,25 +18,6 @@ withDefaults(defineProps<Props>(), {
 })
 
 const isExpanded = ref(false)
-
-function collapse(): void {
-  isExpanded.value = false
-  scrollToTop()
-}
-
-function scrollToTop() {
-  const element = document.getElementById("expandableHeader")
-  if (element) {
-    const headerOffset = values.headerOffset
-    const elementPosition = element?.getBoundingClientRect().top
-    const offsetPosition = elementPosition + window.scrollY - headerOffset
-
-    window.scrollTo({
-      top: offsetPosition,
-      behavior: "smooth",
-    })
-  }
-}
 </script>
 
 <template>
@@ -68,7 +47,6 @@ function scrollToTop() {
       :class="{ 'mt-24': isExpanded }"
     >
       <slot />
-      <TextButton aria-label="Fertig" label="Fertig" @click="collapse" />
     </div>
   </ExpandableContent>
 </template>

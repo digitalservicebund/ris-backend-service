@@ -22,5 +22,7 @@ public interface FieldOfLawRepository {
 
   List<FieldOfLaw> findByNormStrAndSearchTerms(String normStr, String[] searchTerms);
 
-  List<FieldOfLaw> findByIdentifierSearch(String searchStr);
+  List<FieldOfLaw> findByIdentifierAndSearchTerms(String identifier, String[] searchTerms);
+
+  Slice<FieldOfLaw> findByIdentifier(String searchStr, Pageable pageable);
 }

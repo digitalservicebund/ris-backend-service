@@ -2,7 +2,6 @@
 <script setup lang="ts">
 import TextButton from "./input/TextButton.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
-import { ServiceResponse } from "@/services/httpClient"
 import IconArrowBack from "~icons/ic/baseline-arrow-back"
 import IconArrowForward from "~icons/ic/baseline-arrow-forward"
 
@@ -41,12 +40,6 @@ export type Page<T> = {
   last: boolean
   empty: boolean
 }
-
-export type PageableService<TResult, TQuery = TResult> = (
-  page: number,
-  size: number,
-  query?: TQuery,
-) => Promise<ServiceResponse<Page<TResult>>>
 </script>
 
 <template>
