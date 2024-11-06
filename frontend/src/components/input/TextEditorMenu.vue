@@ -33,7 +33,6 @@ import MdiTablePlus from "~icons/mdi/table-plus"
 import MdiTableRemove from "~icons/mdi/table-remove"
 import MdiTableRowPlusAfter from "~icons/mdi/table-row-plus-after"
 import MdiTableRowRemove from "~icons/mdi/table-row-remove"
-import "../../styles/tables.css"
 
 interface Props {
   editorExpanded: boolean
