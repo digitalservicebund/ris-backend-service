@@ -27,6 +27,13 @@ import IconSubscript from "~icons/ic/sharp-subscript"
 import IconSuperscript from "~icons/ic/sharp-superscript"
 import IconUndo from "~icons/ic/sharp-undo"
 import IconParagraph from "~icons/material-symbols/format-paragraph"
+import MdiTableColumnPlusAfter from "~icons/mdi/table-column-plus-after"
+import MdiTableColumnRemove from "~icons/mdi/table-column-remove"
+import MdiTablePlus from "~icons/mdi/table-plus"
+import MdiTableRemove from "~icons/mdi/table-remove"
+import MdiTableRowPlusAfter from "~icons/mdi/table-row-plus-after"
+import MdiTableRowRemove from "~icons/mdi/table-row-remove"
+import "../../styles/tables.css"
 
 interface Props {
   editorExpanded: boolean
@@ -126,6 +133,60 @@ const buttons = computed(() => {
       icon: IconSubscript,
       ariaLabel: "Hochgestellt",
       shortcut: "Strg + ,",
+      group: "format",
+      isCollapsable: false,
+      callback: () =>
+        props.editor.chain().focus().toggleMark("subscript").run(),
+    },
+    {
+      type: "subscript",
+      icon: MdiTablePlus,
+      ariaLabel: "Tabelle einfügen",
+      group: "format",
+      isCollapsable: false,
+      callback: () =>
+        props.editor.chain().focus().toggleMark("subscript").run(),
+    },
+    {
+      type: "subscript",
+      icon: MdiTableRemove,
+      ariaLabel: "Tabelle löschen",
+      group: "format",
+      isCollapsable: false,
+      callback: () =>
+        props.editor.chain().focus().toggleMark("subscript").run(),
+    },
+    {
+      type: "subscript",
+      icon: MdiTableRowRemove,
+      ariaLabel: "Zeile löschen",
+      group: "format",
+      isCollapsable: false,
+      callback: () =>
+        props.editor.chain().focus().toggleMark("subscript").run(),
+    },
+    {
+      type: "subscript",
+      icon: MdiTableColumnRemove,
+      ariaLabel: "Spalte löschen",
+      group: "format",
+      isCollapsable: false,
+      callback: () =>
+        props.editor.chain().focus().toggleMark("subscript").run(),
+    },
+    {
+      type: "subscript",
+      icon: MdiTableRowPlusAfter,
+      ariaLabel: "Zeile darunter einfügen",
+      group: "format",
+      isCollapsable: false,
+      callback: () =>
+        props.editor.chain().focus().toggleMark("subscript").run(),
+    },
+    {
+      type: "subscript",
+      icon: MdiTableColumnPlusAfter,
+      ariaLabel: "Spalte rechts einfügen",
       group: "format",
       isCollapsable: false,
       callback: () =>
