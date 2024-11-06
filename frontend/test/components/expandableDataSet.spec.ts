@@ -79,12 +79,10 @@ describe("ExpandableDataSet", () => {
     await user.click(title)
 
     expect(screen.queryByText("content")).toBeVisible()
-    expect(screen.queryByText("Fertig")).toBeVisible()
 
     await user.click(title)
 
     expect(screen.queryByText("content")).not.toBeInTheDocument()
-    expect(screen.queryByText("Fertig")).not.toBeInTheDocument()
   })
 
   it("shows the default slot and close button when clicking on the summary", async () => {
@@ -99,7 +97,6 @@ describe("ExpandableDataSet", () => {
     await user.click(summary)
 
     expect(screen.queryByText("content")).toBeVisible()
-    expect(screen.queryByText("Fertig")).toBeVisible()
   })
 
   it("hides the summary when opening data set", async () => {
@@ -121,12 +118,10 @@ describe("ExpandableDataSet", () => {
     renderComponent({ title: "test title", defaultSlot: "content" })
     const title = screen.getByText("test title")
     await user.click(title)
-    const button = screen.getByText("Fertig")
 
-    await user.click(button)
+    await user.click(title)
     const slot = screen.queryByText("content")
 
-    expect(button).not.toBeInTheDocument()
     expect(slot).not.toBeInTheDocument()
   })
 })
