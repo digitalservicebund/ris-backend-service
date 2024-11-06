@@ -1,15 +1,27 @@
 import { Extension } from "@tiptap/core"
+import "../styles/tables.css"
 
 export const TableStyle = Extension.create({
   addGlobalAttributes() {
     return [
       {
-        types: ["table", "tableRow", "tableCell", "tableHeader,"],
+        types: ["table", "tableRow", "tableCell", "tableHeader"],
         attributes: {
           style: {
-            renderHTML: (attributes) => {
+            renderHTML: (attributes: { style?: string }) => {
+              const existingStyle = attributes.style || ""
+              const invisibleTableClass =
+                existingStyle.includes("border") ||
+                existingStyle.includes("border-bottom") ||
+                existingStyle.includes("border-top") ||
+                existingStyle.includes("border-right") ||
+                existingStyle.includes("border-left")
+                  ? ""
+                  : "invisible-table"
+
               return {
-                style: attributes.style,
+                class: invisibleTableClass,
+                style: existingStyle,
               }
             },
           },
