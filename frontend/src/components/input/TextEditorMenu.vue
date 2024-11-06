@@ -138,59 +138,6 @@ const buttons = computed(() => {
         props.editor.chain().focus().toggleMark("subscript").run(),
     },
     {
-      type: "subscript",
-      icon: MdiTablePlus,
-      ariaLabel: "Tabelle einfügen",
-      group: "format",
-      isCollapsable: false,
-      callback: () =>
-        props.editor
-          .chain()
-          .focus()
-          .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
-          .run(),
-    },
-    {
-      type: "subscript",
-      icon: MdiTableRemove,
-      ariaLabel: "Tabelle löschen",
-      group: "format",
-      isCollapsable: false,
-      callback: () => props.editor.chain().focus().deleteTable().run(),
-    },
-    {
-      type: "subscript",
-      icon: MdiTableRowRemove,
-      ariaLabel: "Zeile löschen",
-      group: "format",
-      isCollapsable: false,
-      callback: () => props.editor.chain().focus().deleteRow().run(),
-    },
-    {
-      type: "subscript",
-      icon: MdiTableColumnRemove,
-      ariaLabel: "Spalte löschen",
-      group: "format",
-      isCollapsable: false,
-      callback: () => props.editor.chain().focus().deleteColumn().run(),
-    },
-    {
-      type: "subscript",
-      icon: MdiTableRowPlusAfter,
-      ariaLabel: "Zeile darunter einfügen",
-      group: "format",
-      isCollapsable: false,
-      callback: () => props.editor.chain().focus().addRowAfter().run(),
-    },
-    {
-      type: "subscript",
-      icon: MdiTableColumnPlusAfter,
-      ariaLabel: "Spalte rechts einfügen",
-      group: "format",
-      isCollapsable: false,
-      callback: () => props.editor.chain().focus().addColumnAfter().run(),
-    },
-    {
       type: "left",
       icon: IconAlignLeft,
       ariaLabel: "Linksbündig",
@@ -259,6 +206,59 @@ const buttons = computed(() => {
       group: "blockquote",
       isCollapsable: false,
       callback: () => props.editor.chain().focus().toggleBlockquote().run(),
+    },
+    {
+      type: "insertTable",
+      icon: MdiTablePlus,
+      ariaLabel: "Tabelle einfügen",
+      group: "Tabelle",
+      isCollapsable: true,
+      callback: () =>
+        props.editor
+          .chain()
+          .focus()
+          .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+          .run(),
+    },
+    {
+      type: "deleteTable",
+      icon: MdiTableRemove,
+      ariaLabel: "Tabelle löschen",
+      group: "Tabelle",
+      isCollapsable: true,
+      callback: () => props.editor.chain().focus().deleteTable().run(),
+    },
+    {
+      type: "deleteRow",
+      icon: MdiTableRowRemove,
+      ariaLabel: "Zeile löschen",
+      group: "Tabelle",
+      isCollapsable: true,
+      callback: () => props.editor.chain().focus().deleteRow().run(),
+    },
+    {
+      type: "deleteColumn",
+      icon: MdiTableColumnRemove,
+      ariaLabel: "Spalte löschen",
+      group: "Tabelle",
+      isCollapsable: true,
+      callback: () => props.editor.chain().focus().deleteColumn().run(),
+    },
+    {
+      type: "addRowAfter",
+      icon: MdiTableRowPlusAfter,
+      ariaLabel: "Zeile darunter einfügen",
+      group: "Tabelle",
+      isCollapsable: true,
+      callback: () => props.editor.chain().focus().addRowAfter().run(),
+    },
+    {
+      type: "addColumnAfter",
+      icon: MdiTableColumnPlusAfter,
+      ariaLabel: "Spalte rechts einfügen",
+      group: "Tabelle",
+      isCollapsable: true,
+      callback: () => props.editor.chain().focus().addColumnAfter().run(),
     },
   ]
 
