@@ -131,7 +131,8 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   @Override
   @Transactional
   public List<FieldOfLaw> findByIdentifierAndSearchTerms(String identifier, String[] searchTerms) {
-    List<FieldOfLawDTO> fieldOfLawList = repository.findAllByIdentifier(identifier);
+    List<FieldOfLawDTO> fieldOfLawList =
+        repository.findAllByIdentifierStartsWithIgnoreCaseOrderByIdentifier(identifier);
 
     return fieldOfLawList.stream()
         .filter(Objects::nonNull)
