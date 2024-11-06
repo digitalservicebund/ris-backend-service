@@ -13,6 +13,7 @@ interface Props {
   modelValue: FieldOfLaw[]
   showNorms: boolean
   nodeHelper: NodeHelperInterface
+  searchResults?: FieldOfLaw[]
   expandValues: FieldOfLaw[]
   isRoot?: boolean
   rootChild?: boolean
@@ -32,6 +33,7 @@ const emit = defineEmits<{
 
 const isExpanded = ref(false)
 const children = ref<FieldOfLaw[]>([])
+const isSearchCandidate = ref<boolean>(false)
 const isSelected = computed({
   get: () =>
     props.modelValue.some(
@@ -73,6 +75,14 @@ watch(
 watch(
   props,
   async () => {
+    if (props.searchResults) {
+      props.searchResults.forEach((result) => {
+        if (result.identifier == props.node.identifier) {
+          isSearchCandidate.value = true
+        }
+      })
+    }
+
     if (props.selectedNode && props.isRoot) {
       children.value = await props.nodeHelper.getFilteredChildren(
         props.node,
@@ -141,11 +151,16 @@ watch(
           <div class="flex flex-row">
             <div
               v-if="!props.isRoot"
-              class="whitespace-nowrap pl-8 text-[16px]"
+              class="whitespace-nowrap pl-6 text-[16px]"
             >
-              {{ node.identifier }}
+              <span
+                class="p-2"
+                :class="isSearchCandidate ? 'bg-yellow-300' : ''"
+              >
+                {{ node.identifier }}
+              </span>
             </div>
-            <div class="pl-6 pt-2 text-[14px] text-blue-800">
+            <div class="pl-4 pt-2 text-[14px] text-blue-800">
               <TokenizeText
                 :keywords="props.node.linkedFields ?? []"
                 :text="props.node.text"
@@ -183,6 +198,7 @@ watch(
         :node="child"
         :node-helper="nodeHelper"
         :root-child="props.isRoot"
+        :search-results="searchResults"
         :selected-node="selectedNode"
         :show-norms="showNorms"
         @linked-field:select="emit('linked-field:select', $event)"

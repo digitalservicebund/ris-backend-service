@@ -12,6 +12,7 @@ import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const showNorms = ref(false)
 const selectedNode = ref<FieldOfLaw | undefined>(undefined)
+const searchResultList = ref<FieldOfLaw[] | undefined>(undefined)
 
 const store = useDocumentUnitStore()
 const localModelValue = computed({
@@ -33,7 +34,7 @@ const localModelValue = computed({
   },
 })
 
-const addFeldOfLaw = (fieldOfLaw: FieldOfLaw) => {
+const addFieldOfLaw = (fieldOfLaw: FieldOfLaw) => {
   if (
     !localModelValue.value?.find(
       (entry) => entry.identifier === fieldOfLaw.identifier,
@@ -56,6 +57,10 @@ function setSelectedNode(node: FieldOfLaw) {
 
 function removeSelectedNode() {
   selectedNode.value = undefined
+}
+
+function setSearchResults(searchResults: FieldOfLaw[]) {
+  searchResultList.value = searchResults
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -91,16 +96,18 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
               @linked-field:select="setSelectedNode"
               @node:select="setSelectedNode"
               @node:unselect="removeSelectedNode"
+              @search-results="setSearchResults"
             />
           </div>
           <div class="flex-1">
             <FieldOfLawTree
               v-if="localModelValue"
               v-model="localModelValue"
+              :search-results="searchResultList"
               :selected-node="selectedNode"
               :show-norms="showNorms"
               @linked-field:select="setSelectedNode"
-              @node:select="addFeldOfLaw"
+              @node:select="addFieldOfLaw"
               @node:unselect="removeFieldOfLaw"
               @selected-node:reset="removeSelectedNode"
               @toggle-show-norms="showNorms = !showNorms"
@@ -110,7 +117,7 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
         <hr class="w-full border-blue-700" />
         <div class="bg-white p-20">
           <h1 class="ds-heading-03-reg pb-8">Ausgewählte Sachgebiete</h1>
-          <FieldOfLawDirectInputSearch @add-to-list="addFeldOfLaw" />
+          <FieldOfLawDirectInputSearch @add-to-list="addFieldOfLaw" />
           <FieldOfLawSelectionList
             v-model="localModelValue"
             @node:remove="removeFieldOfLaw"

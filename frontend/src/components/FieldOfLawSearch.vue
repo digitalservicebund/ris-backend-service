@@ -11,6 +11,7 @@ import StringsUtil from "@/utils/stringsUtil"
 
 const emit = defineEmits<{
   "node:select": [node: FieldOfLaw]
+  "search-results": [searchResults: FieldOfLaw[]]
   "linked-field:select": [node: FieldOfLaw]
   "node:unselect": []
   "do-show-norms": []
@@ -34,6 +35,12 @@ async function submitSearch(page: number) {
   if (response.data) {
     currentPage.value = response.data
     results.value = response.data.content
+
+    // only highlight results in tree if no paginated results
+    if (currentPage.value.first && currentPage.value.last) {
+      emit("search-results", results.value)
+    }
+
     if (results.value?.[0]) {
       emit("node:select", results.value[0] as FieldOfLaw)
     }

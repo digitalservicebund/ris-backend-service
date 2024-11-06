@@ -10,6 +10,7 @@ import { buildRoot, FieldOfLaw } from "@/domain/fieldOfLaw"
 const props = defineProps<{
   modelValue: FieldOfLaw[]
   selectedNode?: FieldOfLaw
+  searchResults?: FieldOfLaw[]
   showNorms: boolean
 }>()
 
@@ -113,6 +114,7 @@ watch(
     :model-value="modelValue"
     :node="root"
     :node-helper="nodeHelper"
+    :search-results="searchResults"
     :selected-node="selectedNode"
     :show-norms="showNorms"
     @linked-field:select="emit('linked-field:select', $event)"
