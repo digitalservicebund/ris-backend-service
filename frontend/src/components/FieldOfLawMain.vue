@@ -95,8 +95,6 @@ function removeSelectedNode() {
   selectedNode.value = undefined
 }
 
-}
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function selectedFieldsOfLawSummarizer(dataEntry: any) {
   return h("div", [
@@ -126,9 +124,13 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
       :identifier="identifier"
       :norm="norm"
       @search="submitSearch(0)"
-      @update:description="(value: string) => (description = value)"
-      @update:identifier="(value: string) => (identifier = value)"
-      @update:norm="(value: string) => (norm = value)"
+      @update:description="
+        (value?: string) => (value ? (description = value) : undefined)
+      "
+      @update:identifier="
+        (value?: string) => (value ? (identifier = value) : undefined)
+      "
+      @update:norm="(value?: string) => (value ? (norm = value) : undefined)"
     />
 
     <div class="flex flex-row gap-24">
