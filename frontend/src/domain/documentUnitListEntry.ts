@@ -13,7 +13,6 @@ export default class DocumentUnitListEntry {
   appraisalBody?: string
   hasHeadnoteOrPrinciple?: boolean
   hasAttachments?: boolean
-  hasNote?: boolean
   note?: string
   isDeletable?: boolean
   isEditable?: boolean

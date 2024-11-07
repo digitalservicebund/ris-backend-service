@@ -64,9 +64,7 @@ const trimText = (text: string, length: number = 50) =>
   text.length > length ? `${text.slice(0, length)}...` : text
 
 const noteTooltip = (listEntry: DocumentUnitListEntry) =>
-  listEntry.hasNote
-    ? trimText(listEntry.note ?? "Notiz vorhanden")
-    : "Keine Notiz vorhanden"
+  listEntry.note ? trimText(listEntry.note) : "Keine Notiz vorhanden"
 
 /**
  * Stops propagation of scrolling event, and toggles the showModal value
@@ -173,7 +171,7 @@ function onDelete() {
               <IconNote
                 :aria-label="noteTooltip(listEntry)"
                 class="flex-end flex h-20 w-20"
-                :class="listEntry.hasNote ? 'text-blue-800' : 'text-gray-500'"
+                :class="!!listEntry.note ? 'text-blue-800' : 'text-gray-500'"
                 data-testid="note-icon"
               />
             </Tooltip>
