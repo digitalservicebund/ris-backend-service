@@ -3,14 +3,23 @@ import * as Sentry from "@sentry/vue"
 import { computed, h, ref } from "vue"
 import { withSummarizer } from "@/components/DataSetSummary.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
-import FieldOfLawSearch from "@/components/FieldOfLawSearch.vue"
+import FieldOfLawSearchInput from "@/components/FieldOfLawSearchInput.vue"
+import FieldOfLawSearchResultList from "@/components/FieldOfLawSearchResultList.vue"
 import FieldOfLawTree from "@/components/FieldOfLawTree.vue"
+import { Page } from "@/components/Pagination.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
+import service from "@/services/fieldOfLawService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const showNorms = ref(false)
 const selectedNode = ref<FieldOfLaw | undefined>(undefined)
-const searchResultList = ref<FieldOfLaw[] | undefined>(undefined)
+
+const description = ref("")
+const identifier = ref("")
+const norm = ref("")
+const results = ref<FieldOfLaw[]>()
+const currentPage = ref<Page<FieldOfLaw>>()
+const itemsPerPage = 10
 
 const store = useDocumentUnitStore()
 const localModelValue = computed({
@@ -31,6 +40,35 @@ const localModelValue = computed({
     )
   },
 })
+
+async function submitSearch(page: number) {
+  // if (StringsUtil.isEmpty(searchStr.value)) {
+  //   return removeSelectedNode()
+  // }
+
+  console.log("identifier: " + identifier.value)
+
+  const response = await service.searchForFieldsOfLaw(
+    page,
+    itemsPerPage,
+    description.value,
+    identifier.value,
+    norm.value,
+  )
+  if (response.data) {
+    currentPage.value = response.data
+    results.value = response.data.content
+
+    if (results.value?.[0]) {
+      selectedNode.value = results.value[0]
+    }
+    showNorms.value = !!norm.value
+  } else {
+    currentPage.value = undefined
+    results.value = undefined
+    console.error("Error searching for Nodes")
+  }
+}
 
 const addFieldOfLaw = (fieldOfLaw: FieldOfLaw) => {
   if (
@@ -57,8 +95,6 @@ function removeSelectedNode() {
   selectedNode.value = undefined
 }
 
-function setSearchResults(searchResults: FieldOfLaw[]) {
-  searchResultList.value = searchResults
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -79,40 +115,42 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
 </script>
 
 <template>
-  <div class="border-b-1 border-t-1 border-blue-300 py-24">
-    <ExpandableDataSet
-      v-if="localModelValue"
-      :data-set="localModelValue"
-      :summary-component="SelectedFieldsOfLawSummary"
-      title="Sachgebiete"
-    >
-      <div class="w-full">
-        <div class="flex flex-row gap-24">
-          <div class="flex flex-1 flex-col">
-            <FieldOfLawSearch
-              @do-show-norms="showNorms = true"
-              @linked-field:select="setSelectedNode"
-              @node:select="setSelectedNode"
-              @node:unselect="removeSelectedNode"
-              @search-results="setSearchResults"
-            />
-          </div>
-          <div class="flex-1">
-            <FieldOfLawTree
-              v-if="localModelValue"
-              v-model="localModelValue"
-              :search-results="searchResultList"
-              :selected-node="selectedNode"
-              :show-norms="showNorms"
-              @linked-field:select="setSelectedNode"
-              @node:select="addFieldOfLaw"
-              @node:unselect="removeFieldOfLaw"
-              @selected-node:reset="removeSelectedNode"
-              @toggle-show-norms="showNorms = !showNorms"
-            ></FieldOfLawTree>
-          </div>
-        </div>
-      </div>
-    </ExpandableDataSet>
-  </div>
+  <ExpandableDataSet
+    v-if="localModelValue"
+    :data-set="localModelValue"
+    :summary-component="SelectedFieldsOfLawSummary"
+    title="Sachgebiete"
+  >
+    <FieldOfLawSearchInput
+      :description="description"
+      :identifier="identifier"
+      :norm="norm"
+      @search="submitSearch(0)"
+      @update:description="(value: string) => (description = value)"
+      @update:identifier="(value: string) => (identifier = value)"
+      @update:norm="(value: string) => (norm = value)"
+    />
+
+    <div class="flex flex-row gap-24">
+      <FieldOfLawSearchResultList
+        :current-page="currentPage"
+        :results="results"
+        @search="submitSearch"
+        @set-selected-node="setSelectedNode"
+      />
+
+      <FieldOfLawTree
+        v-if="localModelValue"
+        v-model="localModelValue"
+        :search-results="results"
+        :selected-node="selectedNode"
+        :show-norms="showNorms"
+        @linked-field:select="setSelectedNode"
+        @node:select="addFieldOfLaw"
+        @node:unselect="removeFieldOfLaw"
+        @selected-node:reset="removeSelectedNode"
+        @toggle-show-norms="showNorms = !showNorms"
+      ></FieldOfLawTree>
+    </div>
+  </ExpandableDataSet>
 </template>

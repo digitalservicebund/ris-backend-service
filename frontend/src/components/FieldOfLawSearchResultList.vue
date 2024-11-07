@@ -1,0 +1,39 @@
+<script setup lang="ts">
+import FieldOfLawListEntry from "@/components/FieldOfLawListEntry.vue"
+import Pagination, { Page } from "@/components/Pagination.vue"
+import { FieldOfLaw } from "@/domain/fieldOfLaw"
+import errorMessages from "@/i18n/errors.json"
+
+defineProps<{
+  currentPage?: Page<FieldOfLaw>
+  results?: FieldOfLaw[]
+}>()
+
+const emit = defineEmits<{
+  search: [page: number]
+  setSelectedNode: [node: FieldOfLaw]
+}>()
+</script>
+
+<template>
+  <div v-if="currentPage">
+    <Pagination
+      navigation-position="bottom"
+      :page="currentPage"
+      @update-page="(page: number) => emit('search', page)"
+    >
+      <span class="ds-label-01-bold">Passende Suchergebnisse:</span>
+      <FieldOfLawListEntry
+        v-for="(fieldOfLawNode, idx) in results"
+        :key="idx"
+        class="mt-16"
+        :field-of-law="fieldOfLawNode"
+        @linked-field:select="emit('setSelectedNode', fieldOfLawNode)"
+        @node:select="emit('setSelectedNode', fieldOfLawNode)"
+      />
+    </Pagination>
+    <div v-if="!currentPage?.content || currentPage?.content?.length == 0">
+      {{ errorMessages.SEARCH_RESULTS_NOT_FOUND.title }}
+    </div>
+  </div>
+</template>

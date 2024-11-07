@@ -42,10 +42,7 @@ const isExpanded = ref(false)
       </div>
     </template>
 
-    <div
-      class="flex flex-col items-start gap-32"
-      :class="{ 'mt-24': isExpanded }"
-    >
+    <div class="flex flex-col items-start gap-24">
       <slot />
     </div>
   </ExpandableContent>

@@ -90,38 +90,35 @@ watch(
 
 <template>
   <FlexContainer flex-direction="flex-col" justify-content="justify-between">
-    <h1 class="ds-heading-03-reg pb-10">Sachgebietsbaum</h1>
-    <div class="my-14">
-      <InputField
+    <InputField
+      id="showNorms"
+      aria-label="Normen anzeigen"
+      label="Normen anzeigen"
+      label-class="ds-label-02-reg"
+      :label-position="LabelPosition.RIGHT"
+    >
+      <CheckboxInput
         id="showNorms"
-        aria-label="Normen anzeigen"
-        label="Normen anzeigen"
-        label-class="ds-label-01-reg"
-        :label-position="LabelPosition.RIGHT"
-      >
-        <CheckboxInput
-          id="showNorms"
-          v-model="showNormsModelValue"
-          size="small"
-        />
-      </InputField>
-    </div>
+        v-model="showNormsModelValue"
+        size="small"
+      />
+    </InputField>
+    <FieldOfLawNodeComponent
+      :key="root.identifier"
+      :expand-values="expandedNodes"
+      is-root
+      :model-value="modelValue"
+      :node="root"
+      :node-helper="nodeHelper"
+      :search-results="searchResults"
+      :selected-node="selectedNode"
+      :show-norms="showNorms"
+      @linked-field:select="emit('linked-field:select', $event)"
+      @node:collapse="collapseNode"
+      @node:expand="expandSelectedNodes"
+      @node:select="emit('node:select', $event)"
+      @node:unselect="emit('node:unselect', $event)"
+      @selected-node:reset="emit('selected-node:reset')"
+    />
   </FlexContainer>
-  <FieldOfLawNodeComponent
-    :key="root.identifier"
-    :expand-values="expandedNodes"
-    is-root
-    :model-value="modelValue"
-    :node="root"
-    :node-helper="nodeHelper"
-    :search-results="searchResults"
-    :selected-node="selectedNode"
-    :show-norms="showNorms"
-    @linked-field:select="emit('linked-field:select', $event)"
-    @node:collapse="collapseNode"
-    @node:expand="expandSelectedNodes"
-    @node:select="emit('node:select', $event)"
-    @node:unselect="emit('node:unselect', $event)"
-    @selected-node:reset="emit('selected-node:reset')"
-  />
 </template>
