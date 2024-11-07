@@ -32,7 +32,27 @@ export function useCollapsingMenuBar(
       const buttonsOfGroup = buttonList.filter(
         (button) => button.group == lastGroupName,
       )
+      const alwaysCollapsedGroup = buttonList.filter(
+        (button) => button.isAlwaysCollapsed === true,
+      )
 
+      if (alwaysCollapsedGroup.length) {
+        const tableButtonIndex = buttonList.indexOf(alwaysCollapsedGroup[0])
+        const tableMenuButton = {
+          type: "menu",
+          icon: alwaysCollapsedGroup[0].icon,
+          ariaLabel: alwaysCollapsedGroup[0].group || "menu",
+          group: alwaysCollapsedGroup[0].group,
+          isCollapsable: false,
+          childButtons: alwaysCollapsedGroup,
+        }
+        buttonList = buttonList.filter(
+          (button) => !alwaysCollapsedGroup.includes(button),
+        )
+        buttonList.splice(tableButtonIndex, 0, tableMenuButton)
+        setIsLast(buttonList)
+        return buttonList
+      }
       const menuButtonIndex = buttonList.indexOf(buttonsOfGroup[0])
 
       buttonList = buttonList.filter(
