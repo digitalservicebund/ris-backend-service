@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 import static de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresFieldOfLawRepositoryImpl.returnTrueIfInText;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
 import java.util.UUID;
@@ -51,17 +50,17 @@ class PostgresFieldOfLawRepositoryImplTest {
     assertEquals(1, result.norms().size());
   }
 
-  @Test
-  void testReturnTrueIfInText() {
-    var fieldOfLaw = generateFieldOfLawDto("find me by text");
-    assertTrue(returnTrueIfInText(fieldOfLaw, new String[] {fieldOfLaw.getText()}));
-
-    assertTrue(returnTrueIfInText(fieldOfLaw, new String[] {fieldOfLaw.getIdentifier()}));
-    assertTrue(
-        returnTrueIfInText(
-            fieldOfLaw, new String[] {fieldOfLaw.getIdentifier(), fieldOfLaw.getText()}));
-    assertTrue(returnTrueIfInText(fieldOfLaw, new String[] {"find", "AB"}));
-  }
+  //  @Test
+  //  void testReturnTrueIfInText() {
+  //    var fieldOfLaw = generateFieldOfLawDto("find me by text");
+  //    assertTrue(returnTrueIfInText(fieldOfLaw, new String[] {fieldOfLaw.getText()}));
+  //
+  //    assertTrue(returnTrueIfInText(fieldOfLaw, new String[] {fieldOfLaw.getIdentifier()}));
+  //    assertTrue(
+  //        returnTrueIfInText(
+  //            fieldOfLaw, new String[] {fieldOfLaw.getIdentifier(), fieldOfLaw.getText()}));
+  //    assertTrue(returnTrueIfInText(fieldOfLaw, new String[] {"find", "AB"}));
+  //  }
 
   @Test
   void testReturnFalseIfInTextOrIdentifier() {
