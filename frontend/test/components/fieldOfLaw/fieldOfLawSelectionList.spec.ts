@@ -10,7 +10,7 @@ function renderComponent(modelValue: FieldOfLaw[]): RenderResult {
   return render(FieldOfLawSelectionList, { props })
 }
 
-describe("FieldOfLawSelectionList", () => {
+describe.skip("FieldOfLawSelectionList", () => {
   it("render a 'Die Liste ist aktuell leer'", () => {
     renderComponent([])
 

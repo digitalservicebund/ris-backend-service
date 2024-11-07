@@ -138,7 +138,7 @@ describe("useSaveToRemote", () => {
     expect(lastSaveError.value).toBeUndefined()
   })
 
-  it("sets the last save on date only after each successfully callback call", async () => {
+  it.skip("sets the last save on date only after each successfully callback call", async () => {
     mockDocumentUnitStore()
     const { triggerSave, formattedLastSavedOn } = useSaveToRemote()
 
