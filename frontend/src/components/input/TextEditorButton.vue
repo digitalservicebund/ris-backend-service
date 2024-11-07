@@ -56,7 +56,6 @@ export interface EditorButton {
   isLast?: boolean
   isActive?: boolean
   isCollapsable?: boolean
-  isAlwaysCollapsed?: boolean
   disabled?: boolean
   group?: string
   callback?: () => void
