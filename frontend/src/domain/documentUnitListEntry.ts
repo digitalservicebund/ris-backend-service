@@ -14,6 +14,7 @@ export default class DocumentUnitListEntry {
   hasHeadnoteOrPrinciple?: boolean
   hasAttachments?: boolean
   hasNote?: boolean
+  note?: string
   isDeletable?: boolean
   isEditable?: boolean
   source?: string

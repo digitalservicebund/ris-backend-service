@@ -55,6 +55,7 @@ public class DocumentationUnitListItemTransformer {
         .hasNote(
             documentationUnitListItemDTO.getNote() != null
                 && !documentationUnitListItemDTO.getNote().isEmpty())
+        .note(documentationUnitListItemDTO.getNote())
         .creatingDocumentationOffice(
             documentationUnitListItemDTO.getCreatingDocumentationOffice() == null
                 ? null

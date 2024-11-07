@@ -90,7 +90,7 @@ describe("documentUnit list", () => {
   })
 
   test("renders documentUnit list", async () => {
-    renderComponent({
+    const { user } = renderComponent({
       documentUnitListEntries: [
         {
           id: "id",
@@ -98,6 +98,7 @@ describe("documentUnit list", () => {
           documentNumber: "123",
           decisionDate: "2022-02-10",
           fileNumber: "",
+          note: "a note",
           appraisalBody: "",
           documentType: { label: "Test", jurisShortcut: "T" },
           court: { type: "typeA", location: "locB", label: "typeA locB" },
@@ -179,7 +180,9 @@ describe("documentUnit list", () => {
 
     // expect Notes
     expect(screen.getAllByLabelText("Keine Notiz vorhanden")).toHaveLength(2)
-    expect(screen.getByLabelText("Notiz vorhanden")).toBeVisible()
+    await user.hover(screen.getByLabelText("a note"))
+    // The tooltip can be seen after hovering over the icon
+    expect(screen.getByText("a note"))
 
     // expect Headnote or Principal
     expect(screen.getAllByLabelText("Kein Kurztext vorhanden")).toHaveLength(2)
