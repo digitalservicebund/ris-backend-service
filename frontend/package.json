@@ -86,6 +86,7 @@
     "@eslint/js": "^9.14.0",
     "@iconify-json/ic": "^1.2.1",
     "@iconify-json/material-symbols": "^1.2.6",
+    "@iconify-json/mdi": "^1.2.1",
     "@namics/stylelint-bem": "^10.1.0",
     "@pinia/testing": "^0.1.7",
     "@playwright/test": "^1.48.2",

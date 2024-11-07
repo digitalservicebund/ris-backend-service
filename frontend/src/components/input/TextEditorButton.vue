@@ -56,6 +56,7 @@ export interface EditorButton {
   isLast?: boolean
   isActive?: boolean
   isCollapsable?: boolean
+  isAlwaysCollapsed?: boolean
   disabled?: boolean
   group?: string
   callback?: () => void
@@ -91,7 +92,10 @@ export interface EditorButton {
         class="absolute z-50 mt-1 flex flex-row items-center border-1 border-solid border-blue-800 bg-white"
       >
         <div v-for="(childButton, index) in childButtons" :key="index">
-          <Tooltip :shortcut="childButton.shortcut" :text="ariaLabel">
+          <Tooltip
+            :shortcut="childButton.shortcut"
+            :text="childButton.ariaLabel"
+          >
             <button
               ref="children"
               :aria-label="childButton.ariaLabel"
