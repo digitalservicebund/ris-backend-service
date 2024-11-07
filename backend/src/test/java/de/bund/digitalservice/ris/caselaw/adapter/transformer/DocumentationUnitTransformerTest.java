@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
@@ -99,6 +100,18 @@ class DocumentationUnitTransformerTest {
         DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
 
     assertThat(documentationUnitDTO.getLegalEffect()).isNull();
+  }
+
+  @Test
+  void testTransformToDTO_withBlankString_shouldConvertToNull() {
+    DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().note("before change").build();
+
+    DocumentationUnit updatedDomainObject = DocumentationUnit.builder().note("  ").build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+
+    assertNull(documentationUnitDTO.getNote());
   }
 
   @Test
