@@ -8,16 +8,23 @@ export const TableStyle = Extension.create({
         types: ["table", "tableCell", "tableHeader"],
         attributes: {
           style: {
-            renderHTML: (attributes: { style?: string }) => {
+            renderHTML: (attributes) => {
               const existingStyle = attributes.style || ""
-              const invisibleTableClass =
-                existingStyle.includes("border") ||
-                existingStyle.includes("border-bottom") ||
-                existingStyle.includes("border-top") ||
-                existingStyle.includes("border-right") ||
-                existingStyle.includes("border-left")
-                  ? ""
-                  : "invisible-table"
+
+              // Split the style string into individual declarations
+              const styles: string[] = existingStyle.split(";")
+
+              const hasBorderStyle = styles.some((style) => {
+                const trimmedStyle = style.trim()
+                return (
+                  trimmedStyle.startsWith("border") &&
+                  !trimmedStyle.includes("none")
+                )
+              })
+
+              const invisibleTableClass = hasBorderStyle
+                ? ""
+                : "invisible-table"
 
               return {
                 class: invisibleTableClass,
