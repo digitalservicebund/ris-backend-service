@@ -34,6 +34,18 @@ export const TableStyle = Extension.create({
           },
         },
       },
+      {
+        types: ["tableRow"],
+        attributes: {
+          style: {
+            renderHTML: (attributes) => {
+              return {
+                style: attributes.style,
+              }
+            },
+          },
+        },
+      },
     ]
   },
 })

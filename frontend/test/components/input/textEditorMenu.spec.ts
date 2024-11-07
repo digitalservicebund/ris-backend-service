@@ -73,8 +73,8 @@ describe("text editor toolbar", async () => {
       const secondButton = screen.getByLabelText("Nicht-druckbare Zeichen")
       expect(secondButton).toHaveFocus()
 
-      // navigate to last button (arrow right 18 times)
-      await userEvent.keyboard("{ArrowRight>18/}")
+      // navigate to last button (arrow right 25 times)
+      await userEvent.keyboard("{ArrowRight>25/}")
       const lastButton = screen.getByLabelText("Wiederherstellen")
       expect(lastButton).toHaveFocus()
 
