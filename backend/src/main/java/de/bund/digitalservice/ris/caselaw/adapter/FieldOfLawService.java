@@ -3,13 +3,11 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.FieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.Norm;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageImpl;
@@ -30,7 +28,10 @@ public class FieldOfLawService {
   }
 
   public Slice<FieldOfLaw> getFieldsOfLawBySearchQuery(
-      Optional<String> optionalSearchStr, Optional<String> identifier, Pageable pageable) {
+      Optional<String> optionalSearchStr,
+      Optional<String> identifier,
+      Optional<String> norm,
+      Pageable pageable) {
 
     if (identifier.isPresent() && identifier.get().isBlank()) {
       identifier = Optional.empty();
@@ -38,16 +39,11 @@ public class FieldOfLawService {
     if (optionalSearchStr.isPresent() && optionalSearchStr.get().isBlank()) {
       optionalSearchStr = Optional.empty();
     }
-
-    if (optionalSearchStr.isEmpty() && identifier.isPresent()) {
-      return repository.findByIdentifier(identifier.get().trim(), pageable);
+    if (norm.isPresent() && norm.get().isBlank()) {
+      norm = Optional.empty();
     }
 
-    if (optionalSearchStr.isPresent()) {
-      return searchAndOrderByScore(optionalSearchStr, identifier, pageable);
-    } else {
-      return null;
-    }
+    return searchAndOrderByScore(optionalSearchStr, identifier, norm, pageable);
   }
 
   private String[] splitSearchTerms(String searchStr) {
@@ -55,67 +51,79 @@ public class FieldOfLawService {
   }
 
   Slice<FieldOfLaw> searchAndOrderByScore(
-      Optional<String> searchStr, Optional<String> identifier, Pageable pageable) {
-    Matcher matcher = NORMS_PATTERN.matcher(searchStr.orElse(""));
-    String[] searchTerms;
-    String normStr;
+      Optional<String> searchStr,
+      Optional<String> identifier,
+      Optional<String> norm,
+      Pageable pageable) {
+    // Parse search terms if present
+    String[] searchTerms = searchStr.map(this::splitSearchTerms).orElse(null);
 
-    List<FieldOfLaw> unorderedList;
-    if (matcher.find()) {
-      normStr = matcher.group(1).trim().replaceAll("§(\\d+)", "§ $1");
-      String afterNormSearchStr = matcher.group(2).trim();
-      if (afterNormSearchStr.isEmpty()) {
-        searchTerms = null;
-        unorderedList = repository.findByNormStr(normStr);
+    // Parse norm string if present, and format it
+    String normStr = norm.map(n -> n.trim().replaceAll("§(\\d+)", "§ $1")).orElse("");
+
+    // Initialize an unordered list to hold search results
+    List<FieldOfLaw> unorderedList = List.of();
+
+    // Query based on combinations of identifier, searchStr, and norm
+    if (identifier.isPresent()) {
+      String identifierStr = identifier.get().trim();
+
+      // Handle all combinations when identifier is present
+      if (searchTerms != null) {
+        unorderedList =
+            norm.isPresent()
+                ? repository.findByIdentifierAndSearchTermsAndNormStr(
+                    identifierStr, searchTerms, normStr)
+                : repository.findByIdentifierAndSearchTerms(identifierStr, searchTerms);
       } else {
-        searchTerms = splitSearchTerms(afterNormSearchStr);
-        unorderedList = repository.findByNormStrAndSearchTerms(normStr, searchTerms);
+        unorderedList =
+            norm.isPresent()
+                ? repository.findByIdentifierAndNormStr(identifierStr, normStr)
+                : repository.findByIdentifier(identifierStr, pageable);
       }
     } else {
-      normStr = null;
-      searchTerms = splitSearchTerms(searchStr.get());
-      if (identifier.isPresent()) {
-        unorderedList = repository.findByIdentifierAndSearchTerms(identifier.get(), searchTerms);
-      } else {
-        unorderedList = repository.findBySearchTerms(searchTerms);
+      // Handle all combinations when identifier is absent
+      if (searchTerms != null) {
+        unorderedList =
+            norm.isPresent()
+                ? repository.findByNormStrAndSearchTerms(normStr, searchTerms)
+                : repository.findBySearchTerms(searchTerms);
+      } else if (norm.isPresent()) {
+        unorderedList = repository.findByNormStr(normStr);
       }
     }
 
-    if (unorderedList == null || unorderedList.isEmpty()) {
+    // If no results found, return an empty page
+    if (unorderedList.isEmpty()) {
       return new PageImpl<>(List.of(), pageable, 0);
     }
 
-    Map<FieldOfLaw, Integer> scores = calculateScore(searchTerms, normStr, unorderedList);
-
+    // Calculate scores and sort the list based on the score and identifier
+    Map<FieldOfLaw, Integer> scores =
+        calculateScore(identifier, searchTerms, normStr, unorderedList);
     List<FieldOfLaw> orderedList =
         unorderedList.stream()
             .sorted(
                 (f1, f2) -> {
                   int compare = scores.get(f2).compareTo(scores.get(f1));
-
-                  if (compare == 0) {
-                    compare = f1.identifier().compareTo(f2.identifier());
-                  }
-
-                  return compare;
+                  return compare != 0 ? compare : f1.identifier().compareTo(f2.identifier());
                 })
             .toList();
 
+    // Extract the correct sublist for pagination
     int fromIdx = (int) pageable.getOffset();
     int toIdx = (int) Math.min(pageable.getOffset() + pageable.getPageSize(), orderedList.size());
+    List<FieldOfLaw> pageContent = orderedList.subList(Math.max(0, fromIdx), toIdx);
 
-    List<FieldOfLaw> pageContent = new ArrayList<>();
-    if (fromIdx < toIdx) {
-      pageContent = orderedList.subList(fromIdx, toIdx);
-    }
-
-    int totalElements = orderedList.size();
-
-    return new PageImpl<>(pageContent, pageable, totalElements);
+    // Return the paginated results
+    return new PageImpl<>(pageContent, pageable, orderedList.size());
   }
 
   private Map<FieldOfLaw, Integer> calculateScore(
-      String[] searchTerms, String normStr, List<FieldOfLaw> fieldOfLaws) {
+      Optional<String> identifier,
+      String[] searchTerms,
+      String normStr,
+      List<FieldOfLaw> fieldOfLaws) {
     Map<FieldOfLaw, Integer> scores = new HashMap<>();
 
     if (fieldOfLaws == null || fieldOfLaws.isEmpty()) {
@@ -125,6 +133,10 @@ public class FieldOfLawService {
     fieldOfLaws.forEach(
         fieldOfLaw -> {
           int score = 0;
+
+          if (identifier.isPresent()) {
+            score += getScoreContributionFromIdentifier(fieldOfLaw, identifier);
+          }
 
           if (searchTerms != null) {
             for (String searchTerm : searchTerms) {
@@ -142,16 +154,26 @@ public class FieldOfLawService {
     return scores;
   }
 
+  private int getScoreContributionFromIdentifier(
+      FieldOfLaw fieldOfLaw, Optional<String> identifier) {
+    int score = 0;
+    if (identifier.isPresent()) {
+      String searchStr = identifier.get().trim().toLowerCase();
+
+      String identifierStr =
+          fieldOfLaw.identifier() == null ? "" : fieldOfLaw.identifier().toLowerCase();
+
+      if (identifierStr.equals(searchStr)) score += 8;
+      if (identifierStr.startsWith(searchStr)) score += 5;
+      if (identifierStr.contains(searchStr)) score += 2;
+    }
+    return score;
+  }
+
   private int getScoreContributionFromSearchTerm(FieldOfLaw fieldOfLaw, String searchTerm) {
     int score = 0;
     searchTerm = searchTerm.toLowerCase();
-    String identifier =
-        fieldOfLaw.identifier() == null ? "" : fieldOfLaw.identifier().toLowerCase();
     String text = fieldOfLaw.text() == null ? "" : fieldOfLaw.text().toLowerCase();
-
-    if (identifier.equals(searchTerm)) score += 8;
-    if (identifier.startsWith(searchTerm)) score += 5;
-    if (identifier.contains(searchTerm)) score += 2;
 
     if (text.startsWith(searchTerm)) score += 5;
     // split by whitespace and hyphen to get words

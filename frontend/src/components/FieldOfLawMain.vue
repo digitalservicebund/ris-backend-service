@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import * as Sentry from "@sentry/vue"
 import { computed, h, ref } from "vue"
-import FieldOfLawTree from "./FieldOfLawTree.vue"
 import { withSummarizer } from "@/components/DataSetSummary.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import FieldOfLawSearch from "@/components/FieldOfLawSearch.vue"
+import FieldOfLawTree from "@/components/FieldOfLawTree.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue"
 import FieldOfLawListEntry from "@/components/FieldOfLawListEntry.vue"
+import FieldOfLawTree from "@/components/FieldOfLawTree.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
@@ -19,6 +20,7 @@ const emit = defineEmits<{
 
 const searchStr = ref("")
 const fieldOfLawString = ref("")
+const normString = ref("")
 const results = ref<FieldOfLaw[]>()
 const currentPage = ref<Page<FieldOfLaw>>()
 const itemsPerPage = 10
@@ -33,6 +35,7 @@ async function submitSearch(page: number) {
     itemsPerPage,
     searchStr.value,
     fieldOfLawString.value,
+    normString.value,
   )
   if (response.data) {
     currentPage.value = response.data
@@ -83,11 +86,20 @@ watch(
           @enter-released="submitSearch(0)"
         />
       </InputField>
-      <InputField id="fieldOfLawDirectInput" label="Suche">
+      <InputField id="fieldOfLawDirectInput" label="Bezeichnung">
         <TextInput
           id="fieldOfLawSearch"
           v-model="searchStr"
           aria-label="Sachgebiete Suche"
+          size="medium"
+          @enter-released="submitSearch(0)"
+        />
+      </InputField>
+      <InputField id="fieldOfLawNormInput" label="Norm">
+        <TextInput
+          id="fieldOfLawNorm"
+          v-model="normString"
+          aria-label="Sachgebiete Norm"
           size="medium"
           @enter-released="submitSearch(0)"
         />

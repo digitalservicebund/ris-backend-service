@@ -25,6 +25,7 @@ interface FieldOfLawService {
     size: number,
     query?: string,
     identifier?: string,
+    norm?: string,
   ): Promise<ServiceResponse<Page<FieldOfLaw>>>
 }
 
@@ -102,11 +103,18 @@ const service: FieldOfLawService = {
     size: number,
     query?: string,
     identifier?: string,
+    norm?: string,
   ) {
     // Todo: do not send query when not set
     const response = await httpClient.get<Page<FieldOfLaw>>(
       `caselaw/fieldsoflaw?pg=${page}&sz=${size}`,
-      { params: { q: query ?? "", identifier: identifier ?? "" } },
+      {
+        params: {
+          q: query ?? "",
+          identifier: identifier ?? "",
+          norm: norm ?? "",
+        },
+      },
     )
     if (response.status >= 300) {
       response.error = {

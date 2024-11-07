@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.repository.NoRepositoryBean;
 
 @NoRepositoryBean
@@ -14,8 +13,6 @@ public interface FieldOfLawRepository {
 
   FieldOfLaw findTreeByIdentifier(String identifier);
 
-  Slice<FieldOfLaw> findAllByOrderByIdentifierAsc(Pageable pageable);
-
   List<FieldOfLaw> findBySearchTerms(String[] searchTerms);
 
   List<FieldOfLaw> findByNormStr(String normStr);
@@ -24,5 +21,10 @@ public interface FieldOfLawRepository {
 
   List<FieldOfLaw> findByIdentifierAndSearchTerms(String identifier, String[] searchTerms);
 
-  Slice<FieldOfLaw> findByIdentifier(String searchStr, Pageable pageable);
+  List<FieldOfLaw> findByIdentifierAndSearchTermsAndNormStr(
+      String identifier, String[] searchTerms, String normStr);
+
+  List<FieldOfLaw> findByIdentifierAndNormStr(String identifier, String normStr);
+
+  List<FieldOfLaw> findByIdentifier(String searchStr, Pageable pageable);
 }

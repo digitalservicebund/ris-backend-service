@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import static de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresFieldOfLawRepositoryImpl.returnTrueIfInTextOrIdentifier;
+import static de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresFieldOfLawRepositoryImpl.returnTrueIfInText;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -52,29 +52,27 @@ class PostgresFieldOfLawRepositoryImplTest {
   }
 
   @Test
-  void testReturnTrueIfInTextOrIdentifier() {
+  void testReturnTrueIfInText() {
     var fieldOfLaw = generateFieldOfLawDto("find me by text");
-    assertTrue(returnTrueIfInTextOrIdentifier(fieldOfLaw, new String[] {fieldOfLaw.getText()}));
+    assertTrue(returnTrueIfInText(fieldOfLaw, new String[] {fieldOfLaw.getText()}));
 
+    assertTrue(returnTrueIfInText(fieldOfLaw, new String[] {fieldOfLaw.getIdentifier()}));
     assertTrue(
-        returnTrueIfInTextOrIdentifier(fieldOfLaw, new String[] {fieldOfLaw.getIdentifier()}));
-    assertTrue(
-        returnTrueIfInTextOrIdentifier(
+        returnTrueIfInText(
             fieldOfLaw, new String[] {fieldOfLaw.getIdentifier(), fieldOfLaw.getText()}));
-    assertTrue(returnTrueIfInTextOrIdentifier(fieldOfLaw, new String[] {"find", "AB"}));
+    assertTrue(returnTrueIfInText(fieldOfLaw, new String[] {"find", "AB"}));
   }
 
   @Test
   void testReturnFalseIfInTextOrIdentifier() {
     var fieldOfLaw = generateFieldOfLawDto("find me by text");
-    assertFalse(returnTrueIfInTextOrIdentifier(fieldOfLaw, null));
-    assertFalse(returnTrueIfInTextOrIdentifier(fieldOfLaw, new String[] {}));
-    assertFalse(returnTrueIfInTextOrIdentifier(fieldOfLaw, new String[] {"no matches"}));
+    assertFalse(returnTrueIfInText(fieldOfLaw, null));
+    assertFalse(returnTrueIfInText(fieldOfLaw, new String[] {}));
+    assertFalse(returnTrueIfInText(fieldOfLaw, new String[] {"no matches"}));
     assertFalse(
-        returnTrueIfInTextOrIdentifier(
-            fieldOfLaw, new String[] {fieldOfLaw.getIdentifier(), "no matches"}));
+        returnTrueIfInText(fieldOfLaw, new String[] {fieldOfLaw.getIdentifier(), "no matches"}));
     assertFalse(
-        returnTrueIfInTextOrIdentifier(
+        returnTrueIfInText(
             fieldOfLaw,
             new String[] {fieldOfLaw.getIdentifier(), fieldOfLaw.getText(), "no matches"}));
   }
