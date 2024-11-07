@@ -147,7 +147,7 @@ test.describe("norm", () => {
 
     await fillNormInputs(page, {
       singleNorms: [
-        { singleNorm: "§ 123" } as SingleNorm,
+        { singleNorm: " § 123" } as SingleNorm, // check trimming
         { singleNorm: "§ 456", dateOfRelevance: "2022" } as SingleNorm,
       ],
     })
