@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.domain.FieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.Norm;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,7 @@ public class FieldOfLawService {
   }
 
   public Slice<FieldOfLaw> getFieldsOfLawBySearchQuery(
-      Optional<String> optionalSearchStr,
+      Optional<String> description,
       Optional<String> identifier,
       Optional<String> norm,
       Pageable pageable) {
@@ -36,14 +37,14 @@ public class FieldOfLawService {
     if (identifier.isPresent() && identifier.get().isBlank()) {
       identifier = Optional.empty();
     }
-    if (optionalSearchStr.isPresent() && optionalSearchStr.get().isBlank()) {
-      optionalSearchStr = Optional.empty();
+    if (description.isPresent() && description.get().isBlank()) {
+      description = Optional.empty();
     }
     if (norm.isPresent() && norm.get().isBlank()) {
       norm = Optional.empty();
     }
 
-    return searchAndOrderByScore(optionalSearchStr, identifier, norm, pageable);
+    return searchAndOrderByScore(description, identifier, norm, pageable);
   }
 
   private String[] splitSearchTerms(String searchStr) {
@@ -51,46 +52,27 @@ public class FieldOfLawService {
   }
 
   Slice<FieldOfLaw> searchAndOrderByScore(
-      Optional<String> searchStr,
+      Optional<String> description,
       Optional<String> identifier,
       Optional<String> norm,
       Pageable pageable) {
-    // Parse search terms if present
-    String[] searchTerms = searchStr.map(this::splitSearchTerms).orElse(null);
+    Optional<String[]> searchTerms = description.map(this::splitSearchTerms);
+    Optional<String> normStr = norm.map(n -> n.trim().replaceAll("§(\\d+)", "§ $1"));
 
-    // Parse norm string if present, and format it
-    String normStr = norm.map(n -> n.trim().replaceAll("§(\\d+)", "§ $1")).orElse("");
+    List<FieldOfLaw> unorderedList;
 
-    // Initialize an unordered list to hold search results
-    List<FieldOfLaw> unorderedList = List.of();
-
-    // Query based on combinations of identifier, searchStr, and norm
     if (identifier.isPresent()) {
       String identifierStr = identifier.get().trim();
 
-      // Handle all combinations when identifier is present
-      if (searchTerms != null) {
-        unorderedList =
-            norm.isPresent()
-                ? repository.findByIdentifierAndSearchTermsAndNormStr(
-                    identifierStr, searchTerms, normStr)
-                : repository.findByIdentifierAndSearchTerms(identifierStr, searchTerms);
+      if (searchTerms.isEmpty() && normStr.isEmpty()) {
+        // Returned list is already ordered by identifier, so scoring is not necessary here
+        unorderedList = repository.findByIdentifier(identifierStr, pageable);
+        return sliceResults(unorderedList, pageable);
       } else {
-        unorderedList =
-            norm.isPresent()
-                ? repository.findByIdentifierAndNormStr(identifierStr, normStr)
-                : repository.findByIdentifier(identifierStr, pageable);
+        unorderedList = getResultsWithIdentifier(identifierStr, searchTerms, normStr);
       }
     } else {
-      // Handle all combinations when identifier is absent
-      if (searchTerms != null) {
-        unorderedList =
-            norm.isPresent()
-                ? repository.findByNormStrAndSearchTerms(normStr, searchTerms)
-                : repository.findBySearchTerms(searchTerms);
-      } else if (norm.isPresent()) {
-        unorderedList = repository.findByNormStr(normStr);
-      }
+      unorderedList = getResultsWithoutIdentifier(searchTerms, normStr);
     }
 
     // If no results found, return an empty page
@@ -98,32 +80,63 @@ public class FieldOfLawService {
       return new PageImpl<>(List.of(), pageable, 0);
     }
 
-    // Calculate scores and sort the list based on the score and identifier
-    Map<FieldOfLaw, Integer> scores =
-        calculateScore(identifier, searchTerms, normStr, unorderedList);
-    List<FieldOfLaw> orderedList =
-        unorderedList.stream()
-            .sorted(
-                (f1, f2) -> {
-                  int compare = scores.get(f2).compareTo(scores.get(f1));
-                  return compare != 0 ? compare : f1.identifier().compareTo(f2.identifier());
-                })
-            .toList();
+    List<FieldOfLaw> orderedList = orderResults(searchTerms, normStr, unorderedList);
 
+    return sliceResults(orderedList, pageable);
+  }
+
+  private List<FieldOfLaw> getResultsWithIdentifier(
+      String identifierStr, Optional<String[]> searchTerms, Optional<String> norm) {
+    if (searchTerms.isPresent() && norm.isPresent()) {
+      return repository.findByIdentifierAndSearchTermsAndNorm(
+          identifierStr, searchTerms.get(), norm.get());
+    }
+    if (searchTerms.isPresent()) {
+      return repository.findByIdentifierAndSearchTerms(identifierStr, searchTerms.get());
+    }
+    if (norm.isPresent()) {
+      return repository.findByIdentifierAndNorm(identifierStr, norm.get());
+    }
+    return Collections.emptyList();
+  }
+
+  private List<FieldOfLaw> getResultsWithoutIdentifier(
+      Optional<String[]> searchTerms, Optional<String> norm) {
+    if (searchTerms.isPresent() && norm.isPresent()) {
+      return repository.findByNormAndSearchTerms(norm.get(), searchTerms.get());
+    }
+    if (searchTerms.isPresent()) {
+      return repository.findBySearchTerms(searchTerms.get());
+    }
+    if (norm.isPresent()) {
+      return repository.findByNorm(norm.get());
+    }
+    return Collections.emptyList();
+  }
+
+  private List<FieldOfLaw> orderResults(
+      Optional<String[]> searchTerms, Optional<String> normStr, List<FieldOfLaw> unorderedList) {
+    // Calculate scores and sort the list based on the score and identifier
+    Map<FieldOfLaw, Integer> scores = calculateScore(searchTerms, normStr, unorderedList);
+    return unorderedList.stream()
+        .sorted(
+            (f1, f2) -> {
+              int compare = scores.get(f2).compareTo(scores.get(f1));
+              return compare != 0 ? compare : f1.identifier().compareTo(f2.identifier());
+            })
+        .toList();
+  }
+
+  private Slice<FieldOfLaw> sliceResults(List<FieldOfLaw> orderedList, Pageable pageable) {
     // Extract the correct sublist for pagination
     int fromIdx = (int) pageable.getOffset();
     int toIdx = (int) Math.min(pageable.getOffset() + pageable.getPageSize(), orderedList.size());
     List<FieldOfLaw> pageContent = orderedList.subList(Math.max(0, fromIdx), toIdx);
-
-    // Return the paginated results
     return new PageImpl<>(pageContent, pageable, orderedList.size());
   }
 
   private Map<FieldOfLaw, Integer> calculateScore(
-      Optional<String> identifier,
-      String[] searchTerms,
-      String normStr,
-      List<FieldOfLaw> fieldOfLaws) {
+      Optional<String[]> searchTerms, Optional<String> normStr, List<FieldOfLaw> fieldOfLaws) {
     Map<FieldOfLaw, Integer> scores = new HashMap<>();
 
     if (fieldOfLaws == null || fieldOfLaws.isEmpty()) {
@@ -134,40 +147,20 @@ public class FieldOfLawService {
         fieldOfLaw -> {
           int score = 0;
 
-          if (identifier.isPresent()) {
-            score += getScoreContributionFromIdentifier(fieldOfLaw, identifier);
-          }
-
-          if (searchTerms != null) {
-            for (String searchTerm : searchTerms) {
+          if (searchTerms.isPresent()) {
+            for (String searchTerm : searchTerms.get()) {
               score += getScoreContributionFromSearchTerm(fieldOfLaw, searchTerm);
             }
           }
 
-          if (normStr != null) {
-            score += getScoreContributionFromNormStr(fieldOfLaw, normStr);
+          if (normStr.isPresent()) {
+            score += getScoreContributionFromNormStr(fieldOfLaw, normStr.get());
           }
 
           scores.put(fieldOfLaw, score);
         });
 
     return scores;
-  }
-
-  private int getScoreContributionFromIdentifier(
-      FieldOfLaw fieldOfLaw, Optional<String> identifier) {
-    int score = 0;
-    if (identifier.isPresent()) {
-      String searchStr = identifier.get().trim().toLowerCase();
-
-      String identifierStr =
-          fieldOfLaw.identifier() == null ? "" : fieldOfLaw.identifier().toLowerCase();
-
-      if (identifierStr.equals(searchStr)) score += 8;
-      if (identifierStr.startsWith(searchStr)) score += 5;
-      if (identifierStr.contains(searchStr)) score += 2;
-    }
-    return score;
   }
 
   private int getScoreContributionFromSearchTerm(FieldOfLaw fieldOfLaw, String searchTerm) {
@@ -188,6 +181,9 @@ public class FieldOfLawService {
   private int getScoreContributionFromNormStr(FieldOfLaw fieldOfLaw, String normStr) {
     int score = 0;
     normStr = normStr.toLowerCase();
+    if (normStr.isBlank()) {
+      return score;
+    }
     for (Norm norm : fieldOfLaw.norms()) {
       String abbreviation = norm.abbreviation() == null ? "" : norm.abbreviation().toLowerCase();
       String description =

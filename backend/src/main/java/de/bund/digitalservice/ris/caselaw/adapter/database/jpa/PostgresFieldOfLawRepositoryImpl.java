@@ -86,7 +86,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
   @Override
   @Transactional
-  public List<FieldOfLaw> findByNormStr(String normStr) {
+  public List<FieldOfLaw> findByNorm(String normStr) {
     List<FieldOfLawNormDTO> list = getNormDTOs(normStr);
     return list.stream()
         .map(FieldOfLawNormDTO::getFieldOfLaw)
@@ -108,7 +108,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
   @Override
   @Transactional
-  public List<FieldOfLaw> findByNormStrAndSearchTerms(String normStr, String[] searchTerms) {
+  public List<FieldOfLaw> findByNormAndSearchTerms(String normStr, String[] searchTerms) {
     List<FieldOfLawNormDTO> listWithNormStr = getNormDTOs(normStr);
 
     return listWithNormStr.stream()
@@ -122,11 +122,11 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
   @Override
   @Transactional
-  public List<FieldOfLaw> findByIdentifierAndNormStr(String identifier, String normStr) {
+  public List<FieldOfLaw> findByIdentifierAndNorm(String identifier, String norm) {
     List<FieldOfLawDTO> fieldOfLawList =
         repository.findAllByIdentifierStartsWithIgnoreCaseOrderByIdentifier(identifier);
     List<FieldOfLawDTO> fieldOfLawNormDTOList =
-        getNormDTOs(normStr).stream().map(FieldOfLawNormDTO::getFieldOfLaw).toList();
+        getNormDTOs(norm).stream().map(FieldOfLawNormDTO::getFieldOfLaw).toList();
 
     List<FieldOfLawDTO> commonElements = new ArrayList<>(fieldOfLawList);
     commonElements.retainAll(fieldOfLawNormDTOList);
@@ -152,12 +152,12 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
   @Override
   @Transactional
-  public List<FieldOfLaw> findByIdentifierAndSearchTermsAndNormStr(
-      String identifier, String[] searchTerms, String normStr) {
+  public List<FieldOfLaw> findByIdentifierAndSearchTermsAndNorm(
+      String identifier, String[] searchTerms, String norm) {
     List<FieldOfLawDTO> fieldOfLawList =
         repository.findAllByIdentifierStartsWithIgnoreCaseOrderByIdentifier(identifier);
     List<FieldOfLawDTO> fieldOfLawNormDTOList =
-        getNormDTOs(normStr).stream().map(FieldOfLawNormDTO::getFieldOfLaw).toList();
+        getNormDTOs(norm).stream().map(FieldOfLawNormDTO::getFieldOfLaw).toList();
 
     fieldOfLawList.retainAll(fieldOfLawNormDTOList);
 

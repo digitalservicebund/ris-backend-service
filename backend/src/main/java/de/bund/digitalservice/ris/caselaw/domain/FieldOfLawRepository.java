@@ -15,16 +15,16 @@ public interface FieldOfLawRepository {
 
   List<FieldOfLaw> findBySearchTerms(String[] searchTerms);
 
-  List<FieldOfLaw> findByNormStr(String normStr);
+  List<FieldOfLaw> findByNorm(String normStr);
 
-  List<FieldOfLaw> findByNormStrAndSearchTerms(String normStr, String[] searchTerms);
+  List<FieldOfLaw> findByNormAndSearchTerms(String normStr, String[] searchTerms);
 
   List<FieldOfLaw> findByIdentifierAndSearchTerms(String identifier, String[] searchTerms);
 
-  List<FieldOfLaw> findByIdentifierAndSearchTermsAndNormStr(
-      String identifier, String[] searchTerms, String normStr);
+  List<FieldOfLaw> findByIdentifierAndSearchTermsAndNorm(
+      String identifier, String[] searchTerms, String norm);
 
-  List<FieldOfLaw> findByIdentifierAndNormStr(String identifier, String normStr);
+  List<FieldOfLaw> findByIdentifierAndNorm(String identifier, String norm);
 
   List<FieldOfLaw> findByIdentifier(String searchStr, Pageable pageable);
 }
