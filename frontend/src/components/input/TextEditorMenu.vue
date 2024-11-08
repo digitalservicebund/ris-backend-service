@@ -207,7 +207,7 @@ const buttons = computed(() => {
       childButtons: [
         {
           type: "insertTable",
-          icon: MdiTableRemove,
+          icon: MdiTablePlus,
           ariaLabel: "Tabelle einfügen",
           group: "Tabelle",
           isCollapsable: false,
