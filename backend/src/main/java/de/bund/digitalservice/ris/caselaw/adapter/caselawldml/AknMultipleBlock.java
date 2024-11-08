@@ -9,46 +9,33 @@ import java.util.Map;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class Motivation {
+public class AknMultipleBlock {
 
   // Jaxb doesn't handle elements with the same name very well.
   // They need to be in a list with the same class instead of two separate fields.
   // A Map is used with @XmlElement added to a helper getter/setter to facilitate easier use.
-  @XmlTransient private Map<String, AknEmbeddedStructureInBlock> blocks;
+  @XmlTransient private Map<String, AknBlock> blocks;
 
   @XmlElement(name = "block", namespace = CaseLawLdml.AKN_NS)
-  public void setJaxbBlocks(List<AknEmbeddedStructureInBlock> blocks) {
-    for (AknEmbeddedStructureInBlock block : blocks) {
+  public void setJaxbBlocks(List<AknBlock> blocks) {
+    for (AknBlock block : blocks) {
       this.blocks.put(block.getName(), block);
     }
   }
 
   @XmlElement(name = "block", namespace = CaseLawLdml.AKN_NS)
-  public List<AknEmbeddedStructureInBlock> getJaxbBlocks() {
+  public List<AknBlock> getJaxbBlocks() {
     return new ArrayList<>(blocks.values());
   }
 
-  public Motivation() {
+  public AknMultipleBlock() {
     this.blocks = new HashMap<>();
   }
 
-  public Motivation withBlock(String name, AknEmbeddedStructureInBlock block) {
+  public AknMultipleBlock withBlock(String name, AknBlock block) {
     if (block != null) {
       blocks.put(name, block);
     }
     return this;
-  }
-
-  public AknEmbeddedStructureInBlock getBlock(String name) {
-    return blocks.get(name);
-  }
-
-  public JaxbHtml getHtml(String name) {
-    AknEmbeddedStructureInBlock block = blocks.get(name);
-    if (block == null) {
-      return null;
-    } else {
-      return block.getContent();
-    }
   }
 }
