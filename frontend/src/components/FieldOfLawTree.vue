@@ -2,7 +2,6 @@
 import { computed, ref, watch } from "vue"
 import FieldOfLawNodeComponent from "./FieldOfLawNodeComponent.vue"
 import { NodeHelper, NodeHelperInterface } from "@/components/fieldOfLawNode"
-import FlexContainer from "@/components/FlexContainer.vue"
 import CheckboxInput from "@/components/input/CheckboxInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import { buildRoot, FieldOfLaw } from "@/domain/fieldOfLaw"
@@ -89,7 +88,7 @@ watch(
 </script>
 
 <template>
-  <FlexContainer flex-direction="flex-col" justify-content="justify-between">
+  <div class="flex flex-1 flex-col">
     <InputField
       id="showNorms"
       aria-label="Normen anzeigen"
@@ -120,5 +119,5 @@ watch(
       @node:unselect="emit('node:unselect', $event)"
       @selected-node:reset="emit('selected-node:reset')"
     />
-  </FlexContainer>
+  </div>
 </template>

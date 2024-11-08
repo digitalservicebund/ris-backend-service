@@ -35,14 +35,14 @@ const isExpanded = ref(false)
 
     <template #header>
       <div id="expandableHeader" class="flex w-full flex-col">
-        <h2 class="ds-label-01-bold" :class="{ 'mb-16': !!dataSet?.length }">
+        <h2 class="ds-label-01-bold">
           {{ title }}
         </h2>
         <Component :is="summaryComponent" v-if="!isExpanded" :data="dataSet" />
       </div>
     </template>
 
-    <div class="flex flex-col items-start gap-24">
+    <div class="mt-16 flex flex-col items-start gap-24">
       <slot />
     </div>
   </ExpandableContent>

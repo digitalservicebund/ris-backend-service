@@ -133,7 +133,7 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
       @update:norm="(value?: string) => (value ? (norm = value) : undefined)"
     />
 
-    <div class="flex flex-row gap-24">
+    <div class="flex w-full flex-row gap-24">
       <FieldOfLawSearchResultList
         :current-page="currentPage"
         :results="results"

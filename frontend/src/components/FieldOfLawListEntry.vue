@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import FlexContainer from "@/components/FlexContainer.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 
 defineProps<{
@@ -15,24 +14,18 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <FlexContainer
-    class="ds-link-02-bold py-4"
-    flex-direction="flex-row"
-    justify-content="justify-start"
-  >
+  <div class="flex flex-row gap-8 px-16 py-8">
     <button
-      :aria-label="
-        fieldOfLaw.identifier +
-        ' ' +
-        fieldOfLaw.text +
-        ' im Sachgebietsbaum anzeigen'
-      "
-      class="whitespace-nowrap"
+      :aria-label="fieldOfLaw.identifier + ' im Sachgebietsbaum anzeigen'"
+      class="ds-link-02-bold"
       tabindex="0"
       @click="emit('node:select', fieldOfLaw)"
       @keyup.enter="emit('node:select', fieldOfLaw)"
     >
-      {{ fieldOfLaw.identifier }} | {{ fieldOfLaw.text }}
+      <span class="overflow-hidden text-ellipsis whitespace-nowrap">{{
+        fieldOfLaw.identifier
+      }}</span>
     </button>
-  </FlexContainer>
+    <span class="ds-label-02-reg mt-2"> {{ fieldOfLaw.text }}</span>
+  </div>
 </template>

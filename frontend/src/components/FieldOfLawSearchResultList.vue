@@ -16,17 +16,15 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div v-if="currentPage">
+  <div v-if="currentPage" class="flex flex-1 flex-col">
     <Pagination
       navigation-position="bottom"
       :page="currentPage"
       @update-page="(page: number) => emit('search', page)"
     >
-      <span class="ds-label-01-bold">Passende Suchergebnisse:</span>
       <FieldOfLawListEntry
         v-for="(fieldOfLawNode, idx) in results"
         :key="idx"
-        class="mt-16"
         :field-of-law="fieldOfLawNode"
         @linked-field:select="emit('setSelectedNode', fieldOfLawNode)"
         @node:select="emit('setSelectedNode', fieldOfLawNode)"
