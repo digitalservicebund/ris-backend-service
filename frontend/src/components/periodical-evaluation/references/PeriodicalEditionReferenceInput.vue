@@ -199,10 +199,17 @@ function addReferenceWithCreatedDocunit(docUnit: DocumentUnit) {
 }
 
 /**
- * Stops propagation of scrolling event, and toggles the showModal value
+ * Stops propagation of scrolling event, and toggles the showModal value.
+ * @param {boolean} [shouldOpen] - Optional parameter to explicitly set the modal state.
  */
-function toggleDeletionConfirmationModal() {
-  showModal.value = !showModal.value
+function toggleDeletionConfirmationModal(shouldOpen: boolean | undefined) {
+  if (typeof shouldOpen === "boolean") {
+    showModal.value = shouldOpen
+  } else {
+    // Toggle if no parameter is provided
+    showModal.value = !showModal.value
+  }
+
   if (showModal.value) {
     const scrollLeft = document.documentElement.scrollLeft
     const scrollTop = document.documentElement.scrollTop
@@ -218,7 +225,7 @@ function toggleDeletionConfirmationModal() {
 
 function deleteReference() {
   emit("removeEntry", reference.value)
-  toggleDeletionConfirmationModal()
+  toggleDeletionConfirmationModal(false)
 }
 
 async function deleteReferenceAndDocUnit() {
@@ -512,7 +519,7 @@ onMounted(async () => {
           button-type="destructive"
           label="Fundstelle und Dokumentationseinheit löschen"
           size="small"
-          @click.stop="modelValue && emit('removeEntry', modelValue)"
+          @click.stop="deleteReferenceAndDocUnit"
         />
         <TextButton
           v-else

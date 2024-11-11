@@ -457,10 +457,11 @@ test.describe(
             ).toBeHidden()
           })
 
+          const pagePromise = page.context().waitForEvent("page")
+          await page.getByText("Übernehmen und weiter bearbeiten").click()
+          const newTab = await pagePromise
+
           await test.step("Created documentation unit for foreign docoffice is editable for creating docoffice", async () => {
-            const pagePromise = page.context().waitForEvent("page")
-            await page.getByText("Übernehmen und weiter bearbeiten").click()
-            const newTab = await pagePromise
             await expect(newTab).toHaveURL(
               /\/caselaw\/documentunit\/[A-Z0-9]{13}\/categories$/,
             )
@@ -511,14 +512,16 @@ test.describe(
           })
 
           await test.step("Created documentation unit is not visible to creating doc office in search with Fremdanlage status", async () => {
-            await navigateToSearch(page)
+            await navigateToSearch(newTab)
 
-            await page.getByLabel("Dokumentnummer Suche").fill(documentNumber)
+            await newTab.getByLabel("Dokumentnummer Suche").fill(documentNumber)
 
-            const select = page.locator(`select[id="status"]`)
+            const select = newTab.locator(`select[id="status"]`)
             await select.selectOption("Fremdanlage")
-            await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-            const listEntry = page.getByTestId("listEntry")
+            await newTab
+              .getByLabel("Nach Dokumentationseinheiten suchen")
+              .click()
+            const listEntry = newTab.getByTestId("listEntry")
             await expect(listEntry).toHaveCount(0)
           })
 
@@ -547,6 +550,33 @@ test.describe(
               pageWithBghUser.getByText("Dokumentationseinheit bearbeiten"),
             ).toBeHidden()
           })
+
+          /*  await test.step("Created DocUnit is deleted when reference is deleted", async () => {
+                        await page.getByTestId("list-entry-0").click()
+
+                        await page.getByText("Eintrag löschen").click()
+
+                        await expect(
+                          page.getByText(
+                            `AG Aachen, ${formattedDate}, ${randomFileNumber}, Anerkenntnisurteil, Unveröffentlicht`,
+                          ),
+                        ).toBeHidden()
+
+                        await expect(
+                          page.getByText(
+                            `${edition.legalPeriodical?.abbreviation} ${edition.prefix}12${edition.suffix} (L)`,
+                            { exact: true },
+                          ),
+                        ).toBeHidden()
+
+                        await navigateToPreview(page, documentNumber)
+
+                        await expect(
+                          page.getByText(
+                            "Diese Dokumentationseinheit existiert nicht oder Sie haben keine Berechtigung.",
+                          ),
+                        ).toBeVisible()
+                      })*/
         } finally {
           await deleteDocumentUnit(page, documentNumber)
         }
@@ -749,7 +779,9 @@ test.describe(
               0,
             )
 
-            // Todo: also check that reference with created docunit was deleted --> RISDEV-5146
+            await page.reload()
+            await expect(page.getByText(documentNumber2)).toBeHidden()
+            await expect(page.getByLabel("Listen Eintrag")).toHaveCount(2)
           })
         } finally {
           await deleteDocumentUnit(pageWithBghUser, documentNumber1)
