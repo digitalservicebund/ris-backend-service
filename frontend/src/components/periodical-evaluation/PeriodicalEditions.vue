@@ -172,7 +172,7 @@ onMounted(async () => {
           <TextButton
             v-if="legalPeriodical && isInternalUser"
             aria-label="Neue Periodikumsauswertung"
-            class="ds-button-02-reg"
+            class="ds-button-02-reg w-max"
             label="Neue Periodikumsauswertung"
             @click="addEdition"
           ></TextButton>
