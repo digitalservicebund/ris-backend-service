@@ -88,20 +88,26 @@ watch(
 </script>
 
 <template>
-  <div class="flex flex-1 flex-col">
-    <InputField
-      id="showNorms"
-      aria-label="Normen anzeigen"
-      label="Normen anzeigen"
-      label-class="ds-label-02-reg"
-      :label-position="LabelPosition.RIGHT"
-    >
-      <CheckboxInput
-        id="showNorms"
-        v-model="showNormsModelValue"
-        size="small"
-      />
-    </InputField>
+  <div class="flex flex-1 flex-col bg-blue-200 p-16">
+    <div class="flex w-full flex-row justify-between">
+      <div class="flex"><p class="ds-label-01-reg">Sachgebietsbaum</p></div>
+      <div class="flex">
+        <InputField
+          id="showNorms"
+          aria-label="Normen anzeigen"
+          label="Normen anzeigen"
+          label-class="ds-label-02-reg"
+          :label-position="LabelPosition.RIGHT"
+        >
+          <CheckboxInput
+            id="showNorms"
+            v-model="showNormsModelValue"
+            size="small"
+          />
+        </InputField>
+      </div>
+    </div>
+
     <FieldOfLawNodeComponent
       :key="root.identifier"
       :expand-values="expandedNodes"
