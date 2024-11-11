@@ -198,6 +198,36 @@ function addReferenceWithCreatedDocunit(docUnit: DocumentUnit) {
   )
 }
 
+/**
+ * Stops propagation of scrolling event, and toggles the showModal value
+ */
+function toggleDeletionConfirmationModal() {
+  showModal.value = !showModal.value
+  if (showModal.value) {
+    const scrollLeft = document.documentElement.scrollLeft
+    const scrollTop = document.documentElement.scrollTop
+    window.onscroll = () => {
+      window.scrollTo(scrollLeft, scrollTop)
+    }
+  } else {
+    window.onscroll = () => {
+      return
+    }
+  }
+}
+
+function deleteReference() {
+  emit("removeEntry", reference.value)
+  toggleDeletionConfirmationModal()
+}
+
+async function deleteReferenceAndDocUnit() {
+  await documentUnitService.delete(
+    reference.value.documentationUnit?.uuid || "",
+  )
+  deleteReference()
+}
+
 watch(
   () => store.edition?.legalPeriodical,
   (legalPeriodical) => {
@@ -244,36 +274,6 @@ onMounted(async () => {
     await FeatureToggleService.isEnabled("neuris.new-from-search")
   ).data
 })
-
-/**
- * Stops propagation of scrolling event, and toggles the showModal value
- */
-function toggleDeletionConfirmationModal() {
-  showModal.value = !showModal.value
-  if (showModal.value) {
-    const scrollLeft = document.documentElement.scrollLeft
-    const scrollTop = document.documentElement.scrollTop
-    window.onscroll = () => {
-      window.scrollTo(scrollLeft, scrollTop)
-    }
-  } else {
-    window.onscroll = () => {
-      return
-    }
-  }
-}
-
-function deleteReference() {
-  emit("removeEntry", reference.value)
-  toggleDeletionConfirmationModal()
-}
-
-async function deleteReferenceAndDocUnit() {
-  await documentUnitService.delete(
-    reference.value.documentationUnit?.uuid || "",
-  )
-  deleteReference()
-}
 </script>
 
 <template>
@@ -488,27 +488,41 @@ async function deleteReferenceAndDocUnit() {
           />
         </div>
       </div>
-      <TextButton
-        v-if="
-          isSaved &&
-          reference?.documentationUnit?.status?.publicationStatus ===
-            PublicationState.UNPUBLISHED &&
-          reference?.documentationUnit?.createdByReference == reference.id
-        "
-        aria-label="Eintrag löschen"
-        button-type="destructive"
-        label="Eintrag löschen"
-        size="small"
-        @click.stop="toggleDeletionConfirmationModal"
-      />
-      <TextButton
-        v-else-if="isSaved"
-        aria-label="Eintrag löschen"
-        button-type="destructive"
-        label="Eintrag löschen"
-        size="small"
-        @click.stop="modelValue && emit('removeEntry', modelValue)"
-      />
+      <div v-if="isSaved">
+        <TextButton
+          v-if="
+            reference?.documentationUnit?.status?.publicationStatus ===
+              PublicationState.UNPUBLISHED &&
+            reference?.getIsDocumentationUnitCreatedByReference()
+          "
+          aria-label="Eintrag löschen"
+          button-type="destructive"
+          label="Eintrag löschen"
+          size="small"
+          @click.stop="toggleDeletionConfirmationModal"
+        />
+
+        <TextButton
+          v-else-if="
+            reference.documentationUnit?.status?.publicationStatus ===
+              PublicationState.EXTERNAL_HANDOVER_PENDING &&
+            reference?.getIsDocumentationUnitCreatedByReference()
+          "
+          aria-label="Fundstelle und Dokumentationseinheit löschen"
+          button-type="destructive"
+          label="Fundstelle und Dokumentationseinheit löschen"
+          size="small"
+          @click.stop="modelValue && emit('removeEntry', modelValue)"
+        />
+        <TextButton
+          v-else
+          aria-label="Eintrag löschen"
+          button-type="destructive"
+          label="Eintrag löschen"
+          size="small"
+          @click.stop="modelValue && emit('removeEntry', modelValue)"
+        />
+      </div>
     </div>
     <div v-if="isLoading || searchResults" class="bg-blue-200">
       <Pagination

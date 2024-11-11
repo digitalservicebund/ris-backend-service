@@ -37,6 +37,13 @@ export default class Reference implements EditableListItem {
     }
   }
 
+  /**
+   * Returns true if documentation unit is created by a reference as a part of edition.
+   */
+  getIsDocumentationUnitCreatedByReference(): boolean {
+    return this.documentationUnit?.createdByReference === this.id
+  }
+
   get renderDecision(): string {
     return [
       this.legalPeriodical?.abbreviation ?? this.legalPeriodicalRawValue,
