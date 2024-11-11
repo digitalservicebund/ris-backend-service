@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberPatternException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentNumberRecyclingException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -23,9 +22,6 @@ public interface DocumentNumberRecyclingService {
 
   void assertPatternIsValid(String documentationOfficeAbbreviation, String documentationUnitNumber)
       throws DocumentNumberPatternException;
-
-  void assertStatusHasNeverBeenPublished(DocumentationUnitDTO documentationUnitDTO)
-      throws DocumentNumberPatternException, DocumentNumberRecyclingException;
 
   void delete(String documentNumber);
 }

@@ -173,7 +173,6 @@ public class DatabaseDocumentNumberRecyclingService implements DocumentNumberRec
    * @throws DocumentNumberRecyclingException will through error if published / handed over or
    *     status history not empty.
    */
-  @Override
   public void assertStatusHasNeverBeenPublished(DocumentationUnitDTO documentationUnitDTO)
       throws DocumentNumberRecyclingException {
     PublicationStatus status = documentationUnitDTO.getStatus().getPublicationStatus();
