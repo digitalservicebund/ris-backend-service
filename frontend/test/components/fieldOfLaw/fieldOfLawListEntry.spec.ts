@@ -75,9 +75,7 @@ describe("FieldOfLawListEntry", () => {
     )
 
     await fireEvent.click(
-      screen.getByLabelText(
-        "ST-01-02-03 Steuerrecht 1-2-3 im Sachgebietsbaum anzeigen",
-      ),
+      screen.getByLabelText("ST-01-02-03 im Sachgebietsbaum anzeigen"),
     )
 
     expect(emitted()["node:select"]).toBeTruthy()
