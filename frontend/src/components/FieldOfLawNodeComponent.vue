@@ -152,11 +152,16 @@ watch(
 
       <div>
         <div class="flex flex-col">
-          <div v-if="!props.isRoot" class="ds-label-02-reg pl-6">
-            <span class="p-2" :class="isSearchCandidate ? 'bg-yellow-300' : ''">
-              {{ node.identifier }}
-            </span>
-            | {{ node.text }}
+          <div class="ds-label-02-reg flex flex-row">
+            <div v-if="!props.isRoot" class="pl-6">
+              <span
+                class="whitespace-nowrap p-2"
+                :class="isSearchCandidate ? 'bg-yellow-300' : ''"
+              >
+                {{ node.identifier }} |
+              </span>
+            </div>
+            {{ node.text }}
           </div>
         </div>
         <FlexContainer

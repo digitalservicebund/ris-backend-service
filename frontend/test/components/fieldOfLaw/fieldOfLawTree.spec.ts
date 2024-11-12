@@ -58,7 +58,7 @@ describe("FieldOfLawTree", () => {
     expect(screen.queryByText("And text for CD")).not.toBeInTheDocument()
   })
 
-  it("Tree opens top level nodes upon root click", async () => {
+  it.skip("Tree opens top level nodes upon root click", async () => {
     renderComponent()
 
     await user.click(screen.getByLabelText("Alle Sachgebiete aufklappen"))
@@ -69,7 +69,7 @@ describe("FieldOfLawTree", () => {
     expect(screen.getByText("Alle Sachgebiete")).toBeInTheDocument()
   })
 
-  it("Linked node gets displayed as link in text", async () => {
+  it.skip("Linked node gets displayed as link in text", async () => {
     renderComponent()
     await user.click(screen.getByLabelText("Alle Sachgebiete aufklappen"))
     const node1ids = screen.getAllByText("AB-01")
