@@ -95,13 +95,14 @@ watch(
         <InputField
           id="showNorms"
           aria-label="Normen anzeigen"
-          label="Normen anzeigen"
+          label="Mit Normen"
           label-class="ds-label-02-reg"
           :label-position="LabelPosition.RIGHT"
         >
           <CheckboxInput
             id="showNorms"
             v-model="showNormsModelValue"
+            class="ds-checkbox-mini"
             size="small"
           />
         </InputField>

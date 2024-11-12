@@ -3,10 +3,9 @@ import { computed, ref, watch } from "vue"
 import { NodeHelperInterface } from "@/components/fieldOfLawNode"
 import FlexContainer from "@/components/FlexContainer.vue"
 import Checkbox from "@/components/input/CheckboxInput.vue"
-import TokenizeText from "@/components/TokenizeText.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
-import IconAdd from "~icons/ic/baseline-add"
-import IconHorizontalRule from "~icons/ic/baseline-horizontal-rule"
+import IconArrowDown from "~icons/ic/baseline-keyboard-arrow-down"
+import IconArrowUp from "~icons/ic/baseline-keyboard-arrow-up"
 
 interface Props {
   node: FieldOfLaw
@@ -109,24 +108,24 @@ watch(
   <FlexContainer flex-direction="flex-col">
     <FlexContainer class="min-h-[32px]" flex-direction="flex-row">
       <div v-if="node.hasChildren">
-        <div v-if="isExpanded" class="w-[1.3333em] min-w-[1.3333em]">
+        <div v-if="isExpanded">
           <button
-            id="minus-button"
+            id="collapse-button"
             :aria-label="node.text + ' einklappen'"
             class="w-icon rounded-full bg-blue-200 text-blue-800"
             @click="toggleExpanded"
           >
-            <IconHorizontalRule />
+            <IconArrowUp />
           </button>
         </div>
         <div v-else>
           <button
-            id="plus-button"
+            id="expand-button"
             :aria-label="node.text + ' aufklappen'"
             class="w-icon rounded-full bg-blue-200 text-blue-800"
             @click="toggleExpanded"
           >
-            <IconAdd />
+            <IconArrowDown />
           </button>
         </div>
       </div>
@@ -148,25 +147,11 @@ watch(
 
       <div>
         <div class="flex flex-col">
-          <div class="flex flex-row">
-            <div
-              v-if="!props.isRoot"
-              class="whitespace-nowrap pl-6 text-[16px]"
-            >
-              <span
-                class="p-2"
-                :class="isSearchCandidate ? 'bg-yellow-300' : ''"
-              >
-                {{ node.identifier }}
-              </span>
-            </div>
-            <div class="pl-4 pt-2 text-[14px] text-blue-800">
-              <TokenizeText
-                :keywords="props.node.linkedFields ?? []"
-                :text="props.node.text"
-                @linked-field:select="emit('linked-field:select', $event)"
-              />
-            </div>
+          <div v-if="!props.isRoot" class="ds-label-02-reg pl-6">
+            <span class="p-2" :class="isSearchCandidate ? 'bg-yellow-300' : ''">
+              {{ node.identifier }}
+            </span>
+            | {{ node.text }}
           </div>
         </div>
         <FlexContainer
