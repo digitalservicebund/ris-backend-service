@@ -6,6 +6,7 @@ import PeriodicalEditionReferences from "@/components/periodical-evaluation/refe
 import DocumentUnit from "@/domain/documentUnit"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
+import { PublicationState } from "@/domain/publicationStatus"
 import Reference from "@/domain/reference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import documentUnitService from "@/services/documentUnitService"
@@ -185,6 +186,15 @@ describe("Legal periodical edition evaluation", () => {
     expect(documentUnitService.delete).not.toHaveBeenCalled()
   })
 
+  test("deletion button of other court renders on external external handover", async () => {
+    await renderWithExternalReference()
+    expect(
+      screen.getByLabelText("Fundstelle und Dokumentationseinheit löschen", {
+        exact: true,
+      }),
+    ).toBeInTheDocument()
+  })
+
   async function editReferenceWhichCreatedDocUnitOfOwnOffice() {
     const { user } = await renderComponent({
       references: [
@@ -210,7 +220,46 @@ describe("Legal periodical edition evaluation", () => {
     })
 
     await screen.findByText("DOC123")
-    await expect(screen.getByText("file123, Unveröffentlicht")).toBeVisible()
+    expect(screen.getByText("file123, Unveröffentlicht")).toBeVisible()
+    await user.click(screen.getByTestId("list-entry-0"))
+    return user
+  }
+
+  async function renderWithExternalReference() {
+    const sameId = crypto.randomUUID()
+    const { user } = await renderComponent({
+      references: [
+        {
+          id: sameId,
+          citation: "3",
+          referenceSupplement: "3",
+          legalPeriodical: {
+            uuid: crypto.randomUUID(),
+            abbreviation: ".....",
+            title: "Archiv für Rechts- und Sozialphilosophie.",
+            subtitle: "Selbständige Beihefte",
+            primaryReference: false,
+            citationStyle: "1974, 124-139 (ARSP, Beiheft 8)",
+          },
+          legalPeriodicalRawValue: ".....",
+          documentationUnit: {
+            uuid: "90dfa944-17df-4b29-a987-9687ef07c859",
+            documentNumber: "KORE700",
+            createdByReference: sameId,
+            fileNumber: "externalFile123",
+            status: {
+              publicationStatus: PublicationState.EXTERNAL_HANDOVER_PENDING,
+              withError: false,
+            },
+
+            referenceFound: true,
+          } as RelatedDocumentation,
+        } as Reference,
+      ],
+    })
+
+    await screen.findByText("KORE700")
+    expect(screen.getByText("externalFile123, Fremdanlage")).toBeVisible()
     await user.click(screen.getByTestId("list-entry-0"))
     return user
   }

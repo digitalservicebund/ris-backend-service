@@ -513,7 +513,7 @@ export async function fillNormInputs(
         await input.fill(entry.singleNorm)
         await expect(
           page.locator("[aria-label='Einzelnorm der Norm'] >> nth=" + index),
-        ).toHaveValue(entry.singleNorm)
+        ).toHaveValue(entry.singleNorm.trim())
       }
 
       if (entry.dateOfVersion) {

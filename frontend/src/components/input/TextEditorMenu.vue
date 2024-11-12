@@ -27,6 +27,12 @@ import IconSubscript from "~icons/ic/sharp-subscript"
 import IconSuperscript from "~icons/ic/sharp-superscript"
 import IconUndo from "~icons/ic/sharp-undo"
 import IconParagraph from "~icons/material-symbols/format-paragraph"
+import MdiTableColumnPlusAfter from "~icons/mdi/table-column-plus-after"
+import MdiTableColumnRemove from "~icons/mdi/table-column-remove"
+import MdiTablePlus from "~icons/mdi/table-plus"
+import MdiTableRemove from "~icons/mdi/table-remove"
+import MdiTableRowPlusAfter from "~icons/mdi/table-row-plus-after"
+import MdiTableRowRemove from "~icons/mdi/table-row-remove"
 
 interface Props {
   editorExpanded: boolean
@@ -79,8 +85,8 @@ const buttons = computed(() => {
       icon: IconBold,
       ariaLabel: "Fett",
       shortcut: "Strg + b",
-      group: "format",
-      isCollapsable: false,
+      group: "Formatierung",
+      isCollapsable: true,
       callback: () => props.editor.chain().focus().toggleMark("bold").run(),
     },
     {
@@ -88,8 +94,8 @@ const buttons = computed(() => {
       icon: IconItalic,
       ariaLabel: "Kursiv",
       shortcut: "Strg + i",
-      group: "format",
-      isCollapsable: false,
+      group: "Formatierung",
+      isCollapsable: true,
       callback: () => props.editor.chain().focus().toggleMark("italic").run(),
     },
     {
@@ -97,8 +103,8 @@ const buttons = computed(() => {
       icon: IconUnderline,
       ariaLabel: "Unterstrichen",
       shortcut: "Strg + u",
-      group: "format",
-      isCollapsable: false,
+      group: "Formatierung",
+      isCollapsable: true,
       callback: () =>
         props.editor.chain().focus().toggleMark("underline").run(),
     },
@@ -107,8 +113,8 @@ const buttons = computed(() => {
       icon: IconStrikethrough,
       ariaLabel: "Durchgestrichen",
       shortcut: "Strg + ⇧ + s",
-      group: "format",
-      isCollapsable: false,
+      group: "Formatierung",
+      isCollapsable: true,
       callback: () => props.editor.chain().focus().toggleMark("strike").run(),
     },
     {
@@ -116,8 +122,8 @@ const buttons = computed(() => {
       icon: IconSuperscript,
       ariaLabel: "Tiefgestellt",
       shortcut: "Strg + .",
-      group: "format",
-      isCollapsable: false,
+      group: "Formatierung",
+      isCollapsable: true,
       callback: () =>
         props.editor.chain().focus().toggleMark("superscript").run(),
     },
@@ -126,8 +132,8 @@ const buttons = computed(() => {
       icon: IconSubscript,
       ariaLabel: "Hochgestellt",
       shortcut: "Strg + ,",
-      group: "format",
-      isCollapsable: false,
+      group: "Formatierung",
+      isCollapsable: true,
       callback: () =>
         props.editor.chain().focus().toggleMark("subscript").run(),
     },
@@ -191,6 +197,69 @@ const buttons = computed(() => {
       group: "indent",
       isCollapsable: false,
       callback: () => props.editor.chain().focus().indent().run(),
+    },
+    {
+      type: "menu",
+      icon: MdiTablePlus,
+      ariaLabel: "Tabelle einfügen",
+      group: "Tabelle",
+      isCollapsable: false,
+      childButtons: [
+        {
+          type: "insertTable",
+          icon: MdiTablePlus,
+          ariaLabel: "Tabelle einfügen",
+          group: "Tabelle",
+          isCollapsable: false,
+          callback: () => props.editor.chain().focus().insertTable().run(),
+        },
+        {
+          type: "deleteTable",
+          icon: MdiTableRemove,
+          ariaLabel: "Tabelle löschen",
+          group: "Tabelle",
+          isCollapsable: false,
+          callback: () => props.editor.chain().focus().deleteTable().run(),
+        },
+        {
+          type: "addRowAfter",
+          icon: MdiTableRowPlusAfter,
+          ariaLabel: "Zeile darunter einfügen",
+          group: "Tabelle",
+          isCollapsable: false,
+          callback: () => props.editor.chain().focus().addRowAfter().run(),
+        },
+        {
+          type: "deleteRow",
+          icon: MdiTableRowRemove,
+          ariaLabel: "Zeile löschen",
+          group: "Tabelle",
+          isCollapsable: false,
+          callback: () => props.editor.chain().focus().deleteRow().run(),
+        },
+        {
+          type: "addColumnAfter",
+          icon: MdiTableColumnPlusAfter,
+          ariaLabel: "Spalte rechts einfügen",
+          group: "Tabelle",
+          isCollapsable: false,
+          callback: () => props.editor.chain().focus().addColumnAfter().run(),
+        },
+        {
+          type: "deleteColumn",
+          icon: MdiTableColumnRemove,
+          ariaLabel: "Spalte löschen",
+          group: "Tabelle",
+          isCollapsable: false,
+          callback: () => props.editor.chain().focus().deleteColumn().run(),
+        },
+      ],
+      callback: () =>
+        props.editor
+          .chain()
+          .focus()
+          .insertTable({ rows: 3, cols: 3, withHeaderRow: false })
+          .run(),
     },
     {
       type: "blockquote",

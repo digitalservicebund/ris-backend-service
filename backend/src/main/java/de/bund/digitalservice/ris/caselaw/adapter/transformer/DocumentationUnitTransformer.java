@@ -70,7 +70,10 @@ public class DocumentationUnitTransformer {
         currentDto.toBuilder()
             .id(updatedDomainObject.uuid())
             .documentNumber(updatedDomainObject.documentNumber())
-            .note(updatedDomainObject.note())
+            .note(
+                StringUtils.returnTrueIfNullOrBlank(updatedDomainObject.note())
+                    ? null
+                    : updatedDomainObject.note())
             .version(updatedDomainObject.version());
 
     if (updatedDomainObject.coreData() != null) {

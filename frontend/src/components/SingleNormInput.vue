@@ -243,7 +243,7 @@ onMounted(async () => {
         <TextInput
           id="singleNorm"
           ref="singleNormInput"
-          v-model="singleNorm.singleNorm"
+          v-model.trim="singleNorm.singleNorm"
           aria-label="Einzelnorm der Norm"
           :has-error="slotProps.hasError"
           size="medium"

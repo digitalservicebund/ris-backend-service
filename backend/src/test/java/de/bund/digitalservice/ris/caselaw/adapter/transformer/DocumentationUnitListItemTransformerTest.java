@@ -53,7 +53,7 @@ class DocumentationUnitListItemTransformerTest {
 
     // basic data
     assertThat(documentationUnitListItem.referencedDocumentationUnitId()).isEqualTo(id);
-    assertThat(documentationUnitListItem.hasNote()).isTrue();
+    assertThat(documentationUnitListItem.note()).isEqualTo("a note");
     assertThat(documentationUnitListItem.court())
         .isEqualTo(Court.builder().type("LG").location("Berlin").label("LG Berlin").build());
     assertThat(documentationUnitListItem.documentType())
@@ -96,7 +96,7 @@ class DocumentationUnitListItemTransformerTest {
         DocumentationUnitListItemTransformer.transformToDomain(currentDto);
 
     assertThat(documentationUnitListItem.referencedDocumentationUnitId()).isEqualTo(id);
-    assertThat(documentationUnitListItem.hasNote()).isFalse();
+    assertThat(documentationUnitListItem.note()).isNull();
   }
 
   @Test
@@ -109,6 +109,5 @@ class DocumentationUnitListItemTransformerTest {
         DocumentationUnitListItemTransformer.transformToDomain(currentDto);
 
     assertThat(documentationUnitListItem.referencedDocumentationUnitId()).isEqualTo(id);
-    assertThat(documentationUnitListItem.hasNote()).isFalse();
   }
 }

@@ -90,7 +90,9 @@ describe("documentUnit list", () => {
   })
 
   test("renders documentUnit list", async () => {
-    renderComponent({
+    const longNote = "Long note will be trimmed Lorem ipsum dolor sit ama"
+    const trimmedNote = "Long note will be trimmed Lorem ipsum dolor sit am..."
+    const { user } = renderComponent({
       documentUnitListEntries: [
         {
           id: "id",
@@ -98,6 +100,7 @@ describe("documentUnit list", () => {
           documentNumber: "123",
           decisionDate: "2022-02-10",
           fileNumber: "",
+          note: "a note",
           appraisalBody: "",
           documentType: { label: "Test", jurisShortcut: "T" },
           court: { type: "typeA", location: "locB", label: "typeA locB" },
@@ -107,7 +110,6 @@ describe("documentUnit list", () => {
           },
           hasAttachments: true,
           hasHeadnoteOrPrinciple: true,
-          hasNote: true,
           isDeletable: false,
           isEditable: false,
         },
@@ -117,6 +119,7 @@ describe("documentUnit list", () => {
           documentNumber: "234",
           decisionDate: "2022-02-10",
           fileNumber: "",
+          note: longNote,
           appraisalBody: "cba",
           documentType: { label: "Test", jurisShortcut: "T" },
           court: { type: "typeA", location: "locB", label: "typeA locB" },
@@ -126,7 +129,6 @@ describe("documentUnit list", () => {
           },
           hasAttachments: false,
           hasHeadnoteOrPrinciple: false,
-          hasNote: false,
           isDeletable: true,
           isEditable: true,
         },
@@ -145,7 +147,6 @@ describe("documentUnit list", () => {
           },
           hasAttachments: false,
           hasHeadnoteOrPrinciple: false,
-          hasNote: false,
           isDeletable: false,
           isEditable: false,
           source: "NJW",
@@ -178,8 +179,17 @@ describe("documentUnit list", () => {
     ).toBeVisible()
 
     // expect Notes
-    expect(screen.getAllByLabelText("Keine Notiz vorhanden")).toHaveLength(2)
-    expect(screen.getByLabelText("Notiz vorhanden")).toBeVisible()
+    expect(screen.getByLabelText("Keine Notiz vorhanden")).toBeVisible()
+    expect(screen.queryByText("a note")).not.toBeInTheDocument()
+    await user.hover(screen.getByLabelText("a note"))
+    // The tooltip of the short note can be seen fully after hovering over the icon
+    expect(screen.getByText("a note")).toBeVisible()
+
+    await user.hover(screen.getByLabelText(trimmedNote))
+    // After hovering another note, the previous tooltip is hidden
+    expect(screen.queryByText("a note")).not.toBeInTheDocument()
+    // The long tooltip will be shown trimmed to 50 chars after hovering over the icon
+    expect(screen.getByText(trimmedNote)).toBeVisible()
 
     // expect Headnote or Principal
     expect(screen.getAllByLabelText("Kein Kurztext vorhanden")).toHaveLength(2)

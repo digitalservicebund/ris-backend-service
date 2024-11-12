@@ -387,7 +387,8 @@ test.describe("search", () => {
           documentNumber: prefilledDocumentUnit.documentNumber,
         })
         await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-        await expect(page.getByLabel("Notiz vorhanden")).toBeVisible()
+        const trimmedNote = noteContent.slice(0, 50) + "..."
+        await expect(page.getByLabel(trimmedNote)).toBeVisible()
       })
 
       await test.step("delete notiz", async () => {
