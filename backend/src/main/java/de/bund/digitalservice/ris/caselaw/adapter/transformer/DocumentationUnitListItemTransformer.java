@@ -39,6 +39,9 @@ public class DocumentationUnitListItemTransformer {
         .documentNumber(documentationUnitListItemDTO.getDocumentNumber())
         .referencedDocumentationUnitId(documentationUnitListItemDTO.getId())
         .decisionDate(documentationUnitListItemDTO.getDecisionDate())
+        .publicationDate(
+            Optional.ofNullable(documentationUnitListItemDTO.getScheduledPublicationDate())
+                .orElse(documentationUnitListItemDTO.getLastPublicationDate()))
         .appraisalBody(documentationUnitListItemDTO.getJudicialBody())
         .hasHeadnoteOrPrinciple(hasHeadnoteOrPrinciple(documentationUnitListItemDTO))
         .hasAttachments(!documentationUnitListItemDTO.getAttachments().isEmpty())

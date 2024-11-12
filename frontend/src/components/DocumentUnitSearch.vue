@@ -273,12 +273,28 @@ const showDefaultLink = computed(() => {
       :page="currentPage"
       @update-page="updatePage"
     >
+      <p
+        v-if="!isLoading && documentUnitListEntries?.length"
+        class="ds-body-02-reg mt-[-16px]"
+      >
+        Sortiert nach
+        <span class="ds-body-02-bold">{{
+          searchQuery?.publicationDate || searchQuery?.scheduledOnly
+            ? "Übergabedatum"
+            : "Entscheidungsdatum"
+        }}</span>
+      </p>
+
       <DocumentUnitList
         class="grow"
         :document-unit-list-entries="documentUnitListEntries"
         :empty-state="emptyStateLabel"
         :is-loading="isLoading"
         :search-response-error="searchResponseError"
+        :show-publication-date="
+          !!searchQuery?.publicationDate ||
+          searchQuery?.scheduledOnly === 'true'
+        "
         @delete-documentation-unit="handleDelete"
         @take-over-documentation-unit="handleTakeOver"
       >

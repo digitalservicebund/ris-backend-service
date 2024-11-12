@@ -135,6 +135,8 @@ public class DocumentationUnitService {
       Optional<String> courtLocation,
       Optional<LocalDate> decisionDate,
       Optional<LocalDate> decisionDateEnd,
+      Optional<LocalDate> publicationDate,
+      Optional<Boolean> onlyScheduled,
       Optional<String> publicationStatus,
       Optional<Boolean> withError,
       Optional<Boolean> myDocOfficeOnly) {
@@ -147,6 +149,8 @@ public class DocumentationUnitService {
             .courtLocation(normalizeSpace(courtLocation.orElse(null)))
             .decisionDate(decisionDate.orElse(null))
             .decisionDateEnd(decisionDateEnd.orElse(null))
+            .publicationDate(publicationDate.orElse(null))
+            .onlyScheduled(onlyScheduled.orElse(false))
             .status(
                 (publicationStatus.isPresent() || withError.isPresent())
                     ? Status.builder()

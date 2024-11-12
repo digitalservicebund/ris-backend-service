@@ -25,12 +25,14 @@ import IconSubject from "~icons/ic/baseline-subject"
 import IconNote from "~icons/ic/outline-comment-bank"
 import IconEdit from "~icons/ic/outline-edit"
 import IconView from "~icons/ic/outline-remove-red-eye"
+import IconClock from "~icons/ic/outline-watch-later"
 
 const props = defineProps<{
   documentUnitListEntries?: DocumentUnitListEntry[]
   searchResponseError?: ResponseError
   isLoading?: boolean
   emptyState?: string
+  showPublicationDate?: boolean
 }>()
 const emit = defineEmits<{
   deleteDocumentationUnit: [documentUnitListEntry: DocumentUnitListEntry]
@@ -65,6 +67,11 @@ const trimText = (text: string, length: number = 50) =>
 
 const noteTooltip = (listEntry: DocumentUnitListEntry) =>
   listEntry.note ? trimText(listEntry.note) : "Keine Notiz vorhanden"
+
+const schedulingTooltip = (publicationDate?: string) =>
+  publicationDate && Date.parse(publicationDate) >= Date.now()
+    ? `Terminierte Übergabe am\n${dayjs(publicationDate).format("DD.MM.YYYY HH:mm")}`
+    : "Keine Übergabe terminiert"
 
 /**
  * Stops propagation of scrolling event, and toggles the showModal value
@@ -128,6 +135,9 @@ function onDelete() {
         <CellHeaderItem> Aktenzeichen</CellHeaderItem>
         <CellHeaderItem> Spruchkörper</CellHeaderItem>
         <CellHeaderItem> Typ</CellHeaderItem>
+        <CellHeaderItem v-if="showPublicationDate">
+          jDV Übergabedatum</CellHeaderItem
+        >
         <CellHeaderItem> Status</CellHeaderItem>
         <CellHeaderItem> Fehler</CellHeaderItem>
         <CellHeaderItem />
@@ -175,6 +185,20 @@ function onDelete() {
                 data-testid="note-icon"
               />
             </Tooltip>
+
+            <Tooltip :text="schedulingTooltip(listEntry.publicationDate)">
+              <IconClock
+                :aria-label="schedulingTooltip(listEntry.publicationDate)"
+                class="flex-end flex h-20 w-20"
+                :class="
+                  listEntry.publicationDate &&
+                  Date.parse(listEntry.publicationDate) >= Date.now()
+                    ? 'text-blue-800'
+                    : 'text-gray-500'
+                "
+                data-testid="scheduling-icon"
+              />
+            </Tooltip>
           </FlexContainer>
         </CellItem>
         <CellItem>
@@ -199,6 +223,13 @@ function onDelete() {
         <CellItem>
           {{
             listEntry.documentType ? listEntry.documentType.jurisShortcut : "-"
+          }}
+        </CellItem>
+        <CellItem v-if="showPublicationDate">
+          {{
+            listEntry.publicationDate
+              ? dayjs(listEntry.publicationDate).format("DD.MM.YYYY HH:mm")
+              : "-"
           }}
         </CellItem>
         <CellItem class="flex min-w-176 flex-row">

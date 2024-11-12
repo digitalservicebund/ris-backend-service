@@ -191,6 +191,8 @@ public class DocumentationUnitController {
       @RequestParam(value = "courtLocation") Optional<String> courtLocation,
       @RequestParam(value = "decisionDate") Optional<LocalDate> decisionDate,
       @RequestParam(value = "decisionDateEnd") Optional<LocalDate> decisionDateEnd,
+      @RequestParam(value = "publicationDate") Optional<LocalDate> publicationDate,
+      @RequestParam(value = "scheduledOnly") Optional<Boolean> onlyScheduled,
       @RequestParam(value = "publicationStatus") Optional<String> publicationStatus,
       @RequestParam(value = "withError") Optional<Boolean> withError,
       @RequestParam(value = "myDocOfficeOnly") Optional<Boolean> myDocOfficeOnly,
@@ -205,6 +207,8 @@ public class DocumentationUnitController {
         courtLocation,
         decisionDate,
         decisionDateEnd,
+        publicationDate,
+        onlyScheduled,
         publicationStatus,
         withError,
         myDocOfficeOnly);

@@ -22,6 +22,8 @@ public record CoreData(
     @UniqueElements List<String> deviatingEclis,
     String appraisalBody,
     @PastOrPresent LocalDate decisionDate,
+    LocalDate lastPublicationDate,
+    LocalDate scheduledPublicationDate,
     @UniqueElements List<LocalDate> deviatingDecisionDates,
     String legalEffect,
     List<String> inputTypes,

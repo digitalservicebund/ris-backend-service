@@ -46,8 +46,12 @@ public interface DatabaseDocumentationUnitRepository
       )
     )
    AND (:withErrorOnly = FALSE OR documentationUnit.documentationOffice.id = :documentationOfficeId AND documentationUnit.status.withError = TRUE)
-ORDER BY documentationUnit.decisionDate DESC NULLS LAST
+ORDER BY
+ CASE
+  WHEN (:onlyScheduled IS TRUE OR cast(:publicationDate as date) IS NOT NULL) THEN documentationUnit.scheduledPublicationDate ELSE documentationUnit.decisionDate END DESC NULLS LAST
 """;
+
+  // TODO: Order by CASE WHEN
 
   @Query(
       value =
@@ -56,6 +60,8 @@ ORDER BY documentationUnit.decisionDate DESC NULLS LAST
   LEFT JOIN documentationUnit.court court
   LEFT JOIN documentationUnit.status status
   WHERE
+   (cast(:publicationDate as date) IS NULL OR documentationUnit.lastPublicationDate = :publicationDate OR documentationUnit.scheduledPublicationDate = :publicationDate) AND
+    (:onlyScheduled = FALSE OR documentationUnit.scheduledPublicationDate IS NOT NULL) AND
   """
               + BASE_QUERY)
   @SuppressWarnings("java:S107")
@@ -68,6 +74,8 @@ ORDER BY documentationUnit.decisionDate DESC NULLS LAST
       @Param("courtLocation") String courtLocation,
       @Param("decisionDate") LocalDate decisionDate,
       @Param("decisionDateEnd") LocalDate decisionDateEnd,
+      @Param("publicationDate") LocalDate publicationDate,
+      @Param("onlyScheduled") Boolean onlyScheduled,
       @Param("status") PublicationStatus status,
       @Param("withErrorOnly") Boolean withErrorOnly,
       @Param("myDocOfficeOnly") Boolean myDocOfficeOnly,

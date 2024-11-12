@@ -57,6 +57,18 @@ const myDocOfficeOnly = computed({
   },
 })
 
+const scheduledOnly = computed({
+  get: () =>
+    query.value?.scheduledOnly ? JSON.parse(query.value.scheduledOnly) : false,
+  set: (data) => {
+    if (!data) {
+      delete query.value.scheduledOnly
+    } else {
+      query.value.scheduledOnly = "true"
+    }
+  },
+})
+
 const withError = computed({
   get: () =>
     query.value?.withError ? JSON.parse(query.value.withError) : false,
@@ -204,6 +216,8 @@ export type DocumentUnitSearchParameter =
   | "documentNumber"
   | "fileNumber"
   | "publicationStatus"
+  | "publicationDate"
+  | "scheduledOnly"
   | "courtType"
   | "courtLocation"
   | "decisionDate"
@@ -215,12 +229,13 @@ export type DocumentUnitSearchParameter =
 <template>
   <div class="pyb-24 mb-32 flex flex-col bg-blue-200">
     <div
-      class="m-40 grid grid-flow-col grid-cols-[auto_1fr_auto_1fr] grid-rows-[auto_auto_auto_auto] gap-x-12 gap-y-20 lg:gap-x-32"
+      class="m-40 grid grid-flow-col grid-cols-[auto_1fr_auto_1fr] grid-rows-[auto_auto_auto_auto_auto] gap-x-12 gap-y-20 lg:gap-x-32"
     >
       <!-- Column 1 -->
       <div class="ds-body-01-reg flex flex-row items-center">Aktenzeichen</div>
       <div class="ds-body-01-reg flex flex-row items-center">Gericht</div>
       <div class="ds-body-01-reg flex flex-row items-center">Datum</div>
+      <div></div>
       <div></div>
       <!-- Column 2 -->
       <div>
@@ -306,12 +321,16 @@ export type DocumentUnitSearchParameter =
         </InputField>
       </div>
       <div class="pl-32"></div>
+      <div class="pl-32"></div>
       <!-- Column 3 -->
       <div class="ds-body-01-reg flex flex-row items-center pl-24 lg:pl-48">
         Dokumentnummer
       </div>
       <div class="ds-body-01-reg flex flex-row items-center pl-24 lg:pl-48">
         Status
+      </div>
+      <div class="ds-body-01-reg flex flex-row items-center pl-24 lg:pl-48">
+        jDV Übergabe am
       </div>
       <div></div>
       <div></div>
@@ -339,6 +358,46 @@ export type DocumentUnitSearchParameter =
             aria-label="Status Suche"
             class="ds-select-small"
             :items="dropdownItems"
+            @focus="resetErrors"
+          />
+        </InputField>
+      </div>
+      <div class="flex flex-row gap-20">
+        <InputField
+          id="publicationDate"
+          v-slot="{ id, hasError }"
+          data-testid="publication-date-input"
+          label="jDV Übergabedatum"
+          :validation-error="validationStore.getByField('publicationDate')"
+          visually-hide-label
+        >
+          <DateInput
+            :id="id"
+            v-model="query.publicationDate"
+            aria-label="jDV Übergabedatum Suche"
+            class="ds-input-small"
+            :has-error="hasError"
+            is-future-date
+            @blur="validateSearchInput"
+            @focus="resetErrors(id as DocumentUnitSearchParameter)"
+            @update:validation-error="
+              (validationError: ValidationError | undefined) =>
+                handleLocalInputError(validationError, id)
+            "
+          ></DateInput>
+        </InputField>
+        <InputField
+          id="scheduled"
+          v-slot="{ id }"
+          label="Nur terminiert"
+          label-class="ds-label-01-reg"
+          :label-position="LabelPosition.RIGHT"
+        >
+          <Checkbox
+            :id="id"
+            v-model="scheduledOnly"
+            aria-label="Terminiert Filter"
+            class="ds-checkbox-mini bg-white"
             @focus="resetErrors"
           />
         </InputField>
