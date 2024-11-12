@@ -3,6 +3,7 @@ import { computed, ref, watch } from "vue"
 import { NodeHelperInterface } from "@/components/fieldOfLawNode"
 import FlexContainer from "@/components/FlexContainer.vue"
 import Checkbox from "@/components/input/CheckboxInput.vue"
+import Tooltip from "@/components/Tooltip.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import IconArrowDown from "~icons/ic/baseline-keyboard-arrow-down"
 import IconArrowUp from "~icons/ic/baseline-keyboard-arrow-up"
@@ -109,24 +110,28 @@ watch(
     <FlexContainer class="min-h-[32px]" flex-direction="flex-row">
       <div v-if="node.hasChildren">
         <div v-if="isExpanded">
-          <button
-            id="collapse-button"
-            :aria-label="node.text + ' einklappen'"
-            class="w-icon rounded-full bg-blue-200 text-blue-800"
-            @click="toggleExpanded"
-          >
-            <IconArrowUp />
-          </button>
+          <Tooltip text="Zuklappen">
+            <button
+              id="collapse-button"
+              :aria-label="node.text + ' einklappen'"
+              class="w-icon rounded-full bg-blue-200 text-blue-800"
+              @click="toggleExpanded"
+            >
+              <IconArrowUp />
+            </button>
+          </Tooltip>
         </div>
         <div v-else>
-          <button
-            id="expand-button"
-            :aria-label="node.text + ' aufklappen'"
-            class="w-icon rounded-full bg-blue-200 text-blue-800"
-            @click="toggleExpanded"
-          >
-            <IconArrowDown />
-          </button>
+          <Tooltip text="Aufklappen">
+            <button
+              id="expand-button"
+              :aria-label="node.text + ' aufklappen'"
+              class="w-icon rounded-full bg-blue-200 text-blue-800"
+              @click="toggleExpanded"
+            >
+              <IconArrowDown />
+            </button>
+          </Tooltip>
         </div>
       </div>
       <span v-else class="pl-[1.3333em]" />

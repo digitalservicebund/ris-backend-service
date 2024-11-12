@@ -21,10 +21,7 @@ const isExpanded = ref(false)
 </script>
 
 <template>
-  <ExpandableContent
-    v-model:is-expanded="isExpanded"
-    class="border-gray-400 bg-white"
-  >
+  <ExpandableContent v-model:is-expanded="isExpanded" class="bg-white">
     <template #open-icon>
       <IconExpandMore />
     </template>
@@ -35,7 +32,7 @@ const isExpanded = ref(false)
 
     <template #header>
       <div id="expandableHeader" class="flex w-full flex-col">
-        <h2 class="ds-label-01-bold">
+        <h2 class="ds-label-01-bold mb-16">
           {{ title }}
         </h2>
         <Component :is="summaryComponent" v-if="!isExpanded" :data="dataSet" />

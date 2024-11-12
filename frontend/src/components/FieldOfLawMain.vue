@@ -99,11 +99,11 @@ function selectedFieldsOfLawSummarizer(dataEntry: any) {
     h(
       "span",
       {
-        class: "text-blue-800",
+        class: "ds-link-02-bold mr-8",
       },
       dataEntry.identifier,
     ),
-    ", " + dataEntry.text,
+    dataEntry.text,
   ])
 }
 
@@ -125,6 +125,7 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
 <template>
   <ExpandableDataSet
     v-if="localModelValue"
+    class="border-b-1 border-t-1 border-blue-300 py-16"
     :data-set="localModelValue"
     :summary-component="SelectedFieldsOfLawSummary"
     title="Sachgebiete"
