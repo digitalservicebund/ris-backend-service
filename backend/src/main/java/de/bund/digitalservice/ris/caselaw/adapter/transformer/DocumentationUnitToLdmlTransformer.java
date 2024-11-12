@@ -117,13 +117,14 @@ public class DocumentationUnitToLdmlTransformer {
         .motivation(
             JaxbHtml.build(
                 htmlStringToObjectList(nullSafeGet(shortTexts, ShortTexts::guidingPrinciple))))
-        // set headnote/Orientierungssatz, dissentingOpinion/"Abweichende Meinung", "other
-        // headnote"/"Sonstiger Orientierungssatz", Outline/Gliederung, Tenor/Tenor
+        // set headnote/Orientierungssatz, "other headnote"/"Sonstiger Orientierungssatz",
+        // Outline/Gliederung, Tenor/Tenor
         .introduction(buildIntroduction(documentationUnit))
         // set caseFacts/Tatbestand
         .background(
             JaxbHtml.build(htmlStringToObjectList(nullSafeGet(longTexts, LongTexts::caseFacts))))
-        // set decisionReasons/Entscheidungsgründe, reasons/Gründe, otherLongText/"Sonstiger
+        // set decisionReasons/Entscheidungsgründe, reasons/Gründe, otherLongText/"Sonstiger,
+        // dissentingOpinion/"Abweichende Meinung"
         // Langtext"
         .decision(buildDecision(documentationUnit));
 
@@ -135,13 +136,11 @@ public class DocumentationUnitToLdmlTransformer {
     var longTexts = documentationUnit.longTexts();
 
     var headnote = nullSafeGet(shortTexts, ShortTexts::headnote);
-    var dissentingOpinion = nullSafeGet(longTexts, LongTexts::dissentingOpinion);
     var otherHeadnote = nullSafeGet(shortTexts, ShortTexts::otherHeadnote);
     var outline = nullSafeGet(longTexts, LongTexts::outline);
     var tenor = nullSafeGet(longTexts, LongTexts::tenor);
 
     if (StringUtils.isNotEmpty(headnote)
-        || StringUtils.isNotEmpty(dissentingOpinion)
         || StringUtils.isNotEmpty(otherHeadnote)
         || StringUtils.isNotEmpty(outline)
         || StringUtils.isNotEmpty(tenor)) {
@@ -150,7 +149,6 @@ public class DocumentationUnitToLdmlTransformer {
               AknEmbeddedStructureInBlock.HeadNote.NAME,
               AknEmbeddedStructureInBlock.HeadNote.build(
                   JaxbHtml.build(htmlStringToObjectList(headnote))))
-          .withBlock(Opinions.NAME, Opinions.build(htmlStringToObjectList(dissentingOpinion)))
           .withBlock(
               AknEmbeddedStructureInBlock.OtherHeadNote.NAME,
               AknEmbeddedStructureInBlock.OtherHeadNote.build(
@@ -172,12 +170,14 @@ public class DocumentationUnitToLdmlTransformer {
     var longTexts = documentationUnit.longTexts();
 
     var decisionReasons = nullSafeGet(longTexts, LongTexts::decisionReasons);
-    var resons = nullSafeGet(longTexts, LongTexts::reasons);
+    var reasons = nullSafeGet(longTexts, LongTexts::reasons);
     var otherLongText = nullSafeGet(longTexts, LongTexts::otherLongText);
+    var dissentingOpinion = nullSafeGet(longTexts, LongTexts::dissentingOpinion);
 
     if (StringUtils.isNotEmpty(decisionReasons)
-        || StringUtils.isNotEmpty(resons)
-        || StringUtils.isNotEmpty(otherLongText)) {
+        || StringUtils.isNotEmpty(reasons)
+        || StringUtils.isNotEmpty(otherLongText)
+        || StringUtils.isNotEmpty(dissentingOpinion)) {
       return new AknMultipleBlock()
           .withBlock(
               AknEmbeddedStructureInBlock.DecisionReasons.NAME,
@@ -186,11 +186,12 @@ public class DocumentationUnitToLdmlTransformer {
           .withBlock(
               AknEmbeddedStructureInBlock.Reasons.NAME,
               AknEmbeddedStructureInBlock.Reasons.build(
-                  JaxbHtml.build(htmlStringToObjectList(resons))))
+                  JaxbHtml.build(htmlStringToObjectList(reasons))))
           .withBlock(
               AknEmbeddedStructureInBlock.OtherLongText.NAME,
               AknEmbeddedStructureInBlock.OtherLongText.build(
-                  JaxbHtml.build(htmlStringToObjectList(otherLongText))));
+                  JaxbHtml.build(htmlStringToObjectList(otherLongText))))
+          .withBlock(Opinions.NAME, Opinions.build(htmlStringToObjectList(dissentingOpinion)));
     } else {
       return null;
     }
