@@ -46,8 +46,6 @@ async function submitSearch(page: number) {
   //   return removeSelectedNode()
   // }
 
-  console.log("identifier: " + identifier.value)
-
   const response = await service.searchForFieldsOfLaw(
     page,
     itemsPerPage,
@@ -109,6 +107,18 @@ function selectedFieldsOfLawSummarizer(dataEntry: any) {
   ])
 }
 
+function updateIdentifierSearchTerm(newValue?: string) {
+  identifier.value = newValue ? newValue : ""
+}
+
+function updateDescriptionSearchTerm(newValue?: string) {
+  description.value = newValue ? newValue : ""
+}
+
+function updateNormSearchTerm(newValue?: string) {
+  norm.value = newValue ? newValue : ""
+}
+
 const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
 </script>
 
@@ -124,13 +134,9 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
       :identifier="identifier"
       :norm="norm"
       @search="submitSearch(0)"
-      @update:description="
-        (value?: string) => (value ? (description = value) : undefined)
-      "
-      @update:identifier="
-        (value?: string) => (value ? (identifier = value) : undefined)
-      "
-      @update:norm="(value?: string) => (value ? (norm = value) : undefined)"
+      @update:description="updateDescriptionSearchTerm"
+      @update:identifier="updateIdentifierSearchTerm"
+      @update:norm="updateNormSearchTerm"
     />
 
     <div class="flex w-full flex-row gap-24">
