@@ -11,6 +11,7 @@ import TextInput from "@/components/input/TextInput.vue"
 import { ValidationError } from "@/components/input/types"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import PopupModal from "@/components/PopupModal.vue"
+import RadioInput from "@/components/input/RadioInput.vue"
 import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
@@ -308,8 +309,35 @@ onMounted(async () => {
       :decision="reference.documentationUnit"
       :display-mode="DisplayMode.SIDEPANEL"
     />
+    <div class="flex items-center gap-16">
+      <div class="flex items-center">
+        <InputField
+          id="caselaw"
+          label="Rechtsprechung"
+          class="flex items-center"
+        >
+          <RadioInput
+            v-model="reference.referenceType"
+            name="referenceType"
+            size="medium"
+            value="caselaw"
+          />
+        </InputField>
+      </div>
+
+      <div class="flex items-center">
+        <InputField id="literature" label="Literatur" class="flex items-center">
+          <RadioInput
+            v-model="reference.referenceType"
+            name="referenceType"
+            size="medium"
+            value="literature"
+          />
+        </InputField>
+      </div>
+    </div>
     <div class="flex justify-between gap-24">
-      <div id="citationInputField" class="flex-1">
+      <div id="citationInputField" class="flex w-full flex-col">
         <InputField
           v-if="!isSaved"
           id="citation"
@@ -374,8 +402,8 @@ onMounted(async () => {
 
       <InputField
         id="referenceSupplement"
+        v-if="reference.referenceType === 'caselaw'"
         v-slot="slotProps"
-        class="flex-1"
         label="Klammernzusatz *"
         :validation-error="validationStore.getByField('referenceSupplement')"
       >
@@ -389,7 +417,31 @@ onMounted(async () => {
           @focus="validationStore.remove('referenceSupplement')"
         ></TextInput>
       </InputField>
+      <InputField
+        id="literatureReferenceDocumentType"
+        v-if="reference.referenceType === 'literature'"
+        label="Dokumenttyp *"
+      >
+        <ComboboxInput
+          id="literatureReferenceDocumentType"
+          v-model="reference.documentType"
+          aria-label="Dokumenttyp Literaturfundstelle"
+          :item-service="ComboboxItemService.getDocumentTypes"
+        ></ComboboxInput>
+      </InputField>
     </div>
+    <InputField
+      id="literatureReferenceDocumentType"
+      v-if="reference.referenceType === 'literature'"
+      label="Autor *"
+    >
+      <TextInput
+        id="literatureReferenceDocumentType"
+        v-model="reference.author"
+        aria-label="Klammernzusatz"
+        size="medium"
+      ></TextInput>
+    </InputField>
 
     <div v-if="!isSaved" id="documentationUnit" class="flex flex-col gap-24">
       <div class="flex justify-between gap-24">
