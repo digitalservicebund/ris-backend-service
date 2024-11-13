@@ -78,13 +78,34 @@ class DocumentTypeIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody())
-                  .extracting("jurisShortcut", "label")
+                  .extracting("label", "jurisShortcut")
                   .containsExactly(
                       Tuple.tuple("Amtsrechtliche Anordnung", "AmA"),
                       Tuple.tuple("Anordnung", "Ao"),
                       Tuple.tuple("Beschluss", "Bes"),
                       Tuple.tuple("Urteil", "Ur"));
             });
+  }
+
+  @Test
+  void testGetAllDependantLiteratureDocumentTypes() {
+    risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/documenttypes/dependent-literature")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<List<DocumentType>>() {})
+            .consumeWith(
+                    response -> {
+                      assertThat(response.getResponseBody())
+                              .extracting("label", "jurisShortcut")
+                              .containsExactly(
+                                      Tuple.tuple("Anmerkung", "Ean"),
+                                      Tuple.tuple("Entscheidungsbesprechung", "Ebs")
+                              );
+                    });
   }
 
   @Test
@@ -100,10 +121,30 @@ class DocumentTypeIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody())
-                  .extracting("jurisShortcut", "label")
+                  .extracting("label", "jurisShortcut")
                   .containsExactly(
-                      Tuple.tuple("Anordnung", "Ao"),
-                      Tuple.tuple("Amtsrechtliche Anordnung", "AmA"));
+                      Tuple.tuple("Amtsrechtliche Anordnung", "AmA"),
+                      Tuple.tuple("Anordnung", "Ao"));
             });
   }
+
+    @Test
+    void testGetDependantLiteratureDocumentTypesWithQuery() {
+        risWebTestClient
+                .withDefaultLogin()
+                .get()
+                .uri("/api/v1/caselaw/documenttypes/dependent-literature?q=Ea")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(new TypeReference<List<DocumentType>>() {})
+                .consumeWith(
+                        response -> {
+                            assertThat(response.getResponseBody())
+                                    .extracting("label", "jurisShortcut")
+                                    .containsExactly(
+                                            Tuple.tuple("Anmerkung", "Ean")
+                            );
+                        });
+    }
 }

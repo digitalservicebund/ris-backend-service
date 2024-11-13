@@ -6,12 +6,12 @@ import DecisionSummary from "@/components/DecisionSummary.vue"
 import { DisplayMode } from "@/components/enumDisplayMode"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
+import RadioInput from "@/components/input/RadioInput.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import { ValidationError } from "@/components/input/types"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import PopupModal from "@/components/PopupModal.vue"
-import RadioInput from "@/components/input/RadioInput.vue"
 import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
@@ -313,8 +313,8 @@ onMounted(async () => {
       <div class="flex items-center">
         <InputField
           id="caselaw"
-          label="Rechtsprechung"
           class="flex items-center"
+          label="Rechtsprechung"
         >
           <RadioInput
             v-model="reference.referenceType"
@@ -326,7 +326,7 @@ onMounted(async () => {
       </div>
 
       <div class="flex items-center">
-        <InputField id="literature" label="Literatur" class="flex items-center">
+        <InputField id="literature" class="flex items-center" label="Literatur">
           <RadioInput
             v-model="reference.referenceType"
             name="referenceType"
@@ -401,8 +401,8 @@ onMounted(async () => {
       </div>
 
       <InputField
-        id="referenceSupplement"
         v-if="reference.referenceType === 'caselaw'"
+        id="referenceSupplement"
         v-slot="slotProps"
         label="Klammernzusatz *"
         :validation-error="validationStore.getByField('referenceSupplement')"
@@ -418,21 +418,23 @@ onMounted(async () => {
         ></TextInput>
       </InputField>
       <InputField
-        id="literatureReferenceDocumentType"
         v-if="reference.referenceType === 'literature'"
+        id="literatureReferenceDocumentType"
         label="Dokumenttyp *"
       >
         <ComboboxInput
           id="literatureReferenceDocumentType"
           v-model="reference.documentType"
           aria-label="Dokumenttyp Literaturfundstelle"
-          :item-service="ComboboxItemService.getDocumentTypes"
+          :item-service="
+            ComboboxItemService.getDependentLiteratureDocumentTypes
+          "
         ></ComboboxInput>
       </InputField>
     </div>
     <InputField
-      id="literatureReferenceDocumentType"
       v-if="reference.referenceType === 'literature'"
+      id="literatureReferenceDocumentType"
       label="Autor *"
     >
       <TextInput
