@@ -1,7 +1,8 @@
 import { vi } from "vitest"
+import { ref } from "vue"
 import { useCaseLawMenuItems } from "@/composables/useCaseLawMenuItems"
 
-let isInternalUser = false
+const isInternalUser = ref(false)
 vi.mock("@/composables/useInternalUser", () => {
   return {
     useInternalUser: () => isInternalUser,
@@ -10,7 +11,7 @@ vi.mock("@/composables/useInternalUser", () => {
 
 describe("useCaseLawMenuItems", () => {
   it("adds document identifier as route parameter to each menu item", () => {
-    isInternalUser = true
+    isInternalUser.value = true
     const documentNumber = "fake-number"
 
     const menuItems = useCaseLawMenuItems(documentNumber, {})
@@ -23,7 +24,7 @@ describe("useCaseLawMenuItems", () => {
   })
 
   it("clones current route query to menu item", () => {
-    isInternalUser = true
+    isInternalUser.value = true
     const route = {
       query: { foo: "bar" },
     }
@@ -36,7 +37,7 @@ describe("useCaseLawMenuItems", () => {
   })
 
   it("lists all expected menu items", () => {
-    isInternalUser = true
+    isInternalUser.value = true
     const menuItems = useCaseLawMenuItems("", {})
 
     const topLabelNames = menuItems.map((item) => item.label)
@@ -46,7 +47,7 @@ describe("useCaseLawMenuItems", () => {
   })
 
   it("lists all expected menu items for external user", () => {
-    isInternalUser = false
+    isInternalUser.value = false
     const menuItems = useCaseLawMenuItems("", {})
 
     const topLabelNames = menuItems.map((item) => item.label)
