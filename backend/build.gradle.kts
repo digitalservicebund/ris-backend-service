@@ -105,7 +105,8 @@ spotless {
             "**/static/**",
             "**/gradle.properties",
             "**/gradle-wrapper.properties",
-            "**/jaxb.properties"
+            "**/jaxb.properties",
+            "**/sentry-debug-meta.properties"
         )
         // spotless:off
         prettier(
