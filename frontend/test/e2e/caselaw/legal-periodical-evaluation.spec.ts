@@ -526,6 +526,58 @@ test.describe(
       },
     )
 
+    test(
+      "Literature references can be added to periodical evaluation",
+      {
+        tag: "@RISDEV-5236",
+      },
+      async ({ page, editionWithReferences }) => {
+        await test.step("Caselaw reference type is preselected", async () => {
+          await navigateToPeriodicalReferences(
+            page,
+            editionWithReferences.id || "",
+          )
+
+          await expect(
+            page.getByLabel("Rechtsprechung Fundstelle"),
+          ).toBeChecked()
+
+          await expect(
+            page.getByLabel("Literatur Fundstelle"),
+          ).not.toBeChecked()
+
+          await expect(page.getByLabel("Klammernzusatz")).toBeVisible()
+
+          await expect(
+            page.getByLabel("Dokumenttyp Literaturfundstelle"),
+          ).toBeHidden()
+
+          await expect(
+            page.getByLabel("Autor Literaturfundstelle"),
+          ).toBeHidden()
+        })
+
+        await test.step("Selecting literature reference type, renders different inputs", async () => {
+          await page.getByLabel("Literatur Fundstelle").click()
+          await expect(
+            page.getByLabel("Rechtsprechung Fundstelle"),
+          ).not.toBeChecked()
+
+          await expect(page.getByLabel("Literatur Fundstelle")).toBeChecked()
+
+          await expect(page.getByLabel("Klammernzusatz")).toBeHidden()
+
+          await expect(
+            page.getByLabel("Dokumenttyp Literaturfundstelle"),
+          ).toBeVisible()
+
+          await expect(
+            page.getByLabel("Autor Literaturfundstelle"),
+          ).toBeVisible()
+        })
+      },
+    )
+
     // Flaky, needs some clarification
     // eslint-disable-next-line playwright/no-skipped-test
     test.skip(

@@ -1,7 +1,7 @@
+import { DocumentType } from "./documentUnit"
 import EditableListItem from "./editableListItem"
 import RelatedDocumentation from "./relatedDocumentation"
 import LegalPeriodical from "@/domain/legalPeriodical"
-import { DocumentType } from "./documentUnit"
 
 export default class Reference implements EditableListItem {
   id?: string
