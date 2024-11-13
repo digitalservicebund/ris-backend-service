@@ -27,6 +27,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.Docume
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -447,7 +448,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       String fileNumber,
       LocalDate decisionDate,
       LocalDate decisionDateEnd,
-      LocalDate publicationDate,
+      LocalDateTime publicationDate,
       Boolean onlyScheduled,
       PublicationStatus status,
       Boolean withError,

@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -74,7 +75,7 @@ ORDER BY
       @Param("courtLocation") String courtLocation,
       @Param("decisionDate") LocalDate decisionDate,
       @Param("decisionDateEnd") LocalDate decisionDateEnd,
-      @Param("publicationDate") LocalDate publicationDate,
+      @Param("publicationDate") LocalDateTime publicationDate,
       @Param("onlyScheduled") Boolean onlyScheduled,
       @Param("status") PublicationStatus status,
       @Param("withErrorOnly") Boolean withErrorOnly,

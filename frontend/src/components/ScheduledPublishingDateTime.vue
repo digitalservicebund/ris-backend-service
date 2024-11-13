@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import dayjs from "dayjs"
+import dayjsTimezone from "dayjs/plugin/timezone"
+import dayjsUtc from "dayjs/plugin/utc"
 import { computed, ref } from "vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
@@ -11,21 +13,29 @@ import IconWatch from "~icons/ic/outline-watch-later"
 
 const { isPublishable } = defineProps<{ isPublishable: boolean }>()
 
+dayjs.extend(dayjsUtc)
+dayjs.extend(dayjsTimezone)
+
 const store = useDocumentUnitStore()
 
 const scheduledPublishingDate = ref<string | undefined>(
-  dayjs(store.documentUnit!.coreData.scheduledPublicationDate).format(
-    "YYYY-MM-DD",
-  ),
+  store.documentUnit!.coreData.scheduledPublicationDate &&
+    dayjs(store.documentUnit!.coreData.scheduledPublicationDate)
+      .tz("Europe/Berlin")
+      .format("YYYY-MM-DD"),
 )
 const scheduledPublishingTime = ref<string>(
-  dayjs(store.documentUnit!.coreData.scheduledPublicationDate).format(
-    "HH:mm",
-  ) || "05:00",
+  (store.documentUnit!.coreData.scheduledPublicationDate &&
+    dayjs(store.documentUnit!.coreData.scheduledPublicationDate)
+      .tz("Europe/Berlin")
+      .format("HH:mm")) ||
+    "05:00",
 )
 
-const scheduledDateTime = computed(() =>
-  dayjs(scheduledPublishingDate.value + " " + scheduledPublishingTime.value),
+const scheduledDateTimeInput = computed(() =>
+  dayjs.utc(
+    scheduledPublishingDate.value + "T" + scheduledPublishingTime.value,
+  ),
 )
 
 const isScheduled = computed<boolean>(
@@ -36,13 +46,12 @@ const isDateInFuture = computed<boolean>(
   () =>
     !scheduledPublishingDate.value ||
     !scheduledPublishingTime.value ||
-    scheduledDateTime.value.isAfter(new Date()),
+    scheduledDateTimeInput.value.isAfter(new Date()),
 )
 
 const saveScheduling = async () => {
   store.documentUnit!.coreData.scheduledPublicationDate =
-    // TODO: time is missing
-    scheduledDateTime.value.format("YYYY-MM-DD")
+    scheduledDateTimeInput.value.toISOString()
   await store.updateDocumentUnit()
 }
 

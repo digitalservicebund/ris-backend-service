@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -135,7 +136,7 @@ public class DocumentationUnitService {
       Optional<String> courtLocation,
       Optional<LocalDate> decisionDate,
       Optional<LocalDate> decisionDateEnd,
-      Optional<LocalDate> publicationDate,
+      Optional<LocalDateTime> publicationDate,
       Optional<Boolean> onlyScheduled,
       Optional<String> publicationStatus,
       Optional<Boolean> withError,

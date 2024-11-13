@@ -19,6 +19,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -58,10 +59,10 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   private LocalDate decisionDate;
 
   @Column(name = "last_publication_date")
-  private LocalDate lastPublicationDate;
+  private LocalDateTime lastPublicationDate;
 
   @Column(name = "scheduled_publication_date")
-  private LocalDate scheduledPublicationDate;
+  private LocalDateTime scheduledPublicationDate;
 
   @Column(name = "decision_grounds")
   private String decisionGrounds;

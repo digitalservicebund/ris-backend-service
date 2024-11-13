@@ -26,6 +26,7 @@ import IconNote from "~icons/ic/outline-comment-bank"
 import IconEdit from "~icons/ic/outline-edit"
 import IconView from "~icons/ic/outline-remove-red-eye"
 import IconClock from "~icons/ic/outline-watch-later"
+import IconArrowDown from "~icons/mdi/arrow-down-drop"
 
 const props = defineProps<{
   documentUnitListEntries?: DocumentUnitListEntry[]
@@ -131,13 +132,18 @@ function onDelete() {
         <CellHeaderItem class="w-[1%]"> Dokumentnummer</CellHeaderItem>
         <CellHeaderItem> Gerichtstyp</CellHeaderItem>
         <CellHeaderItem> Ort</CellHeaderItem>
-        <CellHeaderItem> Datum</CellHeaderItem>
+        <CellHeaderItem>
+          <div class="flex flex-row">
+            Datum <IconArrowDown v-if="!showPublicationDate" />
+          </div>
+        </CellHeaderItem>
         <CellHeaderItem> Aktenzeichen</CellHeaderItem>
         <CellHeaderItem> Spruchkörper</CellHeaderItem>
         <CellHeaderItem> Typ</CellHeaderItem>
         <CellHeaderItem v-if="showPublicationDate">
-          jDV Übergabedatum</CellHeaderItem
-        >
+          <div class="flex flex-row items-center">
+            jDV Übergabe <IconArrowDown v-if="showPublicationDate" /></div
+        ></CellHeaderItem>
         <CellHeaderItem> Status</CellHeaderItem>
         <CellHeaderItem> Fehler</CellHeaderItem>
         <CellHeaderItem />

@@ -51,6 +51,8 @@ const myDocOfficeOnly = computed({
     if (!data) {
       delete query.value.withError
       delete query.value.myDocOfficeOnly
+      delete query.value.scheduledOnly
+      delete query.value.publicationDate
     } else {
       query.value.myDocOfficeOnly = "true"
     }
@@ -232,10 +234,18 @@ export type DocumentUnitSearchParameter =
       class="m-40 grid grid-flow-col grid-cols-[auto_1fr_auto_1fr] grid-rows-[auto_auto_auto_auto_auto] gap-x-12 gap-y-20 lg:gap-x-32"
     >
       <!-- Column 1 -->
-      <div class="ds-body-01-reg flex flex-row items-center">Aktenzeichen</div>
+      <div class="ds-body-01-reg ml-3 flex flex-row items-center">
+        Aktenzeichen
+      </div>
       <div class="ds-body-01-reg flex flex-row items-center">Gericht</div>
       <div class="ds-body-01-reg flex flex-row items-center">Datum</div>
-      <div></div>
+      <div
+        v-if="myDocOfficeOnly"
+        class="ds-body-01-reg flex flex-row items-center"
+      >
+        jDV Übergabe
+      </div>
+      <div v-if="!myDocOfficeOnly" />
       <div></div>
       <!-- Column 2 -->
       <div>
@@ -320,49 +330,7 @@ export type DocumentUnitSearchParameter =
           ></DateInput>
         </InputField>
       </div>
-      <div class="pl-32"></div>
-      <div class="pl-32"></div>
-      <!-- Column 3 -->
-      <div class="ds-body-01-reg flex flex-row items-center pl-24 lg:pl-48">
-        Dokumentnummer
-      </div>
-      <div class="ds-body-01-reg flex flex-row items-center pl-24 lg:pl-48">
-        Status
-      </div>
-      <div class="ds-body-01-reg flex flex-row items-center pl-24 lg:pl-48">
-        jDV Übergabe am
-      </div>
-      <div></div>
-      <div></div>
-      <!-- Column 4 -->
-      <div class="">
-        <InputField
-          id="documentNumber"
-          label="Dokumentnummer"
-          visually-hide-label
-        >
-          <TextInput
-            id="documentNumber"
-            v-model="query.documentNumber"
-            aria-label="Dokumentnummer Suche"
-            class="ds-input-small"
-            @focus="resetErrors"
-          ></TextInput>
-        </InputField>
-      </div>
-      <div class="">
-        <InputField id="status" label="Status" visually-hide-label>
-          <DropdownInput
-            id="status"
-            v-model="query.publicationStatus"
-            aria-label="Status Suche"
-            class="ds-select-small"
-            :items="dropdownItems"
-            @focus="resetErrors"
-          />
-        </InputField>
-      </div>
-      <div class="flex flex-row gap-20">
+      <div v-if="myDocOfficeOnly" class="flex flex-row gap-20">
         <InputField
           id="publicationDate"
           v-slot="{ id, hasError }"
@@ -398,6 +366,46 @@ export type DocumentUnitSearchParameter =
             v-model="scheduledOnly"
             aria-label="Terminiert Filter"
             class="ds-checkbox-mini bg-white"
+            @focus="resetErrors"
+          />
+        </InputField>
+      </div>
+      <div v-if="!myDocOfficeOnly" />
+      <div class="pl-32"></div>
+      <!-- Column 3 -->
+      <div class="ds-body-01-reg flex flex-row items-center pl-24 lg:pl-48">
+        Dokumentnummer
+      </div>
+      <div class="ds-body-01-reg flex flex-row items-center pl-24 lg:pl-48">
+        Status
+      </div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <!-- Column 4 -->
+      <div class="">
+        <InputField
+          id="documentNumber"
+          label="Dokumentnummer"
+          visually-hide-label
+        >
+          <TextInput
+            id="documentNumber"
+            v-model="query.documentNumber"
+            aria-label="Dokumentnummer Suche"
+            class="ds-input-small"
+            @focus="resetErrors"
+          ></TextInput>
+        </InputField>
+      </div>
+      <div class="">
+        <InputField id="status" label="Status" visually-hide-label>
+          <DropdownInput
+            id="status"
+            v-model="query.publicationStatus"
+            aria-label="Status Suche"
+            class="ds-select-small"
+            :items="dropdownItems"
             @focus="resetErrors"
           />
         </InputField>

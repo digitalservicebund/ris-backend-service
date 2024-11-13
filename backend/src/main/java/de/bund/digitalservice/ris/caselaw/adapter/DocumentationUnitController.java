@@ -27,6 +27,7 @@ import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -191,7 +192,7 @@ public class DocumentationUnitController {
       @RequestParam(value = "courtLocation") Optional<String> courtLocation,
       @RequestParam(value = "decisionDate") Optional<LocalDate> decisionDate,
       @RequestParam(value = "decisionDateEnd") Optional<LocalDate> decisionDateEnd,
-      @RequestParam(value = "publicationDate") Optional<LocalDate> publicationDate,
+      @RequestParam(value = "publicationDate") Optional<LocalDateTime> publicationDate,
       @RequestParam(value = "scheduledOnly") Optional<Boolean> onlyScheduled,
       @RequestParam(value = "publicationStatus") Optional<String> publicationStatus,
       @RequestParam(value = "withError") Optional<Boolean> withError,
