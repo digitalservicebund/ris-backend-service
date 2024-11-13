@@ -3,6 +3,7 @@ import {
   clickCategoryButton,
   navigateToCategories,
   navigateToHandover,
+  save,
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 
@@ -63,6 +64,8 @@ test.describe(
         const inputFieldInnerHTML = await inputField.innerHTML()
         expect(inputFieldInnerHTML).toContain(tableHTML)
       })
+
+      await save(page)
 
       await test.step("Check table is visible in the XML Vorschau", async () => {
         await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
