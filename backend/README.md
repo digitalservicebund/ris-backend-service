@@ -207,8 +207,11 @@ To run a scan locally:
 
 ```bash
 ./gradlew bootBuildImage
+TRIVY_DB_REPOSITORY="ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db" \
+TRIVY_JAVA_DB_REPOSITORY="ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db" \
 trivy image --severity HIGH,CRITICAL ghcr.io/digitalservicebund/ris-backend-service:latest
 ```
+Run with `--format json` to get an extended report.
 
 ## License Scanning
 
