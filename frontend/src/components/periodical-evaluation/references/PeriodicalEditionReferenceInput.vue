@@ -318,6 +318,7 @@ onMounted(async () => {
         >
           <RadioInput
             v-model="reference.referenceType"
+            aria-label="Rechtsprechung Fundstelle"
             name="referenceType"
             size="medium"
             value="caselaw"
@@ -329,6 +330,7 @@ onMounted(async () => {
         <InputField id="literature" class="flex items-center" label="Literatur">
           <RadioInput
             v-model="reference.referenceType"
+            aria-label="Literatur Fundstelle"
             name="referenceType"
             size="medium"
             value="literature"
@@ -434,13 +436,13 @@ onMounted(async () => {
     </div>
     <InputField
       v-if="reference.referenceType === 'literature'"
-      id="literatureReferenceDocumentType"
+      id="literatureReferenceAuthor"
       label="Autor *"
     >
       <TextInput
-        id="literatureReferenceDocumentType"
+        id="literatureReferenceAuthor"
         v-model="reference.author"
-        aria-label="Klammernzusatz"
+        aria-label="Autor Literaturfundstelle"
         size="medium"
       ></TextInput>
     </InputField>

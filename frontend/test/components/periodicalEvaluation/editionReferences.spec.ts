@@ -137,6 +137,8 @@ describe("Legal periodical edition evaluation", () => {
 
   test("renders legal periodical reference input", async () => {
     await renderComponent()
+    expect(screen.getByLabelText("Rechtsprechung Fundstelle")).toBeChecked()
+    expect(screen.getByLabelText("Literatur Fundstelle")).not.toBeChecked()
     expect(
       screen.getByLabelText("Zitatstelle Präfix", { exact: true }),
     ).toHaveValue("präfix")
@@ -162,6 +164,34 @@ describe("Legal periodical edition evaluation", () => {
     expect(
       screen.getByLabelText("Klammernzusatz", { exact: true }),
     ).toBeInTheDocument()
+  })
+
+  test("toggles input fields, when changing reference type", async () => {
+    const { user } = await renderComponent()
+
+    expect(screen.getByLabelText("Rechtsprechung Fundstelle")).toBeChecked()
+    expect(screen.getByLabelText("Literatur Fundstelle")).not.toBeChecked()
+    expect(
+      screen.getByLabelText("Klammernzusatz", { exact: true }),
+    ).toBeVisible()
+    expect(
+      screen.queryByLabelText("Dokumenttyp Literaturfundstelle"),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByLabelText("Autor Literaturfundstelle"),
+    ).not.toBeInTheDocument()
+
+    await user.click(screen.getByLabelText("Literatur Fundstelle"))
+
+    expect(screen.getByLabelText("Rechtsprechung Fundstelle")).not.toBeChecked()
+    expect(screen.getByLabelText("Literatur Fundstelle")).toBeChecked()
+    expect(
+      screen.queryByLabelText("Klammernzusatz", { exact: true }),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.getByLabelText("Dokumenttyp Literaturfundstelle"),
+    ).toBeVisible()
+    expect(screen.getByLabelText("Autor Literaturfundstelle")).toBeVisible()
   })
 
   test("deletes documentation unit created by reference when selected", async () => {
