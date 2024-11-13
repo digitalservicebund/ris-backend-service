@@ -52,9 +52,7 @@ public class DocumentationUnitListItemTransformer {
                 ? null
                 : documentationUnitListItemDTO.getFileNumbers().get(0).getValue())
         .status(StatusTransformer.transformToDomain(documentationUnitListItemDTO.getStatus()))
-        .hasNote(
-            documentationUnitListItemDTO.getNote() != null
-                && !documentationUnitListItemDTO.getNote().isEmpty())
+        .note(documentationUnitListItemDTO.getNote())
         .creatingDocumentationOffice(
             documentationUnitListItemDTO.getCreatingDocumentationOffice() == null
                 ? null

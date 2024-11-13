@@ -157,6 +157,9 @@ describe("text editor", async () => {
     expect(screen.getByLabelText("Nummerierte Liste")).toBeInTheDocument()
     expect(screen.getByLabelText("Einzug verringern")).toBeInTheDocument()
     expect(screen.getByLabelText("Einzug vergrößern")).toBeInTheDocument()
+    expect(
+      screen.getByLabelText("Tabelle", { exact: true }),
+    ).toBeInTheDocument()
     expect(screen.getByLabelText("Zitat einfügen")).toBeInTheDocument()
     expect(
       screen.getByLabelText("Randnummern neu erstellen"),
@@ -164,6 +167,48 @@ describe("text editor", async () => {
     expect(screen.getByLabelText("Randnummern entfernen")).toBeInTheDocument()
     expect(screen.getByLabelText("Rückgängig machen")).toBeInTheDocument()
     expect(screen.getByLabelText("Wiederherstellen")).toBeInTheDocument()
+  })
+
+  it("shows all table buttons after menu is expanded", async () => {
+    render(TextEditor, {
+      props: {
+        value: "Test Value",
+        ariaLabel: "Gründe",
+        editable: true,
+      },
+      global: { plugins: [router] },
+    })
+
+    await flushPromises()
+
+    const editorField = screen.getByTestId("Gründe")
+
+    if (editorField.firstElementChild !== null) {
+      await fireEvent.focus(editorField.firstElementChild)
+    }
+
+    expect(
+      screen.getByLabelText("Tabelle", { exact: true }),
+    ).toBeInTheDocument()
+    expect(screen.queryByLabelText("Tabelle einfügen")).not.toBeInTheDocument()
+    expect(screen.queryByLabelText("Tabelle löschen")).not.toBeInTheDocument()
+    expect(
+      screen.queryByLabelText("Spalte rechts einfügen"),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByLabelText("Zeile darunter einfügen"),
+    ).not.toBeInTheDocument()
+    expect(screen.queryByLabelText("Spalte löschen")).not.toBeInTheDocument()
+    expect(screen.queryByLabelText("Zeile löschen")).not.toBeInTheDocument()
+
+    await fireEvent.click(screen.getByLabelText("Tabelle", { exact: true }))
+
+    expect(screen.getByLabelText("Tabelle einfügen")).toBeInTheDocument()
+    expect(screen.getByLabelText("Tabelle löschen")).toBeInTheDocument()
+    expect(screen.getByLabelText("Spalte rechts einfügen")).toBeInTheDocument()
+    expect(screen.getByLabelText("Zeile darunter einfügen")).toBeInTheDocument()
+    expect(screen.getByLabelText("Spalte löschen")).toBeInTheDocument()
+    expect(screen.getByLabelText("Zeile löschen")).toBeInTheDocument()
   })
 
   it.each([

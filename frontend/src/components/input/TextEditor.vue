@@ -95,7 +95,10 @@ const editor = new Editor({
     Strike,
     CustomSubscript,
     CustomSuperscript,
-    Table,
+    Table.configure({
+      resizable: true,
+      allowTableNodeSelection: true,
+    }),
     TableCell,
     TableHeader,
     TableRow,

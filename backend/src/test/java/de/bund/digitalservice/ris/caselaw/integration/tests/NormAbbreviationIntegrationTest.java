@@ -36,6 +36,8 @@ import java.util.Objects;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -76,7 +78,7 @@ class NormAbbreviationIntegrationTest {
           .documentId(2345L)
           .documentNumber("document number 2")
           .officialLetterAbbreviation("official letter abbreviation 2")
-          .officialLongTitle("official long title 2")
+          .officialLongTitle("I can be searched for 2")
           .officialShortTitle("official short title 2")
           .source("T")
           .build();
@@ -87,7 +89,7 @@ class NormAbbreviationIntegrationTest {
           .documentId(3456L)
           .documentNumber("document number 3")
           .officialLetterAbbreviation("official letter abbreviation 3")
-          .officialLongTitle("official long title 3")
+          .officialLongTitle("I can be searched for 3")
           .officialShortTitle("official short title 3")
           .source("U")
           .build();
@@ -98,7 +100,7 @@ class NormAbbreviationIntegrationTest {
           .documentId(4567L)
           .documentNumber("document number 4")
           .officialLetterAbbreviation("official letter abbreviation 4")
-          .officialLongTitle("official long title 4")
+          .officialLongTitle("I can be searched for 4")
           .officialShortTitle("official short title 4")
           .source("V")
           .build();
@@ -369,12 +371,12 @@ class NormAbbreviationIntegrationTest {
             });
   }
 
-  @Test
-  void testGetNormAbbreviationByPartialSearchQuery() {
+  @ParameterizedTest
+  @ValueSource(strings = {"search query", "can be searched fo"})
+  void testGetByPartialSearchQuery(String query) {
     generateOtherLookupValues();
     generateAbbreviations();
     repository.refreshMaterializedViews();
-    String query = "search query";
 
     risWebTestClient
         .withDefaultLogin()
@@ -388,7 +390,7 @@ class NormAbbreviationIntegrationTest {
             response -> {
               assertThat(response.getResponseBody())
                   .extracting("id")
-                  .containsExactly(
+                  .containsExactlyInAnyOrder(
                       abbreviation2.getId(), abbreviation4.getId(), abbreviation3.getId());
             });
   }

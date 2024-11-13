@@ -38,7 +38,7 @@ jobs:
           java-version: "21.0"
           distribution: "temurin"
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@d156388eb19639ec20ade50009f3d199ce1e2808 # v4.1.0
+        uses: gradle/actions/setup-gradle@473878a77f1b98e2b5ac4af93489d1656a80a5ed # v4.2.0
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
       - name: Run backend tests
@@ -78,7 +78,7 @@ jobs:
           java-version: "21.0"
           distribution: "temurin"
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@d156388eb19639ec20ade50009f3d199ce1e2808 # v4.1.0
+        uses: gradle/actions/setup-gradle@473878a77f1b98e2b5ac4af93489d1656a80a5ed # v4.2.0
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
       - name: Build backend image
@@ -339,7 +339,7 @@ jobs:
       - name: Log into container registry
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: docker/login-action@06895751d15a223ec091bea144ad5c7f50d228d0
+        uses: docker/login-action@7ca345011ac4304463197fac0e56eab1bc7e6af0
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
@@ -387,7 +387,7 @@ jobs:
       - name: Log into container registry
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: docker/login-action@06895751d15a223ec091bea144ad5c7f50d228d0
+        uses: docker/login-action@7ca345011ac4304463197fac0e56eab1bc7e6af0
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
@@ -703,7 +703,7 @@ jobs:
           distribution: "temurin"
           cache: gradle
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@d156388eb19639ec20ade50009f3d199ce1e2808 # v4.1.0
+        uses: gradle/actions/setup-gradle@473878a77f1b98e2b5ac4af93489d1656a80a5ed # v4.2.0
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
       - name: Migrate database for Entity–relationship model

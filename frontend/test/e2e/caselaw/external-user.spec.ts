@@ -73,7 +73,7 @@ test.describe(
 
         await assignUserGroupToProcedure(page, procedureName)
 
-        await test.step("Filter for unassigned doc unit and view in search results as external", async () => {
+        await test.step("Filter for assigned doc unit and view in search results as external", async () => {
           await navigateToSearch(pageWithExternalUser)
           await pageWithExternalUser
             .getByLabel("Dokumentnummer Suche")
