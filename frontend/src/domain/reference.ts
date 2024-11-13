@@ -1,6 +1,7 @@
 import EditableListItem from "./editableListItem"
 import RelatedDocumentation from "./relatedDocumentation"
 import LegalPeriodical from "@/domain/legalPeriodical"
+import { DocumentType } from "./documentUnit"
 
 export default class Reference implements EditableListItem {
   id?: string
@@ -10,6 +11,9 @@ export default class Reference implements EditableListItem {
   legalPeriodical?: LegalPeriodical
   legalPeriodicalRawValue?: string
   documentationUnit?: RelatedDocumentation
+  documentType?: DocumentType
+  author?: string
+  referenceType: "caselaw" | "literature" = "caselaw"
 
   static readonly requiredFields = [
     "legalPeriodical",
