@@ -2,6 +2,7 @@
 import { computed, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import InputField from "@/components/input/InputField.vue"
+import RadioInput from "@/components/input/RadioInput.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
@@ -102,9 +103,36 @@ watch(
         @focus="validationStore.remove('legalPeriodical')"
       ></ComboboxInput>
     </InputField>
+    <div class="flex flex-row items-center gap-16">
+      <div class="flex items-center">
+        <InputField
+          id="caselaw"
+          class="flex items-center"
+          label="Rechtsprechung"
+        >
+          <RadioInput
+            v-model="reference.referenceType"
+            name="referenceType"
+            size="medium"
+            value="caselaw"
+          />
+        </InputField>
+      </div>
+
+      <div class="flex items-center">
+        <InputField id="literature" class="flex items-center" label="Literatur">
+          <RadioInput
+            v-model="reference.referenceType"
+            name="referenceType"
+            size="medium"
+            value="literature"
+          />
+        </InputField>
+      </div>
+    </div>
     <div class="flex flex-col gap-24">
       <div class="flex justify-between gap-24">
-        <div class="flex-1">
+        <div class="flex w-full flex-col">
           <InputField
             id="citation"
             v-slot="slotProps"
@@ -125,9 +153,9 @@ watch(
           >
         </div>
         <InputField
+          v-if="reference.referenceType === 'caselaw'"
           id="referenceSupplement"
           v-slot="slotProps"
-          class="flex-1"
           label="Klammernzusatz"
           :validation-error="validationStore.getByField('referenceSupplement')"
         >
@@ -140,7 +168,33 @@ watch(
             @focus="validationStore.remove('referenceSupplement')"
           ></TextInput>
         </InputField>
+        <InputField
+          v-if="reference.referenceType === 'literature'"
+          id="literatureReferenceDocumentType"
+          label="Dokumenttyp *"
+        >
+          <ComboboxInput
+            id="literatureReferenceDocumentType"
+            v-model="reference.documentType"
+            aria-label="Dokumenttyp Literaturfundstelle"
+            :item-service="
+              ComboboxItemService.getDependentLiteratureDocumentTypes
+            "
+          ></ComboboxInput>
+        </InputField>
       </div>
+      <InputField
+        v-if="reference.referenceType === 'literature'"
+        id="literatureReferenceDocumentType"
+        label="Autor *"
+      >
+        <TextInput
+          id="literatureReferenceDocumentType"
+          v-model="reference.author"
+          aria-label="Klammernzusatz"
+          size="medium"
+        ></TextInput>
+      </InputField>
     </div>
     <div class="flex w-full flex-row justify-between">
       <div>
