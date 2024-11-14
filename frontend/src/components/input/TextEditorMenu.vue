@@ -201,7 +201,7 @@ const buttons = computed(() => {
     {
       type: "menu",
       icon: MdiTablePlus,
-      ariaLabel: "Tabelle einfügen",
+      ariaLabel: "Tabelle",
       group: "Tabelle",
       isCollapsable: false,
       childButtons: [

@@ -21,7 +21,7 @@ export function useCaseLawMenuItems(
         ...baseRoute,
       },
       children: [
-        ...(isInternalUser
+        ...(isInternalUser.value
           ? [
               {
                 label: "Stammdaten",
@@ -59,7 +59,7 @@ export function useCaseLawMenuItems(
         },
       ],
     },
-    ...(isInternalUser
+    ...(isInternalUser.value
       ? [
           {
             label: "Dokumente",
@@ -70,7 +70,7 @@ export function useCaseLawMenuItems(
           },
         ]
       : []),
-    ...(isInternalUser
+    ...(isInternalUser.value
       ? [
           {
             label: "Fundstellen",

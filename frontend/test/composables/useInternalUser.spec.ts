@@ -23,13 +23,13 @@ describe("useExternalUser", () => {
     mockUser("External")
     const result = useInternalUser()
 
-    expect(result).equals(false)
+    expect(result.value).equals(false)
   })
 
   it("should return true if user has role internal", async () => {
     mockUser("Internal")
     const result = useInternalUser()
 
-    expect(result).equals(true)
+    expect(result.value).equals(true)
   })
 })
