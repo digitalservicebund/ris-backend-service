@@ -245,6 +245,55 @@ test.describe(
     )
 
     test(
+      "Literature references can be added to documentation unit",
+      {
+        tag: "@RISDEV-5236",
+      },
+      async ({ page, documentNumber }) => {
+        await test.step("Caselaw reference type is preselected", async () => {
+          await navigateToReferences(page, documentNumber)
+
+          await expect(
+            page.getByLabel("Rechtsprechung Fundstelle"),
+          ).toBeChecked()
+
+          await expect(
+            page.getByLabel("Literatur Fundstelle"),
+          ).not.toBeChecked()
+
+          await expect(page.getByLabel("Klammernzusatz")).toBeVisible()
+
+          await expect(
+            page.getByLabel("Dokumenttyp Literaturfundstelle"),
+          ).toBeHidden()
+
+          await expect(
+            page.getByLabel("Autor Literaturfundstelle"),
+          ).toBeHidden()
+        })
+
+        await test.step("Selecting literature reference type, renders different inputs", async () => {
+          await page.getByLabel("Literatur Fundstelle").click()
+          await expect(
+            page.getByLabel("Rechtsprechung Fundstelle"),
+          ).not.toBeChecked()
+
+          await expect(page.getByLabel("Literatur Fundstelle")).toBeChecked()
+
+          await expect(page.getByLabel("Klammernzusatz")).toBeHidden()
+
+          await expect(
+            page.getByLabel("Dokumenttyp Literaturfundstelle"),
+          ).toBeVisible()
+
+          await expect(
+            page.getByLabel("Autor Literaturfundstelle"),
+          ).toBeVisible()
+        })
+      },
+    )
+
+    test(
       "References are visible in preview",
       {
         annotation: {
