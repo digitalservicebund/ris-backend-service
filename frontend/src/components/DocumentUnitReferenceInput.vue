@@ -103,7 +103,7 @@ watch(
         @focus="validationStore.remove('legalPeriodical')"
       ></ComboboxInput>
     </InputField>
-    <div class="flex flex-row items-center gap-16">
+    <div class="flex items-center gap-16">
       <div class="flex items-center">
         <InputField
           id="caselaw"
@@ -112,6 +112,7 @@ watch(
         >
           <RadioInput
             v-model="reference.referenceType"
+            aria-label="Rechtsprechung Fundstelle"
             name="referenceType"
             size="medium"
             value="caselaw"
@@ -123,6 +124,7 @@ watch(
         <InputField id="literature" class="flex items-center" label="Literatur">
           <RadioInput
             v-model="reference.referenceType"
+            aria-label="Literatur Fundstelle"
             name="referenceType"
             size="medium"
             value="literature"
@@ -191,7 +193,7 @@ watch(
         <TextInput
           id="literatureReferenceDocumentType"
           v-model="reference.author"
-          aria-label="Klammernzusatz"
+          aria-label="Autor Literaturfundstelle"
           size="medium"
         ></TextInput>
       </InputField>

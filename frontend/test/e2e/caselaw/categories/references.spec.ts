@@ -280,8 +280,6 @@ test.describe(
 
           await expect(page.getByLabel("Literatur Fundstelle")).toBeChecked()
 
-          await expect(page.getByLabel("Klammernzusatz")).toBeHidden()
-
           await expect(
             page.getByLabel("Dokumenttyp Literaturfundstelle"),
           ).toBeVisible()
@@ -289,6 +287,7 @@ test.describe(
           await expect(
             page.getByLabel("Autor Literaturfundstelle"),
           ).toBeVisible()
+          await expect(page.getByLabel("Klammernzusatz")).toBeHidden()
         })
       },
     )
