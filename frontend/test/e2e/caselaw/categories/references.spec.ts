@@ -289,6 +289,18 @@ test.describe(
           ).toBeVisible()
           await expect(page.getByLabel("Klammernzusatz")).toBeHidden()
         })
+
+        // await test.step("Save literature reference", async () => {
+
+        // })
+
+        // await test.step("Literature reference visible in correct order", async () => {
+
+        // })
+
+        // await test.step("Radio buttons should not be visible after saving", async () => {
+
+        // })
       },
     )
 
