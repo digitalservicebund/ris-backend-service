@@ -575,6 +575,18 @@ test.describe(
             page.getByLabel("Autor Literaturfundstelle"),
           ).toBeVisible()
         })
+
+        // await test.step("Save literature reference", async () => {
+
+        // })
+
+        // await test.step("Literature reference correctly sorted with other references", async () => {
+
+        // })
+
+        // await test.step("Radio buttons should not be visible after saving", async () => {
+
+        // })
       },
     )
 

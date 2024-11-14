@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import InputField from "@/components/input/InputField.vue"
+import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import RadioInput from "@/components/input/RadioInput.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
@@ -87,6 +87,41 @@ watch(
 
 <template>
   <div class="flex flex-col gap-24">
+    <div v-if="lastSavedModelValue.isEmpty" class="flex items-center gap-16">
+      <div class="flex items-center">
+        <InputField
+          id="caselaw"
+          class="flex items-center"
+          label="Rechtsprechung"
+          :label-position="LabelPosition.RIGHT"
+        >
+          <RadioInput
+            v-model="reference.referenceType"
+            aria-label="Rechtsprechung Fundstelle"
+            name="referenceType"
+            size="medium"
+            value="caselaw"
+          />
+        </InputField>
+      </div>
+
+      <div class="flex items-center">
+        <InputField
+          id="literature"
+          class="flex items-center"
+          label="Literatur"
+          :label-position="LabelPosition.RIGHT"
+        >
+          <RadioInput
+            v-model="reference.referenceType"
+            aria-label="Literatur Fundstelle"
+            name="referenceType"
+            size="medium"
+            value="literature"
+          />
+        </InputField>
+      </div>
+    </div>
     <InputField
       id="legalPeriodical"
       v-slot="slotProps"
@@ -103,35 +138,7 @@ watch(
         @focus="validationStore.remove('legalPeriodical')"
       ></ComboboxInput>
     </InputField>
-    <div class="flex items-center gap-16">
-      <div class="flex items-center">
-        <InputField
-          id="caselaw"
-          class="flex items-center"
-          label="Rechtsprechung"
-        >
-          <RadioInput
-            v-model="reference.referenceType"
-            aria-label="Rechtsprechung Fundstelle"
-            name="referenceType"
-            size="medium"
-            value="caselaw"
-          />
-        </InputField>
-      </div>
 
-      <div class="flex items-center">
-        <InputField id="literature" class="flex items-center" label="Literatur">
-          <RadioInput
-            v-model="reference.referenceType"
-            aria-label="Literatur Fundstelle"
-            name="referenceType"
-            size="medium"
-            value="literature"
-          />
-        </InputField>
-      </div>
-    </div>
     <div class="flex flex-col gap-24">
       <div class="flex justify-between gap-24">
         <div class="flex w-full flex-col">
@@ -185,18 +192,19 @@ watch(
           ></ComboboxInput>
         </InputField>
       </div>
-      <InputField
+      <div
         v-if="reference.referenceType === 'literature'"
-        id="literatureReferenceDocumentType"
-        label="Autor *"
+        class="w-[calc(50%-10px)]"
       >
-        <TextInput
-          id="literatureReferenceDocumentType"
-          v-model="reference.author"
-          aria-label="Autor Literaturfundstelle"
-          size="medium"
-        ></TextInput>
-      </InputField>
+        <InputField id="literatureReferenceDocumentType" label="Autor *">
+          <TextInput
+            id="literatureReferenceDocumentType"
+            v-model="reference.author"
+            aria-label="Autor Literaturfundstelle"
+            size="medium"
+          ></TextInput>
+        </InputField>
+      </div>
     </div>
     <div class="flex w-full flex-row justify-between">
       <div>
