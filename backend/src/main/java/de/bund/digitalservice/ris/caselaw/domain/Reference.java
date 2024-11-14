@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.util.UUID;
 import lombok.Builder;
 
@@ -23,4 +24,7 @@ public record Reference(
     String footnote,
     LegalPeriodical legalPeriodical,
     String legalPeriodicalRawValue,
+    DocumentType documentType,
+    String author,
+    ReferenceType referenceType,
     RelatedDocumentationUnit documentationUnit) {}

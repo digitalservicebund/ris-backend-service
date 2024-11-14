@@ -28,6 +28,8 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.Reference;
+import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
@@ -145,6 +147,7 @@ public class DocumentationUnitTransformer {
     }
 
     addReferences(updatedDomainObject, builder);
+    addDependentLiteratureCitations(updatedDomainObject, builder);
 
     return builder.build();
   }
@@ -156,10 +159,29 @@ public class DocumentationUnitTransformer {
         updatedDomainObject.references() == null
             ? Collections.emptyList()
             : updatedDomainObject.references().stream()
+                .filter(reference -> reference.referenceType() == ReferenceType.CASELAW)
                 .map(ReferenceTransformer::transformToDTO)
                 .map(
                     referenceDTO -> {
                       // TODO why is this necessary?
+                      referenceDTO.setDocumentationUnit(builder.build());
+                      referenceDTO.setRank(i.getAndIncrement());
+                      return referenceDTO;
+                    })
+                .toList());
+  }
+
+  private static void addDependentLiteratureCitations(
+      DocumentationUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
+    AtomicInteger i = new AtomicInteger(1);
+    builder.dependentLiteratureCitations(
+        updatedDomainObject.references() == null
+            ? Collections.emptyList()
+            : updatedDomainObject.references().stream()
+                .filter(reference -> reference.referenceType() == ReferenceType.LITERATURE)
+                .map(DependentLiteratureTransformer::transformToDTO)
+                .map(
+                    referenceDTO -> {
                       referenceDTO.setDocumentationUnit(builder.build());
                       referenceDTO.setRank(i.getAndIncrement());
                       return referenceDTO;
@@ -730,12 +752,24 @@ public class DocumentationUnitTransformer {
   private static void addReferencesToDomain(
       DocumentationUnitDTO documentationUnitDTO,
       DocumentationUnit.DocumentationUnitBuilder builder) {
-    builder.references(
-        documentationUnitDTO.getReferences() == null
-            ? Collections.emptyList()
-            : documentationUnitDTO.getReferences().stream()
-                .map(ReferenceTransformer::transformToDomain)
-                .toList());
+
+    List<Reference> references = new ArrayList<>();
+
+    if (documentationUnitDTO.getReferences() != null) {
+      references.addAll(
+          documentationUnitDTO.getReferences().stream()
+              .map(ReferenceTransformer::transformToDomain)
+              .toList());
+    }
+
+    if (documentationUnitDTO.getDependentLiteratureCitations() != null) {
+      references.addAll(
+          documentationUnitDTO.getDependentLiteratureCitations().stream()
+              .map(DependentLiteratureTransformer::transformToDomain)
+              .toList());
+    }
+
+    builder.references(references);
   }
 
   /**
