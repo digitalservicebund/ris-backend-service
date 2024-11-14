@@ -90,22 +90,21 @@ class DocumentTypeIntegrationTest {
   @Test
   void testGetAllDependantLiteratureDocumentTypes() {
     risWebTestClient
-            .withDefaultLogin()
-            .get()
-            .uri("/api/v1/caselaw/documenttypes/dependent-literature")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(new TypeReference<List<DocumentType>>() {})
-            .consumeWith(
-                    response -> {
-                      assertThat(response.getResponseBody())
-                              .extracting("label", "jurisShortcut")
-                              .containsExactly(
-                                      Tuple.tuple("Anmerkung", "Ean"),
-                                      Tuple.tuple("Entscheidungsbesprechung", "Ebs")
-                              );
-                    });
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documenttypes/dependent-literature")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(new TypeReference<List<DocumentType>>() {})
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody())
+                  .extracting("label", "jurisShortcut")
+                  .containsExactly(
+                      Tuple.tuple("Anmerkung", "Ean"),
+                      Tuple.tuple("Entscheidungsbesprechung", "Ebs"));
+            });
   }
 
   @Test
@@ -128,23 +127,21 @@ class DocumentTypeIntegrationTest {
             });
   }
 
-    @Test
-    void testGetDependantLiteratureDocumentTypesWithQuery() {
-        risWebTestClient
-                .withDefaultLogin()
-                .get()
-                .uri("/api/v1/caselaw/documenttypes/dependent-literature?q=Ea")
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(new TypeReference<List<DocumentType>>() {})
-                .consumeWith(
-                        response -> {
-                            assertThat(response.getResponseBody())
-                                    .extracting("label", "jurisShortcut")
-                                    .containsExactly(
-                                            Tuple.tuple("Anmerkung", "Ean")
-                            );
-                        });
-    }
+  @Test
+  void testGetDependantLiteratureDocumentTypesWithQuery() {
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documenttypes/dependent-literature?q=Ea")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(new TypeReference<List<DocumentType>>() {})
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody())
+                  .extracting("label", "jurisShortcut")
+                  .containsExactly(Tuple.tuple("Anmerkung", "Ean"));
+            });
+  }
 }
