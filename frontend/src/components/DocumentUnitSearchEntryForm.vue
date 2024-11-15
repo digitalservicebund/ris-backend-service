@@ -7,6 +7,7 @@ import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import { DropdownItem, ValidationError } from "@/components/input/types"
+import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { useValidationStore } from "@/composables/useValidationStore"
 import { PublicationState } from "@/domain/publicationStatus"
@@ -195,6 +196,8 @@ function handleSearch() {
   }
 }
 
+const schedulingFeatureToggle = useFeatureToggle("scheduledPublishing")
+
 watch(
   route,
   () => {
@@ -240,12 +243,12 @@ export type DocumentUnitSearchParameter =
       <div class="ds-body-01-reg flex flex-row items-center">Gericht</div>
       <div class="ds-body-01-reg flex flex-row items-center">Datum</div>
       <div
-        v-if="myDocOfficeOnly"
+        v-if="myDocOfficeOnly && schedulingFeatureToggle"
         class="ds-body-01-reg flex flex-row items-center"
       >
         jDV Übergabe
       </div>
-      <div v-if="!myDocOfficeOnly" />
+      <div v-if="!myDocOfficeOnly || !schedulingFeatureToggle" />
       <div></div>
       <!-- Column 2 -->
       <div>
@@ -330,7 +333,10 @@ export type DocumentUnitSearchParameter =
           ></DateInput>
         </InputField>
       </div>
-      <div v-if="myDocOfficeOnly" class="flex flex-row gap-20">
+      <div
+        v-if="myDocOfficeOnly && schedulingFeatureToggle"
+        class="flex flex-row gap-20"
+      >
         <InputField
           id="publicationDate"
           v-slot="{ id, hasError }"
@@ -370,7 +376,7 @@ export type DocumentUnitSearchParameter =
           />
         </InputField>
       </div>
-      <div v-if="!myDocOfficeOnly" />
+      <div v-if="!myDocOfficeOnly || !schedulingFeatureToggle" />
       <div class="pl-32"></div>
       <!-- Column 3 -->
       <div class="ds-body-01-reg flex flex-row items-center pl-24 lg:pl-48">

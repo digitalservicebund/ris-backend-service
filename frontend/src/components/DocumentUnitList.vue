@@ -14,6 +14,7 @@ import PopupModal from "@/components/PopupModal.vue"
 import TableHeader from "@/components/TableHeader.vue"
 import TableRow from "@/components/TableRow.vue"
 import TableView from "@/components/TableView.vue"
+import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { PublicationState } from "@/domain/publicationStatus"
 import { ResponseError } from "@/services/httpClient"
@@ -84,6 +85,8 @@ const publicationDate = (listEntry: DocumentUnitListEntry) => {
   }
 }
 
+const schedulingFeatureToggle = useFeatureToggle("scheduledPublishing")
+
 /**
  * Stops propagation of scrolling event, and toggles the showModal value
  */
@@ -144,15 +147,18 @@ function onDelete() {
         <CellHeaderItem> Ort</CellHeaderItem>
         <CellHeaderItem>
           <div class="flex flex-row">
-            Datum <IconArrowDown v-if="!showPublicationDate" />
+            Datum
+            <IconArrowDown
+              v-if="!showPublicationDate && schedulingFeatureToggle"
+            />
           </div>
         </CellHeaderItem>
         <CellHeaderItem> Aktenzeichen</CellHeaderItem>
         <CellHeaderItem> Spruchkörper</CellHeaderItem>
         <CellHeaderItem> Typ</CellHeaderItem>
-        <CellHeaderItem v-if="showPublicationDate">
+        <CellHeaderItem v-if="showPublicationDate && schedulingFeatureToggle">
           <div class="flex flex-row items-center">
-            jDV Übergabe <IconArrowDown v-if="showPublicationDate" /></div
+            jDV Übergabe <IconArrowDown /></div
         ></CellHeaderItem>
         <CellHeaderItem> Status</CellHeaderItem>
         <CellHeaderItem> Fehler</CellHeaderItem>
@@ -203,6 +209,7 @@ function onDelete() {
             </Tooltip>
 
             <Tooltip
+              v-if="schedulingFeatureToggle"
               :text="schedulingTooltip(listEntry.scheduledPublicationDate)"
             >
               <IconClock
@@ -244,7 +251,7 @@ function onDelete() {
             listEntry.documentType ? listEntry.documentType.jurisShortcut : "-"
           }}
         </CellItem>
-        <CellItem v-if="showPublicationDate">
+        <CellItem v-if="showPublicationDate && schedulingFeatureToggle">
           {{ publicationDate(listEntry) }}
         </CellItem>
         <CellItem class="flex min-w-176 flex-row">

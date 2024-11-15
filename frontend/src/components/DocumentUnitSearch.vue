@@ -64,6 +64,7 @@ async function search() {
   })
   if (response.data) {
     currentPage.value = response.data
+    searchResponseError.value = undefined
   }
   if (response.error) {
     searchResponseError.value = response.error
