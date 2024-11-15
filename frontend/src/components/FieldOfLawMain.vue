@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import * as Sentry from "@sentry/vue"
-import { computed, h, ref } from "vue"
-import { withSummarizer } from "@/components/DataSetSummary.vue"
-import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
+import { computed, ref } from "vue"
+import ExpandableFieldOfLawList from "@/components/ExpandableFieldOfLawList.vue"
 import FieldOfLawSearchInput from "@/components/FieldOfLawSearchInput.vue"
 import FieldOfLawSearchResultList from "@/components/FieldOfLawSearchResultList.vue"
 import FieldOfLawTree from "@/components/FieldOfLawTree.vue"
@@ -93,20 +92,6 @@ function removeSelectedNode() {
   selectedNode.value = undefined
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function selectedFieldsOfLawSummarizer(dataEntry: any) {
-  return h("div", [
-    h(
-      "span",
-      {
-        class: "ds-link-02-bold mr-8",
-      },
-      dataEntry.identifier,
-    ),
-    dataEntry.text,
-  ])
-}
-
 function updateIdentifierSearchTerm(newValue?: string) {
   identifier.value = newValue ? newValue : ""
 }
@@ -118,17 +103,15 @@ function updateDescriptionSearchTerm(newValue?: string) {
 function updateNormSearchTerm(newValue?: string) {
   norm.value = newValue ? newValue : ""
 }
-
-const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
 </script>
 
 <template>
-  <ExpandableDataSet
+  <ExpandableFieldOfLawList
     v-if="localModelValue"
     class="border-b-1 border-t-1 border-blue-300 py-16"
     :data-set="localModelValue"
-    :summary-component="SelectedFieldsOfLawSummary"
     title="Sachgebiete"
+    @node:remove="removeFieldOfLaw"
   >
     <FieldOfLawSearchInput
       :description="description"
@@ -161,5 +144,5 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
         @toggle-show-norms="showNorms = !showNorms"
       ></FieldOfLawTree>
     </div>
-  </ExpandableDataSet>
+  </ExpandableFieldOfLawList>
 </template>
