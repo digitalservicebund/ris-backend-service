@@ -149,7 +149,10 @@ function validateRequiredInput(referenceToValidate?: Reference): boolean {
   const referenceToCheck = referenceToValidate || reference.value
 
   // Check for missing required fields
-  if (referenceToCheck.missingRequiredFields?.length) {
+  if (
+    referenceToCheck.missingRequiredFields?.length &&
+    referenceToValidate?.referenceType == "caselaw"
+  ) {
     referenceToCheck.missingRequiredFields.forEach((missingField: string) => {
       validationStore.add("Pflichtfeld nicht befüllt", missingField)
     })
@@ -166,6 +169,8 @@ function addReference(decision: RelatedDocumentation) {
     id: reference.value.id,
     citation: props.isSaved ? reference.value.citation : buildCitation(),
     referenceSupplement: reference.value.referenceSupplement,
+    author: reference.value.author,
+    documentType: reference.value.documentType,
     footnote: reference.value.footnote,
     legalPeriodical: reference.value.legalPeriodical,
     legalPeriodicalRawValue: reference.value.legalPeriodicalRawValue,
@@ -174,7 +179,11 @@ function addReference(decision: RelatedDocumentation) {
 
   validateRequiredInput(newReference)
 
-  if (validationStore.isValid()) {
+  // Todo validate also literature input
+  if (
+    validationStore.isValid() ||
+    reference.value.referenceType == "literature"
+  ) {
     emit("update:modelValue", newReference)
     emit("addEntry")
   }
@@ -298,7 +307,9 @@ onMounted(async () => {
       @close-modal="deleteReference"
       @confirm-action="deleteReferenceAndDocUnit"
     />
-    <h2 class="ds-label-01-bold mb-16">Fundstelle bearbeiten</h2>
+    <h2 v-if="!isSaved" class="ds-label-01-bold mb-16">
+      Fundstelle bearbeiten
+    </h2>
     <div class="flex flex-col gap-24">
       <DecisionSummary
         v-if="

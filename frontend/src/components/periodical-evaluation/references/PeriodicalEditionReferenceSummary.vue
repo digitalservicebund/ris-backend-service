@@ -15,16 +15,15 @@ const props = defineProps<{
       v-if="props.data.documentationUnit?.documentNumber"
       class="flex flex-col"
     >
+      <div class="ds-label-01-bold mr-8" data-testid="citation-summary">
+        {{ props.data.renderDecision }}
+      </div>
       <FlexContainer flex-direction="flex-row">
         <DecisionSummary
           :decision="props.data.documentationUnit"
           :display-mode="DisplayMode.SIDEPANEL"
         />
       </FlexContainer>
-
-      <div class="ds-label-01-reg mr-8" data-testid="citation-summary">
-        {{ props.data.renderDecision }}
-      </div>
     </div>
   </div>
 </template>

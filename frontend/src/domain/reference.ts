@@ -50,9 +50,11 @@ export default class Reference implements EditableListItem {
 
   get renderDecision(): string {
     return [
+      this.author ? `${this.author},` : "",
       this.legalPeriodical?.abbreviation ?? this.legalPeriodicalRawValue,
       this.citation,
       this.referenceSupplement ? ` (${this.referenceSupplement})` : "",
+      this.documentType ? ` (${this.documentType.jurisShortcut})` : "",
     ]
       .filter(Boolean)
       .join(" ")
