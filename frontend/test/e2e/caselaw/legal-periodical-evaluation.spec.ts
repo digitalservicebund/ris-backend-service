@@ -577,7 +577,8 @@ test.describe(
       {
         tag: "@RISDEV-5236",
       },
-      async ({ page, editionWithReferences }) => {
+      async ({ page, editionWithReferences, prefilledDocumentUnit }) => {
+        const fileNumber = prefilledDocumentUnit.coreData.fileNumbers?.[0] || ""
         await test.step("Caselaw reference type is preselected", async () => {
           await navigateToPeriodicalReferences(
             page,
@@ -622,17 +623,37 @@ test.describe(
           ).toBeVisible()
         })
 
-        // await test.step("Save literature reference", async () => {
+        await test.step("Save literature reference, verify that it is shown in the list", async () => {
+          await page.getByLabel("Literatur Fundstelle").click()
+          await fillInput(page, "Zitatstelle *", `2021, 2`)
+          await fillInput(page, "Autor Literaturfundstelle", "Bilen, Ulviye")
+          await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
+          await page.getByText("Ean", { exact: true }).click()
+          await waitForInputValue(
+            page,
+            "[aria-label='Dokumenttyp Literaturfundstelle']",
+            "Anmerkung",
+          )
+
+          await searchForDocUnitWithFileNumber(page, fileNumber, "31.12.2019")
+          await page.getByLabel("Treffer übernehmen").click()
+          await expect(
+            page.getByText("Bilen, Ulviye, MMG 2024, 2021, 2, Heft 1 (Ean)"),
+          ).toBeVisible()
+        })
+
+        // await test.step("Literature reference are shown in correct order", async () => {
 
         // })
 
-        // await test.step("Literature reference correctly sorted with other references", async () => {
+        await test.step("Radio buttons should not be visible after saving", async () => {
+          await page.getByTestId("list-entry-0").click()
+          await expect(
+            page.getByLabel("Rechtsprechung Fundstelle"),
+          ).toBeHidden()
 
-        // })
-
-        // await test.step("Radio buttons should not be visible after saving", async () => {
-
-        // })
+          await expect(page.getByLabel("Literatur Fundstelle")).toBeHidden()
+        })
       },
     )
 

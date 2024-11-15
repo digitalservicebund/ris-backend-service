@@ -290,17 +290,41 @@ test.describe(
           await expect(page.getByLabel("Klammernzusatz")).toBeHidden()
         })
 
-        // await test.step("Save literature reference", async () => {
+        await test.step("Save literature reference, verify that it is shown in the list", async () => {
+          await fillInput(page, "Periodikum", "AllMBl")
+          await page
+            .getByText("AllMBl | Allgemeines Ministerialblatt", {
+              exact: true,
+            })
+            .click()
+          await waitForInputValue(page, "[aria-label='Periodikum']", "AllMBl")
+          await fillInput(page, "Zitatstelle", "2024, 2")
+          await fillInput(page, "Autor Literaturfundstelle", "Bilen, Ulviye")
+          await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
+          await page.getByText("Ean", { exact: true }).click()
+          await waitForInputValue(
+            page,
+            "[aria-label='Dokumenttyp Literaturfundstelle']",
+            "Anmerkung",
+          )
+          await page.locator("[aria-label='Fundstelle speichern']").click()
+          await expect(
+            page.getByText("Bilen, Ulviye, AllMBl 2024, 2 (Ean)"),
+          ).toBeVisible()
+        })
+
+        // await test.step("Literature reference are shown in correct order", async () => {
 
         // })
 
-        // await test.step("Literature reference visible in correct order", async () => {
+        await test.step("Radio buttons should not be visible after saving", async () => {
+          await page.getByTestId("list-entry-0").click()
+          await expect(
+            page.getByLabel("Rechtsprechung Fundstelle"),
+          ).toBeHidden()
 
-        // })
-
-        // await test.step("Radio buttons should not be visible after saving", async () => {
-
-        // })
+          await expect(page.getByLabel("Literatur Fundstelle")).toBeHidden()
+        })
       },
     )
 
