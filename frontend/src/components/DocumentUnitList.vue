@@ -77,7 +77,7 @@ const schedulingTooltip = (publicationDate?: string) =>
 
 const publicationDate = (listEntry: DocumentUnitListEntry) => {
   const date =
-    listEntry.scheduledPublicationDate ?? listEntry.lastPublicationDate
+    listEntry.scheduledPublicationDateTime ?? listEntry.lastPublicationDate
   if (date) {
     return dayjs(date).format("DD.MM.YYYY HH:mm")
   } else {
@@ -210,15 +210,15 @@ function onDelete() {
 
             <Tooltip
               v-if="schedulingFeatureToggle"
-              :text="schedulingTooltip(listEntry.scheduledPublicationDate)"
+              :text="schedulingTooltip(listEntry.scheduledPublicationDateTime)"
             >
               <IconClock
                 :aria-label="
-                  schedulingTooltip(listEntry.scheduledPublicationDate)
+                  schedulingTooltip(listEntry.scheduledPublicationDateTime)
                 "
                 class="flex-end flex h-20 w-20"
                 :class="
-                  listEntry.scheduledPublicationDate
+                  listEntry.scheduledPublicationDateTime
                     ? 'text-blue-800'
                     : 'text-gray-500'
                 "

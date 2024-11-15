@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Builder;
 
@@ -14,8 +13,8 @@ public record DocumentationUnitSearchInput(
     String courtLocation,
     LocalDate decisionDate,
     LocalDate decisionDateEnd,
-    LocalDateTime publicationDate,
-    Boolean onlyScheduled,
+    LocalDate publicationDate,
+    Boolean scheduledOnly,
     DocumentationOffice documentationOffice,
     Status status,
     boolean myDocOfficeOnly) {}

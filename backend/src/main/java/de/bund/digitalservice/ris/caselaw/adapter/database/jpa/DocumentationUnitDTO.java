@@ -59,10 +59,10 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   private LocalDate decisionDate;
 
   @Column(name = "last_publication_date")
-  private LocalDateTime lastPublicationDate;
+  private LocalDate lastPublicationDate;
 
-  @Column(name = "scheduled_publication_date")
-  private LocalDateTime scheduledPublicationDate;
+  @Column(name = "scheduled_publication_date_time")
+  private LocalDateTime scheduledPublicationDateTime;
 
   @Column(name = "decision_grounds")
   private String decisionGrounds;

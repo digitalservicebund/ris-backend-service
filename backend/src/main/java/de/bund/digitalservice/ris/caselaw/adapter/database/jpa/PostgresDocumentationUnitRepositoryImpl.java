@@ -27,7 +27,6 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.Docume
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -448,8 +447,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       String fileNumber,
       LocalDate decisionDate,
       LocalDate decisionDateEnd,
-      LocalDateTime publicationDate,
-      Boolean onlyScheduled,
+      LocalDate publicationDate,
+      Boolean scheduledOnly,
       PublicationStatus status,
       Boolean withError,
       Boolean myDocOfficeOnly,
@@ -465,7 +464,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
           decisionDate,
           decisionDateEnd,
           publicationDate,
-          onlyScheduled,
+          scheduledOnly,
           status,
           withError,
           myDocOfficeOnly,
@@ -496,6 +495,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
               courtLocation,
               decisionDate,
               decisionDateEnd,
+              publicationDate,
+              scheduledOnly,
               status,
               withError,
               myDocOfficeOnly,
@@ -512,6 +513,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
               courtLocation,
               decisionDate,
               decisionDateEnd,
+              publicationDate,
+              scheduledOnly,
               status,
               withError,
               myDocOfficeOnly,
@@ -575,7 +578,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             searchInput.decisionDate(),
             searchInput.decisionDateEnd(),
             searchInput.publicationDate(),
-            searchInput.onlyScheduled(),
+            searchInput.scheduledOnly(),
             searchInput.status() != null ? searchInput.status().publicationStatus() : null,
             withError,
             searchInput.myDocOfficeOnly(),

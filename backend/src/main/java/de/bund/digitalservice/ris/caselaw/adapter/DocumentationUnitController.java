@@ -192,7 +192,7 @@ public class DocumentationUnitController {
       @RequestParam(value = "decisionDate") Optional<LocalDate> decisionDate,
       @RequestParam(value = "decisionDateEnd") Optional<LocalDate> decisionDateEnd,
       @RequestParam(value = "publicationDate") Optional<LocalDate> publicationDate,
-      @RequestParam(value = "scheduledOnly") Optional<Boolean> onlyScheduled,
+      @RequestParam(value = "scheduledOnly") Optional<Boolean> scheduledOnly,
       @RequestParam(value = "publicationStatus") Optional<String> publicationStatus,
       @RequestParam(value = "withError") Optional<Boolean> withError,
       @RequestParam(value = "myDocOfficeOnly") Optional<Boolean> myDocOfficeOnly,
@@ -207,9 +207,8 @@ public class DocumentationUnitController {
         courtLocation,
         decisionDate,
         decisionDateEnd,
-        // FIXME: This needs to be handed down as a LocalDate, not LocalDateTime
-        publicationDate.map(t -> t.atStartOfDay()),
-        onlyScheduled,
+        publicationDate,
+        scheduledOnly,
         publicationStatus,
         withError,
         myDocOfficeOnly);

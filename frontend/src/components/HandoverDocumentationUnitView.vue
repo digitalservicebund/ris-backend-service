@@ -304,7 +304,7 @@ const isDecisionReasonsInvalid = computed<boolean>(
 const schedulingFeatureToggle = useFeatureToggle("scheduledPublishing")
 
 const isScheduled = computed<boolean>(
-  () => !!store.documentUnit!.coreData.scheduledPublicationDate,
+  () => !!store.documentUnit!.coreData.scheduledPublicationDateTime,
 )
 
 const isPublishable = computed<boolean>(

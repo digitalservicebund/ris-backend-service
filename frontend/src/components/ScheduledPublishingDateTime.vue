@@ -19,14 +19,14 @@ dayjs.extend(dayjsTimezone)
 const store = useDocumentUnitStore()
 
 const scheduledPublishingDate = ref<string | undefined>(
-  store.documentUnit!.coreData.scheduledPublicationDate &&
-    dayjs(store.documentUnit!.coreData.scheduledPublicationDate)
+  store.documentUnit!.coreData.scheduledPublicationDateTime &&
+    dayjs(store.documentUnit!.coreData.scheduledPublicationDateTime)
       .tz("Europe/Berlin")
       .format("YYYY-MM-DD"),
 )
 const scheduledPublishingTime = ref<string>(
-  (store.documentUnit!.coreData.scheduledPublicationDate &&
-    dayjs(store.documentUnit!.coreData.scheduledPublicationDate)
+  (store.documentUnit!.coreData.scheduledPublicationDateTime &&
+    dayjs(store.documentUnit!.coreData.scheduledPublicationDateTime)
       .tz("Europe/Berlin")
       .format("HH:mm")) ||
     "05:00",
@@ -39,7 +39,7 @@ const scheduledDateTimeInput = computed(() =>
 )
 
 const isScheduled = computed<boolean>(
-  () => !!store.documentUnit!.coreData.scheduledPublicationDate,
+  () => !!store.documentUnit!.coreData.scheduledPublicationDateTime,
 )
 
 const isDateInFuture = computed<boolean>(
@@ -50,13 +50,13 @@ const isDateInFuture = computed<boolean>(
 )
 
 const saveScheduling = async () => {
-  store.documentUnit!.coreData.scheduledPublicationDate =
+  store.documentUnit!.coreData.scheduledPublicationDateTime =
     scheduledDateTimeInput.value.toISOString()
   await store.updateDocumentUnit()
 }
 
 const removeScheduling = async () => {
-  store.documentUnit!.coreData.scheduledPublicationDate = undefined
+  store.documentUnit!.coreData.scheduledPublicationDateTime = undefined
   await store.updateDocumentUnit()
   scheduledPublishingDate.value = undefined
 }

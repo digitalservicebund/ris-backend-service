@@ -25,9 +25,9 @@ public interface DocumentationUnitListItemDTO {
 
   LocalDate getDecisionDate();
 
-  LocalDateTime getLastPublicationDate();
+  LocalDate getLastPublicationDate();
 
-  LocalDateTime getScheduledPublicationDate();
+  LocalDateTime getScheduledPublicationDateTime();
 
   DocumentTypeDTO getDocumentType();
 

@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,7 +27,22 @@ public interface DatabaseDocumentationUnitRepository
    AND (cast(:decisionDate as date) IS NULL
        OR (cast(:decisionDateEnd as date) IS NULL AND documentationUnit.decisionDate = :decisionDate)
        OR (cast(:decisionDateEnd as date) IS NOT NULL AND documentationUnit.decisionDate BETWEEN :decisionDate AND :decisionDateEnd))
-   AND (:myDocOfficeOnly = FALSE OR (:myDocOfficeOnly = TRUE AND documentationUnit.documentationOffice.id = :documentationOfficeId))
+   AND (:myDocOfficeOnly = FALSE
+     OR (:myDocOfficeOnly = TRUE
+       AND documentationUnit.documentationOffice.id = :documentationOfficeId
+       AND (
+           (cast(:publicationDate as date) IS NULL AND :scheduledOnly = FALSE)
+        OR (cast(:publicationDate as date) IS NULL AND :scheduledOnly = TRUE
+                AND cast(documentationUnit.scheduledPublicationDateTime as date) IS NOT NULL)
+        OR (cast(:publicationDate as date) IS NOT NULL AND :scheduledOnly = FALSE
+                AND (cast(documentationUnit.scheduledPublicationDateTime as date) = :publicationDate
+                    OR documentationUnit.lastPublicationDate = :publicationDate))
+        OR (cast(:publicationDate as date) IS NOT NULL AND :scheduledOnly = TRUE
+                AND (cast(documentationUnit.scheduledPublicationDateTime as date) = :publicationDate
+                    OR documentationUnit.lastPublicationDate = :publicationDate))
+       )
+     )
+   )
    AND (cast(:documentType as uuid) IS NULL OR documentationUnit.documentType = :documentType)
    AND
      (
@@ -47,12 +61,20 @@ public interface DatabaseDocumentationUnitRepository
       )
     )
    AND (:withErrorOnly = FALSE OR documentationUnit.documentationOffice.id = :documentationOfficeId AND documentationUnit.status.withError = TRUE)
-ORDER BY
- CASE
-  WHEN (:onlyScheduled IS TRUE OR cast(:publicationDate as date) IS NOT NULL) THEN documentationUnit.scheduledPublicationDate ELSE documentationUnit.decisionDate END DESC NULLS LAST
+  ORDER BY
+    CASE
+      WHEN (:scheduledOnly = TRUE OR CAST(:publicationDate AS DATE) IS NOT NULL) THEN 1
+      ELSE 2
+    END,
+    CASE
+      WHEN (:scheduledOnly = TRUE OR CAST(:publicationDate AS DATE) IS NOT NULL) THEN CAST(documentationUnit.scheduledPublicationDateTime AS DATE)
+      ELSE documentationUnit.decisionDate
+    END DESC NULLS LAST,
+    CASE
+      WHEN (:scheduledOnly = TRUE OR CAST(:publicationDate AS DATE) IS NOT NULL) THEN documentationUnit.lastPublicationDate
+      ELSE NULL
+    END DESC NULLS LAST
 """;
-
-  // TODO: Order by CASE WHEN
 
   @Query(
       value =
@@ -61,8 +83,6 @@ ORDER BY
   LEFT JOIN documentationUnit.court court
   LEFT JOIN documentationUnit.status status
   WHERE
-   (cast(:publicationDate as date) IS NULL OR documentationUnit.lastPublicationDate = :publicationDate OR documentationUnit.scheduledPublicationDate = :publicationDate) AND
-    (:onlyScheduled = FALSE OR documentationUnit.scheduledPublicationDate IS NOT NULL) AND
   """
               + BASE_QUERY)
   @SuppressWarnings("java:S107")
@@ -75,8 +95,8 @@ ORDER BY
       @Param("courtLocation") String courtLocation,
       @Param("decisionDate") LocalDate decisionDate,
       @Param("decisionDateEnd") LocalDate decisionDateEnd,
-      @Param("publicationDate") LocalDateTime publicationDate,
-      @Param("onlyScheduled") Boolean onlyScheduled,
+      @Param("publicationDate") LocalDate publicationDate,
+      @Param("scheduledOnly") Boolean scheduledOnly,
       @Param("status") PublicationStatus status,
       @Param("withErrorOnly") Boolean withErrorOnly,
       @Param("myDocOfficeOnly") Boolean myDocOfficeOnly,
@@ -104,6 +124,8 @@ ORDER BY
       @Param("courtLocation") String courtLocation,
       @Param("decisionDate") LocalDate decisionDate,
       @Param("decisionDateEnd") LocalDate decisionDateEnd,
+      @Param("publicationDate") LocalDate publicationDate,
+      @Param("scheduledOnly") Boolean scheduledOnly,
       @Param("status") PublicationStatus status,
       @Param("withErrorOnly") Boolean withErrorOnly,
       @Param("myDocOfficeOnly") Boolean myDocOfficeOnly,
@@ -131,6 +153,8 @@ ORDER BY
       String courtLocation,
       LocalDate decisionDate,
       LocalDate decisionDateEnd,
+      LocalDate publicationDate,
+      Boolean scheduledOnly,
       PublicationStatus status,
       Boolean withErrorOnly,
       Boolean myDocOfficeOnly,

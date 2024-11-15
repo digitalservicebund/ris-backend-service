@@ -83,7 +83,7 @@ public class DocumentationUnitTransformer {
           .ecli(StringUtils.normalizeSpace(coreData.ecli()))
           .judicialBody(StringUtils.normalizeSpace(coreData.appraisalBody()))
           .decisionDate(coreData.decisionDate())
-          .scheduledPublicationDate(coreData.scheduledPublicationDate())
+          .scheduledPublicationDateTime(coreData.scheduledPublicationDateTime())
           .documentType(
               coreData.documentType() != null
                   ? DocumentTypeTransformer.transformToDTO(coreData.documentType())
@@ -583,7 +583,7 @@ public class DocumentationUnitTransformer {
             .ecli(documentationUnitDTO.getEcli())
             .decisionDate(documentationUnitDTO.getDecisionDate())
             .lastPublicationDate(documentationUnitDTO.getLastPublicationDate())
-            .scheduledPublicationDate(documentationUnitDTO.getScheduledPublicationDate())
+            .scheduledPublicationDateTime(documentationUnitDTO.getScheduledPublicationDateTime())
             .appraisalBody(documentationUnitDTO.getJudicialBody())
             .legalEffect(legalEffect == null ? null : legalEffect.getLabel());
 
