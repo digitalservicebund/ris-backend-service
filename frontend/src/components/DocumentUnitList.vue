@@ -74,6 +74,16 @@ const schedulingTooltip = (publicationDate?: string) =>
     ? `Terminierte Übergabe am\n${dayjs(publicationDate).format("DD.MM.YYYY HH:mm")}`
     : "Keine Übergabe terminiert"
 
+const publicationDate = (listEntry: DocumentUnitListEntry) => {
+  const date =
+    listEntry.scheduledPublicationDate ?? listEntry.lastPublicationDate
+  if (date) {
+    return dayjs(date).format("DD.MM.YYYY HH:mm")
+  } else {
+    return "-"
+  }
+}
+
 /**
  * Stops propagation of scrolling event, and toggles the showModal value
  */
@@ -192,13 +202,16 @@ function onDelete() {
               />
             </Tooltip>
 
-            <Tooltip :text="schedulingTooltip(listEntry.publicationDate)">
+            <Tooltip
+              :text="schedulingTooltip(listEntry.scheduledPublicationDate)"
+            >
               <IconClock
-                :aria-label="schedulingTooltip(listEntry.publicationDate)"
+                :aria-label="
+                  schedulingTooltip(listEntry.scheduledPublicationDate)
+                "
                 class="flex-end flex h-20 w-20"
                 :class="
-                  listEntry.publicationDate &&
-                  Date.parse(listEntry.publicationDate) >= Date.now()
+                  listEntry.scheduledPublicationDate
                     ? 'text-blue-800'
                     : 'text-gray-500'
                 "
@@ -232,11 +245,7 @@ function onDelete() {
           }}
         </CellItem>
         <CellItem v-if="showPublicationDate">
-          {{
-            listEntry.publicationDate
-              ? dayjs(listEntry.publicationDate).format("DD.MM.YYYY HH:mm")
-              : "-"
-          }}
+          {{ publicationDate(listEntry) }}
         </CellItem>
         <CellItem class="flex min-w-176 flex-row">
           <IconBadge
