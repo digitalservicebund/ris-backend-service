@@ -1,22 +1,16 @@
 import { fireEvent, render, RenderResult, screen } from "@testing-library/vue"
-import FieldOfLawSelectionList from "@/components/field-of-law/FieldOfLawSelectionList.vue"
+import FieldOfLawSummary from "@/components/field-of-law/FieldOfLawSummary.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 
-function renderComponent(modelValue: FieldOfLaw[]): RenderResult {
+function renderComponent(data: FieldOfLaw[]): RenderResult {
   const props = {
-    modelValue,
+    data,
   }
 
-  return render(FieldOfLawSelectionList, { props })
+  return render(FieldOfLawSummary, { props })
 }
 
-describe.skip("FieldOfLawSelectionList", () => {
-  it("render a 'Die Liste ist aktuell leer'", () => {
-    renderComponent([])
-
-    expect(screen.getByText("Die Liste ist aktuell leer")).toBeInTheDocument()
-  })
-
+describe("FieldOfLawSummary", () => {
   it("render one entry", () => {
     renderComponent([
       {
@@ -28,9 +22,6 @@ describe.skip("FieldOfLawSelectionList", () => {
       },
     ])
 
-    expect(
-      screen.queryByText("Die Liste ist aktuell leer"),
-    ).not.toBeInTheDocument()
     expect(screen.getByText("ST-01-02-03")).toBeInTheDocument()
     expect(screen.getByText("Steuerrecht 1-2-3")).toBeInTheDocument()
     expect(

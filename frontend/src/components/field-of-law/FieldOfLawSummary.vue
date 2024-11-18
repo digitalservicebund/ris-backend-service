@@ -31,7 +31,16 @@ function selectFieldOfLaw(fieldOfLaw: FieldOfLaw) {
         class="flex h-56 w-full flex-row items-center border-b-1 border-blue-300 first:mt-16 first:border-t-1"
       >
         <div class="ds-label-01-reg mr-8 flex-grow">
-          <button class="ds-link-01-bold" @click="selectFieldOfLaw(fieldOfLaw)">
+          <button
+            :aria-label="
+              fieldOfLaw.identifier +
+              ' ' +
+              fieldOfLaw.text +
+              ' im Sachgebietsbaum anzeigen'
+            "
+            class="ds-link-01-bold"
+            @click="selectFieldOfLaw(fieldOfLaw)"
+          >
             {{ fieldOfLaw.identifier }}
           </button>
 
@@ -44,8 +53,13 @@ function selectFieldOfLaw(fieldOfLaw: FieldOfLaw) {
 
         <Tooltip text="Entfernen">
           <button
+            :aria-label="
+              fieldOfLaw.identifier +
+              ' ' +
+              fieldOfLaw.text +
+              ' aus Liste entfernen'
+            "
             class="flex items-center justify-center text-blue-800 hover:bg-blue-100 focus:shadow-[inset_0_0_0_0.125rem] focus:shadow-blue-800 focus:outline-none"
-            data-testid="copy-summary"
             @click="removeFieldOfLaw(fieldOfLaw)"
             @keypress.enter="removeFieldOfLaw(fieldOfLaw)"
           >
