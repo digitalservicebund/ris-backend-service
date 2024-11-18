@@ -33,6 +33,7 @@ border-number number {
 border-number content {
   position: relative;
   padding-left: 8px; /* Space between the border and the text */
+  width: 100%; /* For centered border number content, e.g., centered headlines like "I." */
 }
 
 /* stylelint-disable-next-line selector-type-no-unknown */
