@@ -183,7 +183,7 @@ watch(
       </div>
     </FlexContainer>
     <div v-if="isExpanded">
-      <FieldOfLawNodeComponent
+      <FieldOfLawTreeNode
         v-for="child in children"
         :key="child.identifier"
         class="pl-36"

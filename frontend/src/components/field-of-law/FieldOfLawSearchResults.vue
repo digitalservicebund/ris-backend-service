@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import FieldOfLawListEntry from "@/components/field-of-law/FieldOfLawSearchResultsListItem.vue"
+import FieldOfLawSearchResultsListItem from "@/components/field-of-law/FieldOfLawSearchResultsListItem.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import errorMessages from "@/i18n/errors.json"
@@ -23,7 +23,7 @@ const emit = defineEmits<{
       :page="currentPage"
       @update-page="(page: number) => emit('search', page)"
     >
-      <FieldOfLawListEntry
+      <FieldOfLawSearchResultsListItem
         v-for="(fieldOfLawNode, idx) in results"
         :key="idx"
         :field-of-law="fieldOfLawNode"

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
-import FieldOfLawNodeComponent from "./FieldOfLawTreeNode.vue"
+import FieldOfLawTreeNode from "./FieldOfLawTreeNode.vue"
 import {
   NodeHelper,
   NodeHelperInterface,
@@ -121,7 +121,7 @@ defineExpose({ collapseTree })
       </div>
     </div>
 
-    <FieldOfLawNodeComponent
+    <FieldOfLawTreeNode
       :key="root.identifier"
       :expand-values="expandedNodes"
       is-root
