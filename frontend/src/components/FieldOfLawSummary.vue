@@ -22,10 +22,10 @@ function removeFieldOfLaw(fieldOfLaw: FieldOfLaw) {
       <div
         v-for="(fieldOfLaw, index) in data"
         :key="index"
-        class="flex h-56 w-full flex-row items-center"
+        class="flex h-56 w-full flex-row items-center border-b-1 border-blue-300 first:mt-16 first:border-t-1"
       >
-        <div class="ds-label-01-reg ds-label-02-reg mr-8 flex-grow">
-          <span class="ds-link-02-bold"> {{ fieldOfLaw.identifier }} </span>
+        <div class="ds-label-01-reg mr-8 flex-grow">
+          <span class="ds-link-01-bold"> {{ fieldOfLaw.identifier }} </span>
 
           {{ fieldOfLaw.text }}
         </div>

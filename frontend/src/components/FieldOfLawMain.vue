@@ -108,7 +108,6 @@ function updateNormSearchTerm(newValue?: string) {
 <template>
   <ExpandableFieldOfLawList
     v-if="localModelValue"
-    class="border-b-1 border-t-1 border-blue-300 py-16"
     :data-set="localModelValue"
     title="Sachgebiete"
     @node:remove="removeFieldOfLaw"
