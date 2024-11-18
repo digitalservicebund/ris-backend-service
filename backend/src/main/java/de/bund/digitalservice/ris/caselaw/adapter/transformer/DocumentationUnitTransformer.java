@@ -582,7 +582,7 @@ public class DocumentationUnitTransformer {
                     : documentationUnitDTO.getRegions().get(0).getCode())
             .ecli(documentationUnitDTO.getEcli())
             .decisionDate(documentationUnitDTO.getDecisionDate())
-            .lastPublicationDate(documentationUnitDTO.getLastPublicationDate())
+            .lastPublicationDateTime(documentationUnitDTO.getLastPublicationDateTime())
             .scheduledPublicationDateTime(documentationUnitDTO.getScheduledPublicationDateTime())
             .appraisalBody(documentationUnitDTO.getJudicialBody())
             .legalEffect(legalEffect == null ? null : legalEffect.getLabel());

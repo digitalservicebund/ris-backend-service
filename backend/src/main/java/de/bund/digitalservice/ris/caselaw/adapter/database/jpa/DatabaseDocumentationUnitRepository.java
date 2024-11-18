@@ -36,10 +36,9 @@ public interface DatabaseDocumentationUnitRepository
                 AND cast(documentationUnit.scheduledPublicationDateTime as date) IS NOT NULL)
         OR (cast(:publicationDate as date) IS NOT NULL AND :scheduledOnly = FALSE
                 AND (cast(documentationUnit.scheduledPublicationDateTime as date) = :publicationDate
-                    OR documentationUnit.lastPublicationDate = :publicationDate))
+                    OR cast(documentationUnit.lastPublicationDateTime as date) = :publicationDate))
         OR (cast(:publicationDate as date) IS NOT NULL AND :scheduledOnly = TRUE
-                AND (cast(documentationUnit.scheduledPublicationDateTime as date) = :publicationDate
-                    OR documentationUnit.lastPublicationDate = :publicationDate))
+                AND (cast(documentationUnit.scheduledPublicationDateTime as date) = :publicationDate))
        )
      )
    )
@@ -67,11 +66,11 @@ public interface DatabaseDocumentationUnitRepository
       ELSE 2
     END,
     CASE
-      WHEN (:scheduledOnly = TRUE OR CAST(:publicationDate AS DATE) IS NOT NULL) THEN CAST(documentationUnit.scheduledPublicationDateTime AS DATE)
+      WHEN (:scheduledOnly = TRUE OR CAST(:publicationDate AS DATE) IS NOT NULL) THEN documentationUnit.scheduledPublicationDateTime
       ELSE documentationUnit.decisionDate
     END DESC NULLS LAST,
     CASE
-      WHEN (:scheduledOnly = TRUE OR CAST(:publicationDate AS DATE) IS NOT NULL) THEN documentationUnit.lastPublicationDate
+      WHEN (:scheduledOnly = TRUE OR CAST(:publicationDate AS DATE) IS NOT NULL) THEN documentationUnit.lastPublicationDateTime
       ELSE NULL
     END DESC NULLS LAST
 """;

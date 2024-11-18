@@ -77,7 +77,7 @@ const schedulingTooltip = (publicationDate?: string) =>
 
 const publicationDate = (listEntry: DocumentUnitListEntry) => {
   const date =
-    listEntry.scheduledPublicationDateTime ?? listEntry.lastPublicationDate
+    listEntry.scheduledPublicationDateTime ?? listEntry.lastPublicationDateTime
   if (date) {
     return dayjs(date).format("DD.MM.YYYY HH:mm")
   } else {

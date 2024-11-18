@@ -37,7 +37,7 @@ public record DocumentationUnitListItem(
     String fileNumber,
     Boolean hasAttachments,
     LocalDate decisionDate,
-    LocalDate lastPublicationDate,
+    LocalDateTime lastPublicationDateTime,
     LocalDateTime scheduledPublicationDateTime,
     String appraisalBody,
     Boolean hasHeadnoteOrPrinciple,

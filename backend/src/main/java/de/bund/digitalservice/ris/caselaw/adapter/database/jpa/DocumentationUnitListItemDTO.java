@@ -25,7 +25,7 @@ public interface DocumentationUnitListItemDTO {
 
   LocalDate getDecisionDate();
 
-  LocalDate getLastPublicationDate();
+  LocalDateTime getLastPublicationDateTime();
 
   LocalDateTime getScheduledPublicationDateTime();
 
