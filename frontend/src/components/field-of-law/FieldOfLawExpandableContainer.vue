@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, nextTick, ref } from "vue"
-import FieldOfLawSummary from "@/components/FieldOfLawSummary.vue"
+import FieldOfLawSummary from "@/components/field-of-law/FieldOfLawSummary.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import IconAdd from "~icons/ic/baseline-add"

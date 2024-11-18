@@ -2,7 +2,7 @@
 import { ref } from "vue"
 import ActiveCitations from "@/components/ActiveCitations.vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
-import FieldOfLawMain from "@/components/FieldOfLawMain.vue"
+import FieldOfLawMain from "@/components/field-of-law/FieldOfLaw.vue"
 import KeyWords from "@/components/KeyWords.vue"
 import Norms from "@/components/NormReferences.vue"
 import OtherCategories from "@/components/OtherCategories.vue"

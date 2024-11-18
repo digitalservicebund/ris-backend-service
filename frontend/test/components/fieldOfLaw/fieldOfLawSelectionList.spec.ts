@@ -1,5 +1,5 @@
 import { fireEvent, render, RenderResult, screen } from "@testing-library/vue"
-import FieldOfLawSelectionList from "@/components/FieldOfLawSelectionList.vue"
+import FieldOfLawSelectionList from "@/components/field-of-law/FieldOfLawSelectionList.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 
 function renderComponent(modelValue: FieldOfLaw[]): RenderResult {

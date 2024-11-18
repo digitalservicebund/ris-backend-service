@@ -1,5 +1,5 @@
 import { fireEvent, render, RenderResult, screen } from "@testing-library/vue"
-import FieldOfLawListEntry from "@/components/FieldOfLawListEntry.vue"
+import FieldOfLawListEntry from "@/components/field-of-law/FieldOfLawSearchResultsListItem.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 
 function renderComponent(

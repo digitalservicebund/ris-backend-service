@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import FieldOfLawListEntry from "@/components/FieldOfLawListEntry.vue"
+import FieldOfLawListEntry from "@/components/field-of-law/FieldOfLawSearchResultsListItem.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import errorMessages from "@/i18n/errors.json"

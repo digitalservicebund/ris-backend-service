@@ -1,6 +1,6 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import FieldOfLawTreeVue from "@/components/FieldOfLawTree.vue"
+import FieldOfLawTreeVue from "@/components/field-of-law/FieldOfLawTree.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
 
