@@ -14,7 +14,7 @@ public record DocumentationUnitSearchInput(
     LocalDate decisionDate,
     LocalDate decisionDateEnd,
     LocalDate publicationDate,
-    Boolean scheduledOnly,
+    boolean scheduledOnly,
     DocumentationOffice documentationOffice,
     Status status,
     boolean myDocOfficeOnly) {}
