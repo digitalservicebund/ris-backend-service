@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import * as Sentry from "@sentry/vue"
 import { computed, ref } from "vue"
-import ExpandableFieldOfLawList from "@/components/ExpandableFieldOfLawList.vue"
+import ExpandableFieldOfLawList from "@/components/FieldOfLawExpandableContainer.vue"
 import FieldOfLawSearchInput from "@/components/FieldOfLawSearchInput.vue"
 import FieldOfLawSearchResultList from "@/components/FieldOfLawSearchResultList.vue"
 import FieldOfLawTree from "@/components/FieldOfLawTree.vue"
@@ -103,14 +103,19 @@ function updateDescriptionSearchTerm(newValue?: string) {
 function updateNormSearchTerm(newValue?: string) {
   norm.value = newValue ? newValue : ""
 }
+
+function addFromList(fieldOfLaw: FieldOfLaw) {
+  addFieldOfLaw(fieldOfLaw)
+  setSelectedNode(fieldOfLaw)
+}
 </script>
 
 <template>
   <ExpandableFieldOfLawList
     v-if="localModelValue"
     :data-set="localModelValue"
-    title="Sachgebiete"
     @node:remove="removeFieldOfLaw"
+    @node:select="setSelectedNode"
   >
     <FieldOfLawSearchInput
       :description="description"
@@ -126,8 +131,9 @@ function updateNormSearchTerm(newValue?: string) {
       <FieldOfLawSearchResultList
         :current-page="currentPage"
         :results="results"
+        @linked-field:select="setSelectedNode"
+        @node:select="addFromList"
         @search="submitSearch"
-        @set-selected-node="setSelectedNode"
       />
 
       <FieldOfLawTree

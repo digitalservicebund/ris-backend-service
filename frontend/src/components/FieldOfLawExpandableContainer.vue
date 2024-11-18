@@ -6,12 +6,12 @@ import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import IconAdd from "~icons/ic/baseline-add"
 
 const props = defineProps<{
-  title: string
   dataSet: FieldOfLaw[]
 }>()
 
 const emit = defineEmits<{
   "node:remove": [node: FieldOfLaw]
+  "node:select": [node: FieldOfLaw]
 }>()
 
 const titleRef = ref<HTMLElement | null>(null)
@@ -26,27 +26,31 @@ function removeNode(node: FieldOfLaw) {
   emit("node:remove", node)
 }
 
-async function toggleContentVisibilityOnButton(event: Event) {
-  isExpanded.value = !isExpanded.value
-  if (!isExpanded.value) {
-    // Scroll back up to title - this is needed because field of law edit can be very long
-    await nextTick()
-    titleRef.value?.scrollIntoView({ block: "nearest" })
-  }
-  event.stopPropagation()
+function selectNode(node: FieldOfLaw) {
+  emit("node:select", node)
+  expandContent()
+}
+
+function expandContent() {
+  isExpanded.value = true
+}
+
+async function collapseContent() {
+  isExpanded.value = false
+  await nextTick()
+  titleRef.value?.scrollIntoView({ block: "nearest" })
 }
 </script>
 
 <template>
   <div class="flex w-full items-start justify-between bg-white">
     <div class="flex w-full flex-col">
-      <h2 ref="titleRef" class="ds-label-01-bold">
-        {{ title }}
-      </h2>
+      <h2 ref="titleRef" class="ds-label-01-bold">Sachgebiete</h2>
       <FieldOfLawSummary
         v-if="!isExpanded"
         :data="dataSet"
         @node:remove="removeNode"
+        @node:select="selectNode"
       />
     </div>
   </div>
@@ -62,7 +66,7 @@ async function toggleContentVisibilityOnButton(event: Event) {
     class="my-16"
     label="Fertig"
     size="small"
-    @click="toggleContentVisibilityOnButton"
+    @click="collapseContent"
   />
 
   <TextButton
@@ -72,6 +76,6 @@ async function toggleContentVisibilityOnButton(event: Event) {
     :icon="IconAdd"
     :label="expandButtonLabel"
     size="small"
-    @click="toggleContentVisibilityOnButton"
+    @click="expandContent"
   />
 </template>

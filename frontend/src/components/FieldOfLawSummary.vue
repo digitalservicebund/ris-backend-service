@@ -9,10 +9,15 @@ defineProps<{
 
 const emit = defineEmits<{
   "node:remove": [node: FieldOfLaw]
+  "node:select": [node: FieldOfLaw]
 }>()
 
 function removeFieldOfLaw(fieldOfLaw: FieldOfLaw) {
   emit("node:remove", fieldOfLaw)
+}
+
+function selectFieldOfLaw(fieldOfLaw: FieldOfLaw) {
+  emit("node:select", fieldOfLaw)
 }
 </script>
 
@@ -25,7 +30,9 @@ function removeFieldOfLaw(fieldOfLaw: FieldOfLaw) {
         class="flex h-56 w-full flex-row items-center border-b-1 border-blue-300 first:mt-16 first:border-t-1"
       >
         <div class="ds-label-01-reg mr-8 flex-grow">
-          <span class="ds-link-01-bold"> {{ fieldOfLaw.identifier }} </span>
+          <button class="ds-link-01-bold" @click="selectFieldOfLaw(fieldOfLaw)">
+            {{ fieldOfLaw.identifier }}
+          </button>
 
           {{ fieldOfLaw.text }}
         </div>
