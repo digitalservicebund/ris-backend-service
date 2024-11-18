@@ -9,7 +9,6 @@ import TextButton from "@/components/input/TextButton.vue"
 import TimeInput from "@/components/input/TimeInput.vue"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
-import IconWatch from "~icons/ic/outline-watch-later"
 
 const { isPublishable } = defineProps<{ isPublishable: boolean }>()
 
@@ -63,7 +62,7 @@ const removeScheduling = async () => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-8">
+  <div class="flex flex-col gap-16">
     <p>Oder für später terminieren:</p>
     <div class="flex max-w-640 flex-row items-end gap-8">
       <InputField id="scheduledPublishingDate" label="Datum *">
@@ -87,7 +86,7 @@ const removeScheduling = async () => {
       </InputField>
       <TextButton
         v-if="!isScheduled"
-        aria-label="Terminieren"
+        aria-label="Termin setzen"
         button-type="primary"
         class="w-fit"
         :disabled="
@@ -96,18 +95,16 @@ const removeScheduling = async () => {
           !scheduledPublishingDate ||
           !scheduledPublishingTime
         "
-        :icon="IconWatch"
-        label="Terminieren"
+        label="Termin&nbsp;setzen"
         size="medium"
         @click="saveScheduling"
       />
       <TextButton
         v-if="isScheduled"
-        aria-label="Terminierung löschen"
-        button-type="primary"
+        aria-label="Termin löschen"
+        button-type="destructive"
         class="w-fit shrink-0"
-        :icon="IconWatch"
-        label="Terminierung löschen"
+        label="Termin&nbsp;löschen"
         size="medium"
         @click="removeScheduling"
       />

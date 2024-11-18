@@ -156,12 +156,12 @@ function onDelete() {
         <CellHeaderItem> Aktenzeichen</CellHeaderItem>
         <CellHeaderItem> Spruchkörper</CellHeaderItem>
         <CellHeaderItem> Typ</CellHeaderItem>
+        <CellHeaderItem> Status</CellHeaderItem>
+        <CellHeaderItem> Fehler</CellHeaderItem>
         <CellHeaderItem v-if="showPublicationDate && schedulingFeatureToggle">
           <div class="flex flex-row items-center">
             jDV Übergabe <IconArrowDown /></div
         ></CellHeaderItem>
-        <CellHeaderItem> Status</CellHeaderItem>
-        <CellHeaderItem> Fehler</CellHeaderItem>
         <CellHeaderItem />
       </TableHeader>
       <TableRow
@@ -251,9 +251,6 @@ function onDelete() {
             listEntry.documentType ? listEntry.documentType.jurisShortcut : "-"
           }}
         </CellItem>
-        <CellItem v-if="showPublicationDate && schedulingFeatureToggle">
-          {{ publicationDate(listEntry) }}
-        </CellItem>
         <CellItem class="flex min-w-176 flex-row">
           <IconBadge
             v-if="listEntry.status?.publicationStatus"
@@ -286,6 +283,9 @@ function onDelete() {
             label="Fehler"
           />
           <span v-else>-</span>
+        </CellItem>
+        <CellItem v-if="showPublicationDate && schedulingFeatureToggle">
+          {{ publicationDate(listEntry) }}
         </CellItem>
         <CellItem class="flex">
           <div class="float-end flex">
