@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import TokenizeText from "@/components/TokenizeText.vue"
 import Tooltip from "@/components/Tooltip.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import MaterialSymbolsClose from "~icons/material-symbols/close"
@@ -34,7 +35,11 @@ function selectFieldOfLaw(fieldOfLaw: FieldOfLaw) {
             {{ fieldOfLaw.identifier }}
           </button>
 
-          {{ fieldOfLaw.text }}
+          <TokenizeText
+            :keywords="fieldOfLaw.linkedFields ?? []"
+            :text="fieldOfLaw.text"
+            @linked-field:select="selectFieldOfLaw"
+          />
         </div>
 
         <Tooltip text="Entfernen">

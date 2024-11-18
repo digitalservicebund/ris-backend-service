@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import TokenizeText from "@/components/TokenizeText.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 
 defineProps<{
@@ -26,6 +27,11 @@ const emit = defineEmits<{
         fieldOfLaw.identifier
       }}</span>
     </button>
-    <span class="ds-label-02-reg mt-2"> {{ fieldOfLaw.text }}</span>
+    <span class="ds-label-02-reg mt-2">
+      <TokenizeText
+        :keywords="fieldOfLaw.linkedFields ?? []"
+        :text="fieldOfLaw.text"
+        @linked-field:select="emit('linked-field:select', $event)"
+    /></span>
   </div>
 </template>

@@ -37,17 +37,18 @@ function handleTokenClick(token: Token) {
 </script>
 
 <template>
-  <button
+  <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+  <span
     v-for="(token, idx) in tokenizeText()"
     :key="idx"
     class="text-left"
     :class="token.isLink && 'linked-field'"
-    tabindex="0"
+    :tabindex="token.isLink ? 0 : undefined"
     @click="handleTokenClick(token)"
     @keyup.enter="handleTokenClick(token)"
   >
     {{ token.content }}
-  </button>
+  </span>
 </template>
 
 <style lang="scss" scoped>

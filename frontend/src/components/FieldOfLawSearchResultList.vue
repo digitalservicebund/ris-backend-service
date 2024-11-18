@@ -27,7 +27,7 @@ const emit = defineEmits<{
         v-for="(fieldOfLawNode, idx) in results"
         :key="idx"
         :field-of-law="fieldOfLawNode"
-        @linked-field:select="emit('linkedField:select', fieldOfLawNode)"
+        @linked-field:select="emit('linkedField:select', $event)"
         @node:select="emit('node:select', fieldOfLawNode)"
       />
     </Pagination>
