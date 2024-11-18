@@ -27,6 +27,9 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.Docume
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -364,6 +367,24 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     documentationUnitDTO.getProcedures().clear();
     documentationUnitDTO.getProcedures().addAll(documentationUnitProcedureDTOs);
 
+    repository.save(documentationUnitDTO);
+  }
+
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
+  public void saveLastPublicationDateTime(DocumentationUnit documentationUnit) {
+    if (documentationUnit == null) {
+      return;
+    }
+
+    var documentationUnitDTOOptional = repository.findById(documentationUnit.uuid());
+    if (documentationUnitDTOOptional.isEmpty()) {
+      return;
+    }
+    var documentationUnitDTO = documentationUnitDTOOptional.get();
+    ZoneId germanyZoneId = ZoneId.of("Europe/Berlin");
+    LocalDateTime nowInGermany = ZonedDateTime.now(germanyZoneId).toLocalDateTime();
+    documentationUnitDTO.setLastPublicationDateTime(nowInGermany);
     repository.save(documentationUnitDTO);
   }
 
