@@ -76,6 +76,13 @@ function addExpandedNodes(
   return map
 }
 
+function collapseTree() {
+  expandedNodes.value.forEach((node) => {
+    collapseNode(node)
+  })
+  expandedNodes.value = []
+}
+
 watch(
   () => props.selectedNode,
   async (newSelectedNode, oldSelectedNode) => {
@@ -85,6 +92,8 @@ watch(
   },
   { immediate: true },
 )
+
+defineExpose({ collapseTree })
 </script>
 
 <template>

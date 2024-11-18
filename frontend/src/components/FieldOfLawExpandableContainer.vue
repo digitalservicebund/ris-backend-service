@@ -12,11 +12,16 @@ const props = defineProps<{
 const emit = defineEmits<{
   "node:remove": [node: FieldOfLaw]
   "node:select": [node: FieldOfLaw]
+  editingDone: [void]
 }>()
 
 const titleRef = ref<HTMLElement | null>(null)
 
 const isExpanded = ref(false)
+
+const fieldOfLawCount = computed(() => {
+  return props.dataSet.length > 0 ? " (" + props.dataSet.length + ")" : ""
+})
 
 const expandButtonLabel = computed(() => {
   return props.dataSet.length > 0 ? "Weitere Angabe" : "Sachgebiete"
@@ -28,24 +33,37 @@ function removeNode(node: FieldOfLaw) {
 
 function selectNode(node: FieldOfLaw) {
   emit("node:select", node)
-  expandContent()
+  enterEditMode()
 }
 
-function expandContent() {
+function enterEditMode() {
   isExpanded.value = true
 }
 
-async function collapseContent() {
+async function exitEditMode() {
   isExpanded.value = false
   await nextTick()
   titleRef.value?.scrollIntoView({ block: "nearest" })
+  emit("editingDone")
 }
 </script>
 
 <template>
   <div class="flex w-full items-start justify-between bg-white">
     <div class="flex w-full flex-col">
-      <h2 ref="titleRef" class="ds-label-01-bold">Sachgebiete</h2>
+      <div class="flex w-full flex-row justify-between">
+        <h2 ref="titleRef" class="ds-label-01-bold">
+          Sachgebiete <span v-if="isExpanded">{{ fieldOfLawCount }} </span>
+        </h2>
+        <TextButton
+          v-if="isExpanded"
+          aria-label="Fertig"
+          button-type="primary"
+          label="Fertig"
+          size="small"
+          @click="exitEditMode"
+        />
+      </div>
       <FieldOfLawSummary
         v-if="!isExpanded"
         :data="dataSet"
@@ -55,19 +73,9 @@ async function collapseContent() {
     </div>
   </div>
 
-  <div v-if="isExpanded" class="mt-16 flex flex-col items-start gap-24">
+  <div v-if="isExpanded" class="flex flex-col items-start gap-24">
     <slot />
   </div>
-
-  <TextButton
-    v-if="isExpanded"
-    aria-label="Fertig"
-    button-type="tertiary"
-    class="my-16"
-    label="Fertig"
-    size="small"
-    @click="collapseContent"
-  />
 
   <TextButton
     v-else
@@ -76,6 +84,6 @@ async function collapseContent() {
     :icon="IconAdd"
     :label="expandButtonLabel"
     size="small"
-    @click="expandContent"
+    @click="enterEditMode"
   />
 </template>

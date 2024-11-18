@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import * as Sentry from "@sentry/vue"
-import { computed, ref } from "vue"
+import { computed, ref, useTemplateRef } from "vue"
 import ExpandableFieldOfLawList from "@/components/FieldOfLawExpandableContainer.vue"
 import FieldOfLawSearchInput from "@/components/FieldOfLawSearchInput.vue"
 import FieldOfLawSearchResultList from "@/components/FieldOfLawSearchResultList.vue"
@@ -9,6 +9,9 @@ import { Page } from "@/components/Pagination.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import service from "@/services/fieldOfLawService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+
+type FieldOfLawTreeType = InstanceType<typeof FieldOfLawTree>
+const treeRef = useTemplateRef<FieldOfLawTreeType>("treeRef")
 
 const showNorms = ref(false)
 const selectedNode = ref<FieldOfLaw | undefined>(undefined)
@@ -108,12 +111,27 @@ function addFromList(fieldOfLaw: FieldOfLaw) {
   addFieldOfLaw(fieldOfLaw)
   setSelectedNode(fieldOfLaw)
 }
+
+function resetSearch() {
+  // reset search params
+  identifier.value = ""
+  description.value = ""
+  norm.value = ""
+  // reset search results list
+  currentPage.value = undefined
+  results.value = undefined
+  // reset tree
+  selectedNode.value = undefined
+  showNorms.value = false
+  treeRef.value?.collapseTree()
+}
 </script>
 
 <template>
   <ExpandableFieldOfLawList
     v-if="localModelValue"
     :data-set="localModelValue"
+    @editing-done="resetSearch"
     @node:remove="removeFieldOfLaw"
     @node:select="setSelectedNode"
   >
@@ -138,6 +156,7 @@ function addFromList(fieldOfLaw: FieldOfLaw) {
 
       <FieldOfLawTree
         v-if="localModelValue"
+        ref="treeRef"
         v-model="localModelValue"
         :search-results="results"
         :selected-node="selectedNode"
@@ -147,7 +166,7 @@ function addFromList(fieldOfLaw: FieldOfLaw) {
         @node:unselect="removeFieldOfLaw"
         @selected-node:reset="removeSelectedNode"
         @toggle-show-norms="showNorms = !showNorms"
-      ></FieldOfLawTree>
+      />
     </div>
   </ExpandableFieldOfLawList>
 </template>
