@@ -102,7 +102,7 @@ watch(
           <CheckboxInput
             id="showNorms"
             v-model="showNormsModelValue"
-            class="ds-checkbox-mini"
+            class="ds-checkbox-mini bg-white"
             size="small"
           />
         </InputField>
