@@ -107,7 +107,7 @@ watch(
 
 <template>
   <FlexContainer flex-direction="flex-col">
-    <FlexContainer class="min-h-[32px]" flex-direction="flex-row">
+    <FlexContainer class="min-h-36" flex-direction="flex-row">
       <div v-if="node.hasChildren">
         <div v-if="isExpanded">
           <Tooltip text="Zuklappen">
@@ -145,7 +145,7 @@ watch(
             node.text +
             (isSelected ? ' entfernen' : ' hinzufügen')
           "
-          class="ds-checkbox-mini ml-8 bg-white"
+          class="ds-checkbox-mini ml-12 bg-white"
           :data-testid="`field-of-law-node-${node.identifier}`"
         />
       </div>

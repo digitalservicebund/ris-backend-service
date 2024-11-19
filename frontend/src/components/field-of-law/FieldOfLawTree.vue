@@ -101,8 +101,10 @@ defineExpose({ collapseTree })
 
 <template>
   <div class="flex flex-1 flex-col bg-blue-200 p-16">
-    <div class="flex w-full flex-row justify-between">
-      <div class="flex"><p class="ds-label-01-reg">Sachgebietsbaum</p></div>
+    <div class="mb-20 flex w-full flex-row justify-between">
+      <div class="flex">
+        <p class="ds-label-01-reg">Sachgebietsbaum</p>
+      </div>
       <div class="flex">
         <InputField
           id="showNorms"
