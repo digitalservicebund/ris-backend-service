@@ -70,7 +70,7 @@ async function submitSearch(page: number) {
   }
 }
 
-const addFieldOfLaw = (fieldOfLaw: FieldOfLaw) => {
+const addFieldOfLaw = async (fieldOfLaw: FieldOfLaw) => {
   if (
     !localModelValue.value?.find(
       (entry) => entry.identifier === fieldOfLaw.identifier,
@@ -78,13 +78,13 @@ const addFieldOfLaw = (fieldOfLaw: FieldOfLaw) => {
   ) {
     localModelValue.value?.push(fieldOfLaw)
   }
-  setScrollPosition()
+  await setScrollPosition()
 }
 
-const setScrollPosition = () => {
+const setScrollPosition = async () => {
   const container = document.documentElement // Replace with specific scrollable container if needed
 
-  nextTick(() => {
+  await nextTick(() => {
     // Get all elements with the class 'field-of-law'
     const fieldOfLawElements = document.querySelectorAll(
       ".field-of-law",
@@ -130,8 +130,8 @@ function updateNormSearchTerm(newValue?: string) {
   norm.value = newValue ? newValue : ""
 }
 
-function addFromList(fieldOfLaw: FieldOfLaw) {
-  addFieldOfLaw(fieldOfLaw)
+async function addFromList(fieldOfLaw: FieldOfLaw) {
+  await addFieldOfLaw(fieldOfLaw)
   setSelectedNode(fieldOfLaw)
 }
 

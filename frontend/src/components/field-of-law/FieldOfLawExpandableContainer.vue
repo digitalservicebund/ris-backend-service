@@ -68,8 +68,8 @@ async function exitEditMode() {
 
   <div v-if="isExpanded" class="flex flex-col items-start gap-24">
     <div
-      class="flex w-full flex-row justify-end"
       v-if="isExpanded && dataSet.length > 0"
+      class="flex w-full flex-row justify-end"
     >
       <TextButton
         aria-label="Fertig"
