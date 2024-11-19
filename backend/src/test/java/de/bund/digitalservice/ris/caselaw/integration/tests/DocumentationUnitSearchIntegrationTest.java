@@ -358,6 +358,15 @@ class DocumentationUnitSearchIntegrationTest {
             .returnResult()
             .getResponseBody();
 
+    /*
+     * Ordered results visible for user (lastPublicationDate only if scheduledPublicationDate is null):
+     * 2022-01-23 05:03
+     * 2022-01-23 12:10
+     * 2022-01-23 10:10
+     * 2022-01-23 10:05
+     * 2022-01-23 09:05
+     * 2022-01-23 05:03
+     */
     assertThat(responseBody)
         .extracting("scheduledPublicationDateTime")
         .containsExactly(

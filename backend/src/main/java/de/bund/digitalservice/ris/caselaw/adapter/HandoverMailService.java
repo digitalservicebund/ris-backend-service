@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 /** Implementation of the {@link MailService} interface that sends juris-XML files via email. */
 @Service
 public class HandoverMailService implements MailService {
+
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
   private final XmlExporter xmlExporter;
