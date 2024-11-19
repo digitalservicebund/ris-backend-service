@@ -19,10 +19,6 @@ const titleRef = ref<HTMLElement | null>(null)
 
 const isExpanded = ref(false)
 
-const fieldOfLawCount = computed(() => {
-  return props.dataSet.length > 0 ? " (" + props.dataSet.length + ")" : ""
-})
-
 const expandButtonLabel = computed(() => {
   return props.dataSet.length > 0 ? "Weitere Angabe" : "Sachgebiete"
 })
@@ -51,12 +47,10 @@ async function exitEditMode() {
 <template>
   <div class="flex w-full items-start justify-between bg-white">
     <div class="flex w-full flex-col">
-      <div class="flex w-full flex-row justify-between">
-        <h2 ref="titleRef" class="ds-label-01-bold">
-          Sachgebiete <span v-if="isExpanded">{{ fieldOfLawCount }} </span>
-        </h2>
+      <div class="flex w-full flex-row items-center justify-between">
+        <h2 ref="titleRef" class="ds-label-01-bold">Sachgebiete</h2>
         <TextButton
-          v-if="isExpanded"
+          v-if="isExpanded && dataSet.length == 0"
           aria-label="Fertig"
           button-type="primary"
           label="Fertig"
@@ -65,7 +59,6 @@ async function exitEditMode() {
         />
       </div>
       <FieldOfLawSummary
-        v-if="!isExpanded"
         :data="dataSet"
         @node:remove="removeNode"
         @node:select="selectNode"
@@ -74,6 +67,18 @@ async function exitEditMode() {
   </div>
 
   <div v-if="isExpanded" class="flex flex-col items-start gap-24">
+    <div
+      class="flex w-full flex-row justify-end"
+      v-if="isExpanded && dataSet.length > 0"
+    >
+      <TextButton
+        aria-label="Fertig"
+        button-type="primary"
+        label="Fertig"
+        size="small"
+        @click="exitEditMode"
+      />
+    </div>
     <slot />
   </div>
 

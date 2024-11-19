@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import * as Sentry from "@sentry/vue"
-import { computed, ref, useTemplateRef } from "vue"
+import { computed, nextTick, ref, useTemplateRef } from "vue"
 import ExpandableFieldOfLawList from "@/components/field-of-law/FieldOfLawExpandableContainer.vue"
 import FieldOfLawSearchInput from "@/components/field-of-law/FieldOfLawSearchInput.vue"
 import FieldOfLawSearchResultList from "@/components/field-of-law/FieldOfLawSearchResults.vue"
@@ -78,6 +78,29 @@ const addFieldOfLaw = (fieldOfLaw: FieldOfLaw) => {
   ) {
     localModelValue.value?.push(fieldOfLaw)
   }
+  setScrollPosition()
+}
+
+const setScrollPosition = () => {
+  const container = document.documentElement // Replace with specific scrollable container if needed
+
+  nextTick(() => {
+    // Get all elements with the class 'field-of-law'
+    const fieldOfLawElements = document.querySelectorAll(
+      ".field-of-law",
+    ) as NodeListOf<HTMLElement>
+
+    if (fieldOfLawElements.length > 0) {
+      // Get the height of the last added field-of-law element
+      const lastItem = fieldOfLawElements[fieldOfLawElements.length - 1]
+      if (lastItem) {
+        const addedHeight = lastItem.getBoundingClientRect().height
+
+        // Adjust the scroll position by the height of the last item
+        container.scrollTop += addedHeight
+      }
+    }
+  })
 }
 
 const removeFieldOfLaw = (fieldOfLaw: FieldOfLaw) => {
