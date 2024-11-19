@@ -2,6 +2,7 @@ import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, fireEvent, screen } from "@testing-library/vue"
 import { Stubs } from "@vue/test-utils/dist/types"
+import { beforeEach } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import HandoverDocumentationUnitView from "@/components/HandoverDocumentationUnitView.vue"
 import DocumentUnit from "@/domain/documentUnit"
@@ -75,6 +76,21 @@ describe("HandoverDocumentationUnitView:", () => {
   })
 
   describe("renders plausibility check", () => {
+    let consoleErrorSpy: ReturnType<typeof vi.spyOn>
+
+    beforeEach(() => {
+      consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {})
+    })
+
+    afterEach(() => {
+      if (consoleErrorSpy.mock.calls.length > 0) {
+        console.log(
+          "console.error was called with:",
+          consoleErrorSpy.mock.calls,
+        )
+      }
+      consoleErrorSpy.mockRestore()
+    })
     it("with all required fields filled", async () => {
       renderComponent({
         documentUnit: new DocumentUnit("123", {
