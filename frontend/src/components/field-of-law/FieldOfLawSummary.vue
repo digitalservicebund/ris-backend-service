@@ -38,7 +38,7 @@ function selectFieldOfLaw(fieldOfLaw: FieldOfLaw) {
               fieldOfLaw.text +
               ' im Sachgebietsbaum anzeigen'
             "
-            class="ds-link-01-bold"
+            class="ds-link-01-bold mr-8"
             @click="selectFieldOfLaw(fieldOfLaw)"
           >
             {{ fieldOfLaw.identifier }}
