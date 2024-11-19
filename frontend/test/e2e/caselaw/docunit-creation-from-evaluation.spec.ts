@@ -4,6 +4,7 @@ import {
   deleteDocumentUnit,
   fillInput,
   navigateToPeriodicalReferences,
+  navigateToPreview,
   navigateToSearch,
   waitForInputValue,
 } from "./e2e-utils"
@@ -414,142 +415,164 @@ test.describe(
         const randomFileNumber = generateString()
         let documentNumber = ""
 
-        try {
-          await test.step("After searching, the responsible docoffice is evaluated and a documentation unit can be created", async () => {
-            await searchForDocUnit(
-              page,
-              "AG Aachen",
-              formattedDate,
-              randomFileNumber,
-              "AnU",
-            )
+        await test.step("After searching, the responsible docoffice is evaluated and a documentation unit can be created", async () => {
+          await searchForDocUnit(
+            page,
+            "AG Aachen",
+            formattedDate,
+            randomFileNumber,
+            "AnU",
+          )
 
-            await expect(
-              page.getByText("Übernehmen und weiter bearbeiten"),
-            ).toBeVisible()
+          await expect(
+            page.getByText("Übernehmen und weiter bearbeiten"),
+          ).toBeVisible()
 
-            await expect(
-              page.getByLabel("Zuständige Dokumentationsstelle"),
-            ).toHaveValue("BGH")
-          })
+          await expect(
+            page.getByLabel("Zuständige Dokumentationsstelle"),
+          ).toHaveValue("BGH")
+        })
 
-          await test.step("Validation of required fields before creation new documentation unit from search parameters", async () => {
-            await page.getByText("Übernehmen und weiter bearbeiten").click()
+        await test.step("Validation of required fields before creation new documentation unit from search parameters", async () => {
+          await page.getByText("Übernehmen und weiter bearbeiten").click()
 
-            await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
+          await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
 
-            await expect(
-              page.getByText("Pflichtfeld nicht befüllt"),
-            ).toHaveCount(2)
+          await expect(page.getByText("Pflichtfeld nicht befüllt")).toHaveCount(
+            2,
+          )
 
-            await fillInput(page, "Zitatstelle *", "12")
-            await expect(
-              page.getByText("Pflichtfeld nicht befüllt"),
-            ).toHaveCount(1)
-            await page.getByText("Übernehmen und weiter bearbeiten").click()
+          await fillInput(page, "Zitatstelle *", "12")
+          await expect(page.getByText("Pflichtfeld nicht befüllt")).toHaveCount(
+            1,
+          )
+          await page.getByText("Übernehmen und weiter bearbeiten").click()
 
-            await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
+          await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
 
-            await fillInput(page, "Klammernzusatz", "L")
+          await fillInput(page, "Klammernzusatz", "L")
 
-            await expect(
-              page.getByText("Pflichtfeld nicht befüllt"),
-            ).toBeHidden()
-          })
+          await expect(page.getByText("Pflichtfeld nicht befüllt")).toBeHidden()
+        })
 
-          await test.step("Created documentation unit for foreign docoffice is editable for creating docoffice", async () => {
-            const pagePromise = page.context().waitForEvent("page")
-            await page.getByText("Übernehmen und weiter bearbeiten").click()
-            const newTab = await pagePromise
-            await expect(newTab).toHaveURL(
-              /\/caselaw\/documentunit\/[A-Z0-9]{13}\/categories$/,
-            )
-            documentNumber = /caselaw\/documentunit\/(.*)\/categories/g.exec(
-              newTab.url(),
-            )?.[1] as string
-            await expect(
-              newTab.getByLabel("Gericht", { exact: true }),
-            ).toHaveValue("AG Aachen")
-            await expect(
-              newTab.getByLabel("Entscheidungsdatum", { exact: true }),
-            ).toHaveValue(formattedDate)
-            await expect(newTab.getByTestId("chip-value")).toHaveText(
-              randomFileNumber,
-            )
-            await expect(
-              newTab.getByLabel("Dokumenttyp", { exact: true }),
-            ).toHaveValue("Anerkenntnisurteil")
+        const pagePromise = page.context().waitForEvent("page")
+        await page.getByText("Übernehmen und weiter bearbeiten").click()
+        const newTab = await pagePromise
 
-            await newTab.keyboard.down("v")
+        await test.step("Created documentation unit for foreign docoffice is editable for creating docoffice", async () => {
+          await expect(newTab).toHaveURL(
+            /\/caselaw\/documentunit\/[A-Z0-9]{13}\/categories$/,
+          )
+          documentNumber = /caselaw\/documentunit\/(.*)\/categories/g.exec(
+            newTab.url(),
+          )?.[1] as string
+          await expect(
+            newTab.getByLabel("Gericht", { exact: true }),
+          ).toHaveValue("AG Aachen")
+          await expect(
+            newTab.getByLabel("Entscheidungsdatum", { exact: true }),
+          ).toHaveValue(formattedDate)
+          await expect(newTab.getByTestId("chip-value")).toHaveText(
+            randomFileNumber,
+          )
+          await expect(
+            newTab.getByLabel("Dokumenttyp", { exact: true }),
+          ).toHaveValue("Anerkenntnisurteil")
 
-            await expect(
-              newTab.getByText("Sekundäre Fundstellen"),
-            ).toBeVisible()
-            await expect(
-              newTab.getByText(
-                `${edition.legalPeriodical?.abbreviation} ${edition.prefix}12${edition.suffix} (L)`,
-                { exact: true },
-              ),
-            ).toBeVisible()
-          })
+          await newTab.keyboard.down("v")
 
-          await test.step("The new documentation unit is added to the list of references", async () => {
-            await expect(page.getByLabel("Listen Eintrag")).toHaveCount(2)
+          await expect(newTab.getByText("Sekundäre Fundstellen")).toBeVisible()
+          await expect(
+            newTab.getByText(
+              `${edition.legalPeriodical?.abbreviation} ${edition.prefix}12${edition.suffix} (L)`,
+              { exact: true },
+            ),
+          ).toBeVisible()
+        })
 
-            await expect(
-              page.getByText(
-                `AG Aachen, ${formattedDate}, ${randomFileNumber}, Anerkenntnisurteil, Fremdanlage`,
-              ),
-            ).toBeVisible()
+        await test.step("The new documentation unit is added to the list of references", async () => {
+          await expect(page.getByLabel("Listen Eintrag")).toHaveCount(2)
 
-            await expect(
-              page.getByText(
-                `${edition.legalPeriodical?.abbreviation} ${edition.prefix}12${edition.suffix} (L)`,
-                { exact: true },
-              ),
-            ).toBeVisible()
-          })
+          await expect(
+            page.getByText(
+              `AG Aachen, ${formattedDate}, ${randomFileNumber}, Anerkenntnisurteil, Fremdanlage`,
+            ),
+          ).toBeVisible()
 
-          await test.step("Created documentation unit is not visible to creating doc office in search with Fremdanlage status", async () => {
-            await navigateToSearch(page)
+          await expect(
+            page.getByText(
+              `${edition.legalPeriodical?.abbreviation} ${edition.prefix}12${edition.suffix} (L)`,
+              { exact: true },
+            ),
+          ).toBeVisible()
+        })
 
-            await page.getByLabel("Dokumentnummer Suche").fill(documentNumber)
+        await test.step("Created documentation unit is not visible to creating doc office in search with Fremdanlage status", async () => {
+          await navigateToSearch(newTab)
 
-            const select = page.locator(`select[id="status"]`)
-            await select.selectOption("Fremdanlage")
-            await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-            const listEntry = page.getByTestId("listEntry")
-            await expect(listEntry).toHaveCount(0)
-          })
+          await newTab.getByLabel("Dokumentnummer Suche").fill(documentNumber)
 
-          await test.step("Created documentation unit is visible with 'Übernehmen' button to foreign doc office in search with Fremdanlage status", async () => {
-            await navigateToSearch(pageWithBghUser)
+          const select = newTab.locator(`select[id="status"]`)
+          await select.selectOption("Fremdanlage")
+          await newTab.getByLabel("Nach Dokumentationseinheiten suchen").click()
+          const listEntry = newTab.getByTestId("listEntry")
+          await expect(listEntry).toHaveCount(0)
+        })
 
-            await pageWithBghUser
-              .getByLabel("Dokumentnummer Suche")
-              .fill(documentNumber)
+        await test.step("Created documentation unit is visible with 'Übernehmen' button to foreign doc office in search with Fremdanlage status", async () => {
+          await navigateToSearch(pageWithBghUser)
 
-            const select = pageWithBghUser.locator(`select[id="status"]`)
-            await select.selectOption("Fremdanlage")
-            await pageWithBghUser
-              .getByLabel("Nach Dokumentationseinheiten suchen")
-              .click()
-            const listEntry = pageWithBghUser.getByTestId("listEntry")
-            await expect(listEntry).toHaveCount(1)
-            await expect(listEntry).toContainText(
-              `Fremdanlage aus MMG ${edition.prefix}12${edition.suffix} (DS)`,
-            )
-            await expect(
-              pageWithBghUser.getByLabel("Dokumentationseinheit übernehmen"),
-            ).toBeVisible()
+          await pageWithBghUser
+            .getByLabel("Dokumentnummer Suche")
+            .fill(documentNumber)
 
-            await expect(
-              pageWithBghUser.getByText("Dokumentationseinheit bearbeiten"),
-            ).toBeHidden()
-          })
-        } finally {
-          await deleteDocumentUnit(page, documentNumber)
-        }
+          const select = pageWithBghUser.locator(`select[id="status"]`)
+          await select.selectOption("Fremdanlage")
+          await pageWithBghUser
+            .getByLabel("Nach Dokumentationseinheiten suchen")
+            .click()
+          const listEntry = pageWithBghUser.getByTestId("listEntry")
+          await expect(listEntry).toHaveCount(1)
+          await expect(listEntry).toContainText(
+            `Fremdanlage aus MMG ${edition.prefix}12${edition.suffix} (DS)`,
+          )
+          await expect(
+            pageWithBghUser.getByLabel("Dokumentationseinheit übernehmen"),
+          ).toBeVisible()
+
+          await expect(
+            pageWithBghUser.getByText("Dokumentationseinheit bearbeiten"),
+          ).toBeHidden()
+        })
+
+        await test.step("Created DocUnit is deleted when reference is deleted", async () => {
+          await page.getByTestId("list-entry-0").click()
+
+          await page
+            .getByText("Fundstelle und Dokumentationseinheit löschen")
+            .click()
+
+          await expect(
+            page.getByText(
+              `AG Aachen, ${formattedDate}, ${randomFileNumber}, Anerkenntnisurteil, Unveröffentlicht`,
+            ),
+          ).toBeHidden()
+
+          await expect(
+            page.getByText(
+              `${edition.legalPeriodical?.abbreviation} ${edition.prefix}12${edition.suffix} (L)`,
+              { exact: true },
+            ),
+          ).toBeHidden()
+
+          await navigateToPreview(page, documentNumber, { skipAssert: true })
+
+          await expect(
+            page.getByText(
+              "Diese Dokumentationseinheit existiert nicht oder Sie haben keine Berechtigung.",
+            ),
+          ).toBeVisible()
+        })
       },
     )
 
@@ -749,7 +772,9 @@ test.describe(
               0,
             )
 
-            // Todo: also check that reference with created docunit was deleted --> RISDEV-5146
+            await page.reload()
+            await expect(page.getByText(documentNumber2)).toBeHidden()
+            await expect(page.getByLabel("Listen Eintrag")).toHaveCount(2)
           })
         } finally {
           await deleteDocumentUnit(pageWithBghUser, documentNumber1)

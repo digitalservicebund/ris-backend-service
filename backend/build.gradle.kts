@@ -54,7 +54,7 @@ jacoco {
 }
 
 lombok {
-    version = "1.18.34"
+    version = "1.18.36"
 }
 
 springBoot {
@@ -105,7 +105,8 @@ spotless {
             "**/static/**",
             "**/gradle.properties",
             "**/gradle-wrapper.properties",
-            "**/jaxb.properties"
+            "**/jaxb.properties",
+            "**/sentry-debug-meta.properties"
         )
         // spotless:off
         prettier(
@@ -155,7 +156,7 @@ dependencies {
     implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.3.4")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.0")
 
     // CVE-2024-22262
     implementation("org.springframework:spring-web:6.1.14")
@@ -167,7 +168,7 @@ dependencies {
     // CVE-2022-3171
     implementation("com.google.protobuf:protobuf-java:4.28.3")
     // CVE-2023-52428 in spring-boot-starter-oauth2-client:3.2.3
-    implementation("com.nimbusds:nimbus-jose-jwt:9.46")
+    implementation("com.nimbusds:nimbus-jose-jwt:9.47")
     // CVE-2023-31582
     implementation("org.bitbucket.b_c:jose4j:0.9.6")
 
@@ -177,7 +178,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.29.9"))
+    implementation(platform("software.amazon.awssdk:bom:2.29.16"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -190,7 +191,7 @@ dependencies {
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
     implementation("org.eclipse.angus:angus-mail:2.0.3")
-    implementation("com.icegreen:greenmail:2.1.0")
+    implementation("com.icegreen:greenmail:2.1.1")
 
     // package served by private repo, requires authentication:
     implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.19") {
@@ -211,8 +212,8 @@ dependencies {
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.13.6")
-    implementation("io.micrometer:micrometer-core:1.13.6")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.14.1")
+    implementation("io.micrometer:micrometer-core:1.14.1")
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
     // => CVE-2023-2976
@@ -233,8 +234,8 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:5.14.2")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("io.projectreactor:reactor-test:3.6.11")
-    testImplementation("org.springframework.security:spring-security-test:6.3.4")
+    testImplementation("io.projectreactor:reactor-test:3.7.0")
+    testImplementation("org.springframework.security:spring-security-test:6.4.0")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.3.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")

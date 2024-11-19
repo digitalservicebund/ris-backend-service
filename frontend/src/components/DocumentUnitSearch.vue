@@ -34,7 +34,7 @@ const isInternalUser = useInternalUser()
 
 const emptyStateLabel = computed(() => {
   if (!documentUnitListEntries.value) {
-    if (isInternalUser) {
+    if (isInternalUser.value) {
       return "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit."
     } else {
       return "Starten Sie die Suche."

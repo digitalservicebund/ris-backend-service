@@ -16,7 +16,7 @@ enum Endpoint {
   courts = "courts",
   citationTypes = "citationtypes",
   fieldOfLawSearchByIdentifier = "fieldsoflaw/search-by-identifier",
-  risAbbreviations = `normabbreviation/search?pg=0&sz=15`,
+  risAbbreviations = `normabbreviation/search?pg=0&sz=30`,
   procedures = `procedure`,
   legalForceRegions = `region/applicable`,
   legalForceTypes = `legalforcetype`,
