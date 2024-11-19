@@ -29,7 +29,7 @@ describe("ScheduledPublishingDateTime", () => {
 
     const timeField = screen.getByLabelText("Terminierte Uhrzeit")
     expect(timeField).toHaveValue("05:00")
-    expect(dateField).not.toHaveAttribute("readonly")
+    expect(timeField).not.toHaveAttribute("readonly")
 
     expect(screen.getByLabelText("Termin setzen")).toBeDisabled()
 
@@ -60,7 +60,7 @@ describe("ScheduledPublishingDateTime", () => {
   })
 
   it("should render previously set publishing date", () => {
-    mockDocUnitStore("2080-10-11T03:00:00.000Z")
+    mockDocUnitStore("2080-10-10T23:00:00.000Z")
     render(ScheduledPublishingDateTime, {
       props: { isPublishable: true },
     })
@@ -70,8 +70,8 @@ describe("ScheduledPublishingDateTime", () => {
     expect(dateField).toHaveAttribute("readonly")
 
     const timeField = screen.getByLabelText("Terminierte Uhrzeit")
-    expect(timeField).toHaveValue("05:00")
-    expect(dateField).toHaveAttribute("readonly")
+    expect(timeField).toHaveValue("01:00")
+    expect(timeField).toHaveAttribute("readonly")
 
     expect(screen.queryByLabelText("Termin setzen")).not.toBeInTheDocument()
 
@@ -124,7 +124,7 @@ describe("ScheduledPublishingDateTime", () => {
 
     const timeField = screen.getByLabelText("Terminierte Uhrzeit")
     expect(timeField).toHaveValue("05:00")
-    expect(dateField).not.toHaveAttribute("readonly")
+    expect(timeField).not.toHaveAttribute("readonly")
 
     expect(screen.getByLabelText("Termin setzen")).toBeDisabled()
 

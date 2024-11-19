@@ -10,6 +10,7 @@ import { EventRecordType, HandoverMail, Preview } from "@/domain/eventRecord"
 import LegalForce from "@/domain/legalForce"
 import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
+import featureToggleService from "@/services/featureToggleService"
 import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
 
 const router = createRouter({
@@ -73,8 +74,12 @@ describe("HandoverDocumentationUnitView:", () => {
         success: true,
       }),
     })
-  })
 
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
+  })
   describe("renders plausibility check", () => {
     it("with all required fields filled", async () => {
       renderComponent({
@@ -493,7 +498,7 @@ describe("HandoverDocumentationUnitView:", () => {
     await new Promise((resolve) => setTimeout(resolve, 0))
 
     expect(container).toHaveTextContent(
-      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltRandnummernprüfungDie Reihenfolge der Randnummern ist korrektXML VorschauDokumentationseinheit an jDV übergebenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subject`,
+      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltRandnummernprüfungDie Reihenfolge der Randnummern ist korrektXML VorschauDokumentationseinheit an jDV übergebenOder für später terminieren:Datum * Uhrzeit * Termin setzenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subject`,
     )
 
     const codeSnippet = screen.queryByTestId("code-snippet")
