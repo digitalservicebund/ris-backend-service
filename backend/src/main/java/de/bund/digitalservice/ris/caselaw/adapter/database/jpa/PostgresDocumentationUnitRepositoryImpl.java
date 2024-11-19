@@ -372,12 +372,12 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public void saveLastPublicationDateTime(DocumentationUnit documentationUnit) {
-    if (documentationUnit == null) {
+  public void saveLastPublicationDateTime(UUID uuid) {
+    if (uuid == null) {
       return;
     }
 
-    var documentationUnitDTOOptional = repository.findById(documentationUnit.uuid());
+    var documentationUnitDTOOptional = repository.findById(uuid);
     if (documentationUnitDTOOptional.isEmpty()) {
       return;
     }

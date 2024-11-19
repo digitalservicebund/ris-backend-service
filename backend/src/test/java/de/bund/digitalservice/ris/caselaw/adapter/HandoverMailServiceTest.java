@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -14,7 +13,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
@@ -127,8 +125,6 @@ class HandoverMailServiceTest {
   private LegalPeriodicalEdition edition;
 
   @Autowired private HandoverMailService service;
-
-  @MockBean private DocumentationUnitService documentationUnitService;
 
   @MockBean private XmlExporter xmlExporter;
 
@@ -326,7 +322,6 @@ class HandoverMailServiceTest {
     verify(repository, never()).save(any(HandoverMail.class));
     verify(mailSender, never())
         .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
-    verify(documentationUnitService, never()).setPublicationDateTime(documentationUnit);
   }
 
   @Test
@@ -368,7 +363,6 @@ class HandoverMailServiceTest {
     verify(repository, never()).save(any(HandoverMail.class));
     verify(mailSender, never())
         .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
-    verify(documentationUnitService, never()).setPublicationDateTime(documentationUnit);
   }
 
   @Test
@@ -405,7 +399,6 @@ class HandoverMailServiceTest {
     verify(repository, never()).save(any(HandoverMail.class));
     verify(mailSender, never())
         .sendMail(anyString(), anyString(), anyString(), anyString(), any(List.class), anyString());
-    verify(documentationUnitService, never()).setPublicationDateTime(documentationUnit);
   }
 
   @Test
@@ -437,7 +430,6 @@ class HandoverMailServiceTest {
     verify(repository).save(any(HandoverMail.class));
     verify(mailSender)
         .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
-    verify(documentationUnitService, times(1)).setPublicationDateTime(documentationUnit);
   }
 
   @Test
@@ -451,7 +443,6 @@ class HandoverMailServiceTest {
     verify(repository, never()).save(any(HandoverMail.class));
     verify(mailSender, never())
         .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
-    verify(documentationUnitService, never()).setPublicationDateTime(documentationUnit);
   }
 
   @Test
@@ -481,7 +472,6 @@ class HandoverMailServiceTest {
             Collections.singletonList(
                 MailAttachment.builder().fileName("test.xml").fileContent("xml").build()),
             TEST_UUID.toString());
-    verify(documentationUnitService, never()).setPublicationDateTime(documentationUnit);
   }
 
   // Method providing the parameters for the test

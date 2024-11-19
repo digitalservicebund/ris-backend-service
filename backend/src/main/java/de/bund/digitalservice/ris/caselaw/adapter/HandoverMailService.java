@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverException;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
@@ -35,9 +34,6 @@ import org.springframework.stereotype.Service;
 /** Implementation of the {@link MailService} interface that sends juris-XML files via email. */
 @Service
 public class HandoverMailService implements MailService {
-
-  private final DocumentationUnitService documentationUnitService;
-
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
   private final XmlExporter xmlExporter;
@@ -55,12 +51,10 @@ public class HandoverMailService implements MailService {
   private String jurisUsername;
 
   public HandoverMailService(
-      DocumentationUnitService documentationUnitService,
       XmlExporter xmlExporter,
       HttpMailSender mailSender,
       HandoverRepository repository,
       Environment env) {
-    this.documentationUnitService = documentationUnitService;
     this.xmlExporter = xmlExporter;
     this.mailSender = mailSender;
     this.repository = repository;
@@ -100,7 +94,6 @@ public class HandoverMailService implements MailService {
       return handoverMail;
     }
     generateAndSendMail(handoverMail);
-    documentationUnitService.setPublicationDateTime(documentationUnit);
     return repository.save(handoverMail);
   }
 

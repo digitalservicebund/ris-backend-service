@@ -386,8 +386,8 @@ class DocumentationUnitServiceTest {
   void test_setPublicationDateTime_shouldSaveLastPublicationDateTime() {
     DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
 
-    service.setPublicationDateTime(documentationUnit);
+    service.setPublicationDateTime(documentationUnit.uuid());
 
-    verify(repository, times(1)).saveLastPublicationDateTime(documentationUnit);
+    verify(repository, times(1)).saveLastPublicationDateTime(documentationUnit.uuid());
   }
 }

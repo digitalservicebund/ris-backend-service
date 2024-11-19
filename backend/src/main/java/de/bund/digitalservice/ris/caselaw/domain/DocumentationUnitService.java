@@ -182,8 +182,8 @@ public class DocumentationUnitService {
         oidcUser, repository.findDocumentationUnitListItemByDocumentNumber(documentNumber));
   }
 
-  public void setPublicationDateTime(DocumentationUnit documentationUnit) {
-    repository.saveLastPublicationDateTime(documentationUnit);
+  public void setPublicationDateTime(UUID uuid) {
+    repository.saveLastPublicationDateTime(uuid);
   }
 
   private DocumentationUnitListItem addPermissions(
