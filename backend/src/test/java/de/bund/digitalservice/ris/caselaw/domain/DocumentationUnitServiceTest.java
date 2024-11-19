@@ -381,4 +381,13 @@ class DocumentationUnitServiceTest {
     assertThat(capturedRelatedDocumentationUnit.getFileNumber())
         .isEqualTo("This is a test filenumber with spaces.");
   }
+
+  @Test
+  void test_setPublicationDateTime_shouldSaveLastPublicationDateTime() {
+    DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
+
+    service.setPublicationDateTime(documentationUnit);
+
+    verify(repository, times(1)).saveLastPublicationDateTime(documentationUnit);
+  }
 }

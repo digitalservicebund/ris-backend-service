@@ -30,17 +30,12 @@ public interface DatabaseDocumentationUnitRepository
    AND (:myDocOfficeOnly = FALSE
      OR (:myDocOfficeOnly = TRUE
        AND documentationUnit.documentationOffice.id = :documentationOfficeId
-       AND (
-           (cast(:publicationDate as date) IS NULL AND :scheduledOnly = FALSE)
-        OR (cast(:publicationDate as date) IS NULL AND :scheduledOnly = TRUE
-                AND cast(documentationUnit.scheduledPublicationDateTime as date) IS NOT NULL)
-        OR (cast(:publicationDate as date) IS NOT NULL AND :scheduledOnly = FALSE
-                AND (cast(documentationUnit.scheduledPublicationDateTime as date) = :publicationDate
-                    OR cast(documentationUnit.lastPublicationDateTime as date) = :publicationDate))
-        OR (cast(:publicationDate as date) IS NOT NULL AND :scheduledOnly = TRUE
-                AND (cast(documentationUnit.scheduledPublicationDateTime as date) = :publicationDate))
-       )
      )
+   )
+   AND (
+       (:scheduledOnly = FALSE OR cast(documentationUnit.scheduledPublicationDateTime as date) IS NOT NULL)
+   AND (cast(:publicationDate as date) IS NULL OR (cast(documentationUnit.scheduledPublicationDateTime as date) = :publicationDate)
+      OR (cast(documentationUnit.lastPublicationDateTime as date) = :publicationDate))
    )
    AND (cast(:documentType as uuid) IS NULL OR documentationUnit.documentType = :documentType)
    AND
@@ -60,19 +55,17 @@ public interface DatabaseDocumentationUnitRepository
       )
     )
    AND (:withErrorOnly = FALSE OR documentationUnit.documentationOffice.id = :documentationOfficeId AND documentationUnit.status.withError = TRUE)
-  ORDER BY
-    CASE
-      WHEN (:scheduledOnly = TRUE OR CAST(:publicationDate AS DATE) IS NOT NULL) THEN 1
-      ELSE 2
-    END,
-    CASE
-      WHEN (:scheduledOnly = TRUE OR CAST(:publicationDate AS DATE) IS NOT NULL) THEN documentationUnit.scheduledPublicationDateTime
-      ELSE documentationUnit.decisionDate
-    END DESC NULLS LAST,
-    CASE
-      WHEN (:scheduledOnly = TRUE OR CAST(:publicationDate AS DATE) IS NOT NULL) THEN documentationUnit.lastPublicationDateTime
-      ELSE NULL
-    END DESC NULLS LAST
+   ORDER BY
+     CASE
+       WHEN (:scheduledOnly = TRUE OR CAST(:publicationDate AS DATE) IS NOT NULL)
+          AND documentationUnit.scheduledPublicationDateTime IS NOT NULL
+          THEN documentationUnit.scheduledPublicationDateTime
+       WHEN (:scheduledOnly = TRUE OR CAST(:publicationDate AS DATE) IS NOT NULL)
+          AND documentationUnit.scheduledPublicationDateTime IS NULL
+          AND CAST(documentationUnit.lastPublicationDateTime as date) = :publicationDate
+          THEN documentationUnit.lastPublicationDateTime
+       ELSE documentationUnit.decisionDate
+     END DESC NULLS LAST
 """;
 
   @Query(
