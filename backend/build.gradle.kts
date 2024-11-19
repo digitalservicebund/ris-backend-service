@@ -159,7 +159,7 @@ dependencies {
     implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.0")
 
     // CVE-2024-22262
-    implementation("org.springframework:spring-web:6.2.0")
+    implementation("org.springframework:spring-web:6.1.14")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.3")
 
