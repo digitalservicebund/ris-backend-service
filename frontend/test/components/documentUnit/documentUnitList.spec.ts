@@ -7,6 +7,7 @@ import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { PublicationState } from "@/domain/publicationStatus"
 import { User } from "@/domain/user"
 import errorMessages from "@/i18n/errors.json"
+import featureToggleService from "@/services/featureToggleService"
 import { ResponseError } from "@/services/httpClient"
 import routes from "~/test-helper/routes"
 
