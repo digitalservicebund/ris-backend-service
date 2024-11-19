@@ -76,21 +76,6 @@ describe("HandoverDocumentationUnitView:", () => {
   })
 
   describe("renders plausibility check", () => {
-    let consoleErrorSpy: ReturnType<typeof vi.spyOn>
-
-    beforeEach(() => {
-      consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {})
-    })
-
-    afterEach(() => {
-      if (consoleErrorSpy.mock.calls.length > 0) {
-        console.log(
-          "console.error was called with:",
-          consoleErrorSpy.mock.calls,
-        )
-      }
-      consoleErrorSpy.mockRestore()
-    })
     it("with all required fields filled", async () => {
       renderComponent({
         documentUnit: new DocumentUnit("123", {

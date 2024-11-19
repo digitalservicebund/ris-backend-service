@@ -1,6 +1,7 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { beforeEach } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
@@ -55,6 +56,18 @@ function renderComponent(options?: {
 }
 
 describe("documentUnit list", () => {
+  let consoleErrorSpy: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    if (consoleErrorSpy.mock.calls.length > 0) {
+      console.log("console.error was called with:", consoleErrorSpy.mock.calls)
+    }
+    consoleErrorSpy.mockRestore()
+  })
   test("initial state feedback", async () => {
     renderComponent({})
 
