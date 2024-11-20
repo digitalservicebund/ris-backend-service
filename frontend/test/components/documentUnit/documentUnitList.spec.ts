@@ -1,6 +1,7 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
@@ -17,6 +18,7 @@ function renderComponent(options?: {
   isLoading?: boolean
   emptyState?: string
   activeUser?: User
+  showPublicationDate?: boolean
 }) {
   const user = userEvent.setup()
 
@@ -32,6 +34,7 @@ function renderComponent(options?: {
           (!options?.documentUnitListEntries
             ? "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit."
             : errorMessages.SEARCH_RESULTS_NOT_FOUND.title),
+        showPublicationDate: options?.showPublicationDate,
       },
       global: {
         plugins: [
@@ -314,5 +317,59 @@ describe("documentUnit list", () => {
     expect(
       screen.getByRole("button", { name: "Dokumentationseinheit übernehmen" }),
     ).toBeInTheDocument()
+  })
+
+  test("shows 'jDV Übergabe' column if showPublicationDate is true", async () => {
+    renderComponent({
+      showPublicationDate: true,
+    })
+
+    await nextTick() // can be removed after feature flag removal
+
+    expect(screen.getByText("jDV Übergabe")).toBeInTheDocument()
+  })
+
+  test("shows schedulingToolTip for scheduled future date", async () => {
+    renderComponent({
+      documentUnitListEntries: [
+        {
+          id: "id",
+          uuid: "1",
+          documentNumber: "123",
+          scheduledPublicationDateTime: "2100-01-23T23:00:00",
+        },
+      ],
+      showPublicationDate: true,
+    })
+
+    await nextTick() // should be removed after feature flag removal
+
+    expect(screen.getByText("23.01.2100 23:00")).toBeInTheDocument()
+    expect(
+      screen.getByLabelText("Terminierte Übergabe am 23.01.2100 23:00"),
+    ).toBeInTheDocument()
+    expect(screen.getByTestId("scheduling-icon")).toBeInTheDocument()
+  })
+
+  test("shows schedulingToolTip for last publication date", async () => {
+    renderComponent({
+      documentUnitListEntries: [
+        {
+          id: "id",
+          uuid: "1",
+          documentNumber: "123",
+          scheduledPublicationDateTime: "2000-01-23T23:00:00",
+        },
+      ],
+      showPublicationDate: true,
+    })
+
+    await nextTick() // should be removed after feature flag removal
+
+    expect(screen.getByText("23.01.2000 23:00")).toBeInTheDocument()
+    expect(
+      screen.getByLabelText("Keine Übergabe terminiert"),
+    ).toBeInTheDocument()
+    expect(screen.getByTestId("scheduling-icon")).toBeInTheDocument()
   })
 })
