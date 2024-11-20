@@ -9,6 +9,7 @@ import { Page } from "@/components/Pagination.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import service from "@/services/fieldOfLawService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import StringsUtil from "@/utils/stringsUtil"
 
 type FieldOfLawTreeType = InstanceType<typeof FieldOfLawTree>
 const treeRef = useTemplateRef<FieldOfLawTreeType>("treeRef")
@@ -44,9 +45,13 @@ const localModelValue = computed({
 })
 
 async function submitSearch(page: number) {
-  // if (StringsUtil.isEmpty(searchStr.value)) {
-  //   return removeSelectedNode()
-  // }
+  if (
+    StringsUtil.isEmpty(identifier.value) &&
+    StringsUtil.isEmpty(description.value) &&
+    StringsUtil.isEmpty(norm.value)
+  ) {
+    removeSelectedNode()
+  }
 
   const response = await service.searchForFieldsOfLaw(
     page,

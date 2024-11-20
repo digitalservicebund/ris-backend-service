@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,6 +60,14 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
     }
 
     return parent;
+  }
+
+  @Override
+  @Transactional
+  public Slice<FieldOfLaw> findAllByOrderByIdentifierAsc(Pageable pageable) {
+    return repository
+        .findAllByOrderByIdentifierAsc(pageable)
+        .map(PostgresFieldOfLawRepositoryImpl::getWithNormsWithoutChildren);
   }
 
   @Override

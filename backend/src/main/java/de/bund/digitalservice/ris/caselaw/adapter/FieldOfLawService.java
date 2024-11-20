@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class FieldOfLawService {
   private static final String ROOT_ID = "root";
-  private static final Pattern NORMS_PATTERN = Pattern.compile("norm\\s?:\\s?\"([^\"]*)\"(.*)");
 
   private final FieldOfLawRepository repository;
 
@@ -42,6 +40,10 @@ public class FieldOfLawService {
     }
     if (norm.isPresent() && norm.get().isBlank()) {
       norm = Optional.empty();
+    }
+
+    if (identifier.isEmpty() && description.isEmpty() && norm.isEmpty()) {
+      return repository.findAllByOrderByIdentifierAsc(pageable);
     }
 
     return searchAndOrderByScore(description, identifier, norm, pageable);
