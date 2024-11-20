@@ -3,6 +3,7 @@ import { userEvent } from "@testing-library/user-event"
 import { render, fireEvent, screen } from "@testing-library/vue"
 import { Stubs } from "@vue/test-utils/dist/types"
 import { beforeEach } from "vitest"
+import { nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import HandoverDocumentationUnitView from "@/components/HandoverDocumentationUnitView.vue"
 import DocumentUnit from "@/domain/documentUnit"
@@ -455,6 +456,39 @@ describe("HandoverDocumentationUnitView:", () => {
     expect(codeSnippet).toBeInTheDocument()
     expect(codeSnippet).toHaveAttribute("XML")
     expect(codeSnippet?.getAttribute("xml")).toBe("<xml>all good</xml>")
+  })
+
+  it("should not allow to publish when publication is scheduled", async () => {
+    renderComponent({
+      documentUnit: new DocumentUnit("123", {
+        coreData: {
+          fileNumbers: ["foo"],
+          scheduledPublicationDateTime: "2050-01-01T04:00:00.000Z",
+          court: { type: "type", location: "location", label: "label" },
+          decisionDate: "2022-02-01",
+          legalEffect: "legalEffect",
+          documentType: {
+            jurisShortcut: "ca",
+            label: "category",
+          },
+        },
+      }),
+    })
+
+    expect(
+      screen.getByRole("button", {
+        name: "Dokumentationseinheit an jDV übergeben",
+      }),
+    ).toBeDisabled()
+  })
+
+  it("should show the scheduling component", async () => {
+    renderComponent()
+
+    // wait for feature flag to be loaded, can be removed when scheduledPublication flag is removed.
+    await nextTick()
+
+    expect(screen.getByLabelText("Terminiertes Datum")).toBeVisible()
   })
 
   it("with stubbing", async () => {
