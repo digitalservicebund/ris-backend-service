@@ -11,15 +11,15 @@ import { buildRoot, FieldOfLaw } from "@/domain/fieldOfLaw"
 
 const props = defineProps<{
   modelValue: FieldOfLaw[]
-  selectedNode?: FieldOfLaw
+  nodeOfInterest?: FieldOfLaw
   searchResults?: FieldOfLaw[]
   showNorms: boolean
 }>()
 
 const emit = defineEmits<{
-  "node:select": [node: FieldOfLaw]
-  "node:unselect": [node: FieldOfLaw]
-  "selected-node:reset": []
+  "node:add": [node: FieldOfLaw]
+  "node:remove": [node: FieldOfLaw]
+  "node-of-interest:reset": []
   "linked-field:select": [node: FieldOfLaw]
   "toggle-show-norms": []
 }>()
@@ -32,12 +32,12 @@ const showNormsModelValue = computed({
   set: () => emit("toggle-show-norms"),
 })
 
-async function expandSelectedNode(node: FieldOfLaw) {
+async function expandNode(node: FieldOfLaw) {
   const itemsToReturn = new Map<string, FieldOfLaw>()
-  if (props.selectedNode) {
+  if (props.nodeOfInterest) {
     itemsToReturn.set(node.identifier, node)
     const response = await nodeHelper.value.getAncestors(
-      props.selectedNode.identifier,
+      props.nodeOfInterest.identifier,
     )
     for (const node of response) {
       itemsToReturn.set(node.identifier, node)
@@ -47,7 +47,7 @@ async function expandSelectedNode(node: FieldOfLaw) {
   expandedNodes.value = Array.from(itemsToReturn.values())
 }
 
-async function expandSelectedNodes(node: FieldOfLaw) {
+async function expandNodesUpTo(node: FieldOfLaw) {
   const itemsToReturn = new Map<string, FieldOfLaw>()
 
   if (node.identifier == "root") {
@@ -87,10 +87,10 @@ function collapseTree() {
 }
 
 watch(
-  () => props.selectedNode,
-  async (newSelectedNode, oldSelectedNode) => {
-    if (newSelectedNode !== oldSelectedNode) {
-      if (props.selectedNode) await expandSelectedNode(props.selectedNode)
+  () => props.nodeOfInterest,
+  async (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+      if (props.nodeOfInterest) await expandNode(props.nodeOfInterest)
     }
   },
   { immediate: true },
@@ -130,15 +130,14 @@ defineExpose({ collapseTree })
       :model-value="modelValue"
       :node="root"
       :node-helper="nodeHelper"
+      :node-of-interest="nodeOfInterest"
       :search-results="searchResults"
-      :selected-node="selectedNode"
       :show-norms="showNorms"
-      @linked-field:select="emit('linked-field:select', $event)"
+      @node-of-interest:reset="emit('node-of-interest:reset')"
+      @node:add="emit('node:add', $event)"
       @node:collapse="collapseNode"
-      @node:expand="expandSelectedNodes"
-      @node:select="emit('node:select', $event)"
-      @node:unselect="emit('node:unselect', $event)"
-      @selected-node:reset="emit('selected-node:reset')"
+      @node:expand="expandNodesUpTo"
+      @node:remove="emit('node:remove', $event)"
     />
   </div>
 </template>

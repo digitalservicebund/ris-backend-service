@@ -33,15 +33,15 @@ describe("FieldOfLawSearchResults", () => {
     expect(screen.getByText("Arbeitsrecht")).toBeInTheDocument()
   })
 
-  it("on identifier click emit 'node:select'", async () => {
+  it("on identifier click emit 'node:add'", async () => {
     const { emitted, user } = renderComponent({ identifier: "AR-01" })
 
-    await user.click(screen.getByLabelText("AR-01 im Sachgebietsbaum anzeigen"))
+    await user.click(screen.getByLabelText("AR-01 hinzufügen"))
 
-    expect(emitted()["node:select"]).toBeTruthy()
+    expect(emitted()["node:add"]).toBeTruthy()
   })
 
-  it("on linked field click emit 'linked-field:select'", async () => {
+  it("on linked field click emit 'linked-field:clicked'", async () => {
     const { emitted, user } = renderComponent({
       identifier: "BR-01",
       text: "mit Link zu BR-02",
@@ -50,6 +50,6 @@ describe("FieldOfLawSearchResults", () => {
 
     await user.click(screen.getByText("BR-02"))
 
-    expect(emitted()["linked-field:select"]).toBeTruthy()
+    expect(emitted()["linked-field:clicked"]).toBeTruthy()
   })
 })

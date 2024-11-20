@@ -46,7 +46,7 @@ describe("FieldOfLawSummary", () => {
     expect(emitted()["node:remove"]).toBeTruthy()
   })
 
-  it("click on 'Auswahl im Sachgebietsbaum' emit 'node:select", async () => {
+  it("click on 'Auswahl im Sachgebietsbaum anzeigen' emit 'node:clicked", async () => {
     const { emitted } = renderComponent([generateFieldOfLaw()])
 
     await fireEvent.click(
@@ -54,6 +54,6 @@ describe("FieldOfLawSummary", () => {
         "ST-01-02-03 Steuerrecht 1-2-3 im Sachgebietsbaum anzeigen",
       ),
     )
-    expect(emitted()["node:select"]).toBeTruthy()
+    expect(emitted()["node:clicked"]).toBeTruthy()
   })
 })

@@ -17,18 +17,17 @@ interface Props {
   expandValues: FieldOfLaw[]
   isRoot?: boolean
   rootChild?: boolean
-  selectedNode?: FieldOfLaw
+  nodeOfInterest?: FieldOfLaw
 }
 
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  "node:select": [node: FieldOfLaw]
-  "node:unselect": [node: FieldOfLaw]
+  "node:add": [node: FieldOfLaw]
+  "node:remove": [node: FieldOfLaw]
   "node:expand": [node: FieldOfLaw]
   "node:collapse": [node: FieldOfLaw]
-  "linked-field:select": [node: FieldOfLaw]
-  "selected-node:reset": []
+  "node-of-interest:reset": []
 }>()
 
 const isExpanded = ref(false)
@@ -41,9 +40,9 @@ const isSelected = computed({
     ),
   set: (value) => {
     if (value) {
-      emit("node:select", props.node)
+      emit("node:add", props.node)
     } else {
-      emit("node:unselect", props.node)
+      emit("node:remove", props.node)
     }
   },
 })
@@ -54,8 +53,8 @@ function toggleExpanded() {
     emit("node:expand", props.node)
   } else {
     emit("node:collapse", props.node)
-    if (props.selectedNode && props.rootChild) {
-      emit("selected-node:reset")
+    if (props.nodeOfInterest && props.rootChild) {
+      emit("node-of-interest:reset")
     }
   }
 }
@@ -83,7 +82,7 @@ watch(
       })
     }
 
-    if (props.selectedNode && props.isRoot) {
+    if (props.nodeOfInterest && props.isRoot) {
       children.value = await props.nodeHelper.getFilteredChildren(
         props.node,
         props.expandValues,
@@ -192,16 +191,15 @@ watch(
         :model-value="modelValue"
         :node="child"
         :node-helper="nodeHelper"
+        :node-of-interest="nodeOfInterest"
         :root-child="props.isRoot"
         :search-results="searchResults"
-        :selected-node="selectedNode"
         :show-norms="showNorms"
-        @linked-field:select="emit('linked-field:select', $event)"
+        @node-of-interest:reset="emit('node-of-interest:reset')"
+        @node:add="emit('node:add', $event)"
         @node:collapse="emit('node:collapse', $event)"
         @node:expand="emit('node:expand', $event)"
-        @node:select="emit('node:select', $event)"
-        @node:unselect="emit('node:unselect', $event)"
-        @selected-node:reset="emit('selected-node:reset')"
+        @node:remove="emit('node:remove', $event)"
       />
     </div>
   </FlexContainer>

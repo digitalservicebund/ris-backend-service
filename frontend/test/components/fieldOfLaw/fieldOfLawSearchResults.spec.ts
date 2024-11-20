@@ -62,20 +62,20 @@ describe("FieldOfLawSearchResults", () => {
     expect(screen.getByText("3 Ergebnisse angezeigt")).toBeInTheDocument()
   })
 
-  it("on identifier click emit 'node:select'", async () => {
+  it("on identifier click emit 'node:add'", async () => {
     const { emitted, user } = renderComponent()
 
-    await user.click(screen.getByLabelText("AR-01 im Sachgebietsbaum anzeigen"))
+    await user.click(screen.getByLabelText("AR-01 hinzufügen"))
 
-    expect(emitted()["node:select"]).toBeTruthy()
+    expect(emitted()["node:add"]).toBeTruthy()
   })
 
-  it("on linked field click emit 'linkedField:select'", async () => {
+  it("on linked field click emit 'linkedField:clicked'", async () => {
     const { emitted, user } = renderComponent()
 
     await user.click(screen.getByText("BR-02"))
 
-    expect(emitted()["linkedField:select"]).toBeTruthy()
+    expect(emitted()["linkedField:clicked"]).toBeTruthy()
   })
 
   it("page change emit 'search'", async () => {

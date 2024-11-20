@@ -9,7 +9,7 @@ interface Props {
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  "linked-field:select": [node: FieldOfLaw]
+  "linked-field:clicked": [node: FieldOfLaw]
 }>()
 
 type Token = {
@@ -32,7 +32,7 @@ function tokenizeText(): Token[] {
 function handleTokenClick(token: Token) {
   if (!token.isLink) return
   const toNode = createNode(token.content)
-  emit("linked-field:select", toNode)
+  emit("linked-field:clicked", toNode)
 }
 </script>
 

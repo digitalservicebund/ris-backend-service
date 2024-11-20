@@ -10,15 +10,15 @@ defineProps<{
 
 const emit = defineEmits<{
   "node:remove": [node: FieldOfLaw]
-  "node:select": [node: FieldOfLaw]
+  "node:clicked": [node: FieldOfLaw]
 }>()
 
 function removeFieldOfLaw(fieldOfLaw: FieldOfLaw) {
   emit("node:remove", fieldOfLaw)
 }
 
-function selectFieldOfLaw(fieldOfLaw: FieldOfLaw) {
-  emit("node:select", fieldOfLaw)
+function fieldOfLawClicked(fieldOfLaw: FieldOfLaw) {
+  emit("node:clicked", fieldOfLaw)
 }
 </script>
 
@@ -39,7 +39,7 @@ function selectFieldOfLaw(fieldOfLaw: FieldOfLaw) {
               ' im Sachgebietsbaum anzeigen'
             "
             class="ds-link-01-bold mr-8"
-            @click="selectFieldOfLaw(fieldOfLaw)"
+            @click="fieldOfLawClicked(fieldOfLaw)"
           >
             {{ fieldOfLaw.identifier }}
           </button>
@@ -47,7 +47,7 @@ function selectFieldOfLaw(fieldOfLaw: FieldOfLaw) {
           <TokenizeText
             :keywords="fieldOfLaw.linkedFields ?? []"
             :text="fieldOfLaw.text"
-            @linked-field:select="selectFieldOfLaw"
+            @linked-field:clicked="fieldOfLawClicked"
           />
         </div>
 

@@ -15,7 +15,7 @@ type FieldOfLawTreeType = InstanceType<typeof FieldOfLawTree>
 const treeRef = useTemplateRef<FieldOfLawTreeType>("treeRef")
 
 const showNorms = ref(false)
-const selectedNode = ref<FieldOfLaw | undefined>(undefined)
+const nodeOfInterest = ref<FieldOfLaw | undefined>(undefined)
 
 const description = ref("")
 const identifier = ref("")
@@ -50,7 +50,7 @@ async function submitSearch(page: number) {
     StringsUtil.isEmpty(description.value) &&
     StringsUtil.isEmpty(norm.value)
   ) {
-    removeSelectedNode()
+    removeNodeOfInterest()
   }
 
   const response = await service.searchForFieldsOfLaw(
@@ -65,7 +65,7 @@ async function submitSearch(page: number) {
     results.value = response.data.content
 
     if (results.value?.[0]) {
-      selectedNode.value = results.value[0]
+      nodeOfInterest.value = results.value[0]
     }
     showNorms.value = !!norm.value
   } else {
@@ -115,12 +115,13 @@ const removeFieldOfLaw = (fieldOfLaw: FieldOfLaw) => {
     ) ?? []
 }
 
-function setSelectedNode(node: FieldOfLaw) {
-  selectedNode.value = node
+function setNodeOfInterest(node: FieldOfLaw) {
+  console.log("set node of interest: ", node.identifier)
+  nodeOfInterest.value = node
 }
 
-function removeSelectedNode() {
-  selectedNode.value = undefined
+function removeNodeOfInterest() {
+  nodeOfInterest.value = undefined
 }
 
 function updateIdentifierSearchTerm(newValue?: string) {
@@ -137,7 +138,7 @@ function updateNormSearchTerm(newValue?: string) {
 
 async function addFromList(fieldOfLaw: FieldOfLaw) {
   await addFieldOfLaw(fieldOfLaw)
-  setSelectedNode(fieldOfLaw)
+  setNodeOfInterest(fieldOfLaw)
 }
 
 function resetSearch() {
@@ -149,7 +150,7 @@ function resetSearch() {
   currentPage.value = undefined
   results.value = undefined
   // reset tree
-  selectedNode.value = undefined
+  nodeOfInterest.value = undefined
   showNorms.value = false
   treeRef.value?.collapseTree()
 }
@@ -160,8 +161,8 @@ function resetSearch() {
     v-if="localModelValue"
     :fields-of-law="localModelValue"
     @editing-done="resetSearch"
+    @node:clicked="setNodeOfInterest"
     @node:remove="removeFieldOfLaw"
-    @node:select="setSelectedNode"
   >
     <FieldOfLawSearchInput
       :description="description"
@@ -177,8 +178,8 @@ function resetSearch() {
       <FieldOfLawSearchResultList
         :current-page="currentPage"
         :results="results"
-        @linked-field:select="setSelectedNode"
-        @node:select="addFromList"
+        @linked-field:clicked="setNodeOfInterest"
+        @node:add="addFromList"
         @search="submitSearch"
       />
 
@@ -186,13 +187,13 @@ function resetSearch() {
         v-if="localModelValue"
         ref="treeRef"
         v-model="localModelValue"
+        :node-of-interest="nodeOfInterest"
         :search-results="results"
-        :selected-node="selectedNode"
         :show-norms="showNorms"
-        @linked-field:select="setSelectedNode"
+        @linked-field:select="setNodeOfInterest"
+        @node-of-interest:reset="removeNodeOfInterest"
         @node:select="addFieldOfLaw"
         @node:unselect="removeFieldOfLaw"
-        @selected-node:reset="removeSelectedNode"
         @toggle-show-norms="showNorms = !showNorms"
       />
     </div>

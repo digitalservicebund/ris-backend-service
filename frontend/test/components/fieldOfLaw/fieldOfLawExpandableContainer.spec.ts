@@ -58,7 +58,7 @@ describe("FieldsOfLawExpandableContainer", () => {
     expect(scrollIntoViewMock).toHaveBeenCalledTimes(1)
   })
 
-  it("emits 'node:select'", async () => {
+  it("emits 'node:clicked'", async () => {
     const { emitted, user } = renderComponent([generateFieldOfLaw()])
 
     await user.click(
@@ -67,7 +67,7 @@ describe("FieldsOfLawExpandableContainer", () => {
       }),
     )
 
-    expect(emitted()["node:select"]).toBeTruthy()
+    expect(emitted()["node:clicked"]).toBeTruthy()
   })
 
   it("emits 'node:remove'", async () => {

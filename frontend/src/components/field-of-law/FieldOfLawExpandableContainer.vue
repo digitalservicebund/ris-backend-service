@@ -11,7 +11,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   "node:remove": [node: FieldOfLaw]
-  "node:select": [node: FieldOfLaw]
+  "node:clicked": [node: FieldOfLaw]
   editingDone: [void]
 }>()
 
@@ -27,8 +27,8 @@ function removeNode(node: FieldOfLaw) {
   emit("node:remove", node)
 }
 
-function selectNode(node: FieldOfLaw) {
-  emit("node:select", node)
+function nodeClicked(node: FieldOfLaw) {
+  emit("node:clicked", node)
   enterEditMode()
 }
 
@@ -59,8 +59,8 @@ async function exitEditMode() {
       </div>
       <FieldOfLawSummary
         :fields-of-law="fieldsOfLaw"
+        @node:clicked="nodeClicked"
         @node:remove="removeNode"
-        @node:select="selectNode"
       />
     </div>
   </div>

@@ -11,8 +11,8 @@ defineProps<{
 
 const emit = defineEmits<{
   search: [page: number]
-  "node:select": [node: FieldOfLaw]
-  "linkedField:select": [node: FieldOfLaw]
+  "node:add": [node: FieldOfLaw]
+  "linkedField:clicked": [node: FieldOfLaw]
 }>()
 </script>
 
@@ -27,8 +27,8 @@ const emit = defineEmits<{
         v-for="(fieldOfLawNode, idx) in results"
         :key="idx"
         :field-of-law="fieldOfLawNode"
-        @linked-field:select="emit('linkedField:select', $event)"
-        @node:select="emit('node:select', fieldOfLawNode)"
+        @linked-field:clicked="emit('linkedField:clicked', $event)"
+        @node:add="emit('node:add', fieldOfLawNode)"
       />
     </Pagination>
     <div v-if="!currentPage?.content || currentPage?.content?.length == 0">
