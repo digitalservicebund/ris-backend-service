@@ -58,29 +58,16 @@ describe("FieldOfLawTree", () => {
     expect(screen.queryByText("And text for CD")).not.toBeInTheDocument()
   })
 
-  it.skip("Tree opens top level nodes upon root click", async () => {
+  it("Tree opens top level nodes upon root click", async () => {
     renderComponent()
 
     await user.click(screen.getByLabelText("Alle Sachgebiete aufklappen"))
 
     expect(fetchSpy).toBeCalledTimes(4)
     expect(screen.getByText("Text for AB")).toBeInTheDocument()
-    expect(screen.getByText("And text for CD with link to")).toBeInTheDocument()
+    expect(
+      screen.getByText("And text for CD with link to AB-01"),
+    ).toBeInTheDocument()
     expect(screen.getByText("Alle Sachgebiete")).toBeInTheDocument()
-  })
-
-  it.skip("Linked node gets displayed as link in text", async () => {
-    renderComponent()
-    await user.click(screen.getByLabelText("Alle Sachgebiete aufklappen"))
-    const node1ids = screen.getAllByText("AB-01")
-    const nonLinkText = screen.getByText("And text for CD with link to")
-
-    expect(node1ids).toHaveLength(2)
-    expect(node1ids[1] as HTMLElement).toHaveClass("linked-field")
-    expect(nonLinkText as HTMLElement).not.toHaveClass("linked-field")
-    await user.click(node1ids[1] as HTMLElement)
-    await user.click(node1ids[1] as HTMLElement)
-
-    expect(screen.getByTestId("field-of-law-node-AB-01")).toBeInTheDocument()
   })
 })

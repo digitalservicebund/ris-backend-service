@@ -6,7 +6,7 @@ import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import IconAdd from "~icons/ic/baseline-add"
 
 const props = defineProps<{
-  dataSet: FieldOfLaw[]
+  fieldsOfLaw: FieldOfLaw[]
 }>()
 
 const emit = defineEmits<{
@@ -20,7 +20,7 @@ const titleRef = ref<HTMLElement | null>(null)
 const isExpanded = ref(false)
 
 const expandButtonLabel = computed(() => {
-  return props.dataSet.length > 0 ? "Weitere Angabe" : "Sachgebiete"
+  return props.fieldsOfLaw.length > 0 ? "Weitere Angabe" : "Sachgebiete"
 })
 
 function removeNode(node: FieldOfLaw) {
@@ -50,8 +50,7 @@ async function exitEditMode() {
       <div class="flex w-full flex-row items-center justify-between">
         <h2 ref="titleRef" class="ds-label-01-bold">Sachgebiete</h2>
         <TextButton
-          v-if="isExpanded && dataSet.length == 0"
-          aria-label="Fertig"
+          v-if="isExpanded && fieldsOfLaw.length == 0"
           button-type="primary"
           label="Fertig"
           size="small"
@@ -59,7 +58,7 @@ async function exitEditMode() {
         />
       </div>
       <FieldOfLawSummary
-        :data="dataSet"
+        :fields-of-law="fieldsOfLaw"
         @node:remove="removeNode"
         @node:select="selectNode"
       />
@@ -68,11 +67,10 @@ async function exitEditMode() {
 
   <div v-if="isExpanded" class="flex flex-col items-start gap-24">
     <div
-      v-if="isExpanded && dataSet.length > 0"
+      v-if="isExpanded && fieldsOfLaw.length > 0"
       class="flex w-full flex-row justify-end"
     >
       <TextButton
-        aria-label="Fertig"
         button-type="primary"
         label="Fertig"
         size="small"
@@ -84,7 +82,6 @@ async function exitEditMode() {
 
   <TextButton
     v-else
-    aria-label="Weitere Angabe"
     button-type="tertiary"
     :icon="IconAdd"
     :label="expandButtonLabel"

@@ -2,25 +2,23 @@ import { fireEvent, render, RenderResult, screen } from "@testing-library/vue"
 import FieldOfLawSummary from "@/components/field-of-law/FieldOfLawSummary.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 
-function renderComponent(data: FieldOfLaw[]): RenderResult {
-  const props = {
-    data,
-  }
+function renderComponent(fieldsOfLaw: FieldOfLaw[]): RenderResult {
+  return render(FieldOfLawSummary, { props: { fieldsOfLaw } })
+}
 
-  return render(FieldOfLawSummary, { props })
+function generateFieldOfLaw(): FieldOfLaw {
+  return {
+    identifier: "ST-01-02-03",
+    text: "Steuerrecht 1-2-3",
+    norms: [],
+    children: [],
+    hasChildren: false,
+  }
 }
 
 describe("FieldOfLawSummary", () => {
   it("render one entry", () => {
-    renderComponent([
-      {
-        identifier: "ST-01-02-03",
-        text: "Steuerrecht 1-2-3",
-        norms: [],
-        children: [],
-        hasChildren: false,
-      },
-    ])
+    renderComponent([generateFieldOfLaw()])
 
     expect(screen.getByText("ST-01-02-03")).toBeInTheDocument()
     expect(screen.getByText("Steuerrecht 1-2-3")).toBeInTheDocument()
@@ -37,15 +35,7 @@ describe("FieldOfLawSummary", () => {
   })
 
   it("click on 'Löschen' emit 'node:remove'", async () => {
-    const { emitted } = renderComponent([
-      {
-        identifier: "ST-01-02-03",
-        text: "Steuerrecht 1-2-3",
-        norms: [],
-        children: [],
-        hasChildren: false,
-      },
-    ])
+    const { emitted } = renderComponent([generateFieldOfLaw()])
 
     await fireEvent.click(
       screen.getByLabelText(
@@ -57,15 +47,7 @@ describe("FieldOfLawSummary", () => {
   })
 
   it("click on 'Auswahl im Sachgebietsbaum' emit 'node:select", async () => {
-    const { emitted } = renderComponent([
-      {
-        identifier: "ST-01-02-03",
-        text: "Steuerrecht 1-2-3",
-        norms: [],
-        children: [],
-        hasChildren: false,
-      },
-    ])
+    const { emitted } = renderComponent([generateFieldOfLaw()])
 
     await fireEvent.click(
       screen.getByLabelText(

@@ -48,7 +48,7 @@ const norm = computed({
       <TextInput
         id="fieldOfLawSearch"
         v-model="description"
-        aria-label="Sachgebiete Suche"
+        aria-label="Sachgebiet Suche"
         size="medium"
         @enter-released="emit('search')"
       />
@@ -57,13 +57,14 @@ const norm = computed({
       <TextInput
         id="fieldOfLawNorm"
         v-model="norm"
-        aria-label="Sachgebiete Norm"
+        aria-label="Sachgebiet Norm"
         size="medium"
         @enter-released="emit('search')"
       />
     </InputField>
 
     <TextButton
+      aria-label="Suchen"
       button-type="primary"
       :icon="IconSearch"
       @click="emit('search')"

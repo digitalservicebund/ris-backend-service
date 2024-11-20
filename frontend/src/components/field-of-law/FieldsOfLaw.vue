@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import * as Sentry from "@sentry/vue"
 import { computed, nextTick, ref, useTemplateRef } from "vue"
-import ExpandableFieldOfLawList from "@/components/field-of-law/FieldOfLawExpandableContainer.vue"
+import FieldOfLawExpandableContainer from "@/components/field-of-law/FieldOfLawExpandableContainer.vue"
 import FieldOfLawSearchInput from "@/components/field-of-law/FieldOfLawSearchInput.vue"
 import FieldOfLawSearchResultList from "@/components/field-of-law/FieldOfLawSearchResults.vue"
 import FieldOfLawTree from "@/components/field-of-law/FieldOfLawTree.vue"
@@ -151,9 +151,9 @@ function resetSearch() {
 </script>
 
 <template>
-  <ExpandableFieldOfLawList
+  <FieldOfLawExpandableContainer
     v-if="localModelValue"
-    :data-set="localModelValue"
+    :fields-of-law="localModelValue"
     @editing-done="resetSearch"
     @node:remove="removeFieldOfLaw"
     @node:select="setSelectedNode"
@@ -191,5 +191,5 @@ function resetSearch() {
         @toggle-show-norms="showNorms = !showNorms"
       />
     </div>
-  </ExpandableFieldOfLawList>
+  </FieldOfLawExpandableContainer>
 </template>

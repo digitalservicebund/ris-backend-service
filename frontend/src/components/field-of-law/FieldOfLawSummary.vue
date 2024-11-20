@@ -5,7 +5,7 @@ import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import MaterialSymbolsClose from "~icons/material-symbols/close"
 
 defineProps<{
-  data: FieldOfLaw[]
+  fieldsOfLaw: FieldOfLaw[]
 }>()
 
 const emit = defineEmits<{
@@ -26,7 +26,7 @@ function selectFieldOfLaw(fieldOfLaw: FieldOfLaw) {
   <div class="flex w-full justify-between">
     <div class="flex w-full flex-col">
       <div
-        v-for="(fieldOfLaw, index) in data"
+        v-for="(fieldOfLaw, index) in fieldsOfLaw"
         :key="index"
         class="field-of-law flex h-56 w-full flex-row items-center border-b-1 border-blue-300 first:mt-16 first:border-t-1"
       >

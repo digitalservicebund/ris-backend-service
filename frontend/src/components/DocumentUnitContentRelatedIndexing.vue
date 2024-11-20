@@ -2,7 +2,7 @@
 import { ref } from "vue"
 import ActiveCitations from "@/components/ActiveCitations.vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
-import FieldOfLaw from "@/components/field-of-law/FieldOfLaw.vue"
+import FieldsOfLaw from "@/components/field-of-law/FieldsOfLaw.vue"
 import KeyWords from "@/components/KeyWords.vue"
 import Norms from "@/components/NormReferences.vue"
 import OtherCategories from "@/components/OtherCategories.vue"
@@ -27,7 +27,7 @@ const hasKeywords = ref<boolean>(
     >
       <KeyWords @reset="slotProps.reset" />
     </CategoryWrapper>
-    <FieldOfLaw />
+    <FieldsOfLaw />
     <Norms />
     <ActiveCitations />
     <OtherCategories />

@@ -4,11 +4,9 @@ import { FieldOfLaw } from "@/domain/fieldOfLaw"
 
 defineProps<{
   fieldOfLaw: FieldOfLaw
-  showBin?: boolean
 }>()
 
 const emit = defineEmits<{
-  "node:remove": [node: FieldOfLaw]
   "node:select": [node: FieldOfLaw]
   "linked-field:select": [node: FieldOfLaw]
 }>()
