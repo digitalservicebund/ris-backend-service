@@ -684,6 +684,26 @@ class ProcedureIntegrationTest {
   }
 
   @Test
+  void testSearch_withDifferentCasing_shouldReturnResult() {
+    addProcedureToDocUnit("procedure1", docUnitDTO);
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/procedure?withDocUnits=true&q=PROcedure1 &sz=20&pg=0")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).hasSize(1);
+              assertThat(response.getResponseBody().getContent().get(0).label())
+                  .isEqualTo("procedure1");
+            });
+  }
+
+  @Test
   void testProcedureControllerReturnsPerDocOffice() {
     risWebTestClient
         .withDefaultLogin()
