@@ -238,7 +238,6 @@ test.describe("search", () => {
 
     await test.step("search for file number case insensitive works", async () => {
       await page.getByLabel("Aktenzeichen Suche").fill("FILEnumber1")
-      await page.getByLabel("Nur meine Dokstelle Filter").click()
       await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
       await expect
         .poll(async () => page.getByText("YYTestDoc0001").count())
@@ -279,12 +278,11 @@ test.describe("search", () => {
     await page.getByLabel("Dokumentnummer Suche").fill("YYTestDoc")
 
     await page.getByLabel("Nur meine Dokstelle Filter").click()
-
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
 
     await expect
       .poll(async () => page.getByText("Unveröffentlicht").count())
-      .toBeGreaterThanOrEqual(1)
+      .toBe(7)
 
     const select = page.locator(`select[id="status"]`)
     await select.selectOption("Veröffentlicht")
@@ -295,7 +293,7 @@ test.describe("search", () => {
       .poll(async () =>
         page.getByText("Veröffentlicht", { exact: true }).count(),
       )
-      .toBe(8)
+      .toBe(7)
 
     // only the unpublished in select should be counted.
     await expect

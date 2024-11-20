@@ -3,6 +3,8 @@ import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import DocumentUnit from "../../../src/domain/documentUnit"
 import { navigateToCategories } from "./e2e-utils"
+import { Page as Pagination } from "@/components/Pagination.vue"
+import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import { generateString } from "~/test-helper/dataGenerators"
@@ -314,6 +316,17 @@ export const caselawTest = test.extend<MyFixtures>({
       `api/v1/caselaw/legalperiodicals?q=MMG`,
     )
 
+    const foreignDocumentUnitSearchResponse = await request.get(
+      `api/v1/caselaw/documentunits/search?pg=0&sz=100&documentNumber=YYTestDoc0001`,
+    )
+
+    const foreignDocumentUnitPage =
+      (await foreignDocumentUnitSearchResponse.json()) as Pagination<DocumentUnitListEntry>
+
+    const foreignDocumentUnit = (
+      foreignDocumentUnitPage.content as DocumentUnitListEntry[]
+    ).at(0)
+
     const legalPeriodical = (
       (await legalPeriodicalSearchResponse.json()) as LegalPeriodicalEdition[]
     ).at(0)
@@ -330,7 +343,8 @@ export const caselawTest = test.extend<MyFixtures>({
           references: [
             {
               id: crypto.randomUUID(),
-              citation: "2024, 1-11, Heft 1",
+              citation: "2024, 12-22, Heft 1",
+              referenceSupplement: "L",
               legalPeriodicalRawValue: "MMG",
               legalPeriodical: legalPeriodical,
               documentationUnit: new RelatedDocumentation({
@@ -340,13 +354,13 @@ export const caselawTest = test.extend<MyFixtures>({
             },
             {
               id: crypto.randomUUID(),
-              citation: "2024, 12-22, Heft 1",
-              referenceSupplement: "L",
+              citation: "2024, 1-11, Heft 1",
               legalPeriodicalRawValue: "MMG",
               legalPeriodical: legalPeriodical,
+              // Published foreign BAG docunit
               documentationUnit: new RelatedDocumentation({
-                documentNumber: prefilledDocumentUnit.documentNumber,
-                uuid: prefilledDocumentUnit.uuid,
+                documentNumber: foreignDocumentUnit?.documentNumber,
+                uuid: foreignDocumentUnit?.uuid,
               }),
             },
           ],
