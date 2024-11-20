@@ -9,6 +9,7 @@ const props = defineProps<{
   identifier?: string
   description?: string
   norm?: string
+  errorLabel?: string
 }>()
 
 const emit = defineEmits<{
@@ -34,40 +35,46 @@ const norm = computed({
 </script>
 
 <template>
-  <div class="flex w-full flex-row items-end gap-16">
-    <InputField id="fieldOfLawDirectInput" label="Sachgebiet">
-      <TextInput
-        id="fieldOfLawDirectInput"
-        v-model="identifier"
-        aria-label="Sachgebiet Direkteingabe"
-        size="medium"
-        @enter-released="emit('search')"
-      />
-    </InputField>
-    <InputField id="fieldOfLawDirectInput" label="Bezeichnung">
-      <TextInput
-        id="fieldOfLawSearch"
-        v-model="description"
-        aria-label="Sachgebiet Suche"
-        size="medium"
-        @enter-released="emit('search')"
-      />
-    </InputField>
-    <InputField id="fieldOfLawNormInput" label="Norm">
-      <TextInput
-        id="fieldOfLawNorm"
-        v-model="norm"
-        aria-label="Sachgebiet Norm"
-        size="medium"
-        @enter-released="emit('search')"
-      />
-    </InputField>
+  <div>
+    <div class="flex w-full flex-row items-end gap-16">
+      <InputField id="fieldOfLawDirectInput" label="Sachgebiet">
+        <TextInput
+          id="fieldOfLawDirectInput"
+          v-model="identifier"
+          aria-label="Sachgebiet Direkteingabe"
+          size="medium"
+          @enter-released="emit('search')"
+        />
+      </InputField>
+      <InputField id="fieldOfLawDirectInput" label="Bezeichnung">
+        <TextInput
+          id="fieldOfLawSearch"
+          v-model="description"
+          aria-label="Sachgebiet Suche"
+          size="medium"
+          @enter-released="emit('search')"
+        />
+      </InputField>
+      <InputField id="fieldOfLawNormInput" label="Norm">
+        <TextInput
+          id="fieldOfLawNorm"
+          v-model="norm"
+          aria-label="Sachgebiet Norm"
+          size="medium"
+          @enter-released="emit('search')"
+        />
+      </InputField>
 
-    <TextButton
-      aria-label="Suchen"
-      button-type="primary"
-      :icon="IconSearch"
-      @click="emit('search')"
-    />
+      <TextButton
+        aria-label="Suchen"
+        button-type="primary"
+        :icon="IconSearch"
+        @click="emit('search')"
+      />
+    </div>
+
+    <span v-if="errorLabel" class="ds-label-03-reg min-h-[1rem] text-red-800">{{
+      errorLabel
+    }}</span>
   </div>
 </template>

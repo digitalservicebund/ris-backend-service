@@ -20,6 +20,7 @@ const nodeOfInterest = ref<FieldOfLaw | undefined>(undefined)
 const description = ref("")
 const identifier = ref("")
 const norm = ref("")
+const searchErrorLabel = ref<string | undefined>(undefined)
 const results = ref<FieldOfLaw[]>()
 const currentPage = ref<Page<FieldOfLaw>>()
 const itemsPerPage = 10
@@ -50,7 +51,11 @@ async function submitSearch(page: number) {
     StringsUtil.isEmpty(description.value) &&
     StringsUtil.isEmpty(norm.value)
   ) {
+    searchErrorLabel.value = "Geben Sie mindestens ein Suchkriterium ein"
     removeNodeOfInterest()
+    return
+  } else {
+    searchErrorLabel.value = undefined
   }
 
   const response = await service.searchForFieldsOfLaw(
@@ -165,6 +170,7 @@ function resetSearch() {
   >
     <FieldOfLawSearchInput
       :description="description"
+      :error-label="searchErrorLabel"
       :identifier="identifier"
       :norm="norm"
       @search="submitSearch(0)"
