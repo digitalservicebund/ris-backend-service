@@ -31,7 +31,7 @@ public class FieldOfLawController {
       @RequestParam("pg") int page,
       @RequestParam("sz") int size) {
     return service.getFieldsOfLawBySearchQuery(
-        searchStr, identifier, norm, PageRequest.of(page, size));
+        identifier, searchStr, norm, PageRequest.of(page, size));
   }
 
   @GetMapping(value = "{identifier}/children", produces = MediaType.APPLICATION_JSON_VALUE)

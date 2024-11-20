@@ -29,8 +29,8 @@ public class FieldOfLawService {
   }
 
   public Slice<FieldOfLaw> getFieldsOfLawBySearchQuery(
-      Optional<String> description,
       Optional<String> identifier,
+      Optional<String> description,
       Optional<String> norm,
       Pageable pageable) {
 
@@ -51,7 +51,7 @@ public class FieldOfLawService {
     return Arrays.stream(searchStr.split("\\s+")).map(String::trim).toArray(String[]::new);
   }
 
-  Slice<FieldOfLaw> searchAndOrderByScore(
+  private Slice<FieldOfLaw> searchAndOrderByScore(
       Optional<String> description,
       Optional<String> identifier,
       Optional<String> norm,
