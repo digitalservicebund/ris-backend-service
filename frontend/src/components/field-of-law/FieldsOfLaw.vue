@@ -116,7 +116,6 @@ const removeFieldOfLaw = (fieldOfLaw: FieldOfLaw) => {
 }
 
 function setNodeOfInterest(node: FieldOfLaw) {
-  console.log("set node of interest: ", node.identifier)
   nodeOfInterest.value = node
 }
 
