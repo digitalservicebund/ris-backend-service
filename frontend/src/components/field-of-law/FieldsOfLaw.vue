@@ -191,8 +191,8 @@ function resetSearch() {
         :show-norms="showNorms"
         @linked-field:select="setNodeOfInterest"
         @node-of-interest:reset="removeNodeOfInterest"
-        @node:select="addFieldOfLaw"
-        @node:unselect="removeFieldOfLaw"
+        @node:add="addFieldOfLaw"
+        @node:remove="removeFieldOfLaw"
         @toggle-show-norms="showNorms = !showNorms"
       />
     </div>
