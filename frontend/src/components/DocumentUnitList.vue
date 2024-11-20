@@ -1,5 +1,8 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
+import customParseFormat from "dayjs/plugin/customParseFormat"
+import dayjsTimezone from "dayjs/plugin/timezone"
+import dayjsUtc from "dayjs/plugin/utc"
 import { computed, ref } from "vue"
 import DocumentUnitListEntry from "../domain/documentUnitListEntry"
 import Tooltip from "./Tooltip.vue"
@@ -41,6 +44,10 @@ const emit = defineEmits<{
   takeOverDocumentationUnit: [documentUnitListEntry: DocumentUnitListEntry]
 }>()
 
+dayjs.extend(dayjsUtc)
+dayjs.extend(dayjsTimezone)
+dayjs.extend(customParseFormat)
+
 const emptyStatus = computed(() => props.emptyState)
 
 const listEntries = computed(() => {
@@ -71,15 +78,15 @@ const noteTooltip = (listEntry: DocumentUnitListEntry) =>
   listEntry.note ? trimText(listEntry.note) : "Keine Notiz vorhanden"
 
 const schedulingTooltip = (publicationDate?: string) =>
-  publicationDate && Date.parse(publicationDate) >= Date.now()
-    ? `Terminierte Übergabe am\n${dayjs(publicationDate).format("DD.MM.YYYY HH:mm")}`
+  publicationDate
+    ? `Terminierte Übergabe am\n${dayjs.utc(publicationDate).tz("Europe/Berlin").format("DD.MM.YYYY HH:mm")}`
     : "Keine Übergabe terminiert"
 
 const publicationDate = (listEntry: DocumentUnitListEntry) => {
   const date =
     listEntry.scheduledPublicationDateTime ?? listEntry.lastPublicationDateTime
   if (date) {
-    return dayjs(date).format("DD.MM.YYYY HH:mm")
+    return dayjs.utc(date).tz("Europe/Berlin").format("DD.MM.YYYY HH:mm")
   } else {
     return "-"
   }

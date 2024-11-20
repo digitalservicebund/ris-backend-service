@@ -28,7 +28,6 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfL
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -382,9 +381,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       return;
     }
     var documentationUnitDTO = documentationUnitDTOOptional.get();
-    ZoneId germanyZoneId = ZoneId.of("Europe/Berlin");
-    LocalDateTime nowInGermany = ZonedDateTime.now(germanyZoneId).toLocalDateTime();
-    documentationUnitDTO.setLastPublicationDateTime(nowInGermany);
+    LocalDateTime nowInUtc = ZonedDateTime.now().toLocalDateTime();
+    documentationUnitDTO.setLastPublicationDateTime(nowInUtc);
     repository.save(documentationUnitDTO);
   }
 
