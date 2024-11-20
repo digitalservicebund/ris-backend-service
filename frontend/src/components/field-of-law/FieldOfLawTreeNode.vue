@@ -74,14 +74,6 @@ watch(
 watch(
   props,
   async () => {
-    if (props.searchResults) {
-      props.searchResults.forEach((result) => {
-        if (result.identifier == props.node.identifier) {
-          isSearchCandidate.value = true
-        }
-      })
-    }
-
     if (props.nodeOfInterest && props.isRoot) {
       children.value = await props.nodeHelper.getFilteredChildren(
         props.node,
@@ -93,6 +85,23 @@ watch(
   },
   { immediate: true },
 )
+
+watch(
+  () => props.searchResults,
+  async (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+      if (newValue) {
+        isSearchCandidate.value = newValue
+          .map((item) => item.identifier)
+          .includes(props.node.identifier)
+      } else {
+        isSearchCandidate.value = false
+      }
+    }
+  },
+  { immediate: true },
+)
+
 watch(
   isExpanded,
   async () => {
