@@ -13,7 +13,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="flex flex-row gap-8 px-16 py-8">
+  <div class="flex flex-row items-start gap-8 px-16 py-8">
     <button
       :aria-label="fieldOfLaw.identifier + ' im Sachgebietsbaum anzeigen'"
       class="ds-link-02-bold"

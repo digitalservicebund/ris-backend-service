@@ -28,7 +28,7 @@ function selectFieldOfLaw(fieldOfLaw: FieldOfLaw) {
       <div
         v-for="(fieldOfLaw, index) in fieldsOfLaw"
         :key="index"
-        class="field-of-law flex h-56 w-full flex-row items-center border-b-1 border-blue-300 first:mt-16 first:border-t-1"
+        class="field-of-law flex w-full flex-row items-center border-b-1 border-blue-300 py-16 first:mt-16 first:border-t-1"
       >
         <div class="ds-label-01-reg mr-8 flex-grow">
           <button
