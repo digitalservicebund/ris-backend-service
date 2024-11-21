@@ -99,7 +99,7 @@ describe("Documentunit Search", () => {
               uuid: "123",
               decisionDate: "01.02.2022",
               documentNumber: "documentNumber",
-              lastPublicationDateTime: "2000-11-23T10:04:22.603",
+              scheduledPublicationDateTime: "2000-11-23T10:04:22.603",
             }),
           ],
           size: 0,
