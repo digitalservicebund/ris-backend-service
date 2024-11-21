@@ -28,7 +28,6 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfL
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -381,8 +380,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       return;
     }
     var documentationUnitDTO = documentationUnitDTOOptional.get();
-    LocalDateTime nowInUtc = ZonedDateTime.now().toLocalDateTime();
-    documentationUnitDTO.setLastPublicationDateTime(nowInUtc);
+    documentationUnitDTO.setLastPublicationDateTime(LocalDateTime.now());
     repository.save(documentationUnitDTO);
   }
 
