@@ -122,7 +122,7 @@ describe("Documentunit Search", () => {
     await user.click(
       screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
     )
-    expect(screen.getByRole("cell", { name: "jDV Übergabe" }))
+    expect(screen.getByRole("cell", { name: "jDV Übergabe" })).toBeVisible()
     expect(screen.queryAllByTestId("listEntry").length).toBe(1)
   })
 
@@ -158,7 +158,7 @@ describe("Documentunit Search", () => {
     await user.click(
       screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
     )
-    expect(screen.getByRole("cell", { name: "jDV Übergabe" }))
+    expect(screen.getByRole("cell", { name: "jDV Übergabe" })).toBeVisible()
     expect(screen.queryAllByTestId("listEntry").length).toBe(1)
   })
 
@@ -197,7 +197,7 @@ describe("Documentunit Search", () => {
     await user.click(
       screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
     )
-    expect(screen.getByRole("cell", { name: "jDV Übergabe" }))
+    expect(screen.getByRole("cell", { name: "jDV Übergabe" })).toBeVisible()
     expect(screen.queryAllByTestId("listEntry").length).toBe(1)
   })
 
