@@ -96,13 +96,13 @@ test.describe(
           await expect(
             page.getByText(
               editionWithReferences.references?.[0]?.documentationUnit
-                ?.documentNumber + "_1.XML",
+                ?.documentNumber + ".XML",
             ),
           ).toBeVisible()
           await expect(
             page.getByText(
               editionWithReferences.references?.[1]?.documentationUnit
-                ?.documentNumber + "_1.XML",
+                ?.documentNumber + ".XML",
             ),
           ).toBeVisible()
         })

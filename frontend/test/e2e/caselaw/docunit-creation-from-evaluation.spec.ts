@@ -74,6 +74,25 @@ test.describe(
           )
         })
 
+        await test.step("Deleting court, resets responsible docoffice combobox", async () => {
+          await page
+            .locator("#documentationUnit")
+            .getByLabel("Auswahl zurücksetzen")
+            .click()
+          await page.getByText("Suchen").click()
+          await waitForInputValue(page, "[aria-label='Gericht']", "")
+          await waitForInputValue(
+            page,
+            "[aria-label='Zuständige Dokumentationsstelle']",
+            "",
+          )
+
+          // Resetting court does not reset values for Zitatstelle and Klammernzusatz
+          await waitForInputValue(page, "[aria-label='Zitatstelle *']", "12")
+
+          await waitForInputValue(page, "[aria-label='Klammernzusatz']", "L")
+        })
+
         await test.step("Foreign courts are not assigned to a responsible doc office", async () => {
           await fillInput(page, "Gericht", "Arbeits- und Sozialgericht Wien")
           await page.getByText("Arbeits- und Sozialgericht Wien").click()
@@ -111,9 +130,11 @@ test.describe(
           await expect(page.getByText("BAG")).toBeHidden()
           await expect(page.getByText("BFH")).toBeHidden()
           await expect(page.getByText("BVerwG")).toBeVisible()
-          await expect(page.getByText("BVerfG")).toBeVisible()
+          await expect(
+            page.locator("button").filter({ hasText: "BVerfG" }),
+          ).toBeVisible()
 
-          await page.getByText("BVerfG").click()
+          await page.locator("button").filter({ hasText: "BVerfG" }).click()
 
           await waitForInputValue(
             page,
@@ -319,12 +340,9 @@ test.describe(
           await expect(
             newTab.getByLabel("Dokumenttyp", { exact: true }),
           ).toHaveValue("Anerkenntnisurteil")
+        })
 
-          // Todo: RISDEV-4999
-          // await expect(
-          //   newTab.locator("[aria-label='Rechtskraft']"),
-          // ).toHaveValue("Ja")
-
+        await test.step("Reference is added to new documentation unit (Fundstelle Tab and preview)", async () => {
           await newTab.keyboard.down("v")
           const referenceSummary = `${edition.legalPeriodical?.abbreviation} ${edition.prefix}12${edition.suffix} (L)`
           await expect(newTab.getByText("Sekundäre Fundstellen")).toBeVisible()

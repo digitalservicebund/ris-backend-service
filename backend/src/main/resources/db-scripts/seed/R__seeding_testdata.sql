@@ -64,7 +64,7 @@ VALUES
       FROM
         incremental_migration.documentation_office
       WHERE
-        abbreviation = 'DS'
+        abbreviation = 'BAG'
     ),
     'guiding principle',
     '1.Senat, 2. Kammer',
