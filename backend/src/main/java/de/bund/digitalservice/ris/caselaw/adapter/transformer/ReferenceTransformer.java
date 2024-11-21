@@ -11,6 +11,9 @@ import lombok.experimental.UtilityClass;
 public class ReferenceTransformer {
   public static Reference transformToDomain(ReferenceDTO referenceDTO) {
     LegalPeriodical legalPeriodical = null;
+    if (referenceDTO == null) {
+      return null;
+    }
 
     if (referenceDTO.getLegalPeriodical() != null) {
       legalPeriodical =

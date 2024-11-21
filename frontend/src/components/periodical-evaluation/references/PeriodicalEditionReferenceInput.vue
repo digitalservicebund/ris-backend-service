@@ -203,12 +203,7 @@ function addReferenceWithCreatedDocunit(docUnit: DocumentUnit) {
  * @param {boolean} [shouldOpen] - Optional parameter to explicitly set the modal state.
  */
 function toggleDeletionConfirmationModal(shouldOpen: boolean | undefined) {
-  if (typeof shouldOpen === "boolean") {
-    showModal.value = shouldOpen
-  } else {
-    // Toggle if no parameter is provided
-    showModal.value = !showModal.value
-  }
+  showModal.value = shouldOpen ?? !showModal.value
 
   if (showModal.value) {
     const scrollLeft = document.documentElement.scrollLeft
@@ -235,14 +230,14 @@ async function deleteReferenceAndDocUnit() {
   deleteReference()
 }
 
+/*
+Relates the legal periodical of edition to the reference
+ */
 watch(
   () => store.edition?.legalPeriodical,
   (legalPeriodical) => {
     if (legalPeriodical) {
-      reference.value = new Reference({
-        ...props.modelValue,
-        legalPeriodical: legalPeriodical,
-      })
+      reference.value.legalPeriodical = legalPeriodical
     }
   },
   { immediate: true },

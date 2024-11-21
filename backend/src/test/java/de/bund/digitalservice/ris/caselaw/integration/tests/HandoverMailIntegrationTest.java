@@ -202,21 +202,21 @@ class HandoverMailIntegrationTest {
       LegalPeriodicalEditionDTO legalPeriodicalEditionDTO =
           LegalPeriodicalEditionDTO.builder()
               .id(entityId)
-              .references(
-                  List.of(
-                      ReferenceDTO.builder()
-                          .id(UUID.randomUUID())
-                          .citation("citation")
-                          .legalPeriodicalRawValue("ABC")
-                          .rank(1)
-                          .documentationUnit(savedDocumentationUnitDTO)
-                          .build()))
               .legalPeriodical(
                   LegalPeriodicalDTO.builder()
                       .id(UUID.fromString("1abf62fe-9ddf-487e-962e-1c71cf661c5b"))
                       .abbreviation("ABC")
                       .build())
               .build();
+      legalPeriodicalEditionDTO.setReferences(
+          List.of(
+              ReferenceDTO.builder()
+                  .id(UUID.randomUUID())
+                  .citation("citation")
+                  .legalPeriodicalRawValue("ABC")
+                  .rank(1)
+                  .documentationUnit(savedDocumentationUnitDTO)
+                  .build()));
       editionRepository.save(legalPeriodicalEditionDTO);
       assertThat(editionRepository.findAll()).hasSize(1);
       identifier = "edition-" + entityId;
@@ -314,7 +314,7 @@ class HandoverMailIntegrationTest {
       LegalPeriodicalEditionDTO legalPeriodicalEditionDTO =
           LegalPeriodicalEditionDTO.builder()
               .id(entityId)
-              .references(List.of())
+              .editionReferences(List.of())
               .legalPeriodical(
                   LegalPeriodicalDTO.builder()
                       .id(UUID.fromString("1abf62fe-9ddf-487e-962e-1c71cf661c5b"))

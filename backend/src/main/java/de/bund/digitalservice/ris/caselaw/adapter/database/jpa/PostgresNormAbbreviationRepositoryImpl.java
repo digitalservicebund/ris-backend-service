@@ -82,9 +82,9 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
     }
 
     if (results.size() < size) {
-      var officialLLongTitleStartingWith =
+      var officialLongTitleStartingWith =
           repository.findByOfficialLongTitleContainsIgnoreCase(query, PageRequest.of(page, size));
-      officialLLongTitleStartingWith.stream()
+      officialLongTitleStartingWith.stream()
           .filter(e -> results.size() < size && !results.contains(e))
           .forEach(results::add);
     }

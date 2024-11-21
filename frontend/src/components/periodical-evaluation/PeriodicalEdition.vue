@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
-import { computed, ref } from "vue"
+import { computed, onBeforeMount, ref } from "vue"
 import { useRouter } from "vue-router"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
@@ -21,6 +21,10 @@ const router = useRouter()
 const store = useEditionStore()
 const { edition } = storeToRefs(store)
 const saveEditionError = ref<ResponseError | undefined>()
+
+const name = ref()
+const prefix = ref()
+const suffix = ref()
 
 const validationStore =
   useValidationStore<(typeof LegalPeriodicalEdition.fields)[number]>()
@@ -55,6 +59,13 @@ async function validateRequiredInput() {
 async function saveEdition() {
   validationStore.reset()
   saveEditionError.value = undefined
+  await store.loadEdition()
+  if (edition.value) {
+    edition.value.name = name.value
+    edition.value.prefix = prefix.value
+    edition.value.suffix = suffix.value
+  }
+
   await validateRequiredInput()
   if (validationStore.isValid()) {
     const response = await LegalPeriodicalEditionService.save(
@@ -72,6 +83,16 @@ async function saveEdition() {
     }
   }
 }
+
+/**
+ * Load the editions values for a local use
+ */
+onBeforeMount(async () => {
+  await store.loadEdition()
+  name.value = edition.value?.name
+  prefix.value = edition.value?.prefix
+  suffix.value = edition.value?.name
+})
 </script>
 
 <template>
@@ -108,7 +129,7 @@ async function saveEdition() {
       >
         <TextInput
           id="name"
-          v-model="edition!.name"
+          v-model="name"
           aria-label="Name der Ausgabe"
           class="ds-input-medium"
           :has-error="slotProps.hasError"
@@ -121,7 +142,7 @@ async function saveEdition() {
           <InputField id="prefix" label="Präfix">
             <TextInput
               id="prefix"
-              v-model="edition!.prefix"
+              v-model="prefix"
               aria-label="Präfix"
               class="ds-input-medium"
               size="medium"
@@ -131,7 +152,7 @@ async function saveEdition() {
           <InputField id="suffix" label="Suffix">
             <TextInput
               id="suffix"
-              v-model="edition!.suffix"
+              v-model="suffix"
               aria-label="Suffix"
               class="ds-input-medium"
               size="medium"
