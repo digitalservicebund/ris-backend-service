@@ -92,7 +92,7 @@ const publicationDate = (listEntry: DocumentUnitListEntry) => {
   }
 }
 
-const schedulingFeatureToggle = useFeatureToggle("scheduledPublishing")
+const schedulingFeatureToggle = useFeatureToggle("neuris.scheduledPublishing")
 
 /**
  * Stops propagation of scrolling event, and toggles the showModal value

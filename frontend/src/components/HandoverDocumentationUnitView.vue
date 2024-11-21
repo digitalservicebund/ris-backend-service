@@ -301,7 +301,7 @@ const isDecisionReasonsInvalid = computed<boolean>(
     !!store.documentUnit?.longTexts.decisionReasons,
 )
 
-const schedulingFeatureToggle = useFeatureToggle("scheduledPublishing")
+const schedulingFeatureToggle = useFeatureToggle("neuris.scheduledPublishing")
 
 const isScheduled = computed<boolean>(
   () => !!store.documentUnit!.coreData.scheduledPublicationDateTime,

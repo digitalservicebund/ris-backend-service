@@ -197,7 +197,7 @@ function handleSearch() {
   }
 }
 
-const schedulingFeatureToggle = useFeatureToggle("scheduledPublishing")
+const schedulingFeatureToggle = useFeatureToggle("neuris.scheduledPublishing")
 
 watch(
   route,
