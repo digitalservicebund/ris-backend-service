@@ -204,7 +204,7 @@ dependencies {
 
     implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.29")
     // for local development:
-    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.25.jar"))
+    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.28.jar"))
 
     implementation("com.fasterxml.jackson.core:jackson-core:2.18.1")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.1")

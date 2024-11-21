@@ -7,6 +7,7 @@ import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import authService from "@/services/authService"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
+import featureToggleService from "@/services/featureToggleService"
 import routes from "~/test-helper/routes"
 
 function renderComponent(
@@ -38,6 +39,13 @@ function renderComponent(
 }
 
 describe("Documentunit Search", () => {
+  beforeEach(() => {
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
+  })
+
   vi.spyOn(authService, "getName").mockImplementation(() =>
     Promise.resolve({
       status: 200,
@@ -76,6 +84,121 @@ describe("Documentunit Search", () => {
     ).not.toBeInTheDocument()
     expect(screen.getByText("Starten Sie die Suche.")).toBeVisible()
     expect(screen.queryAllByTestId("listEntry").length).toBe(0)
+  })
+
+  test("search for scheduled publicationDate should display one result", async () => {
+    vi.spyOn(
+      documentUnitService,
+      "searchByDocumentUnitSearchInput",
+    ).mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: {
+          content: [
+            new DocumentUnitListEntry({
+              uuid: "123",
+              decisionDate: "01.02.2022",
+              documentNumber: "documentNumber",
+              scheduledPublicationDateTime: "2000-11-23T10:04:22.603",
+            }),
+          ],
+          size: 0,
+          number: 0,
+          numberOfElements: 20,
+          first: true,
+          last: false,
+          empty: false,
+        },
+      }),
+    )
+    const { user } = renderComponent()
+
+    await user.click(screen.getByLabelText("Nur meine Dokstelle"))
+    await user.type(
+      screen.getByLabelText("jDV Übergabedatum Suche"),
+      "23.11.2000",
+    )
+    await user.click(screen.getByLabelText("Terminiert Filter"))
+    await user.click(
+      screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
+    )
+    expect(screen.getByRole("cell", { name: "jDV Übergabe" }))
+    expect(screen.queryAllByTestId("listEntry").length).toBe(1)
+  })
+
+  test("search with scheduled only should display one result", async () => {
+    vi.spyOn(
+      documentUnitService,
+      "searchByDocumentUnitSearchInput",
+    ).mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: {
+          content: [
+            new DocumentUnitListEntry({
+              uuid: "123",
+              decisionDate: "01.02.2022",
+              documentNumber: "documentNumber",
+              scheduledPublicationDateTime: "2000-11-23T10:04:22.603",
+            }),
+          ],
+          size: 0,
+          number: 0,
+          numberOfElements: 20,
+          first: true,
+          last: false,
+          empty: false,
+        },
+      }),
+    )
+    const { user } = renderComponent()
+
+    await user.click(screen.getByLabelText("Nur meine Dokstelle"))
+    await user.click(screen.getByLabelText("Terminiert Filter"))
+    await user.click(
+      screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
+    )
+    expect(screen.getByRole("cell", { name: "jDV Übergabe" }))
+    expect(screen.queryAllByTestId("listEntry").length).toBe(1)
+  })
+
+  test("search for publicationDate should display one result", async () => {
+    vi.spyOn(
+      documentUnitService,
+      "searchByDocumentUnitSearchInput",
+    ).mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: {
+          content: [
+            new DocumentUnitListEntry({
+              uuid: "123",
+              decisionDate: "01.02.2022",
+              documentNumber: "documentNumber",
+              lastPublicationDateTime: "2000-11-23T10:04:22.603",
+            }),
+          ],
+          size: 0,
+          number: 0,
+          numberOfElements: 20,
+          first: true,
+          last: false,
+          empty: false,
+        },
+      }),
+    )
+    const { user } = renderComponent()
+
+    await user.click(screen.getByLabelText("Nur meine Dokstelle"))
+    await user.type(
+      screen.getByLabelText("jDV Übergabedatum Suche"),
+      "23.11.2000",
+    )
+    await user.click(
+      screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
+    )
+    expect(screen.getByRole("cell", { name: "jDV Übergabe" }))
+    expect(screen.queryAllByTestId("listEntry").length).toBe(1)
   })
 
   test("click on 'Ergebnisse anzeigen' with search input renders results", async () => {

@@ -2,6 +2,8 @@ import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, fireEvent, screen } from "@testing-library/vue"
 import { Stubs } from "@vue/test-utils/dist/types"
+import { beforeEach } from "vitest"
+import { nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import HandoverDocumentationUnitView from "@/components/HandoverDocumentationUnitView.vue"
 import DocumentUnit from "@/domain/documentUnit"
@@ -9,6 +11,7 @@ import { EventRecordType, HandoverMail, Preview } from "@/domain/eventRecord"
 import LegalForce from "@/domain/legalForce"
 import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
+import featureToggleService from "@/services/featureToggleService"
 import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
 
 const router = createRouter({
@@ -72,8 +75,12 @@ describe("HandoverDocumentationUnitView:", () => {
         success: true,
       }),
     })
-  })
 
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
+  })
   describe("renders plausibility check", () => {
     it("with all required fields filled", async () => {
       renderComponent({
@@ -451,6 +458,39 @@ describe("HandoverDocumentationUnitView:", () => {
     expect(codeSnippet?.getAttribute("xml")).toBe("<xml>all good</xml>")
   })
 
+  it("should not allow to publish when publication is scheduled", async () => {
+    renderComponent({
+      documentUnit: new DocumentUnit("123", {
+        coreData: {
+          fileNumbers: ["foo"],
+          scheduledPublicationDateTime: "2050-01-01T04:00:00.000Z",
+          court: { type: "type", location: "location", label: "label" },
+          decisionDate: "2022-02-01",
+          legalEffect: "legalEffect",
+          documentType: {
+            jurisShortcut: "ca",
+            label: "category",
+          },
+        },
+      }),
+    })
+
+    expect(
+      screen.getByRole("button", {
+        name: "Dokumentationseinheit an jDV übergeben",
+      }),
+    ).toBeDisabled()
+  })
+
+  it("should show the scheduling component", async () => {
+    renderComponent()
+
+    // wait for feature flag to be loaded, can be removed when scheduledPublication flag is removed.
+    await nextTick()
+
+    expect(screen.getByLabelText("Terminiertes Datum")).toBeVisible()
+  })
+
   it("with stubbing", async () => {
     const { container } = renderComponent({
       props: {
@@ -492,7 +532,7 @@ describe("HandoverDocumentationUnitView:", () => {
     await new Promise((resolve) => setTimeout(resolve, 0))
 
     expect(container).toHaveTextContent(
-      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltRandnummernprüfungDie Reihenfolge der Randnummern ist korrektXML VorschauDokumentationseinheit an jDV übergebenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subject`,
+      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltRandnummernprüfungDie Reihenfolge der Randnummern ist korrektXML VorschauDokumentationseinheit an jDV übergebenOder für später terminieren:Datum * Uhrzeit * Termin setzenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subject`,
     )
 
     const codeSnippet = screen.queryByTestId("code-snippet")

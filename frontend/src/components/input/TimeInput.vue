@@ -3,7 +3,7 @@ import TextInput from "@/components/input/TextInput.vue"
 
 defineProps<{
   id: string
-  modelValue: string
+  modelValue?: string
 }>()
 
 const emit = defineEmits<{

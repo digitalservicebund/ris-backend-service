@@ -77,6 +77,13 @@ public interface DocumentationUnitRepository {
   void saveProcedures(DocumentationUnit documentationUnit);
 
   /**
+   * Save lastPublicationDateTime of a documentation unit
+   *
+   * @param uuid the UUID of the documentation unit to save the date for
+   */
+  void saveLastPublicationDateTime(UUID uuid);
+
+  /**
    * Delete a documentation unit
    *
    * @param documentationUnit the documentation unit to delete

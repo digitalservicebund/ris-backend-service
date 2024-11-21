@@ -134,6 +134,8 @@ public class DocumentationUnitService {
       Optional<String> courtLocation,
       Optional<LocalDate> decisionDate,
       Optional<LocalDate> decisionDateEnd,
+      Optional<LocalDate> publicationDate,
+      Optional<Boolean> scheduledOnly,
       Optional<String> publicationStatus,
       Optional<Boolean> withError,
       Optional<Boolean> myDocOfficeOnly) {
@@ -146,6 +148,8 @@ public class DocumentationUnitService {
             .courtLocation(normalizeSpace(courtLocation.orElse(null)))
             .decisionDate(decisionDate.orElse(null))
             .decisionDateEnd(decisionDateEnd.orElse(null))
+            .publicationDate(publicationDate.orElse(null))
+            .scheduledOnly(scheduledOnly.orElse(false))
             .status(
                 (publicationStatus.isPresent() || withError.isPresent())
                     ? Status.builder()
@@ -175,6 +179,10 @@ public class DocumentationUnitService {
 
     return addPermissions(
         oidcUser, repository.findDocumentationUnitListItemByDocumentNumber(documentNumber));
+  }
+
+  public void setPublicationDateTime(UUID uuid) {
+    repository.saveLastPublicationDateTime(uuid);
   }
 
   private DocumentationUnitListItem addPermissions(

@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,6 +24,10 @@ public interface DocumentationUnitListItemDTO {
   List<AttachmentDTO> getAttachments();
 
   LocalDate getDecisionDate();
+
+  LocalDateTime getLastPublicationDateTime();
+
+  LocalDateTime getScheduledPublicationDateTime();
 
   DocumentTypeDTO getDocumentType();
 

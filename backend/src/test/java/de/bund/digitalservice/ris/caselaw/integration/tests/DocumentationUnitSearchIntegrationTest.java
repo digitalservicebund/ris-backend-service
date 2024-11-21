@@ -49,6 +49,7 @@ import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -218,6 +219,171 @@ class DocumentationUnitSearchIntegrationTest {
             LocalDate.of(2023, 03, 15),
             LocalDate.of(2022, 01, 23),
             LocalDate.of(2022, 01, 23),
+            null);
+  }
+
+  @Test
+  void test_searchByScheduledOnly_shouldReturnDescendingOrder() {
+    List<LocalDateTime> scheduledPublicationDates =
+        Arrays.asList(
+            LocalDateTime.of(2022, 1, 23, 10, 5),
+            LocalDateTime.of(2024, 1, 24, 10, 5),
+            LocalDateTime.of(2022, 7, 24, 10, 5),
+            LocalDateTime.of(2022, 1, 24, 10, 5),
+            null,
+            LocalDateTime.of(2022, 1, 23, 8, 5),
+            LocalDateTime.of(2022, 1, 23, 10, 4));
+
+    for (LocalDateTime date : scheduledPublicationDates) {
+      EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+          repository,
+          DocumentationUnitDTO.builder()
+              .documentNumber(RandomStringUtils.randomAlphabetic(13))
+              .scheduledPublicationDateTime(date)
+              .documentationOffice(docOfficeDTO));
+    }
+
+    Slice<DocumentationUnitListItem> responseBody =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri(
+                "/api/v1/caselaw/documentunits/search?pg=0&sz=10&myDocOfficeOnly=true&scheduledOnly=true")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+            .returnResult()
+            .getResponseBody();
+
+    assertThat(responseBody)
+        .extracting("scheduledPublicationDateTime")
+        .containsExactly(
+            LocalDateTime.of(2024, 1, 24, 10, 5),
+            LocalDateTime.of(2022, 7, 24, 10, 5),
+            LocalDateTime.of(2022, 1, 24, 10, 5),
+            LocalDateTime.of(2022, 1, 23, 10, 5),
+            LocalDateTime.of(2022, 1, 23, 10, 4),
+            LocalDateTime.of(2022, 1, 23, 8, 5));
+  }
+
+  @Test
+  void
+      test_searchByScheduledOnlyWithPublicationDate_shouldReturnFilteredResultsInDescendingOrder() {
+    List<LocalDateTime> scheduledPublicationDates =
+        Arrays.asList(
+            LocalDateTime.of(2022, 1, 23, 10, 5),
+            LocalDateTime.of(2024, 1, 24, 10, 5),
+            LocalDateTime.of(2022, 7, 24, 10, 5),
+            LocalDateTime.of(2022, 1, 24, 10, 5),
+            null,
+            LocalDateTime.of(2022, 1, 23, 8, 5),
+            LocalDateTime.of(2022, 1, 23, 10, 4));
+
+    for (LocalDateTime date : scheduledPublicationDates) {
+      EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+          repository,
+          DocumentationUnitDTO.builder()
+              .documentNumber(RandomStringUtils.randomAlphabetic(13))
+              .scheduledPublicationDateTime(date)
+              .documentationOffice(docOfficeDTO));
+    }
+
+    Slice<DocumentationUnitListItem> responseBody =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri(
+                "/api/v1/caselaw/documentunits/search?pg=0&sz=10&myDocOfficeOnly=true&publicationDate=2022-01-23&scheduledOnly=true")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+            .returnResult()
+            .getResponseBody();
+
+    assertThat(responseBody)
+        .extracting("scheduledPublicationDateTime")
+        .containsExactly(
+            LocalDateTime.of(2022, 1, 23, 10, 5),
+            LocalDateTime.of(2022, 1, 23, 10, 4),
+            LocalDateTime.of(2022, 1, 23, 8, 5));
+  }
+
+  @Test
+  void test_searchByPublicationDate_shouldFilterAndReturnDescendingOrder() {
+    List<LocalDateTime> lastPublicationDates =
+        Arrays.asList(
+            LocalDateTime.of(2022, 1, 23, 10, 5),
+            null,
+            LocalDateTime.of(2022, 1, 23, 9, 5),
+            LocalDateTime.of(2022, 1, 23, 19, 5),
+            LocalDateTime.of(2024, 1, 23, 8, 5),
+            LocalDateTime.of(2022, 1, 24, 10, 5),
+            null);
+
+    List<LocalDateTime> scheduledPublicationDates =
+        Arrays.asList(
+            null,
+            LocalDateTime.of(2022, 1, 23, 5, 3),
+            null,
+            null,
+            LocalDateTime.of(2022, 1, 23, 10, 10),
+            null,
+            LocalDateTime.of(2022, 1, 23, 12, 10));
+
+    var index = 0;
+
+    for (LocalDateTime date : lastPublicationDates) {
+      EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+          repository,
+          DocumentationUnitDTO.builder()
+              .documentNumber(RandomStringUtils.randomAlphabetic(13))
+              .lastPublicationDateTime(date)
+              .scheduledPublicationDateTime(scheduledPublicationDates.get(index))
+              .documentationOffice(docOfficeDTO));
+      index++;
+    }
+
+    Slice<DocumentationUnitListItem> responseBody =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri(
+                "/api/v1/caselaw/documentunits/search?pg=0&sz=10&myDocOfficeOnly=true&publicationDate=2022-01-23")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+            .returnResult()
+            .getResponseBody();
+
+    /*
+     * Ordered results visible for user (lastPublicationDate only if scheduledPublicationDate is null):
+     * 2022-01-23 19:05
+     * 2022-01-23 12:10
+     * 2022-01-23 10:10
+     * 2022-01-23 10:05
+     * 2022-01-23 09:05
+     * 2022-01-23 05:03
+     */
+    assertThat(responseBody)
+        .extracting("scheduledPublicationDateTime")
+        .containsExactly(
+            null,
+            LocalDateTime.of(2022, 1, 23, 12, 10),
+            LocalDateTime.of(2022, 1, 23, 10, 10),
+            null,
+            null,
+            LocalDateTime.of(2022, 1, 23, 5, 3));
+    assertThat(responseBody)
+        .extracting("lastPublicationDateTime")
+        .containsExactly(
+            LocalDateTime.of(2022, 1, 23, 19, 5),
+            null,
+            LocalDateTime.of(2024, 1, 23, 8, 5),
+            LocalDateTime.of(2022, 1, 23, 10, 5),
+            LocalDateTime.of(2022, 1, 23, 9, 5),
             null);
   }
 

@@ -72,6 +72,8 @@ class DocumentationUnitTransformerTest {
     assertThat(documentationUnitDTO.getEcli()).isNull();
     assertThat(documentationUnitDTO.getJudicialBody()).isNull();
     assertThat(documentationUnitDTO.getDecisionDate()).isNull();
+    assertThat(documentationUnitDTO.getScheduledPublicationDateTime()).isNull();
+    assertThat(documentationUnitDTO.getLastPublicationDateTime()).isNull();
     assertThat(documentationUnitDTO.getCourt()).isNull();
     assertThat(documentationUnitDTO.getDocumentType()).isNull();
     assertThat(documentationUnitDTO.getDocumentationOffice()).isNull();

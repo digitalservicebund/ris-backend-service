@@ -64,6 +64,7 @@ async function search() {
   })
   if (response.data) {
     currentPage.value = response.data
+    searchResponseError.value = undefined
   }
   if (response.error) {
     searchResponseError.value = response.error
@@ -279,6 +280,10 @@ const showDefaultLink = computed(() => {
         :empty-state="emptyStateLabel"
         :is-loading="isLoading"
         :search-response-error="searchResponseError"
+        :show-publication-date="
+          !!searchQuery?.publicationDate ||
+          searchQuery?.scheduledOnly === 'true'
+        "
         @delete-documentation-unit="handleDelete"
         @take-over-documentation-unit="handleTakeOver"
       >

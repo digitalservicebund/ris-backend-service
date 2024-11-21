@@ -27,6 +27,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.Docume
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -367,6 +368,22 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     repository.save(documentationUnitDTO);
   }
 
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
+  public void saveLastPublicationDateTime(UUID uuid) {
+    if (uuid == null) {
+      return;
+    }
+
+    var documentationUnitDTOOptional = repository.findById(uuid);
+    if (documentationUnitDTOOptional.isEmpty()) {
+      return;
+    }
+    var documentationUnitDTO = documentationUnitDTOOptional.get();
+    documentationUnitDTO.setLastPublicationDateTime(LocalDateTime.now());
+    repository.save(documentationUnitDTO);
+  }
+
   private ProcedureDTO getOrCreateProcedure(
       DocumentationOfficeDTO documentationOfficeDTO, Procedure procedure) {
     if (procedure.id() == null) {
@@ -427,6 +444,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             null,
             null,
             false,
+            null,
+            false,
             false,
             relatedDocumentationUnit.getDocumentType(),
             documentationOfficeDTO);
@@ -445,6 +464,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       String fileNumber,
       LocalDate decisionDate,
       LocalDate decisionDateEnd,
+      LocalDate publicationDate,
+      Boolean scheduledOnly,
       PublicationStatus status,
       Boolean withError,
       Boolean myDocOfficeOnly,
@@ -459,6 +480,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
           courtLocation,
           decisionDate,
           decisionDateEnd,
+          publicationDate,
+          scheduledOnly,
           status,
           withError,
           myDocOfficeOnly,
@@ -489,6 +512,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
               courtLocation,
               decisionDate,
               decisionDateEnd,
+              publicationDate,
+              scheduledOnly,
               status,
               withError,
               myDocOfficeOnly,
@@ -505,6 +530,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
               courtLocation,
               decisionDate,
               decisionDateEnd,
+              publicationDate,
+              scheduledOnly,
               status,
               withError,
               myDocOfficeOnly,
@@ -567,6 +594,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             searchInput.fileNumber(),
             searchInput.decisionDate(),
             searchInput.decisionDateEnd(),
+            searchInput.publicationDate(),
+            searchInput.scheduledOnly(),
             searchInput.status() != null ? searchInput.status().publicationStatus() : null,
             withError,
             searchInput.myDocOfficeOnly(),

@@ -20,6 +20,7 @@ export type CoreData = {
   documentType?: DocumentType
   procedure?: Procedure
   previousProcedures?: string[]
+  scheduledPublicationDateTime?: string
   ecli?: string
   deviatingEclis?: string[]
   appraisalBody?: string

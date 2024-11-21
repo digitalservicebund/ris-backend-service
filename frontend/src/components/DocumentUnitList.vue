@@ -1,5 +1,8 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
+import customParseFormat from "dayjs/plugin/customParseFormat"
+import dayjsTimezone from "dayjs/plugin/timezone"
+import dayjsUtc from "dayjs/plugin/utc"
 import { computed, ref } from "vue"
 import DocumentUnitListEntry from "../domain/documentUnitListEntry"
 import Tooltip from "./Tooltip.vue"
@@ -14,6 +17,7 @@ import PopupModal from "@/components/PopupModal.vue"
 import TableHeader from "@/components/TableHeader.vue"
 import TableRow from "@/components/TableRow.vue"
 import TableView from "@/components/TableView.vue"
+import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { PublicationState } from "@/domain/publicationStatus"
 import { ResponseError } from "@/services/httpClient"
@@ -25,17 +29,24 @@ import IconSubject from "~icons/ic/baseline-subject"
 import IconNote from "~icons/ic/outline-comment-bank"
 import IconEdit from "~icons/ic/outline-edit"
 import IconView from "~icons/ic/outline-remove-red-eye"
+import IconClock from "~icons/ic/outline-watch-later"
+import IconArrowDown from "~icons/mdi/arrow-down-drop"
 
 const props = defineProps<{
   documentUnitListEntries?: DocumentUnitListEntry[]
   searchResponseError?: ResponseError
   isLoading?: boolean
   emptyState?: string
+  showPublicationDate?: boolean
 }>()
 const emit = defineEmits<{
   deleteDocumentationUnit: [documentUnitListEntry: DocumentUnitListEntry]
   takeOverDocumentationUnit: [documentUnitListEntry: DocumentUnitListEntry]
 }>()
+
+dayjs.extend(dayjsUtc)
+dayjs.extend(dayjsTimezone)
+dayjs.extend(customParseFormat)
 
 const emptyStatus = computed(() => props.emptyState)
 
@@ -65,6 +76,23 @@ const trimText = (text: string, length: number = 50) =>
 
 const noteTooltip = (listEntry: DocumentUnitListEntry) =>
   listEntry.note ? trimText(listEntry.note) : "Keine Notiz vorhanden"
+
+const schedulingTooltip = (publicationDate?: string) =>
+  publicationDate
+    ? `Terminierte Übergabe am\n${dayjs.utc(publicationDate).tz("Europe/Berlin").format("DD.MM.YYYY HH:mm")}`
+    : "Keine Übergabe terminiert"
+
+const publicationDate = (listEntry: DocumentUnitListEntry) => {
+  const date =
+    listEntry.scheduledPublicationDateTime ?? listEntry.lastPublicationDateTime
+  if (date) {
+    return dayjs.utc(date).tz("Europe/Berlin").format("DD.MM.YYYY HH:mm")
+  } else {
+    return "-"
+  }
+}
+
+const schedulingFeatureToggle = useFeatureToggle("scheduledPublishing")
 
 /**
  * Stops propagation of scrolling event, and toggles the showModal value
@@ -124,12 +152,23 @@ function onDelete() {
         <CellHeaderItem class="w-[1%]"> Dokumentnummer</CellHeaderItem>
         <CellHeaderItem> Gerichtstyp</CellHeaderItem>
         <CellHeaderItem> Ort</CellHeaderItem>
-        <CellHeaderItem> Datum</CellHeaderItem>
+        <CellHeaderItem>
+          <div class="flex flex-row">
+            Datum
+            <IconArrowDown
+              v-if="!showPublicationDate && schedulingFeatureToggle"
+            />
+          </div>
+        </CellHeaderItem>
         <CellHeaderItem> Aktenzeichen</CellHeaderItem>
         <CellHeaderItem> Spruchkörper</CellHeaderItem>
         <CellHeaderItem> Typ</CellHeaderItem>
         <CellHeaderItem> Status</CellHeaderItem>
         <CellHeaderItem> Fehler</CellHeaderItem>
+        <CellHeaderItem v-if="showPublicationDate && schedulingFeatureToggle">
+          <div class="flex flex-row items-center">
+            jDV Übergabe <IconArrowDown /></div
+        ></CellHeaderItem>
         <CellHeaderItem />
       </TableHeader>
       <TableRow
@@ -173,6 +212,24 @@ function onDelete() {
                 class="flex-end flex h-20 w-20"
                 :class="!!listEntry.note ? 'text-blue-800' : 'text-gray-500'"
                 data-testid="note-icon"
+              />
+            </Tooltip>
+
+            <Tooltip
+              v-if="schedulingFeatureToggle"
+              :text="schedulingTooltip(listEntry.scheduledPublicationDateTime)"
+            >
+              <IconClock
+                :aria-label="
+                  schedulingTooltip(listEntry.scheduledPublicationDateTime)
+                "
+                class="flex-end flex h-20 w-20"
+                :class="
+                  listEntry.scheduledPublicationDateTime
+                    ? 'text-blue-800'
+                    : 'text-gray-500'
+                "
+                data-testid="scheduling-icon"
               />
             </Tooltip>
           </FlexContainer>
@@ -233,6 +290,9 @@ function onDelete() {
             label="Fehler"
           />
           <span v-else>-</span>
+        </CellItem>
+        <CellItem v-if="showPublicationDate && schedulingFeatureToggle">
+          {{ publicationDate(listEntry) }}
         </CellItem>
         <CellItem class="flex">
           <div class="float-end flex">
