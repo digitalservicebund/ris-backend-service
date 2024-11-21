@@ -3,13 +3,26 @@ import { fireEvent, render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
 import ScheduledPublishingDateTime from "@/components/ScheduledPublishingDateTime.vue"
 import DocumentUnit from "@/domain/documentUnit"
+import { RisJsonPatch } from "@/domain/risJsonPatch"
+import { ServiceResponse } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
-function mockDocUnitStore(scheduledPublicationDateTime?: string) {
+function mockDocUnitStore({
+  scheduledPublicationDateTime,
+  errorTitle,
+}: {
+  scheduledPublicationDateTime?: string
+  errorTitle?: string
+} = {}) {
   const mockedSessionStore = useDocumentUnitStore()
   mockedSessionStore.documentUnit = new DocumentUnit("q834", {
     coreData: { scheduledPublicationDateTime },
   })
+
+  const response = errorTitle ? { error: { title: errorTitle } } : {}
+  vi.spyOn(mockedSessionStore, "updateDocumentUnit").mockResolvedValue(
+    response as ServiceResponse<RisJsonPatch>,
+  )
 
   return mockedSessionStore
 }
@@ -60,7 +73,9 @@ describe("ScheduledPublishingDateTime", () => {
   })
 
   it("should render previously set publishing date", () => {
-    mockDocUnitStore("2080-10-10T23:00:00.000Z")
+    mockDocUnitStore({
+      scheduledPublicationDateTime: "2080-10-10T23:00:00.000Z",
+    })
     render(ScheduledPublishingDateTime, {
       props: { isPublishable: true },
     })
@@ -107,7 +122,9 @@ describe("ScheduledPublishingDateTime", () => {
   })
 
   it("should reset state after deleting scheduling", async () => {
-    const store = mockDocUnitStore("2080-10-11T02:00:00.000Z")
+    const store = mockDocUnitStore({
+      scheduledPublicationDateTime: "2080-10-11T02:00:00.000Z",
+    })
     render(ScheduledPublishingDateTime, {
       props: { isPublishable: true },
     })
@@ -213,7 +230,9 @@ describe("ScheduledPublishingDateTime", () => {
   })
 
   it("should show error if scheduled date is set and doc unit is not publishable", () => {
-    mockDocUnitStore("2080-10-11T03:00:00.000Z")
+    mockDocUnitStore({
+      scheduledPublicationDateTime: "2080-10-11T03:00:00.000Z",
+    })
     render(ScheduledPublishingDateTime, {
       props: { isPublishable: false },
     })
@@ -228,5 +247,58 @@ describe("ScheduledPublishingDateTime", () => {
         "Die terminierte Abgabe kann aufgrund von Fehlern in der Plausibilitätsprüfung nicht durchgeführt werden.",
       ),
     ).toBeVisible()
+  })
+
+  it("should show error if doc unit cannot be saved when deleting scheduling", async () => {
+    mockDocUnitStore({
+      scheduledPublicationDateTime: "2080-10-11T03:00:00.000Z",
+      errorTitle: "Speichern leider fehlgeschlagen.",
+    })
+    render(ScheduledPublishingDateTime, {
+      props: { isPublishable: true },
+    })
+
+    await fireEvent.click(screen.getByLabelText("Termin löschen"))
+
+    expect(
+      screen.queryByTestId("scheduledPublishingDate_errors"),
+    ).not.toBeInTheDocument()
+    expect(screen.getByText("Speichern leider fehlgeschlagen.")).toBeVisible()
+
+    // Allow saving
+    mockDocUnitStore()
+
+    // New attempt resets error state
+    await fireEvent.click(screen.getByLabelText("Termin löschen"))
+    expect(
+      screen.queryByText("Speichern leider fehlgeschlagen."),
+    ).not.toBeInTheDocument()
+  })
+
+  it("should show error if doc unit cannot be saved when creating scheduling", async () => {
+    mockDocUnitStore({
+      errorTitle: "Speichern leider fehlgeschlagen.",
+    })
+    render(ScheduledPublishingDateTime, {
+      props: { isPublishable: true },
+    })
+
+    const dateField = screen.getByLabelText("Terminiertes Datum")
+    await fireEvent.update(dateField, "01.01.2050")
+    await fireEvent.click(screen.getByLabelText("Termin setzen"))
+
+    expect(
+      screen.queryByTestId("scheduledPublishingDate_errors"),
+    ).not.toBeInTheDocument()
+    expect(screen.getByText("Speichern leider fehlgeschlagen.")).toBeVisible()
+
+    // Allow saving
+    mockDocUnitStore()
+
+    // New attempt resets error state
+    await fireEvent.click(screen.getByLabelText("Termin setzen"))
+    expect(
+      screen.queryByText("Speichern leider fehlgeschlagen."),
+    ).not.toBeInTheDocument()
   })
 })

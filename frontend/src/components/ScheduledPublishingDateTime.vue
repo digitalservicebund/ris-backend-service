@@ -5,10 +5,12 @@ import dayjsTimezone from "dayjs/plugin/timezone"
 import dayjsUtc from "dayjs/plugin/utc"
 import { computed, ref } from "vue"
 import { ValidationError } from "./input/types"
+import InfoModal from "@/components/InfoModal.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TimeInput from "@/components/input/TimeInput.vue"
+import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
@@ -70,7 +72,10 @@ const isValidDateTime = computed<boolean>(
     !dateValidationError.value,
 )
 
+const docUnitSaveError = ref<ResponseError | null>(null)
+
 const saveScheduling = async () => {
+  docUnitSaveError.value = null
   if (dateValidationError.value || !isDateValid.value || !isTimeValid.value) {
     // This is needed as the DateInput does not update its modelValue when the date is incomplete.
     // First input correct date "01.01.2080", then delete last char "01.01.208". Without blurring input, click on button.
@@ -79,20 +84,35 @@ const saveScheduling = async () => {
 
   store.documentUnit!.coreData.scheduledPublicationDateTime =
     scheduledDateTimeInput.value.toISOString()
-  await store.updateDocumentUnit()
 
-  scheduledPublishingDate.value = dayjs(
-    store.documentUnit!.coreData.scheduledPublicationDateTime,
-  )
-    .tz("Europe/Berlin")
-    .format("YYYY-MM-DD")
+  const { error } = await store.updateDocumentUnit()
+
+  if (error) {
+    store.documentUnit!.coreData.scheduledPublicationDateTime = undefined
+    docUnitSaveError.value = error
+  } else {
+    scheduledPublishingDate.value = dayjs(
+      store.documentUnit!.coreData.scheduledPublicationDateTime,
+    )
+      .tz("Europe/Berlin")
+      .format("YYYY-MM-DD")
+  }
 }
 
 const removeScheduling = async () => {
-  scheduledPublishingDate.value = undefined
-  scheduledPublishingTime.value = "05:00"
+  docUnitSaveError.value = null
+  const previousDate = store.documentUnit!.coreData.scheduledPublicationDateTime
   store.documentUnit!.coreData.scheduledPublicationDateTime = undefined
-  await store.updateDocumentUnit()
+
+  const { error } = await store.updateDocumentUnit()
+
+  if (error) {
+    store.documentUnit!.coreData.scheduledPublicationDateTime = previousDate
+    docUnitSaveError.value = error
+  } else {
+    scheduledPublishingDate.value = undefined
+    scheduledPublishingTime.value = "05:00"
+  }
 }
 
 const dateValidationError = ref<ValidationError | undefined>()
@@ -183,5 +203,12 @@ const dateValidationError = ref<ValidationError | undefined>()
         </div>
       </div>
     </div>
+    <InfoModal
+      v-if="docUnitSaveError"
+      aria-label="Fehler bei der Terminierung"
+      class="mt-8"
+      :description="docUnitSaveError.description"
+      :title="docUnitSaveError.title"
+    />
   </div>
 </template>
