@@ -225,7 +225,7 @@ describe("ScheduledPublishingDateTime", () => {
     ).toBeInTheDocument()
     expect(
       screen.getByText(
-        "Die terminierte Abgabe wird aufgrund von Fehlern in der Plausibilitätsprüfung nicht durchgeführt werden.",
+        "Die terminierte Abgabe kann aufgrund von Fehlern in der Plausibilitätsprüfung nicht durchgeführt werden.",
       ),
     ).toBeVisible()
   })

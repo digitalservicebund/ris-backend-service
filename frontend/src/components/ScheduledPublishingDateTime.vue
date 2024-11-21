@@ -177,7 +177,7 @@ const dateValidationError = ref<ValidationError | undefined>()
           v-if="!isPublishable && scheduledPublishingDate"
           class="lex-row ds-label-03-reg mt-2 text-red-800"
         >
-          Die terminierte Abgabe wird aufgrund von Fehlern in der
+          Die terminierte Abgabe kann aufgrund von Fehlern in der
           Plausibilitätsprüfung nicht durchgeführt werden.
         </div>
       </div>
