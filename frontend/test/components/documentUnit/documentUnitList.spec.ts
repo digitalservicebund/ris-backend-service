@@ -344,9 +344,9 @@ describe("documentUnit list", () => {
 
     await nextTick() // should be removed after feature flag removal
 
-    expect(screen.getByText("23.01.2100 23:00")).toBeInTheDocument()
+    expect(screen.getByText("24.01.2100 00:00")).toBeInTheDocument()
     expect(
-      screen.getByLabelText("Terminierte Übergabe am 23.01.2100 23:00"),
+      screen.getByLabelText("Terminierte Übergabe am 24.01.2100 00:00"),
     ).toBeInTheDocument()
     expect(screen.getByTestId("scheduling-icon")).toBeInTheDocument()
   })
@@ -358,7 +358,7 @@ describe("documentUnit list", () => {
           id: "id",
           uuid: "1",
           documentNumber: "123",
-          scheduledPublicationDateTime: "2000-01-23T23:00:00",
+          lastPublicationDateTime: "2000-01-23T23:00:00",
         },
       ],
       showPublicationDate: true,
@@ -366,7 +366,7 @@ describe("documentUnit list", () => {
 
     await nextTick() // should be removed after feature flag removal
 
-    expect(screen.getByText("23.01.2000 23:00")).toBeInTheDocument()
+    expect(screen.getByText("24.01.2000 00:00")).toBeInTheDocument()
     expect(
       screen.getByLabelText("Keine Übergabe terminiert"),
     ).toBeInTheDocument()
