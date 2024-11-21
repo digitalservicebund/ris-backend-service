@@ -9,9 +9,9 @@ import org.springframework.data.repository.NoRepositoryBean;
 public interface DocumentTypeRepository {
   List<DocumentType> findCaselawBySearchStr(String searchString);
 
-  List<DocumentType> findIndependentLiteratureBySearchStr(String searchString);
+  List<DocumentType> findDependentLiteratureBySearchStr(String searchString);
 
-  List<DocumentType> findAllIndependentLiteratureOrderByAbbreviationAscLabelAsc();
+  List<DocumentType> findAllDependentLiteratureOrderByAbbreviationAscLabelAsc();
 
   Optional<DocumentType> findUniqueCaselawBySearchStr(String searchString);
 

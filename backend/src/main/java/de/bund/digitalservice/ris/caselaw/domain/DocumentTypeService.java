@@ -25,9 +25,9 @@ public class DocumentTypeService {
 
   public List<DocumentType> getDependentLiteratureDocumentTypes(Optional<String> searchStr) {
     if (searchStr.isPresent() && !searchStr.get().isBlank()) {
-      return documentTypeRepository.findIndependentLiteratureBySearchStr(searchStr.get().trim());
+      return documentTypeRepository.findDependentLiteratureBySearchStr(searchStr.get().trim());
     }
 
-    return documentTypeRepository.findAllIndependentLiteratureOrderByAbbreviationAscLabelAsc();
+    return documentTypeRepository.findAllDependentLiteratureOrderByAbbreviationAscLabelAsc();
   }
 }
