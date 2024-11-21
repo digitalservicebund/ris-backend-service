@@ -89,9 +89,10 @@ const saveScheduling = async () => {
 }
 
 const removeScheduling = async () => {
+  scheduledPublishingDate.value = undefined
+  scheduledPublishingTime.value = "05:00"
   store.documentUnit!.coreData.scheduledPublicationDateTime = undefined
   await store.updateDocumentUnit()
-  scheduledPublishingDate.value = undefined
 }
 
 const dateValidationError = ref<ValidationError | undefined>()

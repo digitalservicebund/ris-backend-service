@@ -107,7 +107,7 @@ describe("ScheduledPublishingDateTime", () => {
   })
 
   it("should reset state after deleting scheduling", async () => {
-    const store = mockDocUnitStore("2080-10-11T03:00:00.000Z")
+    const store = mockDocUnitStore("2080-10-11T02:00:00.000Z")
     render(ScheduledPublishingDateTime, {
       props: { isPublishable: true },
     })
