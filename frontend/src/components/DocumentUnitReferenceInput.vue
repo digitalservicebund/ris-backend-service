@@ -90,7 +90,7 @@ watch(
     <div v-if="lastSavedModelValue.isEmpty" class="flex items-center gap-16">
       <div class="flex items-center">
         <InputField
-          id="caselaw"
+          id="caselaw-reference-type"
           class="flex items-center"
           label="Rechtsprechung"
           :label-position="LabelPosition.RIGHT"
@@ -100,14 +100,14 @@ watch(
             aria-label="Rechtsprechung Fundstelle"
             name="referenceType"
             size="medium"
-            value="caselaw"
+            value="caselaw-reference-type"
           />
         </InputField>
       </div>
 
       <div class="flex items-center">
         <InputField
-          id="literature"
+          id="literature-reference-type"
           class="flex items-center"
           label="Literatur"
           :label-position="LabelPosition.RIGHT"
@@ -117,7 +117,7 @@ watch(
             aria-label="Literatur Fundstelle"
             name="referenceType"
             size="medium"
-            value="literature"
+            value="literature-reference-type"
           />
         </InputField>
       </div>
