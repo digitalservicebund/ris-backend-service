@@ -31,7 +31,7 @@ public class PostgresDocumentTypeRepositoryImpl implements DocumentTypeRepositor
   }
 
   @Override
-  public List<DocumentType> findIndependentLiteratureBySearchStr(String searchString) {
+  public List<DocumentType> findDependentLiteratureBySearchStr(String searchString) {
     return repository
         .findCaselawBySearchStrAndCategory(
             searchString, categoryRepository.findFirstByLabel("U").getId())
@@ -41,7 +41,7 @@ public class PostgresDocumentTypeRepositoryImpl implements DocumentTypeRepositor
   }
 
   @Override
-  public List<DocumentType> findAllIndependentLiteratureOrderByAbbreviationAscLabelAsc() {
+  public List<DocumentType> findAllDependentLiteratureOrderByAbbreviationAscLabelAsc() {
     return repository
         .findAllByCategoryOrderByAbbreviationAscLabelAsc(categoryRepository.findFirstByLabel("U"))
         .stream()
