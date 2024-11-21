@@ -157,6 +157,16 @@ function validateRequiredInput(referenceToValidate?: Reference): boolean {
       validationStore.add("Pflichtfeld nicht befüllt", missingField)
     })
     return false // Validation failed
+  } else if (
+    referenceToCheck.missingRequiredLiteratureFields?.length &&
+    referenceToValidate?.referenceType == "literature"
+  ) {
+    referenceToCheck.missingRequiredLiteratureFields.forEach(
+      (missingField: string) => {
+        validationStore.add("Pflichtfeld nicht befüllt", missingField)
+      },
+    )
+    return false // Validation failed
   } else {
     return true // Validation passed
   }
@@ -171,6 +181,7 @@ function addReference(decision: RelatedDocumentation) {
     referenceSupplement: reference.value.referenceSupplement,
     author: reference.value.author,
     documentType: reference.value.documentType,
+    referenceType: reference.value.referenceType,
     footnote: reference.value.footnote,
     legalPeriodical: reference.value.legalPeriodical,
     legalPeriodicalRawValue: reference.value.legalPeriodicalRawValue,
@@ -179,11 +190,7 @@ function addReference(decision: RelatedDocumentation) {
 
   validateRequiredInput(newReference)
 
-  // Todo validate also literature input
-  if (
-    validationStore.isValid() ||
-    reference.value.referenceType == "literature"
-  ) {
+  if (validationStore.isValid()) {
     emit("update:modelValue", newReference)
     emit("addEntry")
   }
@@ -334,6 +341,7 @@ onMounted(async () => {
               name="referenceType"
               size="medium"
               value="caselaw"
+              @click="validationStore.reset()"
             />
           </InputField>
         </div>
@@ -351,6 +359,7 @@ onMounted(async () => {
               name="referenceType"
               size="medium"
               value="literature"
+              @click="validationStore.reset()"
             />
           </InputField>
         </div>
@@ -439,15 +448,20 @@ onMounted(async () => {
         <InputField
           v-if="reference.referenceType === 'literature'"
           id="literatureReferenceDocumentType"
+          v-slot="slotProps"
           label="Dokumenttyp *"
+          :validation-error="validationStore.getByField('documentType')"
         >
           <ComboboxInput
             id="literatureReferenceDocumentType"
             v-model="reference.documentType"
             aria-label="Dokumenttyp Literaturfundstelle"
+            :has-error="slotProps.hasError"
             :item-service="
               ComboboxItemService.getDependentLiteratureDocumentTypes
             "
+            @blur="validateRequiredInput(reference)"
+            @focus="validationStore.remove('documentType')"
           ></ComboboxInput>
         </InputField>
       </div>
@@ -455,12 +469,20 @@ onMounted(async () => {
         v-if="reference.referenceType === 'literature'"
         class="w-[calc(50%-10px)]"
       >
-        <InputField id="literatureReferenceAuthor" label="Autor *">
+        <InputField
+          id="literatureReferenceAuthor"
+          v-slot="slotProps"
+          label="Autor *"
+          :validation-error="validationStore.getByField('author')"
+        >
           <TextInput
             id="literatureReferenceAuthor"
             v-model="reference.author"
             aria-label="Autor Literaturfundstelle"
+            :has-error="slotProps.hasError"
             size="medium"
+            @blur="validateRequiredInput(reference)"
+            @focus="validationStore.remove('author')"
           ></TextInput>
         </InputField>
       </div>
@@ -528,11 +550,7 @@ onMounted(async () => {
                 @focus="validationStore.remove('fileNumber')"
               ></TextInput>
             </InputField>
-            <InputField
-              id="decisionDocumentType"
-              label="Dokumenttyp"
-              :validation-error="validationStore.getByField('documentType')"
-            >
+            <InputField id="decisionDocumentType" label="Dokumenttyp">
               <ComboboxInput
                 id="decisionDocumentType"
                 v-model="relatedDocumentationUnit.documentType"

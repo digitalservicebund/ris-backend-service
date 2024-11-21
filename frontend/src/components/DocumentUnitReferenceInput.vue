@@ -51,6 +51,10 @@ async function validateRequiredInput() {
   reference.value.missingRequiredFields.forEach((missingField) =>
     validationStore.add("Pflichtfeld nicht befüllt", missingField),
   )
+
+  reference.value.missingRequiredLiteratureFields.forEach((missingField) =>
+    validationStore.add("Pflichtfeld nicht befüllt", missingField),
+  )
   validationStore.remove("referenceSupplement")
 }
 
@@ -90,7 +94,7 @@ watch(
     <div v-if="lastSavedModelValue.isEmpty" class="flex items-center gap-16">
       <div class="flex items-center">
         <InputField
-          id="caselaw-reference-type"
+          id="caselaw"
           class="flex items-center"
           label="Rechtsprechung"
           :label-position="LabelPosition.RIGHT"
@@ -100,14 +104,15 @@ watch(
             aria-label="Rechtsprechung Fundstelle"
             name="referenceType"
             size="medium"
-            value="caselaw-reference-type"
+            value="caselaw"
+            @click="validationStore.reset()"
           />
         </InputField>
       </div>
 
       <div class="flex items-center">
         <InputField
-          id="literature-reference-type"
+          id="literature"
           class="flex items-center"
           label="Literatur"
           :label-position="LabelPosition.RIGHT"
@@ -117,7 +122,8 @@ watch(
             aria-label="Literatur Fundstelle"
             name="referenceType"
             size="medium"
-            value="literature-reference-type"
+            value="literature"
+            @click="validationStore.reset()"
           />
         </InputField>
       </div>
@@ -180,15 +186,19 @@ watch(
         <InputField
           v-if="reference.referenceType === 'literature'"
           id="literatureReferenceDocumentType"
+          v-slot="slotProps"
           label="Dokumenttyp *"
+          :validation-error="validationStore.getByField('documentType')"
         >
           <ComboboxInput
             id="literatureReferenceDocumentType"
             v-model="reference.documentType"
             aria-label="Dokumenttyp Literaturfundstelle"
+            :has-error="slotProps.hasError"
             :item-service="
               ComboboxItemService.getDependentLiteratureDocumentTypes
             "
+            @focus="validationStore.remove('documentType')"
           ></ComboboxInput>
         </InputField>
       </div>
@@ -196,12 +206,19 @@ watch(
         v-if="reference.referenceType === 'literature'"
         class="w-[calc(50%-10px)]"
       >
-        <InputField id="literatureReferenceDocumentType" label="Autor *">
+        <InputField
+          id="literatureReferenceDocumentType"
+          v-slot="slotProps"
+          label="Autor *"
+          :validation-error="validationStore.getByField('author')"
+        >
           <TextInput
             id="literatureReferenceDocumentType"
             v-model="reference.author"
             aria-label="Autor Literaturfundstelle"
+            :has-error="slotProps.hasError"
             size="medium"
+            @focus="validationStore.remove('author')"
           ></TextInput>
         </InputField>
       </div>
