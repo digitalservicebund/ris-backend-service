@@ -54,6 +54,7 @@ const myDocOfficeOnly = computed({
       delete query.value.myDocOfficeOnly
       delete query.value.scheduledOnly
       delete query.value.publicationDate
+      resetErrors("publicationDate")
     } else {
       query.value.myDocOfficeOnly = "true"
     }
