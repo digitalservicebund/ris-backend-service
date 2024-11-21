@@ -230,14 +230,14 @@ async function deleteReferenceAndDocUnit() {
   deleteReference()
 }
 
+/*
+Relates the legal periodical of edition to the reference
+ */
 watch(
   () => store.edition?.legalPeriodical,
   (legalPeriodical) => {
     if (legalPeriodical) {
-      reference.value = new Reference({
-        ...props.modelValue,
-        legalPeriodical: legalPeriodical,
-      })
+      reference.value.legalPeriodical = legalPeriodical
     }
   },
   { immediate: true },

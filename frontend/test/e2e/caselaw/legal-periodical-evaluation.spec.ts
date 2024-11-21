@@ -334,8 +334,16 @@ test.describe(
           ).toHaveCount(2)
         })
 
+        const secondPage = await context.newPage()
+
         await test.step("A docunit can be added to an edition multiple times", async () => {
+          const saveRequest = page.waitForResponse(
+            `**/api/v1/caselaw/legalperiodicaledition/${edition.id}`,
+            { timeout: 5_000 },
+          )
+          await navigateToPeriodicalReferences(secondPage, edition.id)
           await searchForDocUnitWithFileNumber(page, fileNumber, "31.12.2019")
+
           await expect(
             page
               .getByTestId("reference-list-summary")
@@ -343,13 +351,29 @@ test.describe(
                 `AG Aachen, 31.12.2019, ${fileNumber}, Anerkenntnisurteil, Unveröffentlicht`,
               ),
           ).toBeVisible()
+
           await expect(page.getByText("Bereits hinzugefügt")).toBeVisible()
           await fillInput(page, "Zitatstelle *", "99")
           await fillInput(page, "Klammernzusatz", "LT")
           await page.getByLabel("Treffer übernehmen").click()
-          await expect(
-            page.locator("[aria-label='Listen Eintrag']"),
-          ).toHaveCount(3)
+
+          const locator = page.locator("[aria-label='Listen Eintrag']")
+          await saveRequest
+          await expect(locator).toHaveCount(3)
+        })
+
+        await test.step("An added reference is shown on a second tab", async () => {
+          const editionIntervalFetchResponse = secondPage.waitForResponse(
+            `**/api/v1/caselaw/legalperiodicaledition/${edition.id}`,
+            { timeout: 10_000 }, // auto fetch takes place every 10 seconds
+          )
+
+          await editionIntervalFetchResponse
+          const secondPageLocator = secondPage.locator(
+            "[aria-label='Listen Eintrag']",
+          )
+          await expect(secondPageLocator).toHaveCount(3)
+          await secondPage.close()
         })
 
         await test.step("A reference is added to the editable list after being added", async () => {
