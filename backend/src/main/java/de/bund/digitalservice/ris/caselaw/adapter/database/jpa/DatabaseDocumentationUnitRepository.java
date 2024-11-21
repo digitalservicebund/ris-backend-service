@@ -27,16 +27,11 @@ public interface DatabaseDocumentationUnitRepository
    AND (cast(:decisionDate as date) IS NULL
        OR (cast(:decisionDateEnd as date) IS NULL AND documentationUnit.decisionDate = :decisionDate)
        OR (cast(:decisionDateEnd as date) IS NOT NULL AND documentationUnit.decisionDate BETWEEN :decisionDate AND :decisionDateEnd))
-   AND (:myDocOfficeOnly = FALSE
-     OR (:myDocOfficeOnly = TRUE
-       AND documentationUnit.documentationOffice.id = :documentationOfficeId
-     )
-   )
-   AND (
-       (:scheduledOnly = FALSE OR cast(documentationUnit.scheduledPublicationDateTime as date) IS NOT NULL)
-   AND (cast(:publicationDate as date) IS NULL OR (cast(documentationUnit.scheduledPublicationDateTime as date) = :publicationDate)
-      OR (cast(documentationUnit.lastPublicationDateTime as date) = :publicationDate))
-   )
+   AND (:myDocOfficeOnly = FALSE OR (:myDocOfficeOnly = TRUE AND documentationUnit.documentationOffice.id = :documentationOfficeId))
+   AND (:scheduledOnly = FALSE OR cast(documentationUnit.scheduledPublicationDateTime as date) IS NOT NULL)
+   AND (cast(:publicationDate as date) IS NULL
+       OR (cast(documentationUnit.scheduledPublicationDateTime as date) = :publicationDate)
+       OR (cast(documentationUnit.lastPublicationDateTime as date) = :publicationDate))
    AND (cast(:documentType as uuid) IS NULL OR documentationUnit.documentType = :documentType)
    AND
      (
