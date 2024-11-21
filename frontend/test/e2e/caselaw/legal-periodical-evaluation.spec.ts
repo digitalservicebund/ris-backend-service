@@ -575,7 +575,7 @@ test.describe(
     test(
       "Literature references can be added to periodical evaluation",
       {
-        tag: "@RISDEV-5236",
+        tag: "@RISDEV-5236 @RISDEV-5454",
       },
       async ({ page, editionWithReferences, prefilledDocumentUnit }) => {
         const fileNumber = prefilledDocumentUnit.coreData.fileNumbers?.[0] || ""
@@ -623,9 +623,25 @@ test.describe(
           ).toBeVisible()
         })
 
-        await test.step("Save literature reference, verify that it is shown in the list", async () => {
-          await page.getByLabel("Literatur Fundstelle").click()
+        await test.step("Literature references are validated for required inputs", async () => {
           await fillInput(page, "Zitatstelle *", `2021, 2`)
+
+          await searchForDocUnitWithFileNumber(page, fileNumber, "31.12.2019")
+          await page.getByLabel("Treffer übernehmen").click()
+          // check that both fields display error message
+          await expect(
+            page.locator("text=Pflichtfeld nicht befüllt"),
+          ).toHaveCount(2)
+
+          // Switching between radio buttons resets the validation errors
+          await page.getByLabel("Rechtsprechung Fundstelle").click()
+          await page.getByLabel("Literatur Fundstelle").click()
+          await expect(
+            page.locator("text=Pflichtfeld nicht befüllt"),
+          ).toHaveCount(0)
+        })
+
+        await test.step("Save literature reference, verify that it is shown in the list", async () => {
           await fillInput(page, "Autor Literaturfundstelle", "Bilen, Ulviye")
           await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
           await page.getByText("Ean", { exact: true }).click()

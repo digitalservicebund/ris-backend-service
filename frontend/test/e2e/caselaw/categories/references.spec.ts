@@ -247,7 +247,7 @@ test.describe(
     test(
       "Literature references can be added to documentation unit",
       {
-        tag: "@RISDEV-5236",
+        tag: "@RISDEV-5236 @RISDEV-5454",
       },
       async ({ page, documentNumber }) => {
         await test.step("Caselaw reference type is preselected", async () => {
@@ -290,7 +290,7 @@ test.describe(
           await expect(page.getByLabel("Klammernzusatz")).toBeHidden()
         })
 
-        await test.step("Save literature reference, verify that it is shown in the list", async () => {
+        await test.step("Literature references are validated for required inputs", async () => {
           await fillInput(page, "Periodikum", "AllMBl")
           await page
             .getByText("AllMBl | Allgemeines Ministerialblatt", {
@@ -299,6 +299,22 @@ test.describe(
             .click()
           await waitForInputValue(page, "[aria-label='Periodikum']", "AllMBl")
           await fillInput(page, "Zitatstelle", "2024, 2")
+
+          await page.locator("[aria-label='Fundstelle speichern']").click()
+          // check that both fields display error message
+          await expect(
+            page.locator("text=Pflichtfeld nicht befüllt"),
+          ).toHaveCount(2)
+
+          // Switching between radio buttons resets the validation errors
+          await page.getByLabel("Rechtsprechung Fundstelle").click()
+          await page.getByLabel("Literatur Fundstelle").click()
+          await expect(
+            page.locator("text=Pflichtfeld nicht befüllt"),
+          ).toHaveCount(0)
+        })
+
+        await test.step("Save literature reference, verify that it is shown in the list", async () => {
           await fillInput(page, "Autor Literaturfundstelle", "Bilen, Ulviye")
           await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
           await page.getByText("Ean", { exact: true }).click()
