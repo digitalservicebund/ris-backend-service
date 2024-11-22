@@ -168,6 +168,7 @@ class ReferenceIntegrationTest {
                         .citation("2024, S.3")
                         .referenceSupplement("Klammerzusatz")
                         .footnote("footnote")
+                        .referenceType(ReferenceType.CASELAW)
                         .legalPeriodical(
                             LegalPeriodical.builder()
                                 .uuid(legalPeriodical.getId())
