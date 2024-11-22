@@ -11,18 +11,15 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 public class JudgmentBody {
+  @XmlElement(name = "motivation", namespace = CaseLawLdml.AKN_NS)
+  private JaxbHtml motivation;
+
   @XmlElement(name = "introduction", namespace = CaseLawLdml.AKN_NS)
-  private JaxbHtml introduction;
+  private AknMultipleBlock introduction;
 
   @XmlElement(name = "background", namespace = CaseLawLdml.AKN_NS)
   private JaxbHtml background;
 
   @XmlElement(name = "decision", namespace = CaseLawLdml.AKN_NS)
-  private Decision decision;
-
-  @XmlElement(name = "arguments", namespace = CaseLawLdml.AKN_NS)
-  private JaxbHtml arguments;
-
-  @XmlElement(name = "motivation", namespace = CaseLawLdml.AKN_NS)
-  private Motivation motivation;
+  private AknMultipleBlock decision;
 }

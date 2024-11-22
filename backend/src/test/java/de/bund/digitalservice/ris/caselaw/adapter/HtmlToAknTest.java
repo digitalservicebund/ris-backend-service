@@ -5,12 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknKeyword;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Classification;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Header;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Judgment;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JudgmentBody;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Title;
 import de.bund.digitalservice.ris.caselaw.adapter.exception.LdmlTransformationException;
 import jakarta.xml.bind.JAXB;
 import java.io.IOException;
@@ -86,24 +84,23 @@ class HtmlToAknTest {
 
     String expectedXml =
         """
-                <akn:judgmentBody>
-                 <akn:introduction>
-                    <akn:hcontainer name="randnummer">
-                       <akn:num>1</akn:num>
-                       <akn:content>
-                         <akn:p>Lorem ipsum</akn:p>
-                       </akn:content>
-                    </akn:hcontainer>
-                 </akn:introduction>
-               </akn:judgmentBody>
-          """;
-
+        <akn:judgmentBody>
+          <akn:motivation>
+            <akn:hcontainer name="randnummer">
+               <akn:num>1</akn:num>
+               <akn:content>
+                 <akn:p>Lorem ipsum</akn:p>
+               </akn:content>
+            </akn:hcontainer>
+          </akn:motivation>
+        </akn:judgmentBody>
+        """;
     String result =
         getAkn(
             Judgment.builder()
                 .judgmentBody(
                     JudgmentBody.builder()
-                        .introduction(JaxbHtml.build(htmlStringToObjectList(inputHtml)))
+                        .motivation(JaxbHtml.build(htmlStringToObjectList(inputHtml)))
                         .build())
                 .build());
 
@@ -119,19 +116,13 @@ class HtmlToAknTest {
 
     String expectedXml =
         """
-              <akn:header>
-                 <akn:block name="title">
-                    <akn:docTitle>
-                       <akn:subFlow name="titleWrapper">
-                          <akn:p alternativeTo="textWrapper">Hello</akn:p>
-                          <akn:p> paragraph</akn:p>
-                          <akn:p alternativeTo="textWrapper"> world!</akn:p>
-                       </akn:subFlow>
-                    </akn:docTitle>
-                 </akn:block>
-              </akn:header>
-              """;
-    Header header = new Header().withBlock("title", Title.build(htmlStringToObjectList(inputHtml)));
+        <akn:header>
+          <akn:p alternativeTo="textWrapper">Hello</akn:p>
+          <akn:p> paragraph</akn:p>
+          <akn:p alternativeTo="textWrapper"> world!</akn:p>
+        </akn:header>
+        """;
+    JaxbHtml header = JaxbHtml.build(htmlStringToObjectList(inputHtml));
     String result = getAkn(Judgment.builder().header(header).build());
 
     assertEquals(
