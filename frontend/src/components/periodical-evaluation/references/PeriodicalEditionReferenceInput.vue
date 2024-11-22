@@ -391,7 +391,6 @@ onMounted(async () => {
                 :has-error="slotProps.hasError"
                 placeholder="Variable"
                 size="medium"
-                @blur="validateRequiredInput(reference)"
                 @focus="validationStore.remove('citation')"
               ></TextInput>
               <TextInput
@@ -462,7 +461,6 @@ onMounted(async () => {
             :item-service="
               ComboboxItemService.getDependentLiteratureDocumentTypes
             "
-            @blur="validateRequiredInput(reference)"
             @focus="validationStore.remove('documentType')"
           ></ComboboxInput>
         </InputField>
@@ -483,7 +481,6 @@ onMounted(async () => {
             aria-label="Autor Literaturfundstelle"
             :has-error="slotProps.hasError"
             size="medium"
-            @blur="validateRequiredInput(reference)"
             @focus="validationStore.remove('author')"
           ></TextInput>
         </InputField>

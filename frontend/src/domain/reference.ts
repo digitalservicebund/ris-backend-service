@@ -21,6 +21,11 @@ export default class Reference implements EditableListItem {
     "referenceSupplement",
   ] as const
 
+  static readonly requiredFieldsForDocunit = [
+    "legalPeriodical",
+    "citation",
+  ] as const
+
   static readonly requiredLiteratureFields = [
     "legalPeriodical",
     "citation",
@@ -79,8 +84,18 @@ export default class Reference implements EditableListItem {
     )
   }
 
+  get hasMissingRequiredFieldsForDocunit(): boolean {
+    return this.missingRequiredFieldsForDocunit.length > 0
+  }
+
+  get missingRequiredFieldsForDocunit() {
+    return Reference.requiredFieldsForDocunit.filter((field) =>
+      this.fieldIsEmpty(this[field]),
+    )
+  }
+
   get hasMissingRequiredLiteratureFields(): boolean {
-    return this.missingRequiredFields.length > 0
+    return this.missingRequiredLiteratureFields.length > 0
   }
 
   get missingRequiredLiteratureFields() {

@@ -46,6 +46,14 @@ const legalPeriodical = computed({
   },
 })
 
+const fieldsMissing = computed(
+  () =>
+    (reference.value.referenceType === "caselaw" &&
+      reference.value.hasMissingRequiredFieldsForDocunit) ||
+    (reference.value.referenceType === "literature" &&
+      reference.value.hasMissingRequiredLiteratureFields),
+)
+
 async function validateRequiredInput() {
   validationStore.reset()
   reference.value.missingRequiredFields.forEach((missingField) =>
@@ -61,7 +69,7 @@ async function validateRequiredInput() {
 async function addReference() {
   await validateRequiredInput()
 
-  if (validationStore.isValid()) {
+  if (!fieldsMissing.value) {
     emit("update:modelValue", reference.value as Reference)
     emit("addEntry")
   }
