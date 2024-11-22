@@ -1,10 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DependentLiteratureTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalEditionTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ReferenceTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
+import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -43,10 +45,14 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
   public LegalPeriodicalEdition save(LegalPeriodicalEdition legalPeriodicalEdition) {
 
     List<ReferenceDTO> referenceDTOS = createReferenceDTOs(legalPeriodicalEdition);
+    List<DependentLiteratureCitationDTO> dependentLiteratureCitationDTOS =
+        createLiteratureReferenceDTOs(legalPeriodicalEdition);
     deleteDocUnitLinksForDeletedReferences(legalPeriodicalEdition);
 
     var edition = LegalPeriodicalEditionTransformer.transformToDTO(legalPeriodicalEdition);
     edition.setReferences(referenceDTOS); // Add the new references
+    edition.setLiteratureCitations(
+        dependentLiteratureCitationDTOS); // Add the new literature references
 
     return LegalPeriodicalEditionTransformer.transformToDomain(repository.save(edition));
   }
@@ -96,26 +102,65 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
         continue;
       }
 
-      var newReference = ReferenceTransformer.transformToDTO(reference);
-      newReference.setDocumentationUnit(docUnit.get());
+      if (reference.referenceType().equals(ReferenceType.CASELAW)) {
+        var newReference = ReferenceTransformer.transformToDTO(reference);
+        newReference.setDocumentationUnit(docUnit.get());
 
-      // keep rank for existing references and set to max rank +1 for new references
-      newReference.setRank(
-          docUnit.get().getReferences().stream()
-              .filter(referenceDTO -> referenceDTO.getId().equals(reference.id()))
-              .findFirst()
-              .map(ReferenceDTO::getRank)
-              .orElseGet(
-                  () ->
-                      docUnit.get().getReferences().stream()
-                              .map(ReferenceDTO::getRank)
-                              .max(Comparator.naturalOrder())
-                              .orElse(0)
-                          + 1));
+        // keep rank for existing references and set to max rank +1 for new references
+        newReference.setRank(
+            docUnit.get().getReferences().stream()
+                .filter(referenceDTO -> referenceDTO.getId().equals(reference.id()))
+                .findFirst()
+                .map(ReferenceDTO::getRank)
+                .orElseGet(
+                    () ->
+                        docUnit.get().getReferences().stream()
+                                .map(ReferenceDTO::getRank)
+                                .max(Comparator.naturalOrder())
+                                .orElse(0)
+                            + 1));
 
-      referenceDTOS.add(newReference);
+        referenceDTOS.add(newReference);
+      }
     }
     return referenceDTOS;
+  }
+
+  private List<DependentLiteratureCitationDTO> createLiteratureReferenceDTOs(
+      LegalPeriodicalEdition legalPeriodicalEdition) {
+    List<DependentLiteratureCitationDTO> dependentLiteratureCitationDTOS = new ArrayList<>();
+    if (legalPeriodicalEdition.references() == null) {
+      return dependentLiteratureCitationDTOS;
+    }
+    for (Reference reference : legalPeriodicalEdition.references()) {
+      var docUnit =
+          documentationUnitRepository.findByDocumentNumber(
+              reference.documentationUnit().getDocumentNumber());
+      if (docUnit.isEmpty()) {
+        // don't add references to non-existing documentation units
+        continue;
+      }
+
+      if (reference.referenceType().equals(ReferenceType.LITERATURE)) {
+        var newReference = DependentLiteratureTransformer.transformToDTO(reference);
+        newReference.setDocumentationUnit(docUnit.get());
+        // keep rank for existing references and set to max rank +1 for new references
+        newReference.setRank(
+            docUnit.get().getReferences().stream()
+                .filter(referenceDTO -> referenceDTO.getId().equals(reference.id()))
+                .findFirst()
+                .map(ReferenceDTO::getRank)
+                .orElseGet(
+                    () ->
+                        docUnit.get().getReferences().stream()
+                                .map(ReferenceDTO::getRank)
+                                .max(Comparator.naturalOrder())
+                                .orElse(0)
+                            + 1));
+        dependentLiteratureCitationDTOS.add(newReference);
+      }
+    }
+    return dependentLiteratureCitationDTOS;
   }
 
   @Override

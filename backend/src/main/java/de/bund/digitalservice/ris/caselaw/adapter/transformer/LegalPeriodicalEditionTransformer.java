@@ -2,7 +2,9 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalEditionDTO;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
+import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,6 +18,22 @@ public class LegalPeriodicalEditionTransformer {
       return null;
     }
 
+    ArrayList<Reference> references = new ArrayList<>();
+
+    if (legalPeriodicalEditionDTO.getReferences() != null) {
+      references.addAll(
+          legalPeriodicalEditionDTO.getReferences().stream()
+              .map(ReferenceTransformer::transformToDomain)
+              .toList());
+    }
+
+    if (legalPeriodicalEditionDTO.getLiteratureCitations() != null) {
+      references.addAll(
+          legalPeriodicalEditionDTO.getLiteratureCitations().stream()
+              .map(DependentLiteratureTransformer::transformToDomain)
+              .toList());
+    }
+
     return LegalPeriodicalEdition.builder()
         .id(legalPeriodicalEditionDTO.getId())
         .createdAt(legalPeriodicalEditionDTO.getCreatedAt())
@@ -25,10 +43,7 @@ public class LegalPeriodicalEditionTransformer {
         .name(legalPeriodicalEditionDTO.getName())
         .prefix(legalPeriodicalEditionDTO.getPrefix())
         .suffix(legalPeriodicalEditionDTO.getSuffix())
-        .references(
-            legalPeriodicalEditionDTO.getReferences().stream()
-                .map(ReferenceTransformer::transformToDomain)
-                .toList())
+        .references(references)
         .build();
   }
 
