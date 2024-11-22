@@ -41,8 +41,9 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
         .findById(id)
         .map(
             edition ->
-                LegalPeriodicalEditionTransformer.transformToDomain(
-                    edition, referenceRepository, dependentLiteratureCitationRepository));
+                LegalPeriodicalEditionTransformer.transformToDomain(edition).toBuilder()
+                    .references(addReferences(edition))
+                    .build());
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -50,8 +51,9 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
     return repository.findAllByLegalPeriodicalIdOrderByCreatedAtDesc(legalPeriodicalId).stream()
         .map(
             edition ->
-                LegalPeriodicalEditionTransformer.transformToDomain(
-                    edition, referenceRepository, dependentLiteratureCitationRepository))
+                LegalPeriodicalEditionTransformer.transformToDomain(edition).toBuilder()
+                    .references(addReferences(edition))
+                    .build())
         .toList();
   }
 
@@ -63,13 +65,36 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
         createLiteratureReferenceDTOs(legalPeriodicalEdition);
     deleteDocUnitLinksForDeletedReferences(legalPeriodicalEdition);
 
-    var edition = LegalPeriodicalEditionTransformer.transformToDTO(legalPeriodicalEdition);
-    edition.setReferences(referenceDTOS); // Add the new references
-    edition.setLiteratureCitations(
+    var editionDTO = LegalPeriodicalEditionTransformer.transformToDTO(legalPeriodicalEdition);
+    editionDTO.setReferences(referenceDTOS); // Add the new references
+    editionDTO.setLiteratureCitations(
         dependentLiteratureCitationDTOS); // Add the new literature references
 
-    return LegalPeriodicalEditionTransformer.transformToDomain(
-        repository.save(edition), referenceRepository, dependentLiteratureCitationRepository);
+    return LegalPeriodicalEditionTransformer.transformToDomain(repository.save(editionDTO))
+        .toBuilder()
+        .references(addReferences(editionDTO))
+        .build();
+  }
+
+  private ArrayList<Reference> addReferences(LegalPeriodicalEditionDTO editionDTO) {
+    ArrayList<Reference> references = new ArrayList<>();
+
+    if (editionDTO.getReferences() != null) {
+      references.addAll(
+          editionDTO.getReferences().stream()
+              .map(id -> referenceRepository.findById(id).get())
+              .map(ReferenceTransformer::transformToDomain)
+              .toList());
+    }
+
+    if (editionDTO.getLiteratureCitations() != null) {
+      references.addAll(
+          editionDTO.getLiteratureCitations().stream()
+              .map(id -> dependentLiteratureCitationRepository.findById(id).get())
+              .map(DependentLiteratureTransformer::transformToDomain)
+              .toList());
+    }
+    return references;
   }
 
   private void deleteDocUnitLinksForDeletedReferences(LegalPeriodicalEdition updatedEdition) {
