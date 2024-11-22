@@ -292,25 +292,25 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @OrderBy("rank")
   private List<ReferenceDTO> references = new ArrayList<>();
 
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @OrderBy("rank")
   @Builder.Default
   private List<JobProfileDTO> jobProfiles = new ArrayList<>();
 
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @OrderBy("rank")
   @Builder.Default
   private List<DismissalGroundsDTO> dismissalGrounds = new ArrayList<>();
 
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @OrderBy("rank")
   @Builder.Default
   private List<DismissalTypesDTO> dismissalTypes = new ArrayList<>();
 
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @OrderBy("rank")
   @Builder.Default
@@ -319,7 +319,7 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @Column(name = "legislative_mandate")
   private boolean hasLegislativeMandate;
 
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @OrderBy("rank")
   @Builder.Default
