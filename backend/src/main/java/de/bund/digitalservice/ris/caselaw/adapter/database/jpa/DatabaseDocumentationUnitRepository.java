@@ -51,16 +51,9 @@ public interface DatabaseDocumentationUnitRepository
     )
    AND (:withErrorOnly = FALSE OR documentationUnit.documentationOffice.id = :documentationOfficeId AND documentationUnit.status.withError = TRUE)
    ORDER BY
-     CASE
-       WHEN (:scheduledOnly = TRUE OR CAST(:publicationDate AS DATE) IS NOT NULL)
-          AND documentationUnit.scheduledPublicationDateTime IS NOT NULL
-          THEN documentationUnit.scheduledPublicationDateTime
-       WHEN (:scheduledOnly = TRUE OR CAST(:publicationDate AS DATE) IS NOT NULL)
-          AND documentationUnit.scheduledPublicationDateTime IS NULL
-          AND CAST(documentationUnit.lastPublicationDateTime as date) = :publicationDate
-          THEN documentationUnit.lastPublicationDateTime
-       ELSE documentationUnit.decisionDate
-     END DESC NULLS LAST
+     (CASE WHEN (:scheduledOnly = TRUE OR CAST(:publicationDate AS DATE) IS NOT NULL) THEN documentationUnit.scheduledPublicationDateTime END) DESC NULLS LAST,
+     (CASE WHEN (:scheduledOnly = TRUE OR CAST(:publicationDate AS DATE) IS NOT NULL) THEN documentationUnit.lastPublicationDateTime END) DESC NULLS LAST,
+     documentationUnit.decisionDate DESC NULLS LAST
 """;
 
   @Query(

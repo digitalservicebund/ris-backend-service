@@ -318,7 +318,7 @@ class DocumentationUnitSearchIntegrationTest {
             null,
             LocalDateTime.of(2022, 1, 23, 9, 5),
             LocalDateTime.of(2022, 1, 23, 19, 5),
-            LocalDateTime.of(2024, 1, 23, 8, 5),
+            LocalDateTime.of(2022, 1, 23, 8, 5),
             LocalDateTime.of(2022, 1, 24, 10, 5),
             null);
 
@@ -359,32 +359,34 @@ class DocumentationUnitSearchIntegrationTest {
             .getResponseBody();
 
     /*
+     * These are unlikely test conditions, because scheduled dates are in the future only and lastPublication dates in the past only.
+     *
      * Ordered results visible for user (lastPublicationDate only if scheduledPublicationDate is null):
-     * 2022-01-23 19:05
      * 2022-01-23 12:10
      * 2022-01-23 10:10
+     * 2022-01-23 05:03
+     * 2022-01-23 19:05
      * 2022-01-23 10:05
      * 2022-01-23 09:05
-     * 2022-01-23 05:03
      */
     assertThat(responseBody)
         .extracting("scheduledPublicationDateTime")
         .containsExactly(
-            null,
             LocalDateTime.of(2022, 1, 23, 12, 10),
             LocalDateTime.of(2022, 1, 23, 10, 10),
+            LocalDateTime.of(2022, 1, 23, 5, 3),
             null,
             null,
-            LocalDateTime.of(2022, 1, 23, 5, 3));
+            null);
     assertThat(responseBody)
         .extracting("lastPublicationDateTime")
         .containsExactly(
-            LocalDateTime.of(2022, 1, 23, 19, 5),
             null,
-            LocalDateTime.of(2024, 1, 23, 8, 5),
+            LocalDateTime.of(2022, 1, 23, 8, 5),
+            null,
+            LocalDateTime.of(2022, 1, 23, 19, 5),
             LocalDateTime.of(2022, 1, 23, 10, 5),
-            LocalDateTime.of(2022, 1, 23, 9, 5),
-            null);
+            LocalDateTime.of(2022, 1, 23, 9, 5));
   }
 
   @Test
