@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseReferenceRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DependentLiteratureCitationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalEditionDTO;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
@@ -13,7 +15,9 @@ public class LegalPeriodicalEditionTransformer {
   private LegalPeriodicalEditionTransformer() {}
 
   public static LegalPeriodicalEdition transformToDomain(
-      LegalPeriodicalEditionDTO legalPeriodicalEditionDTO) {
+      LegalPeriodicalEditionDTO legalPeriodicalEditionDTO,
+      DatabaseReferenceRepository referenceRepository,
+      DependentLiteratureCitationRepository dependentLiteratureCitationRepository) {
     if (legalPeriodicalEditionDTO == null) {
       return null;
     }
@@ -23,6 +27,7 @@ public class LegalPeriodicalEditionTransformer {
     if (legalPeriodicalEditionDTO.getReferences() != null) {
       references.addAll(
           legalPeriodicalEditionDTO.getReferences().stream()
+              .map(id -> referenceRepository.findById(id).get())
               .map(ReferenceTransformer::transformToDomain)
               .toList());
     }
@@ -30,6 +35,7 @@ public class LegalPeriodicalEditionTransformer {
     if (legalPeriodicalEditionDTO.getLiteratureCitations() != null) {
       references.addAll(
           legalPeriodicalEditionDTO.getLiteratureCitations().stream()
+              .map(id -> dependentLiteratureCitationRepository.findById(id).get())
               .map(DependentLiteratureTransformer::transformToDomain)
               .toList());
     }

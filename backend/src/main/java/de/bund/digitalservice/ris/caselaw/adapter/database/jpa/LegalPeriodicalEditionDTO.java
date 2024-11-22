@@ -52,17 +52,17 @@ public class LegalPeriodicalEditionDTO {
   private List<EditionReferenceDTO> editionReferences = new ArrayList<>();
 
   // Methods to get references and literature citations
-  public List<DependentLiteratureCitationDTO> getLiteratureCitations() {
+  public List<UUID> getLiteratureCitations() {
     return editionReferences.stream()
         .filter(ref -> "literature".equals(ref.getDtype()))
-        .map(r -> (DependentLiteratureCitationDTO) r.getReference())
+        .map(EditionReferenceDTO::getReferenceId)
         .collect(Collectors.toList());
   }
 
-  public List<ReferenceDTO> getReferences() {
+  public List<UUID> getReferences() {
     return editionReferences.stream()
         .filter(ref -> "reference".equals(ref.getDtype()))
-        .map(r -> (ReferenceDTO) r.getReference())
+        .map(EditionReferenceDTO::getReferenceId)
         .collect(Collectors.toList());
   }
 
@@ -74,7 +74,7 @@ public class LegalPeriodicalEditionDTO {
     for (DependentLiteratureCitationDTO citation : literatureCitations) {
       EditionReferenceDTO editionReference = new EditionReferenceDTO();
       editionReference.setEdition(this);
-      editionReference.setReference(citation);
+      editionReference.setReferenceId(citation.getId());
       editionReference.setRank(citation.getRank());
       editionReference.setDtype("literature");
       editionReferences.add(editionReference);
@@ -88,7 +88,7 @@ public class LegalPeriodicalEditionDTO {
     // Add new references with updated rank
     for (ReferenceDTO reference : references) {
       EditionReferenceDTO editionReference = new EditionReferenceDTO();
-      editionReference.setReference(reference);
+      editionReference.setReferenceId(reference.getId());
       editionReference.setRank(reference.getRank());
       editionReference.setDtype("reference");
       editionReference.setEdition(this);

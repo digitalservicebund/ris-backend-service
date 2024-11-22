@@ -36,6 +36,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalRepository;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
+import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -312,6 +313,7 @@ class LegalPeriodicalEditionIntegrationTest {
                     List.of(
                         Reference.builder()
                             .id(existingReferenceId)
+                            .referenceType(ReferenceType.CASELAW)
                             .citation("New Citation")
                             .legalPeriodicalRawValue("B")
                             .documentationUnit(
@@ -322,6 +324,7 @@ class LegalPeriodicalEditionIntegrationTest {
                             .build(),
                         Reference.builder()
                             .id(newReferenceId)
+                            .referenceType(ReferenceType.CASELAW)
                             .citation("New Reference")
                             .legalPeriodicalRawValue("D")
                             .documentationUnit(
@@ -420,6 +423,7 @@ class LegalPeriodicalEditionIntegrationTest {
                     List.of(
                         Reference.builder()
                             .id(referenceId)
+                            .referenceType(ReferenceType.CASELAW)
                             .citation("ABC 2024, 3")
                             .legalPeriodicalRawValue("ABC")
                             .documentationUnit(
@@ -520,6 +524,7 @@ class LegalPeriodicalEditionIntegrationTest {
                     List.of(
                         Reference.builder()
                             .id(referenceId)
+                            .referenceType(ReferenceType.CASELAW)
                             .citation("ABC 2024, 3")
                             .legalPeriodicalRawValue("ABC")
                             .documentationUnit(

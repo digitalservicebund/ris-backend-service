@@ -21,23 +21,37 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
     implements LegalPeriodicalEditionRepository {
   private final DatabaseLegalPeriodicalEditionRepository repository;
   private final DatabaseDocumentationUnitRepository documentationUnitRepository;
+  private final DatabaseReferenceRepository referenceRepository;
+  private final DependentLiteratureCitationRepository dependentLiteratureCitationRepository;
 
   public PostgresLegalPeriodicalEditionRepositoryImpl(
       DatabaseLegalPeriodicalEditionRepository repository,
-      DatabaseDocumentationUnitRepository documentationUnitRepository) {
+      DatabaseDocumentationUnitRepository documentationUnitRepository,
+      DatabaseReferenceRepository referenceRepository,
+      DependentLiteratureCitationRepository dependentLiteratureCitationRepository) {
     this.repository = repository;
     this.documentationUnitRepository = documentationUnitRepository;
+    this.referenceRepository = referenceRepository;
+    this.dependentLiteratureCitationRepository = dependentLiteratureCitationRepository;
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
   public Optional<LegalPeriodicalEdition> findById(UUID id) {
-    return repository.findById(id).map(LegalPeriodicalEditionTransformer::transformToDomain);
+    return repository
+        .findById(id)
+        .map(
+            edition ->
+                LegalPeriodicalEditionTransformer.transformToDomain(
+                    edition, referenceRepository, dependentLiteratureCitationRepository));
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
   public List<LegalPeriodicalEdition> findAllByLegalPeriodicalId(UUID legalPeriodicalId) {
     return repository.findAllByLegalPeriodicalIdOrderByCreatedAtDesc(legalPeriodicalId).stream()
-        .map(LegalPeriodicalEditionTransformer::transformToDomain)
+        .map(
+            edition ->
+                LegalPeriodicalEditionTransformer.transformToDomain(
+                    edition, referenceRepository, dependentLiteratureCitationRepository))
         .toList();
   }
 
@@ -54,7 +68,8 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
     edition.setLiteratureCitations(
         dependentLiteratureCitationDTOS); // Add the new literature references
 
-    return LegalPeriodicalEditionTransformer.transformToDomain(repository.save(edition));
+    return LegalPeriodicalEditionTransformer.transformToDomain(
+        repository.save(edition), referenceRepository, dependentLiteratureCitationRepository);
   }
 
   private void deleteDocUnitLinksForDeletedReferences(LegalPeriodicalEdition updatedEdition) {
@@ -63,22 +78,24 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
       return;
     }
     // Ensure it's removed from DocumentationUnit's references
-    for (ReferenceDTO reference : oldEdition.get().getReferences()) {
+    for (UUID reference : oldEdition.get().getReferences()) {
       // skip all existing references
       if (updatedEdition.references().stream()
-          .anyMatch(newReference -> newReference.id().equals(reference.getId()))) {
+          .anyMatch(newReference -> newReference.id().equals(reference))) {
         continue;
       }
+
+      var referenceDTO = referenceRepository.findById(reference);
       // delete all deleted references and possible source reference
       documentationUnitRepository
-          .findById(reference.getDocumentationUnit().getId())
+          .findById(referenceDTO.get().getDocumentationUnit().getId())
           .ifPresent(
               docUnit -> {
-                docUnit.getReferences().remove(reference);
+                docUnit.getReferences().remove(referenceDTO.get());
                 if (docUnit.getSource().stream()
                     .findFirst()
                     .map(SourceDTO::getReference)
-                    .filter(ref -> ref.getId().equals(reference.getId()))
+                    .filter(ref -> ref.getId().equals(reference))
                     .isPresent()) {
                   docUnit.getSource().removeFirst();
                 }
@@ -102,27 +119,29 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
         continue;
       }
 
-      if (reference.referenceType().equals(ReferenceType.CASELAW)) {
-        var newReference = ReferenceTransformer.transformToDTO(reference);
-        newReference.setDocumentationUnit(docUnit.get());
-
-        // keep rank for existing references and set to max rank +1 for new references
-        newReference.setRank(
-            docUnit.get().getReferences().stream()
-                .filter(referenceDTO -> referenceDTO.getId().equals(reference.id()))
-                .findFirst()
-                .map(ReferenceDTO::getRank)
-                .orElseGet(
-                    () ->
-                        docUnit.get().getReferences().stream()
-                                .map(ReferenceDTO::getRank)
-                                .max(Comparator.naturalOrder())
-                                .orElse(0)
-                            + 1));
-
-        referenceDTOS.add(newReference);
+      if (!reference.referenceType().equals(ReferenceType.CASELAW)) {
+        continue;
       }
+      var newReference = ReferenceTransformer.transformToDTO(reference);
+      newReference.setDocumentationUnit(docUnit.get());
+
+      // keep rank for existing references and set to max rank +1 for new references
+      newReference.setRank(
+          docUnit.get().getReferences().stream()
+              .filter(referenceDTO -> referenceDTO.getId().equals(reference.id()))
+              .findFirst()
+              .map(ReferenceDTO::getRank)
+              .orElseGet(
+                  () ->
+                      docUnit.get().getReferences().stream()
+                              .map(ReferenceDTO::getRank)
+                              .max(Comparator.naturalOrder())
+                              .orElse(0)
+                          + 1));
+
+      referenceDTOS.add(referenceRepository.save(newReference));
     }
+
     return referenceDTOS;
   }
 
@@ -141,24 +160,26 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
         continue;
       }
 
-      if (reference.referenceType().equals(ReferenceType.LITERATURE)) {
-        var newReference = DependentLiteratureTransformer.transformToDTO(reference);
-        newReference.setDocumentationUnit(docUnit.get());
-        // keep rank for existing references and set to max rank +1 for new references
-        newReference.setRank(
-            docUnit.get().getReferences().stream()
-                .filter(referenceDTO -> referenceDTO.getId().equals(reference.id()))
-                .findFirst()
-                .map(ReferenceDTO::getRank)
-                .orElseGet(
-                    () ->
-                        docUnit.get().getReferences().stream()
-                                .map(ReferenceDTO::getRank)
-                                .max(Comparator.naturalOrder())
-                                .orElse(0)
-                            + 1));
-        dependentLiteratureCitationDTOS.add(newReference);
+      if (!reference.referenceType().equals(ReferenceType.LITERATURE)) {
+        continue;
       }
+
+      var newReference = DependentLiteratureTransformer.transformToDTO(reference);
+      newReference.setDocumentationUnit(docUnit.get());
+      // keep rank for existing references and set to max rank +1 for new references
+      newReference.setRank(
+          docUnit.get().getReferences().stream()
+              .filter(referenceDTO -> referenceDTO.getId().equals(reference.id()))
+              .findFirst()
+              .map(ReferenceDTO::getRank)
+              .orElseGet(
+                  () ->
+                      docUnit.get().getDependentLiteratureCitations().stream()
+                              .map(DependentLiteratureCitationDTO::getRank)
+                              .max(Comparator.naturalOrder())
+                              .orElse(0)
+                          + 1));
+      dependentLiteratureCitationDTOS.add(dependentLiteratureCitationRepository.save(newReference));
     }
     return dependentLiteratureCitationDTOS;
   }
