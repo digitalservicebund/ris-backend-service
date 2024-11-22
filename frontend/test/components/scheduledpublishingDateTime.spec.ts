@@ -38,11 +38,11 @@ describe("ScheduledPublishingDateTime", () => {
 
     const dateField = screen.getByLabelText("Terminiertes Datum")
     expect(dateField).toHaveValue("")
-    expect(dateField).not.toHaveAttribute("readonly")
+    expect(dateField).toBeEnabled()
 
     const timeField = screen.getByLabelText("Terminierte Uhrzeit")
     expect(timeField).toHaveValue("05:00")
-    expect(timeField).not.toHaveAttribute("readonly")
+    expect(timeField).toBeEnabled()
 
     expect(screen.getByLabelText("Termin setzen")).toBeDisabled()
 
@@ -51,7 +51,7 @@ describe("ScheduledPublishingDateTime", () => {
     ).not.toBeInTheDocument()
   })
 
-  it("should be readonly if docunit is not publishable and no scheduled date is set", async () => {
+  it("should be disabled if docunit is not publishable and no scheduled date is set", async () => {
     mockDocUnitStore()
     render(ScheduledPublishingDateTime, {
       props: { isPublishable: false },
@@ -59,11 +59,11 @@ describe("ScheduledPublishingDateTime", () => {
 
     const dateField = screen.getByLabelText("Terminiertes Datum")
     expect(dateField).toHaveValue("")
-    expect(dateField).toHaveAttribute("readonly")
+    expect(dateField).toBeDisabled()
 
     const timeField = screen.getByLabelText("Terminierte Uhrzeit")
     expect(timeField).toHaveValue("05:00")
-    expect(dateField).toHaveAttribute("readonly")
+    expect(dateField).toBeDisabled()
 
     expect(screen.getByLabelText("Termin setzen")).toBeDisabled()
 
@@ -82,11 +82,11 @@ describe("ScheduledPublishingDateTime", () => {
 
     const dateField = screen.getByLabelText("Terminiertes Datum")
     expect(dateField).toHaveValue("11.10.2080")
-    expect(dateField).toHaveAttribute("readonly")
+    expect(dateField).toBeDisabled()
 
     const timeField = screen.getByLabelText("Terminierte Uhrzeit")
     expect(timeField).toHaveValue("01:00")
-    expect(timeField).toHaveAttribute("readonly")
+    expect(timeField).toBeDisabled()
 
     expect(screen.queryByLabelText("Termin setzen")).not.toBeInTheDocument()
 
@@ -137,11 +137,11 @@ describe("ScheduledPublishingDateTime", () => {
 
     const dateField = screen.getByLabelText("Terminiertes Datum")
     expect(dateField).toHaveValue("")
-    expect(dateField).not.toHaveAttribute("readonly")
+    expect(dateField).toBeEnabled()
 
     const timeField = screen.getByLabelText("Terminierte Uhrzeit")
     expect(timeField).toHaveValue("05:00")
-    expect(timeField).not.toHaveAttribute("readonly")
+    expect(timeField).toBeEnabled()
 
     expect(screen.getByLabelText("Termin setzen")).toBeDisabled()
 

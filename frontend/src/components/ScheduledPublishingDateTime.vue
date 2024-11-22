@@ -128,9 +128,9 @@ const dateValidationError = ref<ValidationError | undefined>()
           v-model="scheduledPublishingDate"
           aria-label="Terminiertes Datum"
           class="ds-input-medium"
+          :disabled="!isPublishable || isScheduled"
           :has-error="!!dateValidationError"
           is-future-date
-          :read-only="!isPublishable || isScheduled"
           @update:validation-error="(error) => (dateValidationError = error)"
         ></DateInput>
       </InputField>
@@ -140,7 +140,7 @@ const dateValidationError = ref<ValidationError | undefined>()
           v-model="scheduledPublishingTime"
           aria-label="Terminierte Uhrzeit"
           class="ds-input-medium"
-          :read-only="!isPublishable || isScheduled"
+          :disabled="!isPublishable || isScheduled"
         ></TimeInput>
       </InputField>
       <TextButton
