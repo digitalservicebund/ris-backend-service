@@ -438,6 +438,7 @@ export type DocumentUnitSearchParameter =
           id="withErrorsOnly"
           v-slot="{ id }"
           label="Nur Fehler"
+          label-class="ds-label-01-reg"
           :label-position="LabelPosition.RIGHT"
         >
           <Checkbox
