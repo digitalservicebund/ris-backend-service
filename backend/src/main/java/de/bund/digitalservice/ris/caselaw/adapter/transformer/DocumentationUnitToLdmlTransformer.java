@@ -30,12 +30,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
-import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
-import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
@@ -161,9 +160,8 @@ public class DocumentationUnitToLdmlTransformer {
               AknEmbeddedStructureInBlock.Tenor.NAME,
               AknEmbeddedStructureInBlock.Tenor.build(
                   JaxbHtml.build(htmlStringToObjectList(tenor))));
-    } else {
-      return null;
     }
+    return null;
   }
 
   private static AknMultipleBlock buildDecision(DocumentationUnit documentationUnit) {
@@ -192,9 +190,8 @@ public class DocumentationUnitToLdmlTransformer {
               AknEmbeddedStructureInBlock.OtherLongText.build(
                   JaxbHtml.build(htmlStringToObjectList(otherLongText))))
           .withBlock(Opinions.NAME, Opinions.build(htmlStringToObjectList(dissentingOpinion)));
-    } else {
-      return null;
     }
+    return null;
   }
 
   private static Meta buildMeta(DocumentationUnit documentationUnit) throws ValidationException {
@@ -210,7 +207,7 @@ public class DocumentationUnitToLdmlTransformer {
       validateNotNull(documentationUnit.coreData().legalEffect(), "LegalEffect missing");
       validate(!documentationUnit.coreData().fileNumbers().isEmpty(), "FileNumber missing");
     } else {
-      throw new RuntimeException("Core data is null");
+      throw new ValidationException("Core data is null");
     }
 
     Meta.MetaBuilder builder = Meta.builder();
@@ -235,34 +232,14 @@ public class DocumentationUnitToLdmlTransformer {
   private static RisMeta buildRisMeta(DocumentationUnit documentationUnit) {
     RisMeta.RisMetaBuilder builder = RisMeta.builder();
 
-    List<RelatedDecision> previousDecision = new ArrayList<>();
-    List<RelatedDecision> ensuingDecision = new ArrayList<>();
     if (documentationUnit.previousDecisions() != null) {
-      for (PreviousDecision current : documentationUnit.previousDecisions()) {
-        RelatedDecision decision =
-            RelatedDecision.builder()
-                .date(DateUtils.toDateString(current.getDecisionDate()))
-                .documentNumber(current.getDocumentNumber())
-                .fileNumber(current.getFileNumber())
-                .courtType(nullSafeGet(current.getCourt(), Court::type))
-                .build();
-        previousDecision.add(decision);
-      }
+      applyIfNotEmpty(
+          buildRelatedDecisions(documentationUnit.previousDecisions()), builder::previousDecision);
     }
     if (documentationUnit.ensuingDecisions() != null) {
-      for (EnsuingDecision current : documentationUnit.ensuingDecisions()) {
-        RelatedDecision decision =
-            RelatedDecision.builder()
-                .date(DateUtils.toDateString(current.getDecisionDate()))
-                .documentNumber(current.getDocumentNumber())
-                .fileNumber(current.getFileNumber())
-                .courtType(nullSafeGet(current.getCourt(), Court::type))
-                .build();
-        ensuingDecision.add(decision);
-      }
+      applyIfNotEmpty(
+          buildRelatedDecisions(documentationUnit.ensuingDecisions()), builder::ensuingDecision);
     }
-    applyIfNotEmpty(previousDecision, builder::previousDecision);
-    applyIfNotEmpty(ensuingDecision, builder::ensuingDecision);
 
     var contentRelatedIndexing = documentationUnit.contentRelatedIndexing();
     if (contentRelatedIndexing != null) {
@@ -330,6 +307,22 @@ public class DocumentationUnitToLdmlTransformer {
                 nullSafeGet(lastStatus, Status::publicationStatus), PublicationStatus::toString))
         .error(lastStatus != null && lastStatus.withError())
         .build();
+  }
+
+  private static List<RelatedDecision> buildRelatedDecisions(
+      List<? extends RelatedDocumentationUnit> relatedDecisions) {
+    List<RelatedDecision> previousDecision = new ArrayList<>();
+    for (RelatedDocumentationUnit current : relatedDecisions) {
+      RelatedDecision decision =
+          RelatedDecision.builder()
+              .date(DateUtils.toDateString(current.getDecisionDate()))
+              .documentNumber(current.getDocumentNumber())
+              .fileNumber(current.getFileNumber())
+              .courtType(nullSafeGet(current.getCourt(), Court::type))
+              .build();
+      previousDecision.add(decision);
+    }
+    return previousDecision;
   }
 
   private static Identification buildIdentification(DocumentationUnit documentationUnit)
