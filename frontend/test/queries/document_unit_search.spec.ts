@@ -104,7 +104,7 @@ test.describe("document unit search queries", () => {
 
   testConfigurations.forEach((search) =>
     test(search.title, async ({ page }, testInfo) =>
-      runTestMultipleTimes(5, search, page, testInfo),
+      runTestMultipleTimes(10, search, page, testInfo),
     ),
   )
 })
