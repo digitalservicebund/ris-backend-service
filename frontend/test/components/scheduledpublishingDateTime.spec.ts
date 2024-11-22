@@ -38,10 +38,12 @@ describe("ScheduledPublishingDateTime", () => {
 
     const dateField = screen.getByLabelText("Terminiertes Datum")
     expect(dateField).toHaveValue("")
+    expect(dateField).not.toHaveAttribute("readonly")
     expect(dateField).toBeEnabled()
 
     const timeField = screen.getByLabelText("Terminierte Uhrzeit")
     expect(timeField).toHaveValue("05:00")
+    expect(timeField).not.toHaveAttribute("readonly")
     expect(timeField).toBeEnabled()
 
     expect(screen.getByLabelText("Termin setzen")).toBeDisabled()
@@ -138,10 +140,12 @@ describe("ScheduledPublishingDateTime", () => {
     const dateField = screen.getByLabelText("Terminiertes Datum")
     expect(dateField).toHaveValue("")
     expect(dateField).toBeEnabled()
+    expect(dateField).not.toHaveAttribute("readonly")
 
     const timeField = screen.getByLabelText("Terminierte Uhrzeit")
     expect(timeField).toHaveValue("05:00")
     expect(timeField).toBeEnabled()
+    expect(timeField).not.toHaveAttribute("readonly")
 
     expect(screen.getByLabelText("Termin setzen")).toBeDisabled()
 
