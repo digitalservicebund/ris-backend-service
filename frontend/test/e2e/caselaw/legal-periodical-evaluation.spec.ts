@@ -747,6 +747,57 @@ test.describe(
       },
     )
 
+    test(
+      "External user cannot edit or delete periodical editions",
+      { tag: ["@RISDEV-4724", "@RISDEV-4519"] },
+      async ({ pageWithExternalUser, edition }) => {
+        await navigateToPeriodicalEvaluation(pageWithExternalUser)
+
+        await test.step("A periodical can be selected using a combo box.", async () => {
+          await fillInput(pageWithExternalUser, "Periodikum", "MMG")
+          const periodical = pageWithExternalUser.getByText(
+            "MMG | Medizin Mensch Gesellschaft" + "nicht amtlich",
+            {
+              exact: true,
+            },
+          )
+          await expect(periodical).toBeVisible()
+          await periodical.click()
+          await waitForInputValue(
+            pageWithExternalUser,
+            "[aria-label='Periodikum']",
+            "MMG",
+          )
+        })
+
+        await test.step("User can view but not edit or delete the editions", async () => {
+          await expect(
+            pageWithExternalUser
+              .getByLabel("Ausgabe kann nicht editiert werden")
+              .first(),
+          ).toBeVisible()
+          await expect(
+            pageWithExternalUser
+              .getByLabel("Ausgabe kann nicht gelöscht werden")
+              .first(),
+          ).toBeVisible()
+
+          await expect(
+            pageWithExternalUser.getByText(
+              (edition.name || "") + "MMG" + "0" + formattedDate,
+            ),
+          ).toBeVisible()
+
+          await expect(
+            pageWithExternalUser.getByLabel("Ausgabe editieren"),
+          ).toBeHidden()
+          await expect(
+            pageWithExternalUser.getByLabel("Ausgabe löschen"),
+          ).toBeHidden()
+        })
+      },
+    )
+
     async function openExtraContentSidePanelPreview(
       page: Page,
       fileNumber: string,
