@@ -9,7 +9,7 @@ import org.flywaydb.gradle.task.FlywayMigrateTask
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.3.5"
+    id("org.springframework.boot") version "3.4.0"
     id("io.spring.dependency-management") version "1.1.6"
     id("com.diffplug.spotless") version "6.25.0"
     id("org.sonarqube") version "6.0.0.5145"
@@ -19,7 +19,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.51.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "10.21.0"
+    id("org.flywaydb.flyway") version "10.22.0"
     id("io.sentry.jvm.gradle") version "4.13.0"
 }
 
@@ -145,7 +145,7 @@ sonar {
 }
 
 dependencies {
-    val testContainersVersion = "1.20.3"
+    val testContainersVersion = "1.20.4"
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -156,10 +156,10 @@ dependencies {
     implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.0")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.1")
 
     // CVE-2024-22262
-    implementation("org.springframework:spring-web:6.1.14")
+    implementation("org.springframework:spring-web:6.2.0")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.3")
 
@@ -178,7 +178,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.29.16"))
+    implementation(platform("software.amazon.awssdk:bom:2.29.20"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -219,14 +219,14 @@ dependencies {
     // => CVE-2023-2976
     implementation("com.google.guava:guava:33.3.1-jre")
 
-    implementation("io.getunleash:unleash-client-java:9.2.4")
+    implementation("io.getunleash:unleash-client-java:9.2.5")
     implementation("org.apache.commons:commons-text:1.12.0")
     implementation("org.jsoup:jsoup:1.18.1")
 
-    val flywayCore = "org.flywaydb:flyway-core:10.21.0"
+    val flywayCore = "org.flywaydb:flyway-core:10.22.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.21.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.22.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -235,7 +235,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.7.0")
-    testImplementation("org.springframework.security:spring-security-test:6.4.0")
+    testImplementation("org.springframework.security:spring-security-test:6.4.1")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.3.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
