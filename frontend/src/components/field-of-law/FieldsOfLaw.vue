@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 import * as Sentry from "@sentry/vue"
 import { computed, nextTick, ref, useTemplateRef } from "vue"
-import FieldOfLawExpandableContainer from "@/components/field-of-law/FieldOfLawExpandableContainer.vue"
+import FieldOfLawDirectInputSearch from "@/components/field-of-law/FieldOfLawDirectInputSearch.vue"
+import FieldOfLawExpandableContainer, {
+  InputMethod,
+} from "@/components/field-of-law/FieldOfLawExpandableContainer.vue"
 import FieldOfLawSearchInput from "@/components/field-of-law/FieldOfLawSearchInput.vue"
 import FieldOfLawSearchResultList from "@/components/field-of-law/FieldOfLawSearchResults.vue"
 import FieldOfLawTree from "@/components/field-of-law/FieldOfLawTree.vue"
@@ -158,6 +161,11 @@ function resetSearch() {
   showNorms.value = false
   treeRef.value?.collapseTree()
 }
+
+const inputMethod = ref(InputMethod.DIRECT)
+function updateInputMethod(value: InputMethod) {
+  inputMethod.value = value
+}
 </script>
 
 <template>
@@ -165,10 +173,17 @@ function resetSearch() {
     v-if="localModelValue"
     :fields-of-law="localModelValue"
     @editing-done="resetSearch"
+    @input-method-selected="updateInputMethod"
     @node:clicked="setNodeOfInterest"
     @node:remove="removeFieldOfLaw"
   >
+    <FieldOfLawDirectInputSearch
+      v-if="inputMethod === InputMethod.DIRECT"
+      @add-to-list="addFieldOfLaw"
+    />
+
     <FieldOfLawSearchInput
+      v-if="inputMethod === InputMethod.SEARCH"
       :description="description"
       :error-label="searchErrorLabel"
       :identifier="identifier"
@@ -179,7 +194,10 @@ function resetSearch() {
       @update:norm="updateNormSearchTerm"
     />
 
-    <div class="flex w-full flex-row gap-24">
+    <div
+      v-if="inputMethod === InputMethod.SEARCH"
+      class="flex w-full flex-row gap-24"
+    >
       <FieldOfLawSearchResultList
         :current-page="currentPage"
         :results="results"

@@ -34,6 +34,13 @@ public class FieldOfLawController {
         identifier, searchStr, norm, PageRequest.of(page, size));
   }
 
+  @GetMapping(value = "/search-by-identifier", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("isAuthenticated()")
+  public List<FieldOfLaw> getFieldsOfLawByIdentifierSearch(
+      @RequestParam("q") Optional<String> searchStr) {
+    return service.getFieldsOfLawByIdentifierSearch(searchStr);
+  }
+
   @GetMapping(value = "{identifier}/children", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
   public List<FieldOfLaw> getChildrenOfFieldOfLaw(@PathVariable String identifier) {
