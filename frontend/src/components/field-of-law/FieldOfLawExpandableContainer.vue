@@ -67,13 +67,6 @@ export enum InputMethod {
     <div class="flex w-full flex-col">
       <div class="flex w-full flex-row items-center justify-between">
         <h2 ref="titleRef" class="ds-label-01-bold">Sachgebiete</h2>
-        <TextButton
-          v-if="isExpanded && fieldsOfLaw.length == 0"
-          button-type="primary"
-          label="Fertig"
-          size="small"
-          @click="exitEditMode"
-        />
       </div>
       <FieldOfLawSummary
         :fields-of-law="fieldsOfLaw"
@@ -84,10 +77,7 @@ export enum InputMethod {
   </div>
 
   <div v-if="isExpanded" class="flex flex-col items-start gap-24">
-    <div
-      v-if="isExpanded && fieldsOfLaw.length > 0"
-      class="flex w-full flex-row justify-between"
-    >
+    <div class="flex w-full flex-row justify-between">
       <div class="flex flex-row gap-8">
         <InputField
           id="direct"
