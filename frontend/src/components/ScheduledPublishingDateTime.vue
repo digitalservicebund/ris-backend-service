@@ -22,21 +22,30 @@ dayjs.extend(customParseFormat)
 
 const store = useDocumentUnitStore()
 
+const storedScheduledPublicationDateTime = computed({
+  get: () => store.documentUnit!.managementData.scheduledPublicationDateTime,
+  set: (newDate?: string) =>
+    (store.documentUnit!.managementData.scheduledPublicationDateTime = newDate),
+})
+
+// initialize local values with stored date-time
+/* eslint-disable vue/no-ref-object-destructure */
 const scheduledPublishingDate = ref<string | undefined>(
-  store.documentUnit!.coreData.scheduledPublicationDateTime &&
+  storedScheduledPublicationDateTime.value &&
     dayjs
-      .utc(store.documentUnit!.coreData.scheduledPublicationDateTime)
+      .utc(storedScheduledPublicationDateTime.value)
       .tz("Europe/Berlin")
       .format("YYYY-MM-DD"),
 )
 const scheduledPublishingTime = ref<string | undefined>(
-  (store.documentUnit!.coreData.scheduledPublicationDateTime &&
+  (storedScheduledPublicationDateTime.value &&
     dayjs
-      .utc(store.documentUnit!.coreData.scheduledPublicationDateTime)
+      .utc(storedScheduledPublicationDateTime.value)
       .tz("Europe/Berlin")
       .format("HH:mm")) ||
     "05:00",
 )
+/* eslint-enable vue/no-ref-object-destructure */
 
 const scheduledDateTimeInput = computed(() =>
   dayjs.tz(
@@ -46,7 +55,7 @@ const scheduledDateTimeInput = computed(() =>
 )
 
 const isScheduled = computed<boolean>(
-  () => !!store.documentUnit!.coreData.scheduledPublicationDateTime,
+  () => !!storedScheduledPublicationDateTime.value,
 )
 
 const isDateInFuture = computed<boolean>(
@@ -82,17 +91,17 @@ const saveScheduling = async () => {
     return
   }
 
-  store.documentUnit!.coreData.scheduledPublicationDateTime =
+  storedScheduledPublicationDateTime.value =
     scheduledDateTimeInput.value.toISOString()
 
   const { error } = await store.updateDocumentUnit()
 
   if (error) {
-    store.documentUnit!.coreData.scheduledPublicationDateTime = undefined
+    storedScheduledPublicationDateTime.value = undefined
     docUnitSaveError.value = error
   } else {
     scheduledPublishingDate.value = dayjs(
-      store.documentUnit!.coreData.scheduledPublicationDateTime,
+      storedScheduledPublicationDateTime.value,
     )
       .tz("Europe/Berlin")
       .format("YYYY-MM-DD")
@@ -101,13 +110,13 @@ const saveScheduling = async () => {
 
 const removeScheduling = async () => {
   docUnitSaveError.value = null
-  const previousDate = store.documentUnit!.coreData.scheduledPublicationDateTime
-  store.documentUnit!.coreData.scheduledPublicationDateTime = undefined
+  const previousDate = storedScheduledPublicationDateTime.value
+  storedScheduledPublicationDateTime.value = undefined
 
   const { error } = await store.updateDocumentUnit()
 
   if (error) {
-    store.documentUnit!.coreData.scheduledPublicationDateTime = previousDate
+    storedScheduledPublicationDateTime.value = previousDate
     docUnitSaveError.value = error
   } else {
     scheduledPublishingDate.value = undefined

@@ -147,7 +147,10 @@ function onDelete() {
       @close-modal="toggleModal"
       @confirm-action="onDelete"
     />
-    <TableView class="relative table w-full border-separate">
+    <TableView
+      class="relative table w-full border-separate"
+      data-testid="documentUnitList"
+    >
       <TableHeader>
         <CellHeaderItem class="w-[1%]"> Dokumentnummer</CellHeaderItem>
         <CellHeaderItem> Gerichtstyp</CellHeaderItem>
@@ -174,7 +177,7 @@ function onDelete() {
       <TableRow
         v-for="(listEntry, id) in listEntries"
         :key="id"
-        data-testid="listEntry"
+        :data-testid="`listEntry_${listEntry.documentNumber}`"
       >
         <CellItem>
           <FlexContainer align-items="items-center" class="space-x-8">
@@ -291,7 +294,10 @@ function onDelete() {
           />
           <span v-else>-</span>
         </CellItem>
-        <CellItem v-if="showPublicationDate && schedulingFeatureToggle">
+        <CellItem
+          v-if="showPublicationDate && schedulingFeatureToggle"
+          data-testid="publicationDate"
+        >
           {{ publicationDate(listEntry) }}
         </CellItem>
         <CellItem class="flex">
