@@ -550,6 +550,28 @@ test.describe(
       },
     )
 
+    test(
+      "Search for references",
+      { tag: "@RISDEV-5434" },
+      async ({ page, edition }) => {
+        await test.step("Page number resets when query parameters are changed", async () => {
+          const fileNumber = "1"
+
+          await navigateToPeriodicalReferences(page, edition.id)
+
+          await page.getByText("Suchen").click()
+          await page.getByLabel("nächste Ergebnisse").click()
+          await expect(page.getByText("Seite 2")).toBeVisible()
+
+          await fillInput(page, "Aktenzeichen", fileNumber)
+          await page.getByText("Suchen").click()
+
+          await expect(page.getByText("Seite 2")).toBeHidden()
+          await expect(page.getByText("Seite 1")).toBeVisible()
+        })
+      },
+    )
+
     // Flaky, needs some clarification
     // eslint-disable-next-line playwright/no-skipped-test
     test.skip(
