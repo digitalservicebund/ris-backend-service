@@ -343,6 +343,7 @@ export const caselawTest = test.extend<MyFixtures>({
           references: [
             {
               id: crypto.randomUUID(),
+              referenceType: "caselaw",
               citation: "2024, 12-22, Heft 1",
               referenceSupplement: "L",
               legalPeriodicalRawValue: "MMG",
@@ -354,6 +355,7 @@ export const caselawTest = test.extend<MyFixtures>({
             },
             {
               id: crypto.randomUUID(),
+              referenceType: "caselaw",
               citation: "2024, 1-11, Heft 1",
               legalPeriodicalRawValue: "MMG",
               legalPeriodical: legalPeriodical,

@@ -82,7 +82,7 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
     if (editionDTO.getReferences() != null) {
       references.addAll(
           editionDTO.getReferences().stream()
-              .map(id -> referenceRepository.findById(id).get())
+              .map(id -> referenceRepository.findById(id).orElse(null))
               .map(ReferenceTransformer::transformToDomain)
               .toList());
     }
@@ -90,7 +90,7 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
     if (editionDTO.getLiteratureCitations() != null) {
       references.addAll(
           editionDTO.getLiteratureCitations().stream()
-              .map(id -> dependentLiteratureCitationRepository.findById(id).get())
+              .map(id -> dependentLiteratureCitationRepository.findById(id).orElse(null))
               .map(DependentLiteratureTransformer::transformToDomain)
               .toList());
     }
@@ -111,6 +111,9 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
       }
 
       var referenceDTO = referenceRepository.findById(reference);
+      if (referenceDTO.isEmpty()) {
+        continue;
+      }
       // delete all deleted references and possible source reference
       documentationUnitRepository
           .findById(referenceDTO.get().getDocumentationUnit().getId())

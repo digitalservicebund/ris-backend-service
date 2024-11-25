@@ -13,6 +13,9 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class DependentLiteratureTransformer {
   public static Reference transformToDomain(DependentLiteratureCitationDTO literatureCitationDTO) {
+    if (literatureCitationDTO == null) {
+      return null;
+    }
     LegalPeriodical legalPeriodical = null;
 
     if (literatureCitationDTO.getLegalPeriodical() != null) {
