@@ -271,6 +271,13 @@ watch(
   { deep: true },
 )
 
+/** watches the changes of query related documentations params
+ * resets the page if change took place.
+ */
+watch(searchResultsCurrentPage, () => {
+  pageNumber.value = 0
+})
+
 onMounted(async () => {
   featureToggle.value = (
     await FeatureToggleService.isEnabled("neuris.new-from-search")
