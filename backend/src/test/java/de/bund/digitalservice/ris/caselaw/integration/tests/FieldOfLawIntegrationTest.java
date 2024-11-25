@@ -263,6 +263,23 @@ class FieldOfLawIntegrationTest {
   }
 
   @Test
+  void testGetFieldsOfLawByIdentifierSearch() {
+    List<FieldOfLaw> responseBody =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?q=FL-01")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<List<FieldOfLaw>>() {})
+            .returnResult()
+            .getResponseBody();
+
+    assertThat(responseBody).extracting("identifier").containsExactly("FL-01", "FL-01-01");
+  }
+
+  @Test
   void testGetParentlessChildrenForFieldOfLawByNorms() {
     risWebTestClient
         .withDefaultLogin()

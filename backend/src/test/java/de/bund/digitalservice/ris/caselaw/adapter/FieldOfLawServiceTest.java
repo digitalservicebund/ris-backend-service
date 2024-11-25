@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -33,48 +35,48 @@ class FieldOfLawServiceTest {
 
   @MockBean FieldOfLawRepository repository;
 
-  //  @Test
-  //  void testGetFieldsOfLaw_withoutQuery_shouldNotCallRepository() {
-  //    Pageable pageable = Pageable.unpaged();
-  //
-  //    var page =
-  //        service.getFieldsOfLawBySearchQuery(
-  //            Optional.empty(), Optional.empty(), Optional.empty(), pageable);
-  //    assertThat(page.getContent()).isEmpty();
-  //    assertThat(page.isEmpty()).isTrue();
-  //
-  //    verify(repository, never()).findByIdentifier(any(), any());
-  //    verify(repository, never()).findByNorm(any());
-  //    verify(repository, never()).findBySearchTerms(any());
-  //    verify(repository, never()).findByIdentifierAndSearchTermsAndNorm(any(), any(), any());
-  //    verify(repository, never()).findByIdentifierAndSearchTerms(any(), any());
-  //    verify(repository, never()).findByIdentifierAndNorm(any(), any());
-  //    verify(repository, never()).findByNormAndSearchTerms(any(), any());
-  //  }
+  @Test
+  void testGetFieldsOfLaw_withoutQuery_shouldFindAllByOrderByIdentifierAsc() {
+    Pageable pageable = PageRequest.of(0, 10);
+    when(repository.findAllByOrderByIdentifierAsc(pageable)).thenReturn(Page.empty());
 
-  // TODO figure out what the behaviour for empty query should be
+    var page =
+        service.getFieldsOfLawBySearchQuery(
+            Optional.empty(), Optional.empty(), Optional.empty(), pageable);
+    assertThat(page.isEmpty()).isTrue();
+    assertThat(page.getContent()).isEmpty();
 
-  //  @Test
-  //  void testGetFieldsOfLaw_withEmptyQuery_shouldNotCallRepository() {
-  //    Pageable pageable = Pageable.unpaged();
-  //
-  //    var page =
-  //        service.getFieldsOfLawBySearchQuery(
-  //            Optional.of(""), Optional.of(""), Optional.of(""), pageable);
-  //    assertThat(page.getContent()).isEmpty();
-  //    assertThat(page.isEmpty()).isTrue();
-  //
-  //    verify(repository, never()).findByIdentifier(any(), any());
-  //    verify(repository, never()).findBySearchTerms(any());
-  //    verify(repository, never()).findByNorm(any());
-  //    verify(repository, never()).findByIdentifierAndSearchTermsAndNorm(any(), any(), any());
-  //    verify(repository, never()).findByIdentifierAndSearchTerms(any(), any());
-  //    verify(repository, never()).findByIdentifierAndNorm(any(), any());
-  //    verify(repository, never()).findByNormAndSearchTerms(any(), any());
-  //  }
+    verify(repository, never()).findByIdentifier(any(), any());
+    verify(repository, never()).findByNorm(any());
+    verify(repository, never()).findBySearchTerms(any());
+    verify(repository, never()).findByIdentifierAndSearchTermsAndNorm(any(), any(), any());
+    verify(repository, never()).findByIdentifierAndSearchTerms(any(), any());
+    verify(repository, never()).findByIdentifierAndNorm(any(), any());
+    verify(repository, never()).findByNormAndSearchTerms(any(), any());
+  }
 
   @Test
-  void testGetFieldsOfLaw_withIdentifier_shouldCallRepository() {
+  void testGetFieldsOfLaw_withEmptyQuery_shouldFindAllByOrderByIdentifierAsc() {
+    Pageable pageable = PageRequest.of(0, 10);
+    when(repository.findAllByOrderByIdentifierAsc(pageable)).thenReturn(Page.empty());
+
+    var page =
+        service.getFieldsOfLawBySearchQuery(
+            Optional.of(""), Optional.of(""), Optional.of(""), pageable);
+    assertThat(page.isEmpty()).isTrue();
+    assertThat(page.getContent()).isEmpty();
+
+    verify(repository, never()).findByIdentifier(any(), any());
+    verify(repository, never()).findBySearchTerms(any());
+    verify(repository, never()).findByNorm(any());
+    verify(repository, never()).findByIdentifierAndSearchTermsAndNorm(any(), any(), any());
+    verify(repository, never()).findByIdentifierAndSearchTerms(any(), any());
+    verify(repository, never()).findByIdentifierAndNorm(any(), any());
+    verify(repository, never()).findByNormAndSearchTerms(any(), any());
+  }
+
+  @Test
+  void testGetFieldsOfLaw_withIdentifier_shouldFindByIdentifier() {
     Pageable pageable = PageRequest.of(0, 10);
     var identifierString = "foo";
     var expectedFieldsOfLaw = List.of(generateFieldOfLaw());
@@ -96,7 +98,7 @@ class FieldOfLawServiceTest {
   }
 
   @Test
-  void testGetFieldsOfLaw_withSearchTerm_shouldCallRepository() {
+  void testGetFieldsOfLaw_withSearchTerm_shouldFindBySearchTerms() {
     Pageable pageable = PageRequest.of(0, 10);
     var searchTerms = new String[] {"foo", "bar"};
     var expectedFieldsOfLaw = List.of(generateFieldOfLaw());
@@ -118,7 +120,7 @@ class FieldOfLawServiceTest {
   }
 
   @Test
-  void testGetFieldsOfLaw_withNorm_shouldCallRepository() {
+  void testGetFieldsOfLaw_withNorm_shouldFindByNorm() {
     Pageable pageable = PageRequest.of(0, 10);
     var normString = "foo";
     var expectedFieldsOfLaw = List.of(generateFieldOfLaw());
@@ -140,7 +142,8 @@ class FieldOfLawServiceTest {
   }
 
   @Test
-  void testGetFieldsOfLaw_withIdentifierAndSearchTermAndNorm_shouldCallRepository() {
+  void
+      testGetFieldsOfLaw_withIdentifierAndSearchTermAndNorm_shouldFindByIdentifierAndSearchTermsAndNorm() {
     Pageable pageable = PageRequest.of(0, 10);
     var identifierString = "foo";
     var searchTerms = new String[] {"foo", "bar"};
@@ -194,7 +197,7 @@ class FieldOfLawServiceTest {
   }
 
   @Test
-  void testGetFieldsOfLaw_withIdentifierAndNorm_shouldCallRepository() {
+  void testGetFieldsOfLaw_withIdentifierAndNorm_shouldFindByIdentifierAndNorm() {
     Pageable pageable = PageRequest.of(0, 10);
     var identifierString = "foo";
     var normString = "bar";
@@ -218,7 +221,7 @@ class FieldOfLawServiceTest {
   }
 
   @Test
-  void testGetFieldsOfLaw_withSearchTermAndNorm_shouldCallRepository() {
+  void testGetFieldsOfLaw_withSearchTermAndNorm_shouldFindByNormAndSearchTerms() {
     Pageable pageable = PageRequest.of(0, 10);
     var searchTerms = new String[] {"foo", "bar"};
     var normString = "bar";
@@ -239,6 +242,27 @@ class FieldOfLawServiceTest {
     verify(repository, never()).findByIdentifierAndSearchTerms(any(), any());
     verify(repository, never()).findByIdentifierAndNorm(any(), any());
     verify(repository).findByNormAndSearchTerms(normString, searchTerms);
+  }
+
+  @Test
+  void testGetFieldsOfLawByIdentifierSearch_withoutQuery_shouldFindAllByOrderByIdentifierAsc() {
+    when(repository.findAllByOrderByIdentifierAsc(any())).thenReturn(Page.empty());
+
+    var list = service.getFieldsOfLawByIdentifierSearch(Optional.empty());
+    assertThat(list).isEmpty();
+
+    verify(repository).findAllByOrderByIdentifierAsc(any());
+  }
+
+  @Test
+  void testGetFieldsOfLawByIdentifierSearch_withQuery_shouldFindAllByOrderByIdentifierAsc() {
+    String searchString = "foo";
+    when(repository.findByIdentifier(eq(searchString), any())).thenReturn(List.of());
+
+    var list = service.getFieldsOfLawByIdentifierSearch(Optional.of(searchString));
+    assertThat(list).isEmpty();
+
+    verify(repository).findByIdentifier(eq(searchString), any());
   }
 
   @Test

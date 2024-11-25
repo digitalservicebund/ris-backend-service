@@ -69,6 +69,21 @@ class FieldOfLawControllerTest {
   }
 
   @Test
+  void testFieldsOfLawByIdentifier() {
+    when(service.getFieldsOfLawByIdentifierSearch(Optional.of("AR"))).thenReturn(null);
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    verify(service, times(1)).getFieldsOfLawByIdentifierSearch(Optional.of("AR"));
+  }
+
+  @Test
   void testGetChildrenOfFieldOfLaw() {
     when(service.getChildrenOfFieldOfLaw("root")).thenReturn(null);
 
