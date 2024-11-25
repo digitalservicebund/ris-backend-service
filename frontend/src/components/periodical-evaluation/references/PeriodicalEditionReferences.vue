@@ -16,7 +16,7 @@ const responseError = ref<ResponseError | undefined>()
 const loadEditionIntervalCounter = useInterval(10_000, {})
 
 const references = computed({
-  get: () => (store.edition ? (store.edition.references as Reference[]) : []),
+  get: () => store.edition?.references ?? [],
   set: async (newValues) => {
     await saveReferences(newValues)
   },
