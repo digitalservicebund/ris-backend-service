@@ -81,4 +81,22 @@ describe("FieldsOfLawExpandableContainer", () => {
 
     expect(emitted()["node:remove"]).toBeTruthy()
   })
+
+  it("on radio button click emits 'inputMethodSelected'", async () => {
+    const { emitted, user } = renderComponent([generateFieldOfLaw()])
+
+    await user.click(screen.getByRole("button", { name: "Weitere Angabe" }))
+    await user.click(screen.getByLabelText("Suche"))
+
+    expect(emitted()["inputMethodSelected"]).toBeTruthy()
+  })
+
+  it("on radio button label click emits 'inputMethodSelected'", async () => {
+    const { emitted, user } = renderComponent([generateFieldOfLaw()])
+
+    await user.click(screen.getByRole("button", { name: "Weitere Angabe" }))
+    await user.click(screen.getByLabelText("Sachgebietsuche auswählen"))
+
+    expect(emitted()["inputMethodSelected"]).toBeTruthy()
+  })
 })

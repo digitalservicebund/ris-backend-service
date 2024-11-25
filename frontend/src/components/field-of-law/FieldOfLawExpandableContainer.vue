@@ -85,16 +85,28 @@ export enum InputMethod {
           :label-position="LabelPosition.RIGHT"
           @click="() => (inputMethod = InputMethod.DIRECT)"
         >
-          <RadioInput v-model="inputMethod" size="small" value="direct" />
+          <RadioInput
+            id="direct"
+            v-model="inputMethod"
+            aria-label="Direkteingabe auswählen"
+            size="small"
+            value="direct"
+          />
         </InputField>
 
         <InputField
           id="search"
-          label="Sachgebietsuche"
+          label="Suche"
           :label-position="LabelPosition.RIGHT"
           @click="() => (inputMethod = InputMethod.SEARCH)"
         >
-          <RadioInput v-model="inputMethod" size="small" value="search" />
+          <RadioInput
+            id="search"
+            v-model="inputMethod"
+            aria-label="Sachgebietsuche auswählen"
+            size="small"
+            value="search"
+          />
         </InputField>
       </div>
       <TextButton
