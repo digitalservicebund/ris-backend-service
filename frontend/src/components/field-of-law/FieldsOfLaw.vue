@@ -16,16 +16,10 @@ import StringsUtil from "@/utils/stringsUtil"
 
 type FieldOfLawTreeType = InstanceType<typeof FieldOfLawTree>
 const treeRef = useTemplateRef<FieldOfLawTreeType>("treeRef")
-type ExpandableContainerType = InstanceType<
-  typeof FieldOfLawExpandableContainer
->
-const expandableContainerRef = useTemplateRef<ExpandableContainerType>(
-  "expandableContainerRef",
-)
 
 const showNorms = ref(false)
 const nodeOfInterest = ref<FieldOfLaw | undefined>(undefined)
-
+const isResetButtonVisible = ref(false)
 const description = ref("")
 const identifier = ref("")
 const norm = ref("")
@@ -82,7 +76,7 @@ async function submitSearch(page: number) {
       nodeOfInterest.value = results.value[0]
     }
     showNorms.value = !!norm.value
-    expandableContainerRef.value?.showResetButton()
+    isResetButtonVisible.value = true
   } else {
     currentPage.value = undefined
     results.value = undefined
@@ -168,7 +162,7 @@ function resetSearch() {
   nodeOfInterest.value = undefined
   showNorms.value = false
   treeRef.value?.collapseTree()
-  expandableContainerRef.value?.hideResetButton()
+  isResetButtonVisible.value = false
 }
 
 const inputMethod = ref(InputMethod.DIRECT)
@@ -180,8 +174,8 @@ function updateInputMethod(value: InputMethod) {
 <template>
   <FieldOfLawExpandableContainer
     v-if="localModelValue"
-    ref="expandableContainerRef"
     :fields-of-law="localModelValue"
+    :is-reset-button-visible="isResetButtonVisible"
     @editing-done="resetSearch"
     @input-method-selected="updateInputMethod"
     @node:clicked="setNodeOfInterest"

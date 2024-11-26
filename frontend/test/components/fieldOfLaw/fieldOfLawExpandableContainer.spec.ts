@@ -3,12 +3,15 @@ import { render, screen } from "@testing-library/vue"
 import FieldOfLawExpandableContainer from "@/components/field-of-law/FieldOfLawExpandableContainer.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 
-function renderComponent(fieldsOfLaw: FieldOfLaw[]) {
+function renderComponent(
+  fieldsOfLaw: FieldOfLaw[],
+  isResetButtonVisible: boolean = false,
+) {
   const user = userEvent.setup()
   return {
     user,
     ...render(FieldOfLawExpandableContainer, {
-      props: { fieldsOfLaw },
+      props: { fieldsOfLaw, isResetButtonVisible },
     }),
   }
 }
@@ -98,5 +101,15 @@ describe("FieldsOfLawExpandableContainer", () => {
     await user.click(screen.getByLabelText("Sachgebietsuche auswählen"))
 
     expect(emitted()["inputMethodSelected"]).toBeTruthy()
+  })
+
+  it("on reset search button label click emits 'resetSearch'", async () => {
+    const { emitted, user } = renderComponent([generateFieldOfLaw()], true)
+
+    await user.click(screen.getByRole("button", { name: "Weitere Angabe" }))
+    await user.click(screen.getByLabelText("Sachgebietsuche auswählen"))
+    await user.click(screen.getByRole("button", { name: "Suche zurücksetzen" }))
+
+    expect(emitted()["resetSearch"]).toBeTruthy()
   })
 })

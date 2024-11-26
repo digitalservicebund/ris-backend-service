@@ -9,6 +9,7 @@ import IconAdd from "~icons/ic/baseline-add"
 
 const props = defineProps<{
   fieldsOfLaw: FieldOfLaw[]
+  isResetButtonVisible: boolean
 }>()
 
 const emit = defineEmits<{
@@ -22,7 +23,6 @@ const emit = defineEmits<{
 const titleRef = ref<HTMLElement | null>(null)
 const isExpanded = ref(false)
 const inputMethod = ref(InputMethod.DIRECT)
-const isResetButtonVisible = ref(false)
 
 const expandButtonLabel = computed(() => {
   return props.fieldsOfLaw.length > 0 ? "Weitere Angabe" : "Sachgebiete"
@@ -41,14 +41,6 @@ function enterEditMode() {
   isExpanded.value = true
 }
 
-function showResetButton() {
-  isResetButtonVisible.value = true
-}
-
-function hideResetButton() {
-  isResetButtonVisible.value = false
-}
-
 async function exitEditMode() {
   isExpanded.value = false
   await nextTick()
@@ -63,8 +55,6 @@ watch(
   },
   { deep: true },
 )
-
-defineExpose({ showResetButton, hideResetButton })
 </script>
 <script lang="ts">
 export enum InputMethod {
@@ -122,7 +112,7 @@ export enum InputMethod {
 
       <div class="flex flex-row gap-8">
         <TextButton
-          v-if="isResetButtonVisible"
+          v-if="isResetButtonVisible && inputMethod === InputMethod.SEARCH"
           button-type="tertiary"
           label="Suche zurücksetzen"
           size="small"
