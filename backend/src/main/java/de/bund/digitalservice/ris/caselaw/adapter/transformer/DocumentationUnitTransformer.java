@@ -775,7 +775,6 @@ public class DocumentationUnitTransformer {
               .map(ReferenceTransformer::transformToDomain)
               .toList());
     }
-
     if (documentationUnitDTO.getDependentLiteratureCitations() != null) {
       references.addAll(
           documentationUnitDTO.getDependentLiteratureCitations().stream()

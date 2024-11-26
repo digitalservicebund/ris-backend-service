@@ -104,14 +104,11 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
     }
     // Ensure it's removed from DocumentationUnit's references
     for (UUID reference : oldEdition.get().getReferences()) {
-      // skip all existing references
-      if (updatedEdition.references().stream()
-          .anyMatch(newReference -> newReference.id().equals(reference))) {
-        continue;
-      }
-
+      // skip all existing and null references
       var referenceDTO = referenceRepository.findById(reference);
-      if (referenceDTO.isEmpty()) {
+      if (updatedEdition.references().stream()
+          .anyMatch(
+              newReference -> newReference.id().equals(reference) || referenceDTO.isEmpty())) {
         continue;
       }
       // delete all deleted references and possible source reference
@@ -142,12 +139,7 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
       var docUnit =
           documentationUnitRepository.findByDocumentNumber(
               reference.documentationUnit().getDocumentNumber());
-      if (docUnit.isEmpty()) {
-        // don't add references to non-existing documentation units
-        continue;
-      }
-
-      if (!reference.referenceType().equals(ReferenceType.CASELAW)) {
+      if (docUnit.isEmpty() || !reference.referenceType().equals(ReferenceType.CASELAW)) {
         continue;
       }
       var newReference = ReferenceTransformer.transformToDTO(reference);
@@ -183,12 +175,7 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
       var docUnit =
           documentationUnitRepository.findByDocumentNumber(
               reference.documentationUnit().getDocumentNumber());
-      if (docUnit.isEmpty()) {
-        // don't add references to non-existing documentation units
-        continue;
-      }
-
-      if (!reference.referenceType().equals(ReferenceType.LITERATURE)) {
+      if (docUnit.isEmpty() || !reference.referenceType().equals(ReferenceType.LITERATURE)) {
         continue;
       }
 

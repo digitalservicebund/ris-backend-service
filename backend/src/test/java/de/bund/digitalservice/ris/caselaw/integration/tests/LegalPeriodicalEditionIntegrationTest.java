@@ -564,7 +564,7 @@ class LegalPeriodicalEditionIntegrationTest {
                 .iterator()
                 .next()
                 .getCreatedByReference())
-        .isEqualTo(null);
+        .isNull();
 
     assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").references()).isEmpty();
   }

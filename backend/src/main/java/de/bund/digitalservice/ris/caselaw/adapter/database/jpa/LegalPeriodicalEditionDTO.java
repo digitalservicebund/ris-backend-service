@@ -30,6 +30,8 @@ import org.springframework.data.annotation.CreatedDate;
 @Getter
 @Setter
 public class LegalPeriodicalEditionDTO {
+  public static final String REFERENCE = "reference";
+  public static final String LITERATURE = "literature";
   @Id private UUID id;
 
   @NotNull
@@ -54,21 +56,21 @@ public class LegalPeriodicalEditionDTO {
   // Methods to get references and literature citations
   public List<UUID> getLiteratureCitations() {
     return editionReferences.stream()
-        .filter(ref -> "literature".equals(ref.getDtype()))
+        .filter(ref -> LITERATURE.equals(ref.getDtype()))
         .map(EditionReferenceDTO::getReferenceId)
         .collect(Collectors.toList());
   }
 
   public List<UUID> getReferences() {
     return editionReferences.stream()
-        .filter(ref -> "reference".equals(ref.getDtype()))
+        .filter(ref -> REFERENCE.equals(ref.getDtype()))
         .map(EditionReferenceDTO::getReferenceId)
         .collect(Collectors.toList());
   }
 
   public void setLiteratureCitations(List<DependentLiteratureCitationDTO> literatureCitations) {
     // Remove existing literature citations
-    editionReferences.removeIf(ref -> "literature".equals(ref.getDtype()));
+    editionReferences.removeIf(ref -> LITERATURE.equals(ref.getDtype()));
 
     // Add new literature citations with updated rank
     for (DependentLiteratureCitationDTO citation : literatureCitations) {
@@ -76,21 +78,21 @@ public class LegalPeriodicalEditionDTO {
       editionReference.setEdition(this);
       editionReference.setReferenceId(citation.getId());
       editionReference.setRank(citation.getRank());
-      editionReference.setDtype("literature");
+      editionReference.setDtype(LITERATURE);
       editionReferences.add(editionReference);
     }
   }
 
   public void setReferences(List<ReferenceDTO> references) {
     // Remove existing references
-    editionReferences.removeIf(ref -> "reference".equals(ref.getDtype()));
+    editionReferences.removeIf(ref -> REFERENCE.equals(ref.getDtype()));
 
     // Add new references with updated rank
     for (ReferenceDTO reference : references) {
       EditionReferenceDTO editionReference = new EditionReferenceDTO();
       editionReference.setReferenceId(reference.getId());
       editionReference.setRank(reference.getRank());
-      editionReference.setDtype("reference");
+      editionReference.setDtype(REFERENCE);
       editionReference.setEdition(this);
       editionReferences.add(editionReference);
     }

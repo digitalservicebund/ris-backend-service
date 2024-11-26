@@ -53,7 +53,7 @@ class DocumentTypeControllerTest {
   }
 
   @Test
-  void shouldReturnListOfDocumentTypes_whenGetDocumentTypesIsCalled() throws Exception {
+  void shouldReturnListOfDocumentTypes_whenGetDocumentTypesIsCalled() {
     List<DocumentType> documentTypes = List.of(documentType1, documentType2);
 
     when(service.getDocumentTypes(any(Optional.class))).thenReturn(documentTypes);
@@ -89,8 +89,7 @@ class DocumentTypeControllerTest {
   }
 
   @Test
-  void shouldCallServiceWithSearchQueryParameter_whenGetDocumentTypesIsCalledWithSearchString()
-      throws Exception {
+  void shouldCallServiceWithSearchQueryParameter_whenGetDocumentTypesIsCalledWithSearchString() {
     List<DocumentType> documentTypes = List.of(documentType1, documentType2);
 
     when(service.getDocumentTypes(any(Optional.class))).thenReturn(documentTypes);
@@ -108,8 +107,7 @@ class DocumentTypeControllerTest {
 
   @Test
   void
-      shouldCallServiceWithSearchQueryParameter_whenGetDependentLiteratureDocumentTypesIsCalledWithSearchString()
-          throws Exception {
+      shouldCallServiceWithSearchQueryParameter_whenGetDependentLiteratureDocumentTypesIsCalledWithSearchString() {
     List<DocumentType> documentTypes = List.of(documentType1, documentType2);
 
     when(service.getDependentLiteratureDocumentTypes(any(Optional.class)))
