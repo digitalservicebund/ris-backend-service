@@ -62,11 +62,9 @@ function toggleExpanded() {
 watch(
   props,
   () => {
-    if (props.expandValues.length > 0) {
-      isExpanded.value = props.expandValues.some(
-        (expandedNode) => expandedNode.identifier == props.node.identifier,
-      )
-    }
+    isExpanded.value = props.expandValues.some(
+      (expandedNode) => expandedNode.identifier == props.node.identifier,
+    )
   },
   { immediate: true },
 )

@@ -80,9 +80,6 @@ function addExpandedNodes(
 }
 
 function collapseTree() {
-  expandedNodes.value.forEach((node) => {
-    collapseNode(node)
-  })
   expandedNodes.value = []
 }
 

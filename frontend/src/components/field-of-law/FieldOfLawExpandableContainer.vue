@@ -15,14 +15,14 @@ const emit = defineEmits<{
   "node:remove": [node: FieldOfLaw]
   "node:clicked": [node: FieldOfLaw]
   editingDone: [void]
+  resetSearch: [void]
   inputMethodSelected: [method: InputMethod]
 }>()
 
 const titleRef = ref<HTMLElement | null>(null)
-
 const isExpanded = ref(false)
-
 const inputMethod = ref(InputMethod.DIRECT)
+const isResetButtonVisible = ref(false)
 
 const expandButtonLabel = computed(() => {
   return props.fieldsOfLaw.length > 0 ? "Weitere Angabe" : "Sachgebiete"
@@ -41,6 +41,14 @@ function enterEditMode() {
   isExpanded.value = true
 }
 
+function showResetButton() {
+  isResetButtonVisible.value = true
+}
+
+function hideResetButton() {
+  isResetButtonVisible.value = false
+}
+
 async function exitEditMode() {
   isExpanded.value = false
   await nextTick()
@@ -55,6 +63,8 @@ watch(
   },
   { deep: true },
 )
+
+defineExpose({ showResetButton, hideResetButton })
 </script>
 <script lang="ts">
 export enum InputMethod {
@@ -109,12 +119,22 @@ export enum InputMethod {
           />
         </InputField>
       </div>
-      <TextButton
-        button-type="primary"
-        label="Fertig"
-        size="small"
-        @click="exitEditMode"
-      />
+
+      <div class="flex flex-row gap-8">
+        <TextButton
+          v-if="isResetButtonVisible"
+          button-type="tertiary"
+          label="Suche zurücksetzen"
+          size="small"
+          @click="emit('resetSearch')"
+        />
+        <TextButton
+          button-type="primary"
+          label="Fertig"
+          size="small"
+          @click="exitEditMode"
+        />
+      </div>
     </div>
     <slot />
   </div>
