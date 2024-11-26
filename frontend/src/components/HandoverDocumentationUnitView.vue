@@ -620,7 +620,7 @@ const isPublishable = computed<boolean>(
         confirm-text="Trotzdem übergeben"
         content-text="Die Randnummern sind nicht korrekt. Wollen Sie das Dokument dennoch übergeben?"
         header-text="Warnung: Randnummern inkorrekt"
-        @close-modal="showHandoverModal = false"
+        @close-modal="(showHandoverModal = false)"
         @confirm-action="confirmHandoverDialog"
       />
       <TextButton

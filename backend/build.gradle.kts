@@ -19,8 +19,8 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.51.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "10.22.0"
-    id("io.sentry.jvm.gradle") version "4.13.0"
+    id("org.flywaydb.flyway") version "11.0.0"
+    id("io.sentry.jvm.gradle") version "4.14.0"
 }
 
 group = "de.bund.digitalservice"
@@ -175,7 +175,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.29.20"))
+    implementation(platform("software.amazon.awssdk:bom:2.29.21"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -220,10 +220,10 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.12.0")
     implementation("org.jsoup:jsoup:1.18.1")
 
-    val flywayCore = "org.flywaydb:flyway-core:10.22.0"
+    val flywayCore = "org.flywaydb:flyway-core:11.0.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.22.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.0.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
