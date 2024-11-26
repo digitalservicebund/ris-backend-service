@@ -73,7 +73,7 @@ describe("Documentunit Search", () => {
         "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit.",
       ),
     ).toBeVisible()
-    expect(screen.queryAllByTestId("listEntry").length).toBe(0)
+    expect(screen.queryAllByRole("row").length).toBe(0)
   })
 
   test("External user cannot create new doc unit", async () => {
@@ -83,7 +83,7 @@ describe("Documentunit Search", () => {
       screen.queryByLabelText("Neue Dokumentationseinheit erstellen"),
     ).not.toBeInTheDocument()
     expect(screen.getByText("Starten Sie die Suche.")).toBeVisible()
-    expect(screen.queryAllByTestId("listEntry").length).toBe(0)
+    expect(screen.queryAllByRole("row").length).toBe(0)
   })
 
   test("search for scheduled publicationDate should display one result", async () => {
@@ -123,7 +123,7 @@ describe("Documentunit Search", () => {
       screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
     )
     expect(screen.getByRole("cell", { name: "jDV Übergabe" })).toBeVisible()
-    expect(screen.queryAllByTestId("listEntry").length).toBe(1)
+    expect(screen.queryAllByRole("row").length).toBe(1)
   })
 
   test("search with scheduled only should display one result", async () => {
@@ -159,7 +159,7 @@ describe("Documentunit Search", () => {
       screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
     )
     expect(screen.getByRole("cell", { name: "jDV Übergabe" })).toBeVisible()
-    expect(screen.queryAllByTestId("listEntry").length).toBe(1)
+    expect(screen.queryAllByRole("row").length).toBe(1)
   })
 
   test("search for publicationDate should display one result", async () => {
@@ -198,7 +198,7 @@ describe("Documentunit Search", () => {
       screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
     )
     expect(screen.getByRole("cell", { name: "jDV Übergabe" })).toBeVisible()
-    expect(screen.queryAllByTestId("listEntry").length).toBe(1)
+    expect(screen.queryAllByRole("row").length).toBe(1)
   })
 
   test("click on 'Ergebnisse anzeigen' with search input renders results", async () => {
@@ -245,7 +245,7 @@ describe("Documentunit Search", () => {
       screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
     )
 
-    expect(screen.getAllByTestId("listEntry").length).toBe(1)
+    expect(screen.getAllByRole("row").length).toBe(1)
     expect(screen.getAllByText(/documentNumber/).length).toBe(1)
   })
 
@@ -279,7 +279,7 @@ describe("Documentunit Search", () => {
 
     await new Promise((resolve) => setTimeout(resolve, 100))
 
-    expect(screen.queryAllByTestId("listEntry").length).toBe(0)
+    expect(screen.queryAllByRole("row").length).toBe(0)
 
     expect(screen.getByText("Übernehmen und fortfahren")).toBeVisible()
   })
@@ -314,7 +314,7 @@ describe("Documentunit Search", () => {
 
     await new Promise((resolve) => setTimeout(resolve, 100))
 
-    expect(screen.queryAllByTestId("listEntry").length).toBe(0)
+    expect(screen.queryAllByRole("row").length).toBe(0)
 
     expect(
       screen.queryByText("Übernehmen und fortfahren"),

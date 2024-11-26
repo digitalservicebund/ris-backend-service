@@ -48,7 +48,7 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
     <PreviewReferences :references="documentUnit.references as Reference[]" />
     <PreviewShortTexts
       :short-texts="documentUnit.shortTexts"
-      :valid-border-numbers="documentUnit.borderNumbers"
+      :valid-border-numbers="documentUnit.managementData.borderNumbers"
     />
     <PreviewLongTexts :long-texts="documentUnit.longTexts as LongTexts" />
   </FlexContainer>

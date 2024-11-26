@@ -16,7 +16,7 @@ function mockDocUnitStore({
 } = {}) {
   const mockedSessionStore = useDocumentUnitStore()
   mockedSessionStore.documentUnit = new DocumentUnit("q834", {
-    coreData: { scheduledPublicationDateTime },
+    managementData: { scheduledPublicationDateTime, borderNumbers: [] },
   })
 
   const response = errorTitle ? { error: { title: errorTitle } } : {}
@@ -110,9 +110,9 @@ describe("ScheduledPublishingDateTime", () => {
 
     await fireEvent.click(screen.getByLabelText("Termin setzen"))
 
-    expect(store.documentUnit?.coreData.scheduledPublicationDateTime).toEqual(
-      "2050-01-01T04:00:00.000Z",
-    )
+    expect(
+      store.documentUnit?.managementData.scheduledPublicationDateTime,
+    ).toEqual("2050-01-01T04:00:00.000Z")
 
     expect(dateField).toHaveValue("01.01.2050")
     expect(screen.getByLabelText("Terminierte Uhrzeit")).toHaveValue("05:00")
@@ -134,7 +134,7 @@ describe("ScheduledPublishingDateTime", () => {
     await fireEvent.click(screen.getByLabelText("Termin löschen"))
 
     expect(
-      store.documentUnit?.coreData.scheduledPublicationDateTime,
+      store.documentUnit?.managementData.scheduledPublicationDateTime,
     ).toBeUndefined()
 
     const dateField = screen.getByLabelText("Terminiertes Datum")

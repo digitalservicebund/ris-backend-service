@@ -26,6 +26,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
+import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
@@ -83,7 +84,6 @@ public class DocumentationUnitTransformer {
           .ecli(StringUtils.normalizeSpace(coreData.ecli()))
           .judicialBody(StringUtils.normalizeSpace(coreData.appraisalBody()))
           .decisionDate(coreData.decisionDate())
-          .scheduledPublicationDateTime(coreData.scheduledPublicationDateTime())
           .documentType(
               coreData.documentType() != null
                   ? DocumentTypeTransformer.transformToDTO(coreData.documentType())
@@ -143,6 +143,12 @@ public class DocumentationUnitTransformer {
           .dissentingOpinion(null)
           .otherLongText(null)
           .outline(null);
+    }
+
+    if (updatedDomainObject.managementData() != null) {
+      var managementData = updatedDomainObject.managementData();
+
+      builder.scheduledPublicationDateTime(managementData.scheduledPublicationDateTime());
     }
 
     addReferences(updatedDomainObject, builder);
@@ -582,8 +588,6 @@ public class DocumentationUnitTransformer {
                     : documentationUnitDTO.getRegions().get(0).getCode())
             .ecli(documentationUnitDTO.getEcli())
             .decisionDate(documentationUnitDTO.getDecisionDate())
-            .lastPublicationDateTime(documentationUnitDTO.getLastPublicationDateTime())
-            .scheduledPublicationDateTime(documentationUnitDTO.getScheduledPublicationDateTime())
             .appraisalBody(documentationUnitDTO.getJudicialBody())
             .legalEffect(legalEffect == null ? null : legalEffect.getLabel());
 
@@ -711,6 +715,13 @@ public class DocumentationUnitTransformer {
             documentationUnitDTO.getOtherLongText(),
             documentationUnitDTO.getDissentingOpinion());
 
+    ManagementData managementData =
+        ManagementData.builder()
+            .lastPublicationDateTime(documentationUnitDTO.getLastPublicationDateTime())
+            .scheduledPublicationDateTime(documentationUnitDTO.getScheduledPublicationDateTime())
+            .borderNumbers(borderNumbers)
+            .build();
+
     addOriginalFileDocuments(documentationUnitDTO, builder);
     addPreviousDecisionsToDomain(documentationUnitDTO, builder);
     addEnsuingDecisionsToDomain(documentationUnitDTO, builder);
@@ -721,8 +732,8 @@ public class DocumentationUnitTransformer {
         .coreData(coreData)
         .shortTexts(shortTexts)
         .longTexts(longTexts)
-        .borderNumbers(borderNumbers)
-        .contentRelatedIndexing(contentRelatedIndexing);
+        .contentRelatedIndexing(contentRelatedIndexing)
+        .managementData(managementData);
 
     addStatusToDomain(documentationUnitDTO, builder);
     addReferencesToDomain(documentationUnitDTO, builder);

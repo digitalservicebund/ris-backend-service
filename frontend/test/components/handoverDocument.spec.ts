@@ -461,9 +461,12 @@ describe("HandoverDocumentationUnitView:", () => {
   it("should not allow to publish when publication is scheduled", async () => {
     renderComponent({
       documentUnit: new DocumentUnit("123", {
+        managementData: {
+          borderNumbers: [],
+          scheduledPublicationDateTime: "2050-01-01T04:00:00.000Z",
+        },
         coreData: {
           fileNumbers: ["foo"],
-          scheduledPublicationDateTime: "2050-01-01T04:00:00.000Z",
           court: { type: "type", location: "location", label: "label" },
           decisionDate: "2022-02-01",
           legalEffect: "legalEffect",

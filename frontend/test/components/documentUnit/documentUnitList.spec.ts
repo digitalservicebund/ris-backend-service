@@ -174,7 +174,7 @@ describe("documentUnit list", () => {
       screen.getByRole("link", { name: "Dokumentationseinheit bearbeiten" }),
     ).toBeInTheDocument()
 
-    expect(screen.getAllByTestId("listEntry").length).toBe(3)
+    expect(screen.getAllByRole("row").length).toBe(3)
 
     //Spruchkörper visible
     expect(screen.getByText("cba")).toBeVisible()

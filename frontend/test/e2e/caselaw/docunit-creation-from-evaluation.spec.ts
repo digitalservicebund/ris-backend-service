@@ -383,7 +383,7 @@ test.describe(
 
           await newTab.getByLabel("Dokumentnummer Suche").fill(documentNumber)
           await newTab.getByLabel("Nach Dokumentationseinheiten suchen").click()
-          const listEntry = newTab.getByTestId("listEntry")
+          const listEntry = newTab.getByRole("row")
           await expect(listEntry).toHaveCount(1)
 
           await expect(listEntry).toContainText(documentNumber)
@@ -412,7 +412,7 @@ test.describe(
           ).toBeHidden()
 
           await newTab.reload()
-          const listEntry = newTab.getByTestId("listEntry")
+          const listEntry = newTab.getByRole("row")
           await expect(listEntry).toHaveCount(0)
         })
       },
@@ -533,7 +533,7 @@ test.describe(
           const select = newTab.locator(`select[id="status"]`)
           await select.selectOption("Fremdanlage")
           await newTab.getByLabel("Nach Dokumentationseinheiten suchen").click()
-          const listEntry = newTab.getByTestId("listEntry")
+          const listEntry = newTab.getByRole("row")
           await expect(listEntry).toHaveCount(0)
         })
 
@@ -549,7 +549,7 @@ test.describe(
           await pageWithBghUser
             .getByLabel("Nach Dokumentationseinheiten suchen")
             .click()
-          const listEntry = pageWithBghUser.getByTestId("listEntry")
+          const listEntry = pageWithBghUser.getByRole("row")
           await expect(listEntry).toHaveCount(1)
           await expect(listEntry).toContainText(
             `Fremdanlage aus MMG ${edition.prefix}12${edition.suffix} (DS)`,
@@ -679,7 +679,7 @@ test.describe(
             await pageWithBghUser
               .getByLabel("Nach Dokumentationseinheiten suchen")
               .click()
-            const listEntry = pageWithBghUser.getByTestId("listEntry")
+            const listEntry = pageWithBghUser.getByRole("row")
             await expect(listEntry).toHaveCount(1)
 
             await expect(
@@ -708,7 +708,7 @@ test.describe(
             await pageWithBghUser
               .getByLabel("Nach Dokumentationseinheiten suchen")
               .click()
-            const listEntry = pageWithBghUser.getByTestId("listEntry")
+            const listEntry = pageWithBghUser.getByRole("row")
             await expect(listEntry).toHaveCount(1)
             await expect(listEntry).toContainText(
               `Fremdanlage aus MMG ${edition.prefix}12${edition.suffix} (DS)`,
@@ -746,7 +746,7 @@ test.describe(
           //   await page
           //     .getByLabel("Nach Dokumentationseinheiten suchen")
           //     .click()
-          //   const listEntry = pageWithBghUser.getByTestId("listEntry")
+          //   const listEntry = pageWithBghUser.getByRole("row")
           //   await expect(listEntry).toHaveCount(1)
           //   await expect(listEntry).toContainText(`Unveröffentlicht`)
 
@@ -767,7 +767,7 @@ test.describe(
             await pageWithBghUser
               .getByLabel("Nach Dokumentationseinheiten suchen")
               .click()
-            const listEntry = pageWithBghUser.getByTestId("listEntry")
+            const listEntry = pageWithBghUser.getByRole("row")
             await expect(listEntry).toHaveCount(1)
             await expect(listEntry).toContainText(
               `Fremdanlage aus MMG ${edition.prefix}12${edition.suffix} (DS)`,
@@ -786,9 +786,7 @@ test.describe(
 
             await pageWithBghUser.locator('button:has-text("Löschen")').click()
 
-            await expect(pageWithBghUser.getByTestId("listEntry")).toHaveCount(
-              0,
-            )
+            await expect(pageWithBghUser.getByRole("row")).toHaveCount(0)
 
             await page.reload()
             await expect(page.getByText(documentNumber2)).toBeHidden()
