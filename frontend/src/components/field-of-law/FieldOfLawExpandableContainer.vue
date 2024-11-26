@@ -78,7 +78,7 @@ export enum InputMethod {
 
   <div v-if="isExpanded" class="flex flex-col items-start gap-24">
     <div class="flex w-full flex-row justify-between">
-      <div class="flex flex-row gap-8">
+      <div class="flex flex-row gap-24">
         <InputField
           id="direct"
           label="Direkteingabe"

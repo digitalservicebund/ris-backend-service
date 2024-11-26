@@ -35,7 +35,7 @@ const norm = computed({
 </script>
 
 <template>
-  <div>
+  <div class="flex w-full flex-col">
     <div class="flex w-full flex-row items-end gap-16">
       <InputField id="fieldOfLawDirectInput" label="Sachgebiet">
         <TextInput
