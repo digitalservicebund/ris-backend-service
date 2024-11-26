@@ -87,7 +87,7 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
         <div class="flex flex-row gap-24">
           <div class="flex flex-1 flex-col">
             <FieldOfLawSearch
-              @do-show-norms="showNorms = true"
+              @do-show-norms="(showNorms = true)"
               @linked-field:select="setSelectedNode"
               @node:select="setSelectedNode"
               @node:unselect="removeSelectedNode"
@@ -103,7 +103,7 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
               @node:select="addFeldOfLaw"
               @node:unselect="removeFieldOfLaw"
               @selected-node:reset="removeSelectedNode"
-              @toggle-show-norms="showNorms = !showNorms"
+              @toggle-show-norms="(showNorms = !showNorms)"
             ></FieldOfLawTree>
           </div>
         </div>

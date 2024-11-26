@@ -42,6 +42,6 @@ const isInvalid = computed(() => props.validationError !== undefined)
     }"
     :disabled="readonly"
     type="checkbox"
-    @keydown.space.prevent="localModelValue = !localModelValue"
+    @keydown.space.prevent="(localModelValue = !localModelValue)"
   />
 </template>
