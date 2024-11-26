@@ -222,7 +222,7 @@ function updateInputMethod(value: InputMethod) {
         @node-of-interest:reset="removeNodeOfInterest"
         @node:add="addFieldOfLaw"
         @node:remove="removeFieldOfLaw"
-        @toggle-show-norms="showNorms = !showNorms"
+        @toggle-show-norms="(showNorms = !showNorms)"
       />
     </div>
   </FieldOfLawExpandableContainer>

@@ -15,7 +15,7 @@ const toggleShow = ref(true)
         :is-expanded="toggleShow"
         label="Inhalt links"
         :opening-direction="OpeningDirection.LEFT"
-        @update:is-expanded="toggleShow = !toggleShow.valueOf()"
+        @update:is-expanded="(toggleShow = !toggleShow.valueOf())"
       >
         <div class="flex w-full p-24">
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatem
@@ -28,7 +28,7 @@ const toggleShow = ref(true)
         :is-expanded="!toggleShow"
         label="Inhalt rechts"
         :opening-direction="OpeningDirection.RIGHT"
-        @update:is-expanded="toggleShow = !toggleShow"
+        @update:is-expanded="(toggleShow = !toggleShow)"
       >
         <div class="flex w-full p-24">
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatem

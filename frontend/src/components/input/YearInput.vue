@@ -126,7 +126,7 @@ function validateYear(input: string | undefined): boolean {
     :model-value="localModelValue"
     placeholder="JJJJ"
     type="text"
-    @blur="userHasFinished = true"
+    @blur="(userHasFinished = true)"
     @keydown.delete="backspaceDelete"
     @update:model-value="emitModelValue"
   />
