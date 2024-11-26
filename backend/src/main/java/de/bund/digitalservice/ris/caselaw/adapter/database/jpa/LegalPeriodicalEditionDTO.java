@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,6 +30,8 @@ import org.springframework.data.annotation.CreatedDate;
 @Getter
 @Setter
 public class LegalPeriodicalEditionDTO {
+  public static final String REFERENCE = "reference";
+  public static final String LITERATURE = "literature";
   @Id private UUID id;
 
   @NotNull
@@ -46,8 +49,52 @@ public class LegalPeriodicalEditionDTO {
   @Column(name = "created_at")
   private LocalDate createdAt;
 
-  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-  @JoinColumn(name = "edition_id")
   @Builder.Default
-  private List<ReferenceDTO> references = new ArrayList<>();
+  @OneToMany(mappedBy = "edition", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<EditionReferenceDTO> editionReferences = new ArrayList<>();
+
+  // Methods to get references and literature citations
+  public List<UUID> getLiteratureCitations() {
+    return editionReferences.stream()
+        .filter(ref -> LITERATURE.equals(ref.getDtype()))
+        .map(EditionReferenceDTO::getReferenceId)
+        .collect(Collectors.toList());
+  }
+
+  public List<UUID> getReferences() {
+    return editionReferences.stream()
+        .filter(ref -> REFERENCE.equals(ref.getDtype()))
+        .map(EditionReferenceDTO::getReferenceId)
+        .collect(Collectors.toList());
+  }
+
+  public void setLiteratureCitations(List<DependentLiteratureCitationDTO> literatureCitations) {
+    // Remove existing literature citations
+    editionReferences.removeIf(ref -> LITERATURE.equals(ref.getDtype()));
+
+    // Add new literature citations with updated rank
+    for (DependentLiteratureCitationDTO citation : literatureCitations) {
+      EditionReferenceDTO editionReference = new EditionReferenceDTO();
+      editionReference.setEdition(this);
+      editionReference.setReferenceId(citation.getId());
+      editionReference.setRank(citation.getRank());
+      editionReference.setDtype(LITERATURE);
+      editionReferences.add(editionReference);
+    }
+  }
+
+  public void setReferences(List<ReferenceDTO> references) {
+    // Remove existing references
+    editionReferences.removeIf(ref -> REFERENCE.equals(ref.getDtype()));
+
+    // Add new references with updated rank
+    for (ReferenceDTO reference : references) {
+      EditionReferenceDTO editionReference = new EditionReferenceDTO();
+      editionReference.setReferenceId(reference.getId());
+      editionReference.setRank(reference.getRank());
+      editionReference.setDtype(REFERENCE);
+      editionReference.setEdition(this);
+      editionReferences.add(editionReference);
+    }
+  }
 }

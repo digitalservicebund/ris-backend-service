@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/vue"
 import { expect } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitSearchEntryForm from "@/components/DocumentUnitSearchEntryForm.vue"
+import featureToggleService from "@/services/featureToggleService"
 
 async function renderComponent(options?: { isLoading: boolean }) {
   const props = {
@@ -31,6 +32,13 @@ async function renderComponent(options?: { isLoading: boolean }) {
 }
 
 describe("Documentunit search form", () => {
+  beforeEach(() => {
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
+  })
+
   test("renders correctly", async () => {
     await renderComponent()
     ;[
@@ -99,16 +107,48 @@ describe("Documentunit search form", () => {
     ).toBeVisible()
   })
 
-  test("click on 'Nur meine Dokstelle' renders 'Nur fehlerhafte Dokumentationseinheiten' checkbox", async () => {
+  test("click on 'Nur meine Dokstelle' renders scheduled publication fields", async () => {
     const { user } = await renderComponent()
     expect(
-      screen.queryByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
+      screen.queryByLabelText("jDV Übergabedatum Suche"),
     ).not.toBeInTheDocument()
-    expect(screen.getByLabelText("Nur meine Dokstelle Filter")).toBeVisible()
+    expect(screen.queryByLabelText("Terminiert Filter")).not.toBeInTheDocument()
+
     await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
+
+    expect(screen.getByLabelText("jDV Übergabedatum Suche")).toBeVisible()
+    expect(screen.getByLabelText("Terminiert Filter")).toBeVisible()
+  })
+
+  test("unchecking 'Nur meine Dokstelle' removes scheduled publication input", async () => {
+    const { user } = await renderComponent()
+
+    // 1) After enabling Nur meine Dokstelle, the inputs can be filled
+    await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
+    await user.type(
+      screen.getByLabelText("jDV Übergabedatum Suche"),
+      "10.10.2020",
+    )
+    await user.click(screen.getByLabelText("Terminiert Filter"))
+
+    expect(screen.getByLabelText("jDV Übergabedatum Suche")).toHaveValue(
+      "10.10.2020",
+    )
+    expect(screen.getByLabelText("Terminiert Filter")).toBeChecked()
+
+    // 2) When disabling Nur meine Dokstelle, the inputs are gone
+    await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
+
     expect(
-      screen.getByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
-    ).toBeVisible()
+      screen.queryByLabelText("jDV Übergabedatum Suche"),
+    ).not.toBeInTheDocument()
+    expect(screen.queryByLabelText("Terminiert Filter")).not.toBeInTheDocument()
+
+    // 3) When enabling Nur meine Dokstelle again, the inputs are in empty default state
+    await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
+
+    expect(screen.getByLabelText("jDV Übergabedatum Suche")).toHaveValue("")
+    expect(screen.getByLabelText("Terminiert Filter")).not.toBeChecked()
   })
 
   test("search by pressing ctrl & enter", async () => {

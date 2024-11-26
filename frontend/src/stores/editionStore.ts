@@ -26,19 +26,17 @@ export const useEditionStore = defineStore("editionStore", () => {
     return response
   }
 
-  async function updateEdition(): Promise<
+  async function saveEdition(): Promise<
     ServiceResponse<LegalPeriodicalEdition>
   > {
-    const response = await LegalPeriodicalEditionService.save(
+    return await LegalPeriodicalEditionService.save(
       edition.value as LegalPeriodicalEdition,
     )
-
-    return response
   }
 
   return {
     edition,
     loadEdition,
-    updateEdition,
+    saveEdition,
   }
 })

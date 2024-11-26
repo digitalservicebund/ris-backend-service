@@ -285,6 +285,8 @@ class DocumentationUnitServiceTest {
         Optional.empty(),
         Optional.empty(),
         Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
         Optional.empty());
     verify(repository)
         .searchByDocumentationUnitSearchInput(pageRequest, oidcUser, documentationUnitSearchInput);
@@ -311,6 +313,8 @@ class DocumentationUnitServiceTest {
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007filenumber\u180Ewith\u2060spaces"),
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007courttype\u180Ewith\u2060spaces"),
         Optional.of("This\u00A0is\u202Fa\uFEFFtest\u2007courtlocation\u180Ewith\u2060spaces"),
+        Optional.empty(),
+        Optional.empty(),
         Optional.empty(),
         Optional.empty(),
         Optional.empty(),
@@ -376,5 +380,14 @@ class DocumentationUnitServiceTest {
     // Verify that the fileNumber field has normalized spaces
     assertThat(capturedRelatedDocumentationUnit.getFileNumber())
         .isEqualTo("This is a test filenumber with spaces.");
+  }
+
+  @Test
+  void test_setPublicationDateTime_shouldSaveLastPublicationDateTime() {
+    DocumentationUnit documentationUnit = DocumentationUnit.builder().build();
+
+    service.setPublicationDateTime(documentationUnit.uuid());
+
+    verify(repository, times(1)).saveLastPublicationDateTime(documentationUnit.uuid());
   }
 }

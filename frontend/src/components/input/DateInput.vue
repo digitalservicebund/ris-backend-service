@@ -15,6 +15,7 @@ interface Props {
   hasError?: boolean
   size?: "regular" | "medium" | "small"
   readOnly?: boolean
+  disabled?: boolean
 }
 
 const props = defineProps<Props>()
@@ -121,6 +122,7 @@ watch(inputValue, (is) => {
     :aria-label="ariaLabel"
     class="ds-input"
     :class="conditionalClasses"
+    :disabled="disabled"
     placeholder="TT.MM.JJJJ"
     :readonly="readOnly"
     @blur="onBlur"

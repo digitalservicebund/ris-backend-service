@@ -235,14 +235,10 @@ class CaseLawLdmlExportTest {
   void documentNumberIsFallbackTitleTest() {
     String expected =
         """
-           <akn:block name="title">
-              <akn:docTitle>
-                 <akn:subFlow name="titleWrapper">
-                    <akn:p>testDocumentNumber</akn:p>
-                 </akn:subFlow>
-              </akn:docTitle>
-           </akn:block>
-           """;
+      <akn:header>
+         <akn:p>testDocumentNumber</akn:p>
+      </akn:header>
+     """;
     Optional<CaseLawLdml> ldml =
         DocumentationUnitToLdmlTransformer.transformToLdml(
             testDocumentUnit, documentBuilderFactory);
@@ -259,7 +255,7 @@ class CaseLawLdmlExportTest {
   void dissentingOpinionTest() {
     String expected =
         """
-           <akn:block name="opinions">
+           <akn:block name="Abweichende Meinung">
               <akn:opinion>
                  <akn:embeddedStructure>
                     <akn:p>dissenting test</akn:p>

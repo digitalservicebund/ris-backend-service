@@ -56,7 +56,7 @@ public class OtcObsConfig {
 
   @Bean(name = "ldmlS3Client")
   @Profile({"production", "uat"})
-  public S3Client ldmlS3NoopClient() throws URISyntaxException {
+  public S3Client ldmlS3NoopClient() {
     return new S3NoOpClient();
   }
 

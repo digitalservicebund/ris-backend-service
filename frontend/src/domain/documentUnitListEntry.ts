@@ -6,6 +6,8 @@ export default class DocumentUnitListEntry {
   uuid?: string
   documentNumber?: string
   decisionDate?: string
+  lastPublicationDateTime?: string
+  scheduledPublicationDateTime?: string
   status?: NonNullable<DocumentUnit["status"]>
   fileNumber?: string
   documentType?: DocumentType

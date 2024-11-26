@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useInterval } from "@vueuse/core"
 import { computed, ref, watch } from "vue"
 import PeriodicalEditionReferenceInput from "./PeriodicalEditionReferenceInput.vue"
 import PeriodicalEditionReferenceSummary from "./PeriodicalEditionReferenceSummary.vue"
@@ -12,17 +13,21 @@ import { useEditionStore } from "@/stores/editionStore"
 const store = useEditionStore()
 const responseError = ref<ResponseError | undefined>()
 
+const loadEditionIntervalCounter = useInterval(10_000, {})
+
 const references = computed({
-  get: () => (store.edition ? (store.edition.references as Reference[]) : []),
-  set: (newValues) => {
-    store.edition!.references = newValues
+  get: () => store.edition?.references ?? [],
+  set: async (newValues) => {
+    await saveReferences(newValues)
   },
 })
 
 const defaultValue = new Reference() as Reference
 
-watch(references, async () => {
-  const response = await store.updateEdition()
+async function saveReferences(references: Reference[]) {
+  await store.loadEdition()
+  store.edition!.references = references
+  const response = await store.saveEdition()
   if (response.error) {
     const message =
       "Fehler beim Speichern der Fundstellen. Bitte laden Sie die Seite neu."
@@ -31,6 +36,14 @@ watch(references, async () => {
       title: message,
     }
   }
+}
+
+/**
+ * A watch to load document every x times, to make sure user has the latest version of references
+ * which is critical for external changes
+ */
+watch(loadEditionIntervalCounter, async () => {
+  await store.loadEdition()
 })
 </script>
 

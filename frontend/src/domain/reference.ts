@@ -1,3 +1,4 @@
+import { DocumentType } from "./documentUnit"
 import EditableListItem from "./editableListItem"
 import RelatedDocumentation from "./relatedDocumentation"
 import LegalPeriodical from "@/domain/legalPeriodical"
@@ -10,6 +11,9 @@ export default class Reference implements EditableListItem {
   legalPeriodical?: LegalPeriodical
   legalPeriodicalRawValue?: string
   documentationUnit?: RelatedDocumentation
+  documentType?: DocumentType
+  author?: string
+  referenceType: "caselaw" | "literature" = "caselaw"
 
   static readonly requiredFields = [
     "legalPeriodical",
@@ -17,11 +21,25 @@ export default class Reference implements EditableListItem {
     "referenceSupplement",
   ] as const
 
+  static readonly requiredFieldsForDocunit = [
+    "legalPeriodical",
+    "citation",
+  ] as const
+
+  static readonly requiredLiteratureFields = [
+    "legalPeriodical",
+    "citation",
+    "documentType",
+    "author",
+  ] as const
+
   static readonly fields = [
     "legalPeriodical",
     "citation",
     "referenceSupplement",
     "documentationUnit",
+    "author",
+    "documentType",
   ] as const
 
   constructor(data: Partial<Reference> = {}) {
@@ -46,9 +64,11 @@ export default class Reference implements EditableListItem {
 
   get renderDecision(): string {
     return [
+      this.author ? `${this.author},` : "",
       this.legalPeriodical?.abbreviation ?? this.legalPeriodicalRawValue,
       this.citation,
       this.referenceSupplement ? ` (${this.referenceSupplement})` : "",
+      this.documentType ? ` (${this.documentType.jurisShortcut})` : "",
     ]
       .filter(Boolean)
       .join(" ")
@@ -60,6 +80,26 @@ export default class Reference implements EditableListItem {
 
   get missingRequiredFields() {
     return Reference.requiredFields.filter((field) =>
+      this.fieldIsEmpty(this[field]),
+    )
+  }
+
+  get hasMissingRequiredFieldsForDocunit(): boolean {
+    return this.missingRequiredFieldsForDocunit.length > 0
+  }
+
+  get missingRequiredFieldsForDocunit() {
+    return Reference.requiredFieldsForDocunit.filter((field) =>
+      this.fieldIsEmpty(this[field]),
+    )
+  }
+
+  get hasMissingRequiredLiteratureFields(): boolean {
+    return this.missingRequiredLiteratureFields.length > 0
+  }
+
+  get missingRequiredLiteratureFields() {
+    return Reference.requiredLiteratureFields.filter((field) =>
       this.fieldIsEmpty(this[field]),
     )
   }

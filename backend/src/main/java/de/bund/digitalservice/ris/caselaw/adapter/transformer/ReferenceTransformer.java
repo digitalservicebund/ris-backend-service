@@ -4,12 +4,16 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
+import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class ReferenceTransformer {
   public static Reference transformToDomain(ReferenceDTO referenceDTO) {
+    if (referenceDTO == null) {
+      return null;
+    }
     LegalPeriodical legalPeriodical = null;
 
     if (referenceDTO.getLegalPeriodical() != null) {
@@ -24,6 +28,7 @@ public class ReferenceTransformer {
         .legalPeriodicalRawValue(referenceDTO.getLegalPeriodicalRawValue())
         .citation(referenceDTO.getCitation())
         .footnote(referenceDTO.getFootnote())
+        .referenceType(ReferenceType.CASELAW)
         .documentationUnit(
             RelatedDocumentationUnitTransformer.transformToDomain(
                 referenceDTO.getDocumentationUnit()))

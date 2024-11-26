@@ -177,14 +177,14 @@ export const handoverDocumentationUnit = async (
   page: Page,
   documentNumber: string,
 ) => {
-  await navigateToHandover(page, documentNumber)
-  await expect(page.getByText("XML Vorschau")).toBeVisible()
-  await page
-    .locator("[aria-label='Dokumentationseinheit an jDV übergeben']")
-    .click()
-  await expect(page.getByText("Email wurde versendet")).toBeVisible()
+  await test.step(`Übergebe Dokumentationseinheit ${documentNumber}`, async () => {
+    await navigateToHandover(page, documentNumber)
+    await expect(page.getByText("XML Vorschau")).toBeVisible()
+    await page.getByLabel("Dokumentationseinheit an jDV übergeben").click()
+    await expect(page.getByText("Email wurde versendet")).toBeVisible()
 
-  await expect(page.getByText("Xml Email Abgabe -")).toBeVisible()
+    await expect(page.getByText("Xml Email Abgabe -")).toBeVisible()
+  })
 }
 
 export const uploadTestfile = async (

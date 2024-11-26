@@ -39,6 +39,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
+import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
@@ -50,6 +51,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.Region;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.Collections;
 import java.util.List;
@@ -72,6 +74,8 @@ class DocumentationUnitTransformerTest {
     assertThat(documentationUnitDTO.getEcli()).isNull();
     assertThat(documentationUnitDTO.getJudicialBody()).isNull();
     assertThat(documentationUnitDTO.getDecisionDate()).isNull();
+    assertThat(documentationUnitDTO.getScheduledPublicationDateTime()).isNull();
+    assertThat(documentationUnitDTO.getLastPublicationDateTime()).isNull();
     assertThat(documentationUnitDTO.getCourt()).isNull();
     assertThat(documentationUnitDTO.getDocumentType()).isNull();
     assertThat(documentationUnitDTO.getDocumentationOffice()).isNull();
@@ -895,7 +899,59 @@ class DocumentationUnitTransformerTest {
     DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentationUnit.borderNumbers()).hasSize(2).containsExactly("1", "2");
+    assertThat(documentationUnit.managementData().borderNumbers())
+        .hasSize(2)
+        .containsExactly("1", "2");
+  }
+
+  @Test
+  void testTransformScheduledPublicationDate_withDate_shouldAddScheduledPublicationDate() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder()
+            .scheduledPublicationDateTime(LocalDateTime.parse("2022-01-23T18:25:14"))
+            .build();
+
+    DocumentationUnit documentationUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentationUnit.managementData().scheduledPublicationDateTime())
+        .isEqualTo("2022-01-23T18:25:14");
+  }
+
+  @Test
+  void testTransformScheduledPublicationDate_withoutDate_shouldNotAddScheduledPublicationDate() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder().scheduledPublicationDateTime(null).build();
+
+    DocumentationUnit documentationUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentationUnit.managementData().scheduledPublicationDateTime()).isNull();
+  }
+
+  @Test
+  void testTransformLastPublicationDate_withDate_shouldAddLastPublicationDate() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder()
+            .lastPublicationDateTime(LocalDateTime.parse("2022-01-23T18:25:14"))
+            .build();
+
+    DocumentationUnit documentationUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentationUnit.managementData().lastPublicationDateTime())
+        .isEqualTo("2022-01-23T18:25:14");
+  }
+
+  @Test
+  void testTransformLastPublicationDate_withoutDate_shouldNotAddLastPublicationDate() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder().lastPublicationDateTime(null).build();
+
+    DocumentationUnit documentationUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentationUnit.managementData().lastPublicationDateTime()).isNull();
   }
 
   @Test
@@ -915,7 +971,9 @@ class DocumentationUnitTransformerTest {
     DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentationUnit.borderNumbers()).hasSize(4).containsExactly("1", "2", "3", "4");
+    assertThat(documentationUnit.managementData().borderNumbers())
+        .hasSize(4)
+        .containsExactly("1", "2", "3", "4");
   }
 
   @Test
@@ -926,7 +984,7 @@ class DocumentationUnitTransformerTest {
     DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentationUnit.borderNumbers()).isEmpty();
+    assertThat(documentationUnit.managementData().borderNumbers()).isEmpty();
   }
 
   @Test
@@ -941,7 +999,7 @@ class DocumentationUnitTransformerTest {
     DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentationUnit.borderNumbers()).hasSize(1).containsExactly("2");
+    assertThat(documentationUnit.managementData().borderNumbers()).hasSize(1).containsExactly("2");
   }
 
   @Test
@@ -1274,7 +1332,12 @@ class DocumentationUnitTransformerTest {
         .ensuingDecisions(Collections.emptyList())
         .shortTexts(ShortTexts.builder().build())
         .longTexts(LongTexts.builder().build())
-        .borderNumbers(Collections.emptyList())
+        .managementData(
+            ManagementData.builder()
+                .scheduledPublicationDateTime(null)
+                .lastPublicationDateTime(null)
+                .borderNumbers(Collections.emptyList())
+                .build())
         .attachments(Collections.emptyList())
         .contentRelatedIndexing(
             ContentRelatedIndexing.builder()

@@ -9,36 +9,32 @@ import de.bund.digitalservice.ris.caselaw.adapter.DateUtils;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlUtilService;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknEmbeddedStructureInBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknKeyword;
+import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.AknMultipleBlock;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.CaseLawLdml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Classification;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Decision;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrAlias;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrAuthor;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrCountry;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrDate;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrElement;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.FrbrLanguage;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Header;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Identification;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JaxbHtml;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Judgment;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.JudgmentBody;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Meta;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Motivation;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Opinions;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Proprietary;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RelatedDecision;
 import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.RisMeta;
-import de.bund.digitalservice.ris.caselaw.adapter.caselawldml.Title;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
-import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
-import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
@@ -90,13 +86,13 @@ public class DocumentationUnitToLdmlTransformer {
   private static Judgment buildJudgment(DocumentationUnit documentationUnit)
       throws ValidationException {
     return Judgment.builder()
+        .header(buildHeader(documentationUnit))
         .meta(buildMeta(documentationUnit))
         .judgmentBody(buildJudgmentBody(documentationUnit))
-        .header(buildHeader(documentationUnit))
         .build();
   }
 
-  private static Header buildHeader(DocumentationUnit documentationUnit)
+  private static JaxbHtml buildHeader(DocumentationUnit documentationUnit)
       throws ValidationException {
     // Case law handover : define what the title should be if headline is null
     String title =
@@ -105,10 +101,7 @@ public class DocumentationUnitToLdmlTransformer {
             "<p>" + documentationUnit.documentNumber() + "</p>");
 
     validateNotNull(title, "Title missing");
-    String opinion = nullSafeGet(documentationUnit.longTexts(), LongTexts::dissentingOpinion);
-    return new Header()
-        .withBlock("title", Title.build(htmlStringToObjectList(title)))
-        .withBlock("opinions", Opinions.build(htmlStringToObjectList(opinion)));
+    return JaxbHtml.build(htmlStringToObjectList(title));
   }
 
   private static JudgmentBody buildJudgmentBody(DocumentationUnit documentationUnit) {
@@ -119,45 +112,86 @@ public class DocumentationUnitToLdmlTransformer {
     var longTexts = documentationUnit.longTexts();
 
     builder
-        .introduction(
+        // set guidingPrinciple/Leitsatz
+        .motivation(
             JaxbHtml.build(
                 htmlStringToObjectList(nullSafeGet(shortTexts, ShortTexts::guidingPrinciple))))
+        // set headnote/Orientierungssatz, "other headnote"/"Sonstiger Orientierungssatz",
+        // Outline/Gliederung, Tenor/Tenor
+        .introduction(buildIntroduction(documentationUnit))
+        // set caseFacts/Tatbestand
         .background(
             JaxbHtml.build(htmlStringToObjectList(nullSafeGet(longTexts, LongTexts::caseFacts))))
-        .decision(
-            Decision.build(
-                htmlStringToObjectList(nullSafeGet(longTexts, LongTexts::tenor)),
-                htmlStringToObjectList(nullSafeGet(longTexts, LongTexts::otherLongText))))
-        .arguments(
-            JaxbHtml.build(
-                htmlStringToObjectList(nullSafeGet(longTexts, LongTexts::decisionReasons))));
+        // set decisionReasons/Entscheidungsgründe, reasons/Gründe, otherLongText/"Sonstiger,
+        // dissentingOpinion/"Abweichende Meinung"
+        // Langtext"
+        .decision(buildDecision(documentationUnit));
+
+    return builder.build();
+  }
+
+  private static AknMultipleBlock buildIntroduction(DocumentationUnit documentationUnit) {
+    var shortTexts = documentationUnit.shortTexts();
+    var longTexts = documentationUnit.longTexts();
 
     var headnote = nullSafeGet(shortTexts, ShortTexts::headnote);
     var otherHeadnote = nullSafeGet(shortTexts, ShortTexts::otherHeadnote);
-    var reasons = nullSafeGet(longTexts, LongTexts::reasons);
+    var outline = nullSafeGet(longTexts, LongTexts::outline);
+    var tenor = nullSafeGet(longTexts, LongTexts::tenor);
+
     if (StringUtils.isNotEmpty(headnote)
         || StringUtils.isNotEmpty(otherHeadnote)
-        || StringUtils.isNotEmpty(reasons)) {
-
-      builder
-          .motivation(
-              new Motivation()
-                  .withBlock(
-                      AknEmbeddedStructureInBlock.HeadNote.NAME,
-                      AknEmbeddedStructureInBlock.HeadNote.build(
-                          JaxbHtml.build(htmlStringToObjectList(headnote))))
-                  .withBlock(
-                      AknEmbeddedStructureInBlock.OtherHeadNote.NAME,
-                      AknEmbeddedStructureInBlock.OtherHeadNote.build(
-                          JaxbHtml.build(htmlStringToObjectList(otherHeadnote))))
-                  .withBlock(
-                      AknEmbeddedStructureInBlock.Grounds.NAME,
-                      AknEmbeddedStructureInBlock.Grounds.build(
-                          JaxbHtml.build(htmlStringToObjectList(reasons)))))
-          .build();
+        || StringUtils.isNotEmpty(outline)
+        || StringUtils.isNotEmpty(tenor)) {
+      return new AknMultipleBlock()
+          .withBlock(
+              AknEmbeddedStructureInBlock.HeadNote.NAME,
+              AknEmbeddedStructureInBlock.HeadNote.build(
+                  JaxbHtml.build(htmlStringToObjectList(headnote))))
+          .withBlock(
+              AknEmbeddedStructureInBlock.OtherHeadNote.NAME,
+              AknEmbeddedStructureInBlock.OtherHeadNote.build(
+                  JaxbHtml.build(htmlStringToObjectList(otherHeadnote))))
+          .withBlock(
+              AknEmbeddedStructureInBlock.Outline.NAME,
+              AknEmbeddedStructureInBlock.Outline.build(
+                  JaxbHtml.build(htmlStringToObjectList(outline))))
+          .withBlock(
+              AknEmbeddedStructureInBlock.Tenor.NAME,
+              AknEmbeddedStructureInBlock.Tenor.build(
+                  JaxbHtml.build(htmlStringToObjectList(tenor))));
     }
+    return null;
+  }
 
-    return builder.build();
+  private static AknMultipleBlock buildDecision(DocumentationUnit documentationUnit) {
+    var longTexts = documentationUnit.longTexts();
+
+    var decisionReasons = nullSafeGet(longTexts, LongTexts::decisionReasons);
+    var reasons = nullSafeGet(longTexts, LongTexts::reasons);
+    var otherLongText = nullSafeGet(longTexts, LongTexts::otherLongText);
+    var dissentingOpinion = nullSafeGet(longTexts, LongTexts::dissentingOpinion);
+
+    if (StringUtils.isNotEmpty(decisionReasons)
+        || StringUtils.isNotEmpty(reasons)
+        || StringUtils.isNotEmpty(otherLongText)
+        || StringUtils.isNotEmpty(dissentingOpinion)) {
+      return new AknMultipleBlock()
+          .withBlock(
+              AknEmbeddedStructureInBlock.DecisionReasons.NAME,
+              AknEmbeddedStructureInBlock.DecisionReasons.build(
+                  JaxbHtml.build(htmlStringToObjectList(decisionReasons))))
+          .withBlock(
+              AknEmbeddedStructureInBlock.Reasons.NAME,
+              AknEmbeddedStructureInBlock.Reasons.build(
+                  JaxbHtml.build(htmlStringToObjectList(reasons))))
+          .withBlock(
+              AknEmbeddedStructureInBlock.OtherLongText.NAME,
+              AknEmbeddedStructureInBlock.OtherLongText.build(
+                  JaxbHtml.build(htmlStringToObjectList(otherLongText))))
+          .withBlock(Opinions.NAME, Opinions.build(htmlStringToObjectList(dissentingOpinion)));
+    }
+    return null;
   }
 
   private static Meta buildMeta(DocumentationUnit documentationUnit) throws ValidationException {
@@ -173,7 +207,7 @@ public class DocumentationUnitToLdmlTransformer {
       validateNotNull(documentationUnit.coreData().legalEffect(), "LegalEffect missing");
       validate(!documentationUnit.coreData().fileNumbers().isEmpty(), "FileNumber missing");
     } else {
-      throw new RuntimeException("Core data is null");
+      throw new ValidationException("Core data is null");
     }
 
     Meta.MetaBuilder builder = Meta.builder();
@@ -198,34 +232,14 @@ public class DocumentationUnitToLdmlTransformer {
   private static RisMeta buildRisMeta(DocumentationUnit documentationUnit) {
     RisMeta.RisMetaBuilder builder = RisMeta.builder();
 
-    List<RelatedDecision> previousDecision = new ArrayList<>();
-    List<RelatedDecision> ensuingDecision = new ArrayList<>();
     if (documentationUnit.previousDecisions() != null) {
-      for (PreviousDecision current : documentationUnit.previousDecisions()) {
-        RelatedDecision decision =
-            RelatedDecision.builder()
-                .date(DateUtils.toDateString(current.getDecisionDate()))
-                .documentNumber(current.getDocumentNumber())
-                .fileNumber(current.getFileNumber())
-                .courtType(nullSafeGet(current.getCourt(), Court::type))
-                .build();
-        previousDecision.add(decision);
-      }
+      applyIfNotEmpty(
+          buildRelatedDecisions(documentationUnit.previousDecisions()), builder::previousDecision);
     }
     if (documentationUnit.ensuingDecisions() != null) {
-      for (EnsuingDecision current : documentationUnit.ensuingDecisions()) {
-        RelatedDecision decision =
-            RelatedDecision.builder()
-                .date(DateUtils.toDateString(current.getDecisionDate()))
-                .documentNumber(current.getDocumentNumber())
-                .fileNumber(current.getFileNumber())
-                .courtType(nullSafeGet(current.getCourt(), Court::type))
-                .build();
-        ensuingDecision.add(decision);
-      }
+      applyIfNotEmpty(
+          buildRelatedDecisions(documentationUnit.ensuingDecisions()), builder::ensuingDecision);
     }
-    applyIfNotEmpty(previousDecision, builder::previousDecision);
-    applyIfNotEmpty(ensuingDecision, builder::ensuingDecision);
 
     var contentRelatedIndexing = documentationUnit.contentRelatedIndexing();
     if (contentRelatedIndexing != null) {
@@ -293,6 +307,22 @@ public class DocumentationUnitToLdmlTransformer {
                 nullSafeGet(lastStatus, Status::publicationStatus), PublicationStatus::toString))
         .error(lastStatus != null && lastStatus.withError())
         .build();
+  }
+
+  private static List<RelatedDecision> buildRelatedDecisions(
+      List<? extends RelatedDocumentationUnit> relatedDecisions) {
+    List<RelatedDecision> previousDecision = new ArrayList<>();
+    for (RelatedDocumentationUnit current : relatedDecisions) {
+      RelatedDecision decision =
+          RelatedDecision.builder()
+              .date(DateUtils.toDateString(current.getDecisionDate()))
+              .documentNumber(current.getDocumentNumber())
+              .fileNumber(current.getFileNumber())
+              .courtType(nullSafeGet(current.getCourt(), Court::type))
+              .build();
+      previousDecision.add(decision);
+    }
+    return previousDecision;
   }
 
   private static Identification buildIdentification(DocumentationUnit documentationUnit)

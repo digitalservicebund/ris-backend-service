@@ -16,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,8 @@ class DocumentationUnitListItemTransformerTest {
             .documentType(DocumentTypeDTO.builder().abbreviation("Urt").build())
             .fileNumbers(List.of(FileNumberDTO.builder().value("1 BvR 1234/19").build()))
             .decisionDate(LocalDate.parse("2021-01-01"))
+            .scheduledPublicationDateTime(LocalDateTime.parse("2022-01-23T18:25:14"))
+            .lastPublicationDateTime(LocalDateTime.parse("2022-01-22T18:27:18"))
             .judicialBody("1. Senat")
             .headnote("headnote")
             .creatingDocumentationOffice(
@@ -60,6 +63,10 @@ class DocumentationUnitListItemTransformerTest {
         .isEqualTo(DocumentType.builder().jurisShortcut("Urt").build());
     assertThat(documentationUnitListItem.fileNumber()).isEqualTo("1 BvR 1234/19");
     assertThat(documentationUnitListItem.decisionDate()).isEqualTo(LocalDate.parse("2021-01-01"));
+    assertThat(documentationUnitListItem.scheduledPublicationDateTime())
+        .isEqualTo(LocalDateTime.parse("2022-01-23T18:25:14"));
+    assertThat(documentationUnitListItem.lastPublicationDateTime())
+        .isEqualTo(LocalDateTime.parse("2022-01-22T18:27:18"));
     assertThat(documentationUnitListItem.appraisalBody()).isEqualTo("1. Senat");
     assertThat(documentationUnitListItem.hasHeadnoteOrPrinciple()).isTrue();
     // source and creating doc office

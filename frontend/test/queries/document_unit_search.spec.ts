@@ -100,11 +100,29 @@ test.describe("document unit search queries", () => {
       maxDuration: 450, // last max 556, average 304, min 241
       minResults: 5,
     },
+    {
+      title: "scheduled only",
+      parameter: {
+        myDocOfficeOnly: "true",
+        scheduledOnly: "true",
+      },
+      maxDuration: 500,
+      minResults: 3,
+    },
+    {
+      title: "publication date",
+      parameter: {
+        myDocOfficeOnly: "true",
+        publicationDate: "2100-11-21",
+      },
+      maxDuration: 500,
+      minResults: 3,
+    },
   ]
 
   testConfigurations.forEach((search) =>
     test(search.title, async ({ page }, testInfo) =>
-      runTestMultipleTimes(5, search, page, testInfo),
+      runTestMultipleTimes(10, search, page, testInfo),
     ),
   )
 })

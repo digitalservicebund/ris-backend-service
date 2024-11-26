@@ -17,9 +17,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.LdmlExporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
@@ -38,8 +40,10 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
+import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
@@ -92,6 +96,7 @@ class ReferenceIntegrationTest {
   @Autowired private DatabaseDocumentationUnitRepository repository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseLegalPeriodicalRepository legalPeriodicalRepository;
+  @Autowired private DatabaseDocumentTypeRepository documentTypeRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private MailService mailService;
@@ -163,6 +168,7 @@ class ReferenceIntegrationTest {
                         .citation("2024, S.3")
                         .referenceSupplement("Klammerzusatz")
                         .footnote("footnote")
+                        .referenceType(ReferenceType.CASELAW)
                         .legalPeriodical(
                             LegalPeriodical.builder()
                                 .uuid(legalPeriodical.getId())
@@ -190,6 +196,94 @@ class ReferenceIntegrationTest {
               assertThat(response.getResponseBody().references())
                   .extracting("citation", "referenceSupplement", "footnote", "id")
                   .containsExactly(tuple("2024, S.3", "Klammerzusatz", "footnote", referenceId));
+              assertThat(response.getResponseBody().references())
+                  .extracting("legalPeriodical")
+                  .usingRecursiveComparison()
+                  .isEqualTo(List.of(expectedLegalPeriodical));
+            });
+  }
+
+  @Test
+  void testLiteratureReferencesCanBeSaved() {
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, documentationOffice);
+
+    LegalPeriodicalDTO legalPeriodical =
+        legalPeriodicalRepository.save(
+            LegalPeriodicalDTO.builder()
+                .abbreviation("BVerwGE")
+                .title("Bundesverwaltungsgerichtsentscheidungen")
+                .subtitle("Entscheidungen des Bundesverwaltungsgerichts")
+                .jurisId(123)
+                .primaryReference(true)
+                .build());
+
+    LegalPeriodical expectedLegalPeriodical =
+        LegalPeriodical.builder()
+            .uuid(legalPeriodical.getId())
+            .title(legalPeriodical.getTitle())
+            .subtitle(legalPeriodical.getSubtitle())
+            .abbreviation(legalPeriodical.getAbbreviation())
+            .primaryReference(true)
+            .build();
+
+    DocumentTypeDTO documentTypeDTO =
+        documentTypeRepository.save(
+            DocumentTypeDTO.builder()
+                .label("Anmerkung")
+                .abbreviation("Ean")
+                .multiple(false)
+                .build());
+
+    DocumentType documentType =
+        DocumentType.builder()
+            .uuid(documentTypeDTO.getId())
+            .jurisShortcut(documentTypeDTO.getAbbreviation())
+            .label(documentTypeDTO.getLabel())
+            .build();
+
+    UUID referenceId = UUID.randomUUID();
+    DocumentationUnit documentationUnitFromFrontend =
+        DocumentationUnit.builder()
+            .uuid(dto.getId())
+            .documentNumber(dto.getDocumentNumber())
+            .coreData(CoreData.builder().documentationOffice(docOffice).build())
+            .references(
+                List.of(
+                    Reference.builder()
+                        .id(referenceId)
+                        .citation("2024, S.3")
+                        .author("Heinz Otto")
+                        .documentType(documentType)
+                        .referenceType(ReferenceType.LITERATURE)
+                        .legalPeriodical(
+                            LegalPeriodical.builder()
+                                .uuid(legalPeriodical.getId())
+                                .abbreviation("BVerwGE")
+                                .primaryReference(true)
+                                .build())
+                        .build()))
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
+        .bodyValue(documentationUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentationUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().documentNumber())
+                  .isEqualTo(DEFAULT_DOCUMENT_NUMBER);
+              assertThat(response.getResponseBody().references()).hasSize(1);
+              assertThat(response.getResponseBody().references())
+                  .extracting("citation", "author", "documentType", "id")
+                  .containsExactly(tuple("2024, S.3", "Heinz Otto", documentType, referenceId));
               assertThat(response.getResponseBody().references())
                   .extracting("legalPeriodical")
                   .usingRecursiveComparison()

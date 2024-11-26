@@ -1,22 +1,13 @@
 package de.bund.digitalservice.ris.caselaw.adapter.caselawldml;
 
 import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlSeeAlso;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.eclipse.persistence.oxm.annotations.XmlDiscriminatorNode;
 import org.eclipse.persistence.oxm.annotations.XmlDiscriminatorValue;
 
 @NoArgsConstructor
 @Getter
-@XmlDiscriminatorNode("@name")
-@XmlSeeAlso({
-  AknEmbeddedStructureInBlock.HeadNote.class,
-  AknEmbeddedStructureInBlock.OtherHeadNote.class,
-  AknEmbeddedStructureInBlock.Grounds.class,
-  AknEmbeddedStructureInBlock.OtherLongText.class
-})
-public abstract class AknEmbeddedStructureInBlock {
+public abstract class AknEmbeddedStructureInBlock extends AknBlock {
 
   @XmlElement(name = "embeddedStructure", namespace = CaseLawLdml.AKN_NS)
   protected JaxbHtml content;
@@ -60,16 +51,70 @@ public abstract class AknEmbeddedStructureInBlock {
   }
 
   @NoArgsConstructor
-  @XmlDiscriminatorValue(Grounds.NAME)
-  public static class Grounds extends AknEmbeddedStructureInBlock {
-    public static final String NAME = "Gründe";
+  @XmlDiscriminatorValue(Outline.NAME)
+  public static class Outline extends AknEmbeddedStructureInBlock {
+    public static final String NAME = "Gliederung";
 
-    public Grounds(JaxbHtml content) {
+    public Outline(JaxbHtml content) {
       this.content = content;
     }
 
-    public static Grounds build(JaxbHtml content) {
-      return content == null ? null : new Grounds(content);
+    public static Outline build(JaxbHtml content) {
+      return content == null ? null : new Outline(content);
+    }
+
+    public String getName() {
+      return NAME;
+    }
+  }
+
+  @NoArgsConstructor
+  @XmlDiscriminatorValue(Tenor.NAME)
+  public static class Tenor extends AknEmbeddedStructureInBlock {
+    public static final String NAME = "Tenor";
+
+    public Tenor(JaxbHtml content) {
+      this.content = content;
+    }
+
+    public static Tenor build(JaxbHtml content) {
+      return content == null ? null : new Tenor(content);
+    }
+
+    public String getName() {
+      return NAME;
+    }
+  }
+
+  @NoArgsConstructor
+  @XmlDiscriminatorValue(DecisionReasons.NAME)
+  public static class DecisionReasons extends AknEmbeddedStructureInBlock {
+    public static final String NAME = "Entscheidungsgründe";
+
+    public DecisionReasons(JaxbHtml content) {
+      this.content = content;
+    }
+
+    public static DecisionReasons build(JaxbHtml content) {
+      return content == null ? null : new DecisionReasons(content);
+    }
+
+    public String getName() {
+      return NAME;
+    }
+  }
+
+  @NoArgsConstructor
+  @XmlDiscriminatorValue(Reasons.NAME)
+  public static class Reasons extends AknEmbeddedStructureInBlock {
+    public static final String NAME = "Gründe";
+
+    public Reasons(JaxbHtml content) {
+      this.content = content;
+    }
+
+    public static Reasons build(JaxbHtml content) {
+      return content == null ? null : new Reasons(content);
     }
 
     public String getName() {

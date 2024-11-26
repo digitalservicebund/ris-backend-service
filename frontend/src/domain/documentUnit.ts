@@ -109,6 +109,11 @@ export const longTextLabels: {
   outline: "Gliederung",
 }
 
+export type ManagementData = {
+  scheduledPublicationDateTime?: string
+  borderNumbers: string[]
+}
+
 export type DocumentationUnitParameters = {
   documentationOffice?: DocumentationOffice
   documentType?: DocumentType
@@ -131,10 +136,10 @@ export default class DocumentUnit {
   public previousDecisions?: PreviousDecision[]
   public ensuingDecisions?: EnsuingDecision[]
   public contentRelatedIndexing: ContentRelatedIndexing = {}
-  public borderNumbers: string[] = []
   public note: string = ""
   public references?: Reference[]
   public isEditable: boolean = false
+  public managementData: ManagementData = { borderNumbers: [] }
 
   static readonly requiredFields = [
     "fileNumbers",
@@ -166,6 +171,15 @@ export default class DocumentUnit {
     for (longTextsField in data.longTexts) {
       if (data.longTexts && data.longTexts[longTextsField] === null)
         delete data.longTexts[longTextsField]
+    }
+
+    let managementDataField: keyof ManagementData
+    for (managementDataField in data.managementData) {
+      if (
+        data.managementData &&
+        data.managementData[managementDataField] === null
+      )
+        delete data.managementData[managementDataField]
     }
 
     if (data.longTexts?.participatingJudges)

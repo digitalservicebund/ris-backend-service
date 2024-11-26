@@ -8,6 +8,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class UserGroupsConfig {
 
+  public static final String BGH = "BGH";
+  public static final String BVERWG = "BVerwG";
+  public static final String DS = "DS";
+
   /**
    * Caution: Changing values will delete and recreate the affected group in our database. This
    * means all references to the affected group will be deleted, e.g., the links of the affected
@@ -17,22 +21,22 @@ public class UserGroupsConfig {
   public List<UserGroupFromConfig> getDocumentationOfficeConfigUserGroups() {
     return List.of(
         UserGroupFromConfig.builder()
-            .docOfficeAbbreviation("BGH")
+            .docOfficeAbbreviation(BGH)
             .userGroupPathName("/caselaw/BGH")
             .isInternal(true)
             .build(),
         UserGroupFromConfig.builder()
-            .docOfficeAbbreviation("BGH")
+            .docOfficeAbbreviation(BGH)
             .userGroupPathName("/caselaw/BGH/Intern")
             .isInternal(true)
             .build(),
         UserGroupFromConfig.builder()
-            .docOfficeAbbreviation("BGH")
+            .docOfficeAbbreviation(BGH)
             .userGroupPathName("/caselaw/BGH/Extern/Miotke")
             .isInternal(false)
             .build(),
         UserGroupFromConfig.builder()
-            .docOfficeAbbreviation("BGH")
+            .docOfficeAbbreviation(BGH)
             .userGroupPathName("/caselaw/BGH/Extern/Innodata")
             .isInternal(false)
             .build(),
@@ -62,22 +66,22 @@ public class UserGroupsConfig {
             .isInternal(true)
             .build(),
         UserGroupFromConfig.builder()
-            .docOfficeAbbreviation("BVerwG")
+            .docOfficeAbbreviation(BVERWG)
             .userGroupPathName("/caselaw/BVerwG")
             .isInternal(true)
             .build(),
         UserGroupFromConfig.builder()
-            .docOfficeAbbreviation("BVerwG")
+            .docOfficeAbbreviation(BVERWG)
             .userGroupPathName("/caselaw/BVerwG/Intern")
             .isInternal(true)
             .build(),
         UserGroupFromConfig.builder()
-            .docOfficeAbbreviation("BVerwG")
+            .docOfficeAbbreviation(BVERWG)
             .userGroupPathName("/caselaw/BVerwG/Extern/ErsterDienstleister")
             .isInternal(false)
             .build(),
         UserGroupFromConfig.builder()
-            .docOfficeAbbreviation("BVerwG")
+            .docOfficeAbbreviation(BVERWG)
             .userGroupPathName("/caselaw/BVerwG/Extern/ZweiterDienstleister")
             .isInternal(false)
             .build(),
@@ -92,17 +96,17 @@ public class UserGroupsConfig {
             .isInternal(true)
             .build(),
         UserGroupFromConfig.builder()
-            .docOfficeAbbreviation("DS")
+            .docOfficeAbbreviation(DS)
             .userGroupPathName("/DS")
             .isInternal(true)
             .build(),
         UserGroupFromConfig.builder()
-            .docOfficeAbbreviation("DS")
+            .docOfficeAbbreviation(DS)
             .userGroupPathName("/DS/Intern")
             .isInternal(true)
             .build(),
         UserGroupFromConfig.builder()
-            .docOfficeAbbreviation("DS")
+            .docOfficeAbbreviation(DS)
             .userGroupPathName("/DS/Extern")
             .isInternal(false)
             .build(),

@@ -31,6 +31,25 @@ public class PostgresDocumentTypeRepositoryImpl implements DocumentTypeRepositor
   }
 
   @Override
+  public List<DocumentType> findDependentLiteratureBySearchStr(String searchString) {
+    return repository
+        .findCaselawBySearchStrAndCategory(
+            searchString, categoryRepository.findFirstByLabel("U").getId())
+        .stream()
+        .map(DocumentTypeTransformer::transformToDomain)
+        .toList();
+  }
+
+  @Override
+  public List<DocumentType> findAllDependentLiteratureOrderByAbbreviationAscLabelAsc() {
+    return repository
+        .findAllByCategoryOrderByAbbreviationAscLabelAsc(categoryRepository.findFirstByLabel("U"))
+        .stream()
+        .map(DocumentTypeTransformer::transformToDomain)
+        .toList();
+  }
+
+  @Override
   public Optional<DocumentType> findUniqueCaselawBySearchStr(String searchString) {
     return repository
         .findUniqueCaselawBySearchStrAndCategory(

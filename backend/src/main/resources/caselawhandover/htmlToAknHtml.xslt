@@ -143,8 +143,8 @@
 
     <!--Unfortunately the common parent select can't be shared with text.
     Unsupported text locations are wrapped in a <akn:p>-->
-    <xsl:template match="akn:arguments/text()|akn:background/text()|akn:decision/text()|akn:embeddedStructure/text()
-    |akn:introduction/text()|akn:motivation/text()|akn:subFlow/text()|div/text()">
+    <xsl:template match="akn:header/text()|akn:motivation/text()|akn:introduction/text()|akn:background/text()
+    |akn:decision/text()|akn:embeddedStructure/text()|akn:subFlow/text()|div/text()">
         <akn:p alternativeTo="textWrapper">
             <xsl:value-of select="."/>
         </akn:p>
@@ -333,7 +333,7 @@
     <!--Identity transformation for known cases-->
     <xsl:template match="akn:akomaNtoso|akn:judgment|akn:judgmentBody|akn:meta|akn:header|akn:introduction
     |akn:identification|akn:classification|akn:proprietary|akn:block|akn:keyword|akn:background
-    |akn:decision|akn:arguments|akn:motivation|akn:opinion|akn:embeddedStructure|akn:docTitle|akn:subFlow
+    |akn:decision|akn:motivation|akn:opinion|akn:embeddedStructure|akn:subFlow
     |akn:FRBRWork|akn:FRBRExpression|akn:FRBRManifestation
     |akn:FRBRthis|akn:FRBRuri|akn:FRBRalias|akn:FRBRdate|akn:FRBRauthor|akn:FRBRcountry|akn:FRBRlanguage
     |ris:meta|ris:fileNumbers|ris:fileNumber|ris:documentType|ris:courtLocation|ris:courtType|ris:legalEffect
