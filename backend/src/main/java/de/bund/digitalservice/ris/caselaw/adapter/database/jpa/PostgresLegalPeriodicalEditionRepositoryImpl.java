@@ -106,11 +106,12 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
     for (UUID reference : oldEdition.get().getReferences()) {
       // skip all existing and null references
       var referenceDTO = referenceRepository.findById(reference);
-      if (updatedEdition.references().stream()
-          .anyMatch(
-              newReference -> newReference.id().equals(reference) || referenceDTO.isEmpty())) {
+      if (referenceDTO.isEmpty()
+          || updatedEdition.references().stream()
+              .anyMatch(newReference -> newReference.id().equals(reference))) {
         continue;
       }
+
       // delete all deleted references and possible source reference
       documentationUnitRepository
           .findById(referenceDTO.get().getDocumentationUnit().getId())
