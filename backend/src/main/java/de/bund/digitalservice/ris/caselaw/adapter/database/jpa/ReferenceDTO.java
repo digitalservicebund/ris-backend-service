@@ -54,6 +54,11 @@ public class ReferenceDTO {
   @NotNull
   private String legalPeriodicalRawValue;
 
-  @OneToMany(mappedBy = "reference", cascade = CascadeType.REMOVE)
+  @OneToMany(cascade = CascadeType.REMOVE)
+  @JoinColumn(
+      name = "reference_id",
+      referencedColumnName = "id",
+      insertable = false,
+      updatable = false)
   private List<EditionReferenceDTO> editionReferences;
 }

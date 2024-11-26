@@ -1,41 +1,44 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DependentLiteratureCitationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.domain.DependentLiteratureCitationType;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class ReferenceTransformer {
-  public static Reference transformToDomain(ReferenceDTO referenceDTO) {
-    if (referenceDTO == null) {
+public class DependentLiteratureTransformer {
+  public static Reference transformToDomain(DependentLiteratureCitationDTO literatureCitationDTO) {
+    if (literatureCitationDTO == null) {
       return null;
     }
     LegalPeriodical legalPeriodical = null;
 
-    if (referenceDTO.getLegalPeriodical() != null) {
+    if (literatureCitationDTO.getLegalPeriodical() != null) {
       legalPeriodical =
-          LegalPeriodicalTransformer.transformToDomain(referenceDTO.getLegalPeriodical());
+          LegalPeriodicalTransformer.transformToDomain(literatureCitationDTO.getLegalPeriodical());
     }
 
     return Reference.builder()
-        .id(referenceDTO.getId())
-        .referenceSupplement(referenceDTO.getReferenceSupplement())
+        .id(literatureCitationDTO.getId())
+        .author(literatureCitationDTO.getAuthor())
+        .documentType(
+            DocumentTypeTransformer.transformToDomain(literatureCitationDTO.getDocumentType()))
         .legalPeriodical(legalPeriodical)
-        .legalPeriodicalRawValue(referenceDTO.getLegalPeriodicalRawValue())
-        .citation(referenceDTO.getCitation())
-        .footnote(referenceDTO.getFootnote())
-        .referenceType(ReferenceType.CASELAW)
+        .legalPeriodicalRawValue(literatureCitationDTO.getLegalPeriodicalRawValue())
+        .citation(literatureCitationDTO.getCitation())
+        .referenceType(ReferenceType.LITERATURE)
         .documentationUnit(
             RelatedDocumentationUnitTransformer.transformToDomain(
-                referenceDTO.getDocumentationUnit()))
+                literatureCitationDTO.getDocumentationUnit()))
         .build();
   }
 
-  public static ReferenceDTO transformToDTO(Reference reference) {
+  public static DependentLiteratureCitationDTO transformToDTO(Reference reference) {
     LegalPeriodicalDTO legalPeriodicalDTO = null;
     String legalPeriodicalRawValue = null;
 
@@ -50,16 +53,23 @@ public class ReferenceTransformer {
           DocumentationUnitDTO.builder().id(reference.documentationUnit().getUuid()).build();
     }
 
-    return ReferenceDTO.builder()
+    DocumentTypeDTO documentType = null;
+    if (reference.documentType() != null) {
+      documentType = DocumentTypeTransformer.transformToDTO(reference.documentType());
+    }
+
+    return DependentLiteratureCitationDTO.builder()
         .id(reference.id())
-        .referenceSupplement(reference.referenceSupplement())
-        .legalPeriodical(legalPeriodicalDTO)
+        .author(reference.author())
         .citation(reference.citation())
-        .footnote(reference.footnote())
+        .documentType(documentType)
         .legalPeriodicalRawValue(
             legalPeriodicalRawValue != null
                 ? legalPeriodicalRawValue
                 : reference.legalPeriodicalRawValue())
+        .legalPeriodical(legalPeriodicalDTO)
+        .type(DependentLiteratureCitationType.PASSIVE)
+        .documentTypeRawValue(documentType.getAbbreviation())
         .documentationUnit(documentationUnitDTO)
         .build();
   }

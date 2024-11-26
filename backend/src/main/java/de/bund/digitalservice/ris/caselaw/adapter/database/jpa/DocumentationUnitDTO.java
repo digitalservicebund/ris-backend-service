@@ -292,6 +292,11 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @OrderBy("rank")
   private List<ReferenceDTO> references = new ArrayList<>();
 
+  @OneToMany(mappedBy = "documentationUnit", cascade = CascadeType.ALL, orphanRemoval = true)
+  @Builder.Default
+  @OrderBy("rank")
+  private List<DependentLiteratureCitationDTO> dependentLiteratureCitations = new ArrayList<>();
+
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @OrderBy("rank")

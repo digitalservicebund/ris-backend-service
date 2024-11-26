@@ -52,35 +52,34 @@ public class LegalPeriodicalEditionDTO {
   private List<EditionReferenceDTO> editionReferences = new ArrayList<>();
 
   // Methods to get references and literature citations
-  //  public List<DependentLiteratureCitationDTO> getLiteratureCitations() {
-  //    return editionReferences.stream()
-  //        .filter(ref -> "literature".equals(ref.getDtype()))
-  //        .map(EditionReferenceDTO::getLiteratureCitation)
-  //        .collect(Collectors.toList());
-  //  }
-
-  public List<ReferenceDTO> getReferences() {
+  public List<UUID> getLiteratureCitations() {
     return editionReferences.stream()
-        .filter(ref -> "reference".equals(ref.getDtype()))
-        .map(EditionReferenceDTO::getReference)
+        .filter(ref -> "literature".equals(ref.getDtype()))
+        .map(EditionReferenceDTO::getReferenceId)
         .collect(Collectors.toList());
   }
 
-  //
-  //  public void setLiteratureCitations(List<DependentLiteratureCitationDTO> literatureCitations) {
-  //    // Remove existing literature citations
-  //    editionReferences.removeIf(ref -> "literature".equals(ref.getDtype()));
-  //
-  //    // Add new literature citations with updated rank
-  //    for (DependentLiteratureCitationDTO citation : literatureCitations) {
-  //      EditionReferenceDTO editionReference = new EditionReferenceDTO();
-  //      editionReference.setEdition(this);
-  //      editionReference.setLiteratureCitation(citation);
-  //      editionReference.setRank(citation.getRank());
-  //      editionReference.setDtype("literature");
-  //      editionReferences.add(editionReference);
-  //    }
-  //  }
+  public List<UUID> getReferences() {
+    return editionReferences.stream()
+        .filter(ref -> "reference".equals(ref.getDtype()))
+        .map(EditionReferenceDTO::getReferenceId)
+        .collect(Collectors.toList());
+  }
+
+  public void setLiteratureCitations(List<DependentLiteratureCitationDTO> literatureCitations) {
+    // Remove existing literature citations
+    editionReferences.removeIf(ref -> "literature".equals(ref.getDtype()));
+
+    // Add new literature citations with updated rank
+    for (DependentLiteratureCitationDTO citation : literatureCitations) {
+      EditionReferenceDTO editionReference = new EditionReferenceDTO();
+      editionReference.setEdition(this);
+      editionReference.setReferenceId(citation.getId());
+      editionReference.setRank(citation.getRank());
+      editionReference.setDtype("literature");
+      editionReferences.add(editionReference);
+    }
+  }
 
   public void setReferences(List<ReferenceDTO> references) {
     // Remove existing references
@@ -89,7 +88,7 @@ public class LegalPeriodicalEditionDTO {
     // Add new references with updated rank
     for (ReferenceDTO reference : references) {
       EditionReferenceDTO editionReference = new EditionReferenceDTO();
-      editionReference.setReference(reference);
+      editionReference.setReferenceId(reference.getId());
       editionReference.setRank(reference.getRank());
       editionReference.setDtype("reference");
       editionReference.setEdition(this);

@@ -13,6 +13,7 @@ import errorMessages from "@/i18n/errors.json"
 
 enum Endpoint {
   documentTypes = "documenttypes",
+  dependentLiteratureDocumentTypes = "documenttypes/dependent-literature",
   courts = "courts",
   citationTypes = "citationtypes",
   fieldOfLawSearchByIdentifier = "fieldsoflaw/search-by-identifier",
@@ -29,7 +30,8 @@ function formatDropdownItems(
   endpoint: Endpoint,
 ): ComboboxItem[] {
   switch (endpoint) {
-    case Endpoint.documentTypes: {
+    case Endpoint.documentTypes:
+    case Endpoint.dependentLiteratureDocumentTypes: {
       return (responseData as DocumentType[]).map((item) => ({
         label: item.label,
         value: item,
@@ -153,6 +155,8 @@ const service: ComboboxItemService = {
     await fetchFromEndpoint(Endpoint.courts, filter),
   getDocumentTypes: async (filter?: string) =>
     await fetchFromEndpoint(Endpoint.documentTypes, filter),
+  getDependentLiteratureDocumentTypes: async (filter?: string) =>
+    await fetchFromEndpoint(Endpoint.dependentLiteratureDocumentTypes, filter),
   getFieldOfLawSearchByIdentifier: async (filter?: string) =>
     await fetchFromEndpoint(Endpoint.fieldOfLawSearchByIdentifier, filter),
   getRisAbbreviations: async (filter?: string) =>

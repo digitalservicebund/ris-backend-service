@@ -572,6 +572,107 @@ test.describe(
       },
     )
 
+    test(
+      "Literature references can be added to periodical evaluation",
+      {
+        tag: "@RISDEV-5236 @RISDEV-5454",
+      },
+      async ({ page, editionWithReferences, prefilledDocumentUnit }) => {
+        const fileNumber = prefilledDocumentUnit.coreData.fileNumbers?.[0] || ""
+        await test.step("Caselaw reference type is preselected", async () => {
+          await navigateToPeriodicalReferences(
+            page,
+            editionWithReferences.id || "",
+          )
+
+          await expect(
+            page.getByLabel("Rechtsprechung Fundstelle"),
+          ).toBeChecked()
+
+          await expect(
+            page.getByLabel("Literatur Fundstelle"),
+          ).not.toBeChecked()
+
+          await expect(page.getByLabel("Klammernzusatz")).toBeVisible()
+
+          await expect(
+            page.getByLabel("Dokumenttyp Literaturfundstelle"),
+          ).toBeHidden()
+
+          await expect(
+            page.getByLabel("Autor Literaturfundstelle"),
+          ).toBeHidden()
+        })
+
+        await test.step("Selecting literature reference type, renders different inputs", async () => {
+          await page.getByLabel("Literatur Fundstelle").click()
+          await expect(
+            page.getByLabel("Rechtsprechung Fundstelle"),
+          ).not.toBeChecked()
+
+          await expect(page.getByLabel("Literatur Fundstelle")).toBeChecked()
+
+          await expect(page.getByLabel("Klammernzusatz")).toBeHidden()
+
+          await expect(
+            page.getByLabel("Dokumenttyp Literaturfundstelle"),
+          ).toBeVisible()
+
+          await expect(
+            page.getByLabel("Autor Literaturfundstelle"),
+          ).toBeVisible()
+        })
+
+        await test.step("Literature references are validated for required inputs", async () => {
+          await fillInput(page, "Zitatstelle *", `2021, 2`)
+
+          await searchForDocUnitWithFileNumber(page, fileNumber, "31.12.2019")
+          await page.getByLabel("Treffer übernehmen").click()
+          // check that both fields display error message
+          await expect(
+            page.locator("text=Pflichtfeld nicht befüllt"),
+          ).toHaveCount(2)
+
+          // Switching between radio buttons resets the validation errors
+          await page.getByLabel("Rechtsprechung Fundstelle").click()
+          await page.getByLabel("Literatur Fundstelle").click()
+          await expect(
+            page.locator("text=Pflichtfeld nicht befüllt"),
+          ).toHaveCount(0)
+        })
+
+        await test.step("Save literature reference, verify that it is shown in the list", async () => {
+          await fillInput(page, "Autor Literaturfundstelle", "Bilen, Ulviye")
+          await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
+          await page.getByText("Ean", { exact: true }).click()
+          await waitForInputValue(
+            page,
+            "[aria-label='Dokumenttyp Literaturfundstelle']",
+            "Anmerkung",
+          )
+
+          await searchForDocUnitWithFileNumber(page, fileNumber, "31.12.2019")
+          await page.getByLabel("Treffer übernehmen").click()
+          await expect(
+            page.getByText("Bilen, Ulviye, MMG 2024, 2021, 2, Heft 1 (Ean)"),
+          ).toBeVisible()
+        })
+
+        // await test.step("Literature reference are shown in correct order", async () => {
+
+        // })
+
+        await test.step("Radio buttons should not be visible after saving", async () => {
+          await page.getByTestId("list-entry-0").click()
+          await expect(
+            page.getByLabel("Rechtsprechung Fundstelle"),
+          ).toBeHidden()
+
+          await expect(page.getByLabel("Literatur Fundstelle")).toBeHidden()
+        })
+      },
+    )
+
     // Flaky, needs some clarification
     // eslint-disable-next-line playwright/no-skipped-test
     test.skip(

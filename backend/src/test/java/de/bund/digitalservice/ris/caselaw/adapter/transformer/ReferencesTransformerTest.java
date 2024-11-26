@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
+import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import java.util.List;
 import java.util.UUID;
@@ -38,6 +39,7 @@ class ReferencesTransformerTest {
                 .citation("2024, 123")
                 .footnote("footnote")
                 .referenceSupplement("Klammerzusatz")
+                .referenceType(ReferenceType.CASELAW)
                 .documentationUnit(createTestRelatedDocument())
                 .legalPeriodical(createTestLegalPeriodical())
                 .build()),
@@ -55,6 +57,7 @@ class ReferencesTransformerTest {
                 .citation("2024, 123")
                 .footnote("footnote")
                 .referenceSupplement("Klammerzusatz")
+                .referenceType(ReferenceType.CASELAW)
                 .legalPeriodicalRawValue("LPA")
                 .documentationUnit(createTestRelatedDocument())
                 .build()));
@@ -87,6 +90,7 @@ class ReferencesTransformerTest {
                 .citation("2024, S.5")
                 .footnote("a footnote")
                 .referenceSupplement("Klammerzusatz")
+                .referenceType(ReferenceType.CASELAW)
                 .build(),
             ReferenceDTO.builder()
                 .id(referenceId)
@@ -114,6 +118,7 @@ class ReferencesTransformerTest {
                         .primaryReference(true)
                         .build())
                 .citation("2024, S.5")
+                .referenceType(ReferenceType.CASELAW)
                 .build(),
             ReferenceDTO.builder()
                 .rank(1)
@@ -136,6 +141,7 @@ class ReferencesTransformerTest {
                         .primaryReference(false)
                         .build())
                 .citation("2024, S.5")
+                .referenceType(ReferenceType.CASELAW)
                 .build(),
             ReferenceDTO.builder()
                 .rank(1)
@@ -150,7 +156,11 @@ class ReferencesTransformerTest {
                 .build()),
         // possible with no legalPeriodical
         Arguments.of(
-            Reference.builder().citation("2024, S.5").legalPeriodicalRawValue("ABC").build(),
+            Reference.builder()
+                .citation("2024, S.5")
+                .legalPeriodicalRawValue("ABC")
+                .referenceType(ReferenceType.CASELAW)
+                .build(),
             ReferenceDTO.builder()
                 .rank(1)
                 .citation("2024, S.5")

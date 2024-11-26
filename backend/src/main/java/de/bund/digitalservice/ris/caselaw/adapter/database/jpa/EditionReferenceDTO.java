@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -35,11 +34,6 @@ public class EditionReferenceDTO {
   @JoinColumn(name = "edition_id", nullable = false)
   private LegalPeriodicalEditionDTO edition;
 
-  //  @ManyToOne
-  //  @JoinColumn(name = "reference_id", insertable = false, updatable = false)
-  //  private DependentLiteratureCitationDTO literatureCitation;
-
-  @ManyToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "reference_id")
-  private ReferenceDTO reference;
+  @Column(name = "reference_id")
+  private UUID referenceId;
 }
