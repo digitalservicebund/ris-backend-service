@@ -82,6 +82,7 @@ export enum InputMethod {
         <InputField
           id="direct"
           label="Direkteingabe"
+          label-class="ds-label-01-reg"
           :label-position="LabelPosition.RIGHT"
           @click="() => (inputMethod = InputMethod.DIRECT)"
         >
@@ -97,6 +98,7 @@ export enum InputMethod {
         <InputField
           id="search"
           label="Suche"
+          label-class="ds-label-01-reg"
           :label-position="LabelPosition.RIGHT"
           @click="() => (inputMethod = InputMethod.SEARCH)"
         >
