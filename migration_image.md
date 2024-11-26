@@ -5,13 +5,18 @@
 The following job is importing the minimally required data (refdata and juris tables)
 
 To be able to pull the `ris-data-migration` image, log in to the GitHub Package Repository using your username and a
-credential
-token stored in 1Password (1PW):
+credential token stored in 1Password (1PW):
+
+If you don't have a personal access token, read here on how to
+generate [one](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic).
 
 ```shell
-export CR_PAT=ghp_... # Replace with your personal access token
+export CR_PAT=$(op read op://Employee/CR_PAT/password)
 echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin # Replace USERNAME with your GitHub username
 ```
+
+The following step requires an OTC access token, read here for
+more [info](https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/#step-2-obtain-access_key-credentials).
 
 To connect to your S3 bucket, ensure your AWS credentials are stored in 1Password, and then set the following
 environment variables in your shell:
