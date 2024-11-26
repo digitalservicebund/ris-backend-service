@@ -151,6 +151,7 @@ public class DocumentationUnitTransformer {
       var managementData = updatedDomainObject.managementData();
 
       builder.scheduledPublicationDateTime(managementData.scheduledPublicationDateTime());
+      builder.lastPublicationDateTime(managementData.lastPublicationDateTime());
     }
 
     addReferences(updatedDomainObject, builder);

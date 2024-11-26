@@ -157,6 +157,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.1")
+    implementation("org.jobrunr:jobrunr-spring-boot-3-starter:7.3.2")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.3")
 
@@ -198,7 +199,7 @@ dependencies {
     // implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.10.19.jar"))
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
-    
+
     implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.29")
     // for local development:
     // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.28.jar"))
