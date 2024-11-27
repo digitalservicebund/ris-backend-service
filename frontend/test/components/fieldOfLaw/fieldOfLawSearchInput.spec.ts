@@ -34,17 +34,17 @@ describe("FieldOfLawSearchInput", () => {
     expect(screen.getByText("Bezeichnung")).toBeInTheDocument()
     expect(screen.getByText("Norm")).toBeInTheDocument()
 
-    expect(screen.getByLabelText("Sachgebiet Direkteingabe")).toHaveValue(
-      "AR-01-01",
+    expect(screen.getByLabelText("Sachgebietskürzel")).toHaveValue("AR-01-01")
+    expect(screen.getByLabelText("Sachgebietsbezeichnung")).toHaveValue(
+      "Kurzarbeit",
     )
-    expect(screen.getByLabelText("Sachgebiet Suche")).toHaveValue("Kurzarbeit")
-    expect(screen.getByLabelText("Sachgebiet Norm")).toHaveValue("BGB")
+    expect(screen.getByLabelText("Sachgebietsnorm")).toHaveValue("BGB")
   })
 
   it("click on search button emit 'search'", async () => {
     const { emitted } = renderComponent(undefined, undefined, undefined)
 
-    await fireEvent.click(screen.getByLabelText("Suchen"))
+    await fireEvent.click(screen.getByLabelText("Sachgebietssuche ausführen"))
 
     expect(emitted()["search"]).toBeTruthy()
   })
@@ -52,10 +52,7 @@ describe("FieldOfLawSearchInput", () => {
   it("type in identifier input field should emit 'update:identifier'", async () => {
     const { emitted, user } = renderComponent(undefined, undefined, undefined)
 
-    await user.type(
-      screen.getByLabelText("Sachgebiet Direkteingabe"),
-      "AR-02-02",
-    )
+    await user.type(screen.getByLabelText("Sachgebietskürzel"), "AR-02-02")
 
     expect(emitted()["update:identifier"]).toBeTruthy()
   })
@@ -63,7 +60,7 @@ describe("FieldOfLawSearchInput", () => {
   it("type in description input field should emit 'update:identifier'", async () => {
     const { emitted, user } = renderComponent(undefined, undefined, undefined)
 
-    await user.type(screen.getByLabelText("Sachgebiet Suche"), "kurz")
+    await user.type(screen.getByLabelText("Sachgebietsbezeichnung"), "kurz")
 
     expect(emitted()["update:description"]).toBeTruthy()
   })
@@ -71,7 +68,7 @@ describe("FieldOfLawSearchInput", () => {
   it("type in norm input field should emit 'update:norm'", async () => {
     const { emitted, user } = renderComponent(undefined, undefined, undefined)
 
-    await user.type(screen.getByLabelText("Sachgebiet Norm"), "BGB")
+    await user.type(screen.getByLabelText("Sachgebietsnorm"), "BGB")
 
     expect(emitted()["update:norm"]).toBeTruthy()
   })
