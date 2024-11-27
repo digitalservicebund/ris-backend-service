@@ -1,37 +1,38 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
-import { NodeHelperInterface } from "@/components/fieldOfLawNode"
+import { NodeHelperInterface } from "@/components/field-of-law/fieldOfLawNode"
 import FlexContainer from "@/components/FlexContainer.vue"
 import Checkbox from "@/components/input/CheckboxInput.vue"
-import TokenizeText from "@/components/TokenizeText.vue"
+import Tooltip from "@/components/Tooltip.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
-import IconAdd from "~icons/ic/baseline-add"
-import IconHorizontalRule from "~icons/ic/baseline-horizontal-rule"
+import IconArrowDown from "~icons/ic/baseline-keyboard-arrow-down"
+import IconArrowUp from "~icons/ic/baseline-keyboard-arrow-up"
 
 interface Props {
   node: FieldOfLaw
   modelValue: FieldOfLaw[]
   showNorms: boolean
   nodeHelper: NodeHelperInterface
+  searchResults?: FieldOfLaw[]
   expandValues: FieldOfLaw[]
   isRoot?: boolean
   rootChild?: boolean
-  selectedNode?: FieldOfLaw
+  nodeOfInterest?: FieldOfLaw
 }
 
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  "node:select": [node: FieldOfLaw]
-  "node:unselect": [node: FieldOfLaw]
+  "node:add": [node: FieldOfLaw]
+  "node:remove": [node: FieldOfLaw]
   "node:expand": [node: FieldOfLaw]
   "node:collapse": [node: FieldOfLaw]
-  "linked-field:select": [node: FieldOfLaw]
-  "selected-node:reset": []
+  "node-of-interest:reset": []
 }>()
 
 const isExpanded = ref(false)
 const children = ref<FieldOfLaw[]>([])
+const isSearchCandidate = ref<boolean>(false)
 const isSelected = computed({
   get: () =>
     props.modelValue.some(
@@ -39,9 +40,9 @@ const isSelected = computed({
     ),
   set: (value) => {
     if (value) {
-      emit("node:select", props.node)
+      emit("node:add", props.node)
     } else {
-      emit("node:unselect", props.node)
+      emit("node:remove", props.node)
     }
   },
 })
@@ -52,8 +53,8 @@ function toggleExpanded() {
     emit("node:expand", props.node)
   } else {
     emit("node:collapse", props.node)
-    if (props.selectedNode && props.rootChild) {
-      emit("selected-node:reset")
+    if (props.nodeOfInterest && props.rootChild) {
+      emit("node-of-interest:reset")
     }
   }
 }
@@ -61,11 +62,9 @@ function toggleExpanded() {
 watch(
   props,
   () => {
-    if (props.expandValues.length > 0) {
-      isExpanded.value = props.expandValues.some(
-        (expandedNode) => expandedNode.identifier == props.node.identifier,
-      )
-    }
+    isExpanded.value = props.expandValues.some(
+      (expandedNode) => expandedNode.identifier == props.node.identifier,
+    )
   },
   { immediate: true },
 )
@@ -73,7 +72,7 @@ watch(
 watch(
   props,
   async () => {
-    if (props.selectedNode && props.isRoot) {
+    if (props.nodeOfInterest && props.isRoot) {
       children.value = await props.nodeHelper.getFilteredChildren(
         props.node,
         props.expandValues,
@@ -84,6 +83,23 @@ watch(
   },
   { immediate: true },
 )
+
+watch(
+  () => props.searchResults,
+  async (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+      if (newValue) {
+        isSearchCandidate.value = newValue
+          .map((item) => item.identifier)
+          .includes(props.node.identifier)
+      } else {
+        isSearchCandidate.value = false
+      }
+    }
+  },
+  { immediate: true },
+)
+
 watch(
   isExpanded,
   async () => {
@@ -97,27 +113,31 @@ watch(
 
 <template>
   <FlexContainer flex-direction="flex-col">
-    <FlexContainer class="min-h-[32px]" flex-direction="flex-row">
+    <FlexContainer class="min-h-36" flex-direction="flex-row">
       <div v-if="node.hasChildren">
-        <div v-if="isExpanded" class="w-[1.3333em] min-w-[1.3333em]">
-          <button
-            id="minus-button"
-            :aria-label="node.text + ' einklappen'"
-            class="w-icon rounded-full bg-blue-200 text-blue-800"
-            @click="toggleExpanded"
-          >
-            <IconHorizontalRule />
-          </button>
+        <div v-if="isExpanded">
+          <Tooltip text="Zuklappen">
+            <button
+              id="collapse-button"
+              :aria-label="node.text + ' einklappen'"
+              class="w-icon rounded-full bg-blue-200 text-blue-800"
+              @click="toggleExpanded"
+            >
+              <IconArrowUp />
+            </button>
+          </Tooltip>
         </div>
         <div v-else>
-          <button
-            id="plus-button"
-            :aria-label="node.text + ' aufklappen'"
-            class="w-icon rounded-full bg-blue-200 text-blue-800"
-            @click="toggleExpanded"
-          >
-            <IconAdd />
-          </button>
+          <Tooltip text="Aufklappen">
+            <button
+              id="expand-button"
+              :aria-label="node.text + ' aufklappen'"
+              class="w-icon rounded-full bg-blue-200 text-blue-800"
+              @click="toggleExpanded"
+            >
+              <IconArrowDown />
+            </button>
+          </Tooltip>
         </div>
       </div>
       <span v-else class="pl-[1.3333em]" />
@@ -131,27 +151,23 @@ watch(
             node.text +
             (isSelected ? ' entfernen' : ' hinzufügen')
           "
-          class="ds-checkbox-mini ml-8 bg-white"
+          class="ds-checkbox-mini ml-12 bg-white"
           :data-testid="`field-of-law-node-${node.identifier}`"
         />
       </div>
 
       <div>
         <div class="flex flex-col">
-          <div class="flex flex-row">
-            <div
-              v-if="!props.isRoot"
-              class="whitespace-nowrap pl-8 text-[16px]"
-            >
-              {{ node.identifier }}
+          <div class="ds-label-02-reg flex flex-row">
+            <div v-if="!props.isRoot" class="pl-6">
+              <span
+                class="whitespace-nowrap p-2"
+                :class="isSearchCandidate ? 'bg-yellow-300' : ''"
+              >
+                {{ node.identifier }} |
+              </span>
             </div>
-            <div class="pl-6 pt-2 text-[14px] text-blue-800">
-              <TokenizeText
-                :keywords="props.node.linkedFields ?? []"
-                :text="props.node.text"
-                @linked-field:select="emit('linked-field:select', $event)"
-              />
-            </div>
+            {{ node.text }}
           </div>
         </div>
         <FlexContainer
@@ -173,7 +189,7 @@ watch(
       </div>
     </FlexContainer>
     <div v-if="isExpanded">
-      <FieldOfLawNodeComponent
+      <FieldOfLawTreeNode
         v-for="child in children"
         :key="child.identifier"
         class="pl-36"
@@ -182,15 +198,15 @@ watch(
         :model-value="modelValue"
         :node="child"
         :node-helper="nodeHelper"
+        :node-of-interest="nodeOfInterest"
         :root-child="props.isRoot"
-        :selected-node="selectedNode"
+        :search-results="searchResults"
         :show-norms="showNorms"
-        @linked-field:select="emit('linked-field:select', $event)"
+        @node-of-interest:reset="emit('node-of-interest:reset')"
+        @node:add="emit('node:add', $event)"
         @node:collapse="emit('node:collapse', $event)"
         @node:expand="emit('node:expand', $event)"
-        @node:select="emit('node:select', $event)"
-        @node:unselect="emit('node:unselect', $event)"
-        @selected-node:reset="emit('selected-node:reset')"
+        @node:remove="emit('node:remove', $event)"
       />
     </div>
   </FlexContainer>

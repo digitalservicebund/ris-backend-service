@@ -41,6 +41,8 @@ const emit = defineEmits<{
   removeEntry: [value: Reference]
 }>()
 
+const containerRef = ref<HTMLElement | null>(null)
+
 const store = useEditionStore()
 const reference = ref<Reference>(new Reference({ ...props.modelValue }))
 const validationStore = useValidationStore()
@@ -103,6 +105,17 @@ function updateDateFormatValidation(
   if (validationError)
     validationStore.add(validationError.message, "decisionDate")
   else validationStore.remove("decisionDate")
+}
+
+/**
+ * In case of validation errors it will scroll  back to input fields
+ */
+function scrollToTopPosition() {
+  if (containerRef.value) {
+    containerRef.value.scrollIntoView({
+      block: "start",
+    })
+  }
 }
 
 async function search() {
@@ -193,10 +206,12 @@ function addReference(decision: RelatedDocumentation) {
   if (validationStore.isValid()) {
     emit("update:modelValue", newReference)
     emit("addEntry")
+  } else {
+    scrollToTopPosition()
   }
 }
 
-function addReferenceWithCreatedDocunit(docUnit: DocumentUnit) {
+function addReferenceWithCreatedDocumentationUnit(docUnit: DocumentUnit) {
   if (!docUnit) return
   addReference(
     new RelatedDocumentation({
@@ -303,7 +318,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex flex-col border-b-1">
+  <div ref="containerRef" class="flex flex-col border-b-1">
     <PopupModal
       v-if="showModal"
       aria-label="Eintrag löschen"
@@ -317,7 +332,7 @@ onMounted(async () => {
       @confirm-action="deleteReferenceAndDocUnit"
     />
     <h2 v-if="!isSaved" class="ds-label-01-bold mb-16">
-      Fundstelle bearbeiten
+      Fundstelle hinzufügen
     </h2>
     <div class="flex flex-col gap-24">
       <DecisionSummary
@@ -335,6 +350,7 @@ onMounted(async () => {
             id="caselaw"
             class="flex items-center"
             label="Rechtsprechung"
+            label-class="ds-body-01-reg"
             :label-position="LabelPosition.RIGHT"
           >
             <RadioInput
@@ -353,6 +369,7 @@ onMounted(async () => {
             id="literature"
             class="flex items-center"
             label="Literatur"
+            label-class="ds-body-01-reg"
             :label-position="LabelPosition.RIGHT"
           >
             <RadioInput
@@ -648,7 +665,7 @@ onMounted(async () => {
         v-if="searchResults && featureToggle"
         :parameters="createDocumentationUnitParameters"
         :validate-required-input="() => validateRequiredInput(reference)"
-        @created-documentation-unit="addReferenceWithCreatedDocunit"
+        @created-documentation-unit="addReferenceWithCreatedDocumentationUnit"
       />
     </div>
   </div>

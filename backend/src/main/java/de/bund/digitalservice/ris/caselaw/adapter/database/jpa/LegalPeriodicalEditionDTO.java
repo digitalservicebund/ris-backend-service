@@ -13,6 +13,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -54,18 +55,18 @@ public class LegalPeriodicalEditionDTO {
   private List<EditionReferenceDTO> editionReferences = new ArrayList<>();
 
   // Methods to get references and literature citations
-  public List<UUID> getLiteratureCitations() {
+  public Map<UUID, Integer> getLiteratureCitations() {
     return editionReferences.stream()
         .filter(ref -> LITERATURE.equals(ref.getDtype()))
-        .map(EditionReferenceDTO::getReferenceId)
-        .collect(Collectors.toList());
+        .collect(
+            Collectors.toMap(EditionReferenceDTO::getReferenceId, EditionReferenceDTO::getRank));
   }
 
-  public List<UUID> getReferences() {
+  public Map<UUID, Integer> getReferences() {
     return editionReferences.stream()
         .filter(ref -> REFERENCE.equals(ref.getDtype()))
-        .map(EditionReferenceDTO::getReferenceId)
-        .collect(Collectors.toList());
+        .collect(
+            Collectors.toMap(EditionReferenceDTO::getReferenceId, EditionReferenceDTO::getRank));
   }
 
   public void setLiteratureCitations(List<DependentLiteratureCitationDTO> literatureCitations) {
@@ -77,7 +78,7 @@ public class LegalPeriodicalEditionDTO {
       EditionReferenceDTO editionReference = new EditionReferenceDTO();
       editionReference.setEdition(this);
       editionReference.setReferenceId(citation.getId());
-      editionReference.setRank(citation.getRank());
+      editionReference.setRank(citation.getEditionRank());
       editionReference.setDtype(LITERATURE);
       editionReferences.add(editionReference);
     }
@@ -91,7 +92,7 @@ public class LegalPeriodicalEditionDTO {
     for (ReferenceDTO reference : references) {
       EditionReferenceDTO editionReference = new EditionReferenceDTO();
       editionReference.setReferenceId(reference.getId());
-      editionReference.setRank(reference.getRank());
+      editionReference.setRank(reference.getEditionRank());
       editionReference.setDtype(REFERENCE);
       editionReference.setEdition(this);
       editionReferences.add(editionReference);
