@@ -36,6 +36,7 @@ class ReferencesTransformerTest {
                 .legalPeriodical(createTestLegalPeriodicalDTO())
                 .build(),
             Reference.builder()
+                .rank(1)
                 .citation("2024, 123")
                 .footnote("footnote")
                 .referenceSupplement("Klammerzusatz")
@@ -43,9 +44,10 @@ class ReferencesTransformerTest {
                 .documentationUnit(createTestRelatedDocument())
                 .legalPeriodical(createTestLegalPeriodical())
                 .build()),
-        // without legal periodical
+        // without legal periodical, with editionRank
         Arguments.of(
             ReferenceDTO.builder()
+                .editionRank(3)
                 .rank(1)
                 .citation("2024, 123")
                 .footnote("footnote")
@@ -54,6 +56,7 @@ class ReferencesTransformerTest {
                 .documentationUnit(createTestDocumentationUnitDTO())
                 .build(),
             Reference.builder()
+                .rank(3)
                 .citation("2024, 123")
                 .footnote("footnote")
                 .referenceSupplement("Klammerzusatz")

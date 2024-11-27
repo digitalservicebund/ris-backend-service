@@ -32,6 +32,11 @@ public class ReferenceTransformer {
         .documentationUnit(
             RelatedDocumentationUnitTransformer.transformToDomain(
                 referenceDTO.getDocumentationUnit()))
+        // editionRank is only set if reference is requested from edition
+        .rank(
+            referenceDTO.getEditionRank() != null
+                ? referenceDTO.getEditionRank()
+                : referenceDTO.getRank())
         .build();
   }
 

@@ -35,6 +35,11 @@ public class DependentLiteratureTransformer {
         .documentationUnit(
             RelatedDocumentationUnitTransformer.transformToDomain(
                 literatureCitationDTO.getDocumentationUnit()))
+        // editionRank is only set if reference is requested from edition
+        .rank(
+            literatureCitationDTO.getEditionRank() != null
+                ? literatureCitationDTO.getEditionRank()
+                : literatureCitationDTO.getRank())
         .build();
   }
 

@@ -212,14 +212,18 @@ class HandoverMailIntegrationTest {
               .build();
       legalPeriodicalEditionDTO.setReferences(
           List.of(
-              referenceRepository.save(
-                  ReferenceDTO.builder()
-                      .id(UUID.randomUUID())
-                      .citation("citation")
-                      .legalPeriodicalRawValue("ABC")
-                      .rank(1)
-                      .documentationUnit(savedDocumentationUnitDTO)
-                      .build())));
+              referenceRepository
+                  .save(
+                      ReferenceDTO.builder()
+                          .id(UUID.randomUUID())
+                          .citation("citation")
+                          .legalPeriodicalRawValue("ABC")
+                          .rank(1)
+                          .documentationUnit(savedDocumentationUnitDTO)
+                          .build())
+                  .toBuilder()
+                  .editionRank(1)
+                  .build()));
       editionRepository.save(legalPeriodicalEditionDTO);
       assertThat(editionRepository.findAll()).hasSize(1);
       identifier = "edition-" + entityId;

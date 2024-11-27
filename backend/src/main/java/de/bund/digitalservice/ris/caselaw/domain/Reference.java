@@ -27,4 +27,5 @@ public record Reference(
     DocumentType documentType,
     String author,
     ReferenceType referenceType,
-    RelatedDocumentationUnit documentationUnit) {}
+    RelatedDocumentationUnit documentationUnit,
+    int rank) {}
