@@ -64,6 +64,9 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @Column(name = "scheduled_publication_date_time")
   private LocalDateTime scheduledPublicationDateTime;
 
+  @Column(name = "scheduled_by_email")
+  private String scheduledByEmail;
+
   @Column(name = "decision_grounds")
   private String decisionGrounds;
 

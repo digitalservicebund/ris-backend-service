@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import org.apache.commons.text.RandomStringGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -88,6 +89,7 @@ class ScheduledPublicationServiceTest {
 
   private DocumentationUnit createDocUnit(
       LocalDateTime lastPublicationDateTime, LocalDateTime scheduledPublicationDateTime) {
+    String randomName = RandomStringGenerator.builder().selectFrom('a', 'b', 'c').get().generate(5);
     return DocumentationUnit.builder()
         .uuid(UUID.randomUUID())
         .managementData(
@@ -95,6 +97,7 @@ class ScheduledPublicationServiceTest {
                 .borderNumbers(Collections.emptyList())
                 .lastPublicationDateTime(lastPublicationDateTime)
                 .scheduledPublicationDateTime(scheduledPublicationDateTime)
+                .scheduledByEmail(randomName + "@example.local")
                 .build())
         .build();
   }
@@ -102,7 +105,8 @@ class ScheduledPublicationServiceTest {
   private void verifyPublicationAndProcessing(DocumentationUnit docUnit)
       throws DocumentationUnitNotExistsException {
     verify(handoverService, times(1))
-        .handoverDocumentationUnitAsMail(docUnit.uuid(), "mail@example.local");
+        .handoverDocumentationUnitAsMail(
+            docUnit.uuid(), docUnit.managementData().scheduledByEmail());
     verify(repository, times(1))
         .save(
             argThat(
