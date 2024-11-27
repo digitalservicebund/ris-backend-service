@@ -121,15 +121,15 @@ function removeNodeOfInterest() {
 }
 
 function updateIdentifierSearchTerm(newValue?: string) {
-  identifier.value = newValue ? newValue : ""
+  identifier.value = newValue ?? ""
 }
 
 function updateDescriptionSearchTerm(newValue?: string) {
-  description.value = newValue ? newValue : ""
+  description.value = newValue ?? ""
 }
 
 function updateNormSearchTerm(newValue?: string) {
-  norm.value = newValue ? newValue : ""
+  norm.value = newValue ?? ""
 }
 
 async function addFromList(fieldOfLaw: FieldOfLaw) {
