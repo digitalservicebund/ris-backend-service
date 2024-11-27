@@ -112,7 +112,6 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
               .map(ReferenceTransformer::transformToDomain)
               .toList());
     }
-
     if (editionDTO.getLiteratureCitations() != null) {
       references.addAll(
           editionDTO.getLiteratureCitations().entrySet().stream()

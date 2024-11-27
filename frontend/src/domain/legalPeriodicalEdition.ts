@@ -8,7 +8,6 @@ export default class LegalPeriodicalEdition {
     "suffix",
     "legalPeriodical",
   ] as const
-
   static readonly requiredFields = ["name", "legalPeriodical"] as const
 
   id: string
