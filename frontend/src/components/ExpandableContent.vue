@@ -59,7 +59,7 @@ watch(localIsExpanded, () => emit("update:isExpanded", localIsExpanded.value))
     <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
     <div
       :aria-labelledby="headerId"
-      class="flex w-full items-start justify-between focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
+      class="flex w-full items-center justify-between focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
       :class="{ 'cursor-pointer': !preventExpandOnClick }"
       @click.stop="toggleContentVisibility"
     >

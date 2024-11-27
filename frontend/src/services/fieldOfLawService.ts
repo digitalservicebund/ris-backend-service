@@ -105,7 +105,6 @@ const service: FieldOfLawService = {
     identifier?: string,
     norm?: string,
   ) {
-    // Todo: do not send query when not set
     const response = await httpClient.get<Page<FieldOfLaw>>(
       `caselaw/fieldsoflaw?pg=${page}&sz=${size}`,
       {

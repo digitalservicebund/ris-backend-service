@@ -189,10 +189,10 @@ function updateInputMethod(value: InputMethod) {
 
     <FieldOfLawSearchInput
       v-if="inputMethod === InputMethod.SEARCH"
-      :description="description"
+      v-model:description="description"
+      v-model:identifier="identifier"
+      v-model:norm="norm"
       :error-label="searchErrorLabel"
-      :identifier="identifier"
-      :norm="norm"
       @search="submitSearch(0)"
       @update:description="updateDescriptionSearchTerm"
       @update:identifier="updateIdentifierSearchTerm"

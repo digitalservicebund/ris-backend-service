@@ -186,7 +186,7 @@ describe("Edition Handover", () => {
     ).toBeInTheDocument()
   })
 
-  test.skip("on press 'Fundstellen der Ausgabe an jDV übergeben' hands over successfully", async () => {
+  test("on press 'Fundstellen der Ausgabe an jDV übergeben' hands over successfully", async () => {
     vi.spyOn(handoverEditionService, "handoverEdition").mockImplementation(() =>
       Promise.resolve({
         status: 200,

@@ -36,22 +36,23 @@ import lombok.ToString;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @Entity
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(
     schema = "incremental_migration",
     uniqueConstraints = {@UniqueConstraint(columnNames = {"juris_id", "notation"})},
     name = "field_of_law")
 public class FieldOfLawDTO {
-  @EqualsAndHashCode.Exclude @Id @GeneratedValue private UUID id;
+  @Id @GeneratedValue private UUID id;
 
+  @EqualsAndHashCode.Include
   @Column(unique = true, updatable = false, insertable = false)
   private String identifier;
 
+  @EqualsAndHashCode.Include
   @Column(updatable = false, insertable = false)
   private String text;
 
   // Not used yet
-  @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinTable(
       schema = "incremental_migration",
@@ -62,7 +63,6 @@ public class FieldOfLawDTO {
   private NavigationTermDTO navigationTerm;
 
   // Not used yet
-  @EqualsAndHashCode.Exclude
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       schema = "incremental_migration",
@@ -72,7 +72,6 @@ public class FieldOfLawDTO {
   @Builder.Default
   private List<FieldOfLawKeywordDTO> keywords = new ArrayList<>();
 
-  @EqualsAndHashCode.Exclude
   @OneToMany(
       mappedBy = "fieldOfLaw",
       cascade = CascadeType.ALL,
@@ -83,7 +82,6 @@ public class FieldOfLawDTO {
   @Builder.Default
   private Set<FieldOfLawNormDTO> norms = new HashSet<>();
 
-  @EqualsAndHashCode.Exclude
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinTable(
       schema = "incremental_migration",
@@ -92,13 +90,11 @@ public class FieldOfLawDTO {
       inverseJoinColumns = @JoinColumn(name = "field_of_law_parent_id"))
   private FieldOfLawDTO parent;
 
-  @EqualsAndHashCode.Exclude
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "parent")
   @OrderBy("identifier")
   @Builder.Default
   private Set<FieldOfLawDTO> children = new HashSet<>();
 
-  @EqualsAndHashCode.Exclude
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       schema = "incremental_migration",
@@ -108,11 +104,11 @@ public class FieldOfLawDTO {
   @Builder.Default
   private Set<FieldOfLawDTO> fieldOfLawTextReferences = new HashSet<>();
 
-  @EqualsAndHashCode.Exclude
   @Column(updatable = false, name = "juris_id")
   @ToString.Include
   private Integer jurisId;
 
+  @EqualsAndHashCode.Include
   @Column(updatable = false)
   @Enumerated(EnumType.STRING)
   @ToString.Include

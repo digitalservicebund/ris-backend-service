@@ -26,8 +26,8 @@ function fieldOfLawClicked(fieldOfLaw: FieldOfLaw) {
   <div class="flex w-full justify-between">
     <div class="flex w-full flex-col">
       <div
-        v-for="(fieldOfLaw, index) in fieldsOfLaw"
-        :key="index"
+        v-for="fieldOfLaw in fieldsOfLaw"
+        :key="fieldOfLaw.identifier"
         class="field-of-law flex w-full flex-row items-center border-b-1 border-blue-300 py-16 first:mt-16 first:border-t-1"
       >
         <div class="ds-label-01-reg mr-8 flex-grow">
