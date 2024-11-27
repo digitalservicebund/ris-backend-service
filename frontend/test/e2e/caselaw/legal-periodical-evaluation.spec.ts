@@ -555,9 +555,8 @@ test.describe(
       { tag: "@RISDEV-5434" },
       async ({ page, edition }) => {
         await test.step("Page number resets when query parameters are changed", async () => {
-          const fileNumber = "1"
-
           await navigateToPeriodicalReferences(page, edition.id)
+          const fileNumber = "1"
 
           await page.getByText("Suchen").click()
           await page.getByLabel("nächste Ergebnisse").click()
@@ -568,6 +567,25 @@ test.describe(
 
           await expect(page.getByText("Seite 2")).toBeHidden()
           await expect(page.getByText("Seite 1")).toBeVisible()
+        })
+
+        await test.step("Page scrolls to top on validation errors", async () => {
+          await navigateToPeriodicalReferences(page, edition.id)
+          const fileNumber = "1"
+
+          await page.getByText("Suchen").click()
+
+          const addReferenceButton = page
+            .getByLabel("Treffer übernehmen")
+            .last()
+          await fillInput(page, "Aktenzeichen", fileNumber)
+          await addReferenceButton.scrollIntoViewIfNeeded()
+          await addReferenceButton.last().click()
+
+          const validationErrorPlaceHolder = page
+            .getByText("Pflichtfeld nicht befüllt")
+            .first()
+          await expect(validationErrorPlaceHolder).toBeInViewport()
         })
       },
     )
