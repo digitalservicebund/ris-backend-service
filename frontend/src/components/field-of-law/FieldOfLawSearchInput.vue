@@ -37,36 +37,36 @@ const norm = computed({
 <template>
   <div class="flex w-full flex-col">
     <div class="flex w-full flex-row items-end gap-16">
-      <InputField id="fieldOfLawDirectInput" label="Sachgebiet">
+      <InputField id="fieldOfLawIdentifierInput" label="Sachgebiet">
         <TextInput
-          id="fieldOfLawDirectInput"
+          id="fieldOfLawIdentifierInput"
           v-model="identifier"
-          aria-label="Sachgebiet Direkteingabe"
+          aria-label="Sachgebietskürzel"
           size="medium"
           @enter-released="emit('search')"
         />
       </InputField>
-      <InputField id="fieldOfLawDirectInput" label="Bezeichnung">
+      <InputField id="fieldOfLawDescriptionInput" label="Bezeichnung">
         <TextInput
-          id="fieldOfLawSearch"
+          id="fieldOfLawDescriptionInput"
           v-model="description"
-          aria-label="Sachgebiet Suche"
+          aria-label="Sachgebietsbezeichnung"
           size="medium"
           @enter-released="emit('search')"
         />
       </InputField>
       <InputField id="fieldOfLawNormInput" label="Norm">
         <TextInput
-          id="fieldOfLawNorm"
+          id="fieldOfLawNormInput"
           v-model="norm"
-          aria-label="Sachgebiet Norm"
+          aria-label="Sachgebietsnorm"
           size="medium"
           @enter-released="emit('search')"
         />
       </InputField>
 
       <TextButton
-        aria-label="Suchen"
+        aria-label="Sachgebietssuche ausführen"
         button-type="primary"
         :icon="IconSearch"
         @click="emit('search')"
