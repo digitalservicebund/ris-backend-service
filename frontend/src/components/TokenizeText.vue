@@ -37,10 +37,10 @@ function handleTokenClick(token: Token) {
 </script>
 
 <template>
+  <!-- eslint-disable vue/require-v-for-key -->
   <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
   <span
-    v-for="(token, idx) in tokenizeText()"
-    :key="idx"
+    v-for="token in tokenizeText()"
     class="text-left"
     :class="token.isLink && 'linked-field'"
     :tabindex="token.isLink ? 0 : undefined"
