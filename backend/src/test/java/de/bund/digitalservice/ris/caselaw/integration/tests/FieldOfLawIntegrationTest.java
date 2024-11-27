@@ -111,12 +111,12 @@ class FieldOfLawIntegrationTest {
   }
 
   @Test
-  void testGetFieldsOfLawBySearchQuery() {
+  void testGetFieldsOfLawByIdentifier() {
     Slice<FieldOfLaw> responseBody =
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/fieldsoflaw?q=FL-01&pg=0&sz=10")
+            .uri("/api/v1/caselaw/fieldsoflaw?identifier=FL-01&pg=0&sz=10")
             .exchange()
             .expectStatus()
             .isOk()
@@ -128,12 +128,29 @@ class FieldOfLawIntegrationTest {
   }
 
   @Test
+  void testGetFieldsOfLawBySearchTerms() {
+    Slice<FieldOfLaw> responseBody =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/fieldsoflaw?q=other text&pg=0&sz=10")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<SliceTestImpl<FieldOfLaw>>() {})
+            .returnResult()
+            .getResponseBody();
+
+    assertThat(responseBody).extracting("identifier").containsExactly("CD");
+  }
+
+  @Test
   void testGetFieldsOfLawByNormsQuery_OnlyNormText() {
     Slice<FieldOfLaw> responseBody =
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/fieldsoflaw?q=norm:\"abc\"&pg=0&sz=3")
+            .uri("/api/v1/caselaw/fieldsoflaw?norm=abc&pg=0&sz=3")
             .exchange()
             .expectStatus()
             .isOk()
@@ -155,7 +172,7 @@ class FieldOfLawIntegrationTest {
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/fieldsoflaw?q=norm:\"" + query + "\"&pg=0&sz=3")
+            .uri("/api/v1/caselaw/fieldsoflaw?norm=" + query + "&pg=0&sz=3")
             .exchange()
             .expectStatus()
             .isOk()
@@ -177,7 +194,7 @@ class FieldOfLawIntegrationTest {
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/fieldsoflaw?q=norm:\"" + query + "\"&pg=0&sz=3")
+            .uri("/api/v1/caselaw/fieldsoflaw?norm=" + query + "&pg=0&sz=3")
             .exchange()
             .expectStatus()
             .isOk()
@@ -200,7 +217,7 @@ class FieldOfLawIntegrationTest {
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/fieldsoflaw?q=norm:\"" + query + "\"&pg=0&sz=3")
+            .uri("/api/v1/caselaw/fieldsoflaw?norm=" + query + "&pg=0&sz=3")
             .exchange()
             .expectStatus()
             .isOk()
@@ -212,12 +229,12 @@ class FieldOfLawIntegrationTest {
   }
 
   @Test
-  void testGetFieldsOfLawByNormsAndSearchQuery() {
+  void testGetFieldsOfLawByNormAndIdentifier() {
     Slice<FieldOfLaw> responseBody =
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/fieldsoflaw?q=norm:\"def\" fl-01&pg=0&sz=3")
+            .uri("/api/v1/caselaw/fieldsoflaw?norm=def&identifier=fl&pg=0&sz=3")
             .exchange()
             .expectStatus()
             .isOk()
@@ -226,6 +243,23 @@ class FieldOfLawIntegrationTest {
             .getResponseBody();
 
     assertThat(responseBody).extracting("identifier").containsExactly("FL-01");
+  }
+
+  @Test
+  void testFindByIdentifierAndSearchTerms() {
+    SliceTestImpl<FieldOfLaw> responseBody =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/fieldsoflaw?identifier=FL&q=multiple cats&pg=0&sz=10")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<SliceTestImpl<FieldOfLaw>>() {})
+            .returnResult()
+            .getResponseBody();
+
+    assertThat(responseBody).extracting("identifier").containsExactly("FL-01-01");
   }
 
   @Test
@@ -303,70 +337,5 @@ class FieldOfLawIntegrationTest {
               assertThat(child.identifier()).isEqualTo("FL-01-01");
               assertThat(child.children()).isEmpty();
             });
-  }
-
-  @Test
-  void testOrderingOfGetFieldsOfLawByIdentifierSearch() {
-    List<FieldOfLaw> responseBody =
-        risWebTestClient
-            .withDefaultLogin()
-            .get()
-            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?q=fl")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(new TypeReference<List<FieldOfLaw>>() {})
-            .returnResult()
-            .getResponseBody();
-
-    assertThat(responseBody)
-        .extracting("identifier")
-        .containsExactly("FL", "FL-01", "FL-01-01", "FL-02", "FL-03", "FL-04");
-  }
-
-  @Test
-  void testFindByMultipleSearchTerms() {
-    SliceTestImpl<FieldOfLaw> responseBody =
-        risWebTestClient
-            .withDefaultLogin()
-            .get()
-            .uri("/api/v1/caselaw/fieldsoflaw?q=FL multiple&pg=0&sz=10")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(new TypeReference<SliceTestImpl<FieldOfLaw>>() {})
-            .returnResult()
-            .getResponseBody();
-
-    assertThat(responseBody).extracting("identifier").containsExactly("FL-01-01");
-  }
-
-  @Test
-  void testFindByEmptySearchTerms() {
-    SliceTestImpl<FieldOfLaw> responseBody =
-        risWebTestClient
-            .withDefaultLogin()
-            .get()
-            .uri("/api/v1/caselaw/fieldsoflaw?pg=0&sz=10")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(new TypeReference<SliceTestImpl<FieldOfLaw>>() {})
-            .returnResult()
-            .getResponseBody();
-
-    assertThat(responseBody)
-        .extracting("identifier")
-        .containsExactly(
-            "AB-01",
-            "AB-01-01",
-            "CD",
-            "CD-01",
-            "CD-02",
-            "FL",
-            "FL-01",
-            "FL-01-01",
-            "FL-02",
-            "FL-03");
   }
 }

@@ -1,22 +1,25 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
-import FieldOfLawNodeComponent from "./FieldOfLawNodeComponent.vue"
-import { NodeHelper, NodeHelperInterface } from "@/components/fieldOfLawNode"
-import FlexContainer from "@/components/FlexContainer.vue"
+import FieldOfLawTreeNode from "./FieldOfLawTreeNode.vue"
+import {
+  NodeHelper,
+  NodeHelperInterface,
+} from "@/components/field-of-law/fieldOfLawNode"
 import CheckboxInput from "@/components/input/CheckboxInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import { buildRoot, FieldOfLaw } from "@/domain/fieldOfLaw"
 
 const props = defineProps<{
   modelValue: FieldOfLaw[]
-  selectedNode?: FieldOfLaw
+  nodeOfInterest?: FieldOfLaw
+  searchResults?: FieldOfLaw[]
   showNorms: boolean
 }>()
 
 const emit = defineEmits<{
-  "node:select": [node: FieldOfLaw]
-  "node:unselect": [node: FieldOfLaw]
-  "selected-node:reset": []
+  "node:add": [node: FieldOfLaw]
+  "node:remove": [node: FieldOfLaw]
+  "node-of-interest:reset": []
   "linked-field:select": [node: FieldOfLaw]
   "toggle-show-norms": []
 }>()
@@ -29,12 +32,12 @@ const showNormsModelValue = computed({
   set: () => emit("toggle-show-norms"),
 })
 
-async function expandSelectedNode(node: FieldOfLaw) {
+async function expandNode(node: FieldOfLaw) {
   const itemsToReturn = new Map<string, FieldOfLaw>()
-  if (props.selectedNode) {
+  if (props.nodeOfInterest) {
     itemsToReturn.set(node.identifier, node)
     const response = await nodeHelper.value.getAncestors(
-      props.selectedNode.identifier,
+      props.nodeOfInterest.identifier,
     )
     for (const node of response) {
       itemsToReturn.set(node.identifier, node)
@@ -44,7 +47,7 @@ async function expandSelectedNode(node: FieldOfLaw) {
   expandedNodes.value = Array.from(itemsToReturn.values())
 }
 
-async function expandSelectedNodes(node: FieldOfLaw) {
+async function expandNodesUpTo(node: FieldOfLaw) {
   const itemsToReturn = new Map<string, FieldOfLaw>()
 
   if (node.identifier == "root") {
@@ -76,50 +79,62 @@ function addExpandedNodes(
   return map
 }
 
+function collapseTree() {
+  expandedNodes.value = []
+}
+
 watch(
-  () => props.selectedNode,
-  async (newSelectedNode, oldSelectedNode) => {
-    if (newSelectedNode !== oldSelectedNode) {
-      if (props.selectedNode) await expandSelectedNode(props.selectedNode)
+  () => props.nodeOfInterest,
+  async (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+      if (props.nodeOfInterest) await expandNode(props.nodeOfInterest)
     }
   },
   { immediate: true },
 )
+
+defineExpose({ collapseTree })
 </script>
 
 <template>
-  <FlexContainer flex-direction="flex-col" justify-content="justify-between">
-    <h1 class="ds-heading-03-reg pb-10">Sachgebietsbaum</h1>
-    <div class="my-14">
-      <InputField
-        id="showNorms"
-        aria-label="Normen anzeigen"
-        label="Normen anzeigen"
-        label-class="ds-label-01-reg"
-        :label-position="LabelPosition.RIGHT"
-      >
-        <CheckboxInput
+  <div class="flex flex-1 flex-col bg-blue-200 p-16">
+    <div class="mb-20 flex w-full flex-row justify-between">
+      <div class="flex">
+        <p class="ds-label-01-reg">Sachgebietsbaum</p>
+      </div>
+      <div class="flex">
+        <InputField
           id="showNorms"
-          v-model="showNormsModelValue"
-          size="small"
-        />
-      </InputField>
+          aria-label="Normen anzeigen"
+          label="Mit Normen"
+          label-class="ds-label-02-reg"
+          :label-position="LabelPosition.RIGHT"
+        >
+          <CheckboxInput
+            id="showNorms"
+            v-model="showNormsModelValue"
+            class="ds-checkbox-mini bg-white"
+            size="small"
+          />
+        </InputField>
+      </div>
     </div>
-  </FlexContainer>
-  <FieldOfLawNodeComponent
-    :key="root.identifier"
-    :expand-values="expandedNodes"
-    is-root
-    :model-value="modelValue"
-    :node="root"
-    :node-helper="nodeHelper"
-    :selected-node="selectedNode"
-    :show-norms="showNorms"
-    @linked-field:select="emit('linked-field:select', $event)"
-    @node:collapse="collapseNode"
-    @node:expand="expandSelectedNodes"
-    @node:select="emit('node:select', $event)"
-    @node:unselect="emit('node:unselect', $event)"
-    @selected-node:reset="emit('selected-node:reset')"
-  />
+
+    <FieldOfLawTreeNode
+      :key="root.identifier"
+      :expand-values="expandedNodes"
+      is-root
+      :model-value="modelValue"
+      :node="root"
+      :node-helper="nodeHelper"
+      :node-of-interest="nodeOfInterest"
+      :search-results="searchResults"
+      :show-norms="showNorms"
+      @node-of-interest:reset="emit('node-of-interest:reset')"
+      @node:add="emit('node:add', $event)"
+      @node:collapse="collapseNode"
+      @node:expand="expandNodesUpTo"
+      @node:remove="emit('node:remove', $event)"
+    />
+  </div>
 </template>

@@ -216,10 +216,6 @@ export async function save(page: Page) {
   await expect(page.getByText(`Zuletzt`).first()).toBeVisible()
 }
 
-export async function toggleFieldOfLawSection(page: Page): Promise<void> {
-  await page.getByText("Sachgebiete").click()
-}
-
 export async function deleteDocumentUnit(page: Page, documentNumber: string) {
   const cookies = await page.context().cookies()
   const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
