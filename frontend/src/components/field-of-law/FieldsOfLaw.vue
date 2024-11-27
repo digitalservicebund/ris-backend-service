@@ -49,6 +49,7 @@ const localModelValue = computed({
 })
 
 async function submitSearch(page: number) {
+  searchErrorLabel.value = undefined
   if (
     StringsUtil.isEmpty(identifier.value) &&
     StringsUtil.isEmpty(description.value) &&
@@ -57,8 +58,6 @@ async function submitSearch(page: number) {
     searchErrorLabel.value = "Geben Sie mindestens ein Suchkriterium ein"
     removeNodeOfInterest()
     return
-  } else {
-    searchErrorLabel.value = undefined
   }
 
   const response = await service.searchForFieldsOfLaw(
@@ -80,7 +79,8 @@ async function submitSearch(page: number) {
   } else {
     currentPage.value = undefined
     results.value = undefined
-    console.error("Error searching for Nodes")
+    searchErrorLabel.value =
+      "Leider ist ein Fehler aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut."
   }
 }
 
@@ -95,33 +95,21 @@ const addFieldOfLaw = async (fieldOfLaw: FieldOfLaw) => {
   await setScrollPosition()
 }
 
-const setScrollPosition = async () => {
-  const container = document.documentElement // Replace with specific scrollable container if needed
-
-  await nextTick(() => {
-    // Get all elements with the class 'field-of-law'
-    const fieldOfLawElements = document.querySelectorAll(
-      ".field-of-law",
-    ) as NodeListOf<HTMLElement>
-
-    if (fieldOfLawElements.length > 0) {
-      // Get the height of the last added field-of-law element
-      const lastItem = fieldOfLawElements[fieldOfLawElements.length - 1]
-      if (lastItem) {
-        const addedHeight = lastItem.getBoundingClientRect().height
-
-        // Adjust the scroll position by the height of the last item
-        container.scrollTop += addedHeight
-      }
-    }
-  })
-}
-
-const removeFieldOfLaw = (fieldOfLaw: FieldOfLaw) => {
+const removeFieldOfLaw = async (fieldOfLaw: FieldOfLaw) => {
   localModelValue.value =
     localModelValue.value?.filter(
       (entry) => entry.identifier !== fieldOfLaw.identifier,
     ) ?? []
+  await setScrollPosition()
+}
+
+const setScrollPosition = async () => {
+  const container = document.documentElement
+  const previousHeight = container.scrollHeight
+  await nextTick(() => {
+    const addedHeight = container.scrollHeight - previousHeight
+    container.scrollTop += addedHeight
+  })
 }
 
 function setNodeOfInterest(node: FieldOfLaw) {
