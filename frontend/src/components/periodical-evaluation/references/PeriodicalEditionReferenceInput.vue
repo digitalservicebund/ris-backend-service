@@ -332,7 +332,7 @@ onMounted(async () => {
       @confirm-action="deleteReferenceAndDocUnit"
     />
     <h2 v-if="!isSaved" class="ds-label-01-bold mb-16">
-      Fundstelle bearbeiten
+      Fundstelle hinzufügen
     </h2>
     <div class="flex flex-col gap-24">
       <DecisionSummary
@@ -350,6 +350,7 @@ onMounted(async () => {
             id="caselaw"
             class="flex items-center"
             label="Rechtsprechung"
+            label-class="ds-body-01-reg"
             :label-position="LabelPosition.RIGHT"
           >
             <RadioInput
@@ -368,6 +369,7 @@ onMounted(async () => {
             id="literature"
             class="flex items-center"
             label="Literatur"
+            label-class="ds-body-01-reg"
             :label-position="LabelPosition.RIGHT"
           >
             <RadioInput
