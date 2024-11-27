@@ -2,8 +2,8 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
-import org.jobrunr.jobs.annotations.Job;
-import org.jobrunr.jobs.annotations.Recurring;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,6 +14,11 @@ public class ScheduledPublicationService {
 
   private final HandoverService handoverService;
 
+  /**
+   * "Terminierte Abgabe": Cron job that finds doc units that have a scheduled publishing date-time
+   * now, or in the past and published them. Even if publication fails, we will unset the scheduling
+   * and save the timestamp of the last attempt.
+   */
   public ScheduledPublicationService(
       DocumentationUnitRepository repository, HandoverService handoverService) {
 
@@ -21,17 +26,17 @@ public class ScheduledPublicationService {
     this.handoverService = handoverService;
   }
 
-  @Recurring(id = "scheduled-publication-job", interval = "PT1M") // Runs every 1 minute
-  @Job(name = "Publish scheduled doc units that are due")
+  @Scheduled(fixedRateString = "PT1M") // Runs every minute
+  @SchedulerLock(name = "scheduled-publication-job", lockAtMostFor = "PT3M")
   public void handoverScheduledDocUnits() {
     var scheduledDocUnitsDueNow = this.repository.getScheduledDocumentationUnitsDueNow();
     if (!scheduledDocUnitsDueNow.isEmpty()) {
       log.info("Publishing {} scheduled doc units due now", scheduledDocUnitsDueNow.size());
     }
     for (var docUnit : scheduledDocUnitsDueNow) {
-      // Even if the publication fails, we want to unset the scheduling.
+      // We will continue processing on any exceptions that are thrown.
       handoverDocument(docUnit);
-      setPublicationDates(docUnit);
+      savePublicationDates(docUnit);
     }
   }
 
@@ -39,25 +44,31 @@ public class ScheduledPublicationService {
     try {
       this.handoverService.handoverDocumentationUnitAsMail(docUnit.uuid(), "mail@example.local");
     } catch (Exception e) {
+      // No rethrow: even if the publication fails, we want to unset the scheduling.
       log.error(
           "Could not publish scheduled doc unit {}, scheduling will still be removed",
-          docUnit.documentNumber());
+          docUnit.documentNumber(),
+          e);
     }
   }
 
-  private void setPublicationDates(DocumentationUnit docUnit) {
+  private void savePublicationDates(DocumentationUnit docUnit) {
     try {
-      var updatedDocUnit =
-          docUnit.toBuilder()
-              .managementData(
-                  docUnit.managementData().toBuilder()
-                      .scheduledPublicationDateTime(null)
-                      .lastPublicationDateTime(LocalDateTime.now())
-                      .build())
-              .build();
+      var updatedDocUnit = setPublicationDates(docUnit);
       repository.save(updatedDocUnit);
     } catch (Exception e) {
-      log.error("Could not remove the scheduling for doc unit {}", docUnit.documentNumber());
+      // No rethrow: continue with other doc units, even if save fails for this one.
+      log.error("Could not remove the scheduling for doc unit {}", docUnit.documentNumber(), e);
     }
+  }
+
+  private DocumentationUnit setPublicationDates(DocumentationUnit docUnit) {
+    return docUnit.toBuilder()
+        .managementData(
+            docUnit.managementData().toBuilder()
+                .scheduledPublicationDateTime(null)
+                .lastPublicationDateTime(LocalDateTime.now())
+                .build())
+        .build();
   }
 }

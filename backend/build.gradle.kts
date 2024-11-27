@@ -157,7 +157,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.1")
-    implementation("org.jobrunr:jobrunr-spring-boot-3-starter:7.3.2")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.3")
 
@@ -200,7 +199,7 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.29")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.31")
     // for local development:
     // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.28.jar"))
 
@@ -220,6 +219,9 @@ dependencies {
     implementation("io.getunleash:unleash-client-java:9.2.5")
     implementation("org.apache.commons:commons-text:1.12.0")
     implementation("org.jsoup:jsoup:1.18.1")
+
+    implementation("net.javacrumbs.shedlock:shedlock-spring:6.0.2")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.0.2")
 
     val flywayCore = "org.flywaydb:flyway-core:11.0.0"
     implementation(flywayCore)
