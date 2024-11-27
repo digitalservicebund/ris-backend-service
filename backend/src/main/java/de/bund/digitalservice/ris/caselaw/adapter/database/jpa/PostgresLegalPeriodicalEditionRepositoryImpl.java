@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -106,11 +105,10 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
           editionDTO.getReferences().entrySet().stream()
               .map(
                   entry ->
-                      Objects.requireNonNull(
-                              referenceRepository.findById(entry.getKey()).orElse(null))
-                          .toBuilder()
-                          .editionRank(entry.getValue())
-                          .build())
+                      referenceRepository
+                          .findById(entry.getKey())
+                          .map(dto -> dto.toBuilder().editionRank(entry.getValue()).build())
+                          .orElse(null))
               .map(ReferenceTransformer::transformToDomain)
               .toList());
     }
@@ -120,13 +118,10 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
           editionDTO.getLiteratureCitations().entrySet().stream()
               .map(
                   entry ->
-                      Objects.requireNonNull(
-                              dependentLiteratureCitationRepository
-                                  .findById(entry.getKey())
-                                  .orElse(null))
-                          .toBuilder()
-                          .editionRank(entry.getValue())
-                          .build())
+                      dependentLiteratureCitationRepository
+                          .findById(entry.getKey())
+                          .map(dto -> dto.toBuilder().editionRank(entry.getValue()).build())
+                          .orElse(null))
               .map(DependentLiteratureTransformer::transformToDomain)
               .toList());
     }
