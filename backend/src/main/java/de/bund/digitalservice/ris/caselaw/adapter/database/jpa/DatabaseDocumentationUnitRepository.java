@@ -160,5 +160,5 @@ public interface DatabaseDocumentationUnitRepository
   SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
   WHERE documentationUnit.scheduledPublicationDateTime <= CURRENT_TIMESTAMP
 """)
-  Slice<DocumentationUnitDTO> getScheduledDocumentationUnitsDueNow();
+  List<DocumentationUnitDTO> getScheduledDocumentationUnitsDueNow();
 }

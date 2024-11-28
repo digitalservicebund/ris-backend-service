@@ -1,8 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -10,9 +12,14 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ScheduledPublicationService {
 
-  private final DocumentationUnitRepository repository;
+  private final DocumentationUnitRepository docUnitRepository;
 
   private final HandoverService handoverService;
+
+  private final HttpMailSender mailSender;
+
+  @Value("${mail.exporter.senderAddress:export.test@neuris}")
+  private String senderAddress;
 
   /**
    * "Terminierte Abgabe": Cron job that finds doc units that have a scheduled publishing date-time
@@ -20,16 +27,19 @@ public class ScheduledPublicationService {
    * and save the timestamp of the last attempt.
    */
   public ScheduledPublicationService(
-      DocumentationUnitRepository repository, HandoverService handoverService) {
+      DocumentationUnitRepository docUnitRepository,
+      HandoverService handoverService,
+      HttpMailSender mailSender) {
 
-    this.repository = repository;
+    this.docUnitRepository = docUnitRepository;
     this.handoverService = handoverService;
+    this.mailSender = mailSender;
   }
 
   @Scheduled(fixedRateString = "PT1M") // Runs every minute
   @SchedulerLock(name = "scheduled-publication-job", lockAtMostFor = "PT3M")
   public void handoverScheduledDocUnits() {
-    var scheduledDocUnitsDueNow = this.repository.getScheduledDocumentationUnitsDueNow();
+    var scheduledDocUnitsDueNow = this.docUnitRepository.getScheduledDocumentationUnitsDueNow();
     if (!scheduledDocUnitsDueNow.isEmpty()) {
       log.info("Publishing {} scheduled doc units due now", scheduledDocUnitsDueNow.size());
     }
@@ -50,13 +60,32 @@ public class ScheduledPublicationService {
           "Could not publish scheduled doc unit {}, scheduling will still be removed",
           docUnit.documentNumber(),
           e);
+      informUserAboutErrorViaMail(docUnit, e);
+    }
+  }
+
+  private void informUserAboutErrorViaMail(DocumentationUnit docUnit, Exception error) {
+    try {
+      var docNumber = docUnit.documentNumber();
+      String email = docUnit.managementData().scheduledByEmail();
+      String subject = "Terminierte Abgabe fehlgeschlagen: " + docNumber;
+      String body =
+          ("""
+Die Terminierte Abgabe von Dokument %s konnte nicht erfolgen.
+Bitte beheben Sie den Fehler und wiederholen Sie die Abgabe manuell.
+Technischer Fehler: %s""")
+              .formatted(docNumber, error.getMessage());
+      this.mailSender.sendMail(
+          senderAddress, email, subject, body, Collections.emptyList(), docNumber);
+    } catch (Exception e) {
+      log.error("Could not send error notification to user {}", docUnit.documentNumber(), e);
     }
   }
 
   private void savePublicationDates(DocumentationUnit docUnit) {
     try {
       var updatedDocUnit = setPublicationDates(docUnit);
-      repository.save(updatedDocUnit);
+      docUnitRepository.save(updatedDocUnit);
     } catch (Exception e) {
       // No rethrow: continue with other doc units, even if save fails for this one.
       log.error("Could not remove the scheduling for doc unit {}", docUnit.documentNumber(), e);

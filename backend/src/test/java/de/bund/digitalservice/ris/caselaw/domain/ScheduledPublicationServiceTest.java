@@ -2,6 +2,8 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -22,39 +24,45 @@ import org.junit.jupiter.api.Test;
 class ScheduledPublicationServiceTest {
 
   private ScheduledPublicationService service;
-  private DocumentationUnitRepository repository;
+  private DocumentationUnitRepository docUnitRepository;
   private HandoverService handoverService;
+  private HttpMailSender httpMailSender;
   private final LocalDateTime pastDate = LocalDateTime.now().minusDays(1);
 
   @BeforeEach
   void beforeEach() {
-    this.repository = mock(DocumentationUnitRepository.class);
+    this.docUnitRepository = mock(DocumentationUnitRepository.class);
     this.handoverService = mock(HandoverService.class);
-    this.service = new ScheduledPublicationService(this.repository, this.handoverService);
+    this.httpMailSender = mock(HttpMailSender.class);
+    this.service =
+        new ScheduledPublicationService(
+            this.docUnitRepository, this.handoverService, this.httpMailSender);
   }
 
   @Test
   void shouldIdleForEmptyDueDocUnits() throws DocumentationUnitNotExistsException {
-    when(this.repository.getScheduledDocumentationUnitsDueNow())
+    when(this.docUnitRepository.getScheduledDocumentationUnitsDueNow())
         .thenReturn(Collections.emptyList());
 
     this.service.handoverScheduledDocUnits();
 
     verify(handoverService, never()).handoverDocumentationUnitAsMail(any(), any());
-    verify(repository, never()).save(any());
+    verify(docUnitRepository, never()).save(any());
+    verify(httpMailSender, never()).sendMail(any(), any(), any(), any(), any(), any());
   }
 
   @Test
   void shouldHandoverMultipleDueDocUnits() throws DocumentationUnitNotExistsException {
     var publishedDocUnit = this.createDocUnit(pastDate, pastDate);
     var unpublishedDocUnit = this.createDocUnit(null, pastDate);
-    when(this.repository.getScheduledDocumentationUnitsDueNow())
+    when(this.docUnitRepository.getScheduledDocumentationUnitsDueNow())
         .thenReturn(List.of(publishedDocUnit, unpublishedDocUnit));
 
     this.service.handoverScheduledDocUnits();
 
-    verifyPublicationAndProcessing(publishedDocUnit);
-    verifyPublicationAndProcessing(unpublishedDocUnit);
+    verifyPublicationAndDocUnitUpdate(publishedDocUnit);
+    verifyPublicationAndDocUnitUpdate(unpublishedDocUnit);
+    verify(httpMailSender, never()).sendMail(any(), any(), any(), any(), any(), any());
   }
 
   @Test
@@ -62,29 +70,32 @@ class ScheduledPublicationServiceTest {
       throws DocumentationUnitNotExistsException {
     var publishedDocUnit = this.createDocUnit(pastDate, pastDate);
     var unpublishedDocUnit = this.createDocUnit(null, pastDate);
-    when(this.repository.getScheduledDocumentationUnitsDueNow())
+    when(this.docUnitRepository.getScheduledDocumentationUnitsDueNow())
         .thenReturn(List.of(publishedDocUnit, unpublishedDocUnit));
     when(this.handoverService.handoverDocumentationUnitAsMail(any(), any()))
         .thenThrow(DocumentationUnitNotExistsException.class);
 
     this.service.handoverScheduledDocUnits();
 
-    verifyPublicationAndProcessing(publishedDocUnit);
-    verifyPublicationAndProcessing(unpublishedDocUnit);
+    verifyPublicationAndDocUnitUpdate(publishedDocUnit);
+    verifyPublicationAndDocUnitUpdate(unpublishedDocUnit);
+    verifyEmailErrorNotification(publishedDocUnit);
+    verifyEmailErrorNotification(unpublishedDocUnit);
   }
 
   @Test
   void shouldContinueWhenDocUnitSaveFails() throws DocumentationUnitNotExistsException {
     var publishedDocUnit = this.createDocUnit(pastDate, pastDate);
     var unpublishedDocUnit = this.createDocUnit(null, pastDate);
-    when(this.repository.getScheduledDocumentationUnitsDueNow())
+    when(this.docUnitRepository.getScheduledDocumentationUnitsDueNow())
         .thenReturn(List.of(publishedDocUnit, unpublishedDocUnit));
-    doThrow(RuntimeException.class).when(this.repository).save(any());
+    doThrow(RuntimeException.class).when(this.docUnitRepository).save(any());
 
     this.service.handoverScheduledDocUnits();
 
-    verifyPublicationAndProcessing(publishedDocUnit);
-    verifyPublicationAndProcessing(unpublishedDocUnit);
+    verifyPublicationAndDocUnitUpdate(publishedDocUnit);
+    verifyPublicationAndDocUnitUpdate(unpublishedDocUnit);
+    verify(httpMailSender, never()).sendMail(any(), any(), any(), any(), any(), any());
   }
 
   private DocumentationUnit createDocUnit(
@@ -92,6 +103,7 @@ class ScheduledPublicationServiceTest {
     String randomName = RandomStringGenerator.builder().selectFrom('a', 'b', 'c').get().generate(5);
     return DocumentationUnit.builder()
         .uuid(UUID.randomUUID())
+        .documentNumber("KORE12345" + randomName)
         .managementData(
             ManagementData.builder()
                 .borderNumbers(Collections.emptyList())
@@ -102,12 +114,12 @@ class ScheduledPublicationServiceTest {
         .build();
   }
 
-  private void verifyPublicationAndProcessing(DocumentationUnit docUnit)
+  private void verifyPublicationAndDocUnitUpdate(DocumentationUnit docUnit)
       throws DocumentationUnitNotExistsException {
     verify(handoverService, times(1))
         .handoverDocumentationUnitAsMail(
             docUnit.uuid(), docUnit.managementData().scheduledByEmail());
-    verify(repository, times(1))
+    verify(docUnitRepository, times(1))
         .save(
             argThat(
                 updatedDocUnit ->
@@ -144,5 +156,16 @@ class ScheduledPublicationServiceTest {
                         .scheduledPublicationDateTime(null)
                         .build())
                 .build());
+  }
+
+  private void verifyEmailErrorNotification(DocumentationUnit docUnit) {
+    verify(httpMailSender, times(1))
+        .sendMail(
+            any(),
+            eq(docUnit.managementData().scheduledByEmail()),
+            eq("Terminierte Abgabe fehlgeschlagen: " + docUnit.documentNumber()),
+            contains("Terminierte Abgabe von"),
+            eq(Collections.emptyList()),
+            eq(docUnit.documentNumber()));
   }
 }
