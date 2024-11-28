@@ -12,7 +12,7 @@ plugins {
     id("org.springframework.boot") version "3.3.5"
     id("io.spring.dependency-management") version "1.1.6"
     id("com.diffplug.spotless") version "6.25.0"
-    id("org.sonarqube") version "6.0.0.5145"
+    id("org.sonarqube") version "6.0.1.5171"
     id("com.github.jk1.dependency-license-report") version "2.9"
     id("com.gorylenko.gradle-git-properties") version "2.4.2"
     id("com.adarshr.test-logger") version "4.0.0"
@@ -20,7 +20,7 @@ plugins {
     id("com.github.ben-manes.versions") version "0.51.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
     id("org.flywaydb.flyway") version "11.0.0"
-    id("io.sentry.jvm.gradle") version "4.14.0"
+    id("io.sentry.jvm.gradle") version "4.14.1"
 }
 
 group = "de.bund.digitalservice"
@@ -158,12 +158,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.1")
 
-    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.3")
+    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.4")
 
     // CVE-2024-26308
     implementation("org.apache.commons:commons-compress:1.27.1")
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:4.28.3")
+    implementation("com.google.protobuf:protobuf-java:4.29.0")
     // CVE-2023-52428 in spring-boot-starter-oauth2-client:3.2.3
     implementation("com.nimbusds:nimbus-jose-jwt:9.47")
     // CVE-2023-31582
@@ -175,7 +175,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.29.21"))
+    implementation(platform("software.amazon.awssdk:bom:2.29.23"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -198,14 +198,14 @@ dependencies {
     // implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.10.19.jar"))
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
-    
+
     implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.29")
     // for local development:
     // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.28.jar"))
 
-    implementation("com.fasterxml.jackson.core:jackson-core:2.18.1")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.18.1")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.18.1")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.18.2")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.18.2")
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
@@ -216,9 +216,9 @@ dependencies {
     // => CVE-2023-2976
     implementation("com.google.guava:guava:33.3.1-jre")
 
-    implementation("io.getunleash:unleash-client-java:9.2.5")
+    implementation("io.getunleash:unleash-client-java:9.2.6")
     implementation("org.apache.commons:commons-text:1.12.0")
-    implementation("org.jsoup:jsoup:1.18.1")
+    implementation("org.jsoup:jsoup:1.18.2")
 
     val flywayCore = "org.flywaydb:flyway-core:11.0.0"
     implementation(flywayCore)
