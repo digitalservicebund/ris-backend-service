@@ -6,17 +6,24 @@ import DocumentUnit from "@/domain/documentUnit"
 import { RisJsonPatch } from "@/domain/risJsonPatch"
 import { ServiceResponse } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import useSessionStore from "@/stores/sessionStore"
 
 function mockDocUnitStore({
   scheduledPublicationDateTime,
+  scheduledByEmail,
   errorTitle,
 }: {
   scheduledPublicationDateTime?: string
+  scheduledByEmail?: string
   errorTitle?: string
 } = {}) {
   const mockedSessionStore = useDocumentUnitStore()
   mockedSessionStore.documentUnit = new DocumentUnit("q834", {
-    managementData: { scheduledPublicationDateTime, borderNumbers: [] },
+    managementData: {
+      scheduledPublicationDateTime,
+      scheduledByEmail,
+      borderNumbers: [],
+    },
   })
 
   const response = errorTitle ? { error: { title: errorTitle } } : {}
@@ -28,7 +35,11 @@ function mockDocUnitStore({
 }
 
 describe("ScheduledPublishingDateTime", () => {
-  beforeEach(() => setActivePinia(createTestingPinia()))
+  beforeEach(() => {
+    setActivePinia(createTestingPinia())
+    const sessionStore = useSessionStore()
+    sessionStore.user = { name: "test user", email: "test@mail.local" }
+  })
 
   it("should show empty default state if no date is set and doc unit is publishable", async () => {
     mockDocUnitStore()
@@ -113,6 +124,9 @@ describe("ScheduledPublishingDateTime", () => {
     expect(
       store.documentUnit?.managementData.scheduledPublicationDateTime,
     ).toEqual("2050-01-01T04:00:00.000Z")
+    expect(store.documentUnit?.managementData.scheduledByEmail).toEqual(
+      "test@mail.local",
+    )
 
     expect(dateField).toHaveValue("01.01.2050")
     expect(screen.getByLabelText("Terminierte Uhrzeit")).toHaveValue("05:00")
@@ -126,6 +140,7 @@ describe("ScheduledPublishingDateTime", () => {
   it("should reset state after deleting scheduling", async () => {
     const store = mockDocUnitStore({
       scheduledPublicationDateTime: "2080-10-11T02:00:00.000Z",
+      scheduledByEmail: "other@example.com",
     })
     render(ScheduledPublishingDateTime, {
       props: { isPublishable: true },
@@ -136,6 +151,7 @@ describe("ScheduledPublishingDateTime", () => {
     expect(
       store.documentUnit?.managementData.scheduledPublicationDateTime,
     ).toBeUndefined()
+    expect(store.documentUnit?.managementData.scheduledByEmail).toBeUndefined()
 
     const dateField = screen.getByLabelText("Terminiertes Datum")
     expect(dateField).toHaveValue("")
