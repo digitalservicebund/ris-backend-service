@@ -184,7 +184,7 @@ const dateValidationError = ref<ValidationError | undefined>()
     </div>
     <div
       v-if="
-        !isDateInFuture ||
+        (!isScheduled && !isDateInFuture) ||
         dateValidationError ||
         !isTimeValid ||
         (!isPublishable && scheduledPublishingDate)

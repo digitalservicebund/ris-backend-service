@@ -233,6 +233,19 @@ describe("ScheduledPublishingDateTime", () => {
     ).toBeVisible()
   })
 
+  it("should not show error when date_time is not in the future, but already scheduled", async () => {
+    mockDocUnitStore({
+      scheduledPublicationDateTime: "2020-10-11T03:00:00.000Z",
+    })
+    render(ScheduledPublishingDateTime, {
+      props: { isPublishable: true },
+    })
+
+    expect(
+      screen.queryByTestId("scheduledPublishingDate_errors"),
+    ).not.toBeInTheDocument()
+  })
+
   it("should show error if scheduled date is set and doc unit is not publishable", () => {
     mockDocUnitStore({
       scheduledPublicationDateTime: "2080-10-11T03:00:00.000Z",
