@@ -69,6 +69,7 @@ public class ScheduledPublicationService {
             docUnit.managementData().toBuilder()
                 .scheduledPublicationDateTime(null)
                 .lastPublicationDateTime(LocalDateTime.now())
+                .scheduledByEmail(null)
                 .build())
         .build();
   }

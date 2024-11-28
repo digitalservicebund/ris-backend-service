@@ -12,6 +12,7 @@ import TextButton from "@/components/input/TextButton.vue"
 import TimeInput from "@/components/input/TimeInput.vue"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import useSessionStore from "@/stores/sessionStore"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
 const { isPublishable } = defineProps<{ isPublishable: boolean }>()
@@ -20,12 +21,15 @@ dayjs.extend(dayjsUtc)
 dayjs.extend(dayjsTimezone)
 dayjs.extend(customParseFormat)
 
-const store = useDocumentUnitStore()
+const documentUnitStore = useDocumentUnitStore()
+const sessionStore = useSessionStore()
 
 const storedScheduledPublicationDateTime = computed({
-  get: () => store.documentUnit!.managementData.scheduledPublicationDateTime,
+  get: () =>
+    documentUnitStore.documentUnit!.managementData.scheduledPublicationDateTime,
   set: (newDate?: string) =>
-    (store.documentUnit!.managementData.scheduledPublicationDateTime = newDate),
+    (documentUnitStore.documentUnit!.managementData.scheduledPublicationDateTime =
+      newDate),
 })
 
 // initialize local values with stored date-time
@@ -94,7 +98,10 @@ const saveScheduling = async () => {
   storedScheduledPublicationDateTime.value =
     scheduledDateTimeInput.value.toISOString()
 
-  const { error } = await store.updateDocumentUnit()
+  documentUnitStore.documentUnit!.managementData.scheduledByEmail =
+    sessionStore.user?.email
+
+  const { error } = await documentUnitStore.updateDocumentUnit()
 
   if (error) {
     storedScheduledPublicationDateTime.value = undefined
@@ -112,8 +119,9 @@ const removeScheduling = async () => {
   docUnitSaveError.value = null
   const previousDate = storedScheduledPublicationDateTime.value
   storedScheduledPublicationDateTime.value = undefined
+  documentUnitStore.documentUnit!.managementData.scheduledByEmail = undefined
 
-  const { error } = await store.updateDocumentUnit()
+  const { error } = await documentUnitStore.updateDocumentUnit()
 
   if (error) {
     storedScheduledPublicationDateTime.value = previousDate
