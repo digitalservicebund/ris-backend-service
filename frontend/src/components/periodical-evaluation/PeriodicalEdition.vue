@@ -91,7 +91,7 @@ onBeforeMount(async () => {
   await store.loadEdition()
   name.value = edition.value?.name
   prefix.value = edition.value?.prefix
-  suffix.value = edition.value?.name
+  suffix.value = edition.value?.suffix
 })
 </script>
 
