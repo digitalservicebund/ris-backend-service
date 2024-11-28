@@ -16,7 +16,7 @@ public class ScheduledPublicationService {
 
   /**
    * "Terminierte Abgabe": Cron job that finds doc units that have a scheduled publishing date-time
-   * now, or in the past and published them. Even if publication fails, we will unset the scheduling
+   * now, or in the past and publishes them. Even if publication fails, we will unset the scheduling
    * and save the timestamp of the last attempt.
    */
   public ScheduledPublicationService(
