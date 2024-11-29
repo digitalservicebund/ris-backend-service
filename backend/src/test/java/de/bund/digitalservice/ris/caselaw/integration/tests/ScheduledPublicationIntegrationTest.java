@@ -4,6 +4,11 @@ import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockUserGroups;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
@@ -127,31 +132,80 @@ class ScheduledPublicationIntegrationTest {
   }
 
   @Test
-  void testHandover() {
-    String identifier = "docnr12345678";
-
+  void shouldPublishOnlyDueDocUnitsAndSendErrorNotificationOnSchedule() {
+    // Valid doc unit -> publication will succeed
     DocumentationUnitDTO docUnitDueNow =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             docUnitRepository,
             DocumentationUnitDTO.builder()
                 .documentationOffice(documentationOffice)
-                .documentNumber(identifier)
+                .documentNumber("docnr123456_1")
                 .scheduledByEmail("test@example.local")
                 .scheduledPublicationDateTime(LocalDateTime.now())
                 .decisionDate(LocalDate.now()));
+
+    // Doc unit is not yet due -> will not be touched
+    DocumentationUnitDTO docUnitScheduledForFuture =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            docUnitRepository,
+            DocumentationUnitDTO.builder()
+                .documentationOffice(documentationOffice)
+                .documentNumber("docnr123456_2")
+                .scheduledByEmail("test@example.local")
+                .scheduledPublicationDateTime(LocalDateTime.now().plusMinutes(3))
+                .decisionDate(LocalDate.now()));
+
+    // Invalid doc unit will be unscheduled + send error notification
+    DocumentationUnitDTO docUnitWithFailingXmlExport =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            docUnitRepository,
+            DocumentationUnitDTO.builder()
+                .documentationOffice(documentationOffice)
+                .documentNumber("docnr123456_3")
+                .scheduledByEmail("invalid-docunit@example.local")
+                .scheduledPublicationDateTime(LocalDateTime.now().minusMinutes(3))
+                // Missing decision date let's MockXmlExporter fail
+                .decisionDate(null));
+    // The assertion might take longer -> record now beforehand.
+    LocalDateTime now = LocalDateTime.now();
 
     await()
         .atMost(Duration.ofSeconds(62))
         .untilAsserted(
             () -> {
-              var docUnit = docUnitRepository.findById(docUnitDueNow.getId()).get();
-              assertThat(docUnit.getScheduledByEmail()).isNull();
-              assertThat(docUnit.getScheduledPublicationDateTime()).isNull();
-              assertThat(docUnit.getLastPublicationDateTime())
-                  .isBetween(
-                      LocalDateTime.now().minusSeconds(20), LocalDateTime.now().plusSeconds(20));
+              var publishedDocUnit = docUnitRepository.findById(docUnitDueNow.getId()).get();
+              assertThat(publishedDocUnit.getScheduledByEmail()).isNull();
+              assertThat(publishedDocUnit.getScheduledPublicationDateTime()).isNull();
+              assertThat(publishedDocUnit.getLastPublicationDateTime())
+                  .isBetween(now.minusSeconds(60), now.plusSeconds(60));
+
+              var failedDocUnit =
+                  docUnitRepository.findById(docUnitWithFailingXmlExport.getId()).get();
+              assertThat(failedDocUnit.getScheduledByEmail()).isNull();
+              assertThat(failedDocUnit.getScheduledPublicationDateTime()).isNull();
+              assertThat(failedDocUnit.getLastPublicationDateTime())
+                  .isBetween(now.minusSeconds(60), now.plusSeconds(60));
+
+              var scheduledDocUnit =
+                  docUnitRepository.findById(docUnitScheduledForFuture.getId()).get();
+              assertThat(scheduledDocUnit.getScheduledByEmail())
+                  .isEqualTo(docUnitScheduledForFuture.getScheduledByEmail());
+              assertThat(scheduledDocUnit.getScheduledPublicationDateTime())
+                  .isEqualTo(docUnitScheduledForFuture.getScheduledPublicationDateTime());
+              assertThat(scheduledDocUnit.getLastPublicationDateTime()).isNull();
             });
 
-    assertThat(docUnitRepository.findAll()).hasSize(1);
+    assertThat(docUnitRepository.findAll()).hasSize(3);
+
+    var error = "Terminierte Abgabe fehlgeschlagen: ";
+    var uuid = docUnitDueNow.getId();
+    // One handover mail to jDV is sent out.
+    verify(mailSender, times(1))
+        .sendMail(any(), any(), argThat(s -> !s.startsWith(error)), any(), any(), eq(uuid + ""));
+
+    var subject = error + docUnitWithFailingXmlExport.getDocumentNumber();
+    // One error notification mail to the user is sent out.
+    verify(mailSender, times(1))
+        .sendMail(any(), eq("invalid-docunit@example.local"), eq(subject), any(), any(), any());
   }
 }
