@@ -53,7 +53,10 @@ public class ScheduledPublicationService {
   private void handoverDocument(DocumentationUnit docUnit) {
     try {
       String email = docUnit.managementData().scheduledByEmail();
-      this.handoverService.handoverDocumentationUnitAsMail(docUnit.uuid(), email);
+      var result = this.handoverService.handoverDocumentationUnitAsMail(docUnit.uuid(), email);
+      if (!result.isSuccess()) {
+        throw new HandoverException(String.join(", ", result.statusMessages()));
+      }
     } catch (Exception e) {
       // No rethrow: even if the publication fails, we want to unset the scheduling.
       log.error(
