@@ -90,7 +90,7 @@ onMounted(() => {
     :list-item-count="modelValue?.length ?? 0"
     :sort-alphabetically="sortAlphabetically"
     @toggle="toggleEditMode"
-    @toggle-sorting="(sortAlphabetically = !sortAlphabetically)"
+    @toggle-sorting="sortAlphabetically = !sortAlphabetically"
   />
   <ListInputDisplay
     v-else

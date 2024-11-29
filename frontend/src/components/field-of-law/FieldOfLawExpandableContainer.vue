@@ -100,7 +100,7 @@ export enum InputMethod {
           label="Suche"
           label-class="ds-label-01-reg"
           :label-position="LabelPosition.RIGHT"
-          @click="(inputMethod = InputMethod.SEARCH)"
+          @click="inputMethod = InputMethod.SEARCH"
         >
           <RadioInput
             id="search"

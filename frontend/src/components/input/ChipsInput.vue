@@ -192,7 +192,7 @@ watch(newChipText, async () => {
           :style="{ width: inputContentWidth }"
           type="text"
           @blur="addChip"
-          @focus="(focusedChip = undefined)"
+          @focus="focusedChip = undefined"
           @keydown.enter.stop.prevent="addChip"
           @keydown.left="maybeFocusPrevious"
         />
