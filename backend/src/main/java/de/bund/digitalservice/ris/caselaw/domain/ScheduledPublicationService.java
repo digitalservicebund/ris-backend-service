@@ -36,7 +36,8 @@ public class ScheduledPublicationService {
     this.mailSender = mailSender;
   }
 
-  @Scheduled(fixedRateString = "PT1M") // Runs every minute
+  // Runs every minute, starts initially after 5s
+  @Scheduled(fixedRateString = "PT1M", initialDelayString = "PT5S")
   @SchedulerLock(name = "scheduled-publication-job", lockAtMostFor = "PT3M")
   public void handoverScheduledDocUnits() {
     var scheduledDocUnitsDueNow = this.docUnitRepository.getScheduledDocumentationUnitsDueNow();
@@ -53,7 +54,10 @@ public class ScheduledPublicationService {
   private void handoverDocument(DocumentationUnit docUnit) {
     try {
       String email = docUnit.managementData().scheduledByEmail();
-      this.handoverService.handoverDocumentationUnitAsMail(docUnit.uuid(), email);
+      var result = this.handoverService.handoverDocumentationUnitAsMail(docUnit.uuid(), email);
+      if (!result.isSuccess()) {
+        throw new HandoverException(String.join(", ", result.statusMessages()));
+      }
     } catch (Exception e) {
       // No rethrow: even if the publication fails, we want to unset the scheduling.
       log.error(

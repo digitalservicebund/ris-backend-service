@@ -57,12 +57,32 @@ class ScheduledPublicationServiceTest {
     var unpublishedDocUnit = this.createDocUnit(null, pastDate);
     when(this.docUnitRepository.getScheduledDocumentationUnitsDueNow())
         .thenReturn(List.of(publishedDocUnit, unpublishedDocUnit));
+    mockHandoverWithSuccessStatus(true);
 
     this.service.handoverScheduledDocUnits();
 
     verifyPublicationAndDocUnitUpdate(publishedDocUnit);
     verifyPublicationAndDocUnitUpdate(unpublishedDocUnit);
     verify(httpMailSender, never()).sendMail(any(), any(), any(), any(), any(), any());
+  }
+
+  @Test
+  void shouldStillSavePublicationDatesWhenHandoverIsUnsuccessful()
+      throws DocumentationUnitNotExistsException {
+    var publishedDocUnit = this.createDocUnit(pastDate, pastDate);
+    var unpublishedDocUnit = this.createDocUnit(null, pastDate);
+    when(this.docUnitRepository.getScheduledDocumentationUnitsDueNow())
+        .thenReturn(List.of(publishedDocUnit, unpublishedDocUnit));
+    mockHandoverWithSuccessStatus(false);
+    // When sending the error notification fails, further processing should not be disrupted.
+    mockFailedErrorNotificationOnce();
+
+    this.service.handoverScheduledDocUnits();
+
+    verifyPublicationAndDocUnitUpdate(publishedDocUnit);
+    verifyPublicationAndDocUnitUpdate(unpublishedDocUnit);
+    verifyEmailErrorNotification(publishedDocUnit);
+    verifyEmailErrorNotification(unpublishedDocUnit);
   }
 
   @Test
@@ -87,6 +107,7 @@ class ScheduledPublicationServiceTest {
   void shouldContinueWhenDocUnitSaveFails() throws DocumentationUnitNotExistsException {
     var publishedDocUnit = this.createDocUnit(pastDate, pastDate);
     var unpublishedDocUnit = this.createDocUnit(null, pastDate);
+    mockHandoverWithSuccessStatus(true);
     when(this.docUnitRepository.getScheduledDocumentationUnitsDueNow())
         .thenReturn(List.of(publishedDocUnit, unpublishedDocUnit));
     doThrow(RuntimeException.class).when(this.docUnitRepository).save(any());
@@ -96,6 +117,12 @@ class ScheduledPublicationServiceTest {
     verifyPublicationAndDocUnitUpdate(publishedDocUnit);
     verifyPublicationAndDocUnitUpdate(unpublishedDocUnit);
     verify(httpMailSender, never()).sendMail(any(), any(), any(), any(), any(), any());
+  }
+
+  private void mockHandoverWithSuccessStatus(boolean successStatus)
+      throws DocumentationUnitNotExistsException {
+    var result = new HandoverMail(null, null, "", "", null, successStatus, null, null, null);
+    when(this.handoverService.handoverDocumentationUnitAsMail(any(), any())).thenReturn(result);
   }
 
   private DocumentationUnit createDocUnit(
@@ -167,5 +194,14 @@ class ScheduledPublicationServiceTest {
             contains("Terminierte Abgabe von"),
             eq(Collections.emptyList()),
             eq(docUnit.documentNumber()));
+  }
+
+  private void mockFailedErrorNotificationOnce() {
+    // First call fails
+    doThrow(new RuntimeException())
+        // second call succeeds
+        .doNothing()
+        .when(httpMailSender)
+        .sendMail(any(), any(), any(), any(), any(), any());
   }
 }
