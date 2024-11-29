@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockUserGroups;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.byLessThan;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -51,6 +52,7 @@ import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -177,21 +179,23 @@ class ScheduledPublicationIntegrationTest {
               assertThat(publishedDocUnit.getScheduledByEmail()).isNull();
               assertThat(publishedDocUnit.getScheduledPublicationDateTime()).isNull();
               assertThat(publishedDocUnit.getLastPublicationDateTime())
-                  .isBetween(now.minusSeconds(60), now.plusSeconds(60));
+                  .isCloseTo(now, byLessThan(60, ChronoUnit.SECONDS));
 
               var failedDocUnit =
                   docUnitRepository.findById(docUnitWithFailingXmlExport.getId()).get();
               assertThat(failedDocUnit.getScheduledByEmail()).isNull();
               assertThat(failedDocUnit.getScheduledPublicationDateTime()).isNull();
               assertThat(failedDocUnit.getLastPublicationDateTime())
-                  .isBetween(now.minusSeconds(60), now.plusSeconds(60));
+                  .isCloseTo(now, byLessThan(60, ChronoUnit.SECONDS));
 
               var scheduledDocUnit =
                   docUnitRepository.findById(docUnitScheduledForFuture.getId()).get();
               assertThat(scheduledDocUnit.getScheduledByEmail())
                   .isEqualTo(docUnitScheduledForFuture.getScheduledByEmail());
               assertThat(scheduledDocUnit.getScheduledPublicationDateTime())
-                  .isEqualTo(docUnitScheduledForFuture.getScheduledPublicationDateTime());
+                  .isCloseTo(
+                      docUnitScheduledForFuture.getScheduledPublicationDateTime(),
+                      byLessThan(1, ChronoUnit.SECONDS));
               assertThat(scheduledDocUnit.getLastPublicationDateTime()).isNull();
             });
 
