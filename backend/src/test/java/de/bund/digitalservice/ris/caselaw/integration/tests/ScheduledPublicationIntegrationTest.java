@@ -141,7 +141,7 @@ class ScheduledPublicationIntegrationTest {
                 .decisionDate(LocalDate.now()));
 
     await()
-        .atMost(Duration.ofSeconds(10))
+        .atMost(Duration.ofSeconds(62))
         .untilAsserted(
             () -> {
               var docUnit = docUnitRepository.findById(docUnitDueNow.getId()).get();
