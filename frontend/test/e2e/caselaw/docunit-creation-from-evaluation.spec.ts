@@ -598,6 +598,12 @@ test.describe(
             ),
           ).toBeHidden()
 
+          const saveRequest = page.waitForResponse(
+            "**/api/v1/caselaw/legalperiodicaledition",
+            { timeout: 5_000 },
+          )
+          await saveRequest
+
           await navigateToPreview(page, documentNumber, { skipAssert: true })
 
           await expect(
