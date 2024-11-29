@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
@@ -10,4 +11,5 @@ import lombok.Builder;
 public record ManagementData(
     @PastOrPresent LocalDateTime lastPublicationDateTime,
     @Future LocalDateTime scheduledPublicationDateTime,
+    @Email String scheduledByEmail,
     List<String> borderNumbers) {}

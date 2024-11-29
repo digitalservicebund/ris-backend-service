@@ -151,6 +151,8 @@ public class DocumentationUnitTransformer {
       var managementData = updatedDomainObject.managementData();
 
       builder.scheduledPublicationDateTime(managementData.scheduledPublicationDateTime());
+      builder.lastPublicationDateTime(managementData.lastPublicationDateTime());
+      builder.scheduledByEmail(managementData.scheduledByEmail());
     }
 
     addReferences(updatedDomainObject, builder);
@@ -741,6 +743,7 @@ public class DocumentationUnitTransformer {
         ManagementData.builder()
             .lastPublicationDateTime(documentationUnitDTO.getLastPublicationDateTime())
             .scheduledPublicationDateTime(documentationUnitDTO.getScheduledPublicationDateTime())
+            .scheduledByEmail(documentationUnitDTO.getScheduledByEmail())
             .borderNumbers(borderNumbers)
             .build();
 

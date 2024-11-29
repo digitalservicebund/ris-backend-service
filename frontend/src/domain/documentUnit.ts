@@ -111,6 +111,7 @@ export const longTextLabels: {
 
 export type ManagementData = {
   scheduledPublicationDateTime?: string
+  scheduledByEmail?: string
   borderNumbers: string[]
 }
 

@@ -153,4 +153,12 @@ public interface DatabaseDocumentationUnitRepository
           """,
       nativeQuery = true)
   List<UUID> getRandomDocumentationUnitIds();
+
+  @Query(
+      value =
+          """
+  SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
+  WHERE documentationUnit.scheduledPublicationDateTime <= CURRENT_TIMESTAMP
+""")
+  List<DocumentationUnitDTO> getScheduledDocumentationUnitsDueNow();
 }

@@ -618,4 +618,13 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   public List<UUID> getRandomDocumentationUnitIds() {
     return repository.getRandomDocumentationUnitIds();
   }
+
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
+  public List<DocumentationUnit> getScheduledDocumentationUnitsDueNow() {
+    return repository.getScheduledDocumentationUnitsDueNow().stream()
+        .limit(50)
+        .map(DocumentationUnitTransformer::transformToDomain)
+        .toList();
+  }
 }

@@ -199,9 +199,9 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.29")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.32")
     // for local development:
-    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.28.jar"))
+    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.32.jar"))
 
     implementation("com.fasterxml.jackson.core:jackson-core:2.18.2")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")
@@ -219,6 +219,9 @@ dependencies {
     implementation("io.getunleash:unleash-client-java:9.2.6")
     implementation("org.apache.commons:commons-text:1.12.0")
     implementation("org.jsoup:jsoup:1.18.2")
+
+    implementation("net.javacrumbs.shedlock:shedlock-spring:6.0.2")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.0.2")
 
     val flywayCore = "org.flywaydb:flyway-core:11.0.0"
     implementation(flywayCore)

@@ -128,4 +128,7 @@ public interface DocumentationUnitRepository {
   Map<RelatedDocumentationType, Long> getAllDocumentationUnitWhichLink(UUID documentationUnitId);
 
   List<UUID> getRandomDocumentationUnitIds();
+
+  /** Returns doc units with a scheduled publication date that is in the past. */
+  List<DocumentationUnit> getScheduledDocumentationUnitsDueNow();
 }
