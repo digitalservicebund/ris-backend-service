@@ -40,10 +40,6 @@ function renderComponent() {
 
 describe("Legal periodical edition reference input", () => {
   beforeEach(() => {
-    vi.spyOn(console, "error").mockImplementation((message) => {
-      console.log("console error:", message)
-    })
-
     vi.spyOn(
       documentUnitService,
       "searchByRelatedDocumentation",
