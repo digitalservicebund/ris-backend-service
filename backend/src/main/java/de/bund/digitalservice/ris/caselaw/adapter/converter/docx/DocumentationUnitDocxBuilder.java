@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.domain.docx.BorderNumber;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentationUnitDocx;
 import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingListEntryIndex;
+import de.bund.digitalservice.ris.caselaw.domain.docx.UnhandledElement;
 import jakarta.xml.bind.JAXBElement;
 import java.util.List;
 import org.docx4j.model.listnumbering.AbstractListNumberingDefinition;
@@ -32,13 +33,13 @@ public class DocumentationUnitDocxBuilder extends DocxBuilder {
     return this;
   }
 
-  public DocumentationUnitDocx build() {
+  public DocumentationUnitDocx build(List<UnhandledElement> unhandledElements) {
     if (isBorderNumber()) {
       return convertToBorderNumber();
     } else if (isNumberingListEntry()) {
-      return convertToNumberingListEntry();
+      return convertToNumberingListEntry(unhandledElements);
     } else if (isParagraph()) {
-      return ParagraphConverter.convert(paragraph, converter);
+      return ParagraphConverter.convert(paragraph, converter, unhandledElements);
     }
 
     return null;
@@ -204,7 +205,8 @@ public class DocumentationUnitDocxBuilder extends DocxBuilder {
     return paragraph.getPPr().getNumPr() != null;
   }
 
-  private DocumentationUnitDocx convertToNumberingListEntry() {
+  private DocumentationUnitDocx convertToNumberingListEntry(
+      List<UnhandledElement> unhandledElements) {
     NumPr numPr = paragraph.getPPr().getNumPr();
     String numId = null;
     String iLvl = null;
@@ -233,11 +235,12 @@ public class DocumentationUnitDocxBuilder extends DocxBuilder {
     // as a list entry that brings its own numbering symbol inside the paragraph part,
     // --> we therefore convert it as a paragraph instead of a list
     if (numId == null || numId.equals("0") || listLevel == null) {
-      return ParagraphConverter.convert(paragraph, converter);
+      return ParagraphConverter.convert(paragraph, converter, unhandledElements);
     } else {
       NumberingListEntryIndex numberingListEntryIndex = setNumberingListEntryIndex(listLevel, iLvl);
       return new NumberingListEntry(
-          ParagraphConverter.convert(paragraph, converter), numberingListEntryIndex);
+          ParagraphConverter.convert(paragraph, converter, unhandledElements),
+          numberingListEntryIndex);
     }
   }
 

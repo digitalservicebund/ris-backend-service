@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.domain.docx.TableElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.TextElement;
 import jakarta.xml.bind.JAXBElement;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import javax.xml.namespace.QName;
 import org.docx4j.wml.P;
 import org.docx4j.wml.PPr;
@@ -33,7 +34,7 @@ class DocxParagraphDocxConverterTest {
     Tbl table = new Tbl();
     JAXBElement<Tbl> tblElement = new JAXBElement<>(new QName("table"), Tbl.class, table);
 
-    var result = converter.convert(tblElement);
+    var result = converter.convert(tblElement, new ArrayList<>());
 
     assertTrue(result instanceof TableElement);
   }
@@ -48,7 +49,7 @@ class DocxParagraphDocxConverterTest {
     run.getContent().add(element);
     paragraph.getContent().add(run);
 
-    var result = converter.convert(paragraph);
+    var result = converter.convert(paragraph, new ArrayList<>());
 
     assertTrue(result instanceof TextElement);
   }
@@ -63,7 +64,7 @@ class DocxParagraphDocxConverterTest {
     pPr.setInd(ind);
     paragraph.setPPr(pPr);
 
-    var result = converter.convert(paragraph);
+    var result = converter.convert(paragraph, new ArrayList<>());
 
     assertThat(result.toHtmlString()).contains("margin-left: " + expectedMarginLeft + ".0px");
   }
@@ -80,7 +81,7 @@ class DocxParagraphDocxConverterTest {
     pPr.setInd(ind);
     paragraph.setPPr(pPr);
 
-    var result = converter.convert(paragraph);
+    var result = converter.convert(paragraph, new ArrayList<>());
 
     assertThat(result.toHtmlString()).contains("margin-left: " + expectedMarginLeft + ".0px");
   }
@@ -102,7 +103,7 @@ class DocxParagraphDocxConverterTest {
     run.getContent().add(element);
     paragraph.getContent().add(run);
 
-    var result = converter.convert(paragraph);
+    var result = converter.convert(paragraph, new ArrayList<>());
 
     assertThat(result.toHtmlString()).contains("text");
     assertThat(result.toHtmlString()).doesNotContain("margin-left:");
@@ -115,14 +116,14 @@ class DocxParagraphDocxConverterTest {
     JAXBElement<R.Cr> element = new JAXBElement<>(new QName("cr"), R.Cr.class, new R.Cr());
     run.getContent().add(element);
     paragraph.getContent().add(run);
-    var result = converter.convert(paragraph);
+    var result = converter.convert(paragraph, new ArrayList<>());
     assertThat(result.toHtmlString()).isEqualTo("<p><br/></p>");
   }
 
   @Test
   void testConvert_withUnknownElement() {
 
-    var result = converter.convert(new Object());
+    var result = converter.convert(new Object(), new ArrayList<>());
 
     assertEquals("unknown element: java.lang.Object", result.toString());
   }

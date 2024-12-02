@@ -8,6 +8,8 @@ import de.bund.digitalservice.ris.caselaw.domain.docx.ParagraphElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.RunElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.RunTabElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.RunTextElement;
+import de.bund.digitalservice.ris.caselaw.domain.docx.UnhandledElement;
+import de.bund.digitalservice.ris.caselaw.domain.docx.UnhandledElementType;
 import jakarta.xml.bind.JAXBElement;
 import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
@@ -52,15 +54,27 @@ public class RunElementConverter {
    * @param run the start R element
    * @param paragraphElement the parent paragraph element
    * @param converter the used docx converter (contains meta information of the docx file)
+   * @param unhandledElements
    */
-  public static void convert(R run, ParagraphElement paragraphElement, DocxConverter converter) {
+  public static void convert(
+      R run,
+      ParagraphElement paragraphElement,
+      DocxConverter converter,
+      List<UnhandledElement> unhandledElements) {
     run.getContent()
         .forEach(
-            element -> parseRunChildrenElement(element, run.getRPr(), paragraphElement, converter));
+            element ->
+                parseRunChildrenElement(
+                    element, run.getRPr(), paragraphElement, converter, unhandledElements));
   }
 
   private static void parseRunChildrenElement(
-      Object element, RPr rPr, ParagraphElement paragraphElement, DocxConverter converter) {
+      Object element,
+      RPr rPr,
+      ParagraphElement paragraphElement,
+      DocxConverter converter,
+      List<UnhandledElement> unhandledElements) {
+
     if (element instanceof JAXBElement<?> jaxbElement) {
       var declaredType = jaxbElement.getDeclaredType();
 
@@ -97,9 +111,14 @@ public class RunElementConverter {
         runTextElement.setText("<br/>");
         paragraphElement.addRunElement(runTextElement);
       } else {
-        LOGGER.error("unknown run element: {}", declaredType.getName());
+        unhandledElements.add(
+            new UnhandledElement("run element", declaredType.getName(), UnhandledElementType.JAXB));
         paragraphElement.addRunElement(new ErrorRunElement(declaredType.getName()));
       }
+    } else {
+      unhandledElements.add(
+          new UnhandledElement(
+              "run element", element.getClass().getName(), UnhandledElementType.OBJECT));
     }
   }
 
