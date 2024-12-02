@@ -45,7 +45,7 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
         .map(
             edition ->
                 LegalPeriodicalEditionTransformer.transformToDomain(edition).toBuilder()
-                    .references(addReferences(edition))
+                    .references(createReferenceListFromDTO(edition))
                     .build());
   }
 
@@ -55,7 +55,7 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
         .map(
             edition ->
                 LegalPeriodicalEditionTransformer.transformToDomain(edition).toBuilder()
-                    .references(addReferences(edition))
+                    .references(createReferenceListFromDTO(edition))
                     .build())
         .toList();
   }
@@ -63,6 +63,7 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
   @Transactional(transactionManager = "jpaTransactionManager")
   public LegalPeriodicalEdition save(LegalPeriodicalEdition legalPeriodicalEdition) {
 
+    // create new lists of references and literature citation DTOs to save using common rank
     List<ReferenceDTO> referenceDTOS = new ArrayList<>();
     List<DependentLiteratureCitationDTO> dependentLiteratureCitationDTOS = new ArrayList<>();
 
@@ -78,27 +79,46 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
         continue;
       }
       if (reference.referenceType().equals(ReferenceType.CASELAW)) {
-        referenceDTOS.add(createReferenceDTO(reference, docUnit.get(), editionRank));
+        referenceDTOS.add(
+            saveReference(reference, docUnit.get()).toBuilder()
+                // add transient edition rank to be used for saving in edition later on
+                .editionRank(editionRank.getAndIncrement())
+                .build());
       }
       if (reference.referenceType().equals(ReferenceType.LITERATURE)) {
         dependentLiteratureCitationDTOS.add(
-            createLiteratureCitationDTO(reference, docUnit.get(), editionRank));
+            saveLiteratureCitation(reference, docUnit.get()).toBuilder()
+                // add transient edition rank to be used for saving in edition later on
+                .editionRank(editionRank.getAndIncrement())
+                .build());
       }
     }
 
+    // create edition DTO and assign references and literature citation lists
     var editionDTO = LegalPeriodicalEditionTransformer.transformToDTO(legalPeriodicalEdition);
     editionDTO.setReferences(referenceDTOS);
     editionDTO.setLiteratureCitations(dependentLiteratureCitationDTOS);
 
-    deleteDocUnitLinksForDeletedReferences(legalPeriodicalEdition);
+    // remove references deleted in edition from DocumentationUnit
+    removeDeletedReferences(legalPeriodicalEdition);
 
     return LegalPeriodicalEditionTransformer.transformToDomain(repository.save(editionDTO))
         .toBuilder()
-        .references(addReferences(editionDTO))
+        .references(createReferenceListFromDTO(editionDTO))
         .build();
   }
 
-  private ArrayList<Reference> addReferences(LegalPeriodicalEditionDTO editionDTO) {
+  /**
+   * Manually fetch the references and literature citations of the editionDTO from the DB using
+   * reference and literatureCitation repositories and transform them into reference domain objects
+   * while maintaining the transient editionRank. This is not possible for the edition transformer
+   * via JPA fetching, because the edition does not link to the references or literature citations
+   * via JPA (for they are completely unrelated entities), but only through their id.
+   *
+   * @param editionDTO the DTO to create the reference list from
+   * @return the list of references (containing references and literature citations) ordered by rank
+   */
+  private ArrayList<Reference> createReferenceListFromDTO(LegalPeriodicalEditionDTO editionDTO) {
     ArrayList<Reference> references = new ArrayList<>();
 
     if (editionDTO.getReferences() != null) {
@@ -132,14 +152,21 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
         .collect(Collectors.toCollection(ArrayList::new));
   }
 
-  private void deleteDocUnitLinksForDeletedReferences(LegalPeriodicalEdition updatedEdition) {
+  /**
+   * Delete references removed in legal periodical evaluation from their DocumentationUnit to
+   * prevent reference orphans and ensure a source relationship is removed if exists. The references
+   * to delete are identified by comparing the last saved edition to the updated one.
+   *
+   * @param updatedEdition the new version of the legal periodical edition
+   */
+  private void removeDeletedReferences(LegalPeriodicalEdition updatedEdition) {
     var oldEdition = repository.findById(updatedEdition.id());
     if (oldEdition.isEmpty()) {
       return;
     }
-    // Ensure it's removed from DocumentationUnit's references
+    // Ensure references deleted in edition are removed from DocumentationUnit's references
     for (Map.Entry<UUID, Integer> reference : oldEdition.get().getReferences().entrySet()) {
-      // skip all existing and null references
+      // identify deleted references (not null and not in updated edition)
       var referenceDTO = referenceRepository.findById(reference.getKey());
       if (referenceDTO.isEmpty()
           || updatedEdition.references().stream()
@@ -165,12 +192,11 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
     }
   }
 
-  private ReferenceDTO createReferenceDTO(
-      Reference reference, DocumentationUnitDTO docUnit, AtomicInteger editionRank) {
+  private ReferenceDTO saveReference(Reference reference, DocumentationUnitDTO docUnit) {
     var newReference = ReferenceTransformer.transformToDTO(reference);
     newReference.setDocumentationUnit(docUnit);
 
-    // keep rank for existing references and set to max rank +1 for new references
+    // keep doc unit's rank for existing references and set to max rank +1 for new references
     newReference.setRank(
         docUnit.getReferences().stream()
             .filter(referenceDTO -> referenceDTO.getId().equals(reference.id()))
@@ -184,17 +210,15 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
                             .orElse(0)
                         + 1));
 
-    return referenceRepository.save(newReference).toBuilder()
-        .editionRank(editionRank.getAndIncrement())
-        .build();
+    return referenceRepository.save(newReference);
   }
 
-  private DependentLiteratureCitationDTO createLiteratureCitationDTO(
-      Reference reference, DocumentationUnitDTO docUnit, AtomicInteger editionRank) {
+  private DependentLiteratureCitationDTO saveLiteratureCitation(
+      Reference reference, DocumentationUnitDTO docUnit) {
     var newReference = DependentLiteratureTransformer.transformToDTO(reference);
     newReference.setDocumentationUnit(docUnit);
 
-    // keep rank for existing references and set to max rank +1 for new references
+    // keep docUnit's rank for existing references and set to max rank +1 for new references
     newReference.setRank(
         docUnit.getReferences().stream()
             .filter(referenceDTO -> referenceDTO.getId().equals(reference.id()))
@@ -207,9 +231,8 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
                             .max(Comparator.naturalOrder())
                             .orElse(0)
                         + 1));
-    return dependentLiteratureCitationRepository.save(newReference).toBuilder()
-        .editionRank(editionRank.getAndIncrement())
-        .build();
+
+    return dependentLiteratureCitationRepository.save(newReference);
   }
 
   @Override
