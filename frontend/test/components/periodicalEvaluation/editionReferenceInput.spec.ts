@@ -40,6 +40,8 @@ function renderComponent() {
 
 describe("Legal periodical edition reference input", () => {
   beforeEach(() => {
+    vi.spyOn(window, "scrollTo").mockImplementation(() => vi.fn())
+
     vi.spyOn(
       documentUnitService,
       "searchByRelatedDocumentation",
