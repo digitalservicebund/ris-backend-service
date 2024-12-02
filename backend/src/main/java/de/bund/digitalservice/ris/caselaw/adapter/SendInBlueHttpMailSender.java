@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import sendinblue.ApiClient;
 import sendinblue.ApiException;
 import sendinblue.Configuration;
@@ -20,6 +21,7 @@ import sibModel.SendSmtpEmailTo;
  * Implementation of the {@link HttpMailSender} interface that sends emails using the SendInBlue
  * Service API.
  */
+@Slf4j
 public class SendInBlueHttpMailSender implements HttpMailSender {
   private final String apiKey;
 
@@ -80,6 +82,8 @@ public class SendInBlueHttpMailSender implements HttpMailSender {
     try {
       api.sendTransacEmail(sendSmtpEmail);
     } catch (ApiException e) {
+      log.error(
+          "SendInBlue/Brevo API error when sending mail, error body: {}", e.getResponseBody());
       throw new HandoverException("Couldn't send email.", e);
     }
   }
