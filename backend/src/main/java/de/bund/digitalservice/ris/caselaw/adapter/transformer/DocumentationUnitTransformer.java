@@ -29,7 +29,6 @@ import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
-import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
@@ -770,22 +769,26 @@ public class DocumentationUnitTransformer {
       DocumentationUnitDTO documentationUnitDTO,
       DocumentationUnit.DocumentationUnitBuilder builder) {
 
-    List<Reference> references = new ArrayList<>();
+    builder.references(new ArrayList<>());
 
     if (documentationUnitDTO.getReferences() != null) {
-      references.addAll(
-          documentationUnitDTO.getReferences().stream()
-              .map(ReferenceTransformer::transformToDomain)
-              .toList());
+      builder
+          .build()
+          .references()
+          .addAll(
+              documentationUnitDTO.getReferences().stream()
+                  .map(ReferenceTransformer::transformToDomain)
+                  .toList());
     }
     if (documentationUnitDTO.getDependentLiteratureCitations() != null) {
-      references.addAll(
-          documentationUnitDTO.getDependentLiteratureCitations().stream()
-              .map(DependentLiteratureTransformer::transformToDomain)
-              .toList());
+      builder
+          .build()
+          .references()
+          .addAll(
+              documentationUnitDTO.getDependentLiteratureCitations().stream()
+                  .map(DependentLiteratureTransformer::transformToDomain)
+                  .toList());
     }
-
-    builder.references(references);
   }
 
   /**
