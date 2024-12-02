@@ -38,7 +38,7 @@ function renderComponent() {
   }
 }
 
-describe("Legal periodical edition list", () => {
+describe("Legal periodical edition reference input", () => {
   beforeEach(() => {
     vi.spyOn(
       documentUnitService,
