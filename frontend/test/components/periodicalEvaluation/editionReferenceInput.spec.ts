@@ -1,6 +1,7 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import PeriodicalEditionReferenceInput from "@/components/periodical-evaluation/references/PeriodicalEditionReferenceInput.vue"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
@@ -76,10 +77,12 @@ describe("Legal periodical edition reference input", () => {
 
   test("adding a decision scrolls to reference on validation errors", async () => {
     const { user } = renderComponent()
+
     const scrollIntoViewMock = vi.fn()
     window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
 
     await user.click(await screen.findByLabelText("Nach Entscheidung suchen"))
+    await nextTick()
     await user.click(await screen.findByLabelText("Treffer übernehmen"))
     expect(
       scrollIntoViewMock,
