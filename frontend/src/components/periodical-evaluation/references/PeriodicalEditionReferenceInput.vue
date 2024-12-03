@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from "vue"
+import { computed, nextTick, onMounted, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import CreateNewFromSearch from "@/components/CreateNewFromSearch.vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
@@ -109,9 +109,15 @@ function updateDateFormatValidation(
 
 /**
  * In case of validation errors it will scroll  back to input fields
+ *
+ * @returns A promise that resolves after the DOM updates.
  */
-function scrollToTopPosition() {
-  if (containerRef.value) {
+async function scrollToTopPosition() {
+  await nextTick()
+  if (
+    containerRef.value instanceof HTMLElement &&
+    "scrollIntoView" in containerRef.value
+  ) {
     containerRef.value.scrollIntoView({
       block: "start",
     })
@@ -185,7 +191,7 @@ function validateRequiredInput(referenceToValidate?: Reference): boolean {
   }
 }
 
-function addReference(decision: RelatedDocumentation) {
+async function addReference(decision: RelatedDocumentation) {
   validationStore.reset()
 
   const newReference: Reference = new Reference({
@@ -207,13 +213,13 @@ function addReference(decision: RelatedDocumentation) {
     emit("update:modelValue", newReference)
     emit("addEntry")
   } else {
-    scrollToTopPosition()
+    await scrollToTopPosition()
   }
 }
 
-function addReferenceWithCreatedDocumentationUnit(docUnit: DocumentUnit) {
+async function addReferenceWithCreatedDocumentationUnit(docUnit: DocumentUnit) {
   if (!docUnit) return
-  addReference(
+  await addReference(
     new RelatedDocumentation({
       uuid: docUnit.uuid,
       fileNumber: docUnit.coreData.fileNumbers
