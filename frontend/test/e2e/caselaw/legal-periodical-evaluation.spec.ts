@@ -192,8 +192,8 @@ test.describe(
         })
 
         try {
-          await test.step("'Fortfahren' saved the edition and replaces url with new edition id", async () => {
-            await page.getByLabel("Fortfahren").click()
+          await test.step("'Übernehmen und Fortfahren' saved the edition and replaces url with new edition id", async () => {
+            await page.getByLabel("Übernehmen und Fortfahren").click()
 
             await page.waitForURL(
               /\/caselaw\/periodical-evaluation\/[0-9a-fA-F-]{36}\/references/,
