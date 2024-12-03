@@ -22,35 +22,35 @@ const store = useEditionStore()
 const { edition } = storeToRefs(store)
 const saveEditionError = ref<ResponseError | undefined>()
 
-const name = ref()
-const prefix = ref()
-const suffix = ref()
+const nameRef = ref<string>()
+const prefixRef = ref<string>()
+const suffixRef = ref<string>()
+const legalPeriodicalRef = ref<LegalPeriodical | undefined>()
 
 const validationStore =
   useValidationStore<(typeof LegalPeriodicalEdition.fields)[number]>()
 
 const legalPeriodical = computed({
   get: () =>
-    edition.value?.legalPeriodical
+    legalPeriodicalRef.value
       ? {
           label:
-            edition.value?.legalPeriodical.abbreviation +
+            legalPeriodicalRef.value.abbreviation +
             " | " +
-            edition.value?.legalPeriodical.title,
+            legalPeriodicalRef.value.title,
           value: edition.value?.legalPeriodical,
-          additionalInformation: edition.value?.legalPeriodical.subtitle,
+          additionalInformation: legalPeriodicalRef.value.subtitle,
         }
       : undefined,
   set: (newValue) => {
-    const legalPeriodical = { ...newValue } as LegalPeriodical
-    if (edition.value)
-      edition.value.legalPeriodical = newValue ? legalPeriodical : undefined
+    legalPeriodicalRef.value = newValue
+      ? ({ ...newValue } as LegalPeriodical)
+      : undefined
   },
 })
 
 async function validateRequiredInput() {
   validationStore.reset()
-
   edition.value?.missingRequiredFields.forEach((missingField) =>
     validationStore.add("Pflichtfeld nicht befüllt", missingField),
   )
@@ -61,9 +61,10 @@ async function saveEdition() {
   saveEditionError.value = undefined
   await store.loadEdition()
   if (edition.value) {
-    edition.value.name = name.value
-    edition.value.prefix = prefix.value
-    edition.value.suffix = suffix.value
+    edition.value.name = nameRef.value
+    edition.value.prefix = prefixRef.value
+    edition.value.suffix = suffixRef.value
+    edition.value.legalPeriodical = legalPeriodicalRef.value
   }
 
   await validateRequiredInput()
@@ -89,9 +90,10 @@ async function saveEdition() {
  */
 onBeforeMount(async () => {
   await store.loadEdition()
-  name.value = edition.value?.name
-  prefix.value = edition.value?.prefix
-  suffix.value = edition.value?.suffix
+  nameRef.value = edition.value?.name
+  prefixRef.value = edition.value?.prefix
+  suffixRef.value = edition.value?.suffix
+  legalPeriodicalRef.value = { ...edition.value?.legalPeriodical }
 })
 </script>
 
@@ -129,7 +131,7 @@ onBeforeMount(async () => {
       >
         <TextInput
           id="name"
-          v-model="name"
+          v-model="nameRef"
           aria-label="Name der Ausgabe"
           class="ds-input-medium"
           :has-error="slotProps.hasError"
@@ -142,7 +144,7 @@ onBeforeMount(async () => {
           <InputField id="prefix" label="Präfix">
             <TextInput
               id="prefix"
-              v-model="prefix"
+              v-model="prefixRef"
               aria-label="Präfix"
               class="ds-input-medium"
               size="medium"
@@ -152,7 +154,7 @@ onBeforeMount(async () => {
           <InputField id="suffix" label="Suffix">
             <TextInput
               id="suffix"
-              v-model="suffix"
+              v-model="suffixRef"
               aria-label="Suffix"
               class="ds-input-medium"
               size="medium"
@@ -160,16 +162,16 @@ onBeforeMount(async () => {
           </InputField>
         </div>
 
-        <div v-if="legalPeriodical" class="ds-label-03-reg pt-4">
-          Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}
+        <div v-if="legalPeriodicalRef" class="ds-label-03-reg pt-4">
+          Zitierbeispiel: {{ legalPeriodicalRef.citationStyle }}
         </div>
       </div>
 
       <FlexContainer align-items="items-center" class="gap-16">
         <TextButton
-          aria-label="Fortfahren"
+          aria-label="Übernehmen und fortfahren"
           class="ds-button-02-reg"
-          label="Fortfahren"
+          label="Übernehmen und fortfahren"
           @click="saveEdition"
         ></TextButton>
       </FlexContainer>
