@@ -89,10 +89,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -150,22 +150,22 @@ class DocumentationUnitIntegrationTest {
   @Autowired private DatabaseDeletedDocumentationIdsRepository deletedDocumentationIdsRepository;
   @Autowired private AuthService authService;
 
-  @MockBean private S3AsyncClient s3AsyncClient;
-  @MockBean private MailService mailService;
-  @MockBean private DocxConverterService docxConverterService;
-  @MockBean private UserGroupService userGroupService;
-  @MockBean private ClientRegistrationRepository clientRegistrationRepository;
-  @MockBean private AttachmentService attachmentService;
-  @MockBean private PatchMapperService patchMapperService;
-  @MockBean private HandoverService handoverService;
-  @MockBean private LdmlExporterService ldmlExporterService;
-  @MockBean private DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
+  @MockitoBean private S3AsyncClient s3AsyncClient;
+  @MockitoBean private MailService mailService;
+  @MockitoBean private DocxConverterService docxConverterService;
+  @MockitoBean private UserGroupService userGroupService;
+  @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
+  @MockitoBean private AttachmentService attachmentService;
+  @MockitoBean private PatchMapperService patchMapperService;
+  @MockitoBean private HandoverService handoverService;
+  @MockitoBean private LdmlExporterService ldmlExporterService;
+  @MockitoBean private DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
 
-  @MockBean
+  @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
 
-  @MockBean DocumentNumberPatternConfig documentNumberPatternConfig;
+  @MockitoBean DocumentNumberPatternConfig documentNumberPatternConfig;
 
   private final DocumentationOffice docOffice = buildDSDocOffice();
   private DocumentationOfficeDTO documentationOffice;

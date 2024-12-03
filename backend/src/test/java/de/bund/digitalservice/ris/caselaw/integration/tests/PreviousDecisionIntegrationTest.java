@@ -67,11 +67,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
@@ -120,18 +120,18 @@ class PreviousDecisionIntegrationTest {
   @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
   @Autowired private DatabaseFileNumberRepository databaseFileNumberRepository;
 
-  @MockBean UserService userService;
-  @MockBean ClientRegistrationRepository clientRegistrationRepository;
-  @MockBean private S3AsyncClient s3AsyncClient;
-  @MockBean private MailService mailService;
-  @MockBean DocxConverterService docxConverterService;
-  @MockBean AttachmentService attachmentService;
-  @MockBean private PatchMapperService patchMapperService;
-  @MockBean private HandoverService handoverService;
-  @MockBean private ProcedureService procedureService;
-  @MockBean private LdmlExporterService ldmlExporterService;
+  @MockitoBean UserService userService;
+  @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
+  @MockitoBean private S3AsyncClient s3AsyncClient;
+  @MockitoBean private MailService mailService;
+  @MockitoBean DocxConverterService docxConverterService;
+  @MockitoBean AttachmentService attachmentService;
+  @MockitoBean private PatchMapperService patchMapperService;
+  @MockitoBean private HandoverService handoverService;
+  @MockitoBean private ProcedureService procedureService;
+  @MockitoBean private LdmlExporterService ldmlExporterService;
 
-  @MockBean
+  @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
 

@@ -54,12 +54,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -104,15 +104,15 @@ class LegalPeriodicalEditionIntegrationTest {
   @Autowired private DatabaseDocumentationUnitRepository documentationUnitRepository;
   @Autowired private DocumentationUnitService documentationUnitService;
 
-  @MockBean private UserService userService;
-  @MockBean private DocumentationUnitStatusService statusService;
-  @MockBean private ClientRegistrationRepository clientRegistrationRepository;
-  @MockBean private ProcedureService procedureService;
-  @MockBean private HandoverService handoverService;
-  @MockBean private DocumentNumberService numberService;
-  @MockBean private DocumentNumberRecyclingService recyclingService;
-  @MockBean private AttachmentService attachmentService;
-  @MockBean private PatchMapperService patchMapperService;
+  @MockitoBean private UserService userService;
+  @MockitoBean private DocumentationUnitStatusService statusService;
+  @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
+  @MockitoBean private ProcedureService procedureService;
+  @MockitoBean private HandoverService handoverService;
+  @MockitoBean private DocumentNumberService numberService;
+  @MockitoBean private DocumentNumberRecyclingService recyclingService;
+  @MockitoBean private AttachmentService attachmentService;
+  @MockitoBean private PatchMapperService patchMapperService;
 
   private static final String EDITION_ENDPOINT = "/api/v1/caselaw/legalperiodicaledition";
   private final DocumentationOffice docOffice = buildDSDocOffice();

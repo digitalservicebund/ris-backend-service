@@ -21,10 +21,10 @@ import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -62,10 +62,10 @@ class CitationTypeIntegrationTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseCitationTypeRepository citationTypeRepository;
 
-  @MockBean UserService userService;
-  @MockBean private DocumentationUnitService documentationUnitService;
-  @MockBean ClientRegistrationRepository clientRegistrationRepository;
-  @MockBean private ProcedureService procedureService;
+  @MockitoBean UserService userService;
+  @MockitoBean private DocumentationUnitService documentationUnitService;
+  @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
+  @MockitoBean private ProcedureService procedureService;
 
   @AfterEach
   void cleanUp() {

@@ -34,11 +34,11 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.server.ResponseStatusException;
@@ -54,15 +54,15 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 @ExtendWith(SpringExtension.class)
 @Import({S3AttachmentService.class})
 class S3AttachmentServiceTest {
-  @SpyBean S3AttachmentService service;
+  @MockitoSpyBean S3AttachmentService service;
 
-  @MockBean AttachmentRepository repository;
+  @MockitoBean AttachmentRepository repository;
 
-  @MockBean
+  @MockitoBean
   @Qualifier("docxS3Client")
   S3Client s3Client;
 
-  @MockBean DatabaseDocumentationUnitRepository documentationUnitRepository;
+  @MockitoBean DatabaseDocumentationUnitRepository documentationUnitRepository;
 
   private DocumentationUnitDTO documentationUnitDTO;
 

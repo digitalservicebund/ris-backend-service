@@ -58,11 +58,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -111,17 +111,17 @@ class DocumentationUnitSearchIntegrationTest {
   @Autowired
   private DatabaseDocumentationUnitProcedureRepository documentationUnitProcedureRepository;
 
-  @MockBean S3AsyncClient s3AsyncClient;
-  @MockBean MailService mailService;
-  @MockBean DocxConverterService docxConverterService;
-  @MockBean ClientRegistrationRepository clientRegistrationRepository;
-  @MockBean AttachmentService attachmentService;
-  @MockBean private UserGroupService userGroupService;
-  @MockBean private PatchMapperService patchMapperService;
-  @MockBean private HandoverService handoverService;
-  @MockBean private LdmlExporterService ldmlExporterService;
+  @MockitoBean S3AsyncClient s3AsyncClient;
+  @MockitoBean MailService mailService;
+  @MockitoBean DocxConverterService docxConverterService;
+  @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
+  @MockitoBean AttachmentService attachmentService;
+  @MockitoBean private UserGroupService userGroupService;
+  @MockitoBean private PatchMapperService patchMapperService;
+  @MockitoBean private HandoverService handoverService;
+  @MockitoBean private LdmlExporterService ldmlExporterService;
 
-  @MockBean
+  @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
 
