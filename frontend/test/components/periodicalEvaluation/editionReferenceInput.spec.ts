@@ -75,6 +75,8 @@ describe("Legal periodical edition reference input", () => {
   })
 
   test("adding a decision scrolls to reference on validation errors", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => null)
+
     const { user } = renderComponent()
     const scrollIntoViewMock = vi.fn()
     const searchButton = screen.getByLabelText("Nach Entscheidung suchen")
