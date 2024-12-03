@@ -56,19 +56,25 @@ async function saveEdition() {
 
   await validateRequiredInput()
   if (validationStore.isValid()) {
+    editionRef.value.references = store.edition?.references
     const response = await LegalPeriodicalEditionService.save(
       editionRef.value as LegalPeriodicalEdition,
     )
 
-    if (response.error) {
+    if (response.data) {
+      {
+        store.edition = new LegalPeriodicalEdition({
+          ...response.data,
+        })
+        editionRef.value = new LegalPeriodicalEdition({ ...response.data })
+        await router.push({
+          name: "caselaw-periodical-evaluation-editionId-references",
+          params: { editionId: editionRef?.value?.id },
+          query: {},
+        })
+      }
+    } else if (response.error) {
       saveEditionError.value = response.error
-    } else if (response.data) {
-      editionRef.value = new LegalPeriodicalEdition({ ...response.data })
-      await router.push({
-        name: "caselaw-periodical-evaluation-editionId-references",
-        params: { editionId: editionRef?.value?.id },
-        query: {},
-      })
     }
   }
 }
