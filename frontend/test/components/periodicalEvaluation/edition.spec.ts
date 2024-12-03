@@ -96,7 +96,7 @@ describe("Legal periodical edition list", () => {
     expect(screen.getByLabelText("Name der Ausgabe")).toBeVisible()
     expect(screen.getByLabelText("Präfix")).toBeVisible()
     expect(screen.getByLabelText("Suffix")).toBeVisible()
-    expect(screen.getByText("Fortfahren")).toBeVisible()
+    expect(screen.getByText("Übernehmen und fortfahren")).toBeVisible()
   })
 
   test("selecting legal periodical from combobox value for legal periodical", async () => {
@@ -218,7 +218,7 @@ describe("Legal periodical edition list", () => {
 
       await user.type(screen.getByLabelText("Name der Ausgabe"), "name")
 
-      await user.click(screen.getByLabelText("Fortfahren"))
+      await user.click(screen.getByLabelText("Übernehmen und fortfahren"))
 
       expect(fetchSpy).toHaveBeenCalledTimes(1)
     })
