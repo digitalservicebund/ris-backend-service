@@ -77,10 +77,13 @@ describe("Legal periodical edition reference input", () => {
   test("adding a decision scrolls to reference on validation errors", async () => {
     const { user } = renderComponent()
     const scrollIntoViewMock = vi.fn()
+    const searchButton = screen.getByLabelText("Nach Entscheidung suchen")
     window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
 
-    await user.click(await screen.findByLabelText("Nach Entscheidung suchen"))
-    await user.click(await screen.findByLabelText("Treffer übernehmen"))
+    await user.click(searchButton)
+
+    const addDecision = screen.getByLabelText("Treffer übernehmen")
+    await user.click(addDecision)
     expect(
       scrollIntoViewMock,
       "Adding a reference with missing required fields should scroll to entry",
