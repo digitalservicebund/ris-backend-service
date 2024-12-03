@@ -164,6 +164,7 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
     if (oldEdition.isEmpty()) {
       return;
     }
+
     // Ensure references deleted in edition are removed from DocumentationUnit's references
     for (Map.Entry<UUID, Integer> reference : oldEdition.get().getReferences().entrySet()) {
       // identify deleted references (not null and not in updated edition)
@@ -190,10 +191,36 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
                 documentationUnitRepository.save(docUnit);
               });
     }
+
+    for (Map.Entry<UUID, Integer> citation : oldEdition.get().getLiteratureCitations().entrySet()) {
+      // identify deleted citations (not null and not in updated edition)
+      var citationDTO = dependentLiteratureCitationRepository.findById(citation.getKey());
+      if (citationDTO.isEmpty()
+          || updatedEdition.references().stream()
+              .anyMatch(newCitation -> newCitation.id().equals(citation.getKey()))) {
+        continue;
+      }
+
+      // delete all deleted references and possible source reference
+      documentationUnitRepository
+          .findById(citationDTO.get().getDocumentationUnit().getId())
+          .ifPresent(
+              docUnit -> {
+                docUnit.getDependentLiteratureCitations().remove(citationDTO.get());
+                if (docUnit.getSource().stream()
+                    .findFirst()
+                    .map(SourceDTO::getReference)
+                    .filter(ref -> ref.getId().equals(citation.getKey()))
+                    .isPresent()) {
+                  docUnit.getSource().removeFirst();
+                }
+                documentationUnitRepository.save(docUnit);
+              });
+    }
   }
 
   private ReferenceDTO saveReference(Reference reference, DocumentationUnitDTO docUnit) {
-    var newReference = ReferenceTransformer.transformToDTO(reference);
+    ReferenceDTO newReference = ReferenceTransformer.transformToDTO(reference);
     newReference.setDocumentationUnit(docUnit);
 
     // keep doc unit's rank for existing references and set to max rank +1 for new references
@@ -215,15 +242,18 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
 
   private DependentLiteratureCitationDTO saveLiteratureCitation(
       Reference reference, DocumentationUnitDTO docUnit) {
-    var newReference = DependentLiteratureTransformer.transformToDTO(reference);
+    DependentLiteratureCitationDTO newReference =
+        DependentLiteratureTransformer.transformToDTO(reference);
     newReference.setDocumentationUnit(docUnit);
 
     // keep docUnit's rank for existing references and set to max rank +1 for new references
     newReference.setRank(
-        docUnit.getReferences().stream()
-            .filter(referenceDTO -> referenceDTO.getId().equals(reference.id()))
+        docUnit.getDependentLiteratureCitations().stream()
+            .filter(
+                dependentLiteratureCitationDTO ->
+                    dependentLiteratureCitationDTO.getId().equals(reference.id()))
             .findFirst()
-            .map(ReferenceDTO::getRank)
+            .map(DependentLiteratureCitationDTO::getRank)
             .orElseGet(
                 () ->
                     docUnit.getDependentLiteratureCitations().stream()
