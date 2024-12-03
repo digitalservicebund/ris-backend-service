@@ -3,12 +3,16 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.FieldOfLawTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.FieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import org.apache.commons.lang3.StringUtils;
+import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
@@ -17,13 +21,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   private final DatabaseFieldOfLawRepository repository;
-  private final DatabaseFieldOfLawNormRepository normRepository;
+  private final EntityManager entityManager;
 
   public PostgresFieldOfLawRepositoryImpl(
-      DatabaseFieldOfLawRepository repository, DatabaseFieldOfLawNormRepository normRepository) {
+      DatabaseFieldOfLawRepository repository, EntityManager entityManager) {
 
     this.repository = repository;
-    this.normRepository = normRepository;
+    this.entityManager = entityManager;
   }
 
   @Override
@@ -72,117 +76,52 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
   @Override
   @Transactional
-  public List<FieldOfLaw> findBySearchTerms(String[] searchTerms) {
-    if (searchTerms == null || searchTerms.length == 0) {
-      return Collections.emptyList();
+  public List<FieldOfLaw> find(
+      Optional<String> identifier, Optional<String[]> searchTerms, Optional<String[]> norm) {
+    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+    CriteriaQuery<FieldOfLawDTO> cq = cb.createQuery(FieldOfLawDTO.class);
+    Root<FieldOfLawDTO> fieldOfLawRoot = cq.from(FieldOfLawDTO.class);
+    fieldOfLawRoot.fetch("norms");
+    ArrayList<Predicate> predicates = new ArrayList<>();
+
+    if (searchTerms.isPresent()) {
+      for (String searchTerm : searchTerms.get()) {
+        predicates.add(
+            cb.like(cb.lower(fieldOfLawRoot.get("text")), "%" + searchTerm.toLowerCase() + "%"));
+      }
+    }
+    if (identifier.isPresent()) {
+      Predicate identifierPredicate =
+          cb.like(fieldOfLawRoot.get("identifier"), identifier.get().toUpperCase() + "%");
+      predicates.add(identifierPredicate);
+    }
+    if (norm.isPresent()) {
+      for (String searchTerm : norm.get()) {
+        Predicate normPredicate =
+            cb.like(
+                cb.lower(fieldOfLawRoot.get("norms").get("abbreviation")),
+                "%" + searchTerm.toLowerCase() + "%");
+        Predicate normPredicate2 =
+            cb.like(
+                cb.lower(fieldOfLawRoot.get("norms").get("singleNormDescription")),
+                "%" + searchTerm.toLowerCase() + "%");
+        Predicate combined = cb.or(normPredicate, normPredicate2);
+        predicates.add(combined);
+      }
     }
 
-    List<FieldOfLawDTO> listWithFirstSearchTerm =
-        repository.findAllByNotationAndIdentifierContainingIgnoreCaseOrTextContainingIgnoreCase(
-            searchTerms[0]);
+    var size = predicates.size();
+    cq.select(fieldOfLawRoot).where(predicates.toArray(new Predicate[size]));
+    cq.orderBy(cb.asc(fieldOfLawRoot.get("identifier")));
 
-    if (searchTerms.length == 1) {
-      return listWithFirstSearchTerm.stream()
-          .map(PostgresFieldOfLawRepositoryImpl::getWithNormsWithoutChildren)
-          .toList();
-    }
+    TypedQuery<FieldOfLawDTO> query = entityManager.createQuery(cq);
+    List<FieldOfLawDTO> result = query.getResultList();
 
-    return listWithFirstSearchTerm.stream()
-        .filter(fieldOfLawDTO -> returnTrueIfInText(fieldOfLawDTO, searchTerms))
-        .map(PostgresFieldOfLawRepositoryImpl::getWithNormsWithoutChildren)
-        .toList();
-  }
-
-  @Override
-  @Transactional
-  public List<FieldOfLaw> findByNorm(String normStr) {
-    List<FieldOfLawNormDTO> list = getNormDTOs(normStr);
-    return list.stream()
-        .map(FieldOfLawNormDTO::getFieldOfLaw)
-        .distinct()
-        .map(PostgresFieldOfLawRepositoryImpl::getWithNormsWithoutChildren)
-        .toList();
-  }
-
-  private List<FieldOfLawNormDTO> getNormDTOs(String normStr) {
-    String correctedNormStr = getNormQueryStrings(normStr);
-
-    return normRepository.findByAbbreviationAndSingleNormDescriptionContainingIgnoreCase(
-        correctedNormStr);
-  }
-
-  private String getNormQueryStrings(String normString) {
-    return normString.replaceAll("§(\\w)", "§ $1");
-  }
-
-  @Override
-  @Transactional
-  public List<FieldOfLaw> findByNormAndSearchTerms(String normStr, String[] searchTerms) {
-    List<FieldOfLawNormDTO> listWithNormStr = getNormDTOs(normStr);
-
-    return listWithNormStr.stream()
-        .map(FieldOfLawNormDTO::getFieldOfLaw)
+    return result.stream()
         .filter(Objects::nonNull)
-        .filter(fieldOfLawDTO -> returnTrueIfInText(fieldOfLawDTO, searchTerms))
         .distinct()
         .map(PostgresFieldOfLawRepositoryImpl::getWithNormsWithoutChildren)
         .toList();
-  }
-
-  @Override
-  @Transactional
-  public List<FieldOfLaw> findByIdentifierAndNorm(String identifier, String norm) {
-    List<FieldOfLawDTO> fieldOfLawList =
-        repository.findAllByIdentifierStartsWithIgnoreCaseOrderByIdentifier(identifier);
-    List<FieldOfLawDTO> fieldOfLawNormDTOList =
-        getNormDTOs(norm).stream().map(FieldOfLawNormDTO::getFieldOfLaw).toList();
-
-    List<FieldOfLawDTO> commonElements = new ArrayList<>(fieldOfLawList);
-    commonElements.retainAll(fieldOfLawNormDTOList);
-
-    return commonElements.stream()
-        .map(PostgresFieldOfLawRepositoryImpl::getWithNormsWithoutChildren)
-        .toList();
-  }
-
-  @Override
-  @Transactional
-  public List<FieldOfLaw> findByIdentifierAndSearchTerms(String identifier, String[] searchTerms) {
-    List<FieldOfLawDTO> fieldOfLawList =
-        repository.findAllByIdentifierStartsWithIgnoreCaseOrderByIdentifier(identifier);
-
-    return fieldOfLawList.stream()
-        .filter(Objects::nonNull)
-        .filter(fieldOfLawDTO -> returnTrueIfInText(fieldOfLawDTO, searchTerms))
-        .distinct()
-        .map(PostgresFieldOfLawRepositoryImpl::getWithNormsWithoutChildren)
-        .toList();
-  }
-
-  @Override
-  @Transactional
-  public List<FieldOfLaw> findByIdentifierAndSearchTermsAndNorm(
-      String identifier, String[] searchTerms, String norm) {
-    List<FieldOfLawDTO> fieldOfLawList =
-        repository.findAllByIdentifierStartsWithIgnoreCaseOrderByIdentifier(identifier);
-    List<FieldOfLawDTO> fieldOfLawNormDTOList =
-        getNormDTOs(norm).stream().map(FieldOfLawNormDTO::getFieldOfLaw).toList();
-
-    fieldOfLawList.retainAll(fieldOfLawNormDTOList);
-
-    return fieldOfLawList.stream()
-        .filter(fol -> returnTrueIfInText(fol, searchTerms))
-        .map(PostgresFieldOfLawRepositoryImpl::getWithNormsWithoutChildren)
-        .toList();
-  }
-
-  public static boolean returnTrueIfInText(FieldOfLawDTO fieldOfLawDTO, String[] searchTerms) {
-    if (searchTerms == null || searchTerms.length == 0) {
-      return false;
-    }
-    return Arrays.stream(searchTerms)
-        .allMatch(
-            searchTerm -> StringUtils.containsIgnoreCase(fieldOfLawDTO.getText(), searchTerm));
   }
 
   @Override

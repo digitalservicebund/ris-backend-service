@@ -4,7 +4,6 @@ import de.bund.digitalservice.ris.caselaw.domain.FieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.Norm;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,22 +67,11 @@ public class FieldOfLawService {
       Pageable pageable) {
     Optional<String[]> searchTerms = description.map(this::splitSearchTerms);
     Optional<String> normStr = norm.map(n -> n.trim().replaceAll("§(\\d+)", "§ $1"));
+    Optional<String[]> normTerms = norm.map(n -> n.replaceAll("§", "")).map(this::splitSearchTerms);
 
     List<FieldOfLaw> unorderedList;
 
-    if (identifier.isPresent()) {
-      String identifierStr = identifier.get().trim();
-
-      if (searchTerms.isEmpty() && normStr.isEmpty()) {
-        // Returned list is already ordered by identifier, so scoring is not necessary here
-        unorderedList = repository.findByIdentifier(identifierStr, pageable);
-        return sliceResults(unorderedList, pageable);
-      } else {
-        unorderedList = getResultsWithIdentifier(identifierStr, searchTerms, normStr);
-      }
-    } else {
-      unorderedList = getResultsWithoutIdentifier(searchTerms, normStr);
-    }
+    unorderedList = repository.find(identifier, searchTerms, normTerms);
 
     // If no results found, return an empty page
     if (unorderedList.isEmpty()) {
@@ -93,35 +81,6 @@ public class FieldOfLawService {
     List<FieldOfLaw> orderedList = orderResults(searchTerms, normStr, unorderedList);
 
     return sliceResults(orderedList, pageable);
-  }
-
-  private List<FieldOfLaw> getResultsWithIdentifier(
-      String identifierStr, Optional<String[]> searchTerms, Optional<String> norm) {
-    if (searchTerms.isPresent() && norm.isPresent()) {
-      return repository.findByIdentifierAndSearchTermsAndNorm(
-          identifierStr, searchTerms.get(), norm.get());
-    }
-    if (searchTerms.isPresent()) {
-      return repository.findByIdentifierAndSearchTerms(identifierStr, searchTerms.get());
-    }
-    if (norm.isPresent()) {
-      return repository.findByIdentifierAndNorm(identifierStr, norm.get());
-    }
-    return Collections.emptyList();
-  }
-
-  private List<FieldOfLaw> getResultsWithoutIdentifier(
-      Optional<String[]> searchTerms, Optional<String> norm) {
-    if (searchTerms.isPresent() && norm.isPresent()) {
-      return repository.findByNormAndSearchTerms(norm.get(), searchTerms.get());
-    }
-    if (searchTerms.isPresent()) {
-      return repository.findBySearchTerms(searchTerms.get());
-    }
-    if (norm.isPresent()) {
-      return repository.findByNorm(norm.get());
-    }
-    return Collections.emptyList();
   }
 
   private List<FieldOfLaw> orderResults(
