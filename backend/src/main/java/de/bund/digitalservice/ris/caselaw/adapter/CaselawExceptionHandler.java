@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice
@@ -44,12 +43,6 @@ public class CaselawExceptionHandler extends ResponseEntityExceptionHandler {
     ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
 
     return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
-  }
-
-  @ExceptionHandler(AsyncRequestNotUsableException.class)
-  void handleAsyncRequestNotUsableException(AsyncRequestNotUsableException ex) {
-    /* ignore exception because most of the time this exception occurred when the user
-    close the browser without waiting to the result of an api call. */
   }
 
   public record ApiError(HttpStatus status, String message) {}
