@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.domain;
+package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -12,7 +12,6 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverter;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverterException;
 import de.bund.digitalservice.ris.caselaw.config.ConverterConfig;

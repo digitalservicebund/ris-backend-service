@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.math.BigInteger;
 import org.junit.jupiter.api.Test;
 
-class DocxUnitDocxConverterTest {
+class DocxUnitConverterTest {
   @Test
   void testConvertTwipToPixel() {
     var result = DocxUnitConverter.convertTwipToPixel(1440);

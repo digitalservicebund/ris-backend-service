@@ -175,11 +175,11 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.29.23"))
+    implementation(platform("software.amazon.awssdk:bom:2.29.24"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
-    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.0")
+    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.1")
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
 
     // caselaw tranformation to LDML for the communication with the portal
@@ -188,7 +188,7 @@ dependencies {
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
     implementation("org.eclipse.angus:angus-mail:2.0.3")
-    implementation("com.icegreen:greenmail:2.1.1")
+    implementation("com.icegreen:greenmail:2.1.2")
 
     // package served by private repo, requires authentication:
     implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.19") {
@@ -218,7 +218,7 @@ dependencies {
 
     implementation("io.getunleash:unleash-client-java:9.2.6")
     implementation("org.apache.commons:commons-text:1.12.0")
-    implementation("org.jsoup:jsoup:1.18.2")
+    implementation("org.jsoup:jsoup:1.18.3")
 
     implementation("net.javacrumbs.shedlock:shedlock-spring:6.0.2")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.0.2")

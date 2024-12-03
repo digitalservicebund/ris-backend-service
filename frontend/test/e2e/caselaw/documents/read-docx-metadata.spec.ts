@@ -49,6 +49,7 @@ test.describe(
           await expect(
             page.getByText("ECLIECLI:DE:BGH:2023:210423UVZR86.22.0"),
           ).toBeVisible()
+          await expect(page.getByText("DokumenttypUrteil")).toBeVisible()
         })
 
         // procedure is only displayed in categories
