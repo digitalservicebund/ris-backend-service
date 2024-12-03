@@ -16,7 +16,7 @@ import { Text } from "@tiptap/extension-text"
 import { TextAlign } from "@tiptap/extension-text-align"
 import { TextStyle } from "@tiptap/extension-text-style"
 import { Underline } from "@tiptap/extension-underline"
-import { Editor, EditorContent } from "@tiptap/vue-3"
+import { Content, Editor, EditorContent } from "@tiptap/vue-3"
 import { computed, onMounted, ref, watch } from "vue"
 import TextEditorMenu from "@/components/input/TextEditorMenu.vue"
 import { TextAreaInputAttributes } from "@/components/input/types"
@@ -37,6 +37,9 @@ import { CustomOrderedList } from "@/editor/orderedList"
 import { CustomParagraph } from "@/editor/paragraph"
 import { CustomSubscript, CustomSuperscript } from "@/editor/scriptText"
 import { TableStyle } from "@/editor/tableStyle"
+import { LanguageTool } from "@/editor/languagetool/languageTool"
+import BubbleMenu from "@/editor/languagetool/BubbleMenu.vue"
+import { Match } from "@/types/languagetool"
 
 interface Props {
   value?: string
@@ -126,6 +129,11 @@ const editor = new Editor({
     Indent.configure({
       names: ["listItem", "paragraph"],
     }),
+    LanguageTool.configure({
+      automaticMode: true,
+      documentId: "1",
+      apiUrl: "http://localhost:8081/v2/check",
+    }),
   ],
   onUpdate: () => {
     emit("updateValue", editor.getHTML())
@@ -204,6 +212,42 @@ const resizeObserver = new ResizeObserver((entries) => {
     containerWidth.value = entry.contentRect.width
   }
 })
+
+const shouldShow = ({ editor }) => {
+  const match = editor.storage.languagetool.match
+  const matchRange = editor.storage.languagetool.matchRange
+
+  const { from, to } = editor.state.selection
+
+  return (
+    !!match && !!matchRange && matchRange.from <= from && to <= matchRange.to
+  )
+}
+
+const match = ref<Match>()
+
+const matchRange = ref<{ from: number; to: number }>()
+
+const loading = ref(false)
+
+const updateMatch = (editor: Editor) => {
+  match.value = editor.storage.languagetool.match
+  matchRange.value = editor.storage.languagetool.matchRange
+}
+
+const replacements = computed(() => match.value?.replacements || [])
+
+const matchMessage = computed(() => match.value?.message || "No Message")
+
+const updateHtml = () => navigator.clipboard.writeText(editor.getHTML())
+
+const acceptSuggestion = (sug) => {
+  editor.commands.insertContentAt(matchRange.value, sug.value)
+}
+
+const proofread = () => editor.commands.proofread()
+
+const ignoreSuggestion = () => editor.commands.ignoreLanguageToolSuggestion()
 </script>
 
 <template>
@@ -219,7 +263,7 @@ const resizeObserver = new ResizeObserver((entries) => {
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
   >
-    <TextEditorMenu
+    <!-- <TextEditorMenu
       v-if="editable"
       :aria-label="props.ariaLabel"
       :buttons-disabled="buttonsDisabled"
@@ -229,7 +273,7 @@ const resizeObserver = new ResizeObserver((entries) => {
       @on-editor-expanded-changed="
         (isExpanded) => (editorExpanded = isExpanded)
       "
-    />
+    /> -->
     <hr v-if="editable" class="ml-8 mr-8 border-blue-300" />
     <div>
       <EditorContent
@@ -238,5 +282,30 @@ const resizeObserver = new ResizeObserver((entries) => {
         :editor="editor"
       />
     </div>
+    <bubble-menu
+      class="bubble-menu"
+      v-if="editor"
+      :editor="editor"
+      :tippy-options="{ placement: 'bottom', animation: 'fade' }"
+      :should-show="({ editor }) => shouldShow({ editor })"
+    >
+      <!--
+        <section class="bubble-menu-section-container">
+          <section class="message-section">
+            {{ matchMessage }}
+            <button class="ignore-suggestion-button" @click="ignoreSuggestion">XXX</button>
+          </section>
+          <section class="suggestions-section">
+            <article
+              v-for="(replacement, i) in replacements"
+              @click="() => acceptSuggestion(replacement)"
+              :key="i + replacement.value"
+              class="suggestion">
+              {{ replacement.value }}
+            </article>
+          </section>
+        </section>
+-->
+    </bubble-menu>
   </div>
 </template>
