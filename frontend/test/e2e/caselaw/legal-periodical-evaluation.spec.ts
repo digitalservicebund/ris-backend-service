@@ -338,7 +338,7 @@ test.describe(
 
         await test.step("A docunit can be added to an edition multiple times", async () => {
           const saveRequest = page.waitForResponse(
-            `**/api/v1/caselaw/legalperiodicaledition/${edition.id}`,
+            "**/api/v1/caselaw/legalperiodicaledition",
             { timeout: 5_000 },
           )
           await navigateToPeriodicalReferences(secondPage, edition.id)
