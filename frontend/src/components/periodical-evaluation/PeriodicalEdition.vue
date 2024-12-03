@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { storeToRefs } from "pinia"
 import { computed, onBeforeMount, ref } from "vue"
 import { useRouter } from "vue-router"
 import ComboboxInput from "@/components/ComboboxInput.vue"
@@ -18,9 +19,11 @@ import { useEditionStore } from "@/stores/editionStore"
 
 const router = useRouter()
 const store = useEditionStore()
+const { edition } = storeToRefs(store)
+
 const saveEditionError = ref<ResponseError | undefined>()
 
-const editionRef = ref<LegalPeriodicalEdition>(new LegalPeriodicalEdition())
+const editionRef = ref<LegalPeriodicalEdition | undefined>(undefined)
 const validationStore =
   useValidationStore<(typeof LegalPeriodicalEdition.fields)[number]>()
 
@@ -37,9 +40,11 @@ const legalPeriodical = computed({
         }
       : undefined,
   set: (newValue) => {
-    editionRef.value.legalPeriodical = newValue
-      ? ({ ...newValue } as LegalPeriodical)
-      : undefined
+    if (editionRef.value) {
+      editionRef.value.legalPeriodical = newValue
+        ? ({ ...newValue } as LegalPeriodical)
+        : undefined
+    }
   },
 })
 
@@ -55,7 +60,7 @@ async function saveEdition() {
   saveEditionError.value = undefined
 
   await validateRequiredInput()
-  if (validationStore.isValid()) {
+  if (validationStore.isValid() && editionRef.value) {
     editionRef.value.references = store.edition?.references
     const response = await LegalPeriodicalEditionService.save(
       editionRef.value as LegalPeriodicalEdition,
@@ -66,7 +71,7 @@ async function saveEdition() {
         store.edition = new LegalPeriodicalEdition({
           ...response.data,
         })
-        editionRef.value = new LegalPeriodicalEdition({ ...response.data })
+        editionRef.value = { ...store.edition }
         await router.push({
           name: "caselaw-periodical-evaluation-editionId-references",
           params: { editionId: editionRef?.value?.id },
@@ -84,10 +89,7 @@ async function saveEdition() {
  */
 onBeforeMount(async () => {
   await store.loadEdition()
-  const edition = store.edition
-  if (store.edition && edition instanceof LegalPeriodicalEdition) {
-    editionRef.value = new LegalPeriodicalEdition({ ...edition })
-  }
+  editionRef.value = new LegalPeriodicalEdition({ ...edition.value })
 })
 </script>
 
