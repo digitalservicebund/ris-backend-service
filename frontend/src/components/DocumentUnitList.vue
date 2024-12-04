@@ -311,7 +311,8 @@ function onDelete() {
             >
               <button
                 aria-label="Dokumentationseinheit übernehmen"
-                class="flex cursor-pointer border-2 border-r-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
+                class="flex cursor-pointer border-2 border-r-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200 disabled:border-gray-600 disabled:text-gray-600"
+                :disabled="!listEntry.isEditable"
                 @click="emit('takeOverDocumentationUnit', listEntry)"
               >
                 <IconCheck />
