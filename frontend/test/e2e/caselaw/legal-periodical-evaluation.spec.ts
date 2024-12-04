@@ -192,8 +192,8 @@ test.describe(
         })
 
         try {
-          await test.step("'Fortfahren' saved the edition and replaces url with new edition id", async () => {
-            await page.getByLabel("Fortfahren").click()
+          await test.step("'Übernehmen und Fortfahren' saved the edition and replaces url with new edition id", async () => {
+            await page.getByLabel("Übernehmen und Fortfahren").click()
 
             await page.waitForURL(
               /\/caselaw\/periodical-evaluation\/[0-9a-fA-F-]{36}\/references/,
@@ -338,7 +338,7 @@ test.describe(
 
         await test.step("A docunit can be added to an edition multiple times", async () => {
           const saveRequest = page.waitForResponse(
-            `**/api/v1/caselaw/legalperiodicaledition/${edition.id}`,
+            "**/api/v1/caselaw/legalperiodicaledition",
             { timeout: 5_000 },
           )
           await navigateToPeriodicalReferences(secondPage, edition.id)

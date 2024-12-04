@@ -20,38 +20,37 @@ import { useEditionStore } from "@/stores/editionStore"
 const router = useRouter()
 const store = useEditionStore()
 const { edition } = storeToRefs(store)
+
 const saveEditionError = ref<ResponseError | undefined>()
 
-const name = ref()
-const prefix = ref()
-const suffix = ref()
-
+const editionRef = ref<LegalPeriodicalEdition | undefined>(undefined)
 const validationStore =
   useValidationStore<(typeof LegalPeriodicalEdition.fields)[number]>()
 
 const legalPeriodical = computed({
   get: () =>
-    edition.value?.legalPeriodical
+    editionRef.value?.legalPeriodical
       ? {
           label:
-            edition.value?.legalPeriodical.abbreviation +
+            editionRef.value?.legalPeriodical.abbreviation +
             " | " +
-            edition.value?.legalPeriodical.title,
-          value: edition.value?.legalPeriodical,
-          additionalInformation: edition.value?.legalPeriodical.subtitle,
+            editionRef.value?.legalPeriodical.title,
+          value: editionRef.value?.legalPeriodical,
+          additionalInformation: editionRef.value?.legalPeriodical.subtitle,
         }
       : undefined,
   set: (newValue) => {
-    const legalPeriodical = { ...newValue } as LegalPeriodical
-    if (edition.value)
-      edition.value.legalPeriodical = newValue ? legalPeriodical : undefined
+    if (editionRef.value) {
+      editionRef.value.legalPeriodical = newValue
+        ? ({ ...newValue } as LegalPeriodical)
+        : undefined
+    }
   },
 })
 
 async function validateRequiredInput() {
   validationStore.reset()
-
-  edition.value?.missingRequiredFields.forEach((missingField) =>
+  editionRef.value?.missingRequiredFields.forEach((missingField) =>
     validationStore.add("Pflichtfeld nicht befüllt", missingField),
   )
 }
@@ -59,27 +58,28 @@ async function validateRequiredInput() {
 async function saveEdition() {
   validationStore.reset()
   saveEditionError.value = undefined
-  await store.loadEdition()
-  if (edition.value) {
-    edition.value.name = name.value
-    edition.value.prefix = prefix.value
-    edition.value.suffix = suffix.value
-  }
 
   await validateRequiredInput()
-  if (validationStore.isValid()) {
+  if (validationStore.isValid() && editionRef.value) {
+    editionRef.value.references = store.edition?.references
     const response = await LegalPeriodicalEditionService.save(
-      edition.value as LegalPeriodicalEdition,
+      editionRef.value as LegalPeriodicalEdition,
     )
-    if (response.error) {
+
+    if (response.data) {
+      {
+        store.edition = new LegalPeriodicalEdition({
+          ...response.data,
+        })
+        editionRef.value = { ...store.edition }
+        await router.push({
+          name: "caselaw-periodical-evaluation-editionId-references",
+          params: { editionId: editionRef?.value?.id },
+          query: {},
+        })
+      }
+    } else if (response.error) {
       saveEditionError.value = response.error
-    } else if (response.data) {
-      edition.value = new LegalPeriodicalEdition({ ...response.data })
-      await router.push({
-        name: "caselaw-periodical-evaluation-editionId-references",
-        params: { editionId: edition?.value?.id },
-        query: {},
-      })
     }
   }
 }
@@ -89,15 +89,13 @@ async function saveEdition() {
  */
 onBeforeMount(async () => {
   await store.loadEdition()
-  name.value = edition.value?.name
-  prefix.value = edition.value?.prefix
-  suffix.value = edition.value?.suffix
+  editionRef.value = new LegalPeriodicalEdition({ ...edition.value })
 })
 </script>
 
 <template>
   <div class="flex h-full w-full flex-col space-y-24 bg-gray-100 p-24">
-    <div v-if="edition" class="mb-24 flex flex-col gap-24 bg-white p-24">
+    <div v-if="editionRef" class="mb-24 flex flex-col gap-24 bg-white p-24">
       <TitleElement>Ausgabe</TitleElement>
       <div v-if="saveEditionError">
         <InfoModal
@@ -118,7 +116,7 @@ onBeforeMount(async () => {
           clear-on-choosing-item
           :has-error="slotProps.hasError"
           :item-service="ComboboxItemService.getLegalPeriodicals"
-          :read-only="edition?.references?.length! > 0"
+          :read-only="editionRef?.references?.length! > 0"
         ></ComboboxInput>
       </InputField>
       <InputField
@@ -129,7 +127,7 @@ onBeforeMount(async () => {
       >
         <TextInput
           id="name"
-          v-model="name"
+          v-model="editionRef.name"
           aria-label="Name der Ausgabe"
           class="ds-input-medium"
           :has-error="slotProps.hasError"
@@ -142,7 +140,7 @@ onBeforeMount(async () => {
           <InputField id="prefix" label="Präfix">
             <TextInput
               id="prefix"
-              v-model="prefix"
+              v-model="editionRef.prefix"
               aria-label="Präfix"
               class="ds-input-medium"
               size="medium"
@@ -152,7 +150,7 @@ onBeforeMount(async () => {
           <InputField id="suffix" label="Suffix">
             <TextInput
               id="suffix"
-              v-model="suffix"
+              v-model="editionRef.suffix"
               aria-label="Suffix"
               class="ds-input-medium"
               size="medium"
@@ -160,16 +158,16 @@ onBeforeMount(async () => {
           </InputField>
         </div>
 
-        <div v-if="legalPeriodical" class="ds-label-03-reg pt-4">
-          Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}
+        <div v-if="editionRef.legalPeriodical" class="ds-label-03-reg pt-4">
+          Zitierbeispiel: {{ editionRef.legalPeriodical.citationStyle }}
         </div>
       </div>
 
       <FlexContainer align-items="items-center" class="gap-16">
         <TextButton
-          aria-label="Fortfahren"
+          aria-label="Übernehmen und fortfahren"
           class="ds-button-02-reg"
-          label="Fortfahren"
+          label="Übernehmen und fortfahren"
           @click="saveEdition"
         ></TextButton>
       </FlexContainer>

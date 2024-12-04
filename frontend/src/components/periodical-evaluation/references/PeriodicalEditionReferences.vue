@@ -25,7 +25,6 @@ const references = computed({
 const defaultValue = new Reference() as Reference
 
 async function saveReferences(references: Reference[]) {
-  await store.loadEdition()
   store.edition!.references = references
   const response = await store.saveEdition()
   if (response.error) {

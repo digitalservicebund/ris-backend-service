@@ -96,7 +96,7 @@ describe("Legal periodical edition list", () => {
     expect(screen.getByLabelText("Name der Ausgabe")).toBeVisible()
     expect(screen.getByLabelText("Präfix")).toBeVisible()
     expect(screen.getByLabelText("Suffix")).toBeVisible()
-    expect(screen.getByText("Fortfahren")).toBeVisible()
+    expect(screen.getByText("Übernehmen und fortfahren")).toBeVisible()
   })
 
   test("selecting legal periodical from combobox value for legal periodical", async () => {
@@ -146,7 +146,7 @@ describe("Legal periodical edition list", () => {
     await user.clear(screen.getByLabelText("Suffix"))
     await user.type(screen.getByLabelText("Suffix"), "new suffix")
 
-    await user.click(screen.getByText("Fortfahren"))
+    await user.click(screen.getByText("Übernehmen und fortfahren"))
     expect(fetchSpy).toHaveBeenCalledTimes(1)
     expect(fetchSpy).toHaveBeenCalledWith(
       new LegalPeriodicalEdition({
@@ -162,7 +162,7 @@ describe("Legal periodical edition list", () => {
   })
 
   describe("Legal periodical validation", () => {
-    test("don't call save if empty field", async () => {
+    test("don't call save if required fields are empty", async () => {
       const fetchSpy = vi.spyOn(service, "save").mockImplementation(() =>
         Promise.resolve({
           status: 200,
@@ -179,12 +179,14 @@ describe("Legal periodical edition list", () => {
       const { user } = await renderComponent()
 
       await user.clear(screen.getByLabelText("Name der Ausgabe"))
-      await user.click(screen.getByLabelText("Fortfahren"))
+      await user.clear(screen.getByLabelText("Periodikum"))
+
+      await user.click(screen.getByLabelText("Übernehmen und fortfahren"))
 
       expect(
         screen.getAllByText("Pflichtfeld nicht befüllt").length,
         "should be shown if legal periodical empty",
-      ).toBe(1)
+      ).toBe(2)
       expect(fetchSpy).toHaveBeenCalledTimes(0)
     })
 
@@ -216,7 +218,7 @@ describe("Legal periodical edition list", () => {
 
       await user.type(screen.getByLabelText("Name der Ausgabe"), "name")
 
-      await user.click(screen.getByLabelText("Fortfahren"))
+      await user.click(screen.getByLabelText("Übernehmen und fortfahren"))
 
       expect(fetchSpy).toHaveBeenCalledTimes(1)
     })
