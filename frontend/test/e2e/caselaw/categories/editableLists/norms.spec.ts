@@ -265,6 +265,36 @@ test.describe("norm", () => {
     ).toBeVisible()
   })
 
+  test("does not add duplicate single norms", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    const container = page.getByLabel("Norm")
+
+    await fillNormInputs(page, {
+      normAbbreviation: "PBefG",
+      singleNorms: [{ singleNorm: "§ 123" } as SingleNorm],
+    })
+
+    await container.getByLabel("Norm speichern").click()
+    await expect(container.getByText("PBefG, § 123")).toBeVisible()
+
+    await container.getByTestId("list-entry-0").click()
+    await container.getByLabel("Weitere Einzelnorm").click()
+
+    await fillNormInputs(page, {
+      singleNorms: [
+        { singleNorm: "§ 123", dateOfRelevance: "2022" } as SingleNorm,
+        { singleNorm: "§ 123", dateOfRelevance: "2022" } as SingleNorm,
+      ],
+    })
+
+    await container.getByLabel("Norm speichern").click()
+    await expect(container.getByText("PBefG, § 123, 2022")).toBeVisible()
+  })
+
   test.describe("legal force", () => {
     test("display legal force feature only when the right court type is selected", async ({
       page,

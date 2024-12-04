@@ -150,6 +150,50 @@ describe("Norm references", () => {
     await screen.findByText(/RIS-Abkürzung bereits eingegeben/)
   })
 
+  it("Removes duplicate entries in single norms", async () => {
+    vi.spyOn(documentUnitService, "validateSingleNorm").mockImplementation(() =>
+      Promise.resolve({ status: 200, data: "Ok" }),
+    )
+    const { user } = renderComponent([
+      generateNormReference({
+        normAbbreviation: {
+          abbreviation: "1000g-BefV",
+        },
+        singleNorms: [
+          new SingleNorm({
+            singleNorm: "§ 345",
+            dateOfRelevance: "2022",
+            dateOfVersion: "01.01.2022",
+          }),
+        ],
+      }),
+    ])
+
+    expect(screen.getByLabelText("Listen Eintrag")).toHaveTextContent(
+      "1000g-BefV, § 345, 01.01.2022, 2022",
+    )
+
+    await user.click(screen.getByTestId("list-entry-0"))
+    await user.click(screen.getByLabelText("Weitere Einzelnorm"))
+
+    const singleNorms = await screen.findAllByLabelText("Einzelnorm der Norm")
+    await user.type(singleNorms[1], "§ 345")
+
+    const dates = await screen.findAllByLabelText("Fassungsdatum der Norm")
+    await user.type(dates[1], "01.01.2022")
+
+    const years = await screen.findAllByLabelText("Jahr der Norm")
+    await user.type(years[1], "2022")
+
+    const button = screen.getByLabelText("Norm speichern")
+    await user.click(button)
+
+    const listItems = screen.getAllByLabelText("Listen Eintrag")
+    expect(listItems[0]).toHaveTextContent(
+      "1000g-BefV, § 345, 01.01.2022, 2022",
+    )
+  })
+
   it("deletes norm reference", async () => {
     const { user } = renderComponent([
       generateNormReference(),

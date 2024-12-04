@@ -12,7 +12,7 @@ const store = useDocumentUnitStore()
 
 const norms = computed({
   get: () => store.documentUnit!.contentRelatedIndexing.norms,
-  set: (newValues) => {
+  set: async (newValues) => {
     store.documentUnit!.contentRelatedIndexing.norms = newValues?.filter(
       (value) => {
         if (Object.keys(value).length === 0) {
@@ -21,11 +21,32 @@ const norms = computed({
             "error",
           )
           return false
-        } else {
-          return true
         }
+        // Remove duplicate singleNorms within the current value (norm)
+        if (value.singleNorms && Array.isArray(value.singleNorms)) {
+          const uniqueSingleNorms = new Set() // Use a Set to track unique serialized singleNorms
+
+          value.singleNorms = value.singleNorms.filter((singleNorm) => {
+            // Serialize singleNorm values into a unique string
+            const uniqueKey = JSON.stringify({
+              singleNorm: singleNorm.singleNorm,
+              dateOfVersion: singleNorm.dateOfVersion,
+              dateOfRelevance: singleNorm.dateOfRelevance,
+            })
+
+            // Add to the Set if it doesn't exist yet
+            const isUnique = !uniqueSingleNorms.has(uniqueKey)
+            if (isUnique) {
+              uniqueSingleNorms.add(uniqueKey)
+            }
+
+            return isUnique // Filter out duplicates
+          })
+        }
+        return true // Keep the value in the norms array
       },
     )
+    await store.updateDocumentUnit()
   },
 })
 
