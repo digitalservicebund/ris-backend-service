@@ -290,4 +290,6 @@ class ReferenceIntegrationTest {
                   .isEqualTo(List.of(expectedLegalPeriodical));
             });
   }
+
+  // TODO test deletion
 }

@@ -10,8 +10,12 @@ import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.LegalPeriodicalEditionController;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDependentLiteratureCitationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseReferenceRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DependentLiteratureCitationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresFieldOfLawRepositoryImpl;
@@ -24,6 +28,7 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
+import de.bund.digitalservice.ris.caselaw.domain.DependentLiteratureCitationType;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -40,6 +45,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.ArrayList;
@@ -79,11 +85,22 @@ import org.testcontainers.junit.jupiter.Container;
       TestConfig.class
     },
     controllers = {LegalPeriodicalEditionController.class})
-@Sql(scripts = {"classpath:legal_periodical_init.sql"})
+@Sql(scripts = {"classpath:legal_periodical_init.sql", "classpath:document_types.sql"})
 @Sql(
     scripts = {"classpath:legal_periodical_cleanup.sql"},
     executionPhase = AFTER_TEST_METHOD)
 class LegalPeriodicalEditionIntegrationTest {
+  public static final DocumentType EBS =
+      DocumentType.builder()
+          .uuid(UUID.fromString("198b276e-8e6d-4df6-8692-44d74ed4fcba"))
+          .jurisShortcut("Ebs")
+          .build();
+  public static final DocumentType EAN =
+      DocumentType.builder()
+          .uuid(UUID.fromString("f718a7ee-f419-46cf-a96a-29227927850c"))
+          .jurisShortcut("Ean")
+          .build();
+
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
       new PostgreSQLContainer<>("postgres:14").withInitScript("init_db.sql");
@@ -103,6 +120,8 @@ class LegalPeriodicalEditionIntegrationTest {
   @Autowired private LegalPeriodicalRepository legalPeriodicalRepository;
   @Autowired private DatabaseDocumentationUnitRepository documentationUnitRepository;
   @Autowired private DocumentationUnitService documentationUnitService;
+  @Autowired private DatabaseReferenceRepository referenceRepository;
+  @Autowired private DatabaseDependentLiteratureCitationRepository literatureCitationRepository;
 
   @MockBean private UserService userService;
   @MockBean private DocumentationUnitStatusService statusService;
@@ -125,7 +144,15 @@ class LegalPeriodicalEditionIntegrationTest {
             argThat(
                 (OidcUser user) -> {
                   List<String> groups = user.getAttribute("groups");
-                  return Objects.requireNonNull(groups).get(0).equals("/DS");
+                  return Objects.requireNonNull(groups).getFirst().equals("/DS");
+                }));
+    doReturn(true)
+        .when(userService)
+        .isInternal(
+            argThat(
+                (OidcUser user) -> {
+                  List<String> groups = user.getAttribute("groups");
+                  return Objects.requireNonNull(groups).getFirst().equals("/DS");
                 }));
   }
 
@@ -147,7 +174,7 @@ class LegalPeriodicalEditionIntegrationTest {
   }
 
   @Test
-  void testGetLegalPeriodicalEditions_byLegalPeriodical_shouldReturnValue() {
+  void testGetEditions_byLegalPeriodical_shouldReturnValue() {
 
     var legalPeriodical =
         legalPeriodicalRepository.findAllBySearchStr(Optional.of("ABC")).stream()
@@ -185,7 +212,7 @@ class LegalPeriodicalEditionIntegrationTest {
   }
 
   @Test
-  void testGetEditionById() {
+  void testGetEdition_ById_shouldSucceed() {
     var legalPeriodical =
         legalPeriodicalRepository.findAllBySearchStr(Optional.of("ABC")).stream()
             .findAny()
@@ -220,7 +247,7 @@ class LegalPeriodicalEditionIntegrationTest {
   }
 
   @Test
-  void testDeleteEditionWithoutReferences() {
+  void testDeleteEdition_withoutReferences_shouldSucceed() {
     var legalPeriodical =
         legalPeriodicalRepository.findAllBySearchStr(Optional.of("ABC")).stream()
             .findAny()
@@ -243,7 +270,8 @@ class LegalPeriodicalEditionIntegrationTest {
   }
 
   @Test
-  void testGetLegalPeriodicalEditionsWithReferences() throws DocumentationUnitNotExistsException {
+  void testGetEdition_withMixedReferencesAndLiteratureCitationsFromDocUnitAndEdition_shouldSucceed()
+      throws DocumentationUnitNotExistsException {
     var legalPeriodical =
         legalPeriodicalRepository.findAllBySearchStr(Optional.of("ABC")).stream()
             .findAny()
@@ -252,7 +280,8 @@ class LegalPeriodicalEditionIntegrationTest {
                     new NoSuchElementException(
                         "Legal periodical not found, check legal_periodical_init.sql"));
 
-    var existingReferenceId = UUID.randomUUID();
+    UUID existingReferenceId = UUID.randomUUID();
+    UUID existingLiteratureCitationId = UUID.randomUUID();
 
     var docUnit =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
@@ -262,12 +291,50 @@ class LegalPeriodicalEditionIntegrationTest {
 
     documentationUnitRepository.save(
         docUnit.toBuilder()
+            .dependentLiteratureCitations(
+                List.of(
+                    DependentLiteratureCitationDTO.builder()
+                        .id(UUID.randomUUID())
+                        .rank(1)
+                        .citation("1")
+                        .legalPeriodicalRawValue("A")
+                        .author("author 1")
+                        .type(DependentLiteratureCitationType.PASSIVE)
+                        .documentType(
+                            DocumentTypeDTO.builder()
+                                .id(UUID.fromString("f718a7ee-f419-46cf-a96a-29227927850c"))
+                                .abbreviation("Ean")
+                                .build())
+                        .documentationUnit(
+                            DocumentationUnitDTO.builder()
+                                .id(docUnit.getId())
+                                .documentNumber("DOC_NUMBER")
+                                .build())
+                        .build(),
+                    DependentLiteratureCitationDTO.builder()
+                        .id(existingLiteratureCitationId)
+                        .rank(3)
+                        .citation("3 - original literature citation")
+                        .author("author 3")
+                        .type(DependentLiteratureCitationType.PASSIVE)
+                        .documentType(
+                            DocumentTypeDTO.builder()
+                                .id(UUID.fromString("198b276e-8e6d-4df6-8692-44d74ed4fcba"))
+                                .abbreviation("Ebs")
+                                .build())
+                        .legalPeriodicalRawValue("B")
+                        .documentationUnit(
+                            DocumentationUnitDTO.builder()
+                                .id(docUnit.getId())
+                                .documentNumber("DOC_NUMBER")
+                                .build())
+                        .build()))
             .references(
                 List.of(
                     ReferenceDTO.builder()
                         .id(UUID.randomUUID())
-                        .rank(1)
-                        .citation("1")
+                        .rank(2)
+                        .citation("2")
                         .legalPeriodicalRawValue("A")
                         .documentationUnit(
                             DocumentationUnitDTO.builder()
@@ -279,18 +346,7 @@ class LegalPeriodicalEditionIntegrationTest {
                         .id(existingReferenceId)
                         .citation("Original Citation")
                         .legalPeriodicalRawValue("B")
-                        .rank(2)
-                        .documentationUnit(
-                            DocumentationUnitDTO.builder()
-                                .id(docUnit.getId())
-                                .documentNumber("DOC_NUMBER")
-                                .build())
-                        .build(),
-                    ReferenceDTO.builder()
-                        .id(UUID.randomUUID())
-                        .rank(3)
-                        .citation("3")
-                        .legalPeriodicalRawValue("C")
+                        .rank(4)
                         .documentationUnit(
                             DocumentationUnitDTO.builder()
                                 .id(docUnit.getId())
@@ -300,11 +356,17 @@ class LegalPeriodicalEditionIntegrationTest {
             .build());
 
     UUID newReferenceId = UUID.randomUUID();
+    UUID editionId = UUID.randomUUID();
 
+    RelatedDocumentationUnit relatedDocUnit =
+        RelatedDocumentationUnit.builder()
+            .uuid(docUnit.getId())
+            .documentNumber("DOC_NUMBER")
+            .build();
     var edition =
         repository.save(
             LegalPeriodicalEdition.builder()
-                .id(UUID.randomUUID())
+                .id(editionId)
                 .legalPeriodical(legalPeriodical)
                 .name("2024 Sonderheft 1")
                 .prefix("2024,")
@@ -314,55 +376,72 @@ class LegalPeriodicalEditionIntegrationTest {
                         Reference.builder()
                             .id(existingReferenceId)
                             .referenceType(ReferenceType.CASELAW)
-                            .citation("New Citation")
+                            .citation("1 - Updated Citation")
                             .legalPeriodicalRawValue("B")
-                            .documentationUnit(
-                                RelatedDocumentationUnit.builder()
-                                    .uuid(docUnit.getId())
-                                    .documentNumber("DOC_NUMBER")
-                                    .build())
+                            .documentationUnit(relatedDocUnit)
+                            .build(),
+                        Reference.builder()
+                            .id(existingLiteratureCitationId)
+                            .referenceType(ReferenceType.LITERATURE)
+                            .citation("2 - Updated Literature Citation")
+                            .author("author 2")
+                            .documentType(EBS)
+                            .legalPeriodicalRawValue("B")
+                            .documentationUnit(relatedDocUnit)
                             .build(),
                         Reference.builder()
                             .id(newReferenceId)
                             .referenceType(ReferenceType.CASELAW)
-                            .citation("New Reference")
+                            .citation("3 - New Reference")
                             .legalPeriodicalRawValue("D")
-                            .documentationUnit(
-                                RelatedDocumentationUnit.builder()
-                                    .uuid(docUnit.getId())
-                                    .documentNumber("DOC_NUMBER")
-                                    .build())
+                            .documentationUnit(relatedDocUnit)
+                            .build(),
+                        Reference.builder()
+                            .id(UUID.randomUUID())
+                            .referenceType(ReferenceType.LITERATURE)
+                            .citation("4 - New Literature Citation")
+                            .author("author 4")
+                            .documentType(EAN)
+                            .legalPeriodicalRawValue("C")
+                            .documentationUnit(relatedDocUnit)
                             .build()))
                 .build());
 
-    var editionList =
-        Arrays.stream(
-                risWebTestClient
-                    .withDefaultLogin()
-                    .get()
-                    .uri(EDITION_ENDPOINT + "?legal_periodical_id=" + legalPeriodical.uuid())
-                    .exchange()
-                    .expectStatus()
-                    .isOk()
-                    .expectBody(LegalPeriodicalEdition[].class)
-                    .returnResult()
-                    .getResponseBody())
-            .toList();
+    var editionResponse =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri(EDITION_ENDPOINT + "/" + edition.id())
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(LegalPeriodicalEdition.class)
+            .returnResult()
+            .getResponseBody();
 
-    Assertions.assertFalse(editionList.isEmpty(), "List should not be empty");
-    Assertions.assertEquals("2024 Sonderheft 1", editionList.get(0).name());
-    Assertions.assertEquals(2, editionList.get(0).references().size());
-    Assertions.assertEquals("New Citation", editionList.get(0).references().get(0).citation());
-    Assertions.assertEquals("New Reference", editionList.get(0).references().get(1).citation());
+    Assertions.assertEquals("2024 Sonderheft 1", edition.name());
+    List<Reference> references = editionResponse.references();
+    Assertions.assertEquals(4, references.size());
+    Assertions.assertEquals("1 - Updated Citation", references.get(0).citation());
+    Assertions.assertEquals("2 - Updated Literature Citation", references.get(1).citation());
+    Assertions.assertEquals("3 - New Reference", references.get(2).citation());
+    Assertions.assertEquals("4 - New Literature Citation", references.get(3).citation());
 
     assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").references())
-        .hasSize(4)
+        .hasSize(6)
         .satisfies(
             list -> {
+              // first, caselaw references
+              assertThat(list.get(0).citation()).isEqualTo("2");
               assertThat(list.get(1).id()).isEqualTo(existingReferenceId);
-              assertThat(list.get(1).citation()).isEqualTo("New Citation");
-              assertThat(list.get(3).id()).isEqualTo(newReferenceId);
-              assertThat(list.get(3).citation()).isEqualTo("New Reference");
+              assertThat(list.get(1).citation()).isEqualTo("1 - Updated Citation");
+              assertThat(list.get(2).id()).isEqualTo(newReferenceId);
+              assertThat(list.get(2).citation()).isEqualTo("3 - New Reference");
+              // then, literature references
+              assertThat(list.get(3).citation()).isEqualTo("1");
+              assertThat(list.get(4).id()).isEqualTo(existingLiteratureCitationId);
+              assertThat(list.get(4).citation()).isEqualTo("2 - Updated Literature Citation");
+              assertThat(list.get(5).citation()).isEqualTo("4 - New Literature Citation");
             });
 
     // clean up
@@ -370,7 +449,118 @@ class LegalPeriodicalEditionIntegrationTest {
   }
 
   @Test
-  void testGetLegalPeriodicalEditionsWithDocUnitCreatedByReference()
+  void testDeleteReferencesAndLiteratureCitations_fromEdition_shouldSucceed()
+      throws DocumentationUnitNotExistsException {
+    var legalPeriodical =
+        legalPeriodicalRepository.findAllBySearchStr(Optional.of("ABC")).stream()
+            .findAny()
+            .orElseThrow(
+                () ->
+                    new NoSuchElementException(
+                        "Legal periodical not found, check legal_periodical_init.sql"));
+
+    var docUnit =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            documentationUnitRepository,
+            documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()),
+            "DOC_NUMBER");
+
+    UUID literatureCitationId = UUID.randomUUID();
+    UUID referenceId = UUID.randomUUID();
+    UUID editionId = UUID.randomUUID();
+
+    RelatedDocumentationUnit relatedDocUnit =
+        RelatedDocumentationUnit.builder()
+            .uuid(docUnit.getId())
+            .documentNumber("DOC_NUMBER")
+            .build();
+    var edition =
+        repository.save(
+            LegalPeriodicalEdition.builder()
+                .id(editionId)
+                .legalPeriodical(legalPeriodical)
+                .name("2024 Sonderheft 1")
+                .prefix("2024,")
+                .suffix("- Sonderheft 1")
+                .references(
+                    List.of(
+                        Reference.builder()
+                            .id(UUID.randomUUID())
+                            .referenceType(ReferenceType.CASELAW)
+                            .citation("1 - New Citation")
+                            .legalPeriodicalRawValue("B")
+                            .documentationUnit(relatedDocUnit)
+                            .build(),
+                        Reference.builder()
+                            .id(literatureCitationId)
+                            .referenceType(ReferenceType.LITERATURE)
+                            .citation("2 - New Literature Citation")
+                            .author("author 2")
+                            .documentType(EBS)
+                            .legalPeriodicalRawValue("B")
+                            .documentationUnit(relatedDocUnit)
+                            .build(),
+                        Reference.builder()
+                            .id(referenceId)
+                            .referenceType(ReferenceType.CASELAW)
+                            .citation("3 - New Reference")
+                            .legalPeriodicalRawValue("D")
+                            .documentationUnit(relatedDocUnit)
+                            .build(),
+                        Reference.builder()
+                            .id(UUID.randomUUID())
+                            .referenceType(ReferenceType.LITERATURE)
+                            .citation("4 - New Literature Citation")
+                            .author("author 4")
+                            .documentType(EAN)
+                            .legalPeriodicalRawValue("C")
+                            .documentationUnit(relatedDocUnit)
+                            .build()))
+                .build());
+
+    edition.references().remove(1); // delete 2 - New Literature Citation
+    edition.references().remove(1); // delete 3 - New Reference
+
+    assertThat(referenceRepository.findById(referenceId)).isPresent();
+    assertThat(literatureCitationRepository.findById(literatureCitationId)).isPresent();
+
+    var editionResponse =
+        risWebTestClient
+            .withDefaultLogin()
+            .put()
+            .uri(EDITION_ENDPOINT)
+            .bodyValue(edition)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(LegalPeriodicalEdition.class)
+            .returnResult()
+            .getResponseBody();
+
+    Assertions.assertEquals("2024 Sonderheft 1", edition.name());
+    List<Reference> references = editionResponse.references();
+    Assertions.assertEquals(2, references.size());
+    Assertions.assertEquals("1 - New Citation", references.get(0).citation());
+    Assertions.assertEquals("4 - New Literature Citation", references.get(1).citation());
+
+    // documentation unit is updated
+    assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").references())
+        .hasSize(2)
+        .satisfies(
+            list -> {
+              assertThat(list.get(0).citation()).isEqualTo("1 - New Citation");
+              assertThat(list.get(1).citation()).isEqualTo("4 - New Literature Citation");
+            });
+
+    assertThat(referenceRepository.findById(referenceId)).isEmpty();
+    assertThat(literatureCitationRepository.findById(literatureCitationId)).isEmpty();
+
+    // clean up
+    repository.save(edition.toBuilder().references(List.of()).build());
+  }
+
+  @Test
+  void testGetEdition_withDocUnitCreatedByReference_shouldSucceed()
       throws DocumentationUnitNotExistsException {
     var legalPeriodical =
         legalPeriodicalRepository.findAllBySearchStr(Optional.of("ABC")).stream()
@@ -469,8 +659,7 @@ class LegalPeriodicalEditionIntegrationTest {
   }
 
   @Test
-  void testCleanupDocUnitReferencesAndSourceWhenReferenceDeleted()
-      throws DocumentationUnitNotExistsException {
+  void testDeleteReference_shouldCleanupDocUnitSource() throws DocumentationUnitNotExistsException {
     var legalPeriodical =
         legalPeriodicalRepository.findAllBySearchStr(Optional.of("ABC")).stream()
             .findAny()

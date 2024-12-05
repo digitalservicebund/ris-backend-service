@@ -25,13 +25,13 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
   private final DatabaseLegalPeriodicalEditionRepository repository;
   private final DatabaseDocumentationUnitRepository documentationUnitRepository;
   private final DatabaseReferenceRepository referenceRepository;
-  private final DependentLiteratureCitationRepository dependentLiteratureCitationRepository;
+  private final DatabaseDependentLiteratureCitationRepository dependentLiteratureCitationRepository;
 
   public PostgresLegalPeriodicalEditionRepositoryImpl(
       DatabaseLegalPeriodicalEditionRepository repository,
       DatabaseDocumentationUnitRepository documentationUnitRepository,
       DatabaseReferenceRepository referenceRepository,
-      DependentLiteratureCitationRepository dependentLiteratureCitationRepository) {
+      DatabaseDependentLiteratureCitationRepository dependentLiteratureCitationRepository) {
     this.repository = repository;
     this.documentationUnitRepository = documentationUnitRepository;
     this.referenceRepository = referenceRepository;
