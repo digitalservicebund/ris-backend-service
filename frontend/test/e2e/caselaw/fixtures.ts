@@ -23,6 +23,7 @@ type MyFixtures = {
   prefilledDocumentUnitBgh: DocumentUnit
   edition: LegalPeriodicalEdition
   editionWithReferences: LegalPeriodicalEdition
+  foreignDocumentationUnit: DocumentUnitListEntry
 }
 
 export const caselawTest = test.extend<MyFixtures>({
@@ -303,6 +304,21 @@ export const caselawTest = test.extend<MyFixtures>({
       throw Error(`Edition with number ${edition.id} couldn't be deleted:
       ${deleteResponse.status()} ${deleteResponse.statusText()}`)
     }
+  },
+
+  foreignDocumentationUnit: async ({ request }, use) => {
+    const foreignDocumentUnitSearchResponse = await request.get(
+      `api/v1/caselaw/documentunits/search?pg=0&sz=100&documentNumber=YYTestDoc0001`,
+    )
+
+    const foreignDocumentUnitPage =
+      (await foreignDocumentUnitSearchResponse.json()) as Pagination<DocumentUnitListEntry>
+
+    const foreignDocumentUnit = (
+      foreignDocumentUnitPage.content as DocumentUnitListEntry[]
+    ).at(0)
+
+    await use(foreignDocumentUnit!)
   },
 
   editionWithReferences: async (

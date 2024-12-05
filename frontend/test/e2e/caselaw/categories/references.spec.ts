@@ -329,10 +329,6 @@ test.describe(
           ).toBeVisible()
         })
 
-        // await test.step("Literature reference are shown in correct order", async () => {
-
-        // })
-
         await test.step("Radio buttons should not be visible after saving", async () => {
           await page.getByTestId("list-entry-0").click()
           await expect(

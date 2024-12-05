@@ -7,8 +7,8 @@ import {
   navigateToPreview,
   navigateToSearch,
   waitForInputValue,
-} from "./e2e-utils"
-import { caselawTest as test } from "./fixtures"
+} from "../e2e-utils"
+import { caselawTest as test } from "../fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
 const formattedDate = dayjs().format("DD.MM.YYYY")
