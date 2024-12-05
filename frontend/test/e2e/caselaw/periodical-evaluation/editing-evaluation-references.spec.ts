@@ -413,7 +413,7 @@ test.describe("Editing and deleting references in periodical evaluation", () => 
 
       await expect(
         page.getByText(
-          `BAG, 02.01.1963, fileNumber1, Beschluss, Veröffentlicht`,
+          `BAG, 02.01.1963, fileNumber1, Änderungsnorm, Veröffentlicht`,
         ),
       ).toBeVisible()
     })
