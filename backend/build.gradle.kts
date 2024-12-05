@@ -9,7 +9,7 @@ import org.flywaydb.gradle.task.FlywayMigrateTask
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.3.5"
+    id("org.springframework.boot") version "3.4.0"
     id("io.spring.dependency-management") version "1.1.6"
     id("com.diffplug.spotless") version "6.25.0"
     id("org.sonarqube") version "6.0.1.5171"
@@ -158,7 +158,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.1")
 
-    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.4")
+    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.2.0")
 
     // CVE-2024-26308
     implementation("org.apache.commons:commons-compress:1.27.1")
@@ -175,7 +175,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.29.24"))
+    implementation(platform("software.amazon.awssdk:bom:2.29.25"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 

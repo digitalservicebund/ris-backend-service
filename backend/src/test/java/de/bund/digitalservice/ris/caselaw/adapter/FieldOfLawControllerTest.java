@@ -12,11 +12,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -25,8 +25,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class FieldOfLawControllerTest {
   @Autowired private RisWebTestClient risWebTestClient;
 
-  @MockBean private FieldOfLawService service;
-  @MockBean private ClientRegistrationRepository clientRegistrationRepository;
+  @MockitoBean private FieldOfLawService service;
+  @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
 
   @Test
   void testGetFieldsOfLaw_withoutQuery_shouldCallServiceWithoutValue() {
