@@ -76,8 +76,12 @@ public class SendInBlueHttpMailSender implements HttpMailSender {
     sendSmtpEmail.setTo(toList);
     sendSmtpEmail.setTextContent(content);
     sendSmtpEmail.setSubject(subject);
-    sendSmtpEmail.setAttachment(attachmentList);
     sendSmtpEmail.setTags(tags);
+
+    // Set attachments only if there are any as the api doesn't allow an empty list
+    if (!attachmentList.isEmpty()) {
+      sendSmtpEmail.setAttachment(attachmentList);
+    }
 
     try {
       api.sendTransacEmail(sendSmtpEmail);
