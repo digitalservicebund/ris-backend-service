@@ -7,12 +7,12 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
@@ -76,42 +76,45 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
   @Override
   @Transactional
-  public List<FieldOfLaw> find(
-      Optional<String> identifier, Optional<String[]> searchTerms, Optional<String[]> norm) {
+  public List<FieldOfLaw> findByCombinedCriteria(
+      String identifier, String[] descriptionSearchTerms, String[] normSearchTerms) {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     CriteriaQuery<FieldOfLawDTO> cq = cb.createQuery(FieldOfLawDTO.class);
     Root<FieldOfLawDTO> fieldOfLawRoot = cq.from(FieldOfLawDTO.class);
-    fieldOfLawRoot.fetch("norms");
+    fieldOfLawRoot.fetch("norms", JoinType.LEFT);
     ArrayList<Predicate> predicates = new ArrayList<>();
 
-    if (searchTerms.isPresent()) {
-      for (String searchTerm : searchTerms.get()) {
+    Predicate notationPredicate =
+        cb.equal(fieldOfLawRoot.get("notation"), cb.literal(Notation.NEW));
+    predicates.add(notationPredicate);
+
+    if (descriptionSearchTerms != null) {
+      for (String searchTerm : descriptionSearchTerms) {
         predicates.add(
             cb.like(cb.lower(fieldOfLawRoot.get("text")), "%" + searchTerm.toLowerCase() + "%"));
       }
     }
-    if (identifier.isPresent()) {
+    if (identifier != null) {
       Predicate identifierPredicate =
-          cb.like(fieldOfLawRoot.get("identifier"), identifier.get().toUpperCase() + "%");
+          cb.like(fieldOfLawRoot.get("identifier"), identifier.toUpperCase() + "%");
       predicates.add(identifierPredicate);
     }
-    if (norm.isPresent()) {
-      for (String searchTerm : norm.get()) {
-        Predicate normPredicate =
+    if (normSearchTerms != null) {
+      for (String searchTerm : normSearchTerms) {
+        Predicate normAbbreviationPredicate =
             cb.like(
                 cb.lower(fieldOfLawRoot.get("norms").get("abbreviation")),
                 "%" + searchTerm.toLowerCase() + "%");
-        Predicate normPredicate2 =
+        Predicate singleNormPredicate =
             cb.like(
                 cb.lower(fieldOfLawRoot.get("norms").get("singleNormDescription")),
                 "%" + searchTerm.toLowerCase() + "%");
-        Predicate combined = cb.or(normPredicate, normPredicate2);
+        Predicate combined = cb.or(normAbbreviationPredicate, singleNormPredicate);
         predicates.add(combined);
       }
     }
 
-    var size = predicates.size();
-    cq.select(fieldOfLawRoot).where(predicates.toArray(new Predicate[size]));
+    cq.select(fieldOfLawRoot).where(predicates.toArray(Predicate[]::new));
     cq.orderBy(cb.asc(fieldOfLawRoot.get("identifier")));
 
     TypedQuery<FieldOfLawDTO> query = entityManager.createQuery(cq);
