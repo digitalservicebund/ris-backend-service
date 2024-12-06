@@ -41,13 +41,13 @@ public class HyperlinkConverter {
               } else if (content instanceof JAXBElement<?> jaxbElement) {
                 unhandledElements.add(
                     new UnhandledElement(
-                        "paragraph",
+                        "hyperlink",
                         jaxbElement.getDeclaredType().toString(),
                         UnhandledElementType.JAXB));
               } else {
                 unhandledElements.add(
                     new UnhandledElement(
-                        "paragraph", content.getClass().toString(), UnhandledElementType.OBJECT));
+                        "hyperlink", content.getClass().toString(), UnhandledElementType.OBJECT));
               }
             });
   }
