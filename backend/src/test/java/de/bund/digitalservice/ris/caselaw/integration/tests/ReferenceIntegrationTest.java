@@ -17,10 +17,13 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.LdmlExporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDependentLiteratureCitationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseReferenceRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DependentLiteratureCitationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
@@ -28,19 +31,27 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalEditionRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.DependentLiteratureCitationType;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
+import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
+import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
@@ -67,6 +78,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentNumberRecyclingService.class,
       DatabaseDocumentationUnitStatusService.class,
+      PostgresLegalPeriodicalEditionRepositoryImpl.class,
       DatabaseProcedureService.class,
       PostgresHandoverReportRepositoryImpl.class,
       PostgresDocumentationUnitRepositoryImpl.class,
@@ -97,6 +109,9 @@ class ReferenceIntegrationTest {
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseLegalPeriodicalRepository legalPeriodicalRepository;
   @Autowired private DatabaseDocumentTypeRepository documentTypeRepository;
+  @Autowired private LegalPeriodicalEditionRepository editionRepository;
+  @Autowired private DatabaseReferenceRepository referenceRepository;
+  @Autowired private DatabaseDependentLiteratureCitationRepository literatureCitationRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private MailService mailService;
@@ -115,6 +130,8 @@ class ReferenceIntegrationTest {
   private final DocumentationOffice docOffice = buildDSDocOffice();
   private DocumentationOfficeDTO documentationOffice;
   private static final String DEFAULT_DOCUMENT_NUMBER = "1234567890126";
+  private DocumentType eanDocumentType;
+  private LegalPeriodical bverwgeLegalPeriodical;
 
   @BeforeEach
   void setUp() {
@@ -122,6 +139,26 @@ class ReferenceIntegrationTest {
         documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
 
     when(userService.getDocumentationOffice(any())).thenReturn(docOffice);
+
+    eanDocumentType =
+        DocumentTypeTransformer.transformToDomain(
+            documentTypeRepository.save(
+                DocumentTypeDTO.builder()
+                    .label("Anmerkung")
+                    .abbreviation("Ean")
+                    .multiple(false)
+                    .build()));
+
+    bverwgeLegalPeriodical =
+        LegalPeriodicalTransformer.transformToDomain(
+            legalPeriodicalRepository.save(
+                LegalPeriodicalDTO.builder()
+                    .abbreviation("BVerwGE")
+                    .title("Bundesverwaltungsgerichtsentscheidungen")
+                    .subtitle("Entscheidungen des Bundesverwaltungsgerichts")
+                    .jurisId(123)
+                    .primaryReference(true)
+                    .build()));
   }
 
   @AfterEach
@@ -135,25 +172,6 @@ class ReferenceIntegrationTest {
     DocumentationUnitDTO dto =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository, documentationOffice);
-
-    LegalPeriodicalDTO legalPeriodical =
-        legalPeriodicalRepository.save(
-            LegalPeriodicalDTO.builder()
-                .abbreviation("BVerwGE")
-                .title("Bundesverwaltungsgerichtsentscheidungen")
-                .subtitle("Entscheidungen des Bundesverwaltungsgerichts")
-                .jurisId(123)
-                .primaryReference(true)
-                .build());
-
-    LegalPeriodical expectedLegalPeriodical =
-        LegalPeriodical.builder()
-            .uuid(legalPeriodical.getId())
-            .title(legalPeriodical.getTitle())
-            .subtitle(legalPeriodical.getSubtitle())
-            .abbreviation(legalPeriodical.getAbbreviation())
-            .primaryReference(true)
-            .build();
 
     UUID referenceId = UUID.randomUUID();
     DocumentationUnit documentationUnitFromFrontend =
@@ -171,7 +189,7 @@ class ReferenceIntegrationTest {
                         .referenceType(ReferenceType.CASELAW)
                         .legalPeriodical(
                             LegalPeriodical.builder()
-                                .uuid(legalPeriodical.getId())
+                                .uuid(bverwgeLegalPeriodical.uuid())
                                 .abbreviation("BVerwGE")
                                 .primaryReference(true)
                                 .build())
@@ -199,7 +217,7 @@ class ReferenceIntegrationTest {
               assertThat(response.getResponseBody().references())
                   .extracting("legalPeriodical")
                   .usingRecursiveComparison()
-                  .isEqualTo(List.of(expectedLegalPeriodical));
+                  .isEqualTo(List.of(bverwgeLegalPeriodical));
             });
   }
 
@@ -208,40 +226,6 @@ class ReferenceIntegrationTest {
     DocumentationUnitDTO dto =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository, documentationOffice);
-
-    LegalPeriodicalDTO legalPeriodical =
-        legalPeriodicalRepository.save(
-            LegalPeriodicalDTO.builder()
-                .abbreviation("BVerwGE")
-                .title("Bundesverwaltungsgerichtsentscheidungen")
-                .subtitle("Entscheidungen des Bundesverwaltungsgerichts")
-                .jurisId(123)
-                .primaryReference(true)
-                .build());
-
-    LegalPeriodical expectedLegalPeriodical =
-        LegalPeriodical.builder()
-            .uuid(legalPeriodical.getId())
-            .title(legalPeriodical.getTitle())
-            .subtitle(legalPeriodical.getSubtitle())
-            .abbreviation(legalPeriodical.getAbbreviation())
-            .primaryReference(true)
-            .build();
-
-    DocumentTypeDTO documentTypeDTO =
-        documentTypeRepository.save(
-            DocumentTypeDTO.builder()
-                .label("Anmerkung")
-                .abbreviation("Ean")
-                .multiple(false)
-                .build());
-
-    DocumentType documentType =
-        DocumentType.builder()
-            .uuid(documentTypeDTO.getId())
-            .jurisShortcut(documentTypeDTO.getAbbreviation())
-            .label(documentTypeDTO.getLabel())
-            .build();
 
     UUID referenceId = UUID.randomUUID();
     DocumentationUnit documentationUnitFromFrontend =
@@ -255,11 +239,11 @@ class ReferenceIntegrationTest {
                         .id(referenceId)
                         .citation("2024, S.3")
                         .author("Heinz Otto")
-                        .documentType(documentType)
+                        .documentType(eanDocumentType)
                         .referenceType(ReferenceType.LITERATURE)
                         .legalPeriodical(
                             LegalPeriodical.builder()
-                                .uuid(legalPeriodical.getId())
+                                .uuid(bverwgeLegalPeriodical.uuid())
                                 .abbreviation("BVerwGE")
                                 .primaryReference(true)
                                 .build())
@@ -283,13 +267,165 @@ class ReferenceIntegrationTest {
               assertThat(response.getResponseBody().references()).hasSize(1);
               assertThat(response.getResponseBody().references())
                   .extracting("citation", "author", "documentType", "id")
-                  .containsExactly(tuple("2024, S.3", "Heinz Otto", documentType, referenceId));
+                  .containsExactly(tuple("2024, S.3", "Heinz Otto", eanDocumentType, referenceId));
               assertThat(response.getResponseBody().references())
                   .extracting("legalPeriodical")
                   .usingRecursiveComparison()
-                  .isEqualTo(List.of(expectedLegalPeriodical));
+                  .isEqualTo(List.of(bverwgeLegalPeriodical));
             });
   }
 
-  // TODO test deletion
+  @Test
+  void testReferencesAndLiteratureCitationsCanBeDeleted() {
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, documentationOffice);
+
+    UUID referenceId = UUID.randomUUID();
+
+    UUID literatureCitationId = UUID.randomUUID();
+    repository.save(
+        dto.toBuilder()
+            .references(
+                List.of(
+                    ReferenceDTO.builder()
+                        .rank(1)
+                        .documentationUnit(dto)
+                        .id(referenceId)
+                        .citation("2024, S.3")
+                        .legalPeriodicalRawValue("BVerwGE")
+                        .legalPeriodical(
+                            LegalPeriodicalDTO.builder()
+                                .id(bverwgeLegalPeriodical.uuid())
+                                .abbreviation("BVerwGE")
+                                .primaryReference(true)
+                                .build())
+                        .build()))
+            .dependentLiteratureCitations(
+                List.of(
+                    DependentLiteratureCitationDTO.builder()
+                        .rank(1)
+                        .documentationUnit(dto)
+                        .id(literatureCitationId)
+                        .citation("2024, S.3")
+                        .author("Curie, Marie")
+                        .legalPeriodicalRawValue("BVerwGE")
+                        .documentTypeRawValue("Ean")
+                        .type(DependentLiteratureCitationType.PASSIVE)
+                        .documentType(
+                            DocumentTypeDTO.builder()
+                                .id(eanDocumentType.uuid())
+                                .abbreviation("Ean")
+                                .build())
+                        .legalPeriodical(
+                            LegalPeriodicalDTO.builder()
+                                .id(bverwgeLegalPeriodical.uuid())
+                                .abbreviation("BVerwGE")
+                                .primaryReference(true)
+                                .build())
+                        .build()))
+            .build());
+
+    DocumentationUnit documentationUnitFromFrontend =
+        DocumentationUnit.builder()
+            .uuid(dto.getId())
+            .documentNumber(dto.getDocumentNumber())
+            .coreData(CoreData.builder().documentationOffice(docOffice).build())
+            .references(List.of())
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
+        .bodyValue(documentationUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentationUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().references()).isEmpty();
+            });
+
+    assertThat(referenceRepository.findById(referenceId)).isEmpty();
+    assertThat(literatureCitationRepository.findById(literatureCitationId)).isEmpty();
+  }
+
+  @Test
+  void testReferencesAndLiteratureCitationsOriginatedFromEditionCanBeDeleted() {
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, documentationOffice);
+
+    UUID referenceId = UUID.randomUUID();
+
+    UUID literatureCitationId = UUID.randomUUID();
+    var edition =
+        editionRepository.save(
+            LegalPeriodicalEdition.builder()
+                .id(UUID.randomUUID())
+                .legalPeriodical(bverwgeLegalPeriodical)
+                .name("2024")
+                .references(
+                    List.of(
+                        Reference.builder()
+                            .rank(1)
+                            .referenceType(ReferenceType.CASELAW)
+                            .documentationUnit(
+                                RelatedDocumentationUnit.builder().uuid(dto.getId()).build())
+                            .id(referenceId)
+                            .citation("2024, S.3")
+                            .legalPeriodicalRawValue("BVerwGE")
+                            .legalPeriodical(
+                                LegalPeriodical.builder()
+                                    .uuid(bverwgeLegalPeriodical.uuid())
+                                    .abbreviation("BVerwGE")
+                                    .primaryReference(true)
+                                    .build())
+                            .build(),
+                        Reference.builder()
+                            .rank(2)
+                            .referenceType(ReferenceType.LITERATURE)
+                            .documentationUnit(
+                                RelatedDocumentationUnit.builder().uuid(dto.getId()).build())
+                            .id(literatureCitationId)
+                            .citation("2024, S.3")
+                            .author("Curie, Marie")
+                            .legalPeriodicalRawValue("BVerwGE")
+                            .documentType(eanDocumentType)
+                            .legalPeriodical(bverwgeLegalPeriodical)
+                            .build()))
+                .build());
+
+    DocumentationUnit documentationUnitFromFrontend =
+        DocumentationUnit.builder()
+            .uuid(dto.getId())
+            .documentNumber(dto.getDocumentNumber())
+            .coreData(CoreData.builder().documentationOffice(docOffice).build())
+            .references(List.of())
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
+        .bodyValue(documentationUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentationUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().references()).isEmpty();
+            });
+
+    assertThat(referenceRepository.findById(referenceId)).isEmpty();
+    assertThat(literatureCitationRepository.findById(literatureCitationId)).isEmpty();
+    assertThat(editionRepository.findById(edition.id()).get().references()).isEmpty();
+
+    editionRepository.delete(edition);
+  }
 }
