@@ -106,7 +106,7 @@ public class DatabaseDocumentNumberGeneratorService implements DocumentNumberSer
    * Validate document number not exists in the database
    *
    * @param documentNumber document number
-   * @throws DocumentationUnitExistsException
+   * @throws DocumentationUnitExistsException if no documentation unit for the document number exist
    */
   public void assertNotExists(String documentNumber) throws DocumentationUnitExistsException {
     if (databaseDocumentationUnitRepository.findByDocumentNumber(documentNumber).isPresent()) {

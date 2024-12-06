@@ -318,9 +318,7 @@ class EnsuingDecisionsIntegrationTest {
         .isOk()
         .expectBody(DocumentationUnit.class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
-            });
+            response -> assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2));
   }
 
   @Test
@@ -365,9 +363,7 @@ class EnsuingDecisionsIntegrationTest {
         .isOk()
         .expectBody(DocumentationUnit.class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(1);
-            });
+            response -> assertThat(response.getResponseBody().ensuingDecisions()).hasSize(1));
   }
 
   @Test
@@ -408,9 +404,7 @@ class EnsuingDecisionsIntegrationTest {
         .isOk()
         .expectBody(DocumentationUnit.class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(1);
-            });
+            response -> assertThat(response.getResponseBody().ensuingDecisions()).hasSize(1));
   }
 
   @Test
@@ -444,9 +438,7 @@ class EnsuingDecisionsIntegrationTest {
         .isOk()
         .expectBody(DocumentationUnit.class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody().ensuingDecisions()).isEmpty();
-            });
+            response -> assertThat(response.getResponseBody().ensuingDecisions()).isEmpty());
   }
 
   @Test

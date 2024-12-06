@@ -126,9 +126,9 @@ class DocumentationUnitKeywordIntegrationTest {
         .isOk()
         .expectBody(DocumentationUnit.class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody().contentRelatedIndexing().keywords()).isEmpty();
-            });
+            response ->
+                assertThat(response.getResponseBody().contentRelatedIndexing().keywords())
+                    .isEmpty());
   }
 
   @Test

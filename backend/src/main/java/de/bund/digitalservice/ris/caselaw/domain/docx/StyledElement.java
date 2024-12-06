@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain.docx;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +51,7 @@ public abstract class StyledElement implements DocumentationUnitDocx {
 
     return " style=\""
         + styles.entrySet().stream()
-            .sorted(Comparator.comparing(Entry::getKey))
+            .sorted(Entry.comparingByKey())
             .map(entry -> entry.getKey() + ": " + String.join(" ", entry.getValue()) + "; ")
             .collect(Collectors.joining())
             .trim()

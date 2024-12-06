@@ -138,10 +138,7 @@ class DocxConverterServiceTest {
 
     when(documentBuilderFactory.newDocumentBuilder()).thenThrow(new ParserConfigurationException());
 
-    assertThatThrownBy(
-            () -> {
-              service.getOriginalText(mlPackage);
-            })
+    assertThatThrownBy(() -> service.getOriginalText(mlPackage))
         .isInstanceOf(DocxConverterException.class)
         .hasMessageContaining("Couldn't read all text elements of docx xml!");
   }

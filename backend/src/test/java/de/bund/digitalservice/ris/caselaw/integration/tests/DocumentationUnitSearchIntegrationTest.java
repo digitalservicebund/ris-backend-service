@@ -215,10 +215,10 @@ class DocumentationUnitSearchIntegrationTest {
     assertThat(responseBody)
         .extracting("decisionDate")
         .containsExactly(
-            LocalDate.of(2023, 06, 07),
-            LocalDate.of(2023, 03, 15),
-            LocalDate.of(2022, 01, 23),
-            LocalDate.of(2022, 01, 23),
+            LocalDate.of(2023, 6, 7),
+            LocalDate.of(2023, 3, 15),
+            LocalDate.of(2022, 1, 23),
+            LocalDate.of(2022, 1, 23),
             null);
   }
 
@@ -405,10 +405,7 @@ class DocumentationUnitSearchIntegrationTest {
         .expectStatus()
         .isOk()
         .expectBody(new TypeReference<SliceTestImpl<?>>() {})
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody().isLast()).isFalse();
-            });
+        .consumeWith(response -> assertThat(response.getResponseBody().isLast()).isFalse());
   }
 
   @Test
@@ -515,11 +512,10 @@ class DocumentationUnitSearchIntegrationTest {
         .isOk()
         .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody().getContent())
-                  .extracting("documentNumber")
-                  .containsExactly("AB1234567802");
-            });
+            response ->
+                assertThat(response.getResponseBody().getContent())
+                    .extracting("documentNumber")
+                    .containsExactly("AB1234567802"));
   }
 
   @Test

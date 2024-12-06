@@ -95,12 +95,13 @@ public class EntityBuilderTestUtil {
         null);
   }
 
-  public static DocumentationUnitDTO createAndSavePendingDocumentationUnit(
+  public static void createAndSavePendingDocumentationUnit(
       DatabaseDocumentationUnitRepository repository,
       DocumentationOfficeDTO documentationOffice,
       DocumentationOfficeDTO creatingDocumentationOffice,
       String documentNumber) {
-    return createAndSavePublishedDocumentationUnit(
+
+    createAndSavePublishedDocumentationUnit(
         repository,
         DocumentationUnitDTO.builder()
             .documentNumber(documentNumber)

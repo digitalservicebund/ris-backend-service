@@ -243,18 +243,17 @@ class LegalForceIntegrationTest {
         .isOk()
         .expectBody(DocumentationUnit.class)
         .consumeWith(
-            response -> {
-              assertThat(
-                      response
-                          .getResponseBody()
-                          .contentRelatedIndexing()
-                          .norms()
-                          .get(0)
-                          .singleNorms()
-                          .get(0)
-                          .legalForce())
-                  .isNotNull();
-            });
+            response ->
+                assertThat(
+                        response
+                            .getResponseBody()
+                            .contentRelatedIndexing()
+                            .norms()
+                            .get(0)
+                            .singleNorms()
+                            .get(0)
+                            .legalForce())
+                    .isNotNull());
   }
 
   @Transactional
@@ -360,18 +359,17 @@ class LegalForceIntegrationTest {
         .isOk()
         .expectBody(DocumentationUnit.class)
         .consumeWith(
-            response -> {
-              assertThat(
-                      response
-                          .getResponseBody()
-                          .contentRelatedIndexing()
-                          .norms()
-                          .get(0)
-                          .singleNorms()
-                          .get(0)
-                          .legalForce())
-                  .isNotNull();
-            });
+            response ->
+                assertThat(
+                        response
+                            .getResponseBody()
+                            .contentRelatedIndexing()
+                            .norms()
+                            .get(0)
+                            .singleNorms()
+                            .get(0)
+                            .legalForce())
+                    .isNotNull());
 
     DocumentationUnitDTO result =
         repository.findById(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")).get();
@@ -417,18 +415,17 @@ class LegalForceIntegrationTest {
         .isOk()
         .expectBody(DocumentationUnit.class)
         .consumeWith(
-            response -> {
-              assertThat(
-                      response
-                          .getResponseBody()
-                          .contentRelatedIndexing()
-                          .norms()
-                          .get(0)
-                          .singleNorms()
-                          .get(0)
-                          .legalForce())
-                  .isNull();
-            });
+            response ->
+                assertThat(
+                        response
+                            .getResponseBody()
+                            .contentRelatedIndexing()
+                            .norms()
+                            .get(0)
+                            .singleNorms()
+                            .get(0)
+                            .legalForce())
+                    .isNull());
 
     DocumentationUnitDTO result =
         repository.findById(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")).get();

@@ -11,8 +11,9 @@ public interface LegalPeriodicalRepository {
   /**
    * Find all legal periodicals, filtered by an optional search string.
    *
-   * @param searchStr
-   * @return
+   * @param searchStr search string to filter legal periodicals
+   * @return list of legal periodical which contain the search string or the whole list of legal
+   *     periodical if no search string is given
    */
   List<LegalPeriodical> findAllBySearchStr(Optional<String> searchStr);
 }

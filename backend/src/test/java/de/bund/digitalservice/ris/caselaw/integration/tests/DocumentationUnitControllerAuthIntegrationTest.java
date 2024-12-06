@@ -250,9 +250,9 @@ class DocumentationUnitControllerAuthIntegrationTest {
         .isOk()
         .expectBody(DocumentationUnit.class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody().uuid()).isEqualTo(documentationUnitDTO.getId());
-            });
+            response ->
+                assertThat(response.getResponseBody().uuid())
+                    .isEqualTo(documentationUnitDTO.getId()));
 
     // Documentation Office 2
     risWebTestClient

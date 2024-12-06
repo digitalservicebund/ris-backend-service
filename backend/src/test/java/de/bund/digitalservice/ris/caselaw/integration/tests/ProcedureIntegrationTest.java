@@ -427,14 +427,13 @@ class ProcedureIntegrationTest {
         .is2xxSuccessful()
         .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
         .consumeWith(
-            response -> {
-              assertThat(
-                      Objects.requireNonNull(response.getResponseBody())
-                          .getContent()
-                          .get(0)
-                          .documentationUnitCount())
-                  .isZero();
-            });
+            response ->
+                assertThat(
+                        Objects.requireNonNull(response.getResponseBody())
+                            .getContent()
+                            .get(0)
+                            .documentationUnitCount())
+                    .isZero());
 
     var procedure1Id =
         repository.findAllByLabelAndDocumentationOffice("foo", docOfficeDTO).get().getId();
@@ -448,9 +447,7 @@ class ProcedureIntegrationTest {
         .is2xxSuccessful()
         .expectBody(new TypeReference<List<DocumentationUnitListItem>>() {})
         .consumeWith(
-            response -> {
-              assertThat(Objects.requireNonNull(response.getResponseBody())).isEmpty();
-            });
+            response -> assertThat(Objects.requireNonNull(response.getResponseBody())).isEmpty());
 
     risWebTestClient
         .withDefaultLogin()
@@ -461,14 +458,13 @@ class ProcedureIntegrationTest {
         .is2xxSuccessful()
         .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
         .consumeWith(
-            response -> {
-              assertThat(
-                      Objects.requireNonNull(response.getResponseBody())
-                          .getContent()
-                          .get(0)
-                          .documentationUnitCount())
-                  .isEqualTo(1);
-            });
+            response ->
+                assertThat(
+                        Objects.requireNonNull(response.getResponseBody())
+                            .getContent()
+                            .get(0)
+                            .documentationUnitCount())
+                    .isEqualTo(1));
 
     var procedure3Id =
         repository.findAllByLabelAndDocumentationOffice("baz", docOfficeDTO).get().getId();
@@ -482,10 +478,10 @@ class ProcedureIntegrationTest {
         .is2xxSuccessful()
         .expectBody(new TypeReference<List<DocumentationUnitListItem>>() {})
         .consumeWith(
-            response -> {
-              assertThat(Objects.requireNonNull(response.getResponseBody()).get(0).documentNumber())
-                  .isEqualTo("1234567890123");
-            });
+            response ->
+                assertThat(
+                        Objects.requireNonNull(response.getResponseBody()).get(0).documentNumber())
+                    .isEqualTo("1234567890123"));
   }
 
   @Test
@@ -657,10 +653,7 @@ class ProcedureIntegrationTest {
         .expectStatus()
         .is2xxSuccessful()
         .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isEmpty();
-            });
+        .consumeWith(response -> assertThat(response.getResponseBody()).isEmpty());
   }
 
   @Test
@@ -714,9 +707,9 @@ class ProcedureIntegrationTest {
         .is2xxSuccessful()
         .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
         .consumeWith(
-            response -> {
-              assertThat(Objects.requireNonNull(response.getResponseBody()).getContent()).isEmpty();
-            });
+            response ->
+                assertThat(Objects.requireNonNull(response.getResponseBody()).getContent())
+                    .isEmpty());
   }
 
   @Test
@@ -938,14 +931,13 @@ class ProcedureIntegrationTest {
         .isBadRequest()
         .expectBody(String.class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody())
-                  .contains(
-                      "Failed to convert 'procedureUUID' with value: "
-                          + "'non-existing procedureId'\",\"instance\":\""
-                          + "/api/v1/caselaw/procedure/non-existing%20procedureId/assign/"
-                          + userGroupId);
-            });
+            response ->
+                assertThat(response.getResponseBody())
+                    .contains(
+                        "Failed to convert 'procedureUUID' with value: "
+                            + "'non-existing procedureId'\",\"instance\":\""
+                            + "/api/v1/caselaw/procedure/non-existing%20procedureId/assign/"
+                            + userGroupId));
   }
 
   @Test
@@ -962,15 +954,14 @@ class ProcedureIntegrationTest {
         .isBadRequest()
         .expectBody(String.class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody())
-                  .contains(
-                      "Failed to convert 'userGroupId' with value: "
-                          + "'non-existing groupId'\",\"instance\":\""
-                          + "/api/v1/caselaw/procedure/"
-                          + procedureId
-                          + "/assign/non-existing%20groupId");
-            });
+            response ->
+                assertThat(response.getResponseBody())
+                    .contains(
+                        "Failed to convert 'userGroupId' with value: "
+                            + "'non-existing groupId'\",\"instance\":\""
+                            + "/api/v1/caselaw/procedure/"
+                            + procedureId
+                            + "/assign/non-existing%20groupId"));
   }
 
   @Test

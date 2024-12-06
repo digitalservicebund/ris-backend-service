@@ -68,8 +68,8 @@ public class LdmlExporterService {
         id -> {
           try {
             documentationUnitsToTransform.add(documentationUnitRepository.findByUuid(id));
-          } catch (DocumentationUnitNotExistsException ignored) {
-            log.debug(ignored.getMessage());
+          } catch (DocumentationUnitNotExistsException ex) {
+            log.debug(ex.getMessage());
           }
         });
 

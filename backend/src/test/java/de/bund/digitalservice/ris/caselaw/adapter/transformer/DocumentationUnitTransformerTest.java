@@ -474,9 +474,7 @@ class DocumentationUnitTransformerTest {
     Exception exception =
         assertThrows(
             DocumentationUnitTransformerException.class,
-            () -> {
-              DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
-            });
+            () -> DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject));
 
     String expectedMessage = "Norm reference has no norm abbreviation, but is required.";
     String actualMessage = exception.getMessage();

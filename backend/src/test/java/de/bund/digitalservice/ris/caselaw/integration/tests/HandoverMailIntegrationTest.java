@@ -428,12 +428,11 @@ class HandoverMailIntegrationTest {
         .isOk()
         .expectBody(HandoverMail[].class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody())
-                  .usingRecursiveComparison()
-                  .ignoringFields("handoverDate", "attachments")
-                  .isEqualTo(expectedXmlPublication);
-            });
+            response ->
+                assertThat(response.getResponseBody())
+                    .usingRecursiveComparison()
+                    .ignoringFields("handoverDate", "attachments")
+                    .isEqualTo(expectedXmlPublication));
   }
 
   @ParameterizedTest

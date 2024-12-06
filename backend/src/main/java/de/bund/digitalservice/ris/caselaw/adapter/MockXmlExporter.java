@@ -6,8 +6,6 @@ import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import java.time.Instant;
 import java.util.List;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 /**
  * Mock implementation of the {@link XmlExporter} interface. This implementation is used for testing
@@ -43,8 +41,7 @@ public class MockXmlExporter implements XmlExporter {
    * @return the XML export result
    */
   @Override
-  public List<XmlTransformationResult> transformToXml(LegalPeriodicalEdition edition)
-      throws ParserConfigurationException, TransformerException {
+  public List<XmlTransformationResult> transformToXml(LegalPeriodicalEdition edition) {
     return edition.references().stream()
         .map(
             reference ->

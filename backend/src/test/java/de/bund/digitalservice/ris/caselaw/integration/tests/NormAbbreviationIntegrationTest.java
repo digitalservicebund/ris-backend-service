@@ -233,9 +233,7 @@ class NormAbbreviationIntegrationTest {
         .isOk()
         .expectBody(NormAbbreviation.class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isEqualTo(expectedNormAbbreviation);
-            });
+            response -> assertThat(response.getResponseBody()).isEqualTo(expectedNormAbbreviation));
   }
 
   @Test
@@ -260,9 +258,7 @@ class NormAbbreviationIntegrationTest {
         .isOk()
         .expectBody(NormAbbreviation.class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isEqualTo(expectedNormAbbreviation);
-            });
+            response -> assertThat(response.getResponseBody()).isEqualTo(expectedNormAbbreviation));
   }
 
   @Test
@@ -287,9 +283,7 @@ class NormAbbreviationIntegrationTest {
         .isOk()
         .expectBody(NormAbbreviation.class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isEqualTo(expectedNormAbbreviation);
-            });
+            response -> assertThat(response.getResponseBody()).isEqualTo(expectedNormAbbreviation));
   }
 
   @Test
@@ -309,9 +303,7 @@ class NormAbbreviationIntegrationTest {
         .isOk()
         .expectBody(NormAbbreviation.class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isEqualTo(expectedNormAbbreviation);
-            });
+            response -> assertThat(response.getResponseBody()).isEqualTo(expectedNormAbbreviation));
   }
 
   @Test
@@ -341,10 +333,9 @@ class NormAbbreviationIntegrationTest {
         .isOk()
         .expectBody(NormAbbreviation.class)
         .consumeWith(
-            response -> {
-              assertThat(Objects.requireNonNull(response.getResponseBody()).documentTypes())
-                  .containsAll(expectedNormAbbreviation.documentTypes());
-            });
+            response ->
+                assertThat(Objects.requireNonNull(response.getResponseBody()).documentTypes())
+                    .containsAll(expectedNormAbbreviation.documentTypes()));
   }
 
   @Test
@@ -364,11 +355,10 @@ class NormAbbreviationIntegrationTest {
         .isOk()
         .expectBody(NormAbbreviation[].class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody())
-                  .extracting("id")
-                  .containsExactly(abbreviation2.getId());
-            });
+            response ->
+                assertThat(response.getResponseBody())
+                    .extracting("id")
+                    .containsExactly(abbreviation2.getId()));
   }
 
   @ParameterizedTest
@@ -387,12 +377,11 @@ class NormAbbreviationIntegrationTest {
         .isOk()
         .expectBody(NormAbbreviation[].class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody())
-                  .extracting("id")
-                  .containsExactlyInAnyOrder(
-                      abbreviation2.getId(), abbreviation4.getId(), abbreviation3.getId());
-            });
+            response ->
+                assertThat(response.getResponseBody())
+                    .extracting("id")
+                    .containsExactlyInAnyOrder(
+                        abbreviation2.getId(), abbreviation4.getId(), abbreviation3.getId()));
   }
 
   @Test
@@ -458,16 +447,15 @@ class NormAbbreviationIntegrationTest {
         .isOk()
         .expectBody(NormAbbreviation[].class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody())
-                  .extracting("id")
-                  .containsExactly(
-                      abbreviation8.getId(),
-                      abbreviation9.getId(),
-                      abbreviation10.getId(),
-                      abbreviation11.getId(),
-                      abbreviation12.getId());
-            });
+            response ->
+                assertThat(response.getResponseBody())
+                    .extracting("id")
+                    .containsExactly(
+                        abbreviation8.getId(),
+                        abbreviation9.getId(),
+                        abbreviation10.getId(),
+                        abbreviation11.getId(),
+                        abbreviation12.getId()));
   }
 
   @Test
@@ -487,11 +475,10 @@ class NormAbbreviationIntegrationTest {
         .isOk()
         .expectBody(NormAbbreviation[].class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody())
-                  .extracting("id")
-                  .containsExactly(abbreviationWithSpecialCharacters.getId());
-            });
+            response ->
+                assertThat(response.getResponseBody())
+                    .extracting("id")
+                    .containsExactly(abbreviationWithSpecialCharacters.getId()));
   }
 
   @Test
@@ -511,12 +498,11 @@ class NormAbbreviationIntegrationTest {
         .isOk()
         .expectBody(NormAbbreviation[].class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody())
-                  .extracting("id")
-                  .containsExactly(
-                      abbreviation2.getId(), abbreviation4.getId(), abbreviation3.getId());
-            });
+            response ->
+                assertThat(response.getResponseBody())
+                    .extracting("id")
+                    .containsExactly(
+                        abbreviation2.getId(), abbreviation4.getId(), abbreviation3.getId()));
 
     query = "letter abbreviation query";
 
@@ -529,12 +515,11 @@ class NormAbbreviationIntegrationTest {
         .isOk()
         .expectBody(NormAbbreviation[].class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody())
-                  .extracting("id")
-                  .containsExactlyInAnyOrder(
-                      abbreviation3.getId(), abbreviation2.getId(), abbreviation4.getId());
-            });
+            response ->
+                assertThat(response.getResponseBody())
+                    .extracting("id")
+                    .containsExactlyInAnyOrder(
+                        abbreviation3.getId(), abbreviation2.getId(), abbreviation4.getId()));
   }
 
   private void generateOtherLookupValues() {

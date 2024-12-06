@@ -280,10 +280,7 @@ class DocumentationUnitIntegrationTest {
         .expectStatus()
         .isOk()
         .expectBody(String.class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-            });
+        .consumeWith(response -> assertThat(response.getResponseBody()).isNotNull());
 
     assertThat(repository.findAll()).isEmpty();
 

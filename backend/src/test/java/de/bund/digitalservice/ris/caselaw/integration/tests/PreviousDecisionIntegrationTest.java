@@ -233,11 +233,10 @@ class PreviousDecisionIntegrationTest {
         .isOk()
         .expectBody(DocumentationUnit.class)
         .consumeWith(
-            response -> {
-              assertThat(Objects.requireNonNull(response.getResponseBody()).previousDecisions())
-                  .extracting("fileNumber")
-                  .containsExactly("test");
-            });
+            response ->
+                assertThat(Objects.requireNonNull(response.getResponseBody()).previousDecisions())
+                    .extracting("fileNumber")
+                    .containsExactly("test"));
   }
 
   @Test
@@ -318,9 +317,7 @@ class PreviousDecisionIntegrationTest {
         .isOk()
         .expectBody(DocumentationUnit.class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody().previousDecisions()).isEmpty();
-            });
+            response -> assertThat(response.getResponseBody().previousDecisions()).isEmpty());
   }
 
   @Test
@@ -388,7 +385,7 @@ class PreviousDecisionIntegrationTest {
             .getResponseBody()
             .getContent();
     assertThat(content).hasSize(1);
-    PreviousDecision documentationUnit = (PreviousDecision) content.get(0);
+    PreviousDecision documentationUnit = content.get(0);
     assertThat(documentationUnit.getDecisionDate()).isEqualTo(date1);
   }
 
@@ -402,7 +399,7 @@ class PreviousDecisionIntegrationTest {
             .getResponseBody()
             .getContent();
     assertThat(content).hasSize(3);
-    PreviousDecision documentationUnit = (PreviousDecision) content.get(0);
+    PreviousDecision documentationUnit = content.get(0);
     assertThat(documentationUnit.getCourt()).extracting("type").isEqualTo("Court1");
   }
 
@@ -415,7 +412,7 @@ class PreviousDecisionIntegrationTest {
             .getResponseBody()
             .getContent();
     assertThat(content).hasSize(2);
-    PreviousDecision documentationUnit = (PreviousDecision) content.get(0);
+    PreviousDecision documentationUnit = content.get(0);
     assertThat(documentationUnit.getFileNumber()).isEqualTo("AkteX");
   }
 
@@ -443,7 +440,7 @@ class PreviousDecisionIntegrationTest {
             .getResponseBody()
             .getContent();
     assertThat(content).hasSize(1);
-    PreviousDecision documentationUnit = (PreviousDecision) content.get(0);
+    PreviousDecision documentationUnit = content.get(0);
     assertThat(documentationUnit.getDocumentType().jurisShortcut()).isEqualTo("GH");
   }
 

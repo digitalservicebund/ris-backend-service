@@ -26,7 +26,8 @@ public class LegalPeriodicalController {
    * Returns legal periodical objects in a list
    *
    * @param searchStr An optional search string, that filters the list by abbreviation.
-   * @return
+   * @return list of legal periodical which contain the search string or the whole legal periodical
+   *     list if no search string is given
    */
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
