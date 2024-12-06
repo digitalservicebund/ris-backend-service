@@ -395,10 +395,70 @@ test.describe(
         await navigateToPreview(page, documentNumber)
 
         await expect(
+          page.getByText("Fundstellen", { exact: true }),
+        ).toBeVisible()
+        await expect(page.getByText("Literaturfundstellen")).toBeHidden()
+        await expect(
           page.getByText("Primäre FundstellenGVBl BB 2020, 01-99 (L)"),
         ).toBeVisible()
         await expect(
           page.getByText("Sekundäre FundstellenWdG 2024, 10-12 (LT)"),
+        ).toBeVisible()
+      },
+    )
+
+    test(
+      "Literature references are visible in preview",
+      {
+        annotation: {
+          type: "story",
+          description:
+            "https://digitalservicebund.atlassian.net/browse/RISDEV-4335",
+        },
+      },
+      async ({ page, documentNumber }) => {
+        await test.step("References are not rendered in preview when empty", async () => {
+          await navigateToPreview(page, documentNumber)
+          await expect(page.getByText("Literaturfundstellen")).toBeHidden()
+        })
+
+        await test.step("Add literature reference, verify remdering in preview", async () => {
+          await navigateToReferences(page, documentNumber)
+          await page.getByLabel("Literatur Fundstelle").click()
+          await fillInput(page, "Periodikum", "AllMBl")
+          await page
+            .getByText("AllMBl | Allgemeines Ministerialblatt", {
+              exact: true,
+            })
+            .click()
+          await waitForInputValue(page, "[aria-label='Periodikum']", "AllMBl")
+          await fillInput(page, "Zitatstelle", "2024, 2")
+          await fillInput(page, "Autor Literaturfundstelle", "Bilen, Ulviye")
+          await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
+          await page.getByText("Ean", { exact: true }).click()
+          await waitForInputValue(
+            page,
+            "[aria-label='Dokumenttyp Literaturfundstelle']",
+            "Anmerkung",
+          )
+
+          await page.locator("[aria-label='Fundstelle speichern']").click()
+          await expect(
+            page.getByText("Bilen, Ulviye, AllMBl 2024, 2 (Ean)"),
+          ).toBeVisible()
+        })
+
+        await save(page)
+
+        await navigateToPreview(page, documentNumber)
+
+        await expect(page.getByText("Literaturfundstellen")).toBeVisible()
+        await expect(
+          page.getByText("Fundstellen", { exact: true }),
+        ).toBeHidden()
+
+        await expect(
+          page.getByText("Bilen, Ulviye, AllMBl 2024, 2 (Ean)"),
         ).toBeVisible()
       },
     )

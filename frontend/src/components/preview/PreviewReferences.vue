@@ -11,19 +11,32 @@ const props = defineProps<{
 
 const primaryReferences = computed(() =>
   props.references?.filter(
-    (reference) => reference.legalPeriodical?.primaryReference,
+    (reference) =>
+      reference.referenceType === "caselaw" &&
+      reference.legalPeriodical?.primaryReference,
   ),
 )
 const secondaryReferences = computed(() =>
   props.references?.filter(
-    (reference) => !reference.legalPeriodical?.primaryReference,
+    (reference) =>
+      reference.referenceType === "caselaw" &&
+      !reference.legalPeriodical?.primaryReference,
+  ),
+)
+
+const literatureReferences = computed(() =>
+  props.references?.filter(
+    (reference) => reference.referenceType === "literature",
   ),
 )
 </script>
 
 <template>
   <PreviewRow
-    v-if="props.references && props.references.length > 0"
+    v-if="
+      (primaryReferences && primaryReferences.length > 0) ||
+      (secondaryReferences && secondaryReferences.length > 0)
+    "
     data-testid="references-preview"
   >
     <PreviewCategory>Fundstellen</PreviewCategory>
@@ -59,6 +72,18 @@ const secondaryReferences = computed(() =>
         >
           {{ item.renderDecision }}
         </div>
+      </div>
+    </PreviewContent>
+  </PreviewRow>
+  <PreviewRow
+    v-if="literatureReferences && literatureReferences.length > 0"
+    data-testid="literature-references-preview"
+  >
+    <PreviewCategory>Literaturfundstellen</PreviewCategory>
+
+    <PreviewContent>
+      <div v-for="item in literatureReferences" :key="item.id">
+        {{ item.renderDecision }}
       </div>
     </PreviewContent>
   </PreviewRow>
