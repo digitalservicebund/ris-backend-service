@@ -167,6 +167,8 @@ class ReferenceIntegrationTest {
     legalPeriodicalRepository.deleteAll();
   }
 
+  // TODO add test for rank
+
   @Test
   void testReferencesCanBeSaved() {
     DocumentationUnitDTO dto =
@@ -282,8 +284,8 @@ class ReferenceIntegrationTest {
             repository, documentationOffice);
 
     UUID referenceId = UUID.randomUUID();
-
     UUID literatureCitationId = UUID.randomUUID();
+
     repository.save(
         dto.toBuilder()
             .references(
@@ -295,11 +297,7 @@ class ReferenceIntegrationTest {
                         .citation("2024, S.3")
                         .legalPeriodicalRawValue("BVerwGE")
                         .legalPeriodical(
-                            LegalPeriodicalDTO.builder()
-                                .id(bverwgeLegalPeriodical.uuid())
-                                .abbreviation("BVerwGE")
-                                .primaryReference(true)
-                                .build())
+                            LegalPeriodicalDTO.builder().id(bverwgeLegalPeriodical.uuid()).build())
                         .build()))
             .dependentLiteratureCitations(
                 List.of(
@@ -312,17 +310,9 @@ class ReferenceIntegrationTest {
                         .legalPeriodicalRawValue("BVerwGE")
                         .documentTypeRawValue("Ean")
                         .type(DependentLiteratureCitationType.PASSIVE)
-                        .documentType(
-                            DocumentTypeDTO.builder()
-                                .id(eanDocumentType.uuid())
-                                .abbreviation("Ean")
-                                .build())
+                        .documentType(DocumentTypeDTO.builder().id(eanDocumentType.uuid()).build())
                         .legalPeriodical(
-                            LegalPeriodicalDTO.builder()
-                                .id(bverwgeLegalPeriodical.uuid())
-                                .abbreviation("BVerwGE")
-                                .primaryReference(true)
-                                .build())
+                            LegalPeriodicalDTO.builder().id(bverwgeLegalPeriodical.uuid()).build())
                         .build()))
             .build());
 
@@ -360,8 +350,8 @@ class ReferenceIntegrationTest {
             repository, documentationOffice);
 
     UUID referenceId = UUID.randomUUID();
-
     UUID literatureCitationId = UUID.randomUUID();
+
     var edition =
         editionRepository.save(
             LegalPeriodicalEdition.builder()
@@ -381,8 +371,6 @@ class ReferenceIntegrationTest {
                             .legalPeriodical(
                                 LegalPeriodical.builder()
                                     .uuid(bverwgeLegalPeriodical.uuid())
-                                    .abbreviation("BVerwGE")
-                                    .primaryReference(true)
                                     .build())
                             .build(),
                         Reference.builder()

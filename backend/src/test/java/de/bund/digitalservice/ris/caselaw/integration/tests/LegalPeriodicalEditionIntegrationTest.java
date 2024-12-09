@@ -45,6 +45,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -135,6 +136,7 @@ class LegalPeriodicalEditionIntegrationTest {
 
   private static final String EDITION_ENDPOINT = "/api/v1/caselaw/legalperiodicaledition";
   private final DocumentationOffice docOffice = buildDSDocOffice();
+  private LegalPeriodical legalPeriodical;
 
   @BeforeEach
   void setUp() {
@@ -154,6 +156,14 @@ class LegalPeriodicalEditionIntegrationTest {
                   List<String> groups = user.getAttribute("groups");
                   return Objects.requireNonNull(groups).getFirst().equals("/DS");
                 }));
+
+    legalPeriodical =
+        legalPeriodicalRepository.findAllBySearchStr(Optional.of("ABC")).stream()
+            .findAny()
+            .orElseThrow(
+                () ->
+                    new NoSuchElementException(
+                        "Legal periodical not found, check legal_periodical_init.sql"));
   }
 
   @AfterEach
@@ -175,15 +185,6 @@ class LegalPeriodicalEditionIntegrationTest {
 
   @Test
   void testGetEditions_byLegalPeriodical_shouldReturnValue() {
-
-    var legalPeriodical =
-        legalPeriodicalRepository.findAllBySearchStr(Optional.of("ABC")).stream()
-            .findAny()
-            .orElseThrow(
-                () ->
-                    new NoSuchElementException(
-                        "Legal periodical not found, check legal_periodical_init.sql"));
-
     repository.save(
         LegalPeriodicalEdition.builder()
             .id(UUID.randomUUID())
@@ -213,13 +214,6 @@ class LegalPeriodicalEditionIntegrationTest {
 
   @Test
   void testGetEdition_ById_shouldSucceed() {
-    var legalPeriodical =
-        legalPeriodicalRepository.findAllBySearchStr(Optional.of("ABC")).stream()
-            .findAny()
-            .orElseThrow(
-                () ->
-                    new NoSuchElementException(
-                        "Legal periodical not found, check legal_periodical_init.sql"));
 
     var saved =
         repository.save(
@@ -248,13 +242,6 @@ class LegalPeriodicalEditionIntegrationTest {
 
   @Test
   void testDeleteEdition_withoutReferences_shouldSucceed() {
-    var legalPeriodical =
-        legalPeriodicalRepository.findAllBySearchStr(Optional.of("ABC")).stream()
-            .findAny()
-            .orElseThrow(
-                () ->
-                    new NoSuchElementException(
-                        "Legal periodical not found, check legal_periodical_init.sql"));
 
     var legalPeriodicalEdition =
         LegalPeriodicalEdition.builder()
@@ -272,13 +259,6 @@ class LegalPeriodicalEditionIntegrationTest {
   @Test
   void testGetEdition_withMixedReferencesAndLiteratureCitationsFromDocUnitAndEdition_shouldSucceed()
       throws DocumentationUnitNotExistsException {
-    var legalPeriodical =
-        legalPeriodicalRepository.findAllBySearchStr(Optional.of("ABC")).stream()
-            .findAny()
-            .orElseThrow(
-                () ->
-                    new NoSuchElementException(
-                        "Legal periodical not found, check legal_periodical_init.sql"));
 
     UUID existingReferenceId = UUID.randomUUID();
     UUID existingLiteratureCitationId = UUID.randomUUID();
@@ -451,19 +431,50 @@ class LegalPeriodicalEditionIntegrationTest {
   @Test
   void testDeleteReferencesAndLiteratureCitations_fromEdition_shouldSucceed()
       throws DocumentationUnitNotExistsException {
-    var legalPeriodical =
-        legalPeriodicalRepository.findAllBySearchStr(Optional.of("ABC")).stream()
-            .findAny()
-            .orElseThrow(
-                () ->
-                    new NoSuchElementException(
-                        "Legal periodical not found, check legal_periodical_init.sql"));
 
     var docUnit =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             documentationUnitRepository,
             documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()),
             "DOC_NUMBER");
+
+    // add preexisting references and literature citations
+    documentationUnitRepository.save(
+        docUnit.toBuilder()
+            .dependentLiteratureCitations(
+                List.of(
+                    DependentLiteratureCitationDTO.builder()
+                        .id(UUID.randomUUID())
+                        .rank(1)
+                        .citation("1")
+                        .legalPeriodicalRawValue("A")
+                        .author("author 1")
+                        .type(DependentLiteratureCitationType.PASSIVE)
+                        .documentType(
+                            DocumentTypeDTO.builder()
+                                .id(UUID.fromString("f718a7ee-f419-46cf-a96a-29227927850c"))
+                                .abbreviation("Ean")
+                                .build())
+                        .documentationUnit(
+                            DocumentationUnitDTO.builder()
+                                .id(docUnit.getId())
+                                .documentNumber("DOC_NUMBER")
+                                .build())
+                        .build()))
+            .references(
+                List.of(
+                    ReferenceDTO.builder()
+                        .id(UUID.randomUUID())
+                        .rank(1)
+                        .citation("2")
+                        .legalPeriodicalRawValue("A")
+                        .documentationUnit(
+                            DocumentationUnitDTO.builder()
+                                .id(docUnit.getId())
+                                .documentNumber("DOC_NUMBER")
+                                .build())
+                        .build()))
+            .build());
 
     UUID literatureCitationId = UUID.randomUUID();
     UUID referenceId = UUID.randomUUID();
@@ -474,6 +485,7 @@ class LegalPeriodicalEditionIntegrationTest {
             .uuid(docUnit.getId())
             .documentNumber("DOC_NUMBER")
             .build();
+
     var edition =
         repository.save(
             LegalPeriodicalEdition.builder()
@@ -485,7 +497,7 @@ class LegalPeriodicalEditionIntegrationTest {
                 .references(
                     List.of(
                         Reference.builder()
-                            .id(UUID.randomUUID())
+                            .id(referenceId)
                             .referenceType(ReferenceType.CASELAW)
                             .citation("1 - New Citation")
                             .legalPeriodicalRawValue("B")
@@ -501,7 +513,7 @@ class LegalPeriodicalEditionIntegrationTest {
                             .documentationUnit(relatedDocUnit)
                             .build(),
                         Reference.builder()
-                            .id(referenceId)
+                            .id(UUID.randomUUID())
                             .referenceType(ReferenceType.CASELAW)
                             .citation("3 - New Reference")
                             .legalPeriodicalRawValue("D")
@@ -518,8 +530,8 @@ class LegalPeriodicalEditionIntegrationTest {
                             .build()))
                 .build());
 
-    edition.references().remove(1); // delete 2 - New Literature Citation
-    edition.references().remove(1); // delete 3 - New Reference
+    edition.references().remove(0); // delete 1 - New Citation
+    edition.references().remove(0); // delete 2 - New Literature Citation
 
     assertThat(referenceRepository.findById(referenceId)).isPresent();
     assertThat(literatureCitationRepository.findById(literatureCitationId)).isPresent();
@@ -540,16 +552,29 @@ class LegalPeriodicalEditionIntegrationTest {
     Assertions.assertEquals("2024 Sonderheft 1", edition.name());
     List<Reference> references = editionResponse.references();
     Assertions.assertEquals(2, references.size());
-    Assertions.assertEquals("1 - New Citation", references.get(0).citation());
+    Assertions.assertEquals("3 - New Reference", references.get(0).citation());
     Assertions.assertEquals("4 - New Literature Citation", references.get(1).citation());
+
+    // assure rank is updated
+    assertThat(references.get(0).rank()).isEqualTo(1);
+    assertThat(references.get(1).rank()).isEqualTo(2);
 
     // documentation unit is updated
     assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").references())
-        .hasSize(2)
+        .hasSize(4)
         .satisfies(
             list -> {
-              assertThat(list.get(0).citation()).isEqualTo("1 - New Citation");
-              assertThat(list.get(1).citation()).isEqualTo("4 - New Literature Citation");
+              // first, caselaw references
+              assertThat(list.get(0).citation()).isEqualTo("2");
+              assertThat(list.get(0).rank()).isEqualTo(1);
+              assertThat(list.get(1).citation()).isEqualTo("3 - New Reference");
+              assertThat(list.get(1).rank()).isEqualTo(2);
+
+              // then, literature citations
+              assertThat(list.get(2).citation()).isEqualTo("1");
+              assertThat(list.get(2).rank()).isEqualTo(1);
+              assertThat(list.get(3).citation()).isEqualTo("4 - New Literature Citation");
+              assertThat(list.get(3).rank()).isEqualTo(2);
             });
 
     assertThat(referenceRepository.findById(referenceId)).isEmpty();
@@ -562,13 +587,6 @@ class LegalPeriodicalEditionIntegrationTest {
   @Test
   void testGetEdition_withDocUnitCreatedByReference_shouldSucceed()
       throws DocumentationUnitNotExistsException {
-    var legalPeriodical =
-        legalPeriodicalRepository.findAllBySearchStr(Optional.of("ABC")).stream()
-            .findAny()
-            .orElseThrow(
-                () ->
-                    new NoSuchElementException(
-                        "Legal periodical not found, check legal_periodical_init.sql"));
 
     var referenceId = UUID.randomUUID();
 
@@ -660,13 +678,6 @@ class LegalPeriodicalEditionIntegrationTest {
 
   @Test
   void testDeleteReference_shouldCleanupDocUnitSource() throws DocumentationUnitNotExistsException {
-    var legalPeriodical =
-        legalPeriodicalRepository.findAllBySearchStr(Optional.of("ABC")).stream()
-            .findAny()
-            .orElseThrow(
-                () ->
-                    new NoSuchElementException(
-                        "Legal periodical not found, check legal_periodical_init.sql"));
 
     var referenceId = UUID.randomUUID();
 
