@@ -296,6 +296,202 @@ test.describe(
 
       await checkAllBorderNumbersAreVisible(editor)
     })
+
+    test("add border Numbers (Randnummern) in correct order ('Gründe', 'Abweichende Meinung' and 'Sonstiger Langtext')", async ({
+      page,
+      documentNumber,
+    }) => {
+      await navigateToCategories(page, documentNumber)
+
+      // Gründe
+      await clickCategoryButton("Gründe", page)
+      const reasons = page.locator("[data-testid='Gründe']")
+
+      await test.step("Add three paragraphs into 'Gründe'", async () => {
+        await page.keyboard.insertText(firstParagraph)
+        await page.keyboard.press("Enter")
+        await page.keyboard.insertText(secondParagraph)
+        await page.keyboard.press("Enter")
+        await page.keyboard.insertText(thirdParagraph)
+        await page.keyboard.press("Enter")
+      })
+
+      await checkAllParagraphsAreVisible(reasons)
+
+      await test.step("Select all text", async () => {
+        await page.keyboard.press(`ControlOrMeta+A`)
+      })
+
+      await clickAddBorderNumberButton(page)
+
+      await checkAllBorderNumbersAreVisible(reasons)
+
+      // Abweichende Meinung
+      await clickCategoryButton("Abweichende Meinung", page)
+      const dissentingOpinion = page.locator(
+        "[data-testid='Abweichende Meinung']",
+      )
+
+      await test.step("Add three paragraphs into 'Abweichende Meinung'", async () => {
+        await page.keyboard.insertText(firstParagraph)
+        await page.keyboard.press("Enter")
+        await page.keyboard.insertText(secondParagraph)
+        await page.keyboard.press("Enter")
+        await page.keyboard.insertText(thirdParagraph)
+        await page.keyboard.press("Enter")
+      })
+
+      await checkAllParagraphsAreVisible(dissentingOpinion)
+
+      await test.step("Select all text", async () => {
+        await page.keyboard.press(`ControlOrMeta+A`)
+      })
+
+      await clickAddBorderNumberButton(page)
+
+      await test.step("Check all border numbers are visible and have correct sequence", async () => {
+        await expect(
+          dissentingOpinion.getByText(`4${firstParagraph}`),
+        ).toBeVisible()
+        await expect(
+          dissentingOpinion.getByText(`5${secondParagraph}`),
+        ).toBeVisible()
+        await expect(
+          dissentingOpinion.getByText(`6${thirdParagraph}`),
+        ).toBeVisible()
+      })
+
+      // Sonstiger Langtext
+      await clickCategoryButton("Sonstiger Langtext", page)
+      const otherLongText = page.locator("[data-testid='Sonstiger Langtext']")
+
+      await test.step("Add three paragraphs into 'Sonstiger Langtext'", async () => {
+        await page.keyboard.insertText(firstParagraph)
+        await page.keyboard.press("Enter")
+        await page.keyboard.insertText(secondParagraph)
+        await page.keyboard.press("Enter")
+        await page.keyboard.insertText(thirdParagraph)
+        await page.keyboard.press("Enter")
+      })
+
+      await checkAllParagraphsAreVisible(otherLongText)
+
+      await test.step("Select all text", async () => {
+        await page.keyboard.press(`ControlOrMeta+A`)
+      })
+
+      await clickAddBorderNumberButton(page)
+
+      await test.step("Check all border numbers are visible and have correct sequence", async () => {
+        await expect(
+          otherLongText.getByText(`7${firstParagraph}`),
+        ).toBeVisible()
+        await expect(
+          otherLongText.getByText(`8${secondParagraph}`),
+        ).toBeVisible()
+        await expect(
+          otherLongText.getByText(`9${thirdParagraph}`),
+        ).toBeVisible()
+      })
+    })
+
+    test("add border Numbers (Randnummern) in correct order ('Tatbestand', 'Abweichende Meinung' and 'Sonstiger Langtext')", async ({
+      page,
+      documentNumber,
+    }) => {
+      await navigateToCategories(page, documentNumber)
+
+      // Tatbestand
+      await clickCategoryButton("Tatbestand", page)
+      const casefacts = page.locator("[data-testid='Tatbestand']")
+
+      await test.step("Add three paragraphs into 'Tatbestand'", async () => {
+        await page.keyboard.insertText(firstParagraph)
+        await page.keyboard.press("Enter")
+        await page.keyboard.insertText(secondParagraph)
+        await page.keyboard.press("Enter")
+        await page.keyboard.insertText(thirdParagraph)
+        await page.keyboard.press("Enter")
+      })
+
+      await checkAllParagraphsAreVisible(casefacts)
+
+      await test.step("Select all text", async () => {
+        await page.keyboard.press(`ControlOrMeta+A`)
+      })
+
+      await clickAddBorderNumberButton(page)
+
+      await checkAllBorderNumbersAreVisible(casefacts)
+
+      // Abweichende Meinung
+      await clickCategoryButton("Abweichende Meinung", page)
+      const dissentingOpinion = page.locator(
+        "[data-testid='Abweichende Meinung']",
+      )
+
+      await test.step("Add three paragraphs into 'Abweichende Meinung'", async () => {
+        await page.keyboard.insertText(firstParagraph)
+        await page.keyboard.press("Enter")
+        await page.keyboard.insertText(secondParagraph)
+        await page.keyboard.press("Enter")
+        await page.keyboard.insertText(thirdParagraph)
+        await page.keyboard.press("Enter")
+      })
+
+      await checkAllParagraphsAreVisible(dissentingOpinion)
+
+      await test.step("Select all text", async () => {
+        await page.keyboard.press(`ControlOrMeta+A`)
+      })
+
+      await clickAddBorderNumberButton(page)
+
+      await test.step("Check all border numbers are visible and have correct sequence", async () => {
+        await expect(
+          dissentingOpinion.getByText(`4${firstParagraph}`),
+        ).toBeVisible()
+        await expect(
+          dissentingOpinion.getByText(`5${secondParagraph}`),
+        ).toBeVisible()
+        await expect(
+          dissentingOpinion.getByText(`6${thirdParagraph}`),
+        ).toBeVisible()
+      })
+
+      // Sonstiger Langtext
+      await clickCategoryButton("Sonstiger Langtext", page)
+      const otherLongText = page.locator("[data-testid='Sonstiger Langtext']")
+
+      await test.step("Add three paragraphs into 'Sonstiger Langtext'", async () => {
+        await page.keyboard.insertText(firstParagraph)
+        await page.keyboard.press("Enter")
+        await page.keyboard.insertText(secondParagraph)
+        await page.keyboard.press("Enter")
+        await page.keyboard.insertText(thirdParagraph)
+        await page.keyboard.press("Enter")
+      })
+
+      await checkAllParagraphsAreVisible(otherLongText)
+
+      await test.step("Select all text", async () => {
+        await page.keyboard.press(`ControlOrMeta+A`)
+      })
+
+      await clickAddBorderNumberButton(page)
+
+      await test.step("Check all border numbers are visible and have correct sequence", async () => {
+        await expect(
+          otherLongText.getByText(`7${firstParagraph}`),
+        ).toBeVisible()
+        await expect(
+          otherLongText.getByText(`8${secondParagraph}`),
+        ).toBeVisible()
+        await expect(
+          otherLongText.getByText(`9${thirdParagraph}`),
+        ).toBeVisible()
+      })
+    })
   },
 )
 
