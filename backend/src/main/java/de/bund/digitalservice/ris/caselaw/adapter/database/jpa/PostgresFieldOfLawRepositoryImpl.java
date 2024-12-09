@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
+  private static final String NORMS = "norms";
   private final DatabaseFieldOfLawRepository repository;
   private final EntityManager entityManager;
 
@@ -99,15 +100,15 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
       predicates.add(identifierPredicate);
     }
     if (normSearchTerms != null) {
-      fieldOfLawRoot.fetch("norms", JoinType.LEFT);
+      fieldOfLawRoot.fetch(NORMS, JoinType.LEFT);
       for (String searchTerm : normSearchTerms) {
         Predicate normAbbreviationPredicate =
             cb.like(
-                cb.lower(fieldOfLawRoot.get("norms").get("abbreviation")),
+                cb.lower(fieldOfLawRoot.get(NORMS).get("abbreviation")),
                 "%" + searchTerm.toLowerCase() + "%");
         Predicate singleNormPredicate =
             cb.like(
-                cb.lower(fieldOfLawRoot.get("norms").get("singleNormDescription")),
+                cb.lower(fieldOfLawRoot.get(NORMS).get("singleNormDescription")),
                 "%" + searchTerm.toLowerCase() + "%");
         Predicate combined = cb.or(normAbbreviationPredicate, singleNormPredicate);
         predicates.add(combined);

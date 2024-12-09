@@ -65,13 +65,14 @@ import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 @Service
 @Slf4j
 public class DocxConverterService implements ConverterService {
+  private static final String PARAGRAPH = "paragraph";
   private static final List<UnhandledElement> IRRELEVANT_ELEMENTS =
       List.of(
-          new UnhandledElement("paragraph", "org.docx4j.wml.CTBookmark", UnhandledElementType.JAXB),
+          new UnhandledElement(PARAGRAPH, "org.docx4j.wml.CTBookmark", UnhandledElementType.JAXB),
           new UnhandledElement(
-              "paragraph", "org.docx4j.wml.CTMarkupRange", UnhandledElementType.JAXB),
+              PARAGRAPH, "org.docx4j.wml.CTMarkupRange", UnhandledElementType.JAXB),
           new UnhandledElement(
-              "paragraph", "org.docx4j.wml.CTSimpleField", UnhandledElementType.JAXB),
+              PARAGRAPH, "org.docx4j.wml.CTSimpleField", UnhandledElementType.JAXB),
           // Page break
           new UnhandledElement("run element", "org.docx4j.wml.Br", UnhandledElementType.OBJECT)
           // possible irrelevant (spell and grammar check)
