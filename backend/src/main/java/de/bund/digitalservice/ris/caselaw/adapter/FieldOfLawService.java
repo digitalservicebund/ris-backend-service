@@ -4,7 +4,6 @@ import de.bund.digitalservice.ris.caselaw.domain.FieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.Norm;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,71 +56,32 @@ public class FieldOfLawService {
     return searchAndOrderByScore(description, identifier, norm, pageable);
   }
 
-  private String[] splitSearchTerms(String searchStr) {
-    return Arrays.stream(searchStr.split("\\s+")).map(String::trim).toArray(String[]::new);
-  }
-
   private Slice<FieldOfLaw> searchAndOrderByScore(
       Optional<String> description,
       Optional<String> identifier,
       Optional<String> norm,
       Pageable pageable) {
-    Optional<String[]> searchTerms = description.map(this::splitSearchTerms);
+    Optional<String[]> descriptionSearchTerms = description.map(this::splitSearchTerms);
     Optional<String> normStr = norm.map(n -> n.trim().replaceAll("§(\\d+)", "§ $1"));
+    Optional<String[]> normTerms =
+        norm.map(n -> n.replaceAll("§", "").trim()).map(this::splitSearchTerms);
 
-    List<FieldOfLaw> unorderedList;
-
-    if (identifier.isPresent()) {
-      String identifierStr = identifier.get().trim();
-
-      if (searchTerms.isEmpty() && normStr.isEmpty()) {
-        // Returned list is already ordered by identifier, so scoring is not necessary here
-        unorderedList = repository.findByIdentifier(identifierStr, pageable);
-        return sliceResults(unorderedList, pageable);
-      } else {
-        unorderedList = getResultsWithIdentifier(identifierStr, searchTerms, normStr);
-      }
-    } else {
-      unorderedList = getResultsWithoutIdentifier(searchTerms, normStr);
-    }
+    List<FieldOfLaw> unorderedList =
+        repository.findByCombinedCriteria(
+            identifier.orElse(null), descriptionSearchTerms.orElse(null), normTerms.orElse(null));
 
     // If no results found, return an empty page
     if (unorderedList.isEmpty()) {
       return new PageImpl<>(List.of(), pageable, 0);
     }
 
-    List<FieldOfLaw> orderedList = orderResults(searchTerms, normStr, unorderedList);
+    List<FieldOfLaw> orderedList = orderResults(descriptionSearchTerms, normStr, unorderedList);
 
     return sliceResults(orderedList, pageable);
   }
 
-  private List<FieldOfLaw> getResultsWithIdentifier(
-      String identifierStr, Optional<String[]> searchTerms, Optional<String> norm) {
-    if (searchTerms.isPresent() && norm.isPresent()) {
-      return repository.findByIdentifierAndSearchTermsAndNorm(
-          identifierStr, searchTerms.get(), norm.get());
-    }
-    if (searchTerms.isPresent()) {
-      return repository.findByIdentifierAndSearchTerms(identifierStr, searchTerms.get());
-    }
-    if (norm.isPresent()) {
-      return repository.findByIdentifierAndNorm(identifierStr, norm.get());
-    }
-    return Collections.emptyList();
-  }
-
-  private List<FieldOfLaw> getResultsWithoutIdentifier(
-      Optional<String[]> searchTerms, Optional<String> norm) {
-    if (searchTerms.isPresent() && norm.isPresent()) {
-      return repository.findByNormAndSearchTerms(norm.get(), searchTerms.get());
-    }
-    if (searchTerms.isPresent()) {
-      return repository.findBySearchTerms(searchTerms.get());
-    }
-    if (norm.isPresent()) {
-      return repository.findByNorm(norm.get());
-    }
-    return Collections.emptyList();
+  private String[] splitSearchTerms(String searchStr) {
+    return Arrays.stream(searchStr.split("\\s+")).map(String::trim).toArray(String[]::new);
   }
 
   private List<FieldOfLaw> orderResults(

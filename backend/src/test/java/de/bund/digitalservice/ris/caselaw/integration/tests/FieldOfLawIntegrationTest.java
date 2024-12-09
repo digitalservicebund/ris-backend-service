@@ -186,7 +186,11 @@ class FieldOfLawIntegrationTest {
   @ParameterizedTest
   @ValueSource(
       strings = {
+        "abc § 123", // norm followed by paragraph
+        "abc §123", // norm followed by paragraph without whitespace
+        "abc § 12", // norm followed by incomplete paragraph
         "§ 123 abc", // paragraph followed by norm
+        "§ 12 abc", // incomplete paragraph followed by norm
         "abc", // norm
       })
   void testGetFieldsOfLawByNormsQuery_withAbbreviation(String query) {
@@ -203,29 +207,6 @@ class FieldOfLawIntegrationTest {
             .getResponseBody();
 
     assertThat(responseBody).extracting("identifier").containsExactly("AB-01", "FL");
-  }
-
-  @ParameterizedTest
-  @ValueSource(
-      strings = {
-        "abc § 123", // norm followed by paragraph
-        "abc §123", // norm followed by paragraph without whitespace
-        "abc § 12", // norm followed by incomplete paragraph
-      })
-  void testGetFieldsOfLawByNormsQuery_withStartingAbbreviation(String query) {
-    Slice<FieldOfLaw> responseBody =
-        risWebTestClient
-            .withDefaultLogin()
-            .get()
-            .uri("/api/v1/caselaw/fieldsoflaw?norm=" + query + "&pg=0&sz=3")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(new TypeReference<SliceTestImpl<FieldOfLaw>>() {})
-            .returnResult()
-            .getResponseBody();
-
-    assertThat(responseBody).extracting("identifier").containsExactly("FL");
   }
 
   @Test
@@ -246,7 +227,7 @@ class FieldOfLawIntegrationTest {
   }
 
   @Test
-  void testFindByIdentifierAndSearchTerms() {
+  void testFindByIdentifierAndDescription() {
     SliceTestImpl<FieldOfLaw> responseBody =
         risWebTestClient
             .withDefaultLogin()
@@ -260,6 +241,23 @@ class FieldOfLawIntegrationTest {
             .getResponseBody();
 
     assertThat(responseBody).extracting("identifier").containsExactly("FL-01-01");
+  }
+
+  @Test
+  void testFindByDescriptionAndNorm() {
+    SliceTestImpl<FieldOfLaw> responseBody =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/fieldsoflaw?q=some text&norm=§123&pg=0&sz=10")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<SliceTestImpl<FieldOfLaw>>() {})
+            .returnResult()
+            .getResponseBody();
+
+    assertThat(responseBody).extracting("identifier").containsExactly("AB-01");
   }
 
   @Test

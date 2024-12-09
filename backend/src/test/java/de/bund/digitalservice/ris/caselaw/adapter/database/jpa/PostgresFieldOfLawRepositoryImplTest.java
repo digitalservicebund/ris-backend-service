@@ -1,17 +1,14 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import static de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresFieldOfLawRepositoryImpl.returnTrueIfInText;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 class PostgresFieldOfLawRepositoryImplTest {
-  private static FieldOfLawDTO generateFieldOfLawDto(String text) {
-    return FieldOfLawDTO.builder().identifier("AB-31-21").text(text).build();
+  private static FieldOfLawDTO generateFieldOfLawDto() {
+    return FieldOfLawDTO.builder().identifier("AB-31-21").text("parent").build();
   }
 
   static void addNormToFieldOfLaw(FieldOfLawDTO parent) {
@@ -40,7 +37,7 @@ class PostgresFieldOfLawRepositoryImplTest {
 
   @Test
   void getWithNorms() {
-    var parent = generateFieldOfLawDto("parent");
+    var parent = generateFieldOfLawDto();
     addNormToFieldOfLaw(parent);
     addChildToFieldOfLaw(parent);
 
@@ -48,24 +45,5 @@ class PostgresFieldOfLawRepositoryImplTest {
 
     assertEquals(Collections.emptyList(), result.children());
     assertEquals(1, result.norms().size());
-  }
-
-  @Test
-  void testReturnTrueIfInText() {
-    var fieldOfLaw = generateFieldOfLawDto("find me by text");
-    assertTrue(returnTrueIfInText(fieldOfLaw, new String[] {fieldOfLaw.getText()}));
-    assertTrue(returnTrueIfInText(fieldOfLaw, new String[] {"find", "text"}));
-  }
-
-  @Test
-  void testReturnFalseIfInText() {
-    var fieldOfLaw = generateFieldOfLawDto("find me by text");
-    assertFalse(returnTrueIfInText(fieldOfLaw, null));
-    assertFalse(returnTrueIfInText(fieldOfLaw, new String[] {}));
-    assertFalse(returnTrueIfInText(fieldOfLaw, new String[] {"no matches"}));
-    assertFalse(
-        returnTrueIfInText(
-            fieldOfLaw,
-            new String[] {fieldOfLaw.getIdentifier(), fieldOfLaw.getText(), "no matches"}));
   }
 }
