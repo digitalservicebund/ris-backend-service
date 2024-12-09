@@ -81,7 +81,6 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     CriteriaQuery<FieldOfLawDTO> cq = cb.createQuery(FieldOfLawDTO.class);
     Root<FieldOfLawDTO> fieldOfLawRoot = cq.from(FieldOfLawDTO.class);
-    fieldOfLawRoot.fetch("norms", JoinType.LEFT);
     ArrayList<Predicate> predicates = new ArrayList<>();
 
     Predicate notationPredicate =
@@ -100,6 +99,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
       predicates.add(identifierPredicate);
     }
     if (normSearchTerms != null) {
+      fieldOfLawRoot.fetch("norms", JoinType.LEFT);
       for (String searchTerm : normSearchTerms) {
         Predicate normAbbreviationPredicate =
             cb.like(

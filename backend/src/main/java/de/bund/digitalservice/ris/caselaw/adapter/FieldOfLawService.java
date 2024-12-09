@@ -66,9 +66,7 @@ public class FieldOfLawService {
     Optional<String[]> normTerms =
         norm.map(n -> n.replaceAll("§", "").trim()).map(this::splitSearchTerms);
 
-    List<FieldOfLaw> unorderedList;
-
-    unorderedList =
+    List<FieldOfLaw> unorderedList =
         repository.findByCombinedCriteria(
             identifier.orElse(null), descriptionSearchTerms.orElse(null), normTerms.orElse(null));
 
