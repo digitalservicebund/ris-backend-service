@@ -4,7 +4,7 @@ Date: 2022-05-03
 
 ## Status
 
-Accepted
+Superseded by [22. Use Java 21](0022-use-java-21.md)
 
 ## Context
 
