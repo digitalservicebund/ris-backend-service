@@ -6,7 +6,7 @@ Date: 2024-10-09
 
 Accepted
 
-Supersedes [4. Use Java 17](0004-[Superseded]user-java-17.md)
+Supersedes [4. Use Java 17](0004-\[Superseded\]use-java-17.md)
 
 ## Context
 
