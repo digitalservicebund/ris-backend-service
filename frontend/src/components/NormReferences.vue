@@ -1,11 +1,13 @@
 <script lang="ts" setup>
 import * as Sentry from "@sentry/vue"
+import dayjs from "dayjs"
 import { computed } from "vue"
 import EditableList from "@/components/EditableList.vue"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
 import NormReferenceSummary from "@/components/NormReferenceSummary.vue"
 import NormReference from "@/domain/normReference"
 
+import SingleNorm from "@/domain/singleNorm"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const store = useDocumentUnitStore()
@@ -22,33 +24,42 @@ const norms = computed({
           )
           return false
         }
-        // Remove duplicate singleNorms within the current value (norm)
-        if (value.singleNorms && Array.isArray(value.singleNorms)) {
-          const uniqueSingleNorms = new Set() // Use a Set to track unique serialized singleNorms
-
-          value.singleNorms = value.singleNorms.filter((singleNorm) => {
-            // Serialize singleNorm values into a unique string
-            const uniqueKey = JSON.stringify({
-              singleNorm: singleNorm.singleNorm,
-              dateOfVersion: singleNorm.dateOfVersion,
-              dateOfRelevance: singleNorm.dateOfRelevance,
-            })
-
-            // Add to the Set if it doesn't exist yet
-            const isUnique = !uniqueSingleNorms.has(uniqueKey)
-            if (isUnique) {
-              uniqueSingleNorms.add(uniqueKey)
-            }
-
-            return isUnique // Filter out duplicates
-          })
-        }
+        removeDuplicateSingleNorms(value as NormReference)
         return true // Keep the value in the norms array
       },
     )
     await store.updateDocumentUnit()
   },
 })
+
+function removeDuplicateSingleNorms(norm: NormReference): void {
+  if (!norm.singleNorms || !Array.isArray(norm.singleNorms)) {
+    return // Exit if singleNorms is not an array
+  }
+
+  const uniqueSingleNorms = new Set<string>()
+
+  norm.singleNorms = norm.singleNorms.filter((singleNorm) => {
+    const uniqueKey = generateUniqueSingleNormKey(singleNorm)
+
+    // Check uniqueness and add to the set if it's new
+    if (!uniqueSingleNorms.has(uniqueKey)) {
+      uniqueSingleNorms.add(uniqueKey)
+      return true // Keep this singleNorm
+    }
+    return false // Filter out duplicates
+  })
+}
+
+function generateUniqueSingleNormKey(singleNorm: SingleNorm): string {
+  return JSON.stringify({
+    singleNorm: singleNorm.singleNorm ?? "",
+    dateOfVersion: singleNorm.dateOfVersion
+      ? dayjs(singleNorm.dateOfVersion).format("DD.MM.YYYY")
+      : "",
+    dateOfRelevance: singleNorm.dateOfRelevance ?? "",
+  })
+}
 
 const defaultValue = new NormReference() as NormReference
 </script>

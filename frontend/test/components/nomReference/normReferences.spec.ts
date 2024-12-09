@@ -43,11 +43,10 @@ function generateNormReference(options?: {
   normAbbreviation?: NormAbbreviation
   singleNorms?: SingleNorm[]
 }) {
-  const normReference = new NormReference({
+  return new NormReference({
     normAbbreviation: options?.normAbbreviation ?? { abbreviation: "ABC" },
     singleNorms: options?.singleNorms ?? [],
   })
-  return normReference
 }
 
 describe("Norm references", () => {
