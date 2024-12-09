@@ -223,16 +223,24 @@ public class DocxConverterService implements ConverterService {
   }
 
   private void logUnhandledElements(List<UnhandledElement> unhandledElements) {
-    StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append(unhandledElements.size());
-    stringBuilder.append(" unhandled elements found: ");
-
-    Map<UnhandledElement, Long> unhandledElementMap =
+    List<UnhandledElement> filteredUnhandledElements =
         unhandledElements.stream()
             .filter(unhandledElement -> !IRRELEVANT_ELEMENTS.contains(unhandledElement))
+            .toList();
+
+    if (filteredUnhandledElements.isEmpty()) {
+      return;
+    }
+
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append(filteredUnhandledElements.size());
+    stringBuilder.append(" unhandled elements found: ");
+
+    Map<UnhandledElement, Long> filteredUnhandledElementMap =
+        filteredUnhandledElements.stream()
             .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
     AtomicInteger i = new AtomicInteger();
-    unhandledElementMap.forEach(
+    filteredUnhandledElementMap.forEach(
         (key, value) -> {
           if (i.getAndIncrement() > 0) {
             stringBuilder.append(", ");

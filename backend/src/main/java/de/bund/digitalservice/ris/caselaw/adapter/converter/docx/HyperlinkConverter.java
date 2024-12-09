@@ -42,12 +42,12 @@ public class HyperlinkConverter {
                 unhandledElements.add(
                     new UnhandledElement(
                         "hyperlink",
-                        jaxbElement.getDeclaredType().toString(),
+                        jaxbElement.getDeclaredType().getName(),
                         UnhandledElementType.JAXB));
               } else {
                 unhandledElements.add(
                     new UnhandledElement(
-                        "hyperlink", content.getClass().toString(), UnhandledElementType.OBJECT));
+                        "hyperlink", content.getClass().getName(), UnhandledElementType.OBJECT));
               }
             });
   }

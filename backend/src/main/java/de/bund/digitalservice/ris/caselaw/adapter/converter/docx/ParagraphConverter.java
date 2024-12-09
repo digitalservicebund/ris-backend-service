@@ -89,13 +89,13 @@ public class ParagraphConverter {
                   unhandledElements.add(
                       new UnhandledElement(
                           "paragraph",
-                          jaxbElement.getDeclaredType().toString(),
+                          jaxbElement.getDeclaredType().getName(),
                           UnhandledElementType.JAXB));
                 }
               } else {
                 unhandledElements.add(
                     new UnhandledElement(
-                        "paragraph", content.getClass().toString(), UnhandledElementType.OBJECT));
+                        "paragraph", content.getClass().getName(), UnhandledElementType.OBJECT));
               }
             });
 
