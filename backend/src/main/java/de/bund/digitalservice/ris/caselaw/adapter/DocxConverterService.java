@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.domain.docx.FooterElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.MetadataProperty;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ParagraphElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.UnhandledElement;
+import de.bund.digitalservice.ris.caselaw.domain.docx.UnhandledElementType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -64,6 +65,20 @@ import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 @Service
 @Slf4j
 public class DocxConverterService implements ConverterService {
+  private static final List<UnhandledElement> IRRELEVANT_ELEMENTS =
+      List.of(
+          new UnhandledElement("paragraph", "org.docx4j.wml.CTBookmark", UnhandledElementType.JAXB),
+          new UnhandledElement(
+              "paragraph", "org.docx4j.wml.CTMarkupRange", UnhandledElementType.JAXB),
+          new UnhandledElement(
+              "paragraph", "org.docx4j.wml.CTSimpleField", UnhandledElementType.JAXB),
+          // Page break
+          new UnhandledElement("run element", "org.docx4j.wml.Br", UnhandledElementType.OBJECT)
+          // possible irrelevant (spell and grammar check)
+          // new UnhandledElement("paragraph", "org.docx4j.wml.ProofErr",
+          // UnhandledElementType.OBJECT)
+          );
+
   private final S3Client client;
   private final DocumentBuilderFactory documentBuilderFactory;
   private final DocxConverter converter;
@@ -213,6 +228,7 @@ public class DocxConverterService implements ConverterService {
 
     Map<UnhandledElement, Long> unhandledElementMap =
         unhandledElements.stream()
+            .filter(unhandledElement -> !IRRELEVANT_ELEMENTS.contains(unhandledElement))
             .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
     AtomicInteger i = new AtomicInteger();
     unhandledElementMap.forEach(

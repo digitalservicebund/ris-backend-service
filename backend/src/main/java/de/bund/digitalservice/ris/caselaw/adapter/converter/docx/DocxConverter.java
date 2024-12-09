@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.caselaw.domain.docx.DocxImagePart;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ErrorElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ParagraphElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.UnhandledElement;
+import de.bund.digitalservice.ris.caselaw.domain.docx.UnhandledElementType;
 import jakarta.xml.bind.JAXBElement;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +62,8 @@ public class DocxConverter implements Converter<DocumentationUnitDocx> {
     } else if (part instanceof JAXBElement<?> element && element.getDeclaredType() == Tbl.class) {
       builder = convertTbl((Tbl) element.getValue());
     } else {
+      unhandledElements.add(
+          new UnhandledElement("root", part.getClass().toString(), UnhandledElementType.OBJECT));
       return new ErrorElement(part.getClass().getName());
     }
 
