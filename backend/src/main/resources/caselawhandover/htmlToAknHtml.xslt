@@ -46,9 +46,7 @@
     </xsl:template>
 
     <!--Case Law team handover: decide how to transform these internal Juris image markers into html links -->
-    <xsl:template match="hfj" mode="firstPass">
-        <xsl:apply-templates mode="firstPass"/>
-    </xsl:template>
+    <xsl:template match="hfj" mode="firstPass"/>
 
     <!--Case Law team handover: Validate that removing this tag is okay. Example caselas is WBRE410020500
     The current web view https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX%3A62013CA0192
