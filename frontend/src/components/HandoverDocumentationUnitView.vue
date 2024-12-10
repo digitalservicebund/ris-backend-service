@@ -10,7 +10,6 @@ import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import ScheduledPublishingDateTime from "@/components/ScheduledPublishingDateTime.vue"
 import TitleElement from "@/components/TitleElement.vue"
-import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import ActiveCitation, { activeCitationLabels } from "@/domain/activeCitation"
 import { longTextLabels, shortTextLabels } from "@/domain/documentUnit"
 import EnsuingDecision, {
@@ -300,8 +299,6 @@ const isDecisionReasonsInvalid = computed<boolean>(
     !!store.documentUnit?.longTexts.reasons &&
     !!store.documentUnit?.longTexts.decisionReasons,
 )
-
-const schedulingFeatureToggle = useFeatureToggle("neuris.scheduledPublishing")
 
 const isScheduled = computed<boolean>(
   () => !!store.documentUnit!.managementData.scheduledPublicationDateTime,
@@ -627,17 +624,14 @@ const isPublishable = computed<boolean>(
         aria-label="Dokumentationseinheit an jDV übergeben"
         button-type="primary"
         class="w-fit"
-        :disabled="!isPublishable || (schedulingFeatureToggle && isScheduled)"
+        :disabled="!isPublishable || isScheduled"
         :icon="IconCheck"
         label="Dokumentationseinheit an jDV übergeben"
         size="medium"
         @click="handoverDocumentUnit"
       />
 
-      <ScheduledPublishingDateTime
-        v-if="schedulingFeatureToggle"
-        :is-publishable="isPublishable"
-      />
+      <ScheduledPublishingDateTime :is-publishable="isPublishable" />
 
       <div aria-label="Letzte Ereignisse">
         <h2 class="ds-label-01-bold mb-16">Letzte Ereignisse</h2>

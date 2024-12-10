@@ -17,7 +17,6 @@ import PopupModal from "@/components/PopupModal.vue"
 import TableHeader from "@/components/TableHeader.vue"
 import TableRow from "@/components/TableRow.vue"
 import TableView from "@/components/TableView.vue"
-import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { PublicationState } from "@/domain/publicationStatus"
 import { ResponseError } from "@/services/httpClient"
@@ -92,8 +91,6 @@ const publicationDate = (listEntry: DocumentUnitListEntry) => {
   }
 }
 
-const schedulingFeatureToggle = useFeatureToggle("neuris.scheduledPublishing")
-
 /**
  * Stops propagation of scrolling event, and toggles the showModal value
  */
@@ -158,9 +155,7 @@ function onDelete() {
         <CellHeaderItem>
           <div class="flex flex-row">
             Datum
-            <IconArrowDown
-              v-if="!showPublicationDate && schedulingFeatureToggle"
-            />
+            <IconArrowDown v-if="!showPublicationDate" />
           </div>
         </CellHeaderItem>
         <CellHeaderItem> Aktenzeichen</CellHeaderItem>
@@ -168,7 +163,7 @@ function onDelete() {
         <CellHeaderItem> Typ</CellHeaderItem>
         <CellHeaderItem> Status</CellHeaderItem>
         <CellHeaderItem> Fehler</CellHeaderItem>
-        <CellHeaderItem v-if="showPublicationDate && schedulingFeatureToggle">
+        <CellHeaderItem v-if="showPublicationDate">
           <div class="flex flex-row items-center">
             jDV Übergabe <IconArrowDown /></div
         ></CellHeaderItem>
@@ -219,7 +214,6 @@ function onDelete() {
             </Tooltip>
 
             <Tooltip
-              v-if="schedulingFeatureToggle"
               :text="schedulingTooltip(listEntry.scheduledPublicationDateTime)"
             >
               <IconClock
@@ -294,10 +288,7 @@ function onDelete() {
           />
           <span v-else>-</span>
         </CellItem>
-        <CellItem
-          v-if="showPublicationDate && schedulingFeatureToggle"
-          data-testid="publicationDate"
-        >
+        <CellItem v-if="showPublicationDate" data-testid="publicationDate">
           {{ publicationDate(listEntry) }}
         </CellItem>
         <CellItem class="flex">

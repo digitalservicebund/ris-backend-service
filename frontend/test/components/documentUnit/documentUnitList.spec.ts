@@ -1,14 +1,12 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import { nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { PublicationState } from "@/domain/publicationStatus"
 import { User } from "@/domain/user"
 import errorMessages from "@/i18n/errors.json"
-import featureToggleService from "@/services/featureToggleService"
 import { ResponseError } from "@/services/httpClient"
 import routes from "~/test-helper/routes"
 
@@ -59,13 +57,6 @@ function renderComponent(options?: {
 }
 
 describe("documentUnit list", () => {
-  beforeEach(() => {
-    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
-      status: 200,
-      data: true,
-    })
-  })
-
   test("initial state feedback", async () => {
     renderComponent({})
 
@@ -324,8 +315,6 @@ describe("documentUnit list", () => {
       showPublicationDate: true,
     })
 
-    await nextTick() // can be removed after feature flag removal
-
     expect(screen.getByText("jDV Übergabe")).toBeInTheDocument()
   })
 
@@ -341,8 +330,6 @@ describe("documentUnit list", () => {
       ],
       showPublicationDate: true,
     })
-
-    await nextTick() // should be removed after feature flag removal
 
     expect(screen.getByText("24.01.2100 00:00")).toBeInTheDocument()
     expect(
@@ -363,8 +350,6 @@ describe("documentUnit list", () => {
       ],
       showPublicationDate: true,
     })
-
-    await nextTick() // should be removed after feature flag removal
 
     expect(screen.getByText("24.01.2000 00:00")).toBeInTheDocument()
     expect(

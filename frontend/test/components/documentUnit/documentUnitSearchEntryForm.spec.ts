@@ -3,7 +3,6 @@ import { render, screen } from "@testing-library/vue"
 import { expect } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitSearchEntryForm from "@/components/DocumentUnitSearchEntryForm.vue"
-import featureToggleService from "@/services/featureToggleService"
 
 async function renderComponent(options?: { isLoading: boolean }) {
   const props = {
@@ -32,13 +31,6 @@ async function renderComponent(options?: { isLoading: boolean }) {
 }
 
 describe("Documentunit search form", () => {
-  beforeEach(() => {
-    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
-      status: 200,
-      data: true,
-    })
-  })
-
   test("renders correctly", async () => {
     await renderComponent()
     ;[

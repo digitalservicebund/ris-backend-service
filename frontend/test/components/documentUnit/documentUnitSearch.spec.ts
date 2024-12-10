@@ -7,7 +7,6 @@ import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import authService from "@/services/authService"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
-import featureToggleService from "@/services/featureToggleService"
 import routes from "~/test-helper/routes"
 
 function renderComponent(
@@ -39,13 +38,6 @@ function renderComponent(
 }
 
 describe("Documentunit Search", () => {
-  beforeEach(() => {
-    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
-      status: 200,
-      data: true,
-    })
-  })
-
   vi.spyOn(authService, "getName").mockImplementation(() =>
     Promise.resolve({
       status: 200,
