@@ -14,7 +14,7 @@ import { Query } from "@/composables/useQueryFromRoute"
 import { Court } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import errorMessages from "@/i18n/errors.json"
-import ComboboxItemService from "@/services/comboboxItemService"
+import comboboxItemService from "@/services/comboboxItemService"
 import service from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -44,6 +44,10 @@ const emptyStateLabel = computed(() => {
   }
   return undefined
 })
+
+const courtFilter = ref("")
+const { data: courts, execute: fetchCourts } =
+  comboboxItemService.getCourts(courtFilter)
 
 /**
  * Searches all documentation units by given input and updates the local
@@ -75,18 +79,19 @@ async function search() {
     !hasFilters.value &&
     searchQuery.value?.courtType
   ) {
-    const courtFilter =
+    courtFilter.value =
       searchQuery.value.courtType +
       (searchQuery.value.courtLocation
         ? ` ${searchQuery.value.courtLocation}`
         : "")
 
-    const courtResponse = (await ComboboxItemService.getCourts(courtFilter))
-      .data
+    await fetchCourts()
+
+    const courtResponse = courts.value
 
     //filter for exact matches
     const matches = courtResponse
-      ? courtResponse.filter((item) => item.label === courtFilter)
+      ? courtResponse.filter((item) => item.label === courtFilter.value)
       : []
 
     // add as court query only if 1 exact match

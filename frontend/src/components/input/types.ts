@@ -1,3 +1,5 @@
+import { UseFetchReturn } from "@vueuse/core"
+import { Ref } from "vue"
 import { LabelPosition } from "@/components/input/InputField.vue"
 import { CitationType } from "@/domain/citationType"
 import DocumentationOffice from "@/domain/documentationOffice"
@@ -6,7 +8,6 @@ import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
-import { ResponseError } from "@/services/httpClient"
 
 export enum InputType {
   TEXT = "text",
@@ -144,11 +145,9 @@ export type ComboboxItem = {
 }
 
 export interface ComboboxAttributes extends BaseInputAttributes {
-  itemService: (filter?: string) => Promise<{
-    status: number
-    data?: ComboboxItem[]
-    error?: ResponseError
-  }>
+  itemService: (
+    filter: Ref<string | undefined>,
+  ) => UseFetchReturn<ComboboxItem[]>
   placeholder?: string
   manualEntry?: boolean
   noClear?: boolean

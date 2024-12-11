@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories, waitForInputValue, save } from "../../e2e-utils"
+import { navigateToCategories, save } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 
 test.describe("court", () => {
@@ -9,18 +9,17 @@ test.describe("court", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Gericht']").fill("BGH")
-    await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
+    await page.getByLabel("Gericht", { exact: true }).fill("BGH")
+    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue("BGH")
     await expect(page.getByText("BGH")).toBeVisible()
     await page.getByText("BGH").click()
-    await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
+    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue("BGH")
 
     await save(page)
 
     await page.reload()
-    await page.locator("[aria-label='Gericht']").focus()
-    // Todo: flaky in chromium
-    // await expect(page.locator("[aria-label='Gericht']")).toHaveValue("BGH")
+    await page.getByLabel("Gericht", { exact: true }).focus()
+    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue("BGH")
   })
 
   test("open incorrect court field, input one, save and reload", async ({
@@ -29,12 +28,14 @@ test.describe("court", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Fehlerhaftes Gericht anzeigen']").click()
+    await page
+      .getByLabel("Fehlerhaftes Gericht anzeigen", { exact: true })
+      .click()
 
-    await page.locator("[aria-label='Fehlerhaftes Gericht']").type("abc")
+    await page.getByText("Fehlerhaftes Gericht", { exact: true }).fill("abc")
 
     await expect(
-      page.locator("[aria-label='Fehlerhaftes Gericht']"),
+      page.getByText("Fehlerhaftes Gericht", { exact: true }),
     ).toHaveValue("abc")
 
     await page.keyboard.press("Enter")
@@ -53,14 +54,16 @@ test.describe("court", () => {
     test.slow()
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Fehlerhaftes Gericht anzeigen']").click()
     await page
-      .locator("[aria-label='Fehlerhaftes Gericht']")
-      .type("incorrectCourt1")
+      .getByLabel("Fehlerhaftes Gericht anzeigen", { exact: true })
+      .click()
+    await page
+      .getByText("Fehlerhaftes Gericht", { exact: true })
+      .fill("incorrectCourt1")
     await page.keyboard.press("Enter")
     await page
-      .locator("[aria-label='Fehlerhaftes Gericht']")
-      .type("incorrectCourt2")
+      .getByText("Fehlerhaftes Gericht", { exact: true })
+      .fill("incorrectCourt2")
     await page.keyboard.press("Enter")
 
     await save(page)
@@ -84,12 +87,11 @@ test.describe("court", () => {
 
   test("court dropdown", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
-    const minTotalCourts = 9
 
     // on start: closed dropdown, no input text
-    await waitForInputValue(page, "[aria-label='Gericht']", "")
+    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue("")
     await expect(page.getByText("AG Aachen")).toBeHidden()
-    await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
+    await expect(page.getByLabel("dropdown-option")).toBeHidden()
 
     // open dropdown
     await page
@@ -97,40 +99,35 @@ test.describe("court", () => {
       .filter({ hasText: "Gericht * Fehlerhaftes" })
       .getByLabel("Dropdown öffnen")
       .click()
-    await expect(
-      page.locator("[aria-label='dropdown-option'] >> nth=" + minTotalCourts),
-    ).toBeVisible()
+    await expect(page.getByLabel("dropdown-option")).toHaveCount(10)
     await expect(page.getByText("AG Aachen")).toBeVisible()
     await expect(page.getByText("AG Aalen")).toBeVisible()
 
     // type search string: 3 results for "bayern"
-    await page.locator("[aria-label='Gericht']").fill("bayern")
-    await waitForInputValue(page, "[aria-label='Gericht']", "bayern")
-    // Todo: flaky in chromium
-    // await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(3)
+    await page.getByLabel("Gericht", { exact: true }).fill("bayern")
+    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+      "bayern",
+    )
+    await expect(page.getByLabel("dropdown-option")).toHaveCount(3)
 
     // use the clear icon
-    await page.locator("[aria-label='Auswahl zurücksetzen']").click()
-    await waitForInputValue(page, "[aria-label='Gericht']", "")
-    await expect(
-      page.locator("[aria-label='dropdown-option'] >> nth=" + minTotalCourts),
-    ).toBeVisible()
+    await page.getByLabel("Auswahl zurücksetzen", { exact: true }).click()
+    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue("")
+    await expect(page.getByLabel("dropdown-option")).toHaveCount(10)
 
     // close dropdown
     await page.getByLabel("Dropdown schließen").click()
-    await waitForInputValue(page, "[aria-label='Gericht']", "")
-    await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
+    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue("")
+    await expect(page.getByLabel("dropdown-option")).toBeHidden()
 
     // open dropdown again by focussing
-    await page.locator("[aria-label='Gericht']").focus()
-    await expect(
-      page.locator("[aria-label='dropdown-option'] >> nth=" + minTotalCourts),
-    ).toBeVisible()
+    await page.getByLabel("Gericht", { exact: true }).focus()
+    await expect(page.getByLabel("dropdown-option")).toHaveCount(10)
 
     // close dropdown using the esc key, user input text gets removed and last saved value restored
     await page.keyboard.down("Escape")
-    await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
-    await waitForInputValue(page, "[aria-label='Gericht']", "")
+    await expect(page.getByLabel("dropdown-option")).toBeHidden()
+    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue("")
   })
 
   test("correct esc/tab behaviour in court dropdown", async ({
@@ -139,29 +136,35 @@ test.describe("court", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await waitForInputValue(page, "[aria-label='Gericht']", "")
-    await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
+    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue("")
+    await expect(page.getByLabel("dropdown-option")).toBeHidden()
 
-    await page.locator("[aria-label='Gericht']").fill("BVerfG")
+    await page.getByLabel("Gericht", { exact: true }).fill("BVerfG")
     await page.getByText("BVerfG").click()
 
-    await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
-    await expect(page.locator("[aria-label='Gericht']")).toHaveValue("BVerfG")
+    await expect(page.getByLabel("dropdown-option")).toBeHidden()
+    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+      "BVerfG",
+    )
 
-    await page.locator("[aria-label='Gericht']").fill("BGH")
+    await page.getByLabel("Gericht", { exact: true }).fill("BGH")
 
-    await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(1)
+    await expect(page.getByLabel("dropdown-option")).toHaveCount(1)
 
     await page.keyboard.press("Escape") // reset to last saved value
 
-    await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
-    await expect(page.locator("[aria-label='Gericht']")).toHaveValue("BVerfG")
+    await expect(page.getByLabel("dropdown-option")).toBeHidden()
+    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+      "BVerfG",
+    )
 
-    await page.locator("[aria-label='Gericht']").fill("BGH")
+    await page.getByLabel("Gericht", { exact: true }).fill("BGH")
     await page.keyboard.press("Tab") // reset to last saved value
 
-    await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
-    await expect(page.locator("[aria-label='Gericht']")).toHaveValue("BVerfG")
+    await expect(page.getByLabel("dropdown-option")).toBeHidden()
+    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+      "BVerfG",
+    )
   })
 
   test("that setting a court sets the region automatically", async ({
@@ -170,29 +173,30 @@ test.describe("court", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Gericht']").fill("aalen")
+    await page.getByLabel("Gericht", { exact: true }).fill("aalen")
 
     // clicking on dropdown item triggers auto save
     await page.getByText("AG Aalen").click()
-    await waitForInputValue(page, "[aria-label='Gericht']", "AG Aalen")
+    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+      "AG Aalen",
+    )
 
     await save(page)
 
     await expect(page.getByText("Region")).toBeVisible()
 
     // region was set by the backend based on state database table
-    await waitForInputValue(page, "[aria-label='Region']", "BW")
+    await expect(page.getByLabel("Region", { exact: true })).toHaveValue("BW")
     await page.reload()
     // clear the court
-    await page.locator("[aria-label='Auswahl zurücksetzen']").click()
-    await expect(page.getByText("AG Aalen")).toBeHidden()
-    await waitForInputValue(page, "[aria-label='Gericht']", "")
+    await page.getByLabel("Auswahl zurücksetzen", { exact: true }).click()
+    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue("")
 
     await save(page)
 
     await expect(page.getByText("Region")).toBeVisible()
     // region was cleared by the backend
-    await waitForInputValue(page, "[aria-label='Region']", "")
+    await expect(page.getByLabel("Region", { exact: true })).toHaveValue("")
   })
 
   test("that setting a special court sets legal effect to yes, but it can be changed afterwards", async ({
@@ -200,20 +204,25 @@ test.describe("court", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    await waitForInputValue(page, "select#legalEffect", "Keine Angabe")
-    await page.locator("[aria-label='Gericht']").fill("bgh")
+    await expect(page.getByLabel("Rechtskraft", { exact: true })).toHaveValue(
+      "Keine Angabe",
+    )
+    await page.getByLabel("Gericht", { exact: true }).fill("bgh")
     await page.getByText("BGH").click()
-    await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
+    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue("BGH")
 
-    // FIXME: Remove this save, when bug RISDEV-4480 is resolved
+    // Rechtskraft wird beim Speichern durch Backend gesetzt
     await save(page)
 
-    await waitForInputValue(page, "select#legalEffect", "Ja", 500)
+    await expect(page.getByLabel("Rechtskraft", { exact: true })).toHaveValue(
+      "Ja",
+    )
     await page
       .getByRole("combobox", { name: "Rechtskraft" })
       .selectOption("Nein")
-    await waitForInputValue(page, "select#legalEffect", "Nein")
-    await expect(page.getByLabel("Rechtskraft")).toHaveValue("Nein")
+    await expect(page.getByLabel("Rechtskraft", { exact: true })).toHaveValue(
+      "Nein",
+    )
   })
 
   test("that setting a non-special court leaves legal effect unchanged", async ({
@@ -221,14 +230,17 @@ test.describe("court", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    await waitForInputValue(page, "select#legalEffect", "Keine Angabe")
+    await expect(page.getByLabel("Rechtskraft", { exact: true })).toHaveValue(
+      "Keine Angabe",
+    )
 
-    await page.locator("[aria-label='Gericht']").fill("aachen")
+    await page.getByLabel("Gericht", { exact: true }).fill("aachen")
     await page.getByText("AG Aachen").click()
-    await waitForInputValue(page, "[aria-label='Gericht']", "AG Aachen")
+    await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+      "AG Aachen",
+    )
     await save(page)
 
-    await waitForInputValue(page, "select#legalEffect", "Keine Angabe")
     await expect(
       page.getByRole("combobox", { name: "Rechtskraft" }),
     ).toHaveValue("Keine Angabe")

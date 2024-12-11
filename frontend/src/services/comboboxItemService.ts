@@ -1,5 +1,6 @@
-import { capitalize } from "vue"
-import httpClient, { ServiceResponse } from "./httpClient"
+import { useFetch, UseFetchReturn } from "@vueuse/core"
+import { capitalize, computed, Ref } from "vue"
+import { API_PREFIX } from "./httpClient"
 import { ComboboxInputModelType, ComboboxItem } from "@/components/input/types"
 import { Page } from "@/components/Pagination.vue"
 import { CitationType } from "@/domain/citationType"
@@ -17,7 +18,7 @@ enum Endpoint {
   courts = "courts",
   citationTypes = "citationtypes",
   fieldOfLawSearchByIdentifier = "fieldsoflaw/search-by-identifier",
-  risAbbreviations = `normabbreviation/search?pg=0&sz=30`,
+  risAbbreviations = `normabbreviation/search`,
   procedures = `procedure`,
   legalForceRegions = `region/applicable`,
   legalForceTypes = `legalforcetype`,
@@ -105,74 +106,64 @@ function formatDropdownItems(
   }
 }
 
-async function fetchFromEndpoint(
+function fetchFromEndpoint(
   endpoint: Endpoint,
-  filter?: string,
+  filter: Ref<string | undefined>,
   size?: number,
 ) {
-  const requestParams: { q?: string; sz?: string } = {
-    ...(filter ? { q: filter } : {}),
-    ...(size != undefined ? { sz: size.toString() } : {}),
-  }
-  const response = await httpClient.get<ComboboxInputModelType[]>(
-    `caselaw/${endpoint}`,
-    { params: requestParams },
-  )
-  if (response.data) {
-    return {
-      status: response.status,
-      data: formatDropdownItems(response.data, endpoint),
-    }
-  } else {
-    return {
-      status: response.status,
+  const requestParams = computed<{ q?: string; sz?: string }>(() => ({
+    ...(filter.value ? { q: filter.value } : {}),
+    ...(size != undefined ? { sz: size.toString(), pg: "0" } : {}),
+  }))
+  const url = computed(() => {
+    const queryParams = new URLSearchParams(requestParams.value).toString()
+    return `${API_PREFIX}caselaw/${endpoint}?${queryParams}`
+  })
+
+  return useFetch<ComboboxItem[]>(url, {
+    afterFetch: (ctx) => {
+      ctx.data = formatDropdownItems(ctx.data, endpoint)
+      return ctx
+    },
+    onFetchError: ({ response }) => ({
+      status: response?.status,
       error: {
         title: errorMessages.SERVER_ERROR_DROPDOWN.title,
         description: errorMessages.SERVER_ERROR_DROPDOWN.description,
       },
-    }
-  }
+    }),
+  }).json()
 }
 
 type ComboboxItemService = {
   [key in keyof typeof Endpoint as `get${Capitalize<key>}`]: (
-    filter?: string,
-  ) => Promise<ServiceResponse<ComboboxItem[]>>
-} & {
-  filterItems: (
-    items: ComboboxItem[],
-  ) => (filter?: string) => Promise<ServiceResponse<ComboboxItem[]>>
+    filter: Ref<string | undefined>,
+  ) => UseFetchReturn<ComboboxItem[]>
 }
 
 const service: ComboboxItemService = {
-  filterItems: (items: ComboboxItem[]) => (filter?: string) => {
-    const filteredItems = filter
-      ? items.filter((item) => item.label.includes(filter))
-      : items
-    return Promise.resolve({ status: 200, data: filteredItems })
-  },
-  getCourts: async (filter?: string) =>
-    await fetchFromEndpoint(Endpoint.courts, filter),
-  getDocumentTypes: async (filter?: string) =>
-    await fetchFromEndpoint(Endpoint.documentTypes, filter),
-  getDependentLiteratureDocumentTypes: async (filter?: string) =>
-    await fetchFromEndpoint(Endpoint.dependentLiteratureDocumentTypes, filter),
-  getFieldOfLawSearchByIdentifier: async (filter?: string) =>
-    await fetchFromEndpoint(Endpoint.fieldOfLawSearchByIdentifier, filter),
-  getRisAbbreviations: async (filter?: string) =>
-    await fetchFromEndpoint(Endpoint.risAbbreviations, filter),
-  getCitationTypes: async (filter?: string) =>
-    await fetchFromEndpoint(Endpoint.citationTypes, filter),
-  getProcedures: async (filter?: string) =>
-    await fetchFromEndpoint(Endpoint.procedures, filter, 10),
-  getLegalForceTypes: async (filter?: string) =>
-    await fetchFromEndpoint(Endpoint.legalForceTypes, filter),
-  getLegalForceRegions: async (filter?: string) =>
-    await fetchFromEndpoint(Endpoint.legalForceRegions, filter),
-  getLegalPeriodicals: async (filter?: string) =>
-    await fetchFromEndpoint(Endpoint.legalPeriodicals, filter),
-  getDocumentationOffices: async (filter?: string) =>
-    await fetchFromEndpoint(Endpoint.documentationOffices, filter),
+  getCourts: (filter: Ref<string | undefined>) =>
+    fetchFromEndpoint(Endpoint.courts, filter),
+  getDocumentTypes: (filter: Ref<string | undefined>) =>
+    fetchFromEndpoint(Endpoint.documentTypes, filter),
+  getDependentLiteratureDocumentTypes: (filter: Ref<string | undefined>) =>
+    fetchFromEndpoint(Endpoint.dependentLiteratureDocumentTypes, filter),
+  getFieldOfLawSearchByIdentifier: (filter: Ref<string | undefined>) =>
+    fetchFromEndpoint(Endpoint.fieldOfLawSearchByIdentifier, filter),
+  getRisAbbreviations: (filter: Ref<string | undefined>) =>
+    fetchFromEndpoint(Endpoint.risAbbreviations, filter, 30),
+  getCitationTypes: (filter: Ref<string | undefined>) =>
+    fetchFromEndpoint(Endpoint.citationTypes, filter),
+  getProcedures: (filter: Ref<string | undefined>) =>
+    fetchFromEndpoint(Endpoint.procedures, filter, 10),
+  getLegalForceTypes: (filter: Ref<string | undefined>) =>
+    fetchFromEndpoint(Endpoint.legalForceTypes, filter),
+  getLegalForceRegions: (filter: Ref<string | undefined>) =>
+    fetchFromEndpoint(Endpoint.legalForceRegions, filter),
+  getLegalPeriodicals: (filter: Ref<string | undefined>) =>
+    fetchFromEndpoint(Endpoint.legalPeriodicals, filter),
+  getDocumentationOffices: (filter: Ref<string | undefined>) =>
+    fetchFromEndpoint(Endpoint.documentationOffices, filter),
 }
 
 export default service
