@@ -23,7 +23,6 @@ async function openSidePanel(documentUnitNumber?: string) {
   if (documentUnitNumber) {
     await documentUnitStore.loadDocumentUnit(documentUnitNumber)
     extraContentSidePanelStore.togglePanel(true)
-    extraContentSidePanelStore.setSidePanelMode("preview")
   }
 }
 </script>

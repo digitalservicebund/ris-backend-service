@@ -16,6 +16,7 @@ import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useEditionStore } from "@/stores/editionStore"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import StringsUtil from "@/utils/stringsUtil"
+import IconClear from "~icons/ic/baseline-clear"
 
 const store = useEditionStore()
 const documentUnitStore = useDocumentUnitStore()
@@ -91,17 +92,20 @@ const handleKeyDown = (event: KeyboardEvent) => {
   }
 }
 
-/**
- * Resumes the loading document unit timer if it is expanded on extra content side panel
- * @param expanded
- */
-function handleSidePanelIsExpanded(expanded: boolean) {
-  if (expanded) {
+const { isExpanded } = storeToRefs(extraContentSidePanelStore)
+
+watch(isExpanded, async () => {
+  if (isExpanded.value) {
     resume()
   } else {
+    await documentUnitStore.unloadDocumentUnit()
     pause()
   }
-}
+})
+
+const showSidePanel = computed(
+  () => documentUnit.value && route.path.includes("references"),
+)
 
 /**
  * To make sure the latest version is displayed,
@@ -155,12 +159,12 @@ onMounted(async () => {
       <div v-else class="flex grow flex-row items-start">
         <router-view class="flex-1" />
         <ExtraContentSidePanel
-          v-if="documentUnit && route.path.includes('references')"
+          v-if="showSidePanel"
           :document-unit="documentUnit"
-          :enabled-panels="['preview']"
           hide-panel-mode-bar
+          :icon="IconClear"
           show-edit-button
-          @side-panel-is-expanded="handleSidePanelIsExpanded"
+          side-panel-mode="preview"
         />
       </div>
     </div>

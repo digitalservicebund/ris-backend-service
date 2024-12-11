@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, watch } from "vue"
+import { computed, onMounted } from "vue"
+import type { Component } from "vue"
 import { useRoute } from "vue-router"
 import Tooltip from "./Tooltip.vue"
 import AttachmentView from "@/components/AttachmentView.vue"
@@ -21,14 +22,11 @@ import IconPreview from "~icons/ic/outline-remove-red-eye"
 import IconStickyNote from "~icons/ic/outline-sticky-note-2"
 
 const props = defineProps<{
-  enabledPanels?: SelectablePanelContent[]
+  documentUnit?: DocumentUnit
   showEditButton?: boolean
   hidePanelModeBar?: boolean
-  documentUnit?: DocumentUnit
-}>()
-
-const emit = defineEmits<{
-  sidePanelIsExpanded: [boolean]
+  sidePanelMode?: SelectablePanelContent
+  icon?: Component
 }>()
 
 const store = useExtraContentSidePanelStore()
@@ -90,24 +88,14 @@ function togglePanel(expand?: boolean): boolean {
 }
 
 function setDefaultState() {
-  if (!props.documentUnit!.note && props.documentUnit!.hasAttachments) {
+  if (props.sidePanelMode) {
+    store.setSidePanelMode(props.sidePanelMode)
+  } else if (!props.documentUnit!.note && props.documentUnit!.hasAttachments) {
     selectAttachments()
   } else {
     selectNotes()
   }
 }
-
-/**
- * Checks whether a selected side panel mode is excluded, and defaults to the first available panel if so.
- **/
-watch(store, () => {
-  if (props.enabledPanels) {
-    if (!props.enabledPanels.includes(store.panelMode!)) {
-      store.setSidePanelMode(props.enabledPanels[0])
-    }
-  }
-  emit("sidePanelIsExpanded", store.isExpanded)
-})
 
 /**
  * Checks whether the panel should be expanded when it is mounted.
@@ -135,6 +123,8 @@ onMounted(() => {
   >
     <SideToggle
       class="sticky top-[4rem] z-20 max-h-fit"
+      custom-button-classes="top-24 pt-4"
+      :icon="icon"
       :is-expanded="store.isExpanded"
       label="Seitenpanel"
       :opening-direction="OpeningDirection.LEFT"
@@ -142,9 +132,9 @@ onMounted(() => {
       tabindex="0"
       @update:is-expanded="togglePanel"
     >
-      <FlexContainer class="m-24 ml-16 items-center -space-x-2 px-8">
-        <div v-if="!enabledPanels || enabledPanels.includes('note')">
-          <Tooltip v-if="!hidePanelModeBar" shortcut="n" text="Notiz">
+      <div class="m-24 flex flex-row justify-between">
+        <div v-if="!hidePanelModeBar" class="flex flex-row">
+          <Tooltip shortcut="n" text="Notiz">
             <TextButton
               id="note"
               aria-label="Notiz anzeigen"
@@ -157,9 +147,7 @@ onMounted(() => {
               @click="() => selectNotes()"
             />
           </Tooltip>
-        </div>
-        <div v-if="!enabledPanels || enabledPanels.includes('attachments')">
-          <Tooltip v-if="!hidePanelModeBar" shortcut="d" text="Datei">
+          <Tooltip shortcut="d" text="Datei">
             <TextButton
               id="attachments"
               aria-label="Dokumente anzeigen"
@@ -171,10 +159,8 @@ onMounted(() => {
               @click="() => selectAttachments()"
             />
           </Tooltip>
-        </div>
 
-        <div v-if="!enabledPanels || enabledPanels.includes('preview')">
-          <Tooltip v-if="!hidePanelModeBar" shortcut="v" text="Vorschau">
+          <Tooltip shortcut="v" text="Vorschau">
             <TextButton
               id="preview"
               aria-label="Vorschau anzeigen"
@@ -188,16 +174,18 @@ onMounted(() => {
           </Tooltip>
         </div>
 
-        <div class="flex-grow" />
-
         <FileNavigator
           v-if="store.panelMode === 'attachments'"
           :attachments="props.documentUnit!.attachments"
           :current-index="store.currentAttachmentIndex"
           @select="handleOnSelectAttachment"
         ></FileNavigator>
-        <div v-if="showEditButton">
-          <Tooltip v-if="props.documentUnit!.isEditable" text="Bearbeiten">
+        <div v-if="store.panelMode === 'preview'" class="ml-auto flex flex-row">
+          <Tooltip
+            v-if="props.documentUnit!.isEditable && showEditButton"
+            shortcut="b"
+            text="Bearbeiten"
+          >
             <router-link
               aria-label="Dokumentationseinheit in einem neuen Tab bearbeiten"
               target="_blank"
@@ -208,48 +196,29 @@ onMounted(() => {
                 },
               }"
             >
+              <TextButton button-type="ghost" :icon="IconEdit" size="small" />
+            </router-link>
+          </Tooltip>
+          <Tooltip text="In neuem Tab öffnen">
+            <router-link
+              aria-label="Vorschau in neuem Tab öffnen"
+              target="_blank"
+              :to="{
+                name: 'caselaw-documentUnit-documentNumber-preview',
+                params: {
+                  documentNumber: props.documentUnit!.documentNumber,
+                },
+              }"
+            >
               <TextButton
-                aria-label="Extra content side panel edit link button"
                 button-type="ghost"
-                :icon="IconEdit"
+                :icon="IconOpenInNewTab"
                 size="small"
               />
             </router-link>
           </Tooltip>
-          <div
-            v-else
-            aria-label="Dokumentationseinheit in einem neuen Tab bearbeiten"
-          >
-            <TextButton
-              aria-label="Extra content side panel edit link button"
-              button-type="ghost"
-              disabled
-              :icon="IconEdit"
-              size="small"
-            />
-          </div>
         </div>
-
-        <Tooltip text="In neuem Tab öffnen">
-          <router-link
-            v-if="store.panelMode === 'preview'"
-            aria-label="Vorschau in neuem Tab öffnen"
-            target="_blank"
-            :to="{
-              name: 'caselaw-documentUnit-documentNumber-preview',
-              params: {
-                documentNumber: props.documentUnit!.documentNumber,
-              },
-            }"
-          >
-            <TextButton
-              button-type="ghost"
-              :icon="IconOpenInNewTab"
-              size="small"
-            />
-          </router-link>
-        </Tooltip>
-      </FlexContainer>
+      </div>
 
       <div class="m-24">
         <div v-if="store.panelMode === 'note'">

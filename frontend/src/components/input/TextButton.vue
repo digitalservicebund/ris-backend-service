@@ -103,9 +103,4 @@ const render = () => {
 .ds-button-large > .ds-button-icon {
   font-size: 2rem;
 }
-
-.ds-button.ds-button-ghost {
-  padding-right: 12px;
-  padding-left: 12px;
-}
 </style>

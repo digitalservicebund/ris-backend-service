@@ -30,6 +30,10 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
     return response
   }
 
+  async function unloadDocumentUnit(): Promise<void> {
+    documentUnit.value = undefined
+  }
+
   async function updateDocumentUnit(): Promise<
     ServiceResponse<RisJsonPatch | FailedValidationServerResponse>
   > {
@@ -154,6 +158,7 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
   return {
     documentUnit,
     loadDocumentUnit,
+    unloadDocumentUnit,
     updateDocumentUnit,
   }
 })

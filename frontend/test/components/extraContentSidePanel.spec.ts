@@ -16,9 +16,10 @@ function renderComponent(
     note?: string
     attachments?: Attachment[]
     references?: Reference[]
-    enabledPanels?: SelectablePanelContent[]
+    sidePanelMode?: SelectablePanelContent
     showEditButton?: boolean
     isEditable?: boolean
+    hidePanelModeBar?: boolean
   } = {},
 ) {
   const user = userEvent.setup()
@@ -34,9 +35,10 @@ function renderComponent(
     user,
     ...render(ExtraContentSidePanel, {
       props: {
-        enabledPanels: options.enabledPanels || undefined,
+        sidePanelMode: options.sidePanelMode || undefined,
         showEditButton: options.showEditButton,
         documentUnit: documentUnit,
+        hidePanelModeBar: options.hidePanelModeBar ?? false,
       },
       global: {
         plugins: [
@@ -190,36 +192,16 @@ describe("ExtraContentSidePanel", () => {
   })
 
   test("toggle panel open and closed", async () => {
-    const { emitted } = renderComponent()
+    renderComponent()
     expect(await screen.findByLabelText("Seitenpanel öffnen")).toBeVisible()
-    expect(
-      emitted()["sidePanelIsExpanded"][0],
-      "Shoud be mounted with isExpanded false",
-    ).toEqual([false])
 
     // Opening side panel
     screen.getByLabelText("Seitenpanel öffnen").click()
     expect(await screen.findByLabelText("Seitenpanel schließen")).toBeVisible()
-    expect(
-      emitted()["sidePanelIsExpanded"],
-      "Did not emit when isExpanded changed to true",
-    ).toBeTruthy()
-    expect(
-      emitted()["sidePanelIsExpanded"][1],
-      "Should emit false when opened",
-    ).toEqual([true])
 
     // Closing side panel
     screen.getByLabelText("Seitenpanel schließen").click()
     expect(await screen.findByLabelText("Seitenpanel öffnen")).toBeVisible()
-    expect(
-      emitted()["sidePanelIsExpanded"],
-      "Did not emit when isExpanded changed to false",
-    ).toBeTruthy()
-    expect(
-      emitted()["sidePanelIsExpanded"][2],
-      "Should emit false when closed",
-    ).toEqual([false])
   })
 
   describe("Select panel content", () => {
@@ -299,34 +281,28 @@ describe("ExtraContentSidePanel", () => {
     describe("Enable side panel content", async () => {
       const testCases = [
         {
-          enabledPanels: ["attachments"],
+          sidePanelMode: "attachments",
           expectedHidden: ["note", "preview"],
         },
         {
-          enabledPanels: ["note"],
+          sidePanelMode: "note",
           expectedHidden: ["attachments", "preview"],
         },
         {
-          enabledPanels: ["preview"],
+          sidePanelMode: "preview",
           expectedHidden: ["attachments", "note"],
         },
       ]
-      testCases.forEach(({ enabledPanels, expectedHidden }) =>
-        test(`panel enable ${enabledPanels} and hide ${expectedHidden}`, async () => {
+      testCases.forEach(({ sidePanelMode, expectedHidden }) =>
+        test(`when sidePanelMode ${sidePanelMode} and panel mode bar hidden, hide ${expectedHidden}, `, async () => {
           renderComponent({
             note: "",
             attachments: [],
-            enabledPanels: enabledPanels as SelectablePanelContent[],
+            sidePanelMode: sidePanelMode as SelectablePanelContent,
+            hidePanelModeBar: true,
           })
 
           screen.getByLabelText("Seitenpanel öffnen").click()
-
-          for (const contentType of enabledPanels) {
-            expect(
-              await screen.findByTestId(contentType + "-button"),
-              `${contentType} should be displayed`,
-            ).toBeVisible()
-          }
 
           for (const contentType of expectedHidden) {
             expect(
@@ -356,33 +332,28 @@ describe("ExtraContentSidePanel", () => {
     ]
 
     testCases.forEach(({ showEditButton, isEditable }) =>
-      test(`edition button link display: ${showEditButton} and document unit is editable: ${isEditable}`, async () => {
+      test(`edition button link display in preview mode: ${showEditButton} and document unit is editable: ${isEditable}`, async () => {
         renderComponent({
           note: "some note",
           attachments: [],
           showEditButton: showEditButton,
           isEditable: isEditable,
+          sidePanelMode: "preview",
         })
 
         if (showEditButton) {
-          expect(
-            await screen.findByLabelText(
-              "Dokumentationseinheit in einem neuen Tab bearbeiten",
-            ),
-          ).toBeVisible()
-
           if (isEditable) {
             expect(
               await screen.findByLabelText(
-                "Extra content side panel edit link button",
+                "Dokumentationseinheit in einem neuen Tab bearbeiten",
               ),
-            ).toBeEnabled()
+            ).toBeVisible()
           } else {
             expect(
-              await screen.findByLabelText(
-                "Extra content side panel edit link button",
+              screen.queryByLabelText(
+                "Dokumentationseinheit in einem neuen Tab bearbeiten",
               ),
-            ).toBeDisabled()
+            ).not.toBeInTheDocument()
           }
         } else {
           expect(
