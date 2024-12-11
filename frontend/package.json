@@ -6,6 +6,7 @@
     "node": ">=22.12.0"
   },
   "engineStrict": true,
+  "type": "module",
   "scripts": {
     "preserve": "vite build",
     "serve": "vite preview",

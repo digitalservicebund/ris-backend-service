@@ -1,6 +1,5 @@
 import { expect } from "@playwright/test"
-import errorMessages from "@/i18n/errors.json"
-
+import errorMessages from "@/i18n/errors.json" with { type: "json" }
 import { navigateToCategories, save } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
