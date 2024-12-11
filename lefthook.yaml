@@ -88,7 +88,7 @@ pre-push:
         fi
 
 tests:
-  parallel: false
+  parallel: true
   commands:
     frontend-tests:
       tags: frontend tests
