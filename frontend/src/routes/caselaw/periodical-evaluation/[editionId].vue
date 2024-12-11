@@ -80,7 +80,11 @@ const handleKeyDown = (event: KeyboardEvent) => {
       break
     case "<": // Ctrl + [
       event.preventDefault()
-      toggleNavigationPanel(extraContentSidePanelStore.togglePanel())
+      toggleNavigationPanel(
+        extraContentSidePanelStore.panelMode !== undefined
+          ? extraContentSidePanelStore.togglePanel()
+          : undefined,
+      )
       break
     default:
       break
