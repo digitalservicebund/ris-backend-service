@@ -136,13 +136,12 @@ function onDelete() {
     <PopupModal
       v-if="showModal"
       aria-label="Dokumentationseinheit löschen"
-      cancel-button-type="tertiary"
-      confirm-button-type="destructive"
-      confirm-text="Löschen"
       :content-text="popupModalText"
       header-text="Dokumentationseinheit löschen"
+      primary-button-text="Löschen"
+      primary-button-type="destructive"
       @close-modal="toggleModal"
-      @confirm-action="onDelete"
+      @primary-action="onDelete"
     />
     <TableView
       class="relative table w-full border-separate"

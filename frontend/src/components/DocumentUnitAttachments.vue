@@ -139,13 +139,12 @@ const attachments = computed({
       <PopupModal
         v-if="showDeleteModal"
         :aria-label="deleteModalHeaderText"
-        cancel-button-type="tertiary"
-        confirm-button-type="destructive"
-        confirm-text="Löschen"
         :content-text="`Möchten Sie den Anhang ${attachments?.[deletingAttachmentIndex]?.name} wirklich dauerhaft löschen?`"
         :header-text="deleteModalHeaderText"
+        primary-button-text="Löschen"
+        primary-button-type="destructive"
         @close-modal="closeDeleteModal"
-        @confirm-action="deleteFile(deletingAttachmentIndex)"
+        @primary-action="deleteFile(deletingAttachmentIndex)"
       />
       <TitleElement>Dokumente</TitleElement>
       <AttachmentList

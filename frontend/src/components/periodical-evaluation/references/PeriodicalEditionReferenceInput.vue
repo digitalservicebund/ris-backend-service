@@ -327,15 +327,16 @@ onMounted(async () => {
   <div ref="containerRef" class="flex flex-col border-b-1">
     <PopupModal
       v-if="showModal"
-      aria-label="Eintrag löschen"
-      cancel-button-text="Nur Fundstelle löschen"
-      cancel-button-type="tertiary"
-      confirm-button-type="destructive"
-      confirm-text="Dokumentationseinheit löschen"
+      aria-label="Dialog zur Auswahl der Löschaktion"
       content-text="Die dazugehörige Dokumentationseinheit existiert noch. Soll sie gelöscht werden?"
       header-text="Dazugehörige Dokumentationseinheit löschen?"
-      @close-modal="deleteReference"
-      @confirm-action="deleteReferenceAndDocUnit"
+      primary-button-text="Dokumentationseinheit löschen"
+      primary-button-type="destructive"
+      secondary-button-text="Nur Fundstelle löschen"
+      secondary-button-type="tertiary"
+      @close-modal="toggleDeletionConfirmationModal(false)"
+      @primary-action="deleteReferenceAndDocUnit"
+      @secondary-action="deleteReference"
     />
     <h2 v-if="!isSaved" class="ds-label-01-bold mb-16">
       Fundstelle hinzufügen

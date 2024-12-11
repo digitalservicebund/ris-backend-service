@@ -1,6 +1,6 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
-import { fireEvent, render, screen } from "@testing-library/vue"
+import { fireEvent, render, screen, within } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import PeriodicalEditionReferences from "@/components/periodical-evaluation/references/PeriodicalEditionReferences.vue"
 import DocumentUnit from "@/domain/documentUnit"
@@ -205,14 +205,33 @@ describe("Legal periodical edition evaluation", () => {
     expect(documentUnitService.delete).toHaveBeenCalledWith("docunit-id")
   })
 
+  test("reference deletion of new documentation unit can be aborted", async () => {
+    const user = await editReferenceWhichCreatedDocUnitOfOwnOffice()
+    await user.click(screen.getByLabelText("Eintrag löschen"))
+
+    // Find the "Abbrechen" button within the dialog
+    const cancelButton = within(
+      screen.getByRole("dialog", {
+        name: /Dialog zur Auswahl der Löschaktion/i,
+      }),
+    ).getByRole("button", {
+      name: "Abbrechen",
+    })
+
+    expect(cancelButton).toBeInTheDocument()
+    await user.click(cancelButton)
+    expect(documentUnitService.delete).not.toHaveBeenCalled()
+    expect(service.save).not.toHaveBeenCalled()
+  })
+
   test("does not delete documentation unit created by reference when selected", async () => {
     const user = await editReferenceWhichCreatedDocUnitOfOwnOffice()
     await user.click(screen.getByLabelText("Eintrag löschen"))
-    const cancelButton = screen.getByRole("button", {
+    const onlyReferenceButton = screen.getByRole("button", {
       name: "Nur Fundstelle löschen",
     })
-    expect(cancelButton).toBeInTheDocument()
-    await user.click(cancelButton)
+    expect(onlyReferenceButton).toBeInTheDocument()
+    await user.click(onlyReferenceButton)
     expect(documentUnitService.delete).not.toHaveBeenCalled()
   })
 

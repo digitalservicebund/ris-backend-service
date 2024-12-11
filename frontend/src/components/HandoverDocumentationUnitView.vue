@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, onMounted } from "vue"
+import { computed, onMounted, ref } from "vue"
 import { RouterLink } from "vue-router"
 import ExpandableContent from "./ExpandableContent.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
@@ -612,13 +612,12 @@ const isPublishable = computed<boolean>(
       <PopupModal
         v-if="showHandoverModal"
         aria-label="Bestätigung für Übergabe bei Fehlern"
-        cancel-button-type="tertiary"
-        confirm-button-type="primary"
-        confirm-text="Trotzdem übergeben"
         content-text="Die Randnummern sind nicht korrekt. Wollen Sie das Dokument dennoch übergeben?"
         header-text="Warnung: Randnummern inkorrekt"
+        primary-button-text="Trotzdem übergeben"
+        primary-button-type="primary"
         @close-modal="showHandoverModal = false"
-        @confirm-action="confirmHandoverDialog"
+        @primary-action="confirmHandoverDialog"
       />
       <TextButton
         aria-label="Dokumentationseinheit an jDV übergeben"

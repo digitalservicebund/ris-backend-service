@@ -22,12 +22,15 @@ const toggleModal = () => {
         v-if="showModal"
         aria-label="Popup Modal"
         cancel-button-type="ghost"
-        confirm-button-type="secondary"
-        confirm-text="Bestätigen"
         content-text="This is Popup Modal content"
         header-text="Popup Modal"
+        primary-button-text="Bestätigen"
+        primary-button-type="secondary"
+        secondary-button-text="tertiary"
+        secondary-button-type="Alternative"
         @close-modal="toggleModal"
-        @confirm-action="toggleModal"
+        @primary-action="toggleModal"
+        @secondary-action="toggleModal"
       />
     </div>
   </KitchensinkPage>
