@@ -7,7 +7,9 @@ import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
 import NavbarSide from "@/components/NavbarSide.vue"
 import ErrorPage from "@/components/PageError.vue"
 import PeriodicalEditionInfoPanel from "@/components/periodical-evaluation/PeriodicalEditionInfoPanel.vue"
+import SideToggle from "@/components/SideToggle.vue"
 import { usePeriodicalEvaluationMenuItems } from "@/composables/usePeriodicalEvaluationMenuItems"
+import useQuery from "@/composables/useQueryFromRoute"
 import DocumentUnit from "@/domain/documentUnit"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -18,6 +20,7 @@ import StringsUtil from "@/utils/stringsUtil"
 const store = useEditionStore()
 const documentUnitStore = useDocumentUnitStore()
 const extraContentSidePanelStore = useExtraContentSidePanelStore()
+const { pushQueryToRoute } = useQuery()
 
 const {
   counter: loadDocumentUnitTimer,
@@ -29,6 +32,18 @@ const {
 
 const responseError = ref<ResponseError>()
 const route = useRoute()
+
+const showNavigationPanelRef: Ref<boolean> = ref(
+  route.query.showNavigationPanel !== "false",
+)
+function toggleNavigationPanel(expand?: boolean) {
+  showNavigationPanelRef.value =
+    expand === undefined ? !showNavigationPanelRef.value : expand
+  pushQueryToRoute({
+    ...route.query,
+    showNavigationPanel: showNavigationPanelRef.value.toString(),
+  })
+}
 
 const { documentUnit } = storeToRefs(documentUnitStore) as {
   documentUnit: Ref<DocumentUnit | undefined>
@@ -62,6 +77,10 @@ const handleKeyDown = (event: KeyboardEvent) => {
     case "v": // Ctrl + V
       extraContentSidePanelStore.togglePanel(true)
       extraContentSidePanelStore.setSidePanelMode("preview")
+      break
+    case "<": // Ctrl + [
+      event.preventDefault()
+      toggleNavigationPanel(extraContentSidePanelStore.togglePanel())
       break
     default:
       break
@@ -110,7 +129,16 @@ onMounted(async () => {
     <div
       class="sticky top-0 z-50 flex flex-col border-r-1 border-solid border-gray-400 bg-white"
     >
-      <NavbarSide :is-child="false" :menu-items="menuItems" :route="route" />
+      <SideToggle
+        class="sticky top-0 z-20"
+        data-testid="side-toggle-navigation"
+        :is-expanded="showNavigationPanelRef"
+        label="Navigation"
+        tabindex="0"
+        @update:is-expanded="toggleNavigationPanel"
+      >
+        <NavbarSide :is-child="false" :menu-items="menuItems" :route="route" />
+      </SideToggle>
     </div>
 
     <div class="flex w-full flex-col bg-gray-100">

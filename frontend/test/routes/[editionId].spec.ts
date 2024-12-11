@@ -122,6 +122,7 @@ describe("Edition Id Route", () => {
     const titleElements = screen.getAllByText("Periodikumsauswertung")
     const separatorElements = screen.getAllByText("|")
     const editionNames = screen.getAllByText("BDZ name")
+    const sidePanel = screen.getAllByTestId("side-toggle-navigation")
 
     expect(titleElements.length).toBeGreaterThan(1)
     expect(titleElements[0]).toHaveClass("font-bold")
@@ -131,5 +132,8 @@ describe("Edition Id Route", () => {
 
     expect(editionNames.length).toBeGreaterThan(1)
     expect(editionNames[0]).not.toHaveClass("font-bold")
+
+    expect(sidePanel.length).toBeGreaterThan(1)
+    expect(sidePanel[0]).toBeInTheDocument()
   })
 })
