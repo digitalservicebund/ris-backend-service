@@ -29,7 +29,6 @@ import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
-import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
@@ -167,7 +166,6 @@ public class DocumentationUnitTransformer {
         updatedDomainObject.references() == null
             ? Collections.emptyList()
             : updatedDomainObject.references().stream()
-                .filter(reference -> reference.referenceType() == ReferenceType.CASELAW)
                 .map(ReferenceTransformer::transformToDTO)
                 .map(
                     referenceDTO -> {
@@ -183,10 +181,9 @@ public class DocumentationUnitTransformer {
       DocumentationUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
     AtomicInteger i = new AtomicInteger(1);
     builder.dependentLiteratureCitations(
-        updatedDomainObject.references() == null
+        updatedDomainObject.literatureReferences() == null
             ? Collections.emptyList()
-            : updatedDomainObject.references().stream()
-                .filter(reference -> reference.referenceType() == ReferenceType.LITERATURE)
+            : updatedDomainObject.literatureReferences().stream()
                 .map(DependentLiteratureTransformer::transformToDTO)
                 .map(
                     referenceDTO -> {
@@ -761,6 +758,7 @@ public class DocumentationUnitTransformer {
 
     addStatusToDomain(documentationUnitDTO, builder);
     addReferencesToDomain(documentationUnitDTO, builder);
+    addLiteratureReferencesToDomain(documentationUnitDTO, builder);
 
     return builder.build();
   }
@@ -780,10 +778,18 @@ public class DocumentationUnitTransformer {
                   .map(ReferenceTransformer::transformToDomain)
                   .toList());
     }
+  }
+
+  private static void addLiteratureReferencesToDomain(
+      DocumentationUnitDTO documentationUnitDTO,
+      DocumentationUnit.DocumentationUnitBuilder builder) {
+
+    builder.literatureReferences(new ArrayList<>());
+
     if (documentationUnitDTO.getDependentLiteratureCitations() != null) {
       builder
           .build()
-          .references()
+          .literatureReferences()
           .addAll(
               documentationUnitDTO.getDependentLiteratureCitations().stream()
                   .map(DependentLiteratureTransformer::transformToDomain)

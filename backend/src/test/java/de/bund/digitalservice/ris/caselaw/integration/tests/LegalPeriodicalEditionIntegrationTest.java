@@ -276,7 +276,7 @@ class LegalPeriodicalEditionIntegrationTest {
                     DependentLiteratureCitationDTO.builder()
                         .id(UUID.randomUUID())
                         .rank(1)
-                        .citation("1")
+                        .citation("Literature Reference Citation from Docunit")
                         .legalPeriodicalRawValue("A")
                         .author("author 1")
                         .type(DependentLiteratureCitationType.PASSIVE)
@@ -293,9 +293,9 @@ class LegalPeriodicalEditionIntegrationTest {
                         .build(),
                     DependentLiteratureCitationDTO.builder()
                         .id(existingLiteratureCitationId)
-                        .rank(3)
-                        .citation("3 - original literature citation")
-                        .author("author 3")
+                        .rank(2)
+                        .citation("Original Literature Reference Citation from Docunit")
+                        .author("author 2")
                         .type(DependentLiteratureCitationType.PASSIVE)
                         .documentType(
                             DocumentTypeDTO.builder()
@@ -313,8 +313,8 @@ class LegalPeriodicalEditionIntegrationTest {
                 List.of(
                     ReferenceDTO.builder()
                         .id(UUID.randomUUID())
-                        .rank(2)
-                        .citation("2")
+                        .rank(1)
+                        .citation("Caselaw Reference Citation from Docunit")
                         .legalPeriodicalRawValue("A")
                         .documentationUnit(
                             DocumentationUnitDTO.builder()
@@ -324,9 +324,9 @@ class LegalPeriodicalEditionIntegrationTest {
                         .build(),
                     ReferenceDTO.builder()
                         .id(existingReferenceId)
-                        .citation("Original Citation")
+                        .citation("Original Caselaw Reference Citation from Docunit")
                         .legalPeriodicalRawValue("B")
-                        .rank(4)
+                        .rank(2)
                         .documentationUnit(
                             DocumentationUnitDTO.builder()
                                 .id(docUnit.getId())
@@ -336,6 +336,7 @@ class LegalPeriodicalEditionIntegrationTest {
             .build());
 
     UUID newReferenceId = UUID.randomUUID();
+    UUID newLiteratureReferenceId = UUID.randomUUID();
     UUID editionId = UUID.randomUUID();
 
     RelatedDocumentationUnit relatedDocUnit =
@@ -356,14 +357,14 @@ class LegalPeriodicalEditionIntegrationTest {
                         Reference.builder()
                             .id(existingReferenceId)
                             .referenceType(ReferenceType.CASELAW)
-                            .citation("1 - Updated Citation")
+                            .citation("Updated Caselaw Reference Citation from Edition")
                             .legalPeriodicalRawValue("B")
                             .documentationUnit(relatedDocUnit)
                             .build(),
                         Reference.builder()
                             .id(existingLiteratureCitationId)
                             .referenceType(ReferenceType.LITERATURE)
-                            .citation("2 - Updated Literature Citation")
+                            .citation("Updated Literature Reference Citation from Edition")
                             .author("author 2")
                             .documentType(EBS)
                             .legalPeriodicalRawValue("B")
@@ -372,15 +373,15 @@ class LegalPeriodicalEditionIntegrationTest {
                         Reference.builder()
                             .id(newReferenceId)
                             .referenceType(ReferenceType.CASELAW)
-                            .citation("3 - New Reference")
+                            .citation("New Caselaw Reference Citation from Edition")
                             .legalPeriodicalRawValue("D")
                             .documentationUnit(relatedDocUnit)
                             .build(),
                         Reference.builder()
-                            .id(UUID.randomUUID())
+                            .id(newLiteratureReferenceId)
                             .referenceType(ReferenceType.LITERATURE)
-                            .citation("4 - New Literature Citation")
-                            .author("author 4")
+                            .citation("New Literature Reference Citation from Edition")
+                            .author("author 3")
                             .documentType(EAN)
                             .legalPeriodicalRawValue("C")
                             .documentationUnit(relatedDocUnit)
@@ -402,26 +403,47 @@ class LegalPeriodicalEditionIntegrationTest {
     Assertions.assertEquals("2024 Sonderheft 1", edition.name());
     List<Reference> references = editionResponse.references();
     Assertions.assertEquals(4, references.size());
-    Assertions.assertEquals("1 - Updated Citation", references.get(0).citation());
-    Assertions.assertEquals("2 - Updated Literature Citation", references.get(1).citation());
-    Assertions.assertEquals("3 - New Reference", references.get(2).citation());
-    Assertions.assertEquals("4 - New Literature Citation", references.get(3).citation());
+    Assertions.assertEquals(
+        "Updated Caselaw Reference Citation from Edition", references.get(0).citation());
+    Assertions.assertEquals(
+        "Updated Literature Reference Citation from Edition", references.get(1).citation());
+    Assertions.assertEquals(
+        "New Caselaw Reference Citation from Edition", references.get(2).citation());
+    Assertions.assertEquals(
+        "New Literature Reference Citation from Edition", references.get(3).citation());
 
+    // first, caselaw references
     assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").references())
-        .hasSize(6)
+        .hasSize(3)
         .satisfies(
             list -> {
-              // first, caselaw references
-              assertThat(list.get(0).citation()).isEqualTo("2");
+              assertThat(list.get(0).citation())
+                  .isEqualTo("Caselaw Reference Citation from Docunit");
               assertThat(list.get(1).id()).isEqualTo(existingReferenceId);
-              assertThat(list.get(1).citation()).isEqualTo("1 - Updated Citation");
+              assertThat(list.get(1).citation())
+                  .isEqualTo("Updated Caselaw Reference Citation from Edition");
+              assertThat(list.get(1).rank()).isEqualTo(2);
               assertThat(list.get(2).id()).isEqualTo(newReferenceId);
-              assertThat(list.get(2).citation()).isEqualTo("3 - New Reference");
-              // then, literature references
-              assertThat(list.get(3).citation()).isEqualTo("1");
-              assertThat(list.get(4).id()).isEqualTo(existingLiteratureCitationId);
-              assertThat(list.get(4).citation()).isEqualTo("2 - Updated Literature Citation");
-              assertThat(list.get(5).citation()).isEqualTo("4 - New Literature Citation");
+              assertThat(list.get(2).citation())
+                  .isEqualTo("New Caselaw Reference Citation from Edition");
+              assertThat(list.get(2).rank()).isEqualTo(3);
+            });
+
+    // then, literature references
+    assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").literatureReferences())
+        .hasSize(3)
+        .satisfies(
+            list -> {
+              assertThat(list.get(0).citation())
+                  .isEqualTo("Literature Reference Citation from Docunit");
+              assertThat(list.get(1).id()).isEqualTo(existingLiteratureCitationId);
+              assertThat(list.get(1).citation())
+                  .isEqualTo("Updated Literature Reference Citation from Edition");
+              assertThat(list.get(1).rank()).isEqualTo(2);
+              assertThat(list.get(2).id()).isEqualTo(newLiteratureReferenceId);
+              assertThat(list.get(2).citation())
+                  .isEqualTo("New Literature Reference Citation from Edition");
+              assertThat(list.get(2).rank()).isEqualTo(3);
             });
 
     // clean up
@@ -446,7 +468,7 @@ class LegalPeriodicalEditionIntegrationTest {
                     DependentLiteratureCitationDTO.builder()
                         .id(UUID.randomUUID())
                         .rank(1)
-                        .citation("1")
+                        .citation("Literature Reference from Docunit")
                         .legalPeriodicalRawValue("A")
                         .author("author 1")
                         .type(DependentLiteratureCitationType.PASSIVE)
@@ -466,7 +488,7 @@ class LegalPeriodicalEditionIntegrationTest {
                     ReferenceDTO.builder()
                         .id(UUID.randomUUID())
                         .rank(1)
-                        .citation("2")
+                        .citation("Caselaw Reference from Docunit")
                         .legalPeriodicalRawValue("A")
                         .documentationUnit(
                             DocumentationUnitDTO.builder()
@@ -499,14 +521,14 @@ class LegalPeriodicalEditionIntegrationTest {
                         Reference.builder()
                             .id(referenceId)
                             .referenceType(ReferenceType.CASELAW)
-                            .citation("1 - New Citation")
+                            .citation("Updated Caselaw Reference Citation from Edition")
                             .legalPeriodicalRawValue("B")
                             .documentationUnit(relatedDocUnit)
                             .build(),
                         Reference.builder()
                             .id(literatureCitationId)
                             .referenceType(ReferenceType.LITERATURE)
-                            .citation("2 - New Literature Citation")
+                            .citation("Updated Literature Reference Citation from Edition")
                             .author("author 2")
                             .documentType(EBS)
                             .legalPeriodicalRawValue("B")
@@ -515,14 +537,14 @@ class LegalPeriodicalEditionIntegrationTest {
                         Reference.builder()
                             .id(UUID.randomUUID())
                             .referenceType(ReferenceType.CASELAW)
-                            .citation("3 - New Reference")
+                            .citation("New Caselaw Reference from Edition")
                             .legalPeriodicalRawValue("D")
                             .documentationUnit(relatedDocUnit)
                             .build(),
                         Reference.builder()
                             .id(UUID.randomUUID())
                             .referenceType(ReferenceType.LITERATURE)
-                            .citation("4 - New Literature Citation")
+                            .citation("New Literature Reference from Edition")
                             .author("author 4")
                             .documentType(EAN)
                             .legalPeriodicalRawValue("C")
@@ -530,8 +552,8 @@ class LegalPeriodicalEditionIntegrationTest {
                             .build()))
                 .build());
 
-    edition.references().remove(0); // delete 1 - New Citation
-    edition.references().remove(0); // delete 2 - New Literature Citation
+    edition.references().remove(0); // delete Updated Caselaw Reference Citation from Edition
+    edition.references().remove(0); // delete Updated Literature Reference Citation from Edition
 
     assertThat(referenceRepository.findById(referenceId)).isPresent();
     assertThat(literatureCitationRepository.findById(literatureCitationId)).isPresent();
@@ -552,29 +574,34 @@ class LegalPeriodicalEditionIntegrationTest {
     Assertions.assertEquals("2024 Sonderheft 1", edition.name());
     List<Reference> references = editionResponse.references();
     Assertions.assertEquals(2, references.size());
-    Assertions.assertEquals("3 - New Reference", references.get(0).citation());
-    Assertions.assertEquals("4 - New Literature Citation", references.get(1).citation());
+    Assertions.assertEquals("New Caselaw Reference from Edition", references.get(0).citation());
+    Assertions.assertEquals("New Literature Reference from Edition", references.get(1).citation());
 
     // assure rank is updated
     assertThat(references.get(0).rank()).isEqualTo(1);
     assertThat(references.get(1).rank()).isEqualTo(2);
 
-    // documentation unit is updated
+    // documentation unit references are updated
     assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").references())
-        .hasSize(4)
+        .hasSize(2)
         .satisfies(
             list -> {
               // first, caselaw references
-              assertThat(list.get(0).citation()).isEqualTo("2");
+              assertThat(list.get(0).citation()).isEqualTo("Caselaw Reference from Docunit");
               assertThat(list.get(0).rank()).isEqualTo(1);
-              assertThat(list.get(1).citation()).isEqualTo("3 - New Reference");
+              assertThat(list.get(1).citation()).isEqualTo("New Caselaw Reference from Edition");
               assertThat(list.get(1).rank()).isEqualTo(2);
+            });
 
+    assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").literatureReferences())
+        .hasSize(2)
+        .satisfies(
+            list -> {
               // then, literature citations
-              assertThat(list.get(2).citation()).isEqualTo("1");
-              assertThat(list.get(2).rank()).isEqualTo(1);
-              assertThat(list.get(3).citation()).isEqualTo("4 - New Literature Citation");
-              assertThat(list.get(3).rank()).isEqualTo(2);
+              assertThat(list.get(0).citation()).isEqualTo("Literature Reference from Docunit");
+              assertThat(list.get(0).rank()).isEqualTo(1);
+              assertThat(list.get(1).citation()).isEqualTo("New Literature Reference from Edition");
+              assertThat(list.get(1).rank()).isEqualTo(2);
             });
 
     assertThat(referenceRepository.findById(referenceId)).isEmpty();

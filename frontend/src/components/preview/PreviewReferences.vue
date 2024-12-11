@@ -11,22 +11,12 @@ const props = defineProps<{
 
 const primaryReferences = computed(() =>
   props.references?.filter(
-    (reference) =>
-      reference.referenceType === "caselaw" &&
-      reference.legalPeriodical?.primaryReference,
+    (reference) => reference.legalPeriodical?.primaryReference,
   ),
 )
 const secondaryReferences = computed(() =>
   props.references?.filter(
-    (reference) =>
-      reference.referenceType === "caselaw" &&
-      !reference.legalPeriodical?.primaryReference,
-  ),
-)
-
-const literatureReferences = computed(() =>
-  props.references?.filter(
-    (reference) => reference.referenceType === "literature",
+    (reference) => !reference.legalPeriodical?.primaryReference,
   ),
 )
 </script>
@@ -72,18 +62,6 @@ const literatureReferences = computed(() =>
         >
           {{ item.renderDecision }}
         </div>
-      </div>
-    </PreviewContent>
-  </PreviewRow>
-  <PreviewRow
-    v-if="literatureReferences && literatureReferences.length > 0"
-    data-testid="literature-references-preview"
-  >
-    <PreviewCategory>Literaturfundstellen</PreviewCategory>
-
-    <PreviewContent>
-      <div v-for="item in literatureReferences" :key="item.id">
-        {{ item.renderDecision }}
       </div>
     </PreviewContent>
   </PreviewRow>

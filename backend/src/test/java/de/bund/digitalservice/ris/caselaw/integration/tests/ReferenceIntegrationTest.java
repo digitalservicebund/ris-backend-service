@@ -235,7 +235,7 @@ class ReferenceIntegrationTest {
             .uuid(dto.getId())
             .documentNumber(dto.getDocumentNumber())
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
-            .references(
+            .literatureReferences(
                 List.of(
                     Reference.builder()
                         .id(referenceId)
@@ -266,11 +266,11 @@ class ReferenceIntegrationTest {
               assertThat(response.getResponseBody()).isNotNull();
               assertThat(response.getResponseBody().documentNumber())
                   .isEqualTo(DEFAULT_DOCUMENT_NUMBER);
-              assertThat(response.getResponseBody().references()).hasSize(1);
-              assertThat(response.getResponseBody().references())
+              assertThat(response.getResponseBody().literatureReferences()).hasSize(1);
+              assertThat(response.getResponseBody().literatureReferences())
                   .extracting("citation", "author", "documentType", "id")
                   .containsExactly(tuple("2024, S.3", "Heinz Otto", eanDocumentType, referenceId));
-              assertThat(response.getResponseBody().references())
+              assertThat(response.getResponseBody().literatureReferences())
                   .extracting("legalPeriodical")
                   .usingRecursiveComparison()
                   .isEqualTo(List.of(bverwgeLegalPeriodical));

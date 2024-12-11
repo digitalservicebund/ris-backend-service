@@ -43,5 +43,6 @@ public record DocumentationUnit(
     String note,
     ContentRelatedIndexing contentRelatedIndexing,
     List<Reference> references,
+    List<Reference> literatureReferences,
     boolean isEditable,
     boolean isDeletable) {}

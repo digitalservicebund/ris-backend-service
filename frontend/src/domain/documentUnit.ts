@@ -139,6 +139,7 @@ export default class DocumentUnit {
   public contentRelatedIndexing: ContentRelatedIndexing = {}
   public note: string = ""
   public references?: Reference[]
+  public literatureReferences?: Reference[]
   public isEditable: boolean = false
   public managementData: ManagementData = { borderNumbers: [] }
 
@@ -231,6 +232,11 @@ export default class DocumentUnit {
     if (data.references)
       data.references = data.references.map(
         (reference) => new Reference({ ...reference }),
+      )
+
+    if (data.literatureReferences)
+      data.literatureReferences = data.literatureReferences.map(
+        (literatureReference) => new Reference({ ...literatureReference }),
       )
 
     Object.assign(this, data)

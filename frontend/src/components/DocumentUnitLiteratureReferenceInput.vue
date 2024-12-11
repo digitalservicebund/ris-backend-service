@@ -47,7 +47,7 @@ const legalPeriodical = computed({
 
 async function validateRequiredInput() {
   validationStore.reset()
-  reference.value.missingRequiredFieldsForDocunit.forEach((missingField) =>
+  reference.value.missingRequiredLiteratureFields.forEach((missingField) =>
     validationStore.add("Pflichtfeld nicht befüllt", missingField),
   )
 }
@@ -55,7 +55,7 @@ async function validateRequiredInput() {
 async function addReference() {
   await validateRequiredInput()
 
-  if (!reference.value.hasMissingRequiredFieldsForDocunit) {
+  if (!reference.value.hasMissingRequiredLiteratureFields) {
     emit("update:modelValue", reference.value as Reference)
     emit("addEntry")
   }
@@ -94,7 +94,7 @@ watch(
       <ComboboxInput
         id="legalPeriodical"
         v-model="legalPeriodical"
-        aria-label="Periodikum"
+        aria-label="Periodikum Literaturfundstelle"
         clear-on-choosing-item
         :has-error="slotProps.hasError"
         :item-service="ComboboxItemService.getLegalPeriodicals"
@@ -114,7 +114,7 @@ watch(
             <TextInput
               id="citation"
               v-model="reference.citation"
-              aria-label="Zitatstelle"
+              aria-label="Zitatstelle Literaturfundstelle"
               :has-error="slotProps.hasError"
               size="medium"
               @focus="validationStore.remove('citation')"
@@ -124,19 +124,39 @@ watch(
             >Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}</span
           >
         </div>
+
         <InputField
-          id="referenceSupplement"
+          id="literatureReferenceDocumentType"
           v-slot="slotProps"
-          label="Klammernzusatz"
-          :validation-error="validationStore.getByField('referenceSupplement')"
+          label="Dokumenttyp *"
+          :validation-error="validationStore.getByField('documentType')"
+        >
+          <ComboboxInput
+            id="literatureReferenceDocumentType"
+            v-model="reference.documentType"
+            aria-label="Dokumenttyp Literaturfundstelle"
+            :has-error="slotProps.hasError"
+            :item-service="
+              ComboboxItemService.getDependentLiteratureDocumentTypes
+            "
+            @focus="validationStore.remove('documentType')"
+          ></ComboboxInput>
+        </InputField>
+      </div>
+      <div class="w-[calc(50%-10px)]">
+        <InputField
+          id="literatureReferenceDocumentType"
+          v-slot="slotProps"
+          label="Autor *"
+          :validation-error="validationStore.getByField('author')"
         >
           <TextInput
-            id="referenceSupplement"
-            v-model="reference.referenceSupplement"
-            aria-label="Klammernzusatz"
+            id="literatureReferenceDocumentType"
+            v-model="reference.author"
+            aria-label="Autor Literaturfundstelle"
             :has-error="slotProps.hasError"
             size="medium"
-            @focus="validationStore.remove('referenceSupplement')"
+            @focus="validationStore.remove('author')"
           ></TextInput>
         </InputField>
       </div>
@@ -145,7 +165,7 @@ watch(
       <div>
         <div class="flex gap-16">
           <TextButton
-            aria-label="Fundstelle speichern"
+            aria-label="Literaturfundstelle speichern"
             button-type="tertiary"
             :disabled="reference.isEmpty"
             label="Übernehmen"

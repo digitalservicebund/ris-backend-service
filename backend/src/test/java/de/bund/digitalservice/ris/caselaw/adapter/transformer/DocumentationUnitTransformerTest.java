@@ -1349,7 +1349,8 @@ class DocumentationUnitTransformerTest {
                 .collectiveAgreements(Collections.emptyList())
                 .hasLegislativeMandate(false)
                 .build())
-        .references(Collections.emptyList());
+        .references(Collections.emptyList())
+        .literatureReferences(Collections.emptyList());
   }
 
   private CoreDataBuilder generateSimpleCoreDataBuilder() {

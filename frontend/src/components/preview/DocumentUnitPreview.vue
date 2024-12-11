@@ -9,6 +9,7 @@ import {
 } from "@/components/preview/constants"
 import PreviewContentRelatedIndexing from "@/components/preview/PreviewContentRelatedIndexing.vue"
 import PreviewCoreData from "@/components/preview/PreviewCoreData.vue"
+import PreviewLiteratureReferences from "@/components/preview/PreviewLiteratureReferences.vue"
 import PreviewLongTexts from "@/components/preview/PreviewLongTexts.vue"
 import PreviewNote from "@/components/preview/PreviewNote.vue"
 import PreviewProceedingDecisions from "@/components/preview/PreviewProceedingDecisions.vue"
@@ -46,6 +47,9 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
     <PreviewProceedingDecisions />
     <PreviewContentRelatedIndexing />
     <PreviewReferences :references="documentUnit.references as Reference[]" />
+    <PreviewLiteratureReferences
+      :literature-references="documentUnit.literatureReferences as Reference[]"
+    />
     <PreviewShortTexts
       :short-texts="documentUnit.shortTexts"
       :valid-border-numbers="documentUnit.managementData.borderNumbers"

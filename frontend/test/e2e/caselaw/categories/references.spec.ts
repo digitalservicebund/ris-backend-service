@@ -21,7 +21,7 @@ test.describe(
   },
   () => {
     test(
-      "Display, adding, editing and deleting multiple references",
+      "Display, adding, editing and deleting references",
       {
         annotation: {
           type: "story",
@@ -192,7 +192,7 @@ test.describe(
     )
 
     test(
-      "References input validated against required fields",
+      "References input is validated against required fields",
       {
         annotation: {
           type: "story",
@@ -249,69 +249,32 @@ test.describe(
       {
         tag: "@RISDEV-5236 @RISDEV-5454",
       },
-      async ({ page, documentNumber }) => {
-        await test.step("Caselaw reference type is preselected", async () => {
-          await navigateToReferences(page, documentNumber)
-
-          await expect(
-            page.getByLabel("Rechtsprechung Fundstelle"),
-          ).toBeChecked()
-
-          await expect(
-            page.getByLabel("Literatur Fundstelle"),
-          ).not.toBeChecked()
-
-          await expect(page.getByLabel("Klammernzusatz")).toBeVisible()
-
-          await expect(
-            page.getByLabel("Dokumenttyp Literaturfundstelle"),
-          ).toBeHidden()
-
-          await expect(
-            page.getByLabel("Autor Literaturfundstelle"),
-          ).toBeHidden()
-        })
-
-        await test.step("Selecting literature reference type, renders different inputs", async () => {
-          await page.getByLabel("Literatur Fundstelle").click()
-          await expect(
-            page.getByLabel("Rechtsprechung Fundstelle"),
-          ).not.toBeChecked()
-
-          await expect(page.getByLabel("Literatur Fundstelle")).toBeChecked()
-
-          await expect(
-            page.getByLabel("Dokumenttyp Literaturfundstelle"),
-          ).toBeVisible()
-
-          await expect(
-            page.getByLabel("Autor Literaturfundstelle"),
-          ).toBeVisible()
-          await expect(page.getByLabel("Klammernzusatz")).toBeHidden()
-        })
-
+      async ({ page, prefilledDocumentUnit }) => {
         await test.step("Literature references are validated for required inputs", async () => {
-          await fillInput(page, "Periodikum", "AllMBl")
+          await navigateToReferences(
+            page,
+            prefilledDocumentUnit.documentNumber ?? "",
+          )
+          await fillInput(page, "Periodikum Literaturfundstelle", "AllMBl")
           await page
             .getByText("AllMBl | Allgemeines Ministerialblatt", {
               exact: true,
             })
             .click()
-          await waitForInputValue(page, "[aria-label='Periodikum']", "AllMBl")
-          await fillInput(page, "Zitatstelle", "2024, 2")
+          await waitForInputValue(
+            page,
+            "[aria-label='Periodikum Literaturfundstelle']",
+            "AllMBl",
+          )
+          await fillInput(page, "Zitatstelle Literaturfundstelle", "2024, 2")
 
-          await page.locator("[aria-label='Fundstelle speichern']").click()
+          await page
+            .locator("[aria-label='Literaturfundstelle speichern']")
+            .click()
           // check that both fields display error message
           await expect(
             page.locator("text=Pflichtfeld nicht befüllt"),
           ).toHaveCount(2)
-
-          // Switching between radio buttons resets the validation errors
-          await page.getByLabel("Rechtsprechung Fundstelle").click()
-          await page.getByLabel("Literatur Fundstelle").click()
-          await expect(
-            page.locator("text=Pflichtfeld nicht befüllt"),
-          ).toHaveCount(0)
         })
 
         await test.step("Save literature reference, verify that it is shown in the list", async () => {
@@ -323,19 +286,12 @@ test.describe(
             "[aria-label='Dokumenttyp Literaturfundstelle']",
             "Anmerkung",
           )
-          await page.locator("[aria-label='Fundstelle speichern']").click()
+          await page
+            .locator("[aria-label='Literaturfundstelle speichern']")
+            .click()
           await expect(
             page.getByText("Bilen, Ulviye, AllMBl 2024, 2 (Ean)"),
           ).toBeVisible()
-        })
-
-        await test.step("Radio buttons should not be visible after saving", async () => {
-          await page.getByTestId("list-entry-0").click()
-          await expect(
-            page.getByLabel("Rechtsprechung Fundstelle"),
-          ).toBeHidden()
-
-          await expect(page.getByLabel("Literatur Fundstelle")).toBeHidden()
         })
       },
     )
@@ -424,15 +380,18 @@ test.describe(
 
         await test.step("Add literature reference, verify remdering in preview", async () => {
           await navigateToReferences(page, documentNumber)
-          await page.getByLabel("Literatur Fundstelle").click()
-          await fillInput(page, "Periodikum", "AllMBl")
+          await fillInput(page, "Periodikum Literaturfundstelle", "AllMBl")
           await page
             .getByText("AllMBl | Allgemeines Ministerialblatt", {
               exact: true,
             })
             .click()
-          await waitForInputValue(page, "[aria-label='Periodikum']", "AllMBl")
-          await fillInput(page, "Zitatstelle", "2024, 2")
+          await waitForInputValue(
+            page,
+            "[aria-label='Periodikum Literaturfundstelle']",
+            "AllMBl",
+          )
+          await fillInput(page, "Zitatstelle Literaturfundstelle", "2024, 2")
           await fillInput(page, "Autor Literaturfundstelle", "Bilen, Ulviye")
           await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
           await page.getByText("Ean", { exact: true }).click()
@@ -442,7 +401,9 @@ test.describe(
             "Anmerkung",
           )
 
-          await page.locator("[aria-label='Fundstelle speichern']").click()
+          await page
+            .locator("[aria-label='Literaturfundstelle speichern']")
+            .click()
           await expect(
             page.getByText("Bilen, Ulviye, AllMBl 2024, 2 (Ean)"),
           ).toBeVisible()
