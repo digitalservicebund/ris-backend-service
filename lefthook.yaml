@@ -87,6 +87,25 @@ pre-push:
           exit 1
         fi
 
+tests:
+  parallel: false
+  commands:
+    frontend-tests:
+      tags: frontend tests
+      root: frontend/
+      run: npm run check --verbose 2>&1
+      skip_output: false
+    backend-unit-tests:
+      tags: backend tests
+      root: backend/
+      run: ./gradlew test -x integrationTest --console=plain --info 2>&1
+      skip_output: false
+    backend-integration-tests:
+      tags: backend tests
+      root: backend/
+      run: ./gradlew integrationTest -x test 2>&1 --console=plain
+      skip_output: false
+
 skip_output:
   - meta
   - execution
