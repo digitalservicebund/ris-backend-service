@@ -1,14 +1,23 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { http, HttpResponse } from "msw"
+import { setupServer } from "msw/node"
 import { createRouter, createWebHistory } from "vue-router"
-import { ComboboxItem } from "@/components/input/types"
 import EditionList from "@/components/periodical-evaluation/PeriodicalEditions.vue"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
-import comboboxItemService from "@/services/comboboxItemService"
 import legalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 import routes from "~/test-helper/routes"
+
+const server = setupServer(
+  http.get("/api/v1/caselaw/legalperiodicals", () => {
+    const legalPeriodical: LegalPeriodical = {
+      abbreviation: "BDZ",
+    }
+    return HttpResponse.json([legalPeriodical])
+  }),
+)
 
 function renderComponent() {
   const user = userEvent.setup()
@@ -38,25 +47,16 @@ function renderComponent() {
 }
 
 describe("Legal periodical edition list", () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
   beforeEach(() => {
     const legalPeriodical: LegalPeriodical = {
       abbreviation: "BDZ",
     }
-    const dropdownLegalPeriodicalItems: ComboboxItem[] = [
-      {
-        label: legalPeriodical.abbreviation!,
-        value: legalPeriodical,
-      },
-    ]
-    vi.spyOn(comboboxItemService, "getLegalPeriodicals").mockImplementation(
-      () =>
-        Promise.resolve({ status: 200, data: dropdownLegalPeriodicalItems }),
-    )
     const dropdownLegalPeriodicalEditions: LegalPeriodicalEdition[] = [
       new LegalPeriodicalEdition({
         id: "1",
-        legalPeriodical: dropdownLegalPeriodicalItems[0]
-          .value as LegalPeriodical,
+        legalPeriodical: legalPeriodical,
         name: "2024, Heft 1",
         references: [],
         prefix: "2024",

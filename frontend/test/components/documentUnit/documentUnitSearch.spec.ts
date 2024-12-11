@@ -1,13 +1,26 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { http, HttpResponse } from "msw"
+import { setupServer } from "msw/node"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitSearch from "@/components/DocumentUnitSearch.vue"
+import { Court } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import authService from "@/services/authService"
-import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 import routes from "~/test-helper/routes"
+
+const server = setupServer(
+  http.get("/api/v1/caselaw/courts", () => {
+    const court: Court = {
+      type: "BGH",
+      location: "",
+      label: "BGH",
+    }
+    return HttpResponse.json([court])
+  }),
+)
 
 function renderComponent(
   { isInternal }: { isInternal: boolean } = { isInternal: true },
@@ -38,6 +51,9 @@ function renderComponent(
 }
 
 describe("Documentunit Search", () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   vi.spyOn(authService, "getName").mockImplementation(() =>
     Promise.resolve({
       status: 200,
@@ -49,10 +65,6 @@ describe("Documentunit Search", () => {
       },
     }),
   )
-  vi.spyOn(ComboboxItemService, "getCourts").mockResolvedValue({
-    status: 200,
-    data: [{ label: "BGH" }],
-  })
 
   test("Internal user can create new doc unit", async () => {
     renderComponent()

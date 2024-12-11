@@ -1,15 +1,31 @@
 import { fireEvent, render, screen } from "@testing-library/vue"
+import { http, HttpResponse } from "msw"
+import { setupServer } from "msw/node"
 import { describe } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import CreateNewFromSearch from "@/components/CreateNewFromSearch.vue"
-import { ComboboxItem } from "@/components/input/types"
 import DocumentationOffice from "@/domain/documentationOffice"
 import DocumentUnit, {
   DocumentationUnitParameters,
 } from "@/domain/documentUnit"
-import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 import routes from "~/test-helper/routes"
+
+const docOffice: DocumentationOffice = {
+  id: "123",
+  abbreviation: "BVerfG",
+}
+
+const dsDocOffice: DocumentationOffice = {
+  id: "456",
+  abbreviation: "DS",
+}
+
+const server = setupServer(
+  http.get("/api/v1/caselaw/documentationoffices", () =>
+    HttpResponse.json([docOffice, dsDocOffice]),
+  ),
+)
 
 function renderComponent(options?: {
   parameters?: DocumentationUnitParameters
@@ -30,28 +46,10 @@ function renderComponent(options?: {
 }
 
 describe("Create new documentation unit from search", () => {
-  const docOffice: DocumentationOffice = {
-    id: "123",
-    abbreviation: "BVerfG",
-  }
-
-  const dsDocOffice: DocumentationOffice = {
-    id: "456",
-    abbreviation: "DS",
-  }
-  const dropdownItems: ComboboxItem[] = [
-    {
-      label: docOffice.abbreviation,
-      value: docOffice,
-    },
-    {
-      label: dsDocOffice.abbreviation,
-      value: dsDocOffice,
-    },
-  ]
-  vi.spyOn(comboboxItemService, "getDocumentationOffices").mockImplementation(
-    () => Promise.resolve({ status: 200, data: dropdownItems }),
-  )
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+  beforeEach(() => vi.useFakeTimers())
+  afterEach(() => vi.useRealTimers())
 
   it("renders empty responsible docoffice combobox when no docOffice is given", async () => {
     renderComponent()
@@ -220,6 +218,9 @@ describe("Create new documentation unit from search", () => {
     await fireEvent.focus(
       await screen.findByLabelText("Zuständige Dokumentationsstelle"),
     )
+
+    // The Combobox requests are debounced
+    await vi.advanceTimersByTimeAsync(300)
 
     // change documentation office after it was set automatically
     const dropdownItems = screen.getAllByLabelText("dropdown-option")

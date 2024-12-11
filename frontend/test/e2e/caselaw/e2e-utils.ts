@@ -255,6 +255,10 @@ export async function documentUnitExists(
   ).includes("uuid")
 }
 
+/**
+ * @deprecated
+ * Use playwright's toHaveValue instead: e.g. <pre>page.getByLabel("Gericht").toHaveValue("BGH")</pre>
+ */
 export async function waitForInputValue(
   page: Page,
   selector: string,

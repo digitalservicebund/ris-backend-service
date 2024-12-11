@@ -1,9 +1,39 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen, fireEvent } from "@testing-library/vue"
+import { http, HttpResponse } from "msw"
+import { setupServer } from "msw/node"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { ComboboxItem, ComboboxAttributes } from "@/components/input/types"
 import { Court } from "@/domain/documentUnit"
-import service from "@/services/comboboxItemService"
+import comboboxItemService from "@/services/comboboxItemService"
+
+const items = [
+  {
+    label: "courtlabel1",
+    type: "courttype1",
+    location: "courtlocation1",
+  },
+  {
+    label: "courtlabel2",
+    type: "courttype2",
+    location: "courtlocation2",
+  },
+  {
+    label: "courtlabel3",
+    type: "courttype3",
+    location: "courtlocation3",
+  },
+]
+
+const server = setupServer(
+  http.get("/api/v1/caselaw/courts", ({ request }) => {
+    const filter = new URL(request.url).searchParams.get("q")
+    const filteredItems = filter
+      ? items.filter((item) => item.label.includes(filter))
+      : items
+    return HttpResponse.json(filteredItems)
+  }),
+)
 
 function renderComponent(
   options: {
@@ -15,54 +45,37 @@ function renderComponent(
     noClear?: boolean
   } = {},
 ) {
-  return render(ComboboxInput, {
-    props: {
-      id: options.id ?? "combobox-test",
-      modelValue: options.modelValue,
-      ariaLabel: options.ariaLabel ?? "test label",
-      manualEntry: options.manualEntry ?? false,
-      noClear: options.noClear ?? false,
-      itemService:
-        options.itemService ??
-        service.filterItems([
-          {
-            label: "testItem1",
-            value: {
-              type: "courttype1",
-              location: "courtlocation1",
-              label: "courtlabel1",
-            },
-          },
-          {
-            label: "testItem2",
-            value: {
-              type: "courttype2",
-              location: "courtlocation2",
-              label: "courtlabel2",
-            },
-          },
-          {
-            label: "testItem3",
-            value: {
-              type: "courttype3",
-              location: "courtlocation3",
-              label: "courtlabel3",
-            },
-          },
-        ]),
-    },
-  })
+  return {
+    ...render(ComboboxInput, {
+      props: {
+        id: options.id ?? "combobox-test",
+        modelValue: options.modelValue,
+        ariaLabel: options.ariaLabel ?? "test label",
+        manualEntry: options.manualEntry ?? false,
+        noClear: options.noClear ?? false,
+        itemService: options.itemService ?? comboboxItemService.getCourts,
+      },
+    }),
+  }
 }
 
 describe("Combobox Element", () => {
-  const user = userEvent.setup()
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+  beforeEach(() => vi.useFakeTimers())
+  afterEach(() => {
+    server.resetHandlers()
+    vi.runOnlyPendingTimers()
+    vi.useRealTimers()
+  })
+  const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
 
   it("is closed", () => {
     renderComponent()
 
-    expect(screen.queryByDisplayValue("testItem1")).not.toBeInTheDocument()
-    expect(screen.queryByDisplayValue("testItem2")).not.toBeInTheDocument()
-    expect(screen.queryByDisplayValue("testItem3")).not.toBeInTheDocument()
+    expect(screen.queryByDisplayValue("courtlabel1")).not.toBeInTheDocument()
+    expect(screen.queryByDisplayValue("courtlabel1")).not.toBeInTheDocument()
+    expect(screen.queryByDisplayValue("courtlabel1")).not.toBeInTheDocument()
   })
 
   it("is opened", async () => {
@@ -70,6 +83,7 @@ describe("Combobox Element", () => {
 
     const openComboboxContainer = screen.getByLabelText("Dropdown öffnen")
     await user.click(openComboboxContainer)
+    await vi.advanceTimersByTimeAsync(300)
     expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(3)
     const input = screen.getByLabelText("test label")
     await fireEvent.focus(input)
@@ -78,28 +92,34 @@ describe("Combobox Element", () => {
   })
 
   it("focus should open dropdown", async () => {
+    vi.useFakeTimers()
     renderComponent()
     const input = screen.getByLabelText("test label")
     await fireEvent.focus(input)
+    await vi.advanceTimersByTimeAsync(300)
 
     expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(3)
   })
 
   it("enter should select top value", async () => {
+    vi.useFakeTimers()
     const { emitted } = renderComponent()
     const input = screen.getByLabelText("test label")
     await fireEvent.focus(input)
+    await vi.advanceTimersByTimeAsync(300)
     expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(3)
 
     input.focus()
     await user.keyboard("{enter}")
 
+    await vi.advanceTimersByTimeAsync(300)
+
     expect(emitted()["update:modelValue"]).toEqual([
       [
         {
-          label: "courtlabel1",
-          location: "courtlocation1",
           type: "courttype1",
+          location: "courtlocation1",
+          label: "courtlabel1",
         },
       ],
     ])
@@ -109,7 +129,8 @@ describe("Combobox Element", () => {
     const { emitted } = renderComponent()
     const input = screen.getByLabelText("test label")
 
-    await user.type(input, "test")
+    await user.type(input, "court")
+    await vi.advanceTimersByTimeAsync(300)
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
     await user.click(dropdownItems[1])
 
@@ -122,9 +143,9 @@ describe("Combobox Element", () => {
     expect(emitted()["update:modelValue"]).toEqual([
       [
         {
-          label: "courtlabel2",
-          location: "courtlocation2",
           type: "courttype2",
+          location: "courtlocation2",
+          label: "courtlabel2",
         },
       ],
       [undefined],
@@ -135,23 +156,25 @@ describe("Combobox Element", () => {
     renderComponent()
 
     const input = screen.getByLabelText("test label")
-    await user.type(input, "testItem2")
+    await user.type(input, "courtlabel2")
 
+    await vi.advanceTimersByTimeAsync(300)
     const dropdownItems = screen.queryAllByLabelText("dropdown-option")
     expect(dropdownItems).toHaveLength(1)
 
-    expect(dropdownItems[0]).toHaveTextContent("testItem2")
+    expect(dropdownItems[0]).toHaveTextContent("courtlabel2")
   })
 
   it("items should stay filtered after selection", async () => {
     renderComponent()
 
     const input = screen.getByLabelText("test label")
-    await user.type(input, "testItem2")
+    await user.type(input, "courtlabel2")
 
+    await vi.advanceTimersByTimeAsync(300)
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
 
-    expect(dropdownItems[0]).toHaveTextContent("testItem2")
+    expect(dropdownItems[0]).toHaveTextContent("courtlabel2")
 
     await user.click(dropdownItems[0])
 
@@ -159,6 +182,7 @@ describe("Combobox Element", () => {
 
     await user.click(openDropdownContainer)
 
+    await vi.advanceTimersByTimeAsync(300)
     expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(1)
   })
 
@@ -166,12 +190,13 @@ describe("Combobox Element", () => {
     renderComponent()
 
     const input = screen.getByLabelText("test label")
-    await user.type(input, "testItem2")
+    await user.type(input, "courtlabel2")
 
+    await vi.advanceTimersByTimeAsync(300)
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
 
     expect(dropdownItems).toHaveLength(1)
-    expect(dropdownItems[0]).toHaveTextContent("testItem2")
+    expect(dropdownItems[0]).toHaveTextContent("courtlabel2")
 
     const closeDropdownContainer = screen.getByLabelText("Dropdown schließen")
 
@@ -185,7 +210,7 @@ describe("Combobox Element", () => {
   it("items should be filtered if selected value exists", async () => {
     renderComponent({
       modelValue: {
-        label: "testItem1",
+        label: "courtlabel1",
         value: {
           type: "courttype1",
           location: "courtlocation1",
@@ -197,17 +222,19 @@ describe("Combobox Element", () => {
     const openDropdownContainer = screen.getByLabelText("Dropdown öffnen")
 
     await user.click(openDropdownContainer)
+    await vi.advanceTimersByTimeAsync(300)
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
     expect(dropdownItems).toHaveLength(1)
-    expect(dropdownItems[0]).toHaveTextContent("testItem1")
+    expect(dropdownItems[0]).toHaveTextContent("courtlabel1")
   })
 
   it("items should show message if no items matched", async () => {
     renderComponent()
 
     const input = screen.getByLabelText("test label")
-    await user.type(input, "testItem10")
+    await user.type(input, "courtlabel10")
 
+    await vi.advanceTimersByTimeAsync(300)
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
     expect(dropdownItems).toHaveLength(1)
     expect(dropdownItems[0]).toHaveTextContent("Kein passender Eintrag")
@@ -217,15 +244,16 @@ describe("Combobox Element", () => {
     renderComponent()
 
     const input = screen.getByLabelText("test label")
-    await user.type(input, "testItem2")
+    await user.type(input, "courtlabel2")
 
+    await vi.advanceTimersByTimeAsync(300)
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
     expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(1)
-    expect(dropdownItems[0]).toHaveTextContent("testItem2")
+    expect(dropdownItems[0]).toHaveTextContent("courtlabel2")
 
     await user.click(dropdownItems[0])
     expect(screen.queryByLabelText("dropdown-option")).not.toBeInTheDocument()
-    expect(input).toHaveValue("testItem2")
+    expect(input).toHaveValue("courtlabel2")
 
     const openDropdownContainer = screen.getByLabelText(
       "Dropdown öffnen",
@@ -236,36 +264,30 @@ describe("Combobox Element", () => {
   })
 
   it("uses endpoint to fetch all DocumentType items", async () => {
-    const fetchSpy = vi
-      .spyOn(service, "getDocumentTypes")
-      .mockImplementation(() =>
-        Promise.resolve({
-          status: 200,
-          data: [
-            {
-              label: "AO - Anordnung",
-              value: {
-                jurisShortcut: "AO",
-                label: "AO - Anordnung",
-              },
-            },
-          ],
-        }),
-      )
+    server.use(
+      http.get("api/v1/caselaw/documenttypes", () =>
+        Response.json([
+          {
+            jurisShortcut: "AO",
+            label: "AO - Anordnung",
+          },
+        ]),
+      ),
+    )
 
     renderComponent({
-      itemService: service.getDocumentTypes,
+      itemService: comboboxItemService.getDocumentTypes,
     })
 
     const openDropdownContainer = screen.getByLabelText("Dropdown öffnen")
     await user.click(openDropdownContainer)
+    await vi.advanceTimersByTimeAsync(300)
 
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
 
-    expect(fetchSpy).toHaveBeenCalledTimes(2)
-    expect(fetchSpy).toHaveBeenCalledWith(undefined)
     expect(dropdownItems).toHaveLength(1)
     expect(dropdownItems[0]).toHaveTextContent("AO - Anordnung")
+    await vi.advanceTimersByTimeAsync(300)
   })
 
   it("uses endpoint to fetch all Court items", async () => {
@@ -274,30 +296,18 @@ describe("Combobox Element", () => {
       location: "Karlsruhe",
       label: "BGH Karlsruhe",
     }
-    const dropdownItems: ComboboxItem[] = [
-      {
-        label: "BGH Karlsruhe",
-        value: court, // <-- Court
-      },
-    ]
-    const fetchSpy = vi
-      .spyOn(service, "getCourts")
-      .mockImplementation(() =>
-        Promise.resolve({ status: 200, data: dropdownItems }),
-      )
 
-    renderComponent({
-      itemService: service.getCourts,
-    })
+    server.use(http.get("api/v1/caselaw/courts", () => Response.json([court])))
+
+    renderComponent()
 
     const openDropdownContainer = screen.getByLabelText("Dropdown öffnen")
 
     await user.click(openDropdownContainer)
+    await vi.advanceTimersByTimeAsync(300)
 
     const dropdownItemElements = screen.getAllByLabelText("dropdown-option")
 
-    expect(fetchSpy).toHaveBeenCalledTimes(2)
-    expect(fetchSpy).toHaveBeenCalledWith(undefined)
     expect(dropdownItemElements).toHaveLength(1)
     expect(dropdownItemElements[0]).toHaveTextContent("BGH Karlsruhe")
   })
@@ -309,27 +319,20 @@ describe("Combobox Element", () => {
       label: "BGH Karlsruhe",
     }
     const dropdownItems: ComboboxItem[] = [
-      {
-        label: "BGH Karlsruhe",
-        value: court,
-      },
+      { label: "BGH Karlsruhe", value: court },
     ]
-    const fetchSpy = vi
-      .spyOn(service, "getCourts")
-      .mockImplementation(() =>
-        Promise.resolve({ status: 200, data: dropdownItems }),
-      )
 
-    renderComponent({
-      itemService: service.getCourts,
-    })
+    server.use(
+      http.get("api/v1/caselaw/courts", () => Response.json(dropdownItems)),
+    )
+    renderComponent({})
 
     const input = screen.getByLabelText("test label")
     await user.type(input, "bgh")
+    await vi.advanceTimersByTimeAsync(300)
 
     const dropdownItemElements = screen.getAllByLabelText("dropdown-option")
 
-    expect(fetchSpy).toHaveBeenCalledTimes(4)
     // TODO checking for "b", "bg", "bgh" as the three arguments does not work though
     expect(dropdownItemElements).toHaveLength(1)
     expect(dropdownItemElements[0]).toHaveTextContent("BGH Karlsruhe")
@@ -342,29 +345,17 @@ describe("Combobox Element", () => {
       label: "ABC",
       revoked: "aufgehoben seit: 1973",
     }
-    const dropdownItems: ComboboxItem[] = [
-      {
-        label: "ABC",
-        value: court,
-        additionalInformation: court.revoked,
-      },
-    ]
-    const fetchSpy = vi
-      .spyOn(service, "getCourts")
-      .mockImplementation(() =>
-        Promise.resolve({ status: 200, data: dropdownItems }),
-      )
+    server.use(http.get("api/v1/caselaw/courts", () => Response.json([court])))
 
     renderComponent({
-      itemService: service.getCourts,
+      itemService: comboboxItemService.getCourts,
     })
 
     const openDropdownContainer = screen.getByLabelText("Dropdown öffnen")
     await user.click(openDropdownContainer)
+    await vi.advanceTimersByTimeAsync(300)
 
     const dropdownItemElements = screen.getAllByLabelText("dropdown-option")
-    expect(fetchSpy).toHaveBeenCalledTimes(2)
-    expect(fetchSpy).toHaveBeenCalledWith(undefined)
     expect(dropdownItemElements).toHaveLength(1)
     expect(dropdownItemElements[0]).toHaveTextContent("ABC")
 
@@ -379,29 +370,34 @@ describe("Combobox Element", () => {
     const { emitted } = renderComponent()
 
     const input = screen.getByLabelText("test label")
-    await user.type(input, "foo")
+    await user.type(input, "xxxxxx")
+    await vi.advanceTimersByTimeAsync(300)
 
     let dropdownItems = screen.getAllByLabelText("dropdown-option")
-    expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(1)
+    expect(dropdownItems).toHaveLength(1)
     expect(dropdownItems[0]).toHaveTextContent("Kein passender Eintrag")
 
     await user.keyboard("{escape}")
+    await vi.advanceTimersByTimeAsync(300)
 
     expect(screen.queryByLabelText("dropdown-option")).not.toBeInTheDocument()
     expect(input).toHaveValue("")
 
-    await user.type(input, "testItem1")
+    await user.type(input, "courtlabel1")
+    await vi.advanceTimersByTimeAsync(300)
     dropdownItems = screen.getAllByLabelText("dropdown-option")
 
-    expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(1)
-    expect(dropdownItems[0]).toHaveTextContent("testItem1")
+    expect(dropdownItems).toHaveLength(1)
+    expect(dropdownItems[0]).toHaveTextContent("courtlabel1")
 
     await user.keyboard("{enter}") // save the value
+    await vi.advanceTimersByTimeAsync(300)
     expect(screen.queryByLabelText("dropdown-option")).not.toBeInTheDocument()
-    expect(input).toHaveValue("testItem1")
+    expect(input).toHaveValue("courtlabel1")
 
     await user.type(input, "foo")
     await user.keyboard("{tab}")
+    await vi.advanceTimersByTimeAsync(300)
 
     expect(screen.queryByLabelText("dropdown-option")).not.toBeInTheDocument()
     // expect(input).toHaveValue("testItem1") does not work here anymore because
@@ -413,7 +409,8 @@ describe("Combobox Element", () => {
   it("top search result should get chosen upon enter", async () => {
     const { emitted } = renderComponent()
     const input = screen.getByLabelText("test label")
-    await user.type(input, "test")
+    await user.type(input, "court")
+    await vi.advanceTimersByTimeAsync(300)
     expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(3)
 
     await user.keyboard("{enter}")
@@ -438,6 +435,7 @@ describe("Combobox Element", () => {
     const input = screen.getByLabelText("test label")
     await user.type(input, "foo")
 
+    await vi.advanceTimersByTimeAsync(300)
     const dropdownItems = screen.queryAllByLabelText("dropdown-option")
     expect(dropdownItems).toHaveLength(1)
     expect(dropdownItems[0]).toHaveTextContent("foo neu erstellen")
@@ -456,29 +454,32 @@ describe("Combobox Element", () => {
     renderComponent({ manualEntry: true })
 
     const input = screen.getByLabelText("test label")
-    await user.type(input, "testItem")
+    await user.type(input, "court")
 
+    await vi.advanceTimersByTimeAsync(300)
     const dropdownItems = screen.queryAllByLabelText("dropdown-option")
     expect(dropdownItems).toHaveLength(4)
-    expect(dropdownItems[0]).toHaveTextContent("testItem1")
-    expect(dropdownItems[3]).toHaveTextContent("testItem neu erstellen")
+    expect(dropdownItems[0]).toHaveTextContent("courtlabel1")
+    expect(dropdownItems[3]).toHaveTextContent("court neu erstellen")
   })
 
   it("removes new entry option when exact match found", async () => {
     renderComponent({ manualEntry: true })
 
     const input = screen.getByLabelText("test label")
-    await user.type(input, "testItem")
+    await user.type(input, "court")
 
+    await vi.advanceTimersByTimeAsync(300)
     const dropdownItems = screen.queryAllByLabelText("dropdown-option")
     expect(dropdownItems).toHaveLength(4)
-    expect(dropdownItems[0]).toHaveTextContent("testItem1")
-    expect(dropdownItems[3]).toHaveTextContent("testItem neu erstellen")
+    expect(dropdownItems[0]).toHaveTextContent("courtlabel1")
+    expect(dropdownItems[3]).toHaveTextContent("court neu erstellen")
 
-    await user.type(input, "testItem1")
+    await user.type(input, "courtlabel1")
+    await vi.advanceTimersByTimeAsync(300)
     expect(screen.queryAllByLabelText("dropdown-option")).toHaveLength(1)
     expect(screen.queryAllByLabelText("dropdown-option")[0]).toHaveTextContent(
-      "testItem1",
+      "courtlabel1",
     )
     expect(screen.queryByText("testItem neu erstellen")).not.toBeInTheDocument()
   })
@@ -489,6 +490,7 @@ describe("Combobox Element", () => {
     const input = screen.getByLabelText("test label")
     await user.type(input, "testItem1 ")
 
+    await vi.advanceTimersByTimeAsync(300)
     const dropdownItems = screen.queryAllByLabelText("dropdown-option")
     expect(dropdownItems).toHaveLength(1)
     expect(dropdownItems[0]).toHaveTextContent("testItem1")
@@ -511,7 +513,8 @@ describe("Combobox Element", () => {
   it("does not render clear button if noClear flag is set", async () => {
     renderComponent({ noClear: true })
 
-    await user.type(screen.getByLabelText("test label"), "test")
+    await user.type(screen.getByLabelText("test label"), "court")
+    await vi.advanceTimersByTimeAsync(300)
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
     await user.click(dropdownItems[1])
 
@@ -526,14 +529,19 @@ describe("Combobox Element", () => {
     renderComponent()
 
     const input = screen.getByLabelText("test label")
-    await user.type(input, "b")
+    await user.type(input, "x")
 
+    await vi.advanceTimersByTimeAsync(300)
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
     expect(dropdownItems).toHaveLength(1)
     expect(dropdownItems[0]).toHaveTextContent("Kein passender Eintrag")
-    await user.type(input, "{backspace}")
+    input.focus()
+    await user.keyboard("{Backspace}")
+    await vi.advanceTimersByTimeAsync(300)
     expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(3)
-    expect(dropdownItems[0]).toHaveTextContent("testItem1")
+    expect(screen.getAllByLabelText("dropdown-option")[0]).toHaveTextContent(
+      "courtlabel1",
+    )
   })
 
   describe("keyboard navigation", () => {
@@ -541,6 +549,7 @@ describe("Combobox Element", () => {
       renderComponent()
       const input = screen.getByLabelText("test label")
       await fireEvent.focus(input)
+      await vi.advanceTimersByTimeAsync(300)
       const items = screen.getAllByLabelText("dropdown-option")
 
       input.focus()
@@ -568,6 +577,7 @@ describe("Combobox Element", () => {
       renderComponent()
       const input = screen.getByLabelText("test label")
       await fireEvent.focus(input)
+      await vi.advanceTimersByTimeAsync(300)
       const items = screen.getAllByLabelText("dropdown-option")
 
       input.focus()
@@ -590,13 +600,12 @@ describe("Combobox Element", () => {
     })
 
     it("should work with createNewItem link without any items", async () => {
-      renderComponent({
-        manualEntry: true,
-        itemService: service.filterItems([]),
-      })
+      server.use(http.get("api/v1/caselaw/courts", () => Response.json([])))
+      renderComponent({ manualEntry: true })
       const input = screen.getByLabelText("test label")
       await fireEvent.focus(input)
       await user.type(input, "testItem")
+      await vi.advanceTimersByTimeAsync(300)
       const items = screen.getAllByLabelText("dropdown-option")
 
       expect(items[0]).not.toHaveFocus()
@@ -608,7 +617,8 @@ describe("Combobox Element", () => {
       renderComponent({ manualEntry: true })
       const input = screen.getByLabelText("test label")
       await fireEvent.focus(input)
-      await user.type(input, "testItem")
+      await user.type(input, "court")
+      await vi.advanceTimersByTimeAsync(300)
       const items = screen.getAllByLabelText("dropdown-option")
 
       // Move to createNewItem link

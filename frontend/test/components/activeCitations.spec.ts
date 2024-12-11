@@ -1,15 +1,41 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { fireEvent, render, screen } from "@testing-library/vue"
+import { http, HttpResponse } from "msw"
+import { setupServer } from "msw/node"
 import { createRouter, createWebHistory } from "vue-router"
 import ActiveCitations from "@/components/ActiveCitations.vue"
-import { ComboboxItem } from "@/components/input/types"
 import ActiveCitation from "@/domain/activeCitation"
 import { CitationType } from "@/domain/citationType"
 import DocumentUnit, { Court, DocumentType } from "@/domain/documentUnit"
-import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 import routes from "~/test-helper/routes"
+
+const server = setupServer(
+  http.get("/api/v1/caselaw/courts", () => {
+    const court: Court = {
+      type: "AG",
+      location: "Test",
+      label: "AG Test",
+    }
+    return HttpResponse.json([court])
+  }),
+  http.get("/api/v1/caselaw/documenttypes", () => {
+    const documentType: DocumentType = {
+      jurisShortcut: "Ant",
+      label: "EuGH-Vorlage",
+    }
+    return HttpResponse.json([documentType])
+  }),
+  http.get("/api/v1/caselaw/citationtypes", () => {
+    const citationStyle: CitationType = {
+      uuid: "123",
+      jurisShortcut: "Änderungen",
+      label: "Änderungen",
+    }
+    return HttpResponse.json([citationStyle])
+  }),
+)
 
 function renderComponent(activeCitations?: ActiveCitation[]) {
   const user = userEvent.setup()
@@ -81,6 +107,8 @@ function generateActiveCitation(options?: {
 }
 
 describe("active citations", () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
   beforeEach(() => {
     vi.spyOn(
       documentUnitService,
@@ -116,63 +144,10 @@ describe("active citations", () => {
     )
 
     vi.spyOn(window, "scrollTo").mockImplementation(() => vi.fn())
-
-    vi.spyOn(comboboxItemService, "getCourts").mockImplementation(() =>
-      Promise.resolve({ status: 200, data: dropdownCourtItems }),
-    )
-
-    vi.spyOn(comboboxItemService, "getDocumentTypes").mockImplementation(() =>
-      Promise.resolve({ status: 200, data: dropdownDocumentTypesItems }),
-    )
-
-    vi.spyOn(comboboxItemService, "getCitationTypes").mockImplementation(() =>
-      Promise.resolve({ status: 200, data: dropdownCitationStyleItems }),
-    )
   })
   afterEach(() => {
     vi.resetAllMocks()
   })
-
-  const court: Court = {
-    type: "AG",
-    location: "Test",
-    label: "AG Test",
-  }
-
-  const documentType: DocumentType = {
-    jurisShortcut: "Ant",
-    label: "EuGH-Vorlage",
-  }
-
-  const citationStyle: CitationType = {
-    uuid: "123",
-    jurisShortcut: "Änderungen",
-    label: "Änderungen",
-  }
-
-  const dropdownCourtItems: ComboboxItem[] = [
-    {
-      label: court.label,
-      value: court,
-      additionalInformation: court.revoked,
-    },
-  ]
-
-  const dropdownDocumentTypesItems: ComboboxItem[] = [
-    {
-      label: documentType.label,
-      value: documentType,
-      additionalInformation: documentType.jurisShortcut,
-    },
-  ]
-
-  const dropdownCitationStyleItems: ComboboxItem[] = [
-    {
-      label: citationStyle.label,
-      value: citationStyle,
-      additionalInformation: citationStyle.jurisShortcut,
-    },
-  ]
 
   it("renders empty active citation in edit mode, when no activeCitations in list", async () => {
     renderComponent()

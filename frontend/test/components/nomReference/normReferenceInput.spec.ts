@@ -1,14 +1,34 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { http, HttpResponse } from "msw"
+import { setupServer } from "msw/node"
 import { vi } from "vitest"
 import { ref } from "vue"
-import { ComboboxItem } from "@/components/input/types"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
 import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import NormReference from "@/domain/normReference"
-import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
+
+const server = setupServer(
+  http.get("/api/v1/caselaw/normabbreviation/search", () => {
+    const normAbbreviation: NormAbbreviation = { abbreviation: "1000g-BefV" }
+    return HttpResponse.json([normAbbreviation])
+  }),
+  http.get("/api/v1/caselaw/region/applicable", () => {
+    const region: LegalForceRegion = {
+      longText: "region",
+      code: "BB",
+    }
+    return HttpResponse.json([region])
+  }),
+  http.get("/api/v1/caselaw/legalforcetype", () => {
+    const legalForceType: LegalForceType = {
+      abbreviation: "nichtig",
+    }
+    return HttpResponse.json([legalForceType])
+  }),
+)
 
 function renderComponent(options?: { modelValue?: NormReference }) {
   const user = userEvent.setup()
@@ -20,18 +40,9 @@ function renderComponent(options?: { modelValue?: NormReference }) {
 }
 
 describe("NormReferenceEntry", () => {
-  const normAbbreviation: NormAbbreviation = {
-    abbreviation: "1000g-BefV",
-  }
-  const dropdownAbbreviationItems: ComboboxItem[] = [
-    {
-      label: normAbbreviation.abbreviation,
-      value: normAbbreviation,
-    },
-  ]
-  vi.spyOn(comboboxItemService, "getRisAbbreviations").mockImplementation(() =>
-    Promise.resolve({ status: 200, data: dropdownAbbreviationItems }),
-  )
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   vi.spyOn(documentUnitService, "validateSingleNorm").mockImplementation(() =>
     Promise.resolve({ status: 200, data: "Ok" }),
   )
@@ -449,31 +460,6 @@ describe("NormReferenceEntry", () => {
   })
 
   describe("legal force", () => {
-    const legalForceType: LegalForceType = {
-      abbreviation: "nichtig",
-    }
-    const region: LegalForceRegion = {
-      longText: "region",
-      code: "BB",
-    }
-    const dropdownLegalForceTypeItems: ComboboxItem[] = [
-      {
-        label: legalForceType.abbreviation,
-        value: legalForceType,
-      },
-    ]
-    const dropdownRegionItems: ComboboxItem[] = [
-      {
-        label: region.longText,
-        value: region,
-      },
-    ]
-    vi.spyOn(comboboxItemService, "getLegalForceTypes").mockImplementation(() =>
-      Promise.resolve({ status: 200, data: dropdownLegalForceTypeItems }),
-    )
-    vi.spyOn(comboboxItemService, "getLegalForceRegions").mockImplementation(
-      () => Promise.resolve({ status: 200, data: dropdownRegionItems }),
-    )
     vi.mock("@/composables/useCourtType", () => ({
       useInjectCourtType: vi.fn(() => {
         return ref("VerfG")
@@ -521,7 +507,7 @@ describe("NormReferenceEntry", () => {
       const dropdownItemsLegalForceType = screen.getAllByLabelText(
         "dropdown-option",
       ) as HTMLElement[]
-      expect(dropdownItemsLegalForceType[0]).toHaveTextContent("nichtig")
+      expect(dropdownItemsLegalForceType[0]).toHaveTextContent("Nichtig")
       await user.click(dropdownItemsLegalForceType[0])
 
       const button = screen.getByLabelText("Norm speichern")
