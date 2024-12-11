@@ -1,8 +1,11 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+import styleDictionary from "@digitalservice4germany/style-dictionary/tailwind"
+import plugins from "@digitalservice4germany/angie"
+
+export default {
   content: ["./src/**/*.{html,vue,js,ts}"],
-  presets: [require("@digitalservice4germany/style-dictionary/tailwind")],
-  plugins: [require("@digitalservice4germany/angie")],
+  presets: [styleDictionary],
+  plugins: [plugins],
 
   theme: {
     fontWeight: {

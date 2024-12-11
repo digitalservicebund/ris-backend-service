@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test"
 import dayjs from "dayjs"
-import errorMessages from "@/i18n/errors.json"
+import errorMessages from "@/i18n/errors.json" with { type: "json" }
 
 import {
   deleteDocumentUnit,

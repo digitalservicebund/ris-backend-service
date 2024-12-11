@@ -1,6 +1,6 @@
 import { Locator, Page, test } from "@playwright/test"
 import dayjs from "dayjs"
-import utc from "dayjs/plugin/utc"
+import utc from "dayjs/plugin/utc.js"
 import DocumentUnit from "../../../src/domain/documentUnit"
 import { navigateToCategories } from "./e2e-utils"
 import { Page as Pagination } from "@/components/Pagination.vue"
