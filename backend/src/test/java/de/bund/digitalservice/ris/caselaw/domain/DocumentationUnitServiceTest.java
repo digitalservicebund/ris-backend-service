@@ -10,6 +10,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import com.gravity9.jsonpatch.JsonPatch;
+import com.gravity9.jsonpatch.JsonPatchOperation;
+import com.gravity9.jsonpatch.ReplaceOperation;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
@@ -257,6 +262,39 @@ class DocumentationUnitServiceTest {
     assertEquals(du, documentationUnit);
 
     verify(repository).save(documentationUnit);
+  }
+
+  @Test
+  void testPatchUpdateWithOnlyVersion_shouldNotIncrementVersion()
+      throws DocumentationUnitNotExistsException {
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .uuid(UUID.randomUUID())
+            .documentNumber("ABCDE20220001")
+            .attachments(
+                Collections.singletonList(
+                    Attachment.builder().uploadTimestamp(Instant.now()).build()))
+            .version(0L)
+            .build();
+    when(repository.findByUuid(documentationUnit.uuid())).thenReturn(documentationUnit);
+    when(patchMapperService.calculatePatch(any(), any())).thenReturn(new JsonPatch(List.of()));
+    when(patchMapperService.removePatchForSamePath(any(), any()))
+        .thenReturn(new JsonPatch(List.of()));
+    when(patchMapperService.handlePatchForSamePath(any(), any(), any(), any()))
+        .thenReturn(
+            RisJsonPatch.builder()
+                .patch(new JsonPatch(List.of()))
+                .documentationUnitVersion(1L)
+                .errorPaths(Collections.emptyList())
+                .build());
+
+    JsonNode valueToReplace = new TextNode("0");
+    JsonPatchOperation replaceOp = new ReplaceOperation("/version", valueToReplace);
+    JsonPatch patch = new JsonPatch(List.of(replaceOp));
+    var risJsonPatch = RisJsonPatch.builder().documentationUnitVersion(1L).patch(patch).build();
+
+    var response = service.updateDocumentationUnit(documentationUnit.uuid(), risJsonPatch);
+    assertEquals(response.documentationUnitVersion(), 0L);
   }
 
   @Test

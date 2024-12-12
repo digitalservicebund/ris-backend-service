@@ -1,8 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.domain.mapper;
 
 import com.gravity9.jsonpatch.JsonPatch;
+import com.gravity9.jsonpatch.JsonPatchOperation;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RisJsonPatch;
+import java.util.List;
 import java.util.UUID;
 
 /** A service to enable partial updates of object by patch */
@@ -78,4 +80,19 @@ public interface PatchMapperService {
   JsonPatch removePatchForSamePath(JsonPatch patch1, JsonPatch patch2);
 
   JsonPatch addUpdatePatch(JsonPatch toUpdate, JsonPatch toSaveJsonPatch);
+
+  /**
+   * Returns true if the JSON patch contains includes only version replace op, to prevent increasing
+   * the version if not needed.
+   *
+   * @param patch The JSON patch to check.
+   * @return true if the patch contains only version op, otherwise false.
+   */
+  static boolean containsOnlyVersionInPatch(JsonPatch patch) {
+    if (patch == null || patch.getOperations() == null) {
+      return false;
+    }
+    List<JsonPatchOperation> operations = patch.getOperations();
+    return operations.size() == 1 && "/version".equals(operations.getFirst().getPath());
+  }
 }
