@@ -963,20 +963,22 @@ public class DocumentationUnitTransformer {
       DocumentationUnitDTO documentationUnitDTO,
       DocumentationUnit.DocumentationUnitBuilder builder) {
 
-    List<EnsuingDecisionDTO> ensuingDecisionDTOs = documentationUnitDTO.getEnsuingDecisions();
-    List<PendingDecisionDTO> pendingDecisionDTOs = documentationUnitDTO.getPendingDecisions();
-
-    if (pendingDecisionDTOs == null && ensuingDecisionDTOs == null) {
+    if (documentationUnitDTO.getPendingDecisions() == null
+        && documentationUnitDTO.getEnsuingDecisions() == null) {
       return;
     }
 
-    int size = getEnsuingDecisionListSize(ensuingDecisionDTOs, pendingDecisionDTOs);
+    int size =
+        getEnsuingDecisionListSize(
+            documentationUnitDTO.getEnsuingDecisions(), documentationUnitDTO.getPendingDecisions());
 
     List<EnsuingDecision> withoutRank = new ArrayList<>();
     EnsuingDecision[] ensuingDecisions = new EnsuingDecision[size];
 
-    addEnsuingDecisionToDomain(ensuingDecisionDTOs, withoutRank, ensuingDecisions);
-    addPendingDecisionsToDomain(pendingDecisionDTOs, withoutRank, ensuingDecisions);
+    addEnsuingDecisionToDomain(
+        documentationUnitDTO.getEnsuingDecisions(), withoutRank, ensuingDecisions);
+    addPendingDecisionsToDomain(
+        documentationUnitDTO.getPendingDecisions(), withoutRank, ensuingDecisions);
 
     handleEnsuingDecisionsWithoutRank(withoutRank, ensuingDecisions);
 

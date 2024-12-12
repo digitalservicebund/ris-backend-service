@@ -294,7 +294,7 @@ class DocumentationUnitServiceTest {
     var risJsonPatch = RisJsonPatch.builder().documentationUnitVersion(1L).patch(patch).build();
 
     var response = service.updateDocumentationUnit(documentationUnit.uuid(), risJsonPatch);
-    assertEquals(response.documentationUnitVersion(), 0L);
+    assertEquals(0L, response.documentationUnitVersion());
   }
 
   @Test
