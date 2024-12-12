@@ -7,6 +7,7 @@ import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
 import Attachment from "@/domain/attachment"
 import DocumentUnit from "@/domain/documentUnit"
 import Reference from "@/domain/reference"
+import featureToggleService from "@/services/featureToggleService"
 import { SelectablePanelContent } from "@/types/panelContentMode"
 
 let router: Router
@@ -114,6 +115,15 @@ describe("ExtraContentSidePanel", () => {
         },
       ],
     })
+
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
   })
 
   describe("Open/close the panel", () => {
@@ -282,15 +292,19 @@ describe("ExtraContentSidePanel", () => {
       const testCases = [
         {
           sidePanelMode: "attachments",
-          expectedHidden: ["note", "preview"],
+          expectedHidden: ["note", "preview", "category-import"],
         },
         {
           sidePanelMode: "note",
-          expectedHidden: ["attachments", "preview"],
+          expectedHidden: ["attachments", "preview", "category-import"],
         },
         {
           sidePanelMode: "preview",
-          expectedHidden: ["attachments", "note"],
+          expectedHidden: ["attachments", "note", "category-import"],
+        },
+        {
+          enabledPanels: ["category-import"],
+          expectedHidden: ["attachments", "note", "preview"],
         },
       ]
       testCases.forEach(({ sidePanelMode, expectedHidden }) =>

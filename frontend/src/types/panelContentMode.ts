@@ -1,1 +1,5 @@
-export type SelectablePanelContent = "note" | "attachments" | "preview"
+export type SelectablePanelContent =
+  | "note"
+  | "attachments"
+  | "preview"
+  | "category-import"

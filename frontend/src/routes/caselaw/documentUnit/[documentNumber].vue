@@ -13,6 +13,7 @@ import SideToggle from "@/components/SideToggle.vue"
 import { useCaseLawMenuItems } from "@/composables/useCaseLawMenuItems"
 import useQuery from "@/composables/useQueryFromRoute"
 import DocumentUnit from "@/domain/documentUnit"
+import FeatureToggleService from "@/services/featureToggleService"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
@@ -34,6 +35,8 @@ const { documentUnit } = storeToRefs(store) as {
 const route = useRoute()
 const menuItems = useCaseLawMenuItems(props.documentNumber, route.query)
 const { pushQueryToRoute } = useQuery()
+
+const featureToggle = ref()
 
 const validationErrors = ref<ValidationError[]>([])
 const showNavigationPanelRef: Ref<boolean> = ref(
@@ -114,6 +117,12 @@ const handleKeyDown = (event: KeyboardEvent) => {
       extraContentSidePanelStore.togglePanel(true)
       extraContentSidePanelStore.setSidePanelMode("preview")
       break
+    case "k": // Ctrl + K
+      if (featureToggle.value) {
+        extraContentSidePanelStore.togglePanel(true)
+        extraContentSidePanelStore.setSidePanelMode("category-import")
+      }
+      break
     default:
       break
   }
@@ -127,6 +136,11 @@ onBeforeUnmount(() => {
 onMounted(async () => {
   window.addEventListener("keydown", handleKeyDown)
   await requestDocumentUnitFromServer()
+})
+onMounted(async () => {
+  featureToggle.value = (
+    await FeatureToggleService.isEnabled("neuris.category-importer")
+  ).data
 })
 </script>
 

@@ -38,6 +38,9 @@ test.describe(
           await expect(page.getByLabel("Notiz anzeigen")).toBeVisible()
           await expect(page.getByLabel("Dokumente anzeigen")).toBeVisible()
           await expect(page.getByLabel("Vorschau anzeigen")).toBeVisible()
+          await expect(
+            page.getByLabel("Rubriken-Import anzeigen"),
+          ).toBeVisible()
           await expect(page.getByText("Notiz", { exact: true })).toBeVisible()
           await expect(page.getByLabel("Notiz Eingabefeld")).toHaveValue("")
           await page.getByLabel("Dokumente anzeigen").click()
@@ -314,7 +317,8 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
         })
 
         await test.step("test document selection with keyboard", async () => {
-          // skip preview button
+          // skip preview button & category import button
+          await page.keyboard.press("Tab")
           await page.keyboard.press("Tab")
           await page.keyboard.press("Tab")
           await expect(
@@ -341,6 +345,7 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
 
         await test.step("select preview with keyboard", async () => {
           await page.keyboard.press("Shift+Tab")
+          await page.keyboard.press("Shift+Tab")
           await expect(
             page.getByRole("button", { name: "Vorschau anzeigen" }),
           ).toBeFocused()
@@ -351,6 +356,7 @@ es zu unterlassen, den Kläger für das Einstellen des unter Ziffer 1 genannten 
         })
 
         await test.step("open preview in new tab with keyboard", async () => {
+          await page.keyboard.press("Tab")
           await page.keyboard.press("Tab")
           await expect(
             page.getByRole("link", { name: "Vorschau in neuem Tab öffnen" }),
