@@ -302,17 +302,6 @@ describe("Document Number Route", () => {
       ).toBeVisible()
     })
 
-    it('detects "k" keypress and opens category import', async () => {
-      const { user, router } = renderComponent()
-      await router.push({
-        path: "/caselaw/documentUnit/1234567891234/references?showAttachmentPanel=false",
-      })
-
-      expect(screen.queryByTestId("category-import")).not.toBeInTheDocument()
-      await user.keyboard("k")
-      expect(screen.getByTestId("category-import")).toBeInTheDocument()
-    })
-
     it('detects ">" keypress and opens both panels', async () => {
       const { user, router } = renderComponent()
       await router.push({

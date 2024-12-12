@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue"
+import { computed, onMounted } from "vue"
 import type { Component } from "vue"
 import { useRoute } from "vue-router"
 import Tooltip from "./Tooltip.vue"
 import AttachmentView from "@/components/AttachmentView.vue"
-import CategoryImport from "@/components/CategoryImport.vue"
 import FileNavigator from "@/components/FileNavigator.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
@@ -14,11 +13,9 @@ import TextButton from "@/components/input/TextButton.vue"
 import DocumentUnitPreview from "@/components/preview/DocumentUnitPreview.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
 import DocumentUnit from "@/domain/documentUnit"
-import FeatureToggleService from "@/services/featureToggleService"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import { SelectablePanelContent } from "@/types/panelContentMode"
 import IconAttachFile from "~icons/ic/baseline-attach-file"
-import IconCopyAll from "~icons/ic/baseline-copy-all"
 import IconEdit from "~icons/ic/outline-edit"
 import IconOpenInNewTab from "~icons/ic/outline-open-in-new"
 import IconPreview from "~icons/ic/outline-remove-red-eye"
@@ -35,8 +32,6 @@ const props = defineProps<{
 const store = useExtraContentSidePanelStore()
 
 const route = useRoute()
-
-const featureToggle = ref()
 
 const hasNote = computed(() => {
   return !!props.documentUnit!.note && props.documentUnit!.note.length > 0
@@ -83,13 +78,6 @@ function selectPreview() {
 }
 
 /**
- * Sets the panel content to "category-import", so that the category importer is displayed in the panel.
- */
-function selectImporter() {
-  store.setSidePanelMode("category-import")
-}
-
-/**
  * Expands or collapses the panel.
  * Can be forced by passing a boolean parameter. Otherwise, it will collapse when expanded and expand when collapsed.
  * Pushes the state to the route as a query parameter.
@@ -124,15 +112,6 @@ onMounted(() => {
   } else {
     store.isExpanded = hasNote.value || hasAttachments.value
   }
-})
-
-/**
- * Loads the feature flag for the category import feature.
- */
-onMounted(async () => {
-  featureToggle.value = (
-    await FeatureToggleService.isEnabled("neuris.category-importer")
-  ).data
 })
 </script>
 
@@ -191,21 +170,6 @@ onMounted(async () => {
               :icon="IconPreview"
               size="small"
               @click="() => selectPreview()"
-            />
-          </Tooltip>
-
-          <Tooltip v-if="!hidePanelModeBar" shortcut="k" text="Rubriken-Import">
-            <TextButton
-              id="category-import"
-              aria-label="Rubriken-Import anzeigen"
-              button-type="tertiary"
-              :class="
-                store.panelMode === 'category-import' ? 'bg-blue-200' : ''
-              "
-              data-testid="category-import-button"
-              :icon="IconCopyAll"
-              size="small"
-              @click="() => selectImporter()"
             />
           </Tooltip>
         </div>
@@ -295,8 +259,6 @@ onMounted(async () => {
             layout="narrow"
           />
         </FlexContainer>
-
-        <CategoryImport v-if="store.panelMode === 'category-import'" />
       </div>
     </SideToggle>
   </FlexItem>
