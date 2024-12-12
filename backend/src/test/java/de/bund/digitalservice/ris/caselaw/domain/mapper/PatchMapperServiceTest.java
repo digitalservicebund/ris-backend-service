@@ -6,6 +6,7 @@ import com.gravity9.jsonpatch.JsonPatch;
 import com.gravity9.jsonpatch.JsonPatchOperation;
 import com.gravity9.jsonpatch.ReplaceOperation;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -29,5 +30,12 @@ class PatchMapperServiceTest {
     replaceOps.add(new ReplaceOperation("/fileNumber", valueToReplace));
     Assertions.assertFalse(
         PatchMapperService.containsOnlyVersionInPatch(new JsonPatch(replaceOps)));
+  }
+
+  @Test
+  void containsOnlyVersionInPatch_withEmptyPatchOrOps_shouldReturnFalse() {
+    Assertions.assertFalse(PatchMapperService.containsOnlyVersionInPatch(null));
+    Assertions.assertFalse(
+        PatchMapperService.containsOnlyVersionInPatch(new JsonPatch(Collections.emptyList())));
   }
 }
