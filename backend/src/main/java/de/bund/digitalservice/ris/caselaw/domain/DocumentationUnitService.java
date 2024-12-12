@@ -287,7 +287,8 @@ public class DocumentationUnitService {
 
     JsonPatch toFrontendJsonPatch = new JsonPatch(Collections.emptyList());
     RisJsonPatch toFrontend;
-    if (!patch.patch().getOperations().isEmpty()) {
+    if (!patch.patch().getOperations().isEmpty()
+        && !PatchMapperService.containsOnlyVersionInPatch(patch.patch())) {
       JsonPatch toUpdate = patchMapperService.removePatchForSamePath(patch.patch(), newPatch);
 
       log.debug("version {} - update patch: {}", patch.documentationUnitVersion(), toUpdate);
