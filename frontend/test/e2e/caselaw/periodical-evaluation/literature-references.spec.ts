@@ -61,7 +61,7 @@ test.describe("Literature references", () => {
         await navigateToPeriodicalReferences(page, edition.id || "")
         await page.getByLabel("Literatur Fundstelle").click()
         await expect(page.getByLabel("Literatur Fundstelle")).toBeChecked()
-        await fillInput(page, "Zitatstelle *", `2021, 2`)
+        await fillInput(page, "Zitatstelle *", `2`)
 
         await searchForDocUnitWithFileNumber(page, fileNumber, "31.12.2019")
         await page.getByLabel("Treffer übernehmen").click()
@@ -91,9 +91,7 @@ test.describe("Literature references", () => {
         await searchForDocUnitWithFileNumber(page, fileNumber, "31.12.2019")
         await page.getByLabel("Treffer übernehmen").click()
         await expect(
-          page.getByText(
-            `Bilen, Ulviye, MMG 2024, 2021, 2${edition.suffix} (Ean)`,
-          ),
+          page.getByText(`Bilen, Ulviye, MMG 2024, 2${edition.suffix} (Ean)`),
         ).toBeVisible()
       })
 
@@ -160,10 +158,10 @@ test.describe("Literature references", () => {
           ),
         ).toBeVisible()
         const correctOrder = [
-          "MMG 2024, 12-22, Heft 1  (L)",
+          "MMG 2024, 12-22, Heft 1 (L)",
           "MMG 2024, 1-11, Heft 1",
-          "MMG 2024, 300, Heft 1  (ST)",
-          "Bilen, Ulviye, MMG 2024, 301-305, Heft 1  (Ean)",
+          "MMG 2024, 300, Heft 1 (ST)",
+          "Bilen, Ulviye, MMG 2024, 301-305, Heft 1 (Ean)",
         ]
         const summaries = await page.getByTestId("citation-summary").all()
 

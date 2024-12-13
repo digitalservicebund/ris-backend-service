@@ -1,10 +1,10 @@
 import { expect } from "@playwright/test"
 import {
-  navigateToPreview,
-  navigateToHandover,
-  save,
-  navigateToReferences,
   fillInput,
+  navigateToHandover,
+  navigateToPreview,
+  navigateToReferences,
+  save,
   waitForInputValue,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
@@ -364,13 +364,9 @@ test.describe(
     )
 
     test(
-      "Literature references are visible in preview",
+      "Literature references can be saved and are visible in preview",
       {
-        annotation: {
-          type: "story",
-          description:
-            "https://digitalservicebund.atlassian.net/browse/RISDEV-4335",
-        },
+        tag: "@RISDEV-5240",
       },
       async ({ page, documentNumber }) => {
         await test.step("References are not rendered in preview when empty", async () => {
@@ -378,7 +374,7 @@ test.describe(
           await expect(page.getByText("Literaturfundstellen")).toBeHidden()
         })
 
-        await test.step("Add literature reference, verify remdering in preview", async () => {
+        await test.step("Add literature reference, verify rendering in editable list", async () => {
           await navigateToReferences(page, documentNumber)
           await fillInput(page, "Periodikum Literaturfundstelle", "AllMBl")
           await page
@@ -409,18 +405,78 @@ test.describe(
           ).toBeVisible()
         })
 
-        await save(page)
+        await test.step("Verify rendering in preview", async () => {
+          await page.keyboard.press("v")
 
-        await navigateToPreview(page, documentNumber)
+          const preview = page.locator(
+            '[data-testid="literature-references-preview"]',
+          )
 
-        await expect(page.getByText("Literaturfundstellen")).toBeVisible()
-        await expect(
-          page.getByText("Fundstellen", { exact: true }),
-        ).toBeHidden()
+          await expect(preview.getByText("Literaturfundstellen")).toBeVisible()
+          await expect(
+            preview.getByText("Fundstellen", { exact: true }),
+          ).toBeHidden()
 
-        await expect(
-          page.getByText("Bilen, Ulviye, AllMBl 2024, 2 (Ean)"),
-        ).toBeVisible()
+          await expect(
+            preview.getByText("Bilen, Ulviye, AllMBl 2024, 2 (Ean)"),
+          ).toBeVisible()
+        })
+
+        await test.step("Add second literature reference, verify it is added at the bottom", async () => {
+          await fillInput(page, "Periodikum Literaturfundstelle", "GVBl BB")
+          await page
+            .getByText(
+              "GVBl BB | Gesetz- und Verordnungsblatt für das Land Brandenburg",
+              {
+                exact: true,
+              },
+            )
+            .click()
+          await waitForInputValue(
+            page,
+            "[aria-label='Periodikum Literaturfundstelle']",
+            "GVBl BB",
+          )
+          await fillInput(
+            page,
+            "Zitatstelle Literaturfundstelle",
+            "01/2025, 4-6",
+          )
+          await fillInput(page, "Autor Literaturfundstelle", "Kästner, Erich")
+          await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ebs")
+          await page.getByText("Ebs", { exact: true }).click()
+          await waitForInputValue(
+            page,
+            "[aria-label='Dokumenttyp Literaturfundstelle']",
+            "Entscheidungsbesprechung",
+          )
+
+          await page
+            .locator("[aria-label='Literaturfundstelle speichern']")
+            .click()
+        })
+
+        await test.step("Verify second literature citation it is added at the bottom of editable list", async () => {
+          await expect(page.getByLabel("Listen Eintrag").nth(1)).toHaveText(
+            "Bilen, Ulviye, AllMBl 2024, 2 (Ean)primär",
+          )
+          await expect(page.getByLabel("Listen Eintrag").nth(2)).toHaveText(
+            "Kästner, Erich, GVBl BB 01/2025, 4-6 (Ebs)primär",
+          )
+        })
+
+        await test.step("Verify second literature citation it is added at the bottom of preview", async () => {
+          const literatureReferencesPreview = page.locator(
+            '[data-testid="literature-references-preview"]',
+          )
+          const texts = await literatureReferencesPreview.textContent()
+
+          // Make sure the literature citations are in the correct order
+          expect(texts).toContain(
+            "Bilen, Ulviye, AllMBl 2024, 2 (Ean)" +
+              "Kästner, Erich, GVBl BB 01/2025, 4-6 (Ebs)",
+          )
+        })
       },
     )
 
