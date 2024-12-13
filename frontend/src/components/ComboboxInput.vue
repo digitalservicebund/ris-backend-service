@@ -151,15 +151,21 @@ const updateFocusedItem = () => {
 
 const isFetchingOrTyping = ref(false)
 
+/**
+ * When a new request is started while a previous one is still running -> cancel the old one.
+ * The canceled one should not unset the isFetching state as it is followed by a new request.
+ */
 async function updateCurrentItems() {
   isFetchingOrTyping.value = true
   if (canAbort.value) {
     abort()
   }
   const response = await debouncedFetchItems()
-  if (response) isFetchingOrTyping.value = false
+  const wasCanceled = !response
+  if (!wasCanceled) isFetchingOrTyping.value = false
 }
 
+/** We do not want to select the first result on enter when a request is running, the selection is deferred until the results are in */
 watch(isFetchingOrTyping, async (isFetching, wasFetching) => {
   if (wasFetching === true && isFetching === false) {
     if (hasQueuedEnter.value) {
@@ -178,6 +184,11 @@ const {
 const debouncedFetchItems = useDebounceFn(fetchItems, 200)
 
 const noMatchingItems = [{ label: NO_MATCHING_ENTRY }]
+
+/**
+ * When the search result (existingItems) was fetched, we update the displayed items.
+ * (Special cases: no results, createNewItem "neu erstellen")
+ */
 watch(existingItems, () => {
   if (existingItems.value === null) return
   if (existingItems.value === noMatchingItems) return
@@ -303,9 +314,10 @@ export type InputModelProps =
       class="absolute left-0 right-0 top-[100%] z-20 flex max-h-[300px] flex-col overflow-y-scroll bg-white px-8 py-12 drop-shadow-md"
       tabindex="-1"
     >
+      <!-- Caution: misusage of index as key in v-for is needed for updateFocusedItem, do not remove before refactoring focus logic -->
       <button
-        v-for="item in currentlyDisplayedItems"
-        :key="item.label + item.additionalInformation"
+        v-for="(item, index) in currentlyDisplayedItems"
+        :key="index"
         ref="dropdownItemsRef"
         aria-label="dropdown-option"
         class="cursor-pointer px-16 py-12 text-left hover:bg-blue-100 focus:border-l-4 focus:border-solid focus:border-l-blue-800 focus:bg-blue-200 focus:outline-none"
