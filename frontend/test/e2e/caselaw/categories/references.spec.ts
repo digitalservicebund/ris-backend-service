@@ -245,9 +245,9 @@ test.describe(
     )
 
     test(
-      "Literature references can be added to documentation unit",
+      "Literature references input is validated against required fields",
       {
-        tag: "@RISDEV-5236 @RISDEV-5454",
+        tag: ["@RISDEV-5236", "@RISDEV-5454", "@RISDEV-5240"],
       },
       async ({ page, prefilledDocumentUnit }) => {
         await test.step("Literature references are validated for required inputs", async () => {
@@ -255,6 +255,11 @@ test.describe(
             page,
             prefilledDocumentUnit.documentNumber ?? "",
           )
+
+          await expect(
+            page.locator("[aria-label='Literaturfundstelle speichern']"),
+          ).toBeDisabled()
+
           await fillInput(page, "Periodikum Literaturfundstelle", "AllMBl")
           await page
             .getByText("AllMBl | Allgemeines Ministerialblatt", {
@@ -275,10 +280,13 @@ test.describe(
           await expect(
             page.locator("text=Pflichtfeld nicht befüllt"),
           ).toHaveCount(2)
-        })
 
-        await test.step("Save literature reference, verify that it is shown in the list", async () => {
-          await fillInput(page, "Autor Literaturfundstelle", "Bilen, Ulviye")
+          await fillInput(page, "Autor Literaturfundstelle", "Einstein, Albert")
+
+          await expect(
+            page.locator("text=Pflichtfeld nicht befüllt"),
+          ).toHaveCount(1)
+
           await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
           await page.getByText("Ean", { exact: true }).click()
           await waitForInputValue(
@@ -286,12 +294,10 @@ test.describe(
             "[aria-label='Dokumenttyp Literaturfundstelle']",
             "Anmerkung",
           )
-          await page
-            .locator("[aria-label='Literaturfundstelle speichern']")
-            .click()
+
           await expect(
-            page.getByText("Bilen, Ulviye, AllMBl 2024, 2 (Ean)"),
-          ).toBeVisible()
+            page.locator("text=Pflichtfeld nicht befüllt"),
+          ).toBeHidden()
         })
       },
     )
