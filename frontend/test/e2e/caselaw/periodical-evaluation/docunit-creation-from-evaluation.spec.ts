@@ -9,9 +9,83 @@ import {
   waitForInputValue,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
+import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
 import { generateString } from "~/test-helper/dataGenerators"
 
 const formattedDate = dayjs().format("DD.MM.YYYY")
+
+async function testValidationOfRequiredFields(page: Page) {
+  await page.getByText("Übernehmen und weiter bearbeiten").click()
+
+  await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
+
+  await expect(page.getByText("Pflichtfeld nicht befüllt")).toHaveCount(2)
+
+  await fillInput(page, "Zitatstelle *", "12")
+  await expect(page.getByText("Pflichtfeld nicht befüllt")).toHaveCount(1)
+  await page.getByText("Übernehmen und weiter bearbeiten").click()
+
+  await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
+
+  await fillInput(page, "Klammernzusatz", "L")
+
+  await expect(page.getByText("Pflichtfeld nicht befüllt")).toBeHidden()
+}
+
+async function verifyDocUnitOpensInNewTab(
+  newTab: Page,
+  randomFileNumber: string,
+) {
+  await expect(newTab).toHaveURL(
+    /\/caselaw\/documentunit\/[A-Z0-9]{13}\/categories$/,
+  )
+  const documentNumber = /caselaw\/documentunit\/(.*)\/categories/g.exec(
+    newTab.url(),
+  )?.[1] as string
+  await expect(newTab.getByLabel("Gericht", { exact: true })).toHaveValue(
+    "AG Aachen",
+  )
+  await expect(
+    newTab.getByLabel("Entscheidungsdatum", { exact: true }),
+  ).toHaveValue(formattedDate)
+  await expect(newTab.getByTestId("chip-value")).toHaveText(randomFileNumber)
+  await expect(newTab.getByLabel("Dokumenttyp", { exact: true })).toHaveValue(
+    "Anerkenntnisurteil",
+  )
+  return documentNumber
+}
+
+async function verifyDocUnitCanBeTakenOver(
+  pageWithBghUser: Page,
+  documentNumber: string,
+  edition: LegalPeriodicalEdition,
+) {
+  await navigateToSearch(pageWithBghUser)
+
+  await pageWithBghUser.getByLabel("Dokumentnummer Suche").fill(documentNumber)
+
+  const select = pageWithBghUser.locator(`select[id="status"]`)
+  await select.selectOption("Fremdanlage")
+  await pageWithBghUser
+    .getByLabel("Nach Dokumentationseinheiten suchen")
+    .click()
+  const listEntry = pageWithBghUser.getByRole("row")
+  await expect(listEntry).toHaveCount(1)
+  await expect(listEntry).toContainText(
+    `Fremdanlage aus MMG ${edition.prefix}12${edition.suffix} (DS)`,
+  )
+  await expect(
+    pageWithBghUser.getByLabel("Dokumentationseinheit übernehmen"),
+  ).toBeVisible()
+
+  await expect(
+    pageWithBghUser.getByText("Dokumentationseinheit bearbeiten"),
+  ).toBeHidden()
+
+  await expect(
+    pageWithBghUser.getByLabel("Dokumentationseinheit löschen"),
+  ).toBeVisible()
+}
 
 test.describe(
   "Creation of new documentation units from periodical evaluation",
@@ -200,25 +274,7 @@ test.describe(
         })
 
         await test.step("Validation of required fields before creation new documentation unit from search parameters", async () => {
-          await page.getByText("Übernehmen und weiter bearbeiten").click()
-
-          await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
-
-          await expect(page.getByText("Pflichtfeld nicht befüllt")).toHaveCount(
-            2,
-          )
-
-          await fillInput(page, "Zitatstelle *", "12")
-          await expect(page.getByText("Pflichtfeld nicht befüllt")).toHaveCount(
-            1,
-          )
-          await page.getByText("Übernehmen und weiter bearbeiten").click()
-
-          await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
-
-          await fillInput(page, "Klammernzusatz", "L")
-
-          await expect(page.getByText("Pflichtfeld nicht befüllt")).toBeHidden()
+          await testValidationOfRequiredFields(page)
         })
 
         await test.step("Create docunit, Rechtskraft is set to unknown, as no court was given", async () => {
@@ -327,24 +383,10 @@ test.describe(
         const newTab = await pagePromise
 
         await test.step("Created documentation unit opens up with in new tab with correct data and reference assigned", async () => {
-          await expect(newTab).toHaveURL(
-            /\/caselaw\/documentunit\/[A-Z0-9]{13}\/categories$/,
-          )
-          documentNumber = /caselaw\/documentunit\/(.*)\/categories/g.exec(
-            newTab.url(),
-          )?.[1] as string
-          await expect(
-            newTab.getByLabel("Gericht", { exact: true }),
-          ).toHaveValue("AG Aachen")
-          await expect(
-            newTab.getByLabel("Entscheidungsdatum", { exact: true }),
-          ).toHaveValue(formattedDate)
-          await expect(newTab.getByTestId("chip-value")).toHaveText(
+          documentNumber = await verifyDocUnitOpensInNewTab(
+            newTab,
             randomFileNumber,
           )
-          await expect(
-            newTab.getByLabel("Dokumenttyp", { exact: true }),
-          ).toHaveValue("Anerkenntnisurteil")
         })
 
         await test.step("Reference is added to new documentation unit (Fundstelle Tab and preview)", async () => {
@@ -468,25 +510,7 @@ test.describe(
         })
 
         await test.step("Validation of required fields before creation new documentation unit from search parameters", async () => {
-          await page.getByText("Übernehmen und weiter bearbeiten").click()
-
-          await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
-
-          await expect(page.getByText("Pflichtfeld nicht befüllt")).toHaveCount(
-            2,
-          )
-
-          await fillInput(page, "Zitatstelle *", "12")
-          await expect(page.getByText("Pflichtfeld nicht befüllt")).toHaveCount(
-            1,
-          )
-          await page.getByText("Übernehmen und weiter bearbeiten").click()
-
-          await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
-
-          await fillInput(page, "Klammernzusatz", "L")
-
-          await expect(page.getByText("Pflichtfeld nicht befüllt")).toBeHidden()
+          await testValidationOfRequiredFields(page)
         })
 
         const pagePromise = page.context().waitForEvent("page")
@@ -494,24 +518,10 @@ test.describe(
         const newTab = await pagePromise
 
         await test.step("Created documentation unit for foreign docoffice is editable for creating docoffice", async () => {
-          await expect(newTab).toHaveURL(
-            /\/caselaw\/documentunit\/[A-Z0-9]{13}\/categories$/,
-          )
-          documentNumber = /caselaw\/documentunit\/(.*)\/categories/g.exec(
-            newTab.url(),
-          )?.[1] as string
-          await expect(
-            newTab.getByLabel("Gericht", { exact: true }),
-          ).toHaveValue("AG Aachen")
-          await expect(
-            newTab.getByLabel("Entscheidungsdatum", { exact: true }),
-          ).toHaveValue(formattedDate)
-          await expect(newTab.getByTestId("chip-value")).toHaveText(
+          documentNumber = await verifyDocUnitOpensInNewTab(
+            newTab,
             randomFileNumber,
           )
-          await expect(
-            newTab.getByLabel("Dokumenttyp", { exact: true }),
-          ).toHaveValue("Anerkenntnisurteil")
 
           await newTab.keyboard.down("v")
 
@@ -554,29 +564,11 @@ test.describe(
         })
 
         await test.step("Created documentation unit is visible with 'Übernehmen' button to foreign doc office in search with Fremdanlage status", async () => {
-          await navigateToSearch(pageWithBghUser)
-
-          await pageWithBghUser
-            .getByLabel("Dokumentnummer Suche")
-            .fill(documentNumber)
-
-          const select = pageWithBghUser.locator(`select[id="status"]`)
-          await select.selectOption("Fremdanlage")
-          await pageWithBghUser
-            .getByLabel("Nach Dokumentationseinheiten suchen")
-            .click()
-          const listEntry = pageWithBghUser.getByRole("row")
-          await expect(listEntry).toHaveCount(1)
-          await expect(listEntry).toContainText(
-            `Fremdanlage aus MMG ${edition.prefix}12${edition.suffix} (DS)`,
+          await verifyDocUnitCanBeTakenOver(
+            pageWithBghUser,
+            documentNumber,
+            edition,
           )
-          await expect(
-            pageWithBghUser.getByLabel("Dokumentationseinheit übernehmen"),
-          ).toBeVisible()
-
-          await expect(
-            pageWithBghUser.getByText("Dokumentationseinheit bearbeiten"),
-          ).toBeHidden()
         })
 
         await test.step("Created DocUnit is deleted when reference is deleted", async () => {
@@ -722,30 +714,11 @@ test.describe(
         })
 
         await test.step("Owning docoffice can accept a created docunit from periodical evaluation, which changes the status to unpublished", async () => {
-          await navigateToSearch(pageWithBghUser)
-
-          await pageWithBghUser
-            .getByLabel("Dokumentnummer Suche")
-            .fill(documentNumber1)
-
-          const select = pageWithBghUser.locator(`select[id="status"]`)
-          await select.selectOption("Fremdanlage")
-          await pageWithBghUser
-            .getByLabel("Nach Dokumentationseinheiten suchen")
-            .click()
-          const listEntry = pageWithBghUser.getByRole("row")
-          await expect(listEntry).toHaveCount(1)
-          await expect(listEntry).toContainText(
-            `Fremdanlage aus MMG ${edition.prefix}12${edition.suffix} (DS)`,
+          await verifyDocUnitCanBeTakenOver(
+            pageWithBghUser,
+            documentNumber1,
+            edition,
           )
-          await expect(
-            pageWithBghUser.getByLabel("Dokumentationseinheit übernehmen"),
-          ).toBeVisible()
-
-          await expect(
-            pageWithBghUser.getByText("Dokumentationseinheit bearbeiten"),
-          ).toBeHidden()
-
           await pageWithBghUser
             .getByLabel("Dokumentationseinheit übernehmen")
             .click()
@@ -753,38 +726,20 @@ test.describe(
           await expect(
             pageWithBghUser.getByLabel("Dokumentationseinheit übernehmen"),
           ).toBeHidden()
-
           await expect(
             pageWithBghUser.getByLabel("Dokumentationseinheit bearbeiten"),
           ).toBeVisible()
-          await expect(listEntry).toContainText(`Unveröffentlicht`)
+          await expect(pageWithBghUser.getByRole("row")).toContainText(
+            `Unveröffentlicht`,
+          )
         })
 
         await test.step("Owning docoffice can delete a created docunit from periodical evaluation, which also deletes the reference in the edition", async () => {
-          await navigateToSearch(pageWithBghUser)
-
-          await pageWithBghUser
-            .getByLabel("Dokumentnummer Suche")
-            .fill(documentNumber2)
-
-          const select = pageWithBghUser.locator(`select[id="status"]`)
-          await select.selectOption("Fremdanlage")
-          await pageWithBghUser
-            .getByLabel("Nach Dokumentationseinheiten suchen")
-            .click()
-          const listEntry = pageWithBghUser.getByRole("row")
-          await expect(listEntry).toHaveCount(1)
-          await expect(listEntry).toContainText(
-            `Fremdanlage aus MMG ${edition.prefix}12${edition.suffix} (DS)`,
+          await verifyDocUnitCanBeTakenOver(
+            pageWithBghUser,
+            documentNumber2,
+            edition,
           )
-          await expect(
-            pageWithBghUser.getByLabel("Dokumentationseinheit löschen"),
-          ).toBeVisible()
-
-          await expect(
-            pageWithBghUser.getByText("Dokumentationseinheit bearbeiten"),
-          ).toBeHidden()
-
           await pageWithBghUser
             .getByLabel("Dokumentationseinheit löschen")
             .click()

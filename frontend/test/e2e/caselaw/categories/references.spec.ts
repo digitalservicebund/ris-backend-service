@@ -250,12 +250,12 @@ test.describe(
         tag: ["@RISDEV-5236", "@RISDEV-5454", "@RISDEV-5240"],
       },
       async ({ page, prefilledDocumentUnit }) => {
-        await test.step("Literature references are validated for required inputs", async () => {
-          await navigateToReferences(
-            page,
-            prefilledDocumentUnit.documentNumber ?? "",
-          )
+        await navigateToReferences(
+          page,
+          prefilledDocumentUnit.documentNumber ?? "",
+        )
 
+        await test.step("Literature references are validated for required inputs", async () => {
           await expect(
             page.locator("[aria-label='Literaturfundstelle speichern']"),
           ).toBeDisabled()
@@ -303,15 +303,12 @@ test.describe(
     )
 
     test(
-      "References are visible in preview",
+      "References are visible in preview and jDV export",
       {
-        annotation: {
-          type: "story",
-          description:
-            "https://digitalservicebund.atlassian.net/browse/RISDEV-4335",
-        },
+        tag: ["@RISDEV-4337", "@RISDEV-4337"],
       },
-      async ({ page, documentNumber }) => {
+      async ({ page, prefilledDocumentUnit }) => {
+        const documentNumber = prefilledDocumentUnit.documentNumber!
         await test.step("References are not rendered in preview when empty", async () => {
           await navigateToPreview(page, documentNumber)
           await expect(page.getByText("Fundstellen")).toBeHidden()
@@ -319,7 +316,7 @@ test.describe(
 
         await navigateToReferences(page, documentNumber)
 
-        await test.step("Add primary and secondary references with all data, verify remdering in preview", async () => {
+        await test.step("Add primary and secondary references with all data", async () => {
           await fillInput(page, "Periodikum", "wdg")
           await page
             .getByText("WdG | Welt der Gesundheitsversorgung", {
@@ -352,20 +349,59 @@ test.describe(
             }),
           ).toBeVisible()
         })
+
         await save(page)
 
-        await navigateToPreview(page, documentNumber)
+        await test.step("Verify rendering in preview", async () => {
+          await navigateToPreview(page, documentNumber)
 
-        await expect(
-          page.getByText("Fundstellen", { exact: true }),
-        ).toBeVisible()
-        await expect(page.getByText("Literaturfundstellen")).toBeHidden()
-        await expect(
-          page.getByText("Primäre FundstellenGVBl BB 2020, 01-99 (L)"),
-        ).toBeVisible()
-        await expect(
-          page.getByText("Sekundäre FundstellenWdG 2024, 10-12 (LT)"),
-        ).toBeVisible()
+          await expect(
+            page.getByText("Fundstellen", { exact: true }),
+          ).toBeVisible()
+          await expect(page.getByText("Literaturfundstellen")).toBeHidden()
+          await expect(
+            page.getByText("Primäre FundstellenGVBl BB 2020, 01-99 (L)"),
+          ).toBeVisible()
+          await expect(
+            page.getByText("Sekundäre FundstellenWdG 2024, 10-12 (LT)"),
+          ).toBeVisible()
+        })
+
+        await test.step("Verify references are exported in correct order", async () => {
+          await navigateToHandover(page, documentNumber)
+          await expect(page.getByText("XML Vorschau")).toBeVisible()
+          await page.getByText("XML Vorschau").click()
+
+          const referencesNodes = await page
+            .locator('code:has-text("<fundstelle ")')
+            .all()
+          await expect(referencesNodes[0]).toHaveText(
+            '<fundstelle typ="nichtamtlich">',
+          )
+          await expect(referencesNodes[1]).toHaveText(
+            '<fundstelle typ="amtlich">',
+          )
+
+          const legalPeriodicalNodes = await page
+            .locator('code:has-text("<periodikum>")')
+            .all()
+          await expect(legalPeriodicalNodes[0]).toHaveText(
+            "<periodikum>WdG</periodikum>",
+          )
+          await expect(legalPeriodicalNodes[1]).toHaveText(
+            "<periodikum>GVBl BB</periodikum>",
+          )
+
+          const citationNodes = await page
+            .locator('code:has-text("<zitstelle>")')
+            .all()
+          await expect(citationNodes[0]).toHaveText(
+            "<zitstelle>2024, 10-12 (LT)</zitstelle>",
+          )
+          await expect(citationNodes[1]).toHaveText(
+            "<zitstelle>2020, 01-99 (L)</zitstelle>",
+          )
+        })
       },
     )
 
@@ -481,88 +517,6 @@ test.describe(
           expect(texts).toContain(
             "Bilen, Ulviye, AllMBl 2024, 2 (Ean)" +
               "Kästner, Erich, GVBl BB 01/2025, 4-6 (Ebs)",
-          )
-        })
-      },
-    )
-
-    test(
-      "References can be exported",
-      {
-        annotation: {
-          type: "story",
-          description:
-            "https://digitalservicebund.atlassian.net/browse/RISDEV-4337",
-        },
-      },
-      async ({ page, prefilledDocumentUnit }) => {
-        await navigateToReferences(
-          page,
-          prefilledDocumentUnit.documentNumber ?? "",
-        )
-
-        await test.step("Add primary and secondary references with all data", async () => {
-          await fillInput(page, "Periodikum", "wdg")
-          await page
-            .getByText("WdG | Welt der Gesundheitsversorgung", {
-              exact: true,
-            })
-            .click()
-          await fillInput(page, "Zitatstelle", "2024, 10-12")
-          await fillInput(page, "Klammernzusatz", "LT")
-          await page.locator("[aria-label='Fundstelle speichern']").click()
-          await expect(page.getByText("WdG 2024, 10-12 (LT)")).toBeVisible()
-          await expect(
-            page.getByText("sekundär", { exact: true }),
-          ).toBeVisible()
-          await fillInput(page, "Periodikum", "GVBl BB")
-          await page
-            .getByText(
-              "GVBl BB | Gesetz- und Verordnungsblatt für das Land Brandenburg",
-              { exact: true },
-            )
-            .click()
-          await fillInput(page, "Zitatstelle", "2020, 01-99")
-          await fillInput(page, "Klammernzusatz", "L")
-          await page.locator("[aria-label='Fundstelle speichern']").click()
-          await expect(page.getByText("GVBl BB 2020, 01-99 (L)")).toBeVisible()
-          await expect(page.getByText("primär", { exact: true })).toBeVisible()
-        })
-        await save(page)
-
-        await test.step("Navigate to handover, click in 'XML-Vorschau', check references are visible in correct order", async () => {
-          await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
-          await expect(page.getByText("XML Vorschau")).toBeVisible()
-          await page.getByText("XML Vorschau").click()
-
-          const referencesNodes = await page
-            .locator('code:has-text("<fundstelle ")')
-            .all()
-          await expect(referencesNodes[0]).toHaveText(
-            '<fundstelle typ="nichtamtlich">',
-          )
-          await expect(referencesNodes[1]).toHaveText(
-            '<fundstelle typ="amtlich">',
-          )
-
-          const legalPeriodicalNodes = await page
-            .locator('code:has-text("<periodikum>")')
-            .all()
-          await expect(legalPeriodicalNodes[0]).toHaveText(
-            "<periodikum>WdG</periodikum>",
-          )
-          await expect(legalPeriodicalNodes[1]).toHaveText(
-            "<periodikum>GVBl BB</periodikum>",
-          )
-
-          const citationNodes = await page
-            .locator('code:has-text("<zitstelle>")')
-            .all()
-          await expect(citationNodes[0]).toHaveText(
-            "<zitstelle>2024, 10-12 (LT)</zitstelle>",
-          )
-          await expect(citationNodes[1]).toHaveText(
-            "<zitstelle>2020, 01-99 (L)</zitstelle>",
           )
         })
       },

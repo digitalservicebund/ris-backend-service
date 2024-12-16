@@ -1,7 +1,9 @@
-import { expect, Page } from "@playwright/test"
+import { expect } from "@playwright/test"
 import {
   fillInput,
   navigateToPeriodicalReferences,
+  navigateToPreview,
+  searchForDocUnitWithFileNumber,
   waitForInputValue,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
@@ -46,6 +48,34 @@ test.describe("Literature references", () => {
         ).toBeVisible()
 
         await expect(page.getByLabel("Autor Literaturfundstelle")).toBeVisible()
+      })
+
+      await test.step("Literature document types can be chosen from lookup table values", async () => {
+        await page
+          .locator("[aria-label='Dokumenttyp Literaturfundstelle']")
+          .focus()
+        // we expect a list of at least 15 values
+        await expect(
+          page.locator("[aria-label='dropdown-option'] >> nth=15"),
+        ).toBeVisible()
+      })
+
+      await test.step("Input values are maintained when switching between literature and caselaw references", async () => {
+        await fillInput(page, "Zitatstelle *", "2")
+        await fillInput(page, "Autor Literaturfundstelle", "Einstein, Albert")
+
+        await page.getByLabel("Rechtsprechung Fundstelle").click()
+        await expect(page.locator("[aria-label='Zitatstelle *']")).toHaveValue(
+          "2",
+        )
+
+        await page.getByLabel("Literatur Fundstelle").click()
+        await expect(page.locator("[aria-label='Zitatstelle *']")).toHaveValue(
+          "2",
+        )
+        await expect(
+          page.locator("[aria-label='Autor Literaturfundstelle']"),
+        ).toHaveValue("Einstein, Albert")
       })
     },
   )
@@ -109,8 +139,14 @@ test.describe("Literature references", () => {
     {
       tag: "@RISDEV-5240",
     },
-    async ({ page, prefilledDocumentUnit, editionWithReferences }) => {
-      const fileNumber = prefilledDocumentUnit.coreData.fileNumbers?.[0] || ""
+    async ({
+      page,
+      prefilledDocumentUnitWithReferences,
+      editionWithReferences,
+    }) => {
+      const fileNumber =
+        prefilledDocumentUnitWithReferences.coreData.fileNumbers?.[0] || ""
+
       await test.step("Add caselaw reference to existing references", async () => {
         await navigateToPeriodicalReferences(
           page,
@@ -129,6 +165,7 @@ test.describe("Literature references", () => {
           page.getByText(`MMG 2024, 300${editionWithReferences.suffix} (ST)`),
         ).toBeVisible()
       })
+
       await test.step("Add literature reference to existing references", async () => {
         await page.getByLabel("Literatur Fundstelle").click()
         await expect(page.getByLabel("Literatur Fundstelle")).toBeChecked()
@@ -151,7 +188,7 @@ test.describe("Literature references", () => {
         ).toBeVisible()
       })
 
-      await test.step("Check correct order", async () => {
+      await test.step("Check correct order in edition", async () => {
         await page.reload()
         await expect(
           page.getByText(
@@ -171,21 +208,36 @@ test.describe("Literature references", () => {
           await expect(text).toHaveText(correctOrder[i])
         }
       })
+
+      await test.step("Check correct order in documentation unit", async () => {
+        await navigateToPreview(
+          page,
+          prefilledDocumentUnitWithReferences.documentNumber || "",
+        )
+
+        const referencesPreview = page.locator(
+          '[data-testid="references-preview"]',
+        )
+
+        // Make sure the caselaw citations are in the correct order
+        expect(await referencesPreview.textContent()).toContain(
+          "Fundstellen" +
+            "Sekundäre Fundstellen" +
+            "MMG 2024, 1-2, Heft 1 (L)" +
+            "MMG 2024, 300, Heft 1 (ST)",
+        )
+
+        const literatureReferencesPreview = page.locator(
+          '[data-testid="literature-references-preview"]',
+        )
+
+        // Make sure the literature citations are in the correct order
+        expect(await literatureReferencesPreview.textContent()).toContain(
+          "Literaturfundstellen" +
+            "Krümelmonster, MMG 2024, 3-4, Heft 1 (Ean)" +
+            "Bilen, Ulviye, MMG 2024, 301-305, Heft 1 (Ean)",
+        )
+      })
     },
   )
-
-  async function searchForDocUnitWithFileNumber(
-    page: Page,
-    fileNumber: string,
-    date: string,
-  ) {
-    await fillInput(page, "Gericht", "AG Aachen")
-    await page.getByText("AG Aachen", { exact: true }).click()
-    await fillInput(page, "Aktenzeichen", fileNumber)
-    await fillInput(page, "Entscheidungsdatum", date)
-    await fillInput(page, "Dokumenttyp", "AnU")
-    await page.getByText("Anerkenntnisurteil", { exact: true }).click()
-
-    await page.getByText("Suchen").click()
-  }
 })

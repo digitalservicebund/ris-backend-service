@@ -5,6 +5,7 @@ import {
   navigateToPeriodicalEvaluation,
   navigateToPeriodicalReferences,
   navigateToPreview,
+  searchForDocUnitWithFileNumber,
   waitForInputValue,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
@@ -508,20 +509,5 @@ test.describe("Editing and deleting references in periodical evaluation", () => 
         name: "Dokumentationseinheit in einem neuen Tab bearbeiten",
       })
       .click()
-  }
-
-  async function searchForDocUnitWithFileNumber(
-    page: Page,
-    fileNumber: string,
-    date: string,
-  ) {
-    await fillInput(page, "Gericht", "AG Aachen")
-    await page.getByText("AG Aachen", { exact: true }).click()
-    await fillInput(page, "Aktenzeichen", fileNumber)
-    await fillInput(page, "Entscheidungsdatum", date)
-    await fillInput(page, "Dokumenttyp", "AnU")
-    await page.getByText("Anerkenntnisurteil", { exact: true }).click()
-
-    await page.getByText("Suchen").click()
   }
 })

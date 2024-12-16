@@ -653,3 +653,18 @@ export async function deleteAllProcedures(
     await deleteProcedure(page, uuid)
   }
 }
+
+export async function searchForDocUnitWithFileNumber(
+  page: Page,
+  fileNumber: string,
+  date: string,
+) {
+  await fillInput(page, "Gericht", "AG Aachen")
+  await page.getByText("AG Aachen", { exact: true }).click()
+  await fillInput(page, "Aktenzeichen", fileNumber)
+  await fillInput(page, "Entscheidungsdatum", date)
+  await fillInput(page, "Dokumenttyp", "AnU")
+  await page.getByText("Anerkenntnisurteil", { exact: true }).click()
+
+  await page.getByText("Suchen").click()
+}
