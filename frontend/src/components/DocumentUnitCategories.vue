@@ -4,7 +4,7 @@ import { computed, ref, toRefs } from "vue"
 import { useRoute } from "vue-router"
 import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContentRelatedIndexing.vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
-import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
+import { DocumentUnitCatagoriesEnum } from "@/components/enumDocumentUnitCatagories"
 import FlexItem from "@/components/FlexItem.vue"
 import ProceedingDecisions from "@/components/ProceedingDecisions.vue"
 import DocumentUnitTexts from "@/components/texts/DocumentUnitTexts.vue"
@@ -60,7 +60,7 @@ const coreData = computed({
 })
 
 const { hash: routeHash } = toRefs(route)
-const headerOffset = 64
+const headerOffset = 145
 useScrollToHash(routeHash, headerOffset)
 
 useProvideCourtType(courtTypeRef)
@@ -72,15 +72,13 @@ const isInternalUser = useInternalUser()
   <FlexItem class="w-full flex-1 grow flex-col gap-24 p-24">
     <DocumentUnitCoreData
       v-if="isInternalUser"
-      :id="DocumentUnitCategoriesEnum.CORE_DATA"
+      :id="DocumentUnitCatagoriesEnum.CORE_DATA"
       v-model="coreData"
     />
-    <ProceedingDecisions
-      :id="DocumentUnitCategoriesEnum.PROCEEDINGS_DECISIONS"
-    />
+    <ProceedingDecisions />
     <DocumentUnitContentRelatedIndexing
-      :id="DocumentUnitCategoriesEnum.CONTENT_RELATED_INDEXING"
+      :id="DocumentUnitCatagoriesEnum.CONTENT_RELATED_INDEXING"
     />
-    <DocumentUnitTexts :id="DocumentUnitCategoriesEnum.TEXTS" />
+    <DocumentUnitTexts :id="DocumentUnitCatagoriesEnum.TEXTS" />
   </FlexItem>
 </template>

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, watch } from "vue"
+import { ref } from "vue"
 import TextButton from "@/components/input/TextButton.vue"
 import IconAdd from "~icons/material-symbols/add"
 
@@ -19,14 +19,6 @@ function toggle() {
   shouldShowButton.value = !shouldShowButton.value
   emit("toggled", shouldShowButton.value)
 }
-
-watch(
-  () => props.shouldShowButton,
-  () => {
-    shouldShowButton.value = props.shouldShowButton
-  },
-  { deep: true },
-)
 </script>
 
 <template>

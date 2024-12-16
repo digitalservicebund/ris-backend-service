@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, onMounted, nextTick, watch } from "vue"
+import { ref, computed, onMounted, nextTick } from "vue"
 import ListInputDisplay from "@/components/input/listInput/ListInputDisplay.vue"
 import ListInputEdit from "@/components/input/listInput/ListInputEdit.vue"
 
@@ -80,16 +80,6 @@ async function toggleEditMode() {
 onMounted(() => {
   editMode.value = !props.modelValue?.length
 })
-
-watch(
-  () => props.modelValue,
-  () => {
-    if (props.modelValue) {
-      list.value = props.modelValue
-    }
-  },
-  { deep: true },
-)
 </script>
 
 <template>

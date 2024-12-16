@@ -1,7 +1,7 @@
 /* eslint-disable playwright/no-conditional-in-test */
 /* eslint-disable playwright/no-conditional-expect */
 import { expect } from "@playwright/test"
-import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
+import { DocumentUnitCatagoriesEnum } from "@/components/enumDocumentUnitCatagories"
 import SingleNorm from "@/domain/singleNorm"
 import {
   fillActiveCitationInputs,
@@ -286,11 +286,11 @@ test.describe("related documentation units", () => {
       const secondPage = await secondUserContext.newPage()
 
       await navigateToCategories(secondPage, documentNumber, {
-        category: DocumentUnitCategoriesEnum.PROCEEDINGS_DECISIONS,
+        category: DocumentUnitCatagoriesEnum.PROCEEDINGS_DECISIONS,
       })
 
       await navigateToCategories(page, documentNumber, {
-        category: DocumentUnitCategoriesEnum.PROCEEDINGS_DECISIONS,
+        category: DocumentUnitCatagoriesEnum.PROCEEDINGS_DECISIONS,
       })
 
       await fillPreviousDecisionInputs(page, {
