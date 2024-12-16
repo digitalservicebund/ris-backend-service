@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T extends InputModelProps">
-import * as Sentry from "@sentry/vue"
+import { useDebounceFn } from "@vueuse/core"
 import {
   computed,
   onBeforeUnmount,
@@ -42,8 +42,7 @@ const NO_MATCHING_ENTRY = "Kein passender Eintrag"
 
 const candidateForSelection = ref<ComboboxItem>() // <-- the top search result
 const inputText = ref<string>()
-const existingItems = ref<ComboboxItem[]>()
-const currentlyDisplayedItems = computed(() =>
+const currentlyDisplayedItems = computed<ComboboxItem[]>(() =>
   [...(existingItems.value ?? []), createNewItem.value].filter(isDefined),
 )
 const createNewItem = ref<ComboboxItem>()
@@ -54,14 +53,8 @@ const dropdownItemsRef = shallowRef<HTMLElement[]>([])
 const inputFieldRef = ref<HTMLInputElement>()
 const focusedItemIndex = ref<number>(-1)
 
-const isUpdating = ref(false)
-const hasToUpdate = ref(false)
-
 const ariaLabelDropdownIcon = computed(() =>
   showDropdown.value ? "Dropdown schließen" : "Dropdown öffnen",
-)
-const noMatchingExistingItems = computed(
-  () => !existingItems.value || existingItems.value.length === 0,
 )
 
 const conditionalClasses = computed(() => ({
@@ -113,12 +106,19 @@ const setChosenItem = (item: ComboboxItem) => {
   candidateForSelection.value = undefined
 }
 
+/** When user hits enter while fetching -> wait for results before executing enter action */
+const hasQueuedEnter = ref(false)
 const onEnter = async () => {
-  if (candidateForSelection.value) {
-    setChosenItem(candidateForSelection.value)
-    return
+  if (isFetchingOrTyping.value) {
+    hasQueuedEnter.value = true
+  } else {
+    hasQueuedEnter.value = false
+    if (candidateForSelection.value) {
+      setChosenItem(candidateForSelection.value)
+      return
+    }
+    await toggleDropdown()
   }
-  await toggleDropdown()
 }
 
 const onInput = async () => {
@@ -149,65 +149,74 @@ const updateFocusedItem = () => {
   if (item && item.innerText !== NO_MATCHING_ENTRY) item.focus()
 }
 
-const updateCurrentItems = async () => {
-  hasToUpdate.value = true
-  if (isUpdating.value && hasToUpdate.value) {
-    return
+const isFetchingOrTyping = ref(false)
+
+/**
+ * When a new request is started while a previous one is still running -> cancel the old one.
+ * The canceled one should not unset the isFetching state as it is followed by a new request.
+ */
+async function updateCurrentItems() {
+  isFetchingOrTyping.value = true
+  if (canAbort.value) {
+    abort()
   }
-
-  isUpdating.value = true
-
-  let response
-  let tries = 0
-  do {
-    hasToUpdate.value = false
-    response = await props.itemService(filter.value)
-    isUpdating.value = false
-    tries++
-  } while (hasToUpdate.value && tries < 6)
-
-  if (tries >= 6) {
-    Sentry.captureMessage(
-      "more than 5 tries to call the item service at the combobox",
-      "error",
-    )
-  }
-
-  if (!response.data) {
-    console.error(response.error)
-    return
-  }
-
-  existingItems.value = response.data
-
-  if (
-    noMatchingExistingItems.value ||
-    //no exact match found when add manual entry option set
-    (props.manualEntry &&
-      filter.value &&
-      !existingItems.value.find((item) => item.label === filter.value?.trim()))
-  ) {
-    handleNoSearchResults(filter.value)
-  } else {
-    createNewItem.value = undefined
-    candidateForSelection.value = existingItems.value[0]
-    focusedItemIndex.value = 0
-  }
+  const response = await debouncedFetchItems()
+  const wasCanceled = !response
+  if (!wasCanceled) isFetchingOrTyping.value = false
 }
 
-function handleNoSearchResults(searchStr?: string) {
-  if (props.manualEntry && searchStr) {
+/** We do not want to select the first result on enter when a request is running, the selection is deferred until the results are in */
+watch(isFetchingOrTyping, async (isFetching, wasFetching) => {
+  if (wasFetching === true && isFetching === false) {
+    if (hasQueuedEnter.value) {
+      hasQueuedEnter.value = false
+      await onEnter()
+    }
+  }
+})
+
+const {
+  data: existingItems,
+  execute: fetchItems,
+  canAbort,
+  abort,
+} = props.itemService(filter)
+const debouncedFetchItems = useDebounceFn(fetchItems, 200)
+
+const noMatchingItems = [{ label: NO_MATCHING_ENTRY }]
+
+/**
+ * When the search result (existingItems) was fetched, we update the displayed items.
+ * (Special cases: no results, createNewItem "neu erstellen")
+ */
+watch(existingItems, () => {
+  if (existingItems.value === null) return
+  if (existingItems.value === noMatchingItems) return
+
+  const noMatchesFound = !existingItems.value.length
+  const hasManualEntry = props.manualEntry && inputText.value
+  if (!hasManualEntry && noMatchesFound) {
+    existingItems.value = noMatchingItems
+    candidateForSelection.value = undefined
+    return
+  }
+
+  const exactMatchFound = existingItems.value?.find(
+    (item) => item.label === filter.value?.trim(),
+  )
+  if (!exactMatchFound && hasManualEntry) {
     createNewItem.value = {
-      label: `${searchStr} neu erstellen`,
-      value: { label: searchStr },
+      label: `${inputText.value} neu erstellen`,
+      value: { label: inputText.value! },
       labelCssClasses: "ds-label-01-bold text-blue-800 underline",
     }
-    candidateForSelection.value = { label: searchStr }
   } else {
-    existingItems.value = [{ label: NO_MATCHING_ENTRY }]
-    candidateForSelection.value = undefined
+    createNewItem.value = undefined
   }
-}
+
+  candidateForSelection.value = existingItems.value?.[0] ?? createNewItem.value
+  focusedItemIndex.value = 0
+})
 
 const handleClickOutside = (event: MouseEvent) => {
   const dropdown = dropdownContainerRef.value
@@ -305,6 +314,7 @@ export type InputModelProps =
       class="absolute left-0 right-0 top-[100%] z-20 flex max-h-[300px] flex-col overflow-y-scroll bg-white px-8 py-12 drop-shadow-md"
       tabindex="-1"
     >
+      <!-- Caution: misusage of index as key in v-for is needed for updateFocusedItem, do not remove before refactoring focus logic -->
       <button
         v-for="(item, index) in currentlyDisplayedItems"
         :key="index"
@@ -313,7 +323,10 @@ export type InputModelProps =
         class="cursor-pointer px-16 py-12 text-left hover:bg-blue-100 focus:border-l-4 focus:border-solid focus:border-l-blue-800 focus:bg-blue-200 focus:outline-none"
         :class="{
           'border-l-4 border-solid border-l-blue-800 bg-blue-200':
-            candidateForSelection === item,
+            candidateForSelection &&
+            candidateForSelection.label === item.label &&
+            candidateForSelection.additionalInformation ===
+              item.additionalInformation,
         }"
         tabindex="0"
         @click="setChosenItem(item)"

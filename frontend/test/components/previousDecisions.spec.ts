@@ -1,14 +1,32 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { http, HttpResponse } from "msw"
+import { setupServer } from "msw/node"
 import { createRouter, createWebHistory } from "vue-router"
-import { ComboboxItem } from "@/components/input/types"
 import PreviousDecisions from "@/components/PreviousDecisions.vue"
 import DocumentUnit, { Court, DocumentType } from "@/domain/documentUnit"
 import PreviousDecision from "@/domain/previousDecision"
-import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 import routes from "~/test-helper/routes"
+
+const server = setupServer(
+  http.get("/api/v1/caselaw/courts", () => {
+    const court: Court = {
+      type: "AG",
+      location: "Test",
+      label: "AG Test",
+    }
+    return HttpResponse.json([court])
+  }),
+  http.get("/api/v1/caselaw/documenttypes", () => {
+    const documentType: DocumentType = {
+      jurisShortcut: "Ant",
+      label: "EuGH-Vorlage",
+    }
+    return HttpResponse.json([documentType])
+  }),
+)
 
 function renderComponent(previousDecisions?: PreviousDecision[]) {
   const user = userEvent.setup()
@@ -76,6 +94,9 @@ function generatePreviousDecision(options?: {
 }
 
 describe("PreviousDecisions", () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   vi.spyOn(
     documentUnitService,
     "searchByRelatedDocumentation",
@@ -110,41 +131,6 @@ describe("PreviousDecisions", () => {
   )
 
   vi.spyOn(window, "scrollTo").mockImplementation(() => vi.fn())
-
-  const court: Court = {
-    type: "AG",
-    location: "Test",
-    label: "AG Test",
-  }
-
-  const documentType: DocumentType = {
-    jurisShortcut: "Ant",
-    label: "EuGH-Vorlage",
-  }
-
-  const dropdownCourtItems: ComboboxItem[] = [
-    {
-      label: court.label,
-      value: court,
-      additionalInformation: court.revoked,
-    },
-  ]
-
-  const dropdownDocumentTypesItems: ComboboxItem[] = [
-    {
-      label: documentType.label,
-      value: documentType,
-      additionalInformation: documentType.jurisShortcut,
-    },
-  ]
-
-  vi.spyOn(comboboxItemService, "getCourts").mockImplementation(() =>
-    Promise.resolve({ status: 200, data: dropdownCourtItems }),
-  )
-
-  vi.spyOn(comboboxItemService, "getDocumentTypes").mockImplementation(() =>
-    Promise.resolve({ status: 200, data: dropdownDocumentTypesItems }),
-  )
 
   it("renders empty previous decision in edit mode, when no previousDecisions in list", async () => {
     renderComponent()

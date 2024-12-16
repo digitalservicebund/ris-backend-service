@@ -122,6 +122,7 @@
     "jest-fail-on-console": "^3.3.1",
     "jsdom": "^25.0.1",
     "license-checker": "^25.0.1",
+    "msw": "^2.6.8",
     "playwright": "^1.49.0",
     "postcss": "^8.4.49",
     "postcss-import": "^16.1.0",

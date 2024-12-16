@@ -1,12 +1,12 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { http, HttpResponse } from "msw"
+import { setupServer } from "msw/node"
 import { createRouter, createWebHistory } from "vue-router"
-import { ComboboxItem } from "@/components/input/types"
 import NewEdition from "@/components/periodical-evaluation/PeriodicalEdition.vue"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
-import comboboxItemService from "@/services/comboboxItemService"
 import service from "@/services/legalPeriodicalEditionService"
 import testRoutes from "~/test-helper/routes"
 
@@ -18,6 +18,12 @@ const legalPeriodical: LegalPeriodical = {
   title: "Bundesgesetzblatt",
   citationStyle: "2024, Heft 1",
 }
+
+const server = setupServer(
+  http.get("/api/v1/caselaw/legalperiodicals", () => {
+    return HttpResponse.json([legalPeriodical])
+  }),
+)
 
 async function renderComponent() {
   const user = userEvent.setup()
@@ -64,17 +70,8 @@ async function renderComponent() {
 }
 
 describe("Legal periodical edition list", () => {
-  const dropdownLegalPeriodicalItems: ComboboxItem[] = [
-    {
-      label: legalPeriodical.abbreviation! + " | " + legalPeriodical.title!,
-      value: legalPeriodical,
-    },
-  ]
-
-  vi.spyOn(comboboxItemService, "getLegalPeriodicals").mockImplementation(() =>
-    Promise.resolve({ status: 200, data: dropdownLegalPeriodicalItems }),
-  )
-
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
   vi.spyOn(service, "get").mockImplementation(() =>
     Promise.resolve({
       status: 200,
