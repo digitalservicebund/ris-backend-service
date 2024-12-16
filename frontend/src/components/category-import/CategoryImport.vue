@@ -2,6 +2,7 @@
 import dayjs from "dayjs"
 import { ref } from "vue"
 import { RouterLink } from "vue-router"
+import ImportKeywords from "@/components/category-import/ImportKeywords.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
@@ -13,7 +14,7 @@ import documentUnitService from "@/services/documentUnitService"
 import IconSearch from "~icons/ic/baseline-search"
 
 const documentNumber = ref("")
-const documentUnit = ref<DocumentUnit | undefined>(undefined)
+const documentUnitToImport = ref<DocumentUnit | undefined>(undefined)
 const errorMessage = ref<string | undefined>(undefined)
 
 /**
@@ -26,10 +27,10 @@ async function searchForDocumentUnit() {
     documentNumber.value,
   )
   if (response.data) {
-    documentUnit.value = response.data
+    documentUnitToImport.value = response.data
     errorMessage.value = undefined
   } else {
-    documentUnit.value = undefined
+    documentUnitToImport.value = undefined
     errorMessage.value = "Keine Dokumentationseinheit gefunden."
   }
 }
@@ -50,6 +51,7 @@ async function searchForDocumentUnit() {
           aria-label="Dokumentnummer Eingabefeld"
           :has-error="slotProps.hasError"
           size="medium"
+          @enter-released="searchForDocumentUnit"
         ></TextInput>
       </InputField>
 
@@ -68,37 +70,47 @@ async function searchForDocumentUnit() {
     }}</span>
 
     <div
-      v-if="documentUnit"
+      v-if="documentUnitToImport"
       class="ds-label-02-reg mt-24 flex flex-col gap-16 bg-blue-100 p-16"
     >
       <RouterLink
-        v-if="documentUnit.documentNumber"
+        v-if="documentUnitToImport.documentNumber"
         tabindex="-1"
         target="_blank"
         :to="{
           name: 'caselaw-documentUnit-documentNumber-preview',
-          params: { documentNumber: documentUnit.documentNumber },
+          params: { documentNumber: documentUnitToImport.documentNumber },
         }"
       >
-        <LinkElement :title="documentUnit.documentNumber" />
+        <LinkElement :title="documentUnitToImport.documentNumber" />
       </RouterLink>
 
-      <IconBadge v-bind="useStatusBadge(documentUnit.status).value" />
+      <IconBadge v-bind="useStatusBadge(documentUnitToImport.status).value" />
 
       <div class="flex flex-col">
         <span class="ds-label-02-bold text-gray-900"> Gericht: </span>
-        {{ documentUnit.coreData?.court?.label }}
+        {{ documentUnitToImport.coreData?.court?.label }}
       </div>
 
       <div class="flex flex-col">
         <span class="ds-label-02-bold text-gray-900"> Aktenzeichen: </span>
-        {{ documentUnit.coreData?.fileNumbers?.join(", ") }}
+        {{ documentUnitToImport.coreData?.fileNumbers?.join(", ") }}
       </div>
 
       <div class="flex flex-col">
         <span class="ds-label-02-bold text-gray-900">Entscheidungsdatum</span>
-        {{ dayjs(documentUnit.coreData?.decisionDate).format("DD.MM.YYYY") }}
+        {{
+          dayjs(documentUnitToImport.coreData?.decisionDate).format(
+            "DD.MM.YYYY",
+          )
+        }}
       </div>
+
+      <ImportKeywords
+        :importable-keywords="
+          documentUnitToImport.contentRelatedIndexing.keywords ?? []
+        "
+      />
     </div>
   </div>
 </template>

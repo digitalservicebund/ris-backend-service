@@ -1,13 +1,13 @@
 import { expect, Locator, Page, Request } from "@playwright/test"
 import { Browser } from "playwright"
 import { caselawTest as test } from "./fixtures"
-import { DocumentUnitCatagoriesEnum } from "@/components/enumDocumentUnitCatagories"
+import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import SingleNorm from "@/domain/singleNorm"
 import { generateString } from "~/test-helper/dataGenerators"
 
 /* eslint-disable playwright/no-conditional-in-test */
 
-function scrollToID(category?: DocumentUnitCatagoriesEnum): string {
+function scrollToID(category?: DocumentUnitCategoriesEnum): string {
   return category ? "#" + category : ""
 }
 
@@ -50,7 +50,7 @@ export const navigateToCategories = async (
   page: Page,
   documentNumber: string,
   options?: {
-    category?: DocumentUnitCatagoriesEnum
+    category?: DocumentUnitCategoriesEnum
     skipAssert?: boolean
   },
 ) => {

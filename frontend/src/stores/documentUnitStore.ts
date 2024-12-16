@@ -70,7 +70,7 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
           }),
           backendPatch.patch,
         )
-        // We apply the local changes that were successfully saved in the backend on our docUnit backend reperesentation
+        // We apply the local changes that were successfully saved in the backend on our docUnit backend representation
         originalDocumentUnit.value = getPatchApplyResult(
           new DocumentUnit(documentUnit.value.uuid, {
             ...JSON.parse(JSON.stringify(originalDocumentUnit.value)),
