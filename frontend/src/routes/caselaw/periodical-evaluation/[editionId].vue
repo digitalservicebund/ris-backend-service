@@ -75,10 +75,6 @@ const handleKeyDown = (event: KeyboardEvent) => {
   }
 
   switch (event.key) {
-    case "v": // Ctrl + V
-      extraContentSidePanelStore.togglePanel(true)
-      extraContentSidePanelStore.setSidePanelMode("preview")
-      break
     case "<": // Ctrl + [
       event.preventDefault()
       toggleNavigationPanel(
@@ -124,11 +120,6 @@ onBeforeUnmount(() => {
 
 onMounted(async () => {
   window.addEventListener("keydown", handleKeyDown)
-
-  const response = await store.loadEdition()
-  if (response.error) {
-    responseError.value = response.error
-  }
 })
 </script>
 

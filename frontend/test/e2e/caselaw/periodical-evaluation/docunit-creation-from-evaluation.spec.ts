@@ -795,7 +795,7 @@ test.describe(
 
           await page.reload()
           await expect(page.getByText(documentNumber2)).toBeHidden()
-          await expect(page.getByLabel("Listen Eintrag")).toHaveCount(2)
+          await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
         })
       },
     )

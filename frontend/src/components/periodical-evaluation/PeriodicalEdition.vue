@@ -61,7 +61,7 @@ async function saveEdition() {
 
   await validateRequiredInput()
   if (validationStore.isValid() && editionRef.value) {
-    editionRef.value.references = store.edition?.references
+    editionRef.value.references = edition.value?.references
     const response = await LegalPeriodicalEditionService.save(
       editionRef.value as LegalPeriodicalEdition,
     )
@@ -88,7 +88,6 @@ async function saveEdition() {
  * Load the editions values for a local use
  */
 onBeforeMount(async () => {
-  await store.loadEdition()
   editionRef.value = new LegalPeriodicalEdition({ ...edition.value })
 })
 </script>

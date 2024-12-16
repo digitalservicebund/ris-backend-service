@@ -1,6 +1,8 @@
 <script lang="ts" setup>
+import { UUID } from "crypto"
 import { useInterval } from "@vueuse/core"
 import { computed, ref, watch } from "vue"
+import { useRoute } from "vue-router"
 import PeriodicalEditionReferenceInput from "./PeriodicalEditionReferenceInput.vue"
 import PeriodicalEditionReferenceSummary from "./PeriodicalEditionReferenceSummary.vue"
 import EditableList from "@/components/EditableList.vue"
@@ -10,6 +12,7 @@ import Reference from "@/domain/reference"
 import { ResponseError } from "@/services/httpClient"
 import { useEditionStore } from "@/stores/editionStore"
 
+const route = useRoute()
 const store = useEditionStore()
 const responseError = ref<ResponseError | undefined>()
 
@@ -42,7 +45,11 @@ async function saveReferences(references: Reference[]) {
  * which is critical for external changes
  */
 watch(loadEditionIntervalCounter, async () => {
-  await store.loadEdition()
+  const editionId = route.params.editionId as string
+
+  if (editionId) {
+    await store.loadEdition(editionId as UUID)
+  }
 })
 </script>
 

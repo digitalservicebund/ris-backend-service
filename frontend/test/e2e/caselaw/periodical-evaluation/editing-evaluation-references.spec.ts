@@ -73,8 +73,6 @@ test.describe("Editing and deleting references in periodical evaluation", () => 
         await page.reload() // to clean the search parameters.
       })
 
-      await test.step("Citation input is validated when input is left", async () => {})
-
       await test.step("A docunit can be added as reference by entering citation and search fields", async () => {
         await searchForDocUnitWithFileNumber(page, fileNumber, "31.12.2019")
         await expect(
@@ -133,7 +131,7 @@ test.describe("Editing and deleting references in periodical evaluation", () => 
         const secondPageLocator = secondPage.locator(
           "[aria-label='Listen Eintrag']",
         )
-        await expect(secondPageLocator).toHaveCount(3)
+        await expect(secondPageLocator).toHaveCount(2)
         await secondPage.close()
       })
 
@@ -342,8 +340,7 @@ test.describe("Editing and deleting references in periodical evaluation", () => 
           page.getByText(`MMG 2024, 12-22, Heft 1 (L)`, { exact: true }),
         ).toBeVisible()
         const count = page.getByLabel("Listen Eintrag")
-        // 2 references + 1 empty in edit mode
-        await expect(count).toHaveCount(3)
+        await expect(count).toHaveCount(2)
 
         await page.getByTestId("list-entry-0").click()
 
@@ -363,7 +360,7 @@ test.describe("Editing and deleting references in periodical evaluation", () => 
       await test.step("On reload deleted reference is not visible", async () => {
         await page.reload()
         await expect(page.locator("[aria-label='Listen Eintrag']")).toHaveCount(
-          2,
+          1,
         )
         await expect(
           page.getByText(`MMG 2024, 12-22, Heft 1 (L)`, { exact: true }),
