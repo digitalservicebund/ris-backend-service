@@ -395,7 +395,7 @@ test.describe(
       })
     })
 
-    test("add border Numbers (Randnummern) in correct order ('Tatbestand', 'Abweichende Meinung' and 'Sonstiger Langtext')", async ({
+    test("add border Numbers (Randnummern) in correct order ('Tatbestand', 'Entscheidungsgründe', 'Abweichende Meinung' and 'Sonstiger Langtext')", async ({
       page,
       documentNumber,
     }) => {
@@ -425,6 +425,41 @@ test.describe(
       await checkAllBorderNumbersAreVisible(casefacts)
 
       // Abweichende Meinung
+      await clickCategoryButton("Entscheidungsgründe", page)
+      const decisionReasons = page.locator(
+        "[data-testid='Entscheidungsgründe']",
+      )
+
+      await test.step("Add three paragraphs into 'Entscheidungsgründe'", async () => {
+        await page.keyboard.insertText(firstParagraph)
+        await page.keyboard.press("Enter")
+        await page.keyboard.insertText(secondParagraph)
+        await page.keyboard.press("Enter")
+        await page.keyboard.insertText(thirdParagraph)
+        await page.keyboard.press("Enter")
+      })
+
+      await checkAllParagraphsAreVisible(decisionReasons)
+
+      await test.step("Select all text", async () => {
+        await page.keyboard.press(`ControlOrMeta+A`)
+      })
+
+      await clickAddBorderNumberButton(page)
+
+      await test.step("Check all border numbers are visible and have correct sequence", async () => {
+        await expect(
+          decisionReasons.getByText(`4${firstParagraph}`),
+        ).toBeVisible()
+        await expect(
+          decisionReasons.getByText(`5${secondParagraph}`),
+        ).toBeVisible()
+        await expect(
+          decisionReasons.getByText(`6${thirdParagraph}`),
+        ).toBeVisible()
+      })
+
+      // Abweichende Meinung
       await clickCategoryButton("Abweichende Meinung", page)
       const dissentingOpinion = page.locator(
         "[data-testid='Abweichende Meinung']",
@@ -449,13 +484,13 @@ test.describe(
 
       await test.step("Check all border numbers are visible and have correct sequence", async () => {
         await expect(
-          dissentingOpinion.getByText(`4${firstParagraph}`),
+          dissentingOpinion.getByText(`7${firstParagraph}`),
         ).toBeVisible()
         await expect(
-          dissentingOpinion.getByText(`5${secondParagraph}`),
+          dissentingOpinion.getByText(`8${secondParagraph}`),
         ).toBeVisible()
         await expect(
-          dissentingOpinion.getByText(`6${thirdParagraph}`),
+          dissentingOpinion.getByText(`9${thirdParagraph}`),
         ).toBeVisible()
       })
 
@@ -482,13 +517,13 @@ test.describe(
 
       await test.step("Check all border numbers are visible and have correct sequence", async () => {
         await expect(
-          otherLongText.getByText(`7${firstParagraph}`),
+          otherLongText.getByText(`10${firstParagraph}`),
         ).toBeVisible()
         await expect(
-          otherLongText.getByText(`8${secondParagraph}`),
+          otherLongText.getByText(`11${secondParagraph}`),
         ).toBeVisible()
         await expect(
-          otherLongText.getByText(`9${thirdParagraph}`),
+          otherLongText.getByText(`12${thirdParagraph}`),
         ).toBeVisible()
       })
     })
