@@ -99,25 +99,25 @@ const handleKeyDown = (event: KeyboardEvent) => {
   }
 
   switch (event.key) {
-    case "<": // Ctrl + [
+    case "<":
       event.preventDefault()
       toggleNavigationPanel(extraContentSidePanelStore.togglePanel())
       break
-    case "n": // Ctrl + N
+    case "n":
       event.preventDefault()
       extraContentSidePanelStore.togglePanel(true)
       extraContentSidePanelStore.setSidePanelMode("note")
       break
-    case "d": // Ctrl + D
+    case "d":
       event.preventDefault()
       extraContentSidePanelStore.togglePanel(true)
       extraContentSidePanelStore.setSidePanelMode("attachments")
       break
-    case "v": // Ctrl + V
+    case "v":
       extraContentSidePanelStore.togglePanel(true)
       extraContentSidePanelStore.setSidePanelMode("preview")
       break
-    case "k": // Ctrl + K
+    case "k":
       if (featureToggle.value) {
         extraContentSidePanelStore.togglePanel(true)
         extraContentSidePanelStore.setSidePanelMode("category-import")

@@ -19,8 +19,7 @@ const errorMessage = ref<string | undefined>(undefined)
 
 /**
  * Loads the document unit to import category data from.
- * Displays an error message, if no document unit could be found with
- * the given document number could be found.
+ * Displays an error message, if no document unit could be found with the given document number.
  */
 async function searchForDocumentUnit() {
   const response = await documentUnitService.getByDocumentNumber(
@@ -39,7 +38,7 @@ async function searchForDocumentUnit() {
 <template>
   <div data-testid="category-import">
     <span class="ds-label-01-bold">Rubriken importieren</span>
-    <div class="flex flex-row items-end gap-8">
+    <div class="mt-16 flex flex-row items-end gap-8">
       <InputField
         id="categoryImporterDocumentNumber"
         v-slot="slotProps"
@@ -88,12 +87,12 @@ async function searchForDocumentUnit() {
       <IconBadge v-bind="useStatusBadge(documentUnitToImport.status).value" />
 
       <div class="flex flex-col">
-        <span class="ds-label-02-bold text-gray-900"> Gericht: </span>
+        <span class="ds-label-02-bold text-gray-900"> Gericht</span>
         {{ documentUnitToImport.coreData?.court?.label }}
       </div>
 
       <div class="flex flex-col">
-        <span class="ds-label-02-bold text-gray-900"> Aktenzeichen: </span>
+        <span class="ds-label-02-bold text-gray-900"> Aktenzeichen</span>
         {{ documentUnitToImport.coreData?.fileNumbers?.join(", ") }}
       </div>
 

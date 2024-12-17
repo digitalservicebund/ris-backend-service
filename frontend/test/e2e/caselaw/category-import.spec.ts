@@ -7,44 +7,30 @@ test.describe("category import", () => {
     "display category import",
     { tag: ["@RISDEV-5719"] },
     async ({ page, prefilledDocumentUnit }) => {
-      await navigateToCategoryImport(
-        page,
-        prefilledDocumentUnit.documentNumber as string,
-      )
-      await expect(
-        page.getByRole("button", { name: "Dokumentationseinheit laden" }),
-      ).toBeVisible()
-      await expect(
-        page.getByRole("button", { name: "Dokumentationseinheit laden" }),
-      ).toBeDisabled()
-    },
-  )
+      await test.step("displays category import with disabled button", async () => {
+        await navigateToCategoryImport(
+          page,
+          prefilledDocumentUnit.documentNumber as string,
+        )
+        await expect(
+          page.getByRole("button", { name: "Dokumentationseinheit laden" }),
+        ).toBeVisible()
+        await expect(
+          page.getByRole("button", { name: "Dokumentationseinheit laden" }),
+        ).toBeDisabled()
+      })
 
-  test(
-    "search for non-existent document unit displays error",
-    { tag: ["@RISDEV-5719"] },
-    async ({ page, prefilledDocumentUnit }) => {
-      await navigateToCategoryImport(
-        page,
-        prefilledDocumentUnit.documentNumber as string,
-      )
-      await searchForDocumentUnitToImport(page, "invalidnumber")
-      await expect(
-        page.getByText("Keine Dokumentationseinheit gefunden."),
-      ).toBeVisible()
-    },
-  )
+      await test.step("search for non-existent document unit displays error", async () => {
+        await searchForDocumentUnitToImport(page, "invalidnumber")
+        await expect(
+          page.getByText("Keine Dokumentationseinheit gefunden."),
+        ).toBeVisible()
+      })
 
-  test(
-    "search for document unit displays core data",
-    { tag: ["@RISDEV-5719"] },
-    async ({ page, prefilledDocumentUnit }) => {
-      await navigateToCategoryImport(
-        page,
-        prefilledDocumentUnit.documentNumber as string,
-      )
-      await searchForDocumentUnitToImport(page, "YYTestDoc0013")
-      await expect(page.getByText("fileNumber5")).toBeVisible()
+      await test.step("search for document unit displays core data", async () => {
+        await searchForDocumentUnitToImport(page, "YYTestDoc0013")
+        await expect(page.getByText("fileNumber5")).toBeVisible()
+      })
     },
   )
 
@@ -79,6 +65,9 @@ test.describe("category import", () => {
     page: Page,
     documentNumber: string,
   ) {
+    await page
+      .getByRole("textbox", { name: "Dokumentnummer Eingabefeld" })
+      .fill("")
     await page.getByLabel("Dokumentnummer Eingabefeld").click()
     await page.keyboard.type(documentNumber)
     await expect(
