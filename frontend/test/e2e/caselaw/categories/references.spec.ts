@@ -408,7 +408,7 @@ test.describe(
     test(
       "Literature references can be saved and are visible in preview",
       {
-        tag: "@RISDEV-5240",
+        tag: ["@RISDEV-5240", "@RISDEV-5242"],
       },
       async ({ page, documentNumber }) => {
         await test.step("References are not rendered in preview when empty", async () => {

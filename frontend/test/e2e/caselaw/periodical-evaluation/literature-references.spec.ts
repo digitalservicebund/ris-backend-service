@@ -137,7 +137,7 @@ test.describe("Literature references", () => {
   test(
     "Literature and caselaw references are chronologically ordered",
     {
-      tag: "@RISDEV-5240",
+      tag: ["@RISDEV-5240", "@RISDEV-5242"],
     },
     async ({
       page,
