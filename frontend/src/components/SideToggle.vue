@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Component, computed } from "vue"
+import { type Component, computed } from "vue"
 import Tooltip from "./Tooltip.vue"
 import IconChevronLeft from "~icons/ic/baseline-chevron-left"
 import IconChevronRight from "~icons/ic/baseline-chevron-right"
@@ -65,7 +65,7 @@ export enum OpeningDirection {
         class="w-icon relative flex min-h-32 min-w-32 items-center justify-center rounded-full border-1 border-solid border-gray-400 bg-white text-gray-900"
         @click="toggle"
       >
-        <icon v-if="icon" class="text-blue-800" />
+        <component :is="icon" v-if="icon" class="text-blue-800" />
         <IconChevronLeft
           v-else-if="
             props.openingDirection === OpeningDirection.LEFT
