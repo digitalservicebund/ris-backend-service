@@ -15,11 +15,11 @@ public class CourtService {
     this.courtRepository = courtRepository;
   }
 
-  public List<Court> getCourts(String searchStr) {
+  public List<Court> getCourts(String searchStr, Integer size) {
     if (searchStr != null && !searchStr.trim().isBlank()) {
-      return courtRepository.findBySearchStr(searchStr.trim());
+      return courtRepository.findBySearchStr(searchStr.trim(), size);
     }
 
-    return courtRepository.findAllByOrderByTypeAscLocationAsc();
+    return courtRepository.findAllByOrderByTypeAscLocationAsc(size);
   }
 }

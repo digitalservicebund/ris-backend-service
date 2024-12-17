@@ -18,8 +18,8 @@ public class PostgresCourtRepositoryImpl implements CourtRepository {
   }
 
   @Override
-  public List<Court> findBySearchStr(String searchString) {
-    return repository.findBySearchStr(searchString).stream()
+  public List<Court> findBySearchStr(String searchString, Integer size) {
+    return repository.findBySearchStr(searchString, size).stream()
         .map(CourtTransformer::transformToDomain)
         .toList();
   }
@@ -48,8 +48,8 @@ public class PostgresCourtRepositoryImpl implements CourtRepository {
   }
 
   @Override
-  public List<Court> findAllByOrderByTypeAscLocationAsc() {
-    return repository.findByOrderByTypeAscLocationAsc(Limit.of(10)).stream()
+  public List<Court> findAllByOrderByTypeAscLocationAsc(Integer size) {
+    return repository.findByOrderByTypeAscLocationAsc(Limit.of(size)).stream()
         .map(CourtTransformer::transformToDomain)
         .toList();
   }
