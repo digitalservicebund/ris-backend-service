@@ -29,6 +29,7 @@ const props = defineProps<{
   showEditButton?: boolean
   hidePanelModeBar?: boolean
   sidePanelMode?: SelectablePanelContent
+  sidePanelShortcut?: string
   icon?: Component
 }>()
 
@@ -48,6 +49,8 @@ const hasAttachments = computed(() => {
     props.documentUnit!.attachments.length > 0
   )
 })
+
+const shortCut = computed(() => props.sidePanelShortcut ?? "<")
 
 /**
  * Updates the local attachment index reference, which is used to display the selected attachment in the panel,
@@ -149,7 +152,7 @@ onMounted(async () => {
       :is-expanded="store.isExpanded"
       label="Seitenpanel"
       :opening-direction="OpeningDirection.LEFT"
-      shortcut="<"
+      :shortcut="shortCut"
       tabindex="0"
       @update:is-expanded="togglePanel"
     >

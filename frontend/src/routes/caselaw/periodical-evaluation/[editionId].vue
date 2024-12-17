@@ -76,12 +76,10 @@ const handleKeyDown = (event: KeyboardEvent) => {
 
   switch (event.key) {
     case "<": // Ctrl + [
-      event.preventDefault()
-      toggleNavigationPanel(
-        extraContentSidePanelStore.panelMode !== undefined
-          ? extraContentSidePanelStore.togglePanel()
-          : undefined,
-      )
+      toggleNavigationPanel()
+      break
+    case "x":
+      extraContentSidePanelStore.togglePanel(false)
       break
     default:
       break
@@ -159,6 +157,7 @@ onMounted(async () => {
           :icon="IconClear"
           show-edit-button
           side-panel-mode="preview"
+          side-panel-shortcut="x"
         />
       </div>
     </div>
