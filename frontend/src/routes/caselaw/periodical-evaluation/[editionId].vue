@@ -120,6 +120,9 @@ onBeforeUnmount(() => {
 
 onMounted(async () => {
   window.addEventListener("keydown", handleKeyDown)
+  if (route.meta.error) {
+    responseError.value = { title: route.meta.error as string }
+  }
 })
 </script>
 

@@ -45,10 +45,9 @@ export async function beforeEach(to: RouteLocationNormalized) {
     const editionStore = useEditionStore()
     const editionId = to.params.editionId as string
     if (editionId) {
-      try {
-        await editionStore.loadEdition(editionId as UUID)
-      } catch (error) {
-        console.error("Failed to load edition:", error)
+      const response = await editionStore.loadEdition(editionId as UUID)
+      if (response.error) {
+        to.meta.error = response.error.title
       }
     }
     return true
