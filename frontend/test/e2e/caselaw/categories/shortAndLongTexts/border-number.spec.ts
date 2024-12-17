@@ -424,7 +424,7 @@ test.describe(
 
       await checkAllBorderNumbersAreVisible(casefacts)
 
-      // Abweichende Meinung
+      // Entscheidungsgründe
       await clickCategoryButton("Entscheidungsgründe", page)
       const decisionReasons = page.locator(
         "[data-testid='Entscheidungsgründe']",
