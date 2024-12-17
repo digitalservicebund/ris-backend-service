@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref } from "vue"
+import { computed } from "vue"
 import ActiveCitations from "@/components/ActiveCitations.vue"
 import CategoryWrapper from "@/components/CategoryWrapper.vue"
+import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import FieldsOfLaw from "@/components/field-of-law/FieldsOfLaw.vue"
 import KeyWords from "@/components/KeyWords.vue"
 import Norms from "@/components/NormReferences.vue"
@@ -11,8 +12,9 @@ import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const store = useDocumentUnitStore()
 
-const hasKeywords = ref<boolean>(
-  !!store.documentUnit?.contentRelatedIndexing?.keywords &&
+const hasKeywords = computed(
+  () =>
+    !!store.documentUnit?.contentRelatedIndexing?.keywords &&
     store.documentUnit?.contentRelatedIndexing?.keywords?.length > 0,
 )
 </script>
@@ -21,6 +23,7 @@ const hasKeywords = ref<boolean>(
   <div class="flex flex-col gap-24 bg-white p-24">
     <TitleElement>Inhaltliche Erschließung</TitleElement>
     <CategoryWrapper
+      :id="DocumentUnitCategoriesEnum.KEYWORDS"
       v-slot="slotProps"
       label="Schlagwörter"
       :should-show-button="!hasKeywords"

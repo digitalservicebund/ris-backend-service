@@ -899,3 +899,60 @@ VALUES
     ),
     1
   );
+
+INSERT INTO
+    incremental_migration.keyword (id, value)
+VALUES
+    (
+        gen_random_uuid (),
+        'keyword1'
+    ),
+    (
+        gen_random_uuid (),
+        'keyword2'
+    ),
+    (
+        gen_random_uuid (),
+        'keyword3'
+    )
+ON CONFLICT DO NOTHING;
+
+INSERT INTO
+    incremental_migration.documentation_unit_keyword (documentation_unit_id, keyword_id)
+VALUES
+    (
+        (
+            SELECT id
+            FROM incremental_migration.documentation_unit
+            WHERE document_number = 'YYTestDoc0013'
+        ),
+        (
+            SELECT id
+            FROM incremental_migration.keyword
+            WHERE value = 'keyword1'
+        )
+    ),
+    (
+        (
+            SELECT id
+            FROM incremental_migration.documentation_unit
+            WHERE document_number = 'YYTestDoc0013'
+        ),
+        (
+            SELECT id
+            FROM incremental_migration.keyword
+            WHERE value = 'keyword2'
+        )
+    ),
+    (
+        (
+            SELECT id
+            FROM incremental_migration.documentation_unit
+            WHERE document_number = 'YYTestDoc0013'
+        ),
+        (
+            SELECT id
+            FROM incremental_migration.keyword
+            WHERE value = 'keyword3'
+        )
+    );

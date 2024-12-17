@@ -1,7 +1,10 @@
+import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { setActivePinia } from "pinia"
+import { beforeEach } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
-import CategoryImport from "@/components/CategoryImport.vue"
+import CategoryImport from "@/components/category-import/CategoryImport.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import { PublicationState } from "@/domain/publicationStatus"
 import documentUnitService from "@/services/documentUnitService"
@@ -20,6 +23,9 @@ function renderComponent() {
 }
 
 describe("CategoryImport", () => {
+  beforeEach(() => {
+    setActivePinia(createTestingPinia())
+  })
   it("renders component initial state", () => {
     renderComponent()
 
