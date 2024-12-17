@@ -408,7 +408,7 @@ test.describe(
     test(
       "Literature references can be saved and are visible in preview",
       {
-        tag: ["@RISDEV-5240", "@RISDEV-5242"],
+        tag: ["@RISDEV-5240", "@RISDEV-5242", "@RISDEV-5670"],
       },
       async ({ page, documentNumber }) => {
         await test.step("References are not rendered in preview when empty", async () => {
@@ -416,8 +416,14 @@ test.describe(
           await expect(page.getByText("Literaturfundstellen")).toBeHidden()
         })
 
-        await test.step("Add literature reference, verify rendering in editable list", async () => {
+        await test.step("Literature references are located in a dedicated editable list", async () => {
           await navigateToReferences(page, documentNumber)
+          await expect(
+            page.getByText("Literaturfundstellen", { exact: true }),
+          ).toBeVisible()
+        })
+
+        await test.step("Add literature reference, verify rendering in editable list", async () => {
           await fillInput(page, "Periodikum Literaturfundstelle", "AllMBl")
           await page
             .getByText("AllMBl | Allgemeines Ministerialblatt", {
