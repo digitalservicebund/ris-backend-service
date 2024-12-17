@@ -154,7 +154,7 @@ onMounted(async () => {
       @update:is-expanded="togglePanel"
     >
       <div class="m-24 flex flex-row justify-between">
-        <div v-if="!hidePanelModeBar" class="flex flex-row">
+        <div v-if="!hidePanelModeBar" class="flex flex-row -space-x-2">
           <Tooltip shortcut="n" text="Notiz">
             <TextButton
               id="note"
