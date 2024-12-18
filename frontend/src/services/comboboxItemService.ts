@@ -143,7 +143,7 @@ type ComboboxItemService = {
 
 const service: ComboboxItemService = {
   getCourts: (filter: Ref<string | undefined>) =>
-    fetchFromEndpoint(Endpoint.courts, filter),
+    fetchFromEndpoint(Endpoint.courts, filter, 200),
   getDocumentTypes: (filter: Ref<string | undefined>) =>
     fetchFromEndpoint(Endpoint.documentTypes, filter),
   getDependentLiteratureDocumentTypes: (filter: Ref<string | undefined>) =>

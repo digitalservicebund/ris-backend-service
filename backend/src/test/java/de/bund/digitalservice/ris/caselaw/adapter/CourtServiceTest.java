@@ -33,13 +33,13 @@ class CourtServiceTest {
     Court courtB = Court.builder().type("XYZ").location("Hamburg").build();
 
     List<Court> returnedCourts = List.of(courtA, courtB);
-    when(courtRepository.findAllByOrderByTypeAscLocationAsc()).thenReturn(returnedCourts);
+    when(courtRepository.findAllByOrderByTypeAscLocationAsc(100)).thenReturn(returnedCourts);
 
-    List<Court> resultCourts = service.getCourts(null);
+    List<Court> resultCourts = service.getCourts(null, 100);
 
     Assertions.assertEquals(returnedCourts, resultCourts);
 
-    verify(courtRepository).findAllByOrderByTypeAscLocationAsc();
+    verify(courtRepository).findAllByOrderByTypeAscLocationAsc(100);
   }
 
   @Test
@@ -51,13 +51,13 @@ class CourtServiceTest {
     String trimmedSearchString = searchString.trim();
 
     List<Court> returnedCourts = List.of(courtA, courtB);
-    when(courtRepository.findBySearchStr(trimmedSearchString)).thenReturn(returnedCourts);
+    when(courtRepository.findBySearchStr(trimmedSearchString, 100)).thenReturn(returnedCourts);
 
-    List<Court> resultCourts = service.getCourts(searchString);
+    List<Court> resultCourts = service.getCourts(searchString, 100);
 
     Assertions.assertEquals(returnedCourts, resultCourts);
 
-    verify(courtRepository).findBySearchStr(trimmedSearchString);
+    verify(courtRepository).findBySearchStr(trimmedSearchString, 100);
   }
 
   @Test
@@ -66,12 +66,12 @@ class CourtServiceTest {
     Court courtB = Court.builder().type("XYZ").location("Hamburg").build();
 
     List<Court> returnedCourts = List.of(courtA, courtB);
-    when(courtRepository.findAllByOrderByTypeAscLocationAsc()).thenReturn(returnedCourts);
+    when(courtRepository.findAllByOrderByTypeAscLocationAsc(100)).thenReturn(returnedCourts);
 
-    List<Court> resultCourts = service.getCourts("");
+    List<Court> resultCourts = service.getCourts("", 100);
 
     Assertions.assertEquals(returnedCourts, resultCourts);
 
-    verify(courtRepository).findAllByOrderByTypeAscLocationAsc();
+    verify(courtRepository).findAllByOrderByTypeAscLocationAsc(100);
   }
 }

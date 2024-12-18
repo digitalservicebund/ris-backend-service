@@ -216,7 +216,7 @@ class DocumentationUnitIntegrationTest {
     when(documentNumberPatternConfig.getDocumentNumberPatterns())
         .thenReturn(Map.of("DS", "XXRE0******YY"));
 
-    var court = databaseCourtRepository.findBySearchStr("AG Aachen").get(0);
+    var court = databaseCourtRepository.findBySearchStr("AG Aachen", 100).getFirst();
 
     risWebTestClient
         .withDefaultLogin()
