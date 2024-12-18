@@ -37,6 +37,7 @@ const emits = defineEmits<{
       v-if="!importable"
       background-color="bg-blue-300"
       color="text-blue-900"
+      :data-testid="label + '-empty'"
       :icon="IconInfo"
       label="Quellrubrik leer"
     />
@@ -44,6 +45,7 @@ const emits = defineEmits<{
       v-if="importSuccess"
       background-color="bg-green-300"
       color="text-green-800"
+      :data-testid="label + '-success'"
       :icon="IconCheck"
       label="Übernommen"
     />
