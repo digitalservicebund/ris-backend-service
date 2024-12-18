@@ -1,3 +1,4 @@
+import dayjs from "dayjs"
 import ActiveCitation from "./activeCitation"
 import DocumentationOffice from "./documentationOffice"
 import DocumentUnitListEntry from "./documentUnitListEntry"
@@ -244,6 +245,20 @@ export default class DocumentUnit {
 
   get hasAttachments(): boolean {
     return this.attachments && this.attachments.length > 0
+  }
+
+  get renderDecision(): string {
+    console.log("hi", this.status)
+    return [
+      ...(this.coreData.court ? [`${this.coreData.court?.label}`] : []),
+      ...(this.coreData.decisionDate
+        ? [dayjs(this.coreData.decisionDate).format("DD.MM.YYYY")]
+        : []),
+      ...(this.coreData.fileNumbers ? [this.coreData.fileNumbers[0]] : []),
+      ...(this.coreData.documentType?.label
+        ? [this.coreData.documentType.label]
+        : []),
+    ].join(", ")
   }
 
   get missingRequiredFields() {
