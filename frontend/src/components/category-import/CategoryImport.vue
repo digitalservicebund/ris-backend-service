@@ -76,8 +76,9 @@ async function searchForDocumentUnit() {
     >
       <!-- Todo: Wrap this docunit summary in a reusable component -->
       <span>
-        {{ documentUnitToImport.renderDecision }}
+        <span>{{ documentUnitToImport.renderDecision }}</span>
         <IconBadge
+          v-if="documentUnitToImport?.status"
           :background-color="statusBadge.backgroundColor"
           class="ml-4 inline-block"
           :color="statusBadge.color"
