@@ -248,7 +248,6 @@ export default class DocumentUnit {
   }
 
   get renderDecision(): string {
-    console.log("hi", this.status)
     return [
       ...(this.coreData.court ? [`${this.coreData.court?.label}`] : []),
       ...(this.coreData.decisionDate
