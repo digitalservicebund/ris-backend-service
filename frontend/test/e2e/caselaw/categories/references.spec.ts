@@ -354,10 +354,6 @@ test.describe(
 
         await test.step("Verify rendering in preview", async () => {
           await navigateToPreview(page, documentNumber)
-
-          await expect(
-            page.getByText("Fundstellen", { exact: true }),
-          ).toBeVisible()
           await expect(page.getByText("Literaturfundstellen")).toBeHidden()
           await expect(
             page.getByText("Primäre FundstellenGVBl BB 2020, 01-99 (L)"),

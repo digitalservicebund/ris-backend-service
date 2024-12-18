@@ -400,8 +400,8 @@ test.describe(
           await newTab.getByLabel("Fundstellen").click()
           await expect(
             newTab
-              .getByTestId("references-preview")
-              .getByText("Fundstellen", { exact: true }),
+              .getByTestId("secondary-references-preview")
+              .getByText("Sekundäre Fundstellen", { exact: true }),
           ).toBeVisible()
           await expect(
             newTab

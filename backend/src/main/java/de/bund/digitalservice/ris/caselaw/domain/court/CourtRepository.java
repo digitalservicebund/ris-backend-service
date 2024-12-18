@@ -6,11 +6,11 @@ import org.springframework.data.repository.NoRepositoryBean;
 
 @NoRepositoryBean
 public interface CourtRepository {
-  List<Court> findBySearchStr(String searchString);
+  List<Court> findBySearchStr(String searchString, Integer size);
 
   Optional<Court> findByTypeAndLocation(String type, String location);
 
   Optional<Court> findUniqueBySearchString(String searchString);
 
-  List<Court> findAllByOrderByTypeAscLocationAsc();
+  List<Court> findAllByOrderByTypeAscLocationAsc(Integer size);
 }

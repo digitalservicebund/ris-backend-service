@@ -30,7 +30,9 @@ public class CourtController {
    */
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public List<Court> getCourts(@RequestParam(value = "q", required = false) String searchStr) {
-    return service.getCourts(searchStr);
+  public List<Court> getCourts(
+      @RequestParam(value = "q", required = false) String searchStr,
+      @RequestParam(value = "sz", required = false, defaultValue = "200") Integer size) {
+    return service.getCourts(searchStr, size);
   }
 }

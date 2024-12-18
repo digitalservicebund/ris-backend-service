@@ -216,13 +216,12 @@ test.describe("Literature references", () => {
         )
 
         const referencesPreview = page.locator(
-          '[data-testid="references-preview"]',
+          '[data-testid="secondary-references-preview"]',
         )
 
         // Make sure the caselaw citations are in the correct order
         expect(await referencesPreview.textContent()).toContain(
-          "Fundstellen" +
-            "Sekundäre Fundstellen" +
+          "Sekundäre Fundstellen" +
             "MMG 2024, 1-2, Heft 1 (L)" +
             "MMG 2024, 300, Heft 1 (ST)",
         )

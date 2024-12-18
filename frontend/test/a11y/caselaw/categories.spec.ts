@@ -113,13 +113,13 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
   test("vorgang", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Vorgang']").fill("test Vorgang")
+    await page.getByLabel("Vorgang", { exact: true }).fill("test Vorgang")
     await page.getByLabel("Vorgang", { exact: true }).press("ArrowDown")
-    await page.getByLabel("dropdown-option").press("Enter")
+    await page.getByText("test Vorgang").press("Enter")
 
     await save(page)
 
-    await page.locator("[aria-label='Vorgang']").click()
+    await page.getByLabel("Vorgang", { exact: true }).click()
     await expect(
       page.locator("[aria-label='additional-dropdown-info']"),
     ).toBeVisible()

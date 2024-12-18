@@ -24,6 +24,6 @@ public class LegalPeriodicalService {
    *     periodical if no search string is given
    */
   public List<LegalPeriodical> getLegalPeriodicals(Optional<String> searchStr) {
-    return legalPeriodicalRepository.findAllBySearchStr(searchStr.map(String::trim));
+    return legalPeriodicalRepository.findAllBySearchStr(searchStr.map(String::trim).orElse(null));
   }
 }

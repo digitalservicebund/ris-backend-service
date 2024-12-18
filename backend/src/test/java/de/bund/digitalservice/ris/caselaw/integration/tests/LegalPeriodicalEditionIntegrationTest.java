@@ -158,7 +158,7 @@ class LegalPeriodicalEditionIntegrationTest {
                 }));
 
     legalPeriodical =
-        legalPeriodicalRepository.findAllBySearchStr(Optional.of("ABC")).stream()
+        legalPeriodicalRepository.findAllBySearchStr("ABC").stream()
             .findAny()
             .orElseThrow(
                 () ->
@@ -174,12 +174,11 @@ class LegalPeriodicalEditionIntegrationTest {
   @Test
   void testFindLegalPeriodical_byAbbreviationOrTitle_shouldSucceed() {
     Assertions.assertNotNull(
-        legalPeriodicalRepository.findAllBySearchStr(Optional.of("A&G")).stream().findFirst(),
+        legalPeriodicalRepository.findAllBySearchStr("A&G").stream().findFirst(),
         "Expected a legal periodical by abbreviation but none was found");
 
     Assertions.assertNotNull(
-        legalPeriodicalRepository.findAllBySearchStr(Optional.of("Arbeit & Gesundheit")).stream()
-            .findFirst(),
+        legalPeriodicalRepository.findAllBySearchStr("Arbeit & Gesundheit").stream().findFirst(),
         "Expected a legal periodical by title but none was found");
   }
 

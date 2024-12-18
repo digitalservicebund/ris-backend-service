@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,5 +19,5 @@ public interface DatabaseLegalPeriodicalRepository extends JpaRepository<LegalPe
                 ORDER BY ct.abbreviation
                 LIMIT 15
               """)
-  List<LegalPeriodicalDTO> findBySearchStr(@Param("searchStr") Optional<String> searchStr);
+  List<LegalPeriodicalDTO> findBySearchStr(@Param("searchStr") String searchStr);
 }
