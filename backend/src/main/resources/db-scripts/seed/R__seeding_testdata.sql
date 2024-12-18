@@ -931,7 +931,11 @@ VALUES
             FROM incremental_migration.keyword
             WHERE value = 'keyword1'
         )
-    ),
+    );
+
+INSERT INTO
+    incremental_migration.documentation_unit_field_of_law (documentation_unit_id, field_of_law_id)
+VALUES
     (
         (
             SELECT id
@@ -940,19 +944,7 @@ VALUES
         ),
         (
             SELECT id
-            FROM incremental_migration.keyword
-            WHERE value = 'keyword2'
-        )
-    ),
-    (
-        (
-            SELECT id
-            FROM incremental_migration.documentation_unit
-            WHERE document_number = 'YYTestDoc0013'
-        ),
-        (
-            SELECT id
-            FROM incremental_migration.keyword
-            WHERE value = 'keyword3'
+            FROM incremental_migration.field_of_law
+            WHERE identifier = 'AR-01'
         )
     );
