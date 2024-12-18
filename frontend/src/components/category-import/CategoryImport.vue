@@ -2,6 +2,7 @@
 import dayjs from "dayjs"
 import { ref } from "vue"
 import { RouterLink } from "vue-router"
+import ImportFieldsOfLaw from "@/components/category-import/ImportFieldsOfLaw.vue"
 import ImportKeywords from "@/components/category-import/ImportKeywords.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import InputField from "@/components/input/InputField.vue"
@@ -108,6 +109,12 @@ async function searchForDocumentUnit() {
       <ImportKeywords
         :importable-keywords="
           documentUnitToImport.contentRelatedIndexing.keywords ?? []
+        "
+      />
+
+      <ImportFieldsOfLaw
+        :importable-fields-of-law="
+          documentUnitToImport.contentRelatedIndexing.fieldsOfLaw ?? []
         "
       />
     </div>

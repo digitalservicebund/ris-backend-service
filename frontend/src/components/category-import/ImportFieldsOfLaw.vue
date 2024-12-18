@@ -2,36 +2,40 @@
 import { computed, ref, watch } from "vue"
 import ImportSingleCategory from "@/components/category-import/ImportSingleCategory.vue"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
+import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const props = defineProps<{
-  importableKeywords: string[]
+  importableFieldsOfLaw: FieldOfLaw[]
 }>()
 
 const store = useDocumentUnitStore()
 
-const importable = computed(() => props.importableKeywords.length > 0)
+const importable = computed(() => props.importableFieldsOfLaw.length > 0)
 const copySuccess = ref(false)
 const errorMessage = ref<string | undefined>(undefined)
 
-const existingKeywords = computed({
-  get: () => store.documentUnit!.contentRelatedIndexing.keywords ?? [],
-  set: (newValues: string[]) => {
-    store.documentUnit!.contentRelatedIndexing.keywords = newValues
+const existingFieldsOfLaw = computed({
+  get: () => store.documentUnit!.contentRelatedIndexing.fieldsOfLaw ?? [],
+  set: (newValues: FieldOfLaw[]) => {
+    store.documentUnit!.contentRelatedIndexing.fieldsOfLaw = newValues
   },
 })
 
-async function importKeywords() {
+async function importFieldsOfLaw() {
   hideError()
   if (!importable.value) return
-  const uniqueImportableKeywords = props.importableKeywords.filter(
-    (keyword) => !existingKeywords.value.includes(keyword),
+  const uniqueImportableFieldsOfLaw = props.importableFieldsOfLaw.filter(
+    (fieldOfLaw) =>
+      !existingFieldsOfLaw.value.find(
+        (entry) => entry.identifier === fieldOfLaw.identifier,
+      ),
   )
-  existingKeywords.value.push(...uniqueImportableKeywords)
+  existingFieldsOfLaw.value.push(...uniqueImportableFieldsOfLaw)
 
   const updateResponse = await store.updateDocumentUnit()
   if (updateResponse.error) {
-    errorMessage.value = "Fehler beim Speichern der Schlagwörter"
+    errorMessage.value = "Fehler beim Speichern der Sachgebiete"
   } else {
     //display success badge for 7 seconds
     copySuccess.value = true
@@ -44,7 +48,9 @@ async function importKeywords() {
 }
 
 function scrollToCategory() {
-  const element = document.getElementById(DocumentUnitCategoriesEnum.KEYWORDS)
+  const element = document.getElementById(
+    DocumentUnitCategoriesEnum.FIELDS_OF_LAW,
+  )
   const headerOffset = 80
   const elementPosition = element ? element.getBoundingClientRect().top : 0
   const offsetPosition = elementPosition + window.scrollY - headerOffset
@@ -59,7 +65,7 @@ function hideError() {
 }
 
 watch(
-  () => props.importableKeywords,
+  () => props.importableFieldsOfLaw,
   () => {
     hideError()
   },
@@ -71,7 +77,7 @@ watch(
     :error-message="errorMessage"
     :import-success="copySuccess"
     :importable="importable"
-    label="Schlagwörter"
-    @import="importKeywords"
+    label="Sachgebiete"
+    @import="importFieldsOfLaw"
   />
 </template>
