@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, nextTick, ref, watch } from "vue"
+import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import FieldOfLawSummary from "@/components/field-of-law/FieldOfLawSummary.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import RadioInput from "@/components/input/RadioInput.vue"
@@ -66,7 +67,13 @@ export enum InputMethod {
   <div class="flex w-full items-start justify-between bg-white">
     <div class="flex w-full flex-col">
       <div class="flex w-full flex-row items-center justify-between">
-        <h2 ref="titleRef" class="ds-label-01-bold">Sachgebiete</h2>
+        <h2
+          :id="DocumentUnitCategoriesEnum.FIELDS_OF_LAW"
+          ref="titleRef"
+          class="ds-label-01-bold"
+        >
+          Sachgebiete
+        </h2>
       </div>
       <FieldOfLawSummary
         :fields-of-law="fieldsOfLaw"

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, toRaw, computed, watch } from "vue"
 import { RouterLink } from "vue-router"
-import ImportKeywords from "@/components/category-import/ImportKeywords.vue"
+import ImportListCategories from "@/components/category-import/ImportListCategories.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
@@ -67,7 +67,7 @@ watch(
           :has-error="slotProps.hasError"
           size="medium"
           @enter-released="searchForDocumentUnit"
-        ></TextInput>
+        />
       </InputField>
 
       <TextButton
@@ -114,9 +114,12 @@ watch(
         </RouterLink>
       </span>
 
-      <ImportKeywords
+      <ImportListCategories
+        :importable-fields-of-law="
+          documentUnitToImport.contentRelatedIndexing.fieldsOfLaw
+        "
         :importable-keywords="
-          documentUnitToImport.contentRelatedIndexing.keywords ?? []
+          documentUnitToImport.contentRelatedIndexing.keywords
         "
       />
     </div>

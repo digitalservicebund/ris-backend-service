@@ -49,6 +49,26 @@ test.describe("category import", () => {
       await page.getByLabel("Schlagwörter übernehmen").click()
 
       await expect(page.getByText("Übernommen")).toBeVisible()
+      await expect(page.getByText("keyword1")).toBeVisible()
+    },
+  )
+
+  test(
+    "import fields of law",
+    { tag: ["@RISDEV-5886"] },
+    async ({ page, prefilledDocumentUnit }) => {
+      await navigateToCategoryImport(
+        page,
+        prefilledDocumentUnit.documentNumber as string,
+      )
+      await searchForDocumentUnitToImport(page, "YYTestDoc0013")
+      await expect(page.getByText("fileNumber5")).toBeVisible()
+
+      await expect(page.getByLabel("Sachgebiete übernehmen")).toBeVisible()
+      await page.getByLabel("Sachgebiete übernehmen").click()
+
+      await expect(page.getByText("Übernommen")).toBeVisible()
+      await expect(page.getByText("AR-01")).toBeVisible()
     },
   )
 
