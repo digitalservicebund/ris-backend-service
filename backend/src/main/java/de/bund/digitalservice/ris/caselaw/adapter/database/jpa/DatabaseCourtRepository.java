@@ -60,7 +60,7 @@ public interface DatabaseCourtRepository extends JpaRepository<CourtDTO, UUID> {
                         label LIKE UPPER('%' || :searchStr || '%')
                       ORDER BY
                         weight,
-                        label
+                        label COLLATE "C"
                       LIMIT :size
                       """)
   List<CourtDTO> findBySearchStr(@Param("searchStr") String searchStr, @Param("size") Integer size);
