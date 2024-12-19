@@ -2,11 +2,12 @@ import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
-import ImportKeywords from "@/components/category-import/ImportKeywords.vue"
+import ImportListCategories from "@/components/category-import/ImportListCategories.vue"
 import DocumentUnit from "@/domain/documentUnit"
+import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import routes from "~/test-helper/routes"
 
-function renderComponent(keywords: string[]) {
+function renderComponent(keywords?: string[], fieldsOfLaw?: FieldOfLaw[]) {
   const user = userEvent.setup()
   const router = createRouter({
     history: createWebHistory(),
@@ -14,8 +15,11 @@ function renderComponent(keywords: string[]) {
   })
   return {
     user,
-    ...render(ImportKeywords, {
-      props: { importableKeywords: keywords },
+    ...render(ImportListCategories, {
+      props: {
+        importableKeywords: keywords,
+        importableFieldsOfLaw: fieldsOfLaw,
+      },
       global: {
         plugins: [
           [
@@ -42,23 +46,39 @@ function renderComponent(keywords: string[]) {
 
 describe("ImportKeywords", () => {
   it("renders component", () => {
-    renderComponent([])
+    renderComponent([], [])
     expect(screen.getByText("Schlagwörter")).toBeInTheDocument()
     expect(screen.getByLabelText("Schlagwörter übernehmen")).toBeInTheDocument()
+    expect(screen.getByText("Sachgebiete")).toBeInTheDocument()
+    expect(screen.getByLabelText("Sachgebiete übernehmen")).toBeInTheDocument()
   })
 
   it("enables button with importable keywords", () => {
-    renderComponent(["one"])
+    renderComponent(
+      ["one"],
+      [
+        {
+          identifier: "AB-01",
+          text: "Sachgebiet 1-2-3",
+          norms: [],
+          children: [],
+          hasChildren: false,
+        },
+      ],
+    )
     expect(screen.getByLabelText("Schlagwörter übernehmen")).toBeEnabled()
+    expect(screen.getByLabelText("Sachgebiete übernehmen")).toBeEnabled()
   })
 
-  it("disables button without importable keywords", () => {
-    renderComponent([])
+  it("disables buttons without importable data", () => {
+    renderComponent([], [])
     expect(screen.getByLabelText("Schlagwörter übernehmen")).toBeDisabled()
+    expect(screen.getByLabelText("Sachgebiete übernehmen")).toBeDisabled()
   })
 
-  it("displays error badge without importable keywords", () => {
-    renderComponent([])
-    expect(screen.getByText("Quellrubrik leer")).toBeInTheDocument()
+  it("displays error badges without importable data", () => {
+    renderComponent([], [])
+    expect(screen.getByTestId("Schlagwörter-empty")).toBeInTheDocument()
+    expect(screen.getByTestId("Sachgebiete-empty")).toBeInTheDocument()
   })
 })
