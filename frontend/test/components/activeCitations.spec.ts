@@ -1,6 +1,6 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
-import { fireEvent, render, screen } from "@testing-library/vue"
+import { fireEvent, render, screen, waitFor } from "@testing-library/vue"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import { createRouter, createWebHistory } from "vue-router"
@@ -9,6 +9,7 @@ import ActiveCitation from "@/domain/activeCitation"
 import { CitationType } from "@/domain/citationType"
 import DocumentUnit, { Court, DocumentType } from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
+import featureToggleService from "@/services/featureToggleService"
 import routes from "~/test-helper/routes"
 
 const server = setupServer(
@@ -110,6 +111,10 @@ describe("active citations", () => {
   beforeAll(() => server.listen())
   afterAll(() => server.close())
   beforeEach(() => {
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
     vi.spyOn(
       documentUnitService,
       "searchByRelatedDocumentation",
@@ -505,6 +510,32 @@ describe("active citations", () => {
     expect(clipboardText).toBe(
       "Änderungen, label1, 01.02.2022, test fileNumber, documentType1",
     )
+  })
+
+  it("should render parallel decision icons for 'Teilweise Parallelentscheidung'", async () => {
+    renderComponent([
+      generateActiveCitation({
+        citationStyle: {
+          label: "Teilweise Parallelentscheidung",
+        },
+      }),
+    ])
+    await waitFor(() => {
+      expect(screen.getByTestId("import-categories")).toBeVisible()
+    })
+  })
+
+  it("should render parallel decision icons for 'Parallelentscheidung'", async () => {
+    renderComponent([
+      generateActiveCitation({
+        citationStyle: {
+          label: "Parallelentscheidung",
+        },
+      }),
+    ])
+    await waitFor(() => {
+      expect(screen.getByTestId("import-categories")).toBeVisible()
+    })
   })
 
   describe("keyboard navigation", () => {

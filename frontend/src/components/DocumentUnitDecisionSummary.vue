@@ -1,19 +1,25 @@
 <script lang="ts" setup>
-import { computed } from "vue"
+import { computed, onMounted, ref } from "vue"
 import Tooltip from "./Tooltip.vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import IconBadge from "@/components/IconBadge.vue"
+import TextButton from "@/components/input/TextButton.vue"
 import ActiveCitation from "@/domain/activeCitation"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import PreviousDecision from "@/domain/previousDecision"
+import FeatureToggleService from "@/services/featureToggleService"
+import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import IconBaselineContentCopy from "~icons/ic/baseline-content-copy"
 import IconBaselineDescription from "~icons/ic/baseline-description"
 import IconError from "~icons/ic/baseline-error"
 import IconOutlineDescription from "~icons/ic/outline-description"
+import IconImportCategories from "~icons/material-symbols/text-select-move-back-word"
 
 const props = defineProps<{
   data: ActiveCitation | EnsuingDecision | PreviousDecision
 }>()
+const featureToggle = ref()
+const extraContentSidePanelStore = useExtraContentSidePanelStore()
 
 const iconComponent = computed(() => {
   return props.data?.hasForeignSource
@@ -33,6 +39,18 @@ const showErrorBadge = computed(() => {
 async function copySummary() {
   if (props.data) await navigator.clipboard.writeText(props.data.renderDecision)
 }
+
+async function openCategoryImport(documentNumber?: string) {
+  extraContentSidePanelStore.togglePanel(true)
+  extraContentSidePanelStore.setSidePanelMode("category-import")
+  extraContentSidePanelStore.importDocumentNumber = documentNumber
+}
+
+onMounted(async () => {
+  featureToggle.value = (
+    await FeatureToggleService.isEnabled("neuris.category-importer")
+  ).data
+})
 </script>
 
 <template>
@@ -53,16 +71,39 @@ async function copySummary() {
         label="Fehlende Daten"
       />
     </div>
-    <Tooltip text="Kopieren">
-      <button
-        v-if="data instanceof ActiveCitation"
-        class="flex h-32 w-32 items-center justify-center text-blue-800 hover:bg-blue-100 focus:shadow-[inset_0_0_0_0.125rem] focus:shadow-blue-800 focus:outline-none"
-        data-testid="copy-summary"
-        @click="copySummary"
-        @keypress.enter="copySummary"
+
+    <div class="flex flex-row -space-x-2">
+      <Tooltip
+        v-if="
+          data instanceof ActiveCitation &&
+          (data.citationType?.label == 'Parallelentscheidung' ||
+            data.citationType?.label == 'Teilweise Parallelentscheidung') &&
+          featureToggle
+        "
+        text="Rubriken importieren"
       >
-        <IconBaselineContentCopy />
-      </button>
-    </Tooltip>
+        <TextButton
+          id="category-import"
+          aria-label="Rubriken-Import anzeigen"
+          button-type="tertiary"
+          data-testid="import-categories"
+          :icon="IconImportCategories"
+          size="small"
+          @click="openCategoryImport(data.documentNumber)"
+        />
+      </Tooltip>
+      <Tooltip v-if="data instanceof ActiveCitation" text="Kopieren">
+        <TextButton
+          id="category-import"
+          aria-label="Rubriken-Import anzeigen"
+          button-type="tertiary"
+          data-testid="copy-summary"
+          :icon="IconBaselineContentCopy"
+          size="small"
+          @click="copySummary"
+          @keypress.enter="copySummary"
+        />
+      </Tooltip>
+    </div>
   </div>
 </template>

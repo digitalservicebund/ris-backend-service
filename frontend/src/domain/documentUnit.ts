@@ -249,15 +249,15 @@ export default class DocumentUnit {
 
   get renderDecision(): string {
     return [
-      ...(this.coreData.court ? [`${this.coreData.court?.label}`] : []),
-      ...(this.coreData.decisionDate
-        ? [dayjs(this.coreData.decisionDate).format("DD.MM.YYYY")]
-        : []),
-      ...(this.coreData.fileNumbers ? [this.coreData.fileNumbers[0]] : []),
-      ...(this.coreData.documentType?.label
-        ? [this.coreData.documentType.label]
-        : []),
-    ].join(", ")
+      this.coreData.court?.label,
+      this.coreData.decisionDate
+        ? dayjs(this.coreData.decisionDate).format("DD.MM.YYYY")
+        : null,
+      this.coreData.fileNumbers ? this.coreData.fileNumbers[0] : null,
+      this.coreData.documentType?.label,
+    ]
+      .filter(Boolean)
+      .join(", ")
   }
 
   get missingRequiredFields() {

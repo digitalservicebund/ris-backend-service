@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, toRaw, computed } from "vue"
+import { ref, toRaw, computed, watch } from "vue"
 import { RouterLink } from "vue-router"
 import ImportKeywords from "@/components/category-import/ImportKeywords.vue"
 import IconBadge from "@/components/IconBadge.vue"
@@ -12,7 +12,11 @@ import documentUnitService from "@/services/documentUnitService"
 import BaselineArrowOutward from "~icons/ic/baseline-arrow-outward"
 import IconSearch from "~icons/ic/baseline-search"
 
-const documentNumber = ref("")
+const props = defineProps<{
+  documentNumber?: string
+}>()
+
+const documentNumber = ref<string>(props.documentNumber ?? "")
 const documentUnitToImport = ref<DocumentUnit | undefined>(undefined)
 const errorMessage = ref<string | undefined>(undefined)
 const statusBadge = computed(
@@ -35,6 +39,16 @@ async function searchForDocumentUnit() {
     errorMessage.value = "Keine Dokumentationseinheit gefunden."
   }
 }
+watch(
+  () => props.documentNumber,
+  async () => {
+    documentNumber.value = props.documentNumber ?? ""
+    if (props.documentNumber) {
+      await searchForDocumentUnit()
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -85,7 +99,6 @@ async function searchForDocumentUnit() {
           :icon="toRaw(statusBadge.icon)"
           :label="statusBadge.label"
         />
-
         <span class="ds-label-01-reg ml-8 mr-8">|</span>
         <RouterLink
           class="nowrap ds-link-01-bold border-b-2 border-blue-800 leading-24 no-underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"

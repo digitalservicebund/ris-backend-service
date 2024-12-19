@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { storeToRefs } from "pinia"
 import { computed, onMounted, ref } from "vue"
 import type { Component } from "vue"
 import { useRoute } from "vue-router"
@@ -18,11 +19,11 @@ import FeatureToggleService from "@/services/featureToggleService"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import { SelectablePanelContent } from "@/types/panelContentMode"
 import IconAttachFile from "~icons/ic/baseline-attach-file"
-import IconCopyAll from "~icons/ic/baseline-copy-all"
 import IconEdit from "~icons/ic/outline-edit"
 import IconOpenInNewTab from "~icons/ic/outline-open-in-new"
 import IconPreview from "~icons/ic/outline-remove-red-eye"
 import IconStickyNote from "~icons/ic/outline-sticky-note-2"
+import IconImportCategories from "~icons/material-symbols/text-select-move-back-word"
 
 const props = defineProps<{
   documentUnit?: DocumentUnit
@@ -51,6 +52,8 @@ const hasAttachments = computed(() => {
 })
 
 const shortCut = computed(() => props.sidePanelShortcut ?? "<")
+
+const { importDocumentNumber } = storeToRefs(store)
 
 /**
  * Updates the local attachment index reference, which is used to display the selected attachment in the panel,
@@ -199,7 +202,7 @@ onMounted(async () => {
 
           <Tooltip
             v-if="featureToggle && !hidePanelModeBar"
-            shortcut="k"
+            shortcut="r"
             text="Rubriken-Import"
           >
             <TextButton
@@ -210,7 +213,7 @@ onMounted(async () => {
                 store.panelMode === 'category-import' ? 'bg-blue-200' : ''
               "
               data-testid="category-import-button"
-              :icon="IconCopyAll"
+              :icon="IconImportCategories"
               size="small"
               @click="() => selectImporter()"
             />
@@ -303,7 +306,10 @@ onMounted(async () => {
           />
         </FlexContainer>
 
-        <CategoryImport v-if="store.panelMode === 'category-import'" />
+        <CategoryImport
+          v-if="store.panelMode === 'category-import'"
+          :document-number="importDocumentNumber"
+        />
       </div>
     </SideToggle>
   </FlexItem>

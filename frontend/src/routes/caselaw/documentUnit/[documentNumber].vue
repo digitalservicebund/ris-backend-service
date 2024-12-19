@@ -117,7 +117,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
       extraContentSidePanelStore.togglePanel(true)
       extraContentSidePanelStore.setSidePanelMode("preview")
       break
-    case "k":
+    case "r":
       if (featureToggle.value) {
         extraContentSidePanelStore.togglePanel(true)
         extraContentSidePanelStore.setSidePanelMode("category-import")
