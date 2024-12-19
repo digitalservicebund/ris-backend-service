@@ -22,6 +22,11 @@
   ],
   "automergeType": "pr",
   "packageRules": [
+    // FIXME: Remove this when vuetsc fix is released, see https://github.com/vuejs/language-tools/issues/5018
+    {
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "5.6.x"
+    },
     {
       "groupName": "all-frontend-non-major-dependencies",
       "matchPaths": [
