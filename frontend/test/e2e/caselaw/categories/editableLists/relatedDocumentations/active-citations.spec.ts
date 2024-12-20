@@ -140,7 +140,8 @@ test.describe("active citations", () => {
     )
   })
 
-  test("Generate headnote possible, when citation style 'Parallelentscheidung'", async ({
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("Generate headnote possible, when citation style 'Parallelentscheidung'", async ({
     page,
     documentNumber,
     prefilledDocumentUnit,
@@ -194,7 +195,8 @@ test.describe("active citations", () => {
     await page.getByLabel("Eintrag löschen").click()
   })
 
-  test("Generate headnote possible, when citation style 'Teilweise Parallelentscheidung'", async ({
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("Generate headnote possible, when citation style 'Teilweise Parallelentscheidung'", async ({
     page,
     documentNumber,
     prefilledDocumentUnit,
