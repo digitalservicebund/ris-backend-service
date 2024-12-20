@@ -523,6 +523,9 @@ describe("active citations", () => {
     await waitFor(() => {
       expect(screen.getByTestId("import-categories")).toBeVisible()
     })
+    await waitFor(() => {
+      expect(screen.getByTestId("generate-headnote")).toBeVisible()
+    })
   })
 
   it("should render parallel decision icons for 'Parallelentscheidung'", async () => {
@@ -535,6 +538,9 @@ describe("active citations", () => {
     ])
     await waitFor(() => {
       expect(screen.getByTestId("import-categories")).toBeVisible()
+    })
+    await waitFor(() => {
+      expect(screen.getByTestId("generate-headnote")).toBeVisible()
     })
   })
 
