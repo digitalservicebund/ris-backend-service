@@ -9,6 +9,7 @@ export const useExtraContentSidePanelStore = defineStore(
   () => {
     const panelMode = ref<SelectablePanelContent | undefined>(undefined)
     const isExpanded = ref<boolean>(false)
+    const importDocumentNumber = ref<string | undefined>(undefined)
     const currentAttachmentIndex = ref(0)
 
     const { pushQueryToRoute } = useQuery()
@@ -71,6 +72,7 @@ export const useExtraContentSidePanelStore = defineStore(
       selectAttachments,
       togglePanel,
       onAttachmentDeleted,
+      importDocumentNumber,
       isExpanded,
       currentAttachmentIndex,
       panelMode,

@@ -90,4 +90,52 @@ test.describe("active citations", () => {
 
     await expect(page.getByText("Fehlende Daten")).toBeHidden()
   })
+
+  test("Import categories possible, when citation style 'Parallelentscheidung'", async ({
+    page,
+    documentNumber,
+    prefilledDocumentUnit,
+  }) => {
+    await handoverDocumentationUnit(
+      page,
+      prefilledDocumentUnit.documentNumber || "",
+    )
+    await navigateToCategories(page, documentNumber)
+
+    await fillActiveCitationInputs(page, {
+      citationType: "Parallelentscheidung",
+    })
+    await fillActiveCitationInputs(page, {
+      court: prefilledDocumentUnit.coreData.court?.label,
+      fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
+      documentType: prefilledDocumentUnit.coreData.documentType?.label,
+      decisionDate: "31.12.2019",
+    })
+    const activeCitationContainer = page.getByLabel("Aktivzitierung")
+    await activeCitationContainer.getByLabel("Nach Entscheidung suchen").click()
+
+    await expect(page.getByText("1 Ergebnis gefunden")).toBeVisible()
+
+    await expect(
+      page.getByText(
+        `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`,
+      ),
+    ).toBeVisible()
+
+    await page.getByLabel("Treffer übernehmen").click()
+
+    await expect(
+      page.getByText(
+        `Parallelentscheidung, AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`,
+      ),
+    ).toBeVisible()
+
+    const importButton = page.getByTestId("import-categories")
+    await expect(importButton).toBeVisible()
+    await importButton.click()
+    await expect(page.getByText("Rubriken importieren")).toBeVisible()
+    await expect(page.getByLabel("Dokumentnummer Eingabefeld")).toHaveValue(
+      prefilledDocumentUnit.documentNumber,
+    )
+  })
 })
