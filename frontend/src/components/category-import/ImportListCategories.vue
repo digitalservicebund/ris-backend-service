@@ -12,13 +12,13 @@ const props = defineProps<{
 
 const store = useDocumentUnitStore()
 
-const existingKeywords = computed({
+const keywords = computed({
   get: () => store.documentUnit?.contentRelatedIndexing.keywords ?? [],
   set: (newValues: string[]) =>
     (store.documentUnit!.contentRelatedIndexing.keywords = newValues),
 })
 
-const existingFieldsOfLaw = computed({
+const fieldsOfLaw = computed({
   get: () => store.documentUnit?.contentRelatedIndexing.fieldsOfLaw ?? [],
   set: (newValues: FieldOfLaw[]) =>
     (store.documentUnit!.contentRelatedIndexing.fieldsOfLaw = newValues),
@@ -69,19 +69,19 @@ async function importData(type: CategoryType, mergeData: () => void) {
 
 function mergeKeywords() {
   const uniqueImportableKeywords = importableData.value.keywords.filter(
-    (keyword) => !existingKeywords.value.includes(keyword),
+    (keyword) => !keywords.value.includes(keyword),
   )
-  existingKeywords.value.push(...uniqueImportableKeywords)
+  keywords.value.push(...uniqueImportableKeywords)
 }
 
 function mergeFieldsOfLaw() {
   const uniqueImportableFieldsOfLaw = importableData.value.fieldsOfLaw.filter(
     (fieldOfLaw) =>
-      !existingFieldsOfLaw.value.find(
+      !fieldsOfLaw.value.find(
         (entry) => entry.identifier === fieldOfLaw.identifier,
       ),
   )
-  existingFieldsOfLaw.value.push(...uniqueImportableFieldsOfLaw)
+  fieldsOfLaw.value.push(...uniqueImportableFieldsOfLaw)
 }
 
 function displaySuccess(type: CategoryType) {
@@ -114,7 +114,7 @@ watch(
     :error-message="errorMessage.keywords"
     :import-success="importSuccess.keywords"
     :importable="isImportable.keywords"
-    label="Schlagwörter"
+    :label="labelText.keywords"
     @import="
       importData('keywords', () => {
         mergeKeywords()
@@ -126,7 +126,7 @@ watch(
     :error-message="errorMessage.fieldsOfLaw"
     :import-success="importSuccess.fieldsOfLaw"
     :importable="isImportable.fieldsOfLaw"
-    label="Sachgebiete"
+    :label="labelText.fieldsOfLaw"
     @import="
       importData('fieldsOfLaw', () => {
         mergeFieldsOfLaw()
