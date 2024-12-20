@@ -948,3 +948,20 @@ VALUES
             WHERE identifier = 'AR-01'
         )
     );
+
+INSERT INTO
+    incremental_migration.norm_reference (id, documentation_unit_id, norm_abbreviation_id)
+VALUES
+    (
+        gen_random_uuid (),
+        (
+            SELECT id
+            FROM incremental_migration.documentation_unit
+            WHERE document_number = 'YYTestDoc0013'
+        ),
+        (
+            SELECT id
+            FROM incremental_migration.norm_abbreviation
+            WHERE abbreviation = 'BGB'
+        )
+    );

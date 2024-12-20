@@ -7,6 +7,7 @@ export default class SingleNorm {
   public dateOfVersion?: string
   public dateOfRelevance?: string
   public legalForce?: LegalForce
+  public id?: string
 
   static readonly fields = [
     "singleNorm",

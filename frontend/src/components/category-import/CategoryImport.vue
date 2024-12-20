@@ -8,6 +8,7 @@ import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import DocumentUnit from "@/domain/documentUnit"
+import NormReference from "@/domain/normReference"
 import documentUnitService from "@/services/documentUnitService"
 import BaselineArrowOutward from "~icons/ic/baseline-arrow-outward"
 import IconSearch from "~icons/ic/baseline-search"
@@ -115,11 +116,15 @@ watch(
       </span>
 
       <ImportListCategories
+        v-if="documentUnitToImport.contentRelatedIndexing"
         :importable-fields-of-law="
           documentUnitToImport.contentRelatedIndexing.fieldsOfLaw
         "
         :importable-keywords="
           documentUnitToImport.contentRelatedIndexing.keywords
+        "
+        :importable-norms="
+          documentUnitToImport.contentRelatedIndexing.norms as NormReference[]
         "
       />
     </div>

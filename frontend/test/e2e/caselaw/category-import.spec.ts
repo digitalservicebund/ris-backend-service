@@ -72,6 +72,25 @@ test.describe("category import", () => {
     },
   )
 
+  test(
+    "import norms",
+    { tag: ["@RISDEV-5887"] },
+    async ({ page, prefilledDocumentUnit }) => {
+      await navigateToCategoryImport(
+        page,
+        prefilledDocumentUnit.documentNumber as string,
+      )
+      await searchForDocumentUnitToImport(page, "YYTestDoc0013")
+      await expect(page.getByText("fileNumber5")).toBeVisible()
+
+      await expect(page.getByLabel("Normen übernehmen")).toBeVisible()
+      await page.getByLabel("Normen übernehmen").click()
+
+      await expect(page.getByText("Übernommen")).toBeVisible()
+      await expect(page.getByText("BGB")).toBeVisible()
+    },
+  )
+
   async function navigateToCategoryImport(page: Page, documentNumber: string) {
     await navigateToCategories(page, documentNumber)
     await page.getByLabel("Seitenpanel öffnen").click()

@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue"
-import ImportSingleCategory from "@/components/category-import/ImportSingleCategory.vue"
+import ImportCategoryItem from "@/components/category-import/ImportCategoryItem.vue"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
+import NormReference from "@/domain/normReference"
+import SingleNorm from "@/domain/singleNorm"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const props = defineProps<{
-  importableKeywords: string[] | undefined
-  importableFieldsOfLaw: FieldOfLaw[] | undefined
+  importableKeywords?: string[]
+  importableFieldsOfLaw?: FieldOfLaw[]
+  importableNorms?: NormReference[]
 }>()
 
 const store = useDocumentUnitStore()
@@ -24,33 +27,44 @@ const fieldsOfLaw = computed({
     (store.documentUnit!.contentRelatedIndexing.fieldsOfLaw = newValues),
 })
 
-const importSuccess = ref({ keywords: false, fieldsOfLaw: false })
+const norms = computed({
+  get: () => store.documentUnit?.contentRelatedIndexing.norms ?? [],
+  set: (newValues: NormReference[]) =>
+    (store.documentUnit!.contentRelatedIndexing.norms = newValues),
+})
+
+const importSuccess = ref({ keywords: false, fieldsOfLaw: false, norms: false })
 const errorMessage = ref({
   keywords: undefined as string | undefined,
   fieldsOfLaw: undefined as string | undefined,
+  norms: undefined as string | undefined,
 })
 
 const importableData = computed(() => ({
   keywords: props.importableKeywords ?? [],
   fieldsOfLaw: props.importableFieldsOfLaw ?? [],
+  norms: props.importableNorms ?? [],
 }))
 
 const isImportable = computed(() => ({
   keywords: importableData.value.keywords.length > 0,
   fieldsOfLaw: importableData.value.fieldsOfLaw.length > 0,
+  norms: importableData.value.norms.length > 0,
 }))
 
-const category = {
+const categoryIdentifier = {
   keywords: DocumentUnitCategoriesEnum.KEYWORDS,
   fieldsOfLaw: DocumentUnitCategoriesEnum.FIELDS_OF_LAW,
+  norms: DocumentUnitCategoriesEnum.NORMS,
 }
 
 const labelText = {
   keywords: "Schlagwörter",
   fieldsOfLaw: "Sachgebiete",
+  norms: "Normen",
 }
 
-type CategoryType = "keywords" | "fieldsOfLaw"
+type CategoryType = "keywords" | "fieldsOfLaw" | "norms"
 
 async function importData(type: CategoryType, mergeData: () => void) {
   hideErrors()
@@ -63,7 +77,7 @@ async function importData(type: CategoryType, mergeData: () => void) {
     errorMessage.value[type] = "Fehler beim Speichern der " + labelText[type]
   } else {
     displaySuccess(type)
-    scrollToCategory(category[type])
+    scrollToCategory(categoryIdentifier[type])
   }
 }
 
@@ -84,6 +98,41 @@ function mergeFieldsOfLaw() {
   fieldsOfLaw.value.push(...uniqueImportableFieldsOfLaw)
 }
 
+function mergeNorms() {
+  importableData.value.norms.forEach((importableNorm) => {
+    const existingWithAbbreviation = norms.value.find(
+      (existing) =>
+        existing.normAbbreviation?.abbreviation ===
+        importableNorm.normAbbreviation?.abbreviation,
+    )
+    if (existingWithAbbreviation) {
+      //import single norms into existing norm reference
+      const singleNorms = existingWithAbbreviation?.singleNorms
+      if (singleNorms && importableNorm.singleNorms) {
+        importableNorm.singleNorms
+          .filter(
+            (importableSingleNorm) =>
+              !singleNorms.some(
+                (singleNorm) =>
+                  singleNorm.singleNorm === importableSingleNorm.singleNorm,
+              ),
+          )
+          .map((importableSingleNorm) => {
+            singleNorms.push(
+              new SingleNorm({ ...importableSingleNorm, id: undefined }),
+            )
+          })
+      }
+    } else {
+      // import entire norm reference
+      importableNorm.singleNorms?.forEach(
+        (singleNorm) => (singleNorm.id = undefined),
+      )
+      norms.value.push(new NormReference({ ...importableNorm }))
+    }
+  })
+}
+
 function displaySuccess(type: CategoryType) {
   importSuccess.value[type] = true
   setTimeout(() => (importSuccess.value[type] = false), 7000)
@@ -100,7 +149,11 @@ function scrollToCategory(category: DocumentUnitCategoriesEnum) {
 }
 
 function hideErrors() {
-  errorMessage.value = { keywords: undefined, fieldsOfLaw: undefined }
+  errorMessage.value = {
+    keywords: undefined,
+    fieldsOfLaw: undefined,
+    norms: undefined,
+  }
 }
 
 watch(
@@ -110,7 +163,7 @@ watch(
 </script>
 
 <template>
-  <ImportSingleCategory
+  <ImportCategoryItem
     :error-message="errorMessage.keywords"
     :import-success="importSuccess.keywords"
     :importable="isImportable.keywords"
@@ -122,7 +175,7 @@ watch(
     "
   />
 
-  <ImportSingleCategory
+  <ImportCategoryItem
     :error-message="errorMessage.fieldsOfLaw"
     :import-success="importSuccess.fieldsOfLaw"
     :importable="isImportable.fieldsOfLaw"
@@ -130,6 +183,18 @@ watch(
     @import="
       importData('fieldsOfLaw', () => {
         mergeFieldsOfLaw()
+      })
+    "
+  />
+
+  <ImportCategoryItem
+    :error-message="errorMessage.norms"
+    :import-success="importSuccess.norms"
+    :importable="isImportable.norms"
+    :label="labelText.norms"
+    @import="
+      importData('norms', () => {
+        mergeNorms()
       })
     "
   />

@@ -3,6 +3,7 @@ import * as Sentry from "@sentry/vue"
 import dayjs from "dayjs"
 import { computed } from "vue"
 import EditableList from "@/components/EditableList.vue"
+import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
 import NormReferenceSummary from "@/components/NormReferenceSummary.vue"
 import NormReference from "@/domain/normReference"
@@ -65,7 +66,9 @@ const defaultValue = new NormReference() as NormReference
 </script>
 <template>
   <div aria-label="Norm">
-    <h2 class="ds-label-01-bold mb-16">Normen</h2>
+    <h2 :id="DocumentUnitCategoriesEnum.NORMS" class="ds-label-01-bold mb-16">
+      Normen
+    </h2>
     <div class="flex flex-row">
       <div class="flex-1">
         <EditableList
