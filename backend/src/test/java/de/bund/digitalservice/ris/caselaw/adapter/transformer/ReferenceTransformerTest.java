@@ -21,7 +21,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class ReferencesTransformerTest {
+class ReferenceTransformerTest {
 
   private static Stream<Arguments> provideReferencesTestData_toDomain() {
     return Stream.of(
@@ -43,6 +43,8 @@ class ReferencesTransformerTest {
                 .referenceType(ReferenceType.CASELAW)
                 .documentationUnit(createTestRelatedDocument())
                 .legalPeriodical(createTestLegalPeriodical())
+                .legalPeriodicalRawValue("LPA")
+                .primaryReference(true)
                 .build()),
         // without legal periodical, with editionRank
         Arguments.of(
@@ -53,6 +55,7 @@ class ReferencesTransformerTest {
                 .footnote("footnote")
                 .referenceSupplement("Klammerzusatz")
                 .legalPeriodicalRawValue("LPA")
+                .type("amtlich")
                 .documentationUnit(createTestDocumentationUnitDTO())
                 .build(),
             Reference.builder()
@@ -62,6 +65,22 @@ class ReferencesTransformerTest {
                 .referenceSupplement("Klammerzusatz")
                 .referenceType(ReferenceType.CASELAW)
                 .legalPeriodicalRawValue("LPA")
+                .primaryReference(true)
+                .documentationUnit(createTestRelatedDocument())
+                .build()),
+        // without any legal periodical
+        Arguments.of(
+            ReferenceDTO.builder()
+                .rank(1)
+                .citation("2024, 123")
+                .referenceSupplement("Klammerzusatz")
+                .documentationUnit(createTestDocumentationUnitDTO())
+                .build(),
+            Reference.builder()
+                .rank(1)
+                .citation("2024, 123")
+                .referenceSupplement("Klammerzusatz")
+                .referenceType(ReferenceType.CASELAW)
                 .documentationUnit(createTestRelatedDocument())
                 .build()));
   }
@@ -110,6 +129,7 @@ class ReferencesTransformerTest {
                         .primaryReference(false)
                         .build())
                 .legalPeriodicalRawValue("ABC")
+                .type("nichtamtlich")
                 .build()),
         // with primary flag, the type is amtlich
         Arguments.of(
@@ -133,6 +153,7 @@ class ReferencesTransformerTest {
                         .primaryReference(true)
                         .build())
                 .legalPeriodicalRawValue("ABC")
+                .type("amtlich")
                 .build()),
         // with primary=false flag, the type is nichtamtlich
         Arguments.of(
@@ -156,19 +177,26 @@ class ReferencesTransformerTest {
                         .primaryReference(false)
                         .build())
                 .legalPeriodicalRawValue("ABC")
+                .type("nichtamtlich")
                 .build()),
-        // possible with no legalPeriodical
+        // possible with no legalPeriodical object
         Arguments.of(
             Reference.builder()
                 .citation("2024, S.5")
                 .legalPeriodicalRawValue("ABC")
+                .primaryReference(true)
                 .referenceType(ReferenceType.CASELAW)
                 .build(),
             ReferenceDTO.builder()
                 .rank(1)
                 .citation("2024, S.5")
                 .legalPeriodicalRawValue("ABC")
-                .build()));
+                .type("amtlich")
+                .build()),
+        // possible with no legalPeriodical raw values, should default to nichtamtlich
+        Arguments.of(
+            Reference.builder().citation("2024, S.5").referenceType(ReferenceType.CASELAW).build(),
+            ReferenceDTO.builder().rank(1).citation("2024, S.5").type("nichtamtlich").build()));
   }
 
   @ParameterizedTest

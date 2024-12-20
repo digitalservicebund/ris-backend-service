@@ -8,9 +8,7 @@ const props = defineProps<{
 }>()
 
 const primaryReference = computed(() =>
-  props.data?.legalPeriodical && props.data?.legalPeriodical.primaryReference
-    ? "primär"
-    : "sekundär",
+  props.data?.primaryReference ? "primär" : "sekundär",
 )
 const hasAmbiguousLegalPeriodicalAbbreviation = computed(
   () => !props.data?.legalPeriodical && !!props.data?.legalPeriodicalRawValue,

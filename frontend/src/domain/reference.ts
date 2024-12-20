@@ -10,6 +10,7 @@ export default class Reference implements EditableListItem {
   footnote?: string
   legalPeriodical?: LegalPeriodical
   legalPeriodicalRawValue?: string
+  primaryReference?: boolean
   documentationUnit?: RelatedDocumentation
   documentType?: DocumentType
   author?: string

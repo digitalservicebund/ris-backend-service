@@ -24,8 +24,6 @@ public class ReferenceTransformer {
     return Reference.builder()
         .id(referenceDTO.getId())
         .referenceSupplement(referenceDTO.getReferenceSupplement())
-        .legalPeriodical(legalPeriodical)
-        .legalPeriodicalRawValue(referenceDTO.getLegalPeriodicalRawValue())
         .citation(referenceDTO.getCitation())
         .footnote(referenceDTO.getFootnote())
         .referenceType(ReferenceType.CASELAW)
@@ -37,6 +35,17 @@ public class ReferenceTransformer {
             referenceDTO.getEditionRank() != null
                 ? referenceDTO.getEditionRank()
                 : referenceDTO.getRank())
+        .legalPeriodical(legalPeriodical)
+        .legalPeriodicalRawValue(
+            legalPeriodical != null
+                ? legalPeriodical.abbreviation()
+                : referenceDTO.getLegalPeriodicalRawValue()) // fallback to raw value
+        .primaryReference(
+            legalPeriodical != null
+                ? legalPeriodical.primaryReference()
+                : referenceDTO.getType() != null
+                    ? referenceDTO.getType().equals("amtlich") // fallback to raw value
+                    : null)
         .build();
   }
 
@@ -61,10 +70,18 @@ public class ReferenceTransformer {
         .legalPeriodical(legalPeriodicalDTO)
         .citation(reference.citation())
         .footnote(reference.footnote())
+        .type(
+            (legalPeriodicalDTO != null
+                    ? legalPeriodicalDTO.getPrimaryReference()
+                    : reference.primaryReference() != null
+                        ? reference.primaryReference() // fallback to raw value
+                        : false) // fallback to nichtamtlich
+                ? "amtlich"
+                : "nichtamtlich")
         .legalPeriodicalRawValue(
             legalPeriodicalRawValue != null
                 ? legalPeriodicalRawValue
-                : reference.legalPeriodicalRawValue())
+                : reference.legalPeriodicalRawValue()) // fallback to raw value
         .documentationUnit(documentationUnitDTO)
         .build();
   }

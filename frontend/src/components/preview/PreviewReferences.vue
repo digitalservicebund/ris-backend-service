@@ -10,14 +10,10 @@ const props = defineProps<{
 }>()
 
 const primaryReferences = computed(() =>
-  props.references?.filter(
-    (reference) => reference.legalPeriodical?.primaryReference,
-  ),
+  props.references?.filter((reference) => reference.primaryReference),
 )
 const secondaryReferences = computed(() =>
-  props.references?.filter(
-    (reference) => !reference.legalPeriodical?.primaryReference,
-  ),
+  props.references?.filter((reference) => !reference.primaryReference),
 )
 </script>
 

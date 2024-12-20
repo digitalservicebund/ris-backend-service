@@ -29,7 +29,10 @@ public class DependentLiteratureTransformer {
         .documentType(
             DocumentTypeTransformer.transformToDomain(literatureCitationDTO.getDocumentType()))
         .legalPeriodical(legalPeriodical)
-        .legalPeriodicalRawValue(literatureCitationDTO.getLegalPeriodicalRawValue())
+        .legalPeriodicalRawValue(
+            legalPeriodical != null
+                ? legalPeriodical.abbreviation()
+                : literatureCitationDTO.getLegalPeriodicalRawValue()) // fallback to raw value
         .citation(literatureCitationDTO.getCitation())
         .referenceType(ReferenceType.LITERATURE)
         .documentationUnit(
@@ -40,6 +43,7 @@ public class DependentLiteratureTransformer {
             literatureCitationDTO.getEditionRank() != null
                 ? literatureCitationDTO.getEditionRank()
                 : literatureCitationDTO.getRank())
+        .primaryReference(legalPeriodical != null ? legalPeriodical.primaryReference() : null)
         .build();
   }
 
@@ -71,10 +75,10 @@ public class DependentLiteratureTransformer {
         .legalPeriodicalRawValue(
             legalPeriodicalRawValue != null
                 ? legalPeriodicalRawValue
-                : reference.legalPeriodicalRawValue())
+                : reference.legalPeriodicalRawValue()) // fallback to raw value
         .legalPeriodical(legalPeriodicalDTO)
         .type(DependentLiteratureCitationType.PASSIVE)
-        .documentTypeRawValue(documentType.getAbbreviation())
+        .documentTypeRawValue(documentType != null ? documentType.getAbbreviation() : null)
         .documentationUnit(documentationUnitDTO)
         .build();
   }
