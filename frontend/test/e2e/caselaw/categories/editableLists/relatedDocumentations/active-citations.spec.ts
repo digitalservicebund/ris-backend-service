@@ -188,6 +188,10 @@ test.describe("active citations", () => {
     await expect(page.getByTestId("Orientierungssatz")).toHaveText(
       `Parallelentscheidung zu der Entscheidung (${prefilledDocumentUnit.coreData.documentType?.label}) des ${prefilledDocumentUnit.coreData?.court?.label} (${prefilledDocumentUnit.coreData?.court?.location}) vom ${dayjs(prefilledDocumentUnit.coreData.decisionDate).format("DD.MM.YYYY")} - ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, welche vollständig dokumentiert ist.`,
     )
+    // Clean up: We need to unlink the document units in order to be allowed to delete them in the fixtures
+    await page.getByTestId("list-entry-0").click()
+    await expect(page.getByLabel("Eintrag löschen")).toBeVisible()
+    await page.getByLabel("Eintrag löschen").click()
   })
 
   test("Generate headnote possible, when citation style 'Teilweise Parallelentscheidung'", async ({
@@ -238,5 +242,10 @@ test.describe("active citations", () => {
     await expect(page.getByTestId("Orientierungssatz")).toHaveText(
       `Teilweise Parallelentscheidung zu der Entscheidung (${prefilledDocumentUnit.coreData.documentType?.label}) des ${prefilledDocumentUnit.coreData?.court?.label} (${prefilledDocumentUnit.coreData?.court?.location}) vom ${dayjs(prefilledDocumentUnit.coreData.decisionDate).format("DD.MM.YYYY")} - ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}.`,
     )
+
+    // Clean up: We need to unlink the document units in order to be allowed to delete them in the fixtures
+    await page.getByTestId("list-entry-0").click()
+    await expect(page.getByLabel("Eintrag löschen")).toBeVisible()
+    await page.getByLabel("Eintrag löschen").click()
   })
 })
