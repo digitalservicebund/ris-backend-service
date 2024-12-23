@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, onMounted, nextTick, watch } from "vue"
+import { computed, nextTick, onMounted, ref, watch } from "vue"
 import ListInputDisplay from "@/components/input/listInput/ListInputDisplay.vue"
 import ListInputEdit from "@/components/input/listInput/ListInputEdit.vue"
 
@@ -87,6 +87,14 @@ watch(
     if (props.modelValue) {
       list.value = props.modelValue
     }
+  },
+  { deep: true },
+)
+
+watch(
+  list,
+  (newList) => {
+    emit("update:modelValue", newList)
   },
   { deep: true },
 )

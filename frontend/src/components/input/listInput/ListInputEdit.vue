@@ -65,6 +65,13 @@ watch(
   },
   { immediate: true },
 )
+
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    localModelValue.value = newValue
+  },
+)
 </script>
 
 <template>
