@@ -7,10 +7,12 @@ import App from "./App.vue"
 import router from "./router"
 import useSessionStore from "./stores/sessionStore"
 import { filterConsoleWarnings } from "@/utils/filterConsoleWarnings"
+import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 
 filterConsoleWarnings()
 
 const app = createApp(App)
+app.directive("ctrl-enter", onSearchShortcutDirective)
 app.use(createHead())
 
 function targets(): string[] {

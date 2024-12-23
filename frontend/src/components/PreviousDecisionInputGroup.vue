@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { watch, ref, computed, onMounted } from "vue"
+import { computed, onMounted, ref, watch } from "vue"
 import { ValidationError } from "./input/types"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
@@ -179,7 +179,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-24">
+  <div v-ctrl-enter="search" class="flex flex-col gap-24">
     <div class="flex flex-col gap-24">
       <InputField
         id="dateKnown"

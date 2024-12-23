@@ -10,6 +10,7 @@ import { CitationType } from "@/domain/citationType"
 import DocumentUnit, { Court, DocumentType } from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
+import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
 const server = setupServer(
@@ -49,6 +50,7 @@ function renderComponent(activeCitations?: ActiveCitation[]) {
     user,
     ...render(ActiveCitations, {
       global: {
+        directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [
           [
             createTestingPinia({
@@ -67,7 +69,11 @@ function renderComponent(activeCitations?: ActiveCitation[]) {
           ],
           [router],
         ],
-        stubs: { routerLink: { template: "<a><slot/></a>" } },
+        stubs: {
+          routerLink: {
+            template: "<a><slot/></a>",
+          },
+        },
       },
     }),
   }
@@ -385,6 +391,19 @@ describe("active citations", () => {
 
     expect(screen.queryByText(/test fileNumber/)).not.toBeInTheDocument()
     await user.click(await screen.findByLabelText("Nach Entscheidung suchen"))
+
+    expect(screen.getAllByText(/test fileNumber/).length).toBe(1)
+  })
+
+  it("search is triggered with shortcut", async () => {
+    const { user } = renderComponent()
+
+    expect(screen.queryByText(/test fileNumber/)).not.toBeInTheDocument()
+    await user.type(
+      await screen.findByLabelText("Aktenzeichen Aktivzitierung"),
+      "test",
+    )
+    await user.keyboard("{Control>}{Enter}")
 
     expect(screen.getAllByText(/test fileNumber/).length).toBe(1)
   })

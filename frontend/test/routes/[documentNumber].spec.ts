@@ -9,6 +9,7 @@ import DocumentNumber from "@/routes/caselaw/documentUnit/[documentNumber].vue"
 import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
+import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 
 function renderComponent() {
   const user = userEvent.setup()
@@ -71,6 +72,7 @@ function renderComponent() {
         documentNumber: "1234567891234",
       },
       global: {
+        directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [
           head,
           router,
