@@ -140,8 +140,7 @@ test.describe("active citations", () => {
     )
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("Generate headnote possible, when citation style 'Parallelentscheidung'", async ({
+  test("Generate headnote possible, when citation style 'Parallelentscheidung'", async ({
     page,
     documentNumber,
     prefilledDocumentUnit,
@@ -187,7 +186,7 @@ test.describe("active citations", () => {
       page.getByText("Orientierungssatz", { exact: true }),
     ).toBeVisible()
     await expect(page.getByTestId("Orientierungssatz")).toHaveText(
-      `Parallelentscheidung zu der Entscheidung (${prefilledDocumentUnit.coreData.documentType?.label}) des ${prefilledDocumentUnit.coreData?.court?.label} (${prefilledDocumentUnit.coreData?.court?.location}) vom ${dayjs(prefilledDocumentUnit.coreData.decisionDate).format("DD.MM.YYYY")} - ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, welche vollständig dokumentiert ist.`,
+      `Parallelentscheidung zu der Entscheidung (${prefilledDocumentUnit.coreData.documentType?.label}) des ${prefilledDocumentUnit.coreData?.court?.label} vom ${dayjs(prefilledDocumentUnit.coreData.decisionDate).format("DD.MM.YYYY")} - ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, welche vollständig dokumentiert ist.`,
     )
     // Clean up: We need to unlink the document units in order to be allowed to delete them in the fixtures
     await page.getByTestId("list-entry-0").click()
@@ -195,8 +194,7 @@ test.describe("active citations", () => {
     await page.getByLabel("Eintrag löschen").click()
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("Generate headnote possible, when citation style 'Teilweise Parallelentscheidung'", async ({
+  test("Generate headnote possible, when citation style 'Teilweise Parallelentscheidung'", async ({
     page,
     documentNumber,
     prefilledDocumentUnit,
@@ -242,7 +240,7 @@ test.describe("active citations", () => {
       page.getByText("Orientierungssatz", { exact: true }),
     ).toBeVisible()
     await expect(page.getByTestId("Orientierungssatz")).toHaveText(
-      `Teilweise Parallelentscheidung zu der Entscheidung (${prefilledDocumentUnit.coreData.documentType?.label}) des ${prefilledDocumentUnit.coreData?.court?.label} (${prefilledDocumentUnit.coreData?.court?.location}) vom ${dayjs(prefilledDocumentUnit.coreData.decisionDate).format("DD.MM.YYYY")} - ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}.`,
+      `Teilweise Parallelentscheidung zu der Entscheidung (${prefilledDocumentUnit.coreData.documentType?.label}) des ${prefilledDocumentUnit.coreData?.court?.label} vom ${dayjs(prefilledDocumentUnit.coreData.decisionDate).format("DD.MM.YYYY")} - ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}.`,
     )
 
     // Clean up: We need to unlink the document units in order to be allowed to delete them in the fixtures

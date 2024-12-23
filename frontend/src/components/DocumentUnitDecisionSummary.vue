@@ -60,7 +60,7 @@ async function openCategoryImport(documentNumber?: string) {
 }
 
 async function generateHeadnote() {
-  const text = `${props.data instanceof ActiveCitation && props.data.citationType?.label == "Teilweise Parallelentscheidung" ? "Teilweise " : ""}Parallelentscheidung zu der Entscheidung (${props.data.documentType?.label}) des ${props.data.court?.label} (${props.data.court?.location}) vom ${dayjs(props.data.decisionDate).format("DD.MM.YYYY")} - ${props.data.fileNumber}${props.data instanceof ActiveCitation && props.data.citationType?.label == "Teilweise Parallelentscheidung" ? "." : ", welche vollständig dokumentiert ist."}`
+  const text = `${props.data instanceof ActiveCitation && props.data.citationType?.label == "Teilweise Parallelentscheidung" ? "Teilweise " : ""}Parallelentscheidung zu der Entscheidung (${props.data.documentType?.label}) des ${props.data.court?.label} vom ${dayjs(props.data.decisionDate).format("DD.MM.YYYY")} - ${props.data.fileNumber}${props.data instanceof ActiveCitation && props.data.citationType?.label == "Teilweise Parallelentscheidung" ? "." : ", welche vollständig dokumentiert ist."}`
 
   documentUnitStore.documentUnit!.shortTexts.headnote = text
   await documentUnitStore.updateDocumentUnit()
