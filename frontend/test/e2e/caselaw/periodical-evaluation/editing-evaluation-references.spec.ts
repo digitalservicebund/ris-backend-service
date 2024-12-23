@@ -5,7 +5,7 @@ import {
   navigateToPeriodicalEvaluation,
   navigateToPeriodicalReferences,
   navigateToPreview,
-  searchForDocUnitWithFileNumber,
+  searchForDocUnitWithFileNumberAndDecisionDate,
   waitForInputValue,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
@@ -53,7 +53,11 @@ test.describe("Editing and deleting references in periodical evaluation", () => 
       })
 
       await test.step("should open and close document preview in side panel", async () => {
-        await searchForDocUnitWithFileNumber(page, fileNumber, "31.12.2019")
+        await searchForDocUnitWithFileNumberAndDecisionDate(
+          page,
+          fileNumber,
+          "31.12.2019",
+        )
         await openExtraContentSidePanelPreview(page, fileNumber)
         await expect(page.getByLabel("Seitenpanel öffnen")).toBeHidden()
 
@@ -62,7 +66,11 @@ test.describe("Editing and deleting references in periodical evaluation", () => 
       })
 
       await test.step("open editing from side panel", async () => {
-        await searchForDocUnitWithFileNumber(page, fileNumber, "31.12.2019")
+        await searchForDocUnitWithFileNumberAndDecisionDate(
+          page,
+          fileNumber,
+          "31.12.2019",
+        )
         await openExtraContentSidePanelPreview(page, fileNumber)
 
         const newTabPromise = page.context().waitForEvent("page")
@@ -75,7 +83,11 @@ test.describe("Editing and deleting references in periodical evaluation", () => 
       })
 
       await test.step("A docunit can be added as reference by entering citation and search fields", async () => {
-        await searchForDocUnitWithFileNumber(page, fileNumber, "31.12.2019")
+        await searchForDocUnitWithFileNumberAndDecisionDate(
+          page,
+          fileNumber,
+          "31.12.2019",
+        )
         await expect(
           page.getByText(
             `AG Aachen, 31.12.2019, ${fileNumber}, Anerkenntnisurteil, Unveröffentlicht`,
@@ -102,7 +114,11 @@ test.describe("Editing and deleting references in periodical evaluation", () => 
           { timeout: 5_000 },
         )
         await navigateToPeriodicalReferences(secondPage, edition.id)
-        await searchForDocUnitWithFileNumber(page, fileNumber, "31.12.2019")
+        await searchForDocUnitWithFileNumberAndDecisionDate(
+          page,
+          fileNumber,
+          "31.12.2019",
+        )
 
         await expect(
           page
@@ -152,7 +168,7 @@ test.describe("Editing and deleting references in periodical evaluation", () => 
       })
 
       await test.step("Other docUnits can be added to an edition", async () => {
-        await searchForDocUnitWithFileNumber(
+        await searchForDocUnitWithFileNumberAndDecisionDate(
           page,
           secondFileNumber,
           "01.01.2020",

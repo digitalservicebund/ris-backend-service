@@ -654,7 +654,7 @@ export async function deleteAllProcedures(
   }
 }
 
-export async function searchForDocUnitWithFileNumber(
+export async function searchForDocUnitWithFileNumberAndDecisionDate(
   page: Page,
   fileNumber: string,
   date: string,
