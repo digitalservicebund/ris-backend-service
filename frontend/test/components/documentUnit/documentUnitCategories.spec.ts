@@ -4,6 +4,7 @@ import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitCategories from "@/components/DocumentUnitCategories.vue"
 import DocumentUnit from "@/domain/documentUnit"
+import { searchShortcutDirective } from "@/utils/searchShortcutDirective"
 import routes from "~/test-helper/routes"
 
 function renderComponent() {
@@ -17,6 +18,7 @@ function renderComponent() {
     user,
     ...render(DocumentUnitCategories, {
       global: {
+        directives: { search: searchShortcutDirective },
         plugins: [
           createTestingPinia({
             initialState: {

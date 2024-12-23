@@ -9,6 +9,7 @@ import DocumentUnit, { Court, DocumentType } from "@/domain/documentUnit"
 import PreviousDecision from "@/domain/previousDecision"
 import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
+import { searchShortcutDirective } from "@/utils/searchShortcutDirective"
 import routes from "~/test-helper/routes"
 
 const server = setupServer(
@@ -40,6 +41,7 @@ function renderComponent(previousDecisions?: PreviousDecision[]) {
     user,
     ...render(PreviousDecisions, {
       global: {
+        directives: { search: searchShortcutDirective },
         stubs: { routerLink: { template: "<a><slot/></a>" } },
         plugins: [
           [
@@ -353,6 +355,19 @@ describe("PreviousDecisions", () => {
 
     expect(screen.queryByText(/test fileNumber/)).not.toBeInTheDocument()
     await user.click(await screen.findByLabelText("Nach Entscheidung suchen"))
+
+    expect(screen.getAllByText(/test fileNumber/).length).toBe(1)
+  })
+
+  it("search is triggered with shortcut", async () => {
+    const { user } = renderComponent()
+
+    expect(screen.queryByText(/test fileNumber/)).not.toBeInTheDocument()
+    await user.type(
+      await screen.findByLabelText("Aktenzeichen Vorgehende Entscheidung"),
+      "test",
+    )
+    await user.keyboard("{Control>}{Enter}")
 
     expect(screen.getAllByText(/test fileNumber/).length).toBe(1)
   })

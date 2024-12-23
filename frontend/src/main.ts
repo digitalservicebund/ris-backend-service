@@ -7,10 +7,12 @@ import App from "./App.vue"
 import router from "./router"
 import useSessionStore from "./stores/sessionStore"
 import { filterConsoleWarnings } from "@/utils/filterConsoleWarnings"
+import { searchShortcutDirective } from "@/utils/searchShortcutDirective"
 
 filterConsoleWarnings()
 
 const app = createApp(App)
+app.directive("search", searchShortcutDirective)
 app.use(createHead())
 
 function targets(): string[] {

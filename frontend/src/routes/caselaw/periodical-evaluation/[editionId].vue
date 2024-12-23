@@ -75,7 +75,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
   }
 
   switch (event.key) {
-    case "<": // Ctrl + [
+    case "<":
       toggleNavigationPanel()
       break
     case "x":

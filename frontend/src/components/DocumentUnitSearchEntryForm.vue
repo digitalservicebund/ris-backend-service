@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 import Checkbox from "@/components/input/CheckboxInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import DropdownInput from "@/components/input/DropdownInput.vue"
@@ -183,11 +183,6 @@ function handleSearchButtonClicked() {
   pushQueryToRoute(query.value)
 }
 
-function handleSearchShortcut(event: KeyboardEvent) {
-  if (event.key == "Enter" && (event.ctrlKey || event.metaKey))
-    handleSearchButtonClicked()
-}
-
 function handleSearch() {
   if (!isEmptySearch.value) {
     emit("search", getQueryFromRoute())
@@ -201,17 +196,8 @@ watch(
   () => {
     handleSearch()
   },
-  { deep: true },
+  { deep: true, immediate: true },
 )
-
-onMounted(async () => {
-  handleSearch()
-  window.addEventListener("keydown", handleSearchShortcut)
-})
-
-onUnmounted(() => {
-  window.removeEventListener("keydown", handleSearchShortcut)
-})
 </script>
 
 <script lang="ts">
@@ -230,7 +216,10 @@ export type DocumentUnitSearchParameter =
 </script>
 
 <template>
-  <div class="pyb-24 mb-32 flex flex-col bg-blue-200">
+  <div
+    v-search="handleSearchButtonClicked"
+    class="pyb-24 mb-32 flex flex-col bg-blue-200"
+  >
     <div
       class="m-40 grid grid-flow-col grid-cols-[auto_1fr_auto_1fr] grid-rows-[auto_auto_auto_auto_auto] gap-x-12 gap-y-20 lg:gap-x-32"
     >

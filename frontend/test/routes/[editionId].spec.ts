@@ -14,6 +14,7 @@ import featureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
 import LegalPeriodicalEditionService from "@/services/legalPeriodicalEditionService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import { searchShortcutDirective } from "@/utils/searchShortcutDirective"
 
 const editionUuid = crypto.randomUUID()
 const legalPeriodical: LegalPeriodical = {
@@ -62,6 +63,7 @@ function renderComponent() {
     router,
     ...render(EditionId, {
       global: {
+        directives: { search: searchShortcutDirective },
         plugins: [
           router,
           [

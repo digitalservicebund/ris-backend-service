@@ -9,6 +9,7 @@ import { Court } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import authService from "@/services/authService"
 import documentUnitService from "@/services/documentUnitService"
+import { searchShortcutDirective } from "@/utils/searchShortcutDirective"
 import routes from "~/test-helper/routes"
 
 const server = setupServer(
@@ -35,6 +36,7 @@ function renderComponent(
     user,
     ...render(DocumentUnitSearch, {
       global: {
+        directives: { search: searchShortcutDirective },
         plugins: [
           router,
           createTestingPinia({
@@ -248,6 +250,52 @@ describe("Documentunit Search", () => {
     await user.click(
       screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
     )
+
+    expect(screen.getAllByRole("row").length).toBe(1)
+    expect(screen.getAllByText(/documentNumber/).length).toBe(1)
+  })
+
+  test("Search can be triggered with shortcut", async () => {
+    vi.spyOn(
+      documentUnitService,
+      "searchByDocumentUnitSearchInput",
+    ).mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: {
+          content: [
+            new DocumentUnitListEntry({
+              uuid: "123",
+              court: {
+                type: "type",
+                location: "location",
+                label: "type location",
+              },
+              decisionDate: "01.02.2022",
+              documentType: {
+                jurisShortcut: "documentTypeShortcut",
+                label: "docTypeLabel",
+              },
+              documentNumber: "documentNumber",
+              fileNumber: "fileNumber",
+            }),
+          ],
+          size: 0,
+          number: 0,
+          numberOfElements: 20,
+          first: true,
+          last: false,
+          empty: false,
+        },
+      }),
+    )
+
+    const { user } = renderComponent()
+
+    await user.type(screen.getByLabelText("Gerichtstyp Suche"), "AG")
+    expect(screen.getByLabelText("Gerichtstyp Suche")).toHaveValue("AG")
+
+    await user.keyboard("{Control>}{Enter}")
 
     expect(screen.getAllByRole("row").length).toBe(1)
     expect(screen.getAllByText(/documentNumber/).length).toBe(1)

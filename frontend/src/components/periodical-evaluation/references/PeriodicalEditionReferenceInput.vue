@@ -324,7 +324,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div ref="containerRef" class="flex flex-col border-b-1">
+  <div ref="containerRef" v-search="search" class="flex flex-col border-b-1">
     <PopupModal
       v-if="showModal"
       aria-label="Dialog zur Auswahl der Löschaktion"
