@@ -56,6 +56,7 @@ const labels = {
 // Handle import logic
 const handleImport = async (key: keyof typeof labels) => {
   validationStore.reset()
+
   switch (key) {
     case "keywords":
       importKeywords()
@@ -67,11 +68,8 @@ const handleImport = async (key: keyof typeof labels) => {
       importNorms()
       break
     case "activeCitations":
-      console.log("Importing active citations...")
-      // Add specific logic for importing active citations
+      importActiveCitations()
       break
-    default:
-      console.error("Unknown category")
   }
 
   const updateResponse = await store.updateDocumentUnit()
@@ -163,6 +161,29 @@ function importNorms() {
   }
 }
 
+function importActiveCitations() {
+  const source =
+    documentUnitToImport.value?.contentRelatedIndexing.activeCitations
+  if (!source) return
+
+  const targetActiveCitations =
+    store.documentUnit!.contentRelatedIndexing.activeCitations
+  if (targetActiveCitations) {
+    // consider as duplicate, if real reference found with same docnumber and citation
+    const uniqueImportableFieldsOfLaw = source.filter(
+      (activeCitation) =>
+        !targetActiveCitations.find(
+          (entry) =>
+            entry.documentNumber === activeCitation.documentNumber &&
+            entry.citationType?.uuid === activeCitation.citationType?.uuid,
+        ),
+    )
+    targetActiveCitations.push(...uniqueImportableFieldsOfLaw)
+  } else {
+    store.documentUnit!.contentRelatedIndexing.activeCitations = [...source]
+  }
+}
+
 function scrollToCategory(key: string) {
   const element = document.getElementById(key)
   if (element) {
@@ -172,6 +193,7 @@ function scrollToCategory(key: string) {
     window.scrollTo({ top: offsetPosition, behavior: "smooth" })
   }
 }
+
 watch(
   () => props.documentNumber,
   async () => {
