@@ -1,21 +1,30 @@
 <script setup lang="ts">
+import { ref, computed } from "vue"
 import IconBadge from "@/components/IconBadge.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import TextButton from "@/components/input/TextButton.vue"
+import { ValidationError } from "@/components/input/types"
 import IconAdd from "~icons/ic/baseline-add"
 import IconCheck from "~icons/ic/baseline-check"
 import IconInfo from "~icons/ic/outline-info"
 
-defineProps<{
+const props = defineProps<{
   label: string
-  importable: boolean
-  importSuccess: boolean
-  errorMessage?: string
+  errorMessage: ValidationError | undefined
+  hasContent: boolean
+  handleImport: () => void
 }>()
 
-const emits = defineEmits<{
-  import: [void]
-}>()
+const importSuccess = ref(false)
+const errorMessage = computed(() =>
+  props.errorMessage ? props.errorMessage.message : undefined,
+)
+
+function handleClick() {
+  props.handleImport()
+  importSuccess.value = true
+  setTimeout(() => (importSuccess.value = false), 7000)
+}
 </script>
 
 <template>
@@ -23,18 +32,18 @@ const emits = defineEmits<{
     <TextButton
       :aria-label="label + ' übernehmen'"
       button-type="primary"
-      :disabled="!importable"
+      :disabled="!hasContent"
       :icon="IconAdd"
       size="medium"
-      @click="emits('import')"
+      @click="handleClick"
     />
     <span
       class="ds-label-01-reg"
-      :class="importable ? 'text-blue-800' : 'text-gray-900'"
+      :class="hasContent ? 'text-blue-800' : 'text-gray-900'"
       >{{ label }}</span
     >
     <IconBadge
-      v-if="!importable"
+      v-if="!hasContent"
       background-color="bg-blue-300"
       color="text-blue-900"
       :data-testid="label + '-empty'"

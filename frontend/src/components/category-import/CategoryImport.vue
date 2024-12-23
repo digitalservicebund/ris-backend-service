@@ -1,21 +1,26 @@
 <script setup lang="ts">
 import { ref, toRaw, computed, watch } from "vue"
 import { RouterLink } from "vue-router"
-import ImportListCategories from "@/components/category-import/ImportListCategories.vue"
+import SingleCategory from "@/components/category-import/SingleCategory.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import { useStatusBadge } from "@/composables/useStatusBadge"
+import { useValidationStore } from "@/composables/useValidationStore"
 import DocumentUnit from "@/domain/documentUnit"
 import NormReference from "@/domain/normReference"
+import SingleNorm from "@/domain/singleNorm"
 import documentUnitService from "@/services/documentUnitService"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import BaselineArrowOutward from "~icons/ic/baseline-arrow-outward"
 import IconSearch from "~icons/ic/baseline-search"
 
 const props = defineProps<{
   documentNumber?: string
 }>()
+const store = useDocumentUnitStore()
+const validationStore = useValidationStore<keyof typeof labels>()
 
 const documentNumber = ref<string>(props.documentNumber ?? "")
 const documentUnitToImport = ref<DocumentUnit | undefined>(undefined)
@@ -38,6 +43,133 @@ async function searchForDocumentUnit() {
   } else {
     documentUnitToImport.value = undefined
     errorMessage.value = "Keine Dokumentationseinheit gefunden."
+  }
+}
+
+const labels = {
+  keywords: "Schlagwörter",
+  fieldsOfLaw: "Sachgebiete",
+  norms: "Normen",
+  activeCitations: "Aktivzitierung",
+}
+
+// Handle import logic
+const handleImport = async (key: keyof typeof labels) => {
+  validationStore.reset()
+  switch (key) {
+    case "keywords":
+      importKeywords()
+      break
+    case "fieldsOfLaw":
+      importFieldsOfLaw()
+      break
+    case "norms":
+      importNorms()
+      break
+    case "activeCitations":
+      console.log("Importing active citations...")
+      // Add specific logic for importing active citations
+      break
+    default:
+      console.error("Unknown category")
+  }
+
+  const updateResponse = await store.updateDocumentUnit()
+  if (updateResponse.error) {
+    validationStore.add("Fehler beim Speichern der " + labels[key], key) // add an errormessage to the validationstore field with the key
+  } else {
+    scrollToCategory(key)
+  }
+}
+
+function importKeywords() {
+  const source = documentUnitToImport.value?.contentRelatedIndexing.keywords
+  if (!source) return
+
+  const targetKeywords = store.documentUnit!.contentRelatedIndexing.keywords
+
+  if (targetKeywords) {
+    const uniqueImportableKeywords = source.filter(
+      (keyword) => !targetKeywords.includes(keyword),
+    )
+    targetKeywords.push(...uniqueImportableKeywords)
+  } else {
+    store.documentUnit!.contentRelatedIndexing.keywords = [...source]
+  }
+}
+
+function importFieldsOfLaw() {
+  const source = documentUnitToImport.value?.contentRelatedIndexing.fieldsOfLaw
+  if (!source) return
+
+  const targetFieldsOfLaw =
+    store.documentUnit!.contentRelatedIndexing.fieldsOfLaw
+  if (targetFieldsOfLaw) {
+    const uniqueImportableFieldsOfLaw = source.filter(
+      (fieldOfLaw) =>
+        !targetFieldsOfLaw.find(
+          (entry) => entry.identifier === fieldOfLaw.identifier,
+        ),
+    )
+    targetFieldsOfLaw.push(...uniqueImportableFieldsOfLaw)
+  } else {
+    store.documentUnit!.contentRelatedIndexing.fieldsOfLaw = [...source]
+  }
+}
+
+function importNorms() {
+  const source = documentUnitToImport.value?.contentRelatedIndexing.norms
+  if (!source) return
+
+  const targetNorms = store.documentUnit!.contentRelatedIndexing.norms
+  if (targetNorms) {
+    source.forEach((importableNorm) => {
+      const existingWithAbbreviation = targetNorms.find(
+        (existing) =>
+          existing.normAbbreviation?.abbreviation ===
+          importableNorm.normAbbreviation?.abbreviation,
+      )
+      if (existingWithAbbreviation) {
+        //import single norms into existing norm reference
+        const singleNorms = existingWithAbbreviation?.singleNorms
+        if (singleNorms && importableNorm.singleNorms) {
+          importableNorm.singleNorms
+            .filter(
+              (importableSingleNorm) =>
+                !singleNorms.some(
+                  (singleNorm) =>
+                    singleNorm.singleNorm === importableSingleNorm.singleNorm,
+                ),
+            )
+            .map((importableSingleNorm) => {
+              singleNorms.push(
+                new SingleNorm({
+                  ...(importableSingleNorm as SingleNorm),
+                  id: undefined,
+                }),
+              )
+            })
+        }
+      } else {
+        // import entire norm reference
+        importableNorm.singleNorms?.forEach(
+          (singleNorm) => (singleNorm.id = undefined),
+        )
+        targetNorms.push(
+          new NormReference({ ...(importableNorm as NormReference) }),
+        )
+      }
+    })
+  }
+}
+
+function scrollToCategory(key: string) {
+  const element = document.getElementById(key)
+  if (element) {
+    const headerOffset = 80
+    const offsetPosition =
+      element.getBoundingClientRect().top + window.scrollY - headerOffset
+    window.scrollTo({ top: offsetPosition, behavior: "smooth" })
   }
 }
 watch(
@@ -114,19 +246,19 @@ watch(
           <BaselineArrowOutward class="mb-4 inline w-24" />
         </RouterLink>
       </span>
-
-      <ImportListCategories
-        v-if="documentUnitToImport.contentRelatedIndexing"
-        :importable-fields-of-law="
-          documentUnitToImport.contentRelatedIndexing.fieldsOfLaw
-        "
-        :importable-keywords="
-          documentUnitToImport.contentRelatedIndexing.keywords
-        "
-        :importable-norms="
-          documentUnitToImport.contentRelatedIndexing.norms as NormReference[]
-        "
-      />
+      <div v-for="(value, key) in labels" :key="key">
+        <SingleCategory
+          :error-message="validationStore.getByField(key)"
+          :handle-import="() => handleImport(key)"
+          :has-content="
+            !!(
+              documentUnitToImport.contentRelatedIndexing[key] &&
+              documentUnitToImport.contentRelatedIndexing[key].length > 0
+            )
+          "
+          :label="value"
+        />
+      </div>
     </div>
   </div>
 </template>
