@@ -21,6 +21,13 @@ public class ReferenceTransformer {
           LegalPeriodicalTransformer.transformToDomain(referenceDTO.getLegalPeriodical());
     }
 
+    Boolean isPrimaryReference =
+        legalPeriodical != null
+            ? legalPeriodical.primaryReference()
+            : referenceDTO.getType() != null
+                ? referenceDTO.getType().equals("amtlich") // fallback to raw value
+                : null;
+
     return Reference.builder()
         .id(referenceDTO.getId())
         .referenceSupplement(referenceDTO.getReferenceSupplement())
@@ -40,12 +47,7 @@ public class ReferenceTransformer {
             legalPeriodical != null
                 ? legalPeriodical.abbreviation()
                 : referenceDTO.getLegalPeriodicalRawValue()) // fallback to raw value
-        .primaryReference(
-            legalPeriodical != null
-                ? legalPeriodical.primaryReference()
-                : referenceDTO.getType() != null
-                    ? referenceDTO.getType().equals("amtlich") // fallback to raw value
-                    : null)
+        .primaryReference(isPrimaryReference)
         .build();
   }
 
@@ -64,20 +66,19 @@ public class ReferenceTransformer {
           DocumentationUnitDTO.builder().id(reference.documentationUnit().getUuid()).build();
     }
 
+    boolean isPrimaryReference =
+        legalPeriodicalDTO != null
+            ? legalPeriodicalDTO.getPrimaryReference()
+            : reference.primaryReference() != null
+                && reference.primaryReference(); // fallback to nichtamtlich
+
     return ReferenceDTO.builder()
         .id(reference.id())
         .referenceSupplement(reference.referenceSupplement())
         .legalPeriodical(legalPeriodicalDTO)
         .citation(reference.citation())
         .footnote(reference.footnote())
-        .type(
-            (legalPeriodicalDTO != null
-                    ? legalPeriodicalDTO.getPrimaryReference()
-                    : reference.primaryReference() != null
-                        ? reference.primaryReference() // fallback to raw value
-                        : false) // fallback to nichtamtlich
-                ? "amtlich"
-                : "nichtamtlich")
+        .type(isPrimaryReference ? "amtlich" : "nichtamtlich")
         .legalPeriodicalRawValue(
             legalPeriodicalRawValue != null
                 ? legalPeriodicalRawValue
