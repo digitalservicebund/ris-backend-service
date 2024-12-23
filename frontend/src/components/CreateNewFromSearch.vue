@@ -49,10 +49,7 @@ const responsibleDocOffice = computed({
         }
       : undefined,
   set: (newValue) => {
-    const newDocOffice = { ...newValue } as DocumentationOffice
-    if (newValue) {
-      docOffice.value = newDocOffice
-    }
+    docOffice.value = { ...newValue } as DocumentationOffice
   },
 })
 
@@ -96,7 +93,7 @@ async function createNewFromSearch(openDocunit: boolean = false) {
  * Watches for changes in the `parameters` prop and updates the local `docOffice` value accordingly.
  */
 watch(
-  () => props.parameters,
+  () => props.parameters?.court,
   () => {
     docOffice.value = props.parameters?.court?.responsibleDocOffice
   },
