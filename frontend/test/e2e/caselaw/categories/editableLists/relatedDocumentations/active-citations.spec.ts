@@ -140,17 +140,16 @@ test.describe("active citations", () => {
     )
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("Generate headnote possible, when citation style 'Parallelentscheidung'", async ({
+  test("Generate headnote possible, when citation style 'Parallelentscheidung'", async ({
     page,
-    documentNumber,
+    linkedDocumentNumber,
     prefilledDocumentUnit,
   }) => {
     await handoverDocumentationUnit(
       page,
       prefilledDocumentUnit.documentNumber || "",
     )
-    await navigateToCategories(page, documentNumber)
+    await navigateToCategories(page, linkedDocumentNumber)
 
     await fillActiveCitationInputs(page, {
       citationType: "Parallelentscheidung",
@@ -189,23 +188,18 @@ test.describe("active citations", () => {
     await expect(page.getByTestId("Orientierungssatz")).toHaveText(
       `Parallelentscheidung zu der Entscheidung (${prefilledDocumentUnit.coreData.documentType?.label}) des ${prefilledDocumentUnit.coreData?.court?.label} vom ${dayjs(prefilledDocumentUnit.coreData.decisionDate).format("DD.MM.YYYY")} - ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, welche vollständig dokumentiert ist.`,
     )
-    // Clean up: We need to unlink the document units in order to be allowed to delete them in the fixtures
-    await page.getByTestId("list-entry-0").click()
-    await expect(page.getByLabel("Eintrag löschen")).toBeVisible()
-    await page.getByLabel("Eintrag löschen").click()
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("Generate headnote possible, when citation style 'Teilweise Parallelentscheidung'", async ({
+  test("Generate headnote possible, when citation style 'Teilweise Parallelentscheidung'", async ({
     page,
-    documentNumber,
+    linkedDocumentNumber,
     prefilledDocumentUnit,
   }) => {
     await handoverDocumentationUnit(
       page,
       prefilledDocumentUnit.documentNumber || "",
     )
-    await navigateToCategories(page, documentNumber)
+    await navigateToCategories(page, linkedDocumentNumber)
 
     await fillActiveCitationInputs(page, {
       citationType: "Teilweise Parallelentscheidung",
@@ -244,10 +238,5 @@ test.describe("active citations", () => {
     await expect(page.getByTestId("Orientierungssatz")).toHaveText(
       `Teilweise Parallelentscheidung zu der Entscheidung (${prefilledDocumentUnit.coreData.documentType?.label}) des ${prefilledDocumentUnit.coreData?.court?.label} vom ${dayjs(prefilledDocumentUnit.coreData.decisionDate).format("DD.MM.YYYY")} - ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}.`,
     )
-
-    // Clean up: We need to unlink the document units in order to be allowed to delete them in the fixtures
-    await page.getByTestId("list-entry-0").click()
-    await expect(page.getByLabel("Eintrag löschen")).toBeVisible()
-    await page.getByLabel("Eintrag löschen").click()
   })
 })
