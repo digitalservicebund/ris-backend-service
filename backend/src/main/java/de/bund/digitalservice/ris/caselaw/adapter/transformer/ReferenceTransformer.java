@@ -28,6 +28,11 @@ public class ReferenceTransformer {
                 ? referenceDTO.getType().equals("amtlich") // fallback to raw value
                 : null;
 
+    if (isPrimaryReference == null) {
+      throw new IllegalArgumentException(
+          "Either the referenceDTO's legalPeriodical or type field must be set");
+    }
+
     return Reference.builder()
         .id(referenceDTO.getId())
         .referenceSupplement(referenceDTO.getReferenceSupplement())
@@ -66,11 +71,15 @@ public class ReferenceTransformer {
           DocumentationUnitDTO.builder().id(reference.documentationUnit().getUuid()).build();
     }
 
-    boolean isPrimaryReference =
+    Boolean isPrimaryReference =
         legalPeriodicalDTO != null
             ? legalPeriodicalDTO.getPrimaryReference()
-            : reference.primaryReference() != null
-                && reference.primaryReference(); // fallback to nichtamtlich
+            : reference.primaryReference(); // fallback to nichtamtlich
+
+    if (isPrimaryReference == null) {
+      throw new IllegalArgumentException(
+          "Either the reference's legalPeriodical or primaryReference field must be set");
+    }
 
     return ReferenceDTO.builder()
         .id(reference.id())
