@@ -9,7 +9,7 @@ import { Court } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import authService from "@/services/authService"
 import documentUnitService from "@/services/documentUnitService"
-import { searchShortcutDirective } from "@/utils/searchShortcutDirective"
+import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
 const server = setupServer(
@@ -36,7 +36,7 @@ function renderComponent(
     user,
     ...render(DocumentUnitSearch, {
       global: {
-        directives: { search: searchShortcutDirective },
+        directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [
           router,
           createTestingPinia({

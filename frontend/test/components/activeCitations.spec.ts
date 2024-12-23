@@ -10,7 +10,7 @@ import { CitationType } from "@/domain/citationType"
 import DocumentUnit, { Court, DocumentType } from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
-import { searchShortcutDirective } from "@/utils/searchShortcutDirective"
+import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
 const server = setupServer(
@@ -50,7 +50,7 @@ function renderComponent(activeCitations?: ActiveCitation[]) {
     user,
     ...render(ActiveCitations, {
       global: {
-        directives: { search: searchShortcutDirective },
+        directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [
           [
             createTestingPinia({
@@ -69,7 +69,11 @@ function renderComponent(activeCitations?: ActiveCitation[]) {
           ],
           [router],
         ],
-        stubs: { routerLink: { template: "<a><slot/></a>" } },
+        stubs: {
+          routerLink: {
+            template: "<a><slot/></a>",
+          },
+        },
       },
     }),
   }

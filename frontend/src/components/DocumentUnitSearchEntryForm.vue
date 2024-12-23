@@ -217,7 +217,7 @@ export type DocumentUnitSearchParameter =
 
 <template>
   <div
-    v-search="handleSearchButtonClicked"
+    v-ctrl-enter="handleSearchButtonClicked"
     class="pyb-24 mb-32 flex flex-col bg-blue-200"
   >
     <div

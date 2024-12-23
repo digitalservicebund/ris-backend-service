@@ -179,7 +179,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div v-search="search" class="flex flex-col gap-24">
+  <div v-ctrl-enter="search" class="flex flex-col gap-24">
     <div class="flex flex-col gap-24">
       <InputField
         id="dateKnown"

@@ -9,7 +9,7 @@ import DocumentUnit, { Court, DocumentType } from "@/domain/documentUnit"
 import PreviousDecision from "@/domain/previousDecision"
 import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
-import { searchShortcutDirective } from "@/utils/searchShortcutDirective"
+import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
 const server = setupServer(
@@ -41,8 +41,12 @@ function renderComponent(previousDecisions?: PreviousDecision[]) {
     user,
     ...render(PreviousDecisions, {
       global: {
-        directives: { search: searchShortcutDirective },
-        stubs: { routerLink: { template: "<a><slot/></a>" } },
+        directives: { "ctrl-enter": onSearchShortcutDirective },
+        stubs: {
+          routerLink: {
+            template: "<a><slot/></a>",
+          },
+        },
         plugins: [
           [
             createTestingPinia({

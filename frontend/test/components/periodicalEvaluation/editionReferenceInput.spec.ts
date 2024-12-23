@@ -5,7 +5,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import PeriodicalEditionReferenceInput from "@/components/periodical-evaluation/references/PeriodicalEditionReferenceInput.vue"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import documentUnitService from "@/services/documentUnitService"
-import { searchShortcutDirective } from "@/utils/searchShortcutDirective"
+import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
 function renderComponent() {
@@ -23,7 +23,7 @@ function renderComponent() {
         isSaved: false,
       },
       global: {
-        directives: { search: searchShortcutDirective },
+        directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [
           router,
           [

@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/vue"
 import { expect } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitSearchEntryForm from "@/components/DocumentUnitSearchEntryForm.vue"
-import { searchShortcutDirective } from "@/utils/searchShortcutDirective"
+import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 
 async function renderComponent(options?: { isLoading: boolean }) {
   const props = {
@@ -26,7 +26,7 @@ async function renderComponent(options?: { isLoading: boolean }) {
       props,
       global: {
         directives: {
-          search: searchShortcutDirective,
+          "ctrl-enter": onSearchShortcutDirective,
         },
         plugins: [router],
       },

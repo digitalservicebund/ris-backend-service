@@ -1,6 +1,6 @@
 import { Directive } from "vue"
 
-export const searchShortcutDirective: Directive = {
+export const onSearchShortcutDirective: Directive = {
   mounted(el, binding) {
     const handleKeydown = (event: KeyboardEvent) => {
       if (

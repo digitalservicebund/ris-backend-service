@@ -9,7 +9,7 @@ import DocumentUnit, { Court, DocumentType } from "@/domain/documentUnit"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
-import { searchShortcutDirective } from "@/utils/searchShortcutDirective"
+import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
 const server = setupServer(
@@ -42,7 +42,9 @@ function renderComponent(ensuingDecisions?: EnsuingDecision[]) {
     user,
     ...render(EnsuingDecisions, {
       global: {
-        directives: { search: searchShortcutDirective },
+        directives: {
+          "ctrl-enter": onSearchShortcutDirective,
+        },
         plugins: [
           [
             createTestingPinia({
@@ -59,7 +61,11 @@ function renderComponent(ensuingDecisions?: EnsuingDecision[]) {
           ],
           [router],
         ],
-        stubs: { routerLink: { template: "<a><slot/></a>" } },
+        stubs: {
+          routerLink: {
+            template: "<a><slot/></a>",
+          },
+        },
       },
     }),
   }

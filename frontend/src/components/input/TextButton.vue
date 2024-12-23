@@ -91,7 +91,7 @@ const render = () => {
 </script>
 
 <template>
-  <div class="w-max" data-testid>
+  <div class="w-full" data-testid>
     <render />
   </div>
 </template>
