@@ -76,6 +76,7 @@ export enum InputMethod {
         </h2>
       </div>
       <FieldOfLawSummary
+        data-testid="field-of-law-summary"
         :fields-of-law="fieldsOfLaw"
         @node:clicked="nodeClicked"
         @node:remove="removeNode"

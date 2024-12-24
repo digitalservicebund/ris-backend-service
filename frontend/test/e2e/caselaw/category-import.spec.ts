@@ -50,6 +50,12 @@ test.describe("category import", () => {
 
       await expect(page.getByText("Übernommen")).toBeVisible()
       await expect(page.getByText("keyword1")).toBeVisible()
+
+      const keywordsContainer = page.getByTestId("keywords")
+      await expect(keywordsContainer.getByTestId("chip")).toHaveCount(1)
+      await page.getByLabel("Schlagwörter übernehmen").click()
+      // does not import duplicates
+      await expect(keywordsContainer.getByTestId("chip")).toHaveCount(1)
     },
   )
 
@@ -69,6 +75,11 @@ test.describe("category import", () => {
 
       await expect(page.getByText("Übernommen")).toBeVisible()
       await expect(page.getByText("AR-01")).toBeVisible()
+
+      await expect(page.getByTestId("field-of-law-summary")).toHaveCount(1)
+      await page.getByLabel("Sachgebiete übernehmen").click()
+      // does not import duplicates
+      await expect(page.getByTestId("field-of-law-summary")).toHaveCount(1)
     },
   )
 
@@ -88,6 +99,38 @@ test.describe("category import", () => {
 
       await expect(page.getByText("Übernommen")).toBeVisible()
       await expect(page.getByText("BGB")).toBeVisible()
+
+      const normContainer = page.getByTestId("norms")
+      await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(2)
+      await page.getByLabel("Normen übernehmen").click()
+      // does not import duplicates
+      await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(2)
+    },
+  )
+
+  test(
+    "import active citations",
+    { tag: ["@RISDEV-5888"] },
+    async ({ page, prefilledDocumentUnit }) => {
+      await navigateToCategoryImport(page, prefilledDocumentUnit.documentNumber)
+      await searchForDocumentUnitToImport(page, "YYTestDoc0013")
+      await expect(page.getByText("fileNumber5")).toBeVisible()
+
+      await expect(page.getByLabel("Aktivzitierung übernehmen")).toBeVisible()
+      await page.getByLabel("Aktivzitierung übernehmen").click()
+
+      await expect(page.getByText("Übernommen")).toBeVisible()
+      await expect(page.getByText("Änderung, BVerwG, 09.09.1987")).toBeVisible()
+
+      const activeCitationsContainer = page.getByTestId("activeCitations")
+      await expect(
+        activeCitationsContainer.getByLabel("Listen Eintrag"),
+      ).toHaveCount(2)
+      await page.getByLabel("Aktivzitierung übernehmen").click()
+      // does not import duplicates
+      await expect(
+        activeCitationsContainer.getByLabel("Listen Eintrag"),
+      ).toHaveCount(2)
     },
   )
 
@@ -106,9 +149,8 @@ test.describe("category import", () => {
   ) {
     await page
       .getByRole("textbox", { name: "Dokumentnummer Eingabefeld" })
-      .fill("")
-    await page.getByLabel("Dokumentnummer Eingabefeld").click()
-    await page.keyboard.type(documentNumber)
+      .fill(documentNumber)
+
     await expect(
       page.getByRole("button", { name: "Dokumentationseinheit laden" }),
     ).toBeEnabled()

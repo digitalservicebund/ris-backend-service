@@ -28,11 +28,11 @@ const hasKeywords = computed(
       label="Schlagwörter"
       :should-show-button="!hasKeywords"
     >
-      <KeyWords @reset="slotProps.reset" />
+      <KeyWords data-testid="keywords" @reset="slotProps.reset" />
     </CategoryWrapper>
-    <FieldsOfLaw />
-    <Norms />
-    <ActiveCitations />
+    <FieldsOfLaw data-testid="fieldsOfLaw" />
+    <Norms data-testid="norms" />
+    <ActiveCitations data-testid="activeCitations" />
     <OtherCategories />
   </div>
 </template>
