@@ -965,3 +965,37 @@ VALUES
             WHERE abbreviation = 'BGB'
         )
     );
+
+INSERT INTO
+    incremental_migration.related_documentation (id, dtype, document_number, documentation_unit_id, citation_type_id, referenced_documentation_unit_id, court_id, date)
+VALUES
+    (
+        gen_random_uuid (),
+        'caselaw_active_citation',
+        'YYTestDoc0013',
+        (
+            SELECT id
+            FROM incremental_migration.documentation_unit
+            WHERE document_number = 'YYTestDoc0013'
+        ),
+        (
+            SELECT id
+            FROM incremental_migration.citation_type
+            WHERE abbreviation = 'Änderung'
+        ),
+        (
+            SELECT id
+            FROM incremental_migration.documentation_unit
+            WHERE document_number = 'YYTestDoc0012'
+        ),
+        (
+            SELECT documentation_unit.court_id
+            FROM incremental_migration.documentation_unit
+            WHERE document_number = 'YYTestDoc0012'
+        ),
+        (
+            SELECT documentation_unit.decision_date
+            FROM incremental_migration.documentation_unit
+            WHERE document_number = 'YYTestDoc0012'
+        )
+    );

@@ -91,6 +91,25 @@ test.describe("category import", () => {
     },
   )
 
+  test(
+    "import active citations",
+    { tag: ["@RISDEV-5888"] },
+    async ({ page, prefilledDocumentUnit }) => {
+      await navigateToCategoryImport(page, prefilledDocumentUnit.documentNumber)
+      await searchForDocumentUnitToImport(page, "YYTestDoc0013")
+      await expect(page.getByText("fileNumber5")).toBeVisible()
+
+      await expect(page.getByLabel("Aktivzitierung übernehmen")).toBeVisible()
+      await page.getByLabel("Aktivzitierung übernehmen").click()
+
+      await expect(page.getByText("Übernommen")).toBeVisible()
+      await expect(page.getByText("Änderung, BVerwG, 09.09.1987")).toBeVisible()
+      await expect(
+        page.getByRole("button", { name: "YYTestDoc0013" }),
+      ).toBeVisible()
+    },
+  )
+
   async function navigateToCategoryImport(page: Page, documentNumber: string) {
     await navigateToCategories(page, documentNumber)
     await page.getByLabel("Seitenpanel öffnen").click()
@@ -106,9 +125,8 @@ test.describe("category import", () => {
   ) {
     await page
       .getByRole("textbox", { name: "Dokumentnummer Eingabefeld" })
-      .fill("")
-    await page.getByLabel("Dokumentnummer Eingabefeld").click()
-    await page.keyboard.type(documentNumber)
+      .fill(documentNumber)
+
     await expect(
       page.getByRole("button", { name: "Dokumentationseinheit laden" }),
     ).toBeEnabled()
