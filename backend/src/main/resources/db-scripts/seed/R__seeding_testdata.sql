@@ -917,3 +917,85 @@ VALUES
     )
 ON CONFLICT DO NOTHING;
 
+INSERT INTO
+    incremental_migration.documentation_unit_keyword (documentation_unit_id, keyword_id)
+VALUES
+    (
+        (
+            SELECT id
+            FROM incremental_migration.documentation_unit
+            WHERE document_number = 'YYTestDoc0013'
+        ),
+        (
+            SELECT id
+            FROM incremental_migration.keyword
+            WHERE value = 'keyword1'
+        )
+    );
+
+INSERT INTO
+    incremental_migration.documentation_unit_field_of_law (documentation_unit_id, field_of_law_id)
+VALUES
+    (
+        (
+            SELECT id
+            FROM incremental_migration.documentation_unit
+            WHERE document_number = 'YYTestDoc0013'
+        ),
+        (
+            SELECT id
+            FROM incremental_migration.field_of_law
+            WHERE identifier = 'AR-01'
+        )
+    );
+
+INSERT INTO
+    incremental_migration.norm_reference (id, documentation_unit_id, norm_abbreviation_id)
+VALUES
+    (
+        gen_random_uuid (),
+        (
+            SELECT id
+            FROM incremental_migration.documentation_unit
+            WHERE document_number = 'YYTestDoc0013'
+        ),
+        (
+            SELECT id
+            FROM incremental_migration.norm_abbreviation
+            WHERE abbreviation = 'BGB'
+        )
+    );
+
+INSERT INTO
+    incremental_migration.related_documentation (id, dtype, document_number, documentation_unit_id, citation_type_id, referenced_documentation_unit_id, court_id, date)
+VALUES
+    (
+        gen_random_uuid (),
+        'caselaw_active_citation',
+        'YYTestDoc0013',
+        (
+            SELECT id
+            FROM incremental_migration.documentation_unit
+            WHERE document_number = 'YYTestDoc0013'
+        ),
+        (
+            SELECT id
+            FROM incremental_migration.citation_type
+            WHERE abbreviation = 'Änderung'
+        ),
+        (
+            SELECT id
+            FROM incremental_migration.documentation_unit
+            WHERE document_number = 'YYTestDoc0012'
+        ),
+        (
+            SELECT documentation_unit.court_id
+            FROM incremental_migration.documentation_unit
+            WHERE document_number = 'YYTestDoc0012'
+        ),
+        (
+            SELECT documentation_unit.decision_date
+            FROM incremental_migration.documentation_unit
+            WHERE document_number = 'YYTestDoc0012'
+        )
+    );
