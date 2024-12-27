@@ -37,19 +37,21 @@ test.describe("category import", () => {
   test(
     "import keywords",
     { tag: ["@RISDEV-5720"] },
-    async ({ page, prefilledDocumentUnit }) => {
-      await navigateToCategoryImport(
+    async ({ page, documentNumber, prefilledDocumentUnit }) => {
+      await navigateToCategoryImport(page, documentNumber)
+      await searchForDocumentUnitToImport(
         page,
-        prefilledDocumentUnit.documentNumber as string,
+        prefilledDocumentUnit.documentNumber,
       )
-      await searchForDocumentUnitToImport(page, "YYTestDoc0013")
-      await expect(page.getByText("fileNumber5")).toBeVisible()
+      await expect(
+        page.getByText(prefilledDocumentUnit.coreData.fileNumbers![0]),
+      ).toBeVisible()
 
       await expect(page.getByLabel("Schlagwörter übernehmen")).toBeVisible()
       await page.getByLabel("Schlagwörter übernehmen").click()
 
       await expect(page.getByText("Übernommen")).toBeVisible()
-      await expect(page.getByText("keyword1")).toBeVisible()
+      await expect(page.getByText("keyword")).toBeVisible()
 
       const keywordsContainer = page.getByTestId("keywords")
       await expect(keywordsContainer.getByTestId("chip")).toHaveCount(1)
@@ -62,13 +64,15 @@ test.describe("category import", () => {
   test(
     "import fields of law",
     { tag: ["@RISDEV-5886"] },
-    async ({ page, prefilledDocumentUnit }) => {
-      await navigateToCategoryImport(
+    async ({ page, documentNumber, prefilledDocumentUnit }) => {
+      await navigateToCategoryImport(page, documentNumber)
+      await searchForDocumentUnitToImport(
         page,
-        prefilledDocumentUnit.documentNumber as string,
+        prefilledDocumentUnit.documentNumber,
       )
-      await searchForDocumentUnitToImport(page, "YYTestDoc0013")
-      await expect(page.getByText("fileNumber5")).toBeVisible()
+      await expect(
+        page.getByText(prefilledDocumentUnit.coreData.fileNumbers![0]),
+      ).toBeVisible()
 
       await expect(page.getByLabel("Sachgebiete übernehmen")).toBeVisible()
       await page.getByLabel("Sachgebiete übernehmen").click()
@@ -86,13 +90,15 @@ test.describe("category import", () => {
   test(
     "import norms",
     { tag: ["@RISDEV-5887"] },
-    async ({ page, prefilledDocumentUnit }) => {
-      await navigateToCategoryImport(
+    async ({ page, documentNumber, prefilledDocumentUnit }) => {
+      await navigateToCategoryImport(page, documentNumber)
+      await searchForDocumentUnitToImport(
         page,
-        prefilledDocumentUnit.documentNumber as string,
+        prefilledDocumentUnit.documentNumber,
       )
-      await searchForDocumentUnitToImport(page, "YYTestDoc0013")
-      await expect(page.getByText("fileNumber5")).toBeVisible()
+      await expect(
+        page.getByText(prefilledDocumentUnit.coreData.fileNumbers![0]),
+      ).toBeVisible()
 
       await expect(page.getByLabel("Normen übernehmen")).toBeVisible()
       await page.getByLabel("Normen übernehmen").click()
@@ -108,20 +114,28 @@ test.describe("category import", () => {
     },
   )
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip(
+  test(
     "import active citations",
     { tag: ["@RISDEV-5888"] },
-    async ({ page, prefilledDocumentUnit }) => {
-      await navigateToCategoryImport(page, prefilledDocumentUnit.documentNumber)
-      await searchForDocumentUnitToImport(page, "YYTestDoc0013")
-      await expect(page.getByText("fileNumber5")).toBeVisible()
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnit }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
+      await searchForDocumentUnitToImport(
+        page,
+        prefilledDocumentUnit.documentNumber,
+      )
+      await expect(
+        page.getByText(prefilledDocumentUnit.coreData.fileNumbers![0]),
+      ).toBeVisible()
 
       await expect(page.getByLabel("Aktivzitierung übernehmen")).toBeVisible()
       await page.getByLabel("Aktivzitierung übernehmen").click()
 
       await expect(page.getByText("Übernommen")).toBeVisible()
-      await expect(page.getByText("Änderung, BVerwG, 09.09.1987")).toBeVisible()
+      await expect(
+        page.getByText(
+          "Abgrenzung, AG Aachen, 01.02.2022, 123, Anerkenntnisurteil",
+        ),
+      ).toBeVisible()
 
       const activeCitationsContainer = page.getByTestId("activeCitations")
       await expect(
@@ -138,7 +152,10 @@ test.describe("category import", () => {
   async function navigateToCategoryImport(page: Page, documentNumber: string) {
     await navigateToCategories(page, documentNumber)
     await page.getByLabel("Seitenpanel öffnen").click()
-    await page.getByLabel("Rubriken-Import anzeigen").click()
+    await page
+      .getByTestId("category-import-button")
+      .getByLabel("Rubriken-Import anzeigen")
+      .click()
 
     await expect(page.getByText("Rubriken importieren")).toBeVisible()
     await expect(page.getByLabel("Dokumentnummer Eingabefeld")).toBeVisible()
