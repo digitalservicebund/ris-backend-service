@@ -161,7 +161,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.4")
 
     // CVE-2024-50379
-    implementation ("org.apache.tomcat.embed:tomcat-embed-core:11.0.2")
+    implementation ("org.apache.tomcat.embed:tomcat-embed-core:10.1.34")
     // CVE-2024-26308
     implementation("org.apache.commons:commons-compress:1.27.1")
     // CVE-2022-3171
