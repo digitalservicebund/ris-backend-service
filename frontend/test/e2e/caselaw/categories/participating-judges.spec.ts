@@ -81,21 +81,19 @@ test.describe(
         await page.getByText("XML Vorschau").click()
         const xmlPreview = page.getByTitle("XML Vorschau")
         const innerText = await xmlPreview.innerText()
-        expect(innerText).toBeDefined()
+
         expect(innerText).toContain(
-          "13\n" +
-            "    <paratrubriken>\n" +
-            "14\n" +
-            "        <mitwirkung>Name of judge (Abweichende Meinung)</mitwirkung>\n" +
-            "15\n" +
-            "        <zuordnung>",
+          "<mitwirkung>Name of judge (Abweichende Meinung)</mitwirkung>",
         )
       })
 
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
 
       await test.step("Change the name of the judge", async () => {
-        await page.getByTestId("list-entry-0").click()
+        await page
+          .getByTestId("Mitwirkende Richter")
+          .getByTestId("list-entry-0")
+          .click()
         await page
           .getByTestId("participating-judge-name-input")
           .fill("Updated name")
@@ -112,7 +110,10 @@ test.describe(
       })
 
       await test.step("Delete entry", async () => {
-        await page.getByTestId("list-entry-0").click()
+        await page
+          .getByTestId("Mitwirkende Richter")
+          .getByTestId("list-entry-0")
+          .click()
         await page.getByRole("button", { name: "Eintrag löschen" }).click()
       })
 

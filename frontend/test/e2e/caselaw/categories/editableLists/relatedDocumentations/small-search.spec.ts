@@ -119,6 +119,7 @@ test("search with changed parameters resets the page to 0", async ({
       async () => {
         const firstInput = { decisionDate: "31.12.2019" }
         if (container === activeCitationContainer) {
+          await activeCitationContainer.getByLabel("Weitere Angabe").click()
           await fillActiveCitationInputs(page, firstInput)
         }
         if (container === previousDecisionContainer) {
@@ -190,6 +191,7 @@ test("search for documentunits does not return current documentation unit", asyn
         }
 
         if (container === activeCitationContainer) {
+          await activeCitationContainer.getByLabel("Weitere Angabe").click()
           await fillActiveCitationInputs(page, inputs)
         }
         if (container === previousDecisionContainer) {

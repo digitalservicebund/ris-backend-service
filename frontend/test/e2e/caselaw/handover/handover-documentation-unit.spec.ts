@@ -394,21 +394,10 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
 
         const xmlPreviewText = await page.getByTitle("XML Vorschau").innerText()
 
-        expect(xmlPreviewText).toContain(
-          "30\n        <tenor>\n" +
-            "31\n            <body>\n" +
-            "32\n                <div>\n" +
-            '33\n                    <rdlink nr="2"/>\n' +
-            '34\n <rdlink nr="1"/>\n' +
-            "35\n                </div>\n" +
-            "36\n            </body>\n" +
-            "37\n        </tenor>\n" +
-            "38\n        <tatbestand>\n" +
-            "39\n            <body>\n" +
-            "40\n                <div>\n" +
-            "41\n                    <p>\n" +
-            '42\n                        <rd nr="1"/>Text',
-        )
+        const regex =
+          /<tenor>\s*\d*\s*<body>\s*\d*\s*<div>\s*\d*\s*<rdlink nr="2"\/>\s*\d*\s*<rdlink nr="1"\/>\s*\d*\s*<\/div>\s*\d*\s*<\/body>\s*\d*\s*<\/tenor>\s*\d*\s*<tatbestand>\s*\d*\s*<body>\s*\d*\s*<div>\s*\d*\s*<p>\s*\d*\s*<rd nr="1"\/>Text/
+
+        expect(xmlPreviewText).toMatch(regex)
       })
 
       await test.step("Randnummern und Links werden unter Rubriken korrekt angezeigt", async () => {

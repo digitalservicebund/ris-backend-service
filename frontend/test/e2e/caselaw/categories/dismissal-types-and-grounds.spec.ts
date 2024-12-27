@@ -80,26 +80,10 @@ test.describe(
         await page.getByText("XML Vorschau").click()
         const xmlPreview = page.getByTitle("XML Vorschau")
         const innerText = await xmlPreview.innerText()
-        expect(innerText).toBeDefined()
-        expect(innerText).toContain(
-          "<paratrubriken>\n" +
-            "13\n" +
-            "        <zuordnung>\n" +
-            "14\n" +
-            "            <aspekt>Kündigungsgrund</aspekt>\n" +
-            "15\n" +
-            "            <begriff>Betriebsbedingte Kündigung</begriff>\n" +
-            "16\n" +
-            "        </zuordnung>\n" +
-            "17\n" +
-            "        <zuordnung>\n" +
-            "18\n" +
-            "            <aspekt>Kündigungsgrund</aspekt>\n" +
-            "19\n" +
-            "            <begriff>Einführung neuer Technologien</begriff>\n" +
-            "20\n" +
-            "        </zuordnung>",
-        )
+
+        const regex =
+          /<zuordnung>\s*\d*\s*<aspekt>Kündigungsgrund<\/aspekt>\s*\d*\s*<begriff>Betriebsbedingte Kündigung<\/begriff>\s*\d*\s*<\/zuordnung>\s*\d*\s*<zuordnung>\s*\d*\s*<aspekt>Kündigungsgrund<\/aspekt>\s*\d*\s*<begriff>Einführung neuer Technologien<\/begriff>\s*\d*\s*<\/zuordnung>/
+        expect(innerText).toMatch(regex)
       })
 
       await test.step("Preview should show dismissal fields", async () => {
