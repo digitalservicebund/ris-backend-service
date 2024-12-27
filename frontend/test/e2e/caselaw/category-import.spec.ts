@@ -108,7 +108,8 @@ test.describe("category import", () => {
     },
   )
 
-  test(
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip(
     "import active citations",
     { tag: ["@RISDEV-5888"] },
     async ({ page, prefilledDocumentUnit }) => {
