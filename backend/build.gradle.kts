@@ -162,14 +162,8 @@ dependencies {
 
     // CVE-2024-50379
     implementation ("org.apache.tomcat.embed:tomcat-embed-core:10.1.34")
-    // CVE-2024-26308
-    implementation("org.apache.commons:commons-compress:1.27.1")
     // CVE-2022-3171
     implementation("com.google.protobuf:protobuf-java:4.29.2")
-    // CVE-2023-52428 in spring-boot-starter-oauth2-client:3.2.3
-    implementation("com.nimbusds:nimbus-jose-jwt:9.48")
-    // CVE-2023-31582
-    implementation("org.bitbucket.b_c:jose4j:0.9.6")
 
     implementation("org.postgresql:postgresql:42.7.4")
 
@@ -215,8 +209,6 @@ dependencies {
     implementation("io.micrometer:micrometer-core:1.14.2")
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
-    // => CVE-2023-2976
-    implementation("com.google.guava:guava:33.4.0-jre")
 
     implementation("io.getunleash:unleash-client-java:9.2.6")
     implementation("org.apache.commons:commons-text:1.13.0")
