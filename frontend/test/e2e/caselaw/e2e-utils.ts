@@ -660,17 +660,11 @@ export async function searchForDocUnitWithFileNumberAndDecisionDate(
   date: string,
 ) {
   await fillInput(page, "Gericht", "AG Aachen")
-  await page
-    .getByLabel("dropdown-option")
-    .getByText("AG Aachen", { exact: true })
-    .click()
+  await page.getByText("AG Aachen", { exact: true }).click()
   await fillInput(page, "Aktenzeichen", fileNumber)
   await fillInput(page, "Entscheidungsdatum", date)
   await fillInput(page, "Dokumenttyp", "AnU")
-  await page
-    .getByLabel("dropdown-option")
-    .getByText("Anerkenntnisurteil", { exact: true })
-    .click()
+  await page.getByText("Anerkenntnisurteil", { exact: true }).click()
 
   await page.getByText("Suchen").click()
 }
