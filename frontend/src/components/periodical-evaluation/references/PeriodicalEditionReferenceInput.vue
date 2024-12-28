@@ -26,9 +26,7 @@ import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 import FeatureToggleService from "@/services/featureToggleService"
 import { ResponseError } from "@/services/httpClient"
-import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useEditionStore } from "@/stores/editionStore"
-import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import StringsUtil from "@/utils/stringsUtil"
 
 const props = defineProps<{
@@ -42,9 +40,6 @@ const emit = defineEmits<{
   cancelEdit: [void]
   removeEntry: [value: Reference]
 }>()
-
-const documentUnitStore = useDocumentUnitStore()
-const extraContentSidePanelStore = useExtraContentSidePanelStore()
 
 const containerRef = ref<HTMLElement | null>(null)
 
@@ -273,13 +268,6 @@ async function deleteReferenceAndDocUnit() {
   deleteReference()
 }
 
-async function openSidePanel(documentUnitNumber?: string) {
-  if (documentUnitNumber) {
-    await documentUnitStore.loadDocumentUnit(documentUnitNumber)
-    extraContentSidePanelStore.togglePanel(true)
-  }
-}
-
 /*
 Relates the legal periodical of edition to the reference
  */
@@ -324,12 +312,8 @@ watch(
 /** watches the changes of query related documentations params
  * resets the page if change took place.
  */
-watch(searchResultsCurrentPage, async () => {
+watch(searchResultsCurrentPage, () => {
   pageNumber.value = 0
-
-  if (searchResults.value && searchResults.value.length == 1) {
-    await openSidePanel(searchResults.value[0].decision.documentNumber)
-  }
 })
 
 onMounted(async () => {
