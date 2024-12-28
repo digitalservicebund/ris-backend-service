@@ -104,6 +104,7 @@ test.describe("Editing and deleting references in periodical evaluation", () => 
         await expect(page.locator("[aria-label='Listen Eintrag']")).toHaveCount(
           2,
         )
+        await closeExtraContentSidePanelPreview(page)
       })
 
       const secondPage = await context.newPage()
@@ -163,11 +164,14 @@ test.describe("Editing and deleting references in periodical evaluation", () => 
         await expect(decisionElement.nth(1)).toBeVisible()
 
         await expect(
-          page.getByText(`MMG 2024, 5${suffix} (LT)`, { exact: true }),
+          page
+            .getByTestId("editable-list-container")
+            .getByText(`MMG 2024, 5${suffix} (LT)`, { exact: true }),
         ).toBeVisible()
       })
 
       await test.step("Other docUnits can be added to an edition", async () => {
+        await closeExtraContentSidePanelPreview(page)
         await searchForDocUnitWithFileNumberAndDecisionDate(
           page,
           secondFileNumber,
