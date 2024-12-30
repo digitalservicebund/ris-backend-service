@@ -52,12 +52,13 @@ test.describe("Editing and deleting references in periodical evaluation", () => 
         ).not.toBeEditable()
       })
 
-      await test.step("should automatically open preview, when only one search result", async () => {
+      await test.step("should open and close document preview in side panel", async () => {
         await searchForDocUnitWithFileNumberAndDecisionDate(
           page,
           fileNumber,
           "31.12.2019",
         )
+        await openExtraContentSidePanelPreview(page, fileNumber)
         await expect(page.getByLabel("Seitenpanel öffnen")).toBeHidden()
 
         await closeExtraContentSidePanelPreview(page)
@@ -162,9 +163,7 @@ test.describe("Editing and deleting references in periodical evaluation", () => 
         await expect(decisionElement.nth(1)).toBeVisible()
 
         await expect(
-          page
-            .getByTestId("editable-list-container")
-            .getByText(`MMG 2024, 5${suffix} (LT)`, { exact: true }),
+          page.getByText(`MMG 2024, 5${suffix} (LT)`, { exact: true }),
         ).toBeVisible()
       })
 
