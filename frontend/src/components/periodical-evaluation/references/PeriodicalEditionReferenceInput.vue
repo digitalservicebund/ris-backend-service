@@ -26,7 +26,9 @@ import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 import FeatureToggleService from "@/services/featureToggleService"
 import { ResponseError } from "@/services/httpClient"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useEditionStore } from "@/stores/editionStore"
+import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import StringsUtil from "@/utils/stringsUtil"
 
 const props = defineProps<{
@@ -44,6 +46,8 @@ const emit = defineEmits<{
 const containerRef = ref<HTMLElement | null>(null)
 
 const store = useEditionStore()
+const documentUnitStore = useDocumentUnitStore()
+const extraContentSidePanelStore = useExtraContentSidePanelStore()
 const reference = ref<Reference>(new Reference({ ...props.modelValue }))
 const validationStore = useValidationStore()
 const pageNumber = ref<number>(0)
@@ -268,6 +272,18 @@ async function deleteReferenceAndDocUnit() {
   deleteReference()
 }
 
+async function openSidePanel(documentUnitNumber?: string) {
+  if (documentUnitNumber) {
+    await documentUnitStore.loadDocumentUnit(documentUnitNumber)
+    extraContentSidePanelStore.togglePanel(true)
+  }
+}
+
+async function closeSidePanel() {
+  await documentUnitStore.unloadDocumentUnit()
+  extraContentSidePanelStore.togglePanel(false)
+}
+
 /*
 Relates the legal periodical of edition to the reference
  */
@@ -310,10 +326,16 @@ watch(
 )
 
 /** watches the changes of query related documentations params
- * resets the page if change took place.
+ * resets the page if change took place. If one search results, open side panel.
  */
-watch(searchResultsCurrentPage, () => {
+watch(searchResultsCurrentPage, async () => {
   pageNumber.value = 0
+
+  if (searchResults.value && searchResults.value.length == 1) {
+    await openSidePanel(searchResults.value[0].decision.documentNumber)
+  } else {
+    await closeSidePanel()
+  }
 })
 
 onMounted(async () => {
