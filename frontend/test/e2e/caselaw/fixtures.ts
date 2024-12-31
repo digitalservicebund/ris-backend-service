@@ -116,6 +116,7 @@ export const caselawTest = test.extend<MyFixtures>({
           shortTexts: {
             headnote: "testHeadnote",
             guidingPrinciple: "guidingPrinciple",
+            headline: "testHeadline",
           },
         },
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },

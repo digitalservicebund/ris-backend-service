@@ -51,6 +51,36 @@ const labels = {
   fieldsOfLaw: "Sachgebiete",
   norms: "Normen",
   activeCitations: "Aktivzitierung",
+  headline: "Titelzeile",
+  guidingPrinciple: "Leitsatz",
+  headnote: "Orientierungssatz",
+}
+
+const hasContent = (key: keyof typeof labels): boolean => {
+  if (documentUnitToImport.value)
+    if (key in documentUnitToImport.value.contentRelatedIndexing) {
+      const object =
+        documentUnitToImport.value.contentRelatedIndexing[
+          key as keyof typeof documentUnitToImport.value.contentRelatedIndexing
+        ]
+
+      return !!(Array.isArray(object) && object.length > 0)
+    } else if (key in documentUnitToImport.value.shortTexts) {
+      return !!documentUnitToImport.value.shortTexts[
+        key as keyof typeof documentUnitToImport.value.shortTexts
+      ]
+    }
+  return false
+}
+
+const isImportable = (key: keyof typeof labels): boolean => {
+  if (documentUnitToImport.value)
+    if (key in documentUnitToImport.value.shortTexts) {
+      return !store.documentUnit!.shortTexts[
+        key as keyof typeof documentUnitToImport.value.shortTexts
+      ]
+    }
+  return true
 }
 
 // Handle import logic
@@ -69,6 +99,11 @@ const handleImport = async (key: keyof typeof labels) => {
       break
     case "activeCitations":
       importActiveCitations()
+      break
+    case "headline":
+    case "guidingPrinciple":
+    case "headnote":
+      importShortTexts(key)
       break
   }
 
@@ -184,6 +219,18 @@ function importActiveCitations() {
   }
 }
 
+function importShortTexts(key: string) {
+  const source =
+    documentUnitToImport.value?.shortTexts[
+      key as keyof typeof documentUnitToImport.value.shortTexts
+    ]
+
+  if (store.documentUnit)
+    store.documentUnit.shortTexts[
+      key as keyof typeof store.documentUnit.shortTexts
+    ] = source
+}
+
 function scrollToCategory(key: string) {
   const element = document.getElementById(key)
   if (element) {
@@ -207,7 +254,10 @@ watch(
 </script>
 
 <template>
-  <div data-testid="category-import">
+  <div
+    class="max-h-[70vh] min-h-[63vh] overflow-scroll"
+    data-testid="category-import"
+  >
     <span class="ds-label-01-bold">Rubriken importieren</span>
     <div class="mt-16 flex flex-row items-end gap-8">
       <InputField
@@ -268,16 +318,13 @@ watch(
           <BaselineArrowOutward class="mb-4 inline w-24" />
         </RouterLink>
       </span>
+      <!-- Inhaltliche Erschließung -->
       <div v-for="(value, key) in labels" :key="key">
         <SingleCategory
           :error-message="validationStore.getByField(key)"
           :handle-import="() => handleImport(key)"
-          :has-content="
-            !!(
-              documentUnitToImport.contentRelatedIndexing[key] &&
-              documentUnitToImport.contentRelatedIndexing[key].length > 0
-            )
-          "
+          :has-content="hasContent(key)"
+          :importable="isImportable(key)"
           :label="value"
         />
       </div>

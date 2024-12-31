@@ -1,5 +1,5 @@
 import { expect, Page } from "@playwright/test"
-import { navigateToCategories } from "./e2e-utils"
+import { navigateToCategories, clickCategoryButton, save } from "./e2e-utils"
 import { caselawTest as test } from "./fixtures"
 
 test.describe("category import", () => {
@@ -146,6 +146,95 @@ test.describe("category import", () => {
       await expect(
         activeCitationsContainer.getByLabel("Listen Eintrag"),
       ).toHaveCount(2)
+    },
+  )
+
+  test(
+    "import headline",
+    { tag: ["@RISDEV-5888"] },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnit }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
+      await searchForDocumentUnitToImport(
+        page,
+        prefilledDocumentUnit.documentNumber,
+      )
+      await expect(
+        page.getByText(prefilledDocumentUnit.coreData.fileNumbers![0]),
+      ).toBeVisible()
+
+      await expect(page.getByLabel("Titelzeile übernehmen")).toBeVisible()
+      await page.getByLabel("Titelzeile übernehmen").click()
+
+      await expect(page.getByText("Übernommen")).toBeVisible()
+      await expect(page.getByText("testHeadline")).toBeVisible()
+    },
+  )
+
+  test(
+    "import guiding principle",
+    { tag: ["@RISDEV-5888"] },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnit }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
+      await searchForDocumentUnitToImport(
+        page,
+        prefilledDocumentUnit.documentNumber,
+      )
+      await expect(
+        page.getByText(prefilledDocumentUnit.coreData.fileNumbers![0]),
+      ).toBeVisible()
+
+      await expect(page.getByLabel("Leitsatz übernehmen")).toBeVisible()
+      await page.getByLabel("Leitsatz übernehmen").click()
+
+      await expect(page.getByText("Übernommen")).toBeVisible()
+      await expect(page.getByText("guidingPrinciple")).toBeVisible()
+    },
+  )
+
+  test(
+    "import headnote",
+    { tag: ["@RISDEV-5888"] },
+    async ({ page, linkedDocumentNumber, prefilledDocumentUnit }) => {
+      await navigateToCategoryImport(page, linkedDocumentNumber)
+      await searchForDocumentUnitToImport(
+        page,
+        prefilledDocumentUnit.documentNumber,
+      )
+      await expect(
+        page.getByText(prefilledDocumentUnit.coreData.fileNumbers![0]),
+      ).toBeVisible()
+
+      await expect(
+        page.getByLabel("Orientierungssatz übernehmen"),
+      ).toBeVisible()
+      await page.getByLabel("Orientierungssatz übernehmen").click()
+
+      await expect(page.getByText("Übernommen")).toBeVisible()
+      await expect(page.getByText("testHeadnote")).toBeVisible()
+    },
+  )
+
+  test(
+    "import short texts not possible when target category filled",
+    { tag: ["@RISDEV-5888"] },
+    async ({ page, documentNumber, prefilledDocumentUnit }) => {
+      await navigateToCategories(page, documentNumber)
+      await clickCategoryButton("Leitsatz", page)
+      const guidingPrincipleInput = page.locator("[data-testid='Leitsatz']")
+      await guidingPrincipleInput.click()
+      await page.keyboard.type(`Test`)
+      await save(page)
+
+      await navigateToCategoryImport(page, documentNumber)
+      await searchForDocumentUnitToImport(
+        page,
+        prefilledDocumentUnit.documentNumber,
+      )
+      await expect(page.getByText("Zielrubrik ausgefüllt")).toBeVisible()
+      await guidingPrincipleInput.click()
+      await page.keyboard.press(`ControlOrMeta+A`)
+      await page.keyboard.press(`ControlOrMeta+Backspace`)
+      await expect(page.getByText("Zielrubrik ausgefüllt")).toBeHidden()
     },
   )
 

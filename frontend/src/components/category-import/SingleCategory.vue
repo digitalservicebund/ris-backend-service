@@ -13,6 +13,7 @@ const props = defineProps<{
   errorMessage: ValidationError | undefined
   hasContent: boolean
   handleImport: () => void
+  importable: boolean
 }>()
 
 const importSuccess = ref(false)
@@ -33,7 +34,7 @@ function handleClick() {
       <TextButton
         :aria-label="label + ' übernehmen'"
         button-type="primary"
-        :disabled="!hasContent"
+        :disabled="!hasContent || !importable"
         :icon="IconAdd"
         size="medium"
         @click="handleClick"
@@ -50,6 +51,14 @@ function handleClick() {
         :data-testid="label + '-empty'"
         :icon="IconInfo"
         label="Quellrubrik leer"
+      />
+      <IconBadge
+        v-if="!importable"
+        background-color="bg-blue-300"
+        color="text-blue-900"
+        :data-testid="label + '-empty'"
+        :icon="IconInfo"
+        label="Zielrubrik ausgefüllt"
       />
       <IconBadge
         v-if="importSuccess"

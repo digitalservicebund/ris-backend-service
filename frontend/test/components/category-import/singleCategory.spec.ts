@@ -10,6 +10,7 @@ function renderComponent(options?: {
   errorMessage?: ValidationError | undefined
   hasContent?: boolean
   handleImport?: () => void
+  importable?: boolean
 }) {
   const user = userEvent.setup()
   const router = createRouter({
@@ -24,6 +25,7 @@ function renderComponent(options?: {
         errorMessage: options?.errorMessage ?? undefined,
         hasContent: options?.hasContent ?? true,
         handleImport: options?.handleImport ?? vi.fn(),
+        importable: options?.importable ?? true,
       },
       global: { plugins: [[router]] },
     }),
@@ -61,5 +63,10 @@ describe("SingleCategory", () => {
       screen.getByRole("button", { name: "Testrubrik übernehmen" }),
     )
     expect(screen.getByText("Übernommen")).toBeInTheDocument()
+  })
+
+  it("displays target category filled alert", async () => {
+    renderComponent({ importable: false })
+    expect(screen.getByText("Zielrubrik ausgefüllt")).toBeInTheDocument()
   })
 })
