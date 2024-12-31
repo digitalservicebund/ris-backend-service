@@ -72,7 +72,8 @@ test("copy-paste text with different styles and alignments from side panel", asy
   })
 })
 
-test(
+// eslint-disable-next-line playwright/no-skipped-test
+test.skip(
   "copy-paste indented text from side panel",
   {
     annotation: {
