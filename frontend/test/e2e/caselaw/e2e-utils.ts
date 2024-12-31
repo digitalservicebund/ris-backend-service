@@ -615,7 +615,10 @@ export async function getRequest(url: string, page: Page): Promise<Request> {
 export async function clickCategoryButton(testId: string, page: Page) {
   await test.step(`click '${testId}' button to open category`, async () => {
     const button = page.getByRole("button", { name: testId, exact: true })
-    await button.click()
+
+    if (await button.isVisible()) {
+      await button.click()
+    }
     await expect(page.getByTestId(testId)).toBeVisible()
   })
 }
