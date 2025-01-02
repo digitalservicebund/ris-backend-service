@@ -282,6 +282,7 @@ onMounted(() => {
         </div>
         <FlexContainer
           v-if="store.panelMode === 'preview'"
+          id="preview-container"
           class="max-h-[70vh] overflow-auto"
         >
           <DocumentUnitPreview

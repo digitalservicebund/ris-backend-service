@@ -324,6 +324,37 @@ test.describe("Editing and deleting references in periodical evaluation", () => 
     },
   )
 
+  test("should scroll to guiding principle, if present", async ({
+    page,
+    prefilledDocumentUnit,
+    edition,
+  }) => {
+    const fileNumber = prefilledDocumentUnit.coreData.fileNumbers?.[0] || ""
+
+    await navigateToPeriodicalReferences(page, edition.id || "")
+
+    await searchForDocUnitWithFileNumberAndDecisionDate(
+      page,
+      fileNumber,
+      "31.12.2019",
+    )
+    await openExtraContentSidePanelPreview(page, fileNumber)
+
+    // Wait for the scroll position to reach the target
+    await page.waitForFunction(() => {
+      const containerEl = document.getElementById("preview-container")
+      const targetEl = document.getElementById("previewGuidingPrinciple")
+
+      if (!containerEl || !targetEl) return false
+      return targetEl.offsetTop == containerEl.offsetTop
+    })
+
+    await expect(page.getByText("Leitsatz")).toBeInViewport()
+    await expect(
+      page.getByText(prefilledDocumentUnit.shortTexts.guidingPrinciple!),
+    ).toBeInViewport()
+  })
+
   test(
     "Page number resets when new search started",
     { tag: "@RISDEV-5434" },
