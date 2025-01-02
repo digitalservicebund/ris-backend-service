@@ -9,8 +9,8 @@ import org.flywaydb.gradle.task.FlywayMigrateTask
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.4.1"
-    id("io.spring.dependency-management") version "1.1.7"
+    id("org.springframework.boot") version "3.3.5"
+    id("io.spring.dependency-management") version "1.1.6"
     id("com.diffplug.spotless") version "6.25.0"
     id("org.sonarqube") version "6.0.1.5171"
     id("com.github.jk1.dependency-license-report") version "2.9"
@@ -158,7 +158,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.2")
 
-    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.2.0")
+    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.4")
 
     // CVE-2024-50379
     implementation ("org.apache.tomcat.embed:tomcat-embed-core:10.1.34")
