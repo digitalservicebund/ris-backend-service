@@ -86,7 +86,7 @@ test(
     const singleIndentationText = "Abschnitt mit Einzug 1"
     const doubleIndentationText = "Abschnitt mit Einzug 2"
     const tripleIndentationText = "Abschnitt mit Einzug 3"
-    const noIndentation = /<p>Abschnitt mit Einzug 0<\/p>/
+    const noIndentation = /<p[^>]*>Abschnitt mit Einzug 0<\/p>/
     const singleIndentation =
       /<p\s+style="[^"]*margin-left:\s*40px!important[^"]*"\s*>Abschnitt mit Einzug 1<\/p>/
     const doubleIndentation =
