@@ -58,17 +58,15 @@ test.describe("category import", () => {
     async ({ page, documentNumber, prefilledDocumentUnit }) => {
       await navigateToCategoryImport(page, documentNumber)
       const keywordsContainer = page.getByTestId("keywords")
-      await manuallyAddKeyword(page, "existingKeyword")
 
       // ✔ Bei der Übernahme, werden die bestehenden Daten beibehalten und die importierten Rubrikendaten lediglich angehangen.
       await test.step("import into prefilled category", async () => {
+        await manuallyAddKeyword(page, "existingKeyword")
+
         await searchForDocumentUnitToImport(
           page,
           prefilledDocumentUnit.documentNumber,
         )
-        await expect(
-          page.getByText(prefilledDocumentUnit.coreData.fileNumbers![0]),
-        ).toBeVisible()
 
         await expect(page.getByLabel("Schlagwörter übernehmen")).toBeVisible()
         await page.getByLabel("Schlagwörter übernehmen").click()
@@ -130,30 +128,65 @@ test.describe("category import", () => {
     { tag: ["@RISDEV-5886"] },
     async ({ page, documentNumber, prefilledDocumentUnit }) => {
       await navigateToCategoryImport(page, documentNumber)
+      const fieldsOfLaw = page.getByTestId("field-of-law-summary")
 
-      await searchForDocumentUnitToImport(
-        page,
-        prefilledDocumentUnit.documentNumber,
-      )
-      await expect(
-        page.getByText(prefilledDocumentUnit.coreData.fileNumbers![0]),
-      ).toBeVisible()
+      await test.step("import into prefilled category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnit.documentNumber,
+        )
+        // add a field of law manually
+        await page.getByRole("button", { name: "Sachgebiete" }).click()
+        await page
+          .locator("[aria-label='Direkteingabe-Sachgebietssuche eingeben']")
+          .fill("VR-01-02")
+        await expect(page.getByText("Völkergewohnheitsrecht")).toBeVisible()
+        await page.getByText("Völkergewohnheitsrecht").click()
 
-      await expect(page.getByLabel("Sachgebiete übernehmen")).toBeVisible()
-      await page.getByLabel("Sachgebiete übernehmen").click()
+        await expect(fieldsOfLaw).toHaveCount(1)
 
-      await expect(page.getByText("Übernommen")).toBeVisible()
-      await expect(page.getByText("AR-01")).toBeVisible()
+        await expect(page.getByLabel("Sachgebiete übernehmen")).toBeVisible()
+        await page.getByLabel("Sachgebiete übernehmen").click()
 
-      await expect(page.getByTestId("field-of-law-summary")).toHaveCount(1)
-      await page.getByLabel("Sachgebiete übernehmen").click()
-      // does not import duplicates
-      await expect(page.getByTestId("field-of-law-summary")).toHaveCount(1)
+        const correctOrder = [
+          "VR-01-02",
+          "Völkergewohnheitsrecht",
+          "AR-01",
+          "Arbeitsvertrag: Abschluss, Klauseln, Arten, Betriebsübergang",
+        ]
+        const fieldsOfLawItems = fieldsOfLaw
+        await await expect(fieldsOfLawItems).toHaveText(correctOrder.join(""))
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
 
       await test.step("scroll to category", async () => {
         await expect(
           page.getByRole("heading", { name: "Sachgebiete" }),
         ).toBeInViewport()
+      })
+
+      await test.step("do not import duplicates and keep first field of law", async () => {
+        await page
+          .locator("[aria-label='Direkteingabe-Sachgebietssuche eingeben']")
+          .fill("EU-01-01")
+        await expect(page.getByText("Aufgaben und Ziele")).toBeVisible()
+        await page.getByText("Aufgaben und Ziele").click()
+
+        await page.getByLabel("Sachgebiete übernehmen").click()
+
+        const correctOrder = [
+          "VR-01-02",
+          "Völkergewohnheitsrecht",
+          "AR-01",
+          "Arbeitsvertrag: Abschluss, Klauseln, Arten, Betriebsübergang",
+          "EU-01-01",
+          "Aufgaben und Ziele",
+        ]
+        const fieldsOfLawItems = fieldsOfLaw
+        await await expect(fieldsOfLawItems).toHaveText(correctOrder.join(""))
       })
     },
   )
