@@ -1,5 +1,5 @@
 import { expect, Page } from "@playwright/test"
-import { navigateToCategories, clickCategoryButton, save } from "./e2e-utils"
+import { clickCategoryButton, navigateToCategories, save } from "./e2e-utils"
 import { caselawTest as test } from "./fixtures"
 
 test.describe("category import", () => {
@@ -34,32 +34,97 @@ test.describe("category import", () => {
     },
   )
 
+  // Wenn Rubrik im Quelldokument leer ist, wird der Button disabled und in einem grauen Badge angezeigt “Quellrubrik leer“
+  test(
+    "disable import for empty categories",
+    {
+      tag: [
+        "@RISDEV-5720",
+        "@RISDEV-5886",
+        "@RISDEV-5887",
+        "@RISDEV-5888",
+        "@RISDEV-5721",
+      ],
+    },
+    async ({ page, documentNumber }) => {
+      await navigateToCategoryImport(page, documentNumber)
+      await searchForDocumentUnitToImport(page, documentNumber)
+      await expect(page.getByText("Quellrubrik leer")).toHaveCount(7) // we have 7 importable categories
+    },
+  )
+
   test(
     "import keywords",
     { tag: ["@RISDEV-5720"] },
     async ({ page, documentNumber, prefilledDocumentUnit }) => {
       await navigateToCategoryImport(page, documentNumber)
-      await searchForDocumentUnitToImport(
-        page,
-        prefilledDocumentUnit.documentNumber,
-      )
-      await expect(
-        page.getByText(prefilledDocumentUnit.coreData.fileNumbers![0]),
-      ).toBeVisible()
-
-      await expect(page.getByLabel("Schlagwörter übernehmen")).toBeVisible()
-      await page.getByLabel("Schlagwörter übernehmen").click()
-
-      await expect(page.getByText("Übernommen")).toBeVisible()
-      await expect(page.getByText("keyword")).toBeVisible()
-
       const keywordsContainer = page.getByTestId("keywords")
-      await expect(keywordsContainer.getByTestId("chip")).toHaveCount(1)
-      await page.getByLabel("Schlagwörter übernehmen").click()
-      // does not import duplicates
-      await expect(keywordsContainer.getByTestId("chip")).toHaveCount(1)
+      await manuallyAddKeyword(page, "existingKeyword")
+
+      // ✔ Bei der Übernahme, werden die bestehenden Daten beibehalten und die importierten Rubrikendaten lediglich angehangen.
+      await test.step("import into prefilled category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnit.documentNumber,
+        )
+        await expect(
+          page.getByText(prefilledDocumentUnit.coreData.fileNumbers![0]),
+        ).toBeVisible()
+
+        await expect(page.getByLabel("Schlagwörter übernehmen")).toBeVisible()
+        await page.getByLabel("Schlagwörter übernehmen").click()
+        await expect(page.getByText("keyword", { exact: true })).toBeVisible()
+
+        await expect(keywordsContainer.getByTestId("chip")).toHaveCount(2)
+      })
+
+      // Eine erfolgreiche Übernahme wird mit einem Erfolgs-Alert bestätigt über den Badge “ ✓ Übernommen“
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      // ✔ Bei Übernahme wird die Seite zu der Rubrik gescrollt
+      await test.step("scroll to category", async () => {
+        await expect(
+          page.getByRole("heading", { name: "Schlagwörter" }),
+        ).toBeInViewport()
+      })
+
+      // ✔ Doppelte Einträge werden innerhalb einer Rubrik bereinigt (Das zuletzt hinzugefügte Duplikat verschwindet)
+      await test.step("do not import duplicates and keep first keyword", async () => {
+        await manuallyAddKeyword(page, "newKeyword")
+
+        await page.getByLabel("Schlagwörter übernehmen").click()
+        const chipsLocator = page.getByTestId("keywords").getByTestId("chip")
+        const chips = await chipsLocator.all()
+        await expect(chipsLocator).toHaveCount(3)
+        await expect(chips[0]).toHaveText("existingKeyword")
+        await expect(chips[1]).toHaveText("keyword") // verify that the previously imported keyword is still the second and not appended at the end
+        await expect(chips[2]).toHaveText("newKeyword")
+      })
+
+      // TODO: Eine gescheiterte Übernahme wird mit einem Fehler-Alert inline angezeigt (dem Info Modal im ErrorState)
+      // würde ich nicht im e2e test abdecken --> unit test
     },
   )
+
+  async function manuallyAddKeyword(page: Page, keyword: string) {
+    let button = page
+      .getByTestId("category-wrapper-button")
+      .getByText(/Schlagwörter/)
+    if (await button.isHidden()) {
+      button = page.getByLabel("Schlagwörter bearbeiten")
+    }
+    await button.click()
+    await page.getByLabel("Schlagwörter Input").focus()
+    await page.keyboard.press("Enter")
+    await page.getByLabel("Schlagwörter Input").type(keyword)
+    await page.keyboard.press("Enter")
+    await page
+      .getByTestId("keywords")
+      .getByLabel("Schlagwörter übernehmen")
+      .click()
+  }
 
   test(
     "import fields of law",
