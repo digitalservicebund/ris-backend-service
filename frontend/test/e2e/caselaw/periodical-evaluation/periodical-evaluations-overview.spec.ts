@@ -119,6 +119,32 @@ test.describe(
       })
     })
 
+    test("An edition can't be deleted as long as it has references", async ({
+      page,
+      edition,
+    }) => {
+      await navigateToPeriodicalEvaluation(page)
+
+      await fillInput(page, "Periodikum", "MMG")
+      await page
+        .getByText("MMG | Medizin Mensch Gesellschaft", { exact: true })
+        .click()
+
+      const line = page.getByText(
+        (edition.name || "") + "MMG" + "3" + formattedDate,
+      )
+
+      await expect(line).toBeVisible()
+      // delete button should not be clickable
+      await expect(line.locator("[aria-label='Ausgabe löschen']")).toBeHidden()
+
+      await expect(
+        line
+          .locator("[aria-label='Ausgabe kann nicht gelöscht werden']")
+          .first(),
+      ).toBeVisible()
+    })
+
     test(
       "New periodical evaluation",
       {
