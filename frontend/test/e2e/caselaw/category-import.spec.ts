@@ -34,7 +34,6 @@ test.describe("category import", () => {
     },
   )
 
-  // Wenn Rubrik im Quelldokument leer ist, wird der Button disabled und in einem grauen Badge angezeigt “Quellrubrik leer“
   test(
     "disable import for empty categories",
     {
@@ -131,6 +130,7 @@ test.describe("category import", () => {
     { tag: ["@RISDEV-5886"] },
     async ({ page, documentNumber, prefilledDocumentUnit }) => {
       await navigateToCategoryImport(page, documentNumber)
+
       await searchForDocumentUnitToImport(
         page,
         prefilledDocumentUnit.documentNumber,
@@ -149,6 +149,12 @@ test.describe("category import", () => {
       await page.getByLabel("Sachgebiete übernehmen").click()
       // does not import duplicates
       await expect(page.getByTestId("field-of-law-summary")).toHaveCount(1)
+
+      await test.step("scroll to category", async () => {
+        await expect(
+          page.getByRole("heading", { name: "Sachgebiete" }),
+        ).toBeInViewport()
+      })
     },
   )
 
@@ -176,6 +182,12 @@ test.describe("category import", () => {
       await page.getByLabel("Normen übernehmen").click()
       // does not import duplicates
       await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(2)
+
+      await test.step("scroll to category", async () => {
+        await expect(
+          page.getByRole("heading", { name: "Normen" }),
+        ).toBeInViewport()
+      })
     },
   )
 
@@ -211,6 +223,12 @@ test.describe("category import", () => {
       await expect(
         activeCitationsContainer.getByLabel("Listen Eintrag"),
       ).toHaveCount(2)
+
+      await test.step("scroll to category", async () => {
+        await expect(
+          page.getByRole("heading", { name: "Aktivzitierung" }),
+        ).toBeInViewport()
+      })
     },
   )
 
@@ -219,69 +237,98 @@ test.describe("category import", () => {
     { tag: ["@RISDEV-5888"] },
     async ({ page, linkedDocumentNumber, prefilledDocumentUnit }) => {
       await navigateToCategoryImport(page, linkedDocumentNumber)
-      await searchForDocumentUnitToImport(
-        page,
-        prefilledDocumentUnit.documentNumber,
-      )
-      await expect(
-        page.getByText(prefilledDocumentUnit.coreData.fileNumbers![0]),
-      ).toBeVisible()
 
-      await expect(page.getByLabel("Titelzeile übernehmen")).toBeVisible()
-      await page.getByLabel("Titelzeile übernehmen").click()
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnit.documentNumber,
+        )
 
-      await expect(page.getByText("Übernommen")).toBeVisible()
-      await expect(page.getByText("testHeadline")).toBeVisible()
+        await expect(page.getByLabel("Titelzeile übernehmen")).toBeVisible()
+        await page.getByLabel("Titelzeile übernehmen").click()
+        await expect(page.getByText("testHeadline")).toBeVisible()
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(
+          page.getByLabel("Kurztexte").getByText("Titelzeile", { exact: true }),
+        ).toBeInViewport()
+      })
     },
   )
 
+  // Short text categories
+
   test(
     "import guiding principle",
-    { tag: ["@RISDEV-5888"] },
+    { tag: ["@RISDEV-5721"] },
     async ({ page, linkedDocumentNumber, prefilledDocumentUnit }) => {
       await navigateToCategoryImport(page, linkedDocumentNumber)
-      await searchForDocumentUnitToImport(
-        page,
-        prefilledDocumentUnit.documentNumber,
-      )
-      await expect(
-        page.getByText(prefilledDocumentUnit.coreData.fileNumbers![0]),
-      ).toBeVisible()
 
-      await expect(page.getByLabel("Leitsatz übernehmen")).toBeVisible()
-      await page.getByLabel("Leitsatz übernehmen").click()
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnit.documentNumber,
+        )
 
-      await expect(page.getByText("Übernommen")).toBeVisible()
-      await expect(page.getByText("guidingPrinciple")).toBeVisible()
+        await expect(page.getByLabel("Leitsatz übernehmen")).toBeVisible()
+        await page.getByLabel("Leitsatz übernehmen").click()
+
+        await expect(page.getByText("guidingPrinciple")).toBeVisible()
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(
+          page.getByLabel("Kurztexte").getByText("Leitsatz", { exact: true }),
+        ).toBeInViewport()
+      })
     },
   )
 
   test(
     "import headnote",
-    { tag: ["@RISDEV-5888"] },
+    { tag: ["@RISDEV-5721"] },
     async ({ page, linkedDocumentNumber, prefilledDocumentUnit }) => {
       await navigateToCategoryImport(page, linkedDocumentNumber)
-      await searchForDocumentUnitToImport(
-        page,
-        prefilledDocumentUnit.documentNumber,
-      )
-      await expect(
-        page.getByText(prefilledDocumentUnit.coreData.fileNumbers![0]),
-      ).toBeVisible()
 
-      await expect(
-        page.getByLabel("Orientierungssatz übernehmen"),
-      ).toBeVisible()
-      await page.getByLabel("Orientierungssatz übernehmen").click()
+      await test.step("import into empty category", async () => {
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnit.documentNumber,
+        )
+        await expect(
+          page.getByLabel("Orientierungssatz übernehmen"),
+        ).toBeVisible()
+        await page.getByLabel("Orientierungssatz übernehmen").click()
 
-      await expect(page.getByText("Übernommen")).toBeVisible()
-      await expect(page.getByText("testHeadnote")).toBeVisible()
+        await expect(page.getByText("testHeadnote")).toBeVisible()
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
+
+      await test.step("scroll to category", async () => {
+        await expect(
+          page
+            .getByLabel("Kurztexte")
+            .getByText("Orientierungssatz", { exact: true }),
+        ).toBeInViewport()
+      })
     },
   )
 
   test(
     "import short texts not possible when target category filled",
-    { tag: ["@RISDEV-5888"] },
+    { tag: ["@RISDEV-5721"] },
     async ({ page, documentNumber, prefilledDocumentUnit }) => {
       await navigateToCategories(page, documentNumber)
       await clickCategoryButton("Leitsatz", page)
