@@ -59,7 +59,6 @@ test.describe("category import", () => {
       await navigateToCategoryImport(page, documentNumber)
       const keywordsContainer = page.getByTestId("keywords")
 
-      // ✔ Bei der Übernahme, werden die bestehenden Daten beibehalten und die importierten Rubrikendaten lediglich angehangen.
       await test.step("import into prefilled category", async () => {
         await manuallyAddKeyword(page, "existingKeyword")
 
@@ -75,19 +74,16 @@ test.describe("category import", () => {
         await expect(keywordsContainer.getByTestId("chip")).toHaveCount(2)
       })
 
-      // Eine erfolgreiche Übernahme wird mit einem Erfolgs-Alert bestätigt über den Badge “ ✓ Übernommen“
       await test.step("show success badge", async () => {
         await expect(page.getByText("Übernommen")).toBeVisible()
       })
 
-      // ✔ Bei Übernahme wird die Seite zu der Rubrik gescrollt
       await test.step("scroll to category", async () => {
         await expect(
           page.getByRole("heading", { name: "Schlagwörter" }),
         ).toBeInViewport()
       })
 
-      // ✔ Doppelte Einträge werden innerhalb einer Rubrik bereinigt (Das zuletzt hinzugefügte Duplikat verschwindet)
       await test.step("do not import duplicates and keep first keyword", async () => {
         await manuallyAddKeyword(page, "newKeyword")
 
@@ -99,9 +95,6 @@ test.describe("category import", () => {
         await expect(chips[1]).toHaveText("keyword") // verify that the previously imported keyword is still the second and not appended at the end
         await expect(chips[2]).toHaveText("newKeyword")
       })
-
-      // TODO: Eine gescheiterte Übernahme wird mit einem Fehler-Alert inline angezeigt (dem Info Modal im ErrorState)
-      // würde ich nicht im e2e test abdecken --> unit test
     },
   )
 
