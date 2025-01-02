@@ -154,8 +154,7 @@ test.describe("category import", () => {
           "AR-01",
           "Arbeitsvertrag: Abschluss, Klauseln, Arten, Betriebsübergang",
         ]
-        const fieldsOfLawItems = fieldsOfLaw
-        await await expect(fieldsOfLawItems).toHaveText(correctOrder.join(""))
+        await expect(fieldsOfLaw).toHaveText(correctOrder.join(""))
       })
 
       await test.step("show success badge", async () => {
@@ -185,8 +184,7 @@ test.describe("category import", () => {
           "EU-01-01",
           "Aufgaben und Ziele",
         ]
-        const fieldsOfLawItems = fieldsOfLaw
-        await await expect(fieldsOfLawItems).toHaveText(correctOrder.join(""))
+        await expect(fieldsOfLaw).toHaveText(correctOrder.join(""))
       })
     },
   )
@@ -196,30 +194,36 @@ test.describe("category import", () => {
     { tag: ["@RISDEV-5887"] },
     async ({ page, documentNumber, prefilledDocumentUnit }) => {
       await navigateToCategoryImport(page, documentNumber)
-      await searchForDocumentUnitToImport(
-        page,
-        prefilledDocumentUnit.documentNumber,
-      )
-      await expect(
-        page.getByText(prefilledDocumentUnit.coreData.fileNumbers![0]),
-      ).toBeVisible()
-
-      await expect(page.getByLabel("Normen übernehmen")).toBeVisible()
-      await page.getByLabel("Normen übernehmen").click()
-
-      await expect(page.getByText("Übernommen")).toBeVisible()
-      await expect(page.getByText("BGB")).toBeVisible()
-
       const normContainer = page.getByTestId("norms")
-      await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(2)
-      await page.getByLabel("Normen übernehmen").click()
-      // does not import duplicates
-      await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(2)
+
+      await test.step("import into prefilled category", async () => {
+        // TODO add norm manually
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnit.documentNumber,
+        )
+
+        await expect(page.getByLabel("Normen übernehmen")).toBeVisible()
+        await page.getByLabel("Normen übernehmen").click()
+
+        await expect(page.getByText("BGB")).toBeVisible()
+        await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(2)
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
 
       await test.step("scroll to category", async () => {
         await expect(
           page.getByRole("heading", { name: "Normen" }),
         ).toBeInViewport()
+      })
+
+      await test.step("do not import duplicates and keep first field of law", async () => {
+        // TODO add norm manually
+        await page.getByLabel("Normen übernehmen").click()
+        await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(2)
       })
     },
   )
@@ -229,38 +233,45 @@ test.describe("category import", () => {
     { tag: ["@RISDEV-5888"] },
     async ({ page, linkedDocumentNumber, prefilledDocumentUnit }) => {
       await navigateToCategoryImport(page, linkedDocumentNumber)
-      await searchForDocumentUnitToImport(
-        page,
-        prefilledDocumentUnit.documentNumber,
-      )
-      await expect(
-        page.getByText(prefilledDocumentUnit.coreData.fileNumbers![0]),
-      ).toBeVisible()
-
-      await expect(page.getByLabel("Aktivzitierung übernehmen")).toBeVisible()
-      await page.getByLabel("Aktivzitierung übernehmen").click()
-
-      await expect(page.getByText("Übernommen")).toBeVisible()
-      await expect(
-        page.getByText(
-          "Abgrenzung, AG Aachen, 01.02.2022, 123, Anerkenntnisurteil",
-        ),
-      ).toBeVisible()
-
       const activeCitationsContainer = page.getByTestId("activeCitations")
-      await expect(
-        activeCitationsContainer.getByLabel("Listen Eintrag"),
-      ).toHaveCount(2)
-      await page.getByLabel("Aktivzitierung übernehmen").click()
-      // does not import duplicates
-      await expect(
-        activeCitationsContainer.getByLabel("Listen Eintrag"),
-      ).toHaveCount(2)
+
+      await test.step("import into prefilled category", async () => {
+        // TODO add active citation manually
+        await searchForDocumentUnitToImport(
+          page,
+          prefilledDocumentUnit.documentNumber,
+        )
+
+        await expect(page.getByLabel("Aktivzitierung übernehmen")).toBeVisible()
+        await page.getByLabel("Aktivzitierung übernehmen").click()
+
+        await expect(
+          page.getByText(
+            "Abgrenzung, AG Aachen, 01.02.2022, 123, Anerkenntnisurteil",
+          ),
+        ).toBeVisible()
+
+        await expect(
+          activeCitationsContainer.getByLabel("Listen Eintrag"),
+        ).toHaveCount(2)
+      })
+
+      await test.step("show success badge", async () => {
+        await expect(page.getByText("Übernommen")).toBeVisible()
+      })
 
       await test.step("scroll to category", async () => {
         await expect(
           page.getByRole("heading", { name: "Aktivzitierung" }),
         ).toBeInViewport()
+      })
+
+      await test.step("do not import duplicates and keep first field of law", async () => {
+        // TODO add active citation manually
+        await page.getByLabel("Aktivzitierung übernehmen").click()
+        await expect(
+          activeCitationsContainer.getByLabel("Listen Eintrag"),
+        ).toHaveCount(2)
       })
     },
   )
