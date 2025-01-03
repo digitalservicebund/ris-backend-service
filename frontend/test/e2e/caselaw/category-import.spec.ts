@@ -308,7 +308,7 @@ test.describe("category import", () => {
       })
 
       await test.step("do not import duplicates and keep first field of law", async () => {
-        // Add active citation to YYTestDoc0014 manually
+        // Add active citation to YYTestDoc0003 manually
         await fillActiveCitationInputs(page, {
           court: "BGH",
           decisionDate: "10.10.1964",
