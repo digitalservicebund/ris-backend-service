@@ -1,6 +1,13 @@
 import { expect, Page } from "@playwright/test"
-import { clickCategoryButton, navigateToCategories, save } from "./e2e-utils"
+import {
+  clickCategoryButton,
+  fillActiveCitationInputs,
+  fillNormInputs,
+  navigateToCategories,
+  save,
+} from "./e2e-utils"
 import { caselawTest as test } from "./fixtures"
+import SingleNorm from "@/domain/singleNorm"
 
 test.describe("category import", () => {
   test(
@@ -190,7 +197,13 @@ test.describe("category import", () => {
       const normContainer = page.getByTestId("norms")
 
       await test.step("import into prefilled category", async () => {
-        // TODO add norm manually
+        // add entry manually
+        await fillNormInputs(page, {
+          normAbbreviation: "PBefG",
+        })
+        await normContainer.getByLabel("Norm speichern").click()
+        await expect(normContainer.getByText("PBefG")).toBeVisible()
+
         await searchForDocumentUnitToImport(
           page,
           prefilledDocumentUnit.documentNumber,
@@ -199,8 +212,12 @@ test.describe("category import", () => {
         await expect(page.getByLabel("Normen übernehmen")).toBeVisible()
         await page.getByLabel("Normen übernehmen").click()
 
-        await expect(page.getByText("BGB")).toBeVisible()
-        await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(2)
+        await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(3) // the last entry is the input field
+
+        const correctOrder = ["PBefG", "BGB"]
+        await expect(
+          normContainer.getByTestId("editable-list-container"),
+        ).toHaveText(correctOrder.join("") + "RIS-Abkürzung *")
       })
 
       await test.step("show success badge", async () => {
@@ -214,9 +231,19 @@ test.describe("category import", () => {
       })
 
       await test.step("do not import duplicates and keep first field of law", async () => {
-        // TODO add norm manually
+        // add entry manually
+        await fillNormInputs(page, {
+          normAbbreviation: "KBErrG",
+          singleNorms: [{ singleNorm: "§ 8" } as SingleNorm],
+        })
+        await normContainer.getByLabel("Norm speichern").click()
+
         await page.getByLabel("Normen übernehmen").click()
-        await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(2)
+        await expect(normContainer.getByLabel("Listen Eintrag")).toHaveCount(4) // the last entry is the input field
+        const correctOrder = ["PBefG", "BGB", "KBErrG, § 8"]
+        await expect(
+          normContainer.getByTestId("editable-list-container"),
+        ).toHaveText(correctOrder.join("") + "RIS-Abkürzung *")
       })
     },
   )
@@ -229,7 +256,17 @@ test.describe("category import", () => {
       const activeCitationsContainer = page.getByTestId("activeCitations")
 
       await test.step("import into prefilled category", async () => {
-        // TODO add active citation manually
+        // Add active citation to YYTestDoc0014 manually
+        await fillActiveCitationInputs(page, {
+          court: "AG Aachen",
+          decisionDate: "01.01.1989",
+          citationType: "Abweichung",
+        })
+        await activeCitationsContainer
+          .getByLabel("Nach Entscheidung suchen")
+          .click()
+        await page.getByLabel("Treffer übernehmen").click()
+
         await searchForDocumentUnitToImport(
           page,
           prefilledDocumentUnit.documentNumber,
@@ -246,7 +283,18 @@ test.describe("category import", () => {
 
         await expect(
           activeCitationsContainer.getByLabel("Listen Eintrag"),
-        ).toHaveCount(2)
+        ).toHaveCount(3) // the last entry is the creation form
+
+        await expect(
+          activeCitationsContainer.getByLabel("Listen Eintrag").nth(0),
+        ).toHaveText(
+          "Abweichung, AG Aachen, 01.01.1989, Beschluss |YYTestDoc0014",
+        )
+        await expect(
+          activeCitationsContainer.getByLabel("Listen Eintrag").nth(1),
+        ).toHaveText(
+          `Abgrenzung, AG Aachen, 01.02.2022, 123, Anerkenntnisurteil |YYTestDoc0013`,
+        )
       })
 
       await test.step("show success badge", async () => {
@@ -260,11 +308,35 @@ test.describe("category import", () => {
       })
 
       await test.step("do not import duplicates and keep first field of law", async () => {
-        // TODO add active citation manually
+        // Add active citation to YYTestDoc0014 manually
+        await fillActiveCitationInputs(page, {
+          court: "BGH",
+          decisionDate: "10.10.1964",
+          citationType: "Verbunden",
+        })
+        await activeCitationsContainer
+          .getByLabel("Nach Entscheidung suchen")
+          .click()
+        await page.getByLabel("Treffer übernehmen").click()
+
         await page.getByLabel("Aktivzitierung übernehmen").click()
         await expect(
           activeCitationsContainer.getByLabel("Listen Eintrag"),
-        ).toHaveCount(2)
+        ).toHaveCount(4) // the last entry is the creation form
+
+        await expect(
+          activeCitationsContainer.getByLabel("Listen Eintrag").nth(0),
+        ).toHaveText(
+          "Abweichung, AG Aachen, 01.01.1989, Beschluss |YYTestDoc0014",
+        )
+        await expect(
+          activeCitationsContainer.getByLabel("Listen Eintrag").nth(1),
+        ).toHaveText(
+          `Abgrenzung, AG Aachen, 01.02.2022, 123, Anerkenntnisurteil |YYTestDoc0013`,
+        )
+        await expect(
+          activeCitationsContainer.getByLabel("Listen Eintrag").nth(2),
+        ).toHaveText(`Verbunden, BGH, 10.10.1964 |YYTestDoc0003`)
       })
     },
   )
