@@ -117,7 +117,7 @@ test("search with changed parameters resets the page to 0", async ({
     await test.step(
       "for category " + (await container.first().getAttribute("aria-label")),
       async () => {
-        const firstInput = { decisionDate: "10.03.1993" }
+        const firstInput = { decisionDate: "31.12.2019" }
         if (container === activeCitationContainer) {
           await activeCitationContainer.getByLabel("Weitere Angabe").click()
           await fillActiveCitationInputs(page, firstInput)
@@ -130,7 +130,9 @@ test("search with changed parameters resets the page to 0", async ({
         }
 
         await container.getByLabel("Nach Entscheidung suchen").click()
-        await expect(container.getByText("Ergebnisse")).toBeVisible()
+        await expect(
+          container.getByText("Passende Suchergebnisse:"),
+        ).toBeVisible()
 
         const input = { fileNumber: "I do not exist" }
 
