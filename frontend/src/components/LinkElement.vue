@@ -10,6 +10,7 @@ const props = defineProps<{
 <template>
   <button
     class="ds-link-01-bold flex flex-row border-b-2 border-blue-800 leading-24 no-underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
+    tabindex="-1"
   >
     <FlexContainer align-items="items-center" flex-direction="flex-row">
       <p>{{ props.title }}</p>
