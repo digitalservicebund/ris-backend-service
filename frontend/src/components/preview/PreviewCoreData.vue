@@ -60,10 +60,7 @@ defineProps<{
     >
       <PreviewCategory>Abweichendes Entscheidungsdatum</PreviewCategory>
       <PreviewContent>
-        <div
-          v-for="(item, index) in coreData.deviatingDecisionDates"
-          :key="index"
-        >
+        <div v-for="item in coreData.deviatingDecisionDates" :key="item">
           {{ dayjs(item).format("DD.MM.YYYY") }}
         </div>
       </PreviewContent>
@@ -117,10 +114,8 @@ defineProps<{
       <PreviewCategory>BGH Nachschlagewerk</PreviewCategory>
       <PreviewContent>
         <FlexContainer
-          v-for="(
-            leadingDecisionNormReference, index
-          ) in coreData.leadingDecisionNormReferences"
-          :key="index"
+          v-for="leadingDecisionNormReference in coreData.leadingDecisionNormReferences"
+          :key="leadingDecisionNormReference"
           flex-direction="flex-col"
         >
           <FlexItem> {{ leadingDecisionNormReference }}</FlexItem>
@@ -133,8 +128,8 @@ defineProps<{
       <PreviewCategory>Streitjahr</PreviewCategory>
       <PreviewContent>
         <FlexContainer
-          v-for="(yearOfDispute, index) in coreData.yearsOfDispute"
-          :key="index"
+          v-for="yearOfDispute in coreData.yearsOfDispute"
+          :key="yearOfDispute"
           flex-direction="flex-col"
         >
           <FlexItem> {{ yearOfDispute }}</FlexItem>

@@ -80,10 +80,7 @@ const hasLegislativeMandate = computed(() => {
     <PreviewRow v-if="hasKeywords">
       <PreviewCategory>Schlagwörter</PreviewCategory>
       <PreviewContent>
-        <div
-          v-for="(keyword, index) in contentRelatedIndexing.keywords"
-          :key="index"
-        >
+        <div v-for="keyword in contentRelatedIndexing.keywords" :key="keyword">
           {{ keyword }}
         </div>
       </PreviewContent>
@@ -92,8 +89,8 @@ const hasLegislativeMandate = computed(() => {
       <PreviewCategory>Sachgebiete</PreviewCategory>
       <PreviewContent>
         <div
-          v-for="(fieldOfLaw, index) in contentRelatedIndexing.fieldsOfLaw"
-          :key="index"
+          v-for="fieldOfLaw in contentRelatedIndexing.fieldsOfLaw"
+          :key="fieldOfLaw.identifier"
           class="flex flex-row"
         >
           <div class="min-w-[150px]">{{ fieldOfLaw.identifier }}</div>
@@ -107,7 +104,7 @@ const hasLegislativeMandate = computed(() => {
     <PreviewRow v-if="hasNorms">
       <PreviewCategory>Normen</PreviewCategory>
       <PreviewContent>
-        <div v-for="(norm, index) in contentRelatedIndexing.norms" :key="index">
+        <div v-for="norm in contentRelatedIndexing.norms" :key="norm.id">
           <div v-if="norm.singleNorms && norm.singleNorms.length > 0">
             <div v-for="(singleNorm, i) in norm.singleNorms" :key="i">
               {{ norm.renderDecision }}
@@ -132,10 +129,8 @@ const hasLegislativeMandate = computed(() => {
       <PreviewCategory>Aktivzitierung</PreviewCategory>
       <PreviewContent>
         <div
-          v-for="(
-            activeCitation, index
-          ) in contentRelatedIndexing.activeCitations"
-          :key="index"
+          v-for="activeCitation in contentRelatedIndexing.activeCitations"
+          :key="activeCitation.id"
         >
           {{ activeCitation.renderDecision }}
         </div>
@@ -178,8 +173,8 @@ const hasLegislativeMandate = computed(() => {
       <PreviewCategory>Berufsbild</PreviewCategory>
       <PreviewContent>
         <div
-          v-for="(jobProfile, index) in contentRelatedIndexing.jobProfiles"
-          :key="index"
+          v-for="jobProfile in contentRelatedIndexing.jobProfiles"
+          :key="jobProfile"
         >
           {{ jobProfile }}
         </div>
