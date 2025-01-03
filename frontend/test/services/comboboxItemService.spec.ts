@@ -1,3 +1,4 @@
+import { waitFor } from "@testing-library/vue"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import { ref } from "vue"
@@ -29,19 +30,19 @@ describe("comboboxItemService", () => {
     const { data, execute } = service.getDocumentTypes(ref())
 
     await execute()
-    await new Promise((resolve) => setTimeout(resolve))
-
-    expect(data.value?.[0].label).toEqual("Anordnung")
-    expect(data.value?.[0].value).toEqual(doctype)
+    await waitFor(() => {
+      expect(data.value?.[0].label).toEqual("Anordnung")
+      expect(data.value?.[0].value).toEqual(doctype)
+    })
   })
 
   it("should fetch court from lookup table", async () => {
     const { data, execute } = service.getCourts(ref())
 
     await execute()
-    await new Promise((resolve) => setTimeout(resolve))
-
-    expect(data.value?.[0].label).toEqual("BGH Karlsruhe")
-    expect(data.value?.[0].value).toEqual(court)
+    await waitFor(() => {
+      expect(data.value?.[0].label).toEqual("BGH Karlsruhe")
+      expect(data.value?.[0].value).toEqual(court)
+    })
   })
 })

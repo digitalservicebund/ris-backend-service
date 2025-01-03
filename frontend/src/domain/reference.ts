@@ -63,7 +63,7 @@ export default class Reference implements EditableListItem {
     return this.documentationUnit?.createdByReference === this.id
   }
 
-  get renderDecision(): string {
+  get renderSummary(): string {
     return [
       this.author ? `${this.author},` : "",
       this.legalPeriodical?.abbreviation ?? this.legalPeriodicalRawValue,

@@ -1,19 +1,16 @@
 <script setup lang="ts">
-import { ref, toRaw, computed, watch } from "vue"
-import { RouterLink } from "vue-router"
+import { ref, watch } from "vue"
 import SingleCategory from "@/components/category-import/SingleCategory.vue"
-import IconBadge from "@/components/IconBadge.vue"
+import DecisionSummary from "@/components/DecisionSummary.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
-import { useStatusBadge } from "@/composables/useStatusBadge"
 import { useValidationStore } from "@/composables/useValidationStore"
 import DocumentUnit from "@/domain/documentUnit"
 import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
 import documentUnitService from "@/services/documentUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
-import BaselineArrowOutward from "~icons/ic/baseline-arrow-outward"
 import IconSearch from "~icons/ic/baseline-search"
 
 const props = defineProps<{
@@ -25,9 +22,6 @@ const validationStore = useValidationStore<keyof typeof labels>()
 const documentNumber = ref<string>(props.documentNumber ?? "")
 const documentUnitToImport = ref<DocumentUnit | undefined>(undefined)
 const errorMessage = ref<string | undefined>(undefined)
-const statusBadge = computed(
-  () => useStatusBadge(documentUnitToImport.value?.status).value,
-)
 
 /**
  * Loads the document unit to import category data from.
@@ -293,32 +287,11 @@ watch(
       v-if="documentUnitToImport"
       class="ds-label-01-reg mt-24 flex flex-col gap-16 bg-blue-100 p-16"
     >
-      <!-- Todo: Wrap this docunit summary in a reusable component -->
-      <span>
-        <span>{{ documentUnitToImport.renderDecision }}</span>
-        <IconBadge
-          v-if="documentUnitToImport?.status"
-          :background-color="statusBadge.backgroundColor"
-          class="ml-4 inline-block"
-          :color="statusBadge.color"
-          :icon="toRaw(statusBadge.icon)"
-          :label="statusBadge.label"
-        />
-        <span class="ds-label-01-reg ml-8 mr-8">|</span>
-        <RouterLink
-          class="nowrap ds-link-01-bold border-b-2 border-blue-800 leading-24 no-underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
-          tabindex="-1"
-          target="_blank"
-          :to="{
-            name: 'caselaw-documentUnit-documentNumber-preview',
-            params: { documentNumber: documentUnitToImport.documentNumber },
-          }"
-        >
-          {{ documentUnitToImport.documentNumber }}
-          <BaselineArrowOutward class="mb-4 inline w-24" />
-        </RouterLink>
-      </span>
-      <!-- Inhaltliche Erschließung -->
+      <DecisionSummary
+        :document-number="documentUnitToImport.documentNumber"
+        :status="documentUnitToImport.status"
+        :summary="documentUnitToImport.renderSummary"
+      />
       <div v-for="(value, key) in labels" :key="key">
         <SingleCategory
           :error-message="validationStore.getByField(key)"

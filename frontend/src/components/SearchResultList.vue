@@ -2,6 +2,7 @@
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import { DisplayMode } from "@/components/enumDisplayMode"
 import FlexContainer from "@/components/FlexContainer.vue"
+import IconBadge from "@/components/IconBadge.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
@@ -66,15 +67,20 @@ export type SearchResults<Type extends RelatedDocumentation> = {
             size="small"
             @click.stop="emits('linkDecision', searchResult.decision)"
           />
-          <DecisionSummary
-            :decision="searchResult.decision"
-            :display-mode="displayMode"
-          ></DecisionSummary>
-          <span
-            v-if="searchResult.isLinked"
-            class="ds-label-02-reg ml-8 rounded-full bg-yellow-400 px-8 py-2"
-            >Bereits hinzugefügt</span
-          >
+          <span class="flex w-full flex-row flex-wrap items-center">
+            <DecisionSummary
+              :display-mode="displayMode"
+              :document-number="searchResult.decision.documentNumber"
+              :status="searchResult.decision.status"
+              :summary="searchResult.decision.renderSummary"
+            ></DecisionSummary>
+            <IconBadge
+              v-if="searchResult.isLinked"
+              background-color="bg-yellow-300"
+              color="text-yellow-900"
+              label="Bereits hinzugefügt"
+            />
+          </span>
         </FlexContainer>
       </FlexContainer>
     </FlexContainer>

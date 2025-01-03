@@ -16,7 +16,7 @@ export default class ParticipatingJudge implements EditableListItem {
     }
   }
 
-  get renderDecision(): string {
+  get renderSummary(): string {
     return [
       ...(this.name ? [this.name] : []),
       ...(this.referencedOpinions ? [`(${this.referencedOpinions})`] : []),

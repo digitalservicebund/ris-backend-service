@@ -107,10 +107,10 @@ const hasLegislativeMandate = computed(() => {
         <div v-for="norm in contentRelatedIndexing.norms" :key="norm.id">
           <div v-if="norm.singleNorms && norm.singleNorms.length > 0">
             <div v-for="(singleNorm, i) in norm.singleNorms" :key="i">
-              {{ norm.renderDecision }}
+              {{ norm.renderSummary }}
               {{
-                singleNorm.renderDecision.length > 0
-                  ? " - " + singleNorm.renderDecision
+                singleNorm.renderSummary.length > 0
+                  ? " - " + singleNorm.renderSummary
                   : ""
               }}
               {{
@@ -119,7 +119,7 @@ const hasLegislativeMandate = computed(() => {
             </div>
           </div>
           <div v-else>
-            {{ norm.renderDecision }}
+            {{ norm.renderSummary }}
           </div>
         </div>
       </PreviewContent>
@@ -132,7 +132,7 @@ const hasLegislativeMandate = computed(() => {
           v-for="activeCitation in contentRelatedIndexing.activeCitations"
           :key="activeCitation.id"
         >
-          {{ activeCitation.renderDecision }}
+          {{ activeCitation.renderSummary }}
         </div>
       </PreviewContent>
     </PreviewRow>

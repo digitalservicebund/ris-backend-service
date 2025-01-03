@@ -18,7 +18,7 @@ defineProps<{
 
     <PreviewContent>
       <div v-for="item in literatureReferences" :key="item.id">
-        {{ item.renderDecision }}
+        {{ item.renderSummary }}
       </div>
     </PreviewContent>
   </PreviewRow>

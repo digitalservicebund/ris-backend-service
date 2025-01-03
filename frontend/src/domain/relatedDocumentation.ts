@@ -59,7 +59,7 @@ export default class RelatedDocumentation {
     }
   }
 
-  get renderDecision(): string {
+  get renderSummary(): string {
     return [
       ...(this.court ? [`${this.court?.label}`] : []),
       ...(this.decisionDate
@@ -67,9 +67,6 @@ export default class RelatedDocumentation {
         : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentType?.label ? [this.documentType.label] : []),
-      ...(this.status
-        ? [RelatedDocumentation.getStatusLabel(this.status)]
-        : []),
     ].join(", ")
   }
 }

@@ -71,7 +71,7 @@ export enum InputMethod {
           <h2
             :id="DocumentUnitCategoriesEnum.FIELDS_OF_LAW"
             ref="titleRef"
-            class="ds-label-01-bold"
+            class="ds-label-01-bold mb-16"
           >
             Sachgebiete
           </h2>

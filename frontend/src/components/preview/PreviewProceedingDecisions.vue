@@ -32,7 +32,7 @@ const ensuingDecisions = computed({
           v-for="previousDecision in previousDecisions"
           :key="previousDecision.id"
         >
-          {{ previousDecision.renderDecision }}
+          {{ previousDecision.renderSummary }}
         </div>
       </PreviewContent>
     </PreviewRow>
@@ -43,7 +43,7 @@ const ensuingDecisions = computed({
           v-for="ensuingDecision in ensuingDecisions"
           :key="ensuingDecision.id"
         >
-          {{ ensuingDecision.renderDecision }}
+          {{ ensuingDecision.renderSummary }}
         </div>
       </PreviewContent>
     </PreviewRow>

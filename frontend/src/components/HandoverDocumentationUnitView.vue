@@ -133,7 +133,7 @@ const missingPreviousDecisionFields = ref(
         })
         .map((previousDecision) => {
           return {
-            identifier: previousDecision.renderDecision,
+            identifier: previousDecision.renderSummary,
             missingFields: getMissingPreviousDecisionFields(
               previousDecision as PreviousDecision,
             ),
@@ -160,7 +160,7 @@ const missingEnsuingDecisionFields = ref(
         })
         .map((ensuingDecision) => {
           return {
-            identifier: ensuingDecision.renderDecision,
+            identifier: ensuingDecision.renderSummary,
             missingFields: getMissingEnsuingDecisionFields(
               ensuingDecision as EnsuingDecision,
             ),
@@ -196,7 +196,7 @@ const missingNormsFields = ref(
     })
     .map((normReference) => {
       return {
-        identifier: normReference.renderDecision,
+        identifier: normReference.renderSummary,
         missingFields: ["Gesetzeskraft"],
       }
     }),
@@ -257,7 +257,7 @@ const missingActiveCitationFields = ref(
         )
         .map((activeCitation) => {
           return {
-            identifier: activeCitation.renderDecision,
+            identifier: activeCitation.renderSummary,
             missingFields: getActiveCitationsFields(
               activeCitation as ActiveCitation,
             ),

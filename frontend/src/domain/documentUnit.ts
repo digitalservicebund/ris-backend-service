@@ -247,7 +247,7 @@ export default class DocumentUnit {
     return this.attachments && this.attachments.length > 0
   }
 
-  get renderDecision(): string {
+  get renderSummary(): string {
     return [
       this.coreData.court?.label,
       this.coreData.decisionDate
