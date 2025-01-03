@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
-import { computed, onMounted, ref } from "vue"
+import { computed } from "vue"
 import Tooltip from "./Tooltip.vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
@@ -9,7 +9,6 @@ import TextButton from "@/components/input/TextButton.vue"
 import ActiveCitation from "@/domain/activeCitation"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import PreviousDecision from "@/domain/previousDecision"
-import FeatureToggleService from "@/services/featureToggleService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import IconBaselineContentCopy from "~icons/ic/baseline-content-copy"
@@ -22,7 +21,6 @@ import IconImportCategories from "~icons/material-symbols/text-select-move-back-
 const props = defineProps<{
   data: ActiveCitation | EnsuingDecision | PreviousDecision
 }>()
-const featureToggle = ref()
 const extraContentSidePanelStore = useExtraContentSidePanelStore()
 const documentUnitStore = useDocumentUnitStore()
 
@@ -45,8 +43,7 @@ const isParallelDecision = computed(
   () =>
     props.data instanceof ActiveCitation &&
     (props.data.citationType?.label == "Parallelentscheidung" ||
-      props.data.citationType?.label == "Teilweise Parallelentscheidung") &&
-    featureToggle,
+      props.data.citationType?.label == "Teilweise Parallelentscheidung"),
 )
 
 async function copySummary() {
@@ -74,12 +71,6 @@ async function generateHeadnote() {
     behavior: "smooth",
   })
 }
-
-onMounted(async () => {
-  featureToggle.value = (
-    await FeatureToggleService.isEnabled("neuris.category-importer")
-  ).data
-})
 </script>
 
 <template>

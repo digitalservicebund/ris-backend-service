@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia"
-import { computed, onMounted, ref } from "vue"
 import type { Component } from "vue"
+import { computed, onMounted } from "vue"
 import { useRoute } from "vue-router"
 import Tooltip from "./Tooltip.vue"
 import AttachmentView from "@/components/AttachmentView.vue"
@@ -15,7 +15,6 @@ import TextButton from "@/components/input/TextButton.vue"
 import DocumentUnitPreview from "@/components/preview/DocumentUnitPreview.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
 import DocumentUnit from "@/domain/documentUnit"
-import FeatureToggleService from "@/services/featureToggleService"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import { SelectablePanelContent } from "@/types/panelContentMode"
 import IconAttachFile from "~icons/ic/baseline-attach-file"
@@ -37,8 +36,6 @@ const props = defineProps<{
 const store = useExtraContentSidePanelStore()
 
 const route = useRoute()
-
-const featureToggle = ref()
 
 const hasNote = computed(() => {
   return !!props.documentUnit!.note && props.documentUnit!.note.length > 0
@@ -131,15 +128,6 @@ onMounted(() => {
     store.isExpanded = hasNote.value || hasAttachments.value
   }
 })
-
-/**
- * Loads the feature flag for the category import feature.
- */
-onMounted(async () => {
-  featureToggle.value = (
-    await FeatureToggleService.isEnabled("neuris.category-importer")
-  ).data
-})
 </script>
 
 <template>
@@ -200,11 +188,7 @@ onMounted(async () => {
             />
           </Tooltip>
 
-          <Tooltip
-            v-if="featureToggle && !hidePanelModeBar"
-            shortcut="r"
-            text="Rubriken-Import"
-          >
+          <Tooltip v-if="!hidePanelModeBar" shortcut="r" text="Rubriken-Import">
             <TextButton
               id="category-import"
               aria-label="Rubriken-Import anzeigen"
