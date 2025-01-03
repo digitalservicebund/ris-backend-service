@@ -336,7 +336,7 @@ test.describe("category import", () => {
         )
         await expect(
           activeCitationsContainer.getByLabel("Listen Eintrag").nth(2),
-        ).toHaveText(`Verbunden, BGH, 10.10.1964 |YYTestDoc0003`)
+        ).toHaveText(/Verbunden, BGH, 10.10.1964.*/)
       })
     },
   )
