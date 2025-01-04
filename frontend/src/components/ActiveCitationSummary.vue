@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
-import { computed, onMounted, ref } from "vue"
+import { computed } from "vue"
 import Tooltip from "./Tooltip.vue"
 import DocumentationUnitSummary from "@/components/DocumentationUnitSummary.vue"
 import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
@@ -15,7 +15,6 @@ import IconImportCategories from "~icons/material-symbols/text-select-move-back-
 const props = defineProps<{
   data: ActiveCitation
 }>()
-const featureToggle = ref()
 const extraContentSidePanelStore = useExtraContentSidePanelStore()
 const documentUnitStore = useDocumentUnitStore()
 
@@ -50,12 +49,6 @@ async function generateHeadnote() {
     behavior: "smooth",
   })
 }
-
-onMounted(async () => {
-  featureToggle.value = (
-    await FeatureToggleService.isEnabled("neuris.category-importer")
-  ).data
-})
 </script>
 
 <template>
