@@ -288,12 +288,12 @@ test.describe("category import", () => {
         await expect(
           activeCitationsContainer.getByLabel("Listen Eintrag").nth(0),
         ).toHaveText(
-          "Abweichung, AG Aachen, 01.01.1989, Beschluss |YYTestDoc0014",
+          "Abweichung, AG Aachen, 01.01.1989, Beschluss | YYTestDoc0014",
         )
         await expect(
           activeCitationsContainer.getByLabel("Listen Eintrag").nth(1),
         ).toHaveText(
-          `Abgrenzung, AG Aachen, 01.02.2022, 123, Anerkenntnisurteil |YYTestDoc0013`,
+          `Abgrenzung, AG Aachen, 01.02.2022, 123, Anerkenntnisurteil | YYTestDoc0013`,
         )
       })
 
@@ -327,12 +327,12 @@ test.describe("category import", () => {
         await expect(
           activeCitationsContainer.getByLabel("Listen Eintrag").nth(0),
         ).toHaveText(
-          "Abweichung, AG Aachen, 01.01.1989, Beschluss |YYTestDoc0014",
+          "Abweichung, AG Aachen, 01.01.1989, Beschluss | YYTestDoc0014",
         )
         await expect(
           activeCitationsContainer.getByLabel("Listen Eintrag").nth(1),
         ).toHaveText(
-          `Abgrenzung, AG Aachen, 01.02.2022, 123, Anerkenntnisurteil |YYTestDoc0013`,
+          `Abgrenzung, AG Aachen, 01.02.2022, 123, Anerkenntnisurteil | YYTestDoc0013`,
         )
         await expect(
           activeCitationsContainer.getByLabel("Listen Eintrag").nth(2),
