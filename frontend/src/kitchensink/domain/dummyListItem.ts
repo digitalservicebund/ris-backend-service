@@ -15,7 +15,7 @@ export default class DummyListItem implements EditableListItem {
     return this.uuid
   }
 
-  get renderDecision(): string {
+  get renderSummary(): string {
     return this.text ? this.text : "default text"
   }
 

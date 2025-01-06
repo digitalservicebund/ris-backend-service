@@ -156,7 +156,7 @@ dependencies {
     implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.1")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.2")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.4")
 
@@ -171,7 +171,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.29.41"))
+    implementation(platform("software.amazon.awssdk:bom:2.29.43"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 

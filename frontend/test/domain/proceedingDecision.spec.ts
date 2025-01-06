@@ -51,7 +51,7 @@ describe("ProceedingDecision", () => {
       },
       fileNumber: "bar",
     })
-    expect(proceedingDecision.renderDecision).toStrictEqual("label1, bar")
+    expect(proceedingDecision.renderSummary).toStrictEqual("label1, bar")
   })
 
   it("with all required fields missing", () => {

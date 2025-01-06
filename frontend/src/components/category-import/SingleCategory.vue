@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue"
+import { computed, ref } from "vue"
 import IconBadge from "@/components/IconBadge.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import TextButton from "@/components/input/TextButton.vue"
@@ -53,20 +53,20 @@ function handleClick() {
         label="Quellrubrik leer"
       />
       <IconBadge
-        v-if="!importable"
-        background-color="bg-blue-300"
-        color="text-blue-900"
-        :data-testid="label + '-empty'"
-        :icon="IconInfo"
-        label="Zielrubrik ausgefüllt"
-      />
-      <IconBadge
         v-if="importSuccess"
         background-color="bg-green-300"
         color="text-green-800"
         :data-testid="label + '-success'"
         :icon="IconCheck"
         label="Übernommen"
+      />
+      <IconBadge
+        v-else-if="!importable"
+        background-color="bg-blue-300"
+        color="text-blue-900"
+        :data-testid="label + '-empty'"
+        :icon="IconInfo"
+        label="Zielrubrik ausgefüllt"
       />
     </div>
     <InfoModal

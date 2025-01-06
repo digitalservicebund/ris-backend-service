@@ -647,8 +647,6 @@ test.describe(
           await expect(page.getByLabel("Listen Eintrag")).toHaveCount(2)
         })
 
-        const fileNumberDocUnit2 = generateString()
-
         await test.step("Creating docoffice creates a second documentunit for owning docoffice", async () => {
           await expect(page.getByLabel("Zitatstelle *")).toBeVisible()
 
@@ -659,7 +657,7 @@ test.describe(
             page,
             "AG Aachen",
             formattedDate,
-            fileNumberDocUnit2,
+            generateString(),
             "AnU",
           )
 
@@ -668,12 +666,20 @@ test.describe(
           ).toHaveValue("BGH")
           await page.getByText("Übernehmen", { exact: true }).click()
 
-          documentNumber2 =
-            // eslint-disable-next-line playwright/no-conditional-in-test
-            (await page
-              .getByTestId("document-number-link-" + fileNumberDocUnit2)
-              .getByRole("paragraph")
-              .textContent()) || ""
+          const listItems = await page.getByLabel("Listen Eintrag").all()
+
+          //get the document number of the second
+          const dataTestId = await listItems[1]
+            .locator('[data-testid^="document-number-link-"]')
+            .getAttribute("data-testid")
+
+          const documentNumberMatch = dataTestId?.match(
+            /document-number-link-(\w+)/,
+          )
+          // eslint-disable-next-line playwright/no-conditional-in-test
+          if (documentNumberMatch) {
+            documentNumber2 = documentNumberMatch[1]
+          }
           await expect(page.getByLabel("Listen Eintrag")).toHaveCount(3)
         })
 

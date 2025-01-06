@@ -102,7 +102,7 @@ defineProps<{
         v-for="participatingJudge in longTexts.participatingJudges"
         :key="participatingJudge.id"
       >
-        {{ participatingJudge.renderDecision }}
+        {{ participatingJudge.renderSummary }}
       </div>
     </PreviewContent>
   </PreviewRow>

@@ -20,7 +20,7 @@ export default class SingleNorm {
     Object.assign(this, data)
   }
 
-  get renderDecision(): string {
+  get renderSummary(): string {
     return [
       ...(this.singleNorm ? [this.singleNorm] : []),
       ...(this.dateOfVersion

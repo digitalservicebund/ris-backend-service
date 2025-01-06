@@ -109,9 +109,7 @@ describe("CategoryImport", () => {
     )
 
     expect(screen.getByText("XXRE123456789")).toBeInTheDocument()
+    expect(screen.getByText(/AG Aachen, 01.02.2022, file-123,/)).toBeVisible()
     expect(screen.getByText("Unveröffentlicht")).toBeInTheDocument()
-    expect(
-      screen.getByText("AG Aachen, 01.02.2022, file-123"),
-    ).toBeInTheDocument()
   })
 })

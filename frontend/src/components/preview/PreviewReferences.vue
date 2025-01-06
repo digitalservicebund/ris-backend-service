@@ -24,8 +24,8 @@ const secondaryReferences = computed(() =>
   >
     <PreviewCategory>Primäre Fundstellen</PreviewCategory>
     <PreviewContent>
-      <div v-for="item in primaryReferences" :key="item.legalPeriodical?.uuid">
-        {{ item.renderDecision }}
+      <div v-for="item in primaryReferences" :key="item.id">
+        {{ item.renderSummary }}
       </div>
     </PreviewContent>
   </PreviewRow>
@@ -35,11 +35,8 @@ const secondaryReferences = computed(() =>
   >
     <PreviewCategory>Sekundäre Fundstellen</PreviewCategory>
     <PreviewContent>
-      <div
-        v-for="item in secondaryReferences"
-        :key="item.legalPeriodical?.uuid"
-      >
-        {{ item.renderDecision }}
+      <div v-for="item in secondaryReferences" :key="item.id">
+        {{ item.renderSummary }}
       </div>
     </PreviewContent>
   </PreviewRow>

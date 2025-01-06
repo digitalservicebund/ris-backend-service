@@ -130,10 +130,9 @@ test("search with changed parameters resets the page to 0", async ({
         }
 
         await container.getByLabel("Nach Entscheidung suchen").click()
-        await expect(container.getByText("Seite 1")).toBeVisible()
-
-        await container.getByLabel("nächste Ergebnisse").click()
-        await expect(container.getByText("Seite 2")).toBeVisible()
+        await expect(
+          container.getByText("Passende Suchergebnisse:"),
+        ).toBeVisible()
 
         const input = { fileNumber: "I do not exist" }
 

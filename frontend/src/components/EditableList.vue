@@ -236,6 +236,7 @@ watch(
           class="flex scroll-m-64"
           :data="entry"
         />
+
         <Tooltip text="Aufklappen">
           <button
             id="editable-list-select-button"
