@@ -1,8 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitIdDuplicateCheckDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckRepository;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,11 +19,15 @@ public class DuplicateCheckService {
   private final DocumentationUnitService documentationUnitService;
 
   private final DuplicateCheckRepository repository;
+  private final DuplicateRelationRepository relationRepository;
 
   public DuplicateCheckService(
-      DuplicateCheckRepository repository, DocumentationUnitService documentationUnitService) {
-    this.repository = repository;
+      DuplicateCheckRepository duplicateCheckRepository,
+      DocumentationUnitService documentationUnitService,
+      DuplicateRelationRepository relationRepository) {
+    this.repository = duplicateCheckRepository;
     this.documentationUnitService = documentationUnitService;
+    this.relationRepository = relationRepository;
   }
 
   List<DocumentationUnitIdDuplicateCheckDTO> getDuplicates(String docNumber) {
@@ -60,8 +67,36 @@ public class DuplicateCheckService {
         allEclis.addAll(deviatingEclis.stream().map(String::toUpperCase).toList());
 
       var documentType = documentationUnit.coreData().documentType();
-      return repository.findDuplicates(
-          allFileNumbers, allDates, allCourtIds, allDeviatingCourts, allEclis, documentType.uuid());
+      var duplicates =
+          repository.findDuplicates(
+              allFileNumbers,
+              allDates,
+              allCourtIds,
+              allDeviatingCourts,
+              allEclis,
+              documentType.uuid());
+
+      for (var dup : duplicates) {
+        if (dup.getId().equals(documentationUnit.uuid())) {
+          continue;
+        }
+        DuplicateRelationDTO.DuplicateRelationId duplicateRelationId =
+            new DuplicateRelationDTO.DuplicateRelationId(documentationUnit.uuid(), dup.getId());
+        var existingRelation = relationRepository.findById(duplicateRelationId);
+        var status =
+            Boolean.FALSE.equals(dup.getIsJdvDuplicateCheckActive())
+                ? DuplicateRelationStatus.IGNORED
+                : DuplicateRelationStatus.PENDING;
+        if (existingRelation.isEmpty()) {
+          var newRelation =
+              DuplicateRelationDTO.builder().status(status).id(duplicateRelationId).build();
+          relationRepository.save(newRelation);
+        } else {
+          existingRelation.get().setStatus(status);
+          relationRepository.save(existingRelation.get());
+        }
+      }
+      return duplicates;
     } catch (Exception e) {
       log.debug(e.getMessage());
       return List.of();
