@@ -740,7 +740,7 @@ class ProcedureIntegrationTest {
             .documentNumber(bghDocUnit.getDocumentNumber())
             .coreData(
                 CoreData.builder()
-                    .procedure(ProcedureTransformer.transformToDomain(procedure))
+                    .procedure(ProcedureTransformer.transformToDomain(procedure, false))
                     .documentationOffice(buildBGHDocOffice())
                     .build())
             .build();
