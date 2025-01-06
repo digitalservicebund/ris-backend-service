@@ -79,13 +79,7 @@ public class DatabaseDocumentNumberGeneratorService implements DocumentNumberSer
     if (recycledId != null) return recycledId;
 
     DocumentNumberDTO documentNumberDTO =
-        repository
-            .findById(documentationOfficeAbbreviation)
-            .orElse(
-                DocumentNumberDTO.builder()
-                    .documentationOfficeAbbreviation(documentationOfficeAbbreviation)
-                    .lastNumber(0)
-                    .build());
+        getOrCreateDocumentNumberDTO(documentationOfficeAbbreviation);
 
     String documentNumber =
         DocumentNumberFormatter.builder()
@@ -100,6 +94,26 @@ public class DatabaseDocumentNumberGeneratorService implements DocumentNumberSer
     assertNotExists(documentNumber);
 
     return documentNumber;
+  }
+
+  /**
+   * Retrieves an existing document number entry for the given documentation office abbreviation and
+   * year, or creates a new document number entry if none exists.
+   *
+   * @param documentationOfficeAbbreviation desired court abbreviation by office
+   * @return A {@link DocumentNumberDTO} containing the latest doc number count
+   */
+  public DocumentNumberDTO getOrCreateDocumentNumberDTO(
+      @NotEmpty String documentationOfficeAbbreviation) {
+    return repository
+        .findByDocumentationOfficeAbbreviationAndYear(
+            documentationOfficeAbbreviation, DateUtil.getYear())
+        .orElse(
+            DocumentNumberDTO.builder()
+                .documentationOfficeAbbreviation(documentationOfficeAbbreviation)
+                .lastNumber(0)
+                .year(DateUtil.getYear())
+                .build());
   }
 
   /**
