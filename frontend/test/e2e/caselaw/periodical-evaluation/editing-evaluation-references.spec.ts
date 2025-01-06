@@ -48,19 +48,17 @@ test.describe("Editing and deleting references in periodical evaluation", () => 
 
     await navigateToPeriodicalReferences(page, edition.id || "")
     await test.step("A docunit can be added as reference by entering citation and search fields", async () => {
-      await fillInput(page, "Gericht", "AG Aachen")
-      await page.getByText("AG Aachen", { exact: true }).click()
-      await fillInput(page, "Aktenzeichen", fileNumber)
-      await fillInput(page, "Entscheidungsdatum", "31.12.2019")
-      await fillInput(page, "Dokumenttyp", "AnU")
-      await page.getByText("Anerkenntnisurteil", { exact: true }).click()
-
-      await page.getByText("Suchen").click()
+      await searchForDocUnitWithFileNumberAndDecisionDate(
+        page,
+        fileNumber,
+        "31.12.2019",
+      )
       await expect(
         page.getByText(
           `AG Aachen, 31.12.2019, ${fileNumber}, Anerkenntnisurteil, Unveröffentlicht`,
         ),
       ).toBeVisible()
+      await expect(page).toHaveURL(/showAttachmentPanel=true/)
       await fillInput(page, "Zitatstelle *", "5")
       await fillInput(page, "Klammernzusatz", "LT")
       await page.getByLabel("Treffer übernehmen").click()
@@ -69,17 +67,16 @@ test.describe("Editing and deleting references in periodical evaluation", () => 
         `AG Aachen, 31.12.2019, ${fileNumber}, Anerkenntnisurteil`,
       )
       await expect(decisionElement).toHaveCount(1)
+      await page.getByLabel("Seitenpanel schließen").click()
+      await expect(page.getByLabel("Seitenpanel schließen")).toBeHidden()
     })
 
     await test.step("A docunit can be added to an edition multiple times", async () => {
-      await fillInput(page, "Gericht", "AG Aachen")
-      await page.getByText("AG Aachen", { exact: true }).click()
-      await fillInput(page, "Aktenzeichen", fileNumber)
-      await fillInput(page, "Entscheidungsdatum", "31.12.2019")
-      await fillInput(page, "Dokumenttyp", "AnU")
-      await page.getByText("Anerkenntnisurteil", { exact: true }).click()
-
-      await page.getByText("Suchen").click()
+      await searchForDocUnitWithFileNumberAndDecisionDate(
+        page,
+        fileNumber,
+        "31.12.2019",
+      )
 
       await expect(
         page.getByText(
@@ -154,13 +151,6 @@ test.describe("Editing and deleting references in periodical evaluation", () => 
       const newTab = await newTabPromise
       expect(newTab.url()).toContain("/categories")
       await newTab.close()
-    })
-
-    await test.step("should automatically close preview, when reference added", async () => {
-      await fillInput(page, "Zitatstelle *", "5")
-      await fillInput(page, "Klammernzusatz", "LT")
-      await page.getByLabel("Treffer übernehmen").click()
-      await expect(page).toHaveURL(/showAttachmentPanel=false/)
     })
   })
 

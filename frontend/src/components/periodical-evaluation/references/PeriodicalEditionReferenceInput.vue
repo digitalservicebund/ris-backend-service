@@ -214,7 +214,6 @@ async function addReference(decision: RelatedDocumentation) {
   validateRequiredInput(newReference)
 
   if (validationStore.isValid()) {
-    await closeSidePanel()
     emit("update:modelValue", newReference)
     emit("addEntry")
   } else {
@@ -280,11 +279,6 @@ async function openSidePanel(documentUnitNumber?: string) {
   }
 }
 
-async function closeSidePanel() {
-  await documentUnitStore.unloadDocumentUnit()
-  extraContentSidePanelStore.togglePanel(false)
-}
-
 /*
 Relates the legal periodical of edition to the reference
  */
@@ -327,15 +321,17 @@ watch(
 )
 
 /** watches the changes of query related documentations params
- * resets the page if change took place. If one search results, open side panel.
+ * resets the page if change took place.
+ */
+watch(searchResultsCurrentPage, async () => {
+  pageNumber.value = 0
+})
+
+/**  If one search results, open side panel.
  */
 watch(searchResults, async () => {
-  pageNumber.value = 0
-
   if (searchResults.value && searchResults.value.length == 1) {
     await openSidePanel(searchResults.value[0].decision.documentNumber)
-  } else {
-    await closeSidePanel()
   }
 })
 
