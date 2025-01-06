@@ -23,7 +23,7 @@ public class PostgresDuplicateCheckRepositoryImpl implements DuplicateCheckRepos
 
   @Override
   @Transactional
-  public List<DocumentationUnit> findDuplicates(
+  public List<DocumentationUnitIdDuplicateCheckDTO> findDuplicates(
       List<String> allFileNumbers,
       List<LocalDate> allDates,
       List<UUID> allCourtIds,
@@ -32,7 +32,7 @@ public class PostgresDuplicateCheckRepositoryImpl implements DuplicateCheckRepos
       UUID documentTypeId) {
     long startTime = System.currentTimeMillis();
 
-    List<DocumentationUnitDTO> result =
+    List<DocumentationUnitIdDuplicateCheckDTO> result =
         repository.findDuplicates(
             allFileNumbers, allDates, allCourtIds, allDeviatingCourts, allEclis, documentTypeId);
 
@@ -43,7 +43,6 @@ public class PostgresDuplicateCheckRepositoryImpl implements DuplicateCheckRepos
     return result.stream()
         .filter(Objects::nonNull)
         .distinct()
-        .map(DocumentationUnitTransformer::transformToDomain)
         .toList();
   }
 }

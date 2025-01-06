@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitIdDuplicateCheckDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformerException;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
@@ -245,7 +246,7 @@ public class DocumentationUnitController {
 
   @GetMapping(value = "/{documentNumber}/duplicates", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentNumber.apply(#documentNumber)")
-  public ResponseEntity<List<DocumentationUnit>> getDuplicatesByDocumentNumber(
+  public ResponseEntity<List<DocumentationUnitIdDuplicateCheckDTO>> getDuplicatesByDocumentNumber(
       @AuthenticationPrincipal OidcUser oidcUser, @NonNull @PathVariable String documentNumber) {
     var documentationUnits = duplicateCheckService.getDuplicates(documentNumber);
     return ResponseEntity.ok(documentationUnits);

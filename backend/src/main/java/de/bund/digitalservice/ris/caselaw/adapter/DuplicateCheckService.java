@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitIdDuplicateCheckDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckRepository;
 import java.time.LocalDate;
@@ -23,7 +23,7 @@ public class DuplicateCheckService {
     this.documentationUnitService = documentationUnitService;
   }
 
-  List<DocumentationUnit> getDuplicates(String docNumber) {
+  List<DocumentationUnitIdDuplicateCheckDTO> getDuplicates(String docNumber) {
     try {
       var documentationUnit = documentationUnitService.getByDocumentNumber(docNumber);
 
