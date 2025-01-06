@@ -45,11 +45,12 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
     <PreviewCoreData :core-data="documentUnit.coreData" />
     <PreviewNote :note="documentUnit.note" />
     <PreviewReferences :references="documentUnit.references as Reference[]" />
-    <PreviewProceedingDecisions />
-    <PreviewContentRelatedIndexing />
     <PreviewLiteratureReferences
       :literature-references="documentUnit.literatureReferences as Reference[]"
     />
+    <PreviewProceedingDecisions />
+    <PreviewContentRelatedIndexing />
+
     <PreviewShortTexts
       :short-texts="documentUnit.shortTexts"
       :valid-border-numbers="documentUnit.managementData.borderNumbers"
