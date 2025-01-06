@@ -1,10 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DateUtil;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
@@ -100,5 +102,42 @@ class DatabaseDocumentNumberGeneratorServiceTest {
         .isInstanceOf(DocumentNumberPatternException.class)
         .hasMessageContaining(
             "Could not " + "find pattern for abbreviation " + docOfficeAbbreviation);
+  }
+
+  @Test
+  void getOrCreateDocumentNumberDTO_startsByZero_ifYearAndAbbreviationDoNotExist() {
+
+    var documentNumberDto = service.getOrCreateDocumentNumberDTO(DEFAULT_ABBREVIATION);
+
+    Assertions.assertEquals(0, documentNumberDto.getLastNumber());
+    Assertions.assertEquals(DateUtil.getYear(), documentNumberDto.getYear());
+    Assertions.assertEquals(
+        DEFAULT_ABBREVIATION, documentNumberDto.getDocumentationOfficeAbbreviation());
+
+    verify(databaseDocumentNumberRepository)
+        .findByDocumentationOfficeAbbreviationAndYear(DEFAULT_ABBREVIATION, DateUtil.getYear());
+  }
+
+  @Test
+  void getOrCreateDocumentNumberDTO_shouldContinuesFromLast_ifYearAndAbbreviationExist() {
+    when(databaseDocumentNumberRepository.findByDocumentationOfficeAbbreviationAndYear(
+            DEFAULT_ABBREVIATION, DateUtil.getYear()))
+        .thenReturn(
+            Optional.of(
+                DocumentNumberDTO.builder()
+                    .lastNumber(4)
+                    .year(DateUtil.getYear())
+                    .documentationOfficeAbbreviation(DEFAULT_ABBREVIATION)
+                    .build()));
+
+    var documentNumberDto = service.getOrCreateDocumentNumberDTO(DEFAULT_ABBREVIATION);
+
+    Assertions.assertEquals(4, documentNumberDto.getLastNumber());
+    Assertions.assertEquals(DateUtil.getYear(), documentNumberDto.getYear());
+    Assertions.assertEquals(
+        DEFAULT_ABBREVIATION, documentNumberDto.getDocumentationOfficeAbbreviation());
+
+    verify(databaseDocumentNumberRepository)
+        .findByDocumentationOfficeAbbreviationAndYear(DEFAULT_ABBREVIATION, DateUtil.getYear());
   }
 }
