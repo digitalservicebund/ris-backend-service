@@ -16,7 +16,7 @@ public interface DatabaseDuplicateCheckRepository
       nativeQuery = true,
       value =
           """
-    SELECT documentationUnit.id, documentationUnit.duplicate_check
+    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
     FROM incremental_migration.documentation_unit documentationUnit
       JOIN incremental_migration.file_number fileNumber
         ON documentationUnit.id = fileNumber.documentation_unit_id
@@ -25,7 +25,7 @@ public interface DatabaseDuplicateCheckRepository
 
     UNION
 
-    SELECT documentationUnit.id, documentationUnit.duplicate_check
+    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
     FROM incremental_migration.documentation_unit documentationUnit
       JOIN incremental_migration.file_number fileNumber
         ON documentationUnit.id = fileNumber.documentation_unit_id
@@ -36,7 +36,7 @@ public interface DatabaseDuplicateCheckRepository
 
     UNION
 
-    SELECT documentationUnit.id, documentationUnit.duplicate_check
+    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
     FROM incremental_migration.documentation_unit documentationUnit
       JOIN incremental_migration.deviating_file_number deviatingFileNumber
         ON documentationUnit.id = deviatingFileNumber.documentation_unit_id
@@ -45,7 +45,7 @@ public interface DatabaseDuplicateCheckRepository
 
     UNION
 
-    SELECT documentationUnit.id, documentationUnit.duplicate_check
+    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
     FROM incremental_migration.documentation_unit documentationUnit
       JOIN incremental_migration.deviating_file_number deviatingFileNumber
         ON documentationUnit.id = deviatingFileNumber.documentation_unit_id
@@ -56,7 +56,7 @@ public interface DatabaseDuplicateCheckRepository
 
     UNION
 
-    SELECT documentationUnit.id, documentationUnit.duplicate_check
+    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
     FROM incremental_migration.documentation_unit documentationUnit
       JOIN incremental_migration.file_number fileNumber
         ON documentationUnit.id = fileNumber.documentation_unit_id
@@ -67,7 +67,7 @@ public interface DatabaseDuplicateCheckRepository
 
     UNION
 
-    SELECT documentationUnit.id, documentationUnit.duplicate_check
+    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
     FROM incremental_migration.documentation_unit documentationUnit
       JOIN incremental_migration.deviating_file_number deviatingFileNumber
         ON documentationUnit.id = deviatingFileNumber.documentation_unit_id
@@ -78,7 +78,7 @@ public interface DatabaseDuplicateCheckRepository
 
     UNION
 
-    SELECT documentationUnit.id, documentationUnit.duplicate_check
+    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
     FROM incremental_migration.documentation_unit documentationUnit
       JOIN incremental_migration.file_number fileNumber
         ON documentationUnit.id = fileNumber.documentation_unit_id
@@ -89,7 +89,7 @@ public interface DatabaseDuplicateCheckRepository
 
     UNION
 
-    SELECT documentationUnit.id, documentationUnit.duplicate_check
+    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
     FROM incremental_migration.documentation_unit documentationUnit
       JOIN incremental_migration.deviating_file_number deviatingFileNumber
         ON documentationUnit.id = deviatingFileNumber.documentation_unit_id
@@ -100,7 +100,7 @@ public interface DatabaseDuplicateCheckRepository
 
     UNION
 
-    SELECT documentationUnit.id, documentationUnit.duplicate_check
+    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
     FROM incremental_migration.documentation_unit documentationUnit
       JOIN incremental_migration.file_number fileNumber
         ON documentationUnit.id = fileNumber.documentation_unit_id
@@ -109,7 +109,7 @@ public interface DatabaseDuplicateCheckRepository
 
     UNION
 
-    SELECT documentationUnit.id, documentationUnit.duplicate_check
+    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
     FROM incremental_migration.documentation_unit documentationUnit
       JOIN incremental_migration.deviating_file_number deviatingFileNumber
         ON documentationUnit.id = deviatingFileNumber.documentation_unit_id
@@ -118,7 +118,7 @@ public interface DatabaseDuplicateCheckRepository
 
     UNION
 
-    SELECT documentationUnit.id, documentationUnit.duplicate_check
+    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
     FROM incremental_migration.documentation_unit documentationUnit
       JOIN incremental_migration.file_number fileNumber
         ON documentationUnit.id = fileNumber.documentation_unit_id
@@ -129,7 +129,7 @@ public interface DatabaseDuplicateCheckRepository
 
     UNION
 
-    SELECT documentationUnit.id, documentationUnit.duplicate_check
+    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
     FROM incremental_migration.documentation_unit documentationUnit
       JOIN incremental_migration.deviating_file_number deviatingFileNumber
         ON documentationUnit.id = deviatingFileNumber.documentation_unit_id
@@ -140,7 +140,7 @@ public interface DatabaseDuplicateCheckRepository
 
     UNION
 
-    SELECT documentationUnit.id, documentationUnit.duplicate_check
+    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
     FROM incremental_migration.documentation_unit documentationUnit
       JOIN incremental_migration.file_number fileNumber
         ON documentationUnit.id = fileNumber.documentation_unit_id
@@ -151,7 +151,7 @@ public interface DatabaseDuplicateCheckRepository
 
     UNION
 
-    SELECT documentationUnit.id, documentationUnit.duplicate_check
+    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
     FROM incremental_migration.documentation_unit documentationUnit
       JOIN incremental_migration.deviating_file_number deviatingFileNumber
         ON documentationUnit.id = deviatingFileNumber.documentation_unit_id

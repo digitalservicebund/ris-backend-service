@@ -334,8 +334,9 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   private List<ParticipatingJudgeDTO> participatingJudges = new ArrayList<>();
 
   /**
-   * @deprecated: This field represents the "Dupcode ausschalten" functionality from the jDV. It is set to false
-   * in the migration if the duplication check should be ignored. After the jDV has been deactivated, this field will not be needed anymore.
+   * @deprecated This field represents the "Dupcode ausschalten" functionality from the jDV. It is
+   *     set to false in the migration if the duplication check should be ignored. After the jDV has
+   *     been deactivated, this field will not be needed anymore.
    */
   @Column(name = "duplicate_check")
   @Deprecated(forRemoval = true)
