@@ -20,14 +20,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.LdmlExporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.ProcedureController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserGroupRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
@@ -107,9 +105,6 @@ class DocumentationUnitSearchIntegrationTest {
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseProcedureRepository procedureRepository;
   @Autowired private DatabaseUserGroupRepository userGroupRepository;
-
-  @Autowired
-  private DatabaseDocumentationUnitProcedureRepository documentationUnitProcedureRepository;
 
   @MockBean S3AsyncClient s3AsyncClient;
   @MockBean MailService mailService;
@@ -583,12 +578,9 @@ class DocumentationUnitSearchIntegrationTest {
         procedureRepository.findAllByLabelAndDocumentationOffice("procedure1", docOfficeDTO);
     Optional<UserGroupDTO> userGroupDTO =
         userGroupRepository.findById(UUID.fromString("2b733549-d2cc-40f0-b7f3-9bfa9f3c1b89"));
-    DocumentationUnitProcedureDTO documentationUnitProcedureDTO =
-        DocumentationUnitProcedureDTO.builder()
-            .procedure(procedureDTO.get())
-            .documentationUnit(documentationUnitDTO.get())
-            .build();
-    documentationUnitProcedureRepository.save(documentationUnitProcedureDTO);
+    documentationUnitDTO.get().setProcedureHistory(List.of(procedureDTO.get()));
+    documentationUnitDTO.get().setProcedure(procedureDTO.get());
+    repository.save(documentationUnitDTO.get());
 
     risWebTestClient
         .withDefaultLogin()

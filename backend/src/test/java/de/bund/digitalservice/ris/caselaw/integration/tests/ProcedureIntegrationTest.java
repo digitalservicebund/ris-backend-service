@@ -17,13 +17,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.LdmlExporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.ProcedureController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserGroupRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
@@ -45,6 +43,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
+import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -111,8 +110,8 @@ class ProcedureIntegrationTest {
   @Autowired private DatabaseDocumentationUnitRepository documentationUnitRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseProcedureRepository repository;
-  @Autowired private DatabaseDocumentationUnitProcedureRepository linkRepository;
   @Autowired private DatabaseUserGroupRepository userGroupRepository;
+  @Autowired private ProcedureService procedureService;
 
   @MockBean private DocumentNumberService numberService;
   @MockBean private DocumentationUnitStatusService statusService;
@@ -223,20 +222,29 @@ class ProcedureIntegrationTest {
                     .extracting("id", "label")
                     .containsExactly(procedureDTO.getId(), procedure.label()));
 
-    Optional<ProcedureDTO> resultProcedure =
-        repository.findAllByLabelAndDocumentationOffice("procedure1", docOfficeDTO);
+    DocumentationUnitDTO updatedDocUnitDTO =
+        documentationUnitRepository.findById(docUnitDTO.getId()).get();
+    ProcedureDTO currentProcedure = updatedDocUnitDTO.getProcedure();
+    assertThat(currentProcedure.getLabel()).isEqualTo(procedureDTO.getLabel());
+    assertThat(currentProcedure.getId()).isEqualTo(procedureDTO.getId());
+    assertThat(updatedDocUnitDTO.getProcedureHistory()).hasSize(1);
 
-    assertThat(resultProcedure).isPresent();
-    ProcedureDTO firstProcedure =
-        linkRepository.findFirstByDocumentationUnitOrderByRankDesc(docUnitDTO).getProcedure();
-    assertThat(firstProcedure)
-        .extracting("id", "label")
-        .containsExactly(procedureDTO.getId(), procedureDTO.getLabel());
-    assertThat(firstProcedure.getDocumentationUnits()).hasSize(1);
-    assertThat(firstProcedure.getDocumentationUnits().get(0))
-        .extracting("id", "documentNumber")
-        .containsExactly(docUnitDTO.getId(), docUnitDTO.getDocumentNumber());
-    assertThat(linkRepository.findAll()).hasSize(1);
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/procedure?q=" + "procedure1" + "&sz=1&pg=0")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
+        .consumeWith(
+            response ->
+                assertThat(
+                        Objects.requireNonNull(response.getResponseBody())
+                            .getContent()
+                            .getFirst()
+                            .documentationUnitCount())
+                    .isOne());
   }
 
   @Test
@@ -271,18 +279,14 @@ class ProcedureIntegrationTest {
 
     Optional<ProcedureDTO> resultProcedure =
         repository.findAllByLabelAndDocumentationOffice("procedure1", docOfficeDTO);
-
     assertThat(resultProcedure).isPresent();
-    ProcedureDTO firstProcedure =
-        linkRepository.findFirstByDocumentationUnitOrderByRankDesc(docUnitDTO).getProcedure();
-    assertThat(firstProcedure)
-        .extracting("id", "label")
-        .containsExactly(procedureDTO.getId(), procedureDTO.getLabel());
-    assertThat(firstProcedure.getDocumentationUnits()).hasSize(1);
-    assertThat(firstProcedure.getDocumentationUnits().get(0))
-        .extracting("id", "documentNumber")
-        .containsExactly(docUnitDTO.getId(), docUnitDTO.getDocumentNumber());
-    assertThat(linkRepository.findAll()).hasSize(1);
+
+    DocumentationUnitDTO updatedDocUnitDTO =
+        documentationUnitRepository.findById(docUnitDTO.getId()).get();
+    ProcedureDTO currentProcedure = updatedDocUnitDTO.getProcedure();
+    assertThat(currentProcedure.getLabel()).isEqualTo(procedureDTO.getLabel());
+    assertThat(currentProcedure.getId()).isEqualTo(procedureDTO.getId());
+    assertThat(updatedDocUnitDTO.getProcedureHistory()).hasSize(1);
   }
 
   @Test
@@ -315,14 +319,12 @@ class ProcedureIntegrationTest {
     Optional<ProcedureDTO> resultProcedure =
         repository.findAllByLabelAndDocumentationOffice("procedure1", docOfficeDTO);
     assertThat(resultProcedure).isPresent();
-    ProcedureDTO firstProcedure =
-        linkRepository.findFirstByDocumentationUnitOrderByRankDesc(docUnitDTO).getProcedure();
-    assertThat(firstProcedure).extracting("label").isEqualTo("procedure1");
-    assertThat(firstProcedure.getDocumentationUnits()).hasSize(1);
-    assertThat(firstProcedure.getDocumentationUnits().get(0))
-        .extracting("id", "documentNumber")
-        .containsExactly(docUnitDTO.getId(), docUnitDTO.getDocumentNumber());
-    assertThat(linkRepository.findAll()).hasSize(1);
+
+    DocumentationUnitDTO updatedDocUnitDTO =
+        documentationUnitRepository.findById(docUnitDTO.getId()).get();
+    ProcedureDTO currentProcedure = updatedDocUnitDTO.getProcedure();
+    assertThat(currentProcedure.getLabel()).isEqualTo("procedure1");
+    assertThat(updatedDocUnitDTO.getProcedureHistory()).hasSize(1);
   }
 
   @Test
@@ -586,20 +588,12 @@ class ProcedureIntegrationTest {
     ProcedureDTO procedureWithoutDate =
         repository.findAllByLabelAndDocumentationOffice("without date", docOfficeDTO).get();
 
-    documentationUnitDTO2.setProcedures(
-        List.of(
-            DocumentationUnitProcedureDTO.builder()
-                .documentationUnit(documentationUnitDTO2)
-                .procedure(procedureWithDateInPast)
-                .build()));
+    documentationUnitDTO2.setProcedureHistory(List.of(procedureWithDateInPast));
+    documentationUnitDTO2.setProcedure(procedureWithDateInPast);
     documentationUnitRepository.save(documentationUnitDTO2);
 
-    documentationUnitDTO3.setProcedures(
-        List.of(
-            DocumentationUnitProcedureDTO.builder()
-                .documentationUnit(documentationUnitDTO3)
-                .procedure(procedureWithoutDate)
-                .build()));
+    documentationUnitDTO3.setProcedureHistory(List.of(procedureWithoutDate));
+    documentationUnitDTO3.setProcedure(procedureWithoutDate);
     documentationUnitRepository.save(documentationUnitDTO3);
 
     risWebTestClient
