@@ -634,11 +634,7 @@ test.describe("short and long texts", () => {
       )
 
       await expect(page.getByText(testId, { exact: true })).toBeVisible()
-      await expect(
-        page.getByText(value, {
-          exact: true,
-        }),
-      ).toBeVisible()
+      await expect(page.getByText(value)).toBeVisible()
     })
   }
 

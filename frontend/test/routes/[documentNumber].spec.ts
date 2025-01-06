@@ -9,6 +9,7 @@ import DocumentNumber from "@/routes/caselaw/documentUnit/[documentNumber].vue"
 import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
+import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 
 function renderComponent() {
   const user = userEvent.setup()
@@ -71,6 +72,7 @@ function renderComponent() {
         documentNumber: "1234567891234",
       },
       global: {
+        directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [
           head,
           router,
@@ -302,14 +304,14 @@ describe("Document Number Route", () => {
       ).toBeVisible()
     })
 
-    it('detects "k" keypress and opens category import', async () => {
+    it('detects "r" keypress and opens category import', async () => {
       const { user, router } = renderComponent()
       await router.push({
         path: "/caselaw/documentUnit/1234567891234/references?showAttachmentPanel=false",
       })
 
       expect(screen.queryByTestId("category-import")).not.toBeInTheDocument()
-      await user.keyboard("k")
+      await user.keyboard("r")
       expect(screen.getByTestId("category-import")).toBeInTheDocument()
     })
 

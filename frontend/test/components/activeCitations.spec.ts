@@ -1,6 +1,6 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
-import { fireEvent, render, screen } from "@testing-library/vue"
+import { fireEvent, render, screen, waitFor } from "@testing-library/vue"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import { createRouter, createWebHistory } from "vue-router"
@@ -9,6 +9,8 @@ import ActiveCitation from "@/domain/activeCitation"
 import { CitationType } from "@/domain/citationType"
 import DocumentUnit, { Court, DocumentType } from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
+import featureToggleService from "@/services/featureToggleService"
+import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
 const server = setupServer(
@@ -48,6 +50,7 @@ function renderComponent(activeCitations?: ActiveCitation[]) {
     user,
     ...render(ActiveCitations, {
       global: {
+        directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [
           [
             createTestingPinia({
@@ -66,7 +69,11 @@ function renderComponent(activeCitations?: ActiveCitation[]) {
           ],
           [router],
         ],
-        stubs: { routerLink: { template: "<a><slot/></a>" } },
+        stubs: {
+          routerLink: {
+            template: "<a><slot/></a>",
+          },
+        },
       },
     }),
   }
@@ -110,6 +117,10 @@ describe("active citations", () => {
   beforeAll(() => server.listen())
   afterAll(() => server.close())
   beforeEach(() => {
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
     vi.spyOn(
       documentUnitService,
       "searchByRelatedDocumentation",
@@ -384,6 +395,19 @@ describe("active citations", () => {
     expect(screen.getAllByText(/test fileNumber/).length).toBe(1)
   })
 
+  it("search is triggered with shortcut", async () => {
+    const { user } = renderComponent()
+
+    expect(screen.queryByText(/test fileNumber/)).not.toBeInTheDocument()
+    await user.type(
+      await screen.findByLabelText("Aktenzeichen Aktivzitierung"),
+      "test",
+    )
+    await user.keyboard("{Control>}{Enter}")
+
+    expect(screen.getAllByText(/test fileNumber/).length).toBe(1)
+  })
+
   it("adds active citation from search results", async () => {
     const { user } = renderComponent()
 
@@ -505,6 +529,38 @@ describe("active citations", () => {
     expect(clipboardText).toBe(
       "Änderungen, label1, 01.02.2022, test fileNumber, documentType1",
     )
+  })
+
+  it("should render parallel decision icons for 'Teilweise Parallelentscheidung'", async () => {
+    renderComponent([
+      generateActiveCitation({
+        citationStyle: {
+          label: "Teilweise Parallelentscheidung",
+        },
+      }),
+    ])
+    await waitFor(() => {
+      expect(screen.getByTestId("import-categories")).toBeVisible()
+    })
+    await waitFor(() => {
+      expect(screen.getByTestId("generate-headnote")).toBeVisible()
+    })
+  })
+
+  it("should render parallel decision icons for 'Parallelentscheidung'", async () => {
+    renderComponent([
+      generateActiveCitation({
+        citationStyle: {
+          label: "Parallelentscheidung",
+        },
+      }),
+    ])
+    await waitFor(() => {
+      expect(screen.getByTestId("import-categories")).toBeVisible()
+    })
+    await waitFor(() => {
+      expect(screen.getByTestId("generate-headnote")).toBeVisible()
+    })
   })
 
   describe("keyboard navigation", () => {

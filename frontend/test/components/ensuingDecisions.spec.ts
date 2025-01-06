@@ -8,6 +8,8 @@ import EnsuingDecisions from "@/components/EnsuingDecisions.vue"
 import DocumentUnit, { Court, DocumentType } from "@/domain/documentUnit"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import documentUnitService from "@/services/documentUnitService"
+import featureToggleService from "@/services/featureToggleService"
+import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
 const server = setupServer(
@@ -40,6 +42,9 @@ function renderComponent(ensuingDecisions?: EnsuingDecision[]) {
     user,
     ...render(EnsuingDecisions, {
       global: {
+        directives: {
+          "ctrl-enter": onSearchShortcutDirective,
+        },
         plugins: [
           [
             createTestingPinia({
@@ -56,7 +61,11 @@ function renderComponent(ensuingDecisions?: EnsuingDecision[]) {
           ],
           [router],
         ],
-        stubs: { routerLink: { template: "<a><slot/></a>" } },
+        stubs: {
+          routerLink: {
+            template: "<a><slot/></a>",
+          },
+        },
       },
     }),
   }
@@ -97,40 +106,46 @@ function generateEnsuingDecision(options?: {
 describe("EnsuingDecisions", () => {
   beforeAll(() => server.listen())
   afterAll(() => server.close())
-  vi.spyOn(
-    documentUnitService,
-    "searchByRelatedDocumentation",
-  ).mockImplementation(() =>
-    Promise.resolve({
+  beforeEach(() => {
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
       status: 200,
-      data: {
-        content: [
-          new EnsuingDecision({
-            uuid: "123",
-            court: {
-              type: "type1",
-              location: "location1",
-              label: "label1",
-            },
-            decisionDate: "2022-02-01",
-            documentType: {
-              jurisShortcut: "documentTypeShortcut1",
-              label: "documentType1",
-            },
-            fileNumber: "test fileNumber1",
-          }),
-        ],
-        size: 0,
-        number: 0,
-        numberOfElements: 20,
-        first: true,
-        last: false,
-        empty: false,
-      },
-    }),
-  )
+      data: true,
+    })
+    vi.spyOn(
+      documentUnitService,
+      "searchByRelatedDocumentation",
+    ).mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: {
+          content: [
+            new EnsuingDecision({
+              uuid: "123",
+              court: {
+                type: "type1",
+                location: "location1",
+                label: "label1",
+              },
+              decisionDate: "2022-02-01",
+              documentType: {
+                jurisShortcut: "documentTypeShortcut1",
+                label: "documentType1",
+              },
+              fileNumber: "test fileNumber1",
+            }),
+          ],
+          size: 0,
+          number: 0,
+          numberOfElements: 20,
+          first: true,
+          last: false,
+          empty: false,
+        },
+      }),
+    )
 
-  vi.spyOn(window, "scrollTo").mockImplementation(() => vi.fn())
+    vi.spyOn(window, "scrollTo").mockImplementation(() => vi.fn())
+  })
 
   it("renders empty ensuing decision in edit mode, when no ensuingDecisions in list", async () => {
     renderComponent()
@@ -315,6 +330,19 @@ describe("EnsuingDecisions", () => {
 
     expect(screen.queryByText(/test fileNumber/)).not.toBeInTheDocument()
     await user.click(await screen.findByLabelText("Nach Entscheidung suchen"))
+
+    expect(screen.getAllByText(/test fileNumber/).length).toBe(1)
+  })
+
+  it("search is triggered with shortcut", async () => {
+    const { user } = renderComponent()
+
+    expect(screen.queryByText(/test fileNumber/)).not.toBeInTheDocument()
+    await user.type(
+      await screen.findByLabelText("Aktenzeichen Nachgehende Entscheidung"),
+      "test",
+    )
+    await user.keyboard("{Control>}{Enter}")
 
     expect(screen.getAllByText(/test fileNumber/).length).toBe(1)
   })

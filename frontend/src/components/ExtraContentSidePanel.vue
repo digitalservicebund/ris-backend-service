@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue"
+import { storeToRefs } from "pinia"
 import type { Component } from "vue"
+import { computed, onMounted } from "vue"
 import { useRoute } from "vue-router"
 import Tooltip from "./Tooltip.vue"
 import AttachmentView from "@/components/AttachmentView.vue"
@@ -14,15 +15,14 @@ import TextButton from "@/components/input/TextButton.vue"
 import DocumentUnitPreview from "@/components/preview/DocumentUnitPreview.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
 import DocumentUnit from "@/domain/documentUnit"
-import FeatureToggleService from "@/services/featureToggleService"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import { SelectablePanelContent } from "@/types/panelContentMode"
 import IconAttachFile from "~icons/ic/baseline-attach-file"
-import IconCopyAll from "~icons/ic/baseline-copy-all"
 import IconEdit from "~icons/ic/outline-edit"
 import IconOpenInNewTab from "~icons/ic/outline-open-in-new"
 import IconPreview from "~icons/ic/outline-remove-red-eye"
 import IconStickyNote from "~icons/ic/outline-sticky-note-2"
+import IconImportCategories from "~icons/material-symbols/text-select-move-back-word"
 
 const props = defineProps<{
   documentUnit?: DocumentUnit
@@ -37,8 +37,6 @@ const store = useExtraContentSidePanelStore()
 
 const route = useRoute()
 
-const featureToggle = ref()
-
 const hasNote = computed(() => {
   return !!props.documentUnit!.note && props.documentUnit!.note.length > 0
 })
@@ -51,6 +49,8 @@ const hasAttachments = computed(() => {
 })
 
 const shortCut = computed(() => props.sidePanelShortcut ?? "<")
+
+const { importDocumentNumber } = storeToRefs(store)
 
 /**
  * Updates the local attachment index reference, which is used to display the selected attachment in the panel,
@@ -128,15 +128,6 @@ onMounted(() => {
     store.isExpanded = hasNote.value || hasAttachments.value
   }
 })
-
-/**
- * Loads the feature flag for the category import feature.
- */
-onMounted(async () => {
-  featureToggle.value = (
-    await FeatureToggleService.isEnabled("neuris.category-importer")
-  ).data
-})
 </script>
 
 <template>
@@ -197,11 +188,7 @@ onMounted(async () => {
             />
           </Tooltip>
 
-          <Tooltip
-            v-if="featureToggle && !hidePanelModeBar"
-            shortcut="k"
-            text="Rubriken-Import"
-          >
+          <Tooltip v-if="!hidePanelModeBar" shortcut="r" text="Rubriken-Import">
             <TextButton
               id="category-import"
               aria-label="Rubriken-Import anzeigen"
@@ -210,7 +197,7 @@ onMounted(async () => {
                 store.panelMode === 'category-import' ? 'bg-blue-200' : ''
               "
               data-testid="category-import-button"
-              :icon="IconCopyAll"
+              :icon="IconImportCategories"
               size="small"
               @click="() => selectImporter()"
             />
@@ -295,6 +282,7 @@ onMounted(async () => {
         </div>
         <FlexContainer
           v-if="store.panelMode === 'preview'"
+          id="preview-container"
           class="max-h-[70vh] overflow-auto"
         >
           <DocumentUnitPreview
@@ -303,7 +291,10 @@ onMounted(async () => {
           />
         </FlexContainer>
 
-        <CategoryImport v-if="store.panelMode === 'category-import'" />
+        <CategoryImport
+          v-if="store.panelMode === 'category-import'"
+          :document-number="importDocumentNumber"
+        />
       </div>
     </SideToggle>
   </FlexItem>

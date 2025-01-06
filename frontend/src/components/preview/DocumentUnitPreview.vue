@@ -44,9 +44,9 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
     </p>
     <PreviewCoreData :core-data="documentUnit.coreData" />
     <PreviewNote :note="documentUnit.note" />
+    <PreviewReferences :references="documentUnit.references as Reference[]" />
     <PreviewProceedingDecisions />
     <PreviewContentRelatedIndexing />
-    <PreviewReferences :references="documentUnit.references as Reference[]" />
     <PreviewLiteratureReferences
       :literature-references="documentUnit.literatureReferences as Reference[]"
     />

@@ -86,10 +86,13 @@ test(
     const singleIndentationText = "Abschnitt mit Einzug 1"
     const doubleIndentationText = "Abschnitt mit Einzug 2"
     const tripleIndentationText = "Abschnitt mit Einzug 3"
-    const noIndentation = `<p>Abschnitt mit Einzug 0</p>`
-    const singleIndentation = `<p style="margin-left: 40px!important;">Abschnitt mit Einzug 1</p>`
-    const doubleIndentation = `<p style="margin-left: 80px!important;">Abschnitt mit Einzug 2</p>`
-    const tripleIndentation = `<p style="margin-left: 120px!important;">Abschnitt mit Einzug 3</p>`
+    const noIndentation = /<p[^>]*>Abschnitt mit Einzug 0<\/p>/
+    const singleIndentation =
+      /<p\s+style="[^"]*margin-left:\s*40px!important[^"]*"\s*>Abschnitt mit Einzug 1<\/p>/
+    const doubleIndentation =
+      /<p\s+style="[^"]*margin-left:\s*80px!important[^"]*"\s*>Abschnitt mit Einzug 2<\/p>/
+    const tripleIndentation =
+      /<p\s+style="[^"]*margin-left:\s*120px!important[^"]*"\s*>Abschnitt mit Einzug 3<\/p>/
 
     await test.step("upload document", async () => {
       await uploadTestfile(page, "some-indentations.docx")
@@ -127,10 +130,10 @@ test(
 
       const inputFieldInnerHTML = await inputField.innerHTML()
       // Check all text copied with style
-      expect(inputFieldInnerHTML).toContain(singleIndentation)
-      expect(inputFieldInnerHTML).toContain(doubleIndentation)
-      expect(inputFieldInnerHTML).toContain(tripleIndentation)
-      expect(inputFieldInnerHTML).toContain(noIndentation)
+      expect(inputFieldInnerHTML).toMatch(singleIndentation)
+      expect(inputFieldInnerHTML).toMatch(doubleIndentation)
+      expect(inputFieldInnerHTML).toMatch(tripleIndentation)
+      expect(inputFieldInnerHTML).toMatch(noIndentation)
     })
   },
 )

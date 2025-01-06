@@ -315,6 +315,7 @@ class LegalPeriodicalEditionIntegrationTest {
                         .rank(1)
                         .citation("Caselaw Reference Citation from Docunit")
                         .legalPeriodicalRawValue("A")
+                        .type("amtlich")
                         .documentationUnit(
                             DocumentationUnitDTO.builder()
                                 .id(docUnit.getId())
@@ -325,6 +326,7 @@ class LegalPeriodicalEditionIntegrationTest {
                         .id(existingReferenceId)
                         .citation("Original Caselaw Reference Citation from Docunit")
                         .legalPeriodicalRawValue("B")
+                        .type("amtlich")
                         .rank(2)
                         .documentationUnit(
                             DocumentationUnitDTO.builder()
@@ -358,6 +360,7 @@ class LegalPeriodicalEditionIntegrationTest {
                             .referenceType(ReferenceType.CASELAW)
                             .citation("Updated Caselaw Reference Citation from Edition")
                             .legalPeriodicalRawValue("B")
+                            .primaryReference(true)
                             .documentationUnit(relatedDocUnit)
                             .build(),
                         Reference.builder()
@@ -367,6 +370,7 @@ class LegalPeriodicalEditionIntegrationTest {
                             .author("author 2")
                             .documentType(EBS)
                             .legalPeriodicalRawValue("B")
+                            .primaryReference(true)
                             .documentationUnit(relatedDocUnit)
                             .build(),
                         Reference.builder()
@@ -374,6 +378,7 @@ class LegalPeriodicalEditionIntegrationTest {
                             .referenceType(ReferenceType.CASELAW)
                             .citation("New Caselaw Reference Citation from Edition")
                             .legalPeriodicalRawValue("D")
+                            .primaryReference(true)
                             .documentationUnit(relatedDocUnit)
                             .build(),
                         Reference.builder()
@@ -383,6 +388,7 @@ class LegalPeriodicalEditionIntegrationTest {
                             .author("author 3")
                             .documentType(EAN)
                             .legalPeriodicalRawValue("C")
+                            .primaryReference(true)
                             .documentationUnit(relatedDocUnit)
                             .build()))
                 .build());
@@ -489,6 +495,7 @@ class LegalPeriodicalEditionIntegrationTest {
                         .rank(1)
                         .citation("Caselaw Reference from Docunit")
                         .legalPeriodicalRawValue("A")
+                        .type("amtlich")
                         .documentationUnit(
                             DocumentationUnitDTO.builder()
                                 .id(docUnit.getId())
@@ -522,6 +529,7 @@ class LegalPeriodicalEditionIntegrationTest {
                             .referenceType(ReferenceType.CASELAW)
                             .citation("Updated Caselaw Reference Citation from Edition")
                             .legalPeriodicalRawValue("B")
+                            .primaryReference(true)
                             .documentationUnit(relatedDocUnit)
                             .build(),
                         Reference.builder()
@@ -531,6 +539,7 @@ class LegalPeriodicalEditionIntegrationTest {
                             .author("author 2")
                             .documentType(EBS)
                             .legalPeriodicalRawValue("B")
+                            .primaryReference(true)
                             .documentationUnit(relatedDocUnit)
                             .build(),
                         Reference.builder()
@@ -538,6 +547,7 @@ class LegalPeriodicalEditionIntegrationTest {
                             .referenceType(ReferenceType.CASELAW)
                             .citation("New Caselaw Reference from Edition")
                             .legalPeriodicalRawValue("D")
+                            .primaryReference(true)
                             .documentationUnit(relatedDocUnit)
                             .build(),
                         Reference.builder()
@@ -547,6 +557,7 @@ class LegalPeriodicalEditionIntegrationTest {
                             .author("author 4")
                             .documentType(EAN)
                             .legalPeriodicalRawValue("C")
+                            .primaryReference(true)
                             .documentationUnit(relatedDocUnit)
                             .build()))
                 .build());
@@ -660,6 +671,7 @@ class LegalPeriodicalEditionIntegrationTest {
                             .referenceType(ReferenceType.CASELAW)
                             .citation("ABC 2024, 3")
                             .legalPeriodicalRawValue("ABC")
+                            .primaryReference(true)
                             .documentationUnit(
                                 RelatedDocumentationUnit.builder()
                                     .uuid(docUnit.getId())
@@ -753,6 +765,7 @@ class LegalPeriodicalEditionIntegrationTest {
                             .referenceType(ReferenceType.CASELAW)
                             .citation("ABC 2024, 3")
                             .legalPeriodicalRawValue("ABC")
+                            .primaryReference(true)
                             .documentationUnit(
                                 RelatedDocumentationUnit.builder()
                                     .uuid(docUnit.getId())

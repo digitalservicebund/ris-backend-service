@@ -58,17 +58,9 @@ test.describe(
         await page.getByText("XML Vorschau").click()
         const xmlPreview = page.getByTitle("XML Vorschau")
         const innerText = await xmlPreview.innerText()
-        expect(innerText).toContain(
-          "<paratrubriken>\n" +
-            "14\n" +
-            "        <zuordnung>\n" +
-            "15\n" +
-            "            <aspekt>Berufsbild</aspekt>\n" +
-            "16\n" +
-            "            <begriff>Handwerker</begriff>\n" +
-            "17\n" +
-            "        </zuordnung>",
-        )
+        const regex =
+          /<zuordnung>\s*\d*\s*<aspekt>Berufsbild<\/aspekt>\s*\d*\s*<begriff>Handwerker<\/begriff>\s*\d*\s*<\/zuordnung>/
+        expect(innerText).toMatch(regex)
       })
     })
 

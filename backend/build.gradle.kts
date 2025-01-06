@@ -19,7 +19,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.51.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "11.0.1"
+    id("org.flywaydb.flyway") version "11.1.0"
     id("io.sentry.jvm.gradle") version "4.14.1"
 }
 
@@ -156,18 +156,14 @@ dependencies {
     implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.1")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.2")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.4")
 
-    // CVE-2024-26308
-    implementation("org.apache.commons:commons-compress:1.27.1")
+    // CVE-2024-50379
+    implementation ("org.apache.tomcat.embed:tomcat-embed-core:10.1.34")
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:4.29.1")
-    // CVE-2023-52428 in spring-boot-starter-oauth2-client:3.2.3
-    implementation("com.nimbusds:nimbus-jose-jwt:9.47")
-    // CVE-2023-31582
-    implementation("org.bitbucket.b_c:jose4j:0.9.6")
+    implementation("com.google.protobuf:protobuf-java:4.29.2")
 
     implementation("org.postgresql:postgresql:42.7.4")
 
@@ -175,7 +171,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.29.29"))
+    implementation(platform("software.amazon.awssdk:bom:2.29.43"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -183,7 +179,7 @@ dependencies {
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
 
     // caselaw tranformation to LDML for the communication with the portal
-    implementation("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.4")
+    implementation("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.5")
     implementation("net.sf.saxon:Saxon-HE:12.5")
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
@@ -191,11 +187,11 @@ dependencies {
     implementation("com.icegreen:greenmail:2.1.2")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.21") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.22") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
-    // implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.10.21.jar"))
+    // implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.10.22.jar"))
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
@@ -209,24 +205,22 @@ dependencies {
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.14.1")
-    implementation("io.micrometer:micrometer-core:1.14.1")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.14.2")
+    implementation("io.micrometer:micrometer-core:1.14.2")
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
-    // => CVE-2023-2976
-    implementation("com.google.guava:guava:33.3.1-jre")
 
     implementation("io.getunleash:unleash-client-java:9.2.6")
-    implementation("org.apache.commons:commons-text:1.12.0")
+    implementation("org.apache.commons:commons-text:1.13.0")
     implementation("org.jsoup:jsoup:1.18.3")
 
     implementation("net.javacrumbs.shedlock:shedlock-spring:6.0.2")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.0.2")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.0.1"
+    val flywayCore = "org.flywaydb:flyway-core:11.1.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.0.1")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.1.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -234,8 +228,8 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:5.14.2")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("io.projectreactor:reactor-test:3.7.0")
-    testImplementation("org.springframework.security:spring-security-test:6.4.1")
+    testImplementation("io.projectreactor:reactor-test:3.7.1")
+    testImplementation("org.springframework.security:spring-security-test:6.4.2")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.3.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")

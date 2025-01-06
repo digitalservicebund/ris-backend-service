@@ -22,6 +22,7 @@ import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ParagraphElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.RunElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.RunTextElement;
+import de.bund.digitalservice.ris.caselaw.domain.docx.UnhandledElement;
 import jakarta.xml.bind.JAXBElement;
 import java.awt.Dimension;
 import java.math.BigInteger;
@@ -1023,8 +1024,9 @@ class DocumentationUnitDocxBuilderTest {
 
     builder = builder.setParagraph(paragraph);
     DocumentationUnitDocxBuilder finalBuilder = builder;
+    ArrayList<UnhandledElement> unhandledElements = new ArrayList<>();
     Exception exception =
-        assertThrows(DocxConverterException.class, () -> finalBuilder.build(new ArrayList<>()));
+        assertThrows(DocxConverterException.class, () -> finalBuilder.build(unhandledElements));
 
     assertEquals("more than one graphic data in a drawing", exception.getMessage());
   }
@@ -1042,8 +1044,9 @@ class DocumentationUnitDocxBuilderTest {
 
     builder = builder.setParagraph(paragraph);
     DocumentationUnitDocxBuilder finalBuilder = builder;
+    ArrayList<UnhandledElement> unhandledElements = new ArrayList<>();
     Exception exception =
-        assertThrows(DocxConverterException.class, () -> finalBuilder.build(new ArrayList<>()));
+        assertThrows(DocxConverterException.class, () -> finalBuilder.build(unhandledElements));
 
     assertEquals("no graphic data", exception.getMessage());
   }

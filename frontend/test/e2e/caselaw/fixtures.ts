@@ -62,6 +62,20 @@ export const caselawTest = test.extend<MyFixtures>({
     const courtResponse = await request.get(`api/v1/caselaw/courts?q=AG+Aachen`)
     const court = await courtResponse.json()
 
+    const normAbbreviationResponse = await request.get(
+      `api/v1/caselaw/normabbreviation/search?q=BGB&sz=30&pg=0`,
+    )
+    const normAbbreviation = await normAbbreviationResponse.json()
+
+    const citationTypeResponse = await request.get(
+      `api/v1/caselaw/citationtypes?q=Abgrenzung`,
+    )
+    const citationType = await citationTypeResponse.json()
+
+    const fieldsOfLawResponse = await request.get(
+      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01`,
+    )
+    const fieldsOfLaw = await fieldsOfLawResponse.json()
     const documentTypeResponse = await request.get(
       `api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`,
     )
@@ -80,9 +94,29 @@ export const caselawTest = test.extend<MyFixtures>({
             decisionDate: "2019-12-31",
             appraisalBody: "1. Senat, 2. Kammer",
           },
+          contentRelatedIndexing: {
+            keywords: ["keyword"],
+            norms: [
+              {
+                normAbbreviation: normAbbreviation?.[0],
+              },
+            ],
+            activeCitations: [
+              {
+                documentNumber: "YYTestDoc0013",
+                court: court?.[0],
+                documentType: documentType?.[0],
+                decisionDate: "2022-02-01",
+                fileNumber: "123",
+                citationType: citationType?.[0],
+              },
+            ],
+            fieldsOfLaw: [fieldsOfLaw?.[0]],
+          },
           shortTexts: {
             headnote: "testHeadnote",
             guidingPrinciple: "guidingPrinciple",
+            headline: "testHeadline",
           },
         },
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },

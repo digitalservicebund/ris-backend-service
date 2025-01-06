@@ -39,8 +39,12 @@ const legalPeriodical = computed({
     const legalPeriodical = { ...newValue } as LegalPeriodical
     if (newValue) {
       reference.value.legalPeriodical = legalPeriodical
+      reference.value.legalPeriodicalRawValue = legalPeriodical.abbreviation
+      reference.value.primaryReference = legalPeriodical.primaryReference
     } else {
       reference.value.legalPeriodical = undefined
+      reference.value.legalPeriodicalRawValue = undefined
+      reference.value.primaryReference = undefined
     }
   },
 })

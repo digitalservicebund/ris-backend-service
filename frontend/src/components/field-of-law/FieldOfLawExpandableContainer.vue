@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, nextTick, ref, watch } from "vue"
+import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import FieldOfLawSummary from "@/components/field-of-law/FieldOfLawSummary.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import RadioInput from "@/components/input/RadioInput.vue"
@@ -63,80 +64,89 @@ export enum InputMethod {
 }
 </script>
 <template>
-  <div class="flex w-full items-start justify-between bg-white">
-    <div class="flex w-full flex-col">
-      <div class="flex w-full flex-row items-center justify-between">
-        <h2 ref="titleRef" class="ds-label-01-bold">Sachgebiete</h2>
+  <div>
+    <div class="flex w-full items-start justify-between bg-white">
+      <div class="flex w-full flex-col">
+        <div class="flex w-full flex-row items-center justify-between">
+          <h2
+            :id="DocumentUnitCategoriesEnum.FIELDS_OF_LAW"
+            ref="titleRef"
+            class="ds-label-01-bold mb-16"
+          >
+            Sachgebiete
+          </h2>
+        </div>
+        <FieldOfLawSummary
+          data-testid="field-of-law-summary"
+          :fields-of-law="fieldsOfLaw"
+          @node:clicked="nodeClicked"
+          @node:remove="removeNode"
+        />
       </div>
-      <FieldOfLawSummary
-        :fields-of-law="fieldsOfLaw"
-        @node:clicked="nodeClicked"
-        @node:remove="removeNode"
-      />
     </div>
-  </div>
 
-  <div v-if="isExpanded" class="flex flex-col items-start gap-24">
-    <div class="flex w-full flex-row justify-between">
-      <div class="flex flex-row gap-24">
-        <InputField
-          id="direct"
-          label="Direkteingabe"
-          label-class="ds-label-01-reg"
-          :label-position="LabelPosition.RIGHT"
-          @click="() => (inputMethod = InputMethod.DIRECT)"
-        >
-          <RadioInput
+    <div v-if="isExpanded" class="flex flex-col items-start gap-24">
+      <div class="flex w-full flex-row justify-between">
+        <div class="flex flex-row gap-24">
+          <InputField
             id="direct"
-            v-model="inputMethod"
-            aria-label="Direkteingabe auswählen"
-            size="small"
-            value="direct"
-          />
-        </InputField>
+            label="Direkteingabe"
+            label-class="ds-label-01-reg"
+            :label-position="LabelPosition.RIGHT"
+            @click="() => (inputMethod = InputMethod.DIRECT)"
+          >
+            <RadioInput
+              id="direct"
+              v-model="inputMethod"
+              aria-label="Direkteingabe auswählen"
+              size="small"
+              value="direct"
+            />
+          </InputField>
 
-        <InputField
-          id="search"
-          label="Suche"
-          label-class="ds-label-01-reg"
-          :label-position="LabelPosition.RIGHT"
-          @click="inputMethod = InputMethod.SEARCH"
-        >
-          <RadioInput
+          <InputField
             id="search"
-            v-model="inputMethod"
-            aria-label="Sachgebietsuche auswählen"
+            label="Suche"
+            label-class="ds-label-01-reg"
+            :label-position="LabelPosition.RIGHT"
+            @click="inputMethod = InputMethod.SEARCH"
+          >
+            <RadioInput
+              id="search"
+              v-model="inputMethod"
+              aria-label="Sachgebietsuche auswählen"
+              size="small"
+              value="search"
+            />
+          </InputField>
+        </div>
+
+        <div class="flex flex-row gap-8">
+          <TextButton
+            v-if="isResetButtonVisible && inputMethod === InputMethod.SEARCH"
+            button-type="tertiary"
+            label="Suche zurücksetzen"
             size="small"
-            value="search"
+            @click="emit('resetSearch')"
           />
-        </InputField>
+          <TextButton
+            button-type="primary"
+            label="Fertig"
+            size="small"
+            @click="exitEditMode"
+          />
+        </div>
       </div>
-
-      <div class="flex flex-row gap-8">
-        <TextButton
-          v-if="isResetButtonVisible && inputMethod === InputMethod.SEARCH"
-          button-type="tertiary"
-          label="Suche zurücksetzen"
-          size="small"
-          @click="emit('resetSearch')"
-        />
-        <TextButton
-          button-type="primary"
-          label="Fertig"
-          size="small"
-          @click="exitEditMode"
-        />
-      </div>
+      <slot />
     </div>
-    <slot />
-  </div>
 
-  <TextButton
-    v-else
-    button-type="tertiary"
-    :icon="IconAdd"
-    :label="expandButtonLabel"
-    size="small"
-    @click="enterEditMode"
-  />
+    <TextButton
+      v-else
+      button-type="tertiary"
+      :icon="IconAdd"
+      :label="expandButtonLabel"
+      size="small"
+      @click="enterEditMode"
+    />
+  </div>
 </template>

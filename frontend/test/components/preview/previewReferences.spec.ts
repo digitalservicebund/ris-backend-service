@@ -36,9 +36,9 @@ describe("preview references", () => {
       [
         new Reference({
           citation: "2006, S.3",
+          primaryReference: true,
           legalPeriodical: {
             abbreviation: "ABC",
-            primaryReference: true,
           },
         }),
       ],
@@ -48,16 +48,16 @@ describe("preview references", () => {
       [
         new Reference({
           citation: "2006, S.3",
+          primaryReference: true,
           legalPeriodical: {
             abbreviation: "ABC",
-            primaryReference: true,
           },
         }),
         new Reference({
           citation: "2007, S.4",
+          primaryReference: true,
           legalPeriodical: {
             abbreviation: "XYZ",
-            primaryReference: true,
           },
         }),
       ],

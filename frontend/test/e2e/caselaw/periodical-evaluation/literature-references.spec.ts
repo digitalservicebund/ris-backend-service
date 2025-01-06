@@ -3,7 +3,7 @@ import {
   fillInput,
   navigateToPeriodicalReferences,
   navigateToPreview,
-  searchForDocUnitWithFileNumber,
+  searchForDocUnitWithFileNumberAndDecisionDate,
   waitForInputValue,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
@@ -93,7 +93,11 @@ test.describe("Literature references", () => {
         await expect(page.getByLabel("Literatur Fundstelle")).toBeChecked()
         await fillInput(page, "Zitatstelle *", `2`)
 
-        await searchForDocUnitWithFileNumber(page, fileNumber, "31.12.2019")
+        await searchForDocUnitWithFileNumberAndDecisionDate(
+          page,
+          fileNumber,
+          "31.12.2019",
+        )
         await page.getByLabel("Treffer übernehmen").click()
         // check that both fields display error message
         await expect(
@@ -118,7 +122,11 @@ test.describe("Literature references", () => {
           "Anmerkung",
         )
 
-        await searchForDocUnitWithFileNumber(page, fileNumber, "31.12.2019")
+        await searchForDocUnitWithFileNumberAndDecisionDate(
+          page,
+          fileNumber,
+          "31.12.2019",
+        )
         await page.getByLabel("Treffer übernehmen").click()
         await expect(
           page.getByText(`Bilen, Ulviye, MMG 2024, 2${edition.suffix} (Ean)`),
@@ -159,7 +167,11 @@ test.describe("Literature references", () => {
         await fillInput(page, "Zitatstelle *", "300")
         await fillInput(page, "Klammernzusatz", "ST")
 
-        await searchForDocUnitWithFileNumber(page, fileNumber, "31.12.2019")
+        await searchForDocUnitWithFileNumberAndDecisionDate(
+          page,
+          fileNumber,
+          "31.12.2019",
+        )
         await page.getByLabel("Treffer übernehmen").click()
         await expect(
           page.getByText(`MMG 2024, 300${editionWithReferences.suffix} (ST)`),
@@ -179,7 +191,11 @@ test.describe("Literature references", () => {
           "Anmerkung",
         )
 
-        await searchForDocUnitWithFileNumber(page, fileNumber, "31.12.2019")
+        await searchForDocUnitWithFileNumberAndDecisionDate(
+          page,
+          fileNumber,
+          "31.12.2019",
+        )
         await page.getByLabel("Treffer übernehmen").click()
         await expect(
           page.getByText(

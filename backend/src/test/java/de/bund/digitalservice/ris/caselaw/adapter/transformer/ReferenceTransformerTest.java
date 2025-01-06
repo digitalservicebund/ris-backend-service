@@ -7,6 +7,7 @@ import static de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil.createTes
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
@@ -17,11 +18,12 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class ReferencesTransformerTest {
+class ReferenceTransformerTest {
 
   private static Stream<Arguments> provideReferencesTestData_toDomain() {
     return Stream.of(
@@ -43,6 +45,8 @@ class ReferencesTransformerTest {
                 .referenceType(ReferenceType.CASELAW)
                 .documentationUnit(createTestRelatedDocument())
                 .legalPeriodical(createTestLegalPeriodical())
+                .legalPeriodicalRawValue("LPA")
+                .primaryReference(true)
                 .build()),
         // without legal periodical, with editionRank
         Arguments.of(
@@ -53,6 +57,7 @@ class ReferencesTransformerTest {
                 .footnote("footnote")
                 .referenceSupplement("Klammerzusatz")
                 .legalPeriodicalRawValue("LPA")
+                .type("amtlich")
                 .documentationUnit(createTestDocumentationUnitDTO())
                 .build(),
             Reference.builder()
@@ -62,6 +67,7 @@ class ReferencesTransformerTest {
                 .referenceSupplement("Klammerzusatz")
                 .referenceType(ReferenceType.CASELAW)
                 .legalPeriodicalRawValue("LPA")
+                .primaryReference(true)
                 .documentationUnit(createTestRelatedDocument())
                 .build()));
   }
@@ -71,6 +77,20 @@ class ReferencesTransformerTest {
   void testTransformToDomain_shouldTransformReferences(
       ReferenceDTO referenceDTO, Reference expectedReference) {
     assertThat(ReferenceTransformer.transformToDomain(referenceDTO)).isEqualTo(expectedReference);
+  }
+
+  @Test
+  void testTransformToDomainWithoutType_shouldThrowException() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            ReferenceTransformer.transformToDomain(
+                ReferenceDTO.builder()
+                    .rank(1)
+                    .citation("2024, 123")
+                    .referenceSupplement("Klammerzusatz")
+                    .documentationUnit(createTestDocumentationUnitDTO())
+                    .build()));
   }
 
   private static Stream<Arguments> provideReferencesTestData_toDTO() {
@@ -110,6 +130,7 @@ class ReferencesTransformerTest {
                         .primaryReference(false)
                         .build())
                 .legalPeriodicalRawValue("ABC")
+                .type("nichtamtlich")
                 .build()),
         // with primary flag, the type is amtlich
         Arguments.of(
@@ -133,6 +154,7 @@ class ReferencesTransformerTest {
                         .primaryReference(true)
                         .build())
                 .legalPeriodicalRawValue("ABC")
+                .type("amtlich")
                 .build()),
         // with primary=false flag, the type is nichtamtlich
         Arguments.of(
@@ -156,18 +178,21 @@ class ReferencesTransformerTest {
                         .primaryReference(false)
                         .build())
                 .legalPeriodicalRawValue("ABC")
+                .type("nichtamtlich")
                 .build()),
-        // possible with no legalPeriodical
+        // possible with no legalPeriodical object
         Arguments.of(
             Reference.builder()
                 .citation("2024, S.5")
                 .legalPeriodicalRawValue("ABC")
+                .primaryReference(true)
                 .referenceType(ReferenceType.CASELAW)
                 .build(),
             ReferenceDTO.builder()
                 .rank(1)
                 .citation("2024, S.5")
                 .legalPeriodicalRawValue("ABC")
+                .type("amtlich")
                 .build()));
   }
 
@@ -191,5 +216,17 @@ class ReferencesTransformerTest {
         .isEqualTo(expected);
 
     assertNotNull(referenceDTOS.get(0).getDocumentationUnit());
+  }
+
+  @Test
+  void testTransformToDTOWithoutLegalPeriodicalType_shouldThrowException() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            ReferenceTransformer.transformToDTO(
+                Reference.builder()
+                    .citation("2024, S.5")
+                    .referenceType(ReferenceType.CASELAW)
+                    .build()));
   }
 }

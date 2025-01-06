@@ -38,7 +38,7 @@ export default class EnsuingDecision
     return this.id === entry.id
   }
 
-  get renderDecision(): string {
+  get renderSummary(): string {
     return [
       ...(this.pending === true ? ["anhängig"] : ["nachgehend"]),
       ...(this.court ? [`${this.court?.label}`] : []),

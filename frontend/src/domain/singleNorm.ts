@@ -7,6 +7,7 @@ export default class SingleNorm {
   public dateOfVersion?: string
   public dateOfRelevance?: string
   public legalForce?: LegalForce
+  public id?: string
 
   static readonly fields = [
     "singleNorm",
@@ -19,7 +20,7 @@ export default class SingleNorm {
     Object.assign(this, data)
   }
 
-  get renderDecision(): string {
+  get renderSummary(): string {
     return [
       ...(this.singleNorm ? [this.singleNorm] : []),
       ...(this.dateOfVersion

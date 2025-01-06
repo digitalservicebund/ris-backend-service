@@ -5,6 +5,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import PeriodicalEditionReferenceInput from "@/components/periodical-evaluation/references/PeriodicalEditionReferenceInput.vue"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import documentUnitService from "@/services/documentUnitService"
+import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
 function renderComponent() {
@@ -22,6 +23,7 @@ function renderComponent() {
         isSaved: false,
       },
       global: {
+        directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [
           router,
           [
@@ -72,6 +74,17 @@ describe("Legal periodical edition reference input", () => {
         },
       }),
     )
+  })
+
+  it("search is triggered with shortcut", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => null)
+    const { user } = renderComponent()
+
+    expect(screen.queryByText(/test fileNumber1/)).not.toBeInTheDocument()
+    await user.type(await screen.findByLabelText("Aktenzeichen"), "test")
+    await user.keyboard("{Control>}{Enter}")
+
+    expect(screen.getAllByText(/test fileNumber1/).length).toBe(1)
   })
 
   test("adding a decision scrolls to reference on validation errors", async () => {

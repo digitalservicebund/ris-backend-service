@@ -218,6 +218,7 @@ class HandoverMailIntegrationTest {
                           .id(UUID.randomUUID())
                           .citation("citation")
                           .legalPeriodicalRawValue("ABC")
+                          .type("nichtamtlich")
                           .rank(1)
                           .documentationUnit(savedDocumentationUnitDTO)
                           .build())

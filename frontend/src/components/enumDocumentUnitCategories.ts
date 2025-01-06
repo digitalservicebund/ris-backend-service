@@ -4,4 +4,7 @@ export enum DocumentUnitCategoriesEnum {
   CONTENT_RELATED_INDEXING = "contentRelatedIndexing",
   TEXTS = "texts",
   KEYWORDS = "keywords",
+  FIELDS_OF_LAW = "fieldsOfLaw",
+  NORMS = "norms",
+  ACTIVE_CITATIONS = "activeCitations",
 }

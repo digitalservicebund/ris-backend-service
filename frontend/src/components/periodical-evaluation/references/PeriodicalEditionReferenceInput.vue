@@ -324,7 +324,11 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div ref="containerRef" class="flex flex-col border-b-1">
+  <div
+    ref="containerRef"
+    v-ctrl-enter="search"
+    class="flex flex-col border-b-1"
+  >
     <PopupModal
       v-if="showModal"
       aria-label="Dialog zur Auswahl der Löschaktion"
@@ -348,8 +352,10 @@ onMounted(async () => {
           reference.documentationUnit?.documentNumber
         "
         data-testid="reference-input-summary"
-        :decision="reference.documentationUnit"
         :display-mode="DisplayMode.SIDEPANEL"
+        :document-number="reference.documentationUnit.documentNumber"
+        :status="reference.documentationUnit.status"
+        :summary="reference.documentationUnit.renderSummary"
       />
       <div v-if="!isSaved" class="flex items-center gap-16">
         <div class="flex items-center">

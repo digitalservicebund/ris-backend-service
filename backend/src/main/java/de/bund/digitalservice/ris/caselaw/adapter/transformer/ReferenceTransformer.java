@@ -21,11 +21,21 @@ public class ReferenceTransformer {
           LegalPeriodicalTransformer.transformToDomain(referenceDTO.getLegalPeriodical());
     }
 
+    Boolean isPrimaryReference =
+        legalPeriodical != null
+            ? legalPeriodical.primaryReference()
+            : referenceDTO.getType() != null
+                ? referenceDTO.getType().equals("amtlich") // fallback to raw value
+                : null;
+
+    if (isPrimaryReference == null) {
+      throw new IllegalArgumentException(
+          "Either the referenceDTO's legalPeriodical or type field must be set");
+    }
+
     return Reference.builder()
         .id(referenceDTO.getId())
         .referenceSupplement(referenceDTO.getReferenceSupplement())
-        .legalPeriodical(legalPeriodical)
-        .legalPeriodicalRawValue(referenceDTO.getLegalPeriodicalRawValue())
         .citation(referenceDTO.getCitation())
         .footnote(referenceDTO.getFootnote())
         .referenceType(ReferenceType.CASELAW)
@@ -37,6 +47,12 @@ public class ReferenceTransformer {
             referenceDTO.getEditionRank() != null
                 ? referenceDTO.getEditionRank()
                 : referenceDTO.getRank())
+        .legalPeriodical(legalPeriodical)
+        .legalPeriodicalRawValue(
+            legalPeriodical != null
+                ? legalPeriodical.abbreviation()
+                : referenceDTO.getLegalPeriodicalRawValue()) // fallback to raw value
+        .primaryReference(isPrimaryReference)
         .build();
   }
 
@@ -55,16 +71,27 @@ public class ReferenceTransformer {
           DocumentationUnitDTO.builder().id(reference.documentationUnit().getUuid()).build();
     }
 
+    Boolean isPrimaryReference =
+        legalPeriodicalDTO != null
+            ? legalPeriodicalDTO.getPrimaryReference()
+            : reference.primaryReference(); // fallback to nichtamtlich
+
+    if (isPrimaryReference == null) {
+      throw new IllegalArgumentException(
+          "Either the reference's legalPeriodical or primaryReference field must be set");
+    }
+
     return ReferenceDTO.builder()
         .id(reference.id())
         .referenceSupplement(reference.referenceSupplement())
         .legalPeriodical(legalPeriodicalDTO)
         .citation(reference.citation())
         .footnote(reference.footnote())
+        .type(isPrimaryReference ? "amtlich" : "nichtamtlich")
         .legalPeriodicalRawValue(
             legalPeriodicalRawValue != null
                 ? legalPeriodicalRawValue
-                : reference.legalPeriodicalRawValue())
+                : reference.legalPeriodicalRawValue()) // fallback to raw value
         .documentationUnit(documentationUnitDTO)
         .build();
   }

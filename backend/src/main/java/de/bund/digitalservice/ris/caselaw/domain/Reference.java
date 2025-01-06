@@ -28,4 +28,5 @@ public record Reference(
     String author,
     ReferenceType referenceType,
     RelatedDocumentationUnit documentationUnit,
+    Boolean primaryReference,
     int rank) {}

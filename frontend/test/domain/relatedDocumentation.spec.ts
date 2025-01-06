@@ -20,10 +20,8 @@ describe("RelatedDocumentation", () => {
         },
       },
     })
-    const decision = relatedDocumentation.renderDecision
-    expect(decision).toEqual(
-      "courtLabel, 01.01.1998, fileNumber, Beschluss, Unveröffentlicht",
-    )
+    const decision = relatedDocumentation.renderSummary
+    expect(decision).toEqual("courtLabel, 01.01.1998, fileNumber, Beschluss")
   })
 
   it("renders decision with UNPUBLISHED status and with error", () => {
@@ -44,10 +42,8 @@ describe("RelatedDocumentation", () => {
         },
       },
     })
-    const decision = relatedDocumentation.renderDecision
-    expect(decision).toEqual(
-      "courtLabel, 01.01.1998, fileNumber, Beschluss, Unveröffentlicht",
-    )
+    const decision = relatedDocumentation.renderSummary
+    expect(decision).toEqual("courtLabel, 01.01.1998, fileNumber, Beschluss")
   })
 
   it("renders decision without status", () => {
@@ -64,7 +60,7 @@ describe("RelatedDocumentation", () => {
         },
       },
     })
-    const decision = relatedDocumentation.renderDecision
+    const decision = relatedDocumentation.renderSummary
     expect(decision).toEqual("courtLabel, 01.01.1998, fileNumber, Beschluss")
   })
 })

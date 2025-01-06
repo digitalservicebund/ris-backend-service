@@ -6,7 +6,6 @@ import {
   navigateToPeriodicalReferences,
   navigateToPreview,
   navigateToSearch,
-  waitForInputValue,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
@@ -131,21 +130,17 @@ test.describe(
           await fillInput(page, "Gericht", "AG Aachen")
           await page.getByText("AG Aachen").click()
           await page.getByText("Suchen").click()
-          await waitForInputValue(
-            page,
-            "[aria-label='Zuständige Dokumentationsstelle']",
-            "BGH",
-          )
+          await expect(
+            page.getByLabel("Zuständige Dokumentationsstelle"),
+          ).toHaveValue("BGH")
 
           // Verwaltungsgericht Aarau is a BVerwG court
           await fillInput(page, "Gericht", "Verwaltungsgericht Aarau")
           await page.getByText("Verwaltungsgericht Aarau").click()
           await page.getByText("Suchen").click()
-          await waitForInputValue(
-            page,
-            "[aria-label='Zuständige Dokumentationsstelle']",
-            "BVerwG",
-          )
+          await expect(
+            page.getByLabel("Zuständige Dokumentationsstelle"),
+          ).toHaveValue("BVerwG")
         })
 
         await test.step("Deleting court, resets responsible docoffice combobox", async () => {
@@ -155,17 +150,14 @@ test.describe(
             .click()
           await page.keyboard.press("Escape")
           await page.getByText("Suchen").click()
-          await waitForInputValue(page, "[aria-label='Gericht']", "")
-          await waitForInputValue(
-            page,
-            "[aria-label='Zuständige Dokumentationsstelle']",
-            "",
-          )
+          await expect(page.getByLabel("Gericht")).toHaveValue("")
+          await expect(
+            page.getByLabel("Zuständige Dokumentationsstelle"),
+          ).toHaveValue("")
 
           // Resetting court does not reset values for Zitatstelle and Klammernzusatz
-          await waitForInputValue(page, "[aria-label='Zitatstelle *']", "12")
-
-          await waitForInputValue(page, "[aria-label='Klammernzusatz']", "L")
+          await expect(page.getByLabel("Zitatstelle *")).toHaveValue("12")
+          await expect(page.getByLabel("Klammernzusatz")).toHaveValue("L")
         })
 
         await test.step("Foreign courts are not assigned to a responsible doc office", async () => {
@@ -176,11 +168,9 @@ test.describe(
           await page.getByText("Suchen").click()
           await requestFinishedPromise
 
-          await waitForInputValue(
-            page,
-            "[aria-label='Zuständige Dokumentationsstelle']",
-            "",
-          )
+          await expect(
+            page.getByLabel("Zuständige Dokumentationsstelle"),
+          ).toHaveValue("")
         })
 
         await test.step("Documentation Office is a mandatory field for doc unit creation", async () => {
@@ -200,11 +190,9 @@ test.describe(
           await expect(page.getByText("BFH", { exact: true })).toBeVisible()
 
           await fillInput(page, "Zuständige Dokumentationsstelle", "bv")
-          await waitForInputValue(
-            page,
-            "[aria-label='Zuständige Dokumentationsstelle']",
-            "bv",
-          )
+          await expect(
+            page.getByLabel("Zuständige Dokumentationsstelle"),
+          ).toHaveValue("bv")
 
           await expect(page.getByText("BAG", { exact: true })).toBeHidden()
           await expect(page.getByText("BFH", { exact: true })).toBeHidden()
@@ -215,11 +203,9 @@ test.describe(
 
           await page.locator("button").filter({ hasText: "BVerfG" }).click()
 
-          await waitForInputValue(
-            page,
-            "[aria-label='Zuständige Dokumentationsstelle']",
-            "BVerfG",
-          )
+          await expect(
+            page.getByLabel("Zuständige Dokumentationsstelle"),
+          ).toHaveValue("BVerfG")
 
           await expect(
             page.getByText("Übernehmen und weiter bearbeiten"),
@@ -273,6 +259,13 @@ test.describe(
           ).toBeEnabled()
         })
 
+        await test.step("Changing other inputs does not reset the doc office | RISDEV-5946", async () => {
+          await fillInput(page, "Aktenzeichen", "some new value")
+          await expect(
+            page.getByLabel("Zuständige Dokumentationsstelle"),
+          ).toHaveValue("DS")
+        })
+
         await test.step("Validation of required fields before creation new documentation unit from search parameters", async () => {
           await testValidationOfRequiredFields(page)
         })
@@ -295,7 +288,7 @@ test.describe(
             newTab.getByLabel("Entscheidungsdatum", { exact: true }),
           ).toHaveValue(formattedDate)
           await expect(newTab.getByTestId("chip-value")).toHaveText(
-            randomFileNumber,
+            "some new value",
           )
           await expect(
             newTab.getByLabel("Dokumenttyp", { exact: true }),
@@ -626,7 +619,7 @@ test.describe(
         )
         await test.step("Creating docoffice creates a documentunit for owning docoffice and has edit rights", async () => {
           await fillInput(page, "Zitatstelle *", "12")
-          await waitForInputValue(page, "[aria-label='Zitatstelle *']", "12")
+          await expect(page.getByLabel("Zitatstelle *")).toHaveValue("12")
           await fillInput(page, "Klammernzusatz", "L")
           await searchForDocUnit(
             page,
@@ -654,8 +647,6 @@ test.describe(
           await expect(page.getByLabel("Listen Eintrag")).toHaveCount(2)
         })
 
-        const fileNumberDocUnit2 = generateString()
-
         await test.step("Creating docoffice creates a second documentunit for owning docoffice", async () => {
           await expect(page.getByLabel("Zitatstelle *")).toBeVisible()
 
@@ -666,7 +657,7 @@ test.describe(
             page,
             "AG Aachen",
             formattedDate,
-            fileNumberDocUnit2,
+            generateString(),
             "AnU",
           )
 
@@ -675,12 +666,20 @@ test.describe(
           ).toHaveValue("BGH")
           await page.getByText("Übernehmen", { exact: true }).click()
 
-          documentNumber2 =
-            // eslint-disable-next-line playwright/no-conditional-in-test
-            (await page
-              .getByTestId("document-number-link-" + fileNumberDocUnit2)
-              .getByRole("paragraph")
-              .textContent()) || ""
+          const listItems = await page.getByLabel("Listen Eintrag").all()
+
+          //get the document number of the second
+          const dataTestId = await listItems[1]
+            .locator('[data-testid^="document-number-link-"]')
+            .getAttribute("data-testid")
+
+          const documentNumberMatch = dataTestId?.match(
+            /document-number-link-(\w+)/,
+          )
+          // eslint-disable-next-line playwright/no-conditional-in-test
+          if (documentNumberMatch) {
+            documentNumber2 = documentNumberMatch[1]
+          }
           await expect(page.getByLabel("Listen Eintrag")).toHaveCount(3)
         })
 

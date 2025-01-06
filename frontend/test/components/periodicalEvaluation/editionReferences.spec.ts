@@ -13,6 +13,7 @@ import documentUnitService from "@/services/documentUnitService"
 import featureToggleService from "@/services/featureToggleService"
 import { ServiceResponse } from "@/services/httpClient"
 import service from "@/services/legalPeriodicalEditionService"
+import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import testRoutes from "~/test-helper/routes"
 
 const editionUUid = crypto.randomUUID()
@@ -56,6 +57,7 @@ async function renderComponent(options?: { references?: Reference[] }) {
     user,
     ...render(PeriodicalEditionReferences, {
       global: {
+        directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [router, pinia],
       },
     }),
@@ -269,7 +271,8 @@ describe("Legal periodical edition evaluation", () => {
     })
 
     await screen.findByText("DOC123")
-    expect(screen.getByText("file123, Unveröffentlicht")).toBeVisible()
+    expect(screen.getByText(/file123,/)).toBeVisible()
+    expect(screen.getByText("Unveröffentlicht")).toBeVisible()
     await user.click(screen.getByTestId("list-entry-0"))
     return user
   }
@@ -308,7 +311,8 @@ describe("Legal periodical edition evaluation", () => {
     })
 
     await screen.findByText("KORE700")
-    expect(screen.getByText("externalFile123, Fremdanlage")).toBeVisible()
+    expect(screen.getByText(/externalFile123,/)).toBeVisible()
+    expect(screen.getByText("Fremdanlage")).toBeVisible()
     await user.click(screen.getByTestId("list-entry-0"))
     return user
   }
