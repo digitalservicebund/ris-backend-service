@@ -333,6 +333,16 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @Builder.Default
   private List<ParticipatingJudgeDTO> participatingJudges = new ArrayList<>();
 
+  @OneToMany(fetch = FetchType.LAZY)
+  @JoinColumn(name = "documentation_unit_id1", nullable = false, updatable = false)
+  @Builder.Default
+  private Set<DuplicateRelationDTO> duplicateRelations1 = new HashSet<>();
+
+  @OneToMany(fetch = FetchType.LAZY)
+  @JoinColumn(name = "documentation_unit_id2", nullable = false, updatable = false)
+  @Builder.Default
+  private Set<DuplicateRelationDTO> duplicateRelations2 = new HashSet<>();
+
   /**
    * @deprecated This field represents the "Dupcode ausschalten" functionality from the jDV. It is
    *     set to false in the migration if the duplication check should be ignored. After the jDV has

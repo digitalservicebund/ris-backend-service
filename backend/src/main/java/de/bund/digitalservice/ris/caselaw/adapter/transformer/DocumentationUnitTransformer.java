@@ -23,6 +23,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelation;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
@@ -42,6 +43,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -735,11 +738,19 @@ public class DocumentationUnitTransformer {
             documentationUnitDTO.getOtherLongText(),
             documentationUnitDTO.getDissentingOpinion());
 
+    Set<DuplicateRelation> duplicateRelations =
+        Stream.concat(
+                documentationUnitDTO.getDuplicateRelations1().stream(),
+                documentationUnitDTO.getDuplicateRelations2().stream())
+            .map(DuplicateRelationTransformer::transformToDomain)
+            .collect(Collectors.toSet());
+
     ManagementData managementData =
         ManagementData.builder()
             .lastPublicationDateTime(documentationUnitDTO.getLastPublicationDateTime())
             .scheduledPublicationDateTime(documentationUnitDTO.getScheduledPublicationDateTime())
             .scheduledByEmail(documentationUnitDTO.getScheduledByEmail())
+            .duplicateRelations(duplicateRelations)
             .borderNumbers(borderNumbers)
             .build();
 

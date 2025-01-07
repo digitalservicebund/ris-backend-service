@@ -7,6 +7,10 @@ import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.util.UUID;
@@ -26,21 +30,25 @@ import lombok.Setter;
 @Table(schema = "incremental_migration", name = "duplicate_relation")
 public class DuplicateRelationDTO {
 
+  // TODO: Should we keep the composite key? Would it be easier with ManyToOne only? How would you
+  // set the ids though?
+
   @EmbeddedId private DuplicateRelationId id;
 
   @Column(name = "status")
   @Enumerated(EnumType.STRING)
-  //  @JdbcType(type = PostgreSQLEnumJdbcType.class)
   private DuplicateRelationStatus status;
 
-  //
-  //  @ManyToOne(fetch = FetchType.LAZY)
-  //  @JoinColumn(name = "documentation_unit_id1")
-  //  private DocumentationUnitDTO documentationUnit1;
-  //
-  //  @ManyToOne(fetch = FetchType.LAZY)
-  //  @JoinColumn(name = "documentation_unit_id2")
-  //  private DocumentationUnitDTO documentationUnit2;
+  @ManyToOne(fetch = FetchType.LAZY)
+  // TODO: Verify MapsId is what we want/need
+  @MapsId("documentationUnitId1")
+  @JoinColumn(name = "documentation_unit_id1", insertable = false, updatable = false)
+  private DocumentationUnitDTO documentationUnit1;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @MapsId("documentationUnitId2")
+  @JoinColumn(name = "documentation_unit_id2", insertable = false, updatable = false)
+  private DocumentationUnitDTO documentationUnit2;
 
   @Getter
   @Setter
