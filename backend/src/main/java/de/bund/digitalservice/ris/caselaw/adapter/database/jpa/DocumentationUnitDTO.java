@@ -138,7 +138,7 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @Column(name = "dissenting_opinion")
   private String dissentingOpinion;
 
-  @OneToMany(orphanRemoval = true, fetch = FetchType.EAGER)
+  @OneToMany(orphanRemoval = true)
   @JoinTable(
       name = "documentation_unit_procedure",
       schema = "incremental_migration",
@@ -148,7 +148,7 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @Builder.Default
   private List<ProcedureDTO> procedureHistory = new ArrayList<>();
 
-  @OneToOne(fetch = FetchType.EAGER)
+  @OneToOne
   @JoinColumn(name = "current_procedure_id")
   private ProcedureDTO procedure;
 

@@ -217,17 +217,19 @@ class ProcedureIntegrationTest {
         .is2xxSuccessful()
         .expectBody(DocumentationUnit.class)
         .consumeWith(
-            response ->
-                assertThat(response.getResponseBody().coreData().procedure())
-                    .extracting("id", "label")
-                    .containsExactly(procedureDTO.getId(), procedure.label()));
+            response -> {
+              CoreData coreData = response.getResponseBody().coreData();
+              assertThat(coreData.previousProcedures()).isEmpty();
+              assertThat(coreData.procedure())
+                  .extracting("id", "label")
+                  .containsExactly(procedureDTO.getId(), procedure.label());
+            });
 
     DocumentationUnitDTO updatedDocUnitDTO =
         documentationUnitRepository.findById(docUnitDTO.getId()).get();
     ProcedureDTO currentProcedure = updatedDocUnitDTO.getProcedure();
     assertThat(currentProcedure.getLabel()).isEqualTo(procedureDTO.getLabel());
     assertThat(currentProcedure.getId()).isEqualTo(procedureDTO.getId());
-    assertThat(updatedDocUnitDTO.getProcedureHistory()).hasSize(1);
 
     risWebTestClient
         .withDefaultLogin()
@@ -286,7 +288,6 @@ class ProcedureIntegrationTest {
     ProcedureDTO currentProcedure = updatedDocUnitDTO.getProcedure();
     assertThat(currentProcedure.getLabel()).isEqualTo(procedureDTO.getLabel());
     assertThat(currentProcedure.getId()).isEqualTo(procedureDTO.getId());
-    assertThat(updatedDocUnitDTO.getProcedureHistory()).hasSize(1);
   }
 
   @Test
@@ -324,7 +325,6 @@ class ProcedureIntegrationTest {
         documentationUnitRepository.findById(docUnitDTO.getId()).get();
     ProcedureDTO currentProcedure = updatedDocUnitDTO.getProcedure();
     assertThat(currentProcedure.getLabel()).isEqualTo("procedure1");
-    assertThat(updatedDocUnitDTO.getProcedureHistory()).hasSize(1);
   }
 
   @Test

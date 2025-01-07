@@ -103,6 +103,7 @@ public class DocumentationUnitTransformer {
     } else {
       builder
           .procedureHistory(Collections.emptyList())
+          .procedure(null)
           .ecli(null)
           .judicialBody(null)
           .decisionDate(null)
