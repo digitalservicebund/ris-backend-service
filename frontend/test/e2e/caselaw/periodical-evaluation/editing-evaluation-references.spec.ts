@@ -324,8 +324,7 @@ test.describe("Editing and deleting references in periodical evaluation", () => 
       })
     },
   )
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("should scroll to guiding principle, if present", async ({
+  test("should scroll to guiding principle, if present", async ({
     page,
     prefilledDocumentUnit,
     edition,
@@ -341,15 +340,6 @@ test.describe("Editing and deleting references in periodical evaluation", () => 
       "31.12.2019",
     )
     await openExtraContentSidePanelPreview(page, documentNumber)
-
-    // Wait for the scroll position to reach the target
-    await page.waitForFunction(() => {
-      const containerEl = document.getElementById("preview-container")
-      const targetEl = document.getElementById("previewGuidingPrinciple")
-
-      if (!containerEl || !targetEl) return false
-      return targetEl.offsetTop == containerEl.offsetTop
-    })
 
     await expect(page.getByText("Leitsatz")).toBeInViewport()
     await expect(

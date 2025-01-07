@@ -33,6 +33,19 @@ async function openSidePanel(documentUnitNumber?: string) {
   if (documentUnitNumber) {
     await documentUnitStore.loadDocumentUnit(documentUnitNumber)
     extraContentSidePanelStore.togglePanel(true)
+
+    const container = document.getElementById("preview-container")
+
+    setTimeout(() => {
+      if (!container) return
+      const target = document.getElementById("previewGuidingPrinciple")
+      const scrollPosition = target ? target.offsetTop - container.offsetTop : 0
+
+      container.scrollTo({
+        top: scrollPosition,
+        behavior: "smooth",
+      })
+    })
   }
 }
 
