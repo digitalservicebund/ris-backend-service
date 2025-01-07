@@ -50,10 +50,15 @@ public class DuplicateRelationDTO {
   @Embeddable
   public static class DuplicateRelationId implements Serializable {
 
+    /**
+     * As a SQL constraint, id1 holds the smaller UUID -> That way the duplicate relationship
+     * between doc units A and B is always stored as one of (A,B) or (B,A).
+     */
     public DuplicateRelationId(UUID documentationUnitId1, UUID documentationUnitId2) {
-      // As a SQL constraint, id1 holds the smaller UUID -> That way the duplicate relationship
-      // between doc units A and B is always stored as one of (A,B) or (B,A).
-      if (documentationUnitId1.compareTo(documentationUnitId2) >= 0) {
+      // Java compares UUIDs numerically (based on their internal binary representation)
+      //  whereas PostgresSQL compares UUIDs lexicographically (as strings).
+      //  Therefore, it is important to cast them to strings during comparison.
+      if (documentationUnitId1.toString().compareTo(documentationUnitId2.toString()) < 0) {
         this.documentationUnitId1 = documentationUnitId1;
         this.documentationUnitId2 = documentationUnitId2;
       } else {
