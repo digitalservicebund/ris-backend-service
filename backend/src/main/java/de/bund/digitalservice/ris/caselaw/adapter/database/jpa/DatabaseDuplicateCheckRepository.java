@@ -147,7 +147,7 @@ public interface DatabaseDuplicateCheckRepository
       JOIN incremental_migration.document_type documentType
         ON documentationUnit.document_type_id = documentType.id
     WHERE upper(fileNumber.value) IN (:allFileNumbers)
-      AND documentType.id = :documentTypeId
+      AND documentType.id IN (:allDocTypeIds)
 
     UNION
 
@@ -158,7 +158,7 @@ public interface DatabaseDuplicateCheckRepository
       JOIN incremental_migration.document_type documentType
         ON documentationUnit.document_type_id = documentType.id
     WHERE upper(deviatingFileNumber.value) IN (:allFileNumbers)
-      AND documentType.id = :documentTypeId
+      AND documentType.id IN (:allDocTypeIds)
 """)
   List<DocumentationUnitIdDuplicateCheckDTO> findDuplicates(
       @Param("allFileNumbers") List<String> allFileNumbers,
@@ -166,5 +166,5 @@ public interface DatabaseDuplicateCheckRepository
       @Param("allCourtIds") List<UUID> allCourtIds,
       @Param("allDeviatingCourts") List<String> allDeviatingCourts,
       @Param("allEclis") List<String> allEclis,
-      @Param("documentTypeId") UUID documentTypeId);
+      @Param("allDocTypeIds") List<UUID> allDocTypeIds);
 }

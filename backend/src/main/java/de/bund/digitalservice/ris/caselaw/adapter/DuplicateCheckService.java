@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,10 @@ public class DuplicateCheckService {
         allFileNumbers.addAll(deviatingFileNumbers.stream().map(String::toUpperCase).toList());
       }
 
+      if (allFileNumbers.isEmpty()) {
+        return List.of();
+      }
+
       var decisionDate = documentationUnit.coreData().decisionDate();
       var deviatingDecisionDates = documentationUnit.coreData().deviatingDecisionDates();
       List<LocalDate> allDates = new ArrayList<>();
@@ -66,15 +71,13 @@ public class DuplicateCheckService {
       if (deviatingEclis != null)
         allEclis.addAll(deviatingEclis.stream().map(String::toUpperCase).toList());
 
-      var documentType = documentationUnit.coreData().documentType();
+      List<UUID> allDocTypeIds = new ArrayList<>();
+      var documentationType = documentationUnit.coreData().documentType();
+      if (documentationType != null) allDocTypeIds.add(documentationType.uuid());
+
       var duplicates =
           repository.findDuplicates(
-              allFileNumbers,
-              allDates,
-              allCourtIds,
-              allDeviatingCourts,
-              allEclis,
-              documentType.uuid());
+              allFileNumbers, allDates, allCourtIds, allDeviatingCourts, allEclis, allDocTypeIds);
 
       for (var dup : duplicates) {
         if (dup.getId().equals(documentationUnit.uuid())) {
@@ -82,7 +85,8 @@ public class DuplicateCheckService {
         }
         DuplicateRelationDTO.DuplicateRelationId duplicateRelationId =
             new DuplicateRelationDTO.DuplicateRelationId(documentationUnit.uuid(), dup.getId());
-        var existingRelation = relationRepository.findById(duplicateRelationId);
+        Optional<DuplicateRelationDTO> existingRelation =
+            relationRepository.findById(duplicateRelationId);
         var status =
             Boolean.FALSE.equals(dup.getIsJdvDuplicateCheckActive())
                 ? DuplicateRelationStatus.IGNORED
@@ -91,7 +95,9 @@ public class DuplicateCheckService {
           var newRelation =
               DuplicateRelationDTO.builder().status(status).id(duplicateRelationId).build();
           relationRepository.save(newRelation);
-        } else {
+        } else if (Boolean.FALSE.equals(
+            dup.getIsJdvDuplicateCheckActive()
+                && DuplicateRelationStatus.PENDING.equals(existingRelation.get().getStatus()))) {
           existingRelation.get().setStatus(status);
           relationRepository.save(existingRelation.get());
         }
