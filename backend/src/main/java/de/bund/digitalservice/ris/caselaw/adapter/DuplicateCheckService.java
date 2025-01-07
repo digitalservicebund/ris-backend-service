@@ -1,10 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDuplicateCheckRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitIdDuplicateCheckDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -19,11 +19,11 @@ import org.springframework.stereotype.Service;
 public class DuplicateCheckService {
   private final DocumentationUnitService documentationUnitService;
 
-  private final DuplicateCheckRepository repository;
+  private final DatabaseDuplicateCheckRepository repository;
   private final DuplicateRelationRepository relationRepository;
 
   public DuplicateCheckService(
-      DuplicateCheckRepository duplicateCheckRepository,
+      DatabaseDuplicateCheckRepository duplicateCheckRepository,
       DocumentationUnitService documentationUnitService,
       DuplicateRelationRepository relationRepository) {
     this.repository = duplicateCheckRepository;
@@ -81,6 +81,7 @@ public class DuplicateCheckService {
 
       for (var dup : duplicates) {
         if (dup.getId().equals(documentationUnit.uuid())) {
+          // TODO: filter dup list in the beginning
           continue;
         }
         DuplicateRelationDTO.DuplicateRelationId duplicateRelationId =
@@ -102,6 +103,21 @@ public class DuplicateCheckService {
           relationRepository.save(existingRelation.get());
         }
       }
+
+      var existingDuplicates = relationRepository.findAllByDocUnitId(documentationUnit.uuid());
+      for (var existingDuplicate : existingDuplicates) {
+        var isDuplicate =
+            duplicates.stream()
+                .map(
+                    dup ->
+                        new DuplicateRelationDTO.DuplicateRelationId(
+                            documentationUnit.uuid(), dup.getId()))
+                .anyMatch(dup -> dup.equals(existingDuplicate.getId()));
+        if (!isDuplicate) {
+          relationRepository.delete(existingDuplicate);
+        }
+      }
+
       return duplicates;
     } catch (Exception e) {
       log.debug(e.getMessage());
