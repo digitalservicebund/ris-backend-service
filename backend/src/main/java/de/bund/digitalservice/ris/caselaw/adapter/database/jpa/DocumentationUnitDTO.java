@@ -334,12 +334,12 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   private List<ParticipatingJudgeDTO> participatingJudges = new ArrayList<>();
 
   @OneToMany(fetch = FetchType.LAZY)
-  @JoinColumn(name = "documentation_unit_id1", nullable = false, updatable = false)
+  @JoinColumn(name = "documentation_unit_id1", updatable = false, insertable = false)
   @Builder.Default
   private Set<DuplicateRelationDTO> duplicateRelations1 = new HashSet<>();
 
   @OneToMany(fetch = FetchType.LAZY)
-  @JoinColumn(name = "documentation_unit_id2", nullable = false, updatable = false)
+  @JoinColumn(name = "documentation_unit_id2", updatable = false, insertable = false)
   @Builder.Default
   private Set<DuplicateRelationDTO> duplicateRelations2 = new HashSet<>();
 

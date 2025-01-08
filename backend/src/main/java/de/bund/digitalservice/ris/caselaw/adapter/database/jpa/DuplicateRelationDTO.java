@@ -42,12 +42,12 @@ public class DuplicateRelationDTO {
   @ManyToOne(fetch = FetchType.LAZY)
   // TODO: Verify MapsId is what we want/need
   @MapsId("documentationUnitId1")
-  @JoinColumn(name = "documentation_unit_id1", insertable = false, updatable = false)
+  @JoinColumn(name = "documentation_unit_id1")
   private DocumentationUnitDTO documentationUnit1;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @MapsId("documentationUnitId2")
-  @JoinColumn(name = "documentation_unit_id2", insertable = false, updatable = false)
+  @JoinColumn(name = "documentation_unit_id2")
   private DocumentationUnitDTO documentationUnit2;
 
   @Getter
@@ -75,10 +75,7 @@ public class DuplicateRelationDTO {
       }
     }
 
-    @Column(name = "documentation_unit_id1")
     private UUID documentationUnitId1;
-
-    @Column(name = "documentation_unit_id2")
     private UUID documentationUnitId2;
   }
 }

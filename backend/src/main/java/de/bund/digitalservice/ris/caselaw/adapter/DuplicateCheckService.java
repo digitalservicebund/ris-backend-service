@@ -1,11 +1,14 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDuplicateCheckRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitIdDuplicateCheckDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,14 +24,17 @@ public class DuplicateCheckService {
 
   private final DatabaseDuplicateCheckRepository repository;
   private final DuplicateRelationRepository relationRepository;
+  private final DatabaseDocumentationUnitRepository documentationUnitRepository;
 
   public DuplicateCheckService(
       DatabaseDuplicateCheckRepository duplicateCheckRepository,
       DocumentationUnitService documentationUnitService,
-      DuplicateRelationRepository relationRepository) {
+      DuplicateRelationRepository relationRepository,
+      DatabaseDocumentationUnitRepository documentationUnitRepository) {
     this.repository = duplicateCheckRepository;
     this.documentationUnitService = documentationUnitService;
     this.relationRepository = relationRepository;
+    this.documentationUnitRepository = documentationUnitRepository;
   }
 
   List<DocumentationUnitIdDuplicateCheckDTO> getDuplicates(String docNumber) {
@@ -93,11 +99,30 @@ public class DuplicateCheckService {
                 ? DuplicateRelationStatus.IGNORED
                 : DuplicateRelationStatus.PENDING;
         if (existingRelation.isEmpty()) {
+          var identifiedDuplicate = documentationUnitRepository.findById(dup.getId()).get();
+          var currentDocUnit = documentationUnitRepository.findById(documentationUnit.uuid()).get();
+
+          DocumentationUnitDTO docUnit1;
+          DocumentationUnitDTO docUnit2;
+          // duplicateRelationId determines the order of the two docUnits
+          if (identifiedDuplicate.getId().equals(duplicateRelationId.getDocumentationUnitId1())) {
+            docUnit1 = identifiedDuplicate;
+            docUnit2 = currentDocUnit;
+          } else {
+            docUnit1 = currentDocUnit;
+            docUnit2 = identifiedDuplicate;
+          }
+
           var newRelation =
-              DuplicateRelationDTO.builder().status(status).id(duplicateRelationId).build();
+              DuplicateRelationDTO.builder()
+                  .status(status)
+                  .documentationUnit1(docUnit1)
+                  .documentationUnit2(docUnit2)
+                  .id(duplicateRelationId)
+                  .build();
           relationRepository.save(newRelation);
         } else if (Boolean.FALSE.equals(
-            dup.getIsJdvDuplicateCheckActive()
+            Boolean.TRUE.equals(dup.getIsJdvDuplicateCheckActive())
                 && DuplicateRelationStatus.PENDING.equals(existingRelation.get().getStatus()))) {
           existingRelation.get().setStatus(status);
           relationRepository.save(existingRelation.get());
@@ -119,8 +144,8 @@ public class DuplicateCheckService {
       }
 
       return duplicates;
-    } catch (Exception e) {
-      log.debug(e.getMessage());
+    } catch (DocumentationUnitNotExistsException e) {
+      log.error(e.getMessage());
       return List.of();
     }
   }
