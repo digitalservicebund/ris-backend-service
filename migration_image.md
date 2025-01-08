@@ -7,8 +7,7 @@ The following job is importing the minimally required data (refdata and juris ta
 To be able to pull the `ris-data-migration` image, log in to the GitHub Package Repository using your username and a
 credential token stored in 1Password (1PW):
 
-If you don't have a personal access token, read here on how to
-generate [one](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic).
+If you don't have a personal access token, read [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic) on how to create one. Then:
 
 ```shell
 export CR_PAT=$(op read op://Employee/CR_PAT/password)
