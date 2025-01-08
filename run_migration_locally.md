@@ -8,15 +8,22 @@ This instruction will allow engineers to setup their local environment with the 
 
 ## Prerequisites
 
-1. Clone [ris-data-migration](https://github.com/digitalservicebund/ris-data-migration) repository
+1. Being inside the `ris-backend-service` directory, move one level up and clone the [ris-data-migration](https://github.com/digitalservicebund/ris-data-migration) repository:
+
    ```bash
+   cd ..
    git clone git@github.com:digitalservicebund/ris-data-migration.git
    ```
 
-2. Follow the steps here to get access to OTC buckets via command line. You can use the `AWS_`
-   environment variables that you use
-   for `neuris-infra`: https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/
-   Check if you can access the right bucket with
+2. Follow the steps [here](https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/) to get access to OTC buckets via command line. You can use the `AWS_` environment variables that you use for [neuris-infra](https://github.com/digitalservicebund/neuris-infra). Add them to your local `.env` file, that has been generated before (through `./run.sh env`):
+
+   ```bash
+   AWS_ACCESS_KEY_ID=YOUR_KEY_HERE
+   AWS_SECRET_ACCESS_KEY=YOUR_SECRET_HERE
+   AWS_BUCKET_NAME=neuris-migration-juris-data
+   ```
+
+   Check if you can access the right bucket with:
 
    ```bash
    aws s3 ls --profile otc --endpoint-url https://obs.eu-de.otc.t-systems.com s3://neuris-migration-juris-data
@@ -25,29 +32,35 @@ This instruction will allow engineers to setup their local environment with the 
    #                           PRE monthly/
    ```
 
-3. Make sure [Docker](https://www.docker.com/) is running
+3. Make sure [docker-cli](https://www.docker.com/) is running: `docker --version`
 
 ## Import Data
 
 ### Checkout Migration at Current Tag
 
-Checkout the tag that is used in [backend/build.gradle.kts](backend/build.gradle.kts) , e.g.
+Change to the location where you checked out the [ris-data-migration](https://github.com/digitalservicebund/ris-data-migration) repository. Checkout the tag that is used in [backend/build.gradle.kts](backend/build.gradle.kts) in line that looks like `implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.32")` , e.g.
 
 ```bash
-cd ris-data-migration
-git checkout --tag "0.0.3"
+cd ../ris-data-migration
+git checkout tags/v0.0.32 -b v0.0.32
 ```
 
 ### Import with Script
 
-From here you can run the import by:
+Move back to the `ris-backend-service` repo directory where you can execute the import by:
 
 ```bash
-chmod +x run_migration_locally.sh
+cd ../ris-backend-service
 ./run_migration_locally.sh
 ```
 
-To repeat files downloading, remove the import folder in the migration folder, and rerun.
+This will use the environment variables from `.env` to download the xml files from the s3 bucket to `../ris-data-migration/juris-xml-data`.
+
+In parallel it will spin up a docker container with name `postgres14`, which contains the database schema.
+
+And it runs the migration which can take a while. Wait for it to complete.
+
+To repeat files downloading, remove the `../ris-data-migration/juris-xml-data` directory, and rerun.
 
 ### Import Manually
 
@@ -55,13 +68,13 @@ To repeat files downloading, remove the import folder in the migration folder, a
 
 1. In `ris-backend-service` start the database
 
-   ``` bash
+   ```bash
    cd ris-backend-service
    docker compose up postgres14
    # or use your favourite startup command, e.g. ./run.sh dev --no-backend
    ```
 
-2. All data that is migrated by the migration application resides in the  `incremental_migration` DB schema. Make sure it exists in your local database
+2. All data that is migrated by the migration application resides in the `incremental_migration` DB schema. Make sure it exists in your local database
 
 3. Create a directory where you will store the xml files to import into the database
    in `ris-data-migration`
@@ -82,34 +95,37 @@ To repeat files downloading, remove the import folder in the migration folder, a
    ```bash
    aws s3 cp --profile otc --endpoint-url https://obs.eu-de.otc.t-systems.com --recursive s3://neuris-migration-juris-data/monthly/2024/05/BGH-juris/RSP/2022/ ./juris-xml-data/BGH-juris/RSP/2022/
    ```
+
 6. Setup your local .env file with this command as described
    in [Set up local env](https://github.com/digitalservicebund/ris-data-migration#set-up-local-env)
 
 7. Change the `.env` file in `ris-migration-data` with the following variables:
-    ```bash
-    RIS_MIGRATION_TABLES_LOCATION=juris-xml-data
-    RIS_MIGRATION_INCLUDE_NORM_ABBREVIATIONS=true
-    RIS_MIGRATION_CLI_MODE=true
 
-    # database config
-    RIS_MIGRATION_DB_HOST=localhost
-    RIS_MIGRATION_DB_PORT=5432
-    RIS_MIGRATION_DB_NAME=neuris
-    RIS_MIGRATION_DB_USER=migration
-    RIS_MIGRATION_DB_PASSWORD=migration
-    RIS_MIGRATION_DB_SCHEMA=incremental_migration
-    ```
+   ```bash
+   RIS_MIGRATION_TABLES_LOCATION=juris-xml-data
+   RIS_MIGRATION_INCLUDE_NORM_ABBREVIATIONS=true
+   RIS_MIGRATION_CLI_MODE=true
+
+   # database config
+   RIS_MIGRATION_DB_HOST=localhost
+   RIS_MIGRATION_DB_PORT=5432
+   RIS_MIGRATION_DB_NAME=neuris
+   RIS_MIGRATION_DB_USER=migration
+   RIS_MIGRATION_DB_PASSWORD=migration
+   RIS_MIGRATION_DB_SCHEMA=incremental_migration
+   ```
 
 8. For console logging
+
    ```bash
    export SPRING_PROFILES_ACTIVE=dev
    ```
 
 9. Build the ris-data-migration application into a jar
 
-    ```bash
-    ./gradlew :cli:bootJar
-    ```
+   ```bash
+   ./gradlew :cli:bootJar
+   ```
 
 10. Import the static lookup tables into your new schema (see Confluence "Wertetabellen" to find out
     what is static and dynamic)
@@ -120,15 +136,15 @@ To repeat files downloading, remove the import folder in the migration folder, a
 
 11. Import the dynamic lookup tables
 
-     ```bash
-     java -jar cli/build/libs/ris-data-migration-cli.jar juris-table seed
-     ```
+    ```bash
+    java -jar cli/build/libs/ris-data-migration-cli.jar juris-table seed
+    ```
 
 12. Import the BGH DocumentationUnits
 
-     ```bash
-     java -jar cli/build/libs/ris-data-migration-cli.jar juris-r migrate -p juris-xml-data/
-     ```
+    ```bash
+    java -jar cli/build/libs/ris-data-migration-cli.jar juris-r migrate -p juris-xml-data/
+    ```
 
 ### Update the Lookup Tables / Reimport for Backfilling
 
@@ -143,9 +159,7 @@ To repeat files downloading, remove the import folder in the migration folder, a
 #### Update by script:
 
 Delete the folder in pointed in `DATA_MIGRATION_IMPORT_PATH`, update the month/day in the s3 commands and rerun the script. It will download the necessary files again.
+
 ```bash
 ./run_migration_locally.sh
 ```
-
-
-

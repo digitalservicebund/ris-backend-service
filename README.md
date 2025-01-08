@@ -23,7 +23,7 @@ below.
 
 **Backend only:**
 
-- [java](https://developers.redhat.com/products/openjdk/install) - we use Java 17 in the backend
+- [java](https://developers.redhat.com/products/openjdk/install) - we use Java 21 in the backend
 
 **Optional, but recommended tools:**
 
@@ -74,19 +74,23 @@ This will install a couple of Git hooks which are supposed to help you to:
 
 For shared secrets required for development we're using `gopass`. To set up follow these steps:
 
-Provide some team member a public GPG key with encryption capability (that team member will add you
-as a recipient).
+- If not done yet: generate a gpg keypair
+- Then export your public key: `gpg --armor --export --output my-name.gpg email@example.com`
+- Provide some team member the public GPG key with encryption capability (that team member will add you
+  as a recipient).
 
 Then, run:
 
 ```bash
-gopass --yes setup --remote git@github.com:digitalservicebund/neuris-password-store.git --alias neuris --name <your-name-from-gpg-key> --email <your-email-from-gpg-key>
+gopass init
+
+gopass clone git@github.com:digitalservicebund/neuris-password-store.git neuris --sync gitcli
 ```
 
 > **Note**
 >
 > If there are any issues with this command, you need to clean the store and try again until it
-> works unfortunately ☹️:
+> works unfortunately ☹️. Be aware that this command removes ALL gopass stores from your machine, not only project related ones:
 >
 > ```
 > rm -rf ~/.local/share/gopass/stores
@@ -95,7 +99,7 @@ gopass --yes setup --remote git@github.com:digitalservicebund/neuris-password-st
 Try if you can get access:
 
 ```bash
-gopass ls
+gopass list neuris
 ```
 
 Synchronize the password store:
@@ -104,7 +108,7 @@ Synchronize the password store:
 gopass sync
 ```
 
-Now you can generate a new `.env` file containig the secrets:
+Now you can generate a new `.env` file containing the secrets. When using a Yubikey you may asked multiple times for your pin:
 
 ```bash
 ./run.sh env
@@ -126,7 +130,10 @@ lefthook run tests
 
 The caselaw application requires the initialization of lookup tables by the migration application.
 
-Follow the steps in [run_migration_locally.md](run_migration_locally.md)
+Follow the steps in [run_migration_locally.md](run_migration_locally.md):
+
+1. Prerequisites
+2. Import Data (By Script)
 
 WIP: Run docker image in [migration_image.md](migration_image.md)
 
@@ -142,11 +149,13 @@ mode:
 
 ```bash
 ./run.sh dev -d
+./run.sh dev --detached
 ```
 
 To run a service separately:
 
 ```bash
+./run.sh dev -n
 ./run.sh dev --no-backend
 ```
 
@@ -165,7 +174,7 @@ with [HMR](https://vitejs.dev/guide/features.html#hot-module-replacement).
 > includes supported
 > browsers for E2E and a11y testing through playwright. Should that fail, you
 >
-can [install them manually](https://github.com/digitalservicebund/ris-backend-service/tree/main/frontend#prerequisites).
+> can [install them manually](https://github.com/digitalservicebund/ris-backend-service/tree/main/frontend#prerequisites).
 
 To see logs of the containers, use e.g.
 
