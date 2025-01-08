@@ -39,7 +39,9 @@ public interface DocumentationUnitListItemDTO {
 
   String getNote();
 
-  List<DocumentationUnitProcedureDTO> getProcedures();
+  List<ProcedureDTO> getProcedureHistory();
+
+  ProcedureDTO getProcedure();
 
   List<SourceDTO> getSource();
 }

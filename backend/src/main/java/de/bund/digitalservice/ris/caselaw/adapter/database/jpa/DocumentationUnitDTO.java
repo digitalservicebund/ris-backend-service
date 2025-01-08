@@ -15,6 +15,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderBy;
+import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -137,13 +138,19 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @Column(name = "dissenting_opinion")
   private String dissentingOpinion;
 
-  @OneToMany(
-      mappedBy = "documentationUnit",
-      orphanRemoval = true,
-      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  @OrderBy("rank")
+  @OneToMany(orphanRemoval = true)
+  @JoinTable(
+      name = "documentation_unit_procedure",
+      schema = "incremental_migration",
+      joinColumns = @JoinColumn(name = "documentation_unit_id"),
+      inverseJoinColumns = @JoinColumn(name = "procedure_id"))
+  @OrderColumn(name = "rank")
   @Builder.Default
-  private List<DocumentationUnitProcedureDTO> procedures = new ArrayList<>();
+  private List<ProcedureDTO> procedureHistory = new ArrayList<>();
+
+  @OneToOne
+  @JoinColumn(name = "current_procedure_id")
+  private ProcedureDTO procedure;
 
   @ManyToMany(
       cascade = {CascadeType.MERGE},
