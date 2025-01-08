@@ -1,9 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockUserGroups;
-import static org.mockito.Mockito.when;
-
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclingService;
@@ -27,29 +23,37 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDuplicate
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.CourtTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.AuthService;
+import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParameters;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelation;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
-import java.time.LocalDate;
-import java.util.Map;
-import java.util.Optional;
+import jakarta.validation.constraints.PastOrPresent;
+import lombok.Builder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,6 +66,15 @@ import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockUserGroups;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RISIntegrationTest(
     imports = {
@@ -103,6 +116,7 @@ class DuplicationRelationIntegrationTest {
 
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentationUnitRepository repository;
+  @Autowired private DocumentationUnitRepository documentationUnitRepository;
   @Autowired private DatabaseFileNumberRepository fileNumberRepository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
@@ -111,8 +125,10 @@ class DuplicationRelationIntegrationTest {
   @Autowired private DatabaseRegionRepository regionRepository;
   @Autowired private DatabaseDeletedDocumentationIdsRepository deletedDocumentationIdsRepository;
   @Autowired private DatabaseDuplicateCheckRepository duplicateCheckRepository;
+  @Autowired private DuplicateRelationRepository duplicateRelationRepository;
   @Autowired private AuthService authService;
   @Autowired private DocumentationUnitService documentationUnitService;
+  @Autowired private DuplicateCheckService duplicateCheckService;
 
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private MailService mailService;
@@ -129,8 +145,6 @@ class DuplicationRelationIntegrationTest {
   private DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
 
-  @MockBean DocumentNumberPatternConfig documentNumberPatternConfig;
-
   private DocumentationOffice docOffice;
   private DocumentationOfficeDTO documentationOffice;
 
@@ -141,9 +155,6 @@ class DuplicationRelationIntegrationTest {
 
     docOffice = DocumentationOfficeTransformer.transformToDomain(documentationOffice);
 
-    when(documentNumberPatternConfig.getDocumentNumberPatterns())
-        .thenReturn(Map.of("DS", "XXRE0******YY"));
-
     mockUserGroups(userGroupService);
   }
 
@@ -152,36 +163,108 @@ class DuplicationRelationIntegrationTest {
     fileNumberRepository.deleteAll();
     repository.deleteAll();
     databaseDocumentTypeRepository.deleteAll();
+    duplicateRelationRepository.deleteAll();
   }
 
   @Test
-  void testMy() throws DocumentationUnitNotExistsException {
-    var court = databaseCourtRepository.findBySearchStr("AG Aachen", 100).getFirst();
-
+  void getDuplicates_withNewRelations_shouldCreateNewRelationWithPendingStatus() throws DocumentationUnitNotExistsException {
+    // Arrange
     var creationParams =
-        DocumentationUnitCreationParameters.builder()
-            .court(CourtTransformer.transformToDomain(court))
+        DocumentationUnitTestCreationParameters.builder()
+            .documentNumber("DocumentNumb1")
             .decisionDate(LocalDate.of(2020, 12, 1))
             .fileNumber("AZ-123")
-            .documentationOffice(docOffice)
             .build();
-    var createdDocUnit =
-        documentationUnitService.generateNewDocumentationUnit(
-            docOffice, Optional.of(creationParams));
+    var createdDocUnit1 =
+        DocumentationUnitTransformer.transformToDomain(generateNewDocumentationUnit(
+            docOffice, Optional.of(creationParams)));
 
     var creationParams2 =
-        DocumentationUnitCreationParameters.builder()
-            .court(CourtTransformer.transformToDomain(court))
+        DocumentationUnitTestCreationParameters.builder()
+            .documentNumber("DocumentNumb2")
             .decisionDate(LocalDate.of(2020, 12, 1))
             .fileNumber("AZ-123")
-            .documentationOffice(docOffice)
             .build();
-    documentationUnitService.generateNewDocumentationUnit(docOffice, Optional.of(creationParams2));
+    var createdDocUnit2 =
+        DocumentationUnitTransformer.transformToDomain(generateNewDocumentationUnit(
+            docOffice, Optional.of(creationParams2)));
+    assertThat(duplicateRelationRepository.findAll()).isEmpty();
 
-    var foundDocUnit = documentationUnitService.getByUuid(createdDocUnit.uuid());
-    System.out.println(foundDocUnit.coreData().court().label());
-    System.out.println(foundDocUnit.coreData().fileNumbers());
-    // TODO: Verify the duplicate relationship (see Transformer / domain model)
-    System.out.println(foundDocUnit.managementData().duplicateRelations());
+    // Act
+    duplicateCheckService.getDuplicates(createdDocUnit1.documentNumber());
+
+    var foundDocUnit = documentationUnitService.getByUuid(createdDocUnit1.uuid());
+    var duplicatedRelationIds = new ArrayList<>();
+    for(DuplicateRelation duplicateRelation: foundDocUnit.managementData().duplicateRelations()) {
+      duplicatedRelationIds.add(duplicateRelation.docUnitId1());
+      duplicatedRelationIds.add(duplicateRelation.docUnitId2());
+    }
+
+    // Assert
+    assertThat(duplicateRelationRepository.findAll()).hasSize(1);
+    assertThat(duplicatedRelationIds).contains(createdDocUnit1.uuid(), createdDocUnit2.uuid());
+    assertThat(foundDocUnit.managementData().duplicateRelations().stream().findFirst().get().status()).isEqualTo(DuplicateRelationStatus.PENDING);
+  }
+
+  @Builder(toBuilder = true)
+  public record DocumentationUnitTestCreationParameters(
+      String documentNumber,
+      DocumentationOffice documentationOffice,
+      Court court,
+      List<String> deviatingCourts,
+      DocumentType documentType,
+      @PastOrPresent LocalDate decisionDate,
+      List<LocalDate> deviatingDecisionDates,
+      String fileNumber,
+      List<String> deviatingFileNumbers,
+      String ecli,
+      List<String> deviatingEclis) {}
+
+  private DocumentationUnitDTO generateNewDocumentationUnit(
+        DocumentationOffice userDocOffice, Optional<DocumentationUnitTestCreationParameters> parameters)
+      throws DocumentationUnitException {
+
+    // default office is user office
+    DocumentationUnitTestCreationParameters params =
+        parameters.orElse(
+            DocumentationUnitTestCreationParameters.builder()
+                .documentationOffice(userDocOffice)
+                .build());
+    if (params.documentationOffice() == null) {
+      params = params.toBuilder().documentationOffice(userDocOffice).build();
+    }
+
+    DocumentationUnit docUnit =
+        DocumentationUnit.builder()
+            .version(0L)
+            .documentNumber(params.documentNumber())
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(params.documentationOffice())
+                    .fileNumbers(params.fileNumber() == null ? null : List.of(params.fileNumber()))
+                    .deviatingFileNumbers(params.deviatingFileNumbers())
+                    .documentType(params.documentType())
+                    .decisionDate(params.decisionDate())
+                    .deviatingDecisionDates(params.deviatingDecisionDates())
+                    .court(params.court())
+                    .deviatingCourts(params.deviatingCourts())
+                    .ecli(params.ecli())
+                    .deviatingEclis(params.deviatingEclis())
+                    .build())
+            .build();
+
+    var documentationUnitDTO =
+        repository.save(
+            DocumentationUnitTransformer.transformToDTO(
+                DocumentationUnitDTO.builder()
+                    .documentationOffice(
+                        DocumentationOfficeTransformer.transformToDTO(
+                            docUnit.coreData().documentationOffice()))
+                    .creatingDocumentationOffice(
+                        DocumentationOfficeTransformer.transformToDTO(
+                            docUnit.coreData().creatingDocOffice()))
+                    .build(),
+                docUnit));
+    return repository.save(documentationUnitDTO);
   }
 }

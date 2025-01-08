@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitIdDuplicateCheckDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformerException;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
@@ -60,7 +59,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class DocumentationUnitController {
   private final DocumentationUnitService service;
-  private final DuplicateCheckService duplicateCheckService;
   private final UserService userService;
   private final AttachmentService attachmentService;
   private final ConverterService converterService;
@@ -72,7 +70,6 @@ public class DocumentationUnitController {
 
   public DocumentationUnitController(
       DocumentationUnitService service,
-      DuplicateCheckService duplicateCheckService,
       UserService userService,
       AttachmentService attachmentService,
       ConverterService converterService,
@@ -82,7 +79,6 @@ public class DocumentationUnitController {
       DocumentationUnitDocxMetadataInitializationService
           documentationUnitDocxMetadataInitializationService) {
     this.service = service;
-    this.duplicateCheckService = duplicateCheckService;
     this.userService = userService;
     this.attachmentService = attachmentService;
     this.converterService = converterService;
@@ -242,14 +238,6 @@ public class DocumentationUnitController {
       log.error("Documentation unit '{}' doesn't exist", documentNumber);
       return ResponseEntity.ok(DocumentationUnit.builder().build());
     }
-  }
-
-  @GetMapping(value = "/{documentNumber}/duplicates", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasReadAccessByDocumentNumber.apply(#documentNumber)")
-  public ResponseEntity<List<DocumentationUnitIdDuplicateCheckDTO>> getDuplicatesByDocumentNumber(
-      @AuthenticationPrincipal OidcUser oidcUser, @NonNull @PathVariable String documentNumber) {
-    var documentationUnits = duplicateCheckService.getDuplicates(documentNumber);
-    return ResponseEntity.ok(documentationUnits);
   }
 
   @DeleteMapping(value = "/{uuid}")

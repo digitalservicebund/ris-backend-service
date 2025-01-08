@@ -738,6 +738,7 @@ public class DocumentationUnitTransformer {
             documentationUnitDTO.getOtherLongText(),
             documentationUnitDTO.getDissentingOpinion());
 
+    // Todo: Filter for unpublished from other doc office
     Set<DuplicateRelation> duplicateRelations =
         Stream.concat(
                 documentationUnitDTO.getDuplicateRelations1().stream(),

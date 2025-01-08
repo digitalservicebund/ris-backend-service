@@ -37,7 +37,7 @@ public class DuplicateCheckService {
     this.documentationUnitRepository = documentationUnitRepository;
   }
 
-  List<DocumentationUnitIdDuplicateCheckDTO> getDuplicates(String docNumber) {
+  public List<DocumentationUnitIdDuplicateCheckDTO> getDuplicates(String docNumber) {
     try {
       var documentationUnit = documentationUnitService.getByDocumentNumber(docNumber);
 
@@ -122,7 +122,7 @@ public class DuplicateCheckService {
                   .build();
           relationRepository.save(newRelation);
         } else if (Boolean.FALSE.equals(
-            Boolean.TRUE.equals(dup.getIsJdvDuplicateCheckActive())
+            dup.getIsJdvDuplicateCheckActive()
                 && DuplicateRelationStatus.PENDING.equals(existingRelation.get().getStatus()))) {
           existingRelation.get().setStatus(status);
           relationRepository.save(existingRelation.get());
