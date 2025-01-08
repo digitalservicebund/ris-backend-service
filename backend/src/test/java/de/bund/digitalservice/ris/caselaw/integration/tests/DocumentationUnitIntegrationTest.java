@@ -54,6 +54,7 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.AuthService;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.DateUtil;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParameters;
@@ -77,8 +78,6 @@ import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.net.URI;
 import java.time.LocalDate;
-import java.time.Year;
-import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -1036,18 +1035,20 @@ class DocumentationUnitIntegrationTest {
         DeletedDocumentationUnitDTO.builder()
             .abbreviation("DS")
             .documentNumber("ZZRE202400001")
-            .year(Year.of(LocalDate.now().get(ChronoField.YEAR)))
+            .year(DateUtil.getYear())
             .build();
     deletedDocumentationIdsRepository.save(deletedDocumentationUnitDTO);
 
     when(documentNumberPatternConfig.getDocumentNumberPatterns())
         .thenReturn(Map.of("DS", "ZZREYYYY*****"));
-    when(databaseDocumentNumberRepository.findById("DS"))
+    when(databaseDocumentNumberRepository.findByDocumentationOfficeAbbreviationAndYear(
+            "DS", DateUtil.getYear()))
         .thenReturn(
             Optional.of(
                 DocumentNumberDTO.builder()
                     .documentationOfficeAbbreviation("DS")
                     .lastNumber(1)
+                    .year(DateUtil.getYear())
                     .build()));
 
     risWebTestClient

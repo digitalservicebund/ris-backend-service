@@ -161,7 +161,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.4")
 
     // CVE-2024-50379
-    implementation ("org.apache.tomcat.embed:tomcat-embed-core:10.1.34")
+    implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.34")
     // CVE-2022-3171
     implementation("com.google.protobuf:protobuf-java:4.29.2")
 
@@ -187,7 +187,7 @@ dependencies {
     implementation("com.icegreen:greenmail:2.1.2")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.22") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.24") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
