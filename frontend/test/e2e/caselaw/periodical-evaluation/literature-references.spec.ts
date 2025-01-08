@@ -129,7 +129,7 @@ test.describe("Literature references", () => {
         )
         await page.getByLabel("Treffer übernehmen").click()
         await expect(
-          page.getByText(`Bilen, Ulviye, MMG 2024, 2${edition.suffix} (Ean)`),
+          page.getByText(`MMG 2024, 2${edition.suffix}, Bilen, Ulviye, (Ean)`),
         ).toBeVisible()
       })
 
@@ -199,7 +199,7 @@ test.describe("Literature references", () => {
         await page.getByLabel("Treffer übernehmen").click()
         await expect(
           page.getByText(
-            `Bilen, Ulviye, MMG 2024, 301-305${editionWithReferences.suffix} (Ean)`,
+            `MMG 2024, 301-305${editionWithReferences.suffix}, Bilen, Ulviye, (Ean)`,
           ),
         ).toBeVisible()
       })
@@ -208,14 +208,14 @@ test.describe("Literature references", () => {
         await page.reload()
         await expect(
           page.getByText(
-            `Bilen, Ulviye, MMG 2024, 301-305${editionWithReferences.suffix} (Ean)`,
+            `MMG 2024, 301-305${editionWithReferences.suffix}, Bilen, Ulviye, (Ean)`,
           ),
         ).toBeVisible()
         const correctOrder = [
           "MMG 2024, 12-22, Heft 1 (L)",
           "MMG 2024, 1-11, Heft 1",
           "MMG 2024, 300, Heft 1 (ST)",
-          "Bilen, Ulviye, MMG 2024, 301-305, Heft 1 (Ean)",
+          "MMG 2024, 301-305, Heft 1, Bilen, Ulviye, (Ean)",
         ]
         const summaries = await page.getByTestId("citation-summary").all()
 
@@ -249,8 +249,8 @@ test.describe("Literature references", () => {
         // Make sure the literature citations are in the correct order
         expect(await literatureReferencesPreview.textContent()).toContain(
           "Literaturfundstellen" +
-            "Krümelmonster, MMG 2024, 3-4, Heft 1 (Ean)" +
-            "Bilen, Ulviye, MMG 2024, 301-305, Heft 1 (Ean)",
+            "MMG 2024, 3-4, Heft 1, Krümelmonster, (Ean)" +
+            "MMG 2024, 301-305, Heft 1, Bilen, Ulviye, (Ean)",
         )
       })
     },

@@ -445,7 +445,7 @@ test.describe(
             .locator("[aria-label='Literaturfundstelle speichern']")
             .click()
           await expect(
-            page.getByText("Bilen, Ulviye, AllMBl 2024, 2 (Ean)"),
+            page.getByText("AllMBl 2024, 2, Bilen, Ulviye, (Ean)"),
           ).toBeVisible()
         })
 
@@ -462,7 +462,7 @@ test.describe(
           ).toBeHidden()
 
           await expect(
-            preview.getByText("Bilen, Ulviye, AllMBl 2024, 2 (Ean)"),
+            preview.getByText("AllMBl 2024, 2, Bilen, Ulviye, (Ean)"),
           ).toBeVisible()
         })
 
@@ -502,10 +502,10 @@ test.describe(
 
         await test.step("Verify second literature citation it is added at the bottom of editable list", async () => {
           await expect(page.getByLabel("Listen Eintrag").nth(1)).toHaveText(
-            "Bilen, Ulviye, AllMBl 2024, 2 (Ean)primär",
+            "AllMBl 2024, 2, Bilen, Ulviye, (Ean)primär",
           )
           await expect(page.getByLabel("Listen Eintrag").nth(2)).toHaveText(
-            "Kästner, Erich, GVBl BB 01/2025, 4-6 (Ebs)primär",
+            "GVBl BB 01/2025, 4-6, Kästner, Erich, (Ebs)primär",
           )
         })
 
@@ -517,8 +517,8 @@ test.describe(
 
           // Make sure the literature citations are in the correct order
           expect(texts).toContain(
-            "Bilen, Ulviye, AllMBl 2024, 2 (Ean)" +
-              "Kästner, Erich, GVBl BB 01/2025, 4-6 (Ebs)",
+            "AllMBl 2024, 2, Bilen, Ulviye, (Ean)" +
+              "GVBl BB 01/2025, 4-6, Kästner, Erich, (Ebs)",
           )
         })
       },

@@ -64,11 +64,13 @@ export default class Reference implements EditableListItem {
   }
 
   get renderSummary(): string {
+    const authorSeparator = this.author ? "," : ""
+
     return [
-      this.author ? `${this.author},` : "",
       this.legalPeriodical?.abbreviation ?? this.legalPeriodicalRawValue,
-      this.citation,
+      this.citation ? `${this.citation}${authorSeparator}` : "",
       this.referenceSupplement ? `(${this.referenceSupplement})` : "",
+      this.author ? `${this.author},` : "",
       this.documentType ? `(${this.documentType.jurisShortcut})` : "",
     ]
       .filter(Boolean)
