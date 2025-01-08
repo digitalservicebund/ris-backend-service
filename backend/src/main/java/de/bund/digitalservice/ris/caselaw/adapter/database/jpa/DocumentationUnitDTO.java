@@ -138,7 +138,7 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @Column(name = "dissenting_opinion")
   private String dissentingOpinion;
 
-  @OneToMany(orphanRemoval = true)
+  @OneToMany
   @JoinTable(
       name = "documentation_unit_procedure",
       schema = "incremental_migration",
