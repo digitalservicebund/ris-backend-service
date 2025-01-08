@@ -397,7 +397,7 @@ public class DocumentationUnitService {
           documentationUnit.coreData().documentationOffice().abbreviation());
 
     } catch (Exception e) {
-      log.info("Did not save for recycling", e);
+      log.info("Won´t recycle the document number: {}", e.getMessage());
     }
   }
 }
