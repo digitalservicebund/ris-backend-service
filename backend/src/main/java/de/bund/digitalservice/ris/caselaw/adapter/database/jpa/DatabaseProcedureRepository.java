@@ -27,7 +27,7 @@ public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO,
    * @return a page of {@link ProcedureDTO}s matching the criteria
    */
   @Query(
-      "SELECT p FROM ProcedureDTO p WHERE p.label ILIKE %:label% AND p.documentationOffice = :documentationOffice ORDER BY p.createdAt DESC NULLS LAST")
+      "SELECT p FROM ProcedureDTO p WHERE p.label ILIKE %:label% AND p.documentationOffice = :documentationOffice ORDER BY createdAt DESC NULLS LAST")
   Slice<ProcedureDTO> findAllByLabelContainingAndDocumentationOfficeOrderByCreatedAtDesc(
       @Param("label") String label,
       @Param("documentationOffice") DocumentationOfficeDTO documentationOfficeDTO,
@@ -42,7 +42,7 @@ public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO,
    * @return a page of {@link ProcedureDTO}s matching the criteria
    */
   @Query(
-      "SELECT p FROM ProcedureDTO p WHERE p.documentationOffice = :documentationOffice ORDER BY p.createdAt DESC NULLS LAST")
+      "SELECT p FROM ProcedureDTO p WHERE p.documentationOffice = :documentationOffice ORDER BY createdAt DESC NULLS LAST")
   Slice<ProcedureDTO> findAllByDocumentationOfficeOrderByCreatedAtDesc(
       @Param("documentationOffice") DocumentationOfficeDTO documentationOfficeDTO,
       Pageable pageable);
@@ -90,9 +90,13 @@ public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO,
    */
   @Query(
       "SELECT DISTINCT p FROM ProcedureDTO p "
-          + "JOIN DocumentationUnitDTO dup ON p.id = dup.procedure.id "
+          + "JOIN DocumentationUnitProcedureDTO dup ON p.id = dup.procedure.id "
           + "WHERE (:label IS NULL OR p.label ILIKE %:label%) "
           + "AND p.documentationOffice = :documentationOffice "
+          + "AND ( dup.documentationUnit, dup.rank) IN ("
+          + "    SELECT  dupMax.documentationUnit.id, MAX( dupMax.rank) "
+          + "    FROM DocumentationUnitProcedureDTO dupMax "
+          + "    GROUP BY  dupMax.documentationUnit.id)"
           + "    ORDER BY  p.createdAt DESC NULLS LAST")
   Slice<ProcedureDTO> findLatestUsedProceduresByLabelAndDocumentationOffice(
       @Param("label") String label,
@@ -112,10 +116,14 @@ public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO,
    */
   @Query(
       "SELECT DISTINCT p FROM ProcedureDTO p "
-          + "JOIN DocumentationUnitDTO dup ON p.id = dup.procedure.id "
+          + "JOIN DocumentationUnitProcedureDTO dup ON p.id = dup.procedure.id "
           + "WHERE (:label IS NULL OR p.label ILIKE %:label%) "
           + "AND p.documentationOffice = :documentationOffice "
           + "AND p.userGroupDTO.id = :userGroupId "
+          + "AND ( dup.documentationUnit, dup.rank) IN ("
+          + "    SELECT  dupMax.documentationUnit.id, MAX( dupMax.rank) "
+          + "    FROM DocumentationUnitProcedureDTO dupMax "
+          + "    GROUP BY  dupMax.documentationUnit.id)"
           + "    ORDER BY  p.createdAt DESC NULLS LAST")
   Slice<ProcedureDTO> findLatestUsedProceduresByLabelAndDocumentationOfficeAndUserGroupDTO_Id(
       @Param("label") String label,
@@ -134,8 +142,12 @@ public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO,
    */
   @Query(
       "SELECT DISTINCT p FROM ProcedureDTO p "
-          + "JOIN DocumentationUnitDTO dup ON p.id = dup.procedure.id "
+          + "JOIN DocumentationUnitProcedureDTO dup ON p.id = dup.procedure.id "
           + "WHERE p.documentationOffice = :documentationOffice "
+          + "AND ( dup.documentationUnit, dup.rank) IN ("
+          + "    SELECT  dupMax.documentationUnit.id, MAX( dupMax.rank) "
+          + "    FROM DocumentationUnitProcedureDTO dupMax "
+          + "    GROUP BY  dupMax.documentationUnit.id)"
           + "    ORDER BY  p.createdAt DESC NULLS LAST")
   Slice<ProcedureDTO> findLatestUsedProceduresByDocumentationOffice(
       @Param("documentationOffice") DocumentationOfficeDTO documentationOffice, Pageable pageable);
@@ -152,9 +164,13 @@ public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO,
    */
   @Query(
       "SELECT DISTINCT p FROM ProcedureDTO p "
-          + "JOIN DocumentationUnitDTO dup ON p.id = dup.procedure.id "
+          + "JOIN DocumentationUnitProcedureDTO dup ON p.id = dup.procedure.id "
           + "WHERE p.documentationOffice = :documentationOffice "
           + "AND p.userGroupDTO.id = :userGroupId "
+          + "AND ( dup.documentationUnit, dup.rank) IN ("
+          + "    SELECT  dupMax.documentationUnit.id, MAX( dupMax.rank) "
+          + "    FROM DocumentationUnitProcedureDTO dupMax "
+          + "    GROUP BY  dupMax.documentationUnit.id)"
           + "    ORDER BY  p.createdAt DESC NULLS LAST")
   Slice<ProcedureDTO> findLatestUsedProceduresByDocumentationOfficeAndUserGroupDTO_id(
       @Param("documentationOffice") DocumentationOfficeDTO documentationOffice,

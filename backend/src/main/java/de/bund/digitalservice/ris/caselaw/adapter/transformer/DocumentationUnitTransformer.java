@@ -102,8 +102,7 @@ public class DocumentationUnitTransformer {
 
     } else {
       builder
-          .procedureHistory(Collections.emptyList())
-          .procedure(null)
+          .procedures(Collections.emptyList())
           .ecli(null)
           .judicialBody(null)
           .decisionDate(null)
@@ -590,10 +589,10 @@ public class DocumentationUnitTransformer {
         CoreData.builder()
             .court(CourtTransformer.transformToDomain(documentationUnitDTO.getCourt()))
             .procedure(
-                ProcedureTransformer.transformToDomain(documentationUnitDTO.getProcedure(), false))
+                ProcedureTransformer.transformFirstToDomain(documentationUnitDTO.getProcedures()))
             .previousProcedures(
                 ProcedureTransformer.transformPreviousProceduresToLabel(
-                    documentationUnitDTO.getProcedureHistory()))
+                    documentationUnitDTO.getProcedures()))
             .documentationOffice(
                 DocumentationOfficeTransformer.transformToDomain(
                     documentationUnitDTO.getDocumentationOffice()))

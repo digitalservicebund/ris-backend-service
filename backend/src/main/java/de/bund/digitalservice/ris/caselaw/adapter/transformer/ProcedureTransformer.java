@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import java.util.Collections;
@@ -9,14 +10,21 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class ProcedureTransformer {
+  public static Procedure transformFirstToDomain(
+      List<DocumentationUnitProcedureDTO> procedureDTOs) {
+    if (procedureDTOs == null || procedureDTOs.isEmpty()) return null;
 
-  public static List<String> transformPreviousProceduresToLabel(List<ProcedureDTO> procedureDTOs) {
+    return transformToDomain(procedureDTOs.get(procedureDTOs.size() - 1).getProcedure());
+  }
+
+  public static List<String> transformPreviousProceduresToLabel(
+      List<DocumentationUnitProcedureDTO> procedureDTOs) {
     if (procedureDTOs == null || procedureDTOs.size() < 2) {
       return Collections.emptyList();
     }
 
-    // Skip the last procedure, as it is the current one
     return procedureDTOs.subList(0, procedureDTOs.size() - 1).stream()
+        .map(DocumentationUnitProcedureDTO::getProcedure)
         .map(ProcedureDTO::getLabel)
         .toList();
   }
@@ -27,14 +35,19 @@ public class ProcedureTransformer {
       return 0L;
     }
 
-    return (long) procedureDTO.getDocumentationUnits().size();
+    return procedureDTO.getDocumentationUnits().stream()
+        .filter(
+            documentationUnitDTO ->
+                documentationUnitDTO
+                    .getProcedures()
+                    .get(documentationUnitDTO.getProcedures().size() - 1)
+                    .getProcedure()
+                    .equals(procedureDTO))
+        .distinct()
+        .count();
   }
 
   public static Procedure transformToDomain(ProcedureDTO procedureDTO) {
-    return transformToDomain(procedureDTO, true);
-  }
-
-  public static Procedure transformToDomain(ProcedureDTO procedureDTO, boolean withCount) {
     if (procedureDTO == null) {
       return null;
     }
@@ -43,7 +56,7 @@ public class ProcedureTransformer {
         .id(procedureDTO.getId())
         .label(procedureDTO.getLabel())
         .createdAt(procedureDTO.getCreatedAt())
-        .documentationUnitCount(withCount ? getDocumentationUnitCount(procedureDTO) : 0)
+        .documentationUnitCount(getDocumentationUnitCount(procedureDTO))
         .userGroupId(extractUserGroupId(procedureDTO))
         .build();
   }

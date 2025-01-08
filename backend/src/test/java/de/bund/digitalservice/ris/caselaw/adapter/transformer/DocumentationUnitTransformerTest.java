@@ -70,8 +70,7 @@ class DocumentationUnitTransformerTest {
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
 
-    assertThat(documentationUnitDTO.getProcedureHistory()).isEmpty();
-    assertThat(documentationUnitDTO.getProcedure()).isNull();
+    assertThat(documentationUnitDTO.getProcedures()).isEmpty();
     assertThat(documentationUnitDTO.getEcli()).isNull();
     assertThat(documentationUnitDTO.getJudicialBody()).isNull();
     assertThat(documentationUnitDTO.getDecisionDate()).isNull();

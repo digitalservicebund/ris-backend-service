@@ -319,19 +319,51 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     var documentationUnitDTO = documentationUnitDTOOptional.get();
     Procedure procedure = documentationUnit.coreData().procedure();
 
+    List<DocumentationUnitProcedureDTO> documentationUnitProcedureDTOs = new ArrayList<>();
+
     ProcedureDTO procedureDTO =
         getOrCreateProcedure(documentationUnitDTO.getDocumentationOffice(), procedure);
 
     boolean sameAsLast =
-        documentationUnitDTO.getProcedure() != null
-            && documentationUnitDTO.getProcedure().equals(procedureDTO);
+        !documentationUnitDTO.getProcedures().isEmpty()
+            && documentationUnitDTO
+                .getProcedures()
+                .get(documentationUnitDTO.getProcedures().size() - 1)
+                .getProcedure()
+                .equals(procedureDTO);
 
-    // add the previous procedure to the history
+    documentationUnitDTO
+        .getProcedures()
+        .forEach(
+            documentationUnitProcedureDTO -> {
+              DocumentationUnitProcedureDTO newLink =
+                  DocumentationUnitProcedureDTO.builder()
+                      .primaryKey(
+                          new DocumentationUnitProcedureId(
+                              documentationUnitDTO.getId(),
+                              documentationUnitProcedureDTO.getProcedure().getId()))
+                      .documentationUnit(documentationUnitDTO)
+                      .procedure(documentationUnitProcedureDTO.getProcedure())
+                      .build();
+              documentationUnitProcedureDTOs.add(newLink);
+            });
+
     if (procedureDTO != null && !sameAsLast) {
-      documentationUnitDTO.getProcedureHistory().add(procedureDTO);
+      DocumentationUnitProcedureDTO documentationUnitProcedureDTO =
+          DocumentationUnitProcedureDTO.builder()
+              .primaryKey(
+                  new DocumentationUnitProcedureId(
+                      documentationUnitDTO.getId(), procedureDTO.getId()))
+              .documentationUnit(documentationUnitDTO)
+              .procedure(procedureDTO)
+              .build();
+      documentationUnitProcedureDTOs.add(documentationUnitProcedureDTO);
     }
-    // set new procedure
-    documentationUnitDTO.setProcedure(procedureDTO);
+
+    updateProcedureRank(documentationUnitProcedureDTOs);
+
+    documentationUnitDTO.getProcedures().clear();
+    documentationUnitDTO.getProcedures().addAll(documentationUnitProcedureDTOs);
 
     repository.save(documentationUnitDTO);
   }
@@ -369,6 +401,15 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                       .build()));
     }
     return procedureRepository.findById(procedure.id()).orElse(null);
+  }
+
+  private void updateProcedureRank(
+      List<DocumentationUnitProcedureDTO> documentationUnitProcedureDTOs) {
+    for (int i = 0; i < documentationUnitProcedureDTOs.size(); i++) {
+      DocumentationUnitProcedureDTO documentationUnitProcedureDTO =
+          documentationUnitProcedureDTOs.get(i);
+      documentationUnitProcedureDTO.setRank(i + 1);
+    }
   }
 
   @Override
