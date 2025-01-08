@@ -4,8 +4,11 @@ Built with Vue
 
 ## Prerequisites
 
-The repository contains a `.node-version` file to set up the required Node.js version automatically
-with [nodenv](https://github.com/nodenv/nodenv).
+##### node version:
+
+The repository requires a strict Node.js engine version. Ensure you are using the corresponding version as
+specified in the `package.json` file. The `.npmrc` file is necessary to enforce engine strictness during installation on
+the server.
 
 Install dependencies:
 
@@ -22,10 +25,12 @@ npx playwright install chrome firefox
 
 ## Icons
 
-All icons in the [Google Material](https://icon-sets.iconify.design/ic), [Material Symbol](https://icon-sets.iconify.design/material-symbols)
+All icons in
+the [Google Material](https://icon-sets.iconify.design/ic), [Material Symbol](https://icon-sets.iconify.design/material-symbols)
 and [Material Design Icons](https://icon-sets.iconify.design/mdi/) sets can be used.
 
-To make the icon available in your code, select the icon, choose "Unplugin Icons" as component and copy-paste the import statement. Example:
+To make the icon available in your code, select the icon, choose "Unplugin Icons" as component and copy-paste the import
+statement. Example:
 
 ```typescript
 import VerifiedIcon from "~icons/material-symbols/verified-user"
@@ -154,20 +159,20 @@ To debug frontend in IntelliJ IDEA, such as setting watchers and breakpoints:
 
    Start your Chrome browser in remote debugging mode to allow IntelliJ IDEA to connect to it by:
 
-   - Locate your Chromium-based browser:
-     ```bash
-     cd /Applications/Brave\ Browser.app/Contents/MacOS/
-     ```
-   - Then run it with debugging mode:
-     ```bash
-     ./Brave\ Browser --remote-debugging-port=9222
-     ```
+    - Locate your Chromium-based browser:
+      ```bash
+      cd /Applications/Brave\ Browser.app/Contents/MacOS/
+      ```
+    - Then run it with debugging mode:
+      ```bash
+      ./Brave\ Browser --remote-debugging-port=9222
+      ```
 
 2. **Configure IntelliJ IDEA:**
-   - Open IntelliJ IDEA and navigate to `Run` > `Edit Configurations`.
-   - Click on the `+` button and select `Attach to Node.js/Chrome`.
-   - Make sure you are setting the host to `localhost` and the port to `9222`.
-   - Run your project in IntelliJ IDEA and select the frontend tab to debug.
+    - Open IntelliJ IDEA and navigate to `Run` > `Edit Configurations`.
+    - Click on the `+` button and select `Attach to Node.js/Chrome`.
+    - Make sure you are setting the host to `localhost` and the port to `9222`.
+    - Run your project in IntelliJ IDEA and select the frontend tab to debug.
 
 More info can be found
 in [Debug JavaScript in Chrome](https://www.jetbrains.com/help/idea/debugging-javascript-in-chrome.html)
