@@ -1,5 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockUserGroups;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclingService;
@@ -9,6 +13,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.DuplicateCheckService;
+import de.bund.digitalservice.ris.caselaw.adapter.DuplicateRelationService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.LdmlExporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
@@ -53,6 +58,9 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.Docume
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import jakarta.validation.constraints.PastOrPresent;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import lombok.Builder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -67,18 +75,10 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockUserGroups;
-import static org.assertj.core.api.Assertions.assertThat;
-
 @RISIntegrationTest(
     imports = {
       DocumentationUnitService.class,
+      DuplicateRelationService.class,
       PostgresDeltaMigrationRepositoryImpl.class,
       DatabaseDocumentNumberGeneratorService.class,
       DuplicateCheckService.class,
@@ -167,7 +167,8 @@ class DuplicationRelationIntegrationTest {
   }
 
   @Test
-  void getDuplicates_withNewRelations_shouldCreateNewRelationWithPendingStatus() throws DocumentationUnitNotExistsException {
+  void getDuplicates_withNewRelations_shouldCreateNewRelationWithPendingStatus()
+      throws DocumentationUnitNotExistsException {
     // Arrange
     var creationParams =
         DocumentationUnitTestCreationParameters.builder()
@@ -176,8 +177,8 @@ class DuplicationRelationIntegrationTest {
             .fileNumber("AZ-123")
             .build();
     var createdDocUnit1 =
-        DocumentationUnitTransformer.transformToDomain(generateNewDocumentationUnit(
-            docOffice, Optional.of(creationParams)));
+        DocumentationUnitTransformer.transformToDomain(
+            generateNewDocumentationUnit(docOffice, Optional.of(creationParams)));
 
     var creationParams2 =
         DocumentationUnitTestCreationParameters.builder()
@@ -186,24 +187,21 @@ class DuplicationRelationIntegrationTest {
             .fileNumber("AZ-123")
             .build();
     var createdDocUnit2 =
-        DocumentationUnitTransformer.transformToDomain(generateNewDocumentationUnit(
-            docOffice, Optional.of(creationParams2)));
+        DocumentationUnitTransformer.transformToDomain(
+            generateNewDocumentationUnit(docOffice, Optional.of(creationParams2)));
     assertThat(duplicateRelationRepository.findAll()).isEmpty();
 
     // Act
     duplicateCheckService.getDuplicates(createdDocUnit1.documentNumber());
 
     var foundDocUnit = documentationUnitService.getByUuid(createdDocUnit1.uuid());
-    var duplicatedRelationIds = new ArrayList<>();
-    for(DuplicateRelation duplicateRelation: foundDocUnit.managementData().duplicateRelations()) {
-      duplicatedRelationIds.add(duplicateRelation.docUnitId1());
-      duplicatedRelationIds.add(duplicateRelation.docUnitId2());
-    }
 
     // Assert
     assertThat(duplicateRelationRepository.findAll()).hasSize(1);
-    assertThat(duplicatedRelationIds).contains(createdDocUnit1.uuid(), createdDocUnit2.uuid());
-    assertThat(foundDocUnit.managementData().duplicateRelations().stream().findFirst().get().status()).isEqualTo(DuplicateRelationStatus.PENDING);
+    DuplicateRelation duplicate =
+        foundDocUnit.managementData().duplicateRelations().stream().findFirst().get();
+    assertThat(duplicate.documentNumber()).isEqualTo(createdDocUnit2.documentNumber());
+    assertThat(duplicate.status()).isEqualTo(DuplicateRelationStatus.PENDING);
   }
 
   @Builder(toBuilder = true)
@@ -221,7 +219,8 @@ class DuplicationRelationIntegrationTest {
       List<String> deviatingEclis) {}
 
   private DocumentationUnitDTO generateNewDocumentationUnit(
-        DocumentationOffice userDocOffice, Optional<DocumentationUnitTestCreationParameters> parameters)
+      DocumentationOffice userDocOffice,
+      Optional<DocumentationUnitTestCreationParameters> parameters)
       throws DocumentationUnitException {
 
     // default office is user office

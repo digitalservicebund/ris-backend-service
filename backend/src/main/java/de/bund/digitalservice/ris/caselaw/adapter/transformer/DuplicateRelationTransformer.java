@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelation;
 
@@ -9,20 +10,22 @@ public class DuplicateRelationTransformer {
     // Private constructor to prevent instantiation of this utility class.
   }
 
-  // transformToDTO not needed as data is never written
+  // transformToDTO not needed as data is never written by client
 
-  public static DuplicateRelation transformToDomain(DuplicateRelationDTO duplicateRelationDTO) {
-    System.out.println(duplicateRelationDTO.getDocumentationUnit1().getDocumentNumber());
-    System.out.println(duplicateRelationDTO.getDocumentationUnit2().getDocumentNumber());
-
-    System.out.println("HIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIER");
-
-    // TODO: What do we want to expose? Doc Number enough?
-    // Should we only keep the data of the other docUnit? (Otherwise, we need to filter in the FE)
+  /**
+   * Current is the docUnit that we are currently requesting -> the other doc unit is its duplicate.
+   */
+  public static DuplicateRelation transformToDomain(
+      DuplicateRelationDTO duplicateRelationDTO, DocumentationUnitDTO current) {
+    DocumentationUnitDTO duplicate;
+    if (duplicateRelationDTO.getDocumentationUnit1().getId().equals(current.getId())) {
+      duplicate = duplicateRelationDTO.getDocumentationUnit2();
+    } else {
+      duplicate = duplicateRelationDTO.getDocumentationUnit1();
+    }
 
     return DuplicateRelation.builder()
-        .docUnitId1(duplicateRelationDTO.getId().getDocumentationUnitId1())
-        .docUnitId2(duplicateRelationDTO.getId().getDocumentationUnitId2())
+        .documentNumber(duplicate.getDocumentNumber())
         .status(duplicateRelationDTO.getStatus())
         .build();
   }

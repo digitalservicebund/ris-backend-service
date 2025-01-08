@@ -2,10 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDuplicateCheckRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitIdDuplicateCheckDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -23,21 +20,21 @@ public class DuplicateCheckService {
   private final DocumentationUnitService documentationUnitService;
 
   private final DatabaseDuplicateCheckRepository repository;
-  private final DuplicateRelationRepository relationRepository;
+  private final DuplicateRelationService duplicateRelationService;
   private final DatabaseDocumentationUnitRepository documentationUnitRepository;
 
   public DuplicateCheckService(
       DatabaseDuplicateCheckRepository duplicateCheckRepository,
       DocumentationUnitService documentationUnitService,
-      DuplicateRelationRepository relationRepository,
+      DuplicateRelationService duplicateRelationService,
       DatabaseDocumentationUnitRepository documentationUnitRepository) {
     this.repository = duplicateCheckRepository;
     this.documentationUnitService = documentationUnitService;
-    this.relationRepository = relationRepository;
+    this.duplicateRelationService = duplicateRelationService;
     this.documentationUnitRepository = documentationUnitRepository;
   }
 
-  public List<DocumentationUnitIdDuplicateCheckDTO> getDuplicates(String docNumber) {
+  public void getDuplicates(String docNumber) {
     try {
       var documentationUnit = documentationUnitService.getByDocumentNumber(docNumber);
 
@@ -52,7 +49,8 @@ public class DuplicateCheckService {
       }
 
       if (allFileNumbers.isEmpty()) {
-        return List.of();
+        // TODO: Should we still check with only ECLI?!
+        return;
       }
 
       var decisionDate = documentationUnit.coreData().decisionDate();
@@ -82,54 +80,45 @@ public class DuplicateCheckService {
       if (documentationType != null) allDocTypeIds.add(documentationType.uuid());
 
       var duplicates =
-          repository.findDuplicates(
-              allFileNumbers, allDates, allCourtIds, allDeviatingCourts, allEclis, allDocTypeIds);
+          repository
+              .findDuplicates(
+                  allFileNumbers,
+                  allDates,
+                  allCourtIds,
+                  allDeviatingCourts,
+                  allEclis,
+                  allDocTypeIds)
+              .stream()
+              // Should not contain itself
+              .filter(dup -> !documentationUnit.uuid().equals(dup.getId()))
+              .toList();
 
       for (var dup : duplicates) {
-        if (dup.getId().equals(documentationUnit.uuid())) {
-          // TODO: filter dup list in the beginning
-          continue;
-        }
-        DuplicateRelationDTO.DuplicateRelationId duplicateRelationId =
-            new DuplicateRelationDTO.DuplicateRelationId(documentationUnit.uuid(), dup.getId());
         Optional<DuplicateRelationDTO> existingRelation =
-            relationRepository.findById(duplicateRelationId);
+            duplicateRelationService.findByDocUnitIds(documentationUnit.uuid(), dup.getId());
         var status =
             Boolean.FALSE.equals(dup.getIsJdvDuplicateCheckActive())
                 ? DuplicateRelationStatus.IGNORED
                 : DuplicateRelationStatus.PENDING;
         if (existingRelation.isEmpty()) {
-          var identifiedDuplicate = documentationUnitRepository.findById(dup.getId()).get();
-          var currentDocUnit = documentationUnitRepository.findById(documentationUnit.uuid()).get();
+          var identifiedDuplicate = documentationUnitRepository.findById(dup.getId());
+          var currentDocUnit = documentationUnitRepository.findById(documentationUnit.uuid());
 
-          DocumentationUnitDTO docUnit1;
-          DocumentationUnitDTO docUnit2;
-          // duplicateRelationId determines the order of the two docUnits
-          if (identifiedDuplicate.getId().equals(duplicateRelationId.getDocumentationUnitId1())) {
-            docUnit1 = identifiedDuplicate;
-            docUnit2 = currentDocUnit;
-          } else {
-            docUnit1 = currentDocUnit;
-            docUnit2 = identifiedDuplicate;
+          if (identifiedDuplicate.isEmpty() || currentDocUnit.isEmpty()) {
+            return;
           }
 
-          var newRelation =
-              DuplicateRelationDTO.builder()
-                  .status(status)
-                  .documentationUnit1(docUnit1)
-                  .documentationUnit2(docUnit2)
-                  .id(duplicateRelationId)
-                  .build();
-          relationRepository.save(newRelation);
+          duplicateRelationService.create(currentDocUnit.get(), identifiedDuplicate.get(), status);
+
         } else if (Boolean.FALSE.equals(
             dup.getIsJdvDuplicateCheckActive()
                 && DuplicateRelationStatus.PENDING.equals(existingRelation.get().getStatus()))) {
-          existingRelation.get().setStatus(status);
-          relationRepository.save(existingRelation.get());
+          duplicateRelationService.setStatus(existingRelation.get(), status);
         }
       }
 
-      var existingDuplicates = relationRepository.findAllByDocUnitId(documentationUnit.uuid());
+      var existingDuplicates =
+          duplicateRelationService.findAllByDocUnitId(documentationUnit.uuid());
       for (var existingDuplicate : existingDuplicates) {
         var isDuplicate =
             duplicates.stream()
@@ -139,14 +128,11 @@ public class DuplicateCheckService {
                             documentationUnit.uuid(), dup.getId()))
                 .anyMatch(dup -> dup.equals(existingDuplicate.getId()));
         if (!isDuplicate) {
-          relationRepository.delete(existingDuplicate);
+          duplicateRelationService.delete(existingDuplicate);
         }
       }
-
-      return duplicates;
     } catch (DocumentationUnitNotExistsException e) {
-      log.error(e.getMessage());
-      return List.of();
+      log.error(e.getMessage(), e);
     }
   }
 }

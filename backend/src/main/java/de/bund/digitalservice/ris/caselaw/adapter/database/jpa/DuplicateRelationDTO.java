@@ -30,9 +30,6 @@ import lombok.Setter;
 @Table(schema = "incremental_migration", name = "duplicate_relation")
 public class DuplicateRelationDTO {
 
-  // TODO: Should we keep the composite key? Would it be easier with ManyToOne only? How would you
-  // set the ids though?
-
   @EmbeddedId private DuplicateRelationId id;
 
   @Column(name = "status")
@@ -40,7 +37,6 @@ public class DuplicateRelationDTO {
   private DuplicateRelationStatus status;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  // TODO: Verify MapsId is what we want/need
   @MapsId("documentationUnitId1")
   @JoinColumn(name = "documentation_unit_id1")
   private DocumentationUnitDTO documentationUnit1;

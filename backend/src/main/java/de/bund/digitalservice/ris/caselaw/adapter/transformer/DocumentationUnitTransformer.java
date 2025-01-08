@@ -30,6 +30,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
@@ -738,12 +739,21 @@ public class DocumentationUnitTransformer {
             documentationUnitDTO.getOtherLongText(),
             documentationUnitDTO.getDissentingOpinion());
 
-    // Todo: Filter for unpublished from other doc office
     Set<DuplicateRelation> duplicateRelations =
         Stream.concat(
-                documentationUnitDTO.getDuplicateRelations1().stream(),
-                documentationUnitDTO.getDuplicateRelations2().stream())
-            .map(DuplicateRelationTransformer::transformToDomain)
+                documentationUnitDTO.getDuplicateRelations1().stream()
+                    .filter(
+                        relation ->
+                            isPublishedDuplicateOrSameDocOffice(
+                                documentationUnitDTO, relation.getDocumentationUnit2())),
+                documentationUnitDTO.getDuplicateRelations2().stream()
+                    .filter(
+                        relation ->
+                            isPublishedDuplicateOrSameDocOffice(
+                                documentationUnitDTO, relation.getDocumentationUnit1())))
+            .map(
+                relation ->
+                    DuplicateRelationTransformer.transformToDomain(relation, documentationUnitDTO))
             .collect(Collectors.toSet());
 
     ManagementData managementData =
@@ -773,6 +783,12 @@ public class DocumentationUnitTransformer {
     addLiteratureReferencesToDomain(documentationUnitDTO, builder);
 
     return builder.build();
+  }
+
+  private static Boolean isPublishedDuplicateOrSameDocOffice(
+      DocumentationUnitDTO original, DocumentationUnitDTO duplicate) {
+    return original.getDocumentationOffice().equals(duplicate.getDocumentationOffice())
+        || duplicate.getStatus().getPublicationStatus().equals(PublicationStatus.PUBLISHED);
   }
 
   private static void addReferencesToDomain(
