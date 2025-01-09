@@ -99,6 +99,8 @@ test.describe("Literature references", () => {
           fileNumber,
           "31.12.2019",
         )
+        // wait for panel to open
+        await expect(page).toHaveURL(/showAttachmentPanel=true/)
         await page.getByLabel("Treffer übernehmen").click()
         // check that both fields display error message
         await expect(
@@ -111,6 +113,8 @@ test.describe("Literature references", () => {
         await expect(
           page.locator("text=Pflichtfeld nicht befüllt"),
         ).toHaveCount(0)
+        await page.getByLabel("Seitenpanel schließen").click()
+        await expect(page.getByLabel("Seitenpanel schließen")).toBeHidden()
       })
 
       await test.step("Save literature reference, verify that it is shown in the list", async () => {
