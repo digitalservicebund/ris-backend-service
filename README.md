@@ -139,6 +139,8 @@ WIP: Run docker image in [migration_image.md](migration_image.md)
 
 ## Development
 
+Run the whole stack including migration (initialization) inside docker:
+
 ```bash
 ./run.sh dev
 ```
@@ -152,21 +154,23 @@ mode:
 ./run.sh dev --detached
 ```
 
-To run a service separately:
+To run the frontend stack only (without backend and initialization) run:
 
 ```bash
 ./run.sh dev -n
 ./run.sh dev --no-backend
 ```
 
-The application is available at <http://127.0.0.1>.
+When choosing the no-backend variant, checkout the [backend manual](./backend/README.md) on how to run the backend stand-alone without docker. The easiest way would be:
 
-This will start the
-backend [utilizing Spring Boot developer tools](https://docs.spring.io/spring-boot/docs/current/reference/html/using.html#using.devtools.restart)
-so changes in the Java sources will be reflected without manually restarting. Similarly, the
-frontend is served
-from [Vite](https://vitejs.dev)
-with [HMR](https://vitejs.dev/guide/features.html#hot-module-replacement).
+```bash
+cd backend
+SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
+```
+
+Overall docker compose spins up a reverse proxy (traefik) which listens on port 80. Therefore the application is available at <http://127.0.0.1>. If you get a `bad gateway` error make sure your firewall is not messing with you. On Ubuntu `sudo ufw disable` might do the trick. You may setup a certain firewall rule. Overall your milage may vary.
+
+This (what?) will start the backend [utilizing Spring Boot developer tools](https://docs.spring.io/spring-boot/docs/current/reference/html/using.html#using.devtools.restart) so changes in the Java sources will be reflected without manually restarting. Similarly, the frontend is served from [Vite](https://vitejs.dev) with [HMR](https://vitejs.dev/guide/features.html#hot-module-replacement).
 
 > **Note**
 >
