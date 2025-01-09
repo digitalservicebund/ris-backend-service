@@ -158,8 +158,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.2")
 
-    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.2.0")
-
+    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.4")
     // CVE-2024-50379
     implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.34")
     // CVE-2022-3171

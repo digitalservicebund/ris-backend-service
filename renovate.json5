@@ -68,7 +68,7 @@
         "major"
       ],
       "labels": [
-        "major update"
+        "no-automerge"
       ]
     },
     {
@@ -94,6 +94,13 @@
         "io.spring.dependency-management"
       ],
       "allowedVersions": "1.1.6"
+    },
+    {
+      // due to blocking spring framework issue
+      "matchPackageNames": [
+        "org.springframework.cloud:spring-cloud-starter-kubernetes-client-config"
+      ],
+      "allowedVersions": "3.1.4"
     }
   ]
 }
