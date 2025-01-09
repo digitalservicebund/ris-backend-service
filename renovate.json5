@@ -68,7 +68,7 @@
         "major"
       ],
       "labels": [
-        "manual-update-required"
+        "no-automerge"
       ]
     },
     {
@@ -82,15 +82,25 @@
       "automerge": true,
     },
     {
-      "groupName": "spring-framework-update",
-      "packageNames": [
-        "org.springframework:spring-framework",
+      // due to blocking spring framework issue
+      "matchPackageNames": [
+        "org.springframework:spring-framework"
+      ],
+      "allowedVersions": "3.3.5"
+    },
+    {
+      // due to blocking spring framework issue
+      "matchPackageNames": [
         "io.spring.dependency-management"
       ],
-      "automerge": false,
-      "labels": [
-        "manual-update-required"
-      ]
+      "allowedVersions": "1.1.6"
+    },
+    {
+      // due to blocking spring framework issue
+      "matchPackageNames": [
+        "org.springframework.cloud:spring-cloud-starter-kubernetes-client-config"
+      ],
+      "allowedVersions": "3.1.4"
     }
   ]
 }
