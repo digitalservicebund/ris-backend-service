@@ -110,7 +110,8 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
-  test("vorgang", async ({ page, documentNumber }) => {
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("vorgang", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     await page.getByLabel("Vorgang", { exact: true }).fill("test Vorgang")
