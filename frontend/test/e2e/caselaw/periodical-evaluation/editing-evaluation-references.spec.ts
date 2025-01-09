@@ -218,6 +218,11 @@ test.describe(
       const fileNumber = prefilledDocumentUnit.coreData.fileNumbers?.[0] ?? ""
       const suffix = edition.suffix || ""
 
+      await test.step("should not open preview if more then one search result", async () => {
+        await page.getByText("Suchen").click()
+        await expect(page.getByLabel("Seitenpanel schließen")).toBeHidden()
+      })
+
       await test.step("should open preview if one search result", async () => {
         await searchForDocUnitWithFileNumberAndDecisionDate(
           page,

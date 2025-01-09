@@ -323,7 +323,7 @@ watch(searchResultsCurrentPage, () => {
 /** Opens up the side panel, if only on search result found
  */
 watch(searchResults, async () => {
-  if (searchResults.value?.length) {
+  if (searchResults.value?.length == 1) {
     await openSidePanel(searchResults.value[0].decision.documentNumber)
   }
 })
