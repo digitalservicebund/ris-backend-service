@@ -80,6 +80,20 @@
         "digest"
       ],
       "automerge": true,
+    },
+    {
+      // due to blocking spring framework issue
+      "matchPackageNames": [
+        "org.springframework:spring-framework"
+      ],
+      "allowedVersions": "3.3.5"
+    },
+    {
+      // due to blocking spring framework issue
+      "matchPackageNames": [
+        "io.spring.dependency-management"
+      ],
+      "allowedVersions": "1.1.6"
     }
   ]
 }
