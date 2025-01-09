@@ -68,7 +68,7 @@
         "major"
       ],
       "labels": [
-        "major update"
+        "manual-update-required"
       ]
     },
     {
@@ -80,6 +80,17 @@
         "digest"
       ],
       "automerge": true,
+    },
+    {
+      "groupName": "spring-framework-update",
+      "packageNames": [
+        "org.springframework:spring-framework",
+        "io.spring.dependency-management"
+      ],
+      "automerge": false,
+      "labels": [
+        "manual-update-required"
+      ]
     }
   ]
 }
