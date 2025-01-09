@@ -109,9 +109,11 @@ public class DuplicateCheckService {
 
           duplicateRelationService.create(currentDocUnit.get(), identifiedDuplicate.get(), status);
 
-        } else if (dup.getIsJdvDuplicateCheckActive() != null && Boolean.FALSE.equals(
-            dup.getIsJdvDuplicateCheckActive()
-                && DuplicateRelationStatus.PENDING.equals(existingRelation.get().getStatus()))) {
+        } else if (dup.getIsJdvDuplicateCheckActive() != null
+            && Boolean.FALSE.equals(
+                dup.getIsJdvDuplicateCheckActive()
+                    && DuplicateRelationStatus.PENDING.equals(
+                        existingRelation.get().getStatus()))) {
           duplicateRelationService.setStatus(existingRelation.get(), status);
         }
       }
