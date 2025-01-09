@@ -48,8 +48,14 @@ public class DuplicateCheckService {
         allFileNumbers.addAll(deviatingFileNumbers.stream().map(String::toUpperCase).toList());
       }
 
-      if (allFileNumbers.isEmpty()) {
-        // TODO: Should we still check with only ECLI?!
+      var ecli = documentationUnit.coreData().ecli();
+      var deviatingEclis = documentationUnit.coreData().deviatingEclis();
+      List<String> allEclis = new ArrayList<>();
+      if (ecli != null) allEclis.add(ecli.toUpperCase());
+      if (deviatingEclis != null)
+        allEclis.addAll(deviatingEclis.stream().map(String::toUpperCase).toList());
+
+      if (allFileNumbers.isEmpty() && allEclis.isEmpty()) {
         return;
       }
 
@@ -67,13 +73,6 @@ public class DuplicateCheckService {
       var deviatingCourts = documentationUnit.coreData().deviatingCourts();
       if (deviatingCourts != null)
         allDeviatingCourts.addAll(deviatingCourts.stream().map(String::toUpperCase).toList());
-
-      var ecli = documentationUnit.coreData().ecli();
-      var deviatingEclis = documentationUnit.coreData().deviatingEclis();
-      List<String> allEclis = new ArrayList<>();
-      if (ecli != null) allEclis.add(ecli.toUpperCase());
-      if (deviatingEclis != null)
-        allEclis.addAll(deviatingEclis.stream().map(String::toUpperCase).toList());
 
       List<UUID> allDocTypeIds = new ArrayList<>();
       var documentationType = documentationUnit.coreData().documentType();
