@@ -26,7 +26,9 @@ import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 import FeatureToggleService from "@/services/featureToggleService"
 import { ResponseError } from "@/services/httpClient"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useEditionStore } from "@/stores/editionStore"
+import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import StringsUtil from "@/utils/stringsUtil"
 
 const props = defineProps<{
@@ -42,6 +44,8 @@ const emit = defineEmits<{
 }>()
 
 const containerRef = ref<HTMLElement | null>(null)
+const documentUnitStore = useDocumentUnitStore()
+const extraContentSidePanelStore = useExtraContentSidePanelStore()
 
 const store = useEditionStore()
 const reference = ref<Reference>(new Reference({ ...props.modelValue }))
@@ -315,6 +319,34 @@ watch(
 watch(searchResultsCurrentPage, () => {
   pageNumber.value = 0
 })
+
+/** Opens up the side panel, if only on search result found
+ */
+watch(searchResults, async () => {
+  if (searchResults.value?.length == 1) {
+    await openSidePanel(searchResults.value[0].decision.documentNumber)
+  }
+})
+
+async function openSidePanel(documentUnitNumber?: string) {
+  if (documentUnitNumber) {
+    await documentUnitStore.loadDocumentUnit(documentUnitNumber)
+    extraContentSidePanelStore.togglePanel(true)
+
+    const container = document.getElementById("preview-container")
+
+    setTimeout(() => {
+      if (!container) return
+      const target = document.getElementById("previewGuidingPrinciple")
+      const scrollPosition = target ? target.offsetTop - container.offsetTop : 0
+
+      container.scrollTo({
+        top: scrollPosition,
+        behavior: "smooth",
+      })
+    })
+  }
+}
 
 onMounted(async () => {
   featureToggle.value = (

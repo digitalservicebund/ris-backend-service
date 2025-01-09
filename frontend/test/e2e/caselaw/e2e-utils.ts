@@ -671,3 +671,15 @@ export async function searchForDocUnitWithFileNumberAndDecisionDate(
 
   await page.getByText("Suchen").click()
 }
+
+export async function closeSidePanel(page: Page) {
+  await page.waitForResponse(
+    (response) =>
+      response.url().includes("/api/v1/caselaw/legalperiodicaledition") &&
+      response.status() === 200,
+    { timeout: 5000 },
+  )
+
+  await page.getByLabel("Seitenpanel schließen").click()
+  await expect(page.getByLabel("Seitenpanel schließen")).toBeHidden()
+}

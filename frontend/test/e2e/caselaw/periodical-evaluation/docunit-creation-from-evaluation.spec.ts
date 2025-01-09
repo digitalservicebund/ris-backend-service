@@ -129,7 +129,7 @@ test.describe(
           // AG Aachen is a BGH court
           await fillInput(page, "Gericht", "AG Aachen")
           await page.getByText("AG Aachen").click()
-          await page.getByText("Suchen").click()
+          await page.getByLabel("Nach Entscheidung suchen").click()
           await expect(
             page.getByLabel("Zuständige Dokumentationsstelle"),
           ).toHaveValue("BGH")

@@ -49,6 +49,7 @@ export type SearchResults<Type extends RelatedDocumentation> = {
     <FlexContainer
       v-else-if="searchResults"
       class="p-24"
+      data-testid="search-results"
       flex-direction="flex-col"
     >
       <p class="ds-label-01-bold">Passende Suchergebnisse:</p>
