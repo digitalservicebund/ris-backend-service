@@ -80,7 +80,6 @@ public class DatabaseDocumentNumberRecyclingService implements DocumentNumberRec
       repository.save(deleted);
 
     } catch (Exception e) {
-      log.info("Won´t reuse the document number", e);
       throw e;
     }
   }
