@@ -1,7 +1,6 @@
 import { expect, Page } from "@playwright/test"
 import dayjs from "dayjs"
 import {
-  closeSidePanel,
   fillInput,
   navigateToPeriodicalEvaluation,
   navigateToPeriodicalReferences,
@@ -107,7 +106,7 @@ test.describe(
             page.locator("[aria-label='Listen Eintrag']"),
           ).toHaveCount(2)
 
-          await closeSidePanel(page)
+          await expect(page).toHaveURL(/showAttachmentPanel=false/)
         })
 
         await test.step("A docunit can be added to an edition multiple times", async () => {
@@ -152,7 +151,7 @@ test.describe(
             page.locator("[aria-label='Listen Eintrag']"),
           ).toHaveCount(3)
 
-          await closeSidePanel(page)
+          await expect(page).toHaveURL(/showAttachmentPanel=false/)
         })
 
         await test.step("Other docUnits can be added to an edition", async () => {

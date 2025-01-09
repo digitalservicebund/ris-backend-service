@@ -1,6 +1,5 @@
 import { expect } from "@playwright/test"
 import {
-  closeSidePanel,
   fillInput,
   navigateToPeriodicalReferences,
   navigateToPreview,
@@ -177,12 +176,13 @@ test.describe("Literature references", () => {
           fileNumber,
           "31.12.2019",
         )
+        await expect(page).toHaveURL(/showAttachmentPanel=true/)
         await page.getByLabel("Treffer übernehmen").click()
         await expect(
           page.getByText(`MMG 2024, 300${editionWithReferences.suffix} (ST)`),
         ).toBeVisible()
 
-        await closeSidePanel(page)
+        await expect(page).toHaveURL(/showAttachmentPanel=false/)
       })
 
       await test.step("Add literature reference to existing references", async () => {
@@ -212,7 +212,7 @@ test.describe("Literature references", () => {
             `MMG 2024, 301-305${editionWithReferences.suffix}, Bilen, Ulviye, (Ean)`,
           ),
         ).toBeVisible()
-        await closeSidePanel(page)
+        await expect(page).toHaveURL(/showAttachmentPanel=false/)
       })
 
       await test.step("Check correct order in edition", async () => {
