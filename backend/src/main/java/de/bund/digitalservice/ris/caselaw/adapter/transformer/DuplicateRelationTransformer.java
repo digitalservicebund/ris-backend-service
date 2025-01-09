@@ -13,7 +13,9 @@ public class DuplicateRelationTransformer {
   // transformToDTO not needed as data is never written by client
 
   /**
-   * Current is the docUnit that we are currently requesting -> the other doc unit is its duplicate.
+   * @param duplicateRelationDTO {@link DuplicateRelationDTO} of the duplicate
+   * @param current {@link DocumentationUnitDTO} of the documentation unit that is currently
+   *     requested
    */
   public static DuplicateRelation transformToDomain(
       DuplicateRelationDTO duplicateRelationDTO, DocumentationUnitDTO current) {
