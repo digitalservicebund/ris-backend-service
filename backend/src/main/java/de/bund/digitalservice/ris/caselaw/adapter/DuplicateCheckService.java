@@ -2,7 +2,9 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDuplicateCheckRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitIdDuplicateCheckDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationDTO;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -38,103 +40,174 @@ public class DuplicateCheckService {
     try {
       var documentationUnit = documentationUnitService.getByDocumentNumber(docNumber);
 
-      var fileNumbers = documentationUnit.coreData().fileNumbers();
-      var deviatingFileNumbers = documentationUnit.coreData().deviatingFileNumbers();
-      List<String> allFileNumbers = new ArrayList<>();
-      if (fileNumbers != null) {
-        allFileNumbers.addAll(fileNumbers.stream().map(String::toUpperCase).toList());
-      }
-      if (deviatingFileNumbers != null) {
-        allFileNumbers.addAll(deviatingFileNumbers.stream().map(String::toUpperCase).toList());
-      }
-
-      var ecli = documentationUnit.coreData().ecli();
-      var deviatingEclis = documentationUnit.coreData().deviatingEclis();
-      List<String> allEclis = new ArrayList<>();
-      if (ecli != null) allEclis.add(ecli.toUpperCase());
-      if (deviatingEclis != null)
-        allEclis.addAll(deviatingEclis.stream().map(String::toUpperCase).toList());
+      var allFileNumbers = collectFileNumbers(documentationUnit);
+      var allEclis = collectEclis(documentationUnit);
 
       // A duplicate depends on filenumber/ecli
       if (allFileNumbers.isEmpty() && allEclis.isEmpty()) {
         return;
       }
 
-      var decisionDate = documentationUnit.coreData().decisionDate();
-      var deviatingDecisionDates = documentationUnit.coreData().deviatingDecisionDates();
-      List<LocalDate> allDates = new ArrayList<>();
-      if (decisionDate != null) allDates.add(decisionDate);
-      if (!deviatingDecisionDates.isEmpty()) allDates.addAll(deviatingDecisionDates);
-
-      List<UUID> allCourtIds = new ArrayList<>();
-      var court = documentationUnit.coreData().court();
-      if (court != null) allCourtIds.add(court.id());
-
-      List<String> allDeviatingCourts = new ArrayList<>();
-      var deviatingCourts = documentationUnit.coreData().deviatingCourts();
-      if (deviatingCourts != null)
-        allDeviatingCourts.addAll(deviatingCourts.stream().map(String::toUpperCase).toList());
-
-      List<UUID> allDocTypeIds = new ArrayList<>();
-      var documentationType = documentationUnit.coreData().documentType();
-      if (documentationType != null) allDocTypeIds.add(documentationType.uuid());
+      var allDates = collectDecisionDates(documentationUnit);
+      var allCourtIds = collectCourtIds(documentationUnit);
+      var allDeviatingCourts = collectDeviatingCourts(documentationUnit);
+      var allDocTypeIds = collectDocumentTypeIds(documentationUnit);
 
       var duplicates =
-          repository
-              .findDuplicates(
-                  allFileNumbers,
-                  allDates,
-                  allCourtIds,
-                  allDeviatingCourts,
-                  allEclis,
-                  allDocTypeIds)
-              .stream()
-              // Should not contain itself
-              .filter(dup -> !documentationUnit.uuid().equals(dup.getId()))
-              .toList();
+          findPotentialDuplicates(
+              documentationUnit,
+              allFileNumbers,
+              allDates,
+              allCourtIds,
+              allDeviatingCourts,
+              allEclis,
+              allDocTypeIds);
 
-      for (var dup : duplicates) {
-        Optional<DuplicateRelationDTO> existingRelation =
-            duplicateRelationService.findByDocUnitIds(documentationUnit.uuid(), dup.getId());
-        var status =
-            Boolean.FALSE.equals(dup.getIsJdvDuplicateCheckActive())
-                ? DuplicateRelationStatus.IGNORED
-                : DuplicateRelationStatus.PENDING;
-        if (existingRelation.isEmpty()) {
-          var identifiedDuplicate = documentationUnitRepository.findById(dup.getId());
-          var currentDocUnit = documentationUnitRepository.findById(documentationUnit.uuid());
-
-          if (identifiedDuplicate.isEmpty() || currentDocUnit.isEmpty()) {
-            return;
-          }
-
-          duplicateRelationService.create(currentDocUnit.get(), identifiedDuplicate.get(), status);
-
-        } else if (dup.getIsJdvDuplicateCheckActive() != null
-            && Boolean.FALSE.equals(
-                dup.getIsJdvDuplicateCheckActive()
-                    && DuplicateRelationStatus.PENDING.equals(
-                        existingRelation.get().getStatus()))) {
-          duplicateRelationService.setStatus(existingRelation.get(), status);
-        }
-      }
-
-      var existingDuplicates =
-          duplicateRelationService.findAllByDocUnitId(documentationUnit.uuid());
-      for (var existingDuplicate : existingDuplicates) {
-        var isDuplicate =
-            duplicates.stream()
-                .map(
-                    dup ->
-                        new DuplicateRelationDTO.DuplicateRelationId(
-                            documentationUnit.uuid(), dup.getId()))
-                .anyMatch(dup -> dup.equals(existingDuplicate.getId()));
-        if (!isDuplicate) {
-          duplicateRelationService.delete(existingDuplicate);
-        }
-      }
+      processDuplicates(documentationUnit, duplicates);
+      removeObsoleteDuplicates(documentationUnit, duplicates);
     } catch (DocumentationUnitNotExistsException e) {
       log.error(e.getMessage(), e);
+    }
+  }
+
+  private List<String> collectFileNumbers(DocumentationUnit documentationUnit) {
+    var fileNumbers = documentationUnit.coreData().fileNumbers();
+    var deviatingFileNumbers = documentationUnit.coreData().deviatingFileNumbers();
+    List<String> allFileNumbers = new ArrayList<>();
+    if (fileNumbers != null) {
+      allFileNumbers.addAll(fileNumbers.stream().map(String::toUpperCase).toList());
+    }
+    if (deviatingFileNumbers != null) {
+      allFileNumbers.addAll(deviatingFileNumbers.stream().map(String::toUpperCase).toList());
+    }
+    return allFileNumbers;
+  }
+
+  private List<String> collectEclis(DocumentationUnit documentationUnit) {
+    var ecli = documentationUnit.coreData().ecli();
+    var deviatingEclis = documentationUnit.coreData().deviatingEclis();
+    List<String> allEclis = new ArrayList<>();
+    if (ecli != null) {
+      allEclis.add(ecli.toUpperCase());
+    }
+    if (deviatingEclis != null) {
+      allEclis.addAll(deviatingEclis.stream().map(String::toUpperCase).toList());
+    }
+    return allEclis;
+  }
+
+  private List<LocalDate> collectDecisionDates(DocumentationUnit documentationUnit) {
+    var decisionDate = documentationUnit.coreData().decisionDate();
+    var deviatingDecisionDates = documentationUnit.coreData().deviatingDecisionDates();
+    List<LocalDate> allDates = new ArrayList<>();
+    if (decisionDate != null) {
+      allDates.add(decisionDate);
+    }
+    if (!deviatingDecisionDates.isEmpty()) {
+      allDates.addAll(deviatingDecisionDates);
+    }
+    return allDates;
+  }
+
+  private List<UUID> collectCourtIds(DocumentationUnit documentationUnit) {
+    List<UUID> allCourtIds = new ArrayList<>();
+    var court = documentationUnit.coreData().court();
+    if (court != null) {
+      allCourtIds.add(court.id());
+    }
+    return allCourtIds;
+  }
+
+  private List<String> collectDeviatingCourts(DocumentationUnit documentationUnit) {
+    List<String> allDeviatingCourts = new ArrayList<>();
+    var deviatingCourts = documentationUnit.coreData().deviatingCourts();
+    if (deviatingCourts != null) {
+      allDeviatingCourts.addAll(deviatingCourts.stream().map(String::toUpperCase).toList());
+    }
+    return allDeviatingCourts;
+  }
+
+  private List<UUID> collectDocumentTypeIds(DocumentationUnit documentationUnit) {
+    List<UUID> allDocTypeIds = new ArrayList<>();
+    var documentationType = documentationUnit.coreData().documentType();
+    if (documentationType != null) {
+      allDocTypeIds.add(documentationType.uuid());
+    }
+    return allDocTypeIds;
+  }
+
+  private List<DocumentationUnitIdDuplicateCheckDTO> findPotentialDuplicates(
+      DocumentationUnit documentationUnit,
+      List<String> allFileNumbers,
+      List<LocalDate> allDates,
+      List<UUID> allCourtIds,
+      List<String> allDeviatingCourts,
+      List<String> allEclis,
+      List<UUID> allDocTypeIds) {
+    return repository
+        .findDuplicates(
+            allFileNumbers, allDates, allCourtIds, allDeviatingCourts, allEclis, allDocTypeIds)
+        .stream()
+        // Should not contain itself
+        .filter(dup -> !documentationUnit.uuid().equals(dup.getId()))
+        .toList();
+  }
+
+  private void processDuplicates(
+      DocumentationUnit documentationUnit, List<DocumentationUnitIdDuplicateCheckDTO> duplicates) {
+    for (var dup : duplicates) {
+      Optional<DuplicateRelationDTO> existingRelation =
+          duplicateRelationService.findByDocUnitIds(documentationUnit.uuid(), dup.getId());
+
+      var status =
+          Boolean.FALSE.equals(dup.getIsJdvDuplicateCheckActive())
+              ? DuplicateRelationStatus.IGNORED
+              : DuplicateRelationStatus.PENDING;
+
+      if (existingRelation.isEmpty()) {
+        createDuplicateRelation(documentationUnit, dup, status);
+      } else if (shouldUpdateRelationStatus(dup, existingRelation)) {
+        duplicateRelationService.setStatus(existingRelation.get(), status);
+      }
+    }
+  }
+
+  private void createDuplicateRelation(
+      DocumentationUnit documentationUnit,
+      DocumentationUnitIdDuplicateCheckDTO dup,
+      DuplicateRelationStatus status) {
+    var identifiedDuplicate = documentationUnitRepository.findById(dup.getId());
+    var currentDocUnit = documentationUnitRepository.findById(documentationUnit.uuid());
+
+    if (identifiedDuplicate.isPresent() && currentDocUnit.isPresent()) {
+      duplicateRelationService.create(currentDocUnit.get(), identifiedDuplicate.get(), status);
+    }
+  }
+
+  private boolean shouldUpdateRelationStatus(
+      DocumentationUnitIdDuplicateCheckDTO dup, Optional<DuplicateRelationDTO> existingRelation) {
+    return dup.getIsJdvDuplicateCheckActive() != null
+        && Boolean.FALSE.equals(
+            dup.getIsJdvDuplicateCheckActive()
+                && existingRelation.isPresent()
+                && DuplicateRelationStatus.PENDING.equals(existingRelation.get().getStatus()));
+  }
+
+  private void removeObsoleteDuplicates(
+      DocumentationUnit documentationUnit, List<DocumentationUnitIdDuplicateCheckDTO> duplicates) {
+    var existingDuplicates = duplicateRelationService.findAllByDocUnitId(documentationUnit.uuid());
+    for (var existingDuplicate : existingDuplicates) {
+      var isDuplicate =
+          duplicates.stream()
+              .map(
+                  dup ->
+                      new DuplicateRelationDTO.DuplicateRelationId(
+                          documentationUnit.uuid(), dup.getId()))
+              .anyMatch(dupId -> dupId.equals(existingDuplicate.getId()));
+
+      if (!isDuplicate) {
+        duplicateRelationService.delete(existingDuplicate);
+      }
     }
   }
 }
