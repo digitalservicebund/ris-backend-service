@@ -67,6 +67,7 @@ public class DocumentationUnitController {
   private final OAuthService oAuthService;
   private final DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
+  private final DuplicateCheckService duplicateCheckService;
 
   public DocumentationUnitController(
       DocumentationUnitService service,
@@ -77,7 +78,8 @@ public class DocumentationUnitController {
       LdmlExporterService ldmlExporterService,
       OAuthService oAuthService,
       DocumentationUnitDocxMetadataInitializationService
-          documentationUnitDocxMetadataInitializationService) {
+          documentationUnitDocxMetadataInitializationService,
+      DuplicateCheckService duplicateCheckService) {
     this.service = service;
     this.userService = userService;
     this.attachmentService = attachmentService;
@@ -87,6 +89,7 @@ public class DocumentationUnitController {
     this.oAuthService = oAuthService;
     this.documentationUnitDocxMetadataInitializationService =
         documentationUnitDocxMetadataInitializationService;
+    this.duplicateCheckService = duplicateCheckService;
   }
 
   /**
@@ -224,6 +227,7 @@ public class DocumentationUnitController {
     }
 
     try {
+      duplicateCheckService.checkDuplicates(documentNumber);
       var documentationUnit = service.getByDocumentNumber(documentNumber);
       return ResponseEntity.ok(
           documentationUnit.toBuilder()

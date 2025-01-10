@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatu
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.adapter.HandoverMailService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.LdmlExporterService;
@@ -158,6 +159,7 @@ class HandoverMailIntegrationTest {
   @MockBean private ProcedureService procedureService;
   @MockBean private LdmlExporterService ldmlExporterService;
   @MockBean private UserGroupService userGroupService;
+  @MockBean private DuplicateCheckService duplicateCheckService;
 
   @MockBean
   private DocumentationUnitDocxMetadataInitializationService

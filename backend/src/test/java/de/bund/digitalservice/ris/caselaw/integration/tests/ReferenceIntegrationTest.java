@@ -15,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.adapter.LdmlExporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDependentLiteratureCitationRepository;
@@ -122,6 +123,7 @@ class ReferenceIntegrationTest {
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private LdmlExporterService ldmlExporterService;
   @MockBean private HandoverService handoverService;
+  @MockBean private DuplicateCheckService duplicateCheckService;
 
   @MockBean
   private DocumentationUnitDocxMetadataInitializationService

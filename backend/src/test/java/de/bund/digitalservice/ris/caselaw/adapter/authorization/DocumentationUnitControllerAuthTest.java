@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.DocumentationUnitControllerTestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.LdmlExporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRepository;
@@ -73,6 +74,7 @@ class DocumentationUnitControllerAuthTest {
   @MockBean DatabaseDocumentationOfficeRepository officeRepository;
   @MockBean PatchMapperService patchMapperService;
   @MockBean private ProcedureService procedureService;
+  @MockBean private DuplicateCheckService duplicateCheckService;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private final String docOffice1Group = "/CC-RIS";

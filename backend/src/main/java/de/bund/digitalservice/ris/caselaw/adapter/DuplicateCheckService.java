@@ -7,7 +7,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelation
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
-import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,8 +64,9 @@ public class DuplicateCheckService {
 
       processDuplicates(documentationUnit, duplicates);
       removeObsoleteDuplicates(documentationUnit, duplicates);
-    } catch (DocumentationUnitNotExistsException e) {
-      log.error(e.getMessage(), e);
+    } catch (Exception e) {
+      var errorMessage = String.format("Could not check duplicates for doc unit %s", docNumber);
+      log.error(errorMessage, e);
     }
   }
 

@@ -97,6 +97,7 @@ class DocumentationUnitControllerTest {
   @MockBean private ProcedureService procedureService;
   @MockBean private OidcUser oidcUser;
   @MockBean private UserGroupService userGroupService;
+  @MockBean private DuplicateCheckService duplicateCheckService;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final String ISSUER_ADDRESS = "test-issuer@exporter.neuris";
