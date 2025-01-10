@@ -11,10 +11,12 @@ import TitleElement from "@/components/TitleElement.vue"
 import Reference from "@/domain/reference"
 import { ResponseError } from "@/services/httpClient"
 import { useEditionStore } from "@/stores/editionStore"
+import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 
 const route = useRoute()
 const store = useEditionStore()
 const responseError = ref<ResponseError | undefined>()
+const extraContentSidePanelStore = useExtraContentSidePanelStore()
 
 const loadEditionIntervalCounter = useInterval(10_000, {})
 
@@ -22,6 +24,7 @@ const references = computed({
   get: () => store.edition?.references ?? [],
   set: async (newValues) => {
     await saveReferences(newValues)
+    extraContentSidePanelStore.togglePanel(false)
   },
 })
 

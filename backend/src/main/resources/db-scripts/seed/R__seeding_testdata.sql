@@ -5,6 +5,38 @@ delete from
 where
   document_number LIKE 'YY%';
 
+-- Delete any test-related records in the documentation_unit table
+delete from
+    incremental_migration.documentation_unit
+where
+    current_procedure_id IN (
+        SELECT
+            id
+        from
+            incremental_migration.procedure
+        where
+            name LIKE 'test_%'
+    );
+
+-- Delete test-related records from documentation_unit_procedure
+delete from
+    incremental_migration.documentation_unit_procedure
+where
+    procedure_id IN (
+        SELECT
+            id
+        from
+            incremental_migration.procedure
+        where
+            name LIKE 'test_%'
+    );
+
+-- Delete test-related records from procedure table
+delete from
+    incremental_migration.procedure
+where
+    name LIKE 'test_%';
+
 -- Everytime the application starts, any test procedures that may have accumulated will be deleted
 delete from
   incremental_migration.documentation_unit_procedure

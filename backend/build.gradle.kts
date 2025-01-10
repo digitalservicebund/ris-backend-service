@@ -19,7 +19,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.51.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "11.1.0"
+    id("org.flywaydb.flyway") version "11.1.1"
     id("io.sentry.jvm.gradle") version "4.14.1"
 }
 
@@ -159,11 +159,10 @@ dependencies {
     implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.2")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.4")
-
     // CVE-2024-50379
     implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.34")
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:4.29.2")
+    implementation("com.google.protobuf:protobuf-java:4.29.3")
 
     implementation("org.postgresql:postgresql:42.7.4")
 
@@ -171,7 +170,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.29.43"))
+    implementation(platform("software.amazon.awssdk:bom:2.29.48"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -214,18 +213,18 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.13.0")
     implementation("org.jsoup:jsoup:1.18.3")
 
-    implementation("net.javacrumbs.shedlock:shedlock-spring:6.0.2")
-    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.0.2")
+    implementation("net.javacrumbs.shedlock:shedlock-spring:6.1.0")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.1.0")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.1.0"
+    val flywayCore = "org.flywaydb:flyway-core:11.1.1"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.1.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.1.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
     }
-    testImplementation("org.mockito:mockito-junit-jupiter:5.14.2")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.15.2")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.7.1")
