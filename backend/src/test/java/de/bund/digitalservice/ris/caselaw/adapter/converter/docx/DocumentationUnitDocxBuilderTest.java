@@ -74,6 +74,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class DocumentationUnitDocxBuilderTest {
+  public static final String HTML_ESCAPED_NON_BREAKING_SPACE = "&nbsp;";
+  public static final String HTML_ESCAPED_SOFT_HYPHEN = "&shy;";
 
   @Test
   void test_withoutConvertableElements() {
@@ -1343,41 +1345,63 @@ class DocumentationUnitDocxBuilderTest {
   public static Stream<Arguments> nodesThatShouldTurnIntoAHyphen() {
     return Stream.of(
         Arguments.of(
-            List.of(SOFT_HYPHEN + NON_BREAKING_SPACE), false, List.of("-" + NON_BREAKING_SPACE)),
+            List.of(SOFT_HYPHEN + NON_BREAKING_SPACE),
+            false,
+            List.of("-" + HTML_ESCAPED_NON_BREAKING_SPACE)),
         Arguments.of(
-            List.of(NON_BREAKING_SPACE + SOFT_HYPHEN), false, List.of(NON_BREAKING_SPACE + "-")),
+            List.of(NON_BREAKING_SPACE + SOFT_HYPHEN),
+            false,
+            List.of(HTML_ESCAPED_NON_BREAKING_SPACE + "-")),
         Arguments.of(
-            List.of(NON_BREAKING_SPACE, SOFT_HYPHEN), false, List.of(NON_BREAKING_SPACE, "-")),
+            List.of(NON_BREAKING_SPACE, SOFT_HYPHEN),
+            false,
+            List.of(HTML_ESCAPED_NON_BREAKING_SPACE, "-")),
         Arguments.of(
-            List.of(SOFT_HYPHEN, NON_BREAKING_SPACE), false, List.of("-", NON_BREAKING_SPACE)),
+            List.of(SOFT_HYPHEN, NON_BREAKING_SPACE),
+            false,
+            List.of("-", HTML_ESCAPED_NON_BREAKING_SPACE)),
         Arguments.of(
             List.of("131/16" + NON_BREAKING_SPACE + SOFT_HYPHEN),
             false,
-            List.of("131/16" + NON_BREAKING_SPACE + "-")),
+            List.of("131/16" + HTML_ESCAPED_NON_BREAKING_SPACE + "-")),
         Arguments.of(
             List.of("131/16", NON_BREAKING_SPACE, SOFT_HYPHEN),
             false,
-            List.of("131/16", NON_BREAKING_SPACE, "-")),
+            List.of("131/16", HTML_ESCAPED_NON_BREAKING_SPACE, "-")),
         Arguments.of(
             List.of(NON_BREAKING_SPACE, SOFT_HYPHEN + " ABC"),
             false,
-            List.of(NON_BREAKING_SPACE, "- ABC")),
+            List.of(HTML_ESCAPED_NON_BREAKING_SPACE, "- ABC")),
 
         // with whitespace: preserve
-        Arguments.of(List.of(SOFT_HYPHEN + " "), true, List.of("-" + NON_BREAKING_SPACE)),
-        Arguments.of(List.of(" " + SOFT_HYPHEN), true, List.of(NON_BREAKING_SPACE + "-")));
+        Arguments.of(
+            List.of(SOFT_HYPHEN + " "), true, List.of("-" + HTML_ESCAPED_NON_BREAKING_SPACE)),
+        Arguments.of(
+            List.of(" " + SOFT_HYPHEN), true, List.of(HTML_ESCAPED_NON_BREAKING_SPACE + "-")));
   }
 
   public static Stream<Arguments> nodesThatShouldNotTurnIntoHyphen() {
     return Stream.of(
-        Arguments.of(List.of(SOFT_HYPHEN), false, null), // only soft hyphen
-        Arguments.of(List.of(NON_BREAKING_SPACE), false, null), // only non-breaking space
+        Arguments.of(
+            List.of(SOFT_HYPHEN), false, List.of(HTML_ESCAPED_SOFT_HYPHEN)), // only soft hyphen
+        Arguments.of(
+            List.of(NON_BREAKING_SPACE),
+            false,
+            List.of(HTML_ESCAPED_NON_BREAKING_SPACE)), // only non-breaking space
         Arguments.of(
             List.of(NON_BREAKING_SPACE, " ", SOFT_HYPHEN),
             false,
-            null), // space text node in between
+            List.of(
+                HTML_ESCAPED_NON_BREAKING_SPACE,
+                " ",
+                HTML_ESCAPED_SOFT_HYPHEN)), // space text node in between
         Arguments.of(
-            List.of(NON_BREAKING_SPACE + " " + SOFT_HYPHEN), false, null)); // space char in between
+            List.of(NON_BREAKING_SPACE + " " + SOFT_HYPHEN),
+            false,
+            List.of(
+                HTML_ESCAPED_NON_BREAKING_SPACE
+                    + " "
+                    + HTML_ESCAPED_SOFT_HYPHEN))); // space char in between
   }
 
   /**

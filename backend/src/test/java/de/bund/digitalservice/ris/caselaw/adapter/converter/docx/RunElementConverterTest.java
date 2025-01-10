@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.converter.docx;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -8,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.domain.docx.DocxImagePart;
 import de.bund.digitalservice.ris.caselaw.domain.docx.InlineImageElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ParagraphElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.RunElement;
+import de.bund.digitalservice.ris.caselaw.domain.docx.RunTextElement;
 import jakarta.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,6 +24,7 @@ import org.docx4j.dml.picture.Pic;
 import org.docx4j.dml.wordprocessingDrawing.Inline;
 import org.docx4j.wml.Drawing;
 import org.docx4j.wml.R;
+import org.docx4j.wml.Text;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -78,6 +81,25 @@ class RunElementConverterTest {
     assertThat(runElement).isInstanceOf(InlineImageElement.class);
     InlineImageElement imageElement = (InlineImageElement) runElement;
     assertThat(imageElement.getContentType()).isEqualTo("image/png");
+  }
+
+  @Test
+  void testConvert_textWithHTMLEntities_shouldEscapeHTMLEntities() {
+    R run = new R();
+    Text textNode = new Text();
+    textNode.setValue("<Klammertest>");
+    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, textNode);
+    run.getContent().add(element);
+
+    ParagraphElement paragraphElement = new ParagraphElement();
+
+    DocxConverter converter = mock(DocxConverter.class);
+
+    RunElementConverter.convert(run, paragraphElement, converter, new ArrayList<>());
+
+    RunElement runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(RunTextElement.class, runElement.getClass());
+    assertEquals("&lt;Klammertest&gt;", runElement.toHtmlString());
   }
 
   @NotNull
