@@ -1336,6 +1336,7 @@ class DocumentationUnitTransformerTest {
                 .scheduledPublicationDateTime(null)
                 .lastPublicationDateTime(null)
                 .borderNumbers(Collections.emptyList())
+                .duplicateRelations(Collections.emptySet())
                 .build())
         .attachments(Collections.emptyList())
         .contentRelatedIndexing(

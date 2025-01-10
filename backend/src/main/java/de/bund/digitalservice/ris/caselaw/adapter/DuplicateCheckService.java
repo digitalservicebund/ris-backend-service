@@ -55,6 +55,7 @@ public class DuplicateCheckService {
       if (deviatingEclis != null)
         allEclis.addAll(deviatingEclis.stream().map(String::toUpperCase).toList());
 
+      // A duplicate depends on filenumber/ecli
       if (allFileNumbers.isEmpty() && allEclis.isEmpty()) {
         return;
       }

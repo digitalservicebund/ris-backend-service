@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitIdDuplicateCheckTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitIdDuplicateCheck;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckRepository;
 import java.time.LocalDate;
 import java.util.List;
@@ -21,23 +23,21 @@ public class PostgresDuplicateCheckRepositoryImpl implements DuplicateCheckRepos
 
   @Override
   @Transactional
-  public List<DocumentationUnitIdDuplicateCheckDTO> findDuplicates(
+  public List<DocumentationUnitIdDuplicateCheck> findDuplicates(
       List<String> allFileNumbers,
       List<LocalDate> allDates,
       List<UUID> allCourtIds,
       List<String> allDeviatingCourts,
       List<String> allEclis,
       List<UUID> allDocTypeIds) {
-    long startTime = System.currentTimeMillis();
-
     List<DocumentationUnitIdDuplicateCheckDTO> result =
         repository.findDuplicates(
             allFileNumbers, allDates, allCourtIds, allDeviatingCourts, allEclis, allDocTypeIds);
 
-    long endTime = System.currentTimeMillis();
-    long duration = endTime - startTime;
-    log.info("Query executed in: " + duration + " ms");
-
-    return result.stream().filter(Objects::nonNull).distinct().toList();
+    return result.stream()
+        .filter(Objects::nonNull)
+        .map(DocumentationUnitIdDuplicateCheckTransformer::transformToDomain)
+        .distinct()
+        .toList();
   }
 }

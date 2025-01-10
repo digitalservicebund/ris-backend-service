@@ -137,6 +137,7 @@ class ScheduledPublicationServiceTest {
                 .lastPublicationDateTime(lastPublicationDateTime)
                 .scheduledPublicationDateTime(scheduledPublicationDateTime)
                 .scheduledByEmail(randomName + "@example.local")
+                .duplicateRelations(Collections.emptySet())
                 .build())
         .build();
   }
