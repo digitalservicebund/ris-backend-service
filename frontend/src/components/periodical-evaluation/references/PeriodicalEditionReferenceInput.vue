@@ -15,6 +15,7 @@ import PopupModal from "@/components/PopupModal.vue"
 import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
+import { useScrollPreviewContainer } from "@/composables/useScrollPreviewContainer"
 import { useValidationStore } from "@/composables/useValidationStore"
 import DocumentUnit, {
   DocumentationUnitParameters,
@@ -26,9 +27,7 @@ import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 import FeatureToggleService from "@/services/featureToggleService"
 import { ResponseError } from "@/services/httpClient"
-import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useEditionStore } from "@/stores/editionStore"
-import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import StringsUtil from "@/utils/stringsUtil"
 
 const props = defineProps<{
@@ -44,8 +43,7 @@ const emit = defineEmits<{
 }>()
 
 const containerRef = ref<HTMLElement | null>(null)
-const documentUnitStore = useDocumentUnitStore()
-const extraContentSidePanelStore = useExtraContentSidePanelStore()
+const { openSidePanel } = useScrollPreviewContainer()
 
 const store = useEditionStore()
 const reference = ref<Reference>(new Reference({ ...props.modelValue }))
@@ -327,26 +325,6 @@ watch(searchResults, async () => {
     await openSidePanel(searchResults.value[0].decision.documentNumber)
   }
 })
-
-async function openSidePanel(documentUnitNumber?: string) {
-  if (documentUnitNumber) {
-    await documentUnitStore.loadDocumentUnit(documentUnitNumber)
-    extraContentSidePanelStore.togglePanel(true)
-
-    const container = document.getElementById("preview-container")
-
-    setTimeout(() => {
-      if (!container) return
-      const target = document.getElementById("previewGuidingPrinciple")
-      const scrollPosition = target ? target.offsetTop - container.offsetTop : 0
-
-      container.scrollTo({
-        top: scrollPosition,
-        behavior: "smooth",
-      })
-    })
-  }
-}
 
 onMounted(async () => {
   featureToggle.value = (

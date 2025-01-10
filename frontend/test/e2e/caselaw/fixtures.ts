@@ -25,6 +25,7 @@ type MyFixtures = {
   editionWithReferences: LegalPeriodicalEdition
   foreignDocumentationUnit: DocumentUnitListEntry
   prefilledDocumentUnitWithReferences: DocumentUnit
+  prefilledDocumentUnitWithLongTexts: DocumentUnit
 }
 
 export const caselawTest = test.extend<MyFixtures>({
@@ -212,6 +213,55 @@ export const caselawTest = test.extend<MyFixtures>({
     )
     if (!deleteResponse.ok()) {
       throw Error(`DocumentUnit with number ${prefilledDocumentUnit.documentNumber} couldn't be deleted:
+      ${deleteResponse.status()} ${deleteResponse.statusText()}`)
+    }
+  },
+
+  prefilledDocumentUnitWithLongTexts: async ({ request, context }, use) => {
+    const cookies = await context.cookies()
+    const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+    const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
+      headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+    })
+    const prefilledDocumentUnitWithLongTexts = await response.json()
+
+    const courtResponse = await request.get(`api/v1/caselaw/courts?q=AG+Aachen`)
+    const court = await courtResponse.json()
+
+    const documentTypeResponse = await request.get(
+      `api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`,
+    )
+    const documentType = await documentTypeResponse.json()
+
+    const updateResponse = await request.put(
+      `/api/v1/caselaw/documentunits/${prefilledDocumentUnitWithLongTexts.uuid}`,
+      {
+        data: {
+          ...prefilledDocumentUnitWithLongTexts,
+          coreData: {
+            ...prefilledDocumentUnitWithLongTexts.coreData,
+            court: court?.[0],
+            documentType: documentType?.[0],
+            fileNumbers: [generateString()],
+            decisionDate: "2019-12-31",
+            appraisalBody: "1. Senat, 2. Kammer",
+          },
+          longTexts: {
+            tenor: "testTenor",
+          },
+        },
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
+
+    await use(await updateResponse.json())
+
+    const deleteResponse = await request.delete(
+      `/api/v1/caselaw/documentunits/${prefilledDocumentUnitWithLongTexts.uuid}`,
+      { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
+    )
+    if (!deleteResponse.ok()) {
+      throw Error(`DocumentUnit with number ${prefilledDocumentUnitWithLongTexts.documentNumber} couldn't be deleted:
       ${deleteResponse.status()} ${deleteResponse.statusText()}`)
     }
   },

@@ -440,6 +440,27 @@ test.describe(
       ).toBeInViewport()
     })
 
+    test("should scroll to tenor, if no guiding principle present", async ({
+      page,
+      prefilledDocumentUnitWithLongTexts,
+      edition,
+    }) => {
+      await navigateToPeriodicalReferences(page, edition.id || "")
+
+      await searchForDocUnitWithFileNumberAndDecisionDate(
+        page,
+        prefilledDocumentUnitWithLongTexts.coreData.fileNumbers?.[0] || "",
+        "31.12.2019",
+      )
+      // wait for panel to open
+      await expect(page).toHaveURL(/showAttachmentPanel=true/)
+
+      await expect(page.getByText("Tenor", { exact: true })).toBeInViewport()
+      await expect(
+        page.getByText(prefilledDocumentUnitWithLongTexts.longTexts.tenor!),
+      ).toBeInViewport()
+    })
+
     test(
       "Page number resets when new search started",
       { tag: "@RISDEV-5434" },

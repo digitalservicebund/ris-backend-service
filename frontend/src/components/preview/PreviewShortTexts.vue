@@ -79,11 +79,10 @@ const otherHeadnote = computed(() =>
       />
     </PreviewContent>
   </PreviewRow>
-  <PreviewRow v-if="guidingPrinciple">
+  <PreviewRow v-if="guidingPrinciple" id="previewGuidingPrinciple">
     <PreviewCategory>{{ shortTextLabels.guidingPrinciple }}</PreviewCategory>
     <PreviewContent>
       <TextEditor
-        id="previewGuidingPrinciple"
         :aria-label="shortTextLabels.guidingPrinciple"
         field-size="max"
         preview
