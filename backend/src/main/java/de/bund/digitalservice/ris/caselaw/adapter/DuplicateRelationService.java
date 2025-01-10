@@ -1,10 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationRepository;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
 import java.util.List;
 import java.util.Optional;
@@ -18,10 +16,7 @@ public class DuplicateRelationService {
 
   private final DuplicateRelationRepository relationRepository;
 
-  public DuplicateRelationService(
-      DocumentationUnitService documentationUnitService,
-      DuplicateRelationRepository relationRepository,
-      DatabaseDocumentationUnitRepository documentationUnitRepository) {
+  public DuplicateRelationService(DuplicateRelationRepository relationRepository) {
     this.relationRepository = relationRepository;
   }
 

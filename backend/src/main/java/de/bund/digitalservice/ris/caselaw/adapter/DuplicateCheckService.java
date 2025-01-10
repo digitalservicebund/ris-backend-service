@@ -4,9 +4,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDuplicateCheckRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitIdDuplicateCheckDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
+import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,26 +19,25 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class DuplicateCheckService {
-  private final DocumentationUnitService documentationUnitService;
-
   private final DatabaseDuplicateCheckRepository repository;
   private final DuplicateRelationService duplicateRelationService;
   private final DatabaseDocumentationUnitRepository documentationUnitRepository;
 
   public DuplicateCheckService(
       DatabaseDuplicateCheckRepository duplicateCheckRepository,
-      DocumentationUnitService documentationUnitService,
       DuplicateRelationService duplicateRelationService,
       DatabaseDocumentationUnitRepository documentationUnitRepository) {
     this.repository = duplicateCheckRepository;
-    this.documentationUnitService = documentationUnitService;
     this.duplicateRelationService = duplicateRelationService;
     this.documentationUnitRepository = documentationUnitRepository;
   }
 
+  @Transactional
   public void checkDuplicates(String docNumber) {
     try {
-      var documentationUnit = documentationUnitService.getByDocumentNumber(docNumber);
+      // TODO: Should we work on DTO instead of domain object?
+      var docUnitDto = documentationUnitRepository.findByDocumentNumber(docNumber).orElseThrow();
+      var documentationUnit = DocumentationUnitTransformer.transformToDomain(docUnitDto);
 
       var allFileNumbers = collectFileNumbers(documentationUnit);
       var allEclis = collectEclis(documentationUnit);

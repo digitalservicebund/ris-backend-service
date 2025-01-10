@@ -3,6 +3,8 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import static de.bund.digitalservice.ris.caselaw.domain.StringUtils.normalizeSpace;
 
 import com.gravity9.jsonpatch.JsonPatch;
+import com.gravity9.jsonpatch.JsonPatchOperation;
+import de.bund.digitalservice.ris.caselaw.adapter.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -38,6 +40,7 @@ public class DocumentationUnitService {
   private final PatchMapperService patchMapperService;
   private final AuthService authService;
   private final Validator validator;
+  private final DuplicateCheckService duplicateCheckService;
 
   public DocumentationUnitService(
       DocumentationUnitRepository repository,
@@ -47,7 +50,8 @@ public class DocumentationUnitService {
       Validator validator,
       AttachmentService attachmentService,
       @Lazy AuthService authService,
-      PatchMapperService patchMapperService) {
+      PatchMapperService patchMapperService,
+      DuplicateCheckService duplicateCheckService) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
@@ -57,6 +61,7 @@ public class DocumentationUnitService {
     this.patchMapperService = patchMapperService;
     this.statusService = statusService;
     this.authService = authService;
+    this.duplicateCheckService = duplicateCheckService;
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -297,8 +302,31 @@ public class DocumentationUnitService {
         DocumentationUnit patchedDocumentationUnit =
             patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit);
         patchedDocumentationUnit = patchedDocumentationUnit.toBuilder().version(newVersion).build();
+
+        var attributesForDuplicateCheck =
+            List.of(
+                "/coreData/ecli",
+                "/coreData/deviatingEclis",
+                "/coreData/fileNumbers",
+                "/coreData/deviatingFileNumbers",
+                "/coreData/court",
+                "/coreData/deviatingCourts",
+                "/coreData/decisionDate",
+                "/coreData/deviatingDecisionDate",
+                "/coreData/docType");
+        DuplicateCheck duplicateCheckEnabled;
+        boolean hasChangedAttributeRelevantForDuplicateCheck =
+            patch.patch().getOperations().stream()
+                .map(JsonPatchOperation::getPath)
+                .anyMatch(path -> attributesForDuplicateCheck.stream().anyMatch(path::contains));
+        if (hasChangedAttributeRelevantForDuplicateCheck) {
+          duplicateCheckEnabled = DuplicateCheck.ENABLED;
+        } else {
+          duplicateCheckEnabled = DuplicateCheck.DISABLED;
+        }
+
         DocumentationUnit updatedDocumentationUnit =
-            updateDocumentationUnit(patchedDocumentationUnit);
+            updateDocumentationUnit(patchedDocumentationUnit, duplicateCheckEnabled);
 
         toFrontendJsonPatch =
             patchMapperService.getDiffPatch(patchedDocumentationUnit, updatedDocumentationUnit);
@@ -353,11 +381,21 @@ public class DocumentationUnitService {
 
   public DocumentationUnit updateDocumentationUnit(DocumentationUnit documentationUnit)
       throws DocumentationUnitNotExistsException {
+    return this.updateDocumentationUnit(documentationUnit, DuplicateCheck.DISABLED);
+  }
+
+  public DocumentationUnit updateDocumentationUnit(
+      DocumentationUnit documentationUnit, DuplicateCheck mode)
+      throws DocumentationUnitNotExistsException {
     repository.saveKeywords(documentationUnit);
     repository.saveFieldsOfLaw(documentationUnit);
     repository.saveProcedures(documentationUnit);
 
     repository.save(documentationUnit);
+
+    if (mode == DuplicateCheck.ENABLED) {
+      duplicateCheckService.checkDuplicates(documentationUnit.documentNumber());
+    }
 
     return repository.findByUuid(documentationUnit.uuid());
   }
@@ -399,5 +437,10 @@ public class DocumentationUnitService {
     } catch (Exception e) {
       log.info("Won´t recycle the document number: {}", e.getMessage());
     }
+  }
+
+  public enum DuplicateCheck {
+    ENABLED,
+    DISABLED
   }
 }
