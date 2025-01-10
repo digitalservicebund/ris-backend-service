@@ -110,9 +110,20 @@ export const longTextLabels: {
   outline: "Gliederung",
 }
 
+export enum DuplicationRelationStatus {
+  PENDING = "PENDING",
+  IGNORED = "IGNORED",
+}
+
+export type DuplicationRelation = {
+  documentNumber: string
+  status: DuplicationRelationStatus
+}
+
 export type ManagementData = {
   scheduledPublicationDateTime?: string
   scheduledByEmail?: string
+  duplicateRelations?: DuplicationRelation[]
   borderNumbers: string[]
 }
 
@@ -142,7 +153,10 @@ export default class DocumentUnit {
   public references?: Reference[]
   public literatureReferences?: Reference[]
   public isEditable: boolean = false
-  public managementData: ManagementData = { borderNumbers: [] }
+  public managementData: ManagementData = {
+    borderNumbers: [],
+    duplicateRelations: [],
+  }
 
   static readonly requiredFields = [
     "fileNumbers",

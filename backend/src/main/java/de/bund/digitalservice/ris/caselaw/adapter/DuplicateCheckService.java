@@ -35,6 +35,9 @@ public class DuplicateCheckService {
   @Transactional
   public void checkDuplicates(String docNumber) {
     try {
+
+      // TODO: Feature flag
+
       // TODO: Should we work on DTO instead of domain object?
       var docUnitDto = documentationUnitRepository.findByDocumentNumber(docNumber).orElseThrow();
       var documentationUnit = DocumentationUnitTransformer.transformToDomain(docUnitDto);

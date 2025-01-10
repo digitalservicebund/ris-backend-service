@@ -81,6 +81,17 @@ export function useCaseLawMenuItems(
           },
         ]
       : []),
+    ...(isInternalUser.value
+      ? [
+          {
+            label: "Verwaltungsdaten",
+            route: {
+              ...baseRoute,
+              name: "caselaw-documentUnit-documentNumber-managementData",
+            },
+          },
+        ]
+      : []),
     {
       label: "Übergabe an jDV",
       route: {
