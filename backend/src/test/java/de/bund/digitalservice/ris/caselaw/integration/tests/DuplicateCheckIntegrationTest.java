@@ -201,6 +201,30 @@ class DuplicateCheckIntegrationTest {
     }
 
     @Test
+    void checkDuplicates_withEmptyDocUnit_shouldDoNothing()
+        throws DocumentationUnitNotExistsException {
+      // Arrange
+      var docUnitWithoutFileNumbers =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .documentNumber("DocumentNumb1")
+                      .build()));
+
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
+
+      // Act
+      duplicateCheckService.checkDuplicates(docUnitWithoutFileNumbers.getDocumentNumber());
+
+      var foundDocUnit = documentationUnitService.getByUuid(docUnitWithoutFileNumbers.getId());
+
+      // Assert
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
+      assertThat(foundDocUnit.managementData().duplicateRelations()).isEmpty();
+    }
+
+    @Test
     void checkDuplicates_withoutFoundDuplicates_shouldDoNothing()
         throws DocumentationUnitNotExistsException {
       // Arrange
@@ -258,6 +282,45 @@ class DuplicateCheckIntegrationTest {
                       .documentNumber("DocumentNumb2")
                       .decisionDate(LocalDate.of(2020, 12, 1))
                       .fileNumbers(List.of("AZ-123"))
+                      .build()));
+
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
+
+      // Act
+      duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
+
+      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+
+      // Assert
+      assertThat(duplicateRelationRepository.findAll()).hasSize(1);
+      DuplicateRelation duplicate =
+          foundDocUnit.managementData().duplicateRelations().stream().findFirst().get();
+      assertThat(duplicate.documentNumber()).isEqualTo(docUnitDuplicateDTO.getDocumentNumber());
+      assertThat(duplicate.status()).isEqualTo(DuplicateRelationStatus.PENDING);
+    }
+
+    @Test
+    void checkDuplicates_withMatchingDeviatingFileNumber_shouldCreateNewDuplicateWithPendingStatus()
+        throws DocumentationUnitNotExistsException {
+      // Arrange
+      var docUnitToBeChecked =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .documentNumber("DocumentNumb1")
+                      .decisionDate(LocalDate.of(2020, 12, 1))
+                      .deviatingFileNumbers(List.of("AZ-123-match", "AZ-888", "AZ-999"))
+                      .build()));
+
+      var docUnitDuplicateDTO =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .documentNumber("DocumentNumb2")
+                      .decisionDate(LocalDate.of(2020, 12, 1))
+                      .fileNumbers(List.of("AZ-123-match", "AZ-777", "AZ-555"))
                       .build()));
 
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
