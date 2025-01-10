@@ -180,13 +180,13 @@ class DuplicateCheckIntegrationTest {
         throws DocumentationUnitNotExistsException {
       // Arrange
       var docUnitWithoutFileNumbers =
-              generateNewDocumentationUnit(
-                  docOffice,
-                  Optional.of(
-                      CreationParameters.builder()
-                          .documentNumber("DocumentNumb1")
-                          .decisionDate(LocalDate.of(2020, 12, 1))
-                          .build()));
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .documentNumber("DocumentNumb1")
+                      .decisionDate(LocalDate.of(2020, 12, 1))
+                      .build()));
 
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
 
@@ -207,10 +207,7 @@ class DuplicateCheckIntegrationTest {
       var docUnitWithoutFileNumbers =
           generateNewDocumentationUnit(
               docOffice,
-              Optional.of(
-                  CreationParameters.builder()
-                      .documentNumber("DocumentNumb1")
-                      .build()));
+              Optional.of(CreationParameters.builder().documentNumber("DocumentNumb1").build()));
 
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
 
@@ -607,7 +604,8 @@ class DuplicateCheckIntegrationTest {
     }
 
     @Test
-    void findDuplicates_withCourtAndDeviatingFileNumber() throws DocumentationUnitNotExistsException {
+    void findDuplicates_withCourtAndDeviatingFileNumber()
+        throws DocumentationUnitNotExistsException {
       // Arrange
       var courtDTO = databaseCourtRepository.findBySearchStr("AG Aachen", 100).getFirst();
       var court = CourtTransformer.transformToDomain(courtDTO);
@@ -638,15 +636,16 @@ class DuplicateCheckIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       assertThat(
-          foundDocUnit.managementData().duplicateRelations().stream()
-              .findFirst()
-              .get()
-              .documentNumber())
+              foundDocUnit.managementData().duplicateRelations().stream()
+                  .findFirst()
+                  .get()
+                  .documentNumber())
           .isEqualTo(duplicateDTO.getDocumentNumber());
     }
 
     @Test
-    void findDuplicates_withDeviatingCourtsAndFileNumber() throws DocumentationUnitNotExistsException {
+    void findDuplicates_withDeviatingCourtsAndFileNumber()
+        throws DocumentationUnitNotExistsException {
       // Arrange
       var docUnitToBeChecked =
           generateNewDocumentationUnit(
@@ -683,7 +682,8 @@ class DuplicateCheckIntegrationTest {
     }
 
     @Test
-    void findDuplicates_withDeviatingCourtsAndDeviatingFileNumber() throws DocumentationUnitNotExistsException {
+    void findDuplicates_withDeviatingCourtsAndDeviatingFileNumber()
+        throws DocumentationUnitNotExistsException {
       // Arrange
       var docUnitToBeChecked =
           generateNewDocumentationUnit(
@@ -712,10 +712,10 @@ class DuplicateCheckIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       assertThat(
-          foundDocUnit.managementData().duplicateRelations().stream()
-              .findFirst()
-              .get()
-              .documentNumber())
+              foundDocUnit.managementData().duplicateRelations().stream()
+                  .findFirst()
+                  .get()
+                  .documentNumber())
           .isEqualTo(duplicateDTO.getDocumentNumber());
     }
 
@@ -760,7 +760,8 @@ class DuplicateCheckIntegrationTest {
     }
 
     @Test
-    void findDuplicates_withDocumentTypeAndDeviatingFileNumber() throws DocumentationUnitNotExistsException {
+    void findDuplicates_withDocumentTypeAndDeviatingFileNumber()
+        throws DocumentationUnitNotExistsException {
       // Arrange
       var documentType =
           DocumentTypeTransformer.transformToDomain(
@@ -792,10 +793,10 @@ class DuplicateCheckIntegrationTest {
       // Assert
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
       assertThat(
-          foundDocUnit.managementData().duplicateRelations().stream()
-              .findFirst()
-              .get()
-              .documentNumber())
+              foundDocUnit.managementData().duplicateRelations().stream()
+                  .findFirst()
+                  .get()
+                  .documentNumber())
           .isEqualTo(duplicateDTO.getDocumentNumber());
     }
 
