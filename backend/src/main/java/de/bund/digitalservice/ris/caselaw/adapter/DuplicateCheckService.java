@@ -127,6 +127,13 @@ public class DuplicateCheckService {
     if (deviatingCourts != null) {
       allDeviatingCourts.addAll(deviatingCourts.stream().map(String::toUpperCase).toList());
     }
+    // If doc unit A has deviating court "AG Aachen" (string) and doc unit B court "AG Aachen"
+    // (object)
+    // This should still lead to a duplicate warning. Caveat: only when doc unit B is checked.
+    var court = documentationUnit.coreData().court();
+    if (court != null) {
+      allDeviatingCourts.add(court.label().toUpperCase());
+    }
     return allDeviatingCourts;
   }
 
