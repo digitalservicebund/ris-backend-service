@@ -685,7 +685,7 @@ class DuplicateCheckIntegrationTest {
     void findDuplicates_withDeviatingCourtsAndRegularCourt()
         throws DocumentationUnitNotExistsException {
       // Arrange
-      var courtDTO = databaseCourtRepository.findBySearchStr("AG Aachen", 100).getFirst();
+      var courtDTO = databaseCourtRepository.findBySearchStr("AG Aachen", 1).getFirst();
       var courtAgAachen = CourtTransformer.transformToDomain(courtDTO);
       var docUnitToBeChecked =
           generateNewDocumentationUnit(
@@ -705,6 +705,46 @@ class DuplicateCheckIntegrationTest {
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb2")
                       .deviatingCourts(List.of("BGH", "AG Aachen"))
+                      .fileNumbers(List.of("AZ-123"))
+                      .build()));
+
+      // Act
+      duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
+      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
+
+      // Assert
+      assertThat(duplicateRelationRepository.findAll()).hasSize(1);
+      assertThat(
+              foundDocUnit.managementData().duplicateRelations().stream()
+                  .findFirst()
+                  .get()
+                  .documentNumber())
+          .isEqualTo(duplicateDTO.getDocumentNumber());
+    }
+
+    @Test
+    void findDuplicates_withDeviatingCourtsAndRegularCourtInverse()
+        throws DocumentationUnitNotExistsException {
+      // Arrange
+      var courtDTO = databaseCourtRepository.findBySearchStr("AG Aachen", 1).getFirst();
+      var courtBGH = CourtTransformer.transformToDomain(courtDTO);
+      var docUnitToBeChecked =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .documentNumber("DocumentNumb1")
+                      .deviatingCourts(List.of("AG Aachen"))
+                      .fileNumbers(List.of("AZ-123"))
+                      .build()));
+
+      var duplicateDTO =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .documentNumber("DocumentNumb2")
+                      .court(courtBGH)
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 

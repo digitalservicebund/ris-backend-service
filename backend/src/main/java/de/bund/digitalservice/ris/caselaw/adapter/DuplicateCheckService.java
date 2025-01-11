@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDuplicateCheckRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitIdDuplicateCheckDTO;
@@ -22,14 +23,17 @@ public class DuplicateCheckService {
   private final DatabaseDuplicateCheckRepository repository;
   private final DuplicateRelationService duplicateRelationService;
   private final DatabaseDocumentationUnitRepository documentationUnitRepository;
+  private final DatabaseCourtRepository databaseCourtRepository;
 
   public DuplicateCheckService(
       DatabaseDuplicateCheckRepository duplicateCheckRepository,
       DuplicateRelationService duplicateRelationService,
-      DatabaseDocumentationUnitRepository documentationUnitRepository) {
+      DatabaseDocumentationUnitRepository documentationUnitRepository,
+      DatabaseCourtRepository databaseCourtRepository) {
     this.repository = duplicateCheckRepository;
     this.duplicateRelationService = duplicateRelationService;
     this.documentationUnitRepository = documentationUnitRepository;
+    this.databaseCourtRepository = databaseCourtRepository;
   }
 
   @Transactional
@@ -118,6 +122,13 @@ public class DuplicateCheckService {
     if (court != null) {
       allCourtIds.add(court.id());
     }
+    for (var deviatingCourt : documentationUnit.coreData().deviatingCourts()) {
+      var courtDTOs = databaseCourtRepository.findBySearchStr(deviatingCourt, 2);
+      // The label of the deviating court must be unique to be considered
+      if (courtDTOs.size() == 1) {
+        allCourtIds.add(courtDTOs.getFirst().getId());
+      }
+    }
     return allCourtIds;
   }
 
@@ -127,9 +138,8 @@ public class DuplicateCheckService {
     if (deviatingCourts != null) {
       allDeviatingCourts.addAll(deviatingCourts.stream().map(String::toUpperCase).toList());
     }
-    // If doc unit A has deviating court "AG Aachen" (string) and doc unit B court "AG Aachen"
-    // (object)
-    // This should still lead to a duplicate warning. Caveat: only when doc unit B is checked.
+    // If doc unit A has deviating court "AG Aachen" (string)
+    // and doc unit B court "AG Aachen" (object) -> should still lead to a duplicate warning.
     var court = documentationUnit.coreData().court();
     if (court != null) {
       allDeviatingCourts.add(court.label().toUpperCase());
