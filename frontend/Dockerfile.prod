@@ -1,4 +1,4 @@
-FROM node:22.12.0 AS builder
+FROM node:22.13.0 AS builder
 WORKDIR /usr/src/app
 COPY . .
 RUN npm install && npx vite build
