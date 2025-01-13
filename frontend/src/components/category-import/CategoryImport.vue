@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from "vue"
+import { ref, watch, onMounted } from "vue"
 import SingleCategory from "@/components/category-import/SingleCategory.vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import InputField from "@/components/input/InputField.vue"
@@ -48,6 +48,15 @@ const labels = {
   headline: "Titelzeile",
   guidingPrinciple: "Leitsatz",
   headnote: "Orientierungssatz",
+  otherHeadnote: "Sonstiger Orientierungssatz",
+  tenor: "Tenor",
+  reasons: "Gründe",
+  caseFacts: "Tatbestand",
+  decisionReasons: "Entscheidungsgründe",
+  otherLongText: "Sonstiger Langtext",
+  dissentingOpinion: "Abweichende Meinung",
+  participatingJudges: "Mitwirkende Richter",
+  outline: "Gliederung",
 }
 
 const hasContent = (key: keyof typeof labels): boolean => {
@@ -63,6 +72,18 @@ const hasContent = (key: keyof typeof labels): boolean => {
       return !!documentUnitToImport.value.shortTexts[
         key as keyof typeof documentUnitToImport.value.shortTexts
       ]
+    } else if (key in documentUnitToImport.value.longTexts) {
+      const longText =
+        documentUnitToImport.value.longTexts[
+          key as keyof typeof documentUnitToImport.value.longTexts
+        ]
+
+      if (typeof longText === "string" && longText.trim().length > 0) {
+        return true
+      }
+      if (Array.isArray(longText) && longText.length > 0) {
+        return true
+      }
     }
   return false
 }
@@ -73,6 +94,18 @@ const isImportable = (key: keyof typeof labels): boolean => {
       return !store.documentUnit!.shortTexts[
         key as keyof typeof documentUnitToImport.value.shortTexts
       ]
+    } else if (key in documentUnitToImport.value.longTexts) {
+      const longText =
+        store.documentUnit!.longTexts[
+          key as keyof typeof documentUnitToImport.value.longTexts
+        ]
+
+      if (typeof longText === "string" && longText.trim().length > 0) {
+        return false
+      }
+      if (Array.isArray(longText) && longText.length > 0) {
+        return false
+      }
     }
   return true
 }
@@ -97,7 +130,20 @@ const handleImport = async (key: keyof typeof labels) => {
     case "headline":
     case "guidingPrinciple":
     case "headnote":
+    case "otherHeadnote":
       importShortTexts(key)
+      break
+    case "tenor":
+    case "reasons":
+    case "caseFacts":
+    case "decisionReasons":
+    case "dissentingOpinion":
+    case "otherLongText":
+    case "outline":
+      importLongTexts(key)
+      break
+    case "participatingJudges":
+      importParticipatingJudges()
       break
   }
 
@@ -213,6 +259,15 @@ function importActiveCitations() {
   }
 }
 
+function importParticipatingJudges() {
+  const source = documentUnitToImport.value?.longTexts["participatingJudges"]
+  if (!source) return
+
+  source.forEach((judge) => (judge.id = undefined))
+
+  store.documentUnit!.longTexts["participatingJudges"] = [...source]
+}
+
 function importShortTexts(key: string) {
   const source =
     documentUnitToImport.value?.shortTexts[
@@ -225,6 +280,24 @@ function importShortTexts(key: string) {
     ] = source
 }
 
+// By narrowing the type of key to exclude "participatingJudges", TypeScript no longer considers the possibility of assigning a non-string value to store.documentUnit.longTexts[key].
+type StringKeys =
+  | "tenor"
+  | "reasons"
+  | "caseFacts"
+  | "decisionReasons"
+  | "dissentingOpinion"
+  | "otherLongText"
+  | "outline"
+
+function importLongTexts(key: StringKeys) {
+  const source = documentUnitToImport.value?.longTexts[key]
+
+  if (store.documentUnit) {
+    store.documentUnit.longTexts[key] = source as string
+  }
+}
+
 function scrollToCategory(key: string) {
   const element = document.getElementById(key)
   if (element) {
@@ -232,6 +305,16 @@ function scrollToCategory(key: string) {
     const offsetPosition =
       element.getBoundingClientRect().top + window.scrollY - headerOffset
     window.scrollTo({ top: offsetPosition, behavior: "smooth" })
+  }
+}
+
+function adjustContainerHeight() {
+  const container = document.querySelector(
+    ".scrollable-container",
+  ) as HTMLElement
+  if (container) {
+    const topOffset = container.getBoundingClientRect().top // Distance from the top of the viewport
+    container.style.height = `calc(100vh - ${topOffset}px)` // Dynamically set height
   }
 }
 
@@ -245,11 +328,15 @@ watch(
   },
   { immediate: true },
 )
+
+onMounted(() => {
+  adjustContainerHeight()
+})
 </script>
 
 <template>
   <div
-    class="max-h-[70vh] min-h-[63vh] overflow-scroll"
+    class="scrollable-container relative overflow-auto"
     data-testid="category-import"
   >
     <span class="ds-label-01-bold">Rubriken importieren</span>
