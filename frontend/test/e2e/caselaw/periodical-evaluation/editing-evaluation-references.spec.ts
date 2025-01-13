@@ -442,14 +442,14 @@ test.describe(
 
     test("should scroll to tenor, if no guiding principle present", async ({
       page,
-      prefilledDocumentUnitWithLongTexts,
+      prefilledDocumentUnitWithTexts,
       edition,
     }) => {
       await navigateToPeriodicalReferences(page, edition.id || "")
 
       await searchForDocUnitWithFileNumberAndDecisionDate(
         page,
-        prefilledDocumentUnitWithLongTexts.coreData.fileNumbers?.[0] || "",
+        prefilledDocumentUnitWithTexts.coreData.fileNumbers?.[0] || "",
         "31.12.2019",
       )
       // wait for panel to open
@@ -457,7 +457,7 @@ test.describe(
 
       await expect(page.getByText("Tenor", { exact: true })).toBeInViewport()
       await expect(
-        page.getByText(prefilledDocumentUnitWithLongTexts.longTexts.tenor!),
+        page.getByText(prefilledDocumentUnitWithTexts.longTexts.tenor!),
       ).toBeInViewport()
     })
 

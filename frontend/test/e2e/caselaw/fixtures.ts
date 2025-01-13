@@ -25,7 +25,7 @@ type MyFixtures = {
   editionWithReferences: LegalPeriodicalEdition
   foreignDocumentationUnit: DocumentUnitListEntry
   prefilledDocumentUnitWithReferences: DocumentUnit
-  prefilledDocumentUnitWithLongTexts: DocumentUnit
+  prefilledDocumentUnitWithTexts: DocumentUnit
 }
 
 export const caselawTest = test.extend<MyFixtures>({
@@ -217,7 +217,7 @@ export const caselawTest = test.extend<MyFixtures>({
     }
   },
 
-  prefilledDocumentUnitWithLongTexts: async ({ request, context }, use) => {
+  prefilledDocumentUnitWithTexts: async ({ request, context }, use) => {
     const cookies = await context.cookies()
     const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
     const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
@@ -246,8 +246,21 @@ export const caselawTest = test.extend<MyFixtures>({
             decisionDate: "2019-12-31",
             appraisalBody: "1. Senat, 2. Kammer",
           },
+          shortTexts: {
+            headnote: "Test Orientierungssatz",
+            guidingPrinciple: "Test Leitsatz",
+            headline: "Test Titelzeile",
+            otherHeadnote: "Test Sonstiger Orientierungssatz",
+          },
           longTexts: {
-            tenor: "testTenor",
+            tenor: "Test Tenor",
+            reasons: "Test Gründe",
+            caseFacts: "Test Tatbestand",
+            decisionReasons: "Test Entscheidungsgründe",
+            dissentingOpinion: "Test Abweichende Meinung",
+            participatingJudges: [{ name: "Test Richter" }],
+            otherLongText: "Test Sonstiger Langtext",
+            outline: "Test Gliederung",
           },
         },
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
