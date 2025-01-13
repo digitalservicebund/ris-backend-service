@@ -55,7 +55,7 @@ test.describe("category import", () => {
     async ({ page, documentNumber }) => {
       await navigateToCategoryImport(page, documentNumber)
       await searchForDocumentUnitToImport(page, documentNumber)
-      await expect(page.getByText("Quellrubrik leer")).toHaveCount(15) // we have 15 importable categories
+      await expect(page.getByText("Quellrubrik leer")).toHaveCount(16) // we have 16 importable categories
     },
   )
 

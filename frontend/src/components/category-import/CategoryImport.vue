@@ -78,7 +78,12 @@ const hasContent = (key: keyof typeof labels): boolean => {
           key as keyof typeof documentUnitToImport.value.longTexts
         ]
 
-      return !!longText || !!(Array.isArray(longText) && longText.length > 0)
+      if (typeof longText === "string" && longText.trim().length > 0) {
+        return true
+      }
+      if (Array.isArray(longText) && longText.length > 0) {
+        return true
+      }
     }
   return false
 }
@@ -94,7 +99,7 @@ const isImportable = (key: keyof typeof labels): boolean => {
         store.documentUnit!.longTexts[
           key as keyof typeof documentUnitToImport.value.longTexts
         ]
-      // Return false if longText is a non-empty string or a non-empty array
+
       if (typeof longText === "string" && longText.trim().length > 0) {
         return false
       }
