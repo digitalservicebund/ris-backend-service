@@ -100,10 +100,6 @@ class DocumentationUnitControllerTest {
   @MockBean private UserGroupService userGroupService;
   @MockBean private DuplicateCheckService duplicateCheckService;
 
-  @MockBean
-  private DocumentationUnitDocxMetadataInitializationService
-      documentationUnitDocxMetadataInitializationService;
-
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final String ISSUER_ADDRESS = "test-issuer@exporter.neuris";
   private final DocumentationOffice docOffice = buildDSDocOffice();
@@ -214,8 +210,7 @@ class DocumentationUnitControllerTest {
         .isOk();
 
     verify(duplicateCheckService, times(1)).checkDuplicates(docUnit.documentNumber());
-    verify(documentationUnitDocxMetadataInitializationService, times(1))
-        .initializeCoreData(eq(docUnit), any());
+    verify(docUnitAttachmentService, times(1)).initializeCoreData(eq(docUnit), any());
 
     verify(attachmentService).attachFileToDocumentationUnit(eq(TEST_UUID), any(), any());
   }
