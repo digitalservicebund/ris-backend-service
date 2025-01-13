@@ -541,6 +541,56 @@ class DuplicateCheckIntegrationTest {
                   .documentNumber())
           .isEqualTo("DocumentNumb2");
     }
+
+    @Test
+    void checkDuplicates_deleteDocUnit_shouldDeleteAssociatedDuplicateWarnings()
+        throws DocumentationUnitNotExistsException {
+      // Arrange
+      var docUnitToBeChecked =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .documentNumber("DocumentNumb1")
+                      .decisionDate(LocalDate.of(2020, 12, 1))
+                      .fileNumbers(List.of("AZ-123"))
+                      .build()));
+
+      var duplicateDTO =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .documentNumber("DocumentNumb2")
+                      .decisionDate(LocalDate.of(2020, 12, 1))
+                      .fileNumbers(List.of("AZ-123"))
+                      .build()));
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
+
+      // Create duplicates
+      duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
+      assertThat(
+              documentationUnitService
+                  .getByUuid(docUnitToBeChecked.getId())
+                  .managementData()
+                  .duplicateRelations())
+          .hasSize(1);
+      assertThat(duplicateRelationRepository.findAll()).hasSize(1);
+
+      documentationUnitService.deleteByUuid(duplicateDTO.getId());
+
+      // Act
+      duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
+
+      // Assert
+      assertThat(duplicateRelationRepository.findAll()).hasSize(0);
+      assertThat(
+              documentationUnitService
+                  .getByUuid(docUnitToBeChecked.getId())
+                  .managementData()
+                  .duplicateRelations())
+          .hasSize(0);
+    }
   }
 
   @Nested
