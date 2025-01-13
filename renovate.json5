@@ -84,7 +84,7 @@
     {
       // due to blocking spring framework issue
       "matchPackageNames": [
-        "org.springframework:spring-framework"
+        "org.springframework.boot"
       ],
       "allowedVersions": "3.3.5"
     },
