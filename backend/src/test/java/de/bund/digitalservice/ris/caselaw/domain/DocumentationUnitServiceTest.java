@@ -90,6 +90,7 @@ class DocumentationUnitServiceTest {
         service.generateNewDocumentationUnit(documentationOffice, Optional.empty()));
 
     verify(documentNumberService).generateDocumentNumber(documentationOffice.abbreviation());
+    verify(duplicateCheckService, times(1)).checkDuplicates("nextDocumentNumber");
     verify(repository)
         .createNewDocumentationUnit(
             DocumentationUnit.builder()
