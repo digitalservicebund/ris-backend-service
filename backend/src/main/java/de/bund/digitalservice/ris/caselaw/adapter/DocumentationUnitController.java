@@ -159,7 +159,15 @@ public class DocumentationUnitController {
             .s3path();
     try {
       var docx2html = converterService.getConvertedObject(attachmentPath);
-      documentationUnitDocxMetadataInitializationService.initializeCoreData(uuid, docx2html);
+      try {
+        DocumentationUnit docUnit = service.getByUuid(uuid);
+        documentationUnitDocxMetadataInitializationService.initializeCoreData(docUnit, docx2html);
+        duplicateCheckService.checkDuplicates(docUnit.documentNumber());
+      } catch (DocumentationUnitNotExistsException ex) {
+        // file upload should not fail because of core data initialization or dup check
+        log.error(
+            "Initialize core data failed, because documentation unit '{}' doesn't exist!", uuid);
+      }
       return ResponseEntity.status(HttpStatus.OK).body(docx2html);
 
     } catch (Exception e) {

@@ -100,6 +100,10 @@ class DocumentationUnitControllerTest {
   @MockBean private UserGroupService userGroupService;
   @MockBean private DuplicateCheckService duplicateCheckService;
 
+  @MockBean
+  private DocumentationUnitDocxMetadataInitializationService
+      documentationUnitDocxMetadataInitializationService;
+
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final String ISSUER_ADDRESS = "test-issuer@exporter.neuris";
   private final DocumentationOffice docOffice = buildDSDocOffice();
@@ -178,6 +182,42 @@ class DocumentationUnitControllerTest {
         .is4xxClientError();
 
     verify(attachmentService).deleteByS3Path(any());
+  }
+
+  @Test
+  void testAttachFile_shouldInitializeCoreDataAndCheckDuplicates()
+      throws IOException, DocumentationUnitNotExistsException {
+    var attachment = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
+
+    when(attachmentService.attachFileToDocumentationUnit(
+            eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class)))
+        .thenReturn(Attachment.builder().s3path("fooPath").build());
+
+    DocumentationUnit docUnit =
+        DocumentationUnit.builder()
+            .documentNumber("myDocNumber1")
+            .coreData(CoreData.builder().documentationOffice(docOffice).build())
+            .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
+            .build();
+    when(service.getByUuid(TEST_UUID)).thenReturn(docUnit);
+
+    risWebClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file")
+        .contentType(
+            MediaType.parseMediaType(
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+        .bodyAsByteArray(attachment)
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    verify(duplicateCheckService, times(1)).checkDuplicates(docUnit.documentNumber());
+    verify(documentationUnitDocxMetadataInitializationService, times(1))
+        .initializeCoreData(eq(docUnit), any());
+
+    verify(attachmentService).attachFileToDocumentationUnit(eq(TEST_UUID), any(), any());
   }
 
   @Test
