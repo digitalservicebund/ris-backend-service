@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionNameDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
@@ -16,6 +17,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
@@ -166,35 +168,30 @@ public class DocumentationUnitTransformer {
 
   private static void addReferences(
       DocumentationUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
-    AtomicInteger i = new AtomicInteger(1);
-    builder.references(
+    builder.caselawReferences(
         updatedDomainObject.references() == null
             ? Collections.emptyList()
             : updatedDomainObject.references().stream()
                 .map(ReferenceTransformer::transformToDTO)
                 .map(
                     referenceDTO -> {
-                      // TODO why is this necessary?
-                      referenceDTO.setDocumentationUnit(builder.build());
-                      referenceDTO.setRank(i.getAndIncrement());
-                      return referenceDTO;
+                      referenceDTO.setDocumentationUnit(builder.build()); // TODO needed?
+                      return (CaselawReferenceDTO) referenceDTO;
                     })
                 .toList());
   }
 
   private static void addDependentLiteratureCitations(
       DocumentationUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
-    AtomicInteger i = new AtomicInteger(1);
-    builder.dependentLiteratureCitations(
+    builder.literatureReferences(
         updatedDomainObject.literatureReferences() == null
             ? Collections.emptyList()
             : updatedDomainObject.literatureReferences().stream()
-                .map(DependentLiteratureTransformer::transformToDTO)
+                .map(ReferenceTransformer::transformToDTO)
                 .map(
                     referenceDTO -> {
-                      referenceDTO.setDocumentationUnit(builder.build());
-                      referenceDTO.setRank(i.getAndIncrement());
-                      return referenceDTO;
+                      referenceDTO.setDocumentationUnit(builder.build()); // TODO needed?
+                      return (LiteratureReferenceDTO) referenceDTO;
                     })
                 .toList());
   }
@@ -777,55 +774,30 @@ public class DocumentationUnitTransformer {
         .shortTexts(shortTexts)
         .longTexts(longTexts)
         .contentRelatedIndexing(contentRelatedIndexing)
-        .managementData(managementData);
+        .managementData(managementData)
+        .references(
+            documentationUnitDTO.getCaselawReferences() == null
+                ? new ArrayList<>()
+                : documentationUnitDTO.getCaselawReferences().stream()
+                    .map(ReferenceTransformer::transformToDomain)
+                    .toList())
+        .literatureReferences(
+            documentationUnitDTO.getLiteratureReferences() == null
+                ? new ArrayList<>()
+                : documentationUnitDTO.getLiteratureReferences().stream()
+                    .map(ReferenceTransformer::transformToDomain)
+                    .toList());
 
     addStatusToDomain(documentationUnitDTO, builder);
-    addReferencesToDomain(documentationUnitDTO, builder);
-    addLiteratureReferencesToDomain(documentationUnitDTO, builder);
 
     return builder.build();
   }
 
   private static Boolean isPublishedDuplicateOrSameDocOffice(
-      DocumentationUnitDTO original, DocumentationUnitDTO duplicate) {
+          DocumentationUnitDTO original, DocumentationUnitDTO duplicate) {
     return original.getDocumentationOffice().equals(duplicate.getDocumentationOffice())
-        || duplicate.getStatus().getPublicationStatus().equals(PublicationStatus.PUBLISHED);
+            || duplicate.getStatus().getPublicationStatus().equals(PublicationStatus.PUBLISHED);
   }
-
-  private static void addReferencesToDomain(
-      DocumentationUnitDTO documentationUnitDTO,
-      DocumentationUnit.DocumentationUnitBuilder builder) {
-
-    builder.references(new ArrayList<>());
-
-    if (documentationUnitDTO.getReferences() != null) {
-      builder
-          .build()
-          .references()
-          .addAll(
-              documentationUnitDTO.getReferences().stream()
-                  .map(ReferenceTransformer::transformToDomain)
-                  .toList());
-    }
-  }
-
-  private static void addLiteratureReferencesToDomain(
-      DocumentationUnitDTO documentationUnitDTO,
-      DocumentationUnit.DocumentationUnitBuilder builder) {
-
-    builder.literatureReferences(new ArrayList<>());
-
-    if (documentationUnitDTO.getDependentLiteratureCitations() != null) {
-      builder
-          .build()
-          .literatureReferences()
-          .addAll(
-              documentationUnitDTO.getDependentLiteratureCitations().stream()
-                  .map(DependentLiteratureTransformer::transformToDomain)
-                  .toList());
-    }
-  }
-
   /**
    * Adds norm references to the domain object based on the provided documentation unit DTO. A list
    * of NormReferenceDTOs with the same normAbbreviation are grouped into one NormReference, with a

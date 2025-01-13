@@ -20,6 +20,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.LdmlExporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.LegalPeriodicalEditionController;
 import de.bund.digitalservice.ris.caselaw.adapter.MockXmlExporter;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseHandoverReportRepository;
@@ -40,7 +41,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverR
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalEditionRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.HandoverMailTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -216,12 +216,12 @@ class HandoverMailIntegrationTest {
           List.of(
               referenceRepository
                   .save(
-                      ReferenceDTO.builder()
+                      CaselawReferenceDTO.builder()
                           .id(UUID.randomUUID())
                           .citation("citation")
                           .legalPeriodicalRawValue("ABC")
                           .type("nichtamtlich")
-                          .rank(1)
+                          .documentationUnitRank(1)
                           .documentationUnit(savedDocumentationUnitDTO)
                           .build())
                   .toBuilder()
@@ -324,7 +324,7 @@ class HandoverMailIntegrationTest {
       LegalPeriodicalEditionDTO legalPeriodicalEditionDTO =
           LegalPeriodicalEditionDTO.builder()
               .id(entityId)
-              .editionReferences(List.of())
+              .references(List.of())
               .legalPeriodical(
                   LegalPeriodicalDTO.builder()
                       .id(UUID.fromString("1abf62fe-9ddf-487e-962e-1c71cf661c5b"))
