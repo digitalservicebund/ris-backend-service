@@ -1,4 +1,5 @@
 import { LocationQuery } from "vue-router"
+import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { useInternalUser } from "@/composables/useInternalUser"
 import MenuItem from "@/domain/menuItem"
 
@@ -10,7 +11,9 @@ export function useCaseLawMenuItems(
     params: { documentNumber },
     query: routeQuery,
   }
-
+  const isDuplicateCheckFeatureActive = useFeatureToggle(
+    "neuris.duplicate-check",
+  )
   const isInternalUser = useInternalUser()
 
   return [
@@ -81,7 +84,7 @@ export function useCaseLawMenuItems(
           },
         ]
       : []),
-    ...(isInternalUser.value
+    ...(isInternalUser.value && isDuplicateCheckFeatureActive.value
       ? [
           {
             label: "Verwaltungsdaten",

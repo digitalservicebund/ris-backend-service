@@ -4,6 +4,7 @@ import { computed, ref, toRaw, watchEffect } from "vue"
 import { useRoute } from "vue-router"
 import IconBadge from "@/components/IconBadge.vue"
 import SaveButton from "@/components/SaveDocumentUnitButton.vue"
+import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { useInternalUser } from "@/composables/useInternalUser"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -22,6 +23,8 @@ const route = useRoute()
 const documentUnitStore = useDocumentUnitStore()
 
 const isInternalUser = useInternalUser()
+
+const isDuplicateCheckFeatureActive = useFeatureToggle("neuris.duplicate-check")
 
 const fileNumberInfo = computed(
   () => documentUnitStore.documentUnit?.coreData.fileNumbers?.[0] || "",
@@ -104,7 +107,7 @@ watchEffect(() => {
 
     <span class="flex-grow"></span>
     <div
-      v-if="hasActiveDuplicationWarning"
+      v-if="hasActiveDuplicationWarning && isDuplicateCheckFeatureActive"
       class="flex gap-12 whitespace-nowrap"
     >
       <IconBadge

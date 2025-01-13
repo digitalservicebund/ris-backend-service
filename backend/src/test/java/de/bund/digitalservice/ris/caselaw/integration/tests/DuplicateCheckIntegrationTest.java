@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockUserGroups;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
@@ -50,6 +51,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelation;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
@@ -147,6 +149,7 @@ class DuplicateCheckIntegrationTest {
   @MockBean private HandoverService handoverService;
   @MockBean private LdmlExporterService ldmlExporterService;
   @MockBean private DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
+  @MockBean private FeatureToggleService featureToggleService;
 
   @MockBean
   private DocumentationUnitDocxMetadataInitializationService
@@ -163,6 +166,7 @@ class DuplicateCheckIntegrationTest {
     docOffice = DocumentationOfficeTransformer.transformToDomain(documentationOffice);
 
     mockUserGroups(userGroupService);
+    when(featureToggleService.isEnabled("neuris.duplicate-check")).thenReturn(true);
   }
 
   @AfterEach

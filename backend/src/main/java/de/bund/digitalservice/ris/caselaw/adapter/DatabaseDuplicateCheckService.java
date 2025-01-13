@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelation
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.CourtTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
@@ -28,23 +29,28 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
   private final DatabaseDocumentationUnitRepository documentationUnitRepository;
   private final DatabaseCourtRepository databaseCourtRepository;
 
+  private final FeatureToggleService featureToggleService;
+
   public DatabaseDuplicateCheckService(
       DatabaseDuplicateCheckRepository duplicateCheckRepository,
       DuplicateRelationService duplicateRelationService,
       DatabaseDocumentationUnitRepository documentationUnitRepository,
-      DatabaseCourtRepository databaseCourtRepository) {
+      DatabaseCourtRepository databaseCourtRepository,
+      FeatureToggleService featureToggleService) {
     this.repository = duplicateCheckRepository;
     this.duplicateRelationService = duplicateRelationService;
     this.documentationUnitRepository = documentationUnitRepository;
     this.databaseCourtRepository = databaseCourtRepository;
+    this.featureToggleService = featureToggleService;
   }
 
   @Override
   @Transactional
   public void checkDuplicates(String docNumber) {
     try {
-
-      // TODO: Feature flag
+      if (!featureToggleService.isEnabled("neuris.duplicate-check")) {
+        return;
+      }
 
       var documentationUnit =
           documentationUnitRepository.findByDocumentNumber(docNumber).orElseThrow();
