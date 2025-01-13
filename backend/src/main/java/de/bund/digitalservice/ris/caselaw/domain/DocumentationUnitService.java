@@ -316,7 +316,7 @@ public class DocumentationUnitService {
                 "/coreData/deviatingCourts",
                 "/coreData/decisionDate",
                 "/coreData/deviatingDecisionDate",
-                "/coreData/docType");
+                "/coreData/documentType");
         DuplicateCheck duplicateCheckEnabled;
         boolean hasChangedAttributeRelevantForDuplicateCheck =
             patch.patch().getOperations().stream()
