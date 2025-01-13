@@ -8,11 +8,11 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentationUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.adapter.DuplicateRelationService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.LdmlExporterService;
@@ -48,6 +48,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelation;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
@@ -87,7 +88,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DuplicateRelationService.class,
       PostgresDeltaMigrationRepositoryImpl.class,
       DatabaseDocumentNumberGeneratorService.class,
-      DuplicateCheckService.class,
+      DatabaseDuplicateCheckService.class,
       DatabaseDocumentNumberRecyclingService.class,
       DatabaseDocumentationUnitStatusService.class,
       DatabaseProcedureService.class,
@@ -135,7 +136,7 @@ class DuplicateCheckIntegrationTest {
   @Autowired private DuplicateRelationRepository duplicateRelationRepository;
   @Autowired private AuthService authService;
   @Autowired private DocumentationUnitService documentationUnitService;
-  @Autowired private DuplicateCheckService duplicateCheckService;
+  @Autowired private DatabaseDuplicateCheckService duplicateCheckService;
 
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private MailService mailService;

@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParame
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatusRequest;
 import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverException;
@@ -19,6 +20,7 @@ import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -451,6 +453,36 @@ public class DocumentationUnitController {
     } catch (DocumentationUnitNotExistsException e) {
       log.error("Error handing over documentation unit '{}' to portal", uuid, e);
       return ResponseEntity.internalServerError().build();
+    }
+  }
+
+  /**
+   * Update the duplication status of a duplicate of a documentation unit (ignored vs. pending)
+   *
+   * @param documentNumberOrigin documentNumber of the original documentation unit
+   * @param documentNumberDuplicate documentNumber of the duplicate
+   * @return a String response or empty response with status code 400 if the user is not authorized
+   */
+  @PutMapping(
+      value = "/{documentNumberOrigin}/duplicate-status/{documentNumberDuplicate}",
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      consumes = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize(
+      "@userIsInternal.apply(#oidcUser) and @userHasSameDocOfficeAsDocument.apply(#documentNumberOrigin)")
+  public ResponseEntity<String> updateDuplicateStatus(
+      @AuthenticationPrincipal OidcUser oidcUser,
+      @PathVariable String documentNumberOrigin,
+      @PathVariable String documentNumberDuplicate,
+      @RequestBody @Valid DuplicateRelationStatusRequest duplicateRelationStatusRequest) {
+    try {
+      var result =
+          duplicateCheckService.updateDuplicateStatus(
+              documentNumberOrigin,
+              documentNumberDuplicate,
+              duplicateRelationStatusRequest.getStatus());
+      return ResponseEntity.status(HttpStatus.OK).body(result);
+    } catch (DocumentationUnitNotExistsException | IllegalArgumentException ex) {
+      return ResponseEntity.notFound().build();
     }
   }
 }

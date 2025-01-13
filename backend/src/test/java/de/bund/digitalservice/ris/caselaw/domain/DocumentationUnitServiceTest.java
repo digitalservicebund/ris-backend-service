@@ -65,6 +65,7 @@ class DocumentationUnitServiceTest {
   @MockBean private Validator validator;
   @MockBean private OidcUser oidcUser;
   @MockBean private AuthService authService;
+  @MockBean private DuplicateCheckService duplicateCheckService;
   @Captor private ArgumentCaptor<DocumentationUnitSearchInput> searchInputCaptor;
   @Captor private ArgumentCaptor<RelatedDocumentationUnit> relatedDocumentationUnitCaptor;
 
