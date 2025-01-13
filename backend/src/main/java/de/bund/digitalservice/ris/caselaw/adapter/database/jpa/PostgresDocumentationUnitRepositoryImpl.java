@@ -149,11 +149,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                                     .rank(1)
                                     .value(source)
                                     .reference(
-                                        ReferenceTransformer.transformToDTO(createdFromReference)
-                                            .toBuilder()
-                                            .rank(1)
-                                            .documentationUnit(documentationUnitDTO)
-                                            .build())
+                                        ReferenceTransformer.transformToDTO(createdFromReference))
                                     .build())))
                 .build());
 

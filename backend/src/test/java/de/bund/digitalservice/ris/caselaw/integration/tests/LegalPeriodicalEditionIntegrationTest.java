@@ -10,25 +10,24 @@ import de.bund.digitalservice.ris.caselaw.EntityBuilderTestUtil;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.LegalPeriodicalEditionController;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDependentLiteratureCitationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseReferenceRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DependentLiteratureCitationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresFieldOfLawRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalEditionRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
-import de.bund.digitalservice.ris.caselaw.domain.DependentLiteratureCitationType;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -270,15 +269,14 @@ class LegalPeriodicalEditionIntegrationTest {
 
     documentationUnitRepository.save(
         docUnit.toBuilder()
-            .dependentLiteratureCitations(
+            .literatureReferences(
                 List.of(
-                    DependentLiteratureCitationDTO.builder()
+                    LiteratureReferenceDTO.builder()
                         .id(UUID.randomUUID())
-                        .rank(1)
+                        .documentationUnitRank(1)
                         .citation("Literature Reference Citation from Docunit")
                         .legalPeriodicalRawValue("A")
                         .author("author 1")
-                        .type(DependentLiteratureCitationType.PASSIVE)
                         .documentType(
                             DocumentTypeDTO.builder()
                                 .id(UUID.fromString("f718a7ee-f419-46cf-a96a-29227927850c"))
@@ -290,12 +288,11 @@ class LegalPeriodicalEditionIntegrationTest {
                                 .documentNumber("DOC_NUMBER")
                                 .build())
                         .build(),
-                    DependentLiteratureCitationDTO.builder()
+                    LiteratureReferenceDTO.builder()
                         .id(existingLiteratureCitationId)
-                        .rank(2)
+                        .documentationUnitRank(2)
                         .citation("Original Literature Reference Citation from Docunit")
                         .author("author 2")
-                        .type(DependentLiteratureCitationType.PASSIVE)
                         .documentType(
                             DocumentTypeDTO.builder()
                                 .id(UUID.fromString("198b276e-8e6d-4df6-8692-44d74ed4fcba"))
@@ -308,11 +305,11 @@ class LegalPeriodicalEditionIntegrationTest {
                                 .documentNumber("DOC_NUMBER")
                                 .build())
                         .build()))
-            .references(
+            .caselawReferences(
                 List.of(
-                    ReferenceDTO.builder()
+                    CaselawReferenceDTO.builder()
                         .id(UUID.randomUUID())
-                        .rank(1)
+                        .documentationUnitRank(1)
                         .citation("Caselaw Reference Citation from Docunit")
                         .legalPeriodicalRawValue("A")
                         .type("amtlich")
@@ -322,12 +319,12 @@ class LegalPeriodicalEditionIntegrationTest {
                                 .documentNumber("DOC_NUMBER")
                                 .build())
                         .build(),
-                    ReferenceDTO.builder()
+                    CaselawReferenceDTO.builder()
                         .id(existingReferenceId)
                         .citation("Original Caselaw Reference Citation from Docunit")
                         .legalPeriodicalRawValue("B")
                         .type("amtlich")
-                        .rank(2)
+                        .documentationUnitRank(2)
                         .documentationUnit(
                             DocumentationUnitDTO.builder()
                                 .id(docUnit.getId())
@@ -427,11 +424,11 @@ class LegalPeriodicalEditionIntegrationTest {
               assertThat(list.get(1).id()).isEqualTo(existingReferenceId);
               assertThat(list.get(1).citation())
                   .isEqualTo("Updated Caselaw Reference Citation from Edition");
-              assertThat(list.get(1).rank()).isEqualTo(2);
+              assertThat(list.get(1).documentationUnitRank()).isEqualTo(2);
               assertThat(list.get(2).id()).isEqualTo(newReferenceId);
               assertThat(list.get(2).citation())
                   .isEqualTo("New Caselaw Reference Citation from Edition");
-              assertThat(list.get(2).rank()).isEqualTo(3);
+              assertThat(list.get(2).documentationUnitRank()).isEqualTo(3);
             });
 
     // then, literature references
@@ -444,11 +441,11 @@ class LegalPeriodicalEditionIntegrationTest {
               assertThat(list.get(1).id()).isEqualTo(existingLiteratureCitationId);
               assertThat(list.get(1).citation())
                   .isEqualTo("Updated Literature Reference Citation from Edition");
-              assertThat(list.get(1).rank()).isEqualTo(2);
+              assertThat(list.get(1).documentationUnitRank()).isEqualTo(2);
               assertThat(list.get(2).id()).isEqualTo(newLiteratureReferenceId);
               assertThat(list.get(2).citation())
                   .isEqualTo("New Literature Reference Citation from Edition");
-              assertThat(list.get(2).rank()).isEqualTo(3);
+              assertThat(list.get(2).documentationUnitRank()).isEqualTo(3);
             });
 
     // clean up
@@ -468,15 +465,14 @@ class LegalPeriodicalEditionIntegrationTest {
     // add preexisting references and literature citations
     documentationUnitRepository.save(
         docUnit.toBuilder()
-            .dependentLiteratureCitations(
+            .literatureReferences(
                 List.of(
-                    DependentLiteratureCitationDTO.builder()
+                    LiteratureReferenceDTO.builder()
                         .id(UUID.randomUUID())
-                        .rank(1)
+                        .documentationUnitRank(1)
                         .citation("Literature Reference from Docunit")
                         .legalPeriodicalRawValue("A")
                         .author("author 1")
-                        .type(DependentLiteratureCitationType.PASSIVE)
                         .documentType(
                             DocumentTypeDTO.builder()
                                 .id(UUID.fromString("f718a7ee-f419-46cf-a96a-29227927850c"))
@@ -488,11 +484,11 @@ class LegalPeriodicalEditionIntegrationTest {
                                 .documentNumber("DOC_NUMBER")
                                 .build())
                         .build()))
-            .references(
+            .caselawReferences(
                 List.of(
-                    ReferenceDTO.builder()
+                    CaselawReferenceDTO.builder()
                         .id(UUID.randomUUID())
-                        .rank(1)
+                        .documentationUnitRank(1)
                         .citation("Caselaw Reference from Docunit")
                         .legalPeriodicalRawValue("A")
                         .type("amtlich")
@@ -588,8 +584,8 @@ class LegalPeriodicalEditionIntegrationTest {
     Assertions.assertEquals("New Literature Reference from Edition", references.get(1).citation());
 
     // assure rank is updated
-    assertThat(references.get(0).rank()).isEqualTo(1);
-    assertThat(references.get(1).rank()).isEqualTo(2);
+    assertThat(references.get(0).documentationUnitRank()).isEqualTo(1);
+    assertThat(references.get(1).documentationUnitRank()).isEqualTo(2);
 
     // documentation unit references are updated
     assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").references())
@@ -598,9 +594,9 @@ class LegalPeriodicalEditionIntegrationTest {
             list -> {
               // first, caselaw references
               assertThat(list.get(0).citation()).isEqualTo("Caselaw Reference from Docunit");
-              assertThat(list.get(0).rank()).isEqualTo(1);
+              assertThat(list.get(0).documentationUnitRank()).isEqualTo(1);
               assertThat(list.get(1).citation()).isEqualTo("New Caselaw Reference from Edition");
-              assertThat(list.get(1).rank()).isEqualTo(2);
+              assertThat(list.get(1).documentationUnitRank()).isEqualTo(2);
             });
 
     assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").literatureReferences())
@@ -609,9 +605,9 @@ class LegalPeriodicalEditionIntegrationTest {
             list -> {
               // then, literature citations
               assertThat(list.get(0).citation()).isEqualTo("Literature Reference from Docunit");
-              assertThat(list.get(0).rank()).isEqualTo(1);
+              assertThat(list.get(0).documentationUnitRank()).isEqualTo(1);
               assertThat(list.get(1).citation()).isEqualTo("New Literature Reference from Edition");
-              assertThat(list.get(1).rank()).isEqualTo(2);
+              assertThat(list.get(1).documentationUnitRank()).isEqualTo(2);
             });
 
     assertThat(referenceRepository.findById(referenceId)).isEmpty();
@@ -642,9 +638,9 @@ class LegalPeriodicalEditionIntegrationTest {
                         SourceDTO.builder()
                             .rank(1)
                             .reference(
-                                ReferenceDTO.builder()
+                                CaselawReferenceDTO.builder()
                                     .id(referenceId)
-                                    .rank(1)
+                                    .documentationUnitRank(1)
                                     .legalPeriodicalRawValue("ABC")
                                     .citation("ABC 2024, 3")
                                     .documentationUnit(docUnit)
@@ -736,9 +732,9 @@ class LegalPeriodicalEditionIntegrationTest {
                         SourceDTO.builder()
                             .rank(1)
                             .reference(
-                                ReferenceDTO.builder()
+                                CaselawReferenceDTO.builder()
                                     .id(referenceId)
-                                    .rank(1)
+                                    .documentationUnitRank(1)
                                     .legalPeriodicalRawValue("ABC")
                                     .citation("ABC 2024, 3")
                                     .documentationUnit(docUnit)
