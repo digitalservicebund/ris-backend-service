@@ -1,23 +1,19 @@
-import { computed, Ref } from "vue"
 import { LocationQuery } from "vue-router"
-import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { useInternalUser } from "@/composables/useInternalUser"
 import MenuItem from "@/domain/menuItem"
 
 export function useCaseLawMenuItems(
   documentNumber: string | undefined,
   routeQuery: LocationQuery, // Replace with the appropriate type for route query
-): Ref<MenuItem[]> {
+): MenuItem[] {
   const baseRoute = {
     params: { documentNumber },
     query: routeQuery,
   }
-  const isDuplicateCheckFeatureActive = useFeatureToggle(
-    "neuris.duplicate-check",
-  )
+
   const isInternalUser = useInternalUser()
 
-  return computed(() => [
+  return [
     {
       label: "Rubriken",
       route: {
@@ -85,17 +81,6 @@ export function useCaseLawMenuItems(
           },
         ]
       : []),
-    ...(isInternalUser.value && isDuplicateCheckFeatureActive.value
-      ? [
-          {
-            label: "Verwaltungsdaten",
-            route: {
-              ...baseRoute,
-              name: "caselaw-documentUnit-documentNumber-managementData",
-            },
-          },
-        ]
-      : []),
     {
       label: "Übergabe an jDV",
       route: {
@@ -103,5 +88,5 @@ export function useCaseLawMenuItems(
         name: "caselaw-documentUnit-documentNumber-handover",
       },
     },
-  ])
+  ]
 }
