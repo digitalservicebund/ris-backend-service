@@ -1,3 +1,4 @@
+import { computed, Ref } from "vue"
 import { LocationQuery } from "vue-router"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import { useInternalUser } from "@/composables/useInternalUser"
@@ -6,7 +7,7 @@ import MenuItem from "@/domain/menuItem"
 export function useCaseLawMenuItems(
   documentNumber: string | undefined,
   routeQuery: LocationQuery, // Replace with the appropriate type for route query
-): MenuItem[] {
+): Ref<MenuItem[]> {
   const baseRoute = {
     params: { documentNumber },
     query: routeQuery,
@@ -16,7 +17,7 @@ export function useCaseLawMenuItems(
   )
   const isInternalUser = useInternalUser()
 
-  return [
+  return computed(() => [
     {
       label: "Rubriken",
       route: {
@@ -102,5 +103,5 @@ export function useCaseLawMenuItems(
         name: "caselaw-documentUnit-documentNumber-handover",
       },
     },
-  ]
+  ])
 }
