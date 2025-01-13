@@ -16,6 +16,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.text.StringEscapeUtils;
 import org.docx4j.dml.CTNonVisualDrawingProps;
 import org.docx4j.dml.CTPositiveSize2D;
 import org.docx4j.dml.GraphicData;
@@ -125,8 +126,9 @@ public class RunElementConverter {
   private static RunElement generateRunTextElement(
       String text, RPrAbstract rPr, ParagraphElement paragraph, DocxConverter converter) {
     RunTextElement runTextElement = new RunTextElement();
+    String htmlEscapedText = StringEscapeUtils.escapeHtml4(text);
 
-    runTextElement.setText(text);
+    runTextElement.setText(htmlEscapedText);
     addStyle(runTextElement, rPr, paragraph, converter);
 
     return runTextElement;

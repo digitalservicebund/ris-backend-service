@@ -3,10 +3,9 @@ import { computed, toRaw } from "vue"
 import type { Component } from "vue"
 import { DisplayMode } from "@/components/enumDisplayMode"
 import IconBadge from "@/components/IconBadge.vue"
+import { useScrollPreviewContainer } from "@/composables/useScrollPreviewContainer"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { PublicationStatus } from "@/domain/publicationStatus"
-import { useDocumentUnitStore } from "@/stores/documentUnitStore"
-import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import BaselineArrowOutward from "~icons/ic/baseline-arrow-outward"
 
 interface Props {
@@ -23,31 +22,8 @@ const props = withDefaults(defineProps<Props>(), {
   documentNumber: undefined,
   icon: undefined,
 })
-
+const { openSidePanel } = useScrollPreviewContainer()
 const statusBadge = computed(() => useStatusBadge(props.status).value)
-
-const documentUnitStore = useDocumentUnitStore()
-const extraContentSidePanelStore = useExtraContentSidePanelStore()
-
-async function openSidePanel(documentUnitNumber?: string) {
-  if (documentUnitNumber) {
-    await documentUnitStore.loadDocumentUnit(documentUnitNumber)
-    extraContentSidePanelStore.togglePanel(true)
-
-    const container = document.getElementById("preview-container")
-
-    setTimeout(() => {
-      if (!container) return
-      const target = document.getElementById("previewGuidingPrinciple")
-      const scrollPosition = target ? target.offsetTop - container.offsetTop : 0
-
-      container.scrollTo({
-        top: scrollPosition,
-        behavior: "smooth",
-      })
-    })
-  }
-}
 
 const summary = computed(() =>
   props.status ? `${props.summary},  ` : props.summary,
