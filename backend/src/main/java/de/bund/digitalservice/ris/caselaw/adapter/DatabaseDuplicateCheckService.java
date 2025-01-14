@@ -185,8 +185,7 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
     var court = documentationUnit.getCourt();
     if (court != null) {
       allDeviatingCourts.add(
-          CourtTransformer.generateLabel(
-              court.getType().toUpperCase(), court.getLocation().toUpperCase()));
+          CourtTransformer.generateLabel(court.getType(), court.getLocation()).toUpperCase());
     }
     return allDeviatingCourts;
   }
