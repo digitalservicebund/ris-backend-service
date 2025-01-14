@@ -20,7 +20,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.LdmlExporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.LegalPeriodicalEditionController;
 import de.bund.digitalservice.ris.caselaw.adapter.MockXmlExporter;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseHandoverReportRepository;
@@ -42,6 +41,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverR
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalEditionRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.HandoverMailTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.RelatedDocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -56,12 +56,16 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
+import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalRepository;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
+import de.bund.digitalservice.ris.caselaw.domain.Reference;
+import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Clock;
@@ -176,9 +180,9 @@ class HandoverMailIntegrationTest {
   @AfterEach
   void cleanUp() {
     xmlHandoverRepository.deleteAll();
+    editionRepository.deleteAll();
     repository.deleteAll();
     databaseHandoverReportRepository.deleteAll();
-    editionRepository.deleteAll();
     dblegalPeriodicalRepository.deleteAll();
   }
 
@@ -203,31 +207,30 @@ class HandoverMailIntegrationTest {
     assertThat(repository.findAll()).hasSize(1);
 
     if (entityType == HandoverEntityType.EDITION) {
-      LegalPeriodicalEditionDTO legalPeriodicalEditionDTO =
-          LegalPeriodicalEditionDTO.builder()
+      LegalPeriodicalEdition legalPeriodicalEdition =
+          LegalPeriodicalEdition.builder()
               .id(entityId)
               .legalPeriodical(
-                  LegalPeriodicalDTO.builder()
-                      .id(UUID.fromString("1abf62fe-9ddf-487e-962e-1c71cf661c5b"))
+                  LegalPeriodical.builder()
+                      .uuid(UUID.fromString("1abf62fe-9ddf-487e-962e-1c71cf661c5b"))
                       .abbreviation("ABC")
                       .build())
-              .build();
-      legalPeriodicalEditionDTO.setReferences(
-          List.of(
-              referenceRepository
-                  .save(
-                      CaselawReferenceDTO.builder()
+              .references(
+                  List.of(
+                      Reference.builder()
                           .id(UUID.randomUUID())
+                          .referenceType(ReferenceType.CASELAW)
                           .citation("citation")
                           .legalPeriodicalRawValue("ABC")
-                          .type("nichtamtlich")
+                          .primaryReference(true)
                           .documentationUnitRank(1)
-                          .documentationUnit(savedDocumentationUnitDTO)
-                          .build())
-                  .toBuilder()
-                  .editionRank(1)
-                  .build()));
-      editionRepository.save(legalPeriodicalEditionDTO);
+                          .documentationUnit(
+                              RelatedDocumentationUnitTransformer.transformToDomain(
+                                  (savedDocumentationUnitDTO)))
+                          .editionRank(1)
+                          .build()))
+              .build();
+      legalPeriodicalEditionRepository.save(legalPeriodicalEdition);
       assertThat(editionRepository.findAll()).hasSize(1);
       identifier = "edition-" + entityId;
     }

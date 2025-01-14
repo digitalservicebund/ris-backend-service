@@ -5,10 +5,13 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.ReferenceTransform
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
+import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,15 +20,12 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
     implements LegalPeriodicalEditionRepository {
   private final DatabaseLegalPeriodicalEditionRepository repository;
   private final DatabaseDocumentationUnitRepository documentationUnitRepository;
-  private final DatabaseDependentLiteratureCitationRepository dependentLiteratureCitationRepository;
 
   public PostgresLegalPeriodicalEditionRepositoryImpl(
       DatabaseLegalPeriodicalEditionRepository repository,
-      DatabaseDocumentationUnitRepository documentationUnitRepository,
-      DatabaseDependentLiteratureCitationRepository dependentLiteratureCitationRepository) {
+      DatabaseDocumentationUnitRepository documentationUnitRepository) {
     this.repository = repository;
     this.documentationUnitRepository = documentationUnitRepository;
-    this.dependentLiteratureCitationRepository = dependentLiteratureCitationRepository;
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -45,6 +45,7 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
 
     var references = new ArrayList<ReferenceDTO>();
     var editionDTO = LegalPeriodicalEditionTransformer.transformToDTO(legalPeriodicalEdition);
+    AtomicInteger editionRank = new AtomicInteger(0);
     for (Reference reference :
         Optional.ofNullable(legalPeriodicalEdition.references()).orElse(new ArrayList<>())) {
 
@@ -54,21 +55,55 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
       if (documentationUnitOptional.isEmpty()) {
         continue;
       }
-      var referenceDTO = ReferenceTransformer.transformToDTO(reference);
       var documentationUnitDTO = documentationUnitOptional.get();
-      if (referenceDTO instanceof CaselawReferenceDTO caselawReferenceDTO) {
-        documentationUnitDTO.addCaselawReference(caselawReferenceDTO);
-      } else if (referenceDTO instanceof LiteratureReferenceDTO literatureReferenceDTO) {
-        documentationUnitDTO.addLiteratureReference(literatureReferenceDTO);
-      }
-      documentationUnitRepository.save(documentationUnitDTO);
+      ReferenceDTO referenceDTO = ReferenceTransformer.transformToDTO(reference);
+      referenceDTO.setDocumentationUnitRank(
+          calculateDocumentationUnitRankForReference(reference, documentationUnitDTO));
+      referenceDTO.setDocumentationUnit(documentationUnitDTO);
+      referenceDTO.setEditionRank(editionRank.getAndIncrement());
       referenceDTO.setEdition(editionDTO);
       references.add(referenceDTO);
     }
 
     editionDTO.setReferences(references);
-
     return LegalPeriodicalEditionTransformer.transformToDomain(repository.save(editionDTO));
+  }
+
+  /**
+   * Keep doc unit's rank for existing references and set to max rank +1 for new references
+   *
+   * @param reference
+   * @param docUnit
+   * @return
+   */
+  private Integer calculateDocumentationUnitRankForReference(
+      Reference reference, DocumentationUnitDTO docUnit) {
+    if (reference.referenceType().equals(ReferenceType.CASELAW)) {
+      return docUnit.getCaselawReferences().stream()
+          .filter(referenceDTO -> referenceDTO.getId().equals(reference.id()))
+          .findFirst()
+          .map(ReferenceDTO::getDocumentationUnitRank)
+          .orElseGet(
+              () ->
+                  docUnit.getCaselawReferences().stream()
+                          .map(ReferenceDTO::getDocumentationUnitRank)
+                          .max(Comparator.naturalOrder())
+                          .orElse(0)
+                      + 1);
+    } else if (reference.referenceType().equals(ReferenceType.LITERATURE)) {
+      return docUnit.getLiteratureReferences().stream()
+          .filter(referenceDTO -> referenceDTO.getId().equals(reference.id()))
+          .findFirst()
+          .map(ReferenceDTO::getDocumentationUnitRank)
+          .orElseGet(
+              () ->
+                  docUnit.getLiteratureReferences().stream()
+                          .map(ReferenceDTO::getDocumentationUnitRank)
+                          .max(Comparator.naturalOrder())
+                          .orElse(0)
+                      + 1);
+    }
+    return null;
   }
 
   @Override
