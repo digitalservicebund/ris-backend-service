@@ -1,20 +1,22 @@
 <script lang="ts" setup>
+import Document from "@tiptap/extension-document"
+import Paragraph from "@tiptap/extension-paragraph"
+import Text from "@tiptap/extension-text"
+import { Editor, EditorContent, useEditor } from "@tiptap/vue-3"
 import { computed, ref } from "vue"
-import { useEditor, EditorContent, Editor } from "@tiptap/vue-3"
 
+import TextCorrectionDropdown from "@/components/TextCorrectionDropdown.vue"
+import BubbleMenu from "@/editor/languagetool/BubbleMenu.vue"
 import {
   LanguageTool,
   LanguageToolHelpingWords,
-  Replacement,
   Match,
+  Replacement,
 } from "@/editor/languagetool/languageTool"
-import BubbleMenu from "@/editor/languagetool/BubbleMenu.vue"
-import Paragraph from "@tiptap/extension-paragraph"
-import Document from "@tiptap/extension-document"
-import Text from "@tiptap/extension-text"
 
 const editor = useEditor({
   content: `1
+  LanguageTool ist Ihr intelligenter Schreibassistent für alle gängigen Browser und Textverarbeitungsprogramme. Schreiben sie in diesem Textfeld oder fügen Sie einen Text ein. Rechtshcreibfehler werden rot markirt, Grammatikfehler werden gelb hervor gehoben und Stilfehler werden, anders wie die anderen Fehler, blau unterstrichen. wussten Sie dass Synonyme per Doppelklick auf ein Wort aufgerufen werden können? Nutzen Sie LanguageTool in allen Lebenslagen, zB. wenn Sie am Donnerstag, dem 13. Mai 2022, einen Basketballkorb in 10 Fuß Höhe montieren möchten.
 In der Sache ist streitig, ob der Klägerin und Revisionsklägerin (Klägerin), ei­ner GmbH, die (unter anderem) Wohnungen an Senioren vermietete, im Streitjahr 2012 die erweiterte Gewerbesteuerkürzung gemäß § 9 Nr. 1 Satz 2 des Gewerbesteuergesetzes (GewStG) zusteht.
 
 
@@ -79,7 +81,6 @@ const matchMessage = computed(() => match.value?.message || "No Message")
 
 const acceptSuggestion = (sug: Replacement) => {
   if (editor.value == undefined || matchRange.value == undefined) return
-
   editor.value.commands.insertContentAt(matchRange.value, sug.value)
 }
 
@@ -92,35 +93,22 @@ const ignoreSuggestion = () => {
 
 <template>
   <div>
-    <editor-content class="content" v-if="editor" :editor="editor" />
+    <EditorContent v-if="editor" class="content" :editor="editor" />
 
-    <bubble-menu
-      class="bubble-menu"
+    <BubbleMenu
       v-if="editor"
+      class="bubble-menu"
       :editor="editor"
-      :tippy-options="{ placement: 'bottom', animation: 'fade' }"
       :should-show="shouldShow"
+      :tippy-options="{ placement: 'bottom', animation: 'fade' }"
     >
-      <section class="bubble-menu-section-container">
-        <section class="message-section">
-          {{ matchMessage }}
-
-          <button class="ignore-suggestion-button" @click="ignoreSuggestion">
-            XXX
-          </button>
-        </section>
-        <section class="suggestions-section">
-          <article
-            v-for="(replacement, i) in replacements"
-            @click="() => acceptSuggestion(replacement)"
-            :key="i + replacement.value"
-            class="suggestion"
-          >
-            {{ replacement.value }}
-          </article>
-        </section>
-      </section>
-    </bubble-menu>
+      <TextCorrectionDropdown
+        match-message=""
+        :replacements="replacements"
+        @suggestion:ignore="ignoreSuggestion"
+        @suggestion:update="acceptSuggestion"
+      />
+    </BubbleMenu>
   </div>
 </template>
 

@@ -7,13 +7,14 @@ interface Props {
   label?: string
   icon?: Component
   ariaLabel?: string
-  buttonType?: string
+  buttonType?: "ghost" | "secondary" | "primary" | "destructive" | "tertiary"
   disabled?: boolean
   href?: string
   download?: boolean | string
   size?: "large" | "medium" | "small"
   target?: "_self" | "_blank" | "_parent" | "_top"
   iconPosition?: "left" | "right"
+  width?: "w-max" | "w-full"
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -27,6 +28,7 @@ const props = withDefaults(defineProps<Props>(), {
   size: "medium",
   target: undefined,
   iconPosition: "left",
+  width: "w-max",
 })
 
 const buttonClasses = computed(() => ({
@@ -53,6 +55,7 @@ const buttonClasses = computed(() => ({
     props.label &&
     props.buttonType !== "ghost" &&
     props.iconPosition === "right",
+  "w-full": true,
 }))
 
 const isLink = computed(() => !!props.href)
@@ -91,7 +94,7 @@ const render = () => {
 </script>
 
 <template>
-  <div class="w-max" data-testid>
+  <div :class="width" data-testid>
     <render />
   </div>
 </template>
