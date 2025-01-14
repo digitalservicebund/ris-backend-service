@@ -530,7 +530,7 @@ class DocumentationUnitServiceTest {
         "/coreData/court",
         "/coreData/deviatingCourts",
         "/coreData/decisionDate",
-        "/coreData/deviatingDecisionDate",
+        "/coreData/deviatingDecisionDates",
         "/coreData/documentType");
   }
 
