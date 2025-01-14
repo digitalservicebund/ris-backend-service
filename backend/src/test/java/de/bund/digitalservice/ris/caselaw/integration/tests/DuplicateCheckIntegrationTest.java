@@ -586,13 +586,13 @@ class DuplicateCheckIntegrationTest {
       duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
 
       // Assert
-      assertThat(duplicateRelationRepository.findAll()).hasSize(0);
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
       assertThat(
               documentationUnitService
                   .getByUuid(docUnitToBeChecked.getId())
                   .managementData()
                   .duplicateRelations())
-          .hasSize(0);
+          .isEmpty();
     }
 
     @Test
@@ -636,7 +636,7 @@ class DuplicateCheckIntegrationTest {
                   .getByUuid(docUnitToBeChecked.getId())
                   .managementData()
                   .duplicateRelations())
-          .hasSize(0);
+          .isEmpty();
     }
   }
 
