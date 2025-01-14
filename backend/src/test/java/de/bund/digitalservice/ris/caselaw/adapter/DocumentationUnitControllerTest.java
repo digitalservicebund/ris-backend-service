@@ -785,7 +785,6 @@ class DocumentationUnitControllerTest {
     verify(ldmlExporterService).publishDocumentationUnit(TEST_UUID);
   }
 
-
   @Test
   void testUpdateDuplicateStatus_withValidStatus() throws DocumentationUnitNotExistsException {
     var docNumberOrigin = "documentNumber";
@@ -805,11 +804,16 @@ class DocumentationUnitControllerTest {
 
     when(service.getByDocumentNumber(docNumberOrigin)).thenReturn(documentationUnit);
 
-    DuplicateRelationStatusRequest body = DuplicateRelationStatusRequest.builder().status(DuplicateRelationStatus.IGNORED).build();
+    DuplicateRelationStatusRequest body =
+        DuplicateRelationStatusRequest.builder().status(DuplicateRelationStatus.IGNORED).build();
     risWebClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + docNumberOrigin + "/duplicate-status/" + docNumberDuplicate)
+        .uri(
+            "/api/v1/caselaw/documentunits/"
+                + docNumberOrigin
+                + "/duplicate-status/"
+                + docNumberDuplicate)
         .contentType(MediaType.APPLICATION_JSON)
         .bodyValue(body)
         .exchange()

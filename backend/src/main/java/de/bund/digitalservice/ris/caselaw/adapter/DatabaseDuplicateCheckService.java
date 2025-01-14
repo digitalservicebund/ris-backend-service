@@ -13,14 +13,13 @@ import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
@@ -91,11 +90,18 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
   public String updateDuplicateStatus(
       String docNumberOrigin, String docNumberDuplicate, DuplicateRelationStatus status)
       throws DocumentationUnitNotExistsException {
-    var originDocUnit = documentationUnitRepository.findByDocumentNumber(docNumberOrigin).orElseThrow(DocumentationUnitNotExistsException::new);
-    var duplicateDocUnit = documentationUnitRepository.findByDocumentNumber(docNumberDuplicate).orElseThrow(DocumentationUnitNotExistsException::new);
+    var originDocUnit =
+        documentationUnitRepository
+            .findByDocumentNumber(docNumberOrigin)
+            .orElseThrow(DocumentationUnitNotExistsException::new);
+    var duplicateDocUnit =
+        documentationUnitRepository
+            .findByDocumentNumber(docNumberDuplicate)
+            .orElseThrow(DocumentationUnitNotExistsException::new);
     var duplicateRelation =
-        duplicateRelationService.findByDocUnitIds(
-            originDocUnit.getId(), duplicateDocUnit.getId()).orElseThrow(IllegalArgumentException::new);
+        duplicateRelationService
+            .findByDocUnitIds(originDocUnit.getId(), duplicateDocUnit.getId())
+            .orElseThrow(IllegalArgumentException::new);
     duplicateRelationService.setStatus(duplicateRelation, status);
     return "The duplicate status has been successfully updated to " + status;
   }
