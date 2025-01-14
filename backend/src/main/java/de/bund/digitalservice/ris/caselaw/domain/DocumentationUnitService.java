@@ -40,6 +40,17 @@ public class DocumentationUnitService {
   private final AuthService authService;
   private final Validator validator;
   private final DuplicateCheckService duplicateCheckService;
+  private static final List<String> pathsForDuplicateCheck =
+      List.of(
+          "/coreData/ecli",
+          "/coreData/deviatingEclis",
+          "/coreData/fileNumbers",
+          "/coreData/deviatingFileNumbers",
+          "/coreData/court",
+          "/coreData/deviatingCourts",
+          "/coreData/decisionDate",
+          "/coreData/deviatingDecisionDate",
+          "/coreData/documentType");
 
   public DocumentationUnitService(
       DocumentationUnitRepository repository,
@@ -306,30 +317,10 @@ public class DocumentationUnitService {
             patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit);
         patchedDocumentationUnit = patchedDocumentationUnit.toBuilder().version(newVersion).build();
 
-        var attributesForDuplicateCheck =
-            List.of(
-                "/coreData/ecli",
-                "/coreData/deviatingEclis",
-                "/coreData/fileNumbers",
-                "/coreData/deviatingFileNumbers",
-                "/coreData/court",
-                "/coreData/deviatingCourts",
-                "/coreData/decisionDate",
-                "/coreData/deviatingDecisionDate",
-                "/coreData/documentType");
-        DuplicateCheck duplicateCheckEnabled;
-        boolean hasChangedAttributeRelevantForDuplicateCheck =
-            patch.patch().getOperations().stream()
-                .map(JsonPatchOperation::getPath)
-                .anyMatch(path -> attributesForDuplicateCheck.stream().anyMatch(path::contains));
-        if (hasChangedAttributeRelevantForDuplicateCheck) {
-          duplicateCheckEnabled = DuplicateCheck.ENABLED;
-        } else {
-          duplicateCheckEnabled = DuplicateCheck.DISABLED;
-        }
+        DuplicateCheckStatus duplicateCheckStatus = getDuplicateCheckStatus(patch);
 
         DocumentationUnit updatedDocumentationUnit =
-            updateDocumentationUnit(patchedDocumentationUnit, duplicateCheckEnabled);
+            updateDocumentationUnit(patchedDocumentationUnit, duplicateCheckStatus);
 
         toFrontendJsonPatch =
             patchMapperService.getDiffPatch(patchedDocumentationUnit, updatedDocumentationUnit);
@@ -384,11 +375,11 @@ public class DocumentationUnitService {
 
   public DocumentationUnit updateDocumentationUnit(DocumentationUnit documentationUnit)
       throws DocumentationUnitNotExistsException {
-    return this.updateDocumentationUnit(documentationUnit, DuplicateCheck.DISABLED);
+    return this.updateDocumentationUnit(documentationUnit, DuplicateCheckStatus.DISABLED);
   }
 
   public DocumentationUnit updateDocumentationUnit(
-      DocumentationUnit documentationUnit, DuplicateCheck mode)
+      DocumentationUnit documentationUnit, DuplicateCheckStatus duplicateCheckStatus)
       throws DocumentationUnitNotExistsException {
     repository.saveKeywords(documentationUnit);
     repository.saveFieldsOfLaw(documentationUnit);
@@ -396,7 +387,7 @@ public class DocumentationUnitService {
 
     repository.save(documentationUnit);
 
-    if (mode == DuplicateCheck.ENABLED) {
+    if (duplicateCheckStatus == DuplicateCheckStatus.ENABLED) {
       duplicateCheckService.checkDuplicates(documentationUnit.documentNumber());
     }
 
@@ -442,8 +433,20 @@ public class DocumentationUnitService {
     }
   }
 
-  public enum DuplicateCheck {
+  public enum DuplicateCheckStatus {
     ENABLED,
     DISABLED
+  }
+
+  private static DuplicateCheckStatus getDuplicateCheckStatus(RisJsonPatch patch) {
+    boolean hasPathRelevantForDuplicateCheck =
+        patch.patch().getOperations().stream()
+            .map(JsonPatchOperation::getPath)
+            .anyMatch(path -> pathsForDuplicateCheck.stream().anyMatch(path::contains));
+    if (hasPathRelevantForDuplicateCheck) {
+      return DuplicateCheckStatus.ENABLED;
+    } else {
+      return DuplicateCheckStatus.DISABLED;
+    }
   }
 }
