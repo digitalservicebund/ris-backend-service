@@ -29,6 +29,9 @@ public class DuplicateRelationTransformer {
     return DuplicateRelation.builder()
         .documentNumber(duplicate.getDocumentNumber())
         .status(duplicateRelationDTO.getStatus())
+        .isJdvDuplicateCheckActive(
+            !Boolean.FALSE.equals(duplicate.getIsJdvDuplicateCheckActive())
+                && !Boolean.FALSE.equals(current.getIsJdvDuplicateCheckActive()))
         .build();
   }
 }
