@@ -248,13 +248,15 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
     }
   }
 
+  /**
+   * If the relationship is PENDING and the legacy jdv "dup-code ausschalten" applies, the status
+   * must be set to IGNORED.
+   */
   private boolean shouldUpdateRelationStatus(
       DocumentationUnitIdDuplicateCheckDTO dup, Optional<DuplicateRelationDTO> existingRelation) {
-    return dup.getIsJdvDuplicateCheckActive() != null
-        && Boolean.FALSE.equals(
-            dup.getIsJdvDuplicateCheckActive()
-                && existingRelation.isPresent()
-                && DuplicateRelationStatus.PENDING.equals(existingRelation.get().getStatus()));
+    return Boolean.FALSE.equals(dup.getIsJdvDuplicateCheckActive())
+        && existingRelation.isPresent()
+        && DuplicateRelationStatus.PENDING.equals(existingRelation.get().getStatus());
   }
 
   private void removeObsoleteDuplicates(
