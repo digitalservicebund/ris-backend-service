@@ -35,6 +35,8 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatusRequest;
 import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
@@ -781,5 +783,37 @@ class DocumentationUnitControllerTest {
         .is5xxServerError();
 
     verify(ldmlExporterService).publishDocumentationUnit(TEST_UUID);
+  }
+
+
+  @Test
+  void testUpdateDuplicateStatus_withValidStatus() throws DocumentationUnitNotExistsException {
+    var docNumberOrigin = "documentNumber";
+    var docNumberDuplicate = "duplicateNumb";
+    when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
+    DocumentationOffice documentationOffice =
+        DocumentationOffice.builder()
+            .uuid(UUID.fromString("ba90a851-3c54-4858-b4fa-7742ffbe8f05"))
+            .abbreviation("DS")
+            .build();
+
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .documentNumber(docNumberOrigin)
+            .coreData(CoreData.builder().documentationOffice(documentationOffice).build())
+            .build();
+
+    when(service.getByDocumentNumber(docNumberOrigin)).thenReturn(documentationUnit);
+
+    DuplicateRelationStatusRequest body = DuplicateRelationStatusRequest.builder().status(DuplicateRelationStatus.IGNORED).build();
+    risWebClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + docNumberOrigin + "/duplicate-status/" + docNumberDuplicate)
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue(body)
+        .exchange()
+        .expectStatus()
+        .isOk();
   }
 }
