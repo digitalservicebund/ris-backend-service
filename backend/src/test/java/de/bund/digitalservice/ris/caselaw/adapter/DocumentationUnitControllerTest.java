@@ -255,6 +255,7 @@ class DocumentationUnitControllerTest {
 
     // once by the AuthService and once by the controller asking the service
     verify(service, times(2)).getByDocumentNumber("ABCD202200001");
+    verify(duplicateCheckService, times(1)).checkDuplicates("ABCD202200001");
   }
 
   @Test
