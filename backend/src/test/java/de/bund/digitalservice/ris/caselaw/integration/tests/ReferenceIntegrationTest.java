@@ -369,6 +369,7 @@ class ReferenceIntegrationTest {
                             .legalPeriodical(
                                 LegalPeriodical.builder()
                                     .uuid(bverwgeLegalPeriodical.uuid())
+                                    .primaryReference(true)
                                     .build())
                             .build(),
                         Reference.builder()

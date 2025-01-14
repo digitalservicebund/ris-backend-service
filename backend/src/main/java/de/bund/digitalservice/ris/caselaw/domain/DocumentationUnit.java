@@ -19,7 +19,6 @@ import lombok.Builder;
  * @param ensuingDecisions a list of ensuing decisions
  * @param shortTexts the short texts (e.g. tenor, headnote)
  * @param longTexts the long texts (e.g. reasons)
- * @param borderNumbers a list of border numbers
  * @param status the current status including publication and error status
  * @param note a note added to the documentation unit
  * @param contentRelatedIndexing the content related indexing data

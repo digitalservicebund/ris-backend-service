@@ -157,13 +157,14 @@ public class DocumentationUnitTransformer {
     }
 
     addReferences(updatedDomainObject, builder);
-    addDependentLiteratureCitations(updatedDomainObject, builder);
+    addLiteratureReferences(updatedDomainObject, builder);
 
     return builder.build();
   }
 
   private static void addReferences(
       DocumentationUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
+    AtomicInteger rank = new AtomicInteger(0);
     builder.caselawReferences(
         updatedDomainObject.references() == null
             ? Collections.emptyList()
@@ -172,13 +173,15 @@ public class DocumentationUnitTransformer {
                 .map(
                     referenceDTO -> {
                       referenceDTO.setDocumentationUnit(builder.build()); // TODO needed?
+                      referenceDTO.setDocumentationUnitRank(rank.getAndIncrement());
                       return (CaselawReferenceDTO) referenceDTO;
                     })
                 .toList());
   }
 
-  private static void addDependentLiteratureCitations(
+  private static void addLiteratureReferences(
       DocumentationUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
+    AtomicInteger rank = new AtomicInteger(0);
     builder.literatureReferences(
         updatedDomainObject.literatureReferences() == null
             ? Collections.emptyList()
@@ -187,6 +190,7 @@ public class DocumentationUnitTransformer {
                 .map(
                     referenceDTO -> {
                       referenceDTO.setDocumentationUnit(builder.build()); // TODO needed?
+                      referenceDTO.setDocumentationUnitRank(rank.getAndIncrement());
                       return (LiteratureReferenceDTO) referenceDTO;
                     })
                 .toList());

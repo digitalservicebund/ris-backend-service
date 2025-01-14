@@ -340,16 +340,4 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @OrderBy("rank")
   @Builder.Default
   private List<ParticipatingJudgeDTO> participatingJudges = new ArrayList<>();
-
-  public void addCaselawReference(CaselawReferenceDTO reference) {
-    reference.setDocumentationUnit(this);
-    reference.setDocumentationUnitRank(this.caselawReferences.size());
-    this.caselawReferences.add(reference);
-  }
-
-  public void addLiteratureReference(LiteratureReferenceDTO reference) {
-    reference.setDocumentationUnit(this);
-    reference.setDocumentationUnitRank(this.literatureReferences.size());
-    this.literatureReferences.add(reference);
-  }
 }
