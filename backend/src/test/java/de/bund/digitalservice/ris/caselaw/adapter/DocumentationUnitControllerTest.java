@@ -54,6 +54,7 @@ import de.bund.digitalservice.ris.caselaw.domain.XmlTransformationResult;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
+import jakarta.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
@@ -819,5 +820,83 @@ class DocumentationUnitControllerTest {
         .exchange()
         .expectStatus()
         .isOk();
+  }
+
+  @Test
+  void testUpdateDuplicateStatus_withInValidStatus() throws DocumentationUnitNotExistsException {
+    var docNumberOrigin = "documentNumber";
+    var docNumberDuplicate = "duplicateNumb";
+    when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
+    DocumentationOffice documentationOffice =
+        DocumentationOffice.builder()
+            .uuid(UUID.fromString("ba90a851-3c54-4858-b4fa-7742ffbe8f05"))
+            .abbreviation("DS")
+            .build();
+
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .documentNumber(docNumberOrigin)
+            .coreData(CoreData.builder().documentationOffice(documentationOffice).build())
+            .build();
+
+    when(service.getByDocumentNumber(docNumberOrigin)).thenReturn(documentationUnit);
+
+    String body = """
+            { "status": "INVALID" }
+            """;
+    risWebClient
+        .withDefaultLogin()
+        .put()
+        .uri(
+            "/api/v1/caselaw/documentunits/"
+                + docNumberOrigin
+                + "/duplicate-status/"
+                + docNumberDuplicate)
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyJsonString(body)
+        .exchange()
+        .expectStatus()
+        .isBadRequest();
+  }
+
+  @Test
+  void testUpdateDuplicateStatus_withNonExistingRelation()
+      throws DocumentationUnitNotExistsException {
+    var docNumberOrigin = "documentNumber";
+    var docNumberDuplicate = "duplicateNumb";
+    when(userService.isInternal(any(OidcUser.class))).thenReturn(true);
+    DocumentationOffice documentationOffice =
+        DocumentationOffice.builder()
+            .uuid(UUID.fromString("ba90a851-3c54-4858-b4fa-7742ffbe8f05"))
+            .abbreviation("DS")
+            .build();
+
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .documentNumber(docNumberOrigin)
+            .coreData(CoreData.builder().documentationOffice(documentationOffice).build())
+            .build();
+
+    when(service.getByDocumentNumber(docNumberOrigin)).thenReturn(documentationUnit);
+
+    when(duplicateCheckService.updateDuplicateStatus(any(), any(), any()))
+        .thenThrow(EntityNotFoundException.class);
+
+    DuplicateRelationStatusRequest body =
+        DuplicateRelationStatusRequest.builder().status(DuplicateRelationStatus.IGNORED).build();
+
+    risWebClient
+        .withDefaultLogin()
+        .put()
+        .uri(
+            "/api/v1/caselaw/documentunits/"
+                + docNumberOrigin
+                + "/duplicate-status/"
+                + docNumberDuplicate)
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue(body)
+        .exchange()
+        .expectStatus()
+        .is4xxClientError();
   }
 }

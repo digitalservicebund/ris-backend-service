@@ -25,6 +25,7 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDele
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.domain.export.juris.response.StatusImporterException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
 import java.time.Duration;
@@ -489,7 +490,7 @@ public class DocumentationUnitController {
               documentNumberDuplicate,
               duplicateRelationStatusRequest.getStatus());
       return ResponseEntity.status(HttpStatus.OK).body(result);
-    } catch (DocumentationUnitNotExistsException | IllegalArgumentException ex) {
+    } catch (DocumentationUnitNotExistsException | EntityNotFoundException ex) {
       return ResponseEntity.notFound().build();
     }
   }

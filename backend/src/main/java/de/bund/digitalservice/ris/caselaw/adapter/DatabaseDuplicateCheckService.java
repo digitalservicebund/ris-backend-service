@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -101,7 +102,7 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
     var duplicateRelation =
         duplicateRelationService
             .findByDocUnitIds(originDocUnit.getId(), duplicateDocUnit.getId())
-            .orElseThrow(IllegalArgumentException::new);
+            .orElseThrow(EntityNotFoundException::new);
     duplicateRelationService.setStatus(duplicateRelation, status);
     return "The duplicate status has been successfully updated to " + status;
   }
