@@ -43,18 +43,30 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
   @Transactional(transactionManager = "jpaTransactionManager")
   public LegalPeriodicalEdition save(LegalPeriodicalEdition legalPeriodicalEdition) {
 
+    var references = new ArrayList<ReferenceDTO>();
     var editionDTO = LegalPeriodicalEditionTransformer.transformToDTO(legalPeriodicalEdition);
-
     for (Reference reference :
         Optional.ofNullable(legalPeriodicalEdition.references()).orElse(new ArrayList<>())) {
 
-      if (documentationUnitRepository
-          .findByDocumentNumber(reference.documentationUnit().getDocumentNumber())
-          .isEmpty()) {
+      var documentationUnitOptional =
+          documentationUnitRepository.findByDocumentNumber(
+              reference.documentationUnit().getDocumentNumber());
+      if (documentationUnitOptional.isEmpty()) {
         continue;
       }
-      editionDTO.getReferences().add(ReferenceTransformer.transformToDTO(reference));
+      var referenceDTO = ReferenceTransformer.transformToDTO(reference);
+      var documentationUnitDTO = documentationUnitOptional.get();
+      if (referenceDTO instanceof CaselawReferenceDTO caselawReferenceDTO) {
+        documentationUnitDTO.addCaselawReference(caselawReferenceDTO);
+      } else if (referenceDTO instanceof LiteratureReferenceDTO literatureReferenceDTO) {
+        documentationUnitDTO.addLiteratureReference(literatureReferenceDTO);
+      }
+      documentationUnitRepository.save(documentationUnitDTO);
+      referenceDTO.setEdition(editionDTO);
+      references.add(referenceDTO);
     }
+
+    editionDTO.setReferences(references);
 
     return LegalPeriodicalEditionTransformer.transformToDomain(repository.save(editionDTO));
   }
