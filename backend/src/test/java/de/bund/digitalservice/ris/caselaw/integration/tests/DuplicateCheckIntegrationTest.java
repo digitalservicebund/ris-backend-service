@@ -546,7 +546,7 @@ class DuplicateCheckIntegrationTest {
     }
 
     @Test
-    void checkDuplicates_deleteDocUnit_shouldDeleteAssociatedDuplicateWarnings()
+    void deleteDocUnit_withDuplicateRelation_shouldDeleteDuplicateRelation()
         throws DocumentationUnitNotExistsException {
       // Arrange
       var docUnitToBeChecked =
@@ -580,10 +580,8 @@ class DuplicateCheckIntegrationTest {
           .hasSize(1);
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
 
-      documentationUnitService.deleteByUuid(duplicateDTO.getId());
-
       // Act
-      duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
+      documentationUnitService.deleteByUuid(duplicateDTO.getId());
 
       // Assert
       assertThat(duplicateRelationRepository.findAll()).isEmpty();
