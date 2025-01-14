@@ -56,28 +56,8 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
       var documentationUnit =
           documentationUnitRepository.findByDocumentNumber(docNumber).orElseThrow();
 
-      var allFileNumbers = collectFileNumbers(documentationUnit);
-      var allEclis = collectEclis(documentationUnit);
-
-      // A duplicate depends on filenumber/ecli
-      if (allFileNumbers.isEmpty() && allEclis.isEmpty()) {
-        return;
-      }
-
-      var allDates = collectDecisionDates(documentationUnit);
-      var allCourtIds = collectCourtIds(documentationUnit);
-      var allDeviatingCourts = collectDeviatingCourts(documentationUnit);
-      var allDocTypeIds = collectDocumentTypeIds(documentationUnit);
-
-      var duplicates =
-          findPotentialDuplicates(
-              documentationUnit,
-              allFileNumbers,
-              allDates,
-              allCourtIds,
-              allDeviatingCourts,
-              allEclis,
-              allDocTypeIds);
+      List<DocumentationUnitIdDuplicateCheckDTO> duplicates =
+          findPotentialDuplicates(documentationUnit);
 
       processDuplicates(documentationUnit, duplicates);
       removeObsoleteDuplicates(documentationUnit, duplicates);
@@ -85,6 +65,33 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
       var errorMessage = String.format("Could not check duplicates for doc unit %s", docNumber);
       log.error(errorMessage, e);
     }
+  }
+
+  private List<DocumentationUnitIdDuplicateCheckDTO> findPotentialDuplicates(
+      DocumentationUnitDTO documentationUnit) {
+    var allFileNumbers = collectFileNumbers(documentationUnit);
+    var allEclis = collectEclis(documentationUnit);
+
+    if (allFileNumbers.isEmpty() && allEclis.isEmpty()) {
+      // As duplicates depend on either fileNumber/ECLI, without these attributes -> no duplicates
+      return List.of();
+    }
+
+    var allDates = collectDecisionDates(documentationUnit);
+    var allCourtIds = collectCourtIds(documentationUnit);
+    var allDeviatingCourts = collectDeviatingCourts(documentationUnit);
+    var allDocTypeIds = collectDocumentTypeIds(documentationUnit);
+
+    var duplicates =
+        findPotentialDuplicates(
+            documentationUnit,
+            allFileNumbers,
+            allDates,
+            allCourtIds,
+            allDeviatingCourts,
+            allEclis,
+            allDocTypeIds);
+    return duplicates;
   }
 
   @Override
