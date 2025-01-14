@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
@@ -118,7 +119,10 @@ class ReferenceTransformerTest {
                 .citation("2024, S.5")
                 .footnote("a footnote")
                 .referenceSupplement("Klammerzusatz")
-                .documentationUnit(createTestDocumentationUnitDTO())
+                .documentationUnit(
+                    DocumentationUnitDTO.builder()
+                        .id(UUID.fromString("e8c6f756-d6b2-4fa4-b751-e88c7c53bde4"))
+                        .build())
                 .legalPeriodical(
                     LegalPeriodicalDTO.builder()
                         .id(legalPeriodicalId)
