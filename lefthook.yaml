@@ -88,6 +88,7 @@ pre-push:
         fi
 
 tests:
+  follow: true
   parallel: true
   commands:
     frontend-tests:
