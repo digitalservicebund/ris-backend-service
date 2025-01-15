@@ -804,6 +804,12 @@ class DocumentationUnitIntegrationTest {
           statuses.get(i),
           errorStatuses.get(i));
     }
+    DocumentationOfficeDTO otherDocumentationOffice =
+        documentationOfficeRepository.findByAbbreviation("BGH");
+    String documentNumber = "1234567890123";
+
+    EntityBuilderTestUtil.createAndSavePendingDocumentationUnit(
+        repository, otherDocumentationOffice, documentationOffice, documentNumber);
 
     // no search criteria
     DocumentationUnitSearchInput searchInput = DocumentationUnitSearchInput.builder().build();
@@ -811,7 +817,12 @@ class DocumentationUnitIntegrationTest {
     // by documentNumber
     assertThat(extractDocumentNumbersFromSearchCall(searchInput))
         .contains(
-            "ABCD202300007", "EFGH202200123", "IJKL202101234", "MNOP202300099", "UVWX202311090");
+            "ABCD202300007",
+            "EFGH202200123",
+            "IJKL202101234",
+            "MNOP202300099",
+            "UVWX202311090",
+            "1234567890123");
 
     // by documentNumber
     searchInput = DocumentationUnitSearchInput.builder().documentNumber("abc").build();
