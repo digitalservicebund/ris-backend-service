@@ -102,4 +102,4 @@ tests:
     backend-integration-tests:
       tags: backend tests
       root: backend/
-      run: ./gradlew integrationTest -x test 2>&1 --console=plain
+      run: ./gradlew integrationTest -x test 2>&1
