@@ -18,6 +18,7 @@ import { TextStyle } from "@tiptap/extension-text-style"
 import { Underline } from "@tiptap/extension-underline"
 import { BubbleMenu, Editor, EditorContent } from "@tiptap/vue-3"
 import { computed, onMounted, ref, watch } from "vue"
+import TextEditorMenu from "@/components/input/TextEditorMenu.vue"
 import { TextAreaInputAttributes } from "@/components/input/types"
 import TextCorrectionDropdown from "@/components/TextCorrectionDropdown.vue"
 import {
@@ -200,9 +201,9 @@ watch(
   },
 )
 
-// const buttonsDisabled = computed(
-//   () => !(props.editable && (hasFocus.value || isHovered.value)),
-// )
+const buttonsDisabled = computed(
+  () => !(props.editable && (hasFocus.value || isHovered.value)),
+)
 
 watch(
   () => hasFocus.value,
@@ -281,7 +282,7 @@ const ignoreSuggestion = () => editor.commands.ignoreLanguageToolSuggestion()
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
   >
-    <!-- <TextEditorMenu
+    <TextEditorMenu
       v-if="editable"
       :aria-label="props.ariaLabel"
       :buttons-disabled="buttonsDisabled"
@@ -291,7 +292,7 @@ const ignoreSuggestion = () => editor.commands.ignoreLanguageToolSuggestion()
       @on-editor-expanded-changed="
         (isExpanded) => (editorExpanded = isExpanded)
       "
-    /> -->
+    />
     <hr v-if="editable" class="ml-8 mr-8 border-blue-300" />
     <div>
       <EditorContent
