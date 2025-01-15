@@ -167,7 +167,7 @@ test.describe("Literature references", () => {
         await expect(
           page.getByText(`MMG 2024, 12-22, Heft 1 (L)`, { exact: true }),
         ).toBeVisible()
-        await page.getByLabel("Weitere Angabe").click()
+        await page.getByLabel("Weitere Angabe", { exact: true }).click()
         await fillInput(page, "Zitatstelle *", "300")
         await fillInput(page, "Klammernzusatz", "ST")
 
