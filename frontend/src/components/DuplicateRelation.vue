@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import { computed } from "vue"
+import { storeToRefs } from "pinia"
+import { computed, ref } from "vue"
+import { InfoStatus } from "@/components/enumInfoStatus"
+import InfoModal from "@/components/InfoModal.vue"
 import CheckboxInput from "@/components/input/CheckboxInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import {
   DuplicationRelation,
   DuplicationRelationStatus,
 } from "@/domain/documentUnit"
+import documentUnitService from "@/services/documentUnitService"
+import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import DateUtil from "@/utils/dateUtil"
 import BaselineArrowOutward from "~icons/ic/baseline-arrow-outward"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
@@ -14,14 +19,35 @@ const { duplicateRelation } = defineProps<{
   duplicateRelation: DuplicationRelation
 }>()
 
+const { documentUnit } = storeToRefs(useDocumentUnitStore())
+
+const hasSetStateError = ref(false)
+
 const isIgnored = computed({
   get: () => duplicateRelation.status === DuplicationRelationStatus.IGNORED,
-  set: (shouldBeIgnored) => {
-    if (shouldBeIgnored) {
-      // TODO set status
-    }
+  set: async (shouldBeIgnored) => {
+    const newStatus = shouldBeIgnored
+      ? DuplicationRelationStatus.IGNORED
+      : DuplicationRelationStatus.PENDING
+    await updateStatus(newStatus)
   },
 })
+
+const updateStatus = async (newStatus: DuplicationRelationStatus) => {
+  const { error } = await documentUnitService.setDuplicationRelationStatus(
+    documentUnit.value!.documentNumber,
+    duplicateRelation.documentNumber,
+    newStatus,
+  )
+  hasSetStateError.value = error
+  if (!error) {
+    const docUnitDupRelation =
+      documentUnit.value?.managementData?.duplicateRelations?.find(
+        (rel) => rel.documentNumber === duplicateRelation.documentNumber,
+      )
+    if (docUnitDupRelation) docUnitDupRelation.status = newStatus
+  }
+}
 
 const warningIgnoredLabel = computed(() =>
   duplicateRelation.isJdvDuplicateCheckActive
@@ -43,7 +69,9 @@ const coreDataText = computed(() =>
   <div :key="duplicateRelation.documentNumber" class="flex flex-col gap-8">
     <div class="flex flex-row items-center gap-12">
       <span>
-        <IconErrorOutline class="text-red-800" />
+        <IconErrorOutline
+          :class="isIgnored ? 'text-gray-800' : 'text-red-800'"
+        />
       </span>
 
       <span v-if="coreDataText">
@@ -84,5 +112,12 @@ const coreDataText = computed(() =>
         :readonly="!duplicateRelation.isJdvDuplicateCheckActive"
       />
     </InputField>
+
+    <InfoModal
+      v-if="hasSetStateError"
+      description="Bitte laden Sie die Seite neu und versuchen Sie es erneut."
+      :status="InfoStatus.ERROR"
+      title="Warnungsstatus konnte nicht gesetzt werden."
+    />
   </div>
 </template>
