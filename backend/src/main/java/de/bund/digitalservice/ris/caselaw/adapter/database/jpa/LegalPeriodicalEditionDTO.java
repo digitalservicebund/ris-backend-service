@@ -8,7 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OrderColumn;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -50,7 +50,7 @@ public class LegalPeriodicalEditionDTO {
 
   // new references
   @OneToMany(mappedBy = "edition", cascade = CascadeType.ALL, orphanRemoval = true)
-  @OrderColumn(name = "edition_rank")
+  @OrderBy("editionRank")
   @Builder.Default
   private List<ReferenceDTO> references = new ArrayList<>();
 }

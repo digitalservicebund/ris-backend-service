@@ -299,13 +299,13 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   // Rechtsprechungsfundstellen
   @OneToMany(mappedBy = "documentationUnit", cascade = CascadeType.ALL, orphanRemoval = true)
   @Builder.Default
-  @OrderColumn(name = "documentation_unit_rank")
+  @OrderBy("documentationUnitRank")
   private List<CaselawReferenceDTO> caselawReferences = new ArrayList<>();
 
   // Literaturfundstellen
   @OneToMany(mappedBy = "documentationUnit", cascade = CascadeType.ALL, orphanRemoval = true)
   @Builder.Default
-  @OrderColumn(name = "documentation_unit_rank")
+  @OrderBy("documentationUnitRank")
   private List<LiteratureReferenceDTO> literatureReferences = new ArrayList<>();
 
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
