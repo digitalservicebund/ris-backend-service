@@ -1,4 +1,5 @@
 import dayjs from "dayjs"
+import DocumentationOffice from "./documentationOffice"
 import { Court, DocumentType } from "./documentUnit"
 import {
   Label,
@@ -17,6 +18,8 @@ export default class RelatedDocumentation {
   public documentType?: DocumentType
   public createdByReference?: string
   public referenceFound?: boolean
+  public documentationOffice?: DocumentationOffice
+  public creatingDocOffice?: DocumentationOffice
 
   get hasForeignSource(): boolean {
     return this.documentNumber != null && !!this.referenceFound
