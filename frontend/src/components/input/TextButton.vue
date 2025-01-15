@@ -2,18 +2,20 @@
 import { sanitizeUrl } from "@braintree/sanitize-url"
 import type { Component } from "vue"
 import { computed, h } from "vue"
+import { ButtonType } from "@/components/input/types"
 
 interface Props {
   label?: string
   icon?: Component
   ariaLabel?: string
-  buttonType?: string
+  buttonType?: ButtonType
   disabled?: boolean
   href?: string
   download?: boolean | string
   size?: "large" | "medium" | "small"
   target?: "_self" | "_blank" | "_parent" | "_top"
   iconPosition?: "left" | "right"
+  width?: "w-max" | "w-full"
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -27,6 +29,7 @@ const props = withDefaults(defineProps<Props>(), {
   size: "medium",
   target: undefined,
   iconPosition: "left",
+  width: "w-max",
 })
 
 const buttonClasses = computed(() => ({
@@ -53,6 +56,7 @@ const buttonClasses = computed(() => ({
     props.label &&
     props.buttonType !== "ghost" &&
     props.iconPosition === "right",
+  "w-full": true,
 }))
 
 const isLink = computed(() => !!props.href)
@@ -91,7 +95,7 @@ const render = () => {
 </script>
 
 <template>
-  <div class="w-max">
+  <div :class="width" data-testid>
     <render />
   </div>
 </template>

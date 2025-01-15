@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import "@/styles/text-suggestion.scss"
+
 import { commands } from "@guardian/prosemirror-invisibles"
 import { Blockquote } from "@tiptap/extension-blockquote"
 import { Bold } from "@tiptap/extension-bold"
@@ -16,10 +18,11 @@ import { Text } from "@tiptap/extension-text"
 import { TextAlign } from "@tiptap/extension-text-align"
 import { TextStyle } from "@tiptap/extension-text-style"
 import { Underline } from "@tiptap/extension-underline"
-import { Editor, EditorContent } from "@tiptap/vue-3"
+import { BubbleMenu, Editor, EditorContent } from "@tiptap/vue-3"
 import { computed, onMounted, ref, watch } from "vue"
 import TextEditorMenu from "@/components/input/TextEditorMenu.vue"
 import { TextAreaInputAttributes } from "@/components/input/types"
+import TextSuggestionsDropdown from "@/components/TextSuggestionsDropdown.vue"
 import {
   BorderNumber,
   BorderNumberContent,
@@ -32,11 +35,17 @@ import { FontSize } from "@/editor/fontSize"
 import { CustomImage } from "@/editor/image"
 import { Indent } from "@/editor/indent"
 import { InvisibleCharacters } from "@/editor/invisibleCharacters"
+import { LanguageTool } from "@/editor/languagetool/languageTool"
 import { CustomListItem } from "@/editor/listItem"
 import { CustomOrderedList } from "@/editor/orderedList"
 import { CustomParagraph } from "@/editor/paragraph"
 import { CustomSubscript, CustomSuperscript } from "@/editor/scriptText"
 import { TableStyle } from "@/editor/tableStyle"
+import {
+  LanguageToolHelpingWords,
+  Match,
+  Replacement,
+} from "@/types/languagetool"
 
 interface Props {
   value?: string
@@ -61,11 +70,13 @@ const emit = defineEmits<{
   updateValue: [newValue: string]
 }>()
 
+const loading = ref(false)
+
 const editorElement = ref<HTMLElement>()
 const hasFocus = ref(false)
 const isHovered = ref(false)
 
-const editor = new Editor({
+const editor: Editor = new Editor({
   editorProps: {
     attributes: {
       tabindex: "0",
@@ -126,19 +137,35 @@ const editor = new Editor({
     Indent.configure({
       names: ["listItem", "paragraph"],
     }),
+    LanguageTool.configure({
+      automaticMode: true,
+      documentId: "1",
+      apiUrl: "http://localhost:8081/v2/check",
+    }),
   ],
   onUpdate: () => {
     emit("updateValue", editor.getHTML())
+    setTimeout(() => updateMatch(editor))
   },
   onFocus: () => (hasFocus.value = true),
   editable: props.editable,
   parseOptions: {
     preserveWhitespace: "full",
   },
-  onSelectionUpdate: () => editor.commands.handleSelection(),
+  onSelectionUpdate: () => {
+    editor.commands.handleSelection()
+    setTimeout(() => updateMatch(editor))
+  },
+  onTransaction({ transaction: tr }) {
+    loading.value = !!tr.getMeta(
+      LanguageToolHelpingWords.LoadingTransactionName,
+    )
+  },
 })
 
 const containerWidth = ref<number>()
+
+const match = ref<Match>()
 
 const editorExpanded = ref(false)
 const editorStyleClasses = computed(() => {
@@ -204,6 +231,44 @@ const resizeObserver = new ResizeObserver((entries) => {
     containerWidth.value = entry.contentRect.width
   }
 })
+
+const shouldShow = (): boolean => {
+  if (editor == undefined) return false
+
+  const match = editor.storage.languagetool.match
+  const matchRange = editor.storage.languagetool.matchRange
+
+  const { from, to } = editor.state.selection
+
+  return (
+    !!match && !!matchRange && matchRange.from <= from && to <= matchRange.to
+  )
+}
+
+const matchRange = ref<{ from: number; to: number }>()
+
+// const loading = ref(false)
+
+const updateMatch = (editor: Editor) => {
+  match.value = editor.storage.languagetool.match
+  matchRange.value = editor.storage.languagetool.matchRange
+}
+
+const replacements = computed(() => match.value?.replacements || [])
+
+// const matchMessage = computed(() => match.value?.message || "No Message")
+
+// const updateHtml = () => navigator.clipboard.writeText(editor.getHTML())
+
+const acceptSuggestion = (sug: Replacement) => {
+  if (matchRange.value != undefined) {
+    editor.commands.insertContentAt(matchRange.value, sug.value)
+  }
+}
+
+// const proofread = () => editor.commands.proofread()
+
+const ignoreSuggestion = () => editor.commands.ignoreLanguageToolSuggestion()
 </script>
 
 <template>
@@ -238,5 +303,20 @@ const resizeObserver = new ResizeObserver((entries) => {
         :editor="editor"
       />
     </div>
+
+    <BubbleMenu
+      v-if="editor"
+      class="bubble-menu"
+      :editor="editor"
+      :should-show="shouldShow"
+      :tippy-options="{ placement: 'bottom', animation: 'fade' }"
+    >
+      <TextSuggestionsDropdown
+        match-message=""
+        :replacements="replacements"
+        @suggestion:ignore="ignoreSuggestion"
+        @suggestion:update="acceptSuggestion"
+      />
+    </BubbleMenu>
   </div>
 </template>

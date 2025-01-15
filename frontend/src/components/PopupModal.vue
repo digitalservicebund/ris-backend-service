@@ -1,16 +1,17 @@
 <script lang="ts" setup>
 import { onMounted } from "vue"
 import TextButton from "./input/TextButton.vue"
+import { ButtonType } from "@/components/input/types"
 
 defineProps<{
   ariaLabel?: string
   headerText?: string
   contentText: string
   primaryButtonText: string
-  primaryButtonType?: string
-  secondaryButtonType?: string
+  primaryButtonType?: ButtonType
+  secondaryButtonType?: ButtonType
   secondaryButtonText?: string
-  cancelButtonType?: string
+  cancelButtonType?: ButtonType
 }>()
 
 defineEmits<{
