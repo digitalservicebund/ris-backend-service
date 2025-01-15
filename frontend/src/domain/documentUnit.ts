@@ -118,6 +118,10 @@ export enum DuplicationRelationStatus {
 export type DuplicationRelation = {
   documentNumber: string
   status: DuplicationRelationStatus
+  isJdvDuplicateCheckActive: boolean
+  decisionDate?: Date
+  courtLabel?: string
+  fileNumber?: string
 }
 
 export type ManagementData = {
