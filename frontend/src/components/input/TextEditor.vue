@@ -320,5 +320,3 @@ const ignoreSuggestion = () => editor.commands.ignoreLanguageToolSuggestion()
     </BubbleMenu>
   </div>
 </template>
-
-<style lang="scss"></style>
