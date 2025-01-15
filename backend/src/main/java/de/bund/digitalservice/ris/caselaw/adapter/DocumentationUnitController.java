@@ -25,6 +25,7 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDele
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.domain.export.juris.response.StatusImporterException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
 import java.time.Duration;
@@ -469,7 +470,7 @@ public class DocumentationUnitController {
    *
    * @param documentNumberOrigin documentNumber of the original documentation unit
    * @param documentNumberDuplicate documentNumber of the duplicate
-   * @return a String response or empty response with status code 400 if the user is not authorized
+   * @return a String response or empty response with status code 4xx if invalid auth or input
    */
   @PutMapping(
       value = "/{documentNumberOrigin}/duplicate-status/{documentNumberDuplicate}",
@@ -489,7 +490,7 @@ public class DocumentationUnitController {
               documentNumberDuplicate,
               duplicateRelationStatusRequest.getStatus());
       return ResponseEntity.status(HttpStatus.OK).body(result);
-    } catch (DocumentationUnitNotExistsException | IllegalArgumentException ex) {
+    } catch (DocumentationUnitNotExistsException | EntityNotFoundException ex) {
       return ResponseEntity.notFound().build();
     }
   }

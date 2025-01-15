@@ -17,6 +17,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalTypesDTO
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO.DocumentationUnitDTOBuilder;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
@@ -55,6 +56,7 @@ import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -1367,5 +1369,117 @@ class DocumentationUnitTransformerTest {
         .inputTypes(Collections.emptyList())
         .leadingDecisionNormReferences(Collections.emptyList())
         .yearsOfDispute(Collections.emptyList());
+  }
+
+  @Test
+  void
+      testTransformToDomain_withUnpublishedDuplicateWarningFromOtherDocOffice_Relations1_shouldFilterOutWarning() {
+    var original =
+        generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
+    var unpublishedStatus =
+        StatusDTO.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build();
+    var otherDocOffice = DocumentationOfficeDTO.builder().abbreviation("other office").build();
+    var unpublishedDuplicateFromOtherDocOffice =
+        generateSimpleDTOBuilder()
+            .documentNumber("duplicate")
+            .documentationOffice(otherDocOffice)
+            .id(UUID.randomUUID())
+            .status(unpublishedStatus)
+            .build();
+    var duplicateRelationship =
+        DuplicateRelationDTO.builder()
+            .documentationUnit1(original)
+            .documentationUnit2(unpublishedDuplicateFromOtherDocOffice)
+            .build();
+    original = original.toBuilder().duplicateRelations1(Set.of(duplicateRelationship)).build();
+
+    DocumentationUnit documentationUnit = DocumentationUnitTransformer.transformToDomain(original);
+
+    assertThat(documentationUnit.managementData().duplicateRelations()).isEmpty();
+  }
+
+  @Test
+  void
+      testTransformToDomain_withUnpublishedDuplicateWarningFromOtherDocOffice_Relations2_shouldFilterOutWarning() {
+    var original =
+        generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
+    var unpublishedStatus =
+        StatusDTO.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build();
+    var otherDocOffice = DocumentationOfficeDTO.builder().abbreviation("other office").build();
+    var unpublishedDuplicateFromOtherDocOffice =
+        generateSimpleDTOBuilder()
+            .documentNumber("duplicate")
+            .documentationOffice(otherDocOffice)
+            .id(UUID.randomUUID())
+            .status(unpublishedStatus)
+            .build();
+    var duplicateRelationship =
+        DuplicateRelationDTO.builder()
+            .documentationUnit1(unpublishedDuplicateFromOtherDocOffice)
+            .documentationUnit2(original)
+            .build();
+    original = original.toBuilder().duplicateRelations2(Set.of(duplicateRelationship)).build();
+
+    DocumentationUnit documentationUnit = DocumentationUnitTransformer.transformToDomain(original);
+
+    assertThat(documentationUnit.managementData().duplicateRelations()).isEmpty();
+  }
+
+  @Test
+  void
+      testTransformToDomain_withUnpublishedDuplicateWarningFromSameDocOffice_shouldNotFilterOutWarning() {
+    var original =
+        generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
+    var unpublishedStatus =
+        StatusDTO.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build();
+    var unpublishedDuplicateFromOtherDocOffice =
+        generateSimpleDTOBuilder()
+            .documentNumber("duplicate")
+            .id(UUID.randomUUID())
+            .status(unpublishedStatus)
+            .build();
+    var duplicateRelationship =
+        DuplicateRelationDTO.builder()
+            .documentationUnit1(original)
+            .documentationUnit2(unpublishedDuplicateFromOtherDocOffice)
+            .build();
+    original = original.toBuilder().duplicateRelations1(Set.of(duplicateRelationship)).build();
+
+    DocumentationUnit documentationUnit = DocumentationUnitTransformer.transformToDomain(original);
+
+    assertThat(documentationUnit.managementData().duplicateRelations()).hasSize(1);
+  }
+
+  @Test
+  void
+      testTransformToDomain_withPublishedDuplicateWarningFromOtherDocOffice_shouldNotFilterOutWarning() {
+    var original =
+        generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
+    var publishedStatus =
+        StatusDTO.builder().publicationStatus(PublicationStatus.PUBLISHED).build();
+    var otherDocOffice = DocumentationOfficeDTO.builder().abbreviation("other office").build();
+    var unpublishedDuplicateFromOtherDocOffice =
+        generateSimpleDTOBuilder()
+            .documentNumber("duplicate")
+            .documentationOffice(otherDocOffice)
+            .id(UUID.randomUUID())
+            .status(publishedStatus)
+            .build();
+    var duplicateRelationship =
+        DuplicateRelationDTO.builder()
+            .documentationUnit1(unpublishedDuplicateFromOtherDocOffice)
+            .documentationUnit2(original)
+            .build();
+    original = original.toBuilder().duplicateRelations2(Set.of(duplicateRelationship)).build();
+
+    DocumentationUnit documentationUnit = DocumentationUnitTransformer.transformToDomain(original);
+
+    assertThat(documentationUnit.managementData().duplicateRelations()).hasSize(1);
+    assertThat(
+            documentationUnit.managementData().duplicateRelations().stream()
+                .findFirst()
+                .get()
+                .documentNumber())
+        .isEqualTo("duplicate");
   }
 }

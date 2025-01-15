@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -55,28 +56,8 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
       var documentationUnit =
           documentationUnitRepository.findByDocumentNumber(docNumber).orElseThrow();
 
-      var allFileNumbers = collectFileNumbers(documentationUnit);
-      var allEclis = collectEclis(documentationUnit);
-
-      // A duplicate depends on filenumber/ecli
-      if (allFileNumbers.isEmpty() && allEclis.isEmpty()) {
-        return;
-      }
-
-      var allDates = collectDecisionDates(documentationUnit);
-      var allCourtIds = collectCourtIds(documentationUnit);
-      var allDeviatingCourts = collectDeviatingCourts(documentationUnit);
-      var allDocTypeIds = collectDocumentTypeIds(documentationUnit);
-
-      var duplicates =
-          findPotentialDuplicates(
-              documentationUnit,
-              allFileNumbers,
-              allDates,
-              allCourtIds,
-              allDeviatingCourts,
-              allEclis,
-              allDocTypeIds);
+      List<DocumentationUnitIdDuplicateCheckDTO> duplicates =
+          findPotentialDuplicates(documentationUnit);
 
       processDuplicates(documentationUnit, duplicates);
       removeObsoleteDuplicates(documentationUnit, duplicates);
@@ -86,28 +67,51 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
     }
   }
 
+  private List<DocumentationUnitIdDuplicateCheckDTO> findPotentialDuplicates(
+      DocumentationUnitDTO documentationUnit) {
+    var allFileNumbers = collectFileNumbers(documentationUnit);
+    var allEclis = collectEclis(documentationUnit);
+
+    if (allFileNumbers.isEmpty() && allEclis.isEmpty()) {
+      // As duplicates depend on either fileNumber/ECLI, without these attributes -> no duplicates
+      return List.of();
+    }
+
+    var allDates = collectDecisionDates(documentationUnit);
+    var allCourtIds = collectCourtIds(documentationUnit);
+    var allDeviatingCourts = collectDeviatingCourts(documentationUnit);
+    var allDocTypeIds = collectDocumentTypeIds(documentationUnit);
+
+    var duplicates =
+        findPotentialDuplicates(
+            documentationUnit,
+            allFileNumbers,
+            allDates,
+            allCourtIds,
+            allDeviatingCourts,
+            allEclis,
+            allDocTypeIds);
+    return duplicates;
+  }
+
   @Override
   public String updateDuplicateStatus(
       String docNumberOrigin, String docNumberDuplicate, DuplicateRelationStatus status)
       throws DocumentationUnitNotExistsException {
-    var originDocUnit = documentationUnitRepository.findByDocumentNumber(docNumberOrigin);
-    var duplicateDocUnit = documentationUnitRepository.findByDocumentNumber(docNumberDuplicate);
-    if (originDocUnit.isPresent() && duplicateDocUnit.isPresent()) {
-      var duplicateRelation =
-          duplicateRelationService.findByDocUnitIds(
-              originDocUnit.get().getId(), duplicateDocUnit.get().getId());
-
-      if (duplicateRelation.isPresent()) {
-        duplicateRelationService.setStatus(duplicateRelation.get(), status);
-        return "The duplicate status has been successfully updated to " + status;
-      } else {
-        throw new IllegalArgumentException();
-      }
-    } else if (originDocUnit.isEmpty()) {
-      throw new DocumentationUnitNotExistsException(docNumberOrigin);
-    } else {
-      throw new DocumentationUnitNotExistsException(docNumberDuplicate);
-    }
+    var originDocUnit =
+        documentationUnitRepository
+            .findByDocumentNumber(docNumberOrigin)
+            .orElseThrow(DocumentationUnitNotExistsException::new);
+    var duplicateDocUnit =
+        documentationUnitRepository
+            .findByDocumentNumber(docNumberDuplicate)
+            .orElseThrow(DocumentationUnitNotExistsException::new);
+    var duplicateRelation =
+        duplicateRelationService
+            .findByDocUnitIds(originDocUnit.getId(), duplicateDocUnit.getId())
+            .orElseThrow(EntityNotFoundException::new);
+    duplicateRelationService.setStatus(duplicateRelation, status);
+    return "The duplicate status has been successfully updated to " + status;
   }
 
   private List<String> collectFileNumbers(DocumentationUnitDTO documentationUnit) {
@@ -188,8 +192,7 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
     var court = documentationUnit.getCourt();
     if (court != null) {
       allDeviatingCourts.add(
-          CourtTransformer.generateLabel(
-              court.getType().toUpperCase(), court.getLocation().toUpperCase()));
+          CourtTransformer.generateLabel(court.getType(), court.getLocation()).toUpperCase());
     }
     return allDeviatingCourts;
   }
@@ -252,13 +255,15 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
     }
   }
 
+  /**
+   * If the relationship is PENDING and the legacy jdv "dup-code ausschalten" applies, the status
+   * must be set to IGNORED.
+   */
   private boolean shouldUpdateRelationStatus(
       DocumentationUnitIdDuplicateCheckDTO dup, Optional<DuplicateRelationDTO> existingRelation) {
-    return dup.getIsJdvDuplicateCheckActive() != null
-        && Boolean.FALSE.equals(
-            dup.getIsJdvDuplicateCheckActive()
-                && existingRelation.isPresent()
-                && DuplicateRelationStatus.PENDING.equals(existingRelation.get().getStatus()));
+    return Boolean.FALSE.equals(dup.getIsJdvDuplicateCheckActive())
+        && existingRelation.isPresent()
+        && DuplicateRelationStatus.PENDING.equals(existingRelation.get().getStatus());
   }
 
   private void removeObsoleteDuplicates(

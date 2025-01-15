@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDSDocOffice;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.mockUserGroups;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.TestConfig;
@@ -34,6 +35,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelation
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.CourtTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
@@ -54,6 +56,8 @@ import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
@@ -61,6 +65,7 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotE
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
+import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -543,7 +548,7 @@ class DuplicateCheckIntegrationTest {
     }
 
     @Test
-    void checkDuplicates_deleteDocUnit_shouldDeleteAssociatedDuplicateWarnings()
+    void deleteDocUnit_withDuplicateRelation_shouldDeleteDuplicateRelation()
         throws DocumentationUnitNotExistsException {
       // Arrange
       var docUnitToBeChecked =
@@ -577,19 +582,140 @@ class DuplicateCheckIntegrationTest {
           .hasSize(1);
       assertThat(duplicateRelationRepository.findAll()).hasSize(1);
 
+      // Act
       documentationUnitService.deleteByUuid(duplicateDTO.getId());
 
-      // Act
-      duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
-
       // Assert
-      assertThat(duplicateRelationRepository.findAll()).hasSize(0);
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
       assertThat(
               documentationUnitService
                   .getByUuid(docUnitToBeChecked.getId())
                   .managementData()
                   .duplicateRelations())
-          .hasSize(0);
+          .isEmpty();
+    }
+
+    @Test
+    void
+        checkDuplicates_withUnpublishedDocUnitFromOtherDocOffice_shouldBeFilterOutDuplicateWarnings()
+            throws DocumentationUnitNotExistsException {
+
+      var bghDocumentationOffice = documentationOfficeRepository.findByAbbreviation("BGH");
+
+      var bghDocOffice = DocumentationOfficeTransformer.transformToDomain(bghDocumentationOffice);
+
+      // Arrange
+      var docUnitToBeChecked =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .documentNumber("DocumentNumb1")
+                      .decisionDate(LocalDate.of(2020, 12, 1))
+                      .fileNumbers(List.of("AZ-123"))
+                      .build()));
+
+      generateNewDocumentationUnit(
+          bghDocOffice,
+          Optional.of(
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb2")
+                  .decisionDate(LocalDate.of(2020, 12, 1))
+                  .fileNumbers(List.of("AZ-123"))
+                  .publicationStatus(PublicationStatus.UNPUBLISHED)
+                  .build()));
+
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
+
+      // Create duplicates
+      duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
+      // Although a duplicate relation is created ...
+      assertThat(duplicateRelationRepository.findAll()).hasSize(1);
+      // ... it won't be sent to the frontend
+      assertThat(
+              documentationUnitService
+                  .getByUuid(docUnitToBeChecked.getId())
+                  .managementData()
+                  .duplicateRelations())
+          .isEmpty();
+    }
+
+    @Test
+    void setStatus_withExistingPendingDuplicateRelation_shouldUpdateStatusToIgnored()
+        throws DocumentationUnitNotExistsException {
+      // Arrange
+      var original =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .documentNumber("DocumentNumb1")
+                      .decisionDate(LocalDate.of(2020, 12, 1))
+                      .fileNumbers(List.of("AZ-123"))
+                      .build()));
+
+      var duplicate =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .documentNumber("DocumentNumb2")
+                      .decisionDate(LocalDate.of(2020, 12, 1))
+                      .fileNumbers(List.of("AZ-123"))
+                      .build()));
+
+      duplicateCheckService.checkDuplicates(original.getDocumentNumber());
+      assertThat(duplicateRelationRepository.findAll()).hasSize(1);
+      var pendingDuplicateRelation = duplicateRelationRepository.findAll().getFirst();
+      assertThat(pendingDuplicateRelation.getStatus()).isEqualTo(DuplicateRelationStatus.PENDING);
+
+      // Act
+      duplicateCheckService.updateDuplicateStatus(
+          original.getDocumentNumber(),
+          duplicate.getDocumentNumber(),
+          DuplicateRelationStatus.IGNORED);
+
+      // Assert
+      assertThat(
+              documentationUnitService
+                  .getByUuid(original.getId())
+                  .managementData()
+                  .duplicateRelations()
+                  .stream()
+                  .findFirst()
+                  .get()
+                  .status())
+          .isEqualTo(DuplicateRelationStatus.IGNORED);
+    }
+
+    @Test
+    void setStatus_withoutExistingDuplicateRelation_shouldThrow() {
+      // Arrange
+      generateNewDocumentationUnit(
+          docOffice,
+          Optional.of(
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb1")
+                  .decisionDate(LocalDate.of(2020, 12, 1))
+                  .fileNumbers(List.of("AZ-123"))
+                  .build()));
+
+      generateNewDocumentationUnit(
+          docOffice,
+          Optional.of(
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb2")
+                  .fileNumbers(List.of("DIFFERENT"))
+                  .build()));
+
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
+
+      // Act + Assert
+      assertThatThrownBy(
+              () ->
+                  duplicateCheckService.updateDuplicateStatus(
+                      "DocumentNumb1", "DocumentNumb2", DuplicateRelationStatus.IGNORED))
+          .isInstanceOf(EntityNotFoundException.class);
     }
   }
 
@@ -1021,7 +1147,8 @@ class DuplicateCheckIntegrationTest {
       List<String> deviatingCourts,
       DocumentType documentType,
       String ecli,
-      List<String> deviatingEclis) {}
+      List<String> deviatingEclis,
+      PublicationStatus publicationStatus) {}
 
   private DocumentationUnitDTO generateNewDocumentationUnit(
       DocumentationOffice userDocOffice, Optional<CreationParameters> parameters)
@@ -1051,6 +1178,7 @@ class DuplicateCheckIntegrationTest {
                     .ecli(params.ecli())
                     .deviatingEclis(params.deviatingEclis())
                     .build())
+            .status(Status.builder().publicationStatus(params.publicationStatus()).build())
             .build();
 
     var documentationUnitDTO =
@@ -1066,6 +1194,18 @@ class DuplicateCheckIntegrationTest {
                     .isJdvDuplicateCheckActive(params.isJdvDuplicateCheckActive())
                     .build(),
                 docUnit));
+
+    if (params.publicationStatus != null) {
+      documentationUnitDTO =
+          documentationUnitDTO.toBuilder()
+              .status(
+                  StatusDTO.builder()
+                      .publicationStatus(params.publicationStatus())
+                      .documentationUnit(documentationUnitDTO)
+                      .build())
+              .build();
+    }
+
     return repository.save(documentationUnitDTO);
   }
 }
