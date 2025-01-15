@@ -23,7 +23,7 @@ below.
 
 **Backend only:**
 
-- [java](https://developers.redhat.com/products/openjdk/install) - we use Java 17 in the backend
+- [java](https://developers.redhat.com/products/openjdk/install) - we use Java 21 in the backend
 
 **Optional, but recommended tools:**
 
@@ -74,19 +74,23 @@ This will install a couple of Git hooks which are supposed to help you to:
 
 For shared secrets required for development we're using `gopass`. To set up follow these steps:
 
-Provide some team member a public GPG key with encryption capability (that team member will add you
-as a recipient).
+- If not done yet: generate a gpg keypair
+- Then export your public key: `gpg --armor --export --output my-name.gpg email@example.com`
+- Provide some team member the public GPG key with encryption capability (that team member will add you
+  as a recipient).
 
 Then, run:
 
 ```bash
-gopass --yes setup --remote git@github.com:digitalservicebund/neuris-password-store.git --alias neuris --name <your-name-from-gpg-key> --email <your-email-from-gpg-key>
+gopass init
+
+gopass clone git@github.com:digitalservicebund/neuris-password-store.git neuris --sync gitcli
 ```
 
 > **Note**
 >
 > If there are any issues with this command, you need to clean the store and try again until it
-> works unfortunately ☹️:
+> works unfortunately ☹️. Be aware that this command removes ALL gopass stores from your machine, not only project related ones:
 >
 > ```
 > rm -rf ~/.local/share/gopass/stores
@@ -95,7 +99,7 @@ gopass --yes setup --remote git@github.com:digitalservicebund/neuris-password-st
 Try if you can get access:
 
 ```bash
-gopass ls
+gopass list neuris
 ```
 
 Synchronize the password store:
@@ -104,7 +108,7 @@ Synchronize the password store:
 gopass sync
 ```
 
-Now you can generate a new `.env` file containig the secrets:
+Now you can generate a new `.env` file containing the secrets. When using a Yubikey you may asked multiple times for your pin:
 
 ```bash
 ./run.sh env
@@ -114,14 +118,47 @@ Now you can generate a new `.env` file containig the secrets:
 >
 > This needs to be repeated every time the secrets change.
 
-### Local Migration
+### Lookup Tables Initialization
 
-The caselaw application requires the initialization of lookup tables by the migration application.
+The caselaw application requires the initialization of lookup tables by the migration application image.
 
-Follow the steps in [run_migration_locally.md](run_migration_locally.md)
+#### Prerequisites
 
-WIP: Run docker image in [migration_image.md](migration_image.md)
+To be able to pull the `ris-data-migration` image, log in to the GitHub Package Repository using your username and a
+credential token stored in 1Password (1PW):
+
+If you don't have a personal access token, read [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic) on how to create one. Then:
+
+```shell
+export CR_PAT=$(op read op://Employee/CR_PAT/password)
+echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin # Replace USERNAME with your GitHub username
+```
+
+The following step requires an OTC access token, read here for
+more [info](https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/#step-2-obtain-access_key-credentials).
+
+To connect to your S3 bucket, ensure your AWS credentials are stored in 1Password, and then set the following
+environment variables in your shell:
+
+```shell
+op item edit 'OTC' aws_access_key_id=[your-access-key-id]
+op item edit 'OTC' aws_secret_access_key=[your-access-key-id]
+
+```
+
+#### Run Lookup Tables Initialization with Docker
+
+The following command will migrate the minimally required data (refdata and juris tables):
+
+```bash
+./run.sh -i
+```
+
+> Note: If you wish to migrate documentation units, use the instructions in [run_migration_locally.md](run_migration_locally.md)
+
 ## Development
+
+Run the whole stack including migration (initialization) inside docker:
 
 ```bash
 ./run.sh dev
@@ -133,22 +170,26 @@ mode:
 
 ```bash
 ./run.sh dev -d
+./run.sh dev --detached
 ```
 
-To run a service separately:
+To run the frontend stack only (without backend and initialization) run:
 
 ```bash
+./run.sh dev -n
 ./run.sh dev --no-backend
 ```
 
-The application is available at <http://127.0.0.1>.
+When choosing the no-backend variant, checkout the [backend manual](./backend/README.md) on how to run the backend stand-alone without docker. The easiest way would be to start the backend [utilizing Spring Boot developer tools](https://docs.spring.io/spring-boot/docs/current/reference/html/using.html#using.devtools.restart) so changes in the Java sources will be reflected without manually restarting: 
 
-This will start the
-backend [utilizing Spring Boot developer tools](https://docs.spring.io/spring-boot/docs/current/reference/html/using.html#using.devtools.restart)
-so changes in the Java sources will be reflected without manually restarting. Similarly, the
-frontend is served
-from [Vite](https://vitejs.dev)
-with [HMR](https://vitejs.dev/guide/features.html#hot-module-replacement).
+```bash
+cd backend
+SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
+```
+
+> Note: Similarly, the frontend is served from [Vite](https://vitejs.dev) with [HMR](https://vitejs.dev/guide/features.html#hot-module-replacement)
+
+Overall docker compose spins up a reverse proxy (traefik) which listens on port 80. Therefore the application is available at <http://127.0.0.1>. If you get a `bad gateway` error make sure your firewall is not messing with you. On Ubuntu `sudo ufw disable` might do the trick. You may setup a certain firewall rule. Overall your milage may vary.
 
 > **Note**
 >
@@ -156,7 +197,7 @@ with [HMR](https://vitejs.dev/guide/features.html#hot-module-replacement).
 > includes supported
 > browsers for E2E and a11y testing through playwright. Should that fail, you
 >
-can [install them manually](https://github.com/digitalservicebund/ris-backend-service/tree/main/frontend#prerequisites).
+> can [install them manually](https://github.com/digitalservicebund/ris-backend-service/tree/main/frontend#prerequisites).
 
 To see logs of the containers, use e.g.
 
