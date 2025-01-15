@@ -3,7 +3,9 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalEditionDTO;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -25,6 +27,12 @@ public class LegalPeriodicalEditionTransformer {
         .name(legalPeriodicalEditionDTO.getName())
         .prefix(legalPeriodicalEditionDTO.getPrefix())
         .suffix(legalPeriodicalEditionDTO.getSuffix())
+        .references(
+            legalPeriodicalEditionDTO.getReferences() == null
+                ? new ArrayList<>()
+                : legalPeriodicalEditionDTO.getReferences().stream()
+                    .map(ReferenceTransformer::transformToDomain)
+                    .collect(Collectors.toList()))
         .build();
   }
 
@@ -45,6 +53,12 @@ public class LegalPeriodicalEditionTransformer {
         .name(legalPeriodicalEdition.name())
         .prefix(legalPeriodicalEdition.prefix())
         .suffix(legalPeriodicalEdition.suffix())
+        .references(
+            legalPeriodicalEdition.references() == null
+                ? new ArrayList<>()
+                : legalPeriodicalEdition.references().stream()
+                    .map(ReferenceTransformer::transformToDTO)
+                    .toList())
         .build();
   }
 }

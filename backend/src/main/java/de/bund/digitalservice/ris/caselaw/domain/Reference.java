@@ -29,4 +29,5 @@ public record Reference(
     ReferenceType referenceType,
     RelatedDocumentationUnit documentationUnit,
     Boolean primaryReference,
-    int rank) {}
+    int documentationUnitRank,
+    Integer editionRank) {}
