@@ -13,7 +13,7 @@ const tenor = computed({
     store.documentUnit?.longTexts.tenor
       ? useValidBorderNumberLinks(
           store.documentUnit?.longTexts.tenor,
-          store.documentUnit.borderNumbers,
+          store.documentUnit.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {
@@ -27,7 +27,7 @@ const reasons = computed({
     store.documentUnit?.longTexts.reasons
       ? useValidBorderNumberLinks(
           store.documentUnit?.longTexts.reasons,
-          store.documentUnit.borderNumbers,
+          store.documentUnit.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {
@@ -41,7 +41,7 @@ const caseFacts = computed({
     store.documentUnit?.longTexts.caseFacts
       ? useValidBorderNumberLinks(
           store.documentUnit?.longTexts.caseFacts,
-          store.documentUnit.borderNumbers,
+          store.documentUnit.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {
@@ -55,7 +55,7 @@ const decisionReasons = computed({
     store.documentUnit?.longTexts.decisionReasons
       ? useValidBorderNumberLinks(
           store.documentUnit?.longTexts.decisionReasons,
-          store.documentUnit.borderNumbers,
+          store.documentUnit.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {

@@ -36,14 +36,8 @@ const errorTitle = computed(() => {
   } else return ""
 })
 
-const getAttachment = (index: number) => {
-  return computed(() => {
-    return attachments.value[index]
-  })
-}
-
 const handleDeleteAttachment = async (index: number) => {
-  const fileToDelete = getAttachment(index).value
+  const fileToDelete = attachments.value[index]
   if (fileToDelete.s3path == undefined) {
     console.error("file path is undefined", index)
     return
@@ -113,7 +107,7 @@ watch(showDeleteModal, () => (scrollLock.value = showDeleteModal.value))
 
 function openDeleteModal() {
   const attachmentToBeDeleted =
-    documentUnit.value!.attachments?.[deletingAttachmentIndex.value]?.name
+    attachments.value?.[deletingAttachmentIndex.value]?.name
   if (attachmentToBeDeleted != null) {
     showDeleteModal.value = true
   }
@@ -145,13 +139,12 @@ const attachments = computed({
       <PopupModal
         v-if="showDeleteModal"
         :aria-label="deleteModalHeaderText"
-        cancel-button-type="tertiary"
-        confirm-button-type="destructive"
-        confirm-text="Löschen"
-        :content-text="`Möchten Sie den Anhang ${getAttachment(deletingAttachmentIndex).value.name} wirklich dauerhaft löschen?`"
+        :content-text="`Möchten Sie den Anhang ${attachments?.[deletingAttachmentIndex]?.name} wirklich dauerhaft löschen?`"
         :header-text="deleteModalHeaderText"
+        primary-button-text="Löschen"
+        primary-button-type="destructive"
         @close-modal="closeDeleteModal"
-        @confirm-action="deleteFile(deletingAttachmentIndex)"
+        @primary-action="deleteFile(deletingAttachmentIndex)"
       />
       <TitleElement>Dokumente</TitleElement>
       <AttachmentList

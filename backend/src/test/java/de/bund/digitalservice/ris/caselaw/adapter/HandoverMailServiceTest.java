@@ -5,7 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -224,7 +224,7 @@ class HandoverMailServiceTest {
   }
 
   @Test
-  void testSendEditionWithTwoReferecesForSameDocUnit()
+  void testSendEditionWithTwoReferencesForSameDocUnit()
       throws ParserConfigurationException, TransformerException {
     var editionWithTwoReferencesForSameDocUnit =
         LegalPeriodicalEdition.builder()
@@ -319,8 +319,8 @@ class HandoverMailServiceTest {
     var response = service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS);
     assertThat(response).usingRecursiveComparison().isEqualTo(expected);
 
-    verify(repository, times(0)).save(any(HandoverMail.class));
-    verify(mailSender, times(0))
+    verify(repository, never()).save(any(HandoverMail.class));
+    verify(mailSender, never())
         .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
   }
 
@@ -343,8 +343,8 @@ class HandoverMailServiceTest {
     var response = service.handOver(edition, RECEIVER_ADDRESS, ISSUER_ADDRESS);
     assertThat(response).usingRecursiveComparison().isEqualTo(expected);
 
-    verify(repository, times(0)).save(any(HandoverMail.class));
-    verify(mailSender, times(0))
+    verify(repository, never()).save(any(HandoverMail.class));
+    verify(mailSender, never())
         .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
   }
 
@@ -360,8 +360,8 @@ class HandoverMailServiceTest {
             () -> service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
     Assertions.assertEquals("Couldn't generate xml for documentationUnit.", ex.getMessage());
 
-    verify(repository, times(0)).save(any(HandoverMail.class));
-    verify(mailSender, times(0))
+    verify(repository, never()).save(any(HandoverMail.class));
+    verify(mailSender, never())
         .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
   }
 
@@ -377,8 +377,8 @@ class HandoverMailServiceTest {
             () -> service.handOver(edition, RECEIVER_ADDRESS, ISSUER_ADDRESS));
     Assertions.assertEquals("Couldn't generate xml for edition.", ex.getMessage());
 
-    verify(repository, times(0)).save(any(HandoverMail.class));
-    verify(mailSender, times(0))
+    verify(repository, never()).save(any(HandoverMail.class));
+    verify(mailSender, never())
         .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
   }
 
@@ -396,8 +396,8 @@ class HandoverMailServiceTest {
         .isEqualTo("No document number has been set in the document unit.");
 
     // Verify that repository.save and mailSender.sendMail were not called
-    verify(repository, times(0)).save(any(HandoverMail.class));
-    verify(mailSender, times(0))
+    verify(repository, never()).save(any(HandoverMail.class));
+    verify(mailSender, never())
         .sendMail(anyString(), anyString(), anyString(), anyString(), any(List.class), anyString());
   }
 
@@ -414,8 +414,8 @@ class HandoverMailServiceTest {
     assertThat(throwable.getMessage()).isEqualTo("No id has been set in the edition.");
 
     // Verify that repository.save and mailSender.sendMail were not called
-    verify(repository, times(0)).save(any(HandoverMail.class));
-    verify(mailSender, times(0))
+    verify(repository, never()).save(any(HandoverMail.class));
+    verify(mailSender, never())
         .sendMail(anyString(), anyString(), anyString(), anyString(), any(List.class), anyString());
   }
 
@@ -440,8 +440,8 @@ class HandoverMailServiceTest {
 
     assertThat(throwable.getMessage()).isEqualTo("No receiver mail address is set");
 
-    verify(repository, times(0)).save(any(HandoverMail.class));
-    verify(mailSender, times(0))
+    verify(repository, never()).save(any(HandoverMail.class));
+    verify(mailSender, never())
         .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
   }
 
@@ -462,7 +462,7 @@ class HandoverMailServiceTest {
         HandoverException.class,
         () -> service.handOver(documentationUnit, RECEIVER_ADDRESS, ISSUER_ADDRESS));
 
-    verify(repository, times(0)).save(any(HandoverMail.class));
+    verify(repository, never()).save(any(HandoverMail.class));
     verify(mailSender)
         .sendMail(
             SENDER_ADDRESS,

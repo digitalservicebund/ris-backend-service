@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import static de.bund.digitalservice.ris.caselaw.domain.StringUtils.normalizeSpace;
 
 import com.gravity9.jsonpatch.JsonPatch;
+import com.gravity9.jsonpatch.JsonPatchOperation;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDeletionException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
@@ -38,6 +39,18 @@ public class DocumentationUnitService {
   private final PatchMapperService patchMapperService;
   private final AuthService authService;
   private final Validator validator;
+  private final DuplicateCheckService duplicateCheckService;
+  private static final List<String> pathsForDuplicateCheck =
+      List.of(
+          "/coreData/ecli",
+          "/coreData/deviatingEclis",
+          "/coreData/fileNumbers",
+          "/coreData/deviatingFileNumbers",
+          "/coreData/court",
+          "/coreData/deviatingCourts",
+          "/coreData/decisionDate",
+          "/coreData/deviatingDecisionDates",
+          "/coreData/documentType");
 
   public DocumentationUnitService(
       DocumentationUnitRepository repository,
@@ -47,7 +60,8 @@ public class DocumentationUnitService {
       Validator validator,
       AttachmentService attachmentService,
       @Lazy AuthService authService,
-      PatchMapperService patchMapperService) {
+      PatchMapperService patchMapperService,
+      DuplicateCheckService duplicateCheckService) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
@@ -57,6 +71,7 @@ public class DocumentationUnitService {
     this.patchMapperService = patchMapperService;
     this.statusService = statusService;
     this.authService = authService;
+    this.duplicateCheckService = duplicateCheckService;
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -106,15 +121,19 @@ public class DocumentationUnitService {
             .withError(false)
             .build();
 
-    return repository.createNewDocumentationUnit(
-        docUnit,
-        status,
-        params.reference(),
-        params.reference() != null && params.reference().legalPeriodical() != null
-            ? params.reference().legalPeriodical().abbreviation()
-                + " "
-                + params.reference().citation()
-            : null);
+    var newDocumentationUnit =
+        repository.createNewDocumentationUnit(
+            docUnit,
+            status,
+            params.reference(),
+            params.reference() != null && params.reference().legalPeriodical() != null
+                ? params.reference().legalPeriodical().abbreviation()
+                    + " "
+                    + params.reference().citation()
+                : null);
+
+    duplicateCheckService.checkDuplicates(docUnit.documentNumber());
+    return newDocumentationUnit;
   }
 
   private String generateDocumentNumber(DocumentationOffice documentationOffice) {
@@ -134,6 +153,8 @@ public class DocumentationUnitService {
       Optional<String> courtLocation,
       Optional<LocalDate> decisionDate,
       Optional<LocalDate> decisionDateEnd,
+      Optional<LocalDate> publicationDate,
+      Optional<Boolean> scheduledOnly,
       Optional<String> publicationStatus,
       Optional<Boolean> withError,
       Optional<Boolean> myDocOfficeOnly) {
@@ -146,6 +167,8 @@ public class DocumentationUnitService {
             .courtLocation(normalizeSpace(courtLocation.orElse(null)))
             .decisionDate(decisionDate.orElse(null))
             .decisionDateEnd(decisionDateEnd.orElse(null))
+            .publicationDate(publicationDate.orElse(null))
+            .scheduledOnly(scheduledOnly.orElse(false))
             .status(
                 (publicationStatus.isPresent() || withError.isPresent())
                     ? Status.builder()
@@ -175,6 +198,10 @@ public class DocumentationUnitService {
 
     return addPermissions(
         oidcUser, repository.findDocumentationUnitListItemByDocumentNumber(documentNumber));
+  }
+
+  public void setPublicationDateTime(UUID uuid) {
+    repository.saveLastPublicationDateTime(uuid);
   }
 
   private DocumentationUnitListItem addPermissions(
@@ -279,7 +306,8 @@ public class DocumentationUnitService {
 
     JsonPatch toFrontendJsonPatch = new JsonPatch(Collections.emptyList());
     RisJsonPatch toFrontend;
-    if (!patch.patch().getOperations().isEmpty()) {
+    if (!patch.patch().getOperations().isEmpty()
+        && !PatchMapperService.containsOnlyVersionInPatch(patch.patch())) {
       JsonPatch toUpdate = patchMapperService.removePatchForSamePath(patch.patch(), newPatch);
 
       log.debug("version {} - update patch: {}", patch.documentationUnitVersion(), toUpdate);
@@ -288,8 +316,11 @@ public class DocumentationUnitService {
         DocumentationUnit patchedDocumentationUnit =
             patchMapperService.applyPatchToEntity(toUpdate, existingDocumentationUnit);
         patchedDocumentationUnit = patchedDocumentationUnit.toBuilder().version(newVersion).build();
+
+        DuplicateCheckStatus duplicateCheckStatus = getDuplicateCheckStatus(patch);
+
         DocumentationUnit updatedDocumentationUnit =
-            updateDocumentationUnit(patchedDocumentationUnit);
+            updateDocumentationUnit(patchedDocumentationUnit, duplicateCheckStatus);
 
         toFrontendJsonPatch =
             patchMapperService.getDiffPatch(patchedDocumentationUnit, updatedDocumentationUnit);
@@ -344,11 +375,21 @@ public class DocumentationUnitService {
 
   public DocumentationUnit updateDocumentationUnit(DocumentationUnit documentationUnit)
       throws DocumentationUnitNotExistsException {
+    return this.updateDocumentationUnit(documentationUnit, DuplicateCheckStatus.DISABLED);
+  }
+
+  public DocumentationUnit updateDocumentationUnit(
+      DocumentationUnit documentationUnit, DuplicateCheckStatus duplicateCheckStatus)
+      throws DocumentationUnitNotExistsException {
     repository.saveKeywords(documentationUnit);
     repository.saveFieldsOfLaw(documentationUnit);
     repository.saveProcedures(documentationUnit);
 
     repository.save(documentationUnit);
+
+    if (duplicateCheckStatus == DuplicateCheckStatus.ENABLED) {
+      duplicateCheckService.checkDuplicates(documentationUnit.documentNumber());
+    }
 
     return repository.findByUuid(documentationUnit.uuid());
   }
@@ -388,7 +429,24 @@ public class DocumentationUnitService {
           documentationUnit.coreData().documentationOffice().abbreviation());
 
     } catch (Exception e) {
-      log.info("Did not save for recycling", e);
+      log.info("Won´t recycle the document number: {}", e.getMessage());
+    }
+  }
+
+  public enum DuplicateCheckStatus {
+    ENABLED,
+    DISABLED
+  }
+
+  private static DuplicateCheckStatus getDuplicateCheckStatus(RisJsonPatch patch) {
+    boolean hasPathRelevantForDuplicateCheck =
+        patch.patch().getOperations().stream()
+            .map(JsonPatchOperation::getPath)
+            .anyMatch(path -> pathsForDuplicateCheck.stream().anyMatch(path::contains));
+    if (hasPathRelevantForDuplicateCheck) {
+      return DuplicateCheckStatus.ENABLED;
+    } else {
+      return DuplicateCheckStatus.DISABLED;
     }
   }
 }

@@ -2,6 +2,7 @@ import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, fireEvent, screen } from "@testing-library/vue"
 import { Stubs } from "@vue/test-utils/dist/types"
+import { beforeEach } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import HandoverDocumentationUnitView from "@/components/HandoverDocumentationUnitView.vue"
 import DocumentUnit from "@/domain/documentUnit"
@@ -73,7 +74,6 @@ describe("HandoverDocumentationUnitView:", () => {
       }),
     })
   })
-
   describe("renders plausibility check", () => {
     it("with all required fields filled", async () => {
       renderComponent({
@@ -189,7 +189,8 @@ describe("HandoverDocumentationUnitView:", () => {
       ).toBeInTheDocument()
       expect(screen.queryByText("XML Vorschau")).not.toBeInTheDocument()
     })
-    it("should show error message with invalid casefacts", async () => {
+
+    it("should show validation error message when casefacts are invalid", async () => {
       renderComponent({
         documentUnit: new DocumentUnit("123", {
           documentNumber: "foo",
@@ -210,17 +211,66 @@ describe("HandoverDocumentationUnitView:", () => {
           longTexts: { reasons: "Reasons", caseFacts: "CaseFacts" },
         }),
       })
+
       expect(
         await screen.findByText(
           'Die Rubriken "Gründe" und "Tatbestand" sind befüllt. Es darf nur eine der beiden Rubriken befüllt sein.',
         ),
       ).toBeInTheDocument()
-
       expect(screen.getByText("Rubriken bearbeiten")).toBeInTheDocument()
+
+      expect(
+        screen.queryByText("Alle Pflichtfelder sind korrekt ausgefüllt"),
+      ).not.toBeInTheDocument()
       expect(screen.queryByText("XML Vorschau")).not.toBeInTheDocument()
+      expect(
+        screen.getByRole("button", {
+          name: "Dokumentationseinheit an jDV übergeben",
+        }),
+      ).toBeDisabled()
     })
 
-    it("should show error message with invalid decisionReasons", async () => {
+    it("should show no validation error message when casefacts are valid", async () => {
+      renderComponent({
+        documentUnit: new DocumentUnit("123", {
+          documentNumber: "foo",
+          coreData: {
+            fileNumbers: ["foo"],
+            court: {
+              type: "type",
+              location: "location",
+              label: "label",
+            },
+            decisionDate: "2022-02-01",
+            legalEffect: "legalEffect",
+            documentType: {
+              jurisShortcut: "ca",
+              label: "category",
+            },
+          },
+          longTexts: { caseFacts: "CaseFacts" },
+        }),
+      })
+
+      expect(
+        screen.queryByText(
+          'Die Rubriken "Gründe" und "Tatbestand" sind befüllt. Es darf nur eine der beiden Rubriken befüllt sein.',
+        ),
+      ).not.toBeInTheDocument()
+      expect(screen.queryByText("Rubriken bearbeiten")).not.toBeInTheDocument()
+
+      expect(
+        screen.getByText("Alle Pflichtfelder sind korrekt ausgefüllt"),
+      ).toBeInTheDocument()
+      expect(await screen.findByText("XML Vorschau")).toBeInTheDocument()
+      expect(
+        screen.getByRole("button", {
+          name: "Dokumentationseinheit an jDV übergeben",
+        }),
+      ).toBeEnabled()
+    })
+
+    it("should show validation error message when decisionReasons are invalid", async () => {
       renderComponent({
         documentUnit: new DocumentUnit("123", {
           documentNumber: "foo",
@@ -241,27 +291,91 @@ describe("HandoverDocumentationUnitView:", () => {
           longTexts: { reasons: "Reasons", decisionReasons: "decisionReasons" },
         }),
       })
+
       expect(
         await screen.findByText(
           'Die Rubriken "Gründe" und "Entscheidungsgründe" sind befüllt. Es darf nur eine der beiden Rubriken befüllt sein.',
         ),
       ).toBeInTheDocument()
-
       expect(screen.getByText("Rubriken bearbeiten")).toBeInTheDocument()
+
+      expect(
+        screen.queryByText("Alle Pflichtfelder sind korrekt ausgefüllt"),
+      ).not.toBeInTheDocument()
       expect(screen.queryByText("XML Vorschau")).not.toBeInTheDocument()
+      expect(
+        screen.getByRole("button", {
+          name: "Dokumentationseinheit an jDV übergeben",
+        }),
+      ).toBeDisabled()
+    })
+
+    it("should show no validation error message when decisionReasons are valid", async () => {
+      renderComponent({
+        documentUnit: new DocumentUnit("123", {
+          documentNumber: "foo",
+          coreData: {
+            fileNumbers: ["foo"],
+            court: {
+              type: "type",
+              location: "location",
+              label: "label",
+            },
+            decisionDate: "2022-02-01",
+            legalEffect: "legalEffect",
+            documentType: {
+              jurisShortcut: "ca",
+              label: "category",
+            },
+          },
+          longTexts: { decisionReasons: "decisionReasons" },
+        }),
+      })
+
+      expect(
+        screen.queryByText(
+          'Die Rubriken "Gründe" und "Entscheidungsgründe" sind befüllt. Es darf nur eine der beiden Rubriken befüllt sein.',
+        ),
+      ).not.toBeInTheDocument()
+      expect(screen.queryByText("Rubriken bearbeiten")).not.toBeInTheDocument()
+
+      expect(
+        screen.getByText("Alle Pflichtfelder sind korrekt ausgefüllt"),
+      ).toBeInTheDocument()
+      expect(await screen.findByText("XML Vorschau")).toBeInTheDocument()
+      expect(
+        screen.getByRole("button", {
+          name: "Dokumentationseinheit an jDV übergeben",
+        }),
+      ).toBeEnabled()
     })
 
     it("'Rubriken bearbeiten' button links back to categories", async () => {
-      render(HandoverDocumentationUnitView, {
-        global: {
-          plugins: [router],
+      const pinia = createTestingPinia({
+        initialState: {
+          docunitStore: {
+            documentUnit: new DocumentUnit("123", {
+              documentNumber: "foo",
+              longTexts: {
+                reasons: "Reasons",
+                decisionReasons: "decisionReasons",
+              },
+            }),
+          },
         },
       })
+      render(HandoverDocumentationUnitView, {
+        global: {
+          plugins: [[router], [pinia]],
+        },
+      })
+
       expect(
         await screen.findByLabelText("Rubriken bearbeiten"),
       ).toBeInTheDocument()
 
       await userEvent.click(screen.getByLabelText("Rubriken bearbeiten"))
+
       expect(router.currentRoute.value.name).toBe(
         "caselaw-documentUnit-documentNumber-categories",
       )
@@ -451,6 +565,39 @@ describe("HandoverDocumentationUnitView:", () => {
     expect(codeSnippet?.getAttribute("xml")).toBe("<xml>all good</xml>")
   })
 
+  it("should not allow to publish when publication is scheduled", async () => {
+    renderComponent({
+      documentUnit: new DocumentUnit("123", {
+        managementData: {
+          borderNumbers: [],
+          scheduledPublicationDateTime: "2050-01-01T04:00:00.000Z",
+        },
+        coreData: {
+          fileNumbers: ["foo"],
+          court: { type: "type", location: "location", label: "label" },
+          decisionDate: "2022-02-01",
+          legalEffect: "legalEffect",
+          documentType: {
+            jurisShortcut: "ca",
+            label: "category",
+          },
+        },
+      }),
+    })
+
+    expect(
+      screen.getByRole("button", {
+        name: "Dokumentationseinheit an jDV übergeben",
+      }),
+    ).toBeDisabled()
+  })
+
+  it("should show the scheduling component", async () => {
+    renderComponent()
+
+    expect(screen.getByLabelText("Terminiertes Datum")).toBeVisible()
+  })
+
   it("with stubbing", async () => {
     const { container } = renderComponent({
       props: {
@@ -492,7 +639,7 @@ describe("HandoverDocumentationUnitView:", () => {
     await new Promise((resolve) => setTimeout(resolve, 0))
 
     expect(container).toHaveTextContent(
-      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltRandnummernprüfungDie Reihenfolge der Randnummern ist korrektXML VorschauDokumentationseinheit an jDV übergebenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subject`,
+      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltRandnummernprüfungDie Reihenfolge der Randnummern ist korrektXML VorschauDokumentationseinheit an jDV übergebenOder für später terminieren:Datum * Uhrzeit * Termin setzenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subject`,
     )
 
     const codeSnippet = screen.queryByTestId("code-snippet")

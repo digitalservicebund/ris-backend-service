@@ -13,6 +13,8 @@ import de.bund.digitalservice.ris.caselaw.domain.docx.ECLIElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.FooterElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.MetadataProperty;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ParagraphElement;
+import de.bund.digitalservice.ris.caselaw.domain.docx.UnhandledElement;
+import de.bund.digitalservice.ris.caselaw.domain.docx.UnhandledElementType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -24,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -62,6 +65,21 @@ import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 @Service
 @Slf4j
 public class DocxConverterService implements ConverterService {
+  private static final String PARAGRAPH = "paragraph";
+  private static final List<UnhandledElement> IRRELEVANT_ELEMENTS =
+      List.of(
+          new UnhandledElement(PARAGRAPH, "org.docx4j.wml.CTBookmark", UnhandledElementType.JAXB),
+          new UnhandledElement(
+              PARAGRAPH, "org.docx4j.wml.CTMarkupRange", UnhandledElementType.JAXB),
+          new UnhandledElement(
+              PARAGRAPH, "org.docx4j.wml.CTSimpleField", UnhandledElementType.JAXB),
+          // Page break
+          new UnhandledElement("run element", "org.docx4j.wml.Br", UnhandledElementType.OBJECT)
+          // possible irrelevant (spell and grammar check)
+          // new UnhandledElement("paragraph", "org.docx4j.wml.ProofErr",
+          // UnhandledElementType.OBJECT)
+          );
+
   private final S3Client client;
   private final DocumentBuilderFactory documentBuilderFactory;
   private final DocxConverter converter;
@@ -174,14 +192,16 @@ public class DocxConverterService implements ConverterService {
       throw new DocxConverterException("Couldn't load docx file!", e);
     }
 
+    List<UnhandledElement> unhandledElements = new ArrayList<>();
+
     converter.setStyles(readStyles(mlPackage));
     converter.setImages(readImages(mlPackage));
-    converter.setFooters(readFooters(mlPackage, converter));
+    converter.setFooters(readFooters(mlPackage, converter, unhandledElements));
     converter.setListNumberingDefinitions(readListNumberingDefinitions(mlPackage));
 
     List<DocumentationUnitDocx> documentationUnitDocxList =
         mlPackage.getMainDocumentPart().getContent().stream()
-            .map(converter::convert)
+            .map(element -> converter.convert(element, unhandledElements))
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
 
@@ -197,7 +217,39 @@ public class DocxConverterService implements ConverterService {
 
     DocumentationUnitDocxListUtils.postProcessBorderNumbers(documentationUnitDocxList);
 
+    logUnhandledElements(unhandledElements);
+
     return documentationUnitDocxList;
+  }
+
+  private void logUnhandledElements(List<UnhandledElement> unhandledElements) {
+    List<UnhandledElement> filteredUnhandledElements =
+        unhandledElements.stream()
+            .filter(unhandledElement -> !IRRELEVANT_ELEMENTS.contains(unhandledElement))
+            .toList();
+
+    if (filteredUnhandledElements.isEmpty()) {
+      return;
+    }
+
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append(filteredUnhandledElements.size());
+    stringBuilder.append(" unhandled elements found: ");
+
+    Map<UnhandledElement, Long> filteredUnhandledElementMap =
+        filteredUnhandledElements.stream()
+            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+    AtomicInteger i = new AtomicInteger();
+    filteredUnhandledElementMap.forEach(
+        (key, value) -> {
+          if (i.getAndIncrement() > 0) {
+            stringBuilder.append(", ");
+          }
+          stringBuilder.append(key.toString());
+          stringBuilder.append("(").append(value).append(")");
+        });
+
+    log.warn(stringBuilder.toString());
   }
 
   private List<MetadataProperty> readDocumentProperties(WordprocessingMLPackage mlPackage) {
@@ -287,7 +339,9 @@ public class DocxConverterService implements ConverterService {
   }
 
   private List<ParagraphElement> readFooters(
-      WordprocessingMLPackage mlPackage, DocxConverter converter) {
+      WordprocessingMLPackage mlPackage,
+      DocxConverter converter,
+      List<UnhandledElement> unhandledElements) {
     if (mlPackage == null
         || mlPackage.getDocumentModel() == null
         || mlPackage.getDocumentModel().getSections() == null) {
@@ -306,19 +360,25 @@ public class DocxConverterService implements ConverterService {
               if (headerFooterPolicy.getDefaultFooter() != null) {
                 footers.add(
                     FooterConverter.convert(
-                        headerFooterPolicy.getDefaultFooter().getContent(), converter));
+                        headerFooterPolicy.getDefaultFooter().getContent(),
+                        converter,
+                        unhandledElements));
               }
 
               if (headerFooterPolicy.getFirstFooter() != null) {
                 footers.add(
                     FooterConverter.convert(
-                        headerFooterPolicy.getFirstFooter().getContent(), converter));
+                        headerFooterPolicy.getFirstFooter().getContent(),
+                        converter,
+                        unhandledElements));
               }
 
               if (headerFooterPolicy.getEvenFooter() != null) {
                 footers.add(
                     FooterConverter.convert(
-                        headerFooterPolicy.getEvenFooter().getContent(), converter));
+                        headerFooterPolicy.getEvenFooter().getContent(),
+                        converter,
+                        unhandledElements));
               }
             });
 

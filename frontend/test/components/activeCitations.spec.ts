@@ -1,15 +1,43 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
-import { fireEvent, render, screen } from "@testing-library/vue"
+import { fireEvent, render, screen, waitFor } from "@testing-library/vue"
+import { http, HttpResponse } from "msw"
+import { setupServer } from "msw/node"
 import { createRouter, createWebHistory } from "vue-router"
 import ActiveCitations from "@/components/ActiveCitations.vue"
-import { ComboboxItem } from "@/components/input/types"
 import ActiveCitation from "@/domain/activeCitation"
 import { CitationType } from "@/domain/citationType"
 import DocumentUnit, { Court, DocumentType } from "@/domain/documentUnit"
-import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
+import featureToggleService from "@/services/featureToggleService"
+import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
+
+const server = setupServer(
+  http.get("/api/v1/caselaw/courts", () => {
+    const court: Court = {
+      type: "AG",
+      location: "Test",
+      label: "AG Test",
+    }
+    return HttpResponse.json([court])
+  }),
+  http.get("/api/v1/caselaw/documenttypes", () => {
+    const documentType: DocumentType = {
+      jurisShortcut: "Ant",
+      label: "EuGH-Vorlage",
+    }
+    return HttpResponse.json([documentType])
+  }),
+  http.get("/api/v1/caselaw/citationtypes", () => {
+    const citationStyle: CitationType = {
+      uuid: "123",
+      jurisShortcut: "Änderungen",
+      label: "Änderungen",
+    }
+    return HttpResponse.json([citationStyle])
+  }),
+)
 
 function renderComponent(activeCitations?: ActiveCitation[]) {
   const user = userEvent.setup()
@@ -22,6 +50,7 @@ function renderComponent(activeCitations?: ActiveCitation[]) {
     user,
     ...render(ActiveCitations, {
       global: {
+        directives: { "ctrl-enter": onSearchShortcutDirective },
         plugins: [
           [
             createTestingPinia({
@@ -40,7 +69,11 @@ function renderComponent(activeCitations?: ActiveCitation[]) {
           ],
           [router],
         ],
-        stubs: { routerLink: { template: "<a><slot/></a>" } },
+        stubs: {
+          routerLink: {
+            template: "<a><slot/></a>",
+          },
+        },
       },
     }),
   }
@@ -81,7 +114,13 @@ function generateActiveCitation(options?: {
 }
 
 describe("active citations", () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
   beforeEach(() => {
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
     vi.spyOn(
       documentUnitService,
       "searchByRelatedDocumentation",
@@ -116,63 +155,10 @@ describe("active citations", () => {
     )
 
     vi.spyOn(window, "scrollTo").mockImplementation(() => vi.fn())
-
-    vi.spyOn(comboboxItemService, "getCourts").mockImplementation(() =>
-      Promise.resolve({ status: 200, data: dropdownCourtItems }),
-    )
-
-    vi.spyOn(comboboxItemService, "getDocumentTypes").mockImplementation(() =>
-      Promise.resolve({ status: 200, data: dropdownDocumentTypesItems }),
-    )
-
-    vi.spyOn(comboboxItemService, "getCitationTypes").mockImplementation(() =>
-      Promise.resolve({ status: 200, data: dropdownCitationStyleItems }),
-    )
   })
   afterEach(() => {
     vi.resetAllMocks()
   })
-
-  const court: Court = {
-    type: "AG",
-    location: "Test",
-    label: "AG Test",
-  }
-
-  const documentType: DocumentType = {
-    jurisShortcut: "Ant",
-    label: "EuGH-Vorlage",
-  }
-
-  const citationStyle: CitationType = {
-    uuid: "123",
-    jurisShortcut: "Änderungen",
-    label: "Änderungen",
-  }
-
-  const dropdownCourtItems: ComboboxItem[] = [
-    {
-      label: court.label,
-      value: court,
-      additionalInformation: court.revoked,
-    },
-  ]
-
-  const dropdownDocumentTypesItems: ComboboxItem[] = [
-    {
-      label: documentType.label,
-      value: documentType,
-      additionalInformation: documentType.jurisShortcut,
-    },
-  ]
-
-  const dropdownCitationStyleItems: ComboboxItem[] = [
-    {
-      label: citationStyle.label,
-      value: citationStyle,
-      additionalInformation: citationStyle.jurisShortcut,
-    },
-  ]
 
   it("renders empty active citation in edit mode, when no activeCitations in list", async () => {
     renderComponent()
@@ -409,6 +395,19 @@ describe("active citations", () => {
     expect(screen.getAllByText(/test fileNumber/).length).toBe(1)
   })
 
+  it("search is triggered with shortcut", async () => {
+    const { user } = renderComponent()
+
+    expect(screen.queryByText(/test fileNumber/)).not.toBeInTheDocument()
+    await user.type(
+      await screen.findByLabelText("Aktenzeichen Aktivzitierung"),
+      "test",
+    )
+    await user.keyboard("{Control>}{Enter}")
+
+    expect(screen.getAllByText(/test fileNumber/).length).toBe(1)
+  })
+
   it("adds active citation from search results", async () => {
     const { user } = renderComponent()
 
@@ -530,6 +529,38 @@ describe("active citations", () => {
     expect(clipboardText).toBe(
       "Änderungen, label1, 01.02.2022, test fileNumber, documentType1",
     )
+  })
+
+  it("should render parallel decision icons for 'Teilweise Parallelentscheidung'", async () => {
+    renderComponent([
+      generateActiveCitation({
+        citationStyle: {
+          label: "Teilweise Parallelentscheidung",
+        },
+      }),
+    ])
+    await waitFor(() => {
+      expect(screen.getByTestId("import-categories")).toBeVisible()
+    })
+    await waitFor(() => {
+      expect(screen.getByTestId("generate-headnote")).toBeVisible()
+    })
+  })
+
+  it("should render parallel decision icons for 'Parallelentscheidung'", async () => {
+    renderComponent([
+      generateActiveCitation({
+        citationStyle: {
+          label: "Parallelentscheidung",
+        },
+      }),
+    ])
+    await waitFor(() => {
+      expect(screen.getByTestId("import-categories")).toBeVisible()
+    })
+    await waitFor(() => {
+      expect(screen.getByTestId("generate-headnote")).toBeVisible()
+    })
   })
 
   describe("keyboard navigation", () => {

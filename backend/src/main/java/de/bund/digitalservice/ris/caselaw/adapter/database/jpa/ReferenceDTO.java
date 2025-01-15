@@ -8,7 +8,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
@@ -38,7 +38,7 @@ public class ReferenceDTO {
   // amtlich or nichtamtlich
   private String type;
 
-  @NotBlank private String citation;
+  private String citation;
 
   // Klammerzusatz
   @Column(name = "reference_supplement")
@@ -54,6 +54,13 @@ public class ReferenceDTO {
   @NotNull
   private String legalPeriodicalRawValue;
 
-  @OneToMany(mappedBy = "reference", cascade = CascadeType.REMOVE)
+  @OneToMany(cascade = CascadeType.REMOVE)
+  @JoinColumn(
+      name = "reference_id",
+      referencedColumnName = "id",
+      insertable = false,
+      updatable = false)
   private List<EditionReferenceDTO> editionReferences;
+
+  @Transient private Integer editionRank;
 }

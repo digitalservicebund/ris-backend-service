@@ -17,6 +17,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DismissalTypesDTO
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO.DocumentationUnitDTOBuilder;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
@@ -39,6 +40,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
+import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
@@ -50,9 +52,11 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.Region;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -68,10 +72,13 @@ class DocumentationUnitTransformerTest {
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
 
-    assertThat(documentationUnitDTO.getProcedures()).isEmpty();
+    assertThat(documentationUnitDTO.getProcedureHistory()).isEmpty();
+    assertThat(documentationUnitDTO.getProcedure()).isNull();
     assertThat(documentationUnitDTO.getEcli()).isNull();
     assertThat(documentationUnitDTO.getJudicialBody()).isNull();
     assertThat(documentationUnitDTO.getDecisionDate()).isNull();
+    assertThat(documentationUnitDTO.getScheduledPublicationDateTime()).isNull();
+    assertThat(documentationUnitDTO.getLastPublicationDateTime()).isNull();
     assertThat(documentationUnitDTO.getCourt()).isNull();
     assertThat(documentationUnitDTO.getDocumentType()).isNull();
     assertThat(documentationUnitDTO.getDocumentationOffice()).isNull();
@@ -470,9 +477,7 @@ class DocumentationUnitTransformerTest {
     Exception exception =
         assertThrows(
             DocumentationUnitTransformerException.class,
-            () -> {
-              DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
-            });
+            () -> DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject));
 
     String expectedMessage = "Norm reference has no norm abbreviation, but is required.";
     String actualMessage = exception.getMessage();
@@ -895,7 +900,59 @@ class DocumentationUnitTransformerTest {
     DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentationUnit.borderNumbers()).hasSize(2).containsExactly("1", "2");
+    assertThat(documentationUnit.managementData().borderNumbers())
+        .hasSize(2)
+        .containsExactly("1", "2");
+  }
+
+  @Test
+  void testTransformScheduledPublicationDate_withDate_shouldAddScheduledPublicationDate() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder()
+            .scheduledPublicationDateTime(LocalDateTime.parse("2022-01-23T18:25:14"))
+            .build();
+
+    DocumentationUnit documentationUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentationUnit.managementData().scheduledPublicationDateTime())
+        .isEqualTo("2022-01-23T18:25:14");
+  }
+
+  @Test
+  void testTransformScheduledPublicationDate_withoutDate_shouldNotAddScheduledPublicationDate() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder().scheduledPublicationDateTime(null).build();
+
+    DocumentationUnit documentationUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentationUnit.managementData().scheduledPublicationDateTime()).isNull();
+  }
+
+  @Test
+  void testTransformLastPublicationDate_withDate_shouldAddLastPublicationDate() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder()
+            .lastPublicationDateTime(LocalDateTime.parse("2022-01-23T18:25:14"))
+            .build();
+
+    DocumentationUnit documentationUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentationUnit.managementData().lastPublicationDateTime())
+        .isEqualTo("2022-01-23T18:25:14");
+  }
+
+  @Test
+  void testTransformLastPublicationDate_withoutDate_shouldNotAddLastPublicationDate() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder().lastPublicationDateTime(null).build();
+
+    DocumentationUnit documentationUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentationUnit.managementData().lastPublicationDateTime()).isNull();
   }
 
   @Test
@@ -915,7 +972,9 @@ class DocumentationUnitTransformerTest {
     DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentationUnit.borderNumbers()).hasSize(4).containsExactly("1", "2", "3", "4");
+    assertThat(documentationUnit.managementData().borderNumbers())
+        .hasSize(4)
+        .containsExactly("1", "2", "3", "4");
   }
 
   @Test
@@ -926,7 +985,7 @@ class DocumentationUnitTransformerTest {
     DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentationUnit.borderNumbers()).isEmpty();
+    assertThat(documentationUnit.managementData().borderNumbers()).isEmpty();
   }
 
   @Test
@@ -941,7 +1000,7 @@ class DocumentationUnitTransformerTest {
     DocumentationUnit documentationUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentationUnit.borderNumbers()).hasSize(1).containsExactly("2");
+    assertThat(documentationUnit.managementData().borderNumbers()).hasSize(1).containsExactly("2");
   }
 
   @Test
@@ -1274,7 +1333,13 @@ class DocumentationUnitTransformerTest {
         .ensuingDecisions(Collections.emptyList())
         .shortTexts(ShortTexts.builder().build())
         .longTexts(LongTexts.builder().build())
-        .borderNumbers(Collections.emptyList())
+        .managementData(
+            ManagementData.builder()
+                .scheduledPublicationDateTime(null)
+                .lastPublicationDateTime(null)
+                .borderNumbers(Collections.emptyList())
+                .duplicateRelations(Collections.emptySet())
+                .build())
         .attachments(Collections.emptyList())
         .contentRelatedIndexing(
             ContentRelatedIndexing.builder()
@@ -1288,7 +1353,8 @@ class DocumentationUnitTransformerTest {
                 .collectiveAgreements(Collections.emptyList())
                 .hasLegislativeMandate(false)
                 .build())
-        .references(Collections.emptyList());
+        .references(Collections.emptyList())
+        .literatureReferences(Collections.emptyList());
   }
 
   private CoreDataBuilder generateSimpleCoreDataBuilder() {
@@ -1303,5 +1369,117 @@ class DocumentationUnitTransformerTest {
         .inputTypes(Collections.emptyList())
         .leadingDecisionNormReferences(Collections.emptyList())
         .yearsOfDispute(Collections.emptyList());
+  }
+
+  @Test
+  void
+      testTransformToDomain_withUnpublishedDuplicateWarningFromOtherDocOffice_Relations1_shouldFilterOutWarning() {
+    var original =
+        generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
+    var unpublishedStatus =
+        StatusDTO.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build();
+    var otherDocOffice = DocumentationOfficeDTO.builder().abbreviation("other office").build();
+    var unpublishedDuplicateFromOtherDocOffice =
+        generateSimpleDTOBuilder()
+            .documentNumber("duplicate")
+            .documentationOffice(otherDocOffice)
+            .id(UUID.randomUUID())
+            .status(unpublishedStatus)
+            .build();
+    var duplicateRelationship =
+        DuplicateRelationDTO.builder()
+            .documentationUnit1(original)
+            .documentationUnit2(unpublishedDuplicateFromOtherDocOffice)
+            .build();
+    original = original.toBuilder().duplicateRelations1(Set.of(duplicateRelationship)).build();
+
+    DocumentationUnit documentationUnit = DocumentationUnitTransformer.transformToDomain(original);
+
+    assertThat(documentationUnit.managementData().duplicateRelations()).isEmpty();
+  }
+
+  @Test
+  void
+      testTransformToDomain_withUnpublishedDuplicateWarningFromOtherDocOffice_Relations2_shouldFilterOutWarning() {
+    var original =
+        generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
+    var unpublishedStatus =
+        StatusDTO.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build();
+    var otherDocOffice = DocumentationOfficeDTO.builder().abbreviation("other office").build();
+    var unpublishedDuplicateFromOtherDocOffice =
+        generateSimpleDTOBuilder()
+            .documentNumber("duplicate")
+            .documentationOffice(otherDocOffice)
+            .id(UUID.randomUUID())
+            .status(unpublishedStatus)
+            .build();
+    var duplicateRelationship =
+        DuplicateRelationDTO.builder()
+            .documentationUnit1(unpublishedDuplicateFromOtherDocOffice)
+            .documentationUnit2(original)
+            .build();
+    original = original.toBuilder().duplicateRelations2(Set.of(duplicateRelationship)).build();
+
+    DocumentationUnit documentationUnit = DocumentationUnitTransformer.transformToDomain(original);
+
+    assertThat(documentationUnit.managementData().duplicateRelations()).isEmpty();
+  }
+
+  @Test
+  void
+      testTransformToDomain_withUnpublishedDuplicateWarningFromSameDocOffice_shouldNotFilterOutWarning() {
+    var original =
+        generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
+    var unpublishedStatus =
+        StatusDTO.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build();
+    var unpublishedDuplicateFromOtherDocOffice =
+        generateSimpleDTOBuilder()
+            .documentNumber("duplicate")
+            .id(UUID.randomUUID())
+            .status(unpublishedStatus)
+            .build();
+    var duplicateRelationship =
+        DuplicateRelationDTO.builder()
+            .documentationUnit1(original)
+            .documentationUnit2(unpublishedDuplicateFromOtherDocOffice)
+            .build();
+    original = original.toBuilder().duplicateRelations1(Set.of(duplicateRelationship)).build();
+
+    DocumentationUnit documentationUnit = DocumentationUnitTransformer.transformToDomain(original);
+
+    assertThat(documentationUnit.managementData().duplicateRelations()).hasSize(1);
+  }
+
+  @Test
+  void
+      testTransformToDomain_withPublishedDuplicateWarningFromOtherDocOffice_shouldNotFilterOutWarning() {
+    var original =
+        generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
+    var publishedStatus =
+        StatusDTO.builder().publicationStatus(PublicationStatus.PUBLISHED).build();
+    var otherDocOffice = DocumentationOfficeDTO.builder().abbreviation("other office").build();
+    var unpublishedDuplicateFromOtherDocOffice =
+        generateSimpleDTOBuilder()
+            .documentNumber("duplicate")
+            .documentationOffice(otherDocOffice)
+            .id(UUID.randomUUID())
+            .status(publishedStatus)
+            .build();
+    var duplicateRelationship =
+        DuplicateRelationDTO.builder()
+            .documentationUnit1(unpublishedDuplicateFromOtherDocOffice)
+            .documentationUnit2(original)
+            .build();
+    original = original.toBuilder().duplicateRelations2(Set.of(duplicateRelationship)).build();
+
+    DocumentationUnit documentationUnit = DocumentationUnitTransformer.transformToDomain(original);
+
+    assertThat(documentationUnit.managementData().duplicateRelations()).hasSize(1);
+    assertThat(
+            documentationUnit.managementData().duplicateRelations().stream()
+                .findFirst()
+                .get()
+                .documentNumber())
+        .isEqualTo("duplicate");
   }
 }

@@ -2,7 +2,7 @@
 import type { Component, ComponentPublicInstance, Ref } from "vue"
 import { ref, watch, computed, nextTick } from "vue"
 import Tooltip from "./Tooltip.vue"
-import DataSetSummary from "@/components/DataSetSummary.vue"
+import DefaultSummary from "@/components/DefaultSummary.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import ListItem from "@/domain/editableListItem"
 import IconArrowDown from "~icons/ic/baseline-keyboard-arrow-down"
@@ -16,7 +16,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  summaryComponent: DataSetSummary,
+  summaryComponent: DefaultSummary,
   modelValue: () => [],
 })
 
@@ -236,6 +236,7 @@ watch(
           class="flex scroll-m-64"
           :data="entry"
         />
+
         <Tooltip text="Aufklappen">
           <button
             id="editable-list-select-button"

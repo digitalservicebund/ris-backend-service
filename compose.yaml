@@ -1,11 +1,11 @@
 services:
   initialization:
-    image: ghcr.io/digitalservicebund/ris-data-migration:7365c89e5ea83932c1d5f1dd00a63ccfd4d6fe90
+    image: ghcr.io/digitalservicebund/ris-data-migration:f09e86f8f5839feab9b6e790b00abe823d85fb32
     depends_on:
       - postgres14
     environment:
-      - SPRING_PROFILES_ACTIVE=feature-development,dev
-      - RIS_MIGRATION_RUNNER=feature-development
+      - SPRING_PROFILES_ACTIVE=dev
+      - RIS_MIGRATION_RUNNER=development
       - RIS_MIGRATION_CLI_MODE=false
       - RIS_MIGRATION_DB_HOST=host.docker.internal
       - RIS_MIGRATION_DB_PORT=5432
@@ -21,7 +21,7 @@ services:
       - RIS_MIGRATION_S3_FIRST_DAILY_VERSION=2024-08-31
 
   traefik:
-    image: traefik:v3.2
+    image: traefik:v3.3
     extra_hosts:
       - localhost:host-gateway
     container_name: traefik
@@ -153,7 +153,7 @@ services:
       timeout: 3s
 
   redis:
-    image: cgr.dev/chainguard/redis@sha256:85ac79734b47c59fe5fc9ca923c321991b792ef9cf759f7f5b7cddffb3eda6db
+    image: cgr.dev/chainguard/redis@sha256:dc74ed2817f14bca80560beeb1feed5a0f285fc6f5b00fe748554e9b4c7db2fd
     extra_hosts:
       - localhost:host-gateway
     container_name: redis

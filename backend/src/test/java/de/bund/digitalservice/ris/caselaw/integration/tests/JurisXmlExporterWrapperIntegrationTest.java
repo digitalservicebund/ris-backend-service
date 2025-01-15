@@ -38,7 +38,7 @@ class JurisXmlExporterWrapperIntegrationTest {
   }
 
   @Test
-  void test_validDocumentationUnit_shouldReturnEncryptedXMLString() throws Exception {
+  void test_validDocumentationUnit_shouldReturnEncryptedXMLString() {
     this.jurisXmlExporter = new JurisXmlExporter(objectMapper, new TransformerFactoryImpl());
 
     CoreData coreData =
@@ -92,8 +92,7 @@ class JurisXmlExporterWrapperIntegrationTest {
   }
 
   @Test
-  void test_invalidDocumentationUnitMissingMandatoryFields_shouldReturnEmptyString()
-      throws Exception {
+  void test_invalidDocumentationUnitMissingMandatoryFields_shouldReturnEmptyString() {
     this.jurisXmlExporter = new JurisXmlExporter(objectMapper, new TransformerFactoryImpl());
 
     DocumentationUnit documentationUnit =

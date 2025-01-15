@@ -81,6 +81,7 @@ public class NormReferenceTransformer {
     }
 
     return normReference.singleNorms().stream()
+        .distinct()
         .map(
             singleNorm -> {
               var builder =

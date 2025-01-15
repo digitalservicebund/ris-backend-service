@@ -23,11 +23,14 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelation;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
+import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
@@ -41,6 +44,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -101,7 +106,8 @@ public class DocumentationUnitTransformer {
 
     } else {
       builder
-          .procedures(Collections.emptyList())
+          .procedureHistory(Collections.emptyList())
+          .procedure(null)
           .ecli(null)
           .judicialBody(null)
           .decisionDate(null)
@@ -144,7 +150,16 @@ public class DocumentationUnitTransformer {
           .outline(null);
     }
 
+    if (updatedDomainObject.managementData() != null) {
+      var managementData = updatedDomainObject.managementData();
+
+      builder.scheduledPublicationDateTime(managementData.scheduledPublicationDateTime());
+      builder.lastPublicationDateTime(managementData.lastPublicationDateTime());
+      builder.scheduledByEmail(managementData.scheduledByEmail());
+    }
+
     addReferences(updatedDomainObject, builder);
+    addDependentLiteratureCitations(updatedDomainObject, builder);
 
     return builder.build();
   }
@@ -160,6 +175,23 @@ public class DocumentationUnitTransformer {
                 .map(
                     referenceDTO -> {
                       // TODO why is this necessary?
+                      referenceDTO.setDocumentationUnit(builder.build());
+                      referenceDTO.setRank(i.getAndIncrement());
+                      return referenceDTO;
+                    })
+                .toList());
+  }
+
+  private static void addDependentLiteratureCitations(
+      DocumentationUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
+    AtomicInteger i = new AtomicInteger(1);
+    builder.dependentLiteratureCitations(
+        updatedDomainObject.literatureReferences() == null
+            ? Collections.emptyList()
+            : updatedDomainObject.literatureReferences().stream()
+                .map(DependentLiteratureTransformer::transformToDTO)
+                .map(
+                    referenceDTO -> {
                       referenceDTO.setDocumentationUnit(builder.build());
                       referenceDTO.setRank(i.getAndIncrement());
                       return referenceDTO;
@@ -562,10 +594,10 @@ public class DocumentationUnitTransformer {
         CoreData.builder()
             .court(CourtTransformer.transformToDomain(documentationUnitDTO.getCourt()))
             .procedure(
-                ProcedureTransformer.transformFirstToDomain(documentationUnitDTO.getProcedures()))
+                ProcedureTransformer.transformToDomain(documentationUnitDTO.getProcedure(), false))
             .previousProcedures(
                 ProcedureTransformer.transformPreviousProceduresToLabel(
-                    documentationUnitDTO.getProcedures()))
+                    documentationUnitDTO.getProcedureHistory()))
             .documentationOffice(
                 DocumentationOfficeTransformer.transformToDomain(
                     documentationUnitDTO.getDocumentationOffice()))
@@ -708,6 +740,32 @@ public class DocumentationUnitTransformer {
             documentationUnitDTO.getOtherLongText(),
             documentationUnitDTO.getDissentingOpinion());
 
+    Set<DuplicateRelation> duplicateRelations =
+        Stream.concat(
+                documentationUnitDTO.getDuplicateRelations1().stream()
+                    .filter(
+                        relation ->
+                            isPublishedDuplicateOrSameDocOffice(
+                                documentationUnitDTO, relation.getDocumentationUnit2())),
+                documentationUnitDTO.getDuplicateRelations2().stream()
+                    .filter(
+                        relation ->
+                            isPublishedDuplicateOrSameDocOffice(
+                                documentationUnitDTO, relation.getDocumentationUnit1())))
+            .map(
+                relation ->
+                    DuplicateRelationTransformer.transformToDomain(relation, documentationUnitDTO))
+            .collect(Collectors.toSet());
+
+    ManagementData managementData =
+        ManagementData.builder()
+            .lastPublicationDateTime(documentationUnitDTO.getLastPublicationDateTime())
+            .scheduledPublicationDateTime(documentationUnitDTO.getScheduledPublicationDateTime())
+            .scheduledByEmail(documentationUnitDTO.getScheduledByEmail())
+            .duplicateRelations(duplicateRelations)
+            .borderNumbers(borderNumbers)
+            .build();
+
     addOriginalFileDocuments(documentationUnitDTO, builder);
     addPreviousDecisionsToDomain(documentationUnitDTO, builder);
     addEnsuingDecisionsToDomain(documentationUnitDTO, builder);
@@ -718,24 +776,54 @@ public class DocumentationUnitTransformer {
         .coreData(coreData)
         .shortTexts(shortTexts)
         .longTexts(longTexts)
-        .borderNumbers(borderNumbers)
-        .contentRelatedIndexing(contentRelatedIndexing);
+        .contentRelatedIndexing(contentRelatedIndexing)
+        .managementData(managementData);
 
     addStatusToDomain(documentationUnitDTO, builder);
     addReferencesToDomain(documentationUnitDTO, builder);
+    addLiteratureReferencesToDomain(documentationUnitDTO, builder);
 
     return builder.build();
+  }
+
+  private static Boolean isPublishedDuplicateOrSameDocOffice(
+      DocumentationUnitDTO original, DocumentationUnitDTO duplicate) {
+    return original.getDocumentationOffice().equals(duplicate.getDocumentationOffice())
+        || duplicate.getStatus().getPublicationStatus().equals(PublicationStatus.PUBLISHED);
   }
 
   private static void addReferencesToDomain(
       DocumentationUnitDTO documentationUnitDTO,
       DocumentationUnit.DocumentationUnitBuilder builder) {
-    builder.references(
-        documentationUnitDTO.getReferences() == null
-            ? Collections.emptyList()
-            : documentationUnitDTO.getReferences().stream()
-                .map(ReferenceTransformer::transformToDomain)
-                .toList());
+
+    builder.references(new ArrayList<>());
+
+    if (documentationUnitDTO.getReferences() != null) {
+      builder
+          .build()
+          .references()
+          .addAll(
+              documentationUnitDTO.getReferences().stream()
+                  .map(ReferenceTransformer::transformToDomain)
+                  .toList());
+    }
+  }
+
+  private static void addLiteratureReferencesToDomain(
+      DocumentationUnitDTO documentationUnitDTO,
+      DocumentationUnit.DocumentationUnitBuilder builder) {
+
+    builder.literatureReferences(new ArrayList<>());
+
+    if (documentationUnitDTO.getDependentLiteratureCitations() != null) {
+      builder
+          .build()
+          .literatureReferences()
+          .addAll(
+              documentationUnitDTO.getDependentLiteratureCitations().stream()
+                  .map(DependentLiteratureTransformer::transformToDomain)
+                  .toList());
+    }
   }
 
   /**
@@ -904,20 +992,22 @@ public class DocumentationUnitTransformer {
       DocumentationUnitDTO documentationUnitDTO,
       DocumentationUnit.DocumentationUnitBuilder builder) {
 
-    List<EnsuingDecisionDTO> ensuingDecisionDTOs = documentationUnitDTO.getEnsuingDecisions();
-    List<PendingDecisionDTO> pendingDecisionDTOs = documentationUnitDTO.getPendingDecisions();
-
-    if (pendingDecisionDTOs == null && ensuingDecisionDTOs == null) {
+    if (documentationUnitDTO.getPendingDecisions() == null
+        && documentationUnitDTO.getEnsuingDecisions() == null) {
       return;
     }
 
-    int size = getEnsuingDecisionListSize(ensuingDecisionDTOs, pendingDecisionDTOs);
+    int size =
+        getEnsuingDecisionListSize(
+            documentationUnitDTO.getEnsuingDecisions(), documentationUnitDTO.getPendingDecisions());
 
     List<EnsuingDecision> withoutRank = new ArrayList<>();
     EnsuingDecision[] ensuingDecisions = new EnsuingDecision[size];
 
-    addEnsuingDecisionToDomain(ensuingDecisionDTOs, withoutRank, ensuingDecisions);
-    addPendingDecisionsToDomain(pendingDecisionDTOs, withoutRank, ensuingDecisions);
+    addEnsuingDecisionToDomain(
+        documentationUnitDTO.getEnsuingDecisions(), withoutRank, ensuingDecisions);
+    addPendingDecisionsToDomain(
+        documentationUnitDTO.getPendingDecisions(), withoutRank, ensuingDecisions);
 
     handleEnsuingDecisionsWithoutRank(withoutRank, ensuingDecisions);
 

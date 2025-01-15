@@ -8,7 +8,7 @@ import {
   waitForInputValue,
 } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
-import { DocumentUnitCatagoriesEnum } from "@/components/enumDocumentUnitCatagories"
+import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import DocumentUnit from "@/domain/documentUnit"
 
 test.describe("short and long texts", () => {
@@ -24,7 +24,7 @@ test.describe("short and long texts", () => {
     },
     async ({ page, documentNumber }) => {
       await navigateToCategories(page, documentNumber, {
-        category: DocumentUnitCatagoriesEnum.TEXTS,
+        category: DocumentUnitCategoriesEnum.TEXTS,
       })
       await clickCategoryButton("Entscheidungsname", page)
       const inputText = "Family-Karte"
@@ -634,11 +634,7 @@ test.describe("short and long texts", () => {
       )
 
       await expect(page.getByText(testId, { exact: true })).toBeVisible()
-      await expect(
-        page.getByText(value, {
-          exact: true,
-        }),
-      ).toBeVisible()
+      await expect(page.getByText(value)).toBeVisible()
     })
   }
 

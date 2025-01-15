@@ -75,11 +75,10 @@ class DocumentationOfficeIntegrationTest {
         .isOk()
         .expectBody(new TypeReference<List<DocumentationOffice>>() {})
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody())
-                  .extracting("abbreviation")
-                  .containsExactly("BGH", "CC-RIS", "DS");
-            });
+            response ->
+                assertThat(response.getResponseBody())
+                    .extracting("abbreviation")
+                    .containsExactly("BGH", "CC-RIS", "DS"));
   }
 
   @Test
@@ -93,10 +92,9 @@ class DocumentationOfficeIntegrationTest {
         .isOk()
         .expectBody(new TypeReference<List<DocumentationOffice>>() {})
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody())
-                  .extracting("abbreviation")
-                  .containsExactly("BGH");
-            });
+            response ->
+                assertThat(response.getResponseBody())
+                    .extracting("abbreviation")
+                    .containsExactly("BGH"));
   }
 }

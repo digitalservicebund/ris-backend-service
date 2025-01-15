@@ -1,6 +1,6 @@
-import { devices, PlaywrightTestConfig } from "@playwright/test"
+import { defineConfig, devices } from "@playwright/test"
 
-const config: PlaywrightTestConfig = {
+const config = defineConfig({
   testDir: "./test/e2e",
   retries: process.env.CI ? 1 : 0,
   workers: process.env.CI ? 4 : undefined,
@@ -65,6 +65,6 @@ const config: PlaywrightTestConfig = {
       dependencies: ["setup"],
     },
   ],
-}
+})
 
 export default config

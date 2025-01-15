@@ -1,6 +1,7 @@
 export default interface EditableListItem {
   id?: string
-  renderDecision: string
+  documentNumber?: string
+  renderSummary: string
   hasMissingRequiredFields?: boolean
   missingRequiredFields?: string[]
 

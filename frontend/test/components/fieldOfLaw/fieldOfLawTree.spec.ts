@@ -1,6 +1,6 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import FieldOfLawTreeVue from "@/components/FieldOfLawTree.vue"
+import FieldOfLawTreeVue from "@/components/field-of-law/FieldOfLawTree.vue"
 import { FieldOfLaw } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
 
@@ -65,22 +65,9 @@ describe("FieldOfLawTree", () => {
 
     expect(fetchSpy).toBeCalledTimes(4)
     expect(screen.getByText("Text for AB")).toBeInTheDocument()
-    expect(screen.getByText("And text for CD with link to")).toBeInTheDocument()
+    expect(
+      screen.getByText("And text for CD with link to AB-01"),
+    ).toBeInTheDocument()
     expect(screen.getByText("Alle Sachgebiete")).toBeInTheDocument()
-  })
-
-  it("Linked node gets displayed as link in text", async () => {
-    renderComponent()
-    await user.click(screen.getByLabelText("Alle Sachgebiete aufklappen"))
-    const node1ids = screen.getAllByText("AB-01")
-    const nonLinkText = screen.getByText("And text for CD with link to")
-
-    expect(node1ids).toHaveLength(2)
-    expect(node1ids[1] as HTMLElement).toHaveClass("linked-field")
-    expect(nonLinkText as HTMLElement).not.toHaveClass("linked-field")
-    await user.click(node1ids[1] as HTMLElement)
-    await user.click(node1ids[1] as HTMLElement)
-
-    expect(screen.getByTestId("field-of-law-node-AB-01")).toBeInTheDocument()
   })
 })

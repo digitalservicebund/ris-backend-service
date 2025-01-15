@@ -29,7 +29,6 @@ public class DatabaseDocumentationUnitStatusService implements DocumentationUnit
    *
    * @param documentNumber the document number of the documentation unit
    * @param status the new status
-   * @return the updated documentation unit
    * @throws DocumentationUnitNotExistsException if the documentation unit does not exist
    */
   @Override

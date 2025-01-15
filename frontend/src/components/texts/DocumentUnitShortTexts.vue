@@ -22,7 +22,7 @@ const headline = computed({
     store.documentUnit?.shortTexts.headline
       ? useValidBorderNumberLinks(
           store.documentUnit.shortTexts.headline,
-          store.documentUnit.borderNumbers,
+          store.documentUnit.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {
@@ -36,7 +36,7 @@ const guidingPrinciple = computed({
     store.documentUnit?.shortTexts.guidingPrinciple
       ? useValidBorderNumberLinks(
           store.documentUnit?.shortTexts.guidingPrinciple,
-          store.documentUnit.borderNumbers,
+          store.documentUnit.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {
@@ -50,7 +50,7 @@ const headnote = computed({
     store.documentUnit?.shortTexts.headnote
       ? useValidBorderNumberLinks(
           store.documentUnit?.shortTexts.headnote,
-          store.documentUnit.borderNumbers,
+          store.documentUnit.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {
@@ -64,7 +64,7 @@ const otherHeadnote = computed({
     store.documentUnit?.shortTexts.otherHeadnote
       ? useValidBorderNumberLinks(
           store.documentUnit?.shortTexts.otherHeadnote,
-          store.documentUnit.borderNumbers,
+          store.documentUnit.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {

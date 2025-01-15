@@ -11,8 +11,9 @@ import org.eclipse.persistence.oxm.annotations.XmlDiscriminatorValue;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@XmlDiscriminatorValue("opinions")
+@XmlDiscriminatorValue(Opinions.NAME)
 public class Opinions extends AknBlock {
+  public static final String NAME = "Abweichende Meinung";
 
   @XmlElement(name = "opinion", namespace = CaseLawLdml.AKN_NS)
   private Opinion opinion;
@@ -21,11 +22,10 @@ public class Opinions extends AknBlock {
     if (content == null || content.isEmpty() || content.stream().allMatch(Objects::isNull)) {
       return null;
     }
-
     return new Opinions(new Opinion(content));
   }
 
   public String getName() {
-    return "opinions";
+    return Opinions.NAME;
   }
 }

@@ -4,8 +4,11 @@ Built with Vue
 
 ## Prerequisites
 
-The repository contains a `.node-version` file to set up the required Node.js version automatically
-with [nodenv](https://github.com/nodenv/nodenv).
+##### node version:
+
+The repository requires a strict Node.js engine version. Ensure you are using the corresponding version as
+specified in the `package.json` file. The `.npmrc` file is necessary to enforce engine strictness during installation on
+the server.
 
 Install dependencies:
 
@@ -22,10 +25,12 @@ npx playwright install chrome firefox
 
 ## Icons
 
-All icons in the [Google Material](https://icon-sets.iconify.design/ic), [Material Symbol](https://icon-sets.iconify.design/material-symbols)
+All icons in
+the [Google Material](https://icon-sets.iconify.design/ic), [Material Symbol](https://icon-sets.iconify.design/material-symbols)
 and [Material Design Icons](https://icon-sets.iconify.design/mdi/) sets can be used.
 
-To make the icon available in your code, select the icon, choose "Unplugin Icons" as component and copy-paste the import statement. Example:
+To make the icon available in your code, select the icon, choose "Unplugin Icons" as component and copy-paste the import
+statement. Example:
 
 ```typescript
 import VerifiedIcon from "~icons/material-symbols/verified-user"

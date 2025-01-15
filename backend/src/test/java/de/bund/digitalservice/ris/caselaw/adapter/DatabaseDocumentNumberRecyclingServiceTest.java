@@ -133,7 +133,7 @@ class DatabaseDocumentNumberRecyclingServiceTest {
                     DEFAULT_DOCUMENTATION_OFFICE, Year.now()));
 
     Assertions.assertEquals(
-        exception.getMessage(), "Saved documentation number is currently in use");
+        "Saved documentation number is currently in use", exception.getMessage());
   }
 
   @ParameterizedTest

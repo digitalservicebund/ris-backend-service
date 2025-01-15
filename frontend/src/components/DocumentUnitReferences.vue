@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue"
+import DocumentUnitLiteratureReferenceInput from "@/components/DocumentUnitLiteratureReferenceInput.vue"
 import DocumentUnitReferenceInput from "@/components/DocumentUnitReferenceInput.vue"
 import EditableList from "@/components/EditableList.vue"
 import ReferenceSummary from "@/components/ReferenceSummary.vue"
@@ -9,10 +10,17 @@ import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
 const store = useDocumentUnitStore()
 
-const references = computed({
+const caselawReferences = computed({
   get: () => store.documentUnit!.references as Reference[],
   set: (newValues) => {
     store.documentUnit!.references = newValues
+  },
+})
+
+const literatureReferences = computed({
+  get: () => store.documentUnit!.literatureReferences as Reference[],
+  set: (newValues) => {
+    store.documentUnit!.literatureReferences = newValues
   },
 })
 
@@ -22,12 +30,22 @@ const defaultValue = new Reference() as Reference
 <template>
   <div class="flex w-full flex-1 grow flex-col p-24">
     <div aria-label="Fundstellen" class="flex flex-col gap-24 bg-white p-24">
-      <TitleElement>Fundstellen bearbeiten</TitleElement>
+      <TitleElement>Fundstellen</TitleElement>
       <div class="flex flex-row">
         <EditableList
-          v-model="references"
+          v-model="caselawReferences"
           :default-value="defaultValue"
           :edit-component="DocumentUnitReferenceInput"
+          :summary-component="ReferenceSummary"
+        />
+      </div>
+
+      <TitleElement>Literaturfundstellen</TitleElement>
+      <div class="flex flex-row">
+        <EditableList
+          v-model="literatureReferences"
+          :default-value="defaultValue"
+          :edit-component="DocumentUnitLiteratureReferenceInput"
           :summary-component="ReferenceSummary"
         />
       </div>

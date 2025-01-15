@@ -17,13 +17,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.LdmlExporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.ProcedureController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserGroupRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
@@ -41,10 +39,12 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataIn
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
+import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
@@ -111,8 +111,8 @@ class ProcedureIntegrationTest {
   @Autowired private DatabaseDocumentationUnitRepository documentationUnitRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseProcedureRepository repository;
-  @Autowired private DatabaseDocumentationUnitProcedureRepository linkRepository;
   @Autowired private DatabaseUserGroupRepository userGroupRepository;
+  @Autowired private ProcedureService procedureService;
 
   @MockBean private DocumentNumberService numberService;
   @MockBean private DocumentationUnitStatusService statusService;
@@ -127,6 +127,7 @@ class ProcedureIntegrationTest {
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private HandoverService handoverService;
   @MockBean private LdmlExporterService ldmlExporterService;
+  @MockBean private DuplicateCheckService duplicateCheckService;
 
   @MockBean
   private DocumentationUnitDocxMetadataInitializationService
@@ -218,25 +219,36 @@ class ProcedureIntegrationTest {
         .is2xxSuccessful()
         .expectBody(DocumentationUnit.class)
         .consumeWith(
+            response -> {
+              CoreData coreData = response.getResponseBody().coreData();
+              assertThat(coreData.previousProcedures()).isEmpty();
+              assertThat(coreData.procedure())
+                  .extracting("id", "label")
+                  .containsExactly(procedureDTO.getId(), procedure.label());
+            });
+
+    DocumentationUnitDTO updatedDocUnitDTO =
+        documentationUnitRepository.findById(docUnitDTO.getId()).get();
+    ProcedureDTO currentProcedure = updatedDocUnitDTO.getProcedure();
+    assertThat(currentProcedure.getLabel()).isEqualTo(procedureDTO.getLabel());
+    assertThat(currentProcedure.getId()).isEqualTo(procedureDTO.getId());
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/procedure?q=" + "procedure1" + "&sz=1&pg=0")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
+        .consumeWith(
             response ->
-                assertThat(response.getResponseBody().coreData().procedure())
-                    .extracting("id", "label")
-                    .containsExactly(procedureDTO.getId(), procedure.label()));
-
-    Optional<ProcedureDTO> resultProcedure =
-        repository.findAllByLabelAndDocumentationOffice("procedure1", docOfficeDTO);
-
-    assertThat(resultProcedure).isPresent();
-    ProcedureDTO firstProcedure =
-        linkRepository.findFirstByDocumentationUnitOrderByRankDesc(docUnitDTO).getProcedure();
-    assertThat(firstProcedure)
-        .extracting("id", "label")
-        .containsExactly(procedureDTO.getId(), procedureDTO.getLabel());
-    assertThat(firstProcedure.getDocumentationUnits()).hasSize(1);
-    assertThat(firstProcedure.getDocumentationUnits().get(0))
-        .extracting("id", "documentNumber")
-        .containsExactly(docUnitDTO.getId(), docUnitDTO.getDocumentNumber());
-    assertThat(linkRepository.findAll()).hasSize(1);
+                assertThat(
+                        Objects.requireNonNull(response.getResponseBody())
+                            .getContent()
+                            .getFirst()
+                            .documentationUnitCount())
+                    .isOne());
   }
 
   @Test
@@ -271,18 +283,13 @@ class ProcedureIntegrationTest {
 
     Optional<ProcedureDTO> resultProcedure =
         repository.findAllByLabelAndDocumentationOffice("procedure1", docOfficeDTO);
-
     assertThat(resultProcedure).isPresent();
-    ProcedureDTO firstProcedure =
-        linkRepository.findFirstByDocumentationUnitOrderByRankDesc(docUnitDTO).getProcedure();
-    assertThat(firstProcedure)
-        .extracting("id", "label")
-        .containsExactly(procedureDTO.getId(), procedureDTO.getLabel());
-    assertThat(firstProcedure.getDocumentationUnits()).hasSize(1);
-    assertThat(firstProcedure.getDocumentationUnits().get(0))
-        .extracting("id", "documentNumber")
-        .containsExactly(docUnitDTO.getId(), docUnitDTO.getDocumentNumber());
-    assertThat(linkRepository.findAll()).hasSize(1);
+
+    DocumentationUnitDTO updatedDocUnitDTO =
+        documentationUnitRepository.findById(docUnitDTO.getId()).get();
+    ProcedureDTO currentProcedure = updatedDocUnitDTO.getProcedure();
+    assertThat(currentProcedure.getLabel()).isEqualTo(procedureDTO.getLabel());
+    assertThat(currentProcedure.getId()).isEqualTo(procedureDTO.getId());
   }
 
   @Test
@@ -315,14 +322,11 @@ class ProcedureIntegrationTest {
     Optional<ProcedureDTO> resultProcedure =
         repository.findAllByLabelAndDocumentationOffice("procedure1", docOfficeDTO);
     assertThat(resultProcedure).isPresent();
-    ProcedureDTO firstProcedure =
-        linkRepository.findFirstByDocumentationUnitOrderByRankDesc(docUnitDTO).getProcedure();
-    assertThat(firstProcedure).extracting("label").isEqualTo("procedure1");
-    assertThat(firstProcedure.getDocumentationUnits()).hasSize(1);
-    assertThat(firstProcedure.getDocumentationUnits().get(0))
-        .extracting("id", "documentNumber")
-        .containsExactly(docUnitDTO.getId(), docUnitDTO.getDocumentNumber());
-    assertThat(linkRepository.findAll()).hasSize(1);
+
+    DocumentationUnitDTO updatedDocUnitDTO =
+        documentationUnitRepository.findById(docUnitDTO.getId()).get();
+    ProcedureDTO currentProcedure = updatedDocUnitDTO.getProcedure();
+    assertThat(currentProcedure.getLabel()).isEqualTo("procedure1");
   }
 
   @Test
@@ -427,14 +431,13 @@ class ProcedureIntegrationTest {
         .is2xxSuccessful()
         .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
         .consumeWith(
-            response -> {
-              assertThat(
-                      Objects.requireNonNull(response.getResponseBody())
-                          .getContent()
-                          .get(0)
-                          .documentationUnitCount())
-                  .isZero();
-            });
+            response ->
+                assertThat(
+                        Objects.requireNonNull(response.getResponseBody())
+                            .getContent()
+                            .get(0)
+                            .documentationUnitCount())
+                    .isZero());
 
     var procedure1Id =
         repository.findAllByLabelAndDocumentationOffice("foo", docOfficeDTO).get().getId();
@@ -448,9 +451,7 @@ class ProcedureIntegrationTest {
         .is2xxSuccessful()
         .expectBody(new TypeReference<List<DocumentationUnitListItem>>() {})
         .consumeWith(
-            response -> {
-              assertThat(Objects.requireNonNull(response.getResponseBody())).isEmpty();
-            });
+            response -> assertThat(Objects.requireNonNull(response.getResponseBody())).isEmpty());
 
     risWebTestClient
         .withDefaultLogin()
@@ -461,14 +462,13 @@ class ProcedureIntegrationTest {
         .is2xxSuccessful()
         .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
         .consumeWith(
-            response -> {
-              assertThat(
-                      Objects.requireNonNull(response.getResponseBody())
-                          .getContent()
-                          .get(0)
-                          .documentationUnitCount())
-                  .isEqualTo(1);
-            });
+            response ->
+                assertThat(
+                        Objects.requireNonNull(response.getResponseBody())
+                            .getContent()
+                            .get(0)
+                            .documentationUnitCount())
+                    .isEqualTo(1));
 
     var procedure3Id =
         repository.findAllByLabelAndDocumentationOffice("baz", docOfficeDTO).get().getId();
@@ -482,10 +482,10 @@ class ProcedureIntegrationTest {
         .is2xxSuccessful()
         .expectBody(new TypeReference<List<DocumentationUnitListItem>>() {})
         .consumeWith(
-            response -> {
-              assertThat(Objects.requireNonNull(response.getResponseBody()).get(0).documentNumber())
-                  .isEqualTo("1234567890123");
-            });
+            response ->
+                assertThat(
+                        Objects.requireNonNull(response.getResponseBody()).get(0).documentNumber())
+                    .isEqualTo("1234567890123"));
   }
 
   @Test
@@ -590,20 +590,12 @@ class ProcedureIntegrationTest {
     ProcedureDTO procedureWithoutDate =
         repository.findAllByLabelAndDocumentationOffice("without date", docOfficeDTO).get();
 
-    documentationUnitDTO2.setProcedures(
-        List.of(
-            DocumentationUnitProcedureDTO.builder()
-                .documentationUnit(documentationUnitDTO2)
-                .procedure(procedureWithDateInPast)
-                .build()));
+    documentationUnitDTO2.setProcedureHistory(List.of(procedureWithDateInPast));
+    documentationUnitDTO2.setProcedure(procedureWithDateInPast);
     documentationUnitRepository.save(documentationUnitDTO2);
 
-    documentationUnitDTO3.setProcedures(
-        List.of(
-            DocumentationUnitProcedureDTO.builder()
-                .documentationUnit(documentationUnitDTO3)
-                .procedure(procedureWithoutDate)
-                .build()));
+    documentationUnitDTO3.setProcedureHistory(List.of(procedureWithoutDate));
+    documentationUnitDTO3.setProcedure(procedureWithoutDate);
     documentationUnitRepository.save(documentationUnitDTO3);
 
     risWebTestClient
@@ -657,10 +649,7 @@ class ProcedureIntegrationTest {
         .expectStatus()
         .is2xxSuccessful()
         .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isEmpty();
-            });
+        .consumeWith(response -> assertThat(response.getResponseBody()).isEmpty());
   }
 
   @Test
@@ -714,9 +703,9 @@ class ProcedureIntegrationTest {
         .is2xxSuccessful()
         .expectBody(new TypeReference<SliceTestImpl<Procedure>>() {})
         .consumeWith(
-            response -> {
-              assertThat(Objects.requireNonNull(response.getResponseBody()).getContent()).isEmpty();
-            });
+            response ->
+                assertThat(Objects.requireNonNull(response.getResponseBody()).getContent())
+                    .isEmpty());
   }
 
   @Test
@@ -753,7 +742,7 @@ class ProcedureIntegrationTest {
             .documentNumber(bghDocUnit.getDocumentNumber())
             .coreData(
                 CoreData.builder()
-                    .procedure(ProcedureTransformer.transformToDomain(procedure))
+                    .procedure(ProcedureTransformer.transformToDomain(procedure, false))
                     .documentationOffice(buildBGHDocOffice())
                     .build())
             .build();
@@ -938,14 +927,13 @@ class ProcedureIntegrationTest {
         .isBadRequest()
         .expectBody(String.class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody())
-                  .contains(
-                      "Failed to convert 'procedureUUID' with value: "
-                          + "'non-existing procedureId'\",\"instance\":\""
-                          + "/api/v1/caselaw/procedure/non-existing%20procedureId/assign/"
-                          + userGroupId);
-            });
+            response ->
+                assertThat(response.getResponseBody())
+                    .contains(
+                        "Failed to convert 'procedureUUID' with value: "
+                            + "'non-existing procedureId'\",\"instance\":\""
+                            + "/api/v1/caselaw/procedure/non-existing%20procedureId/assign/"
+                            + userGroupId));
   }
 
   @Test
@@ -962,15 +950,14 @@ class ProcedureIntegrationTest {
         .isBadRequest()
         .expectBody(String.class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody())
-                  .contains(
-                      "Failed to convert 'userGroupId' with value: "
-                          + "'non-existing groupId'\",\"instance\":\""
-                          + "/api/v1/caselaw/procedure/"
-                          + procedureId
-                          + "/assign/non-existing%20groupId");
-            });
+            response ->
+                assertThat(response.getResponseBody())
+                    .contains(
+                        "Failed to convert 'userGroupId' with value: "
+                            + "'non-existing groupId'\",\"instance\":\""
+                            + "/api/v1/caselaw/procedure/"
+                            + procedureId
+                            + "/assign/non-existing%20groupId"));
   }
 
   @Test

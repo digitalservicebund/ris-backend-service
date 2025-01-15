@@ -39,6 +39,9 @@ public class DocumentationUnitListItemTransformer {
         .documentNumber(documentationUnitListItemDTO.getDocumentNumber())
         .referencedDocumentationUnitId(documentationUnitListItemDTO.getId())
         .decisionDate(documentationUnitListItemDTO.getDecisionDate())
+        .scheduledPublicationDateTime(
+            documentationUnitListItemDTO.getScheduledPublicationDateTime())
+        .lastPublicationDateTime(documentationUnitListItemDTO.getLastPublicationDateTime())
         .appraisalBody(documentationUnitListItemDTO.getJudicialBody())
         .hasHeadnoteOrPrinciple(hasHeadnoteOrPrinciple(documentationUnitListItemDTO))
         .hasAttachments(!documentationUnitListItemDTO.getAttachments().isEmpty())
@@ -80,12 +83,13 @@ public class DocumentationUnitListItemTransformer {
    * Checks if a headnote or a guiding principle is given in a documentation unit, to display the
    * information in a list
    *
-   * @param documentationUnitListItemDTO
+   * @param documentationUnitListItemDTO documentation unit to check for headline or principle
    * @return a boolean value if either the headnote or the guiding principle are filled in (i.e. one
    *     or both of these fields)
    */
   private static boolean hasHeadnoteOrPrinciple(
       DocumentationUnitListItemDTO documentationUnitListItemDTO) {
+
     String headnote = documentationUnitListItemDTO.getHeadnote();
     String guidingPrinciple = documentationUnitListItemDTO.getGuidingPrinciple();
 

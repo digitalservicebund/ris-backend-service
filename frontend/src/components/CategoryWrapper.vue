@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from "vue"
+import { ref, watch } from "vue"
 import TextButton from "@/components/input/TextButton.vue"
 import IconAdd from "~icons/material-symbols/add"
 
@@ -19,6 +19,18 @@ function toggle() {
   shouldShowButton.value = !shouldShowButton.value
   emit("toggled", shouldShowButton.value)
 }
+
+watch(
+  () => props.shouldShowButton,
+  () => {
+    // this ensures, that the category expands immediately when the prop changes,
+    // but does not collapse immediately, as this might be disruptive
+    if (!props.shouldShowButton) {
+      shouldShowButton.value = props.shouldShowButton
+    }
+  },
+  { deep: true },
+)
 </script>
 
 <template>

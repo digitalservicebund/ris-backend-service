@@ -20,7 +20,7 @@ const props = defineProps<{
       >
         <component :is="IconBook" class="mr-8" />
         <div class="ds-label-01-reg mr-8">
-          {{ data.renderDecision + ", " + data.singleNorms[0].renderDecision }}
+          {{ data.renderSummary + ", " + data.singleNorms[0].renderSummary }}
         </div>
         <div
           v-if="data.singleNorms[0].legalForce"
@@ -50,7 +50,7 @@ const props = defineProps<{
         <div class="flex flex-row items-center">
           <component :is="IconBook" class="mr-8" />
           <div class="ds-label-01-reg mr-8">
-            {{ data.renderDecision }}
+            {{ data.renderSummary }}
           </div>
           <IconBadge
             v-if="data.hasAmbiguousNormReference"
@@ -66,9 +66,9 @@ const props = defineProps<{
             <div v-if="!singleNorm.isEmpty" class="flex flex-row items-center">
               <component :is="IconArrowRight" class="mr-8" />
               {{
-                data.renderDecision +
+                data.renderSummary +
                 ", " +
-                data.singleNorms[index].renderDecision
+                data.singleNorms[index].renderSummary
               }}
               <div
                 v-if="data.singleNorms[index].legalForce"

@@ -5,6 +5,38 @@ delete from
 where
   document_number LIKE 'YY%';
 
+-- Delete any test-related records in the documentation_unit table
+delete from
+    incremental_migration.documentation_unit
+where
+    current_procedure_id IN (
+        SELECT
+            id
+        from
+            incremental_migration.procedure
+        where
+            name LIKE 'test_%'
+    );
+
+-- Delete test-related records from documentation_unit_procedure
+delete from
+    incremental_migration.documentation_unit_procedure
+where
+    procedure_id IN (
+        SELECT
+            id
+        from
+            incremental_migration.procedure
+        where
+            name LIKE 'test_%'
+    );
+
+-- Delete test-related records from procedure table
+delete from
+    incremental_migration.procedure
+where
+    name LIKE 'test_%';
+
 -- Everytime the application starts, any test procedures that may have accumulated will be deleted
 delete from
   incremental_migration.documentation_unit_procedure
@@ -34,7 +66,9 @@ INSERT INTO
     guiding_principle,
     judicial_body,
     procedure,
-    tenor
+    tenor,
+    last_publication_date_time,
+    scheduled_publication_date_time
   )
 VALUES
   (
@@ -69,7 +103,9 @@ VALUES
     'guiding principle',
     '1.Senat, 2. Kammer',
     NULL,
-    'tenor1'
+    'tenor1',
+    '2000-11-21 09:42:49.385920',
+    NULL
   ),
   (
     gen_random_uuid (),
@@ -88,7 +124,9 @@ VALUES
     NULL,
     NULL,
     NULL,
-    NULL
+    NULL,
+    NULL,
+    '2100-11-21 09:42:49.385920'
   ),
   (
     gen_random_uuid (),
@@ -122,7 +160,9 @@ VALUES
     'guiding principle',
     '1.Senat, 2. Kammer',
     NULL,
-    'tenorx'
+    'tenorx',
+    NULL,
+    '2100-11-30 19:46:49.385920'
   ),
   (
     gen_random_uuid (),
@@ -157,7 +197,9 @@ VALUES
     'guiding principle',
     '1.Senat, 2. Kammer',
     NULL,
-    'tenorx'
+    'tenorx',
+    NULL,
+    NULL
   ),
   (
     gen_random_uuid (),
@@ -191,7 +233,9 @@ VALUES
     'guiding principle',
     '1.Senat, 2. Kammer',
     NULL,
-    'tenorx'
+    'tenorx',
+    '2001-11-21 09:42:49.385920',
+    NULL
   ),
   (
     gen_random_uuid (),
@@ -210,7 +254,9 @@ VALUES
     NULL,
     NULL,
     NULL,
-    'tenorx'
+    'tenorx',
+    '2002-11-21 09:42:49.385920',
+    NULL
   ),
   (
     gen_random_uuid (),
@@ -229,7 +275,9 @@ VALUES
     NULL,
     NULL,
     NULL,
-    'tenorx'
+    'tenorx',
+    NULL,
+    NULL
   ),
   (
     gen_random_uuid (),
@@ -255,7 +303,9 @@ VALUES
     'guiding principle',
     '1.Senat, 2. Kammer',
     NULL,
-    'tenorx'
+    'tenorx',
+    NULL,
+    NULL
   ),
   (
     gen_random_uuid (),
@@ -281,7 +331,9 @@ VALUES
     'guiding principle',
     '1.Senat, 2. Kammer',
     NULL,
-    'tenorx'
+    'tenorx',
+    NULL,
+    NULL
   ),
   (
     gen_random_uuid (),
@@ -315,7 +367,9 @@ VALUES
     'guiding principle',
     '1.Senat, 2. Kammer',
     NULL,
-    'tenorx'
+    'tenorx',
+    NULL,
+    NULL
   ),
   (
     gen_random_uuid (),
@@ -349,7 +403,9 @@ VALUES
     'guiding principle',
     '1.Senat, 2. Kammer',
     NULL,
-    'tenorx'
+    'tenorx',
+    NULL,
+    NULL
   ),
   (
     gen_random_uuid (),
@@ -383,7 +439,9 @@ VALUES
     'guiding principle',
     '1.Senat, 2. Kammer',
     NULL,
-    'tenorx'
+    'tenorx',
+    NULL,
+    NULL
   ),
   (
     gen_random_uuid (),
@@ -417,7 +475,9 @@ VALUES
     'guiding principle',
     '1.Senat, 2. Kammer',
     NULL,
-    'tenorx'
+    'tenorx',
+    NULL,
+    '2100-11-21 19:42:49.385920'
   ),
   (
     gen_random_uuid (),
@@ -452,7 +512,9 @@ VALUES
     'guiding principle',
     '1.Senat, 2. Kammer',
     NULL,
-    'tenorx'
+    'tenorx',
+    NULL,
+    '2100-11-21 10:42:49.385920'
   ),
   (
     gen_random_uuid (),
@@ -478,7 +540,9 @@ VALUES
     'guiding principle',
     '1.Senat, 2. Kammer',
     NULL,
-    'tenorx'
+    'tenorx',
+    '2005-11-21 09:42:49.385920',
+    NULL
   );
 
 INSERT INTO
@@ -867,3 +931,21 @@ VALUES
     ),
     1
   );
+
+INSERT INTO
+    incremental_migration.keyword (id, value)
+VALUES
+    (
+        gen_random_uuid (),
+        'keyword1'
+    ),
+    (
+        gen_random_uuid (),
+        'keyword2'
+    ),
+    (
+        gen_random_uuid (),
+        'keyword3'
+    )
+ON CONFLICT DO NOTHING;
+

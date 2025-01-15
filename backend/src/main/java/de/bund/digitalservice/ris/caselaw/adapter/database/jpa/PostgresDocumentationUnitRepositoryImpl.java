@@ -27,6 +27,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.Docume
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -318,52 +319,36 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     var documentationUnitDTO = documentationUnitDTOOptional.get();
     Procedure procedure = documentationUnit.coreData().procedure();
 
-    List<DocumentationUnitProcedureDTO> documentationUnitProcedureDTOs = new ArrayList<>();
-
     ProcedureDTO procedureDTO =
         getOrCreateProcedure(documentationUnitDTO.getDocumentationOffice(), procedure);
 
     boolean sameAsLast =
-        !documentationUnitDTO.getProcedures().isEmpty()
-            && documentationUnitDTO
-                .getProcedures()
-                .get(documentationUnitDTO.getProcedures().size() - 1)
-                .getProcedure()
-                .equals(procedureDTO);
+        documentationUnitDTO.getProcedure() != null
+            && documentationUnitDTO.getProcedure().equals(procedureDTO);
 
-    documentationUnitDTO
-        .getProcedures()
-        .forEach(
-            documentationUnitProcedureDTO -> {
-              DocumentationUnitProcedureDTO newLink =
-                  DocumentationUnitProcedureDTO.builder()
-                      .primaryKey(
-                          new DocumentationUnitProcedureId(
-                              documentationUnitDTO.getId(),
-                              documentationUnitProcedureDTO.getProcedure().getId()))
-                      .documentationUnit(documentationUnitDTO)
-                      .procedure(documentationUnitProcedureDTO.getProcedure())
-                      .build();
-              documentationUnitProcedureDTOs.add(newLink);
-            });
-
+    // add the previous procedure to the history
     if (procedureDTO != null && !sameAsLast) {
-      DocumentationUnitProcedureDTO documentationUnitProcedureDTO =
-          DocumentationUnitProcedureDTO.builder()
-              .primaryKey(
-                  new DocumentationUnitProcedureId(
-                      documentationUnitDTO.getId(), procedureDTO.getId()))
-              .documentationUnit(documentationUnitDTO)
-              .procedure(procedureDTO)
-              .build();
-      documentationUnitProcedureDTOs.add(documentationUnitProcedureDTO);
+      documentationUnitDTO.getProcedureHistory().add(procedureDTO);
+    }
+    // set new procedure
+    documentationUnitDTO.setProcedure(procedureDTO);
+
+    repository.save(documentationUnitDTO);
+  }
+
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
+  public void saveLastPublicationDateTime(UUID uuid) {
+    if (uuid == null) {
+      return;
     }
 
-    updateProcedureRank(documentationUnitProcedureDTOs);
-
-    documentationUnitDTO.getProcedures().clear();
-    documentationUnitDTO.getProcedures().addAll(documentationUnitProcedureDTOs);
-
+    var documentationUnitDTOOptional = repository.findById(uuid);
+    if (documentationUnitDTOOptional.isEmpty()) {
+      return;
+    }
+    var documentationUnitDTO = documentationUnitDTOOptional.get();
+    documentationUnitDTO.setLastPublicationDateTime(LocalDateTime.now());
     repository.save(documentationUnitDTO);
   }
 
@@ -384,15 +369,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                       .build()));
     }
     return procedureRepository.findById(procedure.id()).orElse(null);
-  }
-
-  private void updateProcedureRank(
-      List<DocumentationUnitProcedureDTO> documentationUnitProcedureDTOs) {
-    for (int i = 0; i < documentationUnitProcedureDTOs.size(); i++) {
-      DocumentationUnitProcedureDTO documentationUnitProcedureDTO =
-          documentationUnitProcedureDTOs.get(i);
-      documentationUnitProcedureDTO.setRank(i + 1);
-    }
   }
 
   @Override
@@ -427,6 +403,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             null,
             null,
             false,
+            null,
+            false,
             false,
             relatedDocumentationUnit.getDocumentType(),
             documentationOfficeDTO);
@@ -445,6 +423,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       String fileNumber,
       LocalDate decisionDate,
       LocalDate decisionDateEnd,
+      LocalDate publicationDate,
+      Boolean scheduledOnly,
       PublicationStatus status,
       Boolean withError,
       Boolean myDocOfficeOnly,
@@ -459,6 +439,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
           courtLocation,
           decisionDate,
           decisionDateEnd,
+          publicationDate,
+          scheduledOnly,
           status,
           withError,
           myDocOfficeOnly,
@@ -489,6 +471,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
               courtLocation,
               decisionDate,
               decisionDateEnd,
+              publicationDate,
+              scheduledOnly,
               status,
               withError,
               myDocOfficeOnly,
@@ -505,6 +489,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
               courtLocation,
               decisionDate,
               decisionDateEnd,
+              publicationDate,
+              scheduledOnly,
               status,
               withError,
               myDocOfficeOnly,
@@ -567,6 +553,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             searchInput.fileNumber(),
             searchInput.decisionDate(),
             searchInput.decisionDateEnd(),
+            searchInput.publicationDate(),
+            searchInput.scheduledOnly(),
             searchInput.status() != null ? searchInput.status().publicationStatus() : null,
             withError,
             searchInput.myDocOfficeOnly(),
@@ -588,5 +576,14 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   @Override
   public List<UUID> getRandomDocumentationUnitIds() {
     return repository.getRandomDocumentationUnitIds();
+  }
+
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
+  public List<DocumentationUnit> getScheduledDocumentationUnitsDueNow() {
+    return repository.getScheduledDocumentationUnitsDueNow().stream()
+        .limit(50)
+        .map(DocumentationUnitTransformer::transformToDomain)
+        .toList();
   }
 }

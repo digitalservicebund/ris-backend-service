@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.NormElement;
@@ -54,6 +55,7 @@ class SingleNormValidationTest {
   @MockBean private HandoverReportRepository handoverReportRepository;
   @MockBean AttachmentService attachmentService;
   @MockBean PatchMapperService patchMapperService;
+  @MockBean DuplicateCheckService duplicateCheckService;
 
   @BeforeEach
   void setUp() {

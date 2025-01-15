@@ -29,18 +29,21 @@ const ensuingDecisions = computed({
       <PreviewCategory>Vorinstanz</PreviewCategory>
       <PreviewContent>
         <div
-          v-for="(previousDecision, index) in previousDecisions"
-          :key="index"
+          v-for="previousDecision in previousDecisions"
+          :key="previousDecision.id"
         >
-          {{ previousDecision.renderDecision }}
+          {{ previousDecision.renderSummary }}
         </div>
       </PreviewContent>
     </PreviewRow>
     <PreviewRow v-if="ensuingDecisions && ensuingDecisions?.length > 0">
       <PreviewCategory>Nachgehende Entscheidungen</PreviewCategory>
       <PreviewContent>
-        <div v-for="(ensuingDecision, index) in ensuingDecisions" :key="index">
-          {{ ensuingDecision.renderDecision }}
+        <div
+          v-for="ensuingDecision in ensuingDecisions"
+          :key="ensuingDecision.id"
+        >
+          {{ ensuingDecision.renderSummary }}
         </div>
       </PreviewContent>
     </PreviewRow>

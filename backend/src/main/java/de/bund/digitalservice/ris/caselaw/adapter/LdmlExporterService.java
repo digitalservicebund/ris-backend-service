@@ -68,8 +68,8 @@ public class LdmlExporterService {
         id -> {
           try {
             documentationUnitsToTransform.add(documentationUnitRepository.findByUuid(id));
-          } catch (DocumentationUnitNotExistsException ignored) {
-            log.debug(ignored.getMessage());
+          } catch (DocumentationUnitNotExistsException ex) {
+            log.debug(ex.getMessage());
           }
         });
 
@@ -209,6 +209,10 @@ public class LdmlExporterService {
       hint = "KARE600062214 contains an invalid width (escaping issue)";
     } else if (beforeXslt.contains("JURE200002538")) {
       hint = "JURE200002538 contains an invalid href (invalid whitespace in the middle of the url)";
+    } else if (beforeXslt.matches("(?s).*?<akn:header>.*?<div.*?>.*?</akn:header>.*")) {
+      hint = "Ldml contained <div> inside title.";
+    } else if (beforeXslt.matches("(?s).*?<akn:header>.*?<br.*?>.*?</akn:header>.*")) {
+      hint = "Ldml contained <br> inside title.";
     }
     logger.error("Error: {} Case Law {} does not match akomantoso30.xsd. {}", hint, caseLawId, e);
   }

@@ -25,6 +25,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseHandoverReportRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseReferenceRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseXmlHandoverMailRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
@@ -47,6 +48,7 @@ import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
 import de.bund.digitalservice.ris.caselaw.domain.EventType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
@@ -140,6 +142,7 @@ class HandoverMailIntegrationTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentationUnitRepository repository;
   @Autowired private DatabaseLegalPeriodicalEditionRepository editionRepository;
+  @Autowired private DatabaseReferenceRepository referenceRepository;
   @Autowired private LegalPeriodicalRepository legalPeriodicalRepository;
   @Autowired private DatabaseLegalPeriodicalRepository dblegalPeriodicalRepository;
   @Autowired private DatabaseXmlHandoverMailRepository xmlHandoverRepository;
@@ -156,6 +159,7 @@ class HandoverMailIntegrationTest {
   @MockBean private ProcedureService procedureService;
   @MockBean private LdmlExporterService ldmlExporterService;
   @MockBean private UserGroupService userGroupService;
+  @MockBean private DuplicateCheckService duplicateCheckService;
 
   @MockBean
   private DocumentationUnitDocxMetadataInitializationService
@@ -210,12 +214,18 @@ class HandoverMailIntegrationTest {
               .build();
       legalPeriodicalEditionDTO.setReferences(
           List.of(
-              ReferenceDTO.builder()
-                  .id(UUID.randomUUID())
-                  .citation("citation")
-                  .legalPeriodicalRawValue("ABC")
-                  .rank(1)
-                  .documentationUnit(savedDocumentationUnitDTO)
+              referenceRepository
+                  .save(
+                      ReferenceDTO.builder()
+                          .id(UUID.randomUUID())
+                          .citation("citation")
+                          .legalPeriodicalRawValue("ABC")
+                          .type("nichtamtlich")
+                          .rank(1)
+                          .documentationUnit(savedDocumentationUnitDTO)
+                          .build())
+                  .toBuilder()
+                  .editionRank(1)
                   .build()));
       editionRepository.save(legalPeriodicalEditionDTO);
       assertThat(editionRepository.findAll()).hasSize(1);
@@ -421,12 +431,11 @@ class HandoverMailIntegrationTest {
         .isOk()
         .expectBody(HandoverMail[].class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody())
-                  .usingRecursiveComparison()
-                  .ignoringFields("handoverDate", "attachments")
-                  .isEqualTo(expectedXmlPublication);
-            });
+            response ->
+                assertThat(response.getResponseBody())
+                    .usingRecursiveComparison()
+                    .ignoringFields("handoverDate", "attachments")
+                    .isEqualTo(expectedXmlPublication));
   }
 
   @ParameterizedTest

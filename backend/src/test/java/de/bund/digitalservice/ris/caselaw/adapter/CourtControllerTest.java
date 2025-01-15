@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,8 +30,8 @@ class CourtControllerTest {
   @MockBean private ClientRegistrationRepository clientRegistrationRepository;
 
   @Test
-  void testGetCourts() {
-    when(service.getCourts(null)).thenReturn(new ArrayList<>());
+  void testGetCourtsWithoutSize() {
+    when(service.getCourts(anyString(), anyInt())).thenReturn(new ArrayList<>());
 
     risWebTestClient
         .withDefaultLogin()
@@ -39,6 +41,36 @@ class CourtControllerTest {
         .expectStatus()
         .isOk();
 
-    verify(service, times(1)).getCourts(null);
+    verify(service, times(1)).getCourts(null, 200);
+  }
+
+  @Test
+  void testGetCourtsWithSize() {
+    when(service.getCourts(anyString(), anyInt())).thenReturn(new ArrayList<>());
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/courts?sz=100")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    verify(service, times(1)).getCourts(null, 100);
+  }
+
+  @Test
+  void testGetCourtsWithQuery() {
+    when(service.getCourts(anyString(), anyInt())).thenReturn(new ArrayList<>());
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/courts?q=test")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    verify(service, times(1)).getCourts("test", 200);
   }
 }

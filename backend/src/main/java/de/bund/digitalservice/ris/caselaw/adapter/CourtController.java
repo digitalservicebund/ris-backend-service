@@ -25,11 +25,14 @@ public class CourtController {
    * Returns court objects in a list
    *
    * @param searchStr An optional search string, which filters the list.
-   * @return
+   * @return a list of courts which contains the search string or the whole list if no search string
+   *     is given
    */
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public List<Court> getCourts(@RequestParam(value = "q", required = false) String searchStr) {
-    return service.getCourts(searchStr);
+  public List<Court> getCourts(
+      @RequestParam(value = "q", required = false) String searchStr,
+      @RequestParam(value = "sz", required = false, defaultValue = "200") Integer size) {
+    return service.getCourts(searchStr, size);
   }
 }

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, onMounted } from "vue"
+import { computed, onMounted, ref } from "vue"
 import { RouterLink } from "vue-router"
 import ExpandableContent from "./ExpandableContent.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
@@ -8,6 +8,7 @@ import InfoModal from "@/components/InfoModal.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import PopupModal from "@/components/PopupModal.vue"
+import ScheduledPublishingDateTime from "@/components/ScheduledPublishingDateTime.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import ActiveCitation, { activeCitationLabels } from "@/domain/activeCitation"
 import { longTextLabels, shortTextLabels } from "@/domain/documentUnit"
@@ -132,7 +133,7 @@ const missingPreviousDecisionFields = ref(
         })
         .map((previousDecision) => {
           return {
-            identifier: previousDecision.renderDecision,
+            identifier: previousDecision.renderSummary,
             missingFields: getMissingPreviousDecisionFields(
               previousDecision as PreviousDecision,
             ),
@@ -159,7 +160,7 @@ const missingEnsuingDecisionFields = ref(
         })
         .map((ensuingDecision) => {
           return {
-            identifier: ensuingDecision.renderDecision,
+            identifier: ensuingDecision.renderSummary,
             missingFields: getMissingEnsuingDecisionFields(
               ensuingDecision as EnsuingDecision,
             ),
@@ -195,7 +196,7 @@ const missingNormsFields = ref(
     })
     .map((normReference) => {
       return {
-        identifier: normReference.renderDecision,
+        identifier: normReference.renderSummary,
         missingFields: ["Gesetzeskraft"],
       }
     }),
@@ -256,7 +257,7 @@ const missingActiveCitationFields = ref(
         )
         .map((activeCitation) => {
           return {
-            identifier: activeCitation.renderDecision,
+            identifier: activeCitation.renderSummary,
             missingFields: getActiveCitationsFields(
               activeCitation as ActiveCitation,
             ),
@@ -297,6 +298,19 @@ const isDecisionReasonsInvalid = computed<boolean>(
   () =>
     !!store.documentUnit?.longTexts.reasons &&
     !!store.documentUnit?.longTexts.decisionReasons,
+)
+
+const isScheduled = computed<boolean>(
+  () => !!store.documentUnit!.managementData.scheduledPublicationDateTime,
+)
+
+const isPublishable = computed<boolean>(
+  () =>
+    !isOutlineInvalid.value &&
+    !fieldsMissing.value &&
+    !isCaseFactsInvalid.value &&
+    !isDecisionReasonsInvalid.value &&
+    !!preview.value?.success,
 )
 </script>
 
@@ -598,30 +612,26 @@ const isDecisionReasonsInvalid = computed<boolean>(
       <PopupModal
         v-if="showHandoverModal"
         aria-label="Bestätigung für Übergabe bei Fehlern"
-        cancel-button-type="tertiary"
-        confirm-button-type="primary"
-        confirm-text="Trotzdem übergeben"
         content-text="Die Randnummern sind nicht korrekt. Wollen Sie das Dokument dennoch übergeben?"
         header-text="Warnung: Randnummern inkorrekt"
+        primary-button-text="Trotzdem übergeben"
+        primary-button-type="primary"
         @close-modal="showHandoverModal = false"
-        @confirm-action="confirmHandoverDialog"
+        @primary-action="confirmHandoverDialog"
       />
       <TextButton
         aria-label="Dokumentationseinheit an jDV übergeben"
         button-type="primary"
         class="w-fit"
-        :disabled="
-          isOutlineInvalid ||
-          fieldsMissing ||
-          isCaseFactsInvalid ||
-          isDecisionReasonsInvalid ||
-          !preview?.success
-        "
+        :disabled="!isPublishable || isScheduled"
         :icon="IconCheck"
         label="Dokumentationseinheit an jDV übergeben"
         size="medium"
         @click="handoverDocumentUnit"
       />
+
+      <ScheduledPublishingDateTime :is-publishable="isPublishable" />
+
       <div aria-label="Letzte Ereignisse">
         <h2 class="ds-label-01-bold mb-16">Letzte Ereignisse</h2>
         <div class="flex flex-col gap-24">

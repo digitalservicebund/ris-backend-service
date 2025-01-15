@@ -12,15 +12,15 @@ plugins {
     id("org.springframework.boot") version "3.3.5"
     id("io.spring.dependency-management") version "1.1.6"
     id("com.diffplug.spotless") version "6.25.0"
-    id("org.sonarqube") version "6.0.0.5145"
+    id("org.sonarqube") version "6.0.1.5171"
     id("com.github.jk1.dependency-license-report") version "2.9"
     id("com.gorylenko.gradle-git-properties") version "2.4.2"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.51.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "10.21.0"
-    id("io.sentry.jvm.gradle") version "4.13.0"
+    id("org.flywaydb.flyway") version "11.1.1"
+    id("io.sentry.jvm.gradle") version "4.14.1"
 }
 
 group = "de.bund.digitalservice"
@@ -145,7 +145,7 @@ sonar {
 }
 
 dependencies {
-    val testContainersVersion = "1.20.3"
+    val testContainersVersion = "1.20.4"
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -156,21 +156,13 @@ dependencies {
     implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.0")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.2")
 
-    // CVE-2024-22262
-    implementation("org.springframework:spring-web:6.1.14")
-
-    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.3")
-
-    // CVE-2024-26308
-    implementation("org.apache.commons:commons-compress:1.27.1")
+    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.4")
+    // CVE-2024-50379
+    implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.34")
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:4.28.3")
-    // CVE-2023-52428 in spring-boot-starter-oauth2-client:3.2.3
-    implementation("com.nimbusds:nimbus-jose-jwt:9.47")
-    // CVE-2023-31582
-    implementation("org.bitbucket.b_c:jose4j:0.9.6")
+    implementation("com.google.protobuf:protobuf-java:4.29.3")
 
     implementation("org.postgresql:postgresql:42.7.4")
 
@@ -178,64 +170,65 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.2")
 
-    implementation(platform("software.amazon.awssdk:bom:2.29.16"))
+    implementation(platform("software.amazon.awssdk:bom:2.29.51"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
-    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.0")
+    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.1")
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
 
     // caselaw tranformation to LDML for the communication with the portal
-    implementation("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.4")
+    implementation("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.5")
     implementation("net.sf.saxon:Saxon-HE:12.5")
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
     implementation("org.eclipse.angus:angus-mail:2.0.3")
-    implementation("com.icegreen:greenmail:2.1.1")
+    implementation("com.icegreen:greenmail:2.1.2")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.19") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.24") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
-    // implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.10.19.jar"))
+    // implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.10.22.jar"))
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.29")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.35")
     // for local development:
-    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.25.jar"))
+    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.34.jar"))
 
-    implementation("com.fasterxml.jackson.core:jackson-core:2.18.1")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.18.1")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.18.1")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.18.2")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.18.2")
 
     implementation("com.gravity9:json-patch-path:2.0.2")
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.14.1")
-    implementation("io.micrometer:micrometer-core:1.14.1")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.14.3")
+    implementation("io.micrometer:micrometer-core:1.14.3")
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
-    // => CVE-2023-2976
-    implementation("com.google.guava:guava:33.3.1-jre")
 
-    implementation("io.getunleash:unleash-client-java:9.2.4")
-    implementation("org.apache.commons:commons-text:1.12.0")
-    implementation("org.jsoup:jsoup:1.18.1")
+    implementation("io.getunleash:unleash-client-java:9.2.6")
+    implementation("org.apache.commons:commons-text:1.13.0")
+    implementation("org.jsoup:jsoup:1.18.3")
 
-    val flywayCore = "org.flywaydb:flyway-core:10.21.0"
+    implementation("net.javacrumbs.shedlock:shedlock-spring:6.2.0")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.2.0")
+
+    val flywayCore = "org.flywaydb:flyway-core:11.1.1"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.21.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.1.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
     }
-    testImplementation("org.mockito:mockito-junit-jupiter:5.14.2")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.15.2")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("io.projectreactor:reactor-test:3.7.0")
-    testImplementation("org.springframework.security:spring-security-test:6.4.0")
+    testImplementation("io.projectreactor:reactor-test:3.7.1")
+    testImplementation("org.springframework.security:spring-security-test:6.4.2")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.3.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")

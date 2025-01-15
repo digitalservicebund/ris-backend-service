@@ -1,6 +1,6 @@
 import { Locator, Page, test } from "@playwright/test"
 import dayjs from "dayjs"
-import utc from "dayjs/plugin/utc"
+import utc from "dayjs/plugin/utc.js"
 import DocumentUnit from "../../../src/domain/documentUnit"
 import { navigateToCategories } from "./e2e-utils"
 import { Page as Pagination } from "@/components/Pagination.vue"
@@ -23,6 +23,9 @@ type MyFixtures = {
   prefilledDocumentUnitBgh: DocumentUnit
   edition: LegalPeriodicalEdition
   editionWithReferences: LegalPeriodicalEdition
+  foreignDocumentationUnit: DocumentUnitListEntry
+  prefilledDocumentUnitWithReferences: DocumentUnit
+  prefilledDocumentUnitWithTexts: DocumentUnit
 }
 
 export const caselawTest = test.extend<MyFixtures>({
@@ -60,6 +63,20 @@ export const caselawTest = test.extend<MyFixtures>({
     const courtResponse = await request.get(`api/v1/caselaw/courts?q=AG+Aachen`)
     const court = await courtResponse.json()
 
+    const normAbbreviationResponse = await request.get(
+      `api/v1/caselaw/normabbreviation/search?q=BGB&sz=30&pg=0`,
+    )
+    const normAbbreviation = await normAbbreviationResponse.json()
+
+    const citationTypeResponse = await request.get(
+      `api/v1/caselaw/citationtypes?q=Abgrenzung`,
+    )
+    const citationType = await citationTypeResponse.json()
+
+    const fieldsOfLawResponse = await request.get(
+      `api/v1/caselaw/fieldsoflaw/search-by-identifier?q=AR-01`,
+    )
+    const fieldsOfLaw = await fieldsOfLawResponse.json()
     const documentTypeResponse = await request.get(
       `api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`,
     )
@@ -78,9 +95,29 @@ export const caselawTest = test.extend<MyFixtures>({
             decisionDate: "2019-12-31",
             appraisalBody: "1. Senat, 2. Kammer",
           },
+          contentRelatedIndexing: {
+            keywords: ["keyword"],
+            norms: [
+              {
+                normAbbreviation: normAbbreviation?.[0],
+              },
+            ],
+            activeCitations: [
+              {
+                documentNumber: "YYTestDoc0013",
+                court: court?.[0],
+                documentType: documentType?.[0],
+                decisionDate: "2022-02-01",
+                fileNumber: "123",
+                citationType: citationType?.[0],
+              },
+            ],
+            fieldsOfLaw: [fieldsOfLaw?.[0]],
+          },
           shortTexts: {
             headnote: "testHeadnote",
             guidingPrinciple: "guidingPrinciple",
+            headline: "testHeadline",
           },
         },
         headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
@@ -95,6 +132,149 @@ export const caselawTest = test.extend<MyFixtures>({
     )
     if (!deleteResponse.ok()) {
       throw Error(`DocumentUnit with number ${prefilledDocumentUnit.documentNumber} couldn't be deleted:
+      ${deleteResponse.status()} ${deleteResponse.statusText()}`)
+    }
+  },
+
+  prefilledDocumentUnitWithReferences: async ({ request, context }, use) => {
+    const cookies = await context.cookies()
+    const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+    const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
+      headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+    })
+    const prefilledDocumentUnit = await response.json()
+
+    const courtResponse = await request.get(`api/v1/caselaw/courts?q=AG+Aachen`)
+    const court = await courtResponse.json()
+
+    const documentTypeResponse = await request.get(
+      `api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`,
+    )
+    const documentType = await documentTypeResponse.json()
+
+    const literatureDocumentTypeResponse = await request.get(
+      `api/v1/caselaw/documenttypes/dependent-literature?q=Ean`,
+    )
+    const literatureDocumentType = await literatureDocumentTypeResponse.json()
+
+    const legalPeriodicalResponse = await request.get(
+      `api/v1/caselaw/legalperiodicals?q=MMG`,
+    )
+    const legalPeriodical = await legalPeriodicalResponse.json()
+
+    const updateResponse = await request.put(
+      `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
+      {
+        data: {
+          ...prefilledDocumentUnit,
+          coreData: {
+            ...prefilledDocumentUnit.coreData,
+            court: court?.[0],
+            documentType: documentType?.[0],
+            fileNumbers: [generateString()],
+            decisionDate: "2019-12-31",
+            appraisalBody: "1. Senat, 2. Kammer",
+          },
+          shortTexts: {
+            headnote: "testHeadnote",
+            guidingPrinciple: "guidingPrinciple",
+          },
+          references: [
+            {
+              id: crypto.randomUUID(),
+              citation: "2024, 1-2, Heft 1",
+              referenceSupplement: "L",
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical?.[0],
+              referenceType: "caselaw",
+            },
+          ],
+          literatureReferences: [
+            {
+              id: crypto.randomUUID(),
+              citation: "2024, 3-4, Heft 1",
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical?.[0],
+              author: "Krümelmonster",
+              documentType: literatureDocumentType?.[0],
+              referenceType: "literature",
+            },
+          ],
+        },
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
+
+    await use(await updateResponse.json())
+
+    const deleteResponse = await request.delete(
+      `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
+      { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
+    )
+    if (!deleteResponse.ok()) {
+      throw Error(`DocumentUnit with number ${prefilledDocumentUnit.documentNumber} couldn't be deleted:
+      ${deleteResponse.status()} ${deleteResponse.statusText()}`)
+    }
+  },
+
+  prefilledDocumentUnitWithTexts: async ({ request, context }, use) => {
+    const cookies = await context.cookies()
+    const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+    const response = await request.put(`/api/v1/caselaw/documentunits/new`, {
+      headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+    })
+    const prefilledDocumentUnitWithLongTexts = await response.json()
+
+    const courtResponse = await request.get(`api/v1/caselaw/courts?q=AG+Aachen`)
+    const court = await courtResponse.json()
+
+    const documentTypeResponse = await request.get(
+      `api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`,
+    )
+    const documentType = await documentTypeResponse.json()
+
+    const updateResponse = await request.put(
+      `/api/v1/caselaw/documentunits/${prefilledDocumentUnitWithLongTexts.uuid}`,
+      {
+        data: {
+          ...prefilledDocumentUnitWithLongTexts,
+          coreData: {
+            ...prefilledDocumentUnitWithLongTexts.coreData,
+            court: court?.[0],
+            documentType: documentType?.[0],
+            fileNumbers: [generateString()],
+            decisionDate: "2019-12-31",
+            appraisalBody: "1. Senat, 2. Kammer",
+          },
+          shortTexts: {
+            headnote: "Test Orientierungssatz",
+            guidingPrinciple: "Test Leitsatz",
+            headline: "Test Titelzeile",
+            otherHeadnote: "Test Sonstiger Orientierungssatz",
+          },
+          longTexts: {
+            tenor: "Test Tenor",
+            reasons: "Test Gründe",
+            caseFacts: "Test Tatbestand",
+            decisionReasons: "Test Entscheidungsgründe",
+            dissentingOpinion: "Test Abweichende Meinung",
+            participatingJudges: [{ name: "Test Richter" }],
+            otherLongText: "Test Sonstiger Langtext",
+            outline: "Test Gliederung",
+          },
+        },
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
+
+    await use(await updateResponse.json())
+
+    const deleteResponse = await request.delete(
+      `/api/v1/caselaw/documentunits/${prefilledDocumentUnitWithLongTexts.uuid}`,
+      { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
+    )
+    if (!deleteResponse.ok()) {
+      throw Error(`DocumentUnit with number ${prefilledDocumentUnitWithLongTexts.documentNumber} couldn't be deleted:
       ${deleteResponse.status()} ${deleteResponse.statusText()}`)
     }
   },
@@ -305,6 +485,21 @@ export const caselawTest = test.extend<MyFixtures>({
     }
   },
 
+  foreignDocumentationUnit: async ({ request }, use) => {
+    const foreignDocumentUnitSearchResponse = await request.get(
+      `api/v1/caselaw/documentunits/search?pg=0&sz=100&documentNumber=YYTestDoc0001`,
+    )
+
+    const foreignDocumentUnitPage =
+      (await foreignDocumentUnitSearchResponse.json()) as Pagination<DocumentUnitListEntry>
+
+    const foreignDocumentUnit = (
+      foreignDocumentUnitPage.content as DocumentUnitListEntry[]
+    ).at(0)
+
+    await use(foreignDocumentUnit!)
+  },
+
   editionWithReferences: async (
     { request, context, prefilledDocumentUnit },
     use,
@@ -343,6 +538,7 @@ export const caselawTest = test.extend<MyFixtures>({
           references: [
             {
               id: crypto.randomUUID(),
+              referenceType: "caselaw",
               citation: "2024, 12-22, Heft 1",
               referenceSupplement: "L",
               legalPeriodicalRawValue: "MMG",
@@ -354,6 +550,7 @@ export const caselawTest = test.extend<MyFixtures>({
             },
             {
               id: crypto.randomUUID(),
+              referenceType: "caselaw",
               citation: "2024, 1-11, Heft 1",
               legalPeriodicalRawValue: "MMG",
               legalPeriodical: legalPeriodical,

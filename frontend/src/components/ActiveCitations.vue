@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import ActiveCitationInput from "@/components/ActiveCitationInput.vue"
-import DocumentUnitDecisionSummary from "@/components/DocumentUnitDecisionSummary.vue"
+import ActiveCitationSummary from "@/components/ActiveCitationSummary.vue"
 import EditableList from "@/components/EditableList.vue"
+import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import ActiveCitation from "@/domain/activeCitation"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 
@@ -20,16 +21,17 @@ const defaultValue = new ActiveCitation() as ActiveCitation
 
 <template>
   <div aria-label="Aktivzitierung">
-    <h2 class="ds-label-01-bold mb-16">Aktivzitierung</h2>
-    <div class="flex flex-row">
-      <div class="flex-1">
-        <EditableList
-          v-model="activeCitations"
-          :default-value="defaultValue"
-          :edit-component="ActiveCitationInput"
-          :summary-component="DocumentUnitDecisionSummary"
-        />
-      </div>
-    </div>
+    <h2
+      :id="DocumentUnitCategoriesEnum.ACTIVE_CITATIONS"
+      class="ds-label-01-bold mb-16"
+    >
+      Aktivzitierung
+    </h2>
+    <EditableList
+      v-model="activeCitations"
+      :default-value="defaultValue"
+      :edit-component="ActiveCitationInput"
+      :summary-component="ActiveCitationSummary"
+    />
   </div>
 </template>

@@ -7,17 +7,21 @@ import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
 import NavbarSide from "@/components/NavbarSide.vue"
 import ErrorPage from "@/components/PageError.vue"
 import PeriodicalEditionInfoPanel from "@/components/periodical-evaluation/PeriodicalEditionInfoPanel.vue"
+import SideToggle from "@/components/SideToggle.vue"
 import { usePeriodicalEvaluationMenuItems } from "@/composables/usePeriodicalEvaluationMenuItems"
+import useQuery from "@/composables/useQueryFromRoute"
 import DocumentUnit from "@/domain/documentUnit"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useEditionStore } from "@/stores/editionStore"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 import StringsUtil from "@/utils/stringsUtil"
+import IconClear from "~icons/ic/baseline-clear"
 
 const store = useEditionStore()
 const documentUnitStore = useDocumentUnitStore()
 const extraContentSidePanelStore = useExtraContentSidePanelStore()
+const { pushQueryToRoute } = useQuery()
 
 const {
   counter: loadDocumentUnitTimer,
@@ -29,6 +33,18 @@ const {
 
 const responseError = ref<ResponseError>()
 const route = useRoute()
+
+const showNavigationPanelRef: Ref<boolean> = ref(
+  route.query.showNavigationPanel !== "false",
+)
+function toggleNavigationPanel(expand?: boolean) {
+  showNavigationPanelRef.value =
+    expand === undefined ? !showNavigationPanelRef.value : expand
+  pushQueryToRoute({
+    ...route.query,
+    showNavigationPanel: showNavigationPanelRef.value.toString(),
+  })
+}
 
 const { documentUnit } = storeToRefs(documentUnitStore) as {
   documentUnit: Ref<DocumentUnit | undefined>
@@ -59,26 +75,31 @@ const handleKeyDown = (event: KeyboardEvent) => {
   }
 
   switch (event.key) {
-    case "v": // Ctrl + V
-      extraContentSidePanelStore.togglePanel(true)
-      extraContentSidePanelStore.setSidePanelMode("preview")
+    case "<":
+      toggleNavigationPanel()
+      break
+    case "x":
+      extraContentSidePanelStore.togglePanel(false)
       break
     default:
       break
   }
 }
 
-/**
- * Resumes the loading document unit timer if it is expanded on extra content side panel
- * @param expanded
- */
-function handleSidePanelIsExpanded(expanded: boolean) {
-  if (expanded) {
+const { isExpanded } = storeToRefs(extraContentSidePanelStore)
+
+watch(isExpanded, async () => {
+  if (isExpanded.value) {
     resume()
   } else {
+    await documentUnitStore.unloadDocumentUnit()
     pause()
   }
-}
+})
+
+const showSidePanel = computed(
+  () => documentUnit.value && route.path.includes("references"),
+)
 
 /**
  * To make sure the latest version is displayed,
@@ -97,10 +118,8 @@ onBeforeUnmount(() => {
 
 onMounted(async () => {
   window.addEventListener("keydown", handleKeyDown)
-
-  const response = await store.loadEdition()
-  if (response.error) {
-    responseError.value = response.error
+  if (route.meta.error) {
+    responseError.value = { title: route.meta.error as string }
   }
 })
 </script>
@@ -110,7 +129,16 @@ onMounted(async () => {
     <div
       class="sticky top-0 z-50 flex flex-col border-r-1 border-solid border-gray-400 bg-white"
     >
-      <NavbarSide :is-child="false" :menu-items="menuItems" :route="route" />
+      <SideToggle
+        class="sticky top-0 z-20"
+        data-testid="side-toggle-navigation"
+        :is-expanded="showNavigationPanelRef"
+        label="Navigation"
+        tabindex="0"
+        @update:is-expanded="toggleNavigationPanel"
+      >
+        <NavbarSide :is-child="false" :menu-items="menuItems" :route="route" />
+      </SideToggle>
     </div>
 
     <div class="flex w-full flex-col bg-gray-100">
@@ -123,12 +151,13 @@ onMounted(async () => {
       <div v-else class="flex grow flex-row items-start">
         <router-view class="flex-1" />
         <ExtraContentSidePanel
-          v-if="documentUnit && route.path.includes('references')"
+          v-if="showSidePanel"
           :document-unit="documentUnit"
-          :enabled-panels="['preview']"
           hide-panel-mode-bar
+          :icon="IconClear"
           show-edit-button
-          @side-panel-is-expanded="handleSidePanelIsExpanded"
+          side-panel-mode="preview"
+          side-panel-shortcut="x"
         />
       </div>
     </div>

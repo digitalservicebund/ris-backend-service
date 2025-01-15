@@ -1,5 +1,8 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
+import customParseFormat from "dayjs/plugin/customParseFormat"
+import dayjsTimezone from "dayjs/plugin/timezone"
+import dayjsUtc from "dayjs/plugin/utc"
 import { computed, ref } from "vue"
 import DocumentUnitListEntry from "../domain/documentUnitListEntry"
 import Tooltip from "./Tooltip.vue"
@@ -25,17 +28,24 @@ import IconSubject from "~icons/ic/baseline-subject"
 import IconNote from "~icons/ic/outline-comment-bank"
 import IconEdit from "~icons/ic/outline-edit"
 import IconView from "~icons/ic/outline-remove-red-eye"
+import IconClock from "~icons/ic/outline-watch-later"
+import IconArrowDown from "~icons/mdi/arrow-down-drop"
 
 const props = defineProps<{
   documentUnitListEntries?: DocumentUnitListEntry[]
   searchResponseError?: ResponseError
   isLoading?: boolean
   emptyState?: string
+  showPublicationDate?: boolean
 }>()
 const emit = defineEmits<{
   deleteDocumentationUnit: [documentUnitListEntry: DocumentUnitListEntry]
   takeOverDocumentationUnit: [documentUnitListEntry: DocumentUnitListEntry]
 }>()
+
+dayjs.extend(dayjsUtc)
+dayjs.extend(dayjsTimezone)
+dayjs.extend(customParseFormat)
 
 const emptyStatus = computed(() => props.emptyState)
 
@@ -65,6 +75,21 @@ const trimText = (text: string, length: number = 50) =>
 
 const noteTooltip = (listEntry: DocumentUnitListEntry) =>
   listEntry.note ? trimText(listEntry.note) : "Keine Notiz vorhanden"
+
+const schedulingTooltip = (publicationDate?: string) =>
+  publicationDate
+    ? `Terminierte Übergabe am\n${dayjs.utc(publicationDate).tz("Europe/Berlin").format("DD.MM.YYYY HH:mm")}`
+    : "Keine Übergabe terminiert"
+
+const publicationDate = (listEntry: DocumentUnitListEntry) => {
+  const date =
+    listEntry.scheduledPublicationDateTime ?? listEntry.lastPublicationDateTime
+  if (date) {
+    return dayjs.utc(date).tz("Europe/Berlin").format("DD.MM.YYYY HH:mm")
+  } else {
+    return "-"
+  }
+}
 
 /**
  * Stops propagation of scrolling event, and toggles the showModal value
@@ -111,31 +136,42 @@ function onDelete() {
     <PopupModal
       v-if="showModal"
       aria-label="Dokumentationseinheit löschen"
-      cancel-button-type="tertiary"
-      confirm-button-type="destructive"
-      confirm-text="Löschen"
       :content-text="popupModalText"
       header-text="Dokumentationseinheit löschen"
+      primary-button-text="Löschen"
+      primary-button-type="destructive"
       @close-modal="toggleModal"
-      @confirm-action="onDelete"
+      @primary-action="onDelete"
     />
-    <TableView class="relative table w-full border-separate">
+    <TableView
+      class="relative table w-full border-separate"
+      data-testid="documentUnitList"
+    >
       <TableHeader>
         <CellHeaderItem class="w-[1%]"> Dokumentnummer</CellHeaderItem>
         <CellHeaderItem> Gerichtstyp</CellHeaderItem>
         <CellHeaderItem> Ort</CellHeaderItem>
-        <CellHeaderItem> Datum</CellHeaderItem>
+        <CellHeaderItem>
+          <div class="flex flex-row">
+            Datum
+            <IconArrowDown v-if="!showPublicationDate" />
+          </div>
+        </CellHeaderItem>
         <CellHeaderItem> Aktenzeichen</CellHeaderItem>
         <CellHeaderItem> Spruchkörper</CellHeaderItem>
         <CellHeaderItem> Typ</CellHeaderItem>
         <CellHeaderItem> Status</CellHeaderItem>
         <CellHeaderItem> Fehler</CellHeaderItem>
+        <CellHeaderItem v-if="showPublicationDate">
+          <div class="flex flex-row items-center">
+            jDV Übergabe <IconArrowDown /></div
+        ></CellHeaderItem>
         <CellHeaderItem />
       </TableHeader>
       <TableRow
         v-for="(listEntry, id) in listEntries"
         :key="id"
-        data-testid="listEntry"
+        :data-testid="`listEntry_${listEntry.documentNumber}`"
       >
         <CellItem>
           <FlexContainer align-items="items-center" class="space-x-8">
@@ -173,6 +209,23 @@ function onDelete() {
                 class="flex-end flex h-20 w-20"
                 :class="!!listEntry.note ? 'text-blue-800' : 'text-gray-500'"
                 data-testid="note-icon"
+              />
+            </Tooltip>
+
+            <Tooltip
+              :text="schedulingTooltip(listEntry.scheduledPublicationDateTime)"
+            >
+              <IconClock
+                :aria-label="
+                  schedulingTooltip(listEntry.scheduledPublicationDateTime)
+                "
+                class="flex-end flex h-20 w-20"
+                :class="
+                  listEntry.scheduledPublicationDateTime
+                    ? 'text-blue-800'
+                    : 'text-gray-500'
+                "
+                data-testid="scheduling-icon"
               />
             </Tooltip>
           </FlexContainer>
@@ -234,6 +287,9 @@ function onDelete() {
           />
           <span v-else>-</span>
         </CellItem>
+        <CellItem v-if="showPublicationDate" data-testid="publicationDate">
+          {{ publicationDate(listEntry) }}
+        </CellItem>
         <CellItem class="flex">
           <div class="float-end flex">
             <Tooltip
@@ -245,7 +301,8 @@ function onDelete() {
             >
               <button
                 aria-label="Dokumentationseinheit übernehmen"
-                class="flex cursor-pointer border-2 border-r-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200"
+                class="flex cursor-pointer border-2 border-r-0 border-solid border-blue-800 p-4 text-blue-800 hover:bg-blue-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800 active:border-blue-200 active:bg-blue-200 disabled:border-gray-600 disabled:text-gray-600"
+                :disabled="!listEntry.isEditable"
                 @click="emit('takeOverDocumentationUnit', listEntry)"
               >
                 <IconCheck />

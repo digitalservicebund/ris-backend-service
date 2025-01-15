@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test"
-import errorMessages from "@/i18n/errors.json"
+import errorMessages from "@/i18n/errors.json" with { type: "json" }
 import {
   fillActiveCitationInputs,
   fillEnsuingDecisionInputs,
@@ -119,6 +119,7 @@ test("search with changed parameters resets the page to 0", async ({
       async () => {
         const firstInput = { decisionDate: "31.12.2019" }
         if (container === activeCitationContainer) {
+          await activeCitationContainer.getByLabel("Weitere Angabe").click()
           await fillActiveCitationInputs(page, firstInput)
         }
         if (container === previousDecisionContainer) {
@@ -129,10 +130,9 @@ test("search with changed parameters resets the page to 0", async ({
         }
 
         await container.getByLabel("Nach Entscheidung suchen").click()
-        await expect(container.getByText("Seite 1")).toBeVisible()
-
-        await container.getByLabel("nächste Ergebnisse").click()
-        await expect(container.getByText("Seite 2")).toBeVisible()
+        await expect(
+          container.getByText("Passende Suchergebnisse:"),
+        ).toBeVisible()
 
         const input = { fileNumber: "I do not exist" }
 
@@ -190,6 +190,7 @@ test("search for documentunits does not return current documentation unit", asyn
         }
 
         if (container === activeCitationContainer) {
+          await activeCitationContainer.getByLabel("Weitere Angabe").click()
           await fillActiveCitationInputs(page, inputs)
         }
         if (container === previousDecisionContainer) {

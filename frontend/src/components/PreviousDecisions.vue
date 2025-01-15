@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import PreviousDecisionInputGroup from "./PreviousDecisionInputGroup.vue"
-import DocumentUnitDecisionSummary from "@/components/DocumentUnitDecisionSummary.vue"
+import DocumentationUnitSummary from "@/components/DocumentationUnitSummary.vue"
 import EditableList from "@/components/EditableList.vue"
 import PreviousDecision from "@/domain/previousDecision"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -28,7 +28,7 @@ const defaultValue = new PreviousDecision() as PreviousDecision
             v-model="previousDecisions"
             :default-value="defaultValue"
             :edit-component="PreviousDecisionInputGroup"
-            :summary-component="DocumentUnitDecisionSummary"
+            :summary-component="DocumentationUnitSummary"
           />
         </div>
       </div>

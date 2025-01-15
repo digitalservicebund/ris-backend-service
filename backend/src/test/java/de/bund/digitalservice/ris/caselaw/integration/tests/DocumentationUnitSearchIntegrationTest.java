@@ -20,14 +20,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.LdmlExporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.ProcedureController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserGroupRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
@@ -41,6 +39,7 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
@@ -49,6 +48,7 @@ import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -107,9 +107,6 @@ class DocumentationUnitSearchIntegrationTest {
   @Autowired private DatabaseProcedureRepository procedureRepository;
   @Autowired private DatabaseUserGroupRepository userGroupRepository;
 
-  @Autowired
-  private DatabaseDocumentationUnitProcedureRepository documentationUnitProcedureRepository;
-
   @MockBean S3AsyncClient s3AsyncClient;
   @MockBean MailService mailService;
   @MockBean DocxConverterService docxConverterService;
@@ -119,6 +116,7 @@ class DocumentationUnitSearchIntegrationTest {
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private HandoverService handoverService;
   @MockBean private LdmlExporterService ldmlExporterService;
+  @MockBean private DuplicateCheckService duplicateCheckService;
 
   @MockBean
   private DocumentationUnitDocxMetadataInitializationService
@@ -214,11 +212,178 @@ class DocumentationUnitSearchIntegrationTest {
     assertThat(responseBody)
         .extracting("decisionDate")
         .containsExactly(
-            LocalDate.of(2023, 06, 07),
-            LocalDate.of(2023, 03, 15),
-            LocalDate.of(2022, 01, 23),
-            LocalDate.of(2022, 01, 23),
+            LocalDate.of(2023, 6, 7),
+            LocalDate.of(2023, 3, 15),
+            LocalDate.of(2022, 1, 23),
+            LocalDate.of(2022, 1, 23),
             null);
+  }
+
+  @Test
+  void test_searchByScheduledOnly_shouldReturnDescendingOrder() {
+    List<LocalDateTime> scheduledPublicationDates =
+        Arrays.asList(
+            LocalDateTime.of(2022, 1, 23, 10, 5),
+            LocalDateTime.of(2024, 1, 24, 10, 5),
+            LocalDateTime.of(2022, 7, 24, 10, 5),
+            LocalDateTime.of(2022, 1, 24, 10, 5),
+            null,
+            LocalDateTime.of(2022, 1, 23, 8, 5),
+            LocalDateTime.of(2022, 1, 23, 10, 4));
+
+    for (LocalDateTime date : scheduledPublicationDates) {
+      EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+          repository,
+          DocumentationUnitDTO.builder()
+              .documentNumber(RandomStringUtils.randomAlphabetic(13))
+              .scheduledPublicationDateTime(date)
+              .documentationOffice(docOfficeDTO));
+    }
+
+    Slice<DocumentationUnitListItem> responseBody =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri(
+                "/api/v1/caselaw/documentunits/search?pg=0&sz=10&myDocOfficeOnly=true&scheduledOnly=true")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+            .returnResult()
+            .getResponseBody();
+
+    assertThat(responseBody)
+        .extracting("scheduledPublicationDateTime")
+        .containsExactly(
+            LocalDateTime.of(2024, 1, 24, 10, 5),
+            LocalDateTime.of(2022, 7, 24, 10, 5),
+            LocalDateTime.of(2022, 1, 24, 10, 5),
+            LocalDateTime.of(2022, 1, 23, 10, 5),
+            LocalDateTime.of(2022, 1, 23, 10, 4),
+            LocalDateTime.of(2022, 1, 23, 8, 5));
+  }
+
+  @Test
+  void
+      test_searchByScheduledOnlyWithPublicationDate_shouldReturnFilteredResultsInDescendingOrder() {
+    List<LocalDateTime> scheduledPublicationDates =
+        Arrays.asList(
+            LocalDateTime.of(2022, 1, 23, 10, 5),
+            LocalDateTime.of(2024, 1, 24, 10, 5),
+            LocalDateTime.of(2022, 7, 24, 10, 5),
+            LocalDateTime.of(2022, 1, 24, 10, 5),
+            null,
+            LocalDateTime.of(2022, 1, 23, 8, 5),
+            LocalDateTime.of(2022, 1, 23, 10, 4));
+
+    for (LocalDateTime date : scheduledPublicationDates) {
+      EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+          repository,
+          DocumentationUnitDTO.builder()
+              .documentNumber(RandomStringUtils.randomAlphabetic(13))
+              .scheduledPublicationDateTime(date)
+              .documentationOffice(docOfficeDTO));
+    }
+
+    Slice<DocumentationUnitListItem> responseBody =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri(
+                "/api/v1/caselaw/documentunits/search?pg=0&sz=10&myDocOfficeOnly=true&publicationDate=2022-01-23&scheduledOnly=true")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+            .returnResult()
+            .getResponseBody();
+
+    assertThat(responseBody)
+        .extracting("scheduledPublicationDateTime")
+        .containsExactly(
+            LocalDateTime.of(2022, 1, 23, 10, 5),
+            LocalDateTime.of(2022, 1, 23, 10, 4),
+            LocalDateTime.of(2022, 1, 23, 8, 5));
+  }
+
+  @Test
+  void test_searchByPublicationDate_shouldFilterAndReturnDescendingOrder() {
+    List<LocalDateTime> lastPublicationDates =
+        Arrays.asList(
+            LocalDateTime.of(2022, 1, 23, 10, 5),
+            null,
+            LocalDateTime.of(2022, 1, 23, 9, 5),
+            LocalDateTime.of(2022, 1, 23, 19, 5),
+            LocalDateTime.of(2022, 1, 23, 8, 5),
+            LocalDateTime.of(2022, 1, 24, 10, 5),
+            null);
+
+    List<LocalDateTime> scheduledPublicationDates =
+        Arrays.asList(
+            null,
+            LocalDateTime.of(2022, 1, 23, 5, 3),
+            null,
+            null,
+            LocalDateTime.of(2022, 1, 23, 10, 10),
+            null,
+            LocalDateTime.of(2022, 1, 23, 12, 10));
+
+    var index = 0;
+
+    for (LocalDateTime date : lastPublicationDates) {
+      EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+          repository,
+          DocumentationUnitDTO.builder()
+              .documentNumber(RandomStringUtils.randomAlphabetic(13))
+              .lastPublicationDateTime(date)
+              .scheduledPublicationDateTime(scheduledPublicationDates.get(index))
+              .documentationOffice(docOfficeDTO));
+      index++;
+    }
+
+    Slice<DocumentationUnitListItem> responseBody =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri(
+                "/api/v1/caselaw/documentunits/search?pg=0&sz=10&myDocOfficeOnly=true&publicationDate=2022-01-23")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
+            .returnResult()
+            .getResponseBody();
+
+    /*
+     * These are unlikely test conditions, because scheduled dates are in the future only and lastPublication dates in the past only.
+     *
+     * Ordered results visible for user (lastPublicationDate only if scheduledPublicationDate is null):
+     * 2022-01-23 12:10
+     * 2022-01-23 10:10
+     * 2022-01-23 05:03
+     * 2022-01-23 19:05
+     * 2022-01-23 10:05
+     * 2022-01-23 09:05
+     */
+    assertThat(responseBody)
+        .extracting("scheduledPublicationDateTime")
+        .containsExactly(
+            LocalDateTime.of(2022, 1, 23, 12, 10),
+            LocalDateTime.of(2022, 1, 23, 10, 10),
+            LocalDateTime.of(2022, 1, 23, 5, 3),
+            null,
+            null,
+            null);
+    assertThat(responseBody)
+        .extracting("lastPublicationDateTime")
+        .containsExactly(
+            null,
+            LocalDateTime.of(2022, 1, 23, 8, 5),
+            null,
+            LocalDateTime.of(2022, 1, 23, 19, 5),
+            LocalDateTime.of(2022, 1, 23, 10, 5),
+            LocalDateTime.of(2022, 1, 23, 9, 5));
   }
 
   @Test
@@ -237,10 +402,7 @@ class DocumentationUnitSearchIntegrationTest {
         .expectStatus()
         .isOk()
         .expectBody(new TypeReference<SliceTestImpl<?>>() {})
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody().isLast()).isFalse();
-            });
+        .consumeWith(response -> assertThat(response.getResponseBody().isLast()).isFalse());
   }
 
   @Test
@@ -347,11 +509,10 @@ class DocumentationUnitSearchIntegrationTest {
         .isOk()
         .expectBody(new TypeReference<SliceTestImpl<DocumentationUnitListItem>>() {})
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody().getContent())
-                  .extracting("documentNumber")
-                  .containsExactly("AB1234567802");
-            });
+            response ->
+                assertThat(response.getResponseBody().getContent())
+                    .extracting("documentNumber")
+                    .containsExactly("AB1234567802"));
   }
 
   @Test
@@ -419,12 +580,9 @@ class DocumentationUnitSearchIntegrationTest {
         procedureRepository.findAllByLabelAndDocumentationOffice("procedure1", docOfficeDTO);
     Optional<UserGroupDTO> userGroupDTO =
         userGroupRepository.findById(UUID.fromString("2b733549-d2cc-40f0-b7f3-9bfa9f3c1b89"));
-    DocumentationUnitProcedureDTO documentationUnitProcedureDTO =
-        DocumentationUnitProcedureDTO.builder()
-            .procedure(procedureDTO.get())
-            .documentationUnit(documentationUnitDTO.get())
-            .build();
-    documentationUnitProcedureRepository.save(documentationUnitProcedureDTO);
+    documentationUnitDTO.get().setProcedureHistory(List.of(procedureDTO.get()));
+    documentationUnitDTO.get().setProcedure(procedureDTO.get());
+    repository.save(documentationUnitDTO.get());
 
     risWebTestClient
         .withDefaultLogin()

@@ -30,7 +30,6 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 @Slf4j
 @Service
@@ -112,7 +111,7 @@ public class S3AttachmentService implements AttachmentService {
     return byteBufferArray;
   }
 
-  private PutObjectResponse putObjectIntoBucket(
+  private void putObjectIntoBucket(
       String fileUuid, ByteBuffer byteBuffer, HttpHeaders httpHeaders) {
 
     var contentLength = httpHeaders.getContentLength();
@@ -139,7 +138,7 @@ public class S3AttachmentService implements AttachmentService {
 
     var putObjectRequest = putObjectRequestBuilder.build();
 
-    return s3Client.putObject(putObjectRequest, requestBody);
+    s3Client.putObject(putObjectRequest, requestBody);
   }
 
   private void deleteObjectFromBucket(String s3Path) {

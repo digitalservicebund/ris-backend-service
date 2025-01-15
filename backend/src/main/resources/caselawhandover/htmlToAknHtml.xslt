@@ -46,9 +46,7 @@
     </xsl:template>
 
     <!--Case Law team handover: decide how to transform these internal Juris image markers into html links -->
-    <xsl:template match="hfj" mode="firstPass">
-        <xsl:apply-templates mode="firstPass"/>
-    </xsl:template>
+    <xsl:template match="hfj" mode="firstPass"/>
 
     <!--Case Law team handover: Validate that removing this tag is okay. Example caselas is WBRE410020500
     The current web view https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX%3A62013CA0192
@@ -81,8 +79,9 @@
 
     <!--Unsupported attributes are renamed to the ris namespace. These attributes are verified to not be
         supported by checking the xsd since the website documentation has no easy way to check this-->
-    <xsl:template match="@id|@scope|@span|@valign|@headers|@nr|@frame|colgroup/col/@width|span/@lang|
-            table/@cellpadding|table/@cellspacing|a/@name|a/@shape|@cite|@datetime|blockquote/@dir">
+    <xsl:template match="@id|@scope|@span|@valign|@align|@headers|@nr|@frame|colgroup/col/@width|
+            span/@lang|table/@cellpadding|table/@cellspacing|a/@name|a/@shape|@cite|@datetime|
+            blockquote/@dir|table/@rules|table/@summary">
         <xsl:attribute name="ris:{name()}">
             <xsl:value-of select="." />
         </xsl:attribute>
@@ -143,8 +142,8 @@
 
     <!--Unfortunately the common parent select can't be shared with text.
     Unsupported text locations are wrapped in a <akn:p>-->
-    <xsl:template match="akn:arguments/text()|akn:background/text()|akn:decision/text()|akn:embeddedStructure/text()
-    |akn:introduction/text()|akn:motivation/text()|akn:subFlow/text()|div/text()">
+    <xsl:template match="akn:header/text()|akn:motivation/text()|akn:introduction/text()|akn:background/text()
+    |akn:decision/text()|akn:embeddedStructure/text()|akn:subFlow/text()|div/text()">
         <akn:p alternativeTo="textWrapper">
             <xsl:value-of select="."/>
         </akn:p>
@@ -242,7 +241,7 @@
         </akn:foreign>
     </xsl:template>
 
-    <xsl:template match="colgroup|col|tbody|th|tr|td">
+    <xsl:template match="colgroup|col|tbody|th|tr|td|thead|tfoot">
         <xsl:element name="ris:{name()}">
             <xsl:apply-templates select="@* | node()"/>
         </xsl:element>
@@ -333,7 +332,7 @@
     <!--Identity transformation for known cases-->
     <xsl:template match="akn:akomaNtoso|akn:judgment|akn:judgmentBody|akn:meta|akn:header|akn:introduction
     |akn:identification|akn:classification|akn:proprietary|akn:block|akn:keyword|akn:background
-    |akn:decision|akn:arguments|akn:motivation|akn:opinion|akn:embeddedStructure|akn:docTitle|akn:subFlow
+    |akn:decision|akn:motivation|akn:opinion|akn:embeddedStructure|akn:subFlow
     |akn:FRBRWork|akn:FRBRExpression|akn:FRBRManifestation
     |akn:FRBRthis|akn:FRBRuri|akn:FRBRalias|akn:FRBRdate|akn:FRBRauthor|akn:FRBRcountry|akn:FRBRlanguage
     |ris:meta|ris:fileNumbers|ris:fileNumber|ris:documentType|ris:courtLocation|ris:courtType|ris:legalEffect

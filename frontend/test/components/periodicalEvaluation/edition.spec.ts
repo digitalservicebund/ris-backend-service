@@ -1,12 +1,12 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { http, HttpResponse } from "msw"
+import { setupServer } from "msw/node"
 import { createRouter, createWebHistory } from "vue-router"
-import { ComboboxItem } from "@/components/input/types"
 import NewEdition from "@/components/periodical-evaluation/PeriodicalEdition.vue"
 import LegalPeriodical from "@/domain/legalPeriodical"
 import LegalPeriodicalEdition from "@/domain/legalPeriodicalEdition"
-import comboboxItemService from "@/services/comboboxItemService"
 import service from "@/services/legalPeriodicalEditionService"
 import testRoutes from "~/test-helper/routes"
 
@@ -18,6 +18,12 @@ const legalPeriodical: LegalPeriodical = {
   title: "Bundesgesetzblatt",
   citationStyle: "2024, Heft 1",
 }
+
+const server = setupServer(
+  http.get("/api/v1/caselaw/legalperiodicals", () => {
+    return HttpResponse.json([legalPeriodical])
+  }),
+)
 
 async function renderComponent() {
   const user = userEvent.setup()
@@ -64,17 +70,8 @@ async function renderComponent() {
 }
 
 describe("Legal periodical edition list", () => {
-  const dropdownLegalPeriodicalItems: ComboboxItem[] = [
-    {
-      label: legalPeriodical.abbreviation! + " | " + legalPeriodical.title!,
-      value: legalPeriodical,
-    },
-  ]
-
-  vi.spyOn(comboboxItemService, "getLegalPeriodicals").mockImplementation(() =>
-    Promise.resolve({ status: 200, data: dropdownLegalPeriodicalItems }),
-  )
-
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
   vi.spyOn(service, "get").mockImplementation(() =>
     Promise.resolve({
       status: 200,
@@ -96,7 +93,7 @@ describe("Legal periodical edition list", () => {
     expect(screen.getByLabelText("Name der Ausgabe")).toBeVisible()
     expect(screen.getByLabelText("Präfix")).toBeVisible()
     expect(screen.getByLabelText("Suffix")).toBeVisible()
-    expect(screen.getByText("Fortfahren")).toBeVisible()
+    expect(screen.getByText("Übernehmen und fortfahren")).toBeVisible()
   })
 
   test("selecting legal periodical from combobox value for legal periodical", async () => {
@@ -146,7 +143,7 @@ describe("Legal periodical edition list", () => {
     await user.clear(screen.getByLabelText("Suffix"))
     await user.type(screen.getByLabelText("Suffix"), "new suffix")
 
-    await user.click(screen.getByText("Fortfahren"))
+    await user.click(screen.getByText("Übernehmen und fortfahren"))
     expect(fetchSpy).toHaveBeenCalledTimes(1)
     expect(fetchSpy).toHaveBeenCalledWith(
       new LegalPeriodicalEdition({
@@ -162,7 +159,7 @@ describe("Legal periodical edition list", () => {
   })
 
   describe("Legal periodical validation", () => {
-    test("don't call save if empty field", async () => {
+    test("don't call save if required fields are empty", async () => {
       const fetchSpy = vi.spyOn(service, "save").mockImplementation(() =>
         Promise.resolve({
           status: 200,
@@ -179,12 +176,14 @@ describe("Legal periodical edition list", () => {
       const { user } = await renderComponent()
 
       await user.clear(screen.getByLabelText("Name der Ausgabe"))
-      await user.click(screen.getByLabelText("Fortfahren"))
+      await user.clear(screen.getByLabelText("Periodikum"))
+
+      await user.click(screen.getByLabelText("Übernehmen und fortfahren"))
 
       expect(
         screen.getAllByText("Pflichtfeld nicht befüllt").length,
         "should be shown if legal periodical empty",
-      ).toBe(1)
+      ).toBe(2)
       expect(fetchSpy).toHaveBeenCalledTimes(0)
     })
 
@@ -216,7 +215,7 @@ describe("Legal periodical edition list", () => {
 
       await user.type(screen.getByLabelText("Name der Ausgabe"), "name")
 
-      await user.click(screen.getByLabelText("Fortfahren"))
+      await user.click(screen.getByLabelText("Übernehmen und fortfahren"))
 
       expect(fetchSpy).toHaveBeenCalledTimes(1)
     })

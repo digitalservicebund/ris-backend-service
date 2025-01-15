@@ -15,7 +15,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.UserGroupController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseUserGroupRepository;
@@ -28,6 +27,7 @@ import de.bund.digitalservice.ris.caselaw.domain.AuthService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroup;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
@@ -80,7 +80,6 @@ class UserGroupIntegrationTest {
   @Autowired private DatabaseDocumentationUnitRepository documentationUnitRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseProcedureRepository repository;
-  @Autowired private DatabaseDocumentationUnitProcedureRepository linkRepository;
   @Autowired private DatabaseUserGroupRepository userGroupRepository;
   @Autowired private AuthService authService;
 
@@ -90,6 +89,7 @@ class UserGroupIntegrationTest {
   @MockBean private AttachmentService attachmentService;
   @MockBean private PatchMapperService patchMapperService;
   @MockBean private ProcedureService procedureService;
+  @MockBean private DuplicateCheckService duplicateCheckService;
 
   @MockBean private DatabaseUserGroupService databaseUserGroupService;
 

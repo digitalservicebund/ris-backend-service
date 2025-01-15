@@ -4,6 +4,7 @@ import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.EXTERN
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
@@ -13,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -85,6 +87,22 @@ public class EntityBuilderTestUtil {
         .build();
   }
 
+  public static DocumentTypeDTO createTestDocumentTypeDTO() {
+    return DocumentTypeDTO.builder()
+        .id(UUID.fromString("33333333-1111-3333-4444-555555555555"))
+        .abbreviation("Auf")
+        .label("Aufsatz")
+        .build();
+  }
+
+  public static DocumentType createTestDocumentType() {
+    return DocumentType.builder()
+        .uuid(UUID.fromString("33333333-1111-3333-4444-555555555555"))
+        .label("Aufsatz")
+        .jurisShortcut("Auf")
+        .build();
+  }
+
   public static DocumentationUnitDTO createAndSavePublishedDocumentationUnit(
       DatabaseDocumentationUnitRepository repository, DocumentationOfficeDTO documentationOffice) {
     return createAndSavePublishedDocumentationUnit(
@@ -95,12 +113,13 @@ public class EntityBuilderTestUtil {
         null);
   }
 
-  public static DocumentationUnitDTO createAndSavePendingDocumentationUnit(
+  public static void createAndSavePendingDocumentationUnit(
       DatabaseDocumentationUnitRepository repository,
       DocumentationOfficeDTO documentationOffice,
       DocumentationOfficeDTO creatingDocumentationOffice,
       String documentNumber) {
-    return createAndSavePublishedDocumentationUnit(
+
+    createAndSavePublishedDocumentationUnit(
         repository,
         DocumentationUnitDTO.builder()
             .documentNumber(documentNumber)

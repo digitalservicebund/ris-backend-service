@@ -22,9 +22,11 @@ import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ParagraphElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.RunElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.RunTextElement;
+import de.bund.digitalservice.ris.caselaw.domain.docx.UnhandledElement;
 import jakarta.xml.bind.JAXBElement;
 import java.awt.Dimension;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,11 +74,13 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class DocumentationUnitDocxBuilderTest {
+  public static final String HTML_ESCAPED_NON_BREAKING_SPACE = "&nbsp;";
+  public static final String HTML_ESCAPED_SOFT_HYPHEN = "&shy;";
 
   @Test
   void test_withoutConvertableElements() {
     DocumentationUnitDocxBuilder builder = DocumentationUnitDocxBuilder.newInstance();
-    var result = builder.build();
+    var result = builder.build(new ArrayList<>());
 
     assertNull(result);
   }
@@ -113,7 +117,7 @@ class DocumentationUnitDocxBuilderTest {
     run.getContent().add(element);
     paragraph.getContent().add(run);
 
-    var result = builder.setParagraph(paragraph).build();
+    var result = builder.setParagraph(paragraph).build(new ArrayList<>());
 
     assertTrue(result instanceof BorderNumber);
     var borderNumberElement = (BorderNumber) result;
@@ -134,7 +138,7 @@ class DocumentationUnitDocxBuilderTest {
     pPr.setPStyle(pStyle);
     paragraph.setPPr(pPr);
 
-    var result = builder.setParagraph(paragraph).build();
+    var result = builder.setParagraph(paragraph).build(new ArrayList<>());
 
     assertTrue(result instanceof BorderNumber);
     // it won't have a number assigned because postprocessing is not done, see the
@@ -153,7 +157,7 @@ class DocumentationUnitDocxBuilderTest {
     CTFramePr framePr = new CTFramePr();
     pPr.setFramePr(framePr);
 
-    var result = builder.setParagraph(paragraph).build();
+    var result = builder.setParagraph(paragraph).build(new ArrayList<>());
 
     assertTrue(result instanceof BorderNumber);
   }
@@ -176,7 +180,7 @@ class DocumentationUnitDocxBuilderTest {
     run.getContent().add(new JAXBElement<>(new QName("text"), Text.class, text));
     paragraph.getContent().add(run);
 
-    var result = builder.setParagraph(paragraph).build();
+    var result = builder.setParagraph(paragraph).build(new ArrayList<>());
 
     assertTrue(result instanceof BorderNumber);
     var borderNumberElement = (BorderNumber) result;
@@ -203,7 +207,7 @@ class DocumentationUnitDocxBuilderTest {
     run.getContent().add(new JAXBElement<>(new QName("text"), Text.class, text));
     paragraph.getContent().add(run);
 
-    var result = builder.setParagraph(paragraph).build();
+    var result = builder.setParagraph(paragraph).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     var paragraphElement = (ParagraphElement) result;
@@ -226,7 +230,7 @@ class DocumentationUnitDocxBuilderTest {
     run.getContent().add(element);
     paragraph.getContent().add(run);
 
-    var result = builder.setParagraph(paragraph).build();
+    var result = builder.setParagraph(paragraph).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     var paragraphElement = (ParagraphElement) result;
@@ -247,7 +251,7 @@ class DocumentationUnitDocxBuilderTest {
     paragraph.getContent().add(run);
     paragraph.getContent().add(new P.Hyperlink());
 
-    var result = builder.setParagraph(paragraph).build();
+    var result = builder.setParagraph(paragraph).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     var paragraphElement = (ParagraphElement) result;
@@ -273,7 +277,7 @@ class DocumentationUnitDocxBuilderTest {
     run.getContent().add(element);
     paragraph.getContent().add(run);
 
-    var result = builder.setParagraph(paragraph).build();
+    var result = builder.setParagraph(paragraph).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -303,7 +307,7 @@ class DocumentationUnitDocxBuilderTest {
     run.getContent().add(element);
     paragraph.getContent().add(run);
 
-    var result = builder.setParagraph(paragraph).build();
+    var result = builder.setParagraph(paragraph).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -333,7 +337,7 @@ class DocumentationUnitDocxBuilderTest {
     run.getContent().add(element);
     paragraph.getContent().add(run);
 
-    var result = builder.setParagraph(paragraph).build();
+    var result = builder.setParagraph(paragraph).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -363,7 +367,7 @@ class DocumentationUnitDocxBuilderTest {
     run.getContent().add(element);
     paragraph.getContent().add(run);
 
-    var result = builder.setParagraph(paragraph).build();
+    var result = builder.setParagraph(paragraph).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -406,7 +410,7 @@ class DocumentationUnitDocxBuilderTest {
     run.getContent().add(element);
     paragraph.getContent().add(run);
 
-    var result = builder.setParagraph(paragraph).build();
+    var result = builder.setParagraph(paragraph).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -439,7 +443,7 @@ class DocumentationUnitDocxBuilderTest {
     run.getContent().add(element);
     paragraph.getContent().add(run);
 
-    var result = builder.setParagraph(paragraph).build();
+    var result = builder.setParagraph(paragraph).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -470,7 +474,7 @@ class DocumentationUnitDocxBuilderTest {
     run.getContent().add(element);
     paragraph.getContent().add(run);
 
-    var result = builder.setParagraph(paragraph).build();
+    var result = builder.setParagraph(paragraph).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -501,7 +505,7 @@ class DocumentationUnitDocxBuilderTest {
     run.getContent().add(element);
     paragraph.getContent().add(run);
 
-    var result = builder.setParagraph(paragraph).build();
+    var result = builder.setParagraph(paragraph).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -532,7 +536,7 @@ class DocumentationUnitDocxBuilderTest {
     run.getContent().add(element);
     paragraph.getContent().add(run);
 
-    var result = builder.setParagraph(paragraph).build();
+    var result = builder.setParagraph(paragraph).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -564,7 +568,7 @@ class DocumentationUnitDocxBuilderTest {
     run.getContent().add(element);
     paragraph.getContent().add(run);
 
-    var result = builder.setParagraph(paragraph).build();
+    var result = builder.setParagraph(paragraph).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -596,7 +600,7 @@ class DocumentationUnitDocxBuilderTest {
     run.getContent().add(element);
     paragraph.getContent().add(run);
 
-    var result = builder.setParagraph(paragraph).build();
+    var result = builder.setParagraph(paragraph).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -628,7 +632,8 @@ class DocumentationUnitDocxBuilderTest {
             .addRunElement(TestDocxBuilder.buildTextRunElement("text"))
             .build();
 
-    var result = DocumentationUnitDocxBuilder.newInstance().setParagraph(paragraph).build();
+    var result =
+        DocumentationUnitDocxBuilder.newInstance().setParagraph(paragraph).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -656,7 +661,8 @@ class DocumentationUnitDocxBuilderTest {
             .addRunElement(TestDocxBuilder.buildTextRunElement("text"))
             .build();
 
-    var result = DocumentationUnitDocxBuilder.newInstance().setParagraph(paragraph).build();
+    var result =
+        DocumentationUnitDocxBuilder.newInstance().setParagraph(paragraph).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -700,7 +706,7 @@ class DocumentationUnitDocxBuilderTest {
         DocumentationUnitDocxBuilder.newInstance()
             .setParagraph(paragraph)
             .setConverter(converter)
-            .build();
+            .build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -722,7 +728,8 @@ class DocumentationUnitDocxBuilderTest {
             .addRunElement(TestDocxBuilder.buildTextRunElement("run text 2"))
             .build();
 
-    var result = DocumentationUnitDocxBuilder.newInstance().setParagraph(paragraph).build();
+    var result =
+        DocumentationUnitDocxBuilder.newInstance().setParagraph(paragraph).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -757,7 +764,7 @@ class DocumentationUnitDocxBuilderTest {
 
     var converter = new DocxConverter();
     converter.setImages(images);
-    var result = builder.setParagraph(paragraph).setConverter(converter).build();
+    var result = builder.setParagraph(paragraph).setConverter(converter).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -789,7 +796,7 @@ class DocumentationUnitDocxBuilderTest {
 
     var converter = new DocxConverter();
     converter.setImages(images);
-    var result = builder.setParagraph(paragraph).setConverter(converter).build();
+    var result = builder.setParagraph(paragraph).setConverter(converter).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -823,7 +830,7 @@ class DocumentationUnitDocxBuilderTest {
 
     var converter = new DocxConverter();
     converter.setImages(images);
-    var result = builder.setParagraph(paragraph).setConverter(converter).build();
+    var result = builder.setParagraph(paragraph).setConverter(converter).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -857,7 +864,7 @@ class DocumentationUnitDocxBuilderTest {
 
     var converter = new DocxConverter();
     converter.setImages(images);
-    var result = builder.setParagraph(paragraph).setConverter(converter).build();
+    var result = builder.setParagraph(paragraph).setConverter(converter).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -891,7 +898,7 @@ class DocumentationUnitDocxBuilderTest {
 
     var converter = new DocxConverter();
     converter.setImages(images);
-    var result = builder.setParagraph(paragraph).setConverter(converter).build();
+    var result = builder.setParagraph(paragraph).setConverter(converter).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -923,7 +930,7 @@ class DocumentationUnitDocxBuilderTest {
 
     var converter = new DocxConverter();
     converter.setImages(images);
-    var result = builder.setParagraph(paragraph).setConverter(converter).build();
+    var result = builder.setParagraph(paragraph).setConverter(converter).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -957,7 +964,7 @@ class DocumentationUnitDocxBuilderTest {
 
     var converter = new DocxConverter();
     converter.setImages(images);
-    var result = builder.setParagraph(paragraph).setConverter(converter).build();
+    var result = builder.setParagraph(paragraph).setConverter(converter).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -991,7 +998,7 @@ class DocumentationUnitDocxBuilderTest {
 
     var converter = new DocxConverter();
     converter.setImages(images);
-    var result = builder.setParagraph(paragraph).setConverter(converter).build();
+    var result = builder.setParagraph(paragraph).setConverter(converter).build(new ArrayList<>());
 
     assertInstanceOf(ParagraphElement.class, result);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -1018,7 +1025,10 @@ class DocumentationUnitDocxBuilderTest {
     paragraph.getContent().add(run);
 
     builder = builder.setParagraph(paragraph);
-    Exception exception = assertThrows(DocxConverterException.class, builder::build);
+    DocumentationUnitDocxBuilder finalBuilder = builder;
+    ArrayList<UnhandledElement> unhandledElements = new ArrayList<>();
+    Exception exception =
+        assertThrows(DocxConverterException.class, () -> finalBuilder.build(unhandledElements));
 
     assertEquals("more than one graphic data in a drawing", exception.getMessage());
   }
@@ -1035,7 +1045,10 @@ class DocumentationUnitDocxBuilderTest {
     paragraph.getContent().add(run);
 
     builder = builder.setParagraph(paragraph);
-    Exception exception = assertThrows(DocxConverterException.class, builder::build);
+    DocumentationUnitDocxBuilder finalBuilder = builder;
+    ArrayList<UnhandledElement> unhandledElements = new ArrayList<>();
+    Exception exception =
+        assertThrows(DocxConverterException.class, () -> finalBuilder.build(unhandledElements));
 
     assertEquals("no graphic data", exception.getMessage());
   }
@@ -1074,7 +1087,7 @@ class DocumentationUnitDocxBuilderTest {
 
     var converter = new DocxConverter();
     converter.setListNumberingDefinitions(listNumberingDefinitions);
-    var result = builder.setParagraph(paragraph).setConverter(converter).build();
+    var result = builder.setParagraph(paragraph).setConverter(converter).build(new ArrayList<>());
 
     assertTrue(result instanceof NumberingListEntry);
     var numberingListEntry = (NumberingListEntry) result;
@@ -1117,7 +1130,7 @@ class DocumentationUnitDocxBuilderTest {
     var converter = new DocxConverter();
     converter.setListNumberingDefinitions(listNumberingDefinitions);
 
-    var result = builder.setParagraph(paragraph).setConverter(converter).build();
+    var result = builder.setParagraph(paragraph).setConverter(converter).build(new ArrayList<>());
     assertTrue(result instanceof NumberingListEntry);
     var numberingListEntry = (NumberingListEntry) result;
     assertEquals(
@@ -1142,7 +1155,7 @@ class DocumentationUnitDocxBuilderTest {
         DocumentationUnitDocxBuilder.newInstance()
             .setParagraph(paragraph)
             .setConverter(converter)
-            .build();
+            .build(new ArrayList<>());
 
     assertThat(result).isInstanceOf(ParagraphElement.class);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -1170,7 +1183,7 @@ class DocumentationUnitDocxBuilderTest {
         DocumentationUnitDocxBuilder.newInstance()
             .setParagraph(paragraph)
             .setConverter(converter)
-            .build();
+            .build(new ArrayList<>());
 
     assertThat(result).isInstanceOf(ParagraphElement.class);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -1187,7 +1200,8 @@ class DocumentationUnitDocxBuilderTest {
     runElement.getContent().add(new JAXBElement<>(new QName("error run"), String.class, "error"));
     P paragraph = TestDocxBuilder.newParagraphBuilder().addRunElement(runElement).build();
 
-    var result = DocumentationUnitDocxBuilder.newInstance().setParagraph(paragraph).build();
+    var result =
+        DocumentationUnitDocxBuilder.newInstance().setParagraph(paragraph).build(new ArrayList<>());
 
     assertThat(result).isInstanceOf(ParagraphElement.class);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -1229,7 +1243,7 @@ class DocumentationUnitDocxBuilderTest {
 
     var converter = new DocxConverter();
     converter.setListNumberingDefinitions(listNumberingDefinitions);
-    var result = builder.setParagraph(paragraph).setConverter(converter).build();
+    var result = builder.setParagraph(paragraph).setConverter(converter).build(new ArrayList<>());
 
     assertTrue(result instanceof ParagraphElement);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -1275,7 +1289,7 @@ class DocumentationUnitDocxBuilderTest {
 
     var converter = new DocxConverter();
     converter.setListNumberingDefinitions(listNumberingDefinitions);
-    var result = builder.setParagraph(paragraph).setConverter(converter).build();
+    var result = builder.setParagraph(paragraph).setConverter(converter).build(new ArrayList<>());
 
     assertTrue(result instanceof ParagraphElement);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -1316,7 +1330,7 @@ class DocumentationUnitDocxBuilderTest {
 
     var converter = new DocxConverter();
     converter.setListNumberingDefinitions(listNumberingDefinitions);
-    var result = builder.setParagraph(paragraph).setConverter(converter).build();
+    var result = builder.setParagraph(paragraph).setConverter(converter).build(new ArrayList<>());
 
     assertTrue(result instanceof ParagraphElement);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -1331,41 +1345,63 @@ class DocumentationUnitDocxBuilderTest {
   public static Stream<Arguments> nodesThatShouldTurnIntoAHyphen() {
     return Stream.of(
         Arguments.of(
-            List.of(SOFT_HYPHEN + NON_BREAKING_SPACE), false, List.of("-" + NON_BREAKING_SPACE)),
+            List.of(SOFT_HYPHEN + NON_BREAKING_SPACE),
+            false,
+            List.of("-" + HTML_ESCAPED_NON_BREAKING_SPACE)),
         Arguments.of(
-            List.of(NON_BREAKING_SPACE + SOFT_HYPHEN), false, List.of(NON_BREAKING_SPACE + "-")),
+            List.of(NON_BREAKING_SPACE + SOFT_HYPHEN),
+            false,
+            List.of(HTML_ESCAPED_NON_BREAKING_SPACE + "-")),
         Arguments.of(
-            List.of(NON_BREAKING_SPACE, SOFT_HYPHEN), false, List.of(NON_BREAKING_SPACE, "-")),
+            List.of(NON_BREAKING_SPACE, SOFT_HYPHEN),
+            false,
+            List.of(HTML_ESCAPED_NON_BREAKING_SPACE, "-")),
         Arguments.of(
-            List.of(SOFT_HYPHEN, NON_BREAKING_SPACE), false, List.of("-", NON_BREAKING_SPACE)),
+            List.of(SOFT_HYPHEN, NON_BREAKING_SPACE),
+            false,
+            List.of("-", HTML_ESCAPED_NON_BREAKING_SPACE)),
         Arguments.of(
             List.of("131/16" + NON_BREAKING_SPACE + SOFT_HYPHEN),
             false,
-            List.of("131/16" + NON_BREAKING_SPACE + "-")),
+            List.of("131/16" + HTML_ESCAPED_NON_BREAKING_SPACE + "-")),
         Arguments.of(
             List.of("131/16", NON_BREAKING_SPACE, SOFT_HYPHEN),
             false,
-            List.of("131/16", NON_BREAKING_SPACE, "-")),
+            List.of("131/16", HTML_ESCAPED_NON_BREAKING_SPACE, "-")),
         Arguments.of(
             List.of(NON_BREAKING_SPACE, SOFT_HYPHEN + " ABC"),
             false,
-            List.of(NON_BREAKING_SPACE, "- ABC")),
+            List.of(HTML_ESCAPED_NON_BREAKING_SPACE, "- ABC")),
 
         // with whitespace: preserve
-        Arguments.of(List.of(SOFT_HYPHEN + " "), true, List.of("-" + NON_BREAKING_SPACE)),
-        Arguments.of(List.of(" " + SOFT_HYPHEN), true, List.of(NON_BREAKING_SPACE + "-")));
+        Arguments.of(
+            List.of(SOFT_HYPHEN + " "), true, List.of("-" + HTML_ESCAPED_NON_BREAKING_SPACE)),
+        Arguments.of(
+            List.of(" " + SOFT_HYPHEN), true, List.of(HTML_ESCAPED_NON_BREAKING_SPACE + "-")));
   }
 
   public static Stream<Arguments> nodesThatShouldNotTurnIntoHyphen() {
     return Stream.of(
-        Arguments.of(List.of(SOFT_HYPHEN), false, null), // only soft hyphen
-        Arguments.of(List.of(NON_BREAKING_SPACE), false, null), // only non-breaking space
+        Arguments.of(
+            List.of(SOFT_HYPHEN), false, List.of(HTML_ESCAPED_SOFT_HYPHEN)), // only soft hyphen
+        Arguments.of(
+            List.of(NON_BREAKING_SPACE),
+            false,
+            List.of(HTML_ESCAPED_NON_BREAKING_SPACE)), // only non-breaking space
         Arguments.of(
             List.of(NON_BREAKING_SPACE, " ", SOFT_HYPHEN),
             false,
-            null), // space text node in between
+            List.of(
+                HTML_ESCAPED_NON_BREAKING_SPACE,
+                " ",
+                HTML_ESCAPED_SOFT_HYPHEN)), // space text node in between
         Arguments.of(
-            List.of(NON_BREAKING_SPACE + " " + SOFT_HYPHEN), false, null)); // space char in between
+            List.of(NON_BREAKING_SPACE + " " + SOFT_HYPHEN),
+            false,
+            List.of(
+                HTML_ESCAPED_NON_BREAKING_SPACE
+                    + " "
+                    + HTML_ESCAPED_SOFT_HYPHEN))); // space char in between
   }
 
   /**
@@ -1392,7 +1428,7 @@ class DocumentationUnitDocxBuilderTest {
       run.getContent().add(element);
       parentParagraph.getContent().add(run);
     }
-    var result = builder.setParagraph(parentParagraph).build();
+    var result = builder.setParagraph(parentParagraph).build(new ArrayList<>());
     assertInstanceOf(ParagraphElement.class, result);
 
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -1428,7 +1464,7 @@ class DocumentationUnitDocxBuilderTest {
     parentParagraph.getContent().add(softHyphenRun);
     parentParagraph.getContent().add(noBreakHyphenRun);
 
-    var result = builder.setParagraph(parentParagraph).build();
+    var result = builder.setParagraph(parentParagraph).build(new ArrayList<>());
     assertInstanceOf(ParagraphElement.class, result);
 
     ParagraphElement paragraphElement = (ParagraphElement) result;

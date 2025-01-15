@@ -1,11 +1,12 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from "vue"
+import { computed, nextTick, onMounted, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import CreateNewFromSearch from "@/components/CreateNewFromSearch.vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import { DisplayMode } from "@/components/enumDisplayMode"
 import DateInput from "@/components/input/DateInput.vue"
-import InputField from "@/components/input/InputField.vue"
+import InputField, { LabelPosition } from "@/components/input/InputField.vue"
+import RadioInput from "@/components/input/RadioInput.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import { ValidationError } from "@/components/input/types"
@@ -14,6 +15,7 @@ import PopupModal from "@/components/PopupModal.vue"
 import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
+import { useScrollPreviewContainer } from "@/composables/useScrollPreviewContainer"
 import { useValidationStore } from "@/composables/useValidationStore"
 import DocumentUnit, {
   DocumentationUnitParameters,
@@ -39,6 +41,9 @@ const emit = defineEmits<{
   cancelEdit: [void]
   removeEntry: [value: Reference]
 }>()
+
+const containerRef = ref<HTMLElement | null>(null)
+const { openSidePanel } = useScrollPreviewContainer()
 
 const store = useEditionStore()
 const reference = ref<Reference>(new Reference({ ...props.modelValue }))
@@ -104,6 +109,23 @@ function updateDateFormatValidation(
   else validationStore.remove("decisionDate")
 }
 
+/**
+ * In case of validation errors it will scroll  back to input fields
+ *
+ * @returns A promise that resolves after the DOM updates.
+ */
+async function scrollToTopPosition() {
+  await nextTick()
+  if (
+    containerRef.value instanceof HTMLElement &&
+    "scrollIntoView" in containerRef.value
+  ) {
+    containerRef.value.scrollIntoView({
+      block: "start",
+    })
+  }
+}
+
 async function search() {
   isLoading.value = true
   createNewFromSearchResponseError.value = undefined
@@ -148,23 +170,39 @@ function validateRequiredInput(referenceToValidate?: Reference): boolean {
   const referenceToCheck = referenceToValidate || reference.value
 
   // Check for missing required fields
-  if (referenceToCheck.missingRequiredFields?.length) {
+  if (
+    referenceToCheck.missingRequiredFields?.length &&
+    referenceToValidate?.referenceType == "caselaw"
+  ) {
     referenceToCheck.missingRequiredFields.forEach((missingField: string) => {
       validationStore.add("Pflichtfeld nicht befüllt", missingField)
     })
+    return false // Validation failed
+  } else if (
+    referenceToCheck.missingRequiredLiteratureFields?.length &&
+    referenceToValidate?.referenceType == "literature"
+  ) {
+    referenceToCheck.missingRequiredLiteratureFields.forEach(
+      (missingField: string) => {
+        validationStore.add("Pflichtfeld nicht befüllt", missingField)
+      },
+    )
     return false // Validation failed
   } else {
     return true // Validation passed
   }
 }
 
-function addReference(decision: RelatedDocumentation) {
+async function addReference(decision: RelatedDocumentation) {
   validationStore.reset()
 
   const newReference: Reference = new Reference({
     id: reference.value.id,
     citation: props.isSaved ? reference.value.citation : buildCitation(),
     referenceSupplement: reference.value.referenceSupplement,
+    author: reference.value.author,
+    documentType: reference.value.documentType,
+    referenceType: reference.value.referenceType,
     footnote: reference.value.footnote,
     legalPeriodical: reference.value.legalPeriodical,
     legalPeriodicalRawValue: reference.value.legalPeriodicalRawValue,
@@ -176,12 +214,14 @@ function addReference(decision: RelatedDocumentation) {
   if (validationStore.isValid()) {
     emit("update:modelValue", newReference)
     emit("addEntry")
+  } else {
+    await scrollToTopPosition()
   }
 }
 
-function addReferenceWithCreatedDocunit(docUnit: DocumentUnit) {
+async function addReferenceWithCreatedDocumentationUnit(docUnit: DocumentUnit) {
   if (!docUnit) return
-  addReference(
+  await addReference(
     new RelatedDocumentation({
       uuid: docUnit.uuid,
       fileNumber: docUnit.coreData.fileNumbers
@@ -230,14 +270,14 @@ async function deleteReferenceAndDocUnit() {
   deleteReference()
 }
 
+/*
+Relates the legal periodical of edition to the reference
+ */
 watch(
   () => store.edition?.legalPeriodical,
   (legalPeriodical) => {
     if (legalPeriodical) {
-      reference.value = new Reference({
-        ...props.modelValue,
-        legalPeriodical: legalPeriodical,
-      })
+      reference.value.legalPeriodical = legalPeriodical
     }
   },
   { immediate: true },
@@ -271,6 +311,21 @@ watch(
   { deep: true },
 )
 
+/** watches the changes of query related documentations params
+ * resets the page if change took place.
+ */
+watch(searchResultsCurrentPage, () => {
+  pageNumber.value = 0
+})
+
+/** Opens up the side panel, if only on search result found
+ */
+watch(searchResults, async () => {
+  if (searchResults.value?.length == 1) {
+    await openSidePanel(searchResults.value[0].decision.documentNumber)
+  }
+})
+
 onMounted(async () => {
   featureToggle.value = (
     await FeatureToggleService.isEnabled("neuris.new-from-search")
@@ -279,274 +334,363 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-24 border-b-1">
+  <div
+    ref="containerRef"
+    v-ctrl-enter="search"
+    class="flex flex-col border-b-1"
+  >
     <PopupModal
       v-if="showModal"
-      aria-label="Eintrag löschen"
-      cancel-button-text="Nur Fundstelle löschen"
-      cancel-button-type="tertiary"
-      confirm-button-type="destructive"
-      confirm-text="Dokumentationseinheit löschen"
+      aria-label="Dialog zur Auswahl der Löschaktion"
       content-text="Die dazugehörige Dokumentationseinheit existiert noch. Soll sie gelöscht werden?"
       header-text="Dazugehörige Dokumentationseinheit löschen?"
-      @close-modal="deleteReference"
-      @confirm-action="deleteReferenceAndDocUnit"
+      primary-button-text="Dokumentationseinheit löschen"
+      primary-button-type="destructive"
+      secondary-button-text="Nur Fundstelle löschen"
+      secondary-button-type="tertiary"
+      @close-modal="toggleDeletionConfirmationModal(false)"
+      @primary-action="deleteReferenceAndDocUnit"
+      @secondary-action="deleteReference"
     />
-    <DecisionSummary
-      v-if="
-        reference.documentationUnit &&
-        reference.documentationUnit?.documentNumber
-      "
-      data-testid="reference-input-summary"
-      :decision="reference.documentationUnit"
-      :display-mode="DisplayMode.SIDEPANEL"
-    />
-    <div class="flex justify-between gap-24">
-      <div id="citationInputField" class="flex-1">
-        <InputField
-          v-if="!isSaved"
-          id="citation"
-          v-slot="slotProps"
-          label="Zitatstelle *"
-          :validation-error="validationStore.getByField('citation')"
-        >
-          <div class="flex flex-grow flex-row gap-16">
-            <TextInput
-              id="citation prefix"
-              v-model="prefix"
-              aria-label="Zitatstelle Präfix"
-              placeholder="Präfix"
-              read-only
+    <h2 v-if="!isSaved" class="ds-label-01-bold mb-16">
+      Fundstelle hinzufügen
+    </h2>
+    <div class="flex flex-col gap-24">
+      <DecisionSummary
+        v-if="
+          reference.documentationUnit &&
+          reference.documentationUnit?.documentNumber
+        "
+        data-testid="reference-input-summary"
+        :display-mode="DisplayMode.SIDEPANEL"
+        :document-number="reference.documentationUnit.documentNumber"
+        :status="reference.documentationUnit.status"
+        :summary="reference.documentationUnit.renderSummary"
+      />
+      <div v-if="!isSaved" class="flex items-center gap-16">
+        <div class="flex items-center">
+          <InputField
+            id="caselaw"
+            class="flex items-center"
+            label="Rechtsprechung"
+            label-class="ds-body-01-reg"
+            :label-position="LabelPosition.RIGHT"
+          >
+            <RadioInput
+              v-model="reference.referenceType"
+              aria-label="Rechtsprechung Fundstelle"
+              name="referenceType"
               size="medium"
-            ></TextInput>
-            <TextInput
-              id="citation"
-              v-model="reference.citation"
-              aria-label="Zitatstelle *"
-              :has-error="slotProps.hasError"
-              placeholder="Variable"
-              size="medium"
-              @blur="validateRequiredInput(reference)"
-              @focus="validationStore.remove('citation')"
-            ></TextInput>
-            <TextInput
-              id="citation suffix"
-              v-model="suffix"
-              aria-label="Zitatstelle Suffix"
-              placeholder="Suffix"
-              read-only
-              size="medium"
-            ></TextInput>
-          </div>
-        </InputField>
+              value="caselaw"
+              @click="validationStore.reset()"
+            />
+          </InputField>
+        </div>
 
-        <InputField
-          v-else
-          id="citation"
-          v-slot="slotProps"
-          label="Zitatstelle *"
-          :validation-error="validationStore.getByField('citation')"
-        >
-          <div class="flex flex-grow flex-row gap-16">
-            <TextInput
-              id="citation"
-              v-model="reference.citation"
-              aria-label="Zitatstelle *"
-              :has-error="slotProps.hasError"
+        <div class="flex items-center">
+          <InputField
+            id="literature"
+            class="flex items-center"
+            label="Literatur"
+            label-class="ds-body-01-reg"
+            :label-position="LabelPosition.RIGHT"
+          >
+            <RadioInput
+              v-model="reference.referenceType"
+              aria-label="Literatur Fundstelle"
+              name="referenceType"
               size="medium"
-              @blur="validateRequiredInput(reference)"
-              @focus="validationStore.remove('citation')"
-            ></TextInput>
-          </div>
-        </InputField>
-
-        <div v-if="legalPeriodical" class="ds-label-03-reg pt-4">
-          Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}
+              value="literature"
+              @click="validationStore.reset()"
+            />
+          </InputField>
         </div>
       </div>
-
-      <InputField
-        id="referenceSupplement"
-        v-slot="slotProps"
-        class="flex-1"
-        label="Klammernzusatz *"
-        :validation-error="validationStore.getByField('referenceSupplement')"
-      >
-        <TextInput
-          id="referenceSupplement"
-          v-model="reference.referenceSupplement"
-          aria-label="Klammernzusatz"
-          :has-error="slotProps.hasError"
-          size="medium"
-          @blur="validateRequiredInput(reference)"
-          @focus="validationStore.remove('referenceSupplement')"
-        ></TextInput>
-      </InputField>
-    </div>
-
-    <div v-if="!isSaved" id="documentationUnit" class="flex flex-col gap-24">
       <div class="flex justify-between gap-24">
-        <InputField
-          id="courtInput"
-          v-slot="slotProps"
-          label="Gericht"
-          :validation-error="validationStore.getByField('court')"
-        >
-          <ComboboxInput
-            id="courtInput"
-            v-model="relatedDocumentationUnit.court"
-            aria-label="Gericht"
-            clear-on-choosing-item
-            :has-error="slotProps.hasError"
-            :item-service="ComboboxItemService.getCourts"
-            :read-only="reference?.documentationUnit?.hasForeignSource"
-            @focus="validationStore.remove('court')"
+        <div id="citationInputField" class="flex w-full flex-col">
+          <InputField
+            v-if="!isSaved"
+            id="citation"
+            v-slot="slotProps"
+            label="Zitatstelle *"
+            :validation-error="validationStore.getByField('citation')"
           >
-          </ComboboxInput>
-        </InputField>
+            <div class="flex flex-grow flex-row gap-16">
+              <TextInput
+                id="citation prefix"
+                v-model="prefix"
+                aria-label="Zitatstelle Präfix"
+                placeholder="Präfix"
+                read-only
+                size="medium"
+              ></TextInput>
+              <TextInput
+                id="citation"
+                v-model="reference.citation"
+                aria-label="Zitatstelle *"
+                :has-error="slotProps.hasError"
+                placeholder="Variable"
+                size="medium"
+                @focus="validationStore.remove('citation')"
+              ></TextInput>
+              <TextInput
+                id="citation suffix"
+                v-model="suffix"
+                aria-label="Zitatstelle Suffix"
+                placeholder="Suffix"
+                read-only
+                size="medium"
+              ></TextInput>
+            </div>
+          </InputField>
+
+          <InputField
+            v-else
+            id="citation"
+            v-slot="slotProps"
+            label="Zitatstelle *"
+            :validation-error="validationStore.getByField('citation')"
+          >
+            <div class="flex flex-grow flex-row gap-16">
+              <TextInput
+                id="citation"
+                v-model="reference.citation"
+                aria-label="Zitatstelle *"
+                :has-error="slotProps.hasError"
+                size="medium"
+                @blur="validateRequiredInput(reference)"
+                @focus="validationStore.remove('citation')"
+              ></TextInput>
+            </div>
+          </InputField>
+
+          <div v-if="legalPeriodical" class="ds-label-03-reg pt-4">
+            Zitierbeispiel: {{ legalPeriodical.value.citationStyle }}
+          </div>
+        </div>
+
         <InputField
-          id="decisionDate"
+          v-if="reference.referenceType === 'caselaw'"
+          id="referenceSupplement"
           v-slot="slotProps"
-          label="Entscheidungsdatum"
-          :validation-error="validationStore.getByField('decisionDate')"
-          @update:validation-error="
-            (validationError: any) =>
-              updateDateFormatValidation(validationError)
-          "
-        >
-          <DateInput
-            id="decisionDate"
-            v-model="relatedDocumentationUnit.decisionDate"
-            aria-label="Entscheidungsdatum"
-            class="ds-input-medium"
-            :has-error="slotProps.hasError"
-            :read-only="reference?.documentationUnit?.hasForeignSource"
-            @focus="validationStore.remove('decisionDate')"
-            @update:validation-error="slotProps.updateValidationError"
-          ></DateInput>
-        </InputField>
-      </div>
-      <div class="flex justify-between gap-24">
-        <InputField
-          id="fileNumber"
-          v-slot="slotProps"
-          label="Aktenzeichen"
-          :validation-error="validationStore.getByField('fileNumber')"
+          label="Klammernzusatz *"
+          :validation-error="validationStore.getByField('referenceSupplement')"
         >
           <TextInput
-            id="fileNumber"
-            v-model="relatedDocumentationUnit.fileNumber"
-            aria-label="Aktenzeichen"
+            id="referenceSupplement"
+            v-model="reference.referenceSupplement"
+            aria-label="Klammernzusatz"
             :has-error="slotProps.hasError"
-            :read-only="reference?.documentationUnit?.hasForeignSource"
             size="medium"
-            @focus="validationStore.remove('fileNumber')"
+            @blur="validateRequiredInput(reference)"
+            @focus="validationStore.remove('referenceSupplement')"
           ></TextInput>
         </InputField>
         <InputField
-          id="decisionDocumentType"
-          label="Dokumenttyp"
+          v-if="reference.referenceType === 'literature'"
+          id="literatureReferenceDocumentType"
+          v-slot="slotProps"
+          label="Dokumenttyp *"
           :validation-error="validationStore.getByField('documentType')"
         >
           <ComboboxInput
-            id="decisionDocumentType"
-            v-model="relatedDocumentationUnit.documentType"
-            aria-label="Dokumenttyp"
-            :item-service="ComboboxItemService.getDocumentTypes"
-            :read-only="reference?.documentationUnit?.hasForeignSource"
+            id="literatureReferenceDocumentType"
+            v-model="reference.documentType"
+            aria-label="Dokumenttyp Literaturfundstelle"
+            :has-error="slotProps.hasError"
+            :item-service="
+              ComboboxItemService.getDependentLiteratureDocumentTypes
+            "
+            @focus="validationStore.remove('documentType')"
           ></ComboboxInput>
         </InputField>
       </div>
-    </div>
+      <div
+        v-if="reference.referenceType === 'literature'"
+        class="w-[calc(50%-10px)]"
+      >
+        <InputField
+          id="literatureReferenceAuthor"
+          v-slot="slotProps"
+          label="Autor *"
+          :validation-error="validationStore.getByField('author')"
+        >
+          <TextInput
+            id="literatureReferenceAuthor"
+            v-model="reference.author"
+            aria-label="Autor Literaturfundstelle"
+            :has-error="slotProps.hasError"
+            size="medium"
+            @focus="validationStore.remove('author')"
+          ></TextInput>
+        </InputField>
+      </div>
 
-    <div class="flex w-full flex-row justify-between">
-      <div>
-        <div class="flex gap-16">
+      <div v-if="!isSaved" id="documentationUnit">
+        <h2 class="ds-label-01-bold mb-16">Entscheidung hinzufügen</h2>
+
+        <div class="flex flex-col gap-24">
+          <div class="flex justify-between gap-24">
+            <InputField
+              id="courtInput"
+              v-slot="slotProps"
+              label="Gericht"
+              :validation-error="validationStore.getByField('court')"
+            >
+              <ComboboxInput
+                id="courtInput"
+                v-model="relatedDocumentationUnit.court"
+                aria-label="Gericht"
+                clear-on-choosing-item
+                :has-error="slotProps.hasError"
+                :item-service="ComboboxItemService.getCourts"
+                :read-only="reference?.documentationUnit?.hasForeignSource"
+                @focus="validationStore.remove('court')"
+              >
+              </ComboboxInput>
+            </InputField>
+            <InputField
+              id="decisionDate"
+              v-slot="slotProps"
+              label="Entscheidungsdatum"
+              :validation-error="validationStore.getByField('decisionDate')"
+              @update:validation-error="
+                (validationError: any) =>
+                  updateDateFormatValidation(validationError)
+              "
+            >
+              <DateInput
+                id="decisionDate"
+                v-model="relatedDocumentationUnit.decisionDate"
+                aria-label="Entscheidungsdatum"
+                class="ds-input-medium"
+                :has-error="slotProps.hasError"
+                :read-only="reference?.documentationUnit?.hasForeignSource"
+                @focus="validationStore.remove('decisionDate')"
+                @update:validation-error="slotProps.updateValidationError"
+              ></DateInput>
+            </InputField>
+          </div>
+
+          <div class="flex justify-between gap-24">
+            <InputField
+              id="fileNumber"
+              v-slot="slotProps"
+              label="Aktenzeichen"
+              :validation-error="validationStore.getByField('fileNumber')"
+            >
+              <TextInput
+                id="fileNumber"
+                v-model="relatedDocumentationUnit.fileNumber"
+                aria-label="Aktenzeichen"
+                :has-error="slotProps.hasError"
+                :read-only="reference?.documentationUnit?.hasForeignSource"
+                size="medium"
+                @focus="validationStore.remove('fileNumber')"
+              ></TextInput>
+            </InputField>
+            <InputField id="decisionDocumentType" label="Dokumenttyp">
+              <ComboboxInput
+                id="decisionDocumentType"
+                v-model="relatedDocumentationUnit.documentType"
+                aria-label="Dokumenttyp"
+                :item-service="ComboboxItemService.getDocumentTypes"
+                :read-only="reference?.documentationUnit?.hasForeignSource"
+              ></ComboboxInput>
+            </InputField>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex w-full flex-row justify-between">
+        <div>
+          <div class="flex gap-16">
+            <TextButton
+              v-if="!isSaved"
+              aria-label="Nach Entscheidung suchen"
+              button-type="primary"
+              label="Suchen"
+              size="small"
+              @click="search"
+            />
+            <TextButton
+              v-if="isSaved"
+              aria-label="Fundstelle vermerken"
+              button-type="tertiary"
+              data-testid="previous-decision-save-button"
+              :disabled="reference.isEmpty"
+              label="Übernehmen"
+              size="small"
+              @click.stop="addReference(relatedDocumentationUnit)"
+            />
+            <TextButton
+              v-if="isSaved"
+              aria-label="Abbrechen"
+              button-type="ghost"
+              label="Abbrechen"
+              size="small"
+              @click.stop="emit('cancelEdit')"
+            />
+          </div>
+        </div>
+        <div v-if="isSaved">
           <TextButton
-            v-if="!isSaved"
-            aria-label="Nach Entscheidung suchen"
-            button-type="primary"
-            label="Suchen"
+            v-if="
+              reference?.documentationUnit?.status?.publicationStatus ===
+                PublicationState.UNPUBLISHED &&
+              reference?.getIsDocumentationUnitCreatedByReference()
+            "
+            aria-label="Eintrag löschen"
+            button-type="destructive"
+            label="Eintrag löschen"
             size="small"
-            @click="search"
+            @click.stop="toggleDeletionConfirmationModal"
+          />
+
+          <TextButton
+            v-else-if="
+              reference.documentationUnit?.status?.publicationStatus ===
+                PublicationState.EXTERNAL_HANDOVER_PENDING &&
+              reference?.getIsDocumentationUnitCreatedByReference()
+            "
+            aria-label="Fundstelle und Dokumentationseinheit löschen"
+            button-type="destructive"
+            label="Fundstelle und Dokumentationseinheit löschen"
+            size="small"
+            @click.stop="deleteReferenceAndDocUnit"
           />
           <TextButton
-            v-if="isSaved"
-            aria-label="Fundstelle vermerken"
-            button-type="tertiary"
-            data-testid="previous-decision-save-button"
-            :disabled="reference.isEmpty"
-            label="Übernehmen"
+            v-else
+            aria-label="Eintrag löschen"
+            button-type="destructive"
+            label="Eintrag löschen"
             size="small"
-            @click.stop="addReference(relatedDocumentationUnit)"
-          />
-          <TextButton
-            v-if="isSaved"
-            aria-label="Abbrechen"
-            button-type="ghost"
-            label="Abbrechen"
-            size="small"
-            @click.stop="emit('cancelEdit')"
+            @click.stop="modelValue && emit('removeEntry', modelValue)"
           />
         </div>
       </div>
-      <div v-if="isSaved">
-        <TextButton
-          v-if="
-            reference?.documentationUnit?.status?.publicationStatus ===
-              PublicationState.UNPUBLISHED &&
-            reference?.getIsDocumentationUnitCreatedByReference()
-          "
-          aria-label="Eintrag löschen"
-          button-type="destructive"
-          label="Eintrag löschen"
-          size="small"
-          @click.stop="toggleDeletionConfirmationModal"
-        />
-
-        <TextButton
-          v-else-if="
-            reference.documentationUnit?.status?.publicationStatus ===
-              PublicationState.EXTERNAL_HANDOVER_PENDING &&
-            reference?.getIsDocumentationUnitCreatedByReference()
-          "
-          aria-label="Fundstelle und Dokumentationseinheit löschen"
-          button-type="destructive"
-          label="Fundstelle und Dokumentationseinheit löschen"
-          size="small"
-          @click.stop="deleteReferenceAndDocUnit"
-        />
-        <TextButton
-          v-else
-          aria-label="Eintrag löschen"
-          button-type="destructive"
-          label="Eintrag löschen"
-          size="small"
-          @click.stop="modelValue && emit('removeEntry', modelValue)"
-        />
+      <div v-if="isLoading || searchResults" class="bg-blue-200">
+        <Pagination
+          navigation-position="bottom"
+          :page="searchResultsCurrentPage"
+          @update-page="updatePage"
+        >
+          <SearchResultList
+            allow-multiple-links
+            :display-mode="DisplayMode.SIDEPANEL"
+            :is-loading="isLoading"
+            :search-results="searchResults"
+            @link-decision="addReference"
+          />
+        </Pagination>
       </div>
+      <CreateNewFromSearch
+        v-if="searchResults && featureToggle"
+        :parameters="createDocumentationUnitParameters"
+        :validate-required-input="() => validateRequiredInput(reference)"
+        @created-documentation-unit="addReferenceWithCreatedDocumentationUnit"
+      />
     </div>
-    <div v-if="isLoading || searchResults" class="bg-blue-200">
-      <Pagination
-        navigation-position="bottom"
-        :page="searchResultsCurrentPage"
-        @update-page="updatePage"
-      >
-        <SearchResultList
-          allow-multiple-links
-          :display-mode="DisplayMode.SIDEPANEL"
-          :is-loading="isLoading"
-          :search-results="searchResults"
-          @link-decision="addReference"
-        />
-      </Pagination>
-    </div>
-    <CreateNewFromSearch
-      v-if="searchResults && featureToggle"
-      :parameters="createDocumentationUnitParameters"
-      :validate-required-input="() => validateRequiredInput(reference)"
-      @created-documentation-unit="addReferenceWithCreatedDocunit"
-    />
   </div>
 </template>
 @/stores/editionStore

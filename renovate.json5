@@ -68,7 +68,7 @@
         "major"
       ],
       "labels": [
-        "major update"
+        "no-automerge"
       ]
     },
     {
@@ -80,6 +80,19 @@
         "digest"
       ],
       "automerge": true,
+    },
+    {
+      // due to blocking spring version
+      "groupName": "blocked-by-spring-version",
+      "matchPackageNames": [
+        "io.spring.dependency-management",
+        "org.springframework.cloud:spring-cloud-starter-kubernetes-client-config",
+        "org.springframework.boot"
+      ],
+      "automerge": false,
+      "labels": [
+        "no-automerge"
+      ]
     }
   ]
 }

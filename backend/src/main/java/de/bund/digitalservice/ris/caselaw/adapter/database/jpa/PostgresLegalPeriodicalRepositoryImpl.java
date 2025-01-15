@@ -4,7 +4,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalTra
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -16,7 +15,7 @@ public class PostgresLegalPeriodicalRepositoryImpl implements LegalPeriodicalRep
   }
 
   @Override
-  public List<LegalPeriodical> findAllBySearchStr(Optional<String> searchStr) {
+  public List<LegalPeriodical> findAllBySearchStr(String searchStr) {
     return repository.findBySearchStr(searchStr).stream()
         .map(LegalPeriodicalTransformer::transformToDomain)
         .toList();

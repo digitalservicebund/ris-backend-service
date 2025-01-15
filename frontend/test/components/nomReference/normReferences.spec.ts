@@ -1,16 +1,25 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { http, HttpResponse } from "msw"
+import { setupServer } from "msw/node"
 import { describe } from "vitest"
-import { ComboboxItem } from "@/components/input/types"
 import NormReferences from "@/components/NormReferences.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import LegalForce from "@/domain/legalForce"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
-import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
+
+const server = setupServer(
+  http.get("/api/v1/caselaw/normabbreviation/search", () => {
+    const normAbbreviation: NormAbbreviation = {
+      abbreviation: "1000g-BefV",
+    }
+    return HttpResponse.json([normAbbreviation])
+  }),
+)
 
 function renderComponent(normReferences?: NormReference[]) {
   const user = userEvent.setup()
@@ -43,27 +52,15 @@ function generateNormReference(options?: {
   normAbbreviation?: NormAbbreviation
   singleNorms?: SingleNorm[]
 }) {
-  const normReference = new NormReference({
+  return new NormReference({
     normAbbreviation: options?.normAbbreviation ?? { abbreviation: "ABC" },
     singleNorms: options?.singleNorms ?? [],
   })
-  return normReference
 }
 
 describe("Norm references", () => {
-  const normAbbreviation: NormAbbreviation = {
-    abbreviation: "1000g-BefV",
-  }
-  const dropdownAbbreviationItems: ComboboxItem[] = [
-    {
-      label: normAbbreviation.abbreviation,
-      value: normAbbreviation,
-    },
-  ]
-  vi.spyOn(comboboxItemService, "getRisAbbreviations").mockImplementation(() =>
-    Promise.resolve({ status: 200, data: dropdownAbbreviationItems }),
-  )
-
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
   it("renders empty norm reference in edit mode, when no norm references in list", async () => {
     renderComponent()
     expect((await screen.findAllByLabelText("Listen Eintrag")).length).toBe(1)
@@ -148,6 +145,50 @@ describe("Norm references", () => {
     const button = screen.getByLabelText("Norm speichern")
     await user.click(button)
     await screen.findByText(/RIS-Abkürzung bereits eingegeben/)
+  })
+
+  it("Removes duplicate entries in single norms", async () => {
+    vi.spyOn(documentUnitService, "validateSingleNorm").mockImplementation(() =>
+      Promise.resolve({ status: 200, data: "Ok" }),
+    )
+    const { user } = renderComponent([
+      generateNormReference({
+        normAbbreviation: {
+          abbreviation: "1000g-BefV",
+        },
+        singleNorms: [
+          new SingleNorm({
+            singleNorm: "§ 345",
+            dateOfRelevance: "2022",
+            dateOfVersion: "01.01.2022",
+          }),
+        ],
+      }),
+    ])
+
+    expect(screen.getByLabelText("Listen Eintrag")).toHaveTextContent(
+      "1000g-BefV, § 345, 01.01.2022, 2022",
+    )
+
+    await user.click(screen.getByTestId("list-entry-0"))
+    await user.click(screen.getByLabelText("Weitere Einzelnorm"))
+
+    const singleNorms = await screen.findAllByLabelText("Einzelnorm der Norm")
+    await user.type(singleNorms[1], "§ 345")
+
+    const dates = await screen.findAllByLabelText("Fassungsdatum der Norm")
+    await user.type(dates[1], "01.01.2022")
+
+    const years = await screen.findAllByLabelText("Jahr der Norm")
+    await user.type(years[1], "2022")
+
+    const button = screen.getByLabelText("Norm speichern")
+    await user.click(button)
+
+    const listItems = screen.getAllByLabelText("Listen Eintrag")
+    expect(listItems[0]).toHaveTextContent(
+      "1000g-BefV, § 345, 01.01.2022, 2022",
+    )
   })
 
   it("deletes norm reference", async () => {

@@ -33,7 +33,7 @@ export default class PreviousDecision
     return this.uuid
   }
 
-  get renderDecision(): string {
+  get renderSummary(): string {
     return [
       ...(this.court ? [`${this.court?.label}`] : []),
       ...(this.decisionDate

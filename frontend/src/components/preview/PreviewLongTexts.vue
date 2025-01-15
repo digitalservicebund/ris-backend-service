@@ -23,11 +23,10 @@ defineProps<{
       />
     </PreviewContent>
   </PreviewRow>
-  <PreviewRow v-if="longTexts.tenor">
+  <PreviewRow v-if="longTexts.tenor" id="previewTenor">
     <PreviewCategory>{{ longTextLabels.tenor }}</PreviewCategory>
     <PreviewContent>
       <TextEditor
-        id="previewTenor"
         :aria-label="longTextLabels.tenor"
         field-size="max"
         preview
@@ -102,7 +101,7 @@ defineProps<{
         v-for="participatingJudge in longTexts.participatingJudges"
         :key="participatingJudge.id"
       >
-        {{ participatingJudge.renderDecision }}
+        {{ participatingJudge.renderSummary }}
       </div>
     </PreviewContent>
   </PreviewRow>

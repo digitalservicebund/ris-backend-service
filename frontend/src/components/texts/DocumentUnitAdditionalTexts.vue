@@ -17,7 +17,7 @@ const otherLongText = computed({
     store.documentUnit?.longTexts.otherLongText
       ? useValidBorderNumberLinks(
           store.documentUnit?.longTexts.otherLongText,
-          store.documentUnit.borderNumbers,
+          store.documentUnit.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {
@@ -31,7 +31,7 @@ const dissentingOpinion = computed({
     store.documentUnit?.longTexts.dissentingOpinion
       ? useValidBorderNumberLinks(
           store.documentUnit?.longTexts.dissentingOpinion,
-          store.documentUnit.borderNumbers,
+          store.documentUnit.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {
@@ -45,7 +45,7 @@ const outline = computed({
     store.documentUnit?.longTexts.outline
       ? useValidBorderNumberLinks(
           store.documentUnit?.longTexts.outline,
-          store.documentUnit.borderNumbers,
+          store.documentUnit.managementData.borderNumbers,
         )
       : undefined,
   set: (newValue) => {

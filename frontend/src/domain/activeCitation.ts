@@ -32,7 +32,7 @@ export default class ActiveCitation
     }
   }
 
-  get renderDecision(): string {
+  get renderSummary(): string {
     return [
       ...(this.citationType?.label ? [this.citationType.label] : []),
       ...(this.court ? [`${this.court?.label}`] : []),

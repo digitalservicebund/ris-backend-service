@@ -26,7 +26,9 @@ test.describe(
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
 
       await test.step("check that with courType 'AG Aachen' checkbox is hidden and button is hidden", async () => {
-        await expect(page.getByText("AG Aachen")).toBeVisible()
+        await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+          "AG Aachen",
+        )
         await expect(
           page.getByRole("button", { name: "Gesetzgebungsauftrag" }),
         ).toBeHidden()
@@ -76,17 +78,10 @@ test.describe(
         await page.getByText("XML Vorschau").click()
         const xmlPreview = page.getByTitle("XML Vorschau")
         const innerText = await xmlPreview.innerText()
-        expect(innerText).toContain(
-          "13\n" +
-            "        <zuordnung>\n" +
-            "14\n" +
-            "            <aspekt>Gesetzgebungsauftrag</aspekt>\n" +
-            "15\n" +
-            "            <begriff>ja</begriff>\n" +
-            "16\n" +
-            "        </zuordnung>\n" +
-            "17",
-        )
+
+        const regex =
+          /<zuordnung>\s*\d*\s*<aspekt>Gesetzgebungsauftrag<\/aspekt>\s*\d*\s*<begriff>ja<\/begriff>\s*\d*\s*<\/zuordnung>/
+        expect(innerText).toMatch(regex)
       })
 
       await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
@@ -133,7 +128,9 @@ test.describe(
       await test.step(`add court type : ${courtType}`, async () => {
         await page.locator("[aria-label='Gericht']").fill(courtType)
         await waitForInputValue(page, "[aria-label='Gericht']", courtType)
-        await expect(page.getByText(courtType)).toBeVisible()
+        await expect(page.getByLabel("Gericht", { exact: true })).toHaveValue(
+          courtType,
+        )
         await page.getByText(courtType).click()
         await waitForInputValue(page, "[aria-label='Gericht']", courtType)
 

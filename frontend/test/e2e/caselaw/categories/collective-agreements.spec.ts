@@ -69,18 +69,11 @@ test.describe(
         await page.getByText("XML Vorschau").click()
         const xmlPreview = page.getByTitle("XML Vorschau")
         const innerText = await xmlPreview.innerText()
-        expect(innerText).toBeDefined()
-        expect(innerText).toContain(
-          "<paratrubriken>\n" +
-            "13\n" +
-            "        <zuordnung>\n" +
-            "14\n" +
-            "            <aspekt>Tarifvertrag</aspekt>\n" +
-            "15\n" +
-            "            <begriff>Stehende Bühnen</begriff>\n" +
-            "16\n" +
-            "        </zuordnung>\n",
-        )
+
+        const regex =
+          /<zuordnung>\s*\d*\s*<aspekt>Tarifvertrag<\/aspekt>\s*\d*\s*<begriff>Stehende Bühnen<\/begriff>\s*\d*\s*<\/zuordnung>/
+
+        expect(innerText).toMatch(regex)
       })
 
       await test.step("Preview should show collective agreement", async () => {

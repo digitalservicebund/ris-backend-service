@@ -20,9 +20,10 @@ public class LegalPeriodicalService {
    * Get legal periodical objects in a list, filtered by an optional search string
    *
    * @param searchStr optional search string
-   * @return
+   * @return list of legal periodical which contain the search string or the whole list of legal
+   *     periodical if no search string is given
    */
   public List<LegalPeriodical> getLegalPeriodicals(Optional<String> searchStr) {
-    return legalPeriodicalRepository.findAllBySearchStr(searchStr.map(String::trim));
+    return legalPeriodicalRepository.findAllBySearchStr(searchStr.map(String::trim).orElse(null));
   }
 }

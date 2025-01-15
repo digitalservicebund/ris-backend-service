@@ -25,10 +25,6 @@ public class LegalPeriodicalEditionTransformer {
         .name(legalPeriodicalEditionDTO.getName())
         .prefix(legalPeriodicalEditionDTO.getPrefix())
         .suffix(legalPeriodicalEditionDTO.getSuffix())
-        .references(
-            legalPeriodicalEditionDTO.getReferences().stream()
-                .map(ReferenceTransformer::transformToDomain)
-                .toList())
         .build();
   }
 

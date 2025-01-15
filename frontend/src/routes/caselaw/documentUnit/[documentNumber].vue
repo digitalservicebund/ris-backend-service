@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { useHead } from "@unhead/vue"
 import { storeToRefs } from "pinia"
-import { onMounted, onBeforeUnmount, ref, Ref } from "vue"
+import { onBeforeUnmount, onMounted, ref, Ref } from "vue"
 import { useRoute } from "vue-router"
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import ExtraContentSidePanel from "@/components/ExtraContentSidePanel.vue"
@@ -96,23 +96,27 @@ const handleKeyDown = (event: KeyboardEvent) => {
   }
 
   switch (event.key) {
-    case "<": // Ctrl + [
+    case "<":
       event.preventDefault()
       toggleNavigationPanel(extraContentSidePanelStore.togglePanel())
       break
-    case "n": // Ctrl + N
+    case "n":
       event.preventDefault()
       extraContentSidePanelStore.togglePanel(true)
       extraContentSidePanelStore.setSidePanelMode("note")
       break
-    case "d": // Ctrl + D
+    case "d":
       event.preventDefault()
       extraContentSidePanelStore.togglePanel(true)
       extraContentSidePanelStore.setSidePanelMode("attachments")
       break
-    case "v": // Ctrl + V
+    case "v":
       extraContentSidePanelStore.togglePanel(true)
       extraContentSidePanelStore.setSidePanelMode("preview")
+      break
+    case "r":
+      extraContentSidePanelStore.togglePanel(true)
+      extraContentSidePanelStore.setSidePanelMode("category-import")
       break
     default:
       break

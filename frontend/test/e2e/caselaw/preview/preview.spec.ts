@@ -19,11 +19,13 @@ test.describe("preview", () => {
     )
 
     const fileNumber = prefilledDocumentUnit.coreData.fileNumbers![0]
-    await expect(page.getByText("AG Aachen")).toBeVisible()
+    await expect(page.getByText("AG Aachen", { exact: true })).toBeVisible()
     await expect(page.getByText(fileNumber)).toBeVisible()
     await expect(page.getByText("31.12.2019")).toBeVisible()
     await expect(page.getByText("1. Senat, 2. Kammer")).toBeVisible()
-    await expect(page.getByText("Anerkenntnisurteil")).toBeVisible()
+    await expect(
+      page.getByText("Anerkenntnisurteil", { exact: true }),
+    ).toBeVisible()
     await expect(page.getByText("Keine Angabe")).toBeVisible()
     await expect(page.getByText("RegionNW")).toBeVisible()
     await expect(page.getByText("guidingPrinciple")).toBeVisible()
@@ -39,7 +41,7 @@ test.describe("preview", () => {
         page,
         prefilledDocumentUnit.documentNumber as string,
       )
-      await expect(page.getByText("AG Aachen")).toBeVisible()
+      await expect(page.getByText("AG Aachen", { exact: true })).toBeVisible()
       await expect(page.getByText("31.12.2019")).toBeVisible()
       await expect(page.getByText("NW", { exact: true })).toBeVisible()
       await expect(page.getByText("guidingPrinciple")).toBeVisible()
@@ -88,7 +90,7 @@ test.describe("preview", () => {
         page,
         prefilledDocumentUnit.documentNumber as string,
       )
-      await expect(page.getByText("AG Aachen")).toBeVisible()
+      await expect(page.getByText("AG Aachen", { exact: true })).toBeVisible()
       await expect(page.getByText("31.12.2019")).toBeVisible()
       await expect(page.getByText("RegionNW")).toBeVisible()
       await expect(page.getByText("guidingPrinciple")).toBeVisible()

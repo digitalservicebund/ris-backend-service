@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 import Checkbox from "@/components/input/CheckboxInput.vue"
 import DateInput from "@/components/input/DateInput.vue"
 import DropdownInput from "@/components/input/DropdownInput.vue"
@@ -51,8 +51,23 @@ const myDocOfficeOnly = computed({
     if (!data) {
       delete query.value.withError
       delete query.value.myDocOfficeOnly
+      delete query.value.scheduledOnly
+      delete query.value.publicationDate
+      resetErrors("publicationDate")
     } else {
       query.value.myDocOfficeOnly = "true"
+    }
+  },
+})
+
+const scheduledOnly = computed({
+  get: () =>
+    query.value?.scheduledOnly ? JSON.parse(query.value.scheduledOnly) : false,
+  set: (data) => {
+    if (!data) {
+      delete query.value.scheduledOnly
+    } else {
+      query.value.scheduledOnly = "true"
     }
   },
 })
@@ -168,11 +183,6 @@ function handleSearchButtonClicked() {
   pushQueryToRoute(query.value)
 }
 
-function handleSearchShortcut(event: KeyboardEvent) {
-  if (event.key == "Enter" && (event.ctrlKey || event.metaKey))
-    handleSearchButtonClicked()
-}
-
 function handleSearch() {
   if (!isEmptySearch.value) {
     emit("search", getQueryFromRoute())
@@ -186,17 +196,8 @@ watch(
   () => {
     handleSearch()
   },
-  { deep: true },
+  { deep: true, immediate: true },
 )
-
-onMounted(async () => {
-  handleSearch()
-  window.addEventListener("keydown", handleSearchShortcut)
-})
-
-onUnmounted(() => {
-  window.removeEventListener("keydown", handleSearchShortcut)
-})
 </script>
 
 <script lang="ts">
@@ -204,6 +205,8 @@ export type DocumentUnitSearchParameter =
   | "documentNumber"
   | "fileNumber"
   | "publicationStatus"
+  | "publicationDate"
+  | "scheduledOnly"
   | "courtType"
   | "courtLocation"
   | "decisionDate"
@@ -213,14 +216,26 @@ export type DocumentUnitSearchParameter =
 </script>
 
 <template>
-  <div class="pyb-24 mb-32 flex flex-col bg-blue-200">
+  <div
+    v-ctrl-enter="handleSearchButtonClicked"
+    class="pyb-24 mb-32 flex flex-col bg-blue-200"
+  >
     <div
-      class="m-40 grid grid-flow-col grid-cols-[auto_1fr_auto_1fr] grid-rows-[auto_auto_auto_auto] gap-x-12 gap-y-20 lg:gap-x-32"
+      class="m-40 grid grid-flow-col grid-cols-[auto_1fr_auto_1fr] grid-rows-[auto_auto_auto_auto_auto] gap-x-12 gap-y-20 lg:gap-x-32"
     >
       <!-- Column 1 -->
-      <div class="ds-body-01-reg flex flex-row items-center">Aktenzeichen</div>
+      <div class="ds-body-01-reg ml-3 flex flex-row items-center">
+        Aktenzeichen
+      </div>
       <div class="ds-body-01-reg flex flex-row items-center">Gericht</div>
       <div class="ds-body-01-reg flex flex-row items-center">Datum</div>
+      <div
+        v-if="myDocOfficeOnly"
+        class="ds-body-01-reg flex flex-row items-center"
+      >
+        jDV Übergabe
+      </div>
+      <div v-if="!myDocOfficeOnly" />
       <div></div>
       <!-- Column 2 -->
       <div>
@@ -305,6 +320,47 @@ export type DocumentUnitSearchParameter =
           ></DateInput>
         </InputField>
       </div>
+      <div v-if="myDocOfficeOnly" class="flex flex-row gap-20">
+        <InputField
+          id="publicationDate"
+          v-slot="{ id, hasError }"
+          data-testid="publication-date-input"
+          label="jDV Übergabedatum"
+          :validation-error="validationStore.getByField('publicationDate')"
+          visually-hide-label
+        >
+          <DateInput
+            :id="id"
+            v-model="query.publicationDate"
+            aria-label="jDV Übergabedatum Suche"
+            class="ds-input-small"
+            :has-error="hasError"
+            is-future-date
+            @blur="validateSearchInput"
+            @focus="resetErrors(id as DocumentUnitSearchParameter)"
+            @update:validation-error="
+              (validationError: ValidationError | undefined) =>
+                handleLocalInputError(validationError, id)
+            "
+          ></DateInput>
+        </InputField>
+        <InputField
+          id="scheduled"
+          v-slot="{ id }"
+          label="Nur terminiert"
+          label-class="ds-label-01-reg"
+          :label-position="LabelPosition.RIGHT"
+        >
+          <Checkbox
+            :id="id"
+            v-model="scheduledOnly"
+            aria-label="Terminiert Filter"
+            class="ds-checkbox-mini bg-white"
+            @focus="resetErrors"
+          />
+        </InputField>
+      </div>
+      <div v-if="!myDocOfficeOnly" />
       <div class="pl-32"></div>
       <!-- Column 3 -->
       <div class="ds-body-01-reg flex flex-row items-center pl-24 lg:pl-48">
@@ -313,6 +369,7 @@ export type DocumentUnitSearchParameter =
       <div class="ds-body-01-reg flex flex-row items-center pl-24 lg:pl-48">
         Status
       </div>
+      <div></div>
       <div></div>
       <div></div>
       <!-- Column 4 -->
@@ -364,6 +421,7 @@ export type DocumentUnitSearchParameter =
           id="withErrorsOnly"
           v-slot="{ id }"
           label="Nur Fehler"
+          label-class="ds-label-01-reg"
           :label-position="LabelPosition.RIGHT"
         >
           <Checkbox

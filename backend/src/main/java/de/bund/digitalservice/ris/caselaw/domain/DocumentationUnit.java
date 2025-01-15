@@ -38,10 +38,11 @@ public record DocumentationUnit(
     List<EnsuingDecision> ensuingDecisions,
     ShortTexts shortTexts,
     LongTexts longTexts,
-    List<String> borderNumbers,
+    @Valid ManagementData managementData,
     Status status,
     String note,
     ContentRelatedIndexing contentRelatedIndexing,
     List<Reference> references,
+    List<Reference> literatureReferences,
     boolean isEditable,
     boolean isDeletable) {}

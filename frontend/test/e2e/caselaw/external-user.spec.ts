@@ -3,6 +3,7 @@ import {
   assignProcedureToDocUnit,
   clickCategoryButton,
   deleteAllProcedures,
+  fillInput,
   navigateToCategories,
   navigateToProcedures,
   navigateToSearch,
@@ -204,7 +205,7 @@ test.describe(
 
     test(
       "External user cannot edit a doc unit after the doc unit is unassigned",
-      { tag: ["@RISDEV-4519"] },
+      { tag: ["@RISDEV-4519", "@RISDEV-4523"] },
       async ({ pageWithExternalUser, page, documentNumber }) => {
         await navigateToCategories(pageWithExternalUser, documentNumber)
 
@@ -215,21 +216,38 @@ test.describe(
         )
         await assignUserGroupToProcedure(page, procedureName)
 
-        await test.step("Assigned external user can edit and save Entscheidungsname", async () => {
-          await clickCategoryButton("Entscheidungsname", pageWithExternalUser)
-          await pageWithExternalUser
-            .getByLabel("Entscheidungsname")
-            .fill("ein Name")
+        await test.step("Assigned external user can edit and save Notiz", async () => {
+          await pageWithExternalUser.getByLabel("Seitenpanel öffnen").click()
+          await fillInput(
+            pageWithExternalUser,
+            "Notiz Eingabefeld",
+            "some text",
+          )
           await save(pageWithExternalUser)
+        })
+
+        await test.step("Assigned external user cannot access Dokumente or Fundstellen", async () => {
+          await expect(
+            pageWithExternalUser.getByTestId(
+              "caselaw-documentUnit-documentNumber-attachments",
+            ),
+          ).toBeHidden()
+          await expect(
+            pageWithExternalUser.getByTestId(
+              "caselaw-documentUnit-documentNumber-references",
+            ),
+          ).toBeHidden()
         })
 
         // Assignment to previous procedure is overwritten -> user (group) is not assigned to doc unit anymore
         await assignProcedureToDocUnit(page, documentNumber, procedurePrefix)
 
-        await test.step("External user gets error when editing Entscheidungsname of unassigned doc unit", async () => {
-          await pageWithExternalUser
-            .getByLabel("Entscheidungsname")
-            .fill("ein anderer Name")
+        await test.step("External user gets error when editing Notiz of unassigned doc unit", async () => {
+          await fillInput(
+            pageWithExternalUser,
+            "Notiz Eingabefeld",
+            "some other text",
+          )
           await pageWithExternalUser
             .locator("[aria-label='Speichern Button']")
             .click()

@@ -77,6 +77,13 @@ public interface DocumentationUnitRepository {
   void saveProcedures(DocumentationUnit documentationUnit);
 
   /**
+   * Save lastPublicationDateTime of a documentation unit
+   *
+   * @param uuid the UUID of the documentation unit to save the date for
+   */
+  void saveLastPublicationDateTime(UUID uuid);
+
+  /**
    * Delete a documentation unit
    *
    * @param documentationUnit the documentation unit to delete
@@ -121,4 +128,7 @@ public interface DocumentationUnitRepository {
   Map<RelatedDocumentationType, Long> getAllDocumentationUnitWhichLink(UUID documentationUnitId);
 
   List<UUID> getRandomDocumentationUnitIds();
+
+  /** Returns doc units with a scheduled publication date that is in the past. */
+  List<DocumentationUnit> getScheduledDocumentationUnitsDueNow();
 }

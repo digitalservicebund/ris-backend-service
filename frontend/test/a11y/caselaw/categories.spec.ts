@@ -110,16 +110,29 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
-  test("vorgang", async ({ page, documentNumber }) => {
+  test("vorgang", async ({ page, context, request }) => {
+    // setup docunit
+    const cookies = await context.cookies()
+    const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+    const newDocunitResponse = await request.put(
+      `/api/v1/caselaw/documentunits/new`,
+      {
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
+
+    const { uuid, documentNumber } = await newDocunitResponse.json()
+
+    // test
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Vorgang']").fill("test Vorgang")
+    await page.getByLabel("Vorgang", { exact: true }).fill("test Vorgang")
     await page.getByLabel("Vorgang", { exact: true }).press("ArrowDown")
-    await page.getByLabel("dropdown-option").press("Enter")
+    await page.getByText("test Vorgang").press("Enter")
 
     await save(page)
 
-    await page.locator("[aria-label='Vorgang']").click()
+    await page.getByLabel("Vorgang", { exact: true }).click()
     await expect(
       page.locator("[aria-label='additional-dropdown-info']"),
     ).toBeVisible()
@@ -130,17 +143,23 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
       .analyze()
     expect(accessibilityScanResults.violations).toEqual([])
 
+    // cleanup docunit
+    const deleteDocunitResponse = await request.delete(
+      `/api/v1/caselaw/documentunits/${uuid}`,
+      {
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
+    expect(deleteDocunitResponse.ok()).toBeTruthy()
+
     // cleanup Vorgang again
-    const response = await page.request.get(
+    const procedureResponse = await page.request.get(
       `/api/v1/caselaw/procedure?sz=10&pg=0&q=${"test Vorgang"}`,
     )
-    const responseBody = await response.json()
-    const uuid = responseBody.content[0].id
+    const responseBody = await procedureResponse.json()
 
-    const cookies = await page.context().cookies()
-    const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
     const deleteResponse = await page.request.delete(
-      `/api/v1/caselaw/procedure/${uuid}`,
+      `/api/v1/caselaw/procedure/${responseBody.content[0].id}`,
       { headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" } },
     )
     expect(deleteResponse.ok()).toBeTruthy()

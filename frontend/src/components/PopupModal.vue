@@ -7,15 +7,17 @@ defineProps<{
   ariaLabel?: string
   headerText?: string
   contentText: string
-  confirmText: string
+  primaryButtonText: string
+  primaryButtonType?: ButtonType
+  secondaryButtonType?: ButtonType
+  secondaryButtonText?: string
   cancelButtonType?: ButtonType
-  cancelButtonText?: string
-  confirmButtonType?: ButtonType
 }>()
 
 defineEmits<{
   closeModal: []
-  confirmAction: []
+  primaryAction: []
+  secondaryAction: []
 }>()
 
 onMounted(() => {
@@ -69,16 +71,24 @@ onMounted(() => {
         class="modal-buttons-container flex w-full flex-row justify-end gap-[1rem]"
       >
         <TextButton
-          :aria-label="confirmText"
-          button-type="confirmButtonType"
-          :label="confirmText"
+          :aria-label="primaryButtonText"
+          :button-type="primaryButtonType"
+          :label="primaryButtonText"
           size="small"
-          @click="$emit('confirmAction')"
+          @click="$emit('primaryAction')"
         />
         <TextButton
-          :aria-label="cancelButtonText || 'Abbrechen'"
-          :button-type="cancelButtonType"
-          :label="cancelButtonText || 'Abbrechen'"
+          v-if="secondaryButtonText"
+          :aria-label="secondaryButtonText"
+          :button-type="secondaryButtonType"
+          :label="secondaryButtonText"
+          size="small"
+          @click="$emit('secondaryAction')"
+        />
+        <TextButton
+          aria-label="Abbrechen"
+          :button-type="cancelButtonType || 'tertiary'"
+          label="Abbrechen"
           size="small"
           @click="$emit('closeModal')"
         />

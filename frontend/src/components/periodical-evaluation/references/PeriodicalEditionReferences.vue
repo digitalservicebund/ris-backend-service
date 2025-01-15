@@ -1,5 +1,8 @@
 <script lang="ts" setup>
+import { UUID } from "crypto"
+import { useInterval } from "@vueuse/core"
 import { computed, ref, watch } from "vue"
+import { useRoute } from "vue-router"
 import PeriodicalEditionReferenceInput from "./PeriodicalEditionReferenceInput.vue"
 import PeriodicalEditionReferenceSummary from "./PeriodicalEditionReferenceSummary.vue"
 import EditableList from "@/components/EditableList.vue"
@@ -8,21 +11,28 @@ import TitleElement from "@/components/TitleElement.vue"
 import Reference from "@/domain/reference"
 import { ResponseError } from "@/services/httpClient"
 import { useEditionStore } from "@/stores/editionStore"
+import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 
+const route = useRoute()
 const store = useEditionStore()
 const responseError = ref<ResponseError | undefined>()
+const extraContentSidePanelStore = useExtraContentSidePanelStore()
+
+const loadEditionIntervalCounter = useInterval(10_000, {})
 
 const references = computed({
-  get: () => (store.edition ? (store.edition.references as Reference[]) : []),
-  set: (newValues) => {
-    store.edition!.references = newValues
+  get: () => store.edition?.references ?? [],
+  set: async (newValues) => {
+    await saveReferences(newValues)
+    extraContentSidePanelStore.togglePanel(false)
   },
 })
 
 const defaultValue = new Reference() as Reference
 
-watch(references, async () => {
-  const response = await store.updateEdition()
+async function saveReferences(references: Reference[]) {
+  store.edition!.references = references
+  const response = await store.saveEdition()
   if (response.error) {
     const message =
       "Fehler beim Speichern der Fundstellen. Bitte laden Sie die Seite neu."
@@ -30,6 +40,18 @@ watch(references, async () => {
     responseError.value = {
       title: message,
     }
+  }
+}
+
+/**
+ * A watch to load document every x times, to make sure user has the latest version of references
+ * which is critical for external changes
+ */
+watch(loadEditionIntervalCounter, async () => {
+  const editionId = route.params.editionId as string
+
+  if (editionId) {
+    await store.loadEdition(editionId as UUID)
   }
 })
 </script>

@@ -1,3 +1,4 @@
+import { UUID } from "crypto"
 import {
   createRouter,
   createWebHistory,
@@ -5,6 +6,7 @@ import {
 } from "vue-router"
 import authService from "./services/authService"
 import useSessionStore from "./stores/sessionStore"
+import { useEditionStore } from "@/stores/editionStore"
 import routes from "~pages"
 
 const router = createRouter({
@@ -38,6 +40,16 @@ export async function beforeEach(to: RouteLocationNormalized) {
   const session = useSessionStore()
   if (await session.isAuthenticated()) {
     followLocationCookie()
+
+    // Preload edition if `editionId` exists in route params
+    const editionStore = useEditionStore()
+    const editionId = to.params.editionId as string
+    if (editionId) {
+      const response = await editionStore.loadEdition(editionId as UUID)
+      if (response.error) {
+        to.meta.error = response.error.title
+      }
+    }
     return true
   } else {
     setLocationCookie(to.path)

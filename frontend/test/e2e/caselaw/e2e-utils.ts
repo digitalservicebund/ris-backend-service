@@ -1,13 +1,13 @@
 import { expect, Locator, Page, Request } from "@playwright/test"
 import { Browser } from "playwright"
 import { caselawTest as test } from "./fixtures"
-import { DocumentUnitCatagoriesEnum } from "@/components/enumDocumentUnitCatagories"
+import { DocumentUnitCategoriesEnum } from "@/components/enumDocumentUnitCategories"
 import SingleNorm from "@/domain/singleNorm"
 import { generateString } from "~/test-helper/dataGenerators"
 
 /* eslint-disable playwright/no-conditional-in-test */
 
-function scrollToID(category?: DocumentUnitCatagoriesEnum): string {
+function scrollToID(category?: DocumentUnitCategoriesEnum): string {
   return category ? "#" + category : ""
 }
 
@@ -50,7 +50,7 @@ export const navigateToCategories = async (
   page: Page,
   documentNumber: string,
   options?: {
-    category?: DocumentUnitCatagoriesEnum
+    category?: DocumentUnitCategoriesEnum
     skipAssert?: boolean
   },
 ) => {
@@ -79,7 +79,7 @@ export const navigateToReferences = async (
     const baseUrl = `/caselaw/documentunit/${documentNumber}/references`
 
     await page.goto(baseUrl)
-    await expect(page.getByText("Periodikum")).toBeVisible()
+    await expect(page.getByLabel("Periodikum", { exact: true })).toBeVisible()
   })
 }
 
@@ -177,14 +177,14 @@ export const handoverDocumentationUnit = async (
   page: Page,
   documentNumber: string,
 ) => {
-  await navigateToHandover(page, documentNumber)
-  await expect(page.getByText("XML Vorschau")).toBeVisible()
-  await page
-    .locator("[aria-label='Dokumentationseinheit an jDV übergeben']")
-    .click()
-  await expect(page.getByText("Email wurde versendet")).toBeVisible()
+  await test.step(`Übergebe Dokumentationseinheit ${documentNumber}`, async () => {
+    await navigateToHandover(page, documentNumber)
+    await expect(page.getByText("XML Vorschau")).toBeVisible()
+    await page.getByLabel("Dokumentationseinheit an jDV übergeben").click()
+    await expect(page.getByText("Email wurde versendet")).toBeVisible()
 
-  await expect(page.getByText("Xml Email Abgabe -")).toBeVisible()
+    await expect(page.getByText("Xml Email Abgabe -")).toBeVisible()
+  })
 }
 
 export const uploadTestfile = async (
@@ -214,10 +214,6 @@ export async function save(page: Page) {
   await page.locator("[aria-label='Speichern Button']").click()
   await saveRequest
   await expect(page.getByText(`Zuletzt`).first()).toBeVisible()
-}
-
-export async function toggleFieldOfLawSection(page: Page): Promise<void> {
-  await page.getByText("Sachgebiete").click()
 }
 
 export async function deleteDocumentUnit(page: Page, documentNumber: string) {
@@ -259,6 +255,10 @@ export async function documentUnitExists(
   ).includes("uuid")
 }
 
+/**
+ * @deprecated
+ * Use playwright's toHaveValue instead: e.g. <pre>page.getByLabel("Gericht").toHaveValue("BGH")</pre>
+ */
 export async function waitForInputValue(
   page: Page,
   selector: string,
@@ -615,7 +615,10 @@ export async function getRequest(url: string, page: Page): Promise<Request> {
 export async function clickCategoryButton(testId: string, page: Page) {
   await test.step(`click '${testId}' button to open category`, async () => {
     const button = page.getByRole("button", { name: testId, exact: true })
-    await button.click()
+
+    if (await button.isVisible()) {
+      await button.click()
+    }
     await expect(page.getByTestId(testId)).toBeVisible()
   })
 }
@@ -652,4 +655,19 @@ export async function deleteAllProcedures(
     const uuid = procedure.id
     await deleteProcedure(page, uuid)
   }
+}
+
+export async function searchForDocUnitWithFileNumberAndDecisionDate(
+  page: Page,
+  fileNumber: string,
+  date: string,
+) {
+  await fillInput(page, "Gericht", "AG Aachen")
+  await page.getByText("AG Aachen", { exact: true }).click()
+  await fillInput(page, "Aktenzeichen", fileNumber)
+  await fillInput(page, "Entscheidungsdatum", date)
+  await fillInput(page, "Dokumenttyp", "AnU")
+  await page.getByText("Anerkenntnisurteil", { exact: true }).click()
+
+  await page.getByText("Suchen").click()
 }

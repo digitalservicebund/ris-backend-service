@@ -14,7 +14,7 @@ const listWithEntries = ref<DummyListItem[]>([
 ])
 
 function summerizer(dataEntry: EditableListItem) {
-  return h("div", { class: ["ds-label-01-reg"] }, dataEntry.renderDecision)
+  return h("div", { class: ["ds-label-01-reg"] }, dataEntry.renderSummary)
 }
 
 const SummaryComponent = withSummarizer(summerizer)

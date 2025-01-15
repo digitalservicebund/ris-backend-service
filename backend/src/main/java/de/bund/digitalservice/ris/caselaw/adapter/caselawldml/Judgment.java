@@ -20,7 +20,7 @@ public class Judgment {
   private Meta meta;
 
   @XmlElement(name = "header", namespace = CaseLawLdml.AKN_NS)
-  private Header header;
+  private JaxbHtml header;
 
   @XmlElement(name = "judgmentBody", namespace = CaseLawLdml.AKN_NS)
   private JudgmentBody judgmentBody;

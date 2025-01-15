@@ -34,6 +34,7 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
@@ -110,6 +111,7 @@ class ActiveCitationIntegrationTest {
   @MockBean private HandoverService handoverService;
   @MockBean private ProcedureService procedureService;
   @MockBean private LdmlExporterService ldmlExporterService;
+  @MockBean private DuplicateCheckService duplicateCheckService;
 
   @MockBean
   private DocumentationUnitDocxMetadataInitializationService
@@ -431,10 +433,9 @@ class ActiveCitationIntegrationTest {
         .isOk()
         .expectBody(DocumentationUnit.class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
-                  .hasSize(2);
-            });
+            response ->
+                assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                    .hasSize(2));
   }
 
   @Test
@@ -485,10 +486,9 @@ class ActiveCitationIntegrationTest {
         .isOk()
         .expectBody(DocumentationUnit.class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
-                  .hasSize(1);
-            });
+            response ->
+                assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                    .hasSize(1));
   }
 
   @Test
@@ -536,10 +536,9 @@ class ActiveCitationIntegrationTest {
         .isOk()
         .expectBody(DocumentationUnit.class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
-                  .hasSize(1);
-            });
+            response ->
+                assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                    .hasSize(1));
   }
 
   @Test
@@ -579,10 +578,9 @@ class ActiveCitationIntegrationTest {
         .isOk()
         .expectBody(DocumentationUnit.class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
-                  .isEmpty();
-            });
+            response ->
+                assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                    .isEmpty());
   }
 
   @Test
@@ -1209,9 +1207,8 @@ class ActiveCitationIntegrationTest {
         .isOk()
         .expectBody(DocumentationUnit.class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
-                  .hasSize(1);
-            });
+            response ->
+                assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                    .hasSize(1));
   }
 }

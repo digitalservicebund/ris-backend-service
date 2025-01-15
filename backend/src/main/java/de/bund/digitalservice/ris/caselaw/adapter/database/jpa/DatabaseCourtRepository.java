@@ -61,7 +61,7 @@ public interface DatabaseCourtRepository extends JpaRepository<CourtDTO, UUID> {
                       ORDER BY
                         weight,
                         label
-                      LIMIT 10
+                      LIMIT :size
                       """)
-  List<CourtDTO> findBySearchStr(@Param("searchStr") String searchStr);
+  List<CourtDTO> findBySearchStr(@Param("searchStr") String searchStr, @Param("size") Integer size);
 }

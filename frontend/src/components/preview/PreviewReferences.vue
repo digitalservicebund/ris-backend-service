@@ -10,55 +10,33 @@ const props = defineProps<{
 }>()
 
 const primaryReferences = computed(() =>
-  props.references?.filter(
-    (reference) => reference.legalPeriodical?.primaryReference,
-  ),
+  props.references?.filter((reference) => reference.primaryReference),
 )
 const secondaryReferences = computed(() =>
-  props.references?.filter(
-    (reference) => !reference.legalPeriodical?.primaryReference,
-  ),
+  props.references?.filter((reference) => !reference.primaryReference),
 )
 </script>
 
 <template>
   <PreviewRow
-    v-if="props.references && props.references.length > 0"
-    data-testid="references-preview"
+    v-if="primaryReferences && primaryReferences.length > 0"
+    data-testid="primary-references-preview"
   >
-    <PreviewCategory>Fundstellen</PreviewCategory>
+    <PreviewCategory>Primäre Fundstellen</PreviewCategory>
     <PreviewContent>
-      <div v-if="primaryReferences && primaryReferences.length > 0">
-        <span class="ds-body-01-bold">Primäre Fundstellen</span>
-
-        <div
-          v-for="item in primaryReferences"
-          :key="item.legalPeriodical?.uuid"
-        >
-          {{ item.renderDecision }}
-        </div>
+      <div v-for="item in primaryReferences" :key="item.id">
+        {{ item.renderSummary }}
       </div>
-      <div
-        v-if="
-          primaryReferences &&
-          primaryReferences.length > 0 &&
-          secondaryReferences &&
-          secondaryReferences.length > 0
-        "
-      >
-        <br />
-      </div>
-      <div
-        v-if="secondaryReferences && secondaryReferences.length > 0"
-        class="pt-4"
-      >
-        <span class="ds-body-01-bold">Sekundäre Fundstellen</span>
-        <div
-          v-for="item in secondaryReferences"
-          :key="item.legalPeriodical?.uuid"
-        >
-          {{ item.renderDecision }}
-        </div>
+    </PreviewContent>
+  </PreviewRow>
+  <PreviewRow
+    v-if="secondaryReferences && secondaryReferences.length > 0"
+    data-testid="secondary-references-preview"
+  >
+    <PreviewCategory>Sekundäre Fundstellen</PreviewCategory>
+    <PreviewContent>
+      <div v-for="item in secondaryReferences" :key="item.id">
+        {{ item.renderSummary }}
       </div>
     </PreviewContent>
   </PreviewRow>

@@ -1,10 +1,10 @@
 import { expect } from "@playwright/test"
 import {
-  navigateToPreview,
-  navigateToHandover,
-  save,
-  navigateToReferences,
   fillInput,
+  navigateToHandover,
+  navigateToPreview,
+  navigateToReferences,
+  save,
   waitForInputValue,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
@@ -21,7 +21,7 @@ test.describe(
   },
   () => {
     test(
-      "Display, adding, editing and deleting multiple references",
+      "Display, adding, editing and deleting references",
       {
         annotation: {
           type: "story",
@@ -192,7 +192,7 @@ test.describe(
     )
 
     test(
-      "References input validated against required fields",
+      "References input is validated against required fields",
       {
         annotation: {
           type: "story",
@@ -245,15 +245,70 @@ test.describe(
     )
 
     test(
-      "References are visible in preview",
+      "Literature references input is validated against required fields",
       {
-        annotation: {
-          type: "story",
-          description:
-            "https://digitalservicebund.atlassian.net/browse/RISDEV-4335",
-        },
+        tag: ["@RISDEV-5236", "@RISDEV-5454", "@RISDEV-5240"],
       },
-      async ({ page, documentNumber }) => {
+      async ({ page, prefilledDocumentUnit }) => {
+        await navigateToReferences(
+          page,
+          prefilledDocumentUnit.documentNumber ?? "",
+        )
+
+        await test.step("Literature references are validated for required inputs", async () => {
+          await expect(
+            page.locator("[aria-label='Literaturfundstelle speichern']"),
+          ).toBeDisabled()
+
+          await fillInput(page, "Periodikum Literaturfundstelle", "AllMBl")
+          await page
+            .getByText("AllMBl | Allgemeines Ministerialblatt", {
+              exact: true,
+            })
+            .click()
+          await waitForInputValue(
+            page,
+            "[aria-label='Periodikum Literaturfundstelle']",
+            "AllMBl",
+          )
+          await fillInput(page, "Zitatstelle Literaturfundstelle", "2024, 2")
+
+          await page
+            .locator("[aria-label='Literaturfundstelle speichern']")
+            .click()
+          // check that both fields display error message
+          await expect(
+            page.locator("text=Pflichtfeld nicht befüllt"),
+          ).toHaveCount(2)
+
+          await fillInput(page, "Autor Literaturfundstelle", "Einstein, Albert")
+
+          await expect(
+            page.locator("text=Pflichtfeld nicht befüllt"),
+          ).toHaveCount(1)
+
+          await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
+          await page.getByText("Ean", { exact: true }).click()
+          await waitForInputValue(
+            page,
+            "[aria-label='Dokumenttyp Literaturfundstelle']",
+            "Anmerkung",
+          )
+
+          await expect(
+            page.locator("text=Pflichtfeld nicht befüllt"),
+          ).toBeHidden()
+        })
+      },
+    )
+
+    test(
+      "References are visible in preview and jDV export",
+      {
+        tag: ["@RISDEV-4337", "@RISDEV-4337"],
+      },
+      async ({ page, prefilledDocumentUnit }) => {
+        const documentNumber = prefilledDocumentUnit.documentNumber!
         await test.step("References are not rendered in preview when empty", async () => {
           await navigateToPreview(page, documentNumber)
           await expect(page.getByText("Fundstellen")).toBeHidden()
@@ -261,7 +316,7 @@ test.describe(
 
         await navigateToReferences(page, documentNumber)
 
-        await test.step("Add primary and secondary references with all data, verify remdering in preview", async () => {
+        await test.step("Add primary and secondary references with all data", async () => {
           await fillInput(page, "Periodikum", "wdg")
           await page
             .getByText("WdG | Welt der Gesundheitsversorgung", {
@@ -294,65 +349,22 @@ test.describe(
             }),
           ).toBeVisible()
         })
+
         await save(page)
 
-        await navigateToPreview(page, documentNumber)
-
-        await expect(
-          page.getByText("Primäre FundstellenGVBl BB 2020, 01-99 (L)"),
-        ).toBeVisible()
-        await expect(
-          page.getByText("Sekundäre FundstellenWdG 2024, 10-12 (LT)"),
-        ).toBeVisible()
-      },
-    )
-
-    test(
-      "References can be exported",
-      {
-        annotation: {
-          type: "story",
-          description:
-            "https://digitalservicebund.atlassian.net/browse/RISDEV-4337",
-        },
-      },
-      async ({ page, prefilledDocumentUnit }) => {
-        await navigateToReferences(
-          page,
-          prefilledDocumentUnit.documentNumber ?? "",
-        )
-
-        await test.step("Add primary and secondary references with all data", async () => {
-          await fillInput(page, "Periodikum", "wdg")
-          await page
-            .getByText("WdG | Welt der Gesundheitsversorgung", {
-              exact: true,
-            })
-            .click()
-          await fillInput(page, "Zitatstelle", "2024, 10-12")
-          await fillInput(page, "Klammernzusatz", "LT")
-          await page.locator("[aria-label='Fundstelle speichern']").click()
-          await expect(page.getByText("WdG 2024, 10-12 (LT)")).toBeVisible()
+        await test.step("Verify rendering in preview", async () => {
+          await navigateToPreview(page, documentNumber)
+          await expect(page.getByText("Literaturfundstellen")).toBeHidden()
           await expect(
-            page.getByText("sekundär", { exact: true }),
+            page.getByText("Primäre FundstellenGVBl BB 2020, 01-99 (L)"),
           ).toBeVisible()
-          await fillInput(page, "Periodikum", "GVBl BB")
-          await page
-            .getByText(
-              "GVBl BB | Gesetz- und Verordnungsblatt für das Land Brandenburg",
-              { exact: true },
-            )
-            .click()
-          await fillInput(page, "Zitatstelle", "2020, 01-99")
-          await fillInput(page, "Klammernzusatz", "L")
-          await page.locator("[aria-label='Fundstelle speichern']").click()
-          await expect(page.getByText("GVBl BB 2020, 01-99 (L)")).toBeVisible()
-          await expect(page.getByText("primär", { exact: true })).toBeVisible()
+          await expect(
+            page.getByText("Sekundäre FundstellenWdG 2024, 10-12 (LT)"),
+          ).toBeVisible()
         })
-        await save(page)
 
-        await test.step("Navigate to handover, click in 'XML-Vorschau', check references are visible in correct order", async () => {
-          await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
+        await test.step("Verify references are exported in correct order", async () => {
+          await navigateToHandover(page, documentNumber)
           await expect(page.getByText("XML Vorschau")).toBeVisible()
           await page.getByText("XML Vorschau").click()
 
@@ -384,6 +396,129 @@ test.describe(
           )
           await expect(citationNodes[1]).toHaveText(
             "<zitstelle>2020, 01-99 (L)</zitstelle>",
+          )
+        })
+      },
+    )
+
+    test(
+      "Literature references can be saved and are visible in preview",
+      {
+        tag: ["@RISDEV-5240", "@RISDEV-5242", "@RISDEV-5670"],
+      },
+      async ({ page, documentNumber }) => {
+        await test.step("References are not rendered in preview when empty", async () => {
+          await navigateToPreview(page, documentNumber)
+          await expect(page.getByText("Literaturfundstellen")).toBeHidden()
+        })
+
+        await test.step("Literature references are located in a dedicated editable list", async () => {
+          await navigateToReferences(page, documentNumber)
+          await expect(
+            page.getByText("Literaturfundstellen", { exact: true }),
+          ).toBeVisible()
+        })
+
+        await test.step("Add literature reference, verify rendering in editable list", async () => {
+          await fillInput(page, "Periodikum Literaturfundstelle", "AllMBl")
+          await page
+            .getByText("AllMBl | Allgemeines Ministerialblatt", {
+              exact: true,
+            })
+            .click()
+          await waitForInputValue(
+            page,
+            "[aria-label='Periodikum Literaturfundstelle']",
+            "AllMBl",
+          )
+          await fillInput(page, "Zitatstelle Literaturfundstelle", "2024, 2")
+          await fillInput(page, "Autor Literaturfundstelle", "Bilen, Ulviye")
+          await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
+          await page.getByText("Ean", { exact: true }).click()
+          await waitForInputValue(
+            page,
+            "[aria-label='Dokumenttyp Literaturfundstelle']",
+            "Anmerkung",
+          )
+
+          await page
+            .locator("[aria-label='Literaturfundstelle speichern']")
+            .click()
+          await expect(
+            page.getByText("AllMBl 2024, 2, Bilen, Ulviye, (Ean)"),
+          ).toBeVisible()
+        })
+
+        await test.step("Verify rendering in preview", async () => {
+          await page.keyboard.press("v")
+
+          const preview = page.locator(
+            '[data-testid="literature-references-preview"]',
+          )
+
+          await expect(preview.getByText("Literaturfundstellen")).toBeVisible()
+          await expect(
+            preview.getByText("Fundstellen", { exact: true }),
+          ).toBeHidden()
+
+          await expect(
+            preview.getByText("AllMBl 2024, 2, Bilen, Ulviye, (Ean)"),
+          ).toBeVisible()
+        })
+
+        await test.step("Add second literature reference, verify it is added at the bottom", async () => {
+          await fillInput(page, "Periodikum Literaturfundstelle", "GVBl BB")
+          await page
+            .getByText(
+              "GVBl BB | Gesetz- und Verordnungsblatt für das Land Brandenburg",
+              {
+                exact: true,
+              },
+            )
+            .click()
+          await waitForInputValue(
+            page,
+            "[aria-label='Periodikum Literaturfundstelle']",
+            "GVBl BB",
+          )
+          await fillInput(
+            page,
+            "Zitatstelle Literaturfundstelle",
+            "01/2025, 4-6",
+          )
+          await fillInput(page, "Autor Literaturfundstelle", "Kästner, Erich")
+          await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ebs")
+          await page.getByText("Ebs", { exact: true }).click()
+          await waitForInputValue(
+            page,
+            "[aria-label='Dokumenttyp Literaturfundstelle']",
+            "Entscheidungsbesprechung",
+          )
+
+          await page
+            .locator("[aria-label='Literaturfundstelle speichern']")
+            .click()
+        })
+
+        await test.step("Verify second literature citation it is added at the bottom of editable list", async () => {
+          await expect(page.getByLabel("Listen Eintrag").nth(1)).toHaveText(
+            "AllMBl 2024, 2, Bilen, Ulviye, (Ean)primär",
+          )
+          await expect(page.getByLabel("Listen Eintrag").nth(2)).toHaveText(
+            "GVBl BB 01/2025, 4-6, Kästner, Erich, (Ebs)primär",
+          )
+        })
+
+        await test.step("Verify second literature citation it is added at the bottom of preview", async () => {
+          const literatureReferencesPreview = page.locator(
+            '[data-testid="literature-references-preview"]',
+          )
+          const texts = await literatureReferencesPreview.textContent()
+
+          // Make sure the literature citations are in the correct order
+          expect(texts).toContain(
+            "AllMBl 2024, 2, Bilen, Ulviye, (Ean)" +
+              "GVBl BB 01/2025, 4-6, Kästner, Erich, (Ebs)",
           )
         })
       },

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from "vue"
+import { type Component, computed } from "vue"
 import Tooltip from "./Tooltip.vue"
 import IconChevronLeft from "~icons/ic/baseline-chevron-left"
 import IconChevronRight from "~icons/ic/baseline-chevron-right"
@@ -9,6 +9,8 @@ interface Props {
   openingDirection?: OpeningDirection
   label?: string
   shortcut?: string
+  icon?: Component
+  customButtonClasses?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -16,6 +18,8 @@ const props = withDefaults(defineProps<Props>(), {
   openingDirection: OpeningDirection.RIGHT,
   label: "side toggle",
   shortcut: undefined,
+  icon: undefined,
+  customButtonClasses: "",
 })
 
 const emit = defineEmits<{
@@ -33,6 +37,7 @@ const classes = computed(() => ({
 const buttonClasses = computed(() => ({
   "right-0 -mr-16": props.openingDirection == OpeningDirection.RIGHT,
   "left-0 -ml-16": props.openingDirection == OpeningDirection.LEFT,
+  [props.customButtonClasses]: props.customButtonClasses,
 }))
 
 const toggle = () => {
@@ -60,8 +65,9 @@ export enum OpeningDirection {
         class="w-icon relative flex min-h-32 min-w-32 items-center justify-center rounded-full border-1 border-solid border-gray-400 bg-white text-gray-900"
         @click="toggle"
       >
+        <component :is="icon" v-if="icon" class="text-blue-800" />
         <IconChevronLeft
-          v-if="
+          v-else-if="
             props.openingDirection === OpeningDirection.LEFT
               ? !isExpanded
               : isExpanded

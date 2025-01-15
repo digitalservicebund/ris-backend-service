@@ -60,8 +60,10 @@ test.describe(
       })
 
       await test.step("check if text is exported with blockquote", async () => {
-        const exportedBlockquote = `<blockquote>34                        <p>Abschnitt</p>35                    </blockquote>`
-        expect(await page.getByTestId("code-snippet").textContent()).toContain(
+        const exportedBlockquote =
+          /<blockquote>\s*\d*\s*<p>Abschnitt<\/p>\s*\d*\s*<\/blockquote>/
+
+        expect(await page.getByTestId("code-snippet").textContent()).toMatch(
           exportedBlockquote,
         )
       })
@@ -118,10 +120,12 @@ test.describe(
       })
 
       await test.step("check if text is exported without blockquote", async () => {
-        const exportedBlockquote = `<blockquote>34                        <p>Abschnitt</p>35                    </blockquote>`
+        const exportedBlockquote =
+          /<blockquote>\s*\d*\s*<p>Abschnitt<\/p>\s*\d*\s*<\/blockquote>/
+
         expect(
           await page.getByTestId("code-snippet").textContent(),
-        ).not.toContain(exportedBlockquote)
+        ).not.toMatch(exportedBlockquote)
         expect(await page.getByTestId("code-snippet").textContent()).toContain(
           `<p>Abschnitt</p>`,
         )
@@ -175,8 +179,10 @@ test.describe(
       })
 
       await test.step("check if text is exported with blockquote", async () => {
-        const exportedBlockquote = `<blockquote>34                        <p>Abschnitt</p>35                    </blockquote>`
-        expect(await page.getByTestId("code-snippet").textContent()).toContain(
+        const exportedBlockquote =
+          /<blockquote>\s*\d*\s*<p>Abschnitt<\/p>\s*\d*\s*<\/blockquote>/
+
+        expect(await page.getByTestId("code-snippet").textContent()).toMatch(
           exportedBlockquote,
         )
       })

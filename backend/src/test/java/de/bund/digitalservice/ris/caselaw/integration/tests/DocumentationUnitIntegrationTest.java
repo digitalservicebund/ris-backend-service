@@ -54,6 +54,7 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.AuthService;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.DateUtil;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParameters;
@@ -61,6 +62,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataIn
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.MailService;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
@@ -77,8 +79,6 @@ import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.net.URI;
 import java.time.LocalDate;
-import java.time.Year;
-import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -160,6 +160,7 @@ class DocumentationUnitIntegrationTest {
   @MockBean private HandoverService handoverService;
   @MockBean private LdmlExporterService ldmlExporterService;
   @MockBean private DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
+  @MockBean private DuplicateCheckService duplicateCheckService;
 
   @MockBean
   private DocumentationUnitDocxMetadataInitializationService
@@ -216,7 +217,7 @@ class DocumentationUnitIntegrationTest {
     when(documentNumberPatternConfig.getDocumentNumberPatterns())
         .thenReturn(Map.of("DS", "XXRE0******YY"));
 
-    var court = databaseCourtRepository.findBySearchStr("AG Aachen").get(0);
+    var court = databaseCourtRepository.findBySearchStr("AG Aachen", 100).getFirst();
 
     risWebTestClient
         .withDefaultLogin()
@@ -280,10 +281,7 @@ class DocumentationUnitIntegrationTest {
         .expectStatus()
         .isOk()
         .expectBody(String.class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-            });
+        .consumeWith(response -> assertThat(response.getResponseBody()).isNotNull());
 
     assertThat(repository.findAll()).isEmpty();
 
@@ -1039,18 +1037,20 @@ class DocumentationUnitIntegrationTest {
         DeletedDocumentationUnitDTO.builder()
             .abbreviation("DS")
             .documentNumber("ZZRE202400001")
-            .year(Year.of(LocalDate.now().get(ChronoField.YEAR)))
+            .year(DateUtil.getYear())
             .build();
     deletedDocumentationIdsRepository.save(deletedDocumentationUnitDTO);
 
     when(documentNumberPatternConfig.getDocumentNumberPatterns())
         .thenReturn(Map.of("DS", "ZZREYYYY*****"));
-    when(databaseDocumentNumberRepository.findById("DS"))
+    when(databaseDocumentNumberRepository.findByDocumentationOfficeAbbreviationAndYear(
+            "DS", DateUtil.getYear()))
         .thenReturn(
             Optional.of(
                 DocumentNumberDTO.builder()
                     .documentationOfficeAbbreviation("DS")
                     .lastNumber(1)
+                    .year(DateUtil.getYear())
                     .build()));
 
     risWebTestClient

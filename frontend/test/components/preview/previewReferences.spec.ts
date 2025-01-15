@@ -21,44 +21,66 @@ describe("preview references", () => {
     "exclude references if null or empty",
     async (references?: Reference[]) => {
       renderComponent(references)
-      expect(screen.queryByTestId("references-preview")).not.toBeInTheDocument()
+      expect(
+        screen.queryByTestId("primary-references-preview"),
+      ).not.toBeInTheDocument()
+      expect(
+        screen.queryByTestId("secondary-references-preview"),
+      ).not.toBeInTheDocument()
     },
   )
 
   it.each([
     [
-      "FundstellenPrimäre FundstellenABC 2006, S.3",
+      "Primäre FundstellenABC 2006, S.3",
       [
         new Reference({
           citation: "2006, S.3",
+          primaryReference: true,
           legalPeriodical: {
             abbreviation: "ABC",
-            primaryReference: true,
           },
         }),
       ],
     ],
     [
-      "FundstellenPrimäre FundstellenABC 2006, S.3XYZ 2007, S.4",
+      "Primäre FundstellenABC 2006, S.3XYZ 2007, S.4",
       [
         new Reference({
           citation: "2006, S.3",
+          primaryReference: true,
           legalPeriodical: {
             abbreviation: "ABC",
-            primaryReference: true,
           },
         }),
         new Reference({
           citation: "2007, S.4",
+          primaryReference: true,
           legalPeriodical: {
             abbreviation: "XYZ",
-            primaryReference: true,
           },
         }),
       ],
     ],
+  ])(
+    `renders primary references %s in preview`,
+    async (expected: string, references: Reference[]) => {
+      renderComponent(references)
+      expect(
+        screen.getByTestId("primary-references-preview"),
+      ).toBeInTheDocument()
+      expect(
+        screen.queryByTestId("secondary-references-preview"),
+      ).not.toBeInTheDocument()
+      expect(
+        screen.getByTestId("primary-references-preview"),
+      ).toHaveTextContent(expected)
+    },
+  )
+
+  it.each([
     [
-      "FundstellenSekundäre FundstellenDEF 2008, S.5",
+      "Sekundäre FundstellenDEF 2008, S.5",
       [
         new Reference({
           citation: "2008, S.5",
@@ -70,17 +92,17 @@ describe("preview references", () => {
       ],
     ],
     [
-      "FundstellenPrimäre FundstellenABC 2006, S.3Sekundäre FundstellenDEF 2008, S.5",
+      "Sekundäre FundstellenDEF 2009, S.5DEF 2009, S.8",
       [
         new Reference({
-          citation: "2006, S.3",
+          citation: "2009, S.5",
           legalPeriodical: {
-            abbreviation: "ABC",
-            primaryReference: true,
+            abbreviation: "DEF",
+            primaryReference: false,
           },
         }),
         new Reference({
-          citation: "2008, S.5",
+          citation: "2009, S.8",
           legalPeriodical: {
             abbreviation: "DEF",
             primaryReference: false,
@@ -89,13 +111,18 @@ describe("preview references", () => {
       ],
     ],
   ])(
-    `renders references %s in preview`,
+    `renders secondary references %s in preview`,
     async (expected: string, references: Reference[]) => {
       renderComponent(references)
-      expect(screen.getByTestId("references-preview")).toBeInTheDocument()
-      expect(screen.getByTestId("references-preview")).toHaveTextContent(
-        expected,
-      )
+      expect(
+        screen.queryByTestId("primary-references-preview"),
+      ).not.toBeInTheDocument()
+      expect(
+        screen.getByTestId("secondary-references-preview"),
+      ).toBeInTheDocument()
+      expect(
+        screen.getByTestId("secondary-references-preview"),
+      ).toHaveTextContent(expected)
     },
   )
 })

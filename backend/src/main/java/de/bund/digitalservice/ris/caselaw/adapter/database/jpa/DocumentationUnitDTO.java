@@ -15,10 +15,12 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderBy;
+import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -56,6 +58,15 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
 
   @Column(name = "decision_date")
   private LocalDate decisionDate;
+
+  @Column(name = "last_publication_date_time")
+  private LocalDateTime lastPublicationDateTime;
+
+  @Column(name = "scheduled_publication_date_time")
+  private LocalDateTime scheduledPublicationDateTime;
+
+  @Column(name = "scheduled_by_email")
+  private String scheduledByEmail;
 
   @Column(name = "decision_grounds")
   private String decisionGrounds;
@@ -127,13 +138,19 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @Column(name = "dissenting_opinion")
   private String dissentingOpinion;
 
-  @OneToMany(
-      mappedBy = "documentationUnit",
-      orphanRemoval = true,
-      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  @OrderBy("rank")
+  @OneToMany
+  @JoinTable(
+      name = "documentation_unit_procedure",
+      schema = "incremental_migration",
+      joinColumns = @JoinColumn(name = "documentation_unit_id"),
+      inverseJoinColumns = @JoinColumn(name = "procedure_id"))
+  @OrderColumn(name = "rank")
   @Builder.Default
-  private List<DocumentationUnitProcedureDTO> procedures = new ArrayList<>();
+  private List<ProcedureDTO> procedureHistory = new ArrayList<>();
+
+  @OneToOne
+  @JoinColumn(name = "current_procedure_id")
+  private ProcedureDTO procedure;
 
   @ManyToMany(
       cascade = {CascadeType.MERGE},
@@ -285,25 +302,30 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @OrderBy("rank")
   private List<ReferenceDTO> references = new ArrayList<>();
 
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(mappedBy = "documentationUnit", cascade = CascadeType.ALL, orphanRemoval = true)
+  @Builder.Default
+  @OrderBy("rank")
+  private List<DependentLiteratureCitationDTO> dependentLiteratureCitations = new ArrayList<>();
+
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @OrderBy("rank")
   @Builder.Default
   private List<JobProfileDTO> jobProfiles = new ArrayList<>();
 
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @OrderBy("rank")
   @Builder.Default
   private List<DismissalGroundsDTO> dismissalGrounds = new ArrayList<>();
 
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @OrderBy("rank")
   @Builder.Default
   private List<DismissalTypesDTO> dismissalTypes = new ArrayList<>();
 
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @OrderBy("rank")
   @Builder.Default
@@ -312,9 +334,28 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @Column(name = "legislative_mandate")
   private boolean hasLegislativeMandate;
 
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @OrderBy("rank")
   @Builder.Default
   private List<ParticipatingJudgeDTO> participatingJudges = new ArrayList<>();
+
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "documentation_unit_id1", updatable = false, insertable = false)
+  @Builder.Default
+  private Set<DuplicateRelationDTO> duplicateRelations1 = new HashSet<>();
+
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "documentation_unit_id2", updatable = false, insertable = false)
+  @Builder.Default
+  private Set<DuplicateRelationDTO> duplicateRelations2 = new HashSet<>();
+
+  /**
+   * @deprecated This field represents the "Dupcode ausschalten" functionality from the jDV. It is
+   *     set to false in the migration if the duplication check should be ignored. After the jDV has
+   *     been deactivated, this field will not be needed anymore.
+   */
+  @Column(name = "duplicate_check")
+  @Deprecated(forRemoval = true)
+  private Boolean isJdvDuplicateCheckActive;
 }

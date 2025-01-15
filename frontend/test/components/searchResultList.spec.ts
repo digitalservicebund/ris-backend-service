@@ -69,7 +69,7 @@ describe("Search result list", () => {
   it("renders correctly", async () => {
     renderSearchResults()
 
-    expect(await screen.findByText("fooLabel")).toBeVisible()
+    expect(await screen.findByText(/fooLabel/)).toBeVisible()
     expect(await screen.findByText("fooDocumentNumber")).toBeVisible()
 
     expect(await screen.findByTestId("add-decision-button")).toBeVisible()
@@ -107,7 +107,7 @@ describe("Search result list", () => {
   it("clicking on 'Übernehmen' emits link decision event", async () => {
     const { user, emitted } = renderSearchResults()
 
-    expect(await screen.findByText("fooLabel")).toBeVisible()
+    expect(await screen.findByText(/fooLabel/)).toBeVisible()
     expect(await screen.findByText("fooDocumentNumber")).toBeVisible()
 
     expect(await screen.findByTestId("add-decision-button")).toBeVisible()

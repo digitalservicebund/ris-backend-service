@@ -1,3 +1,4 @@
+import dayjs from "dayjs"
 import ActiveCitation from "./activeCitation"
 import DocumentationOffice from "./documentationOffice"
 import DocumentUnitListEntry from "./documentUnitListEntry"
@@ -109,6 +110,12 @@ export const longTextLabels: {
   outline: "Gliederung",
 }
 
+export type ManagementData = {
+  scheduledPublicationDateTime?: string
+  scheduledByEmail?: string
+  borderNumbers: string[]
+}
+
 export type DocumentationUnitParameters = {
   documentationOffice?: DocumentationOffice
   documentType?: DocumentType
@@ -131,10 +138,11 @@ export default class DocumentUnit {
   public previousDecisions?: PreviousDecision[]
   public ensuingDecisions?: EnsuingDecision[]
   public contentRelatedIndexing: ContentRelatedIndexing = {}
-  public borderNumbers: string[] = []
   public note: string = ""
   public references?: Reference[]
+  public literatureReferences?: Reference[]
   public isEditable: boolean = false
+  public managementData: ManagementData = { borderNumbers: [] }
 
   static readonly requiredFields = [
     "fileNumbers",
@@ -166,6 +174,15 @@ export default class DocumentUnit {
     for (longTextsField in data.longTexts) {
       if (data.longTexts && data.longTexts[longTextsField] === null)
         delete data.longTexts[longTextsField]
+    }
+
+    let managementDataField: keyof ManagementData
+    for (managementDataField in data.managementData) {
+      if (
+        data.managementData &&
+        data.managementData[managementDataField] === null
+      )
+        delete data.managementData[managementDataField]
     }
 
     if (data.longTexts?.participatingJudges)
@@ -218,11 +235,29 @@ export default class DocumentUnit {
         (reference) => new Reference({ ...reference }),
       )
 
+    if (data.literatureReferences)
+      data.literatureReferences = data.literatureReferences.map(
+        (literatureReference) => new Reference({ ...literatureReference }),
+      )
+
     Object.assign(this, data)
   }
 
   get hasAttachments(): boolean {
     return this.attachments && this.attachments.length > 0
+  }
+
+  get renderSummary(): string {
+    return [
+      this.coreData.court?.label,
+      this.coreData.decisionDate
+        ? dayjs(this.coreData.decisionDate).format("DD.MM.YYYY")
+        : null,
+      this.coreData.fileNumbers ? this.coreData.fileNumbers[0] : null,
+      this.coreData.documentType?.label,
+    ]
+      .filter(Boolean)
+      .join(", ")
   }
 
   get missingRequiredFields() {

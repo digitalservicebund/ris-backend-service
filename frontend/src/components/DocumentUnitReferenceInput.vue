@@ -39,24 +39,27 @@ const legalPeriodical = computed({
     const legalPeriodical = { ...newValue } as LegalPeriodical
     if (newValue) {
       reference.value.legalPeriodical = legalPeriodical
+      reference.value.legalPeriodicalRawValue = legalPeriodical.abbreviation
+      reference.value.primaryReference = legalPeriodical.primaryReference
     } else {
       reference.value.legalPeriodical = undefined
+      reference.value.legalPeriodicalRawValue = undefined
+      reference.value.primaryReference = undefined
     }
   },
 })
 
 async function validateRequiredInput() {
   validationStore.reset()
-  reference.value.missingRequiredFields.forEach((missingField) =>
+  reference.value.missingRequiredFieldsForDocunit.forEach((missingField) =>
     validationStore.add("Pflichtfeld nicht befüllt", missingField),
   )
-  validationStore.remove("referenceSupplement")
 }
 
 async function addReference() {
   await validateRequiredInput()
 
-  if (validationStore.isValid()) {
+  if (!reference.value.hasMissingRequiredFieldsForDocunit) {
     emit("update:modelValue", reference.value as Reference)
     emit("addEntry")
   }
@@ -102,9 +105,10 @@ watch(
         @focus="validationStore.remove('legalPeriodical')"
       ></ComboboxInput>
     </InputField>
+
     <div class="flex flex-col gap-24">
       <div class="flex justify-between gap-24">
-        <div class="flex-1">
+        <div class="flex w-full flex-col">
           <InputField
             id="citation"
             v-slot="slotProps"
@@ -127,7 +131,6 @@ watch(
         <InputField
           id="referenceSupplement"
           v-slot="slotProps"
-          class="flex-1"
           label="Klammernzusatz"
           :validation-error="validationStore.getByField('referenceSupplement')"
         >
