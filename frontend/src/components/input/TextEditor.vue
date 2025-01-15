@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import "@/styles/text-suggestion.scss"
+
 import { commands } from "@guardian/prosemirror-invisibles"
 import { Blockquote } from "@tiptap/extension-blockquote"
 import { Bold } from "@tiptap/extension-bold"
@@ -20,7 +22,7 @@ import { BubbleMenu, Editor, EditorContent } from "@tiptap/vue-3"
 import { computed, onMounted, ref, watch } from "vue"
 import TextEditorMenu from "@/components/input/TextEditorMenu.vue"
 import { TextAreaInputAttributes } from "@/components/input/types"
-import TextCorrectionDropdown from "@/components/TextCorrectionDropdown.vue"
+import TextSuggestionsDropdown from "@/components/TextSuggestionsDropdown.vue"
 import {
   BorderNumber,
   BorderNumberContent,
@@ -309,7 +311,7 @@ const ignoreSuggestion = () => editor.commands.ignoreLanguageToolSuggestion()
       :should-show="shouldShow"
       :tippy-options="{ placement: 'bottom', animation: 'fade' }"
     >
-      <TextCorrectionDropdown
+      <TextSuggestionsDropdown
         match-message=""
         :replacements="replacements"
         @suggestion:ignore="ignoreSuggestion"
@@ -319,74 +321,4 @@ const ignoreSuggestion = () => editor.commands.ignoreLanguageToolSuggestion()
   </div>
 </template>
 
-<style lang="scss">
-.ProseMirror {
-  .lt {
-    border-bottom: 2px solid #e86a69;
-    transition: 0.25s ease-in-out;
-
-    &:hover {
-      background: rgba($color: #e86a69, $alpha: 20%);
-    }
-
-    &-style {
-      border-bottom: 2px solid #9d8eff;
-
-      &:hover {
-        background: rgba($color: #9d8eff, $alpha: 20%) !important;
-      }
-    }
-
-    &-typographical,
-    &-grammar {
-      border-bottom: 2px solid #eeb55c;
-
-      &:hover {
-        background: rgba($color: #eeb55c, $alpha: 20%) !important;
-      }
-    }
-
-    &-misspelling {
-      border-bottom: 2px solid #e86a69;
-
-      &:hover {
-        background: rgba($color: #e86a69, $alpha: 20%) !important;
-      }
-    }
-  }
-
-  &-focused {
-    outline: none !important;
-  }
-}
-
-.bubble-menu > .bubble-menu-section-container {
-  display: flex;
-  max-width: 400px;
-  flex-direction: column;
-  padding: 8px;
-  border-radius: 8px;
-  background-color: white;
-  box-shadow: 0 0 10px rgba($color: black, $alpha: 25%);
-
-  .suggestions-section {
-    display: flex;
-    flex-flow: row wrap;
-    margin-top: 1em;
-    gap: 4px;
-
-    .suggestion {
-      display: flex;
-      max-width: fit-content;
-      align-items: center;
-      padding: 4px;
-      border-radius: 4px;
-      background-color: #229afe;
-      color: white;
-      cursor: pointer;
-      font-size: 1.1em;
-      font-weight: 500;
-    }
-  }
-}
-</style>
+<style lang="scss"></style>

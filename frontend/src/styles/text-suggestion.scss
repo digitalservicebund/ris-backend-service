@@ -1,0 +1,69 @@
+.ProseMirror {
+  .lt {
+    border-bottom: 2px solid #e86a69;
+    transition: 0.25s ease-in-out;
+
+    &:hover {
+      background: rgba($color: #e86a69, $alpha: 20%);
+    }
+
+    &-style {
+      border-bottom: 2px solid #9d8eff;
+
+      &:hover {
+        background: rgba($color: #9d8eff, $alpha: 20%) !important;
+      }
+    }
+
+    &-typographical,
+    &-grammar {
+      border-bottom: 2px solid #eeb55c;
+
+      &:hover {
+        background: rgba($color: #eeb55c, $alpha: 20%) !important;
+      }
+    }
+
+    &-misspelling {
+      border-bottom: 2px solid #e86a69;
+
+      &:hover {
+        background: rgba($color: #e86a69, $alpha: 20%) !important;
+      }
+    }
+  }
+
+  &-focused {
+    outline: none !important;
+  }
+}
+
+.bubble-menu > .bubble-menu-section-container {
+  display: flex;
+  max-width: 400px;
+  flex-direction: column;
+  padding: 8px;
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0 0 10px rgba($color: black, $alpha: 25%);
+
+  .suggestions-section {
+    display: flex;
+    flex-flow: row wrap;
+    margin-top: 1em;
+    gap: 4px;
+
+    .suggestion {
+      display: flex;
+      max-width: fit-content;
+      align-items: center;
+      padding: 4px;
+      border-radius: 4px;
+      background-color: #229afe;
+      color: white;
+      cursor: pointer;
+      font-size: 1.1em;
+      font-weight: 500;
+    }
+  }
+}
