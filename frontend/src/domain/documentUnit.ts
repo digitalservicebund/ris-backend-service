@@ -111,9 +111,24 @@ export const longTextLabels: {
   outline: "Gliederung",
 }
 
+export enum DuplicationRelationStatus {
+  PENDING = "PENDING",
+  IGNORED = "IGNORED",
+}
+
+export type DuplicateRelation = {
+  documentNumber: string
+  status: DuplicationRelationStatus
+  isJdvDuplicateCheckActive: boolean
+  decisionDate?: string
+  courtLabel?: string
+  fileNumber?: string
+}
+
 export type ManagementData = {
   scheduledPublicationDateTime?: string
   scheduledByEmail?: string
+  duplicateRelations?: DuplicateRelation[]
   borderNumbers: string[]
 }
 
@@ -143,7 +158,10 @@ export default class DocumentUnit {
   public references?: Reference[]
   public literatureReferences?: Reference[]
   public isEditable: boolean = false
-  public managementData: ManagementData = { borderNumbers: [] }
+  public managementData: ManagementData = {
+    borderNumbers: [],
+    duplicateRelations: [],
+  }
 
   static readonly requiredFields = [
     "fileNumbers",
