@@ -4,14 +4,12 @@ import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocxMetadataProperty;
-import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -32,31 +30,25 @@ public class DocumentationUnitDocxMetadataInitializationService {
     this.documentTypeRepository = documentTypeRepository;
   }
 
-  public void initializeCoreData(UUID uuid, Docx2Html docx2html) {
-    try {
-      DocumentationUnit documentationUnit = repository.findByUuid(uuid);
-      CoreData.CoreDataBuilder builder = documentationUnit.coreData().toBuilder();
+  public void initializeCoreData(DocumentationUnit documentationUnit, Docx2Html docx2html) {
+    CoreData.CoreDataBuilder builder = documentationUnit.coreData().toBuilder();
 
-      initializeFieldsFromProperties(docx2html.properties(), documentationUnit, builder);
+    initializeFieldsFromProperties(docx2html.properties(), documentationUnit, builder);
 
-      if (docx2html.ecliList().size() == 1) {
-        handleEcli(documentationUnit, builder, docx2html.ecliList().get(0));
-      }
-
-      DocumentationUnit updatedDocumentationUnit =
-          documentationUnit.toBuilder().coreData(builder.build()).build();
-      repository.saveProcedures(updatedDocumentationUnit);
-      // save new court first to avoid override of legal effect
-      repository.save(
-          documentationUnit.toBuilder()
-              .coreData(
-                  documentationUnit.coreData().toBuilder().court(builder.build().court()).build())
-              .build());
-      repository.save(updatedDocumentationUnit);
-    } catch (DocumentationUnitNotExistsException ex) {
-      log.error(
-          "Initialize core data failed, because documentation unit '{}' doesn't exist!", uuid);
+    if (docx2html.ecliList().size() == 1) {
+      handleEcli(documentationUnit, builder, docx2html.ecliList().get(0));
     }
+
+    DocumentationUnit updatedDocumentationUnit =
+        documentationUnit.toBuilder().coreData(builder.build()).build();
+    repository.saveProcedures(updatedDocumentationUnit);
+    // save new court first to avoid override of legal effect
+    repository.save(
+        documentationUnit.toBuilder()
+            .coreData(
+                documentationUnit.coreData().toBuilder().court(builder.build().court()).build())
+            .build());
+    repository.save(updatedDocumentationUnit);
   }
 
   private void initializeFieldsFromProperties(

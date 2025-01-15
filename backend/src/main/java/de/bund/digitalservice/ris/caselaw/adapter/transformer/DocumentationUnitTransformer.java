@@ -23,12 +23,14 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelation;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
 import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
@@ -42,6 +44,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -736,11 +740,29 @@ public class DocumentationUnitTransformer {
             documentationUnitDTO.getOtherLongText(),
             documentationUnitDTO.getDissentingOpinion());
 
+    Set<DuplicateRelation> duplicateRelations =
+        Stream.concat(
+                documentationUnitDTO.getDuplicateRelations1().stream()
+                    .filter(
+                        relation ->
+                            isPublishedDuplicateOrSameDocOffice(
+                                documentationUnitDTO, relation.getDocumentationUnit2())),
+                documentationUnitDTO.getDuplicateRelations2().stream()
+                    .filter(
+                        relation ->
+                            isPublishedDuplicateOrSameDocOffice(
+                                documentationUnitDTO, relation.getDocumentationUnit1())))
+            .map(
+                relation ->
+                    DuplicateRelationTransformer.transformToDomain(relation, documentationUnitDTO))
+            .collect(Collectors.toSet());
+
     ManagementData managementData =
         ManagementData.builder()
             .lastPublicationDateTime(documentationUnitDTO.getLastPublicationDateTime())
             .scheduledPublicationDateTime(documentationUnitDTO.getScheduledPublicationDateTime())
             .scheduledByEmail(documentationUnitDTO.getScheduledByEmail())
+            .duplicateRelations(duplicateRelations)
             .borderNumbers(borderNumbers)
             .build();
 
@@ -762,6 +784,12 @@ public class DocumentationUnitTransformer {
     addLiteratureReferencesToDomain(documentationUnitDTO, builder);
 
     return builder.build();
+  }
+
+  private static Boolean isPublishedDuplicateOrSameDocOffice(
+      DocumentationUnitDTO original, DocumentationUnitDTO duplicate) {
+    return original.getDocumentationOffice().equals(duplicate.getDocumentationOffice())
+        || duplicate.getStatus().getPublicationStatus().equals(PublicationStatus.PUBLISHED);
   }
 
   private static void addReferencesToDomain(

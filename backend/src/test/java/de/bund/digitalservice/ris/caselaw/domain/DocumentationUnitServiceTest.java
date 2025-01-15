@@ -6,12 +6,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.gravity9.jsonpatch.AddOperation;
 import com.gravity9.jsonpatch.JsonPatch;
 import com.gravity9.jsonpatch.JsonPatchOperation;
 import com.gravity9.jsonpatch.ReplaceOperation;
@@ -35,9 +37,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -65,6 +70,7 @@ class DocumentationUnitServiceTest {
   @MockBean private Validator validator;
   @MockBean private OidcUser oidcUser;
   @MockBean private AuthService authService;
+  @MockBean private DuplicateCheckService duplicateCheckService;
   @Captor private ArgumentCaptor<DocumentationUnitSearchInput> searchInputCaptor;
   @Captor private ArgumentCaptor<RelatedDocumentationUnit> relatedDocumentationUnitCaptor;
 
@@ -85,10 +91,10 @@ class DocumentationUnitServiceTest {
     // The chicken-egg-problem is, that we are dictating what happens when
     // repository.save(), so we can't just use a captor at the same time
 
-    Assertions.assertNotNull(
-        service.generateNewDocumentationUnit(documentationOffice, Optional.empty()));
+    assertNotNull(service.generateNewDocumentationUnit(documentationOffice, Optional.empty()));
 
     verify(documentNumberService).generateDocumentNumber(documentationOffice.abbreviation());
+    verify(duplicateCheckService, times(1)).checkDuplicates("nextDocumentNumber");
     verify(repository)
         .createNewDocumentationUnit(
             DocumentationUnit.builder()
@@ -141,7 +147,7 @@ class DocumentationUnitServiceTest {
     // The chicken-egg-problem is, that we are dictating what happens when
     // repository.save(), so we can't just use a captor at the same time
 
-    Assertions.assertNotNull(
+    assertNotNull(
         service.generateNewDocumentationUnit(userDocumentationOffice, Optional.of(parameters)));
 
     verify(documentNumberService)
@@ -297,6 +303,92 @@ class DocumentationUnitServiceTest {
     assertEquals(0L, response.documentationUnitVersion());
   }
 
+  @ParameterizedTest(name = "test patch with path: {0}, should trigger duplicate check")
+  @MethodSource("provideDuplicateCheckPaths")
+  void testPatchUpdateWithCoreData_shouldTriggerDuplicateCheck(String path)
+      throws DocumentationUnitNotExistsException {
+    // Arrange
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .uuid(UUID.randomUUID())
+            .documentNumber("ABCDE20220001")
+            .attachments(
+                Collections.singletonList(
+                    Attachment.builder().uploadTimestamp(Instant.now()).build()))
+            .version(0L)
+            .build();
+
+    JsonNode valueToAdd = new TextNode("old value");
+    JsonPatchOperation addOperation = new AddOperation(path, valueToAdd);
+    JsonPatch patch = new JsonPatch(List.of(addOperation));
+
+    when(repository.findByUuid(documentationUnit.uuid())).thenReturn(documentationUnit);
+    when(patchMapperService.calculatePatch(any(), any())).thenReturn(new JsonPatch(List.of()));
+    when(patchMapperService.removePatchForSamePath(any(), any())).thenReturn(patch);
+    when(patchMapperService.applyPatchToEntity(any(), any())).thenReturn(documentationUnit);
+    when(patchMapperService.handlePatchForSamePath(any(), any(), any(), any()))
+        .thenReturn(
+            RisJsonPatch.builder()
+                .patch(new JsonPatch(List.of()))
+                .documentationUnitVersion(1L)
+                .errorPaths(Collections.emptyList())
+                .build());
+
+    JsonNode valueToReplace = new TextNode("value");
+    JsonPatchOperation replaceOp = new ReplaceOperation(path, valueToReplace);
+    JsonPatch jsonPatch = new JsonPatch(List.of(replaceOp));
+    var risJsonPatch = RisJsonPatch.builder().patch(jsonPatch).build();
+
+    // Act
+    service.updateDocumentationUnit(documentationUnit.uuid(), risJsonPatch);
+
+    // Assert
+    verify(duplicateCheckService, times(1)).checkDuplicates("ABCDE20220001");
+  }
+
+  @ParameterizedTest(name = "test patch with path: {0}, should not trigger duplicate check")
+  @MethodSource("provideNonDuplicateCheckPaths")
+  void testPatchUpdateWithoutCoreData_shouldNotTriggerDuplicateCheck(String path)
+      throws DocumentationUnitNotExistsException {
+    // Arrange
+    DocumentationUnit documentationUnit =
+        DocumentationUnit.builder()
+            .uuid(UUID.randomUUID())
+            .documentNumber("ABCDE20220001")
+            .attachments(
+                Collections.singletonList(
+                    Attachment.builder().uploadTimestamp(Instant.now()).build()))
+            .version(0L)
+            .build();
+
+    JsonNode valueToAdd = new TextNode("old value");
+    JsonPatchOperation addOperation = new AddOperation(path, valueToAdd);
+    JsonPatch patch = new JsonPatch(List.of(addOperation));
+
+    when(repository.findByUuid(documentationUnit.uuid())).thenReturn(documentationUnit);
+    when(patchMapperService.calculatePatch(any(), any())).thenReturn(new JsonPatch(List.of()));
+    when(patchMapperService.removePatchForSamePath(any(), any())).thenReturn(patch);
+    when(patchMapperService.applyPatchToEntity(any(), any())).thenReturn(documentationUnit);
+    when(patchMapperService.handlePatchForSamePath(any(), any(), any(), any()))
+        .thenReturn(
+            RisJsonPatch.builder()
+                .patch(new JsonPatch(List.of()))
+                .documentationUnitVersion(1L)
+                .errorPaths(Collections.emptyList())
+                .build());
+
+    JsonNode valueToReplace = new TextNode("value");
+    JsonPatchOperation replaceOp = new ReplaceOperation(path, valueToReplace);
+    JsonPatch jsonPatch = new JsonPatch(List.of(replaceOp));
+    var risJsonPatch = RisJsonPatch.builder().patch(jsonPatch).build();
+
+    // Act
+    service.updateDocumentationUnit(documentationUnit.uuid(), risJsonPatch);
+
+    // Assert
+    verify(duplicateCheckService, never()).checkDuplicates("ABCDE20220001");
+  }
+
   @Test
   void testSearchByDocumentationUnitListEntry() throws DocumentationUnitNotExistsException {
     DocumentationUnitSearchInput documentationUnitSearchInput =
@@ -427,5 +519,57 @@ class DocumentationUnitServiceTest {
     service.setPublicationDateTime(documentationUnit.uuid());
 
     verify(repository, times(1)).saveLastPublicationDateTime(documentationUnit.uuid());
+  }
+
+  static Stream<String> provideDuplicateCheckPaths() {
+    return Stream.of(
+        "/coreData/ecli",
+        "/coreData/deviatingEclis",
+        "/coreData/fileNumbers",
+        "/coreData/deviatingFileNumbers",
+        "/coreData/court",
+        "/coreData/deviatingCourts",
+        "/coreData/decisionDate",
+        "/coreData/deviatingDecisionDates",
+        "/coreData/documentType");
+  }
+
+  static Stream<String> provideNonDuplicateCheckPaths() {
+    return Stream.of(
+        "/coreData/appraisalBody",
+        "/coreData/procedure",
+        "/coreData/procedure/createdAt",
+        "/coreData/procedure/documentationUnitCount",
+        "/coreData/procedure/label",
+        "/coreData/procedure/id",
+        "/coreData/legalEffect",
+        "/coreData/leadingDecisionNormReferences",
+        "/coreData/yearsOfDispute",
+        "/previousDecisions",
+        "/ensuingDecisions",
+        "/contentRelatedIndexing/keywords",
+        "/contentRelatedIndexing/fieldsOfLaw",
+        "/contentRelatedIndexing/norms",
+        "/contentRelatedIndexing/activeCitations",
+        "/contentRelatedIndexing/jobProfiles",
+        "/contentRelatedIndexing/dismissalTypes",
+        "/contentRelatedIndexing/dismissalGrounds",
+        "/contentRelatedIndexing/collectiveAgreements",
+        "/contentRelatedIndexing/hasLegislativeMandate",
+        "/shortTexts/decisionName",
+        "/shortTexts/headline",
+        "/shortTexts/guidingPrinciple",
+        "/shortTexts/headnote",
+        "/shortTexts/otherHeadnote",
+        "/note",
+        "/version",
+        "/longTexts/tenor",
+        "/longTexts/reasons",
+        "/longTexts/caseFacts",
+        "/longTexts/decisionReasons",
+        "/longTexts/dissentingOpinion",
+        "/longTexts/otherLongText",
+        "/longTexts/outline",
+        "/references");
   }
 }

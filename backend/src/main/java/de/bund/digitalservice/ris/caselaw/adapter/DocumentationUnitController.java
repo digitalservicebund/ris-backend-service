@@ -8,6 +8,8 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitCreationParame
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateCheckService;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatusRequest;
 import de.bund.digitalservice.ris.caselaw.domain.EventRecord;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverEntityType;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverException;
@@ -23,6 +25,7 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitDele
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.domain.export.juris.response.StatusImporterException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
 import java.time.Duration;
@@ -67,6 +70,7 @@ public class DocumentationUnitController {
   private final OAuthService oAuthService;
   private final DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
+  private final DuplicateCheckService duplicateCheckService;
 
   public DocumentationUnitController(
       DocumentationUnitService service,
@@ -77,7 +81,8 @@ public class DocumentationUnitController {
       LdmlExporterService ldmlExporterService,
       OAuthService oAuthService,
       DocumentationUnitDocxMetadataInitializationService
-          documentationUnitDocxMetadataInitializationService) {
+          documentationUnitDocxMetadataInitializationService,
+      DuplicateCheckService duplicateCheckService) {
     this.service = service;
     this.userService = userService;
     this.attachmentService = attachmentService;
@@ -87,6 +92,7 @@ public class DocumentationUnitController {
     this.oAuthService = oAuthService;
     this.documentationUnitDocxMetadataInitializationService =
         documentationUnitDocxMetadataInitializationService;
+    this.duplicateCheckService = duplicateCheckService;
   }
 
   /**
@@ -154,7 +160,15 @@ public class DocumentationUnitController {
             .s3path();
     try {
       var docx2html = converterService.getConvertedObject(attachmentPath);
-      documentationUnitDocxMetadataInitializationService.initializeCoreData(uuid, docx2html);
+      try {
+        DocumentationUnit docUnit = service.getByUuid(uuid);
+        documentationUnitDocxMetadataInitializationService.initializeCoreData(docUnit, docx2html);
+        duplicateCheckService.checkDuplicates(docUnit.documentNumber());
+      } catch (DocumentationUnitNotExistsException ex) {
+        // file upload should not fail because of core data initialization or dup check
+        log.error(
+            "Initialize core data failed, because documentation unit '{}' doesn't exist!", uuid);
+      }
       return ResponseEntity.status(HttpStatus.OK).body(docx2html);
 
     } catch (Exception e) {
@@ -224,6 +238,7 @@ public class DocumentationUnitController {
     }
 
     try {
+      duplicateCheckService.checkDuplicates(documentNumber);
       var documentationUnit = service.getByDocumentNumber(documentNumber);
       return ResponseEntity.ok(
           documentationUnit.toBuilder()
@@ -447,6 +462,36 @@ public class DocumentationUnitController {
     } catch (DocumentationUnitNotExistsException e) {
       log.error("Error handing over documentation unit '{}' to portal", uuid, e);
       return ResponseEntity.internalServerError().build();
+    }
+  }
+
+  /**
+   * Update the duplication status of a duplicate of a documentation unit (ignored vs. pending)
+   *
+   * @param documentNumberOrigin documentNumber of the original documentation unit
+   * @param documentNumberDuplicate documentNumber of the duplicate
+   * @return a String response or empty response with status code 4xx if invalid auth or input
+   */
+  @PutMapping(
+      value = "/{documentNumberOrigin}/duplicate-status/{documentNumberDuplicate}",
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      consumes = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize(
+      "@userIsInternal.apply(#oidcUser) and @userHasSameDocOfficeAsDocument.apply(#documentNumberOrigin)")
+  public ResponseEntity<String> updateDuplicateStatus(
+      @AuthenticationPrincipal OidcUser oidcUser,
+      @PathVariable String documentNumberOrigin,
+      @PathVariable String documentNumberDuplicate,
+      @RequestBody @Valid DuplicateRelationStatusRequest duplicateRelationStatusRequest) {
+    try {
+      var result =
+          duplicateCheckService.updateDuplicateStatus(
+              documentNumberOrigin,
+              documentNumberDuplicate,
+              duplicateRelationStatusRequest.getStatus());
+      return ResponseEntity.status(HttpStatus.OK).body(result);
+    } catch (DocumentationUnitNotExistsException | EntityNotFoundException ex) {
+      return ResponseEntity.notFound().build();
     }
   }
 }
