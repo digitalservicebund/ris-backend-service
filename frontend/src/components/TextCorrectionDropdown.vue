@@ -38,6 +38,8 @@ function ignoreSuggestion() {
     </div>
     <TextButton
       aria-label="Vorschlag ignorieren"
+      button-type="ghost"
+      class="border-t-1"
       label="Ignorieren"
       width="w-full"
       @click="ignoreSuggestion"

@@ -67,7 +67,7 @@ const editorElement = ref<HTMLElement>()
 const hasFocus = ref(false)
 const isHovered = ref(false)
 
-const editor = new Editor({
+const editor: Editor = new Editor({
   editorProps: {
     attributes: {
       tabindex: "0",
@@ -136,16 +136,22 @@ const editor = new Editor({
   ],
   onUpdate: () => {
     emit("updateValue", editor.getHTML())
+    setTimeout(() => updateMatch(editor))
   },
   onFocus: () => (hasFocus.value = true),
   editable: props.editable,
   parseOptions: {
     preserveWhitespace: "full",
   },
-  onSelectionUpdate: () => editor.commands.handleSelection(),
+  onSelectionUpdate: () => {
+    editor.commands.handleSelection()
+    setTimeout(() => updateMatch(editor))
+  },
 })
 
 const containerWidth = ref<number>()
+
+const match = ref<Match>()
 
 const editorExpanded = ref(false)
 const editorStyleClasses = computed(() => {
@@ -183,9 +189,9 @@ watch(
   },
 )
 
-const buttonsDisabled = computed(
-  () => !(props.editable && (hasFocus.value || isHovered.value)),
-)
+// const buttonsDisabled = computed(
+//   () => !(props.editable && (hasFocus.value || isHovered.value)),
+// )
 
 watch(
   () => hasFocus.value,
@@ -212,7 +218,9 @@ const resizeObserver = new ResizeObserver((entries) => {
   }
 })
 
-const shouldShow = ({ editor }) => {
+const shouldShow = (): boolean => {
+  if (editor == undefined) return false
+
   const match = editor.storage.languagetool.match
   const matchRange = editor.storage.languagetool.matchRange
 
@@ -223,11 +231,9 @@ const shouldShow = ({ editor }) => {
   )
 }
 
-const match = ref<Match>()
-
 const matchRange = ref<{ from: number; to: number }>()
 
-const loading = ref(false)
+// const loading = ref(false)
 
 const updateMatch = (editor: Editor) => {
   match.value = editor.storage.languagetool.match
