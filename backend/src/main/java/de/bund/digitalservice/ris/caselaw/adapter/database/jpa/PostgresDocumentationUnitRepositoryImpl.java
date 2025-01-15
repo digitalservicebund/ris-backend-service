@@ -130,6 +130,13 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                     .build(),
                 docUnit));
 
+    ReferenceDTO referenceDTO = null;
+    if (createdFromReference != null) {
+      referenceDTO = ReferenceTransformer.transformToDTO(createdFromReference);
+      referenceDTO.setDocumentationUnitRank(0);
+      referenceDTO.setDocumentationUnit(documentationUnitDTO);
+    }
+
     // saving a second time is necessary because status and reference need a reference to a
     // persisted documentation unit
     DocumentationUnitDTO savedDocUnit =
@@ -148,8 +155,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                                 SourceDTO.builder()
                                     .rank(1)
                                     .value(source)
-                                    .reference(
-                                        ReferenceTransformer.transformToDTO(createdFromReference))
+                                    .reference(referenceDTO)
                                     .build())))
                 .build());
 
