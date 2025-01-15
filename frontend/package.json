@@ -40,6 +40,7 @@
     "@sentry/vue": "^8.39.0",
     "@tiptap/extension-blockquote": "^2.10.0",
     "@tiptap/extension-bold": "^2.10.0",
+    "@tiptap/extension-bubble-menu": "^2.11.2",
     "@tiptap/extension-bullet-list": "^2.10.0",
     "@tiptap/extension-color": "^2.10.0",
     "@tiptap/extension-document": "^2.10.0",

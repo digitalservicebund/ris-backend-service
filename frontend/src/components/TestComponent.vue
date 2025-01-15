@@ -1,12 +1,11 @@
 <script lang="ts" setup>
-import Document from "@tiptap/extension-document"
-import Paragraph from "@tiptap/extension-paragraph"
-import Text from "@tiptap/extension-text"
-import { Editor, EditorContent, useEditor } from "@tiptap/vue-3"
+import { Document } from "@tiptap/extension-document"
+import { Paragraph } from "@tiptap/extension-paragraph"
+import { Text } from "@tiptap/extension-text"
+import { BubbleMenu, Editor, EditorContent, useEditor } from "@tiptap/vue-3"
 import { computed, ref } from "vue"
 
 import TextCorrectionDropdown from "@/components/TextCorrectionDropdown.vue"
-import BubbleMenu from "@/editor/languagetool/BubbleMenu.vue"
 import {
   LanguageTool,
   LanguageToolHelpingWords,

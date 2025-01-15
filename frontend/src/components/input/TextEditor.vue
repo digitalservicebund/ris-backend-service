@@ -16,10 +16,10 @@ import { Text } from "@tiptap/extension-text"
 import { TextAlign } from "@tiptap/extension-text-align"
 import { TextStyle } from "@tiptap/extension-text-style"
 import { Underline } from "@tiptap/extension-underline"
-import { Content, Editor, EditorContent } from "@tiptap/vue-3"
+import { BubbleMenu, Editor, EditorContent } from "@tiptap/vue-3"
 import { computed, onMounted, ref, watch } from "vue"
-import TextEditorMenu from "@/components/input/TextEditorMenu.vue"
 import { TextAreaInputAttributes } from "@/components/input/types"
+import TextCorrectionDropdown from "@/components/TextCorrectionDropdown.vue"
 import {
   BorderNumber,
   BorderNumberContent,
@@ -32,13 +32,12 @@ import { FontSize } from "@/editor/fontSize"
 import { CustomImage } from "@/editor/image"
 import { Indent } from "@/editor/indent"
 import { InvisibleCharacters } from "@/editor/invisibleCharacters"
+import { LanguageTool } from "@/editor/languagetool/languageTool"
 import { CustomListItem } from "@/editor/listItem"
 import { CustomOrderedList } from "@/editor/orderedList"
 import { CustomParagraph } from "@/editor/paragraph"
 import { CustomSubscript, CustomSuperscript } from "@/editor/scriptText"
 import { TableStyle } from "@/editor/tableStyle"
-import { LanguageTool } from "@/editor/languagetool/languageTool"
-import BubbleMenu from "@/editor/languagetool/BubbleMenu.vue"
 import { Match } from "@/types/languagetool"
 
 interface Props {
@@ -282,30 +281,20 @@ const ignoreSuggestion = () => editor.commands.ignoreLanguageToolSuggestion()
         :editor="editor"
       />
     </div>
-    <bubble-menu
-      class="bubble-menu"
+
+    <BubbleMenu
       v-if="editor"
+      class="bubble-menu"
       :editor="editor"
+      :should-show="shouldShow"
       :tippy-options="{ placement: 'bottom', animation: 'fade' }"
-      :should-show="({ editor }) => shouldShow({ editor })"
     >
-      <!--
-        <section class="bubble-menu-section-container">
-          <section class="message-section">
-            {{ matchMessage }}
-            <button class="ignore-suggestion-button" @click="ignoreSuggestion">XXX</button>
-          </section>
-          <section class="suggestions-section">
-            <article
-              v-for="(replacement, i) in replacements"
-              @click="() => acceptSuggestion(replacement)"
-              :key="i + replacement.value"
-              class="suggestion">
-              {{ replacement.value }}
-            </article>
-          </section>
-        </section>
--->
-    </bubble-menu>
+      <TextCorrectionDropdown
+        match-message=""
+        :replacements="replacements"
+        @suggestion:ignore="ignoreSuggestion"
+        @suggestion:update="acceptSuggestion"
+      />
+    </BubbleMenu>
   </div>
 </template>
