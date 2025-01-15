@@ -7,16 +7,19 @@ import PeriodicalEditionReferenceInput from "./PeriodicalEditionReferenceInput.v
 import PeriodicalEditionReferenceSummary from "./PeriodicalEditionReferenceSummary.vue"
 import EditableList from "@/components/EditableList.vue"
 import InfoModal from "@/components/InfoModal.vue"
+import TextButton from "@/components/input/TextButton.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import Reference from "@/domain/reference"
 import { ResponseError } from "@/services/httpClient"
 import { useEditionStore } from "@/stores/editionStore"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
+import IconAdd from "~icons/material-symbols/add"
 
 const route = useRoute()
 const store = useEditionStore()
 const responseError = ref<ResponseError | undefined>()
 const extraContentSidePanelStore = useExtraContentSidePanelStore()
+const editableListRef = ref()
 
 const loadEditionIntervalCounter = useInterval(10_000, {})
 
@@ -43,6 +46,21 @@ async function saveReferences(references: Reference[]) {
   }
 }
 
+async function addNewEntry() {
+  await editableListRef.value.toggleDisplayDefaultValue(true)
+  const element = document.getElementById("reference-input")
+  setTimeout(() => {
+    if (!element) return
+    const headerOffset = 80
+    const scrollPosition =
+      element.getBoundingClientRect().top + window.scrollY - headerOffset
+    window.scrollTo({
+      top: scrollPosition,
+      behavior: "smooth",
+    })
+  })
+}
+
 /**
  * A watch to load document every x times, to make sure user has the latest version of references
  * which is critical for external changes
@@ -66,8 +84,17 @@ watch(loadEditionIntervalCounter, async () => {
           :title="responseError.title"
         />
       </div>
+      <TextButton
+        aria-label="Weitere Angabe Top"
+        button-type="tertiary"
+        :icon="IconAdd"
+        label="Weitere Angabe"
+        size="small"
+        @click="addNewEntry"
+      />
       <div aria-label="Fundstellen">
         <EditableList
+          ref="editableListRef"
           v-model="references"
           :default-value="defaultValue"
           :edit-component="PeriodicalEditionReferenceInput"
