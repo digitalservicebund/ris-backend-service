@@ -118,16 +118,43 @@ Now you can generate a new `.env` file containing the secrets. When using a Yubi
 >
 > This needs to be repeated every time the secrets change.
 
-### Local Migration
+### Lookup Tables Initialization
 
-The caselaw application requires the initialization of lookup tables by the migration application.
+The caselaw application requires the initialization of lookup tables by the migration application image.
 
-Follow the steps in [run_migration_locally.md](run_migration_locally.md):
+#### Prerequisites
 
-1. Prerequisites
-2. Import Data (By Script)
+To be able to pull the `ris-data-migration` image, log in to the GitHub Package Repository using your username and a
+credential token stored in 1Password (1PW):
 
-WIP: Run docker image in [migration_image.md](migration_image.md)
+If you don't have a personal access token, read [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic) on how to create one. Then:
+
+```shell
+export CR_PAT=$(op read op://Employee/CR_PAT/password)
+echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin # Replace USERNAME with your GitHub username
+```
+
+The following step requires an OTC access token, read here for
+more [info](https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/#step-2-obtain-access_key-credentials).
+
+To connect to your S3 bucket, ensure your AWS credentials are stored in 1Password, and then set the following
+environment variables in your shell:
+
+```shell
+op item edit 'OTC' aws_access_key_id=[your-access-key-id]
+op item edit 'OTC' aws_secret_access_key=[your-access-key-id]
+
+```
+
+#### Run Lookup Tables Initialization with Docker
+
+The following command will migrate the minimally required data (refdata and juris tables):
+
+```bash
+./run.sh -i
+```
+
+> Note: If you wish to migrate documentation units, use the instructions in [run_migration_locally.md](run_migration_locally.md)
 
 ## Development
 
@@ -153,16 +180,16 @@ To run the frontend stack only (without backend and initialization) run:
 ./run.sh dev --no-backend
 ```
 
-When choosing the no-backend variant, checkout the [backend manual](./backend/README.md) on how to run the backend stand-alone without docker. The easiest way would be:
+When choosing the no-backend variant, checkout the [backend manual](./backend/README.md) on how to run the backend stand-alone without docker. The easiest way would be to start the backend [utilizing Spring Boot developer tools](https://docs.spring.io/spring-boot/docs/current/reference/html/using.html#using.devtools.restart) so changes in the Java sources will be reflected without manually restarting: 
 
 ```bash
 cd backend
 SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 ```
 
-Overall docker compose spins up a reverse proxy (traefik) which listens on port 80. Therefore the application is available at <http://127.0.0.1>. If you get a `bad gateway` error make sure your firewall is not messing with you. On Ubuntu `sudo ufw disable` might do the trick. You may setup a certain firewall rule. Overall your milage may vary.
+> Note: Similarly, the frontend is served from [Vite](https://vitejs.dev) with [HMR](https://vitejs.dev/guide/features.html#hot-module-replacement)
 
-This (what?) will start the backend [utilizing Spring Boot developer tools](https://docs.spring.io/spring-boot/docs/current/reference/html/using.html#using.devtools.restart) so changes in the Java sources will be reflected without manually restarting. Similarly, the frontend is served from [Vite](https://vitejs.dev) with [HMR](https://vitejs.dev/guide/features.html#hot-module-replacement).
+Overall docker compose spins up a reverse proxy (traefik) which listens on port 80. Therefore the application is available at <http://127.0.0.1>. If you get a `bad gateway` error make sure your firewall is not messing with you. On Ubuntu `sudo ufw disable` might do the trick. You may setup a certain firewall rule. Overall your milage may vary.
 
 > **Note**
 >
