@@ -2,12 +2,13 @@
 import { sanitizeUrl } from "@braintree/sanitize-url"
 import type { Component } from "vue"
 import { computed, h } from "vue"
+import { ButtonType } from "@/components/input/types"
 
 interface Props {
   label?: string
   icon?: Component
   ariaLabel?: string
-  buttonType?: "ghost" | "secondary" | "primary" | "destructive" | "tertiary"
+  buttonType?: ButtonType
   disabled?: boolean
   href?: string
   download?: boolean | string

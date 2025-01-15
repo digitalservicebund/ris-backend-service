@@ -70,3 +70,10 @@ export interface LanguageToolResponse {
   language: Language
   matches: Match[]
 }
+
+export enum LanguageToolHelpingWords {
+  LanguageToolTransactionName = "languageToolTransaction",
+  MatchUpdatedTransactionName = "matchUpdated",
+  MatchRangeUpdatedTransactionName = "matchRangeUpdated",
+  LoadingTransactionName = "languageToolLoading",
+}

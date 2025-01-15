@@ -26,6 +26,14 @@ export enum InputType {
   UNDEFINED_DATE = "undefined_date",
 }
 
+export type ButtonType =
+  | "ghost"
+  | "secondary"
+  | "primary"
+  | "destructive"
+  | "tertiary"
+  | "confirmButtonType"
+
 //BASE
 export interface BaseInputAttributes {
   ariaLabel: string

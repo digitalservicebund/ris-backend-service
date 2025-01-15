@@ -1,15 +1,16 @@
 <script lang="ts" setup>
 import { onMounted } from "vue"
 import TextButton from "./input/TextButton.vue"
+import { ButtonType } from "@/components/input/types"
 
 defineProps<{
   ariaLabel?: string
   headerText?: string
   contentText: string
   confirmText: string
-  cancelButtonType?: string
+  cancelButtonType?: ButtonType
   cancelButtonText?: string
-  confirmButtonType?: string
+  confirmButtonType?: ButtonType
 }>()
 
 defineEmits<{
@@ -69,7 +70,7 @@ onMounted(() => {
       >
         <TextButton
           :aria-label="confirmText"
-          :button-type="confirmButtonType"
+          button-type="confirmButtonType"
           :label="confirmText"
           size="small"
           @click="$emit('confirmAction')"

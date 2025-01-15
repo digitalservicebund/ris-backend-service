@@ -6,12 +6,12 @@ import { BubbleMenu, Editor, EditorContent, useEditor } from "@tiptap/vue-3"
 import { computed, ref } from "vue"
 
 import TextCorrectionDropdown from "@/components/TextCorrectionDropdown.vue"
+import { LanguageTool } from "@/editor/languagetool/languageTool"
 import {
-  LanguageTool,
   LanguageToolHelpingWords,
   Match,
   Replacement,
-} from "@/editor/languagetool/languageTool"
+} from "@/types/languagetool"
 
 const editor = useEditor({
   content: `1
@@ -76,7 +76,7 @@ const updateMatch = (editor: Editor) => {
 
 const replacements = computed(() => match.value?.replacements || [])
 
-const matchMessage = computed(() => match.value?.message || "No Message")
+// const matchMessage = computed(() => match.value?.message || "No Message")
 
 const acceptSuggestion = (sug: Replacement) => {
   if (editor.value == undefined || matchRange.value == undefined) return
@@ -118,14 +118,14 @@ const ignoreSuggestion = () => {
     transition: 0.25s ease-in-out;
 
     &:hover {
-      background: rgba($color: #e86a69, $alpha: 0.2);
+      background: rgba($color: #e86a69, $alpha: 20%);
     }
 
     &-style {
       border-bottom: 2px solid #9d8eff;
 
       &:hover {
-        background: rgba($color: #9d8eff, $alpha: 0.2) !important;
+        background: rgba($color: #9d8eff, $alpha: 20%) !important;
       }
     }
 
@@ -134,7 +134,7 @@ const ignoreSuggestion = () => {
       border-bottom: 2px solid #eeb55c;
 
       &:hover {
-        background: rgba($color: #eeb55c, $alpha: 0.2) !important;
+        background: rgba($color: #eeb55c, $alpha: 20%) !important;
       }
     }
 
@@ -142,7 +142,7 @@ const ignoreSuggestion = () => {
       border-bottom: 2px solid #e86a69;
 
       &:hover {
-        background: rgba($color: #e86a69, $alpha: 0.2) !important;
+        background: rgba($color: #e86a69, $alpha: 20%) !important;
       }
     }
   }
@@ -154,31 +154,30 @@ const ignoreSuggestion = () => {
 
 .bubble-menu > .bubble-menu-section-container {
   display: flex;
+  max-width: 400px;
   flex-direction: column;
-  background-color: white;
   padding: 8px;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba($color: black, $alpha: 0.25);
-  max-width: 400px;
+  background-color: white;
+  box-shadow: 0 0 10px rgba($color: black, $alpha: 25%);
 
   .suggestions-section {
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 4px;
+    flex-flow: row wrap;
     margin-top: 1em;
+    gap: 4px;
 
     .suggestion {
-      background-color: #229afe;
+      display: flex;
+      max-width: fit-content;
+      align-items: center;
+      padding: 4px;
       border-radius: 4px;
+      background-color: #229afe;
       color: white;
       cursor: pointer;
-      font-weight: 500;
-      padding: 4px;
-      display: flex;
-      align-items: center;
       font-size: 1.1em;
-      max-width: fit-content;
+      font-weight: 500;
     }
   }
 }

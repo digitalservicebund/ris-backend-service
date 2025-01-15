@@ -38,7 +38,11 @@ import { CustomOrderedList } from "@/editor/orderedList"
 import { CustomParagraph } from "@/editor/paragraph"
 import { CustomSubscript, CustomSuperscript } from "@/editor/scriptText"
 import { TableStyle } from "@/editor/tableStyle"
-import { Match } from "@/types/languagetool"
+import {
+  LanguageToolHelpingWords,
+  Match,
+  Replacement,
+} from "@/types/languagetool"
 
 interface Props {
   value?: string
@@ -62,6 +66,8 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   updateValue: [newValue: string]
 }>()
+
+const loading = ref(false)
 
 const editorElement = ref<HTMLElement>()
 const hasFocus = ref(false)
@@ -146,6 +152,11 @@ const editor: Editor = new Editor({
   onSelectionUpdate: () => {
     editor.commands.handleSelection()
     setTimeout(() => updateMatch(editor))
+  },
+  onTransaction({ transaction: tr }) {
+    loading.value = !!tr.getMeta(
+      LanguageToolHelpingWords.LoadingTransactionName,
+    )
   },
 })
 
@@ -242,15 +253,17 @@ const updateMatch = (editor: Editor) => {
 
 const replacements = computed(() => match.value?.replacements || [])
 
-const matchMessage = computed(() => match.value?.message || "No Message")
+// const matchMessage = computed(() => match.value?.message || "No Message")
 
-const updateHtml = () => navigator.clipboard.writeText(editor.getHTML())
+// const updateHtml = () => navigator.clipboard.writeText(editor.getHTML())
 
-const acceptSuggestion = (sug) => {
-  editor.commands.insertContentAt(matchRange.value, sug.value)
+const acceptSuggestion = (sug: Replacement) => {
+  if (matchRange.value != undefined) {
+    editor.commands.insertContentAt(matchRange.value, sug.value)
+  }
 }
 
-const proofread = () => editor.commands.proofread()
+// const proofread = () => editor.commands.proofread()
 
 const ignoreSuggestion = () => editor.commands.ignoreLanguageToolSuggestion()
 </script>
