@@ -82,25 +82,17 @@
       "automerge": true,
     },
     {
-      // due to blocking spring framework issue
+      // due to blocking spring version
+      "groupName": "blocked-by-spring-version",
       "matchPackageNames": [
-        "org.springframework:spring-framework"
+        "io.spring.dependency-management",
+        "org.springframework.cloud:spring-cloud-starter-kubernetes-client-config",
+        "org.springframework.boot"
       ],
-      "allowedVersions": "3.3.5"
-    },
-    {
-      // due to blocking spring framework issue
-      "matchPackageNames": [
-        "io.spring.dependency-management"
-      ],
-      "allowedVersions": "1.1.6"
-    },
-    {
-      // due to blocking spring framework issue
-      "matchPackageNames": [
-        "org.springframework.cloud:spring-cloud-starter-kubernetes-client-config"
-      ],
-      "allowedVersions": "3.1.4"
+      "automerge": false,
+      "labels": [
+        "no-automerge"
+      ]
     }
   ]
 }
