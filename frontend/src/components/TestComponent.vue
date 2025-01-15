@@ -38,10 +38,10 @@ Vor dem Streitjahr "verkaufte" die Klägerin der KG mit privatschriftlichem "Kau
     }),
   ],
   onUpdate({ editor }) {
-    setTimeout(() => updateMatch(editor as Editor))
+    setTimeout(() => updateMatch(editor as any))
   },
   onSelectionUpdate({ editor }) {
-    setTimeout(() => updateMatch(editor as Editor))
+    setTimeout(() => updateMatch(editor as any))
   },
   onTransaction({ transaction: tr }) {
     if (tr.getMeta(LanguageToolHelpingWords.LoadingTransactionName))
@@ -110,7 +110,8 @@ const ignoreSuggestion = () => {
     </BubbleMenu>
   </div>
 </template>
-<style lang="scss" scoped>
+
+<style lang="scss">
 .ProseMirror {
   .lt {
     border-bottom: 2px solid #e86a69;
