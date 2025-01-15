@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
-import DuplicateRelation from "@/components/DuplicateRelation.vue"
+import DuplicateRelationListItem from "@/components/DuplicateRelationListItem.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import IconCheck from "~icons/ic/baseline-check"
@@ -18,7 +18,7 @@ const { documentUnit } = storeToRefs(useDocumentUnitStore())
             Dublettenverdacht:
           </dt>
           <dd class="ds-body-02-reg flex flex-col gap-32">
-            <DuplicateRelation
+            <DuplicateRelationListItem
               v-for="duplicateRelation in documentUnit?.managementData
                 .duplicateRelations"
               :key="duplicateRelation.documentNumber"

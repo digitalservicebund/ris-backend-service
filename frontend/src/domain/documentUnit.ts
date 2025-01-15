@@ -115,11 +115,11 @@ export enum DuplicationRelationStatus {
   IGNORED = "IGNORED",
 }
 
-export type DuplicationRelation = {
+export type DuplicateRelation = {
   documentNumber: string
   status: DuplicationRelationStatus
   isJdvDuplicateCheckActive: boolean
-  decisionDate?: Date
+  decisionDate?: string
   courtLabel?: string
   fileNumber?: string
 }
@@ -127,7 +127,7 @@ export type DuplicationRelation = {
 export type ManagementData = {
   scheduledPublicationDateTime?: string
   scheduledByEmail?: string
-  duplicateRelations?: DuplicationRelation[]
+  duplicateRelations?: DuplicateRelation[]
   borderNumbers: string[]
 }
 

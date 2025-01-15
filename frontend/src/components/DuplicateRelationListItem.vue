@@ -6,7 +6,7 @@ import InfoModal from "@/components/InfoModal.vue"
 import CheckboxInput from "@/components/input/CheckboxInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import {
-  DuplicationRelation,
+  DuplicateRelation,
   DuplicationRelationStatus,
 } from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
@@ -16,7 +16,7 @@ import BaselineArrowOutward from "~icons/ic/baseline-arrow-outward"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
 const { duplicateRelation } = defineProps<{
-  duplicateRelation: DuplicationRelation
+  duplicateRelation: DuplicateRelation
 }>()
 
 const { documentUnit } = storeToRefs(useDocumentUnitStore())
@@ -52,13 +52,14 @@ const updateStatus = async (newStatus: DuplicationRelationStatus) => {
 const warningIgnoredLabel = computed(() =>
   duplicateRelation.isJdvDuplicateCheckActive
     ? "Warnung ignorieren"
-    : `Warnung wegen "Dupcode ausschalten" (jDV) ignoriert`,
+    : `Warnung ignoriert wegen "Dupcode ausschalten" (jDV)`,
 )
 const coreDataText = computed(() =>
   [
     duplicateRelation.courtLabel,
     duplicateRelation.fileNumber,
-    DateUtil.formatDate(duplicateRelation.decisionDate),
+    duplicateRelation.decisionDate &&
+      DateUtil.formatDate(duplicateRelation.decisionDate),
   ]
     .filter(Boolean)
     .join(", "),
@@ -74,7 +75,7 @@ const coreDataText = computed(() =>
         />
       </span>
 
-      <span v-if="coreDataText">
+      <span v-if="coreDataText" data-testid="core-data-text">
         {{ coreDataText }}
       </span>
 
@@ -107,7 +108,7 @@ const coreDataText = computed(() =>
       <CheckboxInput
         :id="id"
         v-model="isIgnored"
-        :aria-label="warningIgnoredLabel"
+        aria-label="Warnung ignorieren"
         class="ds-checkbox-mini"
         :readonly="!duplicateRelation.isJdvDuplicateCheckActive"
       />
@@ -115,6 +116,7 @@ const coreDataText = computed(() =>
 
     <InfoModal
       v-if="hasSetStateError"
+      data-testid="set-state-error"
       description="Bitte laden Sie die Seite neu und versuchen Sie es erneut."
       :status="InfoStatus.ERROR"
       title="Warnungsstatus konnte nicht gesetzt werden."
