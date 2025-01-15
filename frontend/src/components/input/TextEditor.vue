@@ -318,7 +318,7 @@ const ignoreSuggestion = () => editor.commands.ignoreLanguageToolSuggestion()
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .ProseMirror {
   .lt {
     border-bottom: 2px solid #e86a69;
