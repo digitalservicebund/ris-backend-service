@@ -596,8 +596,9 @@ class DuplicateCheckIntegrationTest {
     }
 
     @Test
-    void checkDuplicates_unpublishedDocUnitFromOtherDocOffice_shouldBeFilterOutDuplicateWarnings()
-        throws DocumentationUnitNotExistsException {
+    void
+        checkDuplicates_withUnpublishedDocUnitFromOtherDocOffice_shouldBeFilterOutDuplicateWarnings()
+            throws DocumentationUnitNotExistsException {
 
       var bghDocumentationOffice = documentationOfficeRepository.findByAbbreviation("BGH");
 
@@ -640,7 +641,7 @@ class DuplicateCheckIntegrationTest {
     }
 
     @Test
-    void setStatus_existingDuplicateRelation_shouldUpdateStatusToIgnored()
+    void setStatus_withExistingPendingDuplicateRelation_shouldUpdateStatusToIgnored()
         throws DocumentationUnitNotExistsException {
       // Arrange
       var original =
@@ -664,12 +665,17 @@ class DuplicateCheckIntegrationTest {
                       .build()));
 
       duplicateCheckService.checkDuplicates(original.getDocumentNumber());
+      assertThat(duplicateRelationRepository.findAll()).hasSize(1);
+      var pendingDuplicateRelation = duplicateRelationRepository.findAll().getFirst();
+      assertThat(pendingDuplicateRelation.getStatus()).isEqualTo(DuplicateRelationStatus.PENDING);
 
+      // Act
       duplicateCheckService.updateDuplicateStatus(
           original.getDocumentNumber(),
           duplicate.getDocumentNumber(),
           DuplicateRelationStatus.IGNORED);
 
+      // Assert
       assertThat(
               documentationUnitService
                   .getByUuid(original.getId())
@@ -683,36 +689,32 @@ class DuplicateCheckIntegrationTest {
     }
 
     @Test
-    void setStatus_nonExistingDuplicateRelation_shouldThrow() {
-
+    void setStatus_withoutExistingDuplicateRelation_shouldThrow() {
       // Arrange
-      var original =
-          generateNewDocumentationUnit(
-              docOffice,
-              Optional.of(
-                  CreationParameters.builder()
-                      .documentNumber("DocumentNumb1")
-                      .decisionDate(LocalDate.of(2020, 12, 1))
-                      .fileNumbers(List.of("AZ-123"))
-                      .build()));
+      generateNewDocumentationUnit(
+          docOffice,
+          Optional.of(
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb1")
+                  .decisionDate(LocalDate.of(2020, 12, 1))
+                  .fileNumbers(List.of("AZ-123"))
+                  .build()));
 
-      var duplicate =
-          generateNewDocumentationUnit(
-              docOffice,
-              Optional.of(
-                  CreationParameters.builder()
-                      .documentNumber("DocumentNumb2")
-                      .fileNumbers(List.of("DIFFERENT"))
-                      .build()));
+      generateNewDocumentationUnit(
+          docOffice,
+          Optional.of(
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb2")
+                  .fileNumbers(List.of("DIFFERENT"))
+                  .build()));
 
-      // No duplicate relation created.
+      assertThat(duplicateRelationRepository.findAll()).isEmpty();
 
+      // Act + Assert
       assertThatThrownBy(
               () ->
                   duplicateCheckService.updateDuplicateStatus(
-                      original.getDocumentNumber(),
-                      duplicate.getDocumentNumber(),
-                      DuplicateRelationStatus.IGNORED))
+                      "DocumentNumb1", "DocumentNumb2", DuplicateRelationStatus.IGNORED))
           .isInstanceOf(EntityNotFoundException.class);
     }
   }
