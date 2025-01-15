@@ -90,7 +90,8 @@ gopass clone git@github.com:digitalservicebund/neuris-password-store.git neuris 
 > **Note**
 >
 > If there are any issues with this command, you need to clean the store and try again until it
-> works unfortunately ☹️. Be aware that this command removes ALL gopass stores from your machine, not only project related ones:
+> works unfortunately ☹️. Be aware that this command removes ALL gopass stores from your machine, not only project
+> related ones:
 >
 > ```
 > rm -rf ~/.local/share/gopass/stores
@@ -108,7 +109,8 @@ Synchronize the password store:
 gopass sync
 ```
 
-Now you can generate a new `.env` file containing the secrets. When using a Yubikey you may asked multiple times for your pin:
+Now you can generate a new `.env` file containing the secrets. When using a Yubikey you may asked multiple times for
+your pin:
 
 ```bash
 ./run.sh env
@@ -118,24 +120,46 @@ Now you can generate a new `.env` file containing the secrets. When using a Yubi
 >
 > This needs to be repeated every time the secrets change.
 
-### Running all tests locally
+### Lookup Tables Initialization
 
-You can run both frontend and backend tests simultaneously with the following commit:
+The caselaw application requires the initialization of lookup tables by the migration application image.
 
-```bash
-lefthook run tests
+#### Prerequisites
+
+To be able to pull the `ris-data-migration` image, log in to the GitHub Package Repository using your username and a
+credential token stored in 1Password (1PW):
+
+If you don't have a personal access token,
+read [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic)
+on how to create one. Then:
+
+```shell
+export CR_PAT=$(op read op://Employee/CR_PAT/password)
+echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin # Replace USERNAME with your GitHub username
 ```
 
-### Local Migration
+The following step requires an OTC access token, read here for
+more [info](https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/#step-2-obtain-access_key-credentials).
 
-The caselaw application requires the initialization of lookup tables by the migration application.
+To connect to your S3 bucket, ensure your AWS credentials are stored in 1Password, and then set the following
+environment variables in your shell:
 
-Follow the steps in [run_migration_locally.md](run_migration_locally.md):
+```shell
+op item edit 'OTC' aws_access_key_id=[your-access-key-id]
+op item edit 'OTC' aws_secret_access_key=[your-access-key-id]
 
-1. Prerequisites
-2. Import Data (By Script)
+```
 
-WIP: Run docker image in [migration_image.md](migration_image.md)
+#### Run Lookup Tables Initialization with Docker
+
+The following command will migrate the minimally required data (refdata and juris tables):
+
+```bash
+./run.sh -i
+```
+
+> Note: If you wish to migrate documentation units, use the instructions
+> in [run_migration_locally.md](run_migration_locally.md)
 
 ## Development
 
@@ -161,16 +185,22 @@ To run the frontend stack only (without backend and initialization) run:
 ./run.sh dev --no-backend
 ```
 
-When choosing the no-backend variant, checkout the [backend manual](./backend/README.md) on how to run the backend stand-alone without docker. The easiest way would be:
+When choosing the no-backend variant, checkout the [backend manual](./backend/README.md) on how to run the backend
+stand-alone without docker. The easiest way would be to start the
+backend [utilizing Spring Boot developer tools](https://docs.spring.io/spring-boot/docs/current/reference/html/using.html#using.devtools.restart)
+so changes in the Java sources will be reflected without manually restarting:
 
 ```bash
 cd backend
 SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 ```
 
-Overall docker compose spins up a reverse proxy (traefik) which listens on port 80. Therefore the application is available at <http://127.0.0.1>. If you get a `bad gateway` error make sure your firewall is not messing with you. On Ubuntu `sudo ufw disable` might do the trick. You may setup a certain firewall rule. Overall your milage may vary.
+> Note: Similarly, the frontend is served from [Vite](https://vitejs.dev)
+> with [HMR](https://vitejs.dev/guide/features.html#hot-module-replacement)
 
-This (what?) will start the backend [utilizing Spring Boot developer tools](https://docs.spring.io/spring-boot/docs/current/reference/html/using.html#using.devtools.restart) so changes in the Java sources will be reflected without manually restarting. Similarly, the frontend is served from [Vite](https://vitejs.dev) with [HMR](https://vitejs.dev/guide/features.html#hot-module-replacement).
+Overall docker compose spins up a reverse proxy (traefik) which listens on port 80. Therefore the application is
+available at <http://127.0.0.1>. If you get a `bad gateway` error make sure your firewall is not messing with you. On
+Ubuntu `sudo ufw disable` might do the trick. You may setup a certain firewall rule. Overall your milage may vary.
 
 > **Note**
 >
@@ -178,7 +208,8 @@ This (what?) will start the backend [utilizing Spring Boot developer tools](http
 > includes supported
 > browsers for E2E and a11y testing through playwright. Should that fail, you
 >
-> can [install them manually](https://github.com/digitalservicebund/ris-backend-service/tree/main/frontend#prerequisites).
+>
+can [install them manually](https://github.com/digitalservicebund/ris-backend-service/tree/main/frontend#prerequisites).
 
 To see logs of the containers, use e.g.
 
@@ -208,6 +239,14 @@ see [example pipeline deploy step definition](https://github.com/digitalserviceb
 - Sync the respective ArgoCD App, which will cause ArgoCD to apply all changed Kubernetes manifests
   on the cluster to
   create the desired state
+
+## Tests
+
+You can run both frontend and backend tests simultaneously with the following commit:
+
+```bash
+lefthook run tests
+```
 
 ## API Documentation
 

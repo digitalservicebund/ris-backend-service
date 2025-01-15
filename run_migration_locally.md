@@ -38,11 +38,11 @@ This instruction will allow engineers to setup their local environment with the 
 
 ### Checkout Migration at Current Tag
 
-Change to the location where you checked out the [ris-data-migration](https://github.com/digitalservicebund/ris-data-migration) repository. Checkout the tag that is used in [backend/build.gradle.kts](backend/build.gradle.kts) in line that looks like `implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.32")` , e.g.
+Change to the location where you checked out the [ris-data-migration](https://github.com/digitalservicebund/ris-data-migration) repository. Pull the latest state
 
 ```bash
 cd ../ris-data-migration
-git checkout tags/v0.0.32 -b v0.0.32
+git pull
 ```
 
 ### Import with Script
@@ -148,7 +148,7 @@ To repeat files downloading, remove the `../ris-data-migration/juris-xml-data` d
 
 ### Update the Lookup Tables / Reimport for Backfilling
 
-1. Checkout `ris-data-migration` at the currently used tag (see "Checkout Migration at Current Tag" above)
+1. Pull `ris-data-migration` 
 
 2. Download the new lookup tables and document units (see steps 4 and 5 above)
 
