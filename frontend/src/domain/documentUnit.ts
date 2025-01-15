@@ -29,6 +29,7 @@ export type CoreData = {
   legalEffect?: string
   inputTypes?: string[]
   documentationOffice?: DocumentationOffice
+  creatingDocOffice?: DocumentationOffice
   region?: string
   yearsOfDispute?: string[]
   leadingDecisionNormReferences?: string[]

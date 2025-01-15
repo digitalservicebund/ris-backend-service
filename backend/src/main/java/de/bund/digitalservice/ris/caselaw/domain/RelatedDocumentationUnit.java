@@ -30,6 +30,8 @@ public class RelatedDocumentationUnit {
   protected DocumentType documentType;
   protected UUID createdByReference;
   protected boolean referenceFound;
+  protected DocumentationOffice documentationOffice;
+  protected DocumentationOffice creatingDocOffice;
 
   @Transient
   public boolean isEmpty() {

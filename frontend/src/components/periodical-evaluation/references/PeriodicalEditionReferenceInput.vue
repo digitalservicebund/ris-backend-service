@@ -234,6 +234,8 @@ async function addReferenceWithCreatedDocumentationUnit(docUnit: DocumentUnit) {
       status: docUnit.status,
       referenceFound: true,
       createdByReference: reference.value.id,
+      creatingDocOffice: docUnit.coreData.creatingDocOffice,
+      documentationOffice: docUnit.coreData.documentationOffice,
     }),
   )
 }
