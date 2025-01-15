@@ -26,7 +26,7 @@ pre-commit:
       tags: frontend lint
       root: frontend/
       glob: "*.{vue,ts,js,json}"
-      run: npm run --silent eslint:fix {staged_files} && git add {staged_files}
+      run: npm run --silent eslint:fix {staged_files} && git add {staged_files}    
     frontend-stylelint:
       tags: frontend lint
       root: frontend/
@@ -87,6 +87,19 @@ pre-push:
           exit 1
         fi
 
-skip_output:
-  - meta
-  - execution
+tests:
+  follow: true
+  parallel: true
+  commands:
+    frontend-tests:
+      tags: frontend tests
+      root: frontend/
+      run: npm run check 2>&1
+    backend-unit-tests:
+      tags: backend tests
+      root: backend/
+      run: ./gradlew test -x integrationTest 2>&1
+    backend-integration-tests:
+      tags: backend tests
+      root: backend/
+      run: ./gradlew integrationTest -x test 2>&1
