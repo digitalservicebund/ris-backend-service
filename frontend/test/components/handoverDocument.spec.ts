@@ -569,6 +569,7 @@ describe("HandoverDocumentationUnitView:", () => {
     renderComponent({
       documentUnit: new DocumentUnit("123", {
         managementData: {
+          duplicateRelations: [],
           borderNumbers: [],
           scheduledPublicationDateTime: "2050-01-01T04:00:00.000Z",
         },

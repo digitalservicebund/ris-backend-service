@@ -220,7 +220,7 @@ describe("DuplicateRelationListItem", () => {
       expect(setStatusServiceMock).toHaveBeenCalledOnce()
       expect(screen.queryByTestId("set-state-error")).not.toBeInTheDocument()
       expect(
-        documentUnit?.managementData?.duplicateRelations?.[0].status,
+        documentUnit?.managementData?.duplicateRelations[0].status,
       ).toEqual(DuplicationRelationStatus.IGNORED)
     })
 
@@ -246,7 +246,7 @@ describe("DuplicateRelationListItem", () => {
       expect(setStatusServiceMock).toHaveBeenCalledOnce()
       expect(screen.queryByTestId("set-state-error")).not.toBeInTheDocument()
       expect(
-        documentUnit?.managementData?.duplicateRelations?.[0].status,
+        documentUnit?.managementData?.duplicateRelations[0].status,
       ).toEqual(DuplicationRelationStatus.PENDING)
     })
 
@@ -270,7 +270,7 @@ describe("DuplicateRelationListItem", () => {
       expect(setStatusServiceMock).toHaveBeenCalledOnce()
       expect(screen.getByTestId("set-state-error")).toBeInTheDocument()
       expect(
-        documentUnit?.managementData?.duplicateRelations?.[0].status,
+        documentUnit?.managementData?.duplicateRelations[0].status,
       ).toEqual(DuplicationRelationStatus.PENDING)
     })
   })

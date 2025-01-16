@@ -42,7 +42,7 @@ const updateStatus = async (newStatus: DuplicationRelationStatus) => {
   hasSetStateError.value = error
   if (!error) {
     const docUnitDupRelation =
-      documentUnit.value?.managementData?.duplicateRelations?.find(
+      documentUnit.value?.managementData?.duplicateRelations.find(
         (rel) => rel.documentNumber === duplicateRelation.documentNumber,
       )
     if (docUnitDupRelation) docUnitDupRelation.status = newStatus

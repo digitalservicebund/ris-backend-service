@@ -25,7 +25,7 @@ const { documentUnit } = storeToRefs(useDocumentUnitStore())
               :duplicate-relation="duplicateRelation"
             />
             <div
-              v-if="!documentUnit?.managementData.duplicateRelations?.length"
+              v-if="!documentUnit?.managementData.duplicateRelations.length"
               class="flex flex-row gap-8"
             >
               <IconCheck class="text-green-700" />

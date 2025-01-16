@@ -129,7 +129,7 @@ export type DuplicateRelation = {
 export type ManagementData = {
   scheduledPublicationDateTime?: string
   scheduledByEmail?: string
-  duplicateRelations?: DuplicateRelation[]
+  duplicateRelations: DuplicateRelation[]
   borderNumbers: string[]
 }
 

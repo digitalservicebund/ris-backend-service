@@ -4,14 +4,20 @@ import { RouterLink } from "vue-router"
 import ExpandableContent from "./ExpandableContent.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
 import { InfoStatus } from "@/components/enumInfoStatus"
+import HandoverDuplicateCheckView from "@/components/HandoverDuplicateCheckView.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import ScheduledPublishingDateTime from "@/components/ScheduledPublishingDateTime.vue"
 import TitleElement from "@/components/TitleElement.vue"
+import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import ActiveCitation, { activeCitationLabels } from "@/domain/activeCitation"
-import { longTextLabels, shortTextLabels } from "@/domain/documentUnit"
+import {
+  DuplicationRelationStatus,
+  longTextLabels,
+  shortTextLabels,
+} from "@/domain/documentUnit"
 import EnsuingDecision, {
   ensuingDecisionFieldLabels,
 } from "@/domain/ensuingDecision"
@@ -59,6 +65,7 @@ const previewError = ref()
 const errorMessage = computed(
   () => frontendError.value ?? previewError.value ?? props.errorMessage,
 )
+const isDuplicateFeatureActive = useFeatureToggle("neuris.duplicate-check")
 
 onMounted(async () => {
   // Save doc unit in case there are any unsaved local changes before fetching xml preview
@@ -118,6 +125,12 @@ function handoverDocumentUnit() {
 //Required Core Data fields
 const missingCoreDataFields = ref(
   store.documentUnit!.missingRequiredFields.map((field) => fieldLabels[field]),
+)
+
+const pendingDuplicates = ref(
+  store.documentUnit!.managementData.duplicateRelations.filter(
+    (relation) => relation.status === DuplicationRelationStatus.PENDING,
+  ),
 )
 
 //Required Previous Decision fields
@@ -300,6 +313,10 @@ const isDecisionReasonsInvalid = computed<boolean>(
     !!store.documentUnit?.longTexts.decisionReasons,
 )
 
+const hasActiveDuplicateWarning = computed<boolean>(
+  () => pendingDuplicates.value.length > 0,
+)
+
 const isScheduled = computed<boolean>(
   () => !!store.documentUnit!.managementData.scheduledPublicationDateTime,
 )
@@ -310,7 +327,8 @@ const isPublishable = computed<boolean>(
     !fieldsMissing.value &&
     !isCaseFactsInvalid.value &&
     !isDecisionReasonsInvalid.value &&
-    !!preview.value?.success,
+    !!preview.value?.success &&
+    pendingDuplicates.value.length === 0,
 )
 </script>
 
@@ -494,7 +512,7 @@ const isPublishable = computed<boolean>(
               >
                 Die Reihenfolge der Randnummern ist nicht korrekt.
                 <dl class="my-16">
-                  <div class="grid grid-cols-3 gap-24 px-0">
+                  <div class="grid grid-cols-2 gap-24 px-0">
                     <dt class="ds-label-02-bold self-center">Rubrik</dt>
                     <dd class="ds-body-02-reg">
                       {{
@@ -504,7 +522,7 @@ const isPublishable = computed<boolean>(
                       }}
                     </dd>
                   </div>
-                  <div class="grid grid-cols-3 gap-24 px-0">
+                  <div class="grid grid-cols-2 gap-24 px-0">
                     <dt class="ds-label-02-bold self-center">
                       Erwartete Randnummer
                     </dt>
@@ -512,7 +530,7 @@ const isPublishable = computed<boolean>(
                       {{ borderNumberValidationResult.expectedBorderNumber }}
                     </dd>
                   </div>
-                  <div class="grid grid-cols-3 gap-24 px-0">
+                  <div class="grid grid-cols-2 gap-24 px-0">
                     <dt class="ds-label-02-bold self-center">
                       Tatsächliche Randnummer
                     </dt>
@@ -574,6 +592,11 @@ const isPublishable = computed<boolean>(
           <p>Die Randnummern werden neu berechnet</p>
         </div>
       </div>
+      <HandoverDuplicateCheckView
+        :has-active-duplicate-warning="hasActiveDuplicateWarning"
+        :is-duplicate-feature-active="isDuplicateFeatureActive"
+        :pending-duplicates="pendingDuplicates"
+      />
       <div class="border-b-1 border-b-gray-400"></div>
 
       <ExpandableContent
