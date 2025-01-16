@@ -9,5 +9,7 @@ public record DuplicateRelation(
     DuplicateRelationStatus status,
     String courtLabel,
     String fileNumber,
+    String documentType,
+    PublicationStatus publicationStatus,
     LocalDate decisionDate,
     boolean isJdvDuplicateCheckActive) {}

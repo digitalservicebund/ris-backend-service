@@ -119,9 +119,11 @@ export type DuplicateRelation = {
   documentNumber: string
   status: DuplicationRelationStatus
   isJdvDuplicateCheckActive: boolean
-  decisionDate?: string
   courtLabel?: string
+  decisionDate?: string
   fileNumber?: string
+  documentType?: string
+  publicationStatus?: PublicationStatus
 }
 
 export type ManagementData = {
