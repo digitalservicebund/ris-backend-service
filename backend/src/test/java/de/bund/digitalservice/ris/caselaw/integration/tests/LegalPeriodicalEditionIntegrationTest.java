@@ -428,14 +428,15 @@ class LegalPeriodicalEditionIntegrationTest {
             list -> {
               assertThat(list.get(0).citation())
                   .isEqualTo("Caselaw Reference Citation from Docunit");
+              assertThat(list.get(0).documentationUnitRank()).isEqualTo(1);
               assertThat(list.get(1).id()).isEqualTo(existingReferenceId);
               assertThat(list.get(1).citation())
                   .isEqualTo("Updated Caselaw Reference Citation from Edition");
-              assertThat(list.get(1).documentationUnitRank()).isEqualTo(1);
+              assertThat(list.get(1).documentationUnitRank()).isEqualTo(2);
               assertThat(list.get(2).id()).isEqualTo(newReferenceId);
               assertThat(list.get(2).citation())
                   .isEqualTo("New Caselaw Reference Citation from Edition");
-              assertThat(list.get(2).documentationUnitRank()).isEqualTo(2);
+              assertThat(list.get(2).documentationUnitRank()).isEqualTo(3);
             });
 
     // then, literature references
@@ -445,14 +446,15 @@ class LegalPeriodicalEditionIntegrationTest {
             list -> {
               assertThat(list.get(0).citation())
                   .isEqualTo("Literature Reference Citation from Docunit");
+              assertThat(list.get(0).documentationUnitRank()).isEqualTo(1);
               assertThat(list.get(1).id()).isEqualTo(existingLiteratureCitationId);
               assertThat(list.get(1).citation())
                   .isEqualTo("Updated Literature Reference Citation from Edition");
-              assertThat(list.get(1).documentationUnitRank()).isEqualTo(1);
+              assertThat(list.get(1).documentationUnitRank()).isEqualTo(2);
               assertThat(list.get(2).id()).isEqualTo(newLiteratureReferenceId);
               assertThat(list.get(2).citation())
                   .isEqualTo("New Literature Reference Citation from Edition");
-              assertThat(list.get(2).documentationUnitRank()).isEqualTo(2);
+              assertThat(list.get(2).documentationUnitRank()).isEqualTo(3);
             });
 
     // clean up
@@ -591,8 +593,8 @@ class LegalPeriodicalEditionIntegrationTest {
     Assertions.assertEquals("New Literature Reference from Edition", references.get(1).citation());
 
     // assure rank is updated
-    assertThat(references.get(0).documentationUnitRank()).isEqualTo(1);
-    assertThat(references.get(1).documentationUnitRank()).isEqualTo(1);
+    assertThat(references.get(0).documentationUnitRank()).isEqualTo(2);
+    assertThat(references.get(1).documentationUnitRank()).isEqualTo(2);
     assertThat(references.get(0).editionRank()).isEqualTo(0);
     assertThat(references.get(1).editionRank()).isEqualTo(1);
 
@@ -603,9 +605,9 @@ class LegalPeriodicalEditionIntegrationTest {
             list -> {
               // first, caselaw references
               assertThat(list.get(0).citation()).isEqualTo("Caselaw Reference from Docunit");
-              assertThat(list.get(0).documentationUnitRank()).isEqualTo(0);
+              assertThat(list.get(0).documentationUnitRank()).isEqualTo(1);
               assertThat(list.get(1).citation()).isEqualTo("New Caselaw Reference from Edition");
-              assertThat(list.get(1).documentationUnitRank()).isEqualTo(1);
+              assertThat(list.get(1).documentationUnitRank()).isEqualTo(2);
             });
 
     assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").literatureReferences())
@@ -614,9 +616,9 @@ class LegalPeriodicalEditionIntegrationTest {
             list -> {
               // then, literature citations
               assertThat(list.get(0).citation()).isEqualTo("Literature Reference from Docunit");
-              assertThat(list.get(0).documentationUnitRank()).isEqualTo(0);
+              assertThat(list.get(0).documentationUnitRank()).isEqualTo(1);
               assertThat(list.get(1).citation()).isEqualTo("New Literature Reference from Edition");
-              assertThat(list.get(1).documentationUnitRank()).isEqualTo(1);
+              assertThat(list.get(1).documentationUnitRank()).isEqualTo(2);
             });
 
     assertThat(referenceRepository.findById(referenceId)).isEmpty();

@@ -19,12 +19,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostgresLegalPeriodicalEditionRepositoryImpl
     implements LegalPeriodicalEditionRepository {
   private final DatabaseLegalPeriodicalEditionRepository repository;
+  private final DatabaseReferenceRepository referenceRepository;
   private final DatabaseDocumentationUnitRepository documentationUnitRepository;
 
   public PostgresLegalPeriodicalEditionRepositoryImpl(
       DatabaseLegalPeriodicalEditionRepository repository,
+      DatabaseReferenceRepository referenceRepository,
       DatabaseDocumentationUnitRepository documentationUnitRepository) {
     this.repository = repository;
+    this.referenceRepository = referenceRepository;
     this.documentationUnitRepository = documentationUnitRepository;
   }
 
@@ -66,6 +69,7 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
     }
 
     editionDTO.setReferences(references);
+    removeDeletedReferences(legalPeriodicalEdition);
     return LegalPeriodicalEditionTransformer.transformToDomain(repository.save(editionDTO));
   }
 
@@ -104,6 +108,64 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
                       + 1);
     }
     return null;
+  }
+
+  /**
+   * Delete references removed in legal periodical evaluation from their DocumentationUnit to
+   * prevent reference orphans and ensure a source relationship is removed if exists. The references
+   * to delete are identified by comparing the last saved edition to the updated one.
+   *
+   * @param updatedEdition the new version of the legal periodical edition
+   */
+  private void removeDeletedReferences(LegalPeriodicalEdition updatedEdition) {
+    var oldEdition = repository.findById(updatedEdition.id());
+    if (oldEdition.isEmpty()) {
+      return;
+    }
+
+    // Ensure references deleted in edition are removed from DocumentationUnit's references
+    for (ReferenceDTO reference : oldEdition.get().getReferences()) {
+      // identify deleted references (not null and not in updated edition)
+      var referenceDTO = referenceRepository.findById(reference.getId());
+      if (referenceDTO.isEmpty()
+          || updatedEdition.references().stream()
+              .anyMatch(newReference -> newReference.id().equals(reference.getId()))) {
+        continue;
+      }
+
+      // delete all deleted references and possible source reference
+      if (referenceDTO.get() instanceof CaselawReferenceDTO caselawReferenceDTO) {
+        documentationUnitRepository
+            .findById(referenceDTO.get().getDocumentationUnit().getId())
+            .ifPresent(
+                docUnit -> {
+                  docUnit.getCaselawReferences().remove(caselawReferenceDTO);
+                  if (docUnit.getSource().stream()
+                      .findFirst()
+                      .map(SourceDTO::getReference)
+                      .filter(ref -> ref.getId().equals(reference.getId()))
+                      .isPresent()) {
+                    docUnit.getSource().removeFirst();
+                  }
+                  documentationUnitRepository.save(docUnit);
+                });
+      } else if (referenceDTO.get() instanceof LiteratureReferenceDTO literatureReferenceDTO) {
+        documentationUnitRepository
+            .findById(referenceDTO.get().getDocumentationUnit().getId())
+            .ifPresent(
+                docUnit -> {
+                  docUnit.getLiteratureReferences().remove(literatureReferenceDTO);
+                  if (docUnit.getSource().stream()
+                      .findFirst()
+                      .map(SourceDTO::getReference)
+                      .filter(ref -> ref.getId().equals(reference.getId()))
+                      .isPresent()) {
+                    docUnit.getSource().removeFirst();
+                  }
+                  documentationUnitRepository.save(docUnit);
+                });
+      }
+    }
   }
 
   @Override
