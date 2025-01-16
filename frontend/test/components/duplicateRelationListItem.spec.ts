@@ -53,6 +53,12 @@ describe("DuplicateRelationListItem", () => {
       expect(ignoreCheckbox).not.toBeChecked()
       expect(ignoreCheckbox).not.toHaveAttribute("readonly")
       expect(ignoreCheckbox).toBeEnabled()
+
+      const warningIcon = screen.queryByTestId("warning-icon-duplicate-1")
+      // jsdom does not load tailwind classes, so toBeVisible() check does not work here.
+      expect(warningIcon).not.toHaveClass("invisible")
+
+      expect(screen.queryByTestId("set-state-error")).not.toBeInTheDocument()
     })
 
     it("should show checked check box if status is ignored", async () => {
@@ -73,6 +79,12 @@ describe("DuplicateRelationListItem", () => {
       expect(ignoreCheckbox).toBeChecked()
       expect(ignoreCheckbox).not.toHaveAttribute("readonly")
       expect(ignoreCheckbox).toBeEnabled()
+
+      const warningIcon = screen.queryByTestId("warning-icon-duplicate-1")
+      // jsdom does not load tailwind classes, so toBeVisible() check does not work here.
+      expect(warningIcon).toHaveClass("invisible")
+
+      expect(screen.queryByTestId("set-state-error")).not.toBeInTheDocument()
     })
 
     it("should show docnumber and disabled checked check box if jdv dup check is turned off", async () => {
@@ -92,9 +104,20 @@ describe("DuplicateRelationListItem", () => {
       const ignoreCheckbox = screen.getByLabelText("Warnung ignorieren")
       expect(ignoreCheckbox).toBeChecked()
       expect(ignoreCheckbox).toBeDisabled()
+
+      const checkboxLabel = screen.getByText(
+        'Warnung ignoriert wegen "Dupcode ausschalten" (jDV)',
+      )
+      expect(checkboxLabel).toBeVisible()
+
+      const warningIcon = screen.queryByTestId("warning-icon-duplicate-1")
+      // jsdom does not load tailwind classes, so toBeVisible() check does not work here.
+      expect(warningIcon).toHaveClass("invisible")
+
+      expect(screen.queryByTestId("set-state-error")).not.toBeInTheDocument()
     })
 
-    it("should show full data if full core data is given", async () => {
+    it("should display full data if full core data is given", async () => {
       const duplicateRelation: DuplicateRelation = {
         documentNumber: "duplicate-1",
         courtLabel: "AG Aachen",
@@ -116,9 +139,15 @@ describe("DuplicateRelationListItem", () => {
       const ignoreCheckbox = screen.getByLabelText("Warnung ignorieren")
       expect(ignoreCheckbox).not.toBeChecked()
       expect(ignoreCheckbox).toBeEnabled()
+
+      const warningIcon = screen.queryByTestId("warning-icon-duplicate-1")
+      // jsdom does not load tailwind classes, so toBeVisible() check does not work here.
+      expect(warningIcon).not.toHaveClass("invisible")
+
+      expect(screen.queryByTestId("set-state-error")).not.toBeInTheDocument()
     })
 
-    it("should show only partial core data", async () => {
+    it("should display only partial core data", async () => {
       const duplicateRelation: DuplicateRelation = {
         documentNumber: "duplicate-1",
         courtLabel: "AG Aachen",
@@ -137,6 +166,34 @@ describe("DuplicateRelationListItem", () => {
       const ignoreCheckbox = screen.getByLabelText("Warnung ignorieren")
       expect(ignoreCheckbox).not.toBeChecked()
       expect(ignoreCheckbox).toBeEnabled()
+
+      const warningIcon = screen.queryByTestId("warning-icon-duplicate-1")
+      // jsdom does not load tailwind classes, so toBeVisible() check does not work here.
+      expect(warningIcon).not.toHaveClass("invisible")
+    })
+
+    it("should display only single core data", async () => {
+      const duplicateRelation: DuplicateRelation = {
+        documentNumber: "duplicate-1",
+        fileNumber: "fileNumber-A",
+        status: DuplicationRelationStatus.PENDING,
+        isJdvDuplicateCheckActive: true,
+      }
+      renderDuplicateRelation(duplicateRelation)
+
+      const coreDataText = screen.getByTestId("core-data-text")
+      expect(coreDataText).toHaveTextContent("fileNumber-A")
+
+      const docUnitLink = screen.getByTestId("document-number-link-duplicate-1")
+      expect(docUnitLink).toHaveTextContent("duplicate-1")
+
+      const ignoreCheckbox = screen.getByLabelText("Warnung ignorieren")
+      expect(ignoreCheckbox).not.toBeChecked()
+      expect(ignoreCheckbox).toBeEnabled()
+
+      const warningIcon = screen.queryByTestId("warning-icon-duplicate-1")
+      // jsdom does not load tailwind classes, so toBeVisible() check does not work here.
+      expect(warningIcon).not.toHaveClass("invisible")
     })
   })
 
@@ -152,6 +209,7 @@ describe("DuplicateRelationListItem", () => {
       }
       const { documentUnit } = renderDuplicateRelation(duplicateRelation)
 
+      expect(screen.queryByTestId("set-state-error")).not.toBeInTheDocument()
       expect(screen.getByLabelText("Warnung ignorieren")).not.toBeChecked()
 
       const ignoreCheckbox = screen.getByLabelText("Warnung ignorieren")
@@ -177,6 +235,7 @@ describe("DuplicateRelationListItem", () => {
       }
       const { documentUnit } = renderDuplicateRelation(duplicateRelation)
 
+      expect(screen.queryByTestId("set-state-error")).not.toBeInTheDocument()
       expect(screen.getByLabelText("Warnung ignorieren")).toBeChecked()
 
       const ignoreCheckbox = screen.getByLabelText("Warnung ignorieren")
@@ -203,6 +262,7 @@ describe("DuplicateRelationListItem", () => {
       const { documentUnit } = renderDuplicateRelation(duplicateRelation)
 
       expect(screen.getByLabelText("Warnung ignorieren")).not.toBeChecked()
+      expect(screen.queryByTestId("set-state-error")).not.toBeInTheDocument()
 
       const ignoreCheckbox = screen.getByLabelText("Warnung ignorieren")
       await fireEvent.click(ignoreCheckbox)

@@ -71,11 +71,16 @@ const coreDataText = computed(() =>
     <div class="flex flex-row items-center gap-12">
       <span>
         <IconErrorOutline
-          :class="isIgnored ? 'text-gray-800' : 'text-red-800'"
+          :class="isIgnored ? 'invisible' : 'text-red-800'"
+          :data-testid="`warning-icon-${duplicateRelation.documentNumber}`"
         />
       </span>
 
-      <span v-if="coreDataText" data-testid="core-data-text">
+      <span
+        v-if="coreDataText"
+        class="ds-label-01-reg"
+        data-testid="core-data-text"
+      >
         {{ coreDataText }}
       </span>
 
@@ -98,7 +103,7 @@ const coreDataText = computed(() =>
     </div>
 
     <InputField
-      id="isIgnored"
+      :id="`is-ignored-${duplicateRelation.documentNumber}`"
       v-slot="{ id }"
       class="whitespace-nowrap"
       :label="warningIgnoredLabel"
