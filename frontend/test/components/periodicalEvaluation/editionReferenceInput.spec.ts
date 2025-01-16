@@ -42,9 +42,6 @@ function renderComponent() {
 
 describe("Legal periodical edition reference input", () => {
   beforeEach(() => {
-    // Mock scrollIntoView
-    const scrollIntoViewMock = vi.fn()
-    window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
     vi.spyOn(
       documentUnitService,
       "searchByRelatedDocumentation",
@@ -79,10 +76,6 @@ describe("Legal periodical edition reference input", () => {
     )
   })
 
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
   it("search is triggered with shortcut", async () => {
     vi.spyOn(console, "error").mockImplementation(() => null)
     const { user } = renderComponent()
@@ -92,23 +85,23 @@ describe("Legal periodical edition reference input", () => {
     await user.keyboard("{Control>}{Enter}")
 
     expect(screen.getAllByText(/test fileNumber1/).length).toBe(1)
+    vi.restoreAllMocks()
   })
 
   test("adding a decision scrolls to reference on validation errors", async () => {
-    vi.spyOn(console, "error").mockImplementation(() => null)
-
     const { user } = renderComponent()
-    const scrollIntoViewMock = vi.fn()
     const searchButton = screen.getByLabelText("Nach Entscheidung suchen")
-    window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
-
+    const scrollToMock = vi.fn()
+    window.scrollTo = scrollToMock
     await user.click(searchButton)
 
     const addDecision = screen.getByLabelText("Treffer übernehmen")
     await user.click(addDecision)
+
+    // scrollTo called on mounted, on searchresults mounted and on validation failed
     expect(
-      scrollIntoViewMock,
+      scrollToMock,
       "Adding a reference with missing required fields should scroll to entry",
-    ).toHaveBeenCalledTimes(2)
+    ).toHaveBeenCalledTimes(3)
   })
 })
