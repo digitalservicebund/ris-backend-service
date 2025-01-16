@@ -3,12 +3,15 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DuplicateRelationTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelation;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -30,6 +33,8 @@ public class DuplicateRelationTransformerTest {
         DocumentationUnitDTO.builder()
             .id(uuid2)
             .documentNumber("documentNumber2")
+            .status(StatusDTO.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
+            .documentType(DocumentTypeDTO.builder().label("Beschluss").build())
             .court(CourtDTO.builder().type("AG").location("Aachen").build())
             .decisionDate(decisionDate)
             .fileNumbers(List.of(FileNumberDTO.builder().value("my-file-number-1").build()))
@@ -58,6 +63,8 @@ public class DuplicateRelationTransformerTest {
             .documentNumber("documentNumber2")
             .fileNumber("my-file-number-1")
             .courtLabel("AG Aachen")
+            .publicationStatus(PublicationStatus.UNPUBLISHED)
+            .documentType("Beschluss")
             .decisionDate(decisionDate)
             .isJdvDuplicateCheckActive(true)
             .build();
