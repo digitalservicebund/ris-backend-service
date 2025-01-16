@@ -126,45 +126,33 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
     // Ensure references deleted in edition are removed from DocumentationUnit's references
     for (ReferenceDTO reference : oldEdition.get().getReferences()) {
       // identify deleted references (not null and not in updated edition)
-      var referenceDTO = referenceRepository.findById(reference.getId());
-      if (referenceDTO.isEmpty()
+      var referenceDTOOptional = referenceRepository.findById(reference.getId());
+      if (referenceDTOOptional.isEmpty()
           || updatedEdition.references().stream()
               .anyMatch(newReference -> newReference.id().equals(reference.getId()))) {
         continue;
       }
 
       // delete all deleted references and possible source reference
-      if (referenceDTO.get() instanceof CaselawReferenceDTO caselawReferenceDTO) {
-        documentationUnitRepository
-            .findById(referenceDTO.get().getDocumentationUnit().getId())
-            .ifPresent(
-                docUnit -> {
+      ReferenceDTO referenceDTO = referenceDTOOptional.get();
+      documentationUnitRepository
+          .findById(referenceDTO.getDocumentationUnit().getId())
+          .ifPresent(
+              docUnit -> {
+                if (referenceDTO instanceof CaselawReferenceDTO caselawReferenceDTO) {
                   docUnit.getCaselawReferences().remove(caselawReferenceDTO);
-                  if (docUnit.getSource().stream()
-                      .findFirst()
-                      .map(SourceDTO::getReference)
-                      .filter(ref -> ref.getId().equals(reference.getId()))
-                      .isPresent()) {
-                    docUnit.getSource().removeFirst();
-                  }
-                  documentationUnitRepository.save(docUnit);
-                });
-      } else if (referenceDTO.get() instanceof LiteratureReferenceDTO literatureReferenceDTO) {
-        documentationUnitRepository
-            .findById(referenceDTO.get().getDocumentationUnit().getId())
-            .ifPresent(
-                docUnit -> {
+                } else if (referenceDTO instanceof LiteratureReferenceDTO literatureReferenceDTO) {
                   docUnit.getLiteratureReferences().remove(literatureReferenceDTO);
-                  if (docUnit.getSource().stream()
-                      .findFirst()
-                      .map(SourceDTO::getReference)
-                      .filter(ref -> ref.getId().equals(reference.getId()))
-                      .isPresent()) {
-                    docUnit.getSource().removeFirst();
-                  }
-                  documentationUnitRepository.save(docUnit);
-                });
-      }
+                }
+                if (docUnit.getSource().stream()
+                    .findFirst()
+                    .map(SourceDTO::getReference)
+                    .filter(ref -> ref.getId().equals(reference.getId()))
+                    .isPresent()) {
+                  docUnit.getSource().removeFirst();
+                }
+                documentationUnitRepository.save(docUnit);
+              });
     }
   }
 
