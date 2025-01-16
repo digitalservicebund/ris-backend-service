@@ -34,19 +34,18 @@ const isIgnored = computed({
 })
 
 const updateStatus = async (newStatus: DuplicationRelationStatus) => {
+  const docUnitDupRelation =
+    documentUnit.value?.managementData?.duplicateRelations.find(
+      (rel) => rel.documentNumber === duplicateRelation.documentNumber,
+    )
+  if (docUnitDupRelation) docUnitDupRelation.status = newStatus
+
   const { error } = await documentUnitService.setDuplicationRelationStatus(
     documentUnit.value!.documentNumber,
     duplicateRelation.documentNumber,
     newStatus,
   )
   hasSetStateError.value = error
-  if (!error) {
-    const docUnitDupRelation =
-      documentUnit.value?.managementData?.duplicateRelations.find(
-        (rel) => rel.documentNumber === duplicateRelation.documentNumber,
-      )
-    if (docUnitDupRelation) docUnitDupRelation.status = newStatus
-  }
 }
 
 const warningIgnoredLabel = computed(() =>
