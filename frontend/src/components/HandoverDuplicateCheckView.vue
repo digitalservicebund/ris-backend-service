@@ -3,7 +3,6 @@ import dayjs from "dayjs"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import { DuplicateRelation } from "@/domain/documentUnit"
-import { PublicationStatus } from "@/domain/publicationStatus"
 import IconCheck from "~icons/ic/baseline-check"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
@@ -55,11 +54,9 @@ function renderSummary(duplicateRelation: DuplicateRelation) {
               >
                 <DecisionSummary
                   :document-number="duplicateRelation.documentNumber"
-                  :status="
-                    {
-                      publicationStatus: duplicateRelation.publicationStatus,
-                    } as PublicationStatus
-                  "
+                  :status="{
+                    publicationStatus: duplicateRelation.publicationStatus,
+                  }"
                   :summary="renderSummary(duplicateRelation)"
                 ></DecisionSummary>
               </div>

@@ -11,7 +11,7 @@ import SingleNorm from "./singleNorm"
 import Attachment from "@/domain/attachment"
 import LegalForce from "@/domain/legalForce"
 import ParticipatingJudge from "@/domain/participatingJudge"
-import { PublicationStatus } from "@/domain/publicationStatus"
+import { PublicationState, PublicationStatus } from "@/domain/publicationStatus"
 
 export type CoreData = {
   fileNumbers?: string[]
@@ -124,7 +124,7 @@ export type DuplicateRelation = {
   decisionDate?: string
   fileNumber?: string
   documentType?: string
-  publicationStatus?: PublicationStatus
+  publicationStatus?: PublicationState
 }
 
 export type ManagementData = {
