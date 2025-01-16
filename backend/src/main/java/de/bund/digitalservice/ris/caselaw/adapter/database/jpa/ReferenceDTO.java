@@ -24,7 +24,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@Table(schema = "incremental_migration", name = "literature_reference")
+@Table(schema = "incremental_migration", name = "reference")
 public abstract class ReferenceDTO {
 
   @Id private UUID id;
@@ -34,7 +34,7 @@ public abstract class ReferenceDTO {
   @JoinColumn(name = "documentation_unit_id")
   private DocumentationUnitDTO documentationUnit;
 
-  @Column(name = "documentation_unit_rank")
+  @Column(name = "rank")
   @NotNull
   private Integer documentationUnitRank;
 
