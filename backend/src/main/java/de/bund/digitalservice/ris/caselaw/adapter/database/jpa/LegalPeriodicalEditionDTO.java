@@ -48,7 +48,6 @@ public class LegalPeriodicalEditionDTO {
   @Column(name = "created_at")
   private LocalDate createdAt;
 
-  // new references
   @OneToMany(mappedBy = "edition", cascade = CascadeType.ALL, orphanRemoval = true)
   @OrderBy("editionRank")
   @Builder.Default

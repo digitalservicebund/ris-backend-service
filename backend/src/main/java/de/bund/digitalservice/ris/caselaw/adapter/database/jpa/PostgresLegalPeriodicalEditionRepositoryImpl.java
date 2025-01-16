@@ -76,9 +76,9 @@ public class PostgresLegalPeriodicalEditionRepositoryImpl
   /**
    * Keep doc unit's rank for existing references and set to max rank +1 for new references
    *
-   * @param reference
-   * @param docUnit
-   * @return
+   * @param reference the reference to calculate the rank for
+   * @param docUnit the documentation unit that the reference will be inserted into
+   * @return the appropriate rank for the reference inside the documentation unit
    */
   private Integer calculateDocumentationUnitRankForReference(
       Reference reference, DocumentationUnitDTO docUnit) {
