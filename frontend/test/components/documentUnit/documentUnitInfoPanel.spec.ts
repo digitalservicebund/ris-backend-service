@@ -1,11 +1,22 @@
 import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
+import { nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
-import DocumentUnit, { CoreData } from "@/domain/documentUnit"
+import DocumentUnit, {
+  CoreData,
+  DuplicateRelation,
+  DuplicationRelationStatus,
+} from "@/domain/documentUnit"
+import FeatureToggleService from "@/services/featureToggleService"
 import routes from "~/test-helper/routes"
 
-function renderComponent(options?: { heading?: string; coreData?: CoreData }) {
+function renderComponent(options?: {
+  heading?: string
+  coreData?: CoreData
+  duplicateRelations?: DuplicateRelation[]
+  isExternalUser?: boolean
+}) {
   const router = createRouter({
     history: createWebHistory(),
     routes: routes,
@@ -18,6 +29,11 @@ function renderComponent(options?: { heading?: string; coreData?: CoreData }) {
           router,
           createTestingPinia({
             initialState: {
+              session: {
+                user: {
+                  roles: [options?.isExternalUser ? "External" : "Internal"],
+                },
+              },
               docunitStore: {
                 documentUnit: new DocumentUnit("foo", {
                   documentNumber: "1234567891234",
@@ -27,6 +43,10 @@ function renderComponent(options?: { heading?: string; coreData?: CoreData }) {
                       location: "Test",
                       label: "AG Test",
                     },
+                  },
+                  managementData: {
+                    borderNumbers: [],
+                    duplicateRelations: options?.duplicateRelations ?? [],
                   },
                 }),
               },
@@ -39,6 +59,13 @@ function renderComponent(options?: { heading?: string; coreData?: CoreData }) {
 }
 
 describe("documentUnit InfoPanel", () => {
+  beforeAll(() => {
+    vi.spyOn(FeatureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
+  })
+
   it("renders heading if given", async () => {
     renderComponent({ heading: "test heading" })
 
@@ -66,5 +93,59 @@ describe("documentUnit InfoPanel", () => {
     renderComponent()
 
     expect(await screen.findByText("AG Test")).toBeInTheDocument()
+  })
+
+  it("renders a duplicate warning with link if there are pending duplicates", async () => {
+    renderComponent({
+      duplicateRelations: [
+        {
+          status: DuplicationRelationStatus.PENDING,
+          documentNumber: "doc",
+          isJdvDuplicateCheckActive: true,
+        },
+      ],
+    })
+
+    // Wait for feature flag
+    await nextTick()
+
+    expect(await screen.findByText("Dublettenverdacht")).toBeInTheDocument()
+    expect(screen.getByRole("link")).toHaveTextContent("Bitte prüfen")
+  })
+
+  it("renders a duplicate warning without link for external user", async () => {
+    renderComponent({
+      isExternalUser: true,
+      duplicateRelations: [
+        {
+          status: DuplicationRelationStatus.PENDING,
+          documentNumber: "doc",
+          isJdvDuplicateCheckActive: true,
+        },
+      ],
+    })
+
+    // Wait for feature flag
+    await nextTick()
+
+    expect(await screen.findByText("Dublettenverdacht")).toBeInTheDocument()
+    expect(screen.queryByRole("link")).not.toBeInTheDocument()
+  })
+
+  it("renders no duplicate warning if there are ignored duplicates", async () => {
+    renderComponent({
+      duplicateRelations: [
+        {
+          status: DuplicationRelationStatus.IGNORED,
+          documentNumber: "doc",
+          isJdvDuplicateCheckActive: true,
+        },
+      ],
+    })
+
+    // Wait for feature flag
+    await nextTick()
+
+    expect(screen.queryByText("Dublettenverdacht")).not.toBeInTheDocument()
   })
 })

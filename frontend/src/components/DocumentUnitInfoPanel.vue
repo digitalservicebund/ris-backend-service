@@ -66,6 +66,11 @@ const isRouteWithSaveButton = computed(
     route.path.includes("references"),
 )
 
+const managementDataRoute = computed(() => ({
+  name: "caselaw-documentUnit-documentNumber-managementData",
+  params: { documentNumber: documentUnitStore.documentUnit!.documentNumber },
+}))
+
 const statusBadge = ref(
   useStatusBadge(documentUnitStore.documentUnit?.status).value,
 )
@@ -117,10 +122,12 @@ watchEffect(() => {
         :icon="IconError"
         label="Dublettenverdacht"
       />
-      <RouterLink to="managementData">
-        <a v-if="isInternalUser" class="ds-link-01-bold text-red-900"
-          >Bitte prüfen</a
-        ></RouterLink
+      <RouterLink
+        v-if="isInternalUser"
+        class="ds-link-01-bold text-red-900"
+        :to="managementDataRoute"
+      >
+        Bitte prüfen</RouterLink
       >
       <span v-if="isRouteWithSaveButton">|</span>
     </div>
