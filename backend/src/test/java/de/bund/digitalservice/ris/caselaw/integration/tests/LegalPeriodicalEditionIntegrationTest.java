@@ -71,11 +71,6 @@ import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 
-// TODO
-// Edition Rank abtesten
-// Frontend reference: documentationUnitRank & editionRank
-// reference table erweitern statt literature_reference
-
 @RISIntegrationTest(
     imports = {
       DocumentationUnitService.class,
@@ -177,8 +172,9 @@ class LegalPeriodicalEditionIntegrationTest {
 
   @AfterEach
   void tearDown() {
-    databaseEditionRepository.deleteAll();
     documentationUnitRepository.deleteAll();
+    referenceRepository.deleteAll();
+    databaseEditionRepository.deleteAll();
   }
 
   @Test

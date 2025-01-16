@@ -16,7 +16,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Entity
 @EqualsAndHashCode(callSuper = true)
-@DiscriminatorValue("dependent")
+@DiscriminatorValue("literature")
 public class LiteratureReferenceDTO extends ReferenceDTO {
 
   @Column @NotBlank private String author;
