@@ -5,6 +5,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bund.digitalservice.ris.caselaw.config.LanguageToolConfig;
 import de.bund.digitalservice.ris.caselaw.domain.TextCorrectionService;
+import de.bund.digitalservice.ris.caselaw.domain.TextRange;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -36,7 +41,20 @@ public class LanguageToolService implements TextCorrectionService {
     ResponseEntity<String> response =
         restTemplate.exchange(languageToolConfig.getUrl(), HttpMethod.POST, entity, String.class);
 
+    getNoIndexTextRanges(text);
     ObjectMapper objectMapper = new ObjectMapper();
+
     return objectMapper.readTree(response.getBody());
+  }
+
+  public List<TextRange> getNoIndexTextRanges(String text) {
+    String regex = "<noindex>(.*?)</noindex>";
+    Pattern pattern = Pattern.compile(regex);
+    Matcher matcher = pattern.matcher(text);
+    List<TextRange> noIndexTextRanges = new ArrayList<>();
+    while (matcher.find()) {
+      noIndexTextRanges.add(TextRange.builder().start(matcher.start()).end(matcher.end()).build());
+    }
+    return noIndexTextRanges;
   }
 }
