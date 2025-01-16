@@ -34,11 +34,14 @@ import { debounce } from "lodash"
 import { Node as PMNode } from "prosemirror-model"
 import { Plugin, PluginKey, Transaction } from "prosemirror-state"
 import { Decoration, DecorationSet, EditorView } from "prosemirror-view"
+import languageToolService from "@/services/languageToolService"
+
 import {
   LanguageToolHelpingWords,
   LanguageToolResponse,
   Match,
 } from "@/types/languagetool"
+import { ServiceResponse } from "@/services/httpClient"
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -213,20 +216,10 @@ const getMatchAndSetDecorations = async (
   text: string,
   originalFrom: number,
 ) => {
-  const postOptions = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      Accept: "application/json",
-    },
-    body: `text=${encodeURIComponent(text)}&language=de-DE&enabledOnly=false`,
-  }
+  const languageToolCheckResponse: ServiceResponse<LanguageToolResponse> =
+    await languageToolService.check(text)
 
-  const ltRes: LanguageToolResponse = await (
-    await fetch(apiUrl, postOptions)
-  ).json()
-
-  const { matches } = ltRes
+  const { matches } = languageToolCheckResponse.data
 
   const decorations: Decoration[] = []
 
