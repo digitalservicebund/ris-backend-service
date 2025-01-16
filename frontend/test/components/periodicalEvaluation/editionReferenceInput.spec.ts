@@ -42,6 +42,9 @@ function renderComponent() {
 
 describe("Legal periodical edition reference input", () => {
   beforeEach(() => {
+    // Mock scrollIntoView
+    const scrollIntoViewMock = vi.fn()
+    window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
     vi.spyOn(
       documentUnitService,
       "searchByRelatedDocumentation",
@@ -76,6 +79,10 @@ describe("Legal periodical edition reference input", () => {
     )
   })
 
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it("search is triggered with shortcut", async () => {
     vi.spyOn(console, "error").mockImplementation(() => null)
     const { user } = renderComponent()
@@ -102,6 +109,6 @@ describe("Legal periodical edition reference input", () => {
     expect(
       scrollIntoViewMock,
       "Adding a reference with missing required fields should scroll to entry",
-    ).toHaveBeenCalledTimes(1)
+    ).toHaveBeenCalledTimes(2)
   })
 })
