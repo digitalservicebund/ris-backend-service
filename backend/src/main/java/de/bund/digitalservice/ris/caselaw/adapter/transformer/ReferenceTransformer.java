@@ -40,12 +40,14 @@ public class ReferenceTransformer {
                     : referenceDTO.getLegalPeriodicalRawValue()); // fallback to raw value
 
     if (referenceDTO instanceof CaselawReferenceDTO caselawReferenceDTO) {
+      Boolean primaryFromType =
+          caselawReferenceDTO.getType() != null
+              ? caselawReferenceDTO.getType().equals("amtlich") // fallback to raw value
+              : null;
       Boolean isPrimaryReference =
           builder.build().primaryReference() != null
               ? builder.build().primaryReference()
-              : caselawReferenceDTO.getType() != null
-                  ? caselawReferenceDTO.getType().equals("amtlich") // fallback to raw value
-                  : null;
+              : primaryFromType;
 
       if (isPrimaryReference == null) {
         throw new IllegalArgumentException(

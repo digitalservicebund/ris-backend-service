@@ -595,7 +595,7 @@ class LegalPeriodicalEditionIntegrationTest {
     // assure rank is updated
     assertThat(references.get(0).documentationUnitRank()).isEqualTo(2);
     assertThat(references.get(1).documentationUnitRank()).isEqualTo(2);
-    assertThat(references.get(0).editionRank()).isEqualTo(0);
+    assertThat(references.get(0).editionRank()).isZero();
     assertThat(references.get(1).editionRank()).isEqualTo(1);
 
     // documentation unit references are updated
