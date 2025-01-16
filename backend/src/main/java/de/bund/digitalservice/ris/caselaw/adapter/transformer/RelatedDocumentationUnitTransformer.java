@@ -41,6 +41,12 @@ public class RelatedDocumentationUnitTransformer {
                     sourceDTO ->
                         sourceDTO.getReference() == null ? null : sourceDTO.getReference().getId())
                 .orElse(null))
+        .documentationOffice(
+            DocumentationOfficeTransformer.transformToDomain(
+                documentationUnitDTO.getDocumentationOffice()))
+        .creatingDocOffice(
+            DocumentationOfficeTransformer.transformToDomain(
+                documentationUnitDTO.getCreatingDocumentationOffice()))
         .build();
   }
 

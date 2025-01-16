@@ -37,7 +37,8 @@ public interface DatabaseDocumentationUnitRepository
      (
         (:status IS NULL AND (
           documentationUnit.documentationOffice.id = :documentationOfficeId OR
-          status.publicationStatus IN (de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED, de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING)
+          status.publicationStatus IN (de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED, de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING) OR
+          (status.publicationStatus = de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.EXTERNAL_HANDOVER_PENDING AND documentationUnit.creatingDocumentationOffice.id = :documentationOfficeId)
           )
         )
      OR

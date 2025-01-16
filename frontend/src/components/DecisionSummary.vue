@@ -14,6 +14,7 @@ interface Props {
   documentNumber?: string
   displayMode?: DisplayMode
   icon?: Component
+  linkClickable?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -21,6 +22,7 @@ const props = withDefaults(defineProps<Props>(), {
   status: undefined,
   documentNumber: undefined,
   icon: undefined,
+  linkClickable: true, // eslint-disable-line vue/no-boolean-default
 })
 const { openSidePanel } = useScrollPreviewContainer()
 const statusBadge = computed(() => useStatusBadge(props.status).value)
@@ -49,9 +51,10 @@ const divider = computed(() => (props.documentNumber ? ` | ` : undefined))
           />
           {{ divider }}
 
+          <span v-if="!linkClickable"> {{ documentNumber }}</span>
           <!-- open preview in new tab -->
           <RouterLink
-            v-if="documentNumber && props.displayMode === DisplayMode.TAB"
+            v-else-if="documentNumber && props.displayMode === DisplayMode.TAB"
             class="ds-link-01-bold whitespace-nowrap no-underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
             :data-testid="'document-number-link-' + documentNumber"
             tabindex="-1"

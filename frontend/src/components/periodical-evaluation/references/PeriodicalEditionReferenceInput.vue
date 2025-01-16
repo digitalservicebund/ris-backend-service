@@ -234,6 +234,8 @@ async function addReferenceWithCreatedDocumentationUnit(docUnit: DocumentUnit) {
       status: docUnit.status,
       referenceFound: true,
       createdByReference: reference.value.id,
+      creatingDocOffice: docUnit.coreData.creatingDocOffice,
+      documentationOffice: docUnit.coreData.documentationOffice,
     }),
   )
 }
@@ -330,6 +332,13 @@ onMounted(async () => {
   featureToggle.value = (
     await FeatureToggleService.isEnabled("neuris.new-from-search")
   ).data
+  setTimeout(() => {
+    if (!containerRef.value) return
+    containerRef.value.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+    })
+  })
 })
 </script>
 
@@ -352,7 +361,7 @@ onMounted(async () => {
       @primary-action="deleteReferenceAndDocUnit"
       @secondary-action="deleteReference"
     />
-    <h2 v-if="!isSaved" class="ds-label-01-bold mb-16">
+    <h2 v-if="!isSaved" id="reference-input" class="ds-label-01-bold mb-16">
       Fundstelle hinzufügen
     </h2>
     <div class="flex flex-col gap-24">

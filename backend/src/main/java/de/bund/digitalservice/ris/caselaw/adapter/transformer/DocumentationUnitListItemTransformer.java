@@ -120,7 +120,13 @@ public class DocumentationUnitListItemTransformer {
             .documentType(
                 DocumentTypeTransformer.transformToDomain(
                     documentationUnitListItemDTO.getDocumentType()))
-            .referenceFound(true);
+            .referenceFound(true)
+            .documentationOffice(
+                DocumentationOfficeTransformer.transformToDomain(
+                    documentationUnitListItemDTO.getDocumentationOffice()))
+            .creatingDocOffice(
+                DocumentationOfficeTransformer.transformToDomain(
+                    documentationUnitListItemDTO.getCreatingDocumentationOffice()));
 
     if (documentationUnitListItemDTO.getFileNumbers() != null
         && !documentationUnitListItemDTO.getFileNumbers().isEmpty()) {

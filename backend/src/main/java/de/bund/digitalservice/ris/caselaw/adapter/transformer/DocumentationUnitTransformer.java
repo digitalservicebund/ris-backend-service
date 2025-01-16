@@ -997,12 +997,13 @@ public class DocumentationUnitTransformer {
       return;
     }
 
-    int size =
-        getEnsuingDecisionListSize(
-            documentationUnitDTO.getEnsuingDecisions(), documentationUnitDTO.getPendingDecisions());
-
     List<EnsuingDecision> withoutRank = new ArrayList<>();
-    EnsuingDecision[] ensuingDecisions = new EnsuingDecision[size];
+
+    EnsuingDecision[] ensuingDecisions =
+        new EnsuingDecision
+            [getEnsuingDecisionListSize(
+                documentationUnitDTO.getEnsuingDecisions(),
+                documentationUnitDTO.getPendingDecisions())];
 
     addEnsuingDecisionToDomain(
         documentationUnitDTO.getEnsuingDecisions(), withoutRank, ensuingDecisions);

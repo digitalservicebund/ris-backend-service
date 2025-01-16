@@ -82,16 +82,14 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
     var allDeviatingCourts = collectDeviatingCourts(documentationUnit);
     var allDocTypeIds = collectDocumentTypeIds(documentationUnit);
 
-    var duplicates =
-        findPotentialDuplicates(
-            documentationUnit,
-            allFileNumbers,
-            allDates,
-            allCourtIds,
-            allDeviatingCourts,
-            allEclis,
-            allDocTypeIds);
-    return duplicates;
+    return findPotentialDuplicates(
+        documentationUnit,
+        allFileNumbers,
+        allDates,
+        allCourtIds,
+        allDeviatingCourts,
+        allEclis,
+        allDocTypeIds);
   }
 
   @Override

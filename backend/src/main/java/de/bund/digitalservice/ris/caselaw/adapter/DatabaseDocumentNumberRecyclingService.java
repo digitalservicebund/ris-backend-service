@@ -57,31 +57,25 @@ public class DatabaseDocumentNumberRecyclingService implements DocumentNumberRec
           DocumentationUnitNotExistsException,
           DocumentNumberRecyclingException {
 
-    try {
+    assertPatternIsValid(documentationOfficeAbbreviation, documentationUnitNumber);
 
-      assertPatternIsValid(documentationOfficeAbbreviation, documentationUnitNumber);
+    var docUnit =
+        documentationUnitRepository
+            .findById(documentationUnitId)
+            .orElseThrow(() -> new DocumentationUnitNotExistsException(documentationUnitId));
 
-      var docUnit =
-          documentationUnitRepository
-              .findById(documentationUnitId)
-              .orElseThrow(() -> new DocumentationUnitNotExistsException(documentationUnitId));
+    assertDocumentationUnitHasNeverBeenHandedOverOrMigrated(documentationUnitId);
 
-      assertDocumentationUnitHasNeverBeenHandedOverOrMigrated(documentationUnitId);
+    assertStatusHasNeverBeenPublished(docUnit);
 
-      assertStatusHasNeverBeenPublished(docUnit);
+    var deleted =
+        DeletedDocumentationUnitDTO.builder()
+            .documentNumber(documentationUnitNumber)
+            .year(getYear(docUnit.getStatus().getCreatedAt()))
+            .abbreviation(documentationOfficeAbbreviation)
+            .build();
 
-      var deleted =
-          DeletedDocumentationUnitDTO.builder()
-              .documentNumber(documentationUnitNumber)
-              .year(getYear(docUnit.getStatus().getCreatedAt()))
-              .abbreviation(documentationOfficeAbbreviation)
-              .build();
-
-      repository.save(deleted);
-
-    } catch (Exception e) {
-      throw e;
-    }
+    repository.save(deleted);
   }
 
   /**

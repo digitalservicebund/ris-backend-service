@@ -6,7 +6,10 @@ import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
-import DocumentUnit from "@/domain/documentUnit"
+import DocumentUnit, {
+  longTextLabels,
+  shortTextLabels,
+} from "@/domain/documentUnit"
 import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
 import documentUnitService from "@/services/documentUnitService"
@@ -45,18 +48,8 @@ const labels = {
   fieldsOfLaw: "Sachgebiete",
   norms: "Normen",
   activeCitations: "Aktivzitierung",
-  headline: "Titelzeile",
-  guidingPrinciple: "Leitsatz",
-  headnote: "Orientierungssatz",
-  otherHeadnote: "Sonstiger Orientierungssatz",
-  tenor: "Tenor",
-  reasons: "Gründe",
-  caseFacts: "Tatbestand",
-  decisionReasons: "Entscheidungsgründe",
-  otherLongText: "Sonstiger Langtext",
-  dissentingOpinion: "Abweichende Meinung",
-  participatingJudges: "Mitwirkende Richter",
-  outline: "Gliederung",
+  ...shortTextLabels,
+  ...longTextLabels,
 }
 
 const hasContent = (key: keyof typeof labels): boolean => {
@@ -73,17 +66,15 @@ const hasContent = (key: keyof typeof labels): boolean => {
         key as keyof typeof documentUnitToImport.value.shortTexts
       ]
     } else if (key in documentUnitToImport.value.longTexts) {
-      const longText =
+      const sourceLongText =
         documentUnitToImport.value.longTexts[
           key as keyof typeof documentUnitToImport.value.longTexts
         ]
 
-      if (typeof longText === "string" && longText.trim().length > 0) {
-        return true
-      }
-      if (Array.isArray(longText) && longText.length > 0) {
-        return true
-      }
+      return (
+        !!sourceLongText &&
+        (!Array.isArray(sourceLongText) || sourceLongText.length > 0)
+      )
     }
   return false
 }
@@ -95,17 +86,16 @@ const isImportable = (key: keyof typeof labels): boolean => {
         key as keyof typeof documentUnitToImport.value.shortTexts
       ]
     } else if (key in documentUnitToImport.value.longTexts) {
-      const longText =
+      const targetLongText =
         store.documentUnit!.longTexts[
           key as keyof typeof documentUnitToImport.value.longTexts
         ]
 
-      if (typeof longText === "string" && longText.trim().length > 0) {
-        return false
-      }
-      if (Array.isArray(longText) && longText.length > 0) {
-        return false
-      }
+      const isEmptyText =
+        typeof targetLongText === "string" && targetLongText.trim().length > 0
+      const isEmptyArray =
+        Array.isArray(targetLongText) && targetLongText.length > 0
+      return !isEmptyText && !isEmptyArray
     }
   return true
 }
