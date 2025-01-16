@@ -313,7 +313,7 @@ const isDecisionReasonsInvalid = computed<boolean>(
     !!store.documentUnit?.longTexts.decisionReasons,
 )
 
-const hasActiveDuplicateWarning = computed<boolean>(
+const hasPendingDuplicateWarning = computed<boolean>(
   () => pendingDuplicates.value.length > 0,
 )
 
@@ -593,7 +593,7 @@ const isPublishable = computed<boolean>(
         </div>
       </div>
       <HandoverDuplicateCheckView
-        :has-active-duplicate-warning="hasActiveDuplicateWarning"
+        :has-active-duplicate-warning="hasPendingDuplicateWarning"
         :is-duplicate-feature-active="isDuplicateFeatureActive"
         :pending-duplicates="pendingDuplicates"
       />
