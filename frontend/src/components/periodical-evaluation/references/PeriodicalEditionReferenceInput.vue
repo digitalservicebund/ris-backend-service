@@ -332,6 +332,13 @@ onMounted(async () => {
   featureToggle.value = (
     await FeatureToggleService.isEnabled("neuris.new-from-search")
   ).data
+  setTimeout(() => {
+    if (!containerRef.value) return
+    containerRef.value.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+    })
+  })
 })
 </script>
 

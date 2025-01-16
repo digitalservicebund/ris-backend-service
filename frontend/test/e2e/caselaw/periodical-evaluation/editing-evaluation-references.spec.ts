@@ -668,6 +668,27 @@ test.describe(
       })
     })
 
+    test("New list entry is scrolled into viewport, when list is long", async ({
+      page,
+      editionWithManyReferences,
+    }) => {
+      await test.step("Click on 'Weitere Angabe' on top of references list", async () => {
+        await navigateToPeriodicalReferences(
+          page,
+          editionWithManyReferences.id || "",
+        )
+        await expect(page.getByLabel("Listen Eintrag")).toHaveCount(5)
+        await page.getByLabel("Weitere Angabe", { exact: true }).click()
+      })
+
+      await test.step("adds new entry, scrolls to new entry", async () => {
+        await expect(page.getByLabel("Listen Eintrag")).toHaveCount(6)
+        await expect(
+          page.getByLabel("Nach Entscheidung suchen"),
+        ).toBeInViewport()
+      })
+    })
+
     async function openDocumentationUnitEditModeTabThroughSidePanel(
       page: Page,
     ) {
