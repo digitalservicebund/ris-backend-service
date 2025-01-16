@@ -1,6 +1,7 @@
 import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
+import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitManagementData from "@/components/DocumentUnitManagementData.vue"
 import DocumentUnit, {
   DuplicateRelation,
@@ -8,6 +9,7 @@ import DocumentUnit, {
   ManagementData,
 } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import routes from "~/test-helper/routes"
 
 describe("DocumentUnitManagementData", () => {
   beforeEach(() => {
@@ -88,8 +90,15 @@ describe("DocumentUnitManagementData", () => {
 
   function renderManagementData(managementData: ManagementData) {
     const store = mockDocUnitStore(managementData)
+
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: routes,
+    })
+
     render(DocumentUnitManagementData, {
       global: {
+        plugins: [router],
         stubs: {
           RouterLink: {
             template: "<a><slot/></a>",

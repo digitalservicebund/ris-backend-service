@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia"
 import { computed, ref } from "vue"
+import DecisionSummary from "@/components/DecisionSummary.vue"
 import { InfoStatus } from "@/components/enumInfoStatus"
 import InfoModal from "@/components/InfoModal.vue"
 import CheckboxInput from "@/components/input/CheckboxInput.vue"
@@ -12,7 +13,6 @@ import {
 import documentUnitService from "@/services/documentUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import DateUtil from "@/utils/dateUtil"
-import BaselineArrowOutward from "~icons/ic/baseline-arrow-outward"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
 const { duplicateRelation } = defineProps<{
@@ -56,9 +56,10 @@ const warningIgnoredLabel = computed(() =>
 const coreDataText = computed(() =>
   [
     duplicateRelation.courtLabel,
-    duplicateRelation.fileNumber,
     duplicateRelation.decisionDate &&
       DateUtil.formatDate(duplicateRelation.decisionDate),
+    duplicateRelation.fileNumber,
+    duplicateRelation.documentType,
   ]
     .filter(Boolean)
     .join(", "),
@@ -75,30 +76,14 @@ const coreDataText = computed(() =>
         />
       </span>
 
-      <span
-        v-if="coreDataText"
+      <DecisionSummary
         class="ds-label-01-reg"
-        data-testid="core-data-text"
-      >
-        {{ coreDataText }}
-      </span>
-
-      <RouterLink
-        v-if="duplicateRelation.documentNumber"
-        class="ds-link-01-bold flex items-center whitespace-nowrap no-underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
-        :data-testid="
-          'document-number-link-' + duplicateRelation.documentNumber
-        "
-        tabindex="-1"
-        target="_blank"
-        :to="{
-          name: 'caselaw-documentUnit-documentNumber-preview',
-          params: { documentNumber: duplicateRelation.documentNumber },
+        :document-number="duplicateRelation.documentNumber"
+        :status="{
+          publicationStatus: duplicateRelation.publicationStatus,
         }"
-      >
-        {{ duplicateRelation.documentNumber }}
-        <BaselineArrowOutward class="mb-4 inline w-24" />
-      </RouterLink>
+        :summary="coreDataText"
+      ></DecisionSummary>
     </div>
 
     <InputField

@@ -1,13 +1,16 @@
 import { createTestingPinia } from "@pinia/testing"
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
+import { createRouter, createWebHistory } from "vue-router"
 import DuplicateRelationListItem from "@/components/DuplicateRelationListItem.vue"
 import DocumentUnit, {
   DuplicateRelation,
   DuplicationRelationStatus,
 } from "@/domain/documentUnit"
+import { PublicationState } from "@/domain/publicationStatus"
 import documentUnitService from "@/services/documentUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import routes from "~/test-helper/routes"
 
 function mockDocUnitStore(
   {
@@ -69,9 +72,6 @@ describe("DuplicateRelationListItem", () => {
       }
       renderDuplicateRelation(duplicateRelation)
 
-      const coreDataText = screen.queryByTestId("core-data-text")
-      expect(coreDataText).not.toBeInTheDocument()
-
       const docUnitLink = screen.getByTestId("document-number-link-duplicate-1")
       expect(docUnitLink).toHaveTextContent("duplicate-1")
 
@@ -94,9 +94,6 @@ describe("DuplicateRelationListItem", () => {
         isJdvDuplicateCheckActive: false,
       }
       renderDuplicateRelation(duplicateRelation)
-
-      const coreDataText = screen.queryByTestId("core-data-text")
-      expect(coreDataText).not.toBeInTheDocument()
 
       const docUnitLink = screen.getByTestId("document-number-link-duplicate-1")
       expect(docUnitLink).toHaveTextContent("duplicate-1")
@@ -122,15 +119,17 @@ describe("DuplicateRelationListItem", () => {
         documentNumber: "duplicate-1",
         courtLabel: "AG Aachen",
         decisionDate: "2020-04-03",
+        documentType: "Beschluss",
         fileNumber: "fileNumber-A",
+        publicationStatus: PublicationState.PUBLISHED,
         status: DuplicationRelationStatus.PENDING,
         isJdvDuplicateCheckActive: true,
       }
       renderDuplicateRelation(duplicateRelation)
 
-      const coreDataText = screen.getByTestId("core-data-text")
-      expect(coreDataText).toHaveTextContent(
-        "AG Aachen, fileNumber-A, 03.04.2020",
+      const decisionSummary = screen.getByTestId("decision-summary-duplicate-1")
+      expect(decisionSummary).toHaveTextContent(
+        "AG Aachen, 03.04.2020, fileNumber-A, Beschluss, Veröffentlicht",
       )
 
       const docUnitLink = screen.getByTestId("document-number-link-duplicate-1")
@@ -157,8 +156,8 @@ describe("DuplicateRelationListItem", () => {
       }
       renderDuplicateRelation(duplicateRelation)
 
-      const coreDataText = screen.getByTestId("core-data-text")
-      expect(coreDataText).toHaveTextContent("AG Aachen, fileNumber-A")
+      const decisionSummary = screen.getByTestId("decision-summary-duplicate-1")
+      expect(decisionSummary).toHaveTextContent("AG Aachen, fileNumber-A")
 
       const docUnitLink = screen.getByTestId("document-number-link-duplicate-1")
       expect(docUnitLink).toHaveTextContent("duplicate-1")
@@ -181,7 +180,7 @@ describe("DuplicateRelationListItem", () => {
       }
       renderDuplicateRelation(duplicateRelation)
 
-      const coreDataText = screen.getByTestId("core-data-text")
+      const coreDataText = screen.getByTestId("decision-summary-duplicate-1")
       expect(coreDataText).toHaveTextContent("fileNumber-A")
 
       const docUnitLink = screen.getByTestId("document-number-link-duplicate-1")
@@ -269,17 +268,25 @@ describe("DuplicateRelationListItem", () => {
 
       expect(setStatusServiceMock).toHaveBeenCalledOnce()
       expect(screen.getByTestId("set-state-error")).toBeInTheDocument()
+      // The state is set before the error is evaluated as to allow for quick navigation after setting the state
       expect(
         documentUnit?.managementData?.duplicateRelations[0].status,
-      ).toEqual(DuplicationRelationStatus.PENDING)
+      ).toEqual(DuplicationRelationStatus.IGNORED)
     })
   })
 
   function renderDuplicateRelation(duplicateRelation: DuplicateRelation) {
     const store = mockDocUnitStore({ duplicateRelations: [duplicateRelation] })
+
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: routes,
+    })
+
     render(DuplicateRelationListItem, {
       props: { duplicateRelation },
       global: {
+        plugins: [[router]],
         stubs: {
           RouterLink: {
             template: "<a><slot/></a>",
