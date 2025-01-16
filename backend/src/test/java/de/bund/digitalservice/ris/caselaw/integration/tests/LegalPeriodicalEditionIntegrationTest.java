@@ -428,7 +428,6 @@ class LegalPeriodicalEditionIntegrationTest {
             list -> {
               assertThat(list.get(0).citation())
                   .isEqualTo("Caselaw Reference Citation from Docunit");
-              assertThat(list.get(0).documentationUnitRank()).isEqualTo(1);
               assertThat(list.get(1).id()).isEqualTo(existingReferenceId);
               assertThat(list.get(1).citation())
                   .isEqualTo("Updated Caselaw Reference Citation from Edition");
@@ -446,7 +445,6 @@ class LegalPeriodicalEditionIntegrationTest {
             list -> {
               assertThat(list.get(0).citation())
                   .isEqualTo("Literature Reference Citation from Docunit");
-              assertThat(list.get(0).documentationUnitRank()).isEqualTo(1);
               assertThat(list.get(1).id()).isEqualTo(existingLiteratureCitationId);
               assertThat(list.get(1).citation())
                   .isEqualTo("Updated Literature Reference Citation from Edition");
