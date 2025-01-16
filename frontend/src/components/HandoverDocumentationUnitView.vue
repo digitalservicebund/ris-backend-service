@@ -328,7 +328,7 @@ const isPublishable = computed<boolean>(
     !isCaseFactsInvalid.value &&
     !isDecisionReasonsInvalid.value &&
     !!preview.value?.success &&
-    pendingDuplicates.value.length === 0,
+    (pendingDuplicates.value.length === 0 || !isDuplicateFeatureActive.value),
 )
 </script>
 
