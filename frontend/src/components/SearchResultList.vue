@@ -1,15 +1,17 @@
 <script setup lang="ts">
+import { watch } from "vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import { DisplayMode } from "@/components/enumDisplayMode"
 import FlexContainer from "@/components/FlexContainer.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
+import values from "@/data/values.json"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import errorMessages from "@/i18n/errors.json"
 import IconAdd from "~icons/ic/baseline-add"
 
-const { allowMultipleLinks = false } = defineProps<{
+const props = defineProps<{
   searchResults?: SearchResults<RelatedDocumentation>
   isLoading: boolean
   allowMultipleLinks?: boolean
@@ -18,6 +20,28 @@ const { allowMultipleLinks = false } = defineProps<{
 
 const emits =
   defineEmits<(event: "linkDecision", decision: RelatedDocumentation) => void>()
+
+watch(
+  () => props.searchResults,
+  async () => {
+    if (props.searchResults) {
+      setTimeout(() => {
+        const element = document.getElementById("searchResults")
+        if (element) {
+          const headerOffset = values.headerOffset
+          const elementPosition = element?.getBoundingClientRect().top
+          const offsetPosition = elementPosition + window.scrollY - headerOffset
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: "smooth",
+          })
+        }
+      })
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <script lang="ts">
@@ -28,7 +52,7 @@ export type SearchResults<Type extends RelatedDocumentation> = {
 </script>
 
 <template>
-  <div>
+  <div id="searchResults">
     <FlexContainer
       v-if="isLoading"
       class="m-24"
