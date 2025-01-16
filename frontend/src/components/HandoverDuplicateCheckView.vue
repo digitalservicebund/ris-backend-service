@@ -37,33 +37,31 @@ function renderSummary(duplicateRelation: DuplicateRelation) {
     <div v-if="hasActiveDuplicateWarning">
       <div class="flex flex-row gap-8">
         <IconErrorOutline class="text-red-800" />
-        <div class="ds-body-01-reg flex flex-col gap-24">
-          <div>
-            Es besteht Dublettenverdacht.
-            <div class="grid grid-cols-[auto_1fr] gap-24">
-              <div class="ds-label-02-bold mt-12 self-start">
-                {{
-                  pendingDuplicates.length > 1
-                    ? "Dokumentationseinheiten"
-                    : "Dokumentationseinheit"
-                }}
-              </div>
-              <div>
-                <div
-                  v-for="duplicateRelation in pendingDuplicates"
-                  :key="duplicateRelation.fileNumber"
-                  class="my-8"
-                >
-                  <DecisionSummary
-                    :document-number="duplicateRelation.documentNumber"
-                    :status="
-                      {
-                        publicationStatus: duplicateRelation.publicationStatus,
-                      } as PublicationStatus
-                    "
-                    :summary="renderSummary(duplicateRelation)"
-                  ></DecisionSummary>
-                </div>
+        <div class="ds-body-01-reg flex flex-col gap-8">
+          Es besteht Dublettenverdacht.
+          <div class="grid grid-cols-[auto_1fr] gap-24">
+            <div class="ds-label-02-bold mt-12 self-start">
+              {{
+                pendingDuplicates.length > 1
+                  ? "Dokumentationseinheiten"
+                  : "Dokumentationseinheit"
+              }}
+            </div>
+            <div>
+              <div
+                v-for="duplicateRelation in pendingDuplicates"
+                :key="duplicateRelation.fileNumber"
+                class="my-8"
+              >
+                <DecisionSummary
+                  :document-number="duplicateRelation.documentNumber"
+                  :status="
+                    {
+                      publicationStatus: duplicateRelation.publicationStatus,
+                    } as PublicationStatus
+                  "
+                  :summary="renderSummary(duplicateRelation)"
+                ></DecisionSummary>
               </div>
             </div>
           </div>
