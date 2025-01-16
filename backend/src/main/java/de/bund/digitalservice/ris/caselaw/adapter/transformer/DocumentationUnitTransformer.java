@@ -798,10 +798,11 @@ public class DocumentationUnitTransformer {
   }
 
   private static Boolean isPublishedDuplicateOrSameDocOffice(
-          DocumentationUnitDTO original, DocumentationUnitDTO duplicate) {
+      DocumentationUnitDTO original, DocumentationUnitDTO duplicate) {
     return original.getDocumentationOffice().equals(duplicate.getDocumentationOffice())
-            || duplicate.getStatus().getPublicationStatus().equals(PublicationStatus.PUBLISHED);
+        || duplicate.getStatus().getPublicationStatus().equals(PublicationStatus.PUBLISHED);
   }
+
   /**
    * Adds norm references to the domain object based on the provided documentation unit DTO. A list
    * of NormReferenceDTOs with the same normAbbreviation are grouped into one NormReference, with a
