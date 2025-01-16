@@ -41,14 +41,17 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -741,22 +744,7 @@ public class DocumentationUnitTransformer {
             documentationUnitDTO.getOtherLongText(),
             documentationUnitDTO.getDissentingOpinion());
 
-    Set<DuplicateRelation> duplicateRelations =
-        Stream.concat(
-                documentationUnitDTO.getDuplicateRelations1().stream()
-                    .filter(
-                        relation ->
-                            isPublishedDuplicateOrSameDocOffice(
-                                documentationUnitDTO, relation.getDocumentationUnit2())),
-                documentationUnitDTO.getDuplicateRelations2().stream()
-                    .filter(
-                        relation ->
-                            isPublishedDuplicateOrSameDocOffice(
-                                documentationUnitDTO, relation.getDocumentationUnit1())))
-            .map(
-                relation ->
-                    DuplicateRelationTransformer.transformToDomain(relation, documentationUnitDTO))
-            .collect(Collectors.toSet());
+    List<DuplicateRelation> duplicateRelations = transformDuplicateRelations(documentationUnitDTO);
 
     ManagementData managementData =
         ManagementData.builder()
@@ -795,6 +783,30 @@ public class DocumentationUnitTransformer {
     addStatusToDomain(documentationUnitDTO, builder);
 
     return builder.build();
+  }
+
+  @NotNull
+  private static List<DuplicateRelation> transformDuplicateRelations(
+      DocumentationUnitDTO documentationUnitDTO) {
+    return Stream.concat(
+            documentationUnitDTO.getDuplicateRelations1().stream()
+                .filter(
+                    relation ->
+                        isPublishedDuplicateOrSameDocOffice(
+                            documentationUnitDTO, relation.getDocumentationUnit2())),
+            documentationUnitDTO.getDuplicateRelations2().stream()
+                .filter(
+                    relation ->
+                        isPublishedDuplicateOrSameDocOffice(
+                            documentationUnitDTO, relation.getDocumentationUnit1())))
+        .map(
+            relation ->
+                DuplicateRelationTransformer.transformToDomain(relation, documentationUnitDTO))
+        .sorted(
+            Comparator.comparing(
+                relation -> Optional.ofNullable(relation.decisionDate()).orElse(LocalDate.MIN),
+                Comparator.reverseOrder()))
+        .collect(Collectors.toList());
   }
 
   private static Boolean isPublishedDuplicateOrSameDocOffice(
