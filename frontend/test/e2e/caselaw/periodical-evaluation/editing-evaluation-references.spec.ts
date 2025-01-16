@@ -647,47 +647,45 @@ test.describe(
       },
     )
 
-    test("Click on 'Weitere Angabe' on top of references list, scrolls to the bottom and adds new entry", async ({
-      page,
-      editionWithManyReferences,
-    }) => {
-      await test.step("Click on 'Weitere Angabe' on top of references list", async () => {
-        await navigateToPeriodicalReferences(
-          page,
-          editionWithManyReferences.id || "",
-        )
-        await expect(page.getByLabel("Listen Eintrag")).toHaveCount(5)
-        await page.getByLabel("Weitere Angabe Top").click()
-      })
+    test(
+      "Scrolling behaviour in long lists",
+      { tag: "@RISDEV-6030" },
+      async ({ page, editionWithManyReferences }) => {
+        await test.step("Click on 'Weitere Angabe' on top of references list, scrolls new entry at the bottom into viewport", async () => {
+          await navigateToPeriodicalReferences(
+            page,
+            editionWithManyReferences.id || "",
+          )
+          await expect(page.getByLabel("Listen Eintrag")).toHaveCount(5)
+          await page.getByLabel("Weitere Angabe Top").click()
+          await expect(page.getByLabel("Listen Eintrag")).toHaveCount(6)
+          await expect(
+            page.getByRole("heading", { name: "Fundstelle hinzufügen" }),
+          ).toBeInViewport()
+        })
 
-      await test.step("adds new entry, scrolls to new entry", async () => {
-        await expect(page.getByLabel("Listen Eintrag")).toHaveCount(6)
-        await expect(
-          page.getByRole("heading", { name: "Fundstelle hinzufügen" }),
-        ).toBeInViewport()
-      })
-    })
+        await test.step("Click on 'Weitere Angabe' at the bottom also scrolls new entry into viewport", async () => {
+          await page.reload()
+          await navigateToPeriodicalReferences(
+            page,
+            editionWithManyReferences.id || "",
+          )
+          await expect(page.getByLabel("Listen Eintrag")).toHaveCount(5)
+          await page.getByLabel("Weitere Angabe", { exact: true }).click()
+          await expect(page.getByLabel("Listen Eintrag")).toHaveCount(6)
+          await expect(
+            page.getByLabel("Nach Entscheidung suchen"),
+          ).toBeInViewport()
+        })
 
-    test("New list entry is scrolled into viewport, when list is long", async ({
-      page,
-      editionWithManyReferences,
-    }) => {
-      await test.step("Click on 'Weitere Angabe' on top of references list", async () => {
-        await navigateToPeriodicalReferences(
-          page,
-          editionWithManyReferences.id || "",
-        )
-        await expect(page.getByLabel("Listen Eintrag")).toHaveCount(5)
-        await page.getByLabel("Weitere Angabe", { exact: true }).click()
-      })
-
-      await test.step("adds new entry, scrolls to new entry", async () => {
-        await expect(page.getByLabel("Listen Eintrag")).toHaveCount(6)
-        await expect(
-          page.getByLabel("Nach Entscheidung suchen"),
-        ).toBeInViewport()
-      })
-    })
+        await test.step("Click on 'Suche' scrolls search results into viewport", async () => {
+          await page.getByLabel("Nach Entscheidung suchen").click()
+          await expect(
+            page.getByText("Passende Suchergebnisse:"),
+          ).toBeInViewport()
+        })
+      },
+    )
 
     async function openDocumentationUnitEditModeTabThroughSidePanel(
       page: Page,

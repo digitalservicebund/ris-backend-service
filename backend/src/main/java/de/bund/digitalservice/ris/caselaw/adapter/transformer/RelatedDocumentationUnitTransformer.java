@@ -19,7 +19,8 @@ public class RelatedDocumentationUnitTransformer {
     return CourtTransformer.transformToDomain(courtDTO);
   }
 
-  static RelatedDocumentationUnit transformToDomain(DocumentationUnitDTO documentationUnitDTO) {
+  public static RelatedDocumentationUnit transformToDomain(
+      DocumentationUnitDTO documentationUnitDTO) {
     return RelatedDocumentationUnit.builder()
         .uuid(documentationUnitDTO.getId())
         .documentNumber(documentationUnitDTO.getDocumentNumber())

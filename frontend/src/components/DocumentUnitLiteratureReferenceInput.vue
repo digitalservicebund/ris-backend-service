@@ -60,7 +60,11 @@ async function addReference() {
   await validateRequiredInput()
 
   if (!reference.value.hasMissingRequiredLiteratureFields) {
-    emit("update:modelValue", reference.value as Reference)
+    const literatureReference = new Reference({
+      ...reference.value,
+      referenceType: "literature",
+    })
+    emit("update:modelValue", literatureReference)
     emit("addEntry")
   }
 }

@@ -1,7 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.domain.Reference;
 import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
@@ -21,39 +23,55 @@ public class ReferenceTransformer {
           LegalPeriodicalTransformer.transformToDomain(referenceDTO.getLegalPeriodical());
     }
 
-    Boolean isPrimaryReference =
-        legalPeriodical != null
-            ? legalPeriodical.primaryReference()
-            : referenceDTO.getType() != null
-                ? referenceDTO.getType().equals("amtlich") // fallback to raw value
-                : null;
+    Reference.ReferenceBuilder builder =
+        Reference.builder()
+            .id(referenceDTO.getId())
+            .primaryReference(legalPeriodical != null ? legalPeriodical.primaryReference() : null)
+            .citation(referenceDTO.getCitation())
+            .documentationUnit(
+                RelatedDocumentationUnitTransformer.transformToDomain(
+                    referenceDTO.getDocumentationUnit()))
+            .documentationUnitRank(referenceDTO.getDocumentationUnitRank())
+            .editionRank(referenceDTO.getEditionRank())
+            .legalPeriodical(legalPeriodical)
+            .legalPeriodicalRawValue(
+                legalPeriodical != null
+                    ? legalPeriodical.abbreviation()
+                    : referenceDTO.getLegalPeriodicalRawValue()); // fallback to raw value
 
-    if (isPrimaryReference == null) {
-      throw new IllegalArgumentException(
-          "Either the referenceDTO's legalPeriodical or type field must be set");
+    if (referenceDTO instanceof CaselawReferenceDTO caselawReferenceDTO) {
+      Boolean primaryFromType =
+          caselawReferenceDTO.getType() != null
+              ? caselawReferenceDTO.getType().equals("amtlich") // fallback to raw value
+              : null;
+      Boolean isPrimaryReference =
+          builder.build().primaryReference() != null
+              ? builder.build().primaryReference()
+              : primaryFromType;
+
+      if (isPrimaryReference == null) {
+        throw new IllegalArgumentException(
+            "Either the referenceDTO's legalPeriodical or type field must be set");
+      }
+
+      return builder
+          .primaryReference(isPrimaryReference)
+          .referenceSupplement(caselawReferenceDTO.getReferenceSupplement())
+          .footnote(caselawReferenceDTO.getFootnote())
+          .referenceType(ReferenceType.CASELAW)
+          .build();
+
+    } else if (referenceDTO instanceof LiteratureReferenceDTO literatureReferenceDTO) {
+      return builder
+          .author(literatureReferenceDTO.getAuthor())
+          .documentType(
+              DocumentTypeTransformer.transformToDomain(literatureReferenceDTO.getDocumentType()))
+          .referenceType(ReferenceType.LITERATURE)
+          .build();
+
+    } else {
+      throw new IllegalArgumentException("Unsupported referenceDTO type");
     }
-
-    return Reference.builder()
-        .id(referenceDTO.getId())
-        .referenceSupplement(referenceDTO.getReferenceSupplement())
-        .citation(referenceDTO.getCitation())
-        .footnote(referenceDTO.getFootnote())
-        .referenceType(ReferenceType.CASELAW)
-        .documentationUnit(
-            RelatedDocumentationUnitTransformer.transformToDomain(
-                referenceDTO.getDocumentationUnit()))
-        // editionRank is only set if reference is requested from edition
-        .rank(
-            referenceDTO.getEditionRank() != null
-                ? referenceDTO.getEditionRank()
-                : referenceDTO.getRank())
-        .legalPeriodical(legalPeriodical)
-        .legalPeriodicalRawValue(
-            legalPeriodical != null
-                ? legalPeriodical.abbreviation()
-                : referenceDTO.getLegalPeriodicalRawValue()) // fallback to raw value
-        .primaryReference(isPrimaryReference)
-        .build();
   }
 
   public static ReferenceDTO transformToDTO(Reference reference) {
@@ -71,28 +89,45 @@ public class ReferenceTransformer {
           DocumentationUnitDTO.builder().id(reference.documentationUnit().getUuid()).build();
     }
 
-    Boolean isPrimaryReference =
-        legalPeriodicalDTO != null
-            ? legalPeriodicalDTO.getPrimaryReference()
-            : reference.primaryReference(); // fallback to nichtamtlich
+    if (reference.referenceType().equals(ReferenceType.CASELAW)) {
+      Boolean isPrimaryReference =
+          legalPeriodicalDTO != null
+              ? legalPeriodicalDTO.getPrimaryReference()
+              : reference.primaryReference(); // fallback to nichtamtlich
 
-    if (isPrimaryReference == null) {
-      throw new IllegalArgumentException(
-          "Either the reference's legalPeriodical or primaryReference field must be set");
+      if (isPrimaryReference == null) {
+        throw new IllegalArgumentException(
+            "Either the reference's legalPeriodical or primaryReference field must be set");
+      }
+
+      return CaselawReferenceDTO.builder()
+          .id(reference.id())
+          .legalPeriodical(legalPeriodicalDTO)
+          .citation(reference.citation())
+          .legalPeriodicalRawValue(
+              legalPeriodicalRawValue != null
+                  ? legalPeriodicalRawValue
+                  : reference.legalPeriodicalRawValue()) // fallback to raw value
+          .documentationUnit(documentationUnitDTO)
+          .referenceSupplement(reference.referenceSupplement())
+          .footnote(reference.footnote())
+          .type(isPrimaryReference ? "amtlich" : "nichtamtlich")
+          .build();
+    } else if (reference.referenceType().equals(ReferenceType.LITERATURE)) {
+      return LiteratureReferenceDTO.builder()
+          .id(reference.id())
+          .legalPeriodical(legalPeriodicalDTO)
+          .citation(reference.citation())
+          .legalPeriodicalRawValue(
+              legalPeriodicalRawValue != null
+                  ? legalPeriodicalRawValue
+                  : reference.legalPeriodicalRawValue()) // fallback to raw value
+          .documentationUnit(documentationUnitDTO)
+          .author(reference.author())
+          .documentType(DocumentTypeTransformer.transformToDTO(reference.documentType()))
+          .build();
+    } else {
+      throw new IllegalArgumentException("Unsupported reference type");
     }
-
-    return ReferenceDTO.builder()
-        .id(reference.id())
-        .referenceSupplement(reference.referenceSupplement())
-        .legalPeriodical(legalPeriodicalDTO)
-        .citation(reference.citation())
-        .footnote(reference.footnote())
-        .type(isPrimaryReference ? "amtlich" : "nichtamtlich")
-        .legalPeriodicalRawValue(
-            legalPeriodicalRawValue != null
-                ? legalPeriodicalRawValue
-                : reference.legalPeriodicalRawValue()) // fallback to raw value
-        .documentationUnit(documentationUnitDTO)
-        .build();
   }
 }
