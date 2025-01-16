@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.domain;
+package de.bund.digitalservice.ris.caselaw.domain.languagetool;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 

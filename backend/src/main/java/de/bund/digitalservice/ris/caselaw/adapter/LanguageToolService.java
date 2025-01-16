@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bund.digitalservice.ris.caselaw.config.LanguageToolConfig;
-import de.bund.digitalservice.ris.caselaw.domain.TextCorrectionService;
 import de.bund.digitalservice.ris.caselaw.domain.TextRange;
+import de.bund.digitalservice.ris.caselaw.domain.languagetool.TextCorrectionService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -44,7 +44,7 @@ public class LanguageToolService implements TextCorrectionService {
     getNoIndexTextRanges(text);
     ObjectMapper objectMapper = new ObjectMapper();
 
-    return objectMapper.readTree(response.getBody());
+    return objectMapper.readValue(response.getBody(), JsonNode.class);
   }
 
   public List<TextRange> getNoIndexTextRanges(String text) {
@@ -56,5 +56,9 @@ public class LanguageToolService implements TextCorrectionService {
       noIndexTextRanges.add(TextRange.builder().start(matcher.start()).end(matcher.end()).build());
     }
     return noIndexTextRanges;
+  }
+
+  public void removeNoIndexMatches(String text) {
+    var noIndexMatches = getNoIndexTextRanges(text);
   }
 }
