@@ -302,7 +302,7 @@ watch(searchResultsCurrentPage, () => {
   pageNumber.value = 0
 })
 
-/** Opens up the side panel, if only on search result found
+/** Opens up the side panel, if only one search result found
  */
 watch(searchResults, async () => {
   if (searchResults.value?.length == 1) {
