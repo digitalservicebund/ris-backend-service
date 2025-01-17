@@ -99,11 +99,6 @@ describe("DocumentUnitManagementData", () => {
     render(DocumentUnitManagementData, {
       global: {
         plugins: [router],
-        stubs: {
-          RouterLink: {
-            template: "<a><slot/></a>",
-          },
-        },
       },
     })
     return store

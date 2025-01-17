@@ -286,12 +286,7 @@ describe("DuplicateRelationListItem", () => {
     render(DuplicateRelationListItem, {
       props: { duplicateRelation },
       global: {
-        plugins: [[router]],
-        stubs: {
-          RouterLink: {
-            template: "<a><slot/></a>",
-          },
-        },
+        plugins: [router],
       },
     })
     return store
