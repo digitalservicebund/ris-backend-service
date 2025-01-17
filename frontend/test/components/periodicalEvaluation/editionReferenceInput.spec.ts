@@ -1,7 +1,7 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import { createPinia, setActivePinia } from "pinia"
+import { setActivePinia } from "pinia"
 import { createRouter, createWebHistory } from "vue-router"
 import PeriodicalEditionReferenceInput from "@/components/periodical-evaluation/references/PeriodicalEditionReferenceInput.vue"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
@@ -16,6 +16,10 @@ vi.mock("@/stores/documentUnitStore", () => ({
 
 vi.mock("@/stores/extraContentSidePanelStore", () => ({
   useExtraContentSidePanelStore: vi.fn(),
+}))
+
+vi.mock("@/stores/useEditionStore", () => ({
+  useEditionStore: vi.fn(),
 }))
 
 // Mock the useScroll composable globally
@@ -64,7 +68,7 @@ function renderComponent() {
 describe("Legal periodical edition reference input", () => {
   beforeEach(() => {
     // Activate Pinia
-    setActivePinia(createPinia())
+    setActivePinia(createTestingPinia())
 
     // Mock the searchByRelatedDocumentation method
     vi.spyOn(
@@ -102,7 +106,6 @@ describe("Legal periodical edition reference input", () => {
   })
 
   it("search is triggered with shortcut", async () => {
-    vi.spyOn(console, "error").mockImplementation(() => null)
     const { user } = renderComponent()
 
     expect(screen.queryByText(/test fileNumber1/)).not.toBeInTheDocument()
@@ -114,7 +117,6 @@ describe("Legal periodical edition reference input", () => {
   })
 
   test("adding a decision scrolls to reference on validation errors", async () => {
-    vi.spyOn(console, "error").mockImplementation(() => null)
     const { user } = renderComponent()
 
     await user.click(screen.getByLabelText("Nach Entscheidung suchen"))

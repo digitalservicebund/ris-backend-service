@@ -1,4 +1,5 @@
-import { createPinia, setActivePinia } from "pinia"
+import { createTestingPinia } from "@pinia/testing"
+import { setActivePinia } from "pinia"
 import { describe, it, vi, beforeEach, afterEach, expect } from "vitest"
 import { useScroll } from "@/composables/useScroll"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -20,7 +21,7 @@ describe("useScroll", () => {
   beforeEach(() => {
     vi.useFakeTimers()
     // Activate Pinia
-    setActivePinia(createPinia())
+    setActivePinia(createTestingPinia())
 
     // Mock the stores
     documentUnitStoreMock = {
