@@ -49,7 +49,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -807,7 +806,7 @@ public class DocumentationUnitTransformer {
             Comparator.comparing(
                 relation -> Optional.ofNullable(relation.decisionDate()).orElse(LocalDate.MIN),
                 Comparator.reverseOrder()))
-        .collect(Collectors.toList());
+        .toList();
   }
 
   private static Boolean isPublishedDuplicateOrSameDocOffice(
