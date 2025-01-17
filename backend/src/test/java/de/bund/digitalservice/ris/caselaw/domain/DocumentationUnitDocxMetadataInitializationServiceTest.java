@@ -142,14 +142,14 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
             .fileNumbers(List.of())
             .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
             .build();
-    DocumentationUnit documentationUnit = DocumentationUnit.builder().coreData(coreData).build();
-    when(repository.findByUuid(TEST_UUID)).thenReturn(documentationUnit);
+    DocumentationUnit docUnit = DocumentationUnit.builder().coreData(coreData).build();
+    when(repository.findByUuid(TEST_UUID)).thenReturn(docUnit);
 
     Map<DocxMetadataProperty, String> properties =
         Map.of(DocxMetadataProperty.LEGAL_EFFECT, "Nein");
     Docx2Html docx2html = new Docx2Html(null, List.of(), properties);
 
-    service.initializeCoreData(documentationUnit, docx2html);
+    service.initializeCoreData(docUnit, docx2html);
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);
