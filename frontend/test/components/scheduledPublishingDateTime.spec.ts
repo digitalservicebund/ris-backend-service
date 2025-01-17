@@ -22,6 +22,7 @@ function mockDocUnitStore({
     managementData: {
       scheduledPublicationDateTime,
       scheduledByEmail,
+      duplicateRelations: [],
       borderNumbers: [],
     },
   })

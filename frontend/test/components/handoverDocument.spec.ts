@@ -3,30 +3,22 @@ import { userEvent } from "@testing-library/user-event"
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { Stubs } from "@vue/test-utils/dist/types"
 import { beforeEach } from "vitest"
+import { nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import HandoverDocumentationUnitView from "@/components/HandoverDocumentationUnitView.vue"
-import DocumentUnit from "@/domain/documentUnit"
+import DocumentUnit, { DuplicateRelationStatus } from "@/domain/documentUnit"
 import { Env } from "@/domain/env"
 import { EventRecordType, HandoverMail, Preview } from "@/domain/eventRecord"
 import LegalForce from "@/domain/legalForce"
 import NormReference from "@/domain/normReference"
 import SingleNorm from "@/domain/singleNorm"
+import featureToggleService from "@/services/featureToggleService"
 import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
+import routes from "~/test-helper/routes"
 
 const router = createRouter({
   history: createWebHistory(),
-  routes: [
-    {
-      path: "/caselaw/documentUnit/:documentNumber/categories",
-      name: "caselaw-documentUnit-documentNumber-categories",
-      component: {},
-    },
-    {
-      path: "/",
-      name: "caselaw",
-      component: {},
-    },
-  ],
+  routes: routes,
 })
 
 function renderComponent(
@@ -76,6 +68,10 @@ describe("HandoverDocumentationUnitView:", () => {
         success: true,
       }),
     })
+    vi.spyOn(featureToggleService, "isEnabled").mockResolvedValue({
+      status: 200,
+      data: true,
+    })
   })
   describe("renders plausibility check", () => {
     it("with all required fields filled", async () => {
@@ -100,7 +96,7 @@ describe("HandoverDocumentationUnitView:", () => {
       })
 
       expect(
-        screen.getByText("Alle Pflichtfelder sind korrekt ausgefüllt"),
+        screen.getByText("Alle Pflichtfelder sind korrekt ausgefüllt."),
       ).toBeInTheDocument()
       expect(
         screen.queryByText(
@@ -223,7 +219,7 @@ describe("HandoverDocumentationUnitView:", () => {
       expect(screen.getByText("Rubriken bearbeiten")).toBeInTheDocument()
 
       expect(
-        screen.queryByText("Alle Pflichtfelder sind korrekt ausgefüllt"),
+        screen.queryByText("Alle Pflichtfelder sind korrekt ausgefüllt."),
       ).not.toBeInTheDocument()
       expect(screen.queryByText("XML Vorschau")).not.toBeInTheDocument()
       expect(
@@ -263,7 +259,7 @@ describe("HandoverDocumentationUnitView:", () => {
       expect(screen.queryByText("Rubriken bearbeiten")).not.toBeInTheDocument()
 
       expect(
-        screen.getByText("Alle Pflichtfelder sind korrekt ausgefüllt"),
+        screen.getByText("Alle Pflichtfelder sind korrekt ausgefüllt."),
       ).toBeInTheDocument()
       expect(await screen.findByText("XML Vorschau")).toBeInTheDocument()
       expect(
@@ -303,7 +299,7 @@ describe("HandoverDocumentationUnitView:", () => {
       expect(screen.getByText("Rubriken bearbeiten")).toBeInTheDocument()
 
       expect(
-        screen.queryByText("Alle Pflichtfelder sind korrekt ausgefüllt"),
+        screen.queryByText("Alle Pflichtfelder sind korrekt ausgefüllt."),
       ).not.toBeInTheDocument()
       expect(screen.queryByText("XML Vorschau")).not.toBeInTheDocument()
       expect(
@@ -343,7 +339,7 @@ describe("HandoverDocumentationUnitView:", () => {
       expect(screen.queryByText("Rubriken bearbeiten")).not.toBeInTheDocument()
 
       expect(
-        screen.getByText("Alle Pflichtfelder sind korrekt ausgefüllt"),
+        screen.getByText("Alle Pflichtfelder sind korrekt ausgefüllt."),
       ).toBeInTheDocument()
       expect(await screen.findByText("XML Vorschau")).toBeInTheDocument()
       expect(
@@ -382,6 +378,91 @@ describe("HandoverDocumentationUnitView:", () => {
       expect(router.currentRoute.value.name).toBe(
         "caselaw-documentUnit-documentNumber-categories",
       )
+    })
+
+    it("should not allow to publish with pending duplicate", async () => {
+      renderComponent({
+        documentUnit: new DocumentUnit("123", {
+          documentNumber: "foo",
+          managementData: {
+            duplicateRelations: [
+              {
+                documentNumber: "documentNumber",
+                status: DuplicateRelationStatus.PENDING,
+                isJdvDuplicateCheckActive: true,
+              },
+            ],
+            borderNumbers: [],
+          },
+          coreData: {
+            fileNumbers: ["foo"],
+            court: { type: "type", location: "location", label: "label" },
+            decisionDate: "2022-02-01",
+            documentType: {
+              jurisShortcut: "ca",
+              label: "category",
+            },
+          },
+        }),
+      })
+
+      // wait for feature flag to be loaded, can be removed when flag is removed.
+      await nextTick()
+
+      expect(
+        screen.getByText("Es besteht Dublettenverdacht."),
+      ).toBeInTheDocument()
+      expect(
+        screen.getByRole("button", {
+          name: "Dokumentationseinheit an jDV übergeben",
+        }),
+      ).toBeDisabled()
+    })
+
+    it("should allow to publish with ignored duplicate", async () => {
+      renderComponent({
+        documentUnit: new DocumentUnit("123", {
+          documentNumber: "foo",
+          coreData: {
+            fileNumbers: ["foo"],
+            court: {
+              type: "type",
+              location: "location",
+              label: "label",
+            },
+            decisionDate: "2022-02-01",
+            legalEffect: "legalEffect",
+            documentType: {
+              jurisShortcut: "ca",
+              label: "category",
+            },
+          },
+          longTexts: { decisionReasons: "decisionReasons" },
+          managementData: {
+            duplicateRelations: [
+              {
+                documentNumber: "documentNumber",
+                isJdvDuplicateCheckActive: true,
+                status: DuplicateRelationStatus.IGNORED,
+              },
+            ],
+            borderNumbers: [],
+          },
+        }),
+      })
+
+      // wait for feature flag to be loaded, can be removed when flag is removed.
+      await nextTick()
+
+      expect(await screen.findByText("XML Vorschau")).toBeInTheDocument()
+      expect(
+        screen.getByText("Es besteht kein Dublettenverdacht."),
+      ).toBeInTheDocument()
+      expect(
+        screen.getByRole("button", {
+          name: "Dokumentationseinheit an jDV übergeben",
+        }),
+      ).toBeEnabled()
     })
   })
 
@@ -572,6 +653,7 @@ describe("HandoverDocumentationUnitView:", () => {
     renderComponent({
       documentUnit: new DocumentUnit("123", {
         managementData: {
+          duplicateRelations: [],
           borderNumbers: [],
           scheduledPublicationDateTime: "2050-01-01T04:00:00.000Z",
         },
@@ -642,7 +724,7 @@ describe("HandoverDocumentationUnitView:", () => {
     await new Promise((resolve) => setTimeout(resolve, 0))
 
     expect(container).toHaveTextContent(
-      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltRandnummernprüfungDie Reihenfolge der Randnummern ist korrektXML VorschauDokumentationseinheit an jDV übergebenOder für später terminieren:Datum * Uhrzeit * Termin setzenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subject`,
+      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefüllt.RandnummernprüfungDie Reihenfolge der Randnummern ist korrekt.DublettenprüfungEs besteht kein Dublettenverdacht.XML VorschauDokumentationseinheit an jDV übergebenOder für später terminieren:Datum * Uhrzeit * Termin setzenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subject`,
     )
 
     const codeSnippet = screen.queryByTestId("code-snippet")

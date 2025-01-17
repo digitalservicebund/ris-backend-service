@@ -11,7 +11,7 @@ import SingleNorm from "./singleNorm"
 import Attachment from "@/domain/attachment"
 import LegalForce from "@/domain/legalForce"
 import ParticipatingJudge from "@/domain/participatingJudge"
-import { PublicationStatus } from "@/domain/publicationStatus"
+import { PublicationState, PublicationStatus } from "@/domain/publicationStatus"
 
 export type CoreData = {
   fileNumbers?: string[]
@@ -111,9 +111,26 @@ export const longTextLabels: {
   outline: "Gliederung",
 }
 
+export enum DuplicateRelationStatus {
+  PENDING = "PENDING",
+  IGNORED = "IGNORED",
+}
+
+export type DuplicateRelation = {
+  documentNumber: string
+  status: DuplicateRelationStatus
+  isJdvDuplicateCheckActive: boolean
+  courtLabel?: string
+  decisionDate?: string
+  fileNumber?: string
+  documentType?: string
+  publicationStatus?: PublicationState
+}
+
 export type ManagementData = {
   scheduledPublicationDateTime?: string
   scheduledByEmail?: string
+  duplicateRelations: DuplicateRelation[]
   borderNumbers: string[]
 }
 
@@ -143,7 +160,10 @@ export default class DocumentUnit {
   public references?: Reference[]
   public literatureReferences?: Reference[]
   public isEditable: boolean = false
-  public managementData: ManagementData = { borderNumbers: [] }
+  public managementData: ManagementData = {
+    borderNumbers: [],
+    duplicateRelations: [],
+  }
 
   static readonly requiredFields = [
     "fileNumbers",

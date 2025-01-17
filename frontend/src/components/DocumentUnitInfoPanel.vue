@@ -4,6 +4,8 @@ import { computed, ref, toRaw, watchEffect } from "vue"
 import { useRoute } from "vue-router"
 import IconBadge from "@/components/IconBadge.vue"
 import SaveButton from "@/components/SaveDocumentUnitButton.vue"
+import { useFeatureToggle } from "@/composables/useFeatureToggle"
+import { useInternalUser } from "@/composables/useInternalUser"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import IconError from "~icons/ic/baseline-error"
@@ -20,6 +22,10 @@ const route = useRoute()
 
 const documentUnitStore = useDocumentUnitStore()
 
+const isInternalUser = useInternalUser()
+
+const isDuplicateCheckFeatureActive = useFeatureToggle("neuris.duplicate-check")
+
 const fileNumberInfo = computed(
   () => documentUnitStore.documentUnit?.coreData.fileNumbers?.[0] || "",
 )
@@ -30,6 +36,14 @@ const decisionDateInfo = computed(() =>
         "DD.MM.YYYY",
       )
     : "",
+)
+
+const hasPendingDuplicateWarning = computed(
+  () =>
+    documentUnitStore.documentUnit &&
+    (
+      documentUnitStore.documentUnit.managementData.duplicateRelations ?? []
+    ).some((warning) => warning.status === "PENDING"),
 )
 
 const courtInfo = computed(
@@ -44,6 +58,18 @@ const formattedInfo = computed(() => {
   ].filter((part) => part.trim() !== "")
   return parts.join(", ")
 })
+
+const isRouteWithSaveButton = computed(
+  () =>
+    route.path.includes("categories") ||
+    route.path.includes("attachments") ||
+    route.path.includes("references"),
+)
+
+const managementDataRoute = computed(() => ({
+  name: "caselaw-documentUnit-documentNumber-managementdata",
+  params: { documentNumber: documentUnitStore.documentUnit!.documentNumber },
+}))
 
 const statusBadge = ref(
   useStatusBadge(documentUnitStore.documentUnit?.status).value,
@@ -85,12 +111,28 @@ watchEffect(() => {
     />
 
     <span class="flex-grow"></span>
+    <div
+      v-if="hasPendingDuplicateWarning && isDuplicateCheckFeatureActive"
+      class="flex gap-12 whitespace-nowrap"
+    >
+      <IconBadge
+        background-color="bg-red-300"
+        class="ml-12"
+        color="text-red-900"
+        :icon="IconError"
+        label="Dublettenverdacht"
+      />
+      <RouterLink
+        v-if="isInternalUser"
+        class="ds-link-01-bold text-red-900"
+        :to="managementDataRoute"
+      >
+        Bitte prüfen</RouterLink
+      >
+      <span v-if="isRouteWithSaveButton && isInternalUser">|</span>
+    </div>
     <SaveButton
-      v-if="
-        route.path.includes('categories') ||
-        route.path.includes('attachments') ||
-        route.path.includes('references')
-      "
+      v-if="isRouteWithSaveButton"
       aria-label="Speichern Button"
       data-testid="document-unit-save-button"
     />

@@ -37,6 +37,7 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelation;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
@@ -52,6 +53,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.Region;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.Collections;
@@ -1338,7 +1340,7 @@ class DocumentationUnitTransformerTest {
                 .scheduledPublicationDateTime(null)
                 .lastPublicationDateTime(null)
                 .borderNumbers(Collections.emptyList())
-                .duplicateRelations(Collections.emptySet())
+                .duplicateRelations(List.of())
                 .build())
         .attachments(Collections.emptyList())
         .contentRelatedIndexing(
@@ -1481,5 +1483,52 @@ class DocumentationUnitTransformerTest {
                 .get()
                 .documentNumber())
         .isEqualTo("duplicate");
+  }
+
+  @Test
+  void testTransformToDomain_withMultipleDuplicateWarnings_shouldSortByDecisionDate() {
+    var original =
+        generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
+    var duplicate1 =
+        generateSimpleDTOBuilder()
+            .documentNumber("duplicate1")
+            .decisionDate(LocalDate.of(2020, 1, 1))
+            .id(UUID.randomUUID())
+            .build();
+    var duplicate2 =
+        generateSimpleDTOBuilder().documentNumber("duplicate2").id(UUID.randomUUID()).build();
+    var duplicate3 =
+        generateSimpleDTOBuilder()
+            .documentNumber("duplicate3")
+            .decisionDate(LocalDate.of(2021, 1, 1))
+            .id(UUID.randomUUID())
+            .build();
+    var duplicateRelationship1 =
+        DuplicateRelationDTO.builder()
+            .documentationUnit1(duplicate1)
+            .documentationUnit2(original)
+            .build();
+    var duplicateRelationship2 =
+        DuplicateRelationDTO.builder()
+            .documentationUnit1(duplicate2)
+            .documentationUnit2(original)
+            .build();
+    var duplicateRelationship3 =
+        DuplicateRelationDTO.builder()
+            .documentationUnit1(duplicate3)
+            .documentationUnit2(original)
+            .build();
+    original =
+        original.toBuilder()
+            .duplicateRelations2(Set.of(duplicateRelationship1, duplicateRelationship2))
+            .duplicateRelations1(Set.of(duplicateRelationship3))
+            .build();
+
+    DocumentationUnit documentationUnit = DocumentationUnitTransformer.transformToDomain(original);
+
+    var transformedRelations = documentationUnit.managementData().duplicateRelations();
+    assertThat(transformedRelations).hasSize(3);
+    assertThat(transformedRelations.stream().map(DuplicateRelation::documentNumber))
+        .containsExactly("duplicate3", "duplicate1", "duplicate2");
   }
 }
