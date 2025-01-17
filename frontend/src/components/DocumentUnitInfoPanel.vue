@@ -129,7 +129,7 @@ watchEffect(() => {
       >
         Bitte prüfen</RouterLink
       >
-      <span v-if="isRouteWithSaveButton">|</span>
+      <span v-if="isRouteWithSaveButton && isInternalUser">|</span>
     </div>
     <SaveButton
       v-if="isRouteWithSaveButton"
