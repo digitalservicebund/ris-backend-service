@@ -25,10 +25,11 @@ const routes = [
     component: {},
   },
   {
-    path: "/caselaw/documentUnit/:documentNumber/managementdata",
+    path: "/caselaw/documentUnit/:documentNumber/managementData",
     name: "caselaw-documentUnit-documentNumber-managementData",
     component: {},
   },
+  { path: "/managementData", name: "managementData", component: {} },
   {
     path: "/caselaw/periodical-evaluation/:editionId",
     name: "caselaw-periodical-evaluation-editionId",

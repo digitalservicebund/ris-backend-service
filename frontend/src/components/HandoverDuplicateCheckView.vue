@@ -1,16 +1,19 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
+import { computed } from "vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import { DuplicateRelation } from "@/domain/documentUnit"
 import IconCheck from "~icons/ic/baseline-check"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
-defineProps<{
-  isDuplicateFeatureActive: boolean
-  hasActiveDuplicateWarning: boolean
+const props = defineProps<{
   pendingDuplicates: DuplicateRelation[]
 }>()
+
+const hasPendingDuplicateWarning = computed<boolean>(
+  () => props.pendingDuplicates.length > 0,
+)
 
 function renderSummary(duplicateRelation: DuplicateRelation) {
   return [
@@ -26,14 +29,10 @@ function renderSummary(duplicateRelation: DuplicateRelation) {
 }
 </script>
 <template>
-  <div
-    v-if="isDuplicateFeatureActive"
-    aria-label="Dublettenprüfung"
-    class="flex flex-col"
-  >
+  <div aria-label="Dublettenprüfung" class="flex flex-col">
     <h2 class="ds-label-01-bold mb-16">Dublettenprüfung</h2>
 
-    <div v-if="hasActiveDuplicateWarning">
+    <div v-if="hasPendingDuplicateWarning">
       <div class="flex flex-row gap-8">
         <IconErrorOutline class="text-red-800" />
         <div class="ds-body-01-reg flex flex-col gap-8">
@@ -75,7 +74,7 @@ function renderSummary(duplicateRelation: DuplicateRelation) {
     </div>
     <div v-else class="flex flex-row gap-8">
       <IconCheck class="text-green-700" />
-      <p>Es besteht kein Dublettenverdacht.</p>
+      <p>Es besteht kein Dublettenverdacht</p>
     </div>
   </div>
 </template>
