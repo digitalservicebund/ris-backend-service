@@ -70,12 +70,12 @@ describe("HandoverDocumentDuplicateCheckView:", () => {
       screen.getByText("Es besteht Dublettenverdacht."),
     ).toBeInTheDocument()
     expect(screen.getByText("Dokumentationseinheit")).toBeInTheDocument()
-    expect(
-      screen.getByText("AG Aachen, 15.01.2025, AZ ABC, Beschluss,", {
-        exact: false,
-      }),
-    ).toBeInTheDocument()
-    expect(screen.getByText("Unveröffentlicht")).toBeInTheDocument()
+    const decisionSummary = screen.getByTestId(
+      "decision-summary-documentNumber",
+    )
+    expect(decisionSummary).toHaveTextContent(
+      "AG Aachen, 15.01.2025, AZ ABC, Beschluss, Unveröffentlicht",
+    )
     expect(
       screen.getByRole("button", {
         name: "Dublettenwarnung prüfen",
