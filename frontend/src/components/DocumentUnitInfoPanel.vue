@@ -67,7 +67,7 @@ const isRouteWithSaveButton = computed(
 )
 
 const managementDataRoute = computed(() => ({
-  name: "caselaw-documentUnit-documentNumber-managementData",
+  name: "caselaw-documentUnit-documentNumber-managementdata",
   params: { documentNumber: documentUnitStore.documentUnit!.documentNumber },
 }))
 

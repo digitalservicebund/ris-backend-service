@@ -63,7 +63,7 @@ function renderSummary(duplicateRelation: DuplicateRelation) {
           </div>
         </div>
       </div>
-      <RouterLink to="managementData"
+      <RouterLink to="managementdata"
         ><TextButton
           aria-label="Dublettenwarnung prüfen"
           button-type="tertiary"

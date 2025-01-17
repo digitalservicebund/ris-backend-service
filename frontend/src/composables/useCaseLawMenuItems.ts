@@ -91,7 +91,7 @@ export function useCaseLawMenuItems(
             label: "Verwaltungsdaten",
             route: {
               ...baseRoute,
-              name: "caselaw-documentUnit-documentNumber-managementData",
+              name: "caselaw-documentUnit-documentNumber-managementdata",
             },
           },
         ]

@@ -49,7 +49,7 @@ function renderComponent() {
         },
       },
       {
-        path: "/caselaw/documentUnit/:documentNumber/managementData",
+        path: "/caselaw/documentUnit/:documentNumber/managementdata",
         name: "caselaw-documentUnit-documentNumber-managementdata",
         component: {
           template: "<div data-testid='managementdata'>Verwaltungsdaten</div>",
