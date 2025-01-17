@@ -93,6 +93,7 @@ describe("Legal periodical edition reference input", () => {
   })
 
   it("search is triggered with shortcut", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => null)
     const { user } = renderComponent()
 
     window.scrollTo = vi.fn()
