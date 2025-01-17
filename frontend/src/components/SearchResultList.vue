@@ -6,7 +6,7 @@ import FlexContainer from "@/components/FlexContainer.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
-import { useScroll } from "@/composables/useScroll"
+import values from "@/data/values.json"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import errorMessages from "@/i18n/errors.json"
 import IconAdd from "~icons/ic/baseline-add"
@@ -17,13 +17,28 @@ const props = defineProps<{
   allowMultipleLinks?: boolean
   displayMode?: DisplayMode
 }>()
+
 const emits =
   defineEmits<(event: "linkDecision", decision: RelatedDocumentation) => void>()
-const { scrollIntoViewportById } = useScroll()
+
 watch(
   () => props.searchResults,
   async () => {
-    if (props.searchResults) await scrollIntoViewportById("search-results")
+    if (props.searchResults) {
+      setTimeout(() => {
+        const element = document.getElementById("searchResults")
+        if (element) {
+          const headerOffset = values.headerOffset
+          const elementPosition = element?.getBoundingClientRect().top
+          const offsetPosition = elementPosition + window.scrollY - headerOffset
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: "smooth",
+          })
+        }
+      })
+    }
   },
   { immediate: true },
 )
@@ -37,7 +52,7 @@ export type SearchResults<Type extends RelatedDocumentation> = {
 </script>
 
 <template>
-  <div id="search-results">
+  <div id="searchResults">
     <FlexContainer
       v-if="isLoading"
       class="m-24"

@@ -3,7 +3,7 @@ import { computed, toRaw } from "vue"
 import type { Component } from "vue"
 import { DisplayMode } from "@/components/enumDisplayMode"
 import IconBadge from "@/components/IconBadge.vue"
-import { useScroll } from "@/composables/useScroll"
+import { useScrollPreviewContainer } from "@/composables/useScrollPreviewContainer"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { PublicationStatus } from "@/domain/publicationStatus"
 import BaselineArrowOutward from "~icons/ic/baseline-arrow-outward"
@@ -24,7 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
   icon: undefined,
   linkClickable: true, // eslint-disable-line vue/no-boolean-default
 })
-const { openSidePanelAndScrollToSection } = useScroll()
+const { openSidePanel } = useScrollPreviewContainer()
 const statusBadge = computed(() => useStatusBadge(props.status).value)
 
 const summary = computed(() =>
@@ -76,7 +76,7 @@ const divider = computed(() => (props.documentNumber ? ` | ` : undefined))
             <button
               class="ds-link-01-bold whitespace-nowrap leading-24 no-underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
               :data-testid="'document-number-link-' + documentNumber"
-              @click="openSidePanelAndScrollToSection(documentNumber)"
+              @click="openSidePanel(documentNumber)"
             >
               {{ documentNumber }}
               <BaselineArrowOutward class="mb-4 inline w-24" />

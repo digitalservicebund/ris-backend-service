@@ -66,7 +66,9 @@ async function renderComponent(options?: { references?: Reference[] }) {
 
 describe("Legal periodical edition evaluation", () => {
   beforeEach(async () => {
-    window.scrollTo = vi.fn()
+    // Mock scrollIntoView
+    const scrollIntoViewMock = vi.fn()
+    window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
 
     const legalPeriodical: LegalPeriodical = {
       uuid: "1",

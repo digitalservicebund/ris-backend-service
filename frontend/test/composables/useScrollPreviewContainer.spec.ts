@@ -1,6 +1,6 @@
 import { createPinia, setActivePinia } from "pinia"
 import { describe, it, vi, beforeEach, afterEach, expect } from "vitest"
-import { useScroll } from "@/composables/useScroll"
+import { useScrollPreviewContainer } from "@/composables/useScrollPreviewContainer"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 
@@ -13,7 +13,7 @@ vi.mock("@/stores/extraContentSidePanelStore", () => ({
   useExtraContentSidePanelStore: vi.fn(),
 }))
 
-describe("useScroll", () => {
+describe("useOpenSidePanelWithDocUnit", () => {
   let documentUnitStoreMock: any // eslint-disable-line @typescript-eslint/no-explicit-any
   let extraContentSidePanelStoreMock: any // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -42,64 +42,13 @@ describe("useScroll", () => {
     vi.useRealTimers()
   })
 
-  it("scrollIntoViewportById scrolls to the element with the correct offset", async () => {
-    // Arrange
-    const id = "test-element"
-
-    const element = Object.create(HTMLElement.prototype)
-    Object.defineProperty(element, "getBoundingClientRect", {
-      value: () => ({
-        top: 300,
-      }),
-    })
-
-    vi.spyOn(document, "getElementById").mockImplementation((elementId) => {
-      return elementId === id ? element : null
-    })
-
-    Object.defineProperty(window, "scrollY", {
-      value: 50,
-    })
-
-    window.scrollTo = vi.fn()
-
-    const { scrollIntoViewportById } = useScroll()
-
-    // Act
-    await scrollIntoViewportById(id)
-    vi.runAllTimers() // Process the setTimeout
-
-    // Assert
-    expect(window.scrollTo).toHaveBeenCalledWith({
-      top: 180, // 300 (element top) + 50 (scrollY) - 170 (headerOffset)
-      behavior: "smooth",
-    })
-  })
-
-  it("scrollIntoViewportById does nothing if the element is not found", async () => {
-    // Arrange
-    const id = "non-existent-element"
-
-    vi.spyOn(document, "getElementById").mockImplementation(() => null)
-    window.scrollTo = vi.fn()
-
-    const { scrollIntoViewportById } = useScroll()
-
-    // Act
-    await scrollIntoViewportById(id)
-    vi.runAllTimers()
-
-    // Assert
-    expect(window.scrollTo).not.toHaveBeenCalled()
-  })
-
-  it("openSidePanelAndScrollToSection loads the document and opens the side panel when a documentUnitNumber is provided", async () => {
+  it("loads the document and opens the side panel when a documentUnitNumber is provided", async () => {
     // Arrange
     const documentUnitNumber = "12345"
-    const { openSidePanelAndScrollToSection } = useScroll()
+    const { openSidePanel } = useScrollPreviewContainer()
 
     // Act
-    await openSidePanelAndScrollToSection(documentUnitNumber)
+    await openSidePanel(documentUnitNumber)
 
     // Assert
     expect(documentUnitStoreMock.loadDocumentUnit).toHaveBeenCalledWith(
@@ -110,19 +59,19 @@ describe("useScroll", () => {
     )
   })
 
-  it("openSidePanelAndScrollToSection does nothing if no documentUnitNumber is provided", async () => {
+  it("does nothing if no documentUnitNumber is provided", async () => {
     // Arrange
-    const { openSidePanelAndScrollToSection } = useScroll()
+    const { openSidePanel } = useScrollPreviewContainer()
 
     // Act
-    await openSidePanelAndScrollToSection()
+    await openSidePanel()
 
     // Assert
     expect(documentUnitStoreMock.loadDocumentUnit).not.toHaveBeenCalled()
     expect(extraContentSidePanelStoreMock.togglePanel).not.toHaveBeenCalled()
   })
 
-  it("openSidePanelAndScrollToSection scrolls to 'previewGuidingPrinciple' if it exists", async () => {
+  it("scrolls to 'previewGuidingPrinciple' if it exists", async () => {
     // Arrange
     const documentUnitNumber = "12345"
 
@@ -157,10 +106,10 @@ describe("useScroll", () => {
     })
 
     // Get the composable function
-    const { openSidePanelAndScrollToSection } = useScroll()
+    const { openSidePanel } = useScrollPreviewContainer()
 
     // Act - Case 1: previewGuidingPrinciple exists
-    await openSidePanelAndScrollToSection(documentUnitNumber)
+    await openSidePanel(documentUnitNumber)
     vi.runAllTimers() // Make sure any setTimeout is processed
 
     // Assert - Scrolls to previewGuidingPrinciple
@@ -170,7 +119,7 @@ describe("useScroll", () => {
     })
   })
 
-  it("openSidePanelAndScrollToSection scrolls to 'previewTenor' if 'previewGuidingPrinciple' doesn't exist", async () => {
+  it("scrolls to 'previewTenor' if 'previewGuidingPrinciple' doesn't exist", async () => {
     // Arrange
     const documentUnitNumber = "12345"
 
@@ -199,9 +148,9 @@ describe("useScroll", () => {
       return null
     })
 
-    const { openSidePanelAndScrollToSection } = useScroll()
+    const { openSidePanel } = useScrollPreviewContainer()
 
-    await openSidePanelAndScrollToSection(documentUnitNumber)
+    await openSidePanel(documentUnitNumber)
     vi.runAllTimers()
 
     expect(container.scrollTo).toHaveBeenCalledWith({
@@ -210,7 +159,7 @@ describe("useScroll", () => {
     })
   })
 
-  it("openSidePanelAndScrollToSection scrolls to top if neither 'previewTenor' or 'previewGuidingPrinciple' exist", async () => {
+  it("scrolls to top if neither 'previewTenor' or 'previewGuidingPrinciple' exist", async () => {
     // Arrange
     const documentUnitNumber = "12345"
 
@@ -234,9 +183,9 @@ describe("useScroll", () => {
       return null
     })
 
-    const { openSidePanelAndScrollToSection } = useScroll()
+    const { openSidePanel } = useScrollPreviewContainer()
 
-    await openSidePanelAndScrollToSection(documentUnitNumber)
+    await openSidePanel(documentUnitNumber)
     vi.runAllTimers()
 
     expect(container.scrollTo).toHaveBeenCalledWith({
