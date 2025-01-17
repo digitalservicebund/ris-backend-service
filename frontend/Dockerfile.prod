@@ -3,7 +3,7 @@ WORKDIR /usr/src/app
 COPY . .
 RUN npm install && npx vite build
 
-FROM cgr.dev/chainguard/nginx@sha256:4186a153d59aee880f8bd52dd258372464f2aaf41baf6d907690207b60910f4a
+FROM cgr.dev/chainguard/nginx@sha256:a3ce7b468befa2912631496c758566164bb7444bba1277b596f2bfbfba19c8f5
 EXPOSE 8081
 COPY --from=builder /usr/src/app/dist /var/lib/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/ris.conf
