@@ -60,7 +60,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
       "mail.exporter.senderAddress=export@neuris"
     })
 @ActiveProfiles(profiles = {"uat"})
-class HandoverMailServiceTest {
+class HandoverMailServiceUATTest {
   private static final String RECEIVER_ADDRESS = "test-to@mail.com";
   private static final String ISSUER_ADDRESS = "neuris-user@example.com";
   private static final String SENDER_ADDRESS = "export@neuris";
@@ -179,6 +179,7 @@ class HandoverMailServiceTest {
     verify(xmlExporter)
         .transformToXml(
             documentationUnit.toBuilder()
+                .documentNumber("TESTtest-document-number")
                 .coreData(
                     CoreData.builder()
                         .court(

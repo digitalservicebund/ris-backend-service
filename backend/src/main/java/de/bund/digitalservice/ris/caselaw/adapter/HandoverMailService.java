@@ -299,6 +299,7 @@ public class HandoverMailService implements MailService {
           .build();
     }
     return documentationUnit.toBuilder()
+        .documentNumber("TEST" + documentationUnit.documentNumber())
         .coreData(
             Optional.ofNullable(documentationUnit.coreData())
                 .map(
