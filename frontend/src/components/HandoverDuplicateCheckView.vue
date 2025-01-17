@@ -72,7 +72,7 @@ const managementDataRoute = computed(() => ({
         </div>
       </div>
       <RouterLink v-if="isInternalUser" :to="managementDataRoute">
-        ><TextButton
+        <TextButton
           aria-label="Dublettenwarnung prüfen"
           button-type="tertiary"
           class="mt-8 w-fit"
