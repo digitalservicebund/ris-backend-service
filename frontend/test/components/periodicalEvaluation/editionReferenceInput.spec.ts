@@ -8,6 +8,15 @@ import documentUnitService from "@/services/documentUnitService"
 import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
 
+// Mock the stores
+vi.mock("@/stores/documentUnitStore", () => ({
+  useDocumentUnitStore: vi.fn(),
+}))
+
+vi.mock("@/stores/extraContentSidePanelStore", () => ({
+  useExtraContentSidePanelStore: vi.fn(),
+}))
+
 function renderComponent() {
   const user = userEvent.setup()
 
@@ -77,9 +86,9 @@ describe("Legal periodical edition reference input", () => {
   })
 
   it("search is triggered with shortcut", async () => {
-    vi.spyOn(console, "error").mockImplementation(() => null)
     const { user } = renderComponent()
 
+    window.scrollTo = vi.fn()
     expect(screen.queryByText(/test fileNumber1/)).not.toBeInTheDocument()
     await user.type(await screen.findByLabelText("Aktenzeichen"), "test")
     await user.keyboard("{Control>}{Enter}")
