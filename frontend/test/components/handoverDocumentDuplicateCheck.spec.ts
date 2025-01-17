@@ -1,6 +1,7 @@
 import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
-import { describe } from "vitest"
+import { describe, vi } from "vitest"
+import { ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import HandoverDuplicateCheckView from "@/components/HandoverDuplicateCheckView.vue"
 import {
@@ -15,10 +16,17 @@ const router = createRouter({
   routes: routes,
 })
 
+const isInternalUser = ref(true)
+vi.mock("@/composables/useInternalUser", () => {
+  return {
+    useInternalUser: () => isInternalUser,
+  }
+})
+
 describe("HandoverDocumentDuplicateCheckView:", () => {
   test("without duplicates", async () => {
     render(HandoverDuplicateCheckView, {
-      props: { pendingDuplicates: [] },
+      props: { documentNumber: "documentNumber", pendingDuplicates: [] },
       global: {
         plugins: [router],
       },
@@ -26,7 +34,7 @@ describe("HandoverDocumentDuplicateCheckView:", () => {
 
     expect(screen.getByText("Dublettenprüfung")).toBeInTheDocument()
     expect(
-      screen.getByText("Es besteht kein Dublettenverdacht"),
+      screen.getByText("Es besteht kein Dublettenverdacht."),
     ).toBeInTheDocument()
     expect(
       screen.queryByText("Es besteht Dublettenverdacht."),
@@ -51,7 +59,7 @@ describe("HandoverDocumentDuplicateCheckView:", () => {
       publicationStatus: PublicationState.UNPUBLISHED,
     }
     render(HandoverDuplicateCheckView, {
-      props: { pendingDuplicates: [duplicate] },
+      props: { documentNumber: "numberOrigin", pendingDuplicates: [duplicate] },
       global: {
         plugins: [[createTestingPinia()], [router]],
       },
@@ -74,7 +82,7 @@ describe("HandoverDocumentDuplicateCheckView:", () => {
       }),
     ).toBeInTheDocument()
     expect(
-      screen.queryByText("Es besteht kein Dublettenverdacht"),
+      screen.queryByText("Es besteht kein Dublettenverdacht."),
     ).not.toBeInTheDocument()
   })
 
@@ -92,7 +100,10 @@ describe("HandoverDocumentDuplicateCheckView:", () => {
       publicationStatus: PublicationState.PUBLISHED,
     }
     render(HandoverDuplicateCheckView, {
-      props: { pendingDuplicates: [publishedDuplicate, unpublishedDuplicate] },
+      props: {
+        documentNumber: "numberOrigin",
+        pendingDuplicates: [publishedDuplicate, unpublishedDuplicate],
+      },
       global: {
         plugins: [[createTestingPinia()], [router]],
       },
@@ -111,7 +122,40 @@ describe("HandoverDocumentDuplicateCheckView:", () => {
       }),
     ).toBeInTheDocument()
     expect(
-      screen.queryByText("Es besteht kein Dublettenverdacht"),
+      screen.queryByText("Es besteht kein Dublettenverdacht."),
+    ).not.toBeInTheDocument()
+  })
+
+  test("with external user the button should be hidden", async () => {
+    isInternalUser.value = false
+    const duplicate: DuplicateRelation = {
+      documentNumber: "documentNumber",
+      status: DuplicateRelationStatus.PENDING,
+      isJdvDuplicateCheckActive: true,
+      publicationStatus: PublicationState.PUBLISHED,
+    }
+    render(HandoverDuplicateCheckView, {
+      props: {
+        documentNumber: "numberOrigin",
+        pendingDuplicates: [duplicate],
+      },
+      global: {
+        plugins: [[createTestingPinia()], [router]],
+      },
+    })
+
+    expect(screen.getByText("Dublettenprüfung")).toBeInTheDocument()
+    expect(
+      screen.getByText("Es besteht Dublettenverdacht."),
+    ).toBeInTheDocument()
+    expect(screen.getByText("Dokumentationseinheit")).toBeInTheDocument()
+    expect(
+      screen.queryByRole("button", {
+        name: "Dublettenwarnung prüfen",
+      }),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("Es besteht kein Dublettenverdacht."),
     ).not.toBeInTheDocument()
   })
 })

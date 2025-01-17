@@ -489,7 +489,7 @@ const isPublishable = computed<boolean>(
         </div>
         <div v-else class="flex flex-row gap-8">
           <IconCheck class="text-green-700" />
-          <p>Alle Pflichtfelder sind korrekt ausgefüllt</p>
+          <p>Alle Pflichtfelder sind korrekt ausgefüllt.</p>
         </div>
       </div>
       <div aria-label="Randnummernprüfung" class="flex flex-col">
@@ -578,7 +578,7 @@ const isPublishable = computed<boolean>(
           class="flex flex-row gap-8"
         >
           <IconCheck class="text-green-700" />
-          <p>Die Reihenfolge der Randnummern ist korrekt</p>
+          <p>Die Reihenfolge der Randnummern ist korrekt.</p>
         </div>
         <div
           v-if="showRecalculatingBorderNumbersFakeDelay"
@@ -590,6 +590,7 @@ const isPublishable = computed<boolean>(
       </div>
       <HandoverDuplicateCheckView
         v-if="isDuplicateFeatureActive"
+        :document-number="store.documentUnit!.documentNumber"
         :pending-duplicates="pendingDuplicates"
       />
       <div class="border-b-1 border-b-gray-400"></div>

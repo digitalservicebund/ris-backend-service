@@ -1,13 +1,15 @@
 <script lang="ts" setup>
-import dayjs from "dayjs"
 import { computed } from "vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import TextButton from "@/components/input/TextButton.vue"
+import { useInternalUser } from "@/composables/useInternalUser"
 import { DuplicateRelation } from "@/domain/documentUnit"
+import DateUtil from "@/utils/dateUtil"
 import IconCheck from "~icons/ic/baseline-check"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
 const props = defineProps<{
+  documentNumber: string
   pendingDuplicates: DuplicateRelation[]
 }>()
 
@@ -15,18 +17,24 @@ const hasPendingDuplicateWarning = computed<boolean>(
   () => props.pendingDuplicates.length > 0,
 )
 
+const isInternalUser = useInternalUser()
+
 function renderSummary(duplicateRelation: DuplicateRelation) {
   return [
-    ...(duplicateRelation.courtLabel
-      ? [`${duplicateRelation.courtLabel}`]
-      : []),
-    ...(duplicateRelation.decisionDate
-      ? [dayjs(duplicateRelation.decisionDate).format("DD.MM.YYYY")]
-      : []),
-    ...(duplicateRelation.fileNumber ? [duplicateRelation.fileNumber] : []),
-    ...(duplicateRelation.documentType ? [duplicateRelation.documentType] : []),
-  ].join(", ")
+    duplicateRelation.courtLabel,
+    duplicateRelation.decisionDate &&
+      DateUtil.formatDate(duplicateRelation.decisionDate),
+    duplicateRelation.fileNumber,
+    duplicateRelation.documentType,
+  ]
+    .filter(Boolean)
+    .join(", ")
 }
+
+const managementDataRoute = computed(() => ({
+  name: "caselaw-documentUnit-documentNumber-managementdata",
+  params: { documentNumber: props.documentNumber },
+}))
 </script>
 <template>
   <div aria-label="Dublettenprüfung" class="flex flex-col">
@@ -63,7 +71,7 @@ function renderSummary(duplicateRelation: DuplicateRelation) {
           </div>
         </div>
       </div>
-      <RouterLink to="managementdata"
+      <RouterLink v-if="isInternalUser" :to="managementDataRoute">
         ><TextButton
           aria-label="Dublettenwarnung prüfen"
           button-type="tertiary"
@@ -74,7 +82,7 @@ function renderSummary(duplicateRelation: DuplicateRelation) {
     </div>
     <div v-else class="flex flex-row gap-8">
       <IconCheck class="text-green-700" />
-      <p>Es besteht kein Dublettenverdacht</p>
+      <p>Es besteht kein Dublettenverdacht.</p>
     </div>
   </div>
 </template>

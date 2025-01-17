@@ -29,7 +29,6 @@ const routes = [
     name: "caselaw-documentUnit-documentNumber-managementdata",
     component: {},
   },
-  { path: "/managementdata", name: "managementdata", component: {} },
   {
     path: "/caselaw/periodical-evaluation/:editionId",
     name: "caselaw-periodical-evaluation-editionId",

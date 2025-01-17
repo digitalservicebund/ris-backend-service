@@ -93,7 +93,7 @@ describe("HandoverDocumentationUnitView:", () => {
       })
 
       expect(
-        screen.getByText("Alle Pflichtfelder sind korrekt ausgefüllt"),
+        screen.getByText("Alle Pflichtfelder sind korrekt ausgefüllt."),
       ).toBeInTheDocument()
       expect(
         screen.queryByText(
@@ -216,7 +216,7 @@ describe("HandoverDocumentationUnitView:", () => {
       expect(screen.getByText("Rubriken bearbeiten")).toBeInTheDocument()
 
       expect(
-        screen.queryByText("Alle Pflichtfelder sind korrekt ausgefüllt"),
+        screen.queryByText("Alle Pflichtfelder sind korrekt ausgefüllt."),
       ).not.toBeInTheDocument()
       expect(screen.queryByText("XML Vorschau")).not.toBeInTheDocument()
       expect(
@@ -256,7 +256,7 @@ describe("HandoverDocumentationUnitView:", () => {
       expect(screen.queryByText("Rubriken bearbeiten")).not.toBeInTheDocument()
 
       expect(
-        screen.getByText("Alle Pflichtfelder sind korrekt ausgefüllt"),
+        screen.getByText("Alle Pflichtfelder sind korrekt ausgefüllt."),
       ).toBeInTheDocument()
       expect(await screen.findByText("XML Vorschau")).toBeInTheDocument()
       expect(
@@ -296,7 +296,7 @@ describe("HandoverDocumentationUnitView:", () => {
       expect(screen.getByText("Rubriken bearbeiten")).toBeInTheDocument()
 
       expect(
-        screen.queryByText("Alle Pflichtfelder sind korrekt ausgefüllt"),
+        screen.queryByText("Alle Pflichtfelder sind korrekt ausgefüllt."),
       ).not.toBeInTheDocument()
       expect(screen.queryByText("XML Vorschau")).not.toBeInTheDocument()
       expect(
@@ -336,7 +336,7 @@ describe("HandoverDocumentationUnitView:", () => {
       expect(screen.queryByText("Rubriken bearbeiten")).not.toBeInTheDocument()
 
       expect(
-        screen.getByText("Alle Pflichtfelder sind korrekt ausgefüllt"),
+        screen.getByText("Alle Pflichtfelder sind korrekt ausgefüllt."),
       ).toBeInTheDocument()
       expect(await screen.findByText("XML Vorschau")).toBeInTheDocument()
       expect(
@@ -453,7 +453,7 @@ describe("HandoverDocumentationUnitView:", () => {
 
       expect(await screen.findByText("XML Vorschau")).toBeInTheDocument()
       expect(
-        screen.getByText("Es besteht kein Dublettenverdacht"),
+        screen.getByText("Es besteht kein Dublettenverdacht."),
       ).toBeInTheDocument()
       expect(
         screen.getByRole("button", {
@@ -721,7 +721,7 @@ describe("HandoverDocumentationUnitView:", () => {
     await new Promise((resolve) => setTimeout(resolve, 0))
 
     expect(container).toHaveTextContent(
-      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltRandnummernprüfungDie Reihenfolge der Randnummern ist korrektDublettenprüfungEs besteht kein DublettenverdachtXML VorschauDokumentationseinheit an jDV übergebenOder für später terminieren:Datum * Uhrzeit * Termin setzenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subject`,
+      `Übergabe an jDVPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefüllt.RandnummernprüfungDie Reihenfolge der Randnummern ist korrekt.DublettenprüfungEs besteht kein Dublettenverdacht.XML VorschauDokumentationseinheit an jDV übergebenOder für später terminieren:Datum * Uhrzeit * Termin setzenLetzte EreignisseXml Email Abgabe - 02.01.2000 um 00:00 UhrE-Mail an: receiver address Betreff: mail subject`,
     )
 
     const codeSnippet = screen.queryByTestId("code-snippet")
