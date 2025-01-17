@@ -20,6 +20,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNo
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -811,8 +812,12 @@ public class DocumentationUnitTransformer {
 
   private static Boolean isPublishedDuplicateOrSameDocOffice(
       DocumentationUnitDTO original, DocumentationUnitDTO duplicate) {
+    var duplicateStatus =
+        Optional.ofNullable(duplicate.getStatus())
+            .map(StatusDTO::getPublicationStatus)
+            .orElse(null);
     return original.getDocumentationOffice().equals(duplicate.getDocumentationOffice())
-        || duplicate.getStatus().getPublicationStatus().equals(PublicationStatus.PUBLISHED);
+        || PublicationStatus.PUBLISHED.equals(duplicateStatus);
   }
 
   /**
