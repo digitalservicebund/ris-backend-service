@@ -6,7 +6,7 @@ import { DocumentUnitSearchParameter } from "@/components/DocumentUnitSearchEntr
 import { Page } from "@/components/Pagination.vue"
 import DocumentUnit, {
   DocumentationUnitParameters,
-  DuplicationRelationStatus,
+  DuplicateRelationStatus,
 } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
@@ -45,10 +45,10 @@ interface DocumentUnitService {
     singleNormValidationInfo: SingleNormValidationInfo,
   ): Promise<ServiceResponse<unknown>>
 
-  setDuplicationRelationStatus(
+  setDuplicateRelationStatus(
     originalDocNumber: string,
     duplicateDocNumber: string,
-    status: DuplicationRelationStatus,
+    status: DuplicateRelationStatus,
   ): Promise<{ error: boolean }>
 }
 
@@ -235,13 +235,13 @@ const service: DocumentUnitService = {
     return response
   },
 
-  async setDuplicationRelationStatus(
+  async setDuplicateRelationStatus(
     originalDocNumber: string,
     duplicateDocNumber: string,
-    status: DuplicationRelationStatus,
+    status: DuplicateRelationStatus,
   ) {
     const response = await httpClient.put<
-      { status: DuplicationRelationStatus },
+      { status: DuplicateRelationStatus },
       string
     >(
       `caselaw/documentunits/${originalDocNumber}/duplicate-status/${duplicateDocNumber}`,

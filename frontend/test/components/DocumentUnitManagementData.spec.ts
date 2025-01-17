@@ -5,7 +5,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitManagementData from "@/components/DocumentUnitManagementData.vue"
 import DocumentUnit, {
   DuplicateRelation,
-  DuplicationRelationStatus,
+  DuplicateRelationStatus,
   ManagementData,
 } from "@/domain/documentUnit"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -112,7 +112,7 @@ describe("DocumentUnitManagementData", () => {
   function duplicateRelation(docNumber: string): DuplicateRelation {
     return {
       documentNumber: docNumber,
-      status: DuplicationRelationStatus.PENDING,
+      status: DuplicateRelationStatus.PENDING,
       isJdvDuplicateCheckActive: true,
     }
   }

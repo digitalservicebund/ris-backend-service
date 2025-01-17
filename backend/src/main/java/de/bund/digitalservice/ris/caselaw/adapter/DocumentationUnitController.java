@@ -470,7 +470,7 @@ public class DocumentationUnitController {
   }
 
   /**
-   * Update the duplication status of a duplicate of a documentation unit (ignored vs. pending)
+   * Update the duplicate status of a duplicate of a documentation unit (ignored vs. pending)
    *
    * @param documentNumberOrigin documentNumber of the original documentation unit
    * @param documentNumberDuplicate documentNumber of the duplicate

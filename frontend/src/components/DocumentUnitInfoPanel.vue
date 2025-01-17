@@ -38,7 +38,7 @@ const decisionDateInfo = computed(() =>
     : "",
 )
 
-const hasActiveDuplicationWarning = computed(
+const hasPendingDuplicateWarning = computed(
   () =>
     documentUnitStore.documentUnit &&
     (
@@ -112,7 +112,7 @@ watchEffect(() => {
 
     <span class="flex-grow"></span>
     <div
-      v-if="hasActiveDuplicationWarning && isDuplicateCheckFeatureActive"
+      v-if="hasPendingDuplicateWarning && isDuplicateCheckFeatureActive"
       class="flex gap-12 whitespace-nowrap"
     >
       <IconBadge

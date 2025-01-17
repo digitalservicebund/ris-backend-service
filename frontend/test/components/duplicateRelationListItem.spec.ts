@@ -5,7 +5,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import DuplicateRelationListItem from "@/components/DuplicateRelationListItem.vue"
 import DocumentUnit, {
   DuplicateRelation,
-  DuplicationRelationStatus,
+  DuplicateRelationStatus,
 } from "@/domain/documentUnit"
 import { PublicationState } from "@/domain/publicationStatus"
 import documentUnitService from "@/services/documentUnitService"
@@ -41,7 +41,7 @@ describe("DuplicateRelationListItem", () => {
     it("should show docnumber and unchecked check box if no core data is given", async () => {
       const duplicateRelation: DuplicateRelation = {
         documentNumber: "duplicate-1",
-        status: DuplicationRelationStatus.PENDING,
+        status: DuplicateRelationStatus.PENDING,
         isJdvDuplicateCheckActive: true,
       }
       renderDuplicateRelation(duplicateRelation)
@@ -67,7 +67,7 @@ describe("DuplicateRelationListItem", () => {
     it("should show checked check box if status is ignored", async () => {
       const duplicateRelation: DuplicateRelation = {
         documentNumber: "duplicate-1",
-        status: DuplicationRelationStatus.IGNORED,
+        status: DuplicateRelationStatus.IGNORED,
         isJdvDuplicateCheckActive: true,
       }
       renderDuplicateRelation(duplicateRelation)
@@ -90,7 +90,7 @@ describe("DuplicateRelationListItem", () => {
     it("should show docnumber and disabled checked check box if jdv dup check is turned off", async () => {
       const duplicateRelation: DuplicateRelation = {
         documentNumber: "duplicate-1",
-        status: DuplicationRelationStatus.IGNORED,
+        status: DuplicateRelationStatus.IGNORED,
         isJdvDuplicateCheckActive: false,
       }
       renderDuplicateRelation(duplicateRelation)
@@ -122,7 +122,7 @@ describe("DuplicateRelationListItem", () => {
         documentType: "Beschluss",
         fileNumber: "fileNumber-A",
         publicationStatus: PublicationState.PUBLISHED,
-        status: DuplicationRelationStatus.PENDING,
+        status: DuplicateRelationStatus.PENDING,
         isJdvDuplicateCheckActive: true,
       }
       renderDuplicateRelation(duplicateRelation)
@@ -151,7 +151,7 @@ describe("DuplicateRelationListItem", () => {
         documentNumber: "duplicate-1",
         courtLabel: "AG Aachen",
         fileNumber: "fileNumber-A",
-        status: DuplicationRelationStatus.PENDING,
+        status: DuplicateRelationStatus.PENDING,
         isJdvDuplicateCheckActive: true,
       }
       renderDuplicateRelation(duplicateRelation)
@@ -175,7 +175,7 @@ describe("DuplicateRelationListItem", () => {
       const duplicateRelation: DuplicateRelation = {
         documentNumber: "duplicate-1",
         fileNumber: "fileNumber-A",
-        status: DuplicationRelationStatus.PENDING,
+        status: DuplicateRelationStatus.PENDING,
         isJdvDuplicateCheckActive: true,
       }
       renderDuplicateRelation(duplicateRelation)
@@ -199,11 +199,11 @@ describe("DuplicateRelationListItem", () => {
   describe("set duplicate relation status", () => {
     it("should set state from PENDING -> IGNORED", async () => {
       const setStatusServiceMock = vi
-        .spyOn(documentUnitService, "setDuplicationRelationStatus")
+        .spyOn(documentUnitService, "setDuplicateRelationStatus")
         .mockResolvedValue({ error: false })
       const duplicateRelation: DuplicateRelation = {
         documentNumber: "duplicate-1",
-        status: DuplicationRelationStatus.PENDING,
+        status: DuplicateRelationStatus.PENDING,
         isJdvDuplicateCheckActive: true,
       }
       const { documentUnit } = renderDuplicateRelation(duplicateRelation)
@@ -220,16 +220,16 @@ describe("DuplicateRelationListItem", () => {
       expect(screen.queryByTestId("set-state-error")).not.toBeInTheDocument()
       expect(
         documentUnit?.managementData?.duplicateRelations[0].status,
-      ).toEqual(DuplicationRelationStatus.IGNORED)
+      ).toEqual(DuplicateRelationStatus.IGNORED)
     })
 
     it("should set state from IGNORED -> PENDING", async () => {
       const setStatusServiceMock = vi
-        .spyOn(documentUnitService, "setDuplicationRelationStatus")
+        .spyOn(documentUnitService, "setDuplicateRelationStatus")
         .mockResolvedValue({ error: false })
       const duplicateRelation: DuplicateRelation = {
         documentNumber: "duplicate-1",
-        status: DuplicationRelationStatus.IGNORED,
+        status: DuplicateRelationStatus.IGNORED,
         isJdvDuplicateCheckActive: true,
       }
       const { documentUnit } = renderDuplicateRelation(duplicateRelation)
@@ -246,16 +246,16 @@ describe("DuplicateRelationListItem", () => {
       expect(screen.queryByTestId("set-state-error")).not.toBeInTheDocument()
       expect(
         documentUnit?.managementData?.duplicateRelations[0].status,
-      ).toEqual(DuplicationRelationStatus.PENDING)
+      ).toEqual(DuplicateRelationStatus.PENDING)
     })
 
     it("should show error if setting state fails", async () => {
       const setStatusServiceMock = vi
-        .spyOn(documentUnitService, "setDuplicationRelationStatus")
+        .spyOn(documentUnitService, "setDuplicateRelationStatus")
         .mockResolvedValue({ error: true })
       const duplicateRelation: DuplicateRelation = {
         documentNumber: "duplicate-1",
-        status: DuplicationRelationStatus.PENDING,
+        status: DuplicateRelationStatus.PENDING,
         isJdvDuplicateCheckActive: true,
       }
       const { documentUnit } = renderDuplicateRelation(duplicateRelation)
@@ -271,7 +271,7 @@ describe("DuplicateRelationListItem", () => {
       // The state is set before the error is evaluated as to allow for quick navigation after setting the state
       expect(
         documentUnit?.managementData?.duplicateRelations[0].status,
-      ).toEqual(DuplicationRelationStatus.IGNORED)
+      ).toEqual(DuplicateRelationStatus.IGNORED)
     })
   })
 

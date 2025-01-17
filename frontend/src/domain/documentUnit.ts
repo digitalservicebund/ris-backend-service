@@ -111,14 +111,14 @@ export const longTextLabels: {
   outline: "Gliederung",
 }
 
-export enum DuplicationRelationStatus {
+export enum DuplicateRelationStatus {
   PENDING = "PENDING",
   IGNORED = "IGNORED",
 }
 
 export type DuplicateRelation = {
   documentNumber: string
-  status: DuplicationRelationStatus
+  status: DuplicateRelationStatus
   isJdvDuplicateCheckActive: boolean
   courtLabel?: string
   decisionDate?: string

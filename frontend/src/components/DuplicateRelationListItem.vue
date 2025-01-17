@@ -8,7 +8,7 @@ import CheckboxInput from "@/components/input/CheckboxInput.vue"
 import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import {
   DuplicateRelation,
-  DuplicationRelationStatus,
+  DuplicateRelationStatus,
 } from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -24,23 +24,23 @@ const { documentUnit } = storeToRefs(useDocumentUnitStore())
 const hasSetStateError = ref(false)
 
 const isIgnored = computed({
-  get: () => duplicateRelation.status === DuplicationRelationStatus.IGNORED,
+  get: () => duplicateRelation.status === DuplicateRelationStatus.IGNORED,
   set: async (shouldBeIgnored) => {
     const newStatus = shouldBeIgnored
-      ? DuplicationRelationStatus.IGNORED
-      : DuplicationRelationStatus.PENDING
+      ? DuplicateRelationStatus.IGNORED
+      : DuplicateRelationStatus.PENDING
     await updateStatus(newStatus)
   },
 })
 
-const updateStatus = async (newStatus: DuplicationRelationStatus) => {
+const updateStatus = async (newStatus: DuplicateRelationStatus) => {
   const docUnitDupRelation =
     documentUnit.value?.managementData?.duplicateRelations.find(
       (rel) => rel.documentNumber === duplicateRelation.documentNumber,
     )
   if (docUnitDupRelation) docUnitDupRelation.status = newStatus
 
-  const { error } = await documentUnitService.setDuplicationRelationStatus(
+  const { error } = await documentUnitService.setDuplicateRelationStatus(
     documentUnit.value!.documentNumber,
     duplicateRelation.documentNumber,
     newStatus,

@@ -5,7 +5,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import HandoverDuplicateCheckView from "@/components/HandoverDuplicateCheckView.vue"
 import {
   DuplicateRelation,
-  DuplicationRelationStatus,
+  DuplicateRelationStatus,
 } from "@/domain/documentUnit"
 import { PublicationState } from "@/domain/publicationStatus"
 import routes from "~/test-helper/routes"
@@ -46,7 +46,7 @@ describe("HandoverDocumentDuplicateCheckView:", () => {
       courtLabel: "AG Aachen",
       decisionDate: "2025-01-15",
       documentType: "Beschluss",
-      status: DuplicationRelationStatus.PENDING,
+      status: DuplicateRelationStatus.PENDING,
       isJdvDuplicateCheckActive: true,
       publicationStatus: PublicationState.UNPUBLISHED,
     }
@@ -81,13 +81,13 @@ describe("HandoverDocumentDuplicateCheckView:", () => {
   test("with pending unpublished and published duplicates", async () => {
     const unpublishedDuplicate: DuplicateRelation = {
       documentNumber: "documentNumber",
-      status: DuplicationRelationStatus.PENDING,
+      status: DuplicateRelationStatus.PENDING,
       isJdvDuplicateCheckActive: true,
       publicationStatus: PublicationState.UNPUBLISHED,
     }
     const publishedDuplicate: DuplicateRelation = {
       documentNumber: "documentNumber",
-      status: DuplicationRelationStatus.PENDING,
+      status: DuplicateRelationStatus.PENDING,
       isJdvDuplicateCheckActive: true,
       publicationStatus: PublicationState.PUBLISHED,
     }

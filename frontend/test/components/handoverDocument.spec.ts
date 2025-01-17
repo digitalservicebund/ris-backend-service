@@ -6,7 +6,7 @@ import { beforeEach } from "vitest"
 import { nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import HandoverDocumentationUnitView from "@/components/HandoverDocumentationUnitView.vue"
-import DocumentUnit, { DuplicationRelationStatus } from "@/domain/documentUnit"
+import DocumentUnit, { DuplicateRelationStatus } from "@/domain/documentUnit"
 import { EventRecordType, HandoverMail, Preview } from "@/domain/eventRecord"
 import LegalForce from "@/domain/legalForce"
 import NormReference from "@/domain/normReference"
@@ -385,7 +385,7 @@ describe("HandoverDocumentationUnitView:", () => {
             duplicateRelations: [
               {
                 documentNumber: "documentNumber",
-                status: DuplicationRelationStatus.PENDING,
+                status: DuplicateRelationStatus.PENDING,
                 isJdvDuplicateCheckActive: true,
               },
             ],
@@ -440,7 +440,7 @@ describe("HandoverDocumentationUnitView:", () => {
               {
                 documentNumber: "documentNumber",
                 isJdvDuplicateCheckActive: true,
-                status: DuplicationRelationStatus.IGNORED,
+                status: DuplicateRelationStatus.IGNORED,
               },
             ],
             borderNumbers: [],

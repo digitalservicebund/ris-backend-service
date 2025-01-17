@@ -6,7 +6,7 @@ import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import DocumentUnit, {
   CoreData,
   DuplicateRelation,
-  DuplicationRelationStatus,
+  DuplicateRelationStatus,
 } from "@/domain/documentUnit"
 import FeatureToggleService from "@/services/featureToggleService"
 import routes from "~/test-helper/routes"
@@ -99,7 +99,7 @@ describe("documentUnit InfoPanel", () => {
     renderComponent({
       duplicateRelations: [
         {
-          status: DuplicationRelationStatus.PENDING,
+          status: DuplicateRelationStatus.PENDING,
           documentNumber: "doc",
           isJdvDuplicateCheckActive: true,
         },
@@ -118,7 +118,7 @@ describe("documentUnit InfoPanel", () => {
       isExternalUser: true,
       duplicateRelations: [
         {
-          status: DuplicationRelationStatus.PENDING,
+          status: DuplicateRelationStatus.PENDING,
           documentNumber: "doc",
           isJdvDuplicateCheckActive: true,
         },
@@ -136,7 +136,7 @@ describe("documentUnit InfoPanel", () => {
     renderComponent({
       duplicateRelations: [
         {
-          status: DuplicationRelationStatus.IGNORED,
+          status: DuplicateRelationStatus.IGNORED,
           documentNumber: "doc",
           isJdvDuplicateCheckActive: true,
         },

@@ -14,7 +14,7 @@ import TitleElement from "@/components/TitleElement.vue"
 import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import ActiveCitation, { activeCitationLabels } from "@/domain/activeCitation"
 import {
-  DuplicationRelationStatus,
+  DuplicateRelationStatus,
   longTextLabels,
   shortTextLabels,
 } from "@/domain/documentUnit"
@@ -129,7 +129,7 @@ const missingCoreDataFields = ref(
 
 const pendingDuplicates = ref(
   store.documentUnit!.managementData.duplicateRelations.filter(
-    (relation) => relation.status === DuplicationRelationStatus.PENDING,
+    (relation) => relation.status === DuplicateRelationStatus.PENDING,
   ),
 )
 
