@@ -102,6 +102,7 @@ describe("Legal periodical edition reference input", () => {
   })
 
   it("search is triggered with shortcut", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => null)
     const { user } = renderComponent()
 
     expect(screen.queryByText(/test fileNumber1/)).not.toBeInTheDocument()
@@ -113,6 +114,7 @@ describe("Legal periodical edition reference input", () => {
   })
 
   test("adding a decision scrolls to reference on validation errors", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => null)
     const { user } = renderComponent()
 
     await user.click(screen.getByLabelText("Nach Entscheidung suchen"))
