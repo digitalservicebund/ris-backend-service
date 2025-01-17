@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, ref, watch } from "vue"
+import { computed, onMounted, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import CreateNewFromSearch from "@/components/CreateNewFromSearch.vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
@@ -15,7 +15,7 @@ import PopupModal from "@/components/PopupModal.vue"
 import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
-import { useScrollPreviewContainer } from "@/composables/useScrollPreviewContainer"
+import { useScroll } from "@/composables/useScroll"
 import { useValidationStore } from "@/composables/useValidationStore"
 import DocumentUnit, {
   DocumentationUnitParameters,
@@ -42,8 +42,7 @@ const emit = defineEmits<{
   removeEntry: [value: Reference]
 }>()
 
-const containerRef = ref<HTMLElement | null>(null)
-const { openSidePanel } = useScrollPreviewContainer()
+const { scrollIntoViewportById, openSidePanelAndScrollToSection } = useScroll()
 
 const store = useEditionStore()
 const reference = ref<Reference>(new Reference({ ...props.modelValue }))
@@ -107,23 +106,6 @@ function updateDateFormatValidation(
   if (validationError)
     validationStore.add(validationError.message, "decisionDate")
   else validationStore.remove("decisionDate")
-}
-
-/**
- * In case of validation errors it will scroll  back to input fields
- *
- * @returns A promise that resolves after the DOM updates.
- */
-async function scrollToTopPosition() {
-  await nextTick()
-  if (
-    containerRef.value instanceof HTMLElement &&
-    "scrollIntoView" in containerRef.value
-  ) {
-    containerRef.value.scrollIntoView({
-      block: "start",
-    })
-  }
 }
 
 async function search() {
@@ -215,7 +197,7 @@ async function addReference(decision: RelatedDocumentation) {
     emit("update:modelValue", newReference)
     emit("addEntry")
   } else {
-    await scrollToTopPosition()
+    await scrollIntoViewportById("periodical-references")
   }
 }
 
@@ -324,7 +306,9 @@ watch(searchResultsCurrentPage, () => {
  */
 watch(searchResults, async () => {
   if (searchResults.value?.length == 1) {
-    await openSidePanel(searchResults.value[0].decision.documentNumber)
+    await openSidePanelAndScrollToSection(
+      searchResults.value[0].decision.documentNumber,
+    )
   }
 })
 
@@ -332,19 +316,13 @@ onMounted(async () => {
   featureToggle.value = (
     await FeatureToggleService.isEnabled("neuris.new-from-search")
   ).data
-  setTimeout(() => {
-    if (!containerRef.value) return
-    containerRef.value.scrollIntoView({
-      behavior: "smooth",
-      block: "end",
-    })
-  })
+  await scrollIntoViewportById("periodical-references")
 })
 </script>
 
 <template>
   <div
-    ref="containerRef"
+    id="periodical-references"
     v-ctrl-enter="search"
     class="flex flex-col border-b-1"
   >
@@ -702,4 +680,4 @@ onMounted(async () => {
     </div>
   </div>
 </template>
-@/stores/editionStore
+@/stores/editionStore @/composables/useScrollTo
