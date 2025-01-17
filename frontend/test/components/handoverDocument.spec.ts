@@ -7,6 +7,7 @@ import { nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import HandoverDocumentationUnitView from "@/components/HandoverDocumentationUnitView.vue"
 import DocumentUnit, { DuplicateRelationStatus } from "@/domain/documentUnit"
+import { Env } from "@/domain/env"
 import { EventRecordType, HandoverMail, Preview } from "@/domain/eventRecord"
 import LegalForce from "@/domain/legalForce"
 import NormReference from "@/domain/normReference"
@@ -25,6 +26,7 @@ function renderComponent(
     props?: unknown
     documentUnit?: DocumentUnit
     stubs?: Stubs
+    env?: Env
   } = {},
 ) {
   const user = userEvent.setup()
@@ -46,6 +48,7 @@ function renderComponent(
                       documentNumber: "foo",
                     }),
                 },
+                session: { env: options.env ?? "staging" },
               },
             }),
           ],
@@ -730,5 +733,32 @@ describe("HandoverDocumentationUnitView:", () => {
     expect(codeSnippet?.title).toBe("XML")
     expect(codeSnippet).toHaveAttribute("XML")
     expect(codeSnippet?.getAttribute("xml")).toBe("xml content")
+  })
+})
+
+describe("renders uat test mode hint", () => {
+  it("only in uat", async () => {
+    renderComponent({
+      env: "uat",
+    })
+    expect(
+      screen.getByText("UAT Testmodus für die Übergabe an die jDV"),
+    ).toBeInTheDocument()
+  })
+
+  it("not in prod", async () => {
+    renderComponent({
+      env: "production",
+    })
+    expect(
+      screen.queryByText("UAT Testmodus für die Übergabe an die jDV"),
+    ).not.toBeInTheDocument()
+  })
+
+  it("not in staging", async () => {
+    renderComponent()
+    expect(
+      screen.queryByText("UAT Testmodus für die Übergabe an die jDV"),
+    ).not.toBeInTheDocument()
   })
 })

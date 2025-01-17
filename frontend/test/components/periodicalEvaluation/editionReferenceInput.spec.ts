@@ -1,12 +1,37 @@
 import { createTestingPinia } from "@pinia/testing"
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { setActivePinia } from "pinia"
 import { createRouter, createWebHistory } from "vue-router"
 import PeriodicalEditionReferenceInput from "@/components/periodical-evaluation/references/PeriodicalEditionReferenceInput.vue"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import documentUnitService from "@/services/documentUnitService"
 import { onSearchShortcutDirective } from "@/utils/onSearchShortcutDirective"
 import routes from "~/test-helper/routes"
+
+// Mock the stores
+vi.mock("@/stores/documentUnitStore", () => ({
+  useDocumentUnitStore: vi.fn(),
+}))
+
+vi.mock("@/stores/extraContentSidePanelStore", () => ({
+  useExtraContentSidePanelStore: vi.fn(),
+}))
+
+vi.mock("@/stores/useEditionStore", () => ({
+  useEditionStore: vi.fn(),
+}))
+
+// Mock the useScroll composable globally
+const scrollIntoViewportByIdMock = vi.fn()
+const openSidePanelAndScrollToSectionMock = vi.fn()
+
+vi.mock("@/composables/useScroll", () => ({
+  useScroll: () => ({
+    scrollIntoViewportById: scrollIntoViewportByIdMock,
+    openSidePanelAndScrollToSection: openSidePanelAndScrollToSectionMock,
+  }),
+}))
 
 function renderComponent() {
   const user = userEvent.setup()
@@ -42,9 +67,10 @@ function renderComponent() {
 
 describe("Legal periodical edition reference input", () => {
   beforeEach(() => {
-    // Mock scrollIntoView
-    const scrollIntoViewMock = vi.fn()
-    window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
+    // Activate Pinia
+    setActivePinia(createTestingPinia())
+
+    // Mock the searchByRelatedDocumentation method
     vi.spyOn(
       documentUnitService,
       "searchByRelatedDocumentation",
@@ -79,12 +105,7 @@ describe("Legal periodical edition reference input", () => {
     )
   })
 
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
   it("search is triggered with shortcut", async () => {
-    vi.spyOn(console, "error").mockImplementation(() => null)
     const { user } = renderComponent()
 
     expect(screen.queryByText(/test fileNumber1/)).not.toBeInTheDocument()
@@ -92,23 +113,20 @@ describe("Legal periodical edition reference input", () => {
     await user.keyboard("{Control>}{Enter}")
 
     expect(screen.getAllByText(/test fileNumber1/).length).toBe(1)
+    vi.resetAllMocks()
   })
 
   test("adding a decision scrolls to reference on validation errors", async () => {
-    vi.spyOn(console, "error").mockImplementation(() => null)
-
     const { user } = renderComponent()
-    const scrollIntoViewMock = vi.fn()
-    const searchButton = screen.getByLabelText("Nach Entscheidung suchen")
-    window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
 
-    await user.click(searchButton)
+    await user.click(screen.getByLabelText("Nach Entscheidung suchen"))
+    await user.click(screen.getByLabelText("Treffer übernehmen"))
 
-    const addDecision = screen.getByLabelText("Treffer übernehmen")
-    await user.click(addDecision)
-    expect(
-      scrollIntoViewMock,
-      "Adding a reference with missing required fields should scroll to entry",
-    ).toHaveBeenCalledTimes(2)
+    expect(scrollIntoViewportByIdMock).toHaveBeenCalledWith(
+      "periodical-references",
+    )
+
+    // onmounted, on search results and on validation error
+    expect(scrollIntoViewportByIdMock).toHaveBeenCalledTimes(3)
   })
 })

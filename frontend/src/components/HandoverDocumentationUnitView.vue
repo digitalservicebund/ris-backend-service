@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { storeToRefs } from "pinia"
 import { computed, onMounted, ref } from "vue"
 import { RouterLink } from "vue-router"
 import ExpandableContent from "./ExpandableContent.vue"
@@ -34,6 +35,7 @@ import borderNumberService from "@/services/borderNumberService"
 import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import useSessionStore from "@/stores/sessionStore"
 import IconCheck from "~icons/ic/baseline-check"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
 import IconKeyboardArrowDown from "~icons/ic/baseline-keyboard-arrow-down"
@@ -50,6 +52,8 @@ const emits = defineEmits<{
 }>()
 
 const store = useDocumentUnitStore()
+const sessionStore = useSessionStore()
+const { env } = storeToRefs(sessionStore)
 
 const categoriesRoute = computed(() => ({
   name: "caselaw-documentUnit-documentNumber-categories",
@@ -638,6 +642,18 @@ const isPublishable = computed<boolean>(
         @close-modal="showHandoverModal = false"
         @primary-action="confirmHandoverDialog"
       />
+
+      <InfoModal
+        v-if="env === 'uat'"
+        :description="[
+          'Dokumentationseinheiten werden in der jDV ohne Dokumentnummer erstellt',
+          'Diese sind auffindbar über Gericht=VGH Mannheim und Aktenzeichen und/oder Entscheidungsdatum der Entscheidung',
+          'Die Dokumentationseinheiten müssen manuell in der jDV gelöscht werden',
+        ]"
+        :status="InfoStatus.INFO"
+        title="UAT Testmodus für die Übergabe an die jDV"
+      />
+
       <TextButton
         aria-label="Dokumentationseinheit an jDV übergeben"
         button-type="primary"

@@ -1,11 +1,27 @@
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 import { useExtraContentSidePanelStore } from "@/stores/extraContentSidePanelStore"
 
-export function useScrollPreviewContainer() {
+export function useScroll() {
   const extraContentSidePanelStore = useExtraContentSidePanelStore()
   const documentUnitStore = useDocumentUnitStore()
+  const headerOffset = 170
 
-  async function openSidePanel(documentUnitNumber?: string) {
+  async function scrollIntoViewportById(id: string) {
+    setTimeout(() => {
+      const element = document.getElementById(id)
+      if (element) {
+        const elementPosition = element?.getBoundingClientRect().top
+        const offsetPosition = elementPosition + window.scrollY - headerOffset
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth",
+        })
+      }
+    })
+  }
+
+  async function openSidePanelAndScrollToSection(documentUnitNumber?: string) {
     if (documentUnitNumber) {
       await documentUnitStore.loadDocumentUnit(documentUnitNumber)
       extraContentSidePanelStore.togglePanel(true)
@@ -29,6 +45,7 @@ export function useScrollPreviewContainer() {
   }
 
   return {
-    openSidePanel,
+    scrollIntoViewportById,
+    openSidePanelAndScrollToSection,
   }
 }

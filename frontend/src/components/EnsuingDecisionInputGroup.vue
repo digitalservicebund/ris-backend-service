@@ -9,8 +9,8 @@ import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
+import { useScroll } from "@/composables/useScroll"
 import { useValidationStore } from "@/composables/useValidationStore"
-import values from "@/data/values.json"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -28,6 +28,7 @@ const emit = defineEmits<{
   removeEntry: [value?: boolean]
 }>()
 
+const { scrollIntoViewportById } = useScroll()
 const lastSearchInput = ref(new EnsuingDecision())
 const lastSavedModelValue = ref(new EnsuingDecision({ ...props.modelValue }))
 const ensuingDecision = ref(new EnsuingDecision({ ...props.modelValue }))
@@ -126,7 +127,7 @@ function addEnsuingDecision() {
   }
 }
 
-function addEnsuingDecisionFromSearch(decision: RelatedDocumentation) {
+async function addEnsuingDecisionFromSearch(decision: RelatedDocumentation) {
   ensuingDecision.value = new EnsuingDecision({
     ...decision,
     pending: ensuingDecision.value?.pending,
@@ -135,21 +136,7 @@ function addEnsuingDecisionFromSearch(decision: RelatedDocumentation) {
   })
   emit("update:modelValue", ensuingDecision.value as EnsuingDecision)
   emit("addEntry")
-  scrollToTop()
-}
-
-function scrollToTop() {
-  const element = document.getElementById("ensuingDecisions")
-  if (element) {
-    const headerOffset = values.headerOffset
-    const elementPosition = element?.getBoundingClientRect().top
-    const offsetPosition = elementPosition + window.scrollY - headerOffset
-
-    window.scrollTo({
-      top: offsetPosition,
-      behavior: "smooth",
-    })
-  }
+  await scrollIntoViewportById("ensuingDecisions")
 }
 
 function updateDateFormatValidation(
