@@ -1,10 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import de.bund.digitalservice.ris.caselaw.config.LanguageToolConfig;
 import de.bund.digitalservice.ris.caselaw.domain.TextRange;
 import java.util.List;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,10 +20,20 @@ class LanguageToolServiceTest {
 
   @Test
   void testGetNoIndex_shouldReturnNoIndexTextRangesPositions() {
-    String testWithNoindex = "Investmentfonds SEB<noindex>Optimix</noindex>Ertrag (WKN: 974891)";
-    List<TextRange> noIndexTextRanges = service.getNoIndexTextRanges(testWithNoindex);
+    String htmlTestWithNoindex =
+        "text contains no index tags <noindex>this part should be excluded from grammar check</noindex> but this not.";
+    Document document = Jsoup.parse(htmlTestWithNoindex);
+    String plainText = document.text();
+
+    List<TextRange> noIndexTextRanges =
+        LanguageToolService.findNoIndexPositions(Jsoup.parse(htmlTestWithNoindex), plainText);
     Assertions.assertEquals(1, noIndexTextRanges.size());
-    assertEquals(19, noIndexTextRanges.getFirst().start());
-    assertEquals(45, noIndexTextRanges.getFirst().end());
+    Assertions.assertEquals(28, noIndexTextRanges.getFirst().start());
+    Assertions.assertEquals(75, noIndexTextRanges.getFirst().end());
+    String expectedTest = "this part should be excluded from grammar check";
+    Assertions.assertEquals(
+        expectedTest,
+        plainText.substring(
+            noIndexTextRanges.getFirst().start(), noIndexTextRanges.getFirst().end()));
   }
 }

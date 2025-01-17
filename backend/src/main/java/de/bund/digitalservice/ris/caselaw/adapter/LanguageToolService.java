@@ -8,8 +8,9 @@ import de.bund.digitalservice.ris.caselaw.domain.TextRange;
 import de.bund.digitalservice.ris.caselaw.domain.languagetool.TextCorrectionService;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -20,6 +21,8 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class LanguageToolService implements TextCorrectionService {
   private final LanguageToolConfig languageToolConfig;
+
+  private static final String NO_INDEX_ELEMENT = "noindex";
 
   public LanguageToolService(LanguageToolConfig languageToolConfig) {
     this.languageToolConfig = languageToolConfig;
@@ -41,24 +44,34 @@ public class LanguageToolService implements TextCorrectionService {
     ResponseEntity<String> response =
         restTemplate.exchange(languageToolConfig.getUrl(), HttpMethod.POST, entity, String.class);
 
-    getNoIndexTextRanges(text);
     ObjectMapper objectMapper = new ObjectMapper();
 
     return objectMapper.readValue(response.getBody(), JsonNode.class);
   }
 
-  public List<TextRange> getNoIndexTextRanges(String text) {
-    String regex = "<noindex>(.*?)</noindex>";
-    Pattern pattern = Pattern.compile(regex);
-    Matcher matcher = pattern.matcher(text);
-    List<TextRange> noIndexTextRanges = new ArrayList<>();
-    while (matcher.find()) {
-      noIndexTextRanges.add(TextRange.builder().start(matcher.start()).end(matcher.end()).build());
+  public static List<TextRange> findNoIndexPositions(Document doc) {
+    return findNoIndexPositions(doc, doc.text());
+  }
+
+  public static List<TextRange> findNoIndexPositions(Document doc, String plainText) {
+    List<TextRange> positions = new ArrayList<>();
+
+    Elements noIndexElements = doc.select(LanguageToolService.NO_INDEX_ELEMENT);
+
+    for (Element noIndexElement : noIndexElements) {
+      String noIndexText = noIndexElement.text();
+
+      int start = plainText.indexOf(noIndexText);
+      if (start != -1) {
+        int end = start + noIndexText.length();
+        positions.add(TextRange.builder().start(start).end(end).text(noIndexText).build());
+      }
     }
-    return noIndexTextRanges;
+
+    return positions;
   }
 
   public void removeNoIndexMatches(String text) {
-    var noIndexMatches = getNoIndexTextRanges(text);
+    // var noIndexMatches = getNoIndexTextRanges(text);
   }
 }
