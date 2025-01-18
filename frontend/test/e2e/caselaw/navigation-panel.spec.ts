@@ -72,6 +72,10 @@ test.describe("test navigation panel", () => {
     await expect(page.getByRole("link", { name: "Fundstellen" })).toBeFocused()
     await page.keyboard.press("Tab")
     await expect(
+      page.getByRole("link", { name: "Verwaltungsdaten" }),
+    ).toBeFocused()
+    await page.keyboard.press("Tab")
+    await expect(
       page.getByRole("link", { name: "Übergabe an jDV" }),
     ).toBeFocused()
     await page.keyboard.press("Enter")
