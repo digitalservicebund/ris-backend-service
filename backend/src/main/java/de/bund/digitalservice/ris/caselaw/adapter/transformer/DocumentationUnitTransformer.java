@@ -163,14 +163,16 @@ public class DocumentationUnitTransformer {
       builder.scheduledByEmail(managementData.scheduledByEmail());
     }
 
-    addReferences(updatedDomainObject, builder);
-    addLiteratureReferences(updatedDomainObject, builder);
+    addCaselawReferences(updatedDomainObject, builder, currentDto);
+    addLiteratureReferences(updatedDomainObject, builder, currentDto);
 
     return builder.build();
   }
 
-  private static void addReferences(
-      DocumentationUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
+  private static void addCaselawReferences(
+      DocumentationUnit updatedDomainObject,
+      DocumentationUnitDTOBuilder builder,
+      DocumentationUnitDTO currentDTO) {
     AtomicInteger rank = new AtomicInteger(0);
     builder.caselawReferences(
         updatedDomainObject.references() == null
@@ -180,14 +182,27 @@ public class DocumentationUnitTransformer {
                 .map(
                     referenceDTO -> {
                       referenceDTO.setDocumentationUnit(builder.build()); // TODO needed?
-                      referenceDTO.setDocumentationUnitRank(rank.getAndIncrement());
+                      referenceDTO.setDocumentationUnitRank(rank.incrementAndGet());
+
+                      var existingReference =
+                          currentDTO.getCaselawReferences().stream()
+                              .filter(existing -> referenceDTO.getId().equals(existing.getId()))
+                              .findFirst();
+                      existingReference.ifPresent(
+                          caselawReferenceDTO -> {
+                            referenceDTO.setEditionRank(caselawReferenceDTO.getEditionRank());
+                            referenceDTO.setEdition(caselawReferenceDTO.getEdition());
+                          });
+
                       return (CaselawReferenceDTO) referenceDTO;
                     })
                 .toList());
   }
 
   private static void addLiteratureReferences(
-      DocumentationUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
+      DocumentationUnit updatedDomainObject,
+      DocumentationUnitDTOBuilder builder,
+      DocumentationUnitDTO currentDTO) {
     AtomicInteger rank = new AtomicInteger(0);
     builder.literatureReferences(
         updatedDomainObject.literatureReferences() == null
@@ -197,7 +212,18 @@ public class DocumentationUnitTransformer {
                 .map(
                     referenceDTO -> {
                       referenceDTO.setDocumentationUnit(builder.build()); // TODO needed?
-                      referenceDTO.setDocumentationUnitRank(rank.getAndIncrement());
+                      referenceDTO.setDocumentationUnitRank(rank.incrementAndGet());
+
+                      var existingReference =
+                          currentDTO.getLiteratureReferences().stream()
+                              .filter(existing -> referenceDTO.getId().equals(existing.getId()))
+                              .findFirst();
+                      existingReference.ifPresent(
+                          literatureReferenceDTO -> {
+                            referenceDTO.setEditionRank(literatureReferenceDTO.getEditionRank());
+                            referenceDTO.setEdition(literatureReferenceDTO.getEdition());
+                          });
+
                       return (LiteratureReferenceDTO) referenceDTO;
                     })
                 .toList());
