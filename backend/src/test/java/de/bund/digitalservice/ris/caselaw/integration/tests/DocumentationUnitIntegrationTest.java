@@ -76,6 +76,7 @@ import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
+import de.bund.digitalservice.ris.caselaw.webtestclient.RisBodySpec;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.net.URI;
 import java.time.LocalDate;
@@ -805,6 +806,13 @@ class DocumentationUnitIntegrationTest {
           errorStatuses.get(i));
     }
 
+    DocumentationOfficeDTO otherDocumentationOffice =
+        documentationOfficeRepository.findByAbbreviation("BGH");
+    String documentNumber = "1234567890123";
+
+    EntityBuilderTestUtil.createAndSavePendingDocumentationUnit(
+        repository, otherDocumentationOffice, documentationOffice, documentNumber);
+
     // no search criteria
     DocumentationUnitSearchInput searchInput = DocumentationUnitSearchInput.builder().build();
     // the unpublished one from the other docoffice is not in it, the others are ordered
@@ -812,6 +820,10 @@ class DocumentationUnitIntegrationTest {
     assertThat(extractDocumentNumbersFromSearchCall(searchInput))
         .contains(
             "ABCD202300007", "EFGH202200123", "IJKL202101234", "MNOP202300099", "UVWX202311090");
+
+    // pending docunits are only visible in the big search, if I am the owning docoffice (not the
+    // creating)
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).doesNotContain("1234567890123");
 
     // by documentNumber
     searchInput = DocumentationUnitSearchInput.builder().documentNumber("abc").build();
@@ -982,6 +994,82 @@ class DocumentationUnitIntegrationTest {
             .getContent();
 
     return content.stream().map(DocumentationUnitListItem::documentNumber).toList();
+  }
+
+  @Test
+  void
+      testSearchLinkableDocumentationUnits_shouldOnlyFindPublishedOrMineOrPendingWhenCreatingDocoffice() {
+    LocalDate date = LocalDate.parse("2023-02-02");
+
+    var du1 =
+        createDocumentationUnit(date, List.of("AkteZ"), "DS", PublicationStatus.UNPUBLISHED, null);
+    var du2 =
+        createDocumentationUnit(date, List.of("AkteZ"), "DS", PublicationStatus.PUBLISHED, null);
+    var du3 =
+        createDocumentationUnit(
+            date, List.of("AkteZ"), "DS", PublicationStatus.EXTERNAL_HANDOVER_PENDING, "BGH");
+    var du4 =
+        createDocumentationUnit(
+            date, List.of("AkteZ"), "CC-RIS", PublicationStatus.UNPUBLISHED, null);
+    var du5 =
+        createDocumentationUnit(
+            date, List.of("AkteZ"), "CC-RIS", PublicationStatus.PUBLISHED, null);
+    var du6 =
+        createDocumentationUnit(
+            date, List.of("AkteZ"), "CC-RIS", PublicationStatus.EXTERNAL_HANDOVER_PENDING, "DS");
+
+    RisBodySpec<SliceTestImpl<RelatedDocumentationUnit>> risBody =
+        risWebTestClient
+            .withDefaultLogin()
+            .put()
+            .uri(
+                "/api/v1/caselaw/documentunits/search-linkable-documentation-units?pg=0&sz=30&documentNumber=KORE000000000")
+            .bodyValue(RelatedDocumentationUnit.builder().fileNumber("AkteZ").build())
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<>() {});
+    List<RelatedDocumentationUnit> content = risBody.returnResult().getResponseBody().getContent();
+    assertThat(content).hasSize(5);
+    assertThat(content)
+        .extracting(RelatedDocumentationUnit::getUuid)
+        .doesNotContain(du4.getId())
+        .containsExactlyInAnyOrder(du1.getId(), du2.getId(), du3.getId(), du5.getId(), du6.getId());
+  }
+
+  private DocumentationUnitDTO createDocumentationUnit(
+      LocalDate decisionDate,
+      List<String> fileNumbers,
+      String documentOfficeLabel,
+      PublicationStatus status,
+      String creatingDocOfficeLabel) {
+
+    DocumentationOfficeDTO documentOffice =
+        documentationOfficeRepository.findByAbbreviation(documentOfficeLabel);
+
+    DocumentationOfficeDTO creatingDocOffice = null;
+    if (creatingDocOfficeLabel != null) {
+      creatingDocOffice = documentationOfficeRepository.findByAbbreviation(creatingDocOfficeLabel);
+    }
+    assertThat(documentOffice).isNotNull();
+
+    return EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DocumentationUnitDTO.builder()
+            .id(UUID.randomUUID())
+            .documentationOffice(documentOffice)
+            .creatingDocumentationOffice(creatingDocOffice)
+            .documentNumber("XX" + RandomStringUtils.randomAlphanumeric(11))
+            .decisionDate(decisionDate)
+            .documentationOffice(documentOffice)
+            .fileNumbers(
+                fileNumbers == null
+                    ? new ArrayList<>()
+                    : new ArrayList<>(
+                        fileNumbers.stream()
+                            .map(fn -> FileNumberDTO.builder().value(fn).rank(1L).build())
+                            .toList())),
+        status);
   }
 
   @Test
