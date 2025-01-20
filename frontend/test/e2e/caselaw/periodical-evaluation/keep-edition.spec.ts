@@ -14,21 +14,22 @@ test.describe(
   {
     tag: "@RISDEV-6082",
   },
+
   () => {
     test("Editing documentation unit with references that were created during periodical evaluation keeps relationship between reference and edition", async ({
       page,
       edition,
       prefilledDocumentUnit,
     }) => {
-      const suffix = edition.suffix || ""
-      const fileNumber = prefilledDocumentUnit.coreData.fileNumbers?.[0] ?? ""
+      const suffix = edition?.suffix
+      const fileNumber = prefilledDocumentUnit.coreData?.fileNumbers?.[0]
 
       await navigateToPeriodicalReferences(page, edition.id || "")
 
       await test.step("Add caselaw reference", async () => {
         await searchForDocUnitWithFileNumberAndDecisionDate(
           page,
-          fileNumber,
+          fileNumber || "",
           "31.12.2019",
         )
         // wait search result to be visible
@@ -50,7 +51,7 @@ test.describe(
       await test.step("Add literature reference", async () => {
         await searchForDocUnitWithFileNumberAndDecisionDate(
           page,
-          fileNumber,
+          fileNumber || "",
           "31.12.2019",
         )
         // wait search result to be visible
