@@ -113,7 +113,7 @@ watchEffect(() => {
     <span class="flex-grow"></span>
     <div
       v-if="hasPendingDuplicateWarning && isDuplicateCheckFeatureActive"
-      class="flex gap-12 whitespace-nowrap"
+      class="flex items-center gap-12 whitespace-nowrap"
     >
       <IconBadge
         background-color="bg-red-300"
