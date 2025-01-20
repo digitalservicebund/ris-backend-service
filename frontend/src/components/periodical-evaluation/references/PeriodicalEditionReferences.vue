@@ -85,6 +85,7 @@ watch(loadEditionIntervalCounter, async () => {
         />
       </div>
       <TextButton
+        v-if="references.length > 3"
         aria-label="Weitere Angabe Top"
         button-type="tertiary"
         :icon="IconAdd"
