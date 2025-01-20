@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
@@ -23,6 +24,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalEditionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ParticipatingJudgeDTO;
@@ -45,6 +48,8 @@ import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.Reference;
+import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
@@ -774,6 +779,73 @@ class DocumentationUnitTransformerTest {
         .containsExactly("Judge A");
     assertThat(documentationUnitDTO.getParticipatingJudges().get(0).getReferencedOpinions())
         .isNull();
+  }
+
+  @Test
+  void testTransformToDTO_withCaselawReferences() {
+    var uuid = UUID.randomUUID();
+    DocumentationUnitDTO currentDto =
+        DocumentationUnitDTO.builder()
+            .caselawReferences(
+                List.of(
+                    CaselawReferenceDTO.builder()
+                        .id(uuid)
+                        .edition(LegalPeriodicalEditionDTO.builder().name("Foo").build())
+                        .editionRank(3)
+                        .documentationUnitRank(3)
+                        .build()))
+            .build();
+
+    var updatedReferences =
+        List.of(
+            Reference.builder()
+                .id(uuid)
+                .referenceType(ReferenceType.CASELAW)
+                .primaryReference(true)
+                .build());
+    DocumentationUnit updatedDomainObject =
+        DocumentationUnit.builder().references(updatedReferences).build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+
+    assertThat(documentationUnitDTO.getCaselawReferences().getFirst().getDocumentationUnitRank())
+        .isOne();
+    assertThat(documentationUnitDTO.getCaselawReferences().getFirst().getEditionRank())
+        .isEqualTo(3);
+    assertThat(documentationUnitDTO.getCaselawReferences().getFirst().getEdition().getName())
+        .isEqualTo("Foo");
+  }
+
+  @Test
+  void testTransformToDTO_withLiteratureReferences() {
+    var uuid = UUID.randomUUID();
+    DocumentationUnitDTO currentDto =
+        DocumentationUnitDTO.builder()
+            .literatureReferences(
+                List.of(
+                    LiteratureReferenceDTO.builder()
+                        .id(uuid)
+                        .edition(LegalPeriodicalEditionDTO.builder().name("Foo").build())
+                        .editionRank(3)
+                        .documentationUnitRank(3)
+                        .build()))
+            .build();
+
+    var updatedReferences =
+        List.of(Reference.builder().id(uuid).referenceType(ReferenceType.LITERATURE).build());
+    DocumentationUnit updatedDomainObject =
+        DocumentationUnit.builder().literatureReferences(updatedReferences).build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+
+    assertThat(documentationUnitDTO.getLiteratureReferences().getFirst().getDocumentationUnitRank())
+        .isOne();
+    assertThat(documentationUnitDTO.getLiteratureReferences().getFirst().getEditionRank())
+        .isEqualTo(3);
+    assertThat(documentationUnitDTO.getLiteratureReferences().getFirst().getEdition().getName())
+        .isEqualTo("Foo");
   }
 
   @Test

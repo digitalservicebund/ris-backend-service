@@ -667,7 +667,11 @@ export async function searchForDocUnitWithFileNumberAndDecisionDate(
   await fillInput(page, "Aktenzeichen", fileNumber)
   await fillInput(page, "Entscheidungsdatum", date)
   await fillInput(page, "Dokumenttyp", "AnU")
-  await page.getByText("Anerkenntnisurteil", { exact: true }).click()
+
+  await page
+    .locator("button")
+    .filter({ hasText: "AnerkenntnisurteilAnU" })
+    .click()
 
   await page.getByText("Suchen").click()
 }
