@@ -157,6 +157,17 @@ export const navigateToAttachments = async (
   })
 }
 
+export const navigateToManagementData = async (
+  page: Page,
+  documentNumber: string,
+) => {
+  await test.step("Navigate to 'Verwaltungsdaten'", async () => {
+    const baseUrl = `/caselaw/documentunit/${documentNumber}/managementdata`
+    await getRequest(baseUrl, page)
+    await expect(page.getByTestId("title")).toHaveText("Verwaltungsdaten")
+  })
+}
+
 export const navigateToHandover = async (
   page: Page,
   documentNumber: string,
