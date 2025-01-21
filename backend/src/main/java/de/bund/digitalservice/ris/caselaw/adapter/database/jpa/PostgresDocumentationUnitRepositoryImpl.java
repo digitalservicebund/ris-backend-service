@@ -468,6 +468,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     }
 
     // 7. Filter by publication status
+    final String PUBLICATION_STATUS = "publicationStatus";
+    final String STATUS = "status";
     Predicate documentationOfficeIdPredicate =
         criteriaBuilder.equal(
             root.get("documentationOffice").get("id"), documentationOfficeDTO.getId());
@@ -475,14 +477,14 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     Predicate publicationStatusPredicate =
         criteriaBuilder.or(
             criteriaBuilder.equal(
-                root.get("status").get("publicationStatus"), PublicationStatus.PUBLISHED),
+                root.get(STATUS).get(PUBLICATION_STATUS), PublicationStatus.PUBLISHED),
             criteriaBuilder.equal(
-                root.get("status").get("publicationStatus"), PublicationStatus.PUBLISHING));
+                root.get(STATUS).get(PUBLICATION_STATUS), PublicationStatus.PUBLISHING));
 
     Predicate externalHandoverPendingPredicate =
         criteriaBuilder.and(
             criteriaBuilder.equal(
-                root.get("status").get("publicationStatus"),
+                root.get(STATUS).get(PUBLICATION_STATUS),
                 PublicationStatus.EXTERNAL_HANDOVER_PENDING),
             criteriaBuilder.equal(
                 root.get("creatingDocumentationOffice").get("id"), documentationOfficeDTO.getId()));
