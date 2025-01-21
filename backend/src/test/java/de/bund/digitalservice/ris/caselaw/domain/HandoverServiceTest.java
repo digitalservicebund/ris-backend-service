@@ -24,9 +24,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -35,21 +35,21 @@ class HandoverServiceTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final String ISSUER_ADDRESS = "test-issuer@exporter.neuris";
 
-  @MockitoSpyBean private HandoverService service;
+  @SpyBean private HandoverService service;
 
-  @MockitoBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
+  @MockBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
 
-  @MockitoBean private LegalPeriodicalEditionRepository editionRepository;
-  @MockitoBean private DocumentationUnitRepository repository;
-  @MockitoBean private DocumentationUnitService documentationUnitService;
-  @MockitoBean private DocumentNumberService documentNumberService;
-  @MockitoBean private DocumentNumberRecyclingService documentNumberRecyclingService;
-  @MockitoBean private MailService mailService;
-  @MockitoBean private HandoverReportRepository handoverReportRepository;
-  @MockitoBean private DeltaMigrationRepository deltaMigrationRepository;
-  @MockitoBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
-  @MockitoBean private AttachmentService attachmentService;
-  @MockitoBean private Validator validator;
+  @MockBean private LegalPeriodicalEditionRepository editionRepository;
+  @MockBean private DocumentationUnitRepository repository;
+  @MockBean private DocumentationUnitService documentationUnitService;
+  @MockBean private DocumentNumberService documentNumberService;
+  @MockBean private DocumentNumberRecyclingService documentNumberRecyclingService;
+  @MockBean private MailService mailService;
+  @MockBean private HandoverReportRepository handoverReportRepository;
+  @MockBean private DeltaMigrationRepository deltaMigrationRepository;
+  @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  @MockBean private AttachmentService attachmentService;
+  @MockBean private Validator validator;
 
   @Test
   void testHandoverByEmail() throws DocumentationUnitNotExistsException {

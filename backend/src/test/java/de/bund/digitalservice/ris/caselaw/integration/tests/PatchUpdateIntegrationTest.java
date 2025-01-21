@@ -73,10 +73,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
@@ -132,17 +132,17 @@ class PatchUpdateIntegrationTest {
   @Autowired private DatabaseUserGroupRepository userGroupRepository;
   @Autowired private ObjectMapper objectMapper;
 
-  @MockitoBean private S3AsyncClient s3AsyncClient;
-  @MockitoBean private MailService mailService;
-  @MockitoBean DocxConverterService docxConverterService;
-  @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private S3AsyncClient s3AsyncClient;
+  @MockBean private MailService mailService;
+  @MockBean DocxConverterService docxConverterService;
+  @MockBean ClientRegistrationRepository clientRegistrationRepository;
 
-  @MockitoBean AttachmentService attachmentService;
-  @MockitoBean private HandoverService handoverService;
-  @MockitoBean private DocumentationUnitDocxMetadataInitializationService initializationService;
-  @MockitoBean private UserGroupService userGroupService;
-  @MockitoBean private LdmlExporterService ldmlExporterService;
-  @MockitoBean private DuplicateCheckService duplicateCheckService;
+  @MockBean AttachmentService attachmentService;
+  @MockBean private HandoverService handoverService;
+  @MockBean private DocumentationUnitDocxMetadataInitializationService initializationService;
+  @MockBean private UserGroupService userGroupService;
+  @MockBean private LdmlExporterService ldmlExporterService;
+  @MockBean private DuplicateCheckService duplicateCheckService;
 
   private UUID court1Id;
   private UUID court2Id;
@@ -2927,7 +2927,7 @@ class PatchUpdateIntegrationTest {
               Tuple.tuple(
                   0L,
                   "[{\"op\":\"add\",\"path\":\"/previousDecisions/0\","
-                      + "\"value\":{\"uuid\":null,\"newEntry\":false,\"documentNumber\":\""
+                      + "\"value\":{\"uuid\":null,\"documentNumber\":\""
                       + relatedDocument.getDocumentNumber()
                       + "\","
                       + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
@@ -3010,7 +3010,7 @@ class PatchUpdateIntegrationTest {
               Tuple.tuple(
                   0L,
                   "[{\"op\":\"add\",\"path\":\"/previousDecisions/0\","
-                      + "\"value\":{\"uuid\":null,\"newEntry\":false,\"documentNumber\":\""
+                      + "\"value\":{\"uuid\":null,\"documentNumber\":\""
                       + relatedDocument.getDocumentNumber()
                       + "\","
                       + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
@@ -3110,7 +3110,7 @@ class PatchUpdateIntegrationTest {
               Tuple.tuple(
                   0L,
                   "[{\"op\":\"add\",\"path\":\"/previousDecisions/0\","
-                      + "\"value\":{\"uuid\":null,\"newEntry\":false,\"documentNumber\":\""
+                      + "\"value\":{\"uuid\":null,\"documentNumber\":\""
                       + relatedDocument.getDocumentNumber()
                       + "\","
                       + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
@@ -3196,7 +3196,7 @@ class PatchUpdateIntegrationTest {
               Tuple.tuple(
                   0L,
                   "[{\"op\":\"add\",\"path\":\"/previousDecisions/0\","
-                      + "\"value\":{\"uuid\":null,\"newEntry\":false,\"documentNumber\":\""
+                      + "\"value\":{\"uuid\":null,\"documentNumber\":\""
                       + relatedDocument.getDocumentNumber()
                       + "\","
                       + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
@@ -3288,7 +3288,7 @@ class PatchUpdateIntegrationTest {
               Tuple.tuple(
                   0L,
                   "[{\"op\":\"add\",\"path\":\"/previousDecisions/0\","
-                      + "\"value\":{\"uuid\":null,\"newEntry\":false,\"documentNumber\":\""
+                      + "\"value\":{\"uuid\":null,\"documentNumber\":\""
                       + relatedDocument.getDocumentNumber()
                       + "\","
                       + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
@@ -3394,7 +3394,7 @@ class PatchUpdateIntegrationTest {
               Tuple.tuple(
                   0L,
                   "[{\"op\":\"add\",\"path\":\"/previousDecisions/0\","
-                      + "\"value\":{\"uuid\":null,\"newEntry\":false,\"documentNumber\":\""
+                      + "\"value\":{\"uuid\":null,\"documentNumber\":\""
                       + relatedDocument.getDocumentNumber()
                       + "\","
                       + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
@@ -3496,7 +3496,7 @@ class PatchUpdateIntegrationTest {
               Tuple.tuple(
                   0L,
                   "[{\"op\":\"add\",\"path\":\"/previousDecisions/0\","
-                      + "\"value\":{\"uuid\":null,\"newEntry\":false,\"documentNumber\":\""
+                      + "\"value\":{\"uuid\":null,\"documentNumber\":\""
                       + relatedDocument.getDocumentNumber()
                       + "\","
                       + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"

@@ -11,10 +11,10 @@ import de.bund.digitalservice.ris.caselaw.domain.MailTrackingService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 
@@ -42,10 +42,10 @@ class SecurityIntegrationTest {
   }
 
   @Autowired RisWebTestClient webTestClient;
-  @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
-  @MockitoBean MailTrackingService mailTrackingService;
-  @MockitoBean EnvironmentService environmentService;
-  @MockitoBean LdmlExporterService ldmlExporterService;
+  @MockBean ClientRegistrationRepository clientRegistrationRepository;
+  @MockBean MailTrackingService mailTrackingService;
+  @MockBean EnvironmentService environmentService;
+  @MockBean LdmlExporterService ldmlExporterService;
 
   @Test
   void shouldHaveEnabledCSPHeader() {

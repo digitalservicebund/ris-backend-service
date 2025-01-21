@@ -26,8 +26,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
@@ -43,19 +43,19 @@ class SingleNormValidationTest {
 
   @Autowired private DocumentationUnitService service;
   @Autowired private Validator validator;
-  @MockitoBean private DocumentationUnitRepository repository;
-  @MockitoBean private CourtRepository courtRepository;
-  @MockitoBean private NormElementRepository normElementRepository;
-  @MockitoBean private DocumentNumberService numberService;
-  @MockitoBean private DocumentNumberRecyclingService documentNumberRecyclingService;
-  @MockitoBean private S3AsyncClient s3AsyncClient;
-  @MockitoBean private MailService mailService;
-  @MockitoBean private DocumentationUnitStatusService statusService;
-  @MockitoBean private DeltaMigrationRepository deltaMigrationRepository;
-  @MockitoBean private HandoverReportRepository handoverReportRepository;
-  @MockitoBean AttachmentService attachmentService;
-  @MockitoBean PatchMapperService patchMapperService;
-  @MockitoBean DuplicateCheckService duplicateCheckService;
+  @MockBean private DocumentationUnitRepository repository;
+  @MockBean private CourtRepository courtRepository;
+  @MockBean private NormElementRepository normElementRepository;
+  @MockBean private DocumentNumberService numberService;
+  @MockBean private DocumentNumberRecyclingService documentNumberRecyclingService;
+  @MockBean private S3AsyncClient s3AsyncClient;
+  @MockBean private MailService mailService;
+  @MockBean private DocumentationUnitStatusService statusService;
+  @MockBean private DeltaMigrationRepository deltaMigrationRepository;
+  @MockBean private HandoverReportRepository handoverReportRepository;
+  @MockBean AttachmentService attachmentService;
+  @MockBean PatchMapperService patchMapperService;
+  @MockBean DuplicateCheckService duplicateCheckService;
 
   @BeforeEach
   void setUp() {

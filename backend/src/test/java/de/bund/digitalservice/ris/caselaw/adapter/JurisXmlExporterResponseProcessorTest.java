@@ -57,8 +57,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -66,14 +66,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class JurisXmlExporterResponseProcessorTest {
   private static final String DOCUMENT_NUMBER = "KORE123456789";
   private static final UUID DOCUMENT_UUID = UUID.randomUUID();
-  @MockitoBean private DocumentationUnitStatusService statusService;
-  @MockitoBean private HttpMailSender mailSender;
-  @MockitoBean private ImapStoreFactory storeFactory;
-  @MockitoBean private HandoverReportRepository reportRepository;
-  @MockitoBean private DocumentationUnitRepository documentationUnitRepository;
-  @MockitoBean private HandoverRepository xmlHandoverRepository;
+  @MockBean private DocumentationUnitStatusService statusService;
+  @MockBean private HttpMailSender mailSender;
+  @MockBean private ImapStoreFactory storeFactory;
+  @MockBean private HandoverReportRepository reportRepository;
+  @MockBean private DocumentationUnitRepository documentationUnitRepository;
+  @MockBean private HandoverRepository xmlHandoverRepository;
 
-  @MockitoBean private LegalPeriodicalEditionRepository editionRepository;
+  @MockBean private LegalPeriodicalEditionRepository editionRepository;
   @Mock private Store store;
   @Mock private Folder inbox;
   @Mock private Folder processed;

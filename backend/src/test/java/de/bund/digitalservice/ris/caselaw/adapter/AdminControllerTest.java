@@ -16,11 +16,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -28,10 +28,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @Import({SecurityConfig.class, TestConfig.class, DocumentNumberPatternConfig.class})
 class AdminControllerTest {
   @Autowired private RisWebTestClient risWebTestClient;
-  @MockitoBean private MailTrackingService mailTrackingService;
-  @MockitoBean private EnvironmentService environmentService;
-  @MockitoBean LdmlExporterService ldmlExporterService;
-  @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private MailTrackingService mailTrackingService;
+  @MockBean private EnvironmentService environmentService;
+  @MockBean LdmlExporterService ldmlExporterService;
+  @MockBean private ClientRegistrationRepository clientRegistrationRepository;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
 

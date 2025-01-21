@@ -79,10 +79,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -144,19 +144,19 @@ class DuplicateCheckIntegrationTest {
   @Autowired private DocumentationUnitService documentationUnitService;
   @Autowired private DatabaseDuplicateCheckService duplicateCheckService;
 
-  @MockitoBean private S3AsyncClient s3AsyncClient;
-  @MockitoBean private MailService mailService;
-  @MockitoBean private DocxConverterService docxConverterService;
-  @MockitoBean private UserGroupService userGroupService;
-  @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
-  @MockitoBean private AttachmentService attachmentService;
-  @MockitoBean private PatchMapperService patchMapperService;
-  @MockitoBean private HandoverService handoverService;
-  @MockitoBean private LdmlExporterService ldmlExporterService;
-  @MockitoBean private DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
-  @MockitoBean private FeatureToggleService featureToggleService;
+  @MockBean private S3AsyncClient s3AsyncClient;
+  @MockBean private MailService mailService;
+  @MockBean private DocxConverterService docxConverterService;
+  @MockBean private UserGroupService userGroupService;
+  @MockBean private ClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private AttachmentService attachmentService;
+  @MockBean private PatchMapperService patchMapperService;
+  @MockBean private HandoverService handoverService;
+  @MockBean private LdmlExporterService ldmlExporterService;
+  @MockBean private DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
+  @MockBean private FeatureToggleService featureToggleService;
 
-  @MockitoBean
+  @MockBean
   private DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
 

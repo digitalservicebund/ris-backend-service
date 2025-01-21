@@ -39,10 +39,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -156,6 +156,7 @@ class NormAbbreviationIntegrationTest {
       DocumentCategoryDTO.builder().label("M").build();
   private DocumentTypeDTO documentType1 =
       DocumentTypeDTO.builder()
+          .id(UUID.randomUUID())
           .abbreviation("document type abbreviation 1")
           .label("document type label 1")
           .multiple(false)
@@ -164,6 +165,7 @@ class NormAbbreviationIntegrationTest {
           .build();
   private DocumentTypeDTO documentType2 =
       DocumentTypeDTO.builder()
+          .id(UUID.randomUUID())
           .abbreviation("document type abbreviation 2")
           .label("document type label 2")
           .multiple(false)
@@ -192,12 +194,12 @@ class NormAbbreviationIntegrationTest {
   @Autowired private DatabaseDocumentCategoryRepository documentCategoryRepository;
   @Autowired private DatabaseRegionRepository regionRepository;
 
-  @MockitoBean UserService userService;
-  @MockitoBean private DocumentationUnitService documentationUnitService;
-  @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
-  @MockitoBean private S3AsyncClient s3AsyncClient;
-  @MockitoBean private MailService mailService;
-  @MockitoBean private ProcedureService procedureService;
+  @MockBean UserService userService;
+  @MockBean private DocumentationUnitService documentationUnitService;
+  @MockBean ClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private S3AsyncClient s3AsyncClient;
+  @MockBean private MailService mailService;
+  @MockBean private ProcedureService procedureService;
 
   @AfterEach
   void cleanUp() {

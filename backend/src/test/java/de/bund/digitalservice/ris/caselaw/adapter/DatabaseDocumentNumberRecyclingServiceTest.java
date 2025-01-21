@@ -31,9 +31,9 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -42,13 +42,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @Import(DatabaseDocumentNumberRecyclingService.class)
 class DatabaseDocumentNumberRecyclingServiceTest {
 
-  @MockitoBean DatabaseDeletedDocumentationIdsRepository repository;
+  @MockBean DatabaseDeletedDocumentationIdsRepository repository;
 
-  @MockitoBean DatabaseDocumentationUnitRepository documentationUnitRepository;
+  @MockBean DatabaseDocumentationUnitRepository documentationUnitRepository;
 
   @Autowired DatabaseDocumentNumberRecyclingService service;
 
-  @MockitoBean HandoverService handoverService;
+  @MockBean HandoverService handoverService;
 
   private static final String DEFAULT_DOCUMENTATION_OFFICE = "BGH";
 

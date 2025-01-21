@@ -112,6 +112,7 @@ public class DocumentationUnitListItemTransformer {
 
     RelatedDocumentationUnitBuilder<?, ?> builder =
         RelatedDocumentationUnit.builder()
+            .uuid(documentationUnitListItemDTO.getId())
             .documentNumber(documentationUnitListItemDTO.getDocumentNumber())
             .court(CourtTransformer.transformToDomain(documentationUnitListItemDTO.getCourt()))
             .status(getStatus(documentationUnitListItemDTO))

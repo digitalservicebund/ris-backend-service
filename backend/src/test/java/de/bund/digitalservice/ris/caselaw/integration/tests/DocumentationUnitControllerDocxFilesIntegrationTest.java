@@ -67,12 +67,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -139,24 +139,24 @@ class DocumentationUnitControllerDocxFilesIntegrationTest {
   @Autowired private DocxConverterService docxConverterService;
   @Autowired private CourtRepository courtRepository;
   @Autowired private DocumentTypeRepository documentTypeRepository;
-  @MockitoSpyBean private DocumentationUnitDocxMetadataInitializationService service;
+  @SpyBean private DocumentationUnitDocxMetadataInitializationService service;
   @Autowired private DocumentationUnitService documentationUnitService;
 
-  @MockitoBean
+  @MockBean
   @Qualifier("docxS3Client")
   private S3Client s3Client;
 
-  @MockitoBean private MailService mailService;
+  @MockBean private MailService mailService;
 
-  @MockitoBean private HandoverService handoverService;
+  @MockBean private HandoverService handoverService;
 
-  @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
-  @MockitoBean private DocumentBuilderFactory documentBuilderFactory;
-  @MockitoBean private PatchMapperService patchMapperService;
-  @MockitoBean private ProcedureService procedureService;
-  @MockitoBean private UserGroupService userGroupService;
-  @MockitoBean private LdmlExporterService ldmlExporterService;
-  @MockitoBean private DuplicateCheckService duplicateCheckService;
+  @MockBean private ClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private DocumentBuilderFactory documentBuilderFactory;
+  @MockBean private PatchMapperService patchMapperService;
+  @MockBean private ProcedureService procedureService;
+  @MockBean private UserGroupService userGroupService;
+  @MockBean private LdmlExporterService ldmlExporterService;
+  @MockBean private DuplicateCheckService duplicateCheckService;
 
   private DocumentationOfficeDTO dsDocOffice = null;
 

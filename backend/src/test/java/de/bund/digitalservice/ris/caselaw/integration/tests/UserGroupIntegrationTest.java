@@ -36,10 +36,10 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -83,15 +83,15 @@ class UserGroupIntegrationTest {
   @Autowired private DatabaseUserGroupRepository userGroupRepository;
   @Autowired private AuthService authService;
 
-  @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
-  @MockitoBean private DocumentNumberService numberService;
-  @MockitoBean private DocumentNumberRecyclingService documentNumberRecyclingService;
-  @MockitoBean private AttachmentService attachmentService;
-  @MockitoBean private PatchMapperService patchMapperService;
-  @MockitoBean private ProcedureService procedureService;
-  @MockitoBean private DuplicateCheckService duplicateCheckService;
+  @MockBean ClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private DocumentNumberService numberService;
+  @MockBean private DocumentNumberRecyclingService documentNumberRecyclingService;
+  @MockBean private AttachmentService attachmentService;
+  @MockBean private PatchMapperService patchMapperService;
+  @MockBean private ProcedureService procedureService;
+  @MockBean private DuplicateCheckService duplicateCheckService;
 
-  @MockitoBean private DatabaseUserGroupService databaseUserGroupService;
+  @MockBean private DatabaseUserGroupService databaseUserGroupService;
 
   UserGroup internalUserGroup =
       UserGroup.builder()

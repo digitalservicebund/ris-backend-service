@@ -11,9 +11,9 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -23,9 +23,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 })
 class CourtServiceTest {
 
-  @MockitoSpyBean private CourtService service;
+  @SpyBean private CourtService service;
 
-  @MockitoBean private CourtRepository courtRepository;
+  @MockBean private CourtRepository courtRepository;
 
   @Test
   void testGetTwoDifferentCourts() {

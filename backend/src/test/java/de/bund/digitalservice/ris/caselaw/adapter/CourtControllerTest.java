@@ -15,9 +15,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -26,8 +26,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class CourtControllerTest {
   @Autowired private RisWebTestClient risWebTestClient;
 
-  @MockitoBean private CourtService service;
-  @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private CourtService service;
+  @MockBean private ClientRegistrationRepository clientRegistrationRepository;
 
   @Test
   void testGetCourtsWithoutSize() {

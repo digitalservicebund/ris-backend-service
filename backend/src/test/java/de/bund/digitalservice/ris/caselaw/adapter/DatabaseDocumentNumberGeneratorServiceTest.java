@@ -21,9 +21,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -34,13 +34,13 @@ class DatabaseDocumentNumberGeneratorServiceTest {
 
   @Autowired DocumentNumberPatternConfig documentNumberPatternConfig;
 
-  @MockitoBean DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
+  @MockBean DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
 
-  @MockitoBean DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
+  @MockBean DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
 
   @Autowired DatabaseDocumentNumberGeneratorService service;
 
-  @MockitoBean DocumentNumberRecyclingService documentNumberRecyclingService;
+  @MockBean DocumentNumberRecyclingService documentNumberRecyclingService;
 
   private static final String DEFAULT_ABBREVIATION = "BGH";
 

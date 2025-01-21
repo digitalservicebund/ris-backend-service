@@ -48,7 +48,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -124,7 +123,7 @@ public class DocumentationUnitTransformer {
     }
 
     addPreviousDecisions(updatedDomainObject, builder);
-    addEnsuingAndPendingDecisions(updatedDomainObject, builder, currentDto);
+    addEnsuingAndPendingDecisions(updatedDomainObject, builder);
 
     if (updatedDomainObject.contentRelatedIndexing() != null) {
       ContentRelatedIndexing contentRelatedIndexing = updatedDomainObject.contentRelatedIndexing();
@@ -390,19 +389,12 @@ public class DocumentationUnitTransformer {
   }
 
   private static void addEnsuingAndPendingDecisions(
-      DocumentationUnit updatedDomainObject,
-      DocumentationUnitDTOBuilder builder,
-      DocumentationUnitDTO currentDTO) {
+      DocumentationUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
     List<EnsuingDecision> ensuingDecisions = updatedDomainObject.ensuingDecisions();
-
-    List<EnsuingDecisionDTO> ensuingDecisionDTOs = new ArrayList<>();
-    List<PendingDecisionDTO> pendingDecisionDTOs = new ArrayList<>();
-
     if (ensuingDecisions != null) {
-      List<UUID> ensuingDecisionIds =
-          currentDTO.getEnsuingDecisions().stream().map(EnsuingDecisionDTO::getId).toList();
-      List<UUID> pendingDecisionIds =
-          currentDTO.getPendingDecisions().stream().map(PendingDecisionDTO::getId).toList();
+
+      List<EnsuingDecisionDTO> ensuingDecisionDTOs = new ArrayList<>();
+      List<PendingDecisionDTO> pendingDecisionDTOs = new ArrayList<>();
 
       AtomicInteger i = new AtomicInteger(1);
       for (EnsuingDecision ensuingDecision : ensuingDecisions) {
@@ -410,9 +402,6 @@ public class DocumentationUnitTransformer {
           PendingDecisionDTO pendingDecisionDTO =
               PendingDecisionTransformer.transformToDTO(ensuingDecision);
           if (pendingDecisionDTO != null) {
-            if (ensuingDecisionIds.contains(pendingDecisionDTO.getId())) {
-              pendingDecisionDTO.setId(null);
-            }
             pendingDecisionDTO.setRank(i.getAndIncrement());
             pendingDecisionDTOs.add(pendingDecisionDTO);
           }
@@ -420,18 +409,15 @@ public class DocumentationUnitTransformer {
           EnsuingDecisionDTO ensuingDecisionDTO =
               EnsuingDecisionTransformer.transformToDTO(ensuingDecision);
           if (ensuingDecisionDTO != null) {
-            if (pendingDecisionIds.contains(ensuingDecisionDTO.getId())) {
-              ensuingDecisionDTO.setId(null);
-            }
             ensuingDecisionDTO.setRank(i.getAndIncrement());
             ensuingDecisionDTOs.add(ensuingDecisionDTO);
           }
         }
       }
-    }
 
-    builder.ensuingDecisions(ensuingDecisionDTOs);
-    builder.pendingDecisions(pendingDecisionDTOs);
+      builder.ensuingDecisions(ensuingDecisionDTOs.stream().toList());
+      builder.pendingDecisions(pendingDecisionDTOs.stream().toList());
+    }
   }
 
   private static void addPreviousDecisions(

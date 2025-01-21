@@ -22,7 +22,6 @@ import lombok.experimental.SuperBuilder;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RelatedDocumentationUnit {
   protected UUID uuid;
-  protected boolean newEntry;
   protected String documentNumber;
   protected Status status;
   protected Court court;

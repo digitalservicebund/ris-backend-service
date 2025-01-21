@@ -25,25 +25,22 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@Import({
-  DocumentationUnitDocxMetadataInitializationService.class,
-  PostgresCourtRepositoryImpl.class
-})
+@Import({PostgresCourtRepositoryImpl.class})
 class DocumentationUnitDocxMetadataInitializationServiceTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
-  @MockitoSpyBean private DocumentationUnitDocxMetadataInitializationService service;
+  @SpyBean private DocumentationUnitDocxMetadataInitializationService service;
 
   @Autowired private CourtRepository courtRepository;
 
-  @MockitoBean private DocumentationUnitRepository repository;
-  @MockitoBean private DatabaseCourtRepository databaseCourtRepository;
-  @MockitoBean private DocumentTypeRepository documentTypeRepository;
+  @MockBean private DocumentationUnitRepository repository;
+  @MockBean private DatabaseCourtRepository databaseCourtRepository;
+  @MockBean private DocumentTypeRepository documentTypeRepository;
 
   private DocumentationUnit documentationUnit;
 

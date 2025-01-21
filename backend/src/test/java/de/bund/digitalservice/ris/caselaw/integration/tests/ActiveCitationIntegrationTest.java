@@ -48,11 +48,11 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -101,19 +101,19 @@ class ActiveCitationIntegrationTest {
   @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
   @Autowired private DocumentationUnitService documentationUnitService;
 
-  @MockitoBean private UserService userService;
-  @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
-  @MockitoBean private S3AsyncClient s3AsyncClient;
-  @MockitoBean private MailService mailService;
-  @MockitoBean private DocxConverterService docxConverterService;
-  @MockitoBean private AttachmentService attachmentService;
-  @MockitoBean private PatchMapperService patchMapperService;
-  @MockitoBean private HandoverService handoverService;
-  @MockitoBean private ProcedureService procedureService;
-  @MockitoBean private LdmlExporterService ldmlExporterService;
-  @MockitoBean private DuplicateCheckService duplicateCheckService;
+  @MockBean private UserService userService;
+  @MockBean private ClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private S3AsyncClient s3AsyncClient;
+  @MockBean private MailService mailService;
+  @MockBean private DocxConverterService docxConverterService;
+  @MockBean private AttachmentService attachmentService;
+  @MockBean private PatchMapperService patchMapperService;
+  @MockBean private HandoverService handoverService;
+  @MockBean private ProcedureService procedureService;
+  @MockBean private LdmlExporterService ldmlExporterService;
+  @MockBean private DuplicateCheckService duplicateCheckService;
 
-  @MockitoBean
+  @MockBean
   private DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
 
@@ -212,7 +212,7 @@ class ActiveCitationIntegrationTest {
                                         .build())
                                 .build(),
                             ActiveCitation.builder()
-                                .uuid(UUID.fromString("f0232240-7416-11ee-b962-0242ac120003"))
+                                .uuid(UUID.fromString("7da39a1e-78a9-11ee-b962-0242ac120003"))
                                 .citationType(
                                     CitationType.builder()
                                         .uuid(

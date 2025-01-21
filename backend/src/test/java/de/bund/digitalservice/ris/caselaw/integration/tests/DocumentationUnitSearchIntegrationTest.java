@@ -57,11 +57,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -107,18 +107,18 @@ class DocumentationUnitSearchIntegrationTest {
   @Autowired private DatabaseProcedureRepository procedureRepository;
   @Autowired private DatabaseUserGroupRepository userGroupRepository;
 
-  @MockitoBean S3AsyncClient s3AsyncClient;
-  @MockitoBean MailService mailService;
-  @MockitoBean DocxConverterService docxConverterService;
-  @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
-  @MockitoBean AttachmentService attachmentService;
-  @MockitoBean private UserGroupService userGroupService;
-  @MockitoBean private PatchMapperService patchMapperService;
-  @MockitoBean private HandoverService handoverService;
-  @MockitoBean private LdmlExporterService ldmlExporterService;
-  @MockitoBean private DuplicateCheckService duplicateCheckService;
+  @MockBean S3AsyncClient s3AsyncClient;
+  @MockBean MailService mailService;
+  @MockBean DocxConverterService docxConverterService;
+  @MockBean ClientRegistrationRepository clientRegistrationRepository;
+  @MockBean AttachmentService attachmentService;
+  @MockBean private UserGroupService userGroupService;
+  @MockBean private PatchMapperService patchMapperService;
+  @MockBean private HandoverService handoverService;
+  @MockBean private LdmlExporterService ldmlExporterService;
+  @MockBean private DuplicateCheckService duplicateCheckService;
 
-  @MockitoBean
+  @MockBean
   private DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
 
@@ -141,6 +141,7 @@ class DocumentationUnitSearchIntegrationTest {
     EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
         repository,
         DocumentationUnitDTO.builder()
+            .id(UUID.randomUUID())
             .documentNumber("MIGR202200012")
             .documentationOffice(docOfficeDTO)
             .fileNumbers(List.of(FileNumberDTO.builder().value("AkteM").rank(0L).build())));

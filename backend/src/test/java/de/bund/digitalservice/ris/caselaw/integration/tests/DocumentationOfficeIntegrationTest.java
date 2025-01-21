@@ -20,10 +20,10 @@ import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -59,11 +59,10 @@ class DocumentationOfficeIntegrationTest {
 
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentationOfficeRepository repository;
-
-  @MockitoBean private UserService userService;
-  @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
-  @MockitoBean private DocumentationUnitService service;
-  @MockitoBean private ProcedureService procedureService;
+  @MockBean private UserService userService;
+  @MockBean private ClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private DocumentationUnitService service;
+  @MockBean private ProcedureService procedureService;
 
   @Test
   void testGetAllOffices() {

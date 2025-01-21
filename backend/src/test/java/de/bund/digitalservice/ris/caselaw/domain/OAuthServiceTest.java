@@ -24,29 +24,29 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @Import({OAuthService.class})
 class OAuthServiceTest {
 
-  @MockitoSpyBean private OAuthService service;
+  @SpyBean private OAuthService service;
 
-  @MockitoBean private DocumentationUnitService documentationUnitService;
-  @MockitoBean private UserService userService;
-  @MockitoBean private ProcedureService procedureService;
-  @MockitoBean private DatabaseApiKeyRepository keyRepository;
-  @MockitoBean private DatabaseDocumentationOfficeRepository officeRepository;
-  @MockitoBean private SecurityContext securityContext;
-  @MockitoBean private Authentication authentication;
-  @MockitoBean private OidcUser oidcUser;
+  @MockBean private DocumentationUnitService documentationUnitService;
+  @MockBean private UserService userService;
+  @MockBean private ProcedureService procedureService;
+  @MockBean private DatabaseApiKeyRepository keyRepository;
+  @MockBean private DatabaseDocumentationOfficeRepository officeRepository;
+  @MockBean private SecurityContext securityContext;
+  @MockBean private Authentication authentication;
+  @MockBean private OidcUser oidcUser;
 
   @Test
   void testUserHasReadAccessByDocumentNumber_withStatusNull_shouldReturnTrue()

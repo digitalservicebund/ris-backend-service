@@ -34,11 +34,11 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.server.ResponseStatusException;
@@ -54,15 +54,15 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 @ExtendWith(SpringExtension.class)
 @Import({S3AttachmentService.class})
 class S3AttachmentServiceTest {
-  @MockitoSpyBean S3AttachmentService service;
+  @SpyBean S3AttachmentService service;
 
-  @MockitoBean AttachmentRepository repository;
+  @MockBean AttachmentRepository repository;
 
-  @MockitoBean
+  @MockBean
   @Qualifier("docxS3Client")
   S3Client s3Client;
 
-  @MockitoBean DatabaseDocumentationUnitRepository documentationUnitRepository;
+  @MockBean DatabaseDocumentationUnitRepository documentationUnitRepository;
 
   private DocumentationUnitDTO documentationUnitDTO;
 
@@ -76,12 +76,7 @@ class S3AttachmentServiceTest {
         .thenReturn(PutObjectResponse.builder().build());
 
     when(repository.save(any(AttachmentDTO.class)))
-        .thenAnswer(
-            invocation -> {
-              AttachmentDTO unsavedAttachmentDTO = invocation.getArgument(0);
-              unsavedAttachmentDTO.setId(UUID.randomUUID());
-              return unsavedAttachmentDTO;
-            });
+        .thenAnswer(invocation -> invocation.getArgument(0));
   }
 
   @Test
@@ -109,7 +104,7 @@ class S3AttachmentServiceTest {
 
     // repo interaction
     var attachmentDtoCaptor = ArgumentCaptor.forClass(AttachmentDTO.class);
-    verify(repository, times(2)).save(attachmentDtoCaptor.capture());
+    verify(repository).save(attachmentDtoCaptor.capture());
     assertEquals("testfile.docx", attachmentDtoCaptor.getValue().getFilename());
     assertEquals("docx", attachmentDtoCaptor.getValue().getFormat());
   }
@@ -125,7 +120,7 @@ class S3AttachmentServiceTest {
     service.attachFileToDocumentationUnit(documentationUnitDTO.getId(), byteBuffer, httpHeaders);
 
     var attachmentDtoCaptor = ArgumentCaptor.forClass(AttachmentDTO.class);
-    verify(repository, times(2)).save(attachmentDtoCaptor.capture());
+    verify(repository).save(attachmentDtoCaptor.capture());
     assertEquals("Kein Dateiname gefunden", attachmentDtoCaptor.getValue().getFilename());
   }
 
