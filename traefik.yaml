@@ -26,6 +26,7 @@ http:
     test-compress:
       compress:
         defaultEncoding: gzip
+        encodings: gzip
         includedContentTypes:
           - application/json
           - application/javascript
