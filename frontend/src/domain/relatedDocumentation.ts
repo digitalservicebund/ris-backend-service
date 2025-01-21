@@ -18,12 +18,11 @@ export default class RelatedDocumentation {
   public fileNumber?: string
   public documentType?: DocumentType
   public createdByReference?: string
-  public referenceFound?: boolean
   public documentationOffice?: DocumentationOffice
   public creatingDocOffice?: DocumentationOffice
 
   get hasForeignSource(): boolean {
-    return this.documentNumber != null && !!this.referenceFound
+    return this.documentNumber != null
   }
 
   constructor(data: Partial<RelatedDocumentation> = {}) {

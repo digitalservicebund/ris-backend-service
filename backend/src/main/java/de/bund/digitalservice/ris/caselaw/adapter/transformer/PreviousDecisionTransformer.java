@@ -19,7 +19,6 @@ public class PreviousDecisionTransformer extends RelatedDocumentationUnitTransfo
         .deviatingFileNumber(previousDecisionDTO.getDeviatingFileNumber())
         .decisionDate(previousDecisionDTO.getDate())
         .dateKnown(previousDecisionDTO.isDateKnown())
-        .referenceFound(referencedDocumentationUnit.isPresent())
         .build();
   }
 

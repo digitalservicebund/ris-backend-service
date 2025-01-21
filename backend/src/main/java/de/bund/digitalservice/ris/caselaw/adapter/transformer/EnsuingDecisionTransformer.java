@@ -1,15 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
-import java.util.Optional;
 
 public class EnsuingDecisionTransformer extends RelatedDocumentationUnitTransformer {
   public static EnsuingDecision transformToDomain(EnsuingDecisionDTO ensuingDecisionDTO) {
-    Optional<DocumentationUnitDTO> referencedDocumentationUnit =
-        Optional.ofNullable(ensuingDecisionDTO.getReferencedDocumentationUnit());
     return EnsuingDecision.builder()
         .uuid(ensuingDecisionDTO.getId())
         .documentNumber(ensuingDecisionDTO.getDocumentNumber())
@@ -19,7 +15,6 @@ public class EnsuingDecisionTransformer extends RelatedDocumentationUnitTransfor
         .decisionDate(ensuingDecisionDTO.getDate())
         .note(ensuingDecisionDTO.getNote())
         .pending(false)
-        .referenceFound(referencedDocumentationUnit.isPresent())
         .build();
   }
 

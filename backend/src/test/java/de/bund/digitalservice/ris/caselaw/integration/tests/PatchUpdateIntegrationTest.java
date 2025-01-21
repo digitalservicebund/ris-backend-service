@@ -2858,7 +2858,6 @@ class PatchUpdateIntegrationTest {
       JsonNode previousDecisionAsNode =
           objectMapper.convertValue(
               PreviousDecision.builder()
-                  .referenceFound(true)
                   .documentNumber(previousDecision.documentNumber())
                   .status(previousDecision.status())
                   .build(),
@@ -2932,7 +2931,7 @@ class PatchUpdateIntegrationTest {
                       + "\","
                       + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
                       + "\"createdAt\":null},\"court\":null,\"decisionDate\":null,"
-                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,\"referenceFound\":true,"
+                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,"
                       + "\"documentationOffice\":null,\"creatingDocOffice\":null,"
                       + "\"dateKnown\":true,\"deviatingFileNumber\":null}},"
                       + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/uuid\","
@@ -3015,7 +3014,7 @@ class PatchUpdateIntegrationTest {
                       + "\","
                       + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
                       + "\"createdAt\":null},\"court\":null,\"decisionDate\":null,"
-                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,\"referenceFound\":true,"
+                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,"
                       + "\"documentationOffice\":null,\"creatingDocOffice\":null,"
                       + "\"dateKnown\":true,\"deviatingFileNumber\":null}},"
                       + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/uuid\","
@@ -3040,7 +3039,6 @@ class PatchUpdateIntegrationTest {
       JsonNode previousDecisionAsNode =
           objectMapper.convertValue(
               PreviousDecision.builder()
-                  .referenceFound(true)
                   .documentNumber(previousDecision.documentNumber())
                   .status(previousDecision.status())
                   .build(),
@@ -3115,7 +3113,7 @@ class PatchUpdateIntegrationTest {
                       + "\","
                       + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
                       + "\"createdAt\":null},\"court\":null,\"decisionDate\":null,"
-                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,\"referenceFound\":true,"
+                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,"
                       + "\"documentationOffice\":null,\"creatingDocOffice\":null,"
                       + "\"dateKnown\":true,\"deviatingFileNumber\":null}},"
                       + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/uuid\","
@@ -3201,7 +3199,7 @@ class PatchUpdateIntegrationTest {
                       + "\","
                       + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
                       + "\"createdAt\":null},\"court\":null,\"decisionDate\":null,"
-                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,\"referenceFound\":true,"
+                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,"
                       + "\"documentationOffice\":null,\"creatingDocOffice\":null,"
                       + "\"dateKnown\":true,\"deviatingFileNumber\":null}},"
                       + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/uuid\","
@@ -3293,7 +3291,7 @@ class PatchUpdateIntegrationTest {
                       + "\","
                       + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
                       + "\"createdAt\":null},\"court\":null,\"decisionDate\":null,"
-                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,\"referenceFound\":true,"
+                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,"
                       + "\"documentationOffice\":null,\"creatingDocOffice\":null,"
                       + "\"dateKnown\":true,\"deviatingFileNumber\":null}},"
                       + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/uuid\","
@@ -3321,7 +3319,6 @@ class PatchUpdateIntegrationTest {
       JsonNode previousDecision1AsNode =
           objectMapper.convertValue(
               PreviousDecision.builder()
-                  .referenceFound(true)
                   .documentNumber(previousDecision1.documentNumber())
                   .status(previousDecision1.status())
                   .build(),
@@ -3399,7 +3396,7 @@ class PatchUpdateIntegrationTest {
                       + "\","
                       + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
                       + "\"createdAt\":null},\"court\":null,\"decisionDate\":null,"
-                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,\"referenceFound\":true,"
+                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,"
                       + "\"documentationOffice\":null,\"creatingDocOffice\":null,"
                       + "\"dateKnown\":true,\"deviatingFileNumber\":null}},"
                       + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/uuid\","
@@ -3413,7 +3410,6 @@ class PatchUpdateIntegrationTest {
       JsonNode previousDecision2AsNode =
           objectMapper.convertValue(
               PreviousDecision.builder()
-                  .referenceFound(true)
                   .documentNumber(previousDecision2.documentNumber())
                   .status(previousDecision2.status())
                   .build(),
@@ -3501,7 +3497,7 @@ class PatchUpdateIntegrationTest {
                       + "\","
                       + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
                       + "\"createdAt\":null},\"court\":null,\"decisionDate\":null,"
-                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,\"referenceFound\":true,"
+                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,"
                       + "\"documentationOffice\":null,\"creatingDocOffice\":null,"
                       + "\"dateKnown\":true,\"deviatingFileNumber\":null}},"
                       + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/uuid\","
@@ -4021,7 +4017,6 @@ class PatchUpdateIntegrationTest {
       JsonNode previousDecision2AsNode =
           objectMapper.convertValue(
               PreviousDecision.builder()
-                  .referenceFound(true)
                   .documentNumber(previousDecision2.documentNumber())
                   .status(previousDecision2.status())
                   .build(),

@@ -119,7 +119,6 @@ public class DocumentationUnitListItemTransformer {
             .documentType(
                 DocumentTypeTransformer.transformToDomain(
                     documentationUnitListItemDTO.getDocumentType()))
-            .referenceFound(true)
             .documentationOffice(
                 DocumentationOfficeTransformer.transformToDomain(
                     documentationUnitListItemDTO.getDocumentationOffice()))

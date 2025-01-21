@@ -30,7 +30,6 @@ public class RelatedDocumentationUnit {
   protected String fileNumber;
   protected DocumentType documentType;
   protected UUID createdByReference;
-  protected boolean referenceFound;
   protected DocumentationOffice documentationOffice;
   protected DocumentationOffice creatingDocOffice;
 

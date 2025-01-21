@@ -78,12 +78,10 @@ function generatePreviousDecision(options?: {
   fileNumber?: string
   documentType?: DocumentType
   dateKnown?: boolean
-  referenceFound?: boolean
 }) {
   const previousDecision = new PreviousDecision({
     uuid: options?.uuid ?? crypto.randomUUID(),
     documentNumber: options?.documentNumber ?? undefined,
-    referenceFound: options?.referenceFound ?? false,
     court: options?.court ?? {
       type: "type1",
       location: "location1",
@@ -348,7 +346,6 @@ describe("PreviousDecisions", () => {
     renderComponent([
       generatePreviousDecision({
         documentNumber: "ABC",
-        referenceFound: true,
       }),
     ])
     expect(screen.getByLabelText("Listen Eintrag")).toBeInTheDocument()

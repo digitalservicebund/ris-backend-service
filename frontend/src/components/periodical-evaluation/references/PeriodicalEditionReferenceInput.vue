@@ -214,7 +214,6 @@ async function addReferenceWithCreatedDocumentationUnit(docUnit: DocumentUnit) {
       documentType: docUnit.coreData.documentType,
       documentNumber: docUnit.documentNumber,
       status: docUnit.status,
-      referenceFound: true,
       createdByReference: reference.value.id,
       creatingDocOffice: docUnit.coreData.creatingDocOffice,
       documentationOffice: docUnit.coreData.documentationOffice,

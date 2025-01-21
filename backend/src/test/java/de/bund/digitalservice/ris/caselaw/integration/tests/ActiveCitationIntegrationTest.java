@@ -1151,14 +1151,6 @@ class ActiveCitationIntegrationTest {
                           .get(0)
                           .getDocumentNumber())
                   .isEqualTo("documentnr002");
-              assertThat(
-                      response
-                          .getResponseBody()
-                          .contentRelatedIndexing()
-                          .activeCitations()
-                          .get(0)
-                          .isReferenceFound())
-                  .isTrue();
             });
   }
 

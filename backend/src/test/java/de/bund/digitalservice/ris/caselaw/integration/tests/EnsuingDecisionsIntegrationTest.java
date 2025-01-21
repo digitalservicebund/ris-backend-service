@@ -996,8 +996,6 @@ class EnsuingDecisionsIntegrationTest {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(1);
               assertThat(response.getResponseBody().ensuingDecisions().get(0).getDocumentNumber())
                   .isEqualTo("documentnr002");
-              assertThat(response.getResponseBody().ensuingDecisions().get(0).isReferenceFound())
-                  .isTrue();
             });
   }
 

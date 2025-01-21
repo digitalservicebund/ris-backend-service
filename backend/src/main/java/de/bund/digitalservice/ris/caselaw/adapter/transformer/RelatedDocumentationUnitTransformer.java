@@ -33,7 +33,6 @@ public class RelatedDocumentationUnitTransformer {
                 .orElse(null))
         .documentType(
             DocumentTypeTransformer.transformToDomain(documentationUnitDTO.getDocumentType()))
-        .referenceFound(true)
         .status(StatusTransformer.transformToDomain(documentationUnitDTO.getStatus()))
         .createdByReference(
             documentationUnitDTO.getSource().stream()

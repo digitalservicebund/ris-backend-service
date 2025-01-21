@@ -31,7 +31,6 @@ public class EntityBuilderTestUtil {
         .status(null)
         .fileNumber("AB 34/1")
         .court(createTestCourt())
-        .referenceFound(true)
         .build();
   }
 

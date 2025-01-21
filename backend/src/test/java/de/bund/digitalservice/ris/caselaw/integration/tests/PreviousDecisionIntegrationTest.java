@@ -281,8 +281,6 @@ class PreviousDecisionIntegrationTest {
               assertThat(response.getResponseBody().previousDecisions())
                   .extracting("documentNumber")
                   .containsExactly("abcdefghjikl");
-              assertThat(response.getResponseBody().previousDecisions().get(0).isReferenceFound())
-                  .isTrue();
               assertThat(response.getResponseBody().previousDecisions())
                   .extracting("deviatingFileNumber")
                   .containsExactly("deviatest");
