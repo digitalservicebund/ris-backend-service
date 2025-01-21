@@ -325,6 +325,7 @@ const showDefaultLink = computed(() => {
               </p>
               <TextButton
                 button-type="tertiary"
+                class="justify-self-center"
                 label="Übernehmen und fortfahren"
                 size="small"
                 @click="createFromSearchQuery"
