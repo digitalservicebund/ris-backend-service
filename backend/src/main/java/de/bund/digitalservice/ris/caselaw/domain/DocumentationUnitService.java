@@ -38,6 +38,7 @@ public class DocumentationUnitService {
   private final DocumentNumberRecyclingService documentNumberRecyclingService;
   private final PatchMapperService patchMapperService;
   private final AuthService authService;
+  private final UserService userService;
   private final Validator validator;
   private final DuplicateCheckService duplicateCheckService;
   private static final List<String> pathsForDuplicateCheck =
@@ -61,7 +62,8 @@ public class DocumentationUnitService {
       AttachmentService attachmentService,
       @Lazy AuthService authService,
       PatchMapperService patchMapperService,
-      DuplicateCheckService duplicateCheckService) {
+      DuplicateCheckService duplicateCheckService,
+      UserService userService) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
@@ -71,6 +73,7 @@ public class DocumentationUnitService {
     this.patchMapperService = patchMapperService;
     this.statusService = statusService;
     this.authService = authService;
+    this.userService = userService;
     this.duplicateCheckService = duplicateCheckService;
   }
 
@@ -221,6 +224,19 @@ public class DocumentationUnitService {
             (hasWriteAccess
                 && (isInternalUser || authService.isAssignedViaProcedure().apply(listItem.uuid()))))
         .build();
+  }
+
+  private RelatedDocumentationUnit addPermissions(
+      OidcUser oidcUser, RelatedDocumentationUnit relatedDocumentationUnit) {
+
+    boolean hasReadAccess =
+        authService.userHasReadAccess(
+            oidcUser,
+            relatedDocumentationUnit.creatingDocOffice,
+            relatedDocumentationUnit.documentationOffice,
+            relatedDocumentationUnit.status);
+
+    return relatedDocumentationUnit.toBuilder().hasPreviewAccess(hasReadAccess).build();
   }
 
   public DocumentationUnit getByDocumentNumber(String documentNumber)
@@ -396,19 +412,23 @@ public class DocumentationUnitService {
 
   public Slice<RelatedDocumentationUnit> searchLinkableDocumentationUnits(
       RelatedDocumentationUnit relatedDocumentationUnit,
-      DocumentationOffice documentationOffice,
+      OidcUser oidcUser,
       Optional<String> documentNumberToExclude,
       Pageable pageable) {
 
+    var documentationOffice = userService.getDocumentationOffice(oidcUser);
     if (relatedDocumentationUnit.getFileNumber() != null) {
       relatedDocumentationUnit.setFileNumber(
           normalizeSpace(relatedDocumentationUnit.getFileNumber()));
     }
-    return repository.searchLinkableDocumentationUnits(
-        relatedDocumentationUnit,
-        documentationOffice,
-        documentNumberToExclude.orElse(null),
-        pageable);
+    Slice<RelatedDocumentationUnit> relatedDocumentationUnits =
+        repository.searchLinkableDocumentationUnits(
+            relatedDocumentationUnit,
+            documentationOffice,
+            documentNumberToExclude.orElse(null),
+            pageable);
+
+    return relatedDocumentationUnits.map(item -> addPermissions(oidcUser, item));
   }
 
   public String validateSingleNorm(SingleNormValidationInfo singleNormValidationInfo) {

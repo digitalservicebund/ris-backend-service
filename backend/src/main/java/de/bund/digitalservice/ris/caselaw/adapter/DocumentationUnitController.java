@@ -406,12 +406,8 @@ public class DocumentationUnitController {
       @RequestBody RelatedDocumentationUnit relatedDocumentationUnit,
       @AuthenticationPrincipal OidcUser oidcUser) {
 
-    var documentationOffice = userService.getDocumentationOffice(oidcUser);
     return service.searchLinkableDocumentationUnits(
-        relatedDocumentationUnit,
-        documentationOffice,
-        documentNumberToExclude,
-        PageRequest.of(page, size));
+        relatedDocumentationUnit, oidcUser, documentNumberToExclude, PageRequest.of(page, size));
   }
 
   @GetMapping(value = "/{uuid}/docx/{s3Path}", produces = MediaType.APPLICATION_JSON_VALUE)

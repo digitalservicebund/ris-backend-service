@@ -313,6 +313,19 @@ public class OAuthService implements AuthService {
             && userHasSameDocOfficeAsDocumentCreator(userDocumentationOffice, creatingDocOffice));
   }
 
+  @Override
+  public boolean userHasReadAccess(
+      OidcUser oidcUser,
+      DocumentationOffice creatingDocOffice,
+      DocumentationOffice documentationOffice,
+      Status status) {
+    DocumentationOffice userDocumentationOffice = userService.getDocumentationOffice(oidcUser);
+    return userHasSameDocOfficeAsDocument(userDocumentationOffice, documentationOffice)
+        || (isPendingStatus(status)
+            && userHasSameDocOfficeAsDocumentCreator(userDocumentationOffice, creatingDocOffice))
+        || isPublishedStatus(status);
+  }
+
   private boolean userHasReadAccess(DocumentationUnit documentationUnit) {
     return documentationUnit.status() == null
         || isPublishedStatus(documentationUnit.status())
