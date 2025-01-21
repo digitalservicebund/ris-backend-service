@@ -25,6 +25,7 @@ http:
   middlewares:
     test-compress:
       compress:
+        defaultEncoding: gzip
         includedContentTypes:
           - application/json
           - application/javascript
