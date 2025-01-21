@@ -21,7 +21,6 @@ public interface DatabaseDocumentationUnitRepository
   String BASE_QUERY =
       """
   (:documentNumber IS NULL OR upper(documentationUnit.documentNumber) like concat('%', upper(cast(:documentNumber as text)), '%'))
-   AND (:documentNumberToExclude IS NULL OR documentationUnit.documentNumber != :documentNumberToExclude)
    AND (:courtType IS NULL OR upper(court.type) like upper(cast(:courtType as text)))
    AND (:courtLocation IS NULL OR upper(court.location) like upper(cast(:courtLocation as text)))
    AND (cast(:decisionDate as date) IS NULL
@@ -32,7 +31,6 @@ public interface DatabaseDocumentationUnitRepository
    AND (cast(:publicationDate as date) IS NULL
        OR (cast(documentationUnit.scheduledPublicationDateTime as date) = :publicationDate)
        OR (cast(documentationUnit.lastPublicationDateTime as date) = :publicationDate))
-   AND (cast(:documentType as uuid) IS NULL OR documentationUnit.documentType = :documentType)
    AND
      (
         (:status IS NULL AND (
@@ -70,7 +68,6 @@ public interface DatabaseDocumentationUnitRepository
   Slice<DocumentationUnitListItemDTO> searchByDocumentationUnitSearchInput(
       @Param("documentationOfficeId") UUID documentationOfficeId,
       @Param("documentNumber") String documentNumber,
-      @Param("documentNumberToExclude") String documentNumberToExclude,
       @Param("courtType") String courtType,
       @Param("courtLocation") String courtLocation,
       @Param("decisionDate") LocalDate decisionDate,
@@ -80,7 +77,6 @@ public interface DatabaseDocumentationUnitRepository
       @Param("status") PublicationStatus status,
       @Param("withErrorOnly") Boolean withErrorOnly,
       @Param("myDocOfficeOnly") Boolean myDocOfficeOnly,
-      @Param("documentType") DocumentTypeDTO documentType,
       @Param("pageable") Pageable pageable);
 
   @Query(
@@ -98,7 +94,6 @@ public interface DatabaseDocumentationUnitRepository
   Slice<DocumentationUnitListItemDTO> searchByDocumentationUnitSearchInputFileNumber(
       @Param("documentationOfficeId") UUID documentationOfficeId,
       @Param("documentNumber") String documentNumber,
-      @Param("documentNumberToExclude") String documentNumberToExclude,
       @Param("fileNumber") String fileNumber,
       @Param("courtType") String courtType,
       @Param("courtLocation") String courtLocation,
@@ -109,7 +104,6 @@ public interface DatabaseDocumentationUnitRepository
       @Param("status") PublicationStatus status,
       @Param("withErrorOnly") Boolean withErrorOnly,
       @Param("myDocOfficeOnly") Boolean myDocOfficeOnly,
-      @Param("documentType") DocumentTypeDTO documentType,
       @Param("pageable") Pageable pageable);
 
   @Query(
@@ -127,7 +121,6 @@ public interface DatabaseDocumentationUnitRepository
   Slice<DocumentationUnitListItemDTO> searchByDocumentationUnitSearchInputDeviatingFileNumber(
       UUID documentationOfficeId,
       String documentNumber,
-      String documentNumberToExclude,
       String fileNumber,
       String courtType,
       String courtLocation,
@@ -138,7 +131,6 @@ public interface DatabaseDocumentationUnitRepository
       PublicationStatus status,
       Boolean withErrorOnly,
       Boolean myDocOfficeOnly,
-      DocumentTypeDTO documentType,
       Pageable pageable);
 
   // temporarily needed for the ldml handover phase, can be removed once we integrate ldml
