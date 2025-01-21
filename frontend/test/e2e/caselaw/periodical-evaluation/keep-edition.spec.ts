@@ -75,7 +75,7 @@ test.describe(
         await page.getByLabel("Treffer übernehmen").click()
 
         await expect(
-          page.getByText(`MMG 2024, 124${suffix}, Berg, Peter, (Ean)`, {
+          page.getByText(`MMG 2024, 124${suffix}, Berg, Peter (Ean)`, {
             exact: true,
           }),
         ).toHaveCount(1)
@@ -96,7 +96,7 @@ test.describe(
           page.getByText(`MMG 2024, 123${suffix} (L)`, { exact: true }),
         ).toHaveCount(1)
         await expect(
-          page.getByText(`MMG 2024, 124${suffix}, Berg, Peter, (Ean)`, {
+          page.getByText(`MMG 2024, 124${suffix}, Berg, Peter (Ean)`, {
             exact: true,
           }),
         ).toHaveCount(1)

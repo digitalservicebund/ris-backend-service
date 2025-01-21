@@ -133,7 +133,7 @@ test.describe("Literature references", () => {
         )
         await page.getByLabel("Treffer übernehmen").click()
         await expect(
-          page.getByText(`MMG 2024, 2${edition.suffix}, Bilen, Ulviye, (Ean)`),
+          page.getByText(`MMG 2024, 2${edition.suffix}, Bilen, Ulviye (Ean)`),
         ).toBeVisible()
       })
 
@@ -209,7 +209,7 @@ test.describe("Literature references", () => {
         await page.getByLabel("Treffer übernehmen").click()
         await expect(
           page.getByText(
-            `MMG 2024, 301-305${editionWithReferences.suffix}, Bilen, Ulviye, (Ean)`,
+            `MMG 2024, 301-305${editionWithReferences.suffix}, Bilen, Ulviye (Ean)`,
           ),
         ).toBeVisible()
         await expect(page).toHaveURL(/showAttachmentPanel=false/)
@@ -219,14 +219,16 @@ test.describe("Literature references", () => {
         await page.reload()
         await expect(
           page.getByText(
-            `MMG 2024, 301-305${editionWithReferences.suffix}, Bilen, Ulviye, (Ean)`,
+            `MMG 2024, 301-305${editionWithReferences.suffix}, Bilen, Ulviye (Ean)`,
           ),
         ).toBeVisible()
         const correctOrder = [
           "MMG 2024, 12-22, Heft 1 (L)",
           "MMG 2024, 1-11, Heft 1",
+          "MMG 2024, 23-25, Heft 1, Picard, Jean-Luc (Ean)",
+          "MMG 2024, 26, Heft 1, Janeway, Kathryn (Ean)",
           "MMG 2024, 300, Heft 1 (ST)",
-          "MMG 2024, 301-305, Heft 1, Bilen, Ulviye, (Ean)",
+          "MMG 2024, 301-305, Heft 1, Bilen, Ulviye (Ean)",
         ]
         const summaries = await page.getByTestId("citation-summary").all()
 
@@ -260,8 +262,8 @@ test.describe("Literature references", () => {
         // Make sure the literature citations are in the correct order
         expect(await literatureReferencesPreview.textContent()).toContain(
           "Literaturfundstellen" +
-            "MMG 2024, 3-4, Heft 1, Krümelmonster, (Ean)" +
-            "MMG 2024, 301-305, Heft 1, Bilen, Ulviye, (Ean)",
+            "MMG 2024, 3-4, Heft 1, Krümelmonster (Ean)" +
+            "MMG 2024, 301-305, Heft 1, Bilen, Ulviye (Ean)",
         )
       })
     },
