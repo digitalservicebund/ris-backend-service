@@ -323,10 +323,6 @@ class PreviousDecisionIntegrationTest {
 
   @Test
   void testLinkTheSameDocumentationUnitsTwice() {
-    DocumentationUnitDTO childDocumentationUnitDTO =
-        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
-            repository, documentationOfficeDTO, "xxx");
-
     DocumentationUnitDTO parentDocumentationUnitDTO =
         EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
             repository, documentationOfficeDTO, "1234567890123");
