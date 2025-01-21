@@ -32,7 +32,7 @@ public class ParticipatingJudgeTransformer {
         .map(
             judge ->
                 ParticipatingJudgeDTO.builder()
-                    .id(judge.id())
+                    .id(judge.newEntry() ? null : judge.id())
                     .name(judge.name())
                     .referencedOpinions(judge.referencedOpinions())
                     .rank(judges.indexOf(judge) + 1L)

@@ -68,11 +68,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
@@ -121,19 +121,19 @@ class PreviousDecisionIntegrationTest {
   @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
   @Autowired private DatabaseFileNumberRepository databaseFileNumberRepository;
 
-  @MockBean UserService userService;
-  @MockBean ClientRegistrationRepository clientRegistrationRepository;
-  @MockBean private S3AsyncClient s3AsyncClient;
-  @MockBean private MailService mailService;
-  @MockBean DocxConverterService docxConverterService;
-  @MockBean AttachmentService attachmentService;
-  @MockBean private PatchMapperService patchMapperService;
-  @MockBean private HandoverService handoverService;
-  @MockBean private ProcedureService procedureService;
-  @MockBean private LdmlExporterService ldmlExporterService;
-  @MockBean private DuplicateCheckService duplicateCheckService;
+  @MockitoBean UserService userService;
+  @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
+  @MockitoBean private S3AsyncClient s3AsyncClient;
+  @MockitoBean private MailService mailService;
+  @MockitoBean DocxConverterService docxConverterService;
+  @MockitoBean AttachmentService attachmentService;
+  @MockitoBean private PatchMapperService patchMapperService;
+  @MockitoBean private HandoverService handoverService;
+  @MockitoBean private ProcedureService procedureService;
+  @MockitoBean private LdmlExporterService ldmlExporterService;
+  @MockitoBean private DuplicateCheckService duplicateCheckService;
 
-  @MockBean
+  @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
 
@@ -159,7 +159,6 @@ class PreviousDecisionIntegrationTest {
                 .jurisId(courtJurisId.getAndIncrement())
                 .isForeignCourt(false)
                 .isSuperiorCourt(false)
-                .id(UUID.randomUUID())
                 .build());
   }
 
@@ -338,14 +337,8 @@ class PreviousDecisionIntegrationTest {
             .documentNumber("docnr12345678")
             .previousDecisions(
                 List.of(
-                    PreviousDecision.builder()
-                        .uuid(childDocumentationUnitDTO.getId())
-                        .documentNumber("xxx")
-                        .build(),
-                    PreviousDecision.builder()
-                        .uuid(childDocumentationUnitDTO.getId())
-                        .documentNumber("xxx")
-                        .build()))
+                    PreviousDecision.builder().documentNumber("xxx").build(),
+                    PreviousDecision.builder().documentNumber("xxx").build()))
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
             .build();
 
@@ -504,9 +497,13 @@ class PreviousDecisionIntegrationTest {
             .getContent();
     assertThat(content).hasSize(4);
     assertThat(content)
-        .extracting(RelatedDocumentationUnit::getUuid)
-        .doesNotContain(du4.getId(), du6.getId())
-        .containsExactlyInAnyOrder(du1.getId(), du2.getId(), du3.getId(), du5.getId());
+        .extracting(RelatedDocumentationUnit::getDocumentNumber)
+        .doesNotContain(du4.getDocumentNumber(), du6.getDocumentNumber())
+        .containsExactlyInAnyOrder(
+            du1.getDocumentNumber(),
+            du2.getDocumentNumber(),
+            du3.getDocumentNumber(),
+            du5.getDocumentNumber());
   }
 
   private LocalDate prepareDocumentationUnitDTOs() {
@@ -572,7 +569,6 @@ class PreviousDecisionIntegrationTest {
     return EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
         repository,
         DocumentationUnitDTO.builder()
-            .id(UUID.randomUUID())
             .documentationOffice(documentOffice)
             .documentNumber("XX" + RandomStringUtils.randomAlphanumeric(11))
             .court(testCourt)

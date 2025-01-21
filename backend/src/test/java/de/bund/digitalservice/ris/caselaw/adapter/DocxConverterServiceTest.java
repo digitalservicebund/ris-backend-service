@@ -78,9 +78,9 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
@@ -94,17 +94,17 @@ class DocxConverterServiceTest {
 
   @Autowired DocxConverterService service;
 
-  @MockBean
+  @MockitoBean
   @Qualifier("docxS3Client")
   S3Client client;
 
-  @SpyBean DocumentBuilderFactory documentBuilderFactory;
+  @MockitoSpyBean DocumentBuilderFactory documentBuilderFactory;
 
   @Mock WordprocessingMLPackage mlPackage;
 
   @Mock ResponseBytes<GetObjectResponse> responseBytes;
 
-  @MockBean DocxConverter converter;
+  @MockitoBean DocxConverter converter;
 
   @Captor ArgumentCaptor<Map<String, Style>> styleMapCaptor;
   @Captor ArgumentCaptor<List<ParagraphElement>> footerCaptor;

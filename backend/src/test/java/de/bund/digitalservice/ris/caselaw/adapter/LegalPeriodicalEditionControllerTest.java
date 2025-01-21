@@ -24,9 +24,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -36,15 +36,15 @@ class LegalPeriodicalEditionControllerTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private OAuthService oAuthService;
   @Autowired private KeycloakUserService keycloakUserService;
-  @MockBean private LegalPeriodicalEditionService service;
+  @MockitoBean private LegalPeriodicalEditionService service;
 
-  @MockBean private HandoverService handoverService;
-  @MockBean private ClientRegistrationRepository clientRegistrationRepository;
-  @MockBean private DatabaseApiKeyRepository databaseApiKeyRepository;
-  @MockBean private DatabaseDocumentationOfficeRepository databaseDocumentationOfficeRepository;
-  @MockBean private UserGroupService userGroupService;
-  @MockBean private DocumentationUnitService documentationUnitService;
-  @MockBean private ProcedureService procedureService;
+  @MockitoBean private HandoverService handoverService;
+  @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
+  @MockitoBean private DatabaseApiKeyRepository databaseApiKeyRepository;
+  @MockitoBean private DatabaseDocumentationOfficeRepository databaseDocumentationOfficeRepository;
+  @MockitoBean private UserGroupService userGroupService;
+  @MockitoBean private DocumentationUnitService documentationUnitService;
+  @MockitoBean private ProcedureService procedureService;
 
   private static final String EDITION_ENDPOINT = "/api/v1/caselaw/legalperiodicaledition";
 
