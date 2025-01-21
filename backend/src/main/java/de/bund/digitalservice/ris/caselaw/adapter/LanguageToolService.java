@@ -1,10 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bund.digitalservice.ris.caselaw.config.LanguageToolConfig;
 import de.bund.digitalservice.ris.caselaw.domain.TextRange;
+import de.bund.digitalservice.ris.caselaw.domain.languagetool.LanguageToolResponse;
+import de.bund.digitalservice.ris.caselaw.domain.languagetool.Match;
 import de.bund.digitalservice.ris.caselaw.domain.languagetool.TextCorrectionService;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ public class LanguageToolService implements TextCorrectionService {
   }
 
   @Override
-  public JsonNode check(String text) throws JsonProcessingException {
+  public LanguageToolResponse check(String text) throws JsonProcessingException {
     RestTemplate restTemplate = new RestTemplate();
 
     HttpHeaders headers = new HttpHeaders();
@@ -41,12 +41,11 @@ public class LanguageToolService implements TextCorrectionService {
 
     HttpEntity<String> entity = new HttpEntity<>(body, headers);
 
-    ResponseEntity<String> response =
-        restTemplate.exchange(languageToolConfig.getUrl(), HttpMethod.POST, entity, String.class);
+    ResponseEntity<LanguageToolResponse> response =
+        restTemplate.exchange(
+            languageToolConfig.getUrl(), HttpMethod.POST, entity, LanguageToolResponse.class);
 
-    ObjectMapper objectMapper = new ObjectMapper();
-
-    return objectMapper.readValue(response.getBody(), JsonNode.class);
+    return response.getBody();
   }
 
   public static List<TextRange> findNoIndexPositions(Document doc) {
@@ -71,7 +70,26 @@ public class LanguageToolService implements TextCorrectionService {
     return positions;
   }
 
-  public void removeNoIndexMatches(String text) {
-    // var noIndexMatches = getNoIndexTextRanges(text);
+  public static boolean matchIsBetweenNoIndexPosition(
+      Match match, List<TextRange> noIndexPositions) {
+    for (TextRange noIndexPosition : noIndexPositions) {
+      if (noIndexPosition.start() < match.getOffset() && noIndexPosition.end() < match.end()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public static List<Match> removeNoIndexMatches(
+      List<Match> matches, Document doc, String plainText) {
+    var noIndexPositions = findNoIndexPositions(doc, plainText);
+
+    List<Match> list = new ArrayList<>();
+    for (Match match : matches) {
+      if (!matchIsBetweenNoIndexPosition(match, noIndexPositions)) {
+        list.add(match);
+      }
+    }
+    return list;
   }
 }

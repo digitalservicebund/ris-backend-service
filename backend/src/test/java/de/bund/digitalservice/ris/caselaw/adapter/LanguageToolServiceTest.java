@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.config.LanguageToolConfig;
 import de.bund.digitalservice.ris.caselaw.domain.TextRange;
+import de.bund.digitalservice.ris.caselaw.domain.languagetool.Match;
 import java.util.List;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -35,5 +36,14 @@ class LanguageToolServiceTest {
         expectedTest,
         plainText.substring(
             noIndexTextRanges.getFirst().start(), noIndexTextRanges.getFirst().end()));
+  }
+
+  @Test
+  void matchIsBetweenNoIndexPosition() {
+    TextRange noIndexTextRange = TextRange.builder().start(3).end(10).build();
+    var match = Match.builder().offset(6).length(5).build();
+    var result =
+        LanguageToolService.matchIsBetweenNoIndexPosition(match, List.of(noIndexTextRange));
+    Assertions.assertTrue(result);
   }
 }

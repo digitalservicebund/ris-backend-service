@@ -2,10 +2,16 @@ package de.bund.digitalservice.ris.caselaw.domain.languagetool;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class Match {
   private String message;
   private String shortMessage;
@@ -18,4 +24,8 @@ public class Match {
   private Rule rule;
   private boolean ignoreForIncompleteSentence;
   private int contextForSureMatch;
+
+  public int end() {
+    return offset + length;
+  }
 }

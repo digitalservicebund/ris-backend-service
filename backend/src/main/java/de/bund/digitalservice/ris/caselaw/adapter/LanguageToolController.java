@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import de.bund.digitalservice.ris.caselaw.domain.languagetool.LanguageToolResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +27,7 @@ public class LanguageToolController {
       consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE)
   // TODO: PreAutorize : blocked by a test
-  public ResponseEntity<JsonNode> check(
+  public ResponseEntity<LanguageToolResponse> check(
       @AuthenticationPrincipal OidcUser oidcUser, @RequestBody String text) {
     try {
       return ResponseEntity.ok(languageToolService.check(text));
