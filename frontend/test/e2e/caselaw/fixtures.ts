@@ -516,6 +516,14 @@ export const caselawTest = test.extend<MyFixtures>({
       `api/v1/caselaw/documentunits/search?pg=0&sz=100&documentNumber=YYTestDoc0001`,
     )
 
+    const eanDocType = (
+      (await (
+        await request.get(
+          `api/v1/caselaw/documenttypes/dependent-literature?q=Ean`,
+        )
+      ).json()) as DocumentType[]
+    )[0]
+
     const foreignDocumentUnitPage =
       (await foreignDocumentUnitSearchResponse.json()) as Pagination<DocumentUnitListEntry>
 
@@ -553,6 +561,33 @@ export const caselawTest = test.extend<MyFixtures>({
               id: crypto.randomUUID(),
               referenceType: "caselaw",
               citation: "2024, 1-11, Heft 1",
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical,
+              // Published foreign BAG docunit
+              documentationUnit: new RelatedDocumentation({
+                documentNumber: foreignDocumentUnit?.documentNumber,
+                uuid: foreignDocumentUnit?.uuid,
+              }),
+            },
+            {
+              id: crypto.randomUUID(),
+              referenceType: "literature",
+              citation: "2024, 23-25, Heft 1",
+              author: "Picard, Jean-Luc",
+              documentType: eanDocType,
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical,
+              documentationUnit: new RelatedDocumentation({
+                documentNumber: prefilledDocumentUnit.documentNumber,
+                uuid: prefilledDocumentUnit.uuid,
+              }),
+            },
+            {
+              id: crypto.randomUUID(),
+              referenceType: "literature",
+              citation: "2024, 26, Heft 1",
+              author: "Janeway, Kathryn",
+              documentType: eanDocType,
               legalPeriodicalRawValue: "MMG",
               legalPeriodical: legalPeriodical,
               // Published foreign BAG docunit

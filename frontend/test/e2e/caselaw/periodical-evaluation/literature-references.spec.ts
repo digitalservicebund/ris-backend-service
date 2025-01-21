@@ -266,4 +266,99 @@ test.describe("Literature references", () => {
       })
     },
   )
+
+  test(
+    "Editing of existing literature reference",
+    {
+      tag: ["@RISDEV-5237"],
+    },
+    async ({ page, editionWithReferences, prefilledDocumentUnit, context }) => {
+      const suffix = editionWithReferences.suffix || ""
+
+      await test.step("When editing a literature reference, the citation is a single input containing the joined value of prefix, citation and suffix", async () => {
+        const fileNumber = prefilledDocumentUnit.coreData.fileNumbers?.[0] || ""
+
+        await navigateToPeriodicalReferences(
+          page,
+          editionWithReferences.id || "",
+        )
+        await expect(
+          page.getByText(`MMG 2024, 23-25${suffix}, Picard, Jean-Luc (Ean)`, {
+            exact: true,
+          }),
+        ).toBeVisible()
+        await expect(
+          page.getByText(`${prefilledDocumentUnit.documentNumber}`, {
+            exact: true,
+          }),
+        ).toHaveCount(2)
+
+        await page.getByTestId("list-entry-2").click()
+
+        await expect(page.getByLabel("Zitatstelle *")).toHaveValue(
+          `2024, 23-25${suffix}`,
+        )
+        await expect(page.getByLabel("Autor Literaturfundstelle")).toHaveValue(
+          "Picard, Jean-Luc",
+        )
+
+        await expect(page.getByLabel("Zitatstelle Präfix")).toBeHidden()
+        await expect(page.getByLabel("Zitatstelle Suffix")).toBeHidden()
+
+        await expect(
+          page
+            .getByTestId("reference-input-summary")
+            .getByText(
+              `AG Aachen, 31.12.2019, ${fileNumber}, Anerkenntnisurteil, Unveröffentlicht`,
+            ),
+        ).toBeVisible()
+
+        await expect(
+          page.getByText(`MMG 2024, 23-25${suffix}, Picard, Jean-Luc (Ean)`, {
+            exact: true,
+          }),
+        ).toBeHidden()
+
+        await expect(page.locator("[aria-label='Klammernzusatz']")).toBeHidden()
+      })
+
+      await test.step("Change existing reference", async () => {
+        await fillInput(page, "Zitatstelle *", `2021, 99${suffix}`)
+        await fillInput(page, "Autor Literaturfundstelle", "Kirk, James T.")
+        await fillInput(page, "Dokumenttyp Literaturfundstelle", "Ean")
+        await page.getByText("Ean", { exact: true }).click()
+        await waitForInputValue(
+          page,
+          "[aria-label='Dokumenttyp Literaturfundstelle']",
+          "Anmerkung",
+        )
+        await page.getByLabel("Fundstelle vermerken", { exact: true }).click()
+
+        await expect(
+          page.getByText(`MMG 2021, 99${suffix}, Kirk, James T. (Ean)`, {
+            exact: true,
+          }),
+        ).toBeVisible()
+        await expect(
+          page.getByText(`MMG 2024, 23-25${suffix}, Picard, Jean-Luc (Ebs)`, {
+            exact: true,
+          }),
+        ).toBeHidden()
+      })
+
+      await test.step("Changes to the citation are visible in the documentation unit's preview", async () => {
+        const previewTab = await context.newPage()
+
+        await navigateToPreview(
+          previewTab,
+          prefilledDocumentUnit.documentNumber || "",
+        )
+        await expect(
+          previewTab.getByText(`MMG 2021, 99${suffix}, Kirk, James T. (Ean)`, {
+            exact: true,
+          }),
+        ).toBeVisible()
+      })
+    },
+  )
 })
