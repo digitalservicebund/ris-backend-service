@@ -21,10 +21,10 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 
@@ -53,10 +53,10 @@ class AuthIntegrationTest {
   }
 
   @Autowired private RisWebTestClient risWebTestClient;
-  @MockBean ClientRegistrationRepository clientRegistrationRepository;
-  @MockBean DocumentationUnitService documentationUnitService;
-  @MockBean UserGroupService userGroupService;
-  @MockBean private ProcedureService procedureService;
+  @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
+  @MockitoBean DocumentationUnitService documentationUnitService;
+  @MockitoBean UserGroupService userGroupService;
+  @MockitoBean private ProcedureService procedureService;
 
   @BeforeEach
   public void beforeEach() {

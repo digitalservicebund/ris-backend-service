@@ -11,10 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -61,10 +61,10 @@ class HealthEndpointIntegrationTest {
   }
 
   @Autowired MockMvc mockMvc;
-  @MockBean ClientRegistrationRepository clientRegistrationRepository;
-  @MockBean UserGroupService userGroupService;
-  @MockBean EnvironmentConfig environmentConfig;
-  @MockBean EnvironmentService environmentService;
+  @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
+  @MockitoBean UserGroupService userGroupService;
+  @MockitoBean EnvironmentConfig environmentConfig;
+  @MockitoBean EnvironmentService environmentService;
 
   @Test
   void shouldExposeHealthEndpoint() throws Exception {

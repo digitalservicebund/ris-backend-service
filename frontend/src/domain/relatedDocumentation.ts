@@ -9,6 +9,7 @@ import {
 
 export default class RelatedDocumentation {
   public uuid?: string
+  public newEntry: boolean
   public documentNumber?: string
   public status?: PublicationStatus
   public deviatingFileNumber?: string
@@ -27,6 +28,11 @@ export default class RelatedDocumentation {
 
   constructor(data: Partial<RelatedDocumentation> = {}) {
     Object.assign(this, data)
+
+    this.newEntry = false
+    if (data.uuid == undefined) {
+      this.newEntry = true
+    }
   }
 
   public isLinkedWith<Type extends RelatedDocumentation>(

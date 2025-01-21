@@ -52,7 +52,6 @@ public class S3AttachmentService implements AttachmentService {
 
   public Attachment attachFileToDocumentationUnit(
       UUID documentationUnitId, ByteBuffer byteBuffer, HttpHeaders httpHeaders) {
-    var fileUuid = UUID.randomUUID();
     String fileName =
         httpHeaders.containsKey("X-Filename")
             ? httpHeaders.getFirst("X-Filename")
@@ -60,18 +59,22 @@ public class S3AttachmentService implements AttachmentService {
 
     checkDocx(byteBuffer);
 
-    putObjectIntoBucket(fileUuid.toString(), byteBuffer, httpHeaders);
-
     AttachmentDTO attachmentDTO =
         AttachmentDTO.builder()
-            .id(fileUuid)
-            .s3ObjectPath(fileUuid.toString())
+            .s3ObjectPath("unknown yet")
             .documentationUnit(
                 documentationUnitRepository.findById(documentationUnitId).orElseThrow())
             .filename(fileName)
             .format("docx")
             .uploadTimestamp(Instant.now())
             .build();
+
+    attachmentDTO = repository.save(attachmentDTO);
+
+    UUID fileUuid = attachmentDTO.getId();
+    putObjectIntoBucket(fileUuid.toString(), byteBuffer, httpHeaders);
+
+    attachmentDTO.setS3ObjectPath(fileUuid.toString());
 
     return AttachmentTransformer.transformToDomain(repository.save(attachmentDTO));
   }

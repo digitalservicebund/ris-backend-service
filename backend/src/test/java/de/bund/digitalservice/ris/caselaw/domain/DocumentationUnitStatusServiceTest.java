@@ -18,9 +18,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -30,9 +30,9 @@ class DocumentationUnitStatusServiceTest {
 
   private static final String DOCUMENT_NUMBER = "TEST00012024";
 
-  @SpyBean private DatabaseDocumentationUnitStatusService statusService;
+  @MockitoSpyBean private DatabaseDocumentationUnitStatusService statusService;
 
-  @MockBean private DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
+  @MockitoBean private DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
 
   @Test
   void testUpdate_withDocumentNumberAndDocumentationUnitNotFound_shouldNotSaveAStatus() {
