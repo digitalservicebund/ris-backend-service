@@ -34,7 +34,7 @@ public abstract class ReferenceDTO {
   @JoinColumn(name = "documentation_unit_id")
   private DocumentationUnitDTO documentationUnit;
 
-  @Column(name = "rank")
+  @Column(name = "documentation_unit_rank")
   @NotNull
   private Integer documentationUnitRank;
 
