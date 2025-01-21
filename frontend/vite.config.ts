@@ -72,6 +72,9 @@ const vitestConfig = defineVitestConfig({
       "test/test-helper/**/*.ts",
       "test/setup.ts",
     ],
+    fakeTimers: {
+      toFake: ["setTimeout", "clearTimeout", "Date"],
+    },
     coverage: {
       reporter: ["lcov"],
       exclude: [

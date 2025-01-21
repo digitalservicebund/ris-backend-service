@@ -2,7 +2,7 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
-import { vi } from "vitest"
+import { beforeEach, vi } from "vitest"
 import { ref } from "vue"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
 import { LegalForceRegion, LegalForceType } from "@/domain/legalForce"
@@ -40,6 +40,7 @@ function renderComponent(options?: { modelValue?: NormReference }) {
 }
 
 describe("NormReferenceEntry", () => {
+  beforeEach(() => vi.restoreAllMocks())
   beforeAll(() => server.listen())
   afterAll(() => server.close())
 
