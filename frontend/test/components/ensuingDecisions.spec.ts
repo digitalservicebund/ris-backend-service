@@ -78,7 +78,6 @@ function generateEnsuingDecision(options?: {
   decisionDate?: string
   fileNumber?: string
   documentType?: DocumentType
-  referenceFound?: boolean
   pending?: boolean
   note?: string
 }) {
@@ -96,7 +95,6 @@ function generateEnsuingDecision(options?: {
       jurisShortcut: "documentTypeShortcut1",
       label: "documentType1",
     },
-    referenceFound: options?.referenceFound ?? false,
     pending: options?.pending ?? false,
     note: options?.note ?? undefined,
   })
@@ -302,7 +300,6 @@ describe("EnsuingDecisions", () => {
     const { user } = renderComponent([
       generateEnsuingDecision({
         documentNumber: "ABC",
-        referenceFound: true,
       }),
     ])
     await user.click(screen.getByTestId("list-entry-0"))

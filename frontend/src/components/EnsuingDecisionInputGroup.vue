@@ -131,7 +131,6 @@ async function addEnsuingDecisionFromSearch(decision: RelatedDocumentation) {
   ensuingDecision.value = new EnsuingDecision({
     ...decision,
     pending: ensuingDecision.value?.pending,
-    referenceFound: true,
     note: ensuingDecision.value?.note,
   })
   emit("update:modelValue", ensuingDecision.value as EnsuingDecision)

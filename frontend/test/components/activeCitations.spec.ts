@@ -82,7 +82,6 @@ function renderComponent(activeCitations?: ActiveCitation[]) {
 function generateActiveCitation(options?: {
   uuid?: string
   documentNumber?: string
-  referenceFound?: boolean
   court?: Court
   decisionDate?: string
   fileNumber?: string
@@ -108,7 +107,6 @@ function generateActiveCitation(options?: {
       jurisShortcut: "Änderungen",
       label: "Änderungen",
     },
-    referenceFound: options?.referenceFound ?? false,
   })
   return activeCitation
 }
@@ -458,7 +456,6 @@ describe("active citations", () => {
     const { user } = renderComponent([
       generateActiveCitation({
         documentNumber: "123",
-        referenceFound: true,
         citationStyle: {
           label: "invalid",
         },

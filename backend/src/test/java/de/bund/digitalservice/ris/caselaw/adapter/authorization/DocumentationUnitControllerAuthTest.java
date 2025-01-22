@@ -45,12 +45,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -58,23 +58,23 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @Import({DocumentationUnitControllerTestConfig.class})
 class DocumentationUnitControllerAuthTest {
   @Autowired private RisWebTestClient risWebTestClient;
-  @MockBean private DocumentationUnitService service;
+  @MockitoBean private DocumentationUnitService service;
 
-  @MockBean
+  @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
 
-  @MockBean private HandoverService handoverService;
-  @MockBean private KeycloakUserService userService;
-  @MockBean private DocxConverterService docxConverterService;
-  @MockBean private AttachmentService attachmentService;
-  @MockBean private LdmlExporterService ldmlExporterService;
-  @MockBean ClientRegistrationRepository clientRegistrationRepository;
-  @MockBean DatabaseApiKeyRepository apiKeyRepository;
-  @MockBean DatabaseDocumentationOfficeRepository officeRepository;
-  @MockBean PatchMapperService patchMapperService;
-  @MockBean private ProcedureService procedureService;
-  @MockBean private DuplicateCheckService duplicateCheckService;
+  @MockitoBean private HandoverService handoverService;
+  @MockitoBean private KeycloakUserService userService;
+  @MockitoBean private DocxConverterService docxConverterService;
+  @MockitoBean private AttachmentService attachmentService;
+  @MockitoBean private LdmlExporterService ldmlExporterService;
+  @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
+  @MockitoBean DatabaseApiKeyRepository apiKeyRepository;
+  @MockitoBean DatabaseDocumentationOfficeRepository officeRepository;
+  @MockitoBean PatchMapperService patchMapperService;
+  @MockitoBean private ProcedureService procedureService;
+  @MockitoBean private DuplicateCheckService duplicateCheckService;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private final String docOffice1Group = "/CC-RIS";

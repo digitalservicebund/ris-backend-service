@@ -29,6 +29,7 @@ export default class ActiveCitation
     Object.assign(this, data)
     if (this.uuid == undefined) {
       this.uuid = crypto.randomUUID()
+      this.newEntry = true
     }
   }
 

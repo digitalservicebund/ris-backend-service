@@ -46,10 +46,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -126,15 +126,15 @@ class HandoverMailServiceUATTest {
 
   @Autowired private HandoverMailService service;
 
-  @MockBean private XmlExporter xmlExporter;
+  @MockitoBean private XmlExporter xmlExporter;
 
-  @MockBean private HandoverRepository repository;
+  @MockitoBean private HandoverRepository repository;
 
-  @MockBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
+  @MockitoBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
 
-  @MockBean private DatabaseLegalPeriodicalEditionRepository editionRepository;
+  @MockitoBean private DatabaseLegalPeriodicalEditionRepository editionRepository;
 
-  @MockBean private HttpMailSender mailSender;
+  @MockitoBean private HttpMailSender mailSender;
 
   @BeforeEach
   void setUp() throws ParserConfigurationException, TransformerException {

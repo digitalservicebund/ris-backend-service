@@ -219,6 +219,7 @@ test.describe(
 
       await test.step("should not open preview if more then one search result", async () => {
         await page.getByText("Suchen").click()
+        await expect(page.getByLabel("Ladestatus")).toBeHidden()
         await expect(page.getByLabel("Seitenpanel schließen")).toBeHidden()
       })
 
@@ -228,7 +229,7 @@ test.describe(
           fileNumber,
           "31.12.2019",
         )
-
+        await expect(page.getByText("1 Ergebnis gefunden")).toBeVisible()
         await expect(page).toHaveURL(/showAttachmentPanel=true/)
       })
 
@@ -354,13 +355,9 @@ test.describe(
           page.getByText(`${prefilledDocumentUnit.documentNumber}`, {
             exact: true,
           }),
-        ).toBeVisible()
+        ).toHaveCount(2)
 
         await page.getByTestId("list-entry-0").click()
-
-        await expect(
-          page.getByText(`MMG 2024, 12-22${suffix} (L)`, { exact: true }),
-        ).toBeHidden()
 
         await expect(page.getByLabel("Zitatstelle *")).toHaveValue(
           `2024, 12-22${suffix}`,
@@ -379,8 +376,9 @@ test.describe(
         ).toBeVisible()
 
         await expect(
-          page.getByText("MMG 2024, 5, Heft uwkkf (LT)"),
-          "Should hide the summary when in edit mode",
+          page.getByText(`MMG 2024, 12-22${suffix} (L)`, {
+            exact: true,
+          }),
         ).toBeHidden()
 
         await expect(page.locator("[aria-label='Dokumenttyp']")).toBeHidden()
@@ -482,7 +480,7 @@ test.describe(
     test(
       "Deleting references in periodical evaluation",
       {
-        tag: "@RISDEV-5146",
+        tag: ["@RISDEV-5146", "@RISDEV-5237"],
       },
       async ({
         context,
@@ -499,7 +497,7 @@ test.describe(
             page.getByText(`MMG 2024, 12-22, Heft 1 (L)`, { exact: true }),
           ).toBeVisible()
           const count = page.getByLabel("Listen Eintrag")
-          await expect(count).toHaveCount(2)
+          await expect(count).toHaveCount(4)
 
           await page.getByTestId("list-entry-0").click()
 
@@ -510,20 +508,58 @@ test.describe(
           ).toBeHidden()
           await expect(
             page.locator("[aria-label='Listen Eintrag']"),
-          ).toHaveCount(1)
+          ).toHaveCount(3)
           await expect(
             page.getByText(`MMG 2024, 12-22, Heft 1 (L)`, { exact: true }),
           ).toBeHidden()
         })
 
-        await test.step("On reload deleted reference is not visible", async () => {
+        await test.step("On reload deleted references are not visible", async () => {
           await page.reload()
-          await expect(
-            page.locator("[aria-label='Listen Eintrag']"),
-          ).toHaveCount(1)
           await expect(
             page.getByText(`MMG 2024, 12-22, Heft 1 (L)`, { exact: true }),
           ).toBeHidden()
+          await expect(
+            page.locator("[aria-label='Listen Eintrag']"),
+          ).toHaveCount(3)
+        })
+
+        await test.step("Literature reference can be deleted", async () => {
+          await expect(
+            page.getByText(`MMG 2024, 23-25, Heft 1, Picard, Jean-Luc (Ean)`, {
+              exact: true,
+            }),
+          ).toBeVisible()
+          const count = page.getByLabel("Listen Eintrag")
+          await expect(count).toHaveCount(3)
+
+          await page.getByTestId("list-entry-1").click()
+
+          await page.getByText("Eintrag löschen").click()
+
+          await expect(
+            page.locator("[aria-label='Eintrag löschen']"),
+          ).toBeHidden()
+          await expect(
+            page.locator("[aria-label='Listen Eintrag']"),
+          ).toHaveCount(2)
+          await expect(
+            page.getByText(`MMG 2024, 23-25, Heft 1, Picard, Jean-Luc (Ean)`, {
+              exact: true,
+            }),
+          ).toBeHidden()
+        })
+
+        await test.step("On reload deleted references are not visible", async () => {
+          await page.reload()
+          await expect(
+            page.getByText(`MMG 2024, 23-25, Heft 1, Picard, Jean-Luc (Ean)`, {
+              exact: true,
+            }),
+          ).toBeHidden()
+          await expect(
+            page.locator("[aria-label='Listen Eintrag']"),
+          ).toHaveCount(2)
         })
 
         await test.step("Deleted references disappear from the documentation unit's preview", async () => {
@@ -538,7 +574,15 @@ test.describe(
             page.getByText(`MMG 2024, 12-22, Heft 1 (L)`, { exact: true }),
           ).toBeHidden()
           await expect(
+            page.getByText(`MMG 2024, 23-25, Heft 1, Picard, Jean-Luc (Ean)`, {
+              exact: true,
+            }),
+          ).toBeHidden()
+          await expect(
             previewTab.getByText("Fundstellen", { exact: true }),
+          ).toBeHidden()
+          await expect(
+            previewTab.getByText("Literaturfundstellen", { exact: true }),
           ).toBeHidden()
         })
       },

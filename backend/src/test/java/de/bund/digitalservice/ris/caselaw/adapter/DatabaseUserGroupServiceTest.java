@@ -19,8 +19,8 @@ import java.util.UUID;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -70,8 +70,8 @@ class DatabaseUserGroupServiceTest {
 
   private DatabaseUserGroupService service;
 
-  @MockBean private DatabaseDocumentationOfficeRepository officeRepository;
-  @MockBean private DatabaseUserGroupRepository groupRepository;
+  @MockitoBean private DatabaseDocumentationOfficeRepository officeRepository;
+  @MockitoBean private DatabaseUserGroupRepository groupRepository;
 
   @Test
   void shouldHandleEmptyConfig() {

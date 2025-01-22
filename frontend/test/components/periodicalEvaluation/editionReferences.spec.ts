@@ -270,7 +270,6 @@ describe("Legal periodical edition evaluation", () => {
             status: { publicationStatus: "UNPUBLISHED" },
             fileNumber: "file123",
             createdByReference: "id",
-            referenceFound: true,
           } as RelatedDocumentation,
         } as Reference,
       ],
@@ -309,8 +308,6 @@ describe("Legal periodical edition evaluation", () => {
               publicationStatus: PublicationState.EXTERNAL_HANDOVER_PENDING,
               withError: false,
             },
-
-            referenceFound: true,
           } as RelatedDocumentation,
         } as Reference,
       ],

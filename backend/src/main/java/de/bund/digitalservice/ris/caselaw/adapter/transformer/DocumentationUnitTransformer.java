@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -123,7 +124,7 @@ public class DocumentationUnitTransformer {
     }
 
     addPreviousDecisions(updatedDomainObject, builder);
-    addEnsuingAndPendingDecisions(updatedDomainObject, builder);
+    addEnsuingAndPendingDecisions(updatedDomainObject, builder, currentDto);
 
     if (updatedDomainObject.contentRelatedIndexing() != null) {
       ContentRelatedIndexing contentRelatedIndexing = updatedDomainObject.contentRelatedIndexing();
@@ -389,12 +390,19 @@ public class DocumentationUnitTransformer {
   }
 
   private static void addEnsuingAndPendingDecisions(
-      DocumentationUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
+      DocumentationUnit updatedDomainObject,
+      DocumentationUnitDTOBuilder builder,
+      DocumentationUnitDTO currentDTO) {
     List<EnsuingDecision> ensuingDecisions = updatedDomainObject.ensuingDecisions();
-    if (ensuingDecisions != null) {
 
-      List<EnsuingDecisionDTO> ensuingDecisionDTOs = new ArrayList<>();
-      List<PendingDecisionDTO> pendingDecisionDTOs = new ArrayList<>();
+    List<EnsuingDecisionDTO> ensuingDecisionDTOs = new ArrayList<>();
+    List<PendingDecisionDTO> pendingDecisionDTOs = new ArrayList<>();
+
+    if (ensuingDecisions != null) {
+      List<UUID> ensuingDecisionIds =
+          currentDTO.getEnsuingDecisions().stream().map(EnsuingDecisionDTO::getId).toList();
+      List<UUID> pendingDecisionIds =
+          currentDTO.getPendingDecisions().stream().map(PendingDecisionDTO::getId).toList();
 
       AtomicInteger i = new AtomicInteger(1);
       for (EnsuingDecision ensuingDecision : ensuingDecisions) {
@@ -402,6 +410,9 @@ public class DocumentationUnitTransformer {
           PendingDecisionDTO pendingDecisionDTO =
               PendingDecisionTransformer.transformToDTO(ensuingDecision);
           if (pendingDecisionDTO != null) {
+            if (ensuingDecisionIds.contains(pendingDecisionDTO.getId())) {
+              pendingDecisionDTO.setId(null);
+            }
             pendingDecisionDTO.setRank(i.getAndIncrement());
             pendingDecisionDTOs.add(pendingDecisionDTO);
           }
@@ -409,15 +420,18 @@ public class DocumentationUnitTransformer {
           EnsuingDecisionDTO ensuingDecisionDTO =
               EnsuingDecisionTransformer.transformToDTO(ensuingDecision);
           if (ensuingDecisionDTO != null) {
+            if (pendingDecisionIds.contains(ensuingDecisionDTO.getId())) {
+              ensuingDecisionDTO.setId(null);
+            }
             ensuingDecisionDTO.setRank(i.getAndIncrement());
             ensuingDecisionDTOs.add(ensuingDecisionDTO);
           }
         }
       }
-
-      builder.ensuingDecisions(ensuingDecisionDTOs.stream().toList());
-      builder.pendingDecisions(pendingDecisionDTOs.stream().toList());
     }
+
+    builder.ensuingDecisions(ensuingDecisionDTOs);
+    builder.pendingDecisions(pendingDecisionDTOs);
   }
 
   private static void addPreviousDecisions(
@@ -830,8 +844,10 @@ public class DocumentationUnitTransformer {
                 DuplicateRelationTransformer.transformToDomain(relation, documentationUnitDTO))
         .sorted(
             Comparator.comparing(
-                relation -> Optional.ofNullable(relation.decisionDate()).orElse(LocalDate.MIN),
-                Comparator.reverseOrder()))
+                    (DuplicateRelation relation) ->
+                        Optional.ofNullable(relation.decisionDate()).orElse(LocalDate.MIN),
+                    Comparator.reverseOrder())
+                .thenComparing(DuplicateRelation::documentNumber))
         .toList();
   }
 

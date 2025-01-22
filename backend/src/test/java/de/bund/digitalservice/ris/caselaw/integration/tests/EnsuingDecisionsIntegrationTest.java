@@ -47,11 +47,11 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -98,19 +98,19 @@ class EnsuingDecisionsIntegrationTest {
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseHandoverReportRepository databaseHandoverReportRepository;
 
-  @MockBean UserService userService;
-  @MockBean ClientRegistrationRepository clientRegistrationRepository;
-  @MockBean private S3AsyncClient s3AsyncClient;
-  @MockBean private MailService mailService;
-  @MockBean DocxConverterService docxConverterService;
-  @MockBean AttachmentService attachmentService;
-  @MockBean private PatchMapperService patchMapperService;
-  @MockBean private HandoverService handoverService;
-  @MockBean private ProcedureService procedureService;
-  @MockBean private LdmlExporterService ldmlExporterService;
-  @MockBean private DuplicateCheckService duplicateCheckService;
+  @MockitoBean UserService userService;
+  @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
+  @MockitoBean private S3AsyncClient s3AsyncClient;
+  @MockitoBean private MailService mailService;
+  @MockitoBean DocxConverterService docxConverterService;
+  @MockitoBean AttachmentService attachmentService;
+  @MockitoBean private PatchMapperService patchMapperService;
+  @MockitoBean private HandoverService handoverService;
+  @MockitoBean private ProcedureService procedureService;
+  @MockitoBean private LdmlExporterService ldmlExporterService;
+  @MockitoBean private DuplicateCheckService duplicateCheckService;
 
-  @MockBean
+  @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
 
@@ -427,7 +427,6 @@ class EnsuingDecisionsIntegrationTest {
             .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
-            .ensuingDecisions(List.of(EnsuingDecision.builder().build()))
             .build();
 
     risWebTestClient
@@ -926,7 +925,11 @@ class EnsuingDecisionsIntegrationTest {
                         .fileNumber("abc")
                         .note("note2")
                         .build(),
-                    EnsuingDecision.builder().uuid(ensuingDecisionUUID2).fileNumber("cba").build()))
+                    EnsuingDecision.builder()
+                        .uuid(ensuingDecisionUUID2)
+                        .fileNumber("cba")
+                        .pending(true)
+                        .build()))
             .build();
 
     risWebTestClient
@@ -993,8 +996,6 @@ class EnsuingDecisionsIntegrationTest {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(1);
               assertThat(response.getResponseBody().ensuingDecisions().get(0).getDocumentNumber())
                   .isEqualTo("documentnr002");
-              assertThat(response.getResponseBody().ensuingDecisions().get(0).isReferenceFound())
-                  .isTrue();
             });
   }
 

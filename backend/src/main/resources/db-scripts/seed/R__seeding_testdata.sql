@@ -63,6 +63,7 @@ INSERT INTO
     document_number,
     document_type_id,
     documentation_office_id,
+    creating_documentation_office_id,
     guiding_principle,
     judicial_body,
     procedure,
@@ -100,6 +101,7 @@ VALUES
       WHERE
         abbreviation = 'BAG'
     ),
+    NULL,
     'guiding principle',
     '1.Senat, 2. Kammer',
     NULL,
@@ -121,6 +123,7 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+    NULL,
     NULL,
     NULL,
     NULL,
@@ -157,6 +160,7 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+    NULL,
     'guiding principle',
     '1.Senat, 2. Kammer',
     NULL,
@@ -194,6 +198,7 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+    NULL,
     'guiding principle',
     '1.Senat, 2. Kammer',
     NULL,
@@ -230,6 +235,7 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+    NULL,
     'guiding principle',
     '1.Senat, 2. Kammer',
     NULL,
@@ -254,6 +260,7 @@ VALUES
     NULL,
     NULL,
     NULL,
+    NULL,
     'tenorx',
     '2002-11-21 09:42:49.385920',
     NULL
@@ -272,6 +279,7 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+    NULL,
     NULL,
     NULL,
     NULL,
@@ -300,6 +308,7 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+    NULL,
     'guiding principle',
     '1.Senat, 2. Kammer',
     NULL,
@@ -328,6 +337,7 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+    NULL,
     'guiding principle',
     '1.Senat, 2. Kammer',
     NULL,
@@ -364,6 +374,7 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+    NULL,
     'guiding principle',
     '1.Senat, 2. Kammer',
     NULL,
@@ -400,6 +411,7 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+    NULL,
     'guiding principle',
     '1.Senat, 2. Kammer',
     NULL,
@@ -436,6 +448,7 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+    NULL,
     'guiding principle',
     '1.Senat, 2. Kammer',
     NULL,
@@ -472,6 +485,7 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+    NULL,
     'guiding principle',
     '1.Senat, 2. Kammer',
     NULL,
@@ -509,6 +523,7 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+   NULL,
     'guiding principle',
     '1.Senat, 2. Kammer',
     NULL,
@@ -537,12 +552,49 @@ VALUES
       WHERE
         abbreviation = 'DS'
     ),
+   NULL,
     'guiding principle',
     '1.Senat, 2. Kammer',
     NULL,
     'tenorx',
     '2005-11-21 09:42:49.385920',
     NULL
+  ),
+  (
+      gen_random_uuid (),
+      NULL,
+      '2002-08-24',
+      'YYTestDoc0016',
+      (
+          SELECT
+              id
+          FROM
+              incremental_migration.document_type
+          WHERE
+              abbreviation = 'BE'
+      ),
+      (
+          SELECT
+              id
+          FROM
+              incremental_migration.documentation_office
+          WHERE
+              abbreviation = 'BGH'
+      ),
+      (
+          SELECT
+              id
+          FROM
+              incremental_migration.documentation_office
+          WHERE
+              abbreviation = 'DS'
+      ),
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL
   );
 
 INSERT INTO
@@ -791,7 +843,20 @@ VALUES
       WHERE
           document_number = 'YYTestDoc0015'
     )
-  )
+    ),(
+      gen_random_uuid (),
+      '2024-03-14 18:38:43.043877 +00:00',
+      'EXTERNAL_HANDOVER_PENDING',
+      false,
+      (
+          SELECT
+              id
+          FROM
+              incremental_migration.documentation_unit
+          WHERE
+              document_number = 'YYTestDoc0016'
+      )
+    )
     ;
 
 UPDATE incremental_migration.documentation_unit SET current_status_id =
@@ -854,6 +919,10 @@ WHERE document_number = 'YYTestDoc0014';
 UPDATE incremental_migration.documentation_unit SET current_status_id =
     (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0015') ORDER BY created_at DESC LIMIT 1)
 WHERE document_number = 'YYTestDoc0015';
+
+UPDATE incremental_migration.documentation_unit SET current_status_id =
+    (SELECT id FROM incremental_migration.status WHERE documentation_unit_id = (SELECT id FROM incremental_migration.documentation_unit WHERE document_number = 'YYTestDoc0016'))
+WHERE document_number = 'YYTestDoc0016';
 
 
 UPDATE

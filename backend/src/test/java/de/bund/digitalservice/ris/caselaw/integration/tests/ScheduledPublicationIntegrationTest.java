@@ -57,11 +57,11 @@ import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 
@@ -110,17 +110,17 @@ class ScheduledPublicationIntegrationTest {
   @Autowired private DatabaseDocumentationUnitRepository docUnitRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
-  @MockBean private ClientRegistrationRepository clientRegistrationRepository;
-  @MockBean private HttpMailSender mailSender;
-  @MockBean private DocxConverterService docxConverterService;
-  @MockBean private AttachmentService attachmentService;
-  @MockBean private PatchMapperService patchMapperService;
-  @MockBean private ProcedureService procedureService;
-  @MockBean private LdmlExporterService ldmlExporterService;
-  @MockBean private UserGroupService userGroupService;
-  @MockBean private DuplicateCheckService duplicateCheckService;
+  @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
+  @MockitoBean private HttpMailSender mailSender;
+  @MockitoBean private DocxConverterService docxConverterService;
+  @MockitoBean private AttachmentService attachmentService;
+  @MockitoBean private PatchMapperService patchMapperService;
+  @MockitoBean private ProcedureService procedureService;
+  @MockitoBean private LdmlExporterService ldmlExporterService;
+  @MockitoBean private UserGroupService userGroupService;
+  @MockitoBean private DuplicateCheckService duplicateCheckService;
 
-  @MockBean
+  @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
 

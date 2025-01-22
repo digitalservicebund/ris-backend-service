@@ -73,10 +73,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
@@ -132,17 +132,17 @@ class PatchUpdateIntegrationTest {
   @Autowired private DatabaseUserGroupRepository userGroupRepository;
   @Autowired private ObjectMapper objectMapper;
 
-  @MockBean private S3AsyncClient s3AsyncClient;
-  @MockBean private MailService mailService;
-  @MockBean DocxConverterService docxConverterService;
-  @MockBean ClientRegistrationRepository clientRegistrationRepository;
+  @MockitoBean private S3AsyncClient s3AsyncClient;
+  @MockitoBean private MailService mailService;
+  @MockitoBean DocxConverterService docxConverterService;
+  @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
 
-  @MockBean AttachmentService attachmentService;
-  @MockBean private HandoverService handoverService;
-  @MockBean private DocumentationUnitDocxMetadataInitializationService initializationService;
-  @MockBean private UserGroupService userGroupService;
-  @MockBean private LdmlExporterService ldmlExporterService;
-  @MockBean private DuplicateCheckService duplicateCheckService;
+  @MockitoBean AttachmentService attachmentService;
+  @MockitoBean private HandoverService handoverService;
+  @MockitoBean private DocumentationUnitDocxMetadataInitializationService initializationService;
+  @MockitoBean private UserGroupService userGroupService;
+  @MockitoBean private LdmlExporterService ldmlExporterService;
+  @MockitoBean private DuplicateCheckService duplicateCheckService;
 
   private UUID court1Id;
   private UUID court2Id;
@@ -2858,7 +2858,6 @@ class PatchUpdateIntegrationTest {
       JsonNode previousDecisionAsNode =
           objectMapper.convertValue(
               PreviousDecision.builder()
-                  .referenceFound(true)
                   .documentNumber(previousDecision.documentNumber())
                   .status(previousDecision.status())
                   .build(),
@@ -2927,13 +2926,13 @@ class PatchUpdateIntegrationTest {
               Tuple.tuple(
                   0L,
                   "[{\"op\":\"add\",\"path\":\"/previousDecisions/0\","
-                      + "\"value\":{\"uuid\":null,\"documentNumber\":\""
+                      + "\"value\":{\"uuid\":null,\"newEntry\":false,\"documentNumber\":\""
                       + relatedDocument.getDocumentNumber()
                       + "\","
                       + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
                       + "\"createdAt\":null},\"court\":null,\"decisionDate\":null,"
-                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,\"referenceFound\":true,"
-                      + "\"documentationOffice\":null,\"creatingDocOffice\":null,"
+                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,"
+                      + "\"documentationOffice\":null,\"creatingDocOffice\":null,\"hasPreviewAccess\":false,"
                       + "\"dateKnown\":true,\"deviatingFileNumber\":null}},"
                       + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/uuid\","
                       + "\"value\":\""
@@ -3010,13 +3009,13 @@ class PatchUpdateIntegrationTest {
               Tuple.tuple(
                   0L,
                   "[{\"op\":\"add\",\"path\":\"/previousDecisions/0\","
-                      + "\"value\":{\"uuid\":null,\"documentNumber\":\""
+                      + "\"value\":{\"uuid\":null,\"newEntry\":false,\"documentNumber\":\""
                       + relatedDocument.getDocumentNumber()
                       + "\","
                       + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
                       + "\"createdAt\":null},\"court\":null,\"decisionDate\":null,"
-                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,\"referenceFound\":true,"
-                      + "\"documentationOffice\":null,\"creatingDocOffice\":null,"
+                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,"
+                      + "\"documentationOffice\":null,\"creatingDocOffice\":null,\"hasPreviewAccess\":false,"
                       + "\"dateKnown\":true,\"deviatingFileNumber\":null}},"
                       + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/uuid\","
                       + "\"value\":\""
@@ -3040,7 +3039,6 @@ class PatchUpdateIntegrationTest {
       JsonNode previousDecisionAsNode =
           objectMapper.convertValue(
               PreviousDecision.builder()
-                  .referenceFound(true)
                   .documentNumber(previousDecision.documentNumber())
                   .status(previousDecision.status())
                   .build(),
@@ -3110,13 +3108,13 @@ class PatchUpdateIntegrationTest {
               Tuple.tuple(
                   0L,
                   "[{\"op\":\"add\",\"path\":\"/previousDecisions/0\","
-                      + "\"value\":{\"uuid\":null,\"documentNumber\":\""
+                      + "\"value\":{\"uuid\":null,\"newEntry\":false,\"documentNumber\":\""
                       + relatedDocument.getDocumentNumber()
                       + "\","
                       + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
                       + "\"createdAt\":null},\"court\":null,\"decisionDate\":null,"
-                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,\"referenceFound\":true,"
-                      + "\"documentationOffice\":null,\"creatingDocOffice\":null,"
+                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,"
+                      + "\"documentationOffice\":null,\"creatingDocOffice\":null,\"hasPreviewAccess\":false,"
                       + "\"dateKnown\":true,\"deviatingFileNumber\":null}},"
                       + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/uuid\","
                       + "\"value\":\""
@@ -3196,13 +3194,13 @@ class PatchUpdateIntegrationTest {
               Tuple.tuple(
                   0L,
                   "[{\"op\":\"add\",\"path\":\"/previousDecisions/0\","
-                      + "\"value\":{\"uuid\":null,\"documentNumber\":\""
+                      + "\"value\":{\"uuid\":null,\"newEntry\":false,\"documentNumber\":\""
                       + relatedDocument.getDocumentNumber()
                       + "\","
                       + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
                       + "\"createdAt\":null},\"court\":null,\"decisionDate\":null,"
-                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,\"referenceFound\":true,"
-                      + "\"documentationOffice\":null,\"creatingDocOffice\":null,"
+                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,"
+                      + "\"documentationOffice\":null,\"creatingDocOffice\":null,\"hasPreviewAccess\":false,"
                       + "\"dateKnown\":true,\"deviatingFileNumber\":null}},"
                       + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/uuid\","
                       + "\"value\":\""
@@ -3288,13 +3286,13 @@ class PatchUpdateIntegrationTest {
               Tuple.tuple(
                   0L,
                   "[{\"op\":\"add\",\"path\":\"/previousDecisions/0\","
-                      + "\"value\":{\"uuid\":null,\"documentNumber\":\""
+                      + "\"value\":{\"uuid\":null,\"newEntry\":false,\"documentNumber\":\""
                       + relatedDocument.getDocumentNumber()
                       + "\","
                       + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
                       + "\"createdAt\":null},\"court\":null,\"decisionDate\":null,"
-                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,\"referenceFound\":true,"
-                      + "\"documentationOffice\":null,\"creatingDocOffice\":null,"
+                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,"
+                      + "\"documentationOffice\":null,\"creatingDocOffice\":null,\"hasPreviewAccess\":false,"
                       + "\"dateKnown\":true,\"deviatingFileNumber\":null}},"
                       + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/uuid\","
                       + "\"value\":\""
@@ -3321,7 +3319,6 @@ class PatchUpdateIntegrationTest {
       JsonNode previousDecision1AsNode =
           objectMapper.convertValue(
               PreviousDecision.builder()
-                  .referenceFound(true)
                   .documentNumber(previousDecision1.documentNumber())
                   .status(previousDecision1.status())
                   .build(),
@@ -3394,13 +3391,13 @@ class PatchUpdateIntegrationTest {
               Tuple.tuple(
                   0L,
                   "[{\"op\":\"add\",\"path\":\"/previousDecisions/0\","
-                      + "\"value\":{\"uuid\":null,\"documentNumber\":\""
+                      + "\"value\":{\"uuid\":null,\"newEntry\":false,\"documentNumber\":\""
                       + relatedDocument.getDocumentNumber()
                       + "\","
                       + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
                       + "\"createdAt\":null},\"court\":null,\"decisionDate\":null,"
-                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,\"referenceFound\":true,"
-                      + "\"documentationOffice\":null,\"creatingDocOffice\":null,"
+                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,"
+                      + "\"documentationOffice\":null,\"creatingDocOffice\":null,\"hasPreviewAccess\":false,"
                       + "\"dateKnown\":true,\"deviatingFileNumber\":null}},"
                       + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/uuid\","
                       + "\"value\":\""
@@ -3413,7 +3410,6 @@ class PatchUpdateIntegrationTest {
       JsonNode previousDecision2AsNode =
           objectMapper.convertValue(
               PreviousDecision.builder()
-                  .referenceFound(true)
                   .documentNumber(previousDecision2.documentNumber())
                   .status(previousDecision2.status())
                   .build(),
@@ -3496,13 +3492,13 @@ class PatchUpdateIntegrationTest {
               Tuple.tuple(
                   0L,
                   "[{\"op\":\"add\",\"path\":\"/previousDecisions/0\","
-                      + "\"value\":{\"uuid\":null,\"documentNumber\":\""
+                      + "\"value\":{\"uuid\":null,\"newEntry\":false,\"documentNumber\":\""
                       + relatedDocument.getDocumentNumber()
                       + "\","
                       + "\"status\":{\"publicationStatus\":\"UNPUBLISHED\",\"withError\":false,"
                       + "\"createdAt\":null},\"court\":null,\"decisionDate\":null,"
-                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,\"referenceFound\":true,"
-                      + "\"documentationOffice\":null,\"creatingDocOffice\":null,"
+                      + "\"fileNumber\":null,\"documentType\":null,\"createdByReference\":null,"
+                      + "\"documentationOffice\":null,\"creatingDocOffice\":null,\"hasPreviewAccess\":false,"
                       + "\"dateKnown\":true,\"deviatingFileNumber\":null}},"
                       + "{\"op\":\"replace\",\"path\":\"/previousDecisions/0/uuid\","
                       + "\"value\":\""
@@ -4021,7 +4017,6 @@ class PatchUpdateIntegrationTest {
       JsonNode previousDecision2AsNode =
           objectMapper.convertValue(
               PreviousDecision.builder()
-                  .referenceFound(true)
                   .documentNumber(previousDecision2.documentNumber())
                   .status(previousDecision2.status())
                   .build(),

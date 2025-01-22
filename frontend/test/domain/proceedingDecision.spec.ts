@@ -37,7 +37,6 @@ describe("ProceedingDecision", () => {
   it("returns true if linked to other docunit", () => {
     const proceedingDecision = new ProceedingDecision({
       documentNumber: "ABC",
-      referenceFound: true,
     })
     expect(proceedingDecision.isReadOnly).toBeFalsy()
   })

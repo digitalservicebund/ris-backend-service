@@ -388,7 +388,11 @@ public class DocumentationUnitService {
     repository.save(documentationUnit);
 
     if (duplicateCheckStatus == DuplicateCheckStatus.ENABLED) {
-      duplicateCheckService.checkDuplicates(documentationUnit.documentNumber());
+      try {
+        duplicateCheckService.checkDuplicates(documentationUnit.documentNumber());
+      } catch (Exception e) {
+        // Errors in duplicate check should not affect saving, logging in service
+      }
     }
 
     return repository.findByUuid(documentationUnit.uuid());
