@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, toRefs, watch } from "vue"
+import { computed, toRefs, watch, ref, onMounted, onBeforeUnmount } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import ChipsDateInput from "@/components/input/ChipsDateInput.vue"
 import ChipsInput from "@/components/input/ChipsInput.vue"
@@ -29,6 +29,18 @@ const validationStore =
     ["decisionDate", "yearsOfDispute", "deviatingDecisionDates"][number]
   >()
 
+const parentWidth = ref(0)
+const parentRef = ref<HTMLElement | null>(null)
+const resizeObserver: ResizeObserver | null = new ResizeObserver((entries) => {
+  for (const entry of entries) {
+    parentWidth.value = entry.contentRect.width
+  }
+})
+
+const layoutClass = computed(() =>
+  parentWidth.value < 768 ? "flex flex-col gap-24" : "flex flex-row gap-24",
+)
+
 /**
  * Our UI turns the chronological order of the list, so the latest previous procedure is first.
  */
@@ -45,10 +57,22 @@ watch(
   },
   { deep: true },
 )
+
+onMounted(() => {
+  if (!parentRef.value) return
+  resizeObserver.observe(parentRef.value)
+})
+
+onBeforeUnmount(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+  }
+})
 </script>
 
 <template>
   <div
+    ref="parentRef"
     aria-label="Stammdaten"
     class="core-data flex flex-col gap-24 bg-white p-24"
   >
@@ -80,7 +104,7 @@ watch(
       </template>
     </NestedComponent>
 
-    <div class="flex flex-row gap-24">
+    <div :class="layoutClass">
       <NestedComponent
         aria-label="Abweichendes Aktenzeichen"
         class="w-full min-w-0"
@@ -150,7 +174,7 @@ watch(
         </template>
       </NestedComponent>
     </div>
-    <div class="flex flex-row gap-24">
+    <div :class="layoutClass">
       <InputField
         id="appraisalBody"
         v-slot="slotProps"
@@ -177,7 +201,7 @@ watch(
       </InputField>
     </div>
 
-    <div class="flex flex-row gap-24">
+    <div :class="layoutClass">
       <NestedComponent
         aria-label="Abweichender ECLI"
         class="w-full"
@@ -233,7 +257,7 @@ watch(
       </NestedComponent>
     </div>
 
-    <div class="flex flex-row gap-24">
+    <div :class="layoutClass">
       <InputField id="legalEffect" v-slot="{ id }" label="Rechtskraft *">
         <DropdownInput
           :id="id"

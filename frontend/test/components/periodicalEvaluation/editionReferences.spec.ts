@@ -66,6 +66,12 @@ async function renderComponent(options?: { references?: Reference[] }) {
 
 describe("Legal periodical edition evaluation", () => {
   beforeEach(async () => {
+    global.ResizeObserver = vi.fn().mockImplementation(() => ({
+      observe: vi.fn(),
+      unobserve: vi.fn(),
+      disconnect: vi.fn(),
+    }))
+
     window.scrollTo = vi.fn()
 
     const legalPeriodical: LegalPeriodical = {

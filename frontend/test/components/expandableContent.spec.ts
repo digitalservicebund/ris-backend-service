@@ -27,8 +27,6 @@ function renderComponent(options?: {
 }
 
 describe("ExpandableContent", () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  global.ResizeObserver = require("resize-observer-polyfill")
   it("displays given header property as regular text", () => {
     renderComponent({ header: "test header" })
     const header = screen.queryByText("test header")

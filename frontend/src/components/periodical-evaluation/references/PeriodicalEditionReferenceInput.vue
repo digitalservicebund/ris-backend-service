@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from "vue"
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import CreateNewFromSearch from "@/components/CreateNewFromSearch.vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
@@ -52,10 +52,20 @@ const itemsPerPage = ref<number>(15)
 const isLoading = ref(false)
 const featureToggle = ref()
 const showModal = ref(false)
-
 const searchResultsCurrentPage = ref<Page<RelatedDocumentation>>()
 const searchResults = ref<SearchResults<RelatedDocumentation>>()
 const createNewFromSearchResponseError = ref<ResponseError | undefined>()
+const parentWidth = ref(0)
+const parentRef = ref<HTMLElement | null>(null)
+const resizeObserver: ResizeObserver | null = new ResizeObserver((entries) => {
+  for (const entry of entries) {
+    parentWidth.value = entry.contentRect.width
+  }
+})
+
+const layoutClass = computed(() =>
+  parentWidth.value < 768 ? "flex flex-col gap-24" : "flex flex-row gap-24",
+)
 
 const legalPeriodical = computed(() =>
   store.edition && store.edition?.legalPeriodical
@@ -316,12 +326,22 @@ onMounted(async () => {
     await FeatureToggleService.isEnabled("neuris.new-from-search")
   ).data
   await scrollIntoViewportById("periodical-references")
+
+  if (!parentRef.value) return
+  resizeObserver.observe(parentRef.value)
+})
+
+onBeforeUnmount(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+  }
 })
 </script>
 
 <template>
   <div
     id="periodical-references"
+    ref="parentRef"
     v-ctrl-enter="search"
     class="flex flex-col border-b-1"
   >
@@ -392,7 +412,7 @@ onMounted(async () => {
           </InputField>
         </div>
       </div>
-      <div class="flex justify-between gap-24">
+      <div :class="layoutClass">
         <div id="citationInputField" class="flex w-full flex-col">
           <InputField
             v-if="!isSaved"
@@ -491,10 +511,7 @@ onMounted(async () => {
           ></ComboboxInput>
         </InputField>
       </div>
-      <div
-        v-if="reference.referenceType === 'literature'"
-        class="w-[calc(50%-10px)]"
-      >
+      <div v-if="reference.referenceType === 'literature'">
         <InputField
           id="literatureReferenceAuthor"
           v-slot="slotProps"
