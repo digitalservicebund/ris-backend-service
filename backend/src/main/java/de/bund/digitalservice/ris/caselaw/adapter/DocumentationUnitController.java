@@ -173,11 +173,19 @@ public class DocumentationUnitController {
     try {
       DocumentationUnit docUnit = service.getByUuid(uuid);
       documentationUnitDocxMetadataInitializationService.initializeCoreData(docUnit, docx2html);
-      duplicateCheckService.checkDuplicates(docUnit.documentNumber());
+      checkDuplicates(docUnit.documentNumber());
     } catch (DocumentationUnitNotExistsException ex) {
       // file upload should not fail because of core data initialization or dup check
       log.error(
           "Initialize core data failed, because documentation unit '{}' doesn't exist!", uuid);
+    }
+  }
+
+  private void checkDuplicates(String documentNumber) {
+    try {
+      duplicateCheckService.checkDuplicates(documentNumber);
+    } catch (Exception e) {
+      // Error in duplicate check should not affect program flow, logging in service
     }
   }
 
@@ -242,7 +250,7 @@ public class DocumentationUnitController {
     }
 
     try {
-      duplicateCheckService.checkDuplicates(documentNumber);
+      checkDuplicates(documentNumber);
       var documentationUnit = service.getByDocumentNumber(documentNumber);
       return ResponseEntity.ok(
           documentationUnit.toBuilder()
