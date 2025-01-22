@@ -361,7 +361,6 @@ class ReferenceIntegrationTest {
                 .references(
                     List.of(
                         Reference.builder()
-                            .documentationUnitRank(1)
                             .referenceType(ReferenceType.CASELAW)
                             .documentationUnit(
                                 RelatedDocumentationUnit.builder().uuid(dto.getId()).build())
@@ -375,7 +374,6 @@ class ReferenceIntegrationTest {
                                     .build())
                             .build(),
                         Reference.builder()
-                            .documentationUnitRank(2)
                             .referenceType(ReferenceType.LITERATURE)
                             .documentationUnit(
                                 RelatedDocumentationUnit.builder().uuid(dto.getId()).build())

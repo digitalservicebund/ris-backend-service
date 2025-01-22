@@ -31,8 +31,6 @@ public class ReferenceTransformer {
             .documentationUnit(
                 RelatedDocumentationUnitTransformer.transformToDomain(
                     referenceDTO.getDocumentationUnit()))
-            .documentationUnitRank(referenceDTO.getDocumentationUnitRank())
-            .editionRank(referenceDTO.getEditionRank())
             .legalPeriodical(legalPeriodical)
             .legalPeriodicalRawValue(
                 legalPeriodical != null

@@ -411,48 +411,56 @@ class LegalPeriodicalEditionIntegrationTest {
 
     Assertions.assertEquals("2024 Sonderheft 1", edition.name());
     List<Reference> references = editionResponse.references();
-    Assertions.assertEquals(4, references.size());
-    Assertions.assertEquals(
-        "Updated Caselaw Reference Citation from Edition", references.get(0).citation());
-    Assertions.assertEquals(
-        "Updated Literature Reference Citation from Edition", references.get(1).citation());
-    Assertions.assertEquals(
-        "New Caselaw Reference Citation from Edition", references.get(2).citation());
-    Assertions.assertEquals(
-        "New Literature Reference Citation from Edition", references.get(3).citation());
+    assertThat(editionResponse.references())
+        .hasSize(4)
+        .satisfiesExactly(
+            reference ->
+                assertThat(reference.citation())
+                    .isEqualTo("Updated Caselaw Reference Citation from Edition"),
+            reference ->
+                assertThat(reference.citation())
+                    .isEqualTo("Updated Literature Reference Citation from Edition"),
+            reference ->
+                assertThat(reference.citation())
+                    .isEqualTo("New Caselaw Reference Citation from Edition"),
+            reference ->
+                assertThat(reference.citation())
+                    .isEqualTo("New Literature Reference Citation from Edition"));
 
     // first, caselaw references
     assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").references())
         .hasSize(3)
-        .satisfies(
-            list -> {
-              assertThat(list.get(0).citation())
-                  .isEqualTo("Caselaw Reference Citation from Docunit");
-              assertThat(list.get(1).id()).isEqualTo(existingReferenceId);
-              assertThat(list.get(1).citation())
+        .satisfiesExactly(
+            reference ->
+                assertThat(reference.citation())
+                    .isEqualTo("Caselaw Reference Citation from Docunit"),
+            reference -> {
+              assertThat(reference.citation())
                   .isEqualTo("Updated Caselaw Reference Citation from Edition");
-              assertThat(list.get(1).documentationUnitRank()).isEqualTo(2);
-              assertThat(list.get(2).id()).isEqualTo(newReferenceId);
-              assertThat(list.get(2).citation())
+              assertThat(reference.id()).isEqualTo(existingReferenceId);
+            },
+            reference -> {
+              assertThat(reference.citation())
                   .isEqualTo("New Caselaw Reference Citation from Edition");
-              assertThat(list.get(2).documentationUnitRank()).isEqualTo(3);
+              assertThat(reference.id()).isEqualTo(newReferenceId);
             });
 
     // then, literature references
     assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").literatureReferences())
         .hasSize(3)
-        .satisfies(
-            list -> {
-              assertThat(list.get(0).citation())
-                  .isEqualTo("Literature Reference Citation from Docunit");
-              assertThat(list.get(1).id()).isEqualTo(existingLiteratureCitationId);
-              assertThat(list.get(1).citation())
+        .satisfiesExactly(
+            reference ->
+                assertThat(reference.citation())
+                    .isEqualTo("Literature Reference Citation from Docunit"),
+            reference -> {
+              assertThat(reference.citation())
                   .isEqualTo("Updated Literature Reference Citation from Edition");
-              assertThat(list.get(1).documentationUnitRank()).isEqualTo(2);
-              assertThat(list.get(2).id()).isEqualTo(newLiteratureReferenceId);
-              assertThat(list.get(2).citation())
+              assertThat(reference.id()).isEqualTo(existingLiteratureCitationId);
+            },
+            reference -> {
+              assertThat(reference.citation())
                   .isEqualTo("New Literature Reference Citation from Edition");
-              assertThat(list.get(2).documentationUnitRank()).isEqualTo(3);
+              assertThat(reference.id()).isEqualTo(newLiteratureReferenceId);
             });
 
     // clean up
@@ -585,39 +593,34 @@ class LegalPeriodicalEditionIntegrationTest {
             .getResponseBody();
 
     Assertions.assertEquals("2024 Sonderheft 1", edition.name());
-    List<Reference> references = editionResponse.references();
-    Assertions.assertEquals(2, references.size());
-    Assertions.assertEquals("New Caselaw Reference from Edition", references.get(0).citation());
-    Assertions.assertEquals("New Literature Reference from Edition", references.get(1).citation());
-
-    // assure rank is updated
-    assertThat(references.get(0).documentationUnitRank()).isEqualTo(2);
-    assertThat(references.get(1).documentationUnitRank()).isEqualTo(2);
-    assertThat(references.get(0).editionRank()).isZero();
-    assertThat(references.get(1).editionRank()).isEqualTo(1);
+    assertThat(editionResponse.references())
+        .hasSize(2)
+        .satisfiesExactly(
+            reference ->
+                assertThat(reference.citation()).isEqualTo("New Caselaw Reference from Edition"),
+            reference ->
+                assertThat(reference.citation())
+                    .isEqualTo("New Literature Reference from Edition"));
 
     // documentation unit references are updated
+    // first, caselaw references
     assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").references())
         .hasSize(2)
-        .satisfies(
-            list -> {
-              // first, caselaw references
-              assertThat(list.get(0).citation()).isEqualTo("Caselaw Reference from Docunit");
-              assertThat(list.get(0).documentationUnitRank()).isEqualTo(1);
-              assertThat(list.get(1).citation()).isEqualTo("New Caselaw Reference from Edition");
-              assertThat(list.get(1).documentationUnitRank()).isEqualTo(2);
-            });
+        .satisfiesExactly(
+            reference ->
+                assertThat(reference.citation()).isEqualTo("Caselaw Reference from Docunit"),
+            reference ->
+                assertThat(reference.citation()).isEqualTo("New Caselaw Reference from Edition"));
 
+    // then, literature references
     assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").literatureReferences())
         .hasSize(2)
-        .satisfies(
-            list -> {
-              // then, literature citations
-              assertThat(list.get(0).citation()).isEqualTo("Literature Reference from Docunit");
-              assertThat(list.get(0).documentationUnitRank()).isEqualTo(1);
-              assertThat(list.get(1).citation()).isEqualTo("New Literature Reference from Edition");
-              assertThat(list.get(1).documentationUnitRank()).isEqualTo(2);
-            });
+        .satisfiesExactly(
+            reference ->
+                assertThat(reference.citation()).isEqualTo("Literature Reference from Docunit"),
+            reference ->
+                assertThat(reference.citation())
+                    .isEqualTo("New Literature Reference from Edition"));
 
     assertThat(referenceRepository.findById(referenceId)).isEmpty();
     assertThat(referenceRepository.findById(literatureCitationId)).isEmpty();

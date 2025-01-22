@@ -223,11 +223,9 @@ class HandoverMailIntegrationTest {
                           .citation("citation")
                           .legalPeriodicalRawValue("ABC")
                           .primaryReference(true)
-                          .documentationUnitRank(1)
                           .documentationUnit(
                               RelatedDocumentationUnitTransformer.transformToDomain(
                                   (savedDocumentationUnitDTO)))
-                          .editionRank(1)
                           .build()))
               .build();
       legalPeriodicalEditionRepository.save(legalPeriodicalEdition);
