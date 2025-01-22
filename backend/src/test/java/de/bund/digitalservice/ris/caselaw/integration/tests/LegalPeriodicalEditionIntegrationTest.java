@@ -410,7 +410,6 @@ class LegalPeriodicalEditionIntegrationTest {
             .getResponseBody();
 
     Assertions.assertEquals("2024 Sonderheft 1", edition.name());
-    List<Reference> references = editionResponse.references();
     assertThat(editionResponse.references())
         .hasSize(4)
         .satisfiesExactly(
