@@ -161,7 +161,8 @@ class LegalPeriodicalEditionControllerTest {
         .expectStatus()
         .isOk();
 
-    verify(service, times(1)).saveLegalPeriodicalEdition(any(OidcUser.class), edition);
+    verify(service, times(1))
+        .saveLegalPeriodicalEdition(any(OidcUser.class), any(LegalPeriodicalEdition.class));
   }
 
   @Test
