@@ -6,4 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DatabaseDependentLiteratureCitationRepository
-    extends JpaRepository<DependentLiteratureCitationDTO, UUID> {}
+    extends JpaRepository<DependentLiteratureActiveCitationDTO, UUID> {}

@@ -1,8 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import de.bund.digitalservice.ris.caselaw.domain.DependentLiteratureCitationType;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -24,8 +22,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @Entity
-@Table(schema = "incremental_migration", name = "dependent_literature_citation")
-public class DependentLiteratureCitationDTO {
+@Table(schema = "incremental_migration", name = "dependent_literature_active_citation")
+public class DependentLiteratureActiveCitationDTO {
   @Id private UUID id;
 
   private String author;
@@ -43,10 +41,6 @@ public class DependentLiteratureCitationDTO {
   @JoinColumn(name = "legal_periodical_id")
   @ManyToOne
   private LegalPeriodicalDTO legalPeriodical;
-
-  @Column(name = "dtype")
-  @Convert(converter = DependentLiteratureCitationTypeConverter.class)
-  private DependentLiteratureCitationType type;
 
   @ManyToOne
   @JoinColumn(name = "documentation_unit_id")
