@@ -32,6 +32,7 @@ public class RelatedDocumentationUnit {
   protected boolean referenceFound;
   protected DocumentationOffice documentationOffice;
   protected DocumentationOffice creatingDocOffice;
+  protected boolean hasPreviewAccess;
 
   @Transient
   public boolean isEmpty() {

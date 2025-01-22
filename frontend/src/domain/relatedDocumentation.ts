@@ -20,6 +20,7 @@ export default class RelatedDocumentation {
   public referenceFound?: boolean
   public documentationOffice?: DocumentationOffice
   public creatingDocOffice?: DocumentationOffice
+  public hasPreviewAccess?: boolean
 
   get hasForeignSource(): boolean {
     return this.documentNumber != null && !!this.referenceFound
