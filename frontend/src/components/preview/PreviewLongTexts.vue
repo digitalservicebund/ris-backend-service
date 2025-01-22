@@ -23,7 +23,7 @@ defineProps<{
       />
     </PreviewContent>
   </PreviewRow>
-  <PreviewRow v-if="longTexts.tenor" id="previewTenor">
+  <PreviewRow v-if="longTexts.tenor">
     <PreviewCategory>{{ longTextLabels.tenor }}</PreviewCategory>
     <PreviewContent>
       <TextEditor

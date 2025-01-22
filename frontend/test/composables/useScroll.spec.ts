@@ -138,8 +138,8 @@ describe("useScroll", () => {
       get: () => 200,
     })
 
-    const targetTenor = Object.create(HTMLElement.prototype)
-    Object.defineProperty(targetTenor, "offsetTop", {
+    const targetHeadnote = Object.create(HTMLElement.prototype)
+    Object.defineProperty(targetHeadnote, "offsetTop", {
       get: () => 300,
     })
 
@@ -151,8 +151,8 @@ describe("useScroll", () => {
       if (id === "previewGuidingPrinciple") {
         return targetGuidingPrinciple
       }
-      if (id === "previewTenor") {
-        return targetTenor
+      if (id === "previewHeadnote") {
+        return targetHeadnote
       }
       return null
     })
@@ -171,7 +171,7 @@ describe("useScroll", () => {
     })
   })
 
-  it("openSidePanelAndScrollToSection scrolls to 'previewTenor' if 'previewGuidingPrinciple' doesn't exist", async () => {
+  it("openSidePanelAndScrollToSection scrolls to 'previewHeadnote' if 'previewGuidingPrinciple' doesn't exist", async () => {
     // Arrange
     const documentUnitNumber = "12345"
 
@@ -181,8 +181,8 @@ describe("useScroll", () => {
       get: () => 50,
     })
 
-    const targetTenor = Object.create(HTMLElement.prototype)
-    Object.defineProperty(targetTenor, "offsetTop", {
+    const targetHeadnote = Object.create(HTMLElement.prototype)
+    Object.defineProperty(targetHeadnote, "offsetTop", {
       get: () => 300,
     })
 
@@ -194,8 +194,8 @@ describe("useScroll", () => {
       if (id === "previewGuidingPrinciple") {
         return null
       }
-      if (id === "previewTenor") {
-        return targetTenor
+      if (id === "previewHeadnote") {
+        return targetHeadnote
       }
       return null
     })
@@ -206,12 +206,12 @@ describe("useScroll", () => {
     vi.runAllTimers()
 
     expect(container.scrollTo).toHaveBeenCalledWith({
-      top: 250, // targetTenor.top - container.top => 300 - 50 = 250
+      top: 250, // targetHeadnote.top - container.top => 300 - 50 = 250
       behavior: "smooth",
     })
   })
 
-  it("openSidePanelAndScrollToSection scrolls to top if neither 'previewTenor' or 'previewGuidingPrinciple' exist", async () => {
+  it("openSidePanelAndScrollToSection scrolls to top if neither 'previewHeadnote' or 'previewGuidingPrinciple' exist", async () => {
     // Arrange
     const documentUnitNumber = "12345"
 
@@ -229,7 +229,7 @@ describe("useScroll", () => {
       if (id === "previewGuidingPrinciple") {
         return null
       }
-      if (id === "previewTenor") {
+      if (id === "previewHeadnote") {
         return null
       }
       return null

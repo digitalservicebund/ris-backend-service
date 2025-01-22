@@ -31,7 +31,7 @@ export function useScroll() {
         if (!container) return
         const target =
           document.getElementById("previewGuidingPrinciple") ??
-          document.getElementById("previewTenor")
+          document.getElementById("previewHeadnote")
         const scrollPosition = target
           ? target.offsetTop - container.offsetTop
           : 0
