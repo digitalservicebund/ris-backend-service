@@ -45,32 +45,32 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @Import({DocumentationUnitService.class, DatabaseDocumentationUnitStatusService.class})
 class DocumentationUnitServiceTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
-  @SpyBean private DocumentationUnitService service;
-  @MockBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
-  @MockBean private DocumentationUnitRepository repository;
-  @MockBean private DocumentNumberService documentNumberService;
-  @MockBean private DocumentNumberRecyclingService documentNumberRecyclingService;
-  @MockBean private MailService mailService;
-  @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
-  @MockBean private AttachmentService attachmentService;
-  @MockBean private PatchMapperService patchMapperService;
-  @MockBean private Validator validator;
-  @MockBean private OidcUser oidcUser;
-  @MockBean private AuthService authService;
-  @MockBean private DuplicateCheckService duplicateCheckService;
+  @MockitoSpyBean private DocumentationUnitService service;
+  @MockitoBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
+  @MockitoBean private DocumentationUnitRepository repository;
+  @MockitoBean private DocumentNumberService documentNumberService;
+  @MockitoBean private DocumentNumberRecyclingService documentNumberRecyclingService;
+  @MockitoBean private MailService mailService;
+  @MockitoBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  @MockitoBean private AttachmentService attachmentService;
+  @MockitoBean private PatchMapperService patchMapperService;
+  @MockitoBean private Validator validator;
+  @MockitoBean private OidcUser oidcUser;
+  @MockitoBean private AuthService authService;
+  @MockitoBean private DuplicateCheckService duplicateCheckService;
   @Captor private ArgumentCaptor<DocumentationUnitSearchInput> searchInputCaptor;
   @Captor private ArgumentCaptor<RelatedDocumentationUnit> relatedDocumentationUnitCaptor;
 

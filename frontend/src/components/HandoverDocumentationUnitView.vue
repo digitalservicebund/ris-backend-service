@@ -1,17 +1,24 @@
 <script lang="ts" setup>
+import { storeToRefs } from "pinia"
 import { computed, onMounted, ref } from "vue"
 import { RouterLink } from "vue-router"
 import ExpandableContent from "./ExpandableContent.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
 import { InfoStatus } from "@/components/enumInfoStatus"
+import HandoverDuplicateCheckView from "@/components/HandoverDuplicateCheckView.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import ScheduledPublishingDateTime from "@/components/ScheduledPublishingDateTime.vue"
 import TitleElement from "@/components/TitleElement.vue"
+import { useFeatureToggle } from "@/composables/useFeatureToggle"
 import ActiveCitation, { activeCitationLabels } from "@/domain/activeCitation"
-import { longTextLabels, shortTextLabels } from "@/domain/documentUnit"
+import {
+  DuplicateRelationStatus,
+  longTextLabels,
+  shortTextLabels,
+} from "@/domain/documentUnit"
 import EnsuingDecision, {
   ensuingDecisionFieldLabels,
 } from "@/domain/ensuingDecision"
@@ -28,6 +35,7 @@ import borderNumberService from "@/services/borderNumberService"
 import handoverDocumentationUnitService from "@/services/handoverDocumentationUnitService"
 import { ResponseError } from "@/services/httpClient"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
+import useSessionStore from "@/stores/sessionStore"
 import IconCheck from "~icons/ic/baseline-check"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
 import IconKeyboardArrowDown from "~icons/ic/baseline-keyboard-arrow-down"
@@ -44,6 +52,8 @@ const emits = defineEmits<{
 }>()
 
 const store = useDocumentUnitStore()
+const sessionStore = useSessionStore()
+const { env } = storeToRefs(sessionStore)
 
 const categoriesRoute = computed(() => ({
   name: "caselaw-documentUnit-documentNumber-categories",
@@ -59,6 +69,7 @@ const previewError = ref()
 const errorMessage = computed(
   () => frontendError.value ?? previewError.value ?? props.errorMessage,
 )
+const isDuplicateFeatureActive = useFeatureToggle("neuris.duplicate-check")
 
 onMounted(async () => {
   // Save doc unit in case there are any unsaved local changes before fetching xml preview
@@ -118,6 +129,12 @@ function handoverDocumentUnit() {
 //Required Core Data fields
 const missingCoreDataFields = ref(
   store.documentUnit!.missingRequiredFields.map((field) => fieldLabels[field]),
+)
+
+const pendingDuplicates = ref(
+  store.documentUnit!.managementData.duplicateRelations.filter(
+    (relation) => relation.status === DuplicateRelationStatus.PENDING,
+  ),
 )
 
 //Required Previous Decision fields
@@ -310,7 +327,8 @@ const isPublishable = computed<boolean>(
     !fieldsMissing.value &&
     !isCaseFactsInvalid.value &&
     !isDecisionReasonsInvalid.value &&
-    !!preview.value?.success,
+    !!preview.value?.success &&
+    (pendingDuplicates.value.length === 0 || !isDuplicateFeatureActive.value),
 )
 </script>
 
@@ -475,7 +493,7 @@ const isPublishable = computed<boolean>(
         </div>
         <div v-else class="flex flex-row gap-8">
           <IconCheck class="text-green-700" />
-          <p>Alle Pflichtfelder sind korrekt ausgefüllt</p>
+          <p>Alle Pflichtfelder sind korrekt ausgefüllt.</p>
         </div>
       </div>
       <div aria-label="Randnummernprüfung" class="flex flex-col">
@@ -494,7 +512,7 @@ const isPublishable = computed<boolean>(
               >
                 Die Reihenfolge der Randnummern ist nicht korrekt.
                 <dl class="my-16">
-                  <div class="grid grid-cols-3 gap-24 px-0">
+                  <div class="grid grid-cols-2 gap-24 px-0">
                     <dt class="ds-label-02-bold self-center">Rubrik</dt>
                     <dd class="ds-body-02-reg">
                       {{
@@ -504,7 +522,7 @@ const isPublishable = computed<boolean>(
                       }}
                     </dd>
                   </div>
-                  <div class="grid grid-cols-3 gap-24 px-0">
+                  <div class="grid grid-cols-2 gap-24 px-0">
                     <dt class="ds-label-02-bold self-center">
                       Erwartete Randnummer
                     </dt>
@@ -512,7 +530,7 @@ const isPublishable = computed<boolean>(
                       {{ borderNumberValidationResult.expectedBorderNumber }}
                     </dd>
                   </div>
-                  <div class="grid grid-cols-3 gap-24 px-0">
+                  <div class="grid grid-cols-2 gap-24 px-0">
                     <dt class="ds-label-02-bold self-center">
                       Tatsächliche Randnummer
                     </dt>
@@ -564,7 +582,7 @@ const isPublishable = computed<boolean>(
           class="flex flex-row gap-8"
         >
           <IconCheck class="text-green-700" />
-          <p>Die Reihenfolge der Randnummern ist korrekt</p>
+          <p>Die Reihenfolge der Randnummern ist korrekt.</p>
         </div>
         <div
           v-if="showRecalculatingBorderNumbersFakeDelay"
@@ -574,6 +592,11 @@ const isPublishable = computed<boolean>(
           <p>Die Randnummern werden neu berechnet</p>
         </div>
       </div>
+      <HandoverDuplicateCheckView
+        v-if="isDuplicateFeatureActive"
+        :document-number="store.documentUnit!.documentNumber"
+        :pending-duplicates="pendingDuplicates"
+      />
       <div class="border-b-1 border-b-gray-400"></div>
 
       <ExpandableContent
@@ -619,6 +642,18 @@ const isPublishable = computed<boolean>(
         @close-modal="showHandoverModal = false"
         @primary-action="confirmHandoverDialog"
       />
+
+      <InfoModal
+        v-if="env === 'uat'"
+        :description="[
+          'Dokumentationseinheiten werden in der jDV ohne Dokumentnummer erstellt',
+          'Diese sind auffindbar über Gericht=VGH Mannheim und Aktenzeichen und/oder Entscheidungsdatum der Entscheidung',
+          'Die Dokumentationseinheiten müssen manuell in der jDV gelöscht werden',
+        ]"
+        :status="InfoStatus.INFO"
+        title="UAT Testmodus für die Übergabe an die jDV"
+      />
+
       <TextButton
         aria-label="Dokumentationseinheit an jDV übergeben"
         button-type="primary"

@@ -76,6 +76,7 @@ import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
+import de.bund.digitalservice.ris.caselaw.webtestclient.RisBodySpec;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.net.URI;
 import java.time.LocalDate;
@@ -89,10 +90,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -150,23 +151,23 @@ class DocumentationUnitIntegrationTest {
   @Autowired private DatabaseDeletedDocumentationIdsRepository deletedDocumentationIdsRepository;
   @Autowired private AuthService authService;
 
-  @MockBean private S3AsyncClient s3AsyncClient;
-  @MockBean private MailService mailService;
-  @MockBean private DocxConverterService docxConverterService;
-  @MockBean private UserGroupService userGroupService;
-  @MockBean private ClientRegistrationRepository clientRegistrationRepository;
-  @MockBean private AttachmentService attachmentService;
-  @MockBean private PatchMapperService patchMapperService;
-  @MockBean private HandoverService handoverService;
-  @MockBean private LdmlExporterService ldmlExporterService;
-  @MockBean private DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
-  @MockBean private DuplicateCheckService duplicateCheckService;
+  @MockitoBean private S3AsyncClient s3AsyncClient;
+  @MockitoBean private MailService mailService;
+  @MockitoBean private DocxConverterService docxConverterService;
+  @MockitoBean private UserGroupService userGroupService;
+  @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
+  @MockitoBean private AttachmentService attachmentService;
+  @MockitoBean private PatchMapperService patchMapperService;
+  @MockitoBean private HandoverService handoverService;
+  @MockitoBean private LdmlExporterService ldmlExporterService;
+  @MockitoBean private DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
+  @MockitoBean private DuplicateCheckService duplicateCheckService;
 
-  @MockBean
+  @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
 
-  @MockBean DocumentNumberPatternConfig documentNumberPatternConfig;
+  @MockitoBean DocumentNumberPatternConfig documentNumberPatternConfig;
 
   private final DocumentationOffice docOffice = buildDSDocOffice();
   private DocumentationOfficeDTO documentationOffice;
@@ -484,8 +485,7 @@ class DocumentationUnitIntegrationTest {
 
   @Test
   void testSetRegionForCourt() {
-    RegionDTO region =
-        regionRepository.save(RegionDTO.builder().id(UUID.randomUUID()).code("DEU").build());
+    RegionDTO region = regionRepository.save(RegionDTO.builder().code("DEU").build());
 
     CourtDTO bghCourt =
         databaseCourtRepository.save(
@@ -793,7 +793,6 @@ class DocumentationUnitIntegrationTest {
       EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
           repository,
           DocumentationUnitDTO.builder()
-              .id(UUID.randomUUID())
               .documentNumber(documentNumbers.get(i))
               .court(court)
               .decisionDate(decisionDates.get(i))
@@ -805,6 +804,13 @@ class DocumentationUnitIntegrationTest {
           errorStatuses.get(i));
     }
 
+    DocumentationOfficeDTO otherDocumentationOffice =
+        documentationOfficeRepository.findByAbbreviation("BGH");
+    String documentNumber = "1234567890123";
+
+    EntityBuilderTestUtil.createAndSavePendingDocumentationUnit(
+        repository, otherDocumentationOffice, documentationOffice, documentNumber);
+
     // no search criteria
     DocumentationUnitSearchInput searchInput = DocumentationUnitSearchInput.builder().build();
     // the unpublished one from the other docoffice is not in it, the others are ordered
@@ -812,6 +818,10 @@ class DocumentationUnitIntegrationTest {
     assertThat(extractDocumentNumbersFromSearchCall(searchInput))
         .contains(
             "ABCD202300007", "EFGH202200123", "IJKL202101234", "MNOP202300099", "UVWX202311090");
+
+    // pending docunits are only visible in the big search, if I am the owning docoffice (not the
+    // creating)
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).doesNotContain("1234567890123");
 
     // by documentNumber
     searchInput = DocumentationUnitSearchInput.builder().documentNumber("abc").build();
@@ -906,7 +916,6 @@ class DocumentationUnitIntegrationTest {
     EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
         repository,
         DocumentationUnitDTO.builder()
-            .id(UUID.randomUUID())
             .documentNumber("documentNumber")
             .decisionDate(LocalDate.parse("2021-01-02"))
             .documentationOffice(documentationOffice)
@@ -982,6 +991,86 @@ class DocumentationUnitIntegrationTest {
             .getContent();
 
     return content.stream().map(DocumentationUnitListItem::documentNumber).toList();
+  }
+
+  @Test
+  void
+      testSearchLinkableDocumentationUnits_shouldOnlyFindPublishedOrMineOrPendingWhenCreatingDocoffice() {
+    LocalDate date = LocalDate.parse("2023-02-02");
+
+    var du1 =
+        createDocumentationUnit(date, List.of("AkteZ"), "DS", PublicationStatus.UNPUBLISHED, null);
+    var du2 =
+        createDocumentationUnit(date, List.of("AkteZ"), "DS", PublicationStatus.PUBLISHED, null);
+    var du3 =
+        createDocumentationUnit(
+            date, List.of("AkteZ"), "DS", PublicationStatus.EXTERNAL_HANDOVER_PENDING, "BGH");
+    var du4 =
+        createDocumentationUnit(
+            date, List.of("AkteZ"), "CC-RIS", PublicationStatus.UNPUBLISHED, null);
+    var du5 =
+        createDocumentationUnit(
+            date, List.of("AkteZ"), "CC-RIS", PublicationStatus.PUBLISHED, null);
+    var du6 =
+        createDocumentationUnit(
+            date, List.of("AkteZ"), "CC-RIS", PublicationStatus.EXTERNAL_HANDOVER_PENDING, "DS");
+
+    RisBodySpec<SliceTestImpl<RelatedDocumentationUnit>> risBody =
+        risWebTestClient
+            .withDefaultLogin()
+            .put()
+            .uri(
+                "/api/v1/caselaw/documentunits/search-linkable-documentation-units?pg=0&sz=30&documentNumber=KORE000000000")
+            .bodyValue(RelatedDocumentationUnit.builder().fileNumber("AkteZ").build())
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(new TypeReference<>() {});
+    List<RelatedDocumentationUnit> content = risBody.returnResult().getResponseBody().getContent();
+    assertThat(content).hasSize(5);
+    assertThat(content)
+        .extracting(RelatedDocumentationUnit::getDocumentNumber)
+        .doesNotContain(du4.getDocumentNumber())
+        .containsExactlyInAnyOrder(
+            du1.getDocumentNumber(),
+            du2.getDocumentNumber(),
+            du3.getDocumentNumber(),
+            du5.getDocumentNumber(),
+            du6.getDocumentNumber());
+  }
+
+  private DocumentationUnitDTO createDocumentationUnit(
+      LocalDate decisionDate,
+      List<String> fileNumbers,
+      String documentOfficeLabel,
+      PublicationStatus status,
+      String creatingDocOfficeLabel) {
+
+    DocumentationOfficeDTO documentOffice =
+        documentationOfficeRepository.findByAbbreviation(documentOfficeLabel);
+
+    DocumentationOfficeDTO creatingDocOffice = null;
+    if (creatingDocOfficeLabel != null) {
+      creatingDocOffice = documentationOfficeRepository.findByAbbreviation(creatingDocOfficeLabel);
+    }
+    assertThat(documentOffice).isNotNull();
+
+    return EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+        repository,
+        DocumentationUnitDTO.builder()
+            .documentationOffice(documentOffice)
+            .creatingDocumentationOffice(creatingDocOffice)
+            .documentNumber("XX" + RandomStringUtils.randomAlphanumeric(11))
+            .decisionDate(decisionDate)
+            .documentationOffice(documentOffice)
+            .fileNumbers(
+                fileNumbers == null
+                    ? new ArrayList<>()
+                    : new ArrayList<>(
+                        fileNumbers.stream()
+                            .map(fn -> FileNumberDTO.builder().value(fn).rank(1L).build())
+                            .toList())),
+        status);
   }
 
   @Test

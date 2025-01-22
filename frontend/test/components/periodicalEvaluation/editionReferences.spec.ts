@@ -66,6 +66,8 @@ async function renderComponent(options?: { references?: Reference[] }) {
 
 describe("Legal periodical edition evaluation", () => {
   beforeEach(async () => {
+    window.scrollTo = vi.fn()
+
     const legalPeriodical: LegalPeriodical = {
       uuid: "1",
       abbreviation: "BDZ",
@@ -111,6 +113,10 @@ describe("Legal periodical edition evaluation", () => {
       status: 200,
       data: true,
     })
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
   })
 
   it("reference supplement (Klammernzusatz) should display validation on blur and hide on focus", async () => {
@@ -264,7 +270,6 @@ describe("Legal periodical edition evaluation", () => {
             status: { publicationStatus: "UNPUBLISHED" },
             fileNumber: "file123",
             createdByReference: "id",
-            referenceFound: true,
           } as RelatedDocumentation,
         } as Reference,
       ],
@@ -303,8 +308,6 @@ describe("Legal periodical edition evaluation", () => {
               publicationStatus: PublicationState.EXTERNAL_HANDOVER_PENDING,
               withError: false,
             },
-
-            referenceFound: true,
           } as RelatedDocumentation,
         } as Reference,
       ],

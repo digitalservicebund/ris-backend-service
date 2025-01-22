@@ -8,8 +8,8 @@ import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
+import { useScroll } from "@/composables/useScroll"
 import { useValidationStore } from "@/composables/useValidationStore"
-import values from "@/data/values.json"
 import ActiveCitation from "@/domain/activeCitation"
 import { CitationType } from "@/domain/citationType"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
@@ -28,6 +28,7 @@ const emit = defineEmits<{
   removeEntry: [value?: boolean]
 }>()
 
+const { scrollIntoViewportById } = useScroll()
 const lastSearchInput = ref(new ActiveCitation())
 const lastSavedModelValue = ref(new ActiveCitation({ ...props.modelValue }))
 const activeCitation = ref(new ActiveCitation({ ...props.modelValue }))
@@ -149,26 +150,11 @@ async function addActiveCitationFromSearch(decision: RelatedDocumentation) {
   } as CitationType
   activeCitation.value = new ActiveCitation({
     ...decision,
-    referenceFound: true,
     citationType: newActiveCitationType,
   })
   emit("update:modelValue", activeCitation.value as ActiveCitation)
   emit("addEntry")
-  scrollToTop()
-}
-
-function scrollToTop() {
-  const element = document.getElementById("activeCitations")
-  if (element) {
-    const headerOffset = values.headerOffset
-    const elementPosition = element?.getBoundingClientRect().top
-    const offsetPosition = elementPosition + window.scrollY - headerOffset
-
-    window.scrollTo({
-      top: offsetPosition,
-      behavior: "smooth",
-    })
-  }
+  await scrollIntoViewportById("activeCitations")
 }
 
 function updateDateFormatValidation(

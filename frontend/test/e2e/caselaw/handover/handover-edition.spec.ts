@@ -57,7 +57,7 @@ test.describe(
           )
 
           await expect(
-            page.getByText("Die Ausgabe enthält 2 Fundstellen"),
+            page.getByText("Die Ausgabe enthält 4 Fundstellen"),
           ).toBeVisible()
 
           await expect(page.getByText("XML Vorschau")).toBeVisible()
@@ -96,13 +96,13 @@ test.describe(
           await expect(
             page.getByText(
               editionWithReferences.references?.[0]?.documentationUnit
-                ?.documentNumber + ".XML",
+                ?.documentNumber + "_1.XML",
             ),
           ).toBeVisible()
           await expect(
             page.getByText(
               editionWithReferences.references?.[1]?.documentationUnit
-                ?.documentNumber + ".XML",
+                ?.documentNumber + "_1.XML",
             ),
           ).toBeVisible()
         })

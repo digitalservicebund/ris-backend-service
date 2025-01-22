@@ -250,7 +250,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
     ).toBeVisible()
 
     await expect(
-      page.getByText("Alle Pflichtfelder sind korrekt ausgefüllt"),
+      page.getByText("Alle Pflichtfelder sind korrekt ausgefüllt."),
     ).toBeVisible()
 
     await expect(
@@ -284,7 +284,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
       await expect(page.getByText("unveröffentlicht")).toBeVisible()
 
       await expect(
-        page.getByText("Alle Pflichtfelder sind korrekt ausgefüllt"),
+        page.getByText("Alle Pflichtfelder sind korrekt ausgefüllt."),
       ).toBeVisible()
 
       await page
@@ -339,7 +339,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
       await navigateToHandover(page, prefilledDocumentUnit.documentNumber!)
 
       await expect(
-        page.getByText("Alle Pflichtfelder sind korrekt ausgefüllt"),
+        page.getByText("Alle Pflichtfelder sind korrekt ausgefüllt."),
       ).toBeVisible()
 
       await test.step("Fehler in der Randnummerprüfung werden angezeigt", async () => {
@@ -384,7 +384,7 @@ test.describe("ensuring the handover of documentunits works as expected", () => 
           page.getByText("Die Randnummern werden neu berechnet"),
         ).toBeVisible()
         await expect(
-          page.getByText("Die Reihenfolge der Randnummern ist korrekt"),
+          page.getByText("Die Reihenfolge der Randnummern ist korrekt."),
           // The loading spinner is shown for 3s (artificial delay)
         ).toBeVisible({ timeout: 5_000 })
       })

@@ -3,11 +3,9 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO.ActiveCitationDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CitationTypeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -25,8 +23,6 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
               .build();
     }
 
-    Optional<DocumentationUnitDTO> referencedDocumentationUnit =
-        Optional.ofNullable(activeCitationDTO.getReferencedDocumentationUnit());
     return ActiveCitation.builder()
         .uuid(activeCitationDTO.getId())
         .documentNumber(activeCitationDTO.getDocumentNumber())
@@ -35,7 +31,6 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
         .documentType(getDocumentTypeFromDTO(activeCitationDTO.getDocumentType()))
         .decisionDate(activeCitationDTO.getDate())
         .citationType(citationType)
-        .referenceFound(referencedDocumentationUnit.isPresent())
         .build();
   }
 
@@ -46,7 +41,7 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
 
     ActiveCitationDTOBuilder<?, ?> activeCitationDTOBuilder =
         ActiveCitationDTO.builder()
-            .id(activeCitation.getUuid())
+            .id(activeCitation.isNewEntry() ? null : activeCitation.getUuid())
             .court(getCourtFromDomain(activeCitation.getCourt()))
             .date(activeCitation.getDecisionDate())
             .documentNumber(activeCitation.getDocumentNumber())

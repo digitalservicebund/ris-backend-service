@@ -93,6 +93,17 @@
       "labels": [
         "no-automerge"
       ]
+    },
+    {
+      // due to aws upgrade problem
+      "groupName": "blocked-aws-header-error",
+      "matchPackageNames": [
+        "software.amazon.awssdk:bom",
+      ],
+      "automerge": false,
+      "labels": [
+        "no-automerge"
+      ]
     }
   ]
 }

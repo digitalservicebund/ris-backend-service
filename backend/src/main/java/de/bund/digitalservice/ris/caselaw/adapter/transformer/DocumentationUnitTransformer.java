@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionNameDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
@@ -16,8 +17,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -39,14 +42,17 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -118,7 +124,7 @@ public class DocumentationUnitTransformer {
     }
 
     addPreviousDecisions(updatedDomainObject, builder);
-    addEnsuingAndPendingDecisions(updatedDomainObject, builder);
+    addEnsuingAndPendingDecisions(updatedDomainObject, builder, currentDto);
 
     if (updatedDomainObject.contentRelatedIndexing() != null) {
       ContentRelatedIndexing contentRelatedIndexing = updatedDomainObject.contentRelatedIndexing();
@@ -158,43 +164,68 @@ public class DocumentationUnitTransformer {
       builder.scheduledByEmail(managementData.scheduledByEmail());
     }
 
-    addReferences(updatedDomainObject, builder);
-    addDependentLiteratureCitations(updatedDomainObject, builder);
+    addCaselawReferences(updatedDomainObject, builder, currentDto);
+    addLiteratureReferences(updatedDomainObject, builder, currentDto);
 
     return builder.build();
   }
 
-  private static void addReferences(
-      DocumentationUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
-    AtomicInteger i = new AtomicInteger(1);
-    builder.references(
+  private static void addCaselawReferences(
+      DocumentationUnit updatedDomainObject,
+      DocumentationUnitDTOBuilder builder,
+      DocumentationUnitDTO currentDTO) {
+    AtomicInteger rank = new AtomicInteger(0);
+    builder.caselawReferences(
         updatedDomainObject.references() == null
             ? Collections.emptyList()
             : updatedDomainObject.references().stream()
                 .map(ReferenceTransformer::transformToDTO)
                 .map(
                     referenceDTO -> {
-                      // TODO why is this necessary?
-                      referenceDTO.setDocumentationUnit(builder.build());
-                      referenceDTO.setRank(i.getAndIncrement());
-                      return referenceDTO;
+                      referenceDTO.setDocumentationUnit(builder.build()); // TODO needed?
+                      referenceDTO.setDocumentationUnitRank(rank.incrementAndGet());
+
+                      var existingReference =
+                          currentDTO.getCaselawReferences().stream()
+                              .filter(existing -> referenceDTO.getId().equals(existing.getId()))
+                              .findFirst();
+                      existingReference.ifPresent(
+                          caselawReferenceDTO -> {
+                            referenceDTO.setEditionRank(caselawReferenceDTO.getEditionRank());
+                            referenceDTO.setEdition(caselawReferenceDTO.getEdition());
+                          });
+
+                      return (CaselawReferenceDTO) referenceDTO;
                     })
                 .toList());
   }
 
-  private static void addDependentLiteratureCitations(
-      DocumentationUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
-    AtomicInteger i = new AtomicInteger(1);
-    builder.dependentLiteratureCitations(
+  private static void addLiteratureReferences(
+      DocumentationUnit updatedDomainObject,
+      DocumentationUnitDTOBuilder builder,
+      DocumentationUnitDTO currentDTO) {
+    AtomicInteger rank = new AtomicInteger(0);
+    builder.literatureReferences(
         updatedDomainObject.literatureReferences() == null
             ? Collections.emptyList()
             : updatedDomainObject.literatureReferences().stream()
-                .map(DependentLiteratureTransformer::transformToDTO)
+                .map(ReferenceTransformer::transformToDTO)
                 .map(
                     referenceDTO -> {
-                      referenceDTO.setDocumentationUnit(builder.build());
-                      referenceDTO.setRank(i.getAndIncrement());
-                      return referenceDTO;
+                      referenceDTO.setDocumentationUnit(builder.build()); // TODO needed?
+                      referenceDTO.setDocumentationUnitRank(rank.incrementAndGet());
+
+                      var existingReference =
+                          currentDTO.getLiteratureReferences().stream()
+                              .filter(existing -> referenceDTO.getId().equals(existing.getId()))
+                              .findFirst();
+                      existingReference.ifPresent(
+                          literatureReferenceDTO -> {
+                            referenceDTO.setEditionRank(literatureReferenceDTO.getEditionRank());
+                            referenceDTO.setEdition(literatureReferenceDTO.getEdition());
+                          });
+
+                      return (LiteratureReferenceDTO) referenceDTO;
                     })
                 .toList());
   }
@@ -359,12 +390,19 @@ public class DocumentationUnitTransformer {
   }
 
   private static void addEnsuingAndPendingDecisions(
-      DocumentationUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
+      DocumentationUnit updatedDomainObject,
+      DocumentationUnitDTOBuilder builder,
+      DocumentationUnitDTO currentDTO) {
     List<EnsuingDecision> ensuingDecisions = updatedDomainObject.ensuingDecisions();
-    if (ensuingDecisions != null) {
 
-      List<EnsuingDecisionDTO> ensuingDecisionDTOs = new ArrayList<>();
-      List<PendingDecisionDTO> pendingDecisionDTOs = new ArrayList<>();
+    List<EnsuingDecisionDTO> ensuingDecisionDTOs = new ArrayList<>();
+    List<PendingDecisionDTO> pendingDecisionDTOs = new ArrayList<>();
+
+    if (ensuingDecisions != null) {
+      List<UUID> ensuingDecisionIds =
+          currentDTO.getEnsuingDecisions().stream().map(EnsuingDecisionDTO::getId).toList();
+      List<UUID> pendingDecisionIds =
+          currentDTO.getPendingDecisions().stream().map(PendingDecisionDTO::getId).toList();
 
       AtomicInteger i = new AtomicInteger(1);
       for (EnsuingDecision ensuingDecision : ensuingDecisions) {
@@ -372,6 +410,9 @@ public class DocumentationUnitTransformer {
           PendingDecisionDTO pendingDecisionDTO =
               PendingDecisionTransformer.transformToDTO(ensuingDecision);
           if (pendingDecisionDTO != null) {
+            if (ensuingDecisionIds.contains(pendingDecisionDTO.getId())) {
+              pendingDecisionDTO.setId(null);
+            }
             pendingDecisionDTO.setRank(i.getAndIncrement());
             pendingDecisionDTOs.add(pendingDecisionDTO);
           }
@@ -379,15 +420,18 @@ public class DocumentationUnitTransformer {
           EnsuingDecisionDTO ensuingDecisionDTO =
               EnsuingDecisionTransformer.transformToDTO(ensuingDecision);
           if (ensuingDecisionDTO != null) {
+            if (pendingDecisionIds.contains(ensuingDecisionDTO.getId())) {
+              ensuingDecisionDTO.setId(null);
+            }
             ensuingDecisionDTO.setRank(i.getAndIncrement());
             ensuingDecisionDTOs.add(ensuingDecisionDTO);
           }
         }
       }
-
-      builder.ensuingDecisions(ensuingDecisionDTOs.stream().toList());
-      builder.pendingDecisions(pendingDecisionDTOs.stream().toList());
     }
+
+    builder.ensuingDecisions(ensuingDecisionDTOs);
+    builder.pendingDecisions(pendingDecisionDTOs);
   }
 
   private static void addPreviousDecisions(
@@ -740,22 +784,7 @@ public class DocumentationUnitTransformer {
             documentationUnitDTO.getOtherLongText(),
             documentationUnitDTO.getDissentingOpinion());
 
-    Set<DuplicateRelation> duplicateRelations =
-        Stream.concat(
-                documentationUnitDTO.getDuplicateRelations1().stream()
-                    .filter(
-                        relation ->
-                            isPublishedDuplicateOrSameDocOffice(
-                                documentationUnitDTO, relation.getDocumentationUnit2())),
-                documentationUnitDTO.getDuplicateRelations2().stream()
-                    .filter(
-                        relation ->
-                            isPublishedDuplicateOrSameDocOffice(
-                                documentationUnitDTO, relation.getDocumentationUnit1())))
-            .map(
-                relation ->
-                    DuplicateRelationTransformer.transformToDomain(relation, documentationUnitDTO))
-            .collect(Collectors.toSet());
+    List<DuplicateRelation> duplicateRelations = transformDuplicateRelations(documentationUnitDTO);
 
     ManagementData managementData =
         ManagementData.builder()
@@ -777,53 +806,59 @@ public class DocumentationUnitTransformer {
         .shortTexts(shortTexts)
         .longTexts(longTexts)
         .contentRelatedIndexing(contentRelatedIndexing)
-        .managementData(managementData);
+        .managementData(managementData)
+        .references(
+            documentationUnitDTO.getCaselawReferences() == null
+                ? new ArrayList<>()
+                : documentationUnitDTO.getCaselawReferences().stream()
+                    .map(ReferenceTransformer::transformToDomain)
+                    .toList())
+        .literatureReferences(
+            documentationUnitDTO.getLiteratureReferences() == null
+                ? new ArrayList<>()
+                : documentationUnitDTO.getLiteratureReferences().stream()
+                    .map(ReferenceTransformer::transformToDomain)
+                    .toList());
 
     addStatusToDomain(documentationUnitDTO, builder);
-    addReferencesToDomain(documentationUnitDTO, builder);
-    addLiteratureReferencesToDomain(documentationUnitDTO, builder);
 
     return builder.build();
   }
 
+  @NotNull
+  private static List<DuplicateRelation> transformDuplicateRelations(
+      DocumentationUnitDTO documentationUnitDTO) {
+    return Stream.concat(
+            documentationUnitDTO.getDuplicateRelations1().stream()
+                .filter(
+                    relation ->
+                        isPublishedDuplicateOrSameDocOffice(
+                            documentationUnitDTO, relation.getDocumentationUnit2())),
+            documentationUnitDTO.getDuplicateRelations2().stream()
+                .filter(
+                    relation ->
+                        isPublishedDuplicateOrSameDocOffice(
+                            documentationUnitDTO, relation.getDocumentationUnit1())))
+        .map(
+            relation ->
+                DuplicateRelationTransformer.transformToDomain(relation, documentationUnitDTO))
+        .sorted(
+            Comparator.comparing(
+                    (DuplicateRelation relation) ->
+                        Optional.ofNullable(relation.decisionDate()).orElse(LocalDate.MIN),
+                    Comparator.reverseOrder())
+                .thenComparing(DuplicateRelation::documentNumber))
+        .toList();
+  }
+
   private static Boolean isPublishedDuplicateOrSameDocOffice(
       DocumentationUnitDTO original, DocumentationUnitDTO duplicate) {
+    var duplicateStatus =
+        Optional.ofNullable(duplicate.getStatus())
+            .map(StatusDTO::getPublicationStatus)
+            .orElse(null);
     return original.getDocumentationOffice().equals(duplicate.getDocumentationOffice())
-        || duplicate.getStatus().getPublicationStatus().equals(PublicationStatus.PUBLISHED);
-  }
-
-  private static void addReferencesToDomain(
-      DocumentationUnitDTO documentationUnitDTO,
-      DocumentationUnit.DocumentationUnitBuilder builder) {
-
-    builder.references(new ArrayList<>());
-
-    if (documentationUnitDTO.getReferences() != null) {
-      builder
-          .build()
-          .references()
-          .addAll(
-              documentationUnitDTO.getReferences().stream()
-                  .map(ReferenceTransformer::transformToDomain)
-                  .toList());
-    }
-  }
-
-  private static void addLiteratureReferencesToDomain(
-      DocumentationUnitDTO documentationUnitDTO,
-      DocumentationUnit.DocumentationUnitBuilder builder) {
-
-    builder.literatureReferences(new ArrayList<>());
-
-    if (documentationUnitDTO.getDependentLiteratureCitations() != null) {
-      builder
-          .build()
-          .literatureReferences()
-          .addAll(
-              documentationUnitDTO.getDependentLiteratureCitations().stream()
-                  .map(DependentLiteratureTransformer::transformToDomain)
-                  .toList());
-    }
+        || PublicationStatus.PUBLISHED.equals(duplicateStatus);
   }
 
   /**
@@ -997,12 +1032,13 @@ public class DocumentationUnitTransformer {
       return;
     }
 
-    int size =
-        getEnsuingDecisionListSize(
-            documentationUnitDTO.getEnsuingDecisions(), documentationUnitDTO.getPendingDecisions());
-
     List<EnsuingDecision> withoutRank = new ArrayList<>();
-    EnsuingDecision[] ensuingDecisions = new EnsuingDecision[size];
+
+    EnsuingDecision[] ensuingDecisions =
+        new EnsuingDecision
+            [getEnsuingDecisionListSize(
+                documentationUnitDTO.getEnsuingDecisions(),
+                documentationUnitDTO.getPendingDecisions())];
 
     addEnsuingDecisionToDomain(
         documentationUnitDTO.getEnsuingDecisions(), withoutRank, ensuingDecisions);

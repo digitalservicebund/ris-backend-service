@@ -25,22 +25,25 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@Import({PostgresCourtRepositoryImpl.class})
+@Import({
+  DocumentationUnitDocxMetadataInitializationService.class,
+  PostgresCourtRepositoryImpl.class
+})
 class DocumentationUnitDocxMetadataInitializationServiceTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
-  @SpyBean private DocumentationUnitDocxMetadataInitializationService service;
+  @MockitoSpyBean private DocumentationUnitDocxMetadataInitializationService service;
 
   @Autowired private CourtRepository courtRepository;
 
-  @MockBean private DocumentationUnitRepository repository;
-  @MockBean private DatabaseCourtRepository databaseCourtRepository;
-  @MockBean private DocumentTypeRepository documentTypeRepository;
+  @MockitoBean private DocumentationUnitRepository repository;
+  @MockitoBean private DatabaseCourtRepository databaseCourtRepository;
+  @MockitoBean private DocumentTypeRepository documentTypeRepository;
 
   private DocumentationUnit documentationUnit;
 
@@ -142,14 +145,14 @@ class DocumentationUnitDocxMetadataInitializationServiceTest {
             .fileNumbers(List.of())
             .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
             .build();
-    DocumentationUnit documentationUnit = DocumentationUnit.builder().coreData(coreData).build();
-    when(repository.findByUuid(TEST_UUID)).thenReturn(documentationUnit);
+    DocumentationUnit docUnit = DocumentationUnit.builder().coreData(coreData).build();
+    when(repository.findByUuid(TEST_UUID)).thenReturn(docUnit);
 
     Map<DocxMetadataProperty, String> properties =
         Map.of(DocxMetadataProperty.LEGAL_EFFECT, "Nein");
     Docx2Html docx2html = new Docx2Html(null, List.of(), properties);
 
-    service.initializeCoreData(documentationUnit, docx2html);
+    service.initializeCoreData(docUnit, docx2html);
 
     ArgumentCaptor<DocumentationUnit> documentationUnitCaptor =
         ArgumentCaptor.forClass(DocumentationUnit.class);

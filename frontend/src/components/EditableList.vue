@@ -208,6 +208,11 @@ watch(
     deep: true,
   },
 )
+
+// Expose the method
+defineExpose({
+  toggleDisplayDefaultValue,
+})
 </script>
 
 <template>

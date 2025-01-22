@@ -1,4 +1,5 @@
 import dayjs from "dayjs"
+import DocumentationOffice from "./documentationOffice"
 import { Court, DocumentType } from "./documentUnit"
 import {
   Label,
@@ -8,6 +9,7 @@ import {
 
 export default class RelatedDocumentation {
   public uuid?: string
+  public newEntry: boolean
   public documentNumber?: string
   public status?: PublicationStatus
   public deviatingFileNumber?: string
@@ -16,14 +18,20 @@ export default class RelatedDocumentation {
   public fileNumber?: string
   public documentType?: DocumentType
   public createdByReference?: string
-  public referenceFound?: boolean
+  public documentationOffice?: DocumentationOffice
+  public creatingDocOffice?: DocumentationOffice
 
   get hasForeignSource(): boolean {
-    return this.documentNumber != null && !!this.referenceFound
+    return this.documentNumber != null
   }
 
   constructor(data: Partial<RelatedDocumentation> = {}) {
     Object.assign(this, data)
+
+    this.newEntry = false
+    if (data.uuid == undefined) {
+      this.newEntry = true
+    }
   }
 
   public isLinkedWith<Type extends RelatedDocumentation>(

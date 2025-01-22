@@ -31,7 +31,7 @@ const defaultValue = new Reference() as Reference
   <div class="flex w-full flex-1 grow flex-col p-24">
     <div aria-label="Fundstellen" class="flex flex-col gap-24 bg-white p-24">
       <TitleElement>Fundstellen</TitleElement>
-      <div class="flex flex-row">
+      <div class="flex flex-row" data-testid="caselaw-reference-list">
         <EditableList
           v-model="caselawReferences"
           :default-value="defaultValue"
@@ -41,7 +41,7 @@ const defaultValue = new Reference() as Reference
       </div>
 
       <TitleElement>Literaturfundstellen</TitleElement>
-      <div class="flex flex-row">
+      <div class="flex flex-row" data-testid="literature-reference-list">
         <EditableList
           v-model="literatureReferences"
           :default-value="defaultValue"

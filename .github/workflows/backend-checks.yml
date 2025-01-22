@@ -34,12 +34,12 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@7a6d8a8234af8eb26422e24e3006232cccaa061b
+        uses: actions/setup-java@51ab6d2e3070fda1eac8cfaab8ffd90e6019d7e1
         with:
           java-version: "21.0"
           distribution: "temurin"
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@8c3e41f260befbc98f487996e8806e3d51f655c4
+        uses: gradle/actions/setup-gradle@28ab4dff3ac4b4453d40b7b6641ad3a4fe7e8271
         with:
           gradle-version: ${{ env.GRADLE_VERSION}}
       - name: Run backend tests
@@ -67,12 +67,12 @@ jobs:
         run: |
           echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@7a6d8a8234af8eb26422e24e3006232cccaa061b
+        uses: actions/setup-java@51ab6d2e3070fda1eac8cfaab8ffd90e6019d7e1
         with:
           java-version: "21.0"
           distribution: "temurin"
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@8c3e41f260befbc98f487996e8806e3d51f655c4
+        uses: gradle/actions/setup-gradle@28ab4dff3ac4b4453d40b7b6641ad3a4fe7e8271
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
       - name: Run backend tests
@@ -99,7 +99,7 @@ jobs:
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
       - name: Set up JDK
-        uses: actions/setup-java@7a6d8a8234af8eb26422e24e3006232cccaa061b
+        uses: actions/setup-java@51ab6d2e3070fda1eac8cfaab8ffd90e6019d7e1
         with:
           java-version: "21.0"
           distribution: "temurin"
@@ -109,7 +109,7 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@8c3e41f260befbc98f487996e8806e3d51f655c4
+        uses: gradle/actions/setup-gradle@28ab4dff3ac4b4453d40b7b6641ad3a4fe7e8271
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
       - name: Scan with SonarQube

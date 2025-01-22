@@ -16,7 +16,7 @@ describe("useCaseLawMenuItems", () => {
 
     const menuItems = useCaseLawMenuItems(documentNumber, {})
 
-    for (const menuItem of menuItems) {
+    for (const menuItem of menuItems.value) {
       expect(menuItem.route.params).toMatchObject({
         documentNumber: "fake-number",
       })
@@ -31,7 +31,7 @@ describe("useCaseLawMenuItems", () => {
 
     const menuItems = useCaseLawMenuItems("", route.query)
 
-    for (const menuItem of menuItems) {
+    for (const menuItem of menuItems.value) {
       expect(menuItem.route.query).toEqual({ foo: "bar" })
     }
   })
@@ -40,7 +40,7 @@ describe("useCaseLawMenuItems", () => {
     isInternalUser.value = true
     const menuItems = useCaseLawMenuItems("", {})
 
-    const topLabelNames = menuItems.map((item) => item.label)
+    const topLabelNames = menuItems.value.map((item) => item.label)
     expect(topLabelNames).toContain("Rubriken")
     expect(topLabelNames).toContain("Dokumente")
     expect(topLabelNames).toContain("Übergabe an jDV")
@@ -50,12 +50,12 @@ describe("useCaseLawMenuItems", () => {
     isInternalUser.value = false
     const menuItems = useCaseLawMenuItems("", {})
 
-    const topLabelNames = menuItems.map((item) => item.label)
+    const topLabelNames = menuItems.value.map((item) => item.label)
     expect(topLabelNames).toContain("Rubriken")
     expect(topLabelNames).not.toContain("Dokumente")
     expect(topLabelNames).toContain("Übergabe an jDV")
 
-    const categoriesSubMenu = menuItems.find(
+    const categoriesSubMenu = menuItems.value.find(
       (menu) => menu.label === "Rubriken",
     )?.children
     expect(categoriesSubMenu?.map((menu) => menu.label)).toEqual([

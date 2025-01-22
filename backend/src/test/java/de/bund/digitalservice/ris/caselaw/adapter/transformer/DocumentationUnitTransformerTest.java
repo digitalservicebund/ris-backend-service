@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CollectiveAgreementDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
@@ -23,6 +24,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JobProfileDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalEditionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ParticipatingJudgeDTO;
@@ -37,6 +40,7 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelation;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalForce;
 import de.bund.digitalservice.ris.caselaw.domain.LongTexts;
@@ -44,6 +48,8 @@ import de.bund.digitalservice.ris.caselaw.domain.ManagementData;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.Reference;
+import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
@@ -52,6 +58,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.ParticipatingJudge;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.Region;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.Collections;
@@ -775,6 +782,73 @@ class DocumentationUnitTransformerTest {
   }
 
   @Test
+  void testTransformToDTO_withCaselawReferences() {
+    var uuid = UUID.randomUUID();
+    DocumentationUnitDTO currentDto =
+        DocumentationUnitDTO.builder()
+            .caselawReferences(
+                List.of(
+                    CaselawReferenceDTO.builder()
+                        .id(uuid)
+                        .edition(LegalPeriodicalEditionDTO.builder().name("Foo").build())
+                        .editionRank(3)
+                        .documentationUnitRank(3)
+                        .build()))
+            .build();
+
+    var updatedReferences =
+        List.of(
+            Reference.builder()
+                .id(uuid)
+                .referenceType(ReferenceType.CASELAW)
+                .primaryReference(true)
+                .build());
+    DocumentationUnit updatedDomainObject =
+        DocumentationUnit.builder().references(updatedReferences).build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+
+    assertThat(documentationUnitDTO.getCaselawReferences().getFirst().getDocumentationUnitRank())
+        .isOne();
+    assertThat(documentationUnitDTO.getCaselawReferences().getFirst().getEditionRank())
+        .isEqualTo(3);
+    assertThat(documentationUnitDTO.getCaselawReferences().getFirst().getEdition().getName())
+        .isEqualTo("Foo");
+  }
+
+  @Test
+  void testTransformToDTO_withLiteratureReferences() {
+    var uuid = UUID.randomUUID();
+    DocumentationUnitDTO currentDto =
+        DocumentationUnitDTO.builder()
+            .literatureReferences(
+                List.of(
+                    LiteratureReferenceDTO.builder()
+                        .id(uuid)
+                        .edition(LegalPeriodicalEditionDTO.builder().name("Foo").build())
+                        .editionRank(3)
+                        .documentationUnitRank(3)
+                        .build()))
+            .build();
+
+    var updatedReferences =
+        List.of(Reference.builder().id(uuid).referenceType(ReferenceType.LITERATURE).build());
+    DocumentationUnit updatedDomainObject =
+        DocumentationUnit.builder().literatureReferences(updatedReferences).build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+
+    assertThat(documentationUnitDTO.getLiteratureReferences().getFirst().getDocumentationUnitRank())
+        .isOne();
+    assertThat(documentationUnitDTO.getLiteratureReferences().getFirst().getEditionRank())
+        .isEqualTo(3);
+    assertThat(documentationUnitDTO.getLiteratureReferences().getFirst().getEdition().getName())
+        .isEqualTo("Foo");
+  }
+
+  @Test
   void testTransformToDomain_withDocumentationUnitDTOIsNull_shouldReturnEmptyDocumentationUnit() {
 
     assertThatThrownBy(() -> DocumentationUnitTransformer.transformToDomain(null))
@@ -1338,7 +1412,7 @@ class DocumentationUnitTransformerTest {
                 .scheduledPublicationDateTime(null)
                 .lastPublicationDateTime(null)
                 .borderNumbers(Collections.emptyList())
-                .duplicateRelations(Collections.emptySet())
+                .duplicateRelations(List.of())
                 .build())
         .attachments(Collections.emptyList())
         .contentRelatedIndexing(
@@ -1481,5 +1555,71 @@ class DocumentationUnitTransformerTest {
                 .get()
                 .documentNumber())
         .isEqualTo("duplicate");
+  }
+
+  @Test
+  void testTransformToDomain_withMultipleDuplicateWarnings_shouldSortByDecisionDateAndDocNumber() {
+    var original =
+        generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
+    var duplicate1 =
+        generateSimpleDTOBuilder()
+            .documentNumber("duplicate1")
+            .decisionDate(LocalDate.of(2020, 1, 1))
+            .id(UUID.randomUUID())
+            .build();
+    var duplicate2 =
+        generateSimpleDTOBuilder().documentNumber("duplicate2").id(UUID.randomUUID()).build();
+    var duplicate3 =
+        generateSimpleDTOBuilder()
+            .documentNumber("duplicate3")
+            .decisionDate(LocalDate.of(2021, 1, 1))
+            .id(UUID.randomUUID())
+            .build();
+    var duplicate4 =
+        generateSimpleDTOBuilder()
+            .documentNumber("duplicate4")
+            .decisionDate(LocalDate.of(2021, 1, 1))
+            .id(UUID.randomUUID())
+            .build();
+    var duplicate5 =
+        generateSimpleDTOBuilder().documentNumber("duplicate05").id(UUID.randomUUID()).build();
+    var duplicateRelationship1 =
+        DuplicateRelationDTO.builder()
+            .documentationUnit1(duplicate1)
+            .documentationUnit2(original)
+            .build();
+    var duplicateRelationship2 =
+        DuplicateRelationDTO.builder()
+            .documentationUnit1(duplicate2)
+            .documentationUnit2(original)
+            .build();
+    var duplicateRelationship3 =
+        DuplicateRelationDTO.builder()
+            .documentationUnit1(duplicate3)
+            .documentationUnit2(original)
+            .build();
+    var duplicateRelationship4 =
+        DuplicateRelationDTO.builder()
+            .documentationUnit1(duplicate4)
+            .documentationUnit2(original)
+            .build();
+    var duplicateRelationship5 =
+        DuplicateRelationDTO.builder()
+            .documentationUnit1(duplicate5)
+            .documentationUnit2(original)
+            .build();
+    original =
+        original.toBuilder()
+            .duplicateRelations2(
+                Set.of(duplicateRelationship1, duplicateRelationship2, duplicateRelationship5))
+            .duplicateRelations1(Set.of(duplicateRelationship4, duplicateRelationship3))
+            .build();
+
+    DocumentationUnit documentationUnit = DocumentationUnitTransformer.transformToDomain(original);
+
+    var transformedRelations = documentationUnit.managementData().duplicateRelations();
+    assertThat(transformedRelations).hasSize(5);
+    assertThat(transformedRelations.stream().map(DuplicateRelation::documentNumber))
+        .containsExactly("duplicate3", "duplicate4", "duplicate1", "duplicate05", "duplicate2");
   }
 }

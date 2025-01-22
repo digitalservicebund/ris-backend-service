@@ -17,22 +17,22 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocumentationUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.LdmlExporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.OAuthService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CaselawReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDependentLiteratureCitationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseLegalPeriodicalRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseReferenceRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DependentLiteratureCitationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalPeriodicalDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalEditionRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LegalPeriodicalTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
@@ -40,7 +40,6 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
-import de.bund.digitalservice.ris.caselaw.domain.DependentLiteratureCitationType;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitDocxMetadataInitializationService;
@@ -64,10 +63,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -114,18 +113,18 @@ class ReferenceIntegrationTest {
   @Autowired private DatabaseReferenceRepository referenceRepository;
   @Autowired private DatabaseDependentLiteratureCitationRepository literatureCitationRepository;
 
-  @MockBean private S3AsyncClient s3AsyncClient;
-  @MockBean private MailService mailService;
-  @MockBean private DocxConverterService docxConverterService;
-  @MockBean private UserService userService;
-  @MockBean private ClientRegistrationRepository clientRegistrationRepository;
-  @MockBean private AttachmentService attachmentService;
-  @MockBean private PatchMapperService patchMapperService;
-  @MockBean private LdmlExporterService ldmlExporterService;
-  @MockBean private HandoverService handoverService;
-  @MockBean private DuplicateCheckService duplicateCheckService;
+  @MockitoBean private S3AsyncClient s3AsyncClient;
+  @MockitoBean private MailService mailService;
+  @MockitoBean private DocxConverterService docxConverterService;
+  @MockitoBean private UserService userService;
+  @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
+  @MockitoBean private AttachmentService attachmentService;
+  @MockitoBean private PatchMapperService patchMapperService;
+  @MockitoBean private LdmlExporterService ldmlExporterService;
+  @MockitoBean private HandoverService handoverService;
+  @MockitoBean private DuplicateCheckService duplicateCheckService;
 
-  @MockBean
+  @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
 
@@ -290,10 +289,10 @@ class ReferenceIntegrationTest {
 
     repository.save(
         dto.toBuilder()
-            .references(
+            .caselawReferences(
                 List.of(
-                    ReferenceDTO.builder()
-                        .rank(1)
+                    CaselawReferenceDTO.builder()
+                        .documentationUnitRank(1)
                         .documentationUnit(dto)
                         .id(referenceId)
                         .citation("2024, S.3")
@@ -301,17 +300,16 @@ class ReferenceIntegrationTest {
                         .legalPeriodical(
                             LegalPeriodicalDTO.builder().id(bverwgeLegalPeriodical.uuid()).build())
                         .build()))
-            .dependentLiteratureCitations(
+            .literatureReferences(
                 List.of(
-                    DependentLiteratureCitationDTO.builder()
-                        .rank(1)
+                    LiteratureReferenceDTO.builder()
+                        .documentationUnitRank(1)
                         .documentationUnit(dto)
                         .id(literatureCitationId)
                         .citation("2024, S.3")
                         .author("Curie, Marie")
                         .legalPeriodicalRawValue("BVerwGE")
                         .documentTypeRawValue("Ean")
-                        .type(DependentLiteratureCitationType.PASSIVE)
                         .documentType(DocumentTypeDTO.builder().id(eanDocumentType.uuid()).build())
                         .legalPeriodical(
                             LegalPeriodicalDTO.builder().id(bverwgeLegalPeriodical.uuid()).build())
@@ -363,7 +361,7 @@ class ReferenceIntegrationTest {
                 .references(
                     List.of(
                         Reference.builder()
-                            .rank(1)
+                            .documentationUnitRank(1)
                             .referenceType(ReferenceType.CASELAW)
                             .documentationUnit(
                                 RelatedDocumentationUnit.builder().uuid(dto.getId()).build())
@@ -373,10 +371,11 @@ class ReferenceIntegrationTest {
                             .legalPeriodical(
                                 LegalPeriodical.builder()
                                     .uuid(bverwgeLegalPeriodical.uuid())
+                                    .primaryReference(true)
                                     .build())
                             .build(),
                         Reference.builder()
-                            .rank(2)
+                            .documentationUnitRank(2)
                             .referenceType(ReferenceType.LITERATURE)
                             .documentationUnit(
                                 RelatedDocumentationUnit.builder().uuid(dto.getId()).build())

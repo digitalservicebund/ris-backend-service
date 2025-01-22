@@ -23,6 +23,7 @@ type MyFixtures = {
   prefilledDocumentUnitBgh: DocumentUnit
   edition: LegalPeriodicalEdition
   editionWithReferences: LegalPeriodicalEdition
+  editionWithManyReferences: LegalPeriodicalEdition
   foreignDocumentationUnit: DocumentUnitListEntry
   prefilledDocumentUnitWithReferences: DocumentUnit
   prefilledDocumentUnitWithTexts: DocumentUnit
@@ -515,6 +516,14 @@ export const caselawTest = test.extend<MyFixtures>({
       `api/v1/caselaw/documentunits/search?pg=0&sz=100&documentNumber=YYTestDoc0001`,
     )
 
+    const eanDocType = (
+      (await (
+        await request.get(
+          `api/v1/caselaw/documenttypes/dependent-literature?q=Ean`,
+        )
+      ).json()) as DocumentType[]
+    )[0]
+
     const foreignDocumentUnitPage =
       (await foreignDocumentUnitSearchResponse.json()) as Pagination<DocumentUnitListEntry>
 
@@ -546,6 +555,176 @@ export const caselawTest = test.extend<MyFixtures>({
               documentationUnit: new RelatedDocumentation({
                 documentNumber: prefilledDocumentUnit.documentNumber,
                 uuid: prefilledDocumentUnit.uuid,
+              }),
+            },
+            {
+              id: crypto.randomUUID(),
+              referenceType: "caselaw",
+              citation: "2024, 1-11, Heft 1",
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical,
+              // Published foreign BAG docunit
+              documentationUnit: new RelatedDocumentation({
+                documentNumber: foreignDocumentUnit?.documentNumber,
+                uuid: foreignDocumentUnit?.uuid,
+              }),
+            },
+            {
+              id: crypto.randomUUID(),
+              referenceType: "literature",
+              citation: "2024, 23-25, Heft 1",
+              author: "Picard, Jean-Luc",
+              documentType: eanDocType,
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical,
+              documentationUnit: new RelatedDocumentation({
+                documentNumber: prefilledDocumentUnit.documentNumber,
+                uuid: prefilledDocumentUnit.uuid,
+              }),
+            },
+            {
+              id: crypto.randomUUID(),
+              referenceType: "literature",
+              citation: "2024, 26, Heft 1",
+              author: "Janeway, Kathryn",
+              documentType: eanDocType,
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical,
+              // Published foreign BAG docunit
+              documentationUnit: new RelatedDocumentation({
+                documentNumber: foreignDocumentUnit?.documentNumber,
+                uuid: foreignDocumentUnit?.uuid,
+              }),
+            },
+          ],
+        },
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
+
+    const edition = await editionResponse.json()
+    if (!editionResponse.ok()) {
+      throw Error(`Edition couldn't be created:
+      ${editionResponse.status()} ${editionResponse.statusText()}`)
+    }
+    await use(edition)
+
+    // delete references to be able to delete
+    const response = await request.put(
+      `api/v1/caselaw/legalperiodicaledition`,
+      {
+        data: {
+          legalPeriodical: edition.legalPeriodical,
+          id: edition.id,
+          prefix: edition.prefix,
+          suffix: edition.suffix,
+          name: "NAME",
+          references: [],
+        },
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
+    await response.json()
+    if (!response.ok()) {
+      throw Error(`References in Edition with number ${edition.id} couldn't be deleted:
+      ${response.status()} ${response.statusText()}`)
+    }
+
+    const deleteResponse = await request.delete(
+      `/api/v1/caselaw/legalperiodicaledition/${edition.id}`,
+      {
+        headers: { "X-XSRF-TOKEN": csrfToken?.value ?? "" },
+      },
+    )
+
+    if (!deleteResponse.ok()) {
+      throw Error(`Edition with number ${edition.id} couldn't be deleted:
+      ${deleteResponse.status()} ${deleteResponse.statusText()}`)
+    }
+  },
+
+  editionWithManyReferences: async (
+    { request, context, prefilledDocumentUnit },
+    use,
+  ) => {
+    const cookies = await context.cookies()
+    const csrfToken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")
+
+    const legalPeriodicalSearchResponse = await request.get(
+      `api/v1/caselaw/legalperiodicals?q=MMG`,
+    )
+
+    const foreignDocumentUnitSearchResponse = await request.get(
+      `api/v1/caselaw/documentunits/search?pg=0&sz=100&documentNumber=YYTestDoc0001`,
+    )
+
+    const foreignDocumentUnitPage =
+      (await foreignDocumentUnitSearchResponse.json()) as Pagination<DocumentUnitListEntry>
+
+    const foreignDocumentUnit = (
+      foreignDocumentUnitPage.content as DocumentUnitListEntry[]
+    ).at(0)
+
+    const legalPeriodical = (
+      (await legalPeriodicalSearchResponse.json()) as LegalPeriodicalEdition[]
+    ).at(0)
+
+    const editionResponse = await request.put(
+      `api/v1/caselaw/legalperiodicaledition`,
+      {
+        data: {
+          legalPeriodical: legalPeriodical,
+          id: crypto.randomUUID(),
+          prefix: "2024, ",
+          suffix: ", Heft 1",
+          name: "2024, " + generateString(),
+          references: [
+            {
+              id: crypto.randomUUID(),
+              referenceType: "caselaw",
+              citation: "2024, 12-22, Heft 1",
+              referenceSupplement: "L",
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical,
+              documentationUnit: new RelatedDocumentation({
+                documentNumber: prefilledDocumentUnit.documentNumber,
+                uuid: prefilledDocumentUnit.uuid,
+              }),
+            },
+            {
+              id: crypto.randomUUID(),
+              referenceType: "caselaw",
+              citation: "2024, 1-11, Heft 1",
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical,
+              // Published foreign BAG docunit
+              documentationUnit: new RelatedDocumentation({
+                documentNumber: foreignDocumentUnit?.documentNumber,
+                uuid: foreignDocumentUnit?.uuid,
+              }),
+            },
+            {
+              id: crypto.randomUUID(),
+              referenceType: "caselaw",
+              citation: "2024, 1-11, Heft 1",
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical,
+              // Published foreign BAG docunit
+              documentationUnit: new RelatedDocumentation({
+                documentNumber: foreignDocumentUnit?.documentNumber,
+                uuid: foreignDocumentUnit?.uuid,
+              }),
+            },
+            {
+              id: crypto.randomUUID(),
+              referenceType: "caselaw",
+              citation: "2024, 1-11, Heft 1",
+              legalPeriodicalRawValue: "MMG",
+              legalPeriodical: legalPeriodical,
+              // Published foreign BAG docunit
+              documentationUnit: new RelatedDocumentation({
+                documentNumber: foreignDocumentUnit?.documentNumber,
+                uuid: foreignDocumentUnit?.uuid,
               }),
             },
             {

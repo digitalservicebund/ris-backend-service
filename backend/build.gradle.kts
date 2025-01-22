@@ -9,7 +9,7 @@ import org.flywaydb.gradle.task.FlywayMigrateTask
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.3.5"
+    id("org.springframework.boot") version "3.4.1"
     id("io.spring.dependency-management") version "1.1.6"
     id("com.diffplug.spotless") version "6.25.0"
     id("org.sonarqube") version "6.0.1.5171"
@@ -19,7 +19,7 @@ plugins {
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
     id("com.github.ben-manes.versions") version "0.51.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "11.1.1"
+    id("org.flywaydb.flyway") version "11.2.0"
     id("io.sentry.jvm.gradle") version "4.14.1"
 }
 
@@ -158,13 +158,14 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.security:spring-security-oauth2-resource-server:6.4.2")
 
-    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.4")
+    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.2.0")
+
     // CVE-2024-50379
     implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.34")
     // CVE-2022-3171
     implementation("com.google.protobuf:protobuf-java:4.29.3")
 
-    implementation("org.postgresql:postgresql:42.7.4")
+    implementation("org.postgresql:postgresql:42.7.5")
 
     implementation("com.sendinblue:sib-api-v3-sdk:7.0.0")
     // CVE-2022-4244
@@ -194,9 +195,9 @@ dependencies {
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
-    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.35")
+    implementation("de.bund.digitalservice:neuris-caselaw-migration-schema:0.0.40")
     // for local development:
-    // implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.34.jar"))
+//     implementation(files("../../ris-data-migration/schema/build/libs/schema-0.0.40.jar"))
 
     implementation("com.fasterxml.jackson.core:jackson-core:2.18.2")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")
@@ -216,10 +217,10 @@ dependencies {
     implementation("net.javacrumbs.shedlock:shedlock-spring:6.2.0")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.2.0")
 
-    val flywayCore = "org.flywaydb:flyway-core:11.1.1"
+    val flywayCore = "org.flywaydb:flyway-core:11.2.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.1.1")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:11.2.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -227,7 +228,7 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:5.15.2")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("io.projectreactor:reactor-test:3.7.1")
+    testImplementation("io.projectreactor:reactor-test:3.7.2")
     testImplementation("org.springframework.security:spring-security-test:6.4.2")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.3.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")

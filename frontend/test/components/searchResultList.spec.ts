@@ -66,6 +66,12 @@ function renderSearchResults(
 }
 
 describe("Search result list", () => {
+  beforeEach(() => {
+    vi.spyOn(window, "scrollTo").mockImplementation(() => vi.fn())
+  })
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
   it("renders correctly", async () => {
     renderSearchResults()
 

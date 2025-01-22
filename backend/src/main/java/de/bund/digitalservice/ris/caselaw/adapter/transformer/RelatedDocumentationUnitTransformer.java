@@ -19,7 +19,8 @@ public class RelatedDocumentationUnitTransformer {
     return CourtTransformer.transformToDomain(courtDTO);
   }
 
-  static RelatedDocumentationUnit transformToDomain(DocumentationUnitDTO documentationUnitDTO) {
+  public static RelatedDocumentationUnit transformToDomain(
+      DocumentationUnitDTO documentationUnitDTO) {
     return RelatedDocumentationUnit.builder()
         .uuid(documentationUnitDTO.getId())
         .documentNumber(documentationUnitDTO.getDocumentNumber())
@@ -32,7 +33,6 @@ public class RelatedDocumentationUnitTransformer {
                 .orElse(null))
         .documentType(
             DocumentTypeTransformer.transformToDomain(documentationUnitDTO.getDocumentType()))
-        .referenceFound(true)
         .status(StatusTransformer.transformToDomain(documentationUnitDTO.getStatus()))
         .createdByReference(
             documentationUnitDTO.getSource().stream()
@@ -41,6 +41,12 @@ public class RelatedDocumentationUnitTransformer {
                     sourceDTO ->
                         sourceDTO.getReference() == null ? null : sourceDTO.getReference().getId())
                 .orElse(null))
+        .documentationOffice(
+            DocumentationOfficeTransformer.transformToDomain(
+                documentationUnitDTO.getDocumentationOffice()))
+        .creatingDocOffice(
+            DocumentationOfficeTransformer.transformToDomain(
+                documentationUnitDTO.getCreatingDocumentationOffice()))
         .build();
   }
 

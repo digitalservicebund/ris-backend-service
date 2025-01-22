@@ -10,8 +10,8 @@ import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import NestedComponent from "@/components/NestedComponents.vue"
 import Pagination, { Page } from "@/components/Pagination.vue"
+import { useScroll } from "@/composables/useScroll"
 import { useValidationStore } from "@/composables/useValidationStore"
-import values from "@/data/values.json"
 import PreviousDecision from "@/domain/previousDecision"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -28,7 +28,7 @@ const emit = defineEmits<{
   cancelEdit: [void]
   removeEntry: [value: PreviousDecision]
 }>()
-
+const { scrollIntoViewportById } = useScroll()
 const lastSearchInput = ref(new PreviousDecision())
 const lastSavedModelValue = ref(new PreviousDecision({ ...props.modelValue }))
 const previousDecision = ref(new PreviousDecision({ ...props.modelValue }))
@@ -131,26 +131,11 @@ async function addPreviousDecision() {
 async function addPreviousDecisionFromSearch(decision: RelatedDocumentation) {
   previousDecision.value = new PreviousDecision({
     ...decision,
-    referenceFound: true,
     deviatingFileNumber: previousDecision.value.deviatingFileNumber,
   })
   emit("update:modelValue", previousDecision.value as PreviousDecision)
   emit("addEntry")
-  scrollToTop()
-}
-
-function scrollToTop() {
-  const element = document.getElementById("previousDecisions")
-  if (element) {
-    const headerOffset = values.headerOffset
-    const elementPosition = element?.getBoundingClientRect().top
-    const offsetPosition = elementPosition + window.scrollY - headerOffset
-
-    window.scrollTo({
-      top: offsetPosition,
-      behavior: "smooth",
-    })
-  }
+  await scrollIntoViewportById("previousDecisions")
 }
 
 function updateDateFormatValidation(

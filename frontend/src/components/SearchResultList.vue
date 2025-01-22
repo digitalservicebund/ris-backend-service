@@ -1,23 +1,32 @@
 <script setup lang="ts">
+import { watch } from "vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import { DisplayMode } from "@/components/enumDisplayMode"
 import FlexContainer from "@/components/FlexContainer.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
+import { useScroll } from "@/composables/useScroll"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import errorMessages from "@/i18n/errors.json"
 import IconAdd from "~icons/ic/baseline-add"
 
-const { allowMultipleLinks = false } = defineProps<{
+const props = defineProps<{
   searchResults?: SearchResults<RelatedDocumentation>
   isLoading: boolean
   allowMultipleLinks?: boolean
   displayMode?: DisplayMode
 }>()
-
 const emits =
   defineEmits<(event: "linkDecision", decision: RelatedDocumentation) => void>()
+const { scrollIntoViewportById } = useScroll()
+watch(
+  () => props.searchResults,
+  async () => {
+    if (props.searchResults) await scrollIntoViewportById("search-results")
+  },
+  { immediate: true },
+)
 </script>
 
 <script lang="ts">
@@ -28,7 +37,7 @@ export type SearchResults<Type extends RelatedDocumentation> = {
 </script>
 
 <template>
-  <div>
+  <div id="search-results">
     <FlexContainer
       v-if="isLoading"
       class="m-24"

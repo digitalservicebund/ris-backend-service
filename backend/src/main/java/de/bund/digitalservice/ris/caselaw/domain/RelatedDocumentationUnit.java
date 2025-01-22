@@ -22,6 +22,7 @@ import lombok.experimental.SuperBuilder;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RelatedDocumentationUnit {
   protected UUID uuid;
+  protected boolean newEntry;
   protected String documentNumber;
   protected Status status;
   protected Court court;
@@ -29,7 +30,8 @@ public class RelatedDocumentationUnit {
   protected String fileNumber;
   protected DocumentType documentType;
   protected UUID createdByReference;
-  protected boolean referenceFound;
+  protected DocumentationOffice documentationOffice;
+  protected DocumentationOffice creatingDocOffice;
 
   @Transient
   public boolean isEmpty() {

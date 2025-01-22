@@ -25,6 +25,14 @@ import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitExce
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -61,6 +69,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   private final DatabaseProcedureRepository procedureRepository;
   private final DatabaseRelatedDocumentationRepository relatedDocumentationRepository;
   private final UserService userService;
+  private final EntityManager entityManager;
 
   public PostgresDocumentationUnitRepositoryImpl(
       DatabaseDocumentationUnitRepository repository,
@@ -70,7 +79,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       DatabaseKeywordRepository keywordRepository,
       DatabaseProcedureRepository procedureRepository,
       DatabaseFieldOfLawRepository fieldOfLawRepository,
-      UserService userService) {
+      UserService userService,
+      EntityManager entityManager) {
 
     this.repository = repository;
     this.databaseCourtRepository = databaseCourtRepository;
@@ -80,6 +90,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
     this.fieldOfLawRepository = fieldOfLawRepository;
     this.procedureRepository = procedureRepository;
     this.userService = userService;
+    this.entityManager = entityManager;
   }
 
   @Override
@@ -130,6 +141,13 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                     .build(),
                 docUnit));
 
+    ReferenceDTO referenceDTO = null;
+    if (createdFromReference != null) {
+      referenceDTO = ReferenceTransformer.transformToDTO(createdFromReference);
+      referenceDTO.setDocumentationUnitRank(0);
+      referenceDTO.setDocumentationUnit(documentationUnitDTO);
+    }
+
     // saving a second time is necessary because status and reference need a reference to a
     // persisted documentation unit
     DocumentationUnitDTO savedDocUnit =
@@ -148,12 +166,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
                                 SourceDTO.builder()
                                     .rank(1)
                                     .value(source)
-                                    .reference(
-                                        ReferenceTransformer.transformToDTO(createdFromReference)
-                                            .toBuilder()
-                                            .rank(1)
-                                            .documentationUnit(documentationUnitDTO)
-                                            .build())
+                                    .reference(referenceDTO)
                                     .build())))
                 .build());
 
@@ -383,32 +396,124 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       DocumentationOffice documentationOffice,
       String documentNumberToExclude,
       Pageable pageable) {
+
+    // CriteriaBuilder and CriteriaQuery setup
+    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+    CriteriaQuery<DocumentationUnitListItemDTO> criteriaQuery =
+        criteriaBuilder.createQuery(DocumentationUnitListItemDTO.class);
+    Root<DocumentationUnitDTO> root = criteriaQuery.from(DocumentationUnitDTO.class);
+
+    // Join for 'court' and 'fileNumber'
+    Join<DocumentationUnitDTO, Court> courtJoin = root.join("court", JoinType.LEFT);
+    Join<DocumentationUnitDTO, String> fileNumberJoin = root.join("fileNumbers", JoinType.LEFT);
+
+    // Conditions setup
+    Predicate conditions = criteriaBuilder.conjunction(); // Start with an empty conjunction (AND)
     String courtType =
         Optional.ofNullable(relatedDocumentationUnit.getCourt()).map(Court::type).orElse(null);
     String courtLocation =
         Optional.ofNullable(relatedDocumentationUnit.getCourt()).map(Court::location).orElse(null);
+    LocalDate decisionDate = relatedDocumentationUnit.getDecisionDate();
+    String fileNumber = relatedDocumentationUnit.getFileNumber();
+    DocumentType documentType = relatedDocumentationUnit.getDocumentType();
 
     DocumentationOfficeDTO documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
 
-    Slice<DocumentationUnitListItemDTO> allResults =
-        getDocumentationUnitSearchResultDTOS(
-            pageable,
-            courtType,
-            courtLocation,
-            null,
-            documentNumberToExclude,
-            relatedDocumentationUnit.getFileNumber(),
-            relatedDocumentationUnit.getDecisionDate(),
-            null,
-            null,
-            false,
-            null,
-            false,
-            false,
-            relatedDocumentationUnit.getDocumentType(),
-            documentationOfficeDTO);
+    // 1. Filter by document number
+    if (documentNumberToExclude != null) {
+      Predicate documentNumberPredicate =
+          criteriaBuilder.notEqual(root.get("documentNumber"), documentNumberToExclude);
+      conditions = criteriaBuilder.and(conditions, documentNumberPredicate);
+    }
 
+    // 2. Filter by court type
+    if (courtType != null) {
+      Predicate courtTypePredicate =
+          criteriaBuilder.like(
+              criteriaBuilder.upper(courtJoin.get("type")), "%" + courtType.toUpperCase() + "%");
+      conditions = criteriaBuilder.and(conditions, courtTypePredicate);
+    }
+
+    // 3. Filter by court location
+    if (courtLocation != null) {
+      Predicate courtLocationPredicate =
+          criteriaBuilder.like(
+              criteriaBuilder.upper(courtJoin.get("location")),
+              "%" + courtLocation.toUpperCase() + "%");
+      conditions = criteriaBuilder.and(conditions, courtLocationPredicate);
+    }
+
+    // 4. Filter by decision date
+    if (decisionDate != null) {
+      Predicate decisionDatePredicate =
+          criteriaBuilder.equal(root.get("decisionDate"), decisionDate);
+      conditions = criteriaBuilder.and(conditions, decisionDatePredicate);
+    }
+
+    // 5. Filter by file number
+    if (fileNumber != null) {
+      Predicate fileNumberPredicate =
+          criteriaBuilder.like(
+              criteriaBuilder.upper(fileNumberJoin.get("value")), fileNumber.toUpperCase() + "%");
+      conditions = criteriaBuilder.and(conditions, fileNumberPredicate);
+    }
+
+    // 6. Filter by document type
+    if (documentType != null) {
+      Predicate documentTypePredicate =
+          criteriaBuilder.equal(
+              root.get("documentType"), DocumentTypeTransformer.transformToDTO(documentType));
+      conditions = criteriaBuilder.and(conditions, documentTypePredicate);
+    }
+
+    // 7. Filter by publication status
+    final String PUBLICATION_STATUS = "publicationStatus";
+    final String STATUS = "status";
+    Predicate documentationOfficeIdPredicate =
+        criteriaBuilder.equal(
+            root.get("documentationOffice").get("id"), documentationOfficeDTO.getId());
+
+    Predicate publicationStatusPredicate =
+        criteriaBuilder.or(
+            criteriaBuilder.equal(
+                root.get(STATUS).get(PUBLICATION_STATUS), PublicationStatus.PUBLISHED),
+            criteriaBuilder.equal(
+                root.get(STATUS).get(PUBLICATION_STATUS), PublicationStatus.PUBLISHING));
+
+    Predicate externalHandoverPendingPredicate =
+        criteriaBuilder.and(
+            criteriaBuilder.equal(
+                root.get(STATUS).get(PUBLICATION_STATUS),
+                PublicationStatus.EXTERNAL_HANDOVER_PENDING),
+            criteriaBuilder.equal(
+                root.get("creatingDocumentationOffice").get("id"), documentationOfficeDTO.getId()));
+
+    Predicate finalPredicate =
+        criteriaBuilder.or(
+            documentationOfficeIdPredicate,
+            publicationStatusPredicate,
+            externalHandoverPendingPredicate);
+
+    conditions = criteriaBuilder.and(conditions, finalPredicate);
+
+    // Apply conditions to query
+    criteriaQuery.where(conditions);
+
+    // Apply pagination
+    TypedQuery<DocumentationUnitListItemDTO> query = entityManager.createQuery(criteriaQuery);
+    query.setFirstResult(pageable.getPageNumber() * pageable.getPageSize());
+    query.setMaxResults(pageable.getPageSize());
+
+    // Get results and create Slice
+    List<DocumentationUnitListItemDTO> resultList = query.getResultList();
+
+    // The highest possible number of results - For page 0: 30, for page 1: 60, for page 2: 90, etc.
+    int maxResultsUpToCurrentPage = (pageable.getPageNumber() + 1) * pageable.getPageSize();
+    boolean hasNext = resultList.size() >= maxResultsUpToCurrentPage;
+
+    SliceImpl<DocumentationUnitListItemDTO> allResults =
+        new SliceImpl<>(resultList, pageable, hasNext);
     return allResults.map(DocumentationUnitListItemTransformer::transformToRelatedDocumentation);
   }
 
@@ -419,7 +524,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       String courtType,
       String courtLocation,
       String documentNumber,
-      String documentNumberToExclude,
       String fileNumber,
       LocalDate decisionDate,
       LocalDate decisionDateEnd,
@@ -428,13 +532,11 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
       PublicationStatus status,
       Boolean withError,
       Boolean myDocOfficeOnly,
-      DocumentType documentType,
       DocumentationOfficeDTO documentationOfficeDTO) {
     if ((fileNumber == null || fileNumber.trim().isEmpty())) {
       return repository.searchByDocumentationUnitSearchInput(
           documentationOfficeDTO.getId(),
           documentNumber,
-          documentNumberToExclude,
           courtType,
           courtLocation,
           decisionDate,
@@ -444,7 +546,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
           status,
           withError,
           myDocOfficeOnly,
-          DocumentTypeTransformer.transformToDTO(documentType),
           pageable);
     }
 
@@ -465,7 +566,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
           repository.searchByDocumentationUnitSearchInputFileNumber(
               documentationOfficeDTO.getId(),
               documentNumber,
-              documentNumberToExclude,
               fileNumber.trim(),
               courtType,
               courtLocation,
@@ -476,14 +576,12 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
               status,
               withError,
               myDocOfficeOnly,
-              DocumentTypeTransformer.transformToDTO(documentType),
               fixedPageRequest);
 
       deviatingFileNumberResults =
           repository.searchByDocumentationUnitSearchInputDeviatingFileNumber(
               documentationOfficeDTO.getId(),
               documentNumber,
-              documentNumberToExclude,
               fileNumber.trim(),
               courtType,
               courtLocation,
@@ -494,7 +592,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
               status,
               withError,
               myDocOfficeOnly,
-              DocumentTypeTransformer.transformToDTO(documentType),
               fixedPageRequest);
     }
 
@@ -549,7 +646,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             searchInput.courtType(),
             searchInput.courtLocation(),
             searchInput.documentNumber(),
-            null,
             searchInput.fileNumber(),
             searchInput.decisionDate(),
             searchInput.decisionDateEnd(),
@@ -558,7 +654,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             searchInput.status() != null ? searchInput.status().publicationStatus() : null,
             withError,
             searchInput.myDocOfficeOnly(),
-            null,
             documentationOfficeDTO);
 
     return allResults.map(DocumentationUnitListItemTransformer::transformToDomain);

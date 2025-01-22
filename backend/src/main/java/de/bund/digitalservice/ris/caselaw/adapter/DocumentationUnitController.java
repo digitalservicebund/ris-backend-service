@@ -160,20 +160,24 @@ public class DocumentationUnitController {
             .s3path();
     try {
       var docx2html = converterService.getConvertedObject(attachmentPath);
-      try {
-        DocumentationUnit docUnit = service.getByUuid(uuid);
-        documentationUnitDocxMetadataInitializationService.initializeCoreData(docUnit, docx2html);
-        duplicateCheckService.checkDuplicates(docUnit.documentNumber());
-      } catch (DocumentationUnitNotExistsException ex) {
-        // file upload should not fail because of core data initialization or dup check
-        log.error(
-            "Initialize core data failed, because documentation unit '{}' doesn't exist!", uuid);
-      }
+      initializeCoreDataAndCheckDuplicates(uuid, docx2html);
       return ResponseEntity.status(HttpStatus.OK).body(docx2html);
 
     } catch (Exception e) {
       attachmentService.deleteByS3Path(attachmentPath);
       return ResponseEntity.unprocessableEntity().build();
+    }
+  }
+
+  private void initializeCoreDataAndCheckDuplicates(UUID uuid, Docx2Html docx2html) {
+    try {
+      DocumentationUnit docUnit = service.getByUuid(uuid);
+      documentationUnitDocxMetadataInitializationService.initializeCoreData(docUnit, docx2html);
+      duplicateCheckService.checkDuplicates(docUnit.documentNumber());
+    } catch (DocumentationUnitNotExistsException ex) {
+      // file upload should not fail because of core data initialization or dup check
+      log.error(
+          "Initialize core data failed, because documentation unit '{}' doesn't exist!", uuid);
     }
   }
 
@@ -466,7 +470,7 @@ public class DocumentationUnitController {
   }
 
   /**
-   * Update the duplication status of a duplicate of a documentation unit (ignored vs. pending)
+   * Update the duplicate status of a duplicate of a documentation unit (ignored vs. pending)
    *
    * @param documentNumberOrigin documentNumber of the original documentation unit
    * @param documentNumberDuplicate documentNumber of the duplicate

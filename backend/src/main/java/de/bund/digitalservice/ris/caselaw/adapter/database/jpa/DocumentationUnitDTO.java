@@ -296,16 +296,17 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @OrderBy("rank")
   private Set<YearOfDisputeDTO> yearsOfDispute = new HashSet<>();
 
-  // Fundstellen
+  // Rechtsprechungsfundstellen
   @OneToMany(mappedBy = "documentationUnit", cascade = CascadeType.ALL, orphanRemoval = true)
   @Builder.Default
-  @OrderBy("rank")
-  private List<ReferenceDTO> references = new ArrayList<>();
+  @OrderBy("documentationUnitRank")
+  private List<CaselawReferenceDTO> caselawReferences = new ArrayList<>();
 
+  // Literaturfundstellen
   @OneToMany(mappedBy = "documentationUnit", cascade = CascadeType.ALL, orphanRemoval = true)
   @Builder.Default
-  @OrderBy("rank")
-  private List<DependentLiteratureCitationDTO> dependentLiteratureCitations = new ArrayList<>();
+  @OrderBy("documentationUnitRank")
+  private List<LiteratureReferenceDTO> literatureReferences = new ArrayList<>();
 
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
@@ -352,7 +353,7 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
 
   /**
    * @deprecated This field represents the "Dupcode ausschalten" functionality from the jDV. It is
-   *     set to false in the migration if the duplication check should be ignored. After the jDV has
+   *     set to false in the migration if the duplicate check should be ignored. After the jDV has
    *     been deactivated, this field will not be needed anymore.
    */
   @Column(name = "duplicate_check")

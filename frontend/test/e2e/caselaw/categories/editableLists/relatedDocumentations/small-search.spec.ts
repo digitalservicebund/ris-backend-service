@@ -209,6 +209,64 @@ test("search for documentunits does not return current documentation unit", asyn
   }
 })
 
+test(
+  "search for documentunits does return status 'Fremdanlage', if I am creating docoffice",
+  {
+    tag: "@RISDEV-5713",
+  },
+  async ({ page, prefilledDocumentUnit }) => {
+    await handoverDocumentationUnit(
+      page,
+      prefilledDocumentUnit.documentNumber || "",
+    )
+
+    await navigateToCategories(page, prefilledDocumentUnit.documentNumber || "")
+
+    const activeCitationContainer = page.getByLabel("Aktivzitierung", {
+      exact: true,
+    })
+    const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
+    const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
+
+    const containers = [
+      activeCitationContainer,
+      previousDecisionContainer,
+      ensuingDecisionContainer,
+    ]
+
+    for (const container of containers) {
+      await test.step(
+        "for category " + (await container.first().getAttribute("aria-label")),
+        async () => {
+          const inputs = {
+            decisionDate: "24.08.2002",
+          }
+
+          if (container === activeCitationContainer) {
+            await activeCitationContainer.getByLabel("Weitere Angabe").click()
+            await fillActiveCitationInputs(page, {
+              ...inputs,
+              citationType: "Änderung",
+            })
+          }
+          if (container === previousDecisionContainer) {
+            await fillPreviousDecisionInputs(page, inputs)
+          }
+          if (container === ensuingDecisionContainer) {
+            await fillEnsuingDecisionInputs(page, inputs)
+          }
+
+          await container.getByLabel("Nach Entscheidung suchen").click()
+          await expect(
+            container.getByText("24.08.2002, Beschluss"),
+          ).toBeVisible()
+          await expect(container.getByText("Fremdanlage")).toBeVisible()
+        },
+      )
+    }
+  },
+)
+
 test("clicking on link of referenced documentation unit added by search opens new tab, does not enter edit mode", async ({
   page,
   documentNumber,

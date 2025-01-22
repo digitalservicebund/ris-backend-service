@@ -11,6 +11,7 @@ function renderComponent(options?: {
   status?: PublicationStatus
   documentNumber?: string
   displayMode?: DisplayMode
+  linkClickable?: boolean
 }) {
   const router = createRouter({
     history: createWebHistory(),
@@ -23,6 +24,7 @@ function renderComponent(options?: {
       status: options?.status ?? undefined,
       documentNumber: options?.documentNumber ?? undefined,
       displayMode: options?.displayMode ?? undefined,
+      linkClickable: options?.linkClickable ?? true,
     },
     global: {
       plugins: [[createTestingPinia()], [router]],
@@ -60,5 +62,14 @@ describe("Decision summary", () => {
       },
     })
     expect(await screen.findByText(/Veröffentlicht/)).toBeVisible()
+  })
+
+  it("docnumber is not clickable, if linkClickable false", async () => {
+    renderComponent({
+      linkClickable: false,
+    })
+
+    expect(screen.queryByRole("link")).not.toBeInTheDocument()
+    expect(screen.queryByRole("button")).not.toBeInTheDocument()
   })
 })

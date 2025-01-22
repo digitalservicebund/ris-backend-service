@@ -1,20 +1,14 @@
+import { DuplicateRelationStatus } from "@/domain/documentUnit"
 import service from "@/services/documentUnitService"
-import { ServiceResponse } from "@/services/httpClient"
+import HttpClient from "@/services/httpClient"
 
 describe("documentUnitService", () => {
-  vi.mock("@/services/httpClient", () => {
-    const testResponse: ServiceResponse<string> = {
+  it("appends correct error message if status 500", async () => {
+    vi.spyOn(HttpClient, "get").mockResolvedValue({
       status: 500,
       data: "foo",
-    }
-    return {
-      default: {
-        get: vi.fn().mockReturnValue(testResponse),
-      },
-    }
-  })
+    })
 
-  it("appends correct error message if status 500", async () => {
     const result = await service.searchByDocumentUnitSearchInput({
       pg: "0",
       sz: "20",
@@ -25,5 +19,49 @@ describe("documentUnitService", () => {
     expect(result.error?.description).toEqual(
       "Bitte versuchen Sie es später erneut.",
     )
+  })
+
+  describe("setDuplicateRelationStatus", () => {
+    it("should set error flag with unsuccessful status", async () => {
+      const httpMock = vi.spyOn(HttpClient, "put").mockResolvedValue({
+        status: 400,
+        data: "error",
+      })
+
+      const response = await service.setDuplicateRelationStatus(
+        "123",
+        "abc",
+        DuplicateRelationStatus.IGNORED,
+      )
+
+      expect(response).toEqual({ error: true })
+
+      expect(httpMock).toHaveBeenCalledWith(
+        "caselaw/documentunits/123/duplicate-status/abc",
+        {},
+        { status: DuplicateRelationStatus.IGNORED },
+      )
+    })
+
+    it("should set error flag to false on success", async () => {
+      const httpMock = vi.spyOn(HttpClient, "put").mockResolvedValue({
+        status: 200,
+        data: "success",
+      })
+
+      const response = await service.setDuplicateRelationStatus(
+        "abc",
+        "123",
+        DuplicateRelationStatus.PENDING,
+      )
+
+      expect(response).toEqual({ error: false })
+
+      expect(httpMock).toHaveBeenCalledWith(
+        "caselaw/documentunits/abc/duplicate-status/123",
+        {},
+        { status: DuplicateRelationStatus.PENDING },
+      )
+    })
   })
 })

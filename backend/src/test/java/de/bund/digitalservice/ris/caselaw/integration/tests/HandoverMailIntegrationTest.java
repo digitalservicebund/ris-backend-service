@@ -40,8 +40,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverR
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalEditionRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresLegalPeriodicalRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.HandoverMailTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.RelatedDocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -56,12 +56,16 @@ import de.bund.digitalservice.ris.caselaw.domain.HandoverMail;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverReport;
 import de.bund.digitalservice.ris.caselaw.domain.HandoverService;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
+import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEdition;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalEditionService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalPeriodicalRepository;
 import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
+import de.bund.digitalservice.ris.caselaw.domain.Reference;
+import de.bund.digitalservice.ris.caselaw.domain.ReferenceType;
 import de.bund.digitalservice.ris.caselaw.domain.UserGroupService;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.LegalPeriodical;
 import de.bund.digitalservice.ris.caselaw.domain.mapper.PatchMapperService;
 import de.bund.digitalservice.ris.caselaw.webtestclient.RisWebTestClient;
 import java.time.Clock;
@@ -77,11 +81,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -150,18 +154,18 @@ class HandoverMailIntegrationTest {
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private LegalPeriodicalEditionRepository legalPeriodicalEditionRepository;
 
-  @MockBean ClientRegistrationRepository clientRegistrationRepository;
-  @MockBean private S3AsyncClient s3AsyncClient;
-  @MockBean private HttpMailSender mailSender;
-  @MockBean DocxConverterService docxConverterService;
-  @MockBean AttachmentService attachmentService;
-  @MockBean private PatchMapperService patchMapperService;
-  @MockBean private ProcedureService procedureService;
-  @MockBean private LdmlExporterService ldmlExporterService;
-  @MockBean private UserGroupService userGroupService;
-  @MockBean private DuplicateCheckService duplicateCheckService;
+  @MockitoBean ClientRegistrationRepository clientRegistrationRepository;
+  @MockitoBean private S3AsyncClient s3AsyncClient;
+  @MockitoBean private HttpMailSender mailSender;
+  @MockitoBean DocxConverterService docxConverterService;
+  @MockitoBean AttachmentService attachmentService;
+  @MockitoBean private PatchMapperService patchMapperService;
+  @MockitoBean private ProcedureService procedureService;
+  @MockitoBean private LdmlExporterService ldmlExporterService;
+  @MockitoBean private UserGroupService userGroupService;
+  @MockitoBean private DuplicateCheckService duplicateCheckService;
 
-  @MockBean
+  @MockitoBean
   private DocumentationUnitDocxMetadataInitializationService
       documentationUnitDocxMetadataInitializationService;
 
@@ -176,9 +180,9 @@ class HandoverMailIntegrationTest {
   @AfterEach
   void cleanUp() {
     xmlHandoverRepository.deleteAll();
+    editionRepository.deleteAll();
     repository.deleteAll();
     databaseHandoverReportRepository.deleteAll();
-    editionRepository.deleteAll();
     dblegalPeriodicalRepository.deleteAll();
   }
 
@@ -203,31 +207,30 @@ class HandoverMailIntegrationTest {
     assertThat(repository.findAll()).hasSize(1);
 
     if (entityType == HandoverEntityType.EDITION) {
-      LegalPeriodicalEditionDTO legalPeriodicalEditionDTO =
-          LegalPeriodicalEditionDTO.builder()
+      LegalPeriodicalEdition legalPeriodicalEdition =
+          LegalPeriodicalEdition.builder()
               .id(entityId)
               .legalPeriodical(
-                  LegalPeriodicalDTO.builder()
-                      .id(UUID.fromString("1abf62fe-9ddf-487e-962e-1c71cf661c5b"))
+                  LegalPeriodical.builder()
+                      .uuid(UUID.fromString("1abf62fe-9ddf-487e-962e-1c71cf661c5b"))
                       .abbreviation("ABC")
                       .build())
-              .build();
-      legalPeriodicalEditionDTO.setReferences(
-          List.of(
-              referenceRepository
-                  .save(
-                      ReferenceDTO.builder()
+              .references(
+                  List.of(
+                      Reference.builder()
                           .id(UUID.randomUUID())
+                          .referenceType(ReferenceType.CASELAW)
                           .citation("citation")
                           .legalPeriodicalRawValue("ABC")
-                          .type("nichtamtlich")
-                          .rank(1)
-                          .documentationUnit(savedDocumentationUnitDTO)
-                          .build())
-                  .toBuilder()
-                  .editionRank(1)
-                  .build()));
-      editionRepository.save(legalPeriodicalEditionDTO);
+                          .primaryReference(true)
+                          .documentationUnitRank(1)
+                          .documentationUnit(
+                              RelatedDocumentationUnitTransformer.transformToDomain(
+                                  (savedDocumentationUnitDTO)))
+                          .editionRank(1)
+                          .build()))
+              .build();
+      legalPeriodicalEditionRepository.save(legalPeriodicalEdition);
       assertThat(editionRepository.findAll()).hasSize(1);
       identifier = "edition-" + entityId;
     }
@@ -324,7 +327,7 @@ class HandoverMailIntegrationTest {
       LegalPeriodicalEditionDTO legalPeriodicalEditionDTO =
           LegalPeriodicalEditionDTO.builder()
               .id(entityId)
-              .editionReferences(List.of())
+              .references(List.of())
               .legalPeriodical(
                   LegalPeriodicalDTO.builder()
                       .id(UUID.fromString("1abf62fe-9ddf-487e-962e-1c71cf661c5b"))

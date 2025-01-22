@@ -242,7 +242,7 @@ test.describe(
         .click()
 
       const line = page.getByText(
-        (editionWithReferences.name || "") + "MMG" + "2" + formattedDate,
+        (editionWithReferences.name || "") + "MMG" + "4" + formattedDate,
       )
 
       await expect(line).toBeVisible()

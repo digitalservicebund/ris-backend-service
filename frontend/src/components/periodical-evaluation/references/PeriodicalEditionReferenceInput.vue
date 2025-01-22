@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, ref, watch } from "vue"
+import { computed, onMounted, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import CreateNewFromSearch from "@/components/CreateNewFromSearch.vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
@@ -15,7 +15,7 @@ import PopupModal from "@/components/PopupModal.vue"
 import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
-import { useScrollPreviewContainer } from "@/composables/useScrollPreviewContainer"
+import { useScroll } from "@/composables/useScroll"
 import { useValidationStore } from "@/composables/useValidationStore"
 import DocumentUnit, {
   DocumentationUnitParameters,
@@ -42,8 +42,7 @@ const emit = defineEmits<{
   removeEntry: [value: Reference]
 }>()
 
-const containerRef = ref<HTMLElement | null>(null)
-const { openSidePanel } = useScrollPreviewContainer()
+const { scrollIntoViewportById, openSidePanelAndScrollToSection } = useScroll()
 
 const store = useEditionStore()
 const reference = ref<Reference>(new Reference({ ...props.modelValue }))
@@ -107,23 +106,6 @@ function updateDateFormatValidation(
   if (validationError)
     validationStore.add(validationError.message, "decisionDate")
   else validationStore.remove("decisionDate")
-}
-
-/**
- * In case of validation errors it will scroll  back to input fields
- *
- * @returns A promise that resolves after the DOM updates.
- */
-async function scrollToTopPosition() {
-  await nextTick()
-  if (
-    containerRef.value instanceof HTMLElement &&
-    "scrollIntoView" in containerRef.value
-  ) {
-    containerRef.value.scrollIntoView({
-      block: "start",
-    })
-  }
 }
 
 async function search() {
@@ -215,7 +197,7 @@ async function addReference(decision: RelatedDocumentation) {
     emit("update:modelValue", newReference)
     emit("addEntry")
   } else {
-    await scrollToTopPosition()
+    await scrollIntoViewportById("periodical-references")
   }
 }
 
@@ -232,8 +214,9 @@ async function addReferenceWithCreatedDocumentationUnit(docUnit: DocumentUnit) {
       documentType: docUnit.coreData.documentType,
       documentNumber: docUnit.documentNumber,
       status: docUnit.status,
-      referenceFound: true,
       createdByReference: reference.value.id,
+      creatingDocOffice: docUnit.coreData.creatingDocOffice,
+      documentationOffice: docUnit.coreData.documentationOffice,
     }),
   )
 }
@@ -318,11 +301,13 @@ watch(searchResultsCurrentPage, () => {
   pageNumber.value = 0
 })
 
-/** Opens up the side panel, if only on search result found
+/** Opens up the side panel, if only one search result found
  */
 watch(searchResults, async () => {
   if (searchResults.value?.length == 1) {
-    await openSidePanel(searchResults.value[0].decision.documentNumber)
+    await openSidePanelAndScrollToSection(
+      searchResults.value[0].decision.documentNumber,
+    )
   }
 })
 
@@ -330,12 +315,13 @@ onMounted(async () => {
   featureToggle.value = (
     await FeatureToggleService.isEnabled("neuris.new-from-search")
   ).data
+  await scrollIntoViewportById("periodical-references")
 })
 </script>
 
 <template>
   <div
-    ref="containerRef"
+    id="periodical-references"
     v-ctrl-enter="search"
     class="flex flex-col border-b-1"
   >
@@ -352,7 +338,7 @@ onMounted(async () => {
       @primary-action="deleteReferenceAndDocUnit"
       @secondary-action="deleteReference"
     />
-    <h2 v-if="!isSaved" class="ds-label-01-bold mb-16">
+    <h2 v-if="!isSaved" id="reference-input" class="ds-label-01-bold mb-16">
       Fundstelle hinzufügen
     </h2>
     <div class="flex flex-col gap-24">
@@ -693,4 +679,4 @@ onMounted(async () => {
     </div>
   </div>
 </template>
-@/stores/editionStore
+@/stores/editionStore @/composables/useScrollTo

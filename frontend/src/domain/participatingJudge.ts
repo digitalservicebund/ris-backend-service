@@ -2,6 +2,7 @@ import EditableListItem from "./editableListItem"
 
 export default class ParticipatingJudge implements EditableListItem {
   public id?: string
+  public newEntry?: boolean
   public name?: string
   public referencedOpinions?: string
 
@@ -11,8 +12,12 @@ export default class ParticipatingJudge implements EditableListItem {
 
   constructor(data: Partial<ParticipatingJudge> = {}) {
     Object.assign(this, data)
+
     if (this.id == undefined) {
       this.id = crypto.randomUUID()
+      this.newEntry = true
+    } else if (data.newEntry == undefined) {
+      this.newEntry = false
     }
   }
 
