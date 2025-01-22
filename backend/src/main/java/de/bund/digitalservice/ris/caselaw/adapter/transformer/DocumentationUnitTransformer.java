@@ -844,8 +844,10 @@ public class DocumentationUnitTransformer {
                 DuplicateRelationTransformer.transformToDomain(relation, documentationUnitDTO))
         .sorted(
             Comparator.comparing(
-                relation -> Optional.ofNullable(relation.decisionDate()).orElse(LocalDate.MIN),
-                Comparator.reverseOrder()))
+                    (DuplicateRelation relation) ->
+                        Optional.ofNullable(relation.decisionDate()).orElse(LocalDate.MIN),
+                    Comparator.reverseOrder())
+                .thenComparing(DuplicateRelation::documentNumber))
         .toList();
   }
 

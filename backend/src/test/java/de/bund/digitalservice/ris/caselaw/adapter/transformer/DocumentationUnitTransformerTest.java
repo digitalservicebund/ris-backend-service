@@ -1558,7 +1558,7 @@ class DocumentationUnitTransformerTest {
   }
 
   @Test
-  void testTransformToDomain_withMultipleDuplicateWarnings_shouldSortByDecisionDate() {
+  void testTransformToDomain_withMultipleDuplicateWarnings_shouldSortByDecisionDateAndDocNumber() {
     var original =
         generateSimpleDTOBuilder().documentNumber("original").id(UUID.randomUUID()).build();
     var duplicate1 =
@@ -1575,6 +1575,14 @@ class DocumentationUnitTransformerTest {
             .decisionDate(LocalDate.of(2021, 1, 1))
             .id(UUID.randomUUID())
             .build();
+    var duplicate4 =
+        generateSimpleDTOBuilder()
+            .documentNumber("duplicate4")
+            .decisionDate(LocalDate.of(2021, 1, 1))
+            .id(UUID.randomUUID())
+            .build();
+    var duplicate5 =
+        generateSimpleDTOBuilder().documentNumber("duplicate05").id(UUID.randomUUID()).build();
     var duplicateRelationship1 =
         DuplicateRelationDTO.builder()
             .documentationUnit1(duplicate1)
@@ -1590,17 +1598,28 @@ class DocumentationUnitTransformerTest {
             .documentationUnit1(duplicate3)
             .documentationUnit2(original)
             .build();
+    var duplicateRelationship4 =
+        DuplicateRelationDTO.builder()
+            .documentationUnit1(duplicate4)
+            .documentationUnit2(original)
+            .build();
+    var duplicateRelationship5 =
+        DuplicateRelationDTO.builder()
+            .documentationUnit1(duplicate5)
+            .documentationUnit2(original)
+            .build();
     original =
         original.toBuilder()
-            .duplicateRelations2(Set.of(duplicateRelationship1, duplicateRelationship2))
-            .duplicateRelations1(Set.of(duplicateRelationship3))
+            .duplicateRelations2(
+                Set.of(duplicateRelationship1, duplicateRelationship2, duplicateRelationship5))
+            .duplicateRelations1(Set.of(duplicateRelationship4, duplicateRelationship3))
             .build();
 
     DocumentationUnit documentationUnit = DocumentationUnitTransformer.transformToDomain(original);
 
     var transformedRelations = documentationUnit.managementData().duplicateRelations();
-    assertThat(transformedRelations).hasSize(3);
+    assertThat(transformedRelations).hasSize(5);
     assertThat(transformedRelations.stream().map(DuplicateRelation::documentNumber))
-        .containsExactly("duplicate3", "duplicate1", "duplicate2");
+        .containsExactly("duplicate3", "duplicate4", "duplicate1", "duplicate05", "duplicate2");
   }
 }
