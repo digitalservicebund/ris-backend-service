@@ -228,14 +228,18 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
       Optional<DuplicateRelationDTO> existingRelation =
           duplicateRelationService.findByDocUnitIds(documentationUnit.getId(), dup.getId());
 
+      var isJDVDuplicateCheckActive =
+          !Boolean.FALSE.equals(dup.getIsJdvDuplicateCheckActive())
+              && !Boolean.FALSE.equals(documentationUnit.getIsJdvDuplicateCheckActive());
+
       var status =
-          Boolean.FALSE.equals(dup.getIsJdvDuplicateCheckActive())
-              ? DuplicateRelationStatus.IGNORED
-              : DuplicateRelationStatus.PENDING;
+          isJDVDuplicateCheckActive
+              ? DuplicateRelationStatus.PENDING
+              : DuplicateRelationStatus.IGNORED;
 
       if (existingRelation.isEmpty()) {
         createDuplicateRelation(documentationUnit, dup, status);
-      } else if (shouldUpdateRelationStatus(dup, existingRelation)) {
+      } else if (shouldUpdateRelationStatus(isJDVDuplicateCheckActive, existingRelation)) {
         duplicateRelationService.setStatus(existingRelation.get(), status);
       }
     }
@@ -258,8 +262,8 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
    * must be set to IGNORED.
    */
   private boolean shouldUpdateRelationStatus(
-      DocumentationUnitIdDuplicateCheckDTO dup, Optional<DuplicateRelationDTO> existingRelation) {
-    return Boolean.FALSE.equals(dup.getIsJdvDuplicateCheckActive())
+      boolean isJDVDuplicateCheckActive, Optional<DuplicateRelationDTO> existingRelation) {
+    return !isJDVDuplicateCheckActive
         && existingRelation.isPresent()
         && DuplicateRelationStatus.PENDING.equals(existingRelation.get().getStatus());
   }
