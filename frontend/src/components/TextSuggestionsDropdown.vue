@@ -1,11 +1,9 @@
 <script lang="ts" setup>
-import FlexContainer from "@/components/FlexContainer.vue"
 import TextButton from "@/components/input/TextButton.vue"
-import { Replacement } from "@/types/languagetool"
+import { Match, Replacement } from "@/types/languagetool"
 
-defineProps<{
-  replacements: Replacement[]
-  matchMessage?: string
+const props = defineProps<{
+  match: Match
 }>()
 
 const emit = defineEmits<{
@@ -23,26 +21,33 @@ function ignoreSuggestion() {
 </script>
 
 <template>
-  <FlexContainer
-    class="flex w-auto flex-col border-2 border-solid border-blue-800 bg-white"
+  <div
+    class="flex flex-col items-start justify-start border-2 border-solid border-blue-800 bg-white p-24"
   >
-    <div v-for="(replacement, i) in replacements" :key="i + replacement.value">
+    <button
+      class="ds-link-01-bold whitespace-nowrap leading-24 focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
+      @click="ignoreSuggestion"
+    >
+      Ignorieren
+    </button>
+
+    <label>
+      {{ match.message }}
+    </label>
+    <div
+      v-for="(replacement, i) in match.replacements"
+      :key="i + replacement.value"
+      class="flex w-full flex-row flex-nowrap gap-24"
+    >
       <TextButton
         aria-label="Vorschlag übernehmen"
-        button-type="ghost"
+        button-type="primary"
         :label="replacement.value"
-        width="w-full"
+        size="small"
+        width="w-max"
         @click="acceptSuggestion(replacement)"
       >
       </TextButton>
     </div>
-    <TextButton
-      aria-label="Vorschlag ignorieren"
-      button-type="ghost"
-      class="border-t-1"
-      label="Ignorieren"
-      width="w-full"
-      @click="ignoreSuggestion"
-    ></TextButton>
-  </FlexContainer>
+  </div>
 </template>

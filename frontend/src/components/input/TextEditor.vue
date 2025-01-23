@@ -312,8 +312,9 @@ const ignoreSuggestion = () => editor.commands.ignoreLanguageToolSuggestion()
       :tippy-options="{ placement: 'bottom', animation: 'fade' }"
     >
       <TextSuggestionsDropdown
+        v-if="match"
+        :match="match"
         match-message=""
-        :replacements="replacements"
         @suggestion:ignore="ignoreSuggestion"
         @suggestion:update="acceptSuggestion"
       />
