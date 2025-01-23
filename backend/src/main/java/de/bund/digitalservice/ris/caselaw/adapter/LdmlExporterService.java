@@ -10,14 +10,19 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.exception.DocumentationUnitNotExistsException;
 import jakarta.xml.bind.JAXB;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Templates;
 import javax.xml.transform.stream.StreamSource;
@@ -157,6 +162,131 @@ public class LdmlExporterService {
       log.error("Could not save LDML to bucket", e);
       throw new PublishException("Could not save LDML to bucket.", e);
     }
+  }
+
+  public void exportSampleLdmls() throws IOException {
+    List<String> documentNumbers =
+        List.of(
+            "KORE300422021",
+            "KORE300962024",
+            "KORE300712021",
+            "KORE315152024",
+            "KORE300452019",
+            "KORE303732016",
+            "KORE317912010",
+            "KORE629592018",
+            "KORE313312019",
+            "KORE307272022",
+            "KVRE427971801",
+            "KVRE417211601",
+            "KVRE450362201",
+            "KVRE443042101",
+            "KVRE407641401",
+            "KVRE457652301",
+            "KVRE402711301",
+            "KVRE451122301",
+            "KVRE400071201",
+            "KVRE438112001",
+            "",
+            "WBRE201800180",
+            "WBRE201900148",
+            "WBRE201900147",
+            "WBRE201800214",
+            "WBRE201800217",
+            "WBRE201800218",
+            "WBRE201800216",
+            "WBRE201800215",
+            "WBRE201800307",
+            "WBRE202300156",
+            "",
+            "STRE201150211",
+            "STRE201350061",
+            "STRE201450500",
+            "STRE201750064",
+            "STRE201550401",
+            "STRE201350278",
+            "STRE201250108",
+            "STRE201250718",
+            "STRE201350075",
+            "STRE201650167",
+            "",
+            "KSRE126071509",
+            "KSRE125951515",
+            "KSRE125801515",
+            "KSRE125961515",
+            "KSRE128321509",
+            "KSRE130411615",
+            "KSRE166401506",
+            "KSRE144180209",
+            "KSRE131851609",
+            "KSRE130181715",
+            "",
+            "KARE600032200",
+            "KARE600035228",
+            "KARE600051335",
+            "KARE600051463",
+            "KARE600055529",
+            "KARE600055896",
+            "KARE600055891",
+            "KARE600055897",
+            "KARE600061633",
+            "KARE600061634",
+            "",
+            "JURE229030565",
+            "JURE169016439",
+            "JURE229030432",
+            "JURE239031156",
+            "JURE209002984",
+            "JURE239030994",
+            "JURE249031620",
+            "JURE219029935",
+            "JURE199002514",
+            "JURE249031399");
+
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    ZipOutputStream zos = new ZipOutputStream(baos);
+
+    for (String documentNumber : documentNumbers) {
+      DocumentationUnit documentationUnit;
+      try {
+        documentationUnit = documentationUnitRepository.findByDocumentNumber(documentNumber);
+      } catch (DocumentationUnitNotExistsException ex) {
+        continue;
+      }
+
+      Optional<CaseLawLdml> ldml =
+          DocumentationUnitToLdmlTransformer.transformToLdml(
+              documentationUnit, documentBuilderFactory);
+
+      if (ldml.isEmpty()) {
+        continue;
+      }
+
+      Optional<String> fileContent = ldmlToString(ldml.get());
+      if (fileContent.isEmpty()) {
+        continue;
+      }
+
+      ByteArrayInputStream bais = new ByteArrayInputStream(fileContent.get().getBytes());
+
+      byte[] bytes = new byte[1024];
+      int length;
+
+      ZipEntry entry = new ZipEntry(documentationUnit.documentNumber() + ".xml");
+      zos.putNextEntry(entry);
+
+      while ((length = bais.read(bytes)) >= 0) {
+        zos.write(bytes, 0, length);
+      }
+
+      zos.closeEntry();
+    }
+
+    zos.close();
+    ByteBuffer buffer = ByteBuffer.wrap(baos.toByteArray());
+    buffer.rewind();
+
+    ldmlBucket.saveBytes("test_documentation_units.zip", buffer);
   }
 
   public String transformAndSaveDocumentationUnit(DocumentationUnit documentationUnit) {

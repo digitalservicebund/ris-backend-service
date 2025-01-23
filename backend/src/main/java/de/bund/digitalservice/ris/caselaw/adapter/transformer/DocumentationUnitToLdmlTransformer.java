@@ -340,9 +340,11 @@ public class DocumentationUnitToLdmlTransformer {
                 nullSafeGet(documentationUnit.coreData(), CoreData::decisionDate)));
     FrbrAuthor frbrAuthor = new FrbrAuthor();
 
+    List<FrbrAlias> aliases = generateAliases(documentationUnit);
+
     FrbrElement work =
         FrbrElement.builder()
-            .frbrAlias(new FrbrAlias(documentationUnit.uuid().toString()))
+            .frbrAlias(aliases)
             .frbrDate(frbrDate)
             .frbrAuthor(frbrAuthor)
             .frbrCountry(new FrbrCountry())
@@ -371,6 +373,18 @@ public class DocumentationUnitToLdmlTransformer {
         .build();
   }
 
+  private static List<FrbrAlias> generateAliases(DocumentationUnit documentationUnit) {
+    List<FrbrAlias> aliases = new ArrayList<>();
+
+    aliases.add(new FrbrAlias("uebergreifende-id", documentationUnit.uuid().toString()));
+
+    if (documentationUnit.coreData() != null && documentationUnit.coreData().ecli() != null) {
+      aliases.add(new FrbrAlias("ecli", documentationUnit.coreData().ecli()));
+    }
+
+    return aliases;
+  }
+
   private static String nullIfEmpty(String input) {
     if (StringUtils.isEmpty(input)) {
       return null;
@@ -382,6 +396,8 @@ public class DocumentationUnitToLdmlTransformer {
     if (StringUtils.isBlank(html)) {
       return Collections.emptyList();
     }
+
+    html = html.replace("&nbsp;", "&#160;");
 
     try {
       String wrapped = "<wrapper>" + html + "</wrapper>";

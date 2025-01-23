@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.exception.BucketException;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +76,17 @@ public class S3Bucket {
         PutObjectRequest.builder().bucket(bucketName).key(fileName).build();
     try {
       s3Client.putObject(putObjectRequest, RequestBody.fromString(fileContent));
+    } catch (S3Exception e) {
+      log.error("File could not be saved to bucket.", e);
+      throw new BucketException("File could not be saved to bucket.", e);
+    }
+  }
+
+  public void saveBytes(String fileName, ByteBuffer buffer) {
+    PutObjectRequest putObjectRequest =
+        PutObjectRequest.builder().bucket(bucketName).key(fileName).build();
+    try {
+      s3Client.putObject(putObjectRequest, RequestBody.fromByteBuffer(buffer));
     } catch (S3Exception e) {
       log.error("File could not be saved to bucket.", e);
       throw new BucketException("File could not be saved to bucket.", e);

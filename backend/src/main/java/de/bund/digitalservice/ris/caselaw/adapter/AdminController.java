@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.MailTrackingService;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -50,6 +51,19 @@ public class AdminController {
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<Void> createLdml() {
     ldmlExporterService.exportMultipleRandomDocumentationUnits();
+    return ResponseEntity.ok().build();
+  }
+
+  @GetMapping("/ldml/samples")
+  @PreAuthorize("isAuthenticated()")
+  public ResponseEntity<Void> createSampleLdmls() {
+    try {
+      ldmlExporterService.exportSampleLdmls();
+    } catch (IOException ex) {
+      log.error("Couldn't generate zip file for sample documentation units.", ex);
+      return ResponseEntity.internalServerError().build();
+    }
+
     return ResponseEntity.ok().build();
   }
 

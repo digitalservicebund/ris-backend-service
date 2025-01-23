@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -389,6 +390,39 @@ class CaseLawLdmlExportTest {
     Optional<String> fileContent = exporter.ldmlToString(ldml.get());
     Assertions.assertTrue(fileContent.isPresent());
     Assertions.assertTrue(
+        StringUtils.deleteWhitespace(fileContent.get())
+            .contains(StringUtils.deleteWhitespace(expected)));
+  }
+
+  @Test
+  @DisplayName("Long text with non breaking spaces")
+  void testTransformToLdml_longTextWithNBSP_shouldReplaceItWithUnicode() {
+    String expected =
+        """
+         <akn:decision>
+            <akn:block name="Gruende">
+               <akn:embeddedStructure>
+                  <akn:p>text with non&#160;breaking&#160;spaces</akn:p>
+               </akn:embeddedStructure>
+            </akn:block>
+         </akn:decision>
+         """;
+    DocumentationUnit otherLongTextCaseLaw =
+        testDocumentUnit.toBuilder()
+            .longTexts(
+                LongTexts.builder()
+                    .reasons("<p>text with non&nbsp;breaking&nbsp;spaces</p>")
+                    .build())
+            .build();
+
+    Optional<CaseLawLdml> ldml =
+        DocumentationUnitToLdmlTransformer.transformToLdml(
+            otherLongTextCaseLaw, documentBuilderFactory);
+
+    assertThat(ldml).isPresent();
+    Optional<String> fileContent = exporter.ldmlToString(ldml.get());
+    assertThat(fileContent).isPresent();
+    assertThat(
         StringUtils.deleteWhitespace(fileContent.get())
             .contains(StringUtils.deleteWhitespace(expected)));
   }

@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.caselawldml;
 
 import jakarta.xml.bind.annotation.XmlElement;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,7 +20,7 @@ public class FrbrElement {
   private FrbrUri frbrUri;
 
   @XmlElement(name = "FRBRalias", namespace = CaseLawLdml.AKN_NS)
-  private FrbrAlias frbrAlias;
+  private List<FrbrAlias> frbrAlias;
 
   @XmlElement(name = "FRBRdate", namespace = CaseLawLdml.AKN_NS)
   private FrbrDate frbrDate;

@@ -7,10 +7,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class FrbrAlias {
-  @XmlAttribute private String name = "uebergreifende-id";
+  @XmlAttribute private String name;
   @XmlAttribute private String value;
 
-  public FrbrAlias(String value) {
+  public FrbrAlias(String name, String value) {
+    this.name = name;
     this.value = value;
   }
 }
