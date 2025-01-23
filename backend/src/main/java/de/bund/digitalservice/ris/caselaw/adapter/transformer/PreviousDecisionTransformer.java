@@ -1,15 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
-import java.util.Optional;
 
 public class PreviousDecisionTransformer extends RelatedDocumentationUnitTransformer {
   public static PreviousDecision transformToDomain(PreviousDecisionDTO previousDecisionDTO) {
-    Optional<DocumentationUnitDTO> referencedDocumentationUnit =
-        Optional.ofNullable(previousDecisionDTO.getReferencedDocumentationUnit());
     return PreviousDecision.builder()
         .uuid(previousDecisionDTO.getId())
         .documentNumber(previousDecisionDTO.getDocumentNumber())

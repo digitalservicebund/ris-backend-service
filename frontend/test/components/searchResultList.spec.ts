@@ -27,7 +27,6 @@ function renderSearchResults(
               label: "fooLabel",
             },
             documentNumber: "fooDocumentNumber",
-            referencedDocumentationUnitId: "foo",
           },
         }),
         isLinked: false,

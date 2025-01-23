@@ -660,11 +660,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
   }
 
   @Override
-  public Map<RelatedDocumentationType, Long> getAllDocumentationUnitWhichLink(
-      UUID documentationUnitId) {
-    return relatedDocumentationRepository
-        .findAllByReferencedDocumentationUnitId(documentationUnitId)
-        .stream()
+  public Map<RelatedDocumentationType, Long> getAllRelatedDocumentationUnitsByDocumentNumber(
+      String documentNumber) {
+    return relatedDocumentationRepository.findAllByDocumentNumber(documentNumber).stream()
         .collect(Collectors.groupingBy(RelatedDocumentationDTO::getType, Collectors.counting()));
   }
 

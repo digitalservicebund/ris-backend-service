@@ -236,8 +236,9 @@ public class DocumentationUnitService {
   @Transactional(transactionManager = "jpaTransactionManager")
   public String deleteByUuid(UUID documentationUnitId) throws DocumentationUnitNotExistsException {
 
+    DocumentationUnit docUnit = getByUuid(documentationUnitId);
     Map<RelatedDocumentationType, Long> relatedEntities =
-        repository.getAllDocumentationUnitWhichLink(documentationUnitId);
+        repository.getAllRelatedDocumentationUnitsByDocumentNumber(docUnit.documentNumber());
 
     if (!(relatedEntities == null
         || relatedEntities.isEmpty()

@@ -501,7 +501,7 @@ class EnsuingDecisionsIntegrationTest {
 
   @Test
   void
-      testUpdateDocumentationUnit_addPendingDecisionWithDocumentNumber_shouldLinkReferencedDocumentationUnit() {
+      testUpdateDocumentationUnit_addPendingDecisionWithDocumentNumber_shouldLinkRelatedDocumentationUnit() {
     UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
     UUID ensuingDecisionUUID1 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
     UUID ensuingDecisionUUID2 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120003");

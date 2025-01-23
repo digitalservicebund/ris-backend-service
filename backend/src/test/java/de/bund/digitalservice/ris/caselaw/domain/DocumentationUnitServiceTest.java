@@ -234,13 +234,13 @@ class DocumentationUnitServiceTest {
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> service.deleteByUuid(TEST_UUID));
 
-    verify(repository).findByUuid(TEST_UUID);
+    verify(repository, times(2)).findByUuid(TEST_UUID);
   }
 
   @Test
   void testDeleteByUuid_withLinks() throws DocumentationUnitNotExistsException {
     when(repository.findByUuid(TEST_UUID)).thenReturn(DocumentationUnit.builder().build());
-    when(repository.getAllDocumentationUnitWhichLink(TEST_UUID))
+    when(repository.getAllRelatedDocumentationUnitsByDocumentNumber(any()))
         .thenReturn(Map.of(ACTIVE_CITATION, 2L));
     DocumentationUnitDeletionException throwable =
         Assertions.assertThrows(

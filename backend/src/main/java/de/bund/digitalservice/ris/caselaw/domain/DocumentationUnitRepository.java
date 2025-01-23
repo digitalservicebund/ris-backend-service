@@ -121,11 +121,12 @@ public interface DocumentationUnitRepository {
    * Find existing links to a documentation unit with a given id. This can be used to check if a
    * documentation unit can safely be deleted.
    *
-   * @param documentationUnitId the UUID of the documentation unit to find links to
+   * @param documentNumber the documentNumber of the documentation unit to find links to
    * @return a map containing the relation extension (e.g. previous decision) and the number of
    *     links with this relation in the documentation unit with the given id
    */
-  Map<RelatedDocumentationType, Long> getAllDocumentationUnitWhichLink(UUID documentationUnitId);
+  Map<RelatedDocumentationType, Long> getAllRelatedDocumentationUnitsByDocumentNumber(
+      String documentNumber);
 
   List<UUID> getRandomDocumentationUnitIds();
 
