@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue"
+import { useScrollLock } from "@vueuse/core"
+import { computed, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import TextButton from "@/components/input/TextButton.vue"
 import PopupModal from "@/components/PopupModal.vue"
@@ -11,6 +12,10 @@ const { documentNumber, uuid } = defineProps<{
 }>()
 
 const showDeleteModal = ref(false)
+
+const scrollLock = useScrollLock(document)
+watch(showDeleteModal, () => (scrollLock.value = showDeleteModal.value))
+
 const deleteModalText = computed(
   () =>
     `Möchten Sie die Dokumentationseinheit ${documentNumber} wirklich dauerhaft löschen?`,
