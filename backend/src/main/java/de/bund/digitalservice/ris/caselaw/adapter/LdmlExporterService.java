@@ -248,7 +248,9 @@ public class LdmlExporterService {
       DocumentationUnit documentationUnit;
       try {
         documentationUnit = documentationUnitRepository.findByDocumentNumber(documentNumber);
-      } catch (DocumentationUnitNotExistsException ex) {
+      } catch (Exception ex) {
+        log.error(
+            "Couldn't export (step get documentation unit) {} as LegalDocML", documentNumber, ex);
         continue;
       }
 
@@ -257,11 +259,13 @@ public class LdmlExporterService {
               documentationUnit, documentBuilderFactory);
 
       if (ldml.isEmpty()) {
+        log.error("Couldn't export (step tranform) {} as LegalDocML", documentNumber);
         continue;
       }
 
       Optional<String> fileContent = ldmlToString(ldml.get());
       if (fileContent.isEmpty()) {
+        log.error("Couldn't export (step generate file content) {} as LegalDocML", documentNumber);
         continue;
       }
 
