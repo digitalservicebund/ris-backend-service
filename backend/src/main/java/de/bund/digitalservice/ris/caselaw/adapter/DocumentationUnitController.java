@@ -496,11 +496,6 @@ public class DocumentationUnitController {
       @PathVariable String documentNumberDuplicate,
       @RequestBody @Valid DuplicateRelationStatusRequest duplicateRelationStatusRequest) {
     try {
-      log.info(
-          "PUT duplicate relation status: {}, {}, {}",
-          documentNumberOrigin,
-          documentNumberDuplicate,
-          duplicateRelationStatusRequest.getStatus());
       var result =
           duplicateCheckService.updateDuplicateStatus(
               documentNumberOrigin,
@@ -508,7 +503,6 @@ public class DocumentationUnitController {
               duplicateRelationStatusRequest.getStatus());
       return ResponseEntity.status(HttpStatus.OK).body(result);
     } catch (DocumentationUnitNotExistsException | EntityNotFoundException ex) {
-      log.error("Could not find given relationship", ex);
       return ResponseEntity.notFound().build();
     }
   }
