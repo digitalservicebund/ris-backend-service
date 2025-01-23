@@ -239,8 +239,9 @@ class DocumentationUnitServiceTest {
 
   @Test
   void testDeleteByUuid_withLinks() throws DocumentationUnitNotExistsException {
-    when(repository.findByUuid(TEST_UUID)).thenReturn(DocumentationUnit.builder().build());
-    when(repository.getAllRelatedDocumentationUnitsByDocumentNumber(any()))
+    when(repository.findByUuid(TEST_UUID))
+        .thenReturn(DocumentationUnit.builder().documentNumber("foo").build());
+    when(repository.getAllRelatedDocumentationUnitsByDocumentNumber(any(String.class)))
         .thenReturn(Map.of(ACTIVE_CITATION, 2L));
     DocumentationUnitDeletionException throwable =
         Assertions.assertThrows(
