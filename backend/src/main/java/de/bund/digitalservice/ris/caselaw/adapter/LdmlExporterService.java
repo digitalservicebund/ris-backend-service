@@ -28,18 +28,15 @@ import javax.xml.transform.Templates;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mapping.MappingException;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
 @Service
 @Slf4j
 public class LdmlExporterService {
-
-  private static final Logger logger = LogManager.getLogger(LdmlExporterService.class);
 
   private final DocumentationUnitRepository documentationUnitRepository;
   private final DocumentBuilderFactory documentBuilderFactory;
@@ -65,7 +62,7 @@ public class LdmlExporterService {
   }
 
   public void exportMultipleRandomDocumentationUnits() {
-    logger.info("Export to LDML process has started");
+    log.info("Export to LDML process has started");
     List<DocumentationUnit> documentationUnitsToTransform = new ArrayList<>();
 
     List<UUID> idsToTransform = documentationUnitRepository.getRandomDocumentationUnitIds();
@@ -101,7 +98,7 @@ public class LdmlExporterService {
       }
     }
 
-    logger.info("Export to LDML process is done");
+    log.info("Export to LDML process is done");
   }
 
   /**
@@ -164,6 +161,7 @@ public class LdmlExporterService {
     }
   }
 
+  @Async
   public void exportSampleLdmls() throws IOException {
     List<String> documentNumbers =
         List.of(
@@ -280,6 +278,8 @@ public class LdmlExporterService {
       }
 
       zos.closeEntry();
+
+      log.info("Add {} to the zip file.", documentationUnit.documentNumber());
     }
 
     zos.close();
@@ -315,7 +315,7 @@ public class LdmlExporterService {
         int hintEnd = Math.min(ldmlAsXmlString.length(), hintStart + 60);
         String hint =
             "\"..." + ldmlAsXmlString.substring(hintStart, hintEnd).replace("\n", "") + "...\"";
-        logger.error(
+        log.error(
             "Invalid ldml produced for {}. A new unsupported attribute or elements was discovered."
                 + " It is either an error or needs to be added to the allow list. hint : {}",
             ldml.getUniqueId(),
@@ -344,6 +344,6 @@ public class LdmlExporterService {
     } else if (beforeXslt.matches("(?s).*?<akn:header>.*?<br.*?>.*?</akn:header>.*")) {
       hint = "Ldml contained <br> inside title.";
     }
-    logger.error("Error: {} Case Law {} does not match akomantoso30.xsd. {}", hint, caseLawId, e);
+    log.error("Error: {} Case Law {} does not match akomantoso30.xsd. {}", hint, caseLawId, e);
   }
 }
