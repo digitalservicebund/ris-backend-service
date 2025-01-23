@@ -55,7 +55,6 @@ class DocumentationUnitListItemTransformerTest {
         DocumentationUnitListItemTransformer.transformToDomain(currentDto);
 
     // basic data
-    assertThat(documentationUnitListItem.referencedDocumentationUnitId()).isEqualTo(id);
     assertThat(documentationUnitListItem.note()).isEqualTo("a note");
     assertThat(documentationUnitListItem.court())
         .isEqualTo(Court.builder().type("LG").location("Berlin").label("LG Berlin").build());
@@ -89,7 +88,6 @@ class DocumentationUnitListItemTransformerTest {
     DocumentationUnitListItem documentationUnitListItem =
         DocumentationUnitListItemTransformer.transformToDomain(currentDto);
 
-    assertThat(documentationUnitListItem.referencedDocumentationUnitId()).isEqualTo(id);
     assertThat(documentationUnitListItem.status()).isNull();
   }
 
@@ -102,19 +100,6 @@ class DocumentationUnitListItemTransformerTest {
     DocumentationUnitListItem documentationUnitListItem =
         DocumentationUnitListItemTransformer.transformToDomain(currentDto);
 
-    assertThat(documentationUnitListItem.referencedDocumentationUnitId()).isEqualTo(id);
     assertThat(documentationUnitListItem.note()).isNull();
-  }
-
-  @Test
-  void testTransformToDomain_withoutEmptyNote_shouldHaveNoNote() {
-    UUID id = UUID.randomUUID();
-    DocumentationUnitListItemDTO currentDto =
-        DocumentationUnitDTO.builder().id(id).note("").build();
-
-    DocumentationUnitListItem documentationUnitListItem =
-        DocumentationUnitListItemTransformer.transformToDomain(currentDto);
-
-    assertThat(documentationUnitListItem.referencedDocumentationUnitId()).isEqualTo(id);
   }
 }

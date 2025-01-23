@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DatabaseRelatedDocumentationRepository
     extends JpaRepository<RelatedDocumentationDTO, UUID> {
-  List<RelatedDocumentationDTO> findAllByReferencedDocumentationUnitId(UUID documentationUnitId);
+  List<RelatedDocumentationDTO> findAllByDocumentNumber(String documentNumber);
 }
