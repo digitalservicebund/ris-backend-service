@@ -9,15 +9,15 @@ import org.flywaydb.gradle.task.FlywayMigrateTask
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.4.1"
-    id("io.spring.dependency-management") version "1.1.6"
+    id("org.springframework.boot") version "3.4.2"
+    id("io.spring.dependency-management") version "1.1.7"
     id("com.diffplug.spotless") version "6.25.0"
     id("org.sonarqube") version "6.0.1.5171"
     id("com.github.jk1.dependency-license-report") version "2.9"
     id("com.gorylenko.gradle-git-properties") version "2.4.2"
     id("com.adarshr.test-logger") version "4.0.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.18"
-    id("com.github.ben-manes.versions") version "0.51.0"
+    id("com.github.ben-manes.versions") version "0.52.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
     id("org.flywaydb.flyway") version "11.2.0"
     id("io.sentry.jvm.gradle") version "4.14.1"
@@ -210,7 +210,7 @@ dependencies {
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
-    implementation("io.getunleash:unleash-client-java:9.2.6")
+    implementation("io.getunleash:unleash-client-java:9.3.1")
     implementation("org.apache.commons:commons-text:1.13.0")
     implementation("org.jsoup:jsoup:1.18.3")
 
