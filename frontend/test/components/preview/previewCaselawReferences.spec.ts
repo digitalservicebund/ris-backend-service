@@ -1,12 +1,12 @@
 import { render, screen } from "@testing-library/vue"
 import { previewLayoutInjectionKey } from "@/components/preview/constants"
-import PreviewReferences from "@/components/preview/PreviewReferences.vue"
+import PreviewCaselawReferences from "@/components/preview/PreviewCaselawReferences.vue"
 import Reference from "@/domain/reference"
 
-function renderComponent(references?: Reference[]) {
-  return render(PreviewReferences, {
+function renderComponent(caselawReferences?: Reference[]) {
+  return render(PreviewCaselawReferences, {
     props: {
-      references: references || [],
+      caselawReferences: caselawReferences || [],
     },
     global: {
       provide: {
@@ -16,7 +16,7 @@ function renderComponent(references?: Reference[]) {
   })
 }
 
-describe("preview references", () => {
+describe("preview caselaw references", () => {
   test.each([undefined, []])(
     "exclude references if null or empty",
     async (references?: Reference[]) => {

@@ -11,9 +11,9 @@ import { useDocumentUnitStore } from "@/stores/documentUnitStore"
 const store = useDocumentUnitStore()
 
 const caselawReferences = computed({
-  get: () => store.documentUnit!.references as Reference[],
+  get: () => store.documentUnit!.caselawReferences as Reference[],
   set: (newValues) => {
-    store.documentUnit!.references = newValues
+    store.documentUnit!.caselawReferences = newValues
   },
 })
 

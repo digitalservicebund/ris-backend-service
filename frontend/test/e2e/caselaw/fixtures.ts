@@ -180,7 +180,7 @@ export const caselawTest = test.extend<MyFixtures>({
             headnote: "testHeadnote",
             guidingPrinciple: "guidingPrinciple",
           },
-          references: [
+          caselawReferences: [
             {
               id: crypto.randomUUID(),
               citation: "2024, 1-2, Heft 1",

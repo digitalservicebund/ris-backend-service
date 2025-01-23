@@ -874,7 +874,8 @@ class OAuthServiceTest {
         "/longTexts/dissentingOpinion",
         "/longTexts/otherLongText",
         "/longTexts/outline",
-        "/references"
+        "/caselawReferences",
+        "/literatureReferences"
       })
   void test_isPatchAllowedForExternalUsers_withProhibitedPath_shouldReturnFalse(String path) {
     // Arrange

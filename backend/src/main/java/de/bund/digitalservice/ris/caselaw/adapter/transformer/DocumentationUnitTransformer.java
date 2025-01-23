@@ -176,9 +176,9 @@ public class DocumentationUnitTransformer {
       DocumentationUnitDTO currentDTO) {
     AtomicInteger rank = new AtomicInteger(0);
     builder.caselawReferences(
-        updatedDomainObject.references() == null
+        updatedDomainObject.caselawReferences() == null
             ? Collections.emptyList()
-            : updatedDomainObject.references().stream()
+            : updatedDomainObject.caselawReferences().stream()
                 .map(ReferenceTransformer::transformToDTO)
                 .map(
                     referenceDTO -> {
@@ -807,7 +807,7 @@ public class DocumentationUnitTransformer {
         .longTexts(longTexts)
         .contentRelatedIndexing(contentRelatedIndexing)
         .managementData(managementData)
-        .references(
+        .caselawReferences(
             documentationUnitDTO.getCaselawReferences() == null
                 ? new ArrayList<>()
                 : documentationUnitDTO.getCaselawReferences().stream()

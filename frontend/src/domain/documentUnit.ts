@@ -157,7 +157,7 @@ export default class DocumentUnit {
   public ensuingDecisions?: EnsuingDecision[]
   public contentRelatedIndexing: ContentRelatedIndexing = {}
   public note: string = ""
-  public references?: Reference[]
+  public caselawReferences?: Reference[]
   public literatureReferences?: Reference[]
   public isEditable: boolean = false
   public managementData: ManagementData = {
@@ -251,8 +251,8 @@ export default class DocumentUnit {
       )
     }
 
-    if (data.references)
-      data.references = data.references.map(
+    if (data.caselawReferences)
+      data.caselawReferences = data.caselawReferences.map(
         (reference) => new Reference({ ...reference }),
       )
 

@@ -6,14 +6,14 @@ import PreviewRow from "@/components/preview/PreviewRow.vue"
 import Reference from "@/domain/reference"
 
 const props = defineProps<{
-  references: Reference[] | undefined
+  caselawReferences: Reference[] | undefined
 }>()
 
 const primaryReferences = computed(() =>
-  props.references?.filter((reference) => reference.primaryReference),
+  props.caselawReferences?.filter((reference) => reference.primaryReference),
 )
 const secondaryReferences = computed(() =>
-  props.references?.filter((reference) => !reference.primaryReference),
+  props.caselawReferences?.filter((reference) => !reference.primaryReference),
 )
 </script>
 

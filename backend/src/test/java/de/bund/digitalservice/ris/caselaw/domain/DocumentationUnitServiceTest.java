@@ -571,6 +571,7 @@ class DocumentationUnitServiceTest {
         "/longTexts/dissentingOpinion",
         "/longTexts/otherLongText",
         "/longTexts/outline",
-        "/references");
+        "/caselawReferences",
+        "/literatureReferences");
   }
 }

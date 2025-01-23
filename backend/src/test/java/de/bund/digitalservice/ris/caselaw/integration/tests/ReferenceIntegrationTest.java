@@ -182,7 +182,7 @@ class ReferenceIntegrationTest {
             .uuid(dto.getId())
             .documentNumber(dto.getDocumentNumber())
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
-            .references(
+            .caselawReferences(
                 List.of(
                     Reference.builder()
                         .id(referenceId)
@@ -213,11 +213,11 @@ class ReferenceIntegrationTest {
               assertThat(response.getResponseBody()).isNotNull();
               assertThat(response.getResponseBody().documentNumber())
                   .isEqualTo(DEFAULT_DOCUMENT_NUMBER);
-              assertThat(response.getResponseBody().references()).hasSize(1);
-              assertThat(response.getResponseBody().references())
+              assertThat(response.getResponseBody().caselawReferences()).hasSize(1);
+              assertThat(response.getResponseBody().caselawReferences())
                   .extracting("citation", "referenceSupplement", "footnote", "id")
                   .containsExactly(tuple("2024, S.3", "Klammerzusatz", "footnote", referenceId));
-              assertThat(response.getResponseBody().references())
+              assertThat(response.getResponseBody().caselawReferences())
                   .extracting("legalPeriodical")
                   .usingRecursiveComparison()
                   .isEqualTo(List.of(bverwgeLegalPeriodical));
@@ -321,7 +321,7 @@ class ReferenceIntegrationTest {
             .uuid(dto.getId())
             .documentNumber(dto.getDocumentNumber())
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
-            .references(List.of())
+            .caselawReferences(List.of())
             .build();
 
     risWebTestClient
@@ -336,7 +336,7 @@ class ReferenceIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().references()).isEmpty();
+              assertThat(response.getResponseBody().caselawReferences()).isEmpty();
             });
 
     assertThat(referenceRepository.findById(referenceId)).isEmpty();
@@ -391,7 +391,7 @@ class ReferenceIntegrationTest {
             .uuid(dto.getId())
             .documentNumber(dto.getDocumentNumber())
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
-            .references(List.of())
+            .caselawReferences(List.of())
             .build();
 
     risWebTestClient
@@ -406,7 +406,7 @@ class ReferenceIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().references()).isEmpty();
+              assertThat(response.getResponseBody().caselawReferences()).isEmpty();
             });
 
     assertThat(referenceRepository.findById(referenceId)).isEmpty();

@@ -73,7 +73,7 @@ public class JurisXmlExporterWrapper implements XmlExporter {
           jurisXmlExporter.generateXml(
               DocumentationUnit.builder()
                   .documentNumber(reference.documentationUnit().getDocumentNumber())
-                  .references(List.of(reference))
+                  .caselawReferences(List.of(reference))
                   .build(),
               false);
       results.add(

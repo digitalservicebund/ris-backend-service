@@ -804,7 +804,7 @@ class DocumentationUnitTransformerTest {
                 .primaryReference(true)
                 .build());
     DocumentationUnit updatedDomainObject =
-        DocumentationUnit.builder().references(updatedReferences).build();
+        DocumentationUnit.builder().caselawReferences(updatedReferences).build();
 
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
@@ -1427,7 +1427,7 @@ class DocumentationUnitTransformerTest {
                 .collectiveAgreements(Collections.emptyList())
                 .hasLegislativeMandate(false)
                 .build())
-        .references(Collections.emptyList())
+        .caselawReferences(Collections.emptyList())
         .literatureReferences(Collections.emptyList());
   }
 

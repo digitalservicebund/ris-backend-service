@@ -22,7 +22,9 @@ import lombok.Builder;
  * @param status the current status including publication and error status
  * @param note a note added to the documentation unit
  * @param contentRelatedIndexing the content related indexing data
- * @param references a list of legal periodical references (Fundstellen)
+ * @param caselawReferences a list of legal periodical caselaw references (Fundstellen)
+ * @param literatureReferences a list of legal periodical literature references
+ *     (Literaturfundstellen)
  * @param isEditable a flag indicating if the documentation unit is editable by the user
  */
 @Builder(toBuilder = true)
@@ -41,7 +43,7 @@ public record DocumentationUnit(
     Status status,
     String note,
     ContentRelatedIndexing contentRelatedIndexing,
-    List<Reference> references,
+    List<Reference> caselawReferences,
     List<Reference> literatureReferences,
     boolean isEditable,
     boolean isDeletable) {}

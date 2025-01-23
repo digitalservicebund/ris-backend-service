@@ -7,13 +7,13 @@ import {
   PreviewLayout,
   previewLayoutInjectionKey,
 } from "@/components/preview/constants"
+import PreviewCaselawReferences from "@/components/preview/PreviewCaselawReferences.vue"
 import PreviewContentRelatedIndexing from "@/components/preview/PreviewContentRelatedIndexing.vue"
 import PreviewCoreData from "@/components/preview/PreviewCoreData.vue"
 import PreviewLiteratureReferences from "@/components/preview/PreviewLiteratureReferences.vue"
 import PreviewLongTexts from "@/components/preview/PreviewLongTexts.vue"
 import PreviewNote from "@/components/preview/PreviewNote.vue"
 import PreviewProceedingDecisions from "@/components/preview/PreviewProceedingDecisions.vue"
-import PreviewReferences from "@/components/preview/PreviewReferences.vue"
 import PreviewShortTexts from "@/components/preview/PreviewShortTexts.vue"
 import { LongTexts } from "@/domain/documentUnit"
 import Reference from "@/domain/reference"
@@ -44,7 +44,9 @@ provide(previewLayoutInjectionKey, props.layout || "wide")
     </p>
     <PreviewCoreData :core-data="documentUnit.coreData" />
     <PreviewNote :note="documentUnit.note" />
-    <PreviewReferences :references="documentUnit.references as Reference[]" />
+    <PreviewCaselawReferences
+      :caselaw-references="documentUnit.caselawReferences as Reference[]"
+    />
     <PreviewLiteratureReferences
       :literature-references="documentUnit.literatureReferences as Reference[]"
     />

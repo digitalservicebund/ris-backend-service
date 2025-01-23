@@ -427,7 +427,7 @@ class LegalPeriodicalEditionIntegrationTest {
                     .isEqualTo("New Literature Reference Citation from Edition"));
 
     // first, caselaw references
-    assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").references())
+    assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").caselawReferences())
         .hasSize(3)
         .satisfiesExactly(
             reference ->
@@ -603,7 +603,7 @@ class LegalPeriodicalEditionIntegrationTest {
 
     // documentation unit references are updated
     // first, caselaw references
-    assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").references())
+    assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").caselawReferences())
         .hasSize(2)
         .satisfiesExactly(
             reference ->
@@ -707,7 +707,7 @@ class LegalPeriodicalEditionIntegrationTest {
     Assertions.assertEquals(
         referenceId, firstEditionReferences.get(0).documentationUnit().getCreatedByReference());
 
-    assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").references())
+    assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").caselawReferences())
         .hasSize(1)
         .satisfies(
             list -> {
@@ -812,6 +812,7 @@ class LegalPeriodicalEditionIntegrationTest {
                 .getCreatedByReference())
         .isNull();
 
-    assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").references()).isEmpty();
+    assertThat(documentationUnitService.getByDocumentNumber("DOC_NUMBER").caselawReferences())
+        .isEmpty();
   }
 }
