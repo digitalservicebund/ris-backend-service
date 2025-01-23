@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -37,7 +39,6 @@ class LegalPeriodicalEditionControllerTest {
   @Autowired private OAuthService oAuthService;
   @Autowired private KeycloakUserService keycloakUserService;
   @MockitoBean private LegalPeriodicalEditionService service;
-
   @MockitoBean private HandoverService handoverService;
   @MockitoBean private ClientRegistrationRepository clientRegistrationRepository;
   @MockitoBean private DatabaseApiKeyRepository databaseApiKeyRepository;
@@ -60,7 +61,8 @@ class LegalPeriodicalEditionControllerTest {
             .suffix("- Sonderheft 1")
             .build();
 
-    when(service.getById(uuid)).thenReturn(Optional.ofNullable(edition));
+    when(service.getById(any(OidcUser.class), any(UUID.class)))
+        .thenReturn(Optional.ofNullable(edition));
 
     risWebTestClient
         .withDefaultLogin()
@@ -147,7 +149,8 @@ class LegalPeriodicalEditionControllerTest {
             .prefix("2024,")
             .suffix("- Sonderheft 1")
             .build();
-    when(service.saveLegalPeriodicalEdition(edition)).thenReturn(edition);
+    when(service.saveLegalPeriodicalEdition(any(OidcUser.class), any(LegalPeriodicalEdition.class)))
+        .thenReturn(edition);
 
     risWebTestClient
         .withDefaultLogin()
@@ -158,7 +161,8 @@ class LegalPeriodicalEditionControllerTest {
         .expectStatus()
         .isOk();
 
-    verify(service, times(1)).saveLegalPeriodicalEdition(edition);
+    verify(service, times(1))
+        .saveLegalPeriodicalEdition(any(OidcUser.class), any(LegalPeriodicalEdition.class));
   }
 
   @Test

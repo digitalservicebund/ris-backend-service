@@ -43,7 +43,10 @@ async function saveReferences(references: Reference[]) {
     responseError.value = {
       title: message,
     }
-  }
+  } else
+    store.edition!.references = response.data.references?.map(
+      (decision) => new Reference({ ...decision }),
+    )
 }
 
 async function addNewEntry() {

@@ -44,9 +44,10 @@ public class LegalPeriodicalEditionController {
 
   @GetMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("isAuthenticated()")
-  public ResponseEntity<LegalPeriodicalEdition> getById(@NonNull @PathVariable UUID uuid) {
+  public ResponseEntity<LegalPeriodicalEdition> getById(
+      @NonNull @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
     try {
-      return ResponseEntity.ok(service.getById(uuid).orElseThrow());
+      return ResponseEntity.ok(service.getById(oidcUser, uuid).orElseThrow());
     } catch (NoSuchElementException e) {
       return ResponseEntity.notFound().build();
     }
@@ -66,7 +67,7 @@ public class LegalPeriodicalEditionController {
   public LegalPeriodicalEdition save(
       @Valid @RequestBody LegalPeriodicalEdition legalPeriodicalEdition,
       @AuthenticationPrincipal OidcUser oidcUser) {
-    return service.saveLegalPeriodicalEdition(legalPeriodicalEdition);
+    return service.saveLegalPeriodicalEdition(oidcUser, legalPeriodicalEdition);
   }
 
   @DeleteMapping(value = "/{editionId}")

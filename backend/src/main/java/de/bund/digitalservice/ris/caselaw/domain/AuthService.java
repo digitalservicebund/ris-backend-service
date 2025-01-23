@@ -14,4 +14,10 @@ public interface AuthService {
       DocumentationOffice creatingDocOffice,
       DocumentationOffice documentationOffice,
       Status status);
+
+  boolean userHasReadAccess(
+      OidcUser oidcUser,
+      DocumentationOffice creatingDocOffice,
+      DocumentationOffice documentationOffice,
+      Status status);
 }
