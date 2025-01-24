@@ -40,13 +40,17 @@ describe("DocumentUnitDeleteButton", () => {
 
     await fireEvent.click(cancelButton)
 
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole("dialog", { name: "Dokumentationseinheit löschen" }),
+    ).not.toBeInTheDocument()
 
     expect(deleteMock).not.toHaveBeenCalled()
   })
 
   it("should delete the doc unit when the dialog is confirmed", async () => {
-    renderDeleteButton()
+    const { router } = renderDeleteButton()
+    const routerPushSpy = vi.spyOn(router, "push")
+
     deleteMock.mockResolvedValue({ status: 200, data: "success" })
 
     const button = screen.getByRole("button", {
@@ -61,6 +65,7 @@ describe("DocumentUnitDeleteButton", () => {
 
     expect(deleteMock).toHaveBeenCalledOnce()
     expect(deleteMock).toHaveBeenCalledWith("123456")
+    expect(routerPushSpy).toHaveBeenCalledWith({ path: "/" })
   })
 
   it("should show an alert if the deletion fails", async () => {
@@ -70,7 +75,6 @@ describe("DocumentUnitDeleteButton", () => {
       data: "error explained" as never,
       error: { title: "" },
     })
-    const alertMock = vi.spyOn(window, "alert").mockReturnValue()
 
     const button = screen.getByRole("button", {
       name: "Dokumentationseinheit löschen",
@@ -84,10 +88,24 @@ describe("DocumentUnitDeleteButton", () => {
 
     expect(deleteMock).toHaveBeenCalledOnce()
     expect(deleteMock).toHaveBeenCalledWith("123456")
-    expect(alertMock).toHaveBeenCalledOnce()
-    expect(alertMock).toHaveBeenCalledWith(
-      "Fehler beim Löschen der Dokumentationseinheit: error explained",
-    )
+
+    expect(
+      screen.queryByRole("dialog", { name: "Dokumentationseinheit löschen" }),
+    ).not.toBeInTheDocument()
+
+    expect(
+      screen.getByRole("dialog", {
+        name: "Fehler beim Löschen der Dokumentationseinheit",
+      }),
+    ).toHaveTextContent("error explained")
+
+    await fireEvent.click(screen.getByRole("button", { name: "OK" }))
+
+    expect(
+      screen.queryByRole("dialog", {
+        name: "Fehler beim Löschen der Dokumentationseinheit",
+      }),
+    ).not.toBeInTheDocument()
   })
 
   function renderDeleteButton() {
@@ -105,5 +123,6 @@ describe("DocumentUnitDeleteButton", () => {
         plugins: [router],
       },
     })
+    return { router }
   }
 })

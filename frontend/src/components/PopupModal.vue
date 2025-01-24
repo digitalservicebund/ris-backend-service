@@ -1,16 +1,16 @@
 <script lang="ts" setup>
 import { onMounted } from "vue"
-import TextButton from "./input/TextButton.vue"
+import TextButton, { ButtonType } from "./input/TextButton.vue"
 
 defineProps<{
   ariaLabel?: string
   headerText?: string
   contentText: string
   primaryButtonText: string
-  primaryButtonType?: string
-  secondaryButtonType?: string
+  primaryButtonType?: ButtonType
+  secondaryButtonType?: ButtonType
   secondaryButtonText?: string
-  cancelButtonType?: string
+  cancelButtonType?: ButtonType | "none"
 }>()
 
 defineEmits<{
@@ -85,6 +85,7 @@ onMounted(() => {
           @click="$emit('secondaryAction')"
         />
         <TextButton
+          v-if="cancelButtonType !== 'none'"
           aria-label="Abbrechen"
           :button-type="cancelButtonType || 'tertiary'"
           label="Abbrechen"

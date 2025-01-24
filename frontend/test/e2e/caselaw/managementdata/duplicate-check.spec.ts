@@ -131,7 +131,6 @@ test.describe(
       })
     })
 
-    // FIXME: ignoring second duplicate warning is flaky
     test("Handover is only possible, when all warnings are ignored", async ({
       page,
       documentNumber,
