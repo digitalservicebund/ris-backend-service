@@ -46,7 +46,7 @@ import {
 } from "@/types/languagetool"
 
 import "@/styles/language-tool.scss"
-import { LanguageTool } from "@/editor/languagetool/languageTool"
+import { LanguageToolExtension } from "@/editor/languagetool/languageToolExtension"
 import TextSuggestionsDropdown from "@/components/input/TextSuggestionsDropdown.vue"
 
 interface Props {
@@ -139,10 +139,9 @@ const editor: Editor = new Editor({
     Indent.configure({
       names: ["listItem", "paragraph"],
     }),
-    LanguageTool.configure({
-      automaticMode: true,
+    LanguageToolExtension.configure({
+      automaticMode: !props.preview,
       documentId: "1",
-      apiUrl: "http://localhost:8081/v2/check",
     }),
   ],
   onUpdate: () => {

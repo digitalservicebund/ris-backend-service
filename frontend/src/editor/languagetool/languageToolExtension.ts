@@ -36,8 +36,11 @@ import languageToolService from "@/services/languageToolService"
 
 import {
   LanguageToolHelpingWords,
+  LanguageToolOptions,
   LanguageToolResponse,
+  LanguageToolStorage,
   Match,
+  TextNodesWithPosition,
 } from "@/types/languagetool"
 
 declare module "@tiptap/core" {
@@ -61,28 +64,6 @@ declare module "@tiptap/core" {
   }
 }
 
-interface TextNodesWithPosition {
-  text: string
-  from: number
-  to: number
-}
-
-interface LanguageToolOptions {
-  language: string
-  apiUrl: string
-  automaticMode: boolean
-  documentId: string | number | undefined
-}
-
-interface LanguageToolStorage {
-  match?: Match
-  loading?: boolean
-  matchRange?: { from: number; to: number }
-  active: boolean
-}
-
-// *************** OVER: TYPES *****************
-
 let editorView: EditorView
 
 let decorationSet: DecorationSet
@@ -98,8 +79,6 @@ db.version(1).stores({
 })
 
 let extensionDocId: string | number
-
-let apiUrl = "http://localhost:8081/v2/check"
 
 let textNodesWithPosition: TextNodesWithPosition[] = []
 
@@ -216,7 +195,7 @@ const getMatchAndSetDecorations = async (
   const languageToolCheckResponse: ServiceResponse<LanguageToolResponse> =
     await languageToolService.check(text)
 
-  const { matches } = languageToolCheckResponse.data
+  const matches = languageToolCheckResponse.data?.matches || []
 
   const decorations: Decoration[] = []
 
@@ -381,7 +360,7 @@ const debouncedProofreadAndDecorate = debounce(
   500,
 )
 
-export const LanguageTool = Extension.create<
+export const LanguageToolExtension = Extension.create<
   LanguageToolOptions,
   LanguageToolStorage
 >({
@@ -390,7 +369,6 @@ export const LanguageTool = Extension.create<
   addOptions() {
     return {
       language: "auto",
-      apiUrl: process?.env?.VUE_APP_LANGUAGE_TOOL_URL + "check",
       automaticMode: true,
       documentId: undefined,
     }
@@ -413,8 +391,6 @@ export const LanguageTool = Extension.create<
       proofread:
         () =>
         ({ tr }) => {
-          apiUrl = this.options.apiUrl
-
           proofreadAndDecorateWholeDoc(tr.doc)
           return true
         },
@@ -486,9 +462,7 @@ export const LanguageTool = Extension.create<
   },
 
   addProseMirrorPlugins() {
-    const { apiUrl: optionsApiUrl, documentId } = this.options
-
-    apiUrl = optionsApiUrl
+    const { documentId } = this.options
 
     return [
       new Plugin({

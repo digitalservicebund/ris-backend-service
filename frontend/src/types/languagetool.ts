@@ -71,6 +71,25 @@ export interface LanguageToolResponse {
   matches: Match[]
 }
 
+export interface TextNodesWithPosition {
+  text: string
+  from: number
+  to: number
+}
+
+export interface LanguageToolOptions {
+  language: string
+  automaticMode: boolean
+  documentId: string | number | undefined
+}
+
+export interface LanguageToolStorage {
+  match?: Match
+  loading?: boolean
+  matchRange?: { from: number; to: number }
+  active: boolean
+}
+
 export enum LanguageToolHelpingWords {
   LanguageToolTransactionName = "languageToolTransaction",
   MatchUpdatedTransactionName = "matchUpdated",
