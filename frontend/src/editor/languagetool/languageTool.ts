@@ -1,7 +1,7 @@
 /**
- * Taken from 
+ * Taken from
  * https://github.com/sereneinserenade/tiptap-languagetool/blob/main/src/components/extensions/languagetool.ts
- * 
+ *
  * MIT License
 
  * Copyright (c) 2022 Jeet Mandaliya
@@ -26,85 +26,19 @@
  */
 
 import { Extension } from "@tiptap/core"
-import { Node as PMNode } from "prosemirror-model"
 import { Dexie } from "dexie"
 import { debounce } from "lodash"
+import { Node as PMNode } from "prosemirror-model"
 import { Plugin, PluginKey, Transaction } from "prosemirror-state"
 import { Decoration, DecorationSet, EditorView } from "prosemirror-view"
+import { ServiceResponse } from "@/services/httpClient"
+import languageToolService from "@/services/languageToolService"
 
-// *************** TYPES *****************
-export interface Software {
-  name: string
-  version: string
-  buildDate: string
-  apiVersion: number
-  premium: boolean
-  premiumHint: string
-  status: string
-}
-
-export interface Warnings {
-  incompleteResults: boolean
-}
-
-export interface DetectedLanguage {
-  name: string
-  code: string
-  confidence: number
-}
-
-export interface Language {
-  name: string
-  code: string
-  detectedLanguage: DetectedLanguage
-}
-
-export interface Replacement {
-  value: string
-}
-
-export interface Context {
-  text: string
-  offset: number
-  length: number
-}
-
-export interface Type {
-  typeName: string
-}
-
-export interface Category {
-  id: string
-  name: string
-}
-
-export interface Rule {
-  id: string
-  description: string
-  issueType: string
-  category: Category
-}
-
-export interface Match {
-  message: string
-  shortMessage: string
-  replacements: Replacement[]
-  offset: number
-  length: number
-  context: Context
-  sentence: string
-  type: Type
-  rule: Rule
-  ignoreForIncompleteSentence: boolean
-  contextForSureMatch: number
-}
-
-export interface LanguageToolResponse {
-  software: Software
-  warnings: Warnings
-  language: Language
-  matches: Match[]
-}
+import {
+  LanguageToolHelpingWords,
+  LanguageToolResponse,
+  Match,
+} from "@/types/languagetool"
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -146,6 +80,7 @@ interface LanguageToolStorage {
   matchRange?: { from: number; to: number }
   active: boolean
 }
+
 // *************** OVER: TYPES *****************
 
 let editorView: EditorView
@@ -175,13 +110,6 @@ let matchRange: { from: number; to: number } | undefined
 let proofReadInitially = false
 
 let isLanguageToolActive = true
-
-export enum LanguageToolHelpingWords {
-  LanguageToolTransactionName = "languageToolTransaction",
-  MatchUpdatedTransactionName = "matchUpdated",
-  MatchRangeUpdatedTransactionName = "matchRangeUpdated",
-  LoadingTransactionName = "languageToolLoading",
-}
 
 const dispatch = (tr: Transaction) => editorView.dispatch(tr)
 
@@ -285,20 +213,10 @@ const getMatchAndSetDecorations = async (
   text: string,
   originalFrom: number,
 ) => {
-  const postOptions = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      Accept: "application/json",
-    },
-    body: `text=${encodeURIComponent(text)}&language=de-DE&enabledOnly=false`,
-  }
+  const languageToolCheckResponse: ServiceResponse<LanguageToolResponse> =
+    await languageToolService.check(text)
 
-  const ltRes: LanguageToolResponse = await (
-    await fetch(apiUrl, postOptions)
-  ).json()
-
-  const { matches } = ltRes
+  const { matches } = languageToolCheckResponse.data
 
   const decorations: Decoration[] = []
 

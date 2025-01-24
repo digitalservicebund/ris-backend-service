@@ -74,6 +74,10 @@ springdoc:
 unleash:
   appName: unleash-proxy
 
+languagetool:
+  url: http://localhost:8081/v2/check
+  language: de-DE
+
 neuris:
   document-number-patterns:
     BGH: KORE7****YYYY # results in e.g. KORE 7 0001 2024

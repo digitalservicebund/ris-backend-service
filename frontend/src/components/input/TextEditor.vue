@@ -33,18 +33,20 @@ import { CustomImage } from "@/editor/image"
 import { Indent } from "@/editor/indent"
 import { InvisibleCharacters } from "@/editor/invisibleCharacters"
 import BubbleMenu from "@/editor/languagetool/BubbleMenu.vue"
-import {
-  LanguageTool,
-  LanguageToolHelpingWords,
-} from "@/editor/languagetool/languageTool"
+
 import { CustomListItem } from "@/editor/listItem"
 import { CustomOrderedList } from "@/editor/orderedList"
 import { CustomParagraph } from "@/editor/paragraph"
 import { CustomSubscript, CustomSuperscript } from "@/editor/scriptText"
 import { TableStyle } from "@/editor/tableStyle"
-import { Match, Replacement } from "@/types/languagetool"
+import {
+  LanguageToolHelpingWords,
+  Match,
+  Replacement,
+} from "@/types/languagetool"
 
 import "@/styles/language-tool.scss"
+import { LanguageTool } from "@/editor/languagetool/languageTool"
 import TextSuggestionsDropdown from "@/components/input/TextSuggestionsDropdown.vue"
 
 interface Props {
