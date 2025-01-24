@@ -880,41 +880,44 @@ public class DocumentationUnitTransformer {
               NormReference normReference =
                   NormReferenceTransformer.transformToDomain(normReferenceDTO);
 
-              // Determine the match key (either normAbbreviation ID or raw value)
-              String abbreviation =
-                  normReferenceDTO.getNormAbbreviation() != null
-                      ? normReferenceDTO.getNormAbbreviation().getId().toString()
-                      : normReferenceDTO.getNormAbbreviationRawValue();
-
-              if (abbreviation != null) {
-                // Try to find an existing NormReference by the match key
+              if (normReferenceDTO.getNormAbbreviation() != null) {
                 NormReference existingReference =
                     normReferences.stream()
                         .filter(
-                            existingNormReference -> {
-                              if (normReferenceDTO.getNormAbbreviation() != null) {
-                                return existingNormReference.normAbbreviation() != null
+                            existingNormReference ->
+                                existingNormReference.normAbbreviation() != null
                                     && existingNormReference
                                         .normAbbreviation()
                                         .id()
-                                        .equals(abbreviation);
-                              } else {
-                                return existingNormReference.normAbbreviationRawValue() != null
-                                    && existingNormReference
-                                        .normAbbreviationRawValue()
-                                        .equals(abbreviation);
-                              }
-                            })
+                                        .equals(normReferenceDTO.getNormAbbreviation().getId()))
                         .findFirst()
                         .orElse(null);
 
                 if (existingReference != null) {
-                  // If found, add the SingleNorm to the existing reference
                   existingReference
                       .singleNorms()
                       .add(SingleNormTransformer.transformToDomain(normReferenceDTO));
                 } else {
-                  // If not found, add the new NormReference
+                  normReferences.add(normReference);
+                }
+
+              } else if (normReferenceDTO.getNormAbbreviationRawValue() != null) {
+                NormReference existingReference =
+                    normReferences.stream()
+                        .filter(
+                            existingNormReference ->
+                                existingNormReference.normAbbreviationRawValue() != null
+                                    && existingNormReference
+                                        .normAbbreviationRawValue()
+                                        .equals(normReferenceDTO.getNormAbbreviationRawValue()))
+                        .findFirst()
+                        .orElse(null);
+
+                if (existingReference != null) {
+                  existingReference
+                      .singleNorms()
+                      .add(SingleNormTransformer.transformToDomain(normReferenceDTO));
+                } else {
                   normReferences.add(normReference);
                 }
               }
