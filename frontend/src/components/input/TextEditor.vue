@@ -16,7 +16,7 @@ import { Text } from "@tiptap/extension-text"
 import { TextAlign } from "@tiptap/extension-text-align"
 import { TextStyle } from "@tiptap/extension-text-style"
 import { Underline } from "@tiptap/extension-underline"
-import { Content, Editor, EditorContent } from "@tiptap/vue-3"
+import { Editor, EditorContent } from "@tiptap/vue-3"
 import { computed, onMounted, ref, watch } from "vue"
 import TextEditorMenu from "@/components/input/TextEditorMenu.vue"
 import { TextAreaInputAttributes } from "@/components/input/types"
@@ -32,14 +32,20 @@ import { FontSize } from "@/editor/fontSize"
 import { CustomImage } from "@/editor/image"
 import { Indent } from "@/editor/indent"
 import { InvisibleCharacters } from "@/editor/invisibleCharacters"
+import BubbleMenu from "@/editor/languagetool/BubbleMenu.vue"
+import {
+  LanguageTool,
+  LanguageToolHelpingWords,
+} from "@/editor/languagetool/languageTool"
 import { CustomListItem } from "@/editor/listItem"
 import { CustomOrderedList } from "@/editor/orderedList"
 import { CustomParagraph } from "@/editor/paragraph"
 import { CustomSubscript, CustomSuperscript } from "@/editor/scriptText"
 import { TableStyle } from "@/editor/tableStyle"
-import { LanguageTool } from "@/editor/languagetool/languageTool"
-import BubbleMenu from "@/editor/languagetool/BubbleMenu.vue"
-import { Match } from "@/types/languagetool"
+import { Match, Replacement } from "@/types/languagetool"
+
+import "@/styles/language-tool.scss"
+import TextSuggestionsDropdown from "@/components/input/TextSuggestionsDropdown.vue"
 
 interface Props {
   value?: string
@@ -64,11 +70,13 @@ const emit = defineEmits<{
   updateValue: [newValue: string]
 }>()
 
+const loading = ref(false)
+
 const editorElement = ref<HTMLElement>()
 const hasFocus = ref(false)
 const isHovered = ref(false)
 
-const editor = new Editor({
+const editor: Editor = new Editor({
   editorProps: {
     attributes: {
       tabindex: "0",
@@ -137,16 +145,27 @@ const editor = new Editor({
   ],
   onUpdate: () => {
     emit("updateValue", editor.getHTML())
+    setTimeout(() => updateMatch(editor))
   },
   onFocus: () => (hasFocus.value = true),
   editable: props.editable,
   parseOptions: {
     preserveWhitespace: "full",
   },
-  onSelectionUpdate: () => editor.commands.handleSelection(),
+  onSelectionUpdate: () => {
+    editor.commands.handleSelection()
+    setTimeout(() => updateMatch(editor))
+  },
+  onTransaction({ transaction: tr }) {
+    loading.value = !!tr.getMeta(
+      LanguageToolHelpingWords.LoadingTransactionName,
+    )
+  },
 })
 
 const containerWidth = ref<number>()
+
+const match = ref<Match>()
 
 const editorExpanded = ref(false)
 const editorStyleClasses = computed(() => {
@@ -213,7 +232,9 @@ const resizeObserver = new ResizeObserver((entries) => {
   }
 })
 
-const shouldShow = ({ editor }) => {
+const shouldShow = (): boolean => {
+  if (editor == undefined) return false
+
   const match = editor.storage.languagetool.match
   const matchRange = editor.storage.languagetool.matchRange
 
@@ -224,11 +245,9 @@ const shouldShow = ({ editor }) => {
   )
 }
 
-const match = ref<Match>()
-
 const matchRange = ref<{ from: number; to: number }>()
 
-const loading = ref(false)
+// const loading = ref(false)
 
 const updateMatch = (editor: Editor) => {
   match.value = editor.storage.languagetool.match
@@ -237,15 +256,17 @@ const updateMatch = (editor: Editor) => {
 
 const replacements = computed(() => match.value?.replacements || [])
 
-const matchMessage = computed(() => match.value?.message || "No Message")
+// const matchMessage = computed(() => match.value?.message || "No Message")
 
-const updateHtml = () => navigator.clipboard.writeText(editor.getHTML())
+// const updateHtml = () => navigator.clipboard.writeText(editor.getHTML())
 
-const acceptSuggestion = (sug) => {
-  editor.commands.insertContentAt(matchRange.value, sug.value)
+const acceptSuggestion = (sug: Replacement) => {
+  if (matchRange.value != undefined) {
+    editor.commands.insertContentAt(matchRange.value, sug.value)
+  }
 }
 
-const proofread = () => editor.commands.proofread()
+// const proofread = () => editor.commands.proofread()
 
 const ignoreSuggestion = () => editor.commands.ignoreLanguageToolSuggestion()
 </script>
@@ -263,7 +284,7 @@ const ignoreSuggestion = () => editor.commands.ignoreLanguageToolSuggestion()
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
   >
-    <!-- <TextEditorMenu
+    <TextEditorMenu
       v-if="editable"
       :aria-label="props.ariaLabel"
       :buttons-disabled="buttonsDisabled"
@@ -273,7 +294,7 @@ const ignoreSuggestion = () => editor.commands.ignoreLanguageToolSuggestion()
       @on-editor-expanded-changed="
         (isExpanded) => (editorExpanded = isExpanded)
       "
-    /> -->
+    />
     <hr v-if="editable" class="ml-8 mr-8 border-blue-300" />
     <div>
       <EditorContent
@@ -282,30 +303,21 @@ const ignoreSuggestion = () => editor.commands.ignoreLanguageToolSuggestion()
         :editor="editor"
       />
     </div>
-    <bubble-menu
-      class="bubble-menu"
+
+    <BubbleMenu
       v-if="editor"
+      class="bubble-menu"
       :editor="editor"
+      :should-show="shouldShow"
       :tippy-options="{ placement: 'bottom', animation: 'fade' }"
-      :should-show="({ editor }) => shouldShow({ editor })"
     >
-      <!--
-        <section class="bubble-menu-section-container">
-          <section class="message-section">
-            {{ matchMessage }}
-            <button class="ignore-suggestion-button" @click="ignoreSuggestion">XXX</button>
-          </section>
-          <section class="suggestions-section">
-            <article
-              v-for="(replacement, i) in replacements"
-              @click="() => acceptSuggestion(replacement)"
-              :key="i + replacement.value"
-              class="suggestion">
-              {{ replacement.value }}
-            </article>
-          </section>
-        </section>
--->
-    </bubble-menu>
+      <TextSuggestionsDropdown
+        v-if="match"
+        :match="match"
+        match-message=""
+        @suggestion:ignore="ignoreSuggestion"
+        @suggestion:update="acceptSuggestion"
+      />
+    </BubbleMenu>
   </div>
 </template>
