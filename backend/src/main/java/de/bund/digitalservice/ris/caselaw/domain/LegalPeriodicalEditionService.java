@@ -39,7 +39,7 @@ public class LegalPeriodicalEditionService {
                                       oidcUser,
                                       reference.documentationUnit())) // Update documentationUnit
                               .build()) // Build the updated Reference
-                  .collect(Collectors.toList());
+                  .collect(Collectors.toList()); // NOSONAR: is correct for mutable list
 
           // Return a new LegalPeriodicalEdition with updated references
           return e.toBuilder().references(updatedReferences).build();
@@ -66,7 +66,7 @@ public class LegalPeriodicalEditionService {
                                 oidcUser,
                                 reference.documentationUnit())) // Update documentationUnit
                         .build()) // Build the updated Reference
-            .collect(Collectors.toList());
+            .collect(Collectors.toList()); // NOSONAR: is correct for mutable list
 
     return edition.toBuilder().references(updatedReferences).build();
   }

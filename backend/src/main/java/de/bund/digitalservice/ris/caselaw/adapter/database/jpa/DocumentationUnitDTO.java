@@ -352,11 +352,9 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   private Set<DuplicateRelationDTO> duplicateRelations2 = new HashSet<>();
 
   /**
-   * @deprecated This field represents the "Dupcode ausschalten" functionality from the jDV. It is
-   *     set to false in the migration if the duplicate check should be ignored. After the jDV has
-   *     been deactivated, this field will not be needed anymore.
+   * This field represents the "Dupcode ausschalten" functionality from the jDV. It is set to false
+   * in the migration if the duplicate check should be ignored.
    */
   @Column(name = "duplicate_check")
-  @Deprecated(forRemoval = true)
   private Boolean isJdvDuplicateCheckActive;
 }

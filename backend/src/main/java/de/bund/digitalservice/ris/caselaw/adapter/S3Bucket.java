@@ -22,6 +22,8 @@ public class S3Bucket {
 
   private final S3Client s3Client;
   private final String bucketName;
+  private static final String FILE_COULD_NOT_BE_SAVED_TO_BUCKET =
+      "File could not be saved to bucket.";
 
   public S3Bucket(S3Client s3Client, String bucketName) {
     this.s3Client = s3Client;
@@ -77,8 +79,8 @@ public class S3Bucket {
     try {
       s3Client.putObject(putObjectRequest, RequestBody.fromString(fileContent));
     } catch (S3Exception e) {
-      log.error("File could not be saved to bucket.", e);
-      throw new BucketException("File could not be saved to bucket.", e);
+      log.error(FILE_COULD_NOT_BE_SAVED_TO_BUCKET, e);
+      throw new BucketException(FILE_COULD_NOT_BE_SAVED_TO_BUCKET, e);
     }
   }
 
@@ -88,8 +90,8 @@ public class S3Bucket {
     try {
       s3Client.putObject(putObjectRequest, RequestBody.fromByteBuffer(buffer));
     } catch (S3Exception e) {
-      log.error("File could not be saved to bucket.", e);
-      throw new BucketException("File could not be saved to bucket.", e);
+      log.error(FILE_COULD_NOT_BE_SAVED_TO_BUCKET, e);
+      throw new BucketException(FILE_COULD_NOT_BE_SAVED_TO_BUCKET, e);
     }
   }
 

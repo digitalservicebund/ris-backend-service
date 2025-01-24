@@ -74,7 +74,7 @@ public class SecurityConfig {
                             referrerPolicyConfig.policy(
                                 ReferrerPolicyHeaderWriter.ReferrerPolicy
                                     .STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
-                    .permissionsPolicy(
+                    .permissionsPolicyHeader(
                         permissionsPolicyConfig ->
                             permissionsPolicyConfig.policy(
                                 "accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), cross-origin-isolated=(), "
