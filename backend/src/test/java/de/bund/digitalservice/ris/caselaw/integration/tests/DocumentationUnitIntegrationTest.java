@@ -408,11 +408,6 @@ class DocumentationUnitIntegrationTest {
             });
   }
 
-  /**
-   * The normAbbreviationRawValue is not insertable or updatable. This test validates that the
-   * client can send a normReference without normAbbreviation and with normAbbreviationRawValue
-   * without breaking anything.
-   */
   @Test
   void testUpdateNormReferenceWithoutNormAbbreviationAndWithNormAbbreviationRawValue() {
     DocumentationUnitDTO dto =
@@ -475,7 +470,93 @@ class DocumentationUnitIntegrationTest {
                           .norms()
                           .get(0)
                           .normAbbreviationRawValue())
+                  .isEqualTo("EWGAssRBes 1/80");
+            });
+
+    List<DocumentationUnitDTO> list = repository.findAll();
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getDocumentNumber()).isEqualTo("1234567890123");
+  }
+
+  @Test
+  void
+      testUpdateNormReferenceWithoutNormAbbreviationAndWithNormAbbreviationRawValue_shouldAlsoGroupNorms() {
+    DocumentationUnitDTO dto =
+        EntityBuilderTestUtil.createAndSavePublishedDocumentationUnit(
+            repository, documentationOffice, "1234567890123");
+
+    List<SingleNorm> singleNorms =
+        List.of(
+            SingleNorm.builder().singleNorm("Art 7 S 1").build(),
+            SingleNorm.builder().singleNorm("Art 8 S 1").build());
+
+    List<NormReference> norms =
+        List.of(
+            NormReference.builder()
+                .normAbbreviation(null)
+                .normAbbreviationRawValue("EWGAssRBes 1/80")
+                .singleNorms(singleNorms)
+                .build());
+
+    DocumentationUnit documentationUnitFromFrontend =
+        DocumentationUnit.builder()
+            .uuid(dto.getId())
+            .documentNumber(dto.getDocumentNumber())
+            .contentRelatedIndexing(ContentRelatedIndexing.builder().norms(norms).build())
+            .coreData(CoreData.builder().documentationOffice(docOffice).build())
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
+        .bodyValue(documentationUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentationUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().documentNumber()).isEqualTo("1234567890123");
+              assertThat(response.getResponseBody().contentRelatedIndexing().norms().size())
+                  .isEqualTo(1);
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .norms()
+                          .getFirst()
+                          .singleNorms()
+                          .getFirst()
+                          .singleNorm())
+                  .isEqualTo("Art 7 S 1");
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .norms()
+                          .getFirst()
+                          .singleNorms()
+                          .get(1)
+                          .singleNorm())
+                  .isEqualTo("Art 8 S 1");
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .norms()
+                          .getFirst()
+                          .normAbbreviation())
                   .isNull();
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .norms()
+                          .getFirst()
+                          .normAbbreviationRawValue())
+                  .isEqualTo("EWGAssRBes 1/80");
             });
 
     List<DocumentationUnitDTO> list = repository.findAll();

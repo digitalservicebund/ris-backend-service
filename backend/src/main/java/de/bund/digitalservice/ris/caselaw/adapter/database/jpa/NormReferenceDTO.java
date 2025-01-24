@@ -37,7 +37,7 @@ public class NormReferenceDTO {
   @JoinColumn(name = "norm_abbreviation_id")
   private NormAbbreviationDTO normAbbreviation;
 
-  @Column(name = "norm_abbreviation_raw_value", insertable = false, updatable = false)
+  @Column(name = "norm_abbreviation_raw_value")
   private String normAbbreviationRawValue;
 
   @Column(name = "single_norm")

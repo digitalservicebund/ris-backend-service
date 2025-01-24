@@ -873,41 +873,63 @@ public class DocumentationUnitTransformer {
       DocumentationUnitDTO documentationUnitDTO) {
     List<NormReference> normReferences = new ArrayList<>();
 
-    documentationUnitDTO.getNormReferences().stream()
-        .filter(normReferenceDTO -> normReferenceDTO.getNormAbbreviation() != null)
+    documentationUnitDTO
+        .getNormReferences()
         .forEach(
             normReferenceDTO -> {
               NormReference normReference =
                   NormReferenceTransformer.transformToDomain(normReferenceDTO);
-              List<NormReference> existingNormReferences =
-                  normReferences.stream()
-                      .filter(
-                          existingNormReference ->
-                              existingNormReference
-                                  .normAbbreviation()
-                                  .id()
-                                  .equals(normReferenceDTO.getNormAbbreviation().getId()))
-                      .toList();
-              if (existingNormReferences.size() > 1) {
-                log.error(
-                    "More than one norm references for norm abbreviation ({}, {})",
-                    normReferenceDTO.getNormAbbreviation().getId(),
-                    normReferenceDTO.getNormAbbreviation().getAbbreviation());
-                throw new DocumentationUnitTransformerException(
-                    "More than one norm references with the same norm abbreviation.");
-              } else if (existingNormReferences.isEmpty()) {
-                normReferences.add(normReference);
-              } else {
-                existingNormReferences
-                    .get(0)
-                    .singleNorms()
-                    .add(SingleNormTransformer.transformToDomain(normReferenceDTO));
+
+              if (normReferenceDTO.getNormAbbreviation() != null) {
+                NormReference existingReference =
+                    normReferences.stream()
+                        .filter(
+                            existingNormReference ->
+                                existingNormReference.normAbbreviation() != null
+                                    && existingNormReference
+                                        .normAbbreviation()
+                                        .id()
+                                        .equals(normReferenceDTO.getNormAbbreviation().getId()))
+                        .findFirst()
+                        .orElse(null);
+
+                if (existingReference != null) {
+                  existingReference
+                      .singleNorms()
+                      .add(SingleNormTransformer.transformToDomain(normReferenceDTO));
+                } else {
+                  normReferences.add(normReference);
+                }
+
+              } else if (normReferenceDTO.getNormAbbreviationRawValue() != null) {
+                NormReference existingReference =
+                    normReferences.stream()
+                        .filter(
+                            existingNormReference ->
+                                existingNormReference.normAbbreviationRawValue() != null
+                                    && existingNormReference
+                                        .normAbbreviationRawValue()
+                                        .equals(normReferenceDTO.getNormAbbreviationRawValue()))
+                        .findFirst()
+                        .orElse(null);
+
+                if (existingReference != null) {
+                  existingReference
+                      .singleNorms()
+                      .add(SingleNormTransformer.transformToDomain(normReferenceDTO));
+                } else {
+                  normReferences.add(normReference);
+                }
               }
             });
 
+    // Handle cases where both abbreviation and raw value are null
     normReferences.addAll(
         documentationUnitDTO.getNormReferences().stream()
-            .filter(normReferenceDTO -> normReferenceDTO.getNormAbbreviation() == null)
+            .filter(
+                normReferenceDTO ->
+                    normReferenceDTO.getNormAbbreviation() == null
+                        && normReferenceDTO.getNormAbbreviationRawValue() == null)
             .map(NormReferenceTransformer::transformToDomain)
             .toList());
 
