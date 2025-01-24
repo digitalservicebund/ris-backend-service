@@ -1126,7 +1126,8 @@ class DocumentationUnitTransformerTest {
   }
 
   @Test
-  void testTransformToDomain_withMultipleNormReferences_withSameNormAbbreviation() {
+  void
+      testTransformToDomain_withMultipleNormReferences_withSameNormAbbreviation_shouldGroupNorms() {
     UUID normAbbreviationId = UUID.randomUUID();
     DocumentationUnitDTO documentationUnitDTO =
         generateSimpleDTOBuilder()
@@ -1164,6 +1165,54 @@ class DocumentationUnitTransformerTest {
                 .contentRelatedIndexing()
                 .norms()
                 .get(0)
+                .singleNorms()
+                .get(1)
+                .singleNorm())
+        .isEqualTo("single norm 2");
+  }
+
+  @Test
+  void
+      testTransformToDomain_withMultipleNormReferences_withNoAbbreviation_withSameNAbbreviationRawValue_shouldGroupNorms() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder()
+            .normReferences(
+                List.of(
+                    NormReferenceDTO.builder()
+                        .normAbbreviationRawValue("foo")
+                        .singleNorm("single norm 1")
+                        .build(),
+                    NormReferenceDTO.builder()
+                        .normAbbreviationRawValue("foo")
+                        .singleNorm("single norm 2")
+                        .build()))
+            .build();
+
+    DocumentationUnit documentationUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentationUnit.contentRelatedIndexing().norms()).hasSize(1);
+    assertThat(
+            documentationUnit
+                .contentRelatedIndexing()
+                .norms()
+                .getFirst()
+                .normAbbreviationRawValue())
+        .isEqualTo("foo");
+    assertThat(
+            documentationUnit
+                .contentRelatedIndexing()
+                .norms()
+                .getFirst()
+                .singleNorms()
+                .getFirst()
+                .singleNorm())
+        .isEqualTo("single norm 1");
+    assertThat(
+            documentationUnit
+                .contentRelatedIndexing()
+                .norms()
+                .getFirst()
                 .singleNorms()
                 .get(1)
                 .singleNorm())
