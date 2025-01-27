@@ -7,6 +7,7 @@ const props = defineProps<{
   modelValue?: DropdownInputModelType
   placeholder?: string
   readOnly?: boolean
+  hasError?: boolean
   isSmall?: boolean
 }>()
 
@@ -22,7 +23,7 @@ const localModelValue = computed({
 })
 
 const conditionalClasses = computed(() => ({
-  "ds-select-small": props.isSmall,
+  "has-error": props.hasError,
   "ds-select-medium": !props.isSmall,
 }))
 

@@ -213,7 +213,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentationUni
             .getSource()
             .add(
                 SourceDTO.builder()
-                    .value(documentationUnit.coreData().source().toString())
+                    .value(documentationUnit.coreData().source().value().toString())
                     .rank(rank)
                     .build());
       }

@@ -30,4 +30,4 @@ public record CoreData(
     String region,
     @UniqueElements List<String> leadingDecisionNormReferences,
     List<@PastOrPresent Year> yearsOfDispute,
-    SourceValue source) {}
+    Source source) {}

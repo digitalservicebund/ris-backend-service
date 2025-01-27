@@ -33,7 +33,7 @@ export type CoreData = {
   region?: string
   yearsOfDispute?: string[]
   leadingDecisionNormReferences?: string[]
-  source?: SourceValue
+  source?: Source
 }
 
 export enum SourceValue {
@@ -43,6 +43,11 @@ export enum SourceValue {
   Email = "E",
   LaenderEuGH = "L",
   Sonstige = "S",
+}
+
+export type Source = {
+  value?: SourceValue
+  sourceRawValue?: string
 }
 
 export type ContentRelatedIndexing = {

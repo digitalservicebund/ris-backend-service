@@ -27,7 +27,12 @@ const emit = defineEmits<{
 const { modelValue } = toRefs(props)
 const validationStore =
   useValidationStore<
-    ["decisionDate", "yearsOfDispute", "deviatingDecisionDates"][number]
+    [
+      "decisionDate",
+      "yearsOfDispute",
+      "deviatingDecisionDates",
+      "source",
+    ][number]
   >()
 
 const parentWidth = ref(0)
@@ -73,12 +78,50 @@ const sourceItems: DropdownItem[] = [
   { label: "Sonstige (S)", value: SourceValue.Sonstige },
 ]
 
+const source = computed({
+  get: () =>
+    props.modelValue.source?.value
+      ? props.modelValue.source?.value
+      : (props.modelValue.source?.sourceRawValue ?? undefined),
+  set: (newValue) => {
+    if (Object.values(SourceValue).includes(newValue as SourceValue)) {
+      modelValue.value.source = {
+        ...modelValue.value.source,
+        value: newValue as SourceValue,
+      }
+    }
+  },
+})
+
 watch(
   modelValue,
   () => {
     emit("update:modelValue", modelValue.value)
   },
   { deep: true },
+)
+
+/**
+ * This updates the local norm with the updated model value from the props. It also stores a copy of the last saved
+ * model value, because the local norm might change in between. When the new model value is empty, all validation
+ * errors are resetted. If it has an amiguous norm reference, the validation store is updated. When the list of
+ * single norms is empty, a new empty single norm entry is added.
+ */
+watch(
+  () => props.modelValue,
+  () => {
+    if (
+      !!props.modelValue.source &&
+      !props.modelValue.source.value &&
+      !!props.modelValue.source.sourceRawValue
+    ) {
+      validationStore.add(
+        `"${props.modelValue.source.sourceRawValue}" ist keine gültige Quellenangabe`,
+        "source",
+      )
+    }
+  },
+  { immediate: true, deep: true },
 )
 
 onMounted(() => {
@@ -303,11 +346,17 @@ onBeforeUnmount(() => {
       </InputField>
     </div>
     <div :class="layoutClass">
-      <InputField id="source" v-slot="{ id }" label="Quelle">
+      <InputField
+        id="source"
+        v-slot="slotProps"
+        label="Quelle"
+        :validation-error="validationStore.getByField('source')"
+      >
         <DropdownInput
-          :id="id"
-          v-model="modelValue.source"
-          aria-label="Rechtskraft"
+          :id="slotProps.id"
+          v-model="source"
+          aria-label="Quelle"
+          :has-error="slotProps.hasError"
           :items="sourceItems"
           placeholder="Bitte auswählen"
         />
