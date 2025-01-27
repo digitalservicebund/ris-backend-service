@@ -17,8 +17,8 @@ onBeforeUnmount(async function () {
   await triggerSave()
   window.onbeforeunload = null
 })
-window.onbeforeunload = async function () {
-  await triggerSave()
+window.onbeforeunload = function () {
+  void triggerSave() // NOSONAR: The void is needed to avoid a browser warning on reload
 }
 </script>
 
