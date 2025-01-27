@@ -327,9 +327,9 @@ test.describe("short and long texts", () => {
 
       await test.step("Mitwirkende Richter ist bearbeitbar", async () => {
         await clickCategoryButton("Mitwirkende Richter", page)
-        const nameInput = page.getByTestId("participating-judge-name")
+        const nameInput = page.getByTestId("participating-judge-name-input")
         const referenceOpinionsInput = page.getByTestId(
-          "participating-judge-reference-opinions",
+          "participating-judge-reference-opinions-input",
         )
 
         await expect(nameInput).toBeEditable()
