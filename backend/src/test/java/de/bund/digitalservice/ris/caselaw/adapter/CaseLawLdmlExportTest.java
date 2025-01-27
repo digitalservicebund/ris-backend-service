@@ -37,7 +37,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -396,15 +395,14 @@ class CaseLawLdmlExportTest {
   }
 
   @Test
-  @Disabled("Now that the assert is fixed, the test fails")
   @DisplayName("Long text with non breaking spaces")
   void testTransformToLdml_longTextWithNBSP_shouldReplaceItWithUnicode() {
     String expected =
         """
          <akn:decision>
-            <akn:block name="Gruende">
+            <akn:block name="Gründe">
                <akn:embeddedStructure>
-                  <akn:p>text with non&#160;breaking&#160;spaces</akn:p>
+                  <akn:p>text with non\u00a0breaking\u00a0spaces</akn:p>
                </akn:embeddedStructure>
             </akn:block>
          </akn:decision>
