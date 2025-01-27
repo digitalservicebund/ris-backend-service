@@ -17,8 +17,8 @@ onBeforeUnmount(async function () {
   await triggerSave()
   window.onbeforeunload = null
 })
-window.onbeforeunload = function () {
-  void triggerSave()
+window.onbeforeunload = async function () {
+  await triggerSave()
 }
 </script>
 

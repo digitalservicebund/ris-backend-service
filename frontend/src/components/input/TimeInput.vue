@@ -17,10 +17,10 @@ const emit = defineEmits<{
     :id="id"
     :aria-label="($attrs.ariaLabel as string) ?? ''"
     class="ds-input"
+    data-test-id="time-input"
     :disabled="disabled"
     :model-value="modelValue"
     placeholder="HH:MM"
-    role="textbox"
     type="time"
     @update:model-value="emit('update:modelValue', $event)"
   />

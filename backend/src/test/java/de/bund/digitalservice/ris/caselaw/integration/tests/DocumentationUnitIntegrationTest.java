@@ -519,8 +519,7 @@ class DocumentationUnitIntegrationTest {
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
               assertThat(response.getResponseBody().documentNumber()).isEqualTo("1234567890123");
-              assertThat(response.getResponseBody().contentRelatedIndexing().norms().size())
-                  .isEqualTo(1);
+              assertThat(response.getResponseBody().contentRelatedIndexing().norms()).hasSize(1);
               assertThat(
                       response
                           .getResponseBody()

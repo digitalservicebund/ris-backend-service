@@ -78,9 +78,11 @@ watch(
 <template>
   <div class="flex flex-col gap-24">
     <div class="flex flex-col gap-4">
-      <label id="list-input" class="ds-label-02-reg"> {{ label }}</label>
+      <label id="list-input" class="ds-label-02-reg" for="list-input-id">
+        {{ label }}</label
+      >
       <textarea
-        id="list-input"
+        id="list-input-id"
         v-model="localModelValue"
         :aria-label="`${label} Input`"
         class="ds-input h-auto resize-none overflow-hidden p-20"

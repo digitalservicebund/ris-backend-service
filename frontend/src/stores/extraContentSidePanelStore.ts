@@ -30,7 +30,7 @@ export const useExtraContentSidePanelStore = defineStore(
       expand?: boolean,
       mode?: SelectablePanelContent,
     ): boolean {
-      isExpanded.value = expand === undefined ? !isExpanded.value : expand
+      isExpanded.value = expand ?? !isExpanded.value
       pushQueryToRoute({
         ...route.query,
         showAttachmentPanel: isExpanded.value.toString(),

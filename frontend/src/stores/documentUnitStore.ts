@@ -34,7 +34,8 @@ export const useDocumentUnitStore = defineStore("docunitStore", () => {
     documentUnit.value = undefined
   }
 
-  async function updateDocumentUnit(): Promise<
+  // prettier-ignore
+  async function updateDocumentUnit(): Promise< // NOSONAR: needs definitely refactoring
     ServiceResponse<RisJsonPatch | FailedValidationServerResponse>
   > {
     if (!documentUnit.value || !originalDocumentUnit.value) {

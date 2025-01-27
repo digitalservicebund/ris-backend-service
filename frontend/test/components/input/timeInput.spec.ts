@@ -26,13 +26,13 @@ function renderComponent(
 describe("Time Input", () => {
   it("shows an text input element", () => {
     renderComponent()
-    const input: HTMLInputElement | null = screen.queryByRole("textbox")
+    const input: HTMLInputElement | null = screen.queryByTestId("time-input")
     expect(input).toBeInTheDocument()
   })
 
   it("shows the value", () => {
     renderComponent({ modelValue: "12:30" })
-    const input: HTMLInputElement = screen.getByRole("textbox")
+    const input: HTMLInputElement = screen.getByTestId("time-input")
     expect(input).toHaveValue("12:30")
   })
 
@@ -50,7 +50,7 @@ describe("Time Input", () => {
 
   it("emits model update event when user types into input", async () => {
     const { emitted } = renderComponent()
-    const input: HTMLInputElement = screen.getByRole("textbox")
+    const input: HTMLInputElement = screen.getByTestId("time-input")
     await userEvent.type(input, "12:34")
 
     // Why 12:03 and 12:34? Because the time input element is a bit quirky.
@@ -63,64 +63,64 @@ describe("Time Input", () => {
 
   it("renders a validation error", () => {
     renderComponent(undefined, { hasError: true })
-    const input = screen.getByRole("textbox")
+    const input = screen.queryByTestId("time-input")
     expect(input).toHaveClass("has-error")
   })
 
   it("renders a read-only input", () => {
     renderComponent(undefined, { readOnly: true })
-    const input = screen.getByRole("textbox")
+    const input = screen.queryByTestId("time-input")
     expect(input).toHaveAttribute("readonly")
   })
 
   it("does not rennder a read-only input", () => {
     renderComponent(undefined, { readOnly: false })
-    const input = screen.getByRole("textbox")
+    const input = screen.queryByTestId("time-input")
     expect(input).not.toHaveAttribute("readonly")
   })
 
   it("renders a disabled input", () => {
     renderComponent({ disabled: true })
-    const input = screen.getByRole("textbox")
+    const input = screen.queryByTestId("time-input")
     expect(input).toBeDisabled()
   })
 
   it("renders an enabled input", () => {
     renderComponent({ disabled: false })
-    const input = screen.getByRole("textbox")
+    const input = screen.queryByTestId("time-input")
     expect(input).toBeEnabled()
   })
 
   it("renders an enabled input by default", () => {
     renderComponent()
-    const input = screen.getByRole("textbox")
+    const input = screen.queryByTestId("time-input")
     expect(input).toBeEnabled()
   })
 
   it("renders the regular variant by default", () => {
     renderComponent()
-    const input = screen.getByRole("textbox")
+    const input = screen.queryByTestId("time-input")
     expect(input).not.toHaveClass("ds-input-medium")
     expect(input).not.toHaveClass("ds-input-small")
   })
 
   it("renders the regular variant", () => {
     renderComponent(undefined, { size: "regular" })
-    const input = screen.getByRole("textbox")
+    const input = screen.queryByTestId("time-input")
     expect(input).not.toHaveClass("ds-input-medium")
     expect(input).not.toHaveClass("ds-input-small")
   })
 
   it("renders the medium variant", () => {
     renderComponent(undefined, { size: "medium" })
-    const input = screen.getByRole("textbox")
+    const input = screen.queryByTestId("time-input")
     expect(input).toHaveClass("ds-input-medium")
     expect(input).not.toHaveClass("ds-input-small")
   })
 
   it("renders the small variant", () => {
     renderComponent(undefined, { size: "small" })
-    const input = screen.getByRole("textbox")
+    const input = screen.queryByTestId("time-input")
     expect(input).not.toHaveClass("ds-input-medium")
     expect(input).toHaveClass("ds-input-small")
   })

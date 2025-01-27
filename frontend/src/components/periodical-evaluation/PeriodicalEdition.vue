@@ -67,17 +67,15 @@ async function saveEdition() {
     )
 
     if (response.data) {
-      {
-        store.edition = new LegalPeriodicalEdition({
-          ...response.data,
-        })
-        editionRef.value = { ...store.edition }
-        await router.push({
-          name: "caselaw-periodical-evaluation-editionId-references",
-          params: { editionId: editionRef?.value?.id },
-          query: {},
-        })
-      }
+      store.edition = new LegalPeriodicalEdition({
+        ...response.data,
+      })
+      editionRef.value = { ...store.edition }
+      await router.push({
+        name: "caselaw-periodical-evaluation-editionId-references",
+        params: { editionId: editionRef?.value?.id },
+        query: {},
+      })
     } else if (response.error) {
       saveEditionError.value = response.error
     }

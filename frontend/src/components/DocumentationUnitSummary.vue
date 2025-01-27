@@ -3,7 +3,7 @@ import { computed } from "vue"
 import DecisionSummary from "@/components/DecisionSummary.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import ActiveCitation from "@/domain/activeCitation"
-import ListItem from "@/domain/editableListItem"
+import ListItem from "@/domain/editableListItem" // NOSONAR: import is needed for extension
 import IconBaselineDescription from "~icons/ic/baseline-description"
 import IconError from "~icons/ic/baseline-error"
 import IconOutlineDescription from "~icons/ic/outline-description"
