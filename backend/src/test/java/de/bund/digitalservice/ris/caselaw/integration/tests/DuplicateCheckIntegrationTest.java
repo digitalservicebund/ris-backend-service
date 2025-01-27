@@ -32,6 +32,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRep
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationViewRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
@@ -143,6 +144,7 @@ class DuplicateCheckIntegrationTest {
   @Autowired private AuthService authService;
   @Autowired private DocumentationUnitService documentationUnitService;
   @Autowired private DatabaseDuplicateCheckService duplicateCheckService;
+  @Autowired private DuplicateRelationViewRepository duplicateRelationViewRepository;
 
   @MockitoBean private S3AsyncClient s3AsyncClient;
   @MockitoBean private MailService mailService;
@@ -833,7 +835,7 @@ class DuplicateCheckIntegrationTest {
               Optional.of(
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb1")
-                      .deviatingCourts(List.of("BGH", "BVerfG"))
+                      .deviatingCourts(List.of("AG Aachen", "BVerfG"))
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -843,7 +845,7 @@ class DuplicateCheckIntegrationTest {
               Optional.of(
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb2")
-                      .deviatingCourts(List.of("BGH"))
+                      .deviatingCourts(List.of("AG Aachen"))
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -952,7 +954,7 @@ class DuplicateCheckIntegrationTest {
               Optional.of(
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb1")
-                      .deviatingCourts(List.of("BGH", "BVerfG"))
+                      .deviatingCourts(List.of("AG Aachen", "BVerfG"))
                       .fileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -962,7 +964,7 @@ class DuplicateCheckIntegrationTest {
               Optional.of(
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb2")
-                      .deviatingCourts(List.of("BGH"))
+                      .deviatingCourts(List.of("AG Aachen"))
                       .deviatingFileNumbers(List.of("AZ-123"))
                       .build()));
 
@@ -1131,6 +1133,74 @@ class DuplicateCheckIntegrationTest {
                   .documentNumber("DocumentNumb2")
                   .deviatingEclis(List.of("ECLI:DE:BFH:2024:B.080980.TEST.00.0"))
                   .build()));
+    }
+  }
+
+  @Nested
+  class FindAllDuplicatesQueryTest {
+    @Test
+    void findAllDuplicates_withCourtAndFileNumber() throws DocumentationUnitNotExistsException {
+      // Arrange
+      var courtDTO = databaseCourtRepository.findBySearchStr("AG Aachen", 100).getFirst();
+      var court = CourtTransformer.transformToDomain(courtDTO);
+      var documentType =
+          DocumentTypeTransformer.transformToDomain(
+              databaseDocumentTypeRepository.findAll().get(0));
+      var docUnitToBeChecked =
+          generateNewDocumentationUnit(
+              docOffice,
+              Optional.of(
+                  CreationParameters.builder()
+                      .documentNumber("DocumentNumb1")
+                      .court(court)
+                      .fileNumbers(List.of("AZ-123"))
+                      .documentType(documentType)
+                      .ecli("ECLI:DE:BFH:2024")
+                      .build()));
+
+      // Gericht + AZ
+      generateNewDocumentationUnit(
+          docOffice,
+          Optional.of(
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb2")
+                  .court(court)
+                  .fileNumbers(List.of("AZ-123"))
+                  .build()));
+      // Gericht + abw. AZ
+      generateNewDocumentationUnit(
+          docOffice,
+          Optional.of(
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb3")
+                  .court(court)
+                  .deviatingFileNumbers(List.of("AZ-123"))
+                  .build()));
+      // abw. Gericht + AZ
+      generateNewDocumentationUnit(
+          docOffice,
+          Optional.of(
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb4")
+                  .deviatingCourts(List.of("AG Aachen"))
+                  .fileNumbers(List.of("AZ-123"))
+                  .build()));
+      // abw. Gericht + abw. AZ
+      generateNewDocumentationUnit(
+          docOffice,
+          Optional.of(
+              CreationParameters.builder()
+                  .documentNumber("DocumentNumb5")
+                  .deviatingCourts(List.of("AG Aachen"))
+                  .deviatingFileNumbers(List.of("AZ-123"))
+                  .build()));
+
+      // Act
+      duplicateCheckService.checkAllDuplicates();
+
+      // Assert: 5 doc units, all related with each other: 4 + 3 + 2 + 1 = 10 relations.
+      var allDuplicates = duplicateRelationRepository.findAll();
+      assertThat(allDuplicates).hasSize(10);
     }
   }
 
