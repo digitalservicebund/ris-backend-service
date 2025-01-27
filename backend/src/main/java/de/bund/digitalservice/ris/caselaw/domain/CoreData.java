@@ -29,4 +29,5 @@ public record CoreData(
     DocumentationOffice creatingDocOffice,
     String region,
     @UniqueElements List<String> leadingDecisionNormReferences,
-    List<@PastOrPresent Year> yearsOfDispute) {}
+    List<@PastOrPresent Year> yearsOfDispute,
+    SourceValue source) {}

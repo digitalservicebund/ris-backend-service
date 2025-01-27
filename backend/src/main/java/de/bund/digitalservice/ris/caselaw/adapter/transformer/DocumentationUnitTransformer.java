@@ -20,6 +20,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNo
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LiteratureReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.SourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.YearOfDisputeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
@@ -36,6 +37,7 @@ import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.ShortTexts;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
+import de.bund.digitalservice.ris.caselaw.domain.SourceValue;
 import de.bund.digitalservice.ris.caselaw.domain.StringUtils;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.LocalDate;
@@ -658,7 +660,13 @@ public class DocumentationUnitTransformer {
             .ecli(documentationUnitDTO.getEcli())
             .decisionDate(documentationUnitDTO.getDecisionDate())
             .appraisalBody(documentationUnitDTO.getJudicialBody())
-            .legalEffect(legalEffect == null ? null : legalEffect.getLabel());
+            .legalEffect(legalEffect == null ? null : legalEffect.getLabel())
+            .source(
+                SourceValue.valueOf(
+                    documentationUnitDTO.getSource().stream()
+                        .max(Comparator.comparing(SourceDTO::getRank))
+                        .map(SourceDTO::getValue)
+                        .orElse(null)));
 
     addInputTypesToDomain(documentationUnitDTO, coreDataBuilder);
     addFileNumbersToDomain(documentationUnitDTO, coreDataBuilder);

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, toRefs, watch, ref, onMounted, onBeforeUnmount } from "vue"
+import { DropdownItem } from "./input/types"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import ChipsDateInput from "@/components/input/ChipsDateInput.vue"
 import ChipsInput from "@/components/input/ChipsInput.vue"
@@ -12,7 +13,7 @@ import NestedComponent from "@/components/NestedComponents.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
-import { CoreData } from "@/domain/documentUnit"
+import { CoreData, SourceValue } from "@/domain/documentUnit"
 import ComboboxItemService from "@/services/comboboxItemService"
 
 interface Props {
@@ -49,6 +50,28 @@ const descendingPreviousProcedures = computed(() =>
     ? modelValue.value.previousProcedures.toReversed()
     : undefined,
 )
+
+const sourceItems: DropdownItem[] = [
+  {
+    label: "unaufgefordert eingesandtes Original (O)",
+    value: SourceValue.UnaufgefordertesOriginal,
+  },
+  {
+    label: "angefordertes Original (A)",
+    value: SourceValue.AngefordertesOriginal,
+  },
+  {
+    label: "Zeitschriftenveröffentlichung (Z)",
+    value: SourceValue.Zeitschrift,
+  },
+  { label: "ohne Vorlage des Originals E-Mail (E)", value: SourceValue.Email },
+  {
+    label:
+      "Ländergerichte, EuG- und EuGH-Entscheidungen über jDV-Verfahren (L)",
+    value: SourceValue.LaenderEuGH,
+  },
+  { label: "Sonstige (S)", value: SourceValue.Sonstige },
+]
 
 watch(
   modelValue,
@@ -269,6 +292,29 @@ onBeforeUnmount(() => {
       </InputField>
 
       <InputField id="region" class="flex-col" label="Region">
+        <TextInput
+          id="region"
+          v-model="modelValue.region"
+          aria-label="Region"
+          class="ds-input-medium"
+          read-only
+          size="medium"
+        ></TextInput>
+      </InputField>
+    </div>
+    <div :class="layoutClass">
+      <InputField id="source" v-slot="{ id }" label="Quelle">
+        <DropdownInput
+          :id="id"
+          v-model="modelValue.source"
+          aria-label="Rechtskraft"
+          :items="sourceItems"
+          placeholder="Bitte auswählen"
+        />
+      </InputField>
+
+      <!-- Todo Eingangsart -->
+      <InputField id="region" class="flex-col" label="Eingangsart">
         <TextInput
           id="region"
           v-model="modelValue.region"
