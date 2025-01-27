@@ -57,7 +57,7 @@ test.describe(
         await page.keyboard.press("Enter")
         await expect(
           page
-            .getByTestId("chips-input_dismissalTypes")
+            .getByTestId("chips-input-wrapper_dismissalTypes")
             .getByTestId("chip-value"),
         ).toHaveText("Betriebsbedingte Kündigung")
       })
@@ -69,7 +69,7 @@ test.describe(
         await page.keyboard.press("Enter")
         await expect(
           page
-            .getByTestId("chips-input_dismissalGrounds")
+            .getByTestId("chips-input-wrapper_dismissalGrounds")
             .getByTestId("chip-value"),
         ).toHaveText("Einführung neuer Technologien")
       })

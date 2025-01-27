@@ -161,7 +161,7 @@ watch(newChipText, async () => {
       ref="wrapperEl"
       class="flex min-h-48 w-full cursor-text flex-wrap bg-white p-8 shadow-button shadow-blue-800"
       :class="conditionalClasses"
-      :data-testid="`chips-input_${id}`"
+      :data-testid="`chips-input-wrapper_${id}`"
       @click="focusInput"
     >
       <ChipsList
@@ -189,6 +189,7 @@ watch(newChipText, async () => {
           :aria-label="ariaLabel"
           class="peer w-4 min-w-0 border-none bg-transparent outline-none"
           :data-maska="maska ?? null"
+          :data-testid="`chips-input_${id}`"
           :style="{ width: inputContentWidth }"
           type="text"
           @blur="addChip"
