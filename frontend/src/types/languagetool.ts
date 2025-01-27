@@ -1,3 +1,5 @@
+import LanguageTool from "@/editor/languagetool/languageTool"
+
 export interface Software {
   name: string
   version: string
@@ -84,10 +86,9 @@ export interface LanguageToolOptions {
 }
 
 export interface LanguageToolStorage {
-  match?: Match
   loading?: boolean
   matchRange?: { from: number; to: number }
-  active: boolean
+  languageToolService?: LanguageTool
 }
 
 export enum LanguageToolHelpingWords {

@@ -208,6 +208,44 @@ const buttonsDisabled = computed(
   () => !(props.editable && (hasFocus.value || isHovered.value)),
 )
 
+const shouldShow = (): boolean => {
+  if (editor == undefined) return false
+
+  if (
+    editor.storage.languagetool == undefined ||
+    editor.storage.languagetool.languageToolService == undefined
+  )
+    return false
+  const match = editor.storage.languagetool.languageToolService.match
+  const matchRange = editor.storage.languagetool.languageToolService.matchRange
+
+  const { from, to } = editor.state.selection
+
+  return (
+    !!match && !!matchRange && matchRange.from <= from && to <= matchRange.to
+  )
+}
+
+const matchRange = ref<{ from: number; to: number }>()
+
+// const loading = ref(false)
+
+const updateMatch = (editor: Editor) => {
+  match.value = editor.storage.languagetool.languageToolService.match
+  matchRange.value = editor.storage.languagetool.languageToolService.matchRange
+}
+
+// const updateHtml = () => navigator.clipboard.writeText(editor.getHTML())
+
+const acceptSuggestion = (sug: Replacement) => {
+  if (matchRange.value != undefined) {
+    editor.commands.insertContentAt(matchRange.value, sug.value)
+    editor.storage.languagetool.languageToolService.resetLanguageToolMatch()
+  }
+}
+
+const ignoreSuggestion = () => editor.commands.ignoreLanguageToolSuggestion()
+
 watch(
   () => hasFocus.value,
   () => {
@@ -232,44 +270,6 @@ const resizeObserver = new ResizeObserver((entries) => {
     containerWidth.value = entry.contentRect.width
   }
 })
-
-const shouldShow = (): boolean => {
-  if (editor == undefined) return false
-
-  const match = editor.storage.languagetool.match
-  const matchRange = editor.storage.languagetool.matchRange
-
-  const { from, to } = editor.state.selection
-
-  return (
-    !!match && !!matchRange && matchRange.from <= from && to <= matchRange.to
-  )
-}
-
-const matchRange = ref<{ from: number; to: number }>()
-
-// const loading = ref(false)
-
-const updateMatch = (editor: Editor) => {
-  match.value = editor.storage.languagetool.match
-  matchRange.value = editor.storage.languagetool.matchRange
-}
-
-const replacements = computed(() => match.value?.replacements || [])
-
-// const matchMessage = computed(() => match.value?.message || "No Message")
-
-// const updateHtml = () => navigator.clipboard.writeText(editor.getHTML())
-
-const acceptSuggestion = (sug: Replacement) => {
-  if (matchRange.value != undefined) {
-    editor.commands.insertContentAt(matchRange.value, sug.value)
-  }
-}
-
-// const proofread = () => editor.commands.proofread()
-
-const ignoreSuggestion = () => editor.commands.ignoreLanguageToolSuggestion()
 </script>
 
 <template>
