@@ -84,6 +84,20 @@ const withError = computed({
   },
 })
 
+const withDuplicateWarning = computed({
+  get: () =>
+    query.value?.withDuplicateWarning
+      ? JSON.parse(query.value.withDuplicateWarning)
+      : false,
+  set: (data) => {
+    if (!data) {
+      delete query.value.withDuplicateWarning
+    } else {
+      query.value.withDuplicateWarning = "true"
+    }
+  },
+})
+
 function resetSearch() {
   validationStore.reset()
   submitButtonError.value = undefined
@@ -213,6 +227,7 @@ export type DocumentUnitSearchParameter =
   | "decisionDateEnd"
   | "withError"
   | "myDocOfficeOnly"
+  | "withDuplicateWarning"
 </script>
 
 <template>
@@ -432,6 +447,21 @@ export type DocumentUnitSearchParameter =
             @focus="resetErrors"
           />
         </InputField>
+        <InputField
+          v-if="myDocOfficeOnly"
+          id="withErrorsOnly"
+          v-slot="{ id }"
+          label="Dublettenverdacht"
+          label-class="ds-label-01-reg"
+          :label-position="LabelPosition.RIGHT"
+        >
+          <Checkbox
+            :id="id"
+            v-model="withDuplicateWarning"
+            aria-label="Dokumentationseinheiten mit Dublettenverdacht"
+            class="ds-checkbox-mini bg-white"
+            @focus="resetErrors"
+        /></InputField>
       </div>
       <div class="flex flex-row">
         <div class="flex flex-col gap-4">
