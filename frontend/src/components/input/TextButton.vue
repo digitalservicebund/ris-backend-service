@@ -7,7 +7,7 @@ interface Props {
   label?: string
   icon?: Component
   ariaLabel?: string
-  buttonType?: string
+  buttonType?: ButtonType
   disabled?: boolean
   href?: string
   download?: boolean | string
@@ -88,6 +88,15 @@ const render = () => {
     ],
   )
 }
+</script>
+
+<script lang="ts">
+export type ButtonType =
+  | "primary"
+  | "secondary"
+  | "tertiary"
+  | "ghost"
+  | "destructive"
 </script>
 
 <template>

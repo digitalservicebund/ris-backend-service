@@ -1,6 +1,7 @@
 import { createTestingPinia } from "@pinia/testing"
 import { render, screen } from "@testing-library/vue"
 import { setActivePinia } from "pinia"
+import { it } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitManagementData from "@/components/DocumentUnitManagementData.vue"
 import DocumentUnit, {
@@ -88,6 +89,22 @@ describe("DocumentUnitManagementData", () => {
     })
   })
 
+  it("should show a delete doc unit button", () => {
+    const managementData: ManagementData = {
+      borderNumbers: [],
+      duplicateRelations: [],
+    }
+    renderManagementData(managementData)
+
+    expect(
+      screen.getByText(`Dokumentationseinheit "DS123" löschen`),
+    ).toBeVisible()
+
+    expect(
+      screen.getByRole("button", { name: "Dokumentationseinheit löschen" }),
+    ).toBeVisible()
+  })
+
   function renderManagementData(managementData: ManagementData) {
     const store = mockDocUnitStore(managementData)
 
@@ -115,7 +132,7 @@ describe("DocumentUnitManagementData", () => {
   function mockDocUnitStore(managementData: ManagementData) {
     const mockedSessionStore = useDocumentUnitStore()
     mockedSessionStore.documentUnit = new DocumentUnit("q834", {
-      documentNumber: "original",
+      documentNumber: "DS123",
       managementData,
     })
 

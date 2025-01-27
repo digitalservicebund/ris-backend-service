@@ -164,7 +164,9 @@ export const navigateToManagementData = async (
   await test.step("Navigate to 'Verwaltungsdaten'", async () => {
     const baseUrl = `/caselaw/documentunit/${documentNumber}/managementdata`
     await getRequest(baseUrl, page)
-    await expect(page.getByTestId("title")).toHaveText("Verwaltungsdaten")
+    await expect(page.getByTestId("title").first()).toHaveText(
+      "Verwaltungsdaten",
+    )
   })
 }
 

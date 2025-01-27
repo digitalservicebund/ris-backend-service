@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
+import DocumentUnitDeleteButton from "@/components/DocumentUnitDeleteButton.vue"
 import DuplicateRelationListItem from "@/components/DuplicateRelationListItem.vue"
 import TitleElement from "@/components/TitleElement.vue"
 import { useDocumentUnitStore } from "@/stores/documentUnitStore"
@@ -34,6 +35,16 @@ const { documentUnit } = storeToRefs(useDocumentUnitStore())
           </dd>
         </div>
       </dl>
+    </div>
+    <div class="flex flex-col gap-24 bg-white p-24">
+      <TitleElement
+        >Dokumentationseinheit "{{ documentUnit?.documentNumber }}"
+        löschen</TitleElement
+      >
+      <DocumentUnitDeleteButton
+        :document-number="documentUnit?.documentNumber!"
+        :uuid="documentUnit?.uuid!"
+      />
     </div>
   </div>
 </template>
