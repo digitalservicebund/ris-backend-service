@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
+import jakarta.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -56,7 +57,12 @@ public class DuplicateRelationService {
             .documentationUnit2(docUnit2)
             .id(duplicateRelationId)
             .build();
-    relationRepository.save(newRelation);
+    try {
+      relationRepository.save(newRelation);
+    } catch (ConstraintViolationException e) {
+      // Duplicate relations might be created multiple times in parallel or while a deletion of a
+      // doc unit is in progress (e2e tests). Instead of locking we choose to ignore this.
+    }
   }
 
   void setStatus(DuplicateRelationDTO duplicateRelation, DuplicateRelationStatus status) {
