@@ -36,7 +36,7 @@ public class DuplicateRelationViewDTO {
   @Builder(toBuilder = true)
   @Embeddable
   public static class DuplicateRelationId implements Serializable {
-    private UUID id_a;
-    private UUID id_b;
+    private UUID id_a; // NOSONAR: Should it be document_unit_id1?
+    private UUID id_b; // NOSONAR: Unclear if same name would be clearer
   }
 }
