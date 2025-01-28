@@ -70,7 +70,6 @@
     "@vueuse/router": "^12.5.0",
     "axios": "^1.7.9",
     "dayjs": "^1.11.13",
-    "dexie": "^4.0.10",
     "fast-json-patch": "^3.1.1",
     "immer": "^10.1.1",
     "maska": "^3.1.0",

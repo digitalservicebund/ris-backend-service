@@ -1,4 +1,3 @@
-import Dexie from "dexie"
 import { debounce } from "lodash"
 import { Node as PMNode } from "prosemirror-model"
 import { Transaction } from "prosemirror-state"
@@ -45,8 +44,6 @@ export default class LanguageTool {
 
   private editorView?: EditorView
 
-  private db: any
-
   public decorationSet: DecorationSet
 
   public lastOriginalFrom = 0
@@ -59,15 +56,6 @@ export default class LanguageTool {
 
   constructor(decorationSet: DecorationSet) {
     this.decorationSet = decorationSet
-
-    this.db = new Dexie("LanguageToolIgnoredSuggestions")
-    this.db.version(1).stores({
-      ignoredWords: `
-    ++id,
-    &value,
-    documentId
-  `,
-    })
   }
 
   get languageToolActiveState(): boolean {

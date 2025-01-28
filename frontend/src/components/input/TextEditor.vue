@@ -19,6 +19,7 @@ import { Underline } from "@tiptap/extension-underline"
 import { BubbleMenu, Editor, EditorContent } from "@tiptap/vue-3"
 import { computed, onMounted, ref, watch } from "vue"
 import TextEditorMenu from "@/components/input/TextEditorMenu.vue"
+import TextSuggestionsDropdown from "@/components/input/TextSuggestionsDropdown.vue"
 import { TextAreaInputAttributes } from "@/components/input/types"
 import {
   BorderNumber,
@@ -32,6 +33,7 @@ import { FontSize } from "@/editor/fontSize"
 import { CustomImage } from "@/editor/image"
 import { Indent } from "@/editor/indent"
 import { InvisibleCharacters } from "@/editor/invisibleCharacters"
+import { LanguageToolExtension } from "@/editor/languagetool/languageToolExtension"
 import { CustomListItem } from "@/editor/listItem"
 import { CustomOrderedList } from "@/editor/orderedList"
 import { CustomParagraph } from "@/editor/paragraph"
@@ -44,8 +46,6 @@ import {
 } from "@/types/languagetool"
 
 import "@/styles/language-tool.scss"
-import { LanguageToolExtension } from "@/editor/languagetool/languageToolExtension"
-import TextSuggestionsDropdown from "@/components/input/TextSuggestionsDropdown.vue"
 
 interface Props {
   value?: string
