@@ -55,7 +55,7 @@ test.describe("procedure", () => {
       await expect(page.getByText("Vorgangshistorie")).toBeVisible()
       await expect(
         page
-          .getByTestId("chips-input_previousProcedures")
+          .getByTestId("chips-input-wrapper_previousProcedures")
           .getByText(newProcedure),
       ).toBeVisible()
     })

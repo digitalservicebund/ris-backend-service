@@ -1,4 +1,4 @@
-import { expect, Locator } from "@playwright/test"
+import { expect } from "@playwright/test"
 import { deleteDocumentUnit, navigateToCategories, save } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 
@@ -171,7 +171,7 @@ test.describe("core data", () => {
       page.locator("[aria-label='dropdown-option']"),
     ).not.toHaveCount(0)
     await expect(page.getByText("Anerkenntnisurteil")).toBeVisible()
-    await expect(page.getByText("Anhängiges Verfahren")).toBeVisible()
+    await expect(page.getByText("EuGH-Vorlage")).toBeVisible()
 
     // type search string: 3 results for "zwischen"
     await page.locator("[aria-label='Dokumenttyp']").fill("zwischen")
@@ -291,7 +291,7 @@ test.describe("core data", () => {
     ).toBeVisible()
 
     await page
-      .getByTestId("chips-input_leadingDecisionNormReferences")
+      .getByTestId("chips-input-wrapper_leadingDecisionNormReferences")
       .getByLabel("Löschen")
       .click()
     await save(page)
@@ -324,7 +324,7 @@ test.describe("core data", () => {
       await test.step("Gericht und Fehlerhaftes Gericht sind nicht sichtbar", async () => {
         const court = pageWithExternalUser.locator("[aria-label='Gericht']")
         const deviatingCourt = pageWithExternalUser.getByTestId(
-          "chips-input_deviatingCourt",
+          "chips-input-wrapper_deviatingCourt",
         )
         await expect(court).toBeHidden()
         await expect(deviatingCourt).toBeHidden()
@@ -332,10 +332,10 @@ test.describe("core data", () => {
 
       await test.step("Aktenzeichen und abweichendes Aktenzeichen sind nicht sichtbar", async () => {
         const fileNumber = pageWithExternalUser.getByTestId(
-          "chips-input_fileNumber",
+          "chips-input-wrapper_fileNumber",
         )
         const deviatingFileNumber = pageWithExternalUser.getByTestId(
-          "chips-input_deviatingFileNumber",
+          "chips-input-wrapper_deviatingFileNumber",
         )
         await expect(fileNumber).toBeHidden()
         await expect(deviatingFileNumber).toBeHidden()
@@ -346,7 +346,7 @@ test.describe("core data", () => {
           "[aria-label='Entscheidungsdatum']",
         )
         const deviatingDecisionDate = pageWithExternalUser.getByTestId(
-          "chips-input_deviatingDecisionDates",
+          "chips-input-wrapper_deviatingDecisionDates",
         )
         await expect(decisionDate).toBeHidden()
         await expect(deviatingDecisionDate).toBeHidden()
@@ -369,7 +369,7 @@ test.describe("core data", () => {
       await test.step("ECLI und abweichender ECLI sind nicht sichtbar", async () => {
         const ecli = pageWithExternalUser.locator("[aria-label='ECLI']")
         const deviatingEcli = pageWithExternalUser.getByTestId(
-          "chips-input_deviatingEclis",
+          "chips-input-wrapper_deviatingEclis",
         )
         await expect(ecli).toBeHidden()
         await expect(deviatingEcli).toBeHidden()
@@ -394,7 +394,7 @@ test.describe("core data", () => {
 
       await test.step("Streitjahr ist nicht sichtbar", async () => {
         const yearsOfDispute = pageWithExternalUser.getByTestId(
-          "chips-input_yearOfDispute",
+          "chips-input-wrapper_yearOfDispute",
         )
         await expect(yearsOfDispute).toBeHidden()
       })
@@ -420,7 +420,7 @@ test.describe("core data", () => {
         const court = page.locator("[aria-label='Gericht']")
         const deviatingCourt = page.getByTestId("chips-input_deviatingCourt")
         await expect(court).toBeEditable()
-        expect(await isReadOnly(deviatingCourt)).toBe(false)
+        await expect(deviatingCourt).toBeEditable()
       })
 
       await test.step("Aktenzeichen und abweichendes Aktenzeichen sind bearbeitbar", async () => {
@@ -429,7 +429,7 @@ test.describe("core data", () => {
           "chips-input_deviatingFileNumber",
         )
         await expect(fileNumber).toBeEditable()
-        expect(await isReadOnly(deviatingFileNumber)).toBe(false)
+        await expect(deviatingFileNumber).toBeEditable()
       })
 
       await test.step("Entscheidungsdatum und abweichendes Entscheidungsdatum sind bearbeitbar", async () => {
@@ -438,7 +438,7 @@ test.describe("core data", () => {
           "chips-input_deviatingDecisionDates",
         )
         await expect(decisionDate).toBeEditable()
-        expect(await isReadOnly(deviatingDecisionDate)).toBe(false)
+        await expect(deviatingDecisionDate).toBeEditable()
       })
 
       await test.step("Spruchkörper ist bearbeitbar", async () => {
@@ -455,7 +455,7 @@ test.describe("core data", () => {
         const ecli = page.locator("[aria-label='ECLI']")
         const deviatingEcli = page.getByTestId("chips-input_deviatingEclis")
         await expect(ecli).toBeEditable()
-        expect(await isReadOnly(deviatingEcli)).toBe(false)
+        await expect(deviatingEcli).toBeEditable()
       })
 
       await test.step("Vorgang ist bearbeitbar", async () => {
@@ -475,13 +475,8 @@ test.describe("core data", () => {
 
       await test.step("Streitjahr ist bearbeitbar", async () => {
         const yearsOfDispute = page.locator("[aria-label='Streitjahr']")
-        expect(await isReadOnly(yearsOfDispute)).toBe(false)
+        await expect(yearsOfDispute).toBeEditable()
       })
     },
   )
-
-  const isReadOnly = async (locator: Locator) => {
-    const classAttribute = await locator.getAttribute("class")
-    return classAttribute?.split(" ").includes("!bg-blue-300")
-  }
 })
