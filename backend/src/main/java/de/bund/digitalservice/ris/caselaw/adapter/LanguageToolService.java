@@ -66,7 +66,7 @@ public class LanguageToolService implements TextCorrectionService {
       return URLDecoder.decode(encodedText, StandardCharsets.UTF_8);
     } catch (Exception e) {
       throw new RuntimeException("Failed to decode text", e);
-    }.
+    }
   }
 
   public static List<TextRange> findNoIndexPositions(Document doc) {
