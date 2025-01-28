@@ -32,7 +32,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRep
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationViewRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDeltaMigrationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
@@ -149,7 +148,6 @@ class DuplicateCheckFullIntegrationTest {
   @Autowired private AuthService authService;
   @Autowired private DocumentationUnitService documentationUnitService;
   @Autowired private DatabaseDuplicateCheckService duplicateCheckService;
-  @Autowired private DuplicateRelationViewRepository duplicateRelationViewRepository;
 
   @MockitoBean private S3AsyncClient s3AsyncClient;
   @MockitoBean private MailService mailService;
