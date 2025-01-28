@@ -81,7 +81,6 @@ public class DuplicateRelationService {
 
   void updateAllDuplicates() {
     log.info("Updating all duplicate relations");
-    this.relationViewRepository.refreshDuplicateRelationsView();
     var removedRelations = this.relationViewRepository.removeObsoleteDuplicateRelations();
     var insertedRelations = this.relationViewRepository.addMissingDuplicateRelations();
     var ignoredRelations =
