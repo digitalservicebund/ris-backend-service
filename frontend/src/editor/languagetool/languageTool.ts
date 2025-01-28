@@ -43,9 +43,7 @@ export default class LanguageTool {
 
   matchRange: { from: number; to: number } | undefined
 
-  private editorView: EditorView
-
-  private extensionDocId: string | number
+  private editorView?: EditorView
 
   private db: any
 
@@ -80,10 +78,6 @@ export default class LanguageTool {
     return this.match
   }
 
-  public setExtensionId(documentId: string | number) {
-    this.extensionDocId = documentId
-  }
-
   public setMatch(match: Match) {
     this.match = match
   }
@@ -96,7 +90,7 @@ export default class LanguageTool {
     }
   }
 
-  public setEditorView(editorView) {
+  public setEditorView(editorView: EditorView) {
     this.editorView = editorView
   }
 
@@ -112,11 +106,15 @@ export default class LanguageTool {
       this.matchRange = undefined
     }
 
-    const tr = this.editorView.state.tr
-    tr.setMeta(LanguageToolHelpingWords.MatchUpdatedTransactionName, true)
-    tr.setMeta(LanguageToolHelpingWords.MatchRangeUpdatedTransactionName, true)
-
-    this.editorView.dispatch(tr)
+    if (this.editorView) {
+      const tr = this.editorView.state.tr
+      tr.setMeta(LanguageToolHelpingWords.MatchUpdatedTransactionName, true)
+      tr.setMeta(
+        LanguageToolHelpingWords.MatchRangeUpdatedTransactionName,
+        true,
+      )
+      this.editorView.dispatch(tr)
+    }
   }
 
   public getMatchAndSetDecorations = async (
@@ -135,21 +133,7 @@ export default class LanguageTool {
       const docFrom = match.offset + originalFrom
       const docTo = docFrom + match.length
 
-      if (this.extensionDocId) {
-        const content = text.substring(
-          match.offset - 1,
-          match.offset + match.length - 1,
-        )
-        const result = await this.db.ignoredWords.get({
-          value: content,
-        })
-
-        if (!result) {
-          decorations.push(this.gimmeDecoration(docFrom, docTo, match))
-        }
-      } else {
-        decorations.push(this.gimmeDecoration(docFrom, docTo, match))
-      }
+      decorations.push(this.gimmeDecoration(docFrom, docTo, match))
     }
 
     const decorationsToRemove = this.decorationSet.find(

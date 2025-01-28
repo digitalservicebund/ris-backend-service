@@ -2,7 +2,7 @@
 import TextButton from "@/components/input/TextButton.vue"
 import { Match, Replacement } from "@/types/languagetool"
 
-const props = defineProps<{
+defineProps<{
   match: Match
 }>()
 

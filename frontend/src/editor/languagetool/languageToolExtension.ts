@@ -75,19 +75,12 @@ export const LanguageToolExtension = Extension.create<
               "Please provide a unique Document ID(number|string)",
             )
 
-          const { selection, doc } = editor.state
+          const { selection } = editor.state
           const { from, to } = selection
 
           this.storage.languageToolService?.removeDecorationSet(from, to)
 
-          const content = doc.textBetween(from, to)
-
-          /*
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ;(db as any).ignoredWords.add({
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          value: content,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          documentId: `${extensionDocId}`,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        })
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             */
+          // const content = doc.textBetween(from, to)
 
           return false
         },
@@ -136,8 +129,6 @@ export const LanguageToolExtension = Extension.create<
   },
 
   addProseMirrorPlugins() {
-    const { documentId } = this.options
-
     return [
       new Plugin({
         key: new PluginKey("languagetoolPlugin"),
@@ -148,17 +139,6 @@ export const LanguageToolExtension = Extension.create<
           attributes: {
             spellcheck: "false",
             isLanguageToolActive: `${this.storage.languageToolService?.languageToolActive}`,
-          },
-
-          handlePaste(view) {
-            const { docChanged } = view.state.tr
-
-            if (docChanged)
-              this.storage.languageToolService!.debouncedProofreadAndDecorate(
-                view.state.tr.doc,
-              )
-
-            return false
           },
         },
         state: {
@@ -173,21 +153,11 @@ export const LanguageToolExtension = Extension.create<
               )
             }
 
-            if (documentId)
-              this.storage.languageToolService.setExtensionId(documentId)
-
             return this.storage.languageToolService.decorationSet
           },
           apply: (tr) => {
             if (!this.storage.languageToolService!.languageToolActiveState)
               return DecorationSet.empty
-
-            const matchUpdated = tr.getMeta(
-              LanguageToolHelpingWords.MatchUpdatedTransactionName,
-            )
-            const matchRangeUpdated = tr.getMeta(
-              LanguageToolHelpingWords.MatchRangeUpdatedTransactionName,
-            )
 
             const loading = tr.getMeta(
               LanguageToolHelpingWords.LoadingTransactionName,
@@ -195,11 +165,6 @@ export const LanguageToolExtension = Extension.create<
 
             if (loading) this.storage.loading = true
             else this.storage.loading = false
-
-            /*
-                                                                                                                                                                                                                                                                                                       if (matchUpdated) this.storage.languageTool!.match = match
-                                                                                                                                                                                                                                                                                                if (matchRangeUpdated) this.storage.matchRange = matchRan
-                                                                                                                                                                                                                                                                                               */
 
             const languageToolDecorations = tr.getMeta(
               LanguageToolHelpingWords.LanguageToolTransactionName,
@@ -218,7 +183,9 @@ export const LanguageToolExtension = Extension.create<
                   selection: { from, to },
                 } = tr
 
-                let changedNodeWithPos: { node: PMNode; pos: number }
+                let changedNodeWithPos:
+                  | { node: PMNode; pos: number }
+                  | undefined
 
                 tr.doc.descendants((node, pos) => {
                   if (!node.isBlock) return false
@@ -228,6 +195,7 @@ export const LanguageToolExtension = Extension.create<
                   if (!(nodeFrom <= from && to <= nodeTo)) return
 
                   changedNodeWithPos = { node, pos }
+                  return false
                 })
 
                 if (changedNodeWithPos) {
