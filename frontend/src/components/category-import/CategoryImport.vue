@@ -187,10 +187,13 @@ function importNorms() {
   const targetNorms = store.documentUnit!.contentRelatedIndexing.norms
   if (targetNorms) {
     source.forEach((importableNorm) => {
-      const existingWithAbbreviation = targetNorms.find(
-        (existing) =>
-          existing.normAbbreviation?.abbreviation ===
-          importableNorm.normAbbreviation?.abbreviation,
+      // first check for abbreviation, then for raw value
+      const existingWithAbbreviation = targetNorms.find((existing) =>
+        importableNorm.normAbbreviation?.abbreviation != null
+          ? existing.normAbbreviation?.abbreviation ===
+            importableNorm.normAbbreviation?.abbreviation
+          : existing.normAbbreviationRawValue ===
+            importableNorm.normAbbreviationRawValue,
       )
       if (existingWithAbbreviation) {
         //import single norms into existing norm reference

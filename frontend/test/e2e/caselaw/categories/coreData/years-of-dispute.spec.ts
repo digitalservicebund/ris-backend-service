@@ -56,7 +56,9 @@ test.describe(
               await page.keyboard.press("Enter")
 
               await expect(
-                page.getByTestId("chips-input_yearOfDispute").getByText(year),
+                page
+                  .getByTestId("chips-input-wrapper_yearOfDispute")
+                  .getByText(year),
               ).toBeVisible()
             },
           )
@@ -74,19 +76,25 @@ test.describe(
 
         await test.step("Navigate back by arrow left, delete last chip on enter", async () => {
           await expect(
-            page.getByTestId("chips-input_yearOfDispute").getByText("2024"),
+            page
+              .getByTestId("chips-input-wrapper_yearOfDispute")
+              .getByText("2024"),
           ).toBeVisible()
           await page.keyboard.press("ArrowLeft")
           await page.keyboard.press("Enter")
 
           await expect(
-            page.getByTestId("chips-input_yearOfDispute").getByText("2024"),
+            page
+              .getByTestId("chips-input-wrapper_yearOfDispute")
+              .getByText("2024"),
           ).toBeHidden()
         })
 
         await test.step("Tab out, tab in, navigate back by arrow left, delete last chip on enter", async () => {
           await expect(
-            page.getByTestId("chips-input_yearOfDispute").getByText("2023"),
+            page
+              .getByTestId("chips-input-wrapper_yearOfDispute")
+              .getByText("2023"),
           ).toBeVisible()
           await page.keyboard.press("Tab")
           await page.keyboard.press("Tab")
@@ -96,7 +104,9 @@ test.describe(
           await page.keyboard.press("ArrowLeft")
           await page.keyboard.press("Enter")
           await expect(
-            page.getByTestId("chips-input_yearOfDispute").getByText("2023"),
+            page
+              .getByTestId("chips-input-wrapper_yearOfDispute")
+              .getByText("2023"),
           ).toBeHidden()
         })
 
@@ -113,7 +123,9 @@ test.describe(
           await page.reload()
           for (const year of testData) {
             await expect(
-              page.getByTestId("chips-input_yearOfDispute").getByText(year),
+              page
+                .getByTestId("chips-input-wrapper_yearOfDispute")
+                .getByText(year),
             ).toBeVisible()
           }
         })
@@ -141,7 +153,9 @@ test.describe(
               await page.keyboard.press("Enter")
 
               await expect(
-                page.getByTestId("chips-input_yearOfDispute").getByText(year),
+                page
+                  .getByTestId("chips-input-wrapper_yearOfDispute")
+                  .getByText(year),
               ).toBeVisible()
             },
           )
@@ -200,7 +214,9 @@ test.describe(
               await page.keyboard.press("Enter")
 
               await expect(
-                page.getByTestId("chips-input_yearOfDispute").getByText(year),
+                page
+                  .getByTestId("chips-input-wrapper_yearOfDispute")
+                  .getByText(year),
               ).toBeVisible()
             },
           )
@@ -243,7 +259,9 @@ test.describe(
           await page.locator("[aria-label='Streitjahr']").fill("2022")
           await page.keyboard.press("Enter")
           await expect(
-            page.getByTestId("chips-input_yearOfDispute").getByText("2022"),
+            page
+              .getByTestId("chips-input-wrapper_yearOfDispute")
+              .getByText("2022"),
           ).toBeVisible()
 
           await page.locator("[aria-label='Streitjahr']").fill("2022")
@@ -262,7 +280,9 @@ test.describe(
           await page.locator("[aria-label='Streitjahr']").fill("20202")
           await page.keyboard.press("Enter")
           await expect(
-            page.getByTestId("chips-input_yearOfDispute").getByText("2020"),
+            page
+              .getByTestId("chips-input-wrapper_yearOfDispute")
+              .getByText("2020"),
           ).toBeVisible()
         })
 
@@ -270,7 +290,9 @@ test.describe(
           await page.locator("[aria-label='Streitjahr']").fill("abcd")
           await page.keyboard.press("Enter")
           await expect(
-            page.getByTestId("chips-input_yearOfDispute").getByText("abcd"),
+            page
+              .getByTestId("chips-input-wrapper_yearOfDispute")
+              .getByText("abcd"),
           ).toBeHidden()
         })
 
@@ -296,7 +318,9 @@ test.describe(
         await test.step("Check if onyl valids years of dispute are persisted in reload", async () => {
           await page.reload()
           await expect(
-            page.getByTestId("chips-input_yearOfDispute").getByText("2022"),
+            page
+              .getByTestId("chips-input-wrapper_yearOfDispute")
+              .getByText("2022"),
           ).toBeVisible()
         })
       },

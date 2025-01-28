@@ -150,7 +150,7 @@ describe("Chips Input", () => {
   it("focuses the input when clicking on the chips component", async () => {
     const { user } = renderComponent({ id: "test" })
 
-    const chips = screen.getByTestId("chips-input_test")
+    const chips = screen.getByTestId("chips-input-wrapper_test")
     await user.click(chips)
 
     const input = screen.getByRole<HTMLInputElement>("textbox")
