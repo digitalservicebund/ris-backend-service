@@ -50,6 +50,7 @@ const myDocOfficeOnly = computed({
   set: (data) => {
     if (!data) {
       delete query.value.withError
+      delete query.value.withDuplicateWarning
       delete query.value.myDocOfficeOnly
       delete query.value.scheduledOnly
       delete query.value.publicationDate
@@ -449,7 +450,7 @@ export type DocumentUnitSearchParameter =
         </InputField>
         <InputField
           v-if="myDocOfficeOnly"
-          id="withErrorsOnly"
+          id="withDuplicateWaring"
           v-slot="{ id }"
           label="Dublettenverdacht"
           label-class="ds-label-01-reg"
