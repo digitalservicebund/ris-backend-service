@@ -297,47 +297,51 @@ test.describe(
           prefilledDocumentUnit,
           secondPrefilledDocumentUnit,
         }) => {
-          // create two duplicates with one extra doc unit
-          await navigateToCategories(page, documentNumber)
-          await setDeviatingFileNumberToMatchDocUnit(
-            page,
-            prefilledDocumentUnit,
-          )
-          await navigateToCategories(
-            page,
-            secondPrefilledDocumentUnit.documentNumber,
-          )
-          await setDeviatingFileNumberToMatchDocUnit(
-            page,
-            prefilledDocumentUnit,
-          )
-          await save(page)
-          await expectDuplicateWarning(page)
+          await test.step("Create two duplicates and one non duplicate", async () => {
+            await navigateToCategories(page, documentNumber)
+            await setDeviatingFileNumberToMatchDocUnit(
+              page,
+              prefilledDocumentUnit,
+            )
+            await navigateToCategories(
+              page,
+              secondPrefilledDocumentUnit.documentNumber,
+            )
+            await setDeviatingFileNumberToMatchDocUnit(
+              page,
+              prefilledDocumentUnit,
+            )
+            await save(page)
+            await expectDuplicateWarning(page)
+          })
 
-          await page.goto("/")
+          await test.step("Search for 3 doc units with same 'Aktenzeichen'", async () => {
+            await page.goto("/")
 
-          const fileNumber = prefilledDocumentUnit.coreData.fileNumbers![0]
-          await page.getByLabel("Aktenzeichen Suche").fill(fileNumber)
-          await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-          //3 + table header
-          await expect
-            .poll(async () => page.locator(".table-row").count())
-            .toBe(4)
+            const fileNumber = prefilledDocumentUnit.coreData.fileNumbers![0]
+            await page.getByLabel("Aktenzeichen Suche").fill(fileNumber)
+            await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+            //3 + table header
+            await expect
+              .poll(async () => page.locator(".table-row").count())
+              .toBe(4)
+          })
 
-          const docofficeOnly = page.getByLabel("Nur meine Dokstelle Filter")
-          await docofficeOnly.click()
-          const withDuplicateWarning = page.getByLabel("Dublettenverdacht")
-          await withDuplicateWarning.click()
-          await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+          await test.step("Apply duplicate filter to search for 2 duplicates", async () => {
+            const docOfficeOnly = page.getByLabel("Nur meine Dokstelle Filter")
+            await docOfficeOnly.click()
+            const withDuplicateWarning = page.getByLabel("Dublettenverdacht")
+            await withDuplicateWarning.click()
+            await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
 
-          //2 + table header
-          await expect
-            .poll(async () => page.locator(".table-row").count())
-            .toBe(3)
+            //2 + table header
+            await expect
+              .poll(async () => page.locator(".table-row").count())
+              .toBe(3)
 
-          //unclick my dokstelle should also reset errors only filter
-          await docofficeOnly.click()
-          await expect(withDuplicateWarning).toBeHidden()
+            await docOfficeOnly.click()
+            await expect(withDuplicateWarning).toBeHidden()
+          })
         })
       },
     )
