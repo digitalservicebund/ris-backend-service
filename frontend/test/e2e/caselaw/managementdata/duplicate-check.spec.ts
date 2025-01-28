@@ -286,6 +286,61 @@ test.describe(
         ).toBeEnabled()
       })
     })
+
+    test.describe(
+      "Search for documents with duplicate warning",
+      { tag: ["@RISDEV-5912"] },
+      () => {
+        test("user can filter search result for duplicate warning", async ({
+          page,
+          documentNumber,
+          prefilledDocumentUnit,
+          secondPrefilledDocumentUnit,
+        }) => {
+          // create two duplicates with one extra doc unit
+          await navigateToCategories(page, documentNumber)
+          await setDeviatingFileNumberToMatchDocUnit(
+            page,
+            prefilledDocumentUnit,
+          )
+          await navigateToCategories(
+            page,
+            secondPrefilledDocumentUnit.documentNumber,
+          )
+          await setDeviatingFileNumberToMatchDocUnit(
+            page,
+            prefilledDocumentUnit,
+          )
+          await save(page)
+          await expectDuplicateWarning(page)
+
+          await page.goto("/")
+
+          const fileNumber = prefilledDocumentUnit.coreData.fileNumbers![0]
+          await page.getByLabel("Aktenzeichen Suche").fill(fileNumber)
+          await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+          //3 + table header
+          await expect
+            .poll(async () => page.locator(".table-row").count())
+            .toBe(4)
+
+          const docofficeOnly = page.getByLabel("Nur meine Dokstelle Filter")
+          await docofficeOnly.click()
+          const withDuplicateWarning = page.getByLabel("Dublettenverdacht")
+          await withDuplicateWarning.click()
+          await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+
+          //2 + table header
+          await expect
+            .poll(async () => page.locator(".table-row").count())
+            .toBe(3)
+
+          //unclick my dokstelle should also reset errors only filter
+          await docofficeOnly.click()
+          await expect(withDuplicateWarning).toBeHidden()
+        })
+      },
+    )
   },
 )
 
