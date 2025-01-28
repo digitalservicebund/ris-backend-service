@@ -313,7 +313,6 @@ const resizeObserver = new ResizeObserver((entries) => {
       <TextSuggestionsDropdown
         v-if="match"
         :match="match"
-        match-message=""
         @suggestion:ignore="ignoreSuggestion"
         @suggestion:update="acceptSuggestion"
       />

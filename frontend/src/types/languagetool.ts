@@ -64,6 +64,8 @@ export interface Match {
   rule: Rule
   ignoreForIncompleteSentence: boolean
   contextForSureMatch: number
+  content: string
+  textContent: string
 }
 
 export interface LanguageToolResponse {

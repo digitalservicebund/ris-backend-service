@@ -22,18 +22,22 @@ function ignoreSuggestion() {
 
 <template>
   <div
-    class="w-max-480 flex-col flex-wrap items-start justify-start border-2 border-solid border-blue-800 bg-white p-24"
+    class="flex flex-col flex-wrap items-start justify-start gap-16 border-2 border-solid border-blue-800 bg-white p-24"
   >
-    <button
-      class="ds-link-01-bold w-full whitespace-nowrap leading-24 focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
-      @click="ignoreSuggestion"
-    >
-      Ignorieren
-    </button>
+    <div class="flex flex-row gap-8">
+      <label class="font-bold">
+        {{ match.textContent }}
+      </label>
+      <span> | </span>
+      <button
+        class="ds-link-01-bold whitespace-nowrap leading-24 focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
+        @click="ignoreSuggestion"
+      >
+        Ignorieren
+      </button>
+    </div>
 
-    <label>
-      {{ match.message }}
-    </label>
+    <p>{{ match.shortMessage || match.message }}</p>
     <div class="flex w-full flex-row flex-wrap gap-24">
       <div
         v-for="(replacement, i) in match.replacements"

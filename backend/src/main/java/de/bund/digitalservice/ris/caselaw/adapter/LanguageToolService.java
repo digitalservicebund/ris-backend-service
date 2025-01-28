@@ -5,8 +5,11 @@ import de.bund.digitalservice.ris.caselaw.domain.TextRange;
 import de.bund.digitalservice.ris.caselaw.domain.languagetool.LanguageToolResponse;
 import de.bund.digitalservice.ris.caselaw.domain.languagetool.Match;
 import de.bund.digitalservice.ris.caselaw.domain.languagetool.TextCorrectionService;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -44,7 +47,26 @@ public class LanguageToolService implements TextCorrectionService {
         restTemplate.exchange(
             languageToolConfig.getUrl(), HttpMethod.POST, entity, LanguageToolResponse.class);
 
+    if (Objects.requireNonNull(response.getBody()).getMatches() != null) {
+      for (Match match : response.getBody().getMatches()) {
+        addTextContentToMatch(match, text);
+      }
+    }
+
     return response.getBody();
+  }
+
+  public void addTextContentToMatch(Match match, String text) {
+    match.setTextContent(
+        decodeText(text).substring(match.getOffset(), match.getOffset() + match.getLength()));
+  }
+
+  public String decodeText(String encodedText) {
+    try {
+      return URLDecoder.decode(encodedText, StandardCharsets.UTF_8);
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to decode text", e);
+    }.
   }
 
   public static List<TextRange> findNoIndexPositions(Document doc) {

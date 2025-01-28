@@ -24,6 +24,7 @@ public class Match {
   private Rule rule;
   private boolean ignoreForIncompleteSentence;
   private int contextForSureMatch;
+  private String textContent;
 
   public int end() {
     return offset + length;
