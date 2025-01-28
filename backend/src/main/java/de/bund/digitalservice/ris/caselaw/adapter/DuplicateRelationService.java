@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DuplicateRelationViewRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DuplicateRelationStatus;
 import jakarta.validation.ConstraintViolationException;
 import java.util.List;
@@ -17,13 +16,9 @@ import org.springframework.stereotype.Service;
 public class DuplicateRelationService {
 
   private final DuplicateRelationRepository relationRepository;
-  private final DuplicateRelationViewRepository relationViewRepository;
 
-  public DuplicateRelationService(
-      DuplicateRelationRepository relationRepository,
-      DuplicateRelationViewRepository relationViewRepository) {
+  public DuplicateRelationService(DuplicateRelationRepository relationRepository) {
     this.relationRepository = relationRepository;
-    this.relationViewRepository = relationViewRepository;
   }
 
   Optional<DuplicateRelationDTO> findByDocUnitIds(UUID docUnitIdA, UUID docUnitIdB) {
@@ -81,10 +76,10 @@ public class DuplicateRelationService {
 
   void updateAllDuplicates() {
     log.info("Updating all duplicate relations");
-    var removedRelations = this.relationViewRepository.removeObsoleteDuplicateRelations();
-    var insertedRelations = this.relationViewRepository.addMissingDuplicateRelations();
+    var removedRelations = this.relationRepository.removeObsoleteDuplicateRelations();
+    var insertedRelations = this.relationRepository.addMissingDuplicateRelations();
     var ignoredRelations =
-        this.relationViewRepository.ignoreDuplicateRelationsWhenJdvDupCheckDisabled();
+        this.relationRepository.ignoreDuplicateRelationsWhenJdvDupCheckDisabled();
     log.info(
         "Updating duplicate relations finished: {} duplicates added, {} duplicates removed, {} duplicates set to ignored.",
         insertedRelations,
