@@ -611,9 +611,9 @@ class DocumentationUnitIntegrationTest {
 
   @Test
   void testDocumentTypeToSetIdFromLookuptable() {
-    var categoryA =
+    var categoryB =
         databaseDocumentCategoryRepository.saveAndFlush(
-            DocumentCategoryDTO.builder().label("A").build());
+            DocumentCategoryDTO.builder().label("B").build());
     var categoryR =
         databaseDocumentCategoryRepository.saveAndFlush(
             DocumentCategoryDTO.builder().label("R").build());
@@ -624,7 +624,7 @@ class DocumentationUnitIntegrationTest {
     databaseDocumentTypeRepository.save(
         DocumentTypeDTO.builder()
             .abbreviation("ABC")
-            .category(categoryA)
+            .category(categoryB)
             .label("ABC123")
             .multiple(true)
             .build());
