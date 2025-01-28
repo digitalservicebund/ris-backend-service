@@ -6,6 +6,7 @@ import ExpandableContent from "./ExpandableContent.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
 import { InfoStatus } from "@/components/enumInfoStatus"
 import HandoverDuplicateCheckView from "@/components/HandoverDuplicateCheckView.vue"
+import HandoverLanguageTool from "@/components/HandoverLanguageTool.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
@@ -220,6 +221,7 @@ const missingNormsFields = ref(
 )
 
 const showHandoverModal = ref(false)
+
 function confirmHandoverDialog() {
   emits("handoverDocument")
   showHandoverModal.value = false
@@ -597,8 +599,12 @@ const isPublishable = computed<boolean>(
         :document-number="store.documentUnit!.documentNumber"
         :pending-duplicates="pendingDuplicates"
       />
-      <div class="border-b-1 border-b-gray-400"></div>
 
+      <HandoverLanguageTool
+        :document-number="store.documentUnit!.documentNumber"
+      />
+
+      <div class="border-b-1 border-b-gray-400"></div>
       <ExpandableContent
         v-if="
           !fieldsMissing &&
