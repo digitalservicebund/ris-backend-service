@@ -171,7 +171,7 @@ test.describe("core data", () => {
       page.locator("[aria-label='dropdown-option']"),
     ).not.toHaveCount(0)
     await expect(page.getByText("Anerkenntnisurteil")).toBeVisible()
-    await expect(page.getByText("Anhängiges Verfahren")).toBeVisible()
+    await expect(page.getByText("EuGH-Vorlage")).toBeVisible()
 
     // type search string: 3 results for "zwischen"
     await page.locator("[aria-label='Dokumenttyp']").fill("zwischen")
