@@ -111,34 +111,11 @@ public interface DatabaseDuplicateCheckRepository
       JOIN incremental_migration.deviating_ecli deviatingEcli
         ON documentationUnit.id = deviatingEcli.documentation_unit_id
     WHERE upper(deviatingEcli.value) IN (:allEclis)
-
-    UNION
-
-    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
-    FROM incremental_migration.documentation_unit documentationUnit
-      JOIN incremental_migration.file_number fileNumber
-        ON documentationUnit.id = fileNumber.documentation_unit_id
-      JOIN incremental_migration.document_type documentType
-        ON documentationUnit.document_type_id = documentType.id
-    WHERE upper(fileNumber.value) IN (:allFileNumbers)
-      AND documentType.id IN (:allDocTypeIds)
-
-    UNION
-
-    SELECT documentationUnit.id, documentationUnit.duplicate_check AS isJdvDuplicateCheckActive
-    FROM incremental_migration.documentation_unit documentationUnit
-      JOIN incremental_migration.deviating_file_number deviatingFileNumber
-        ON documentationUnit.id = deviatingFileNumber.documentation_unit_id
-      JOIN incremental_migration.document_type documentType
-        ON documentationUnit.document_type_id = documentType.id
-    WHERE upper(deviatingFileNumber.value) IN (:allFileNumbers)
-      AND documentType.id IN (:allDocTypeIds)
 """)
   List<DocumentationUnitIdDuplicateCheckDTO> findDuplicates(
       @Param("allFileNumbers") List<String> allFileNumbers,
       @Param("allDates") List<LocalDate> allDates,
       @Param("allCourtIds") List<UUID> allCourtIds,
       @Param("allDeviatingCourts") List<String> allDeviatingCourts,
-      @Param("allEclis") List<String> allEclis,
-      @Param("allDocTypeIds") List<UUID> allDocTypeIds);
+      @Param("allEclis") List<String> allEclis);
 }

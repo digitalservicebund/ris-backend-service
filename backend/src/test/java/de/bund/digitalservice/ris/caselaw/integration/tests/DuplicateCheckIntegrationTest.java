@@ -37,7 +37,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresHandoverReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.CourtTransformer;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
@@ -963,87 +962,6 @@ class DuplicateCheckIntegrationTest {
                   CreationParameters.builder()
                       .documentNumber("DocumentNumb2")
                       .deviatingCourts(List.of("AG Aachen"))
-                      .deviatingFileNumbers(List.of("AZ-123"))
-                      .build()));
-
-      // Act
-      duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
-
-      // Assert
-      assertThat(duplicateRelationRepository.findAll()).hasSize(1);
-      assertThat(
-              foundDocUnit.managementData().duplicateRelations().stream()
-                  .findFirst()
-                  .get()
-                  .documentNumber())
-          .isEqualTo(duplicateDTO.getDocumentNumber());
-    }
-
-    @Test
-    void findDuplicates_withDocumentTypeAndFileNumber() throws DocumentationUnitNotExistsException {
-      // Arrange
-      var documentType =
-          DocumentTypeTransformer.transformToDomain(
-              databaseDocumentTypeRepository.findAll().get(0));
-      var docUnitToBeChecked =
-          generateNewDocumentationUnit(
-              docOffice,
-              Optional.of(
-                  CreationParameters.builder()
-                      .documentNumber("DocumentNumb1")
-                      .documentType(documentType)
-                      .fileNumbers(List.of("AZ-123"))
-                      .build()));
-
-      var duplicateDTO =
-          generateNewDocumentationUnit(
-              docOffice,
-              Optional.of(
-                  CreationParameters.builder()
-                      .documentNumber("DocumentNumb2")
-                      .documentType(documentType)
-                      .fileNumbers(List.of("AZ-123"))
-                      .build()));
-
-      // Act
-      duplicateCheckService.checkDuplicates(docUnitToBeChecked.getDocumentNumber());
-      var foundDocUnit = documentationUnitService.getByUuid(docUnitToBeChecked.getId());
-
-      // Assert
-      assertThat(duplicateRelationRepository.findAll()).hasSize(1);
-      assertThat(
-              foundDocUnit.managementData().duplicateRelations().stream()
-                  .findFirst()
-                  .get()
-                  .documentNumber())
-          .isEqualTo(duplicateDTO.getDocumentNumber());
-    }
-
-    @Test
-    void findDuplicates_withDocumentTypeAndDeviatingFileNumber()
-        throws DocumentationUnitNotExistsException {
-      // Arrange
-      var documentType =
-          DocumentTypeTransformer.transformToDomain(
-              databaseDocumentTypeRepository.findAll().get(0));
-      var docUnitToBeChecked =
-          generateNewDocumentationUnit(
-              docOffice,
-              Optional.of(
-                  CreationParameters.builder()
-                      .documentNumber("DocumentNumb1")
-                      .documentType(documentType)
-                      .fileNumbers(List.of("AZ-123"))
-                      .build()));
-
-      var duplicateDTO =
-          generateNewDocumentationUnit(
-              docOffice,
-              Optional.of(
-                  CreationParameters.builder()
-                      .documentNumber("DocumentNumb2")
-                      .documentType(documentType)
                       .deviatingFileNumbers(List.of("AZ-123"))
                       .build()));
 
