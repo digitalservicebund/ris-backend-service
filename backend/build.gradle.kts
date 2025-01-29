@@ -217,6 +217,9 @@ dependencies {
     implementation("net.javacrumbs.shedlock:shedlock-spring:6.2.0")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.2.0")
 
+    // CVE-2023-3635
+    implementation("com.squareup.okio:okio-jvm:3.10.2")
+
     val flywayCore = "org.flywaydb:flyway-core:11.2.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
