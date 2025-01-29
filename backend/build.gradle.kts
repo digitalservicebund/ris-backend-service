@@ -11,7 +11,7 @@ plugins {
     jacoco
     id("org.springframework.boot") version "3.4.2"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.diffplug.spotless") version "6.25.0"
+    id("com.diffplug.spotless") version "7.0.2"
     id("org.sonarqube") version "6.0.1.5171"
     id("com.github.jk1.dependency-license-report") version "2.9"
     id("com.gorylenko.gradle-git-properties") version "2.4.2"
