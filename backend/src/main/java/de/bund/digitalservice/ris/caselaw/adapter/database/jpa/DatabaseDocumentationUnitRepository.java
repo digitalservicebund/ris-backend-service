@@ -63,8 +63,8 @@ public interface DatabaseDocumentationUnitRepository
   SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
   LEFT JOIN documentationUnit.court court
   LEFT JOIN documentationUnit.status status
-  LEFT JOIN documentationUnit.duplicateRelations1 duplicateRelation1
-  LEFT JOIN documentationUnit.duplicateRelations2 duplicateRelation2
+  LEFT JOIN FETCH documentationUnit.duplicateRelations1 duplicateRelation1
+  LEFT JOIN FETCH documentationUnit.duplicateRelations2 duplicateRelation2
   WHERE
   """
               + BASE_QUERY)
@@ -90,8 +90,8 @@ public interface DatabaseDocumentationUnitRepository
           """
   SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
   LEFT JOIN documentationUnit.court court
-  LEFT JOIN documentationUnit.duplicateRelations1 duplicateRelation1
-  LEFT JOIN documentationUnit.duplicateRelations2 duplicateRelation2
+  LEFT JOIN FETCH documentationUnit.duplicateRelations1 duplicateRelation1
+  LEFT JOIN FETCH documentationUnit.duplicateRelations2 duplicateRelation2
   LEFT JOIN documentationUnit.fileNumbers fileNumber
   WHERE (upper(fileNumber.value) like upper(concat(:fileNumber,'%')))
   AND
@@ -120,8 +120,8 @@ public interface DatabaseDocumentationUnitRepository
           """
   SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
   LEFT JOIN documentationUnit.court court
-  LEFT JOIN documentationUnit.duplicateRelations1 duplicateRelation1
-  LEFT JOIN documentationUnit.duplicateRelations2 duplicateRelation2
+  LEFT JOIN FETCH documentationUnit.duplicateRelations1 duplicateRelation1
+  LEFT JOIN FETCH documentationUnit.duplicateRelations2 duplicateRelation2
   LEFT JOIN documentationUnit.deviatingFileNumbers deviatingFileNumber
   WHERE (upper(deviatingFileNumber.value) like upper(concat(:fileNumber,'%')))
   AND
