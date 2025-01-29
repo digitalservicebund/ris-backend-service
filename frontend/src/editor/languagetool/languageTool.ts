@@ -113,7 +113,10 @@ export default class LanguageTool {
     const languageToolCheckResponse: ServiceResponse<LanguageToolResponse> =
       await languageToolService.check(text)
 
-    const matches = languageToolCheckResponse.data?.matches || []
+    const matches =
+      languageToolCheckResponse.data?.suggestions.flatMap(
+        (suggestion) => suggestion.matches,
+      ) || []
 
     const decorations: Decoration[] = []
 
