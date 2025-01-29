@@ -842,7 +842,8 @@ class DocumentationUnitControllerTest {
 
     when(service.getByDocumentNumber(docNumberOrigin)).thenReturn(documentationUnit);
 
-    String body = """
+    String body =
+        """
             { "status": "INVALID" }
             """;
     risWebClient
