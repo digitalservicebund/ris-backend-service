@@ -4,7 +4,6 @@ import static de.bund.digitalservice.ris.caselaw.adapter.converter.docx.Document
 import static de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocumentationUnitDocxBuilder.SOFT_HYPHEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -1451,7 +1450,7 @@ class DocumentationUnitDocxBuilderTest {
     R softHyphenRun = new R();
     R.SoftHyphen softHyphen = new R.SoftHyphen();
     JAXBElement<R.SoftHyphen> softHyphenElement =
-            new JAXBElement<>(new QName("text"), R.SoftHyphen.class, softHyphen);
+        new JAXBElement<>(new QName("text"), R.SoftHyphen.class, softHyphen);
     softHyphenRun.getContent().add(softHyphenElement);
 
     parentParagraph.getContent().add(softHyphenRun);
@@ -1465,7 +1464,6 @@ class DocumentationUnitDocxBuilderTest {
     // expect soft hyphen not to be transformed
     assertEquals(0, paragraphElement.getRunElements().size());
   }
-
 
   @Test
   void testBuild_paragraphWithNoBreakHyphenRunElements_shouldBeTransformed() {
@@ -1489,7 +1487,6 @@ class DocumentationUnitDocxBuilderTest {
 
     ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
-
 
     // expect no break hyphen to be transformed
     RunElement secondRunElement = paragraphElement.getRunElements().get(0);
