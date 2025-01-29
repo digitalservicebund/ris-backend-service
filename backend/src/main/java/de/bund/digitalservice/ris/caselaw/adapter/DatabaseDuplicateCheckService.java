@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -67,6 +69,15 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
     }
   }
 
+  // Runs every night at 05:05:10
+  @Scheduled(cron = "10 5 5 * * *")
+  @SchedulerLock(name = "duplicate-check-job", lockAtMostFor = "PT15M")
+  @Transactional
+  @Override
+  public void checkAllDuplicates() {
+    this.duplicateRelationService.updateAllDuplicates();
+  }
+
   private List<DocumentationUnitIdDuplicateCheckDTO> findPotentialDuplicates(
       DocumentationUnitDTO documentationUnit) {
     var allFileNumbers = collectFileNumbers(documentationUnit);
@@ -80,16 +91,9 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
     var allDates = collectDecisionDates(documentationUnit);
     var allCourtIds = collectCourtIds(documentationUnit);
     var allDeviatingCourts = collectDeviatingCourts(documentationUnit);
-    var allDocTypeIds = collectDocumentTypeIds(documentationUnit);
 
     return findPotentialDuplicates(
-        documentationUnit,
-        allFileNumbers,
-        allDates,
-        allCourtIds,
-        allDeviatingCourts,
-        allEclis,
-        allDocTypeIds);
+        documentationUnit, allFileNumbers, allDates, allCourtIds, allDeviatingCourts, allEclis);
   }
 
   @Override
@@ -195,26 +199,15 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
     return allDeviatingCourts;
   }
 
-  private List<UUID> collectDocumentTypeIds(DocumentationUnitDTO documentationUnit) {
-    List<UUID> allDocTypeIds = new ArrayList<>();
-    var documentationType = documentationUnit.getDocumentType();
-    if (documentationType != null) {
-      allDocTypeIds.add(documentationType.getId());
-    }
-    return allDocTypeIds;
-  }
-
   private List<DocumentationUnitIdDuplicateCheckDTO> findPotentialDuplicates(
       DocumentationUnitDTO documentationUnit,
       List<String> allFileNumbers,
       List<LocalDate> allDates,
       List<UUID> allCourtIds,
       List<String> allDeviatingCourts,
-      List<String> allEclis,
-      List<UUID> allDocTypeIds) {
+      List<String> allEclis) {
     return repository
-        .findDuplicates(
-            allFileNumbers, allDates, allCourtIds, allDeviatingCourts, allEclis, allDocTypeIds)
+        .findDuplicates(allFileNumbers, allDates, allCourtIds, allDeviatingCourts, allEclis)
         .stream()
         // Should not contain itself
         .filter(dup -> !documentationUnit.getId().equals(dup.getId()))

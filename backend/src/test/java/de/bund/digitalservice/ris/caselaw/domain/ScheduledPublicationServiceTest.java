@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.apache.commons.text.RandomStringGenerator;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,6 +36,16 @@ class ScheduledPublicationServiceTest {
     this.docUnitRepository = mock(DocumentationUnitRepository.class);
     this.handoverService = mock(HandoverService.class);
     this.httpMailSender = mock(HttpMailSender.class);
+    this.service =
+        new ScheduledPublicationService(
+            this.docUnitRepository, this.handoverService, this.httpMailSender);
+  }
+
+  @AfterEach
+  void afterEach() {
+    reset(this.docUnitRepository);
+    reset(this.handoverService);
+    reset(this.httpMailSender);
     this.service =
         new ScheduledPublicationService(
             this.docUnitRepository, this.handoverService, this.httpMailSender);

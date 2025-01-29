@@ -105,7 +105,7 @@ test.describe(
       await test.step("Create duplicate by editing core data", async () => {
         await navigateToCategories(page, documentNumber)
         await setFileNumberToMatchDocUnit(page, prefilledDocumentUnit)
-        await setDocTypeToMatchDocUnit(page, prefilledDocumentUnit)
+        await setDecisionDateToMatchDocUnit(page, prefilledDocumentUnit)
         await save(page)
         await expectDuplicateWarning(page)
       })
@@ -141,6 +141,7 @@ test.describe(
         await navigateToCategories(page, documentNumber)
         await setFileNumberToMatchDocUnit(page, prefilledDocumentUnit)
         await setDocTypeToMatchDocUnit(page, prefilledDocumentUnit)
+        await setDecisionDateToMatchDocUnit(page, prefilledDocumentUnit)
         await setDeviatingFileNumberToMatchDocUnit(
           page,
           prefilledDocumentUnitWithTexts,
@@ -218,9 +219,6 @@ test.describe(
         await setDecisionDateToMatchDocUnit(page, prefilledDocumentUnit)
         await setDocTypeToMatchDocUnit(page, prefilledDocumentUnit)
         await setCourtToBGH(page)
-        await page
-          .getByLabel("Entscheidungsdatum", { exact: true })
-          .fill("01.01.1990")
         await save(page)
         await expectDuplicateWarning(page)
       })

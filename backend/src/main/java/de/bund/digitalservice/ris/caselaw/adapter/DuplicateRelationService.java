@@ -73,4 +73,17 @@ public class DuplicateRelationService {
   void delete(DuplicateRelationDTO duplicateRelation) {
     relationRepository.delete(duplicateRelation);
   }
+
+  void updateAllDuplicates() {
+    log.info("Updating all duplicate relations");
+    var removedRelations = this.relationRepository.removeObsoleteDuplicateRelations();
+    var insertedRelations = this.relationRepository.addMissingDuplicateRelations();
+    var ignoredRelations =
+        this.relationRepository.ignoreDuplicateRelationsWhenJdvDupCheckDisabled();
+    log.info(
+        "Updating duplicate relations finished: {} duplicates added, {} duplicates removed, {} duplicates set to ignored.",
+        insertedRelations,
+        removedRelations,
+        ignoredRelations);
+  }
 }
