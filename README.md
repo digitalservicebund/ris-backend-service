@@ -154,6 +154,12 @@ op item edit 'OTC' aws_secret_access_key=[your-access-key-id]
 
 The following command will migrate the minimally required data (refdata and juris tables):
 
+Make sure the latest
+[ris data migration image](https://github.com/digitalservicebund/ris-data-migration/pkgs/container/ris-data-migration)
+is
+in [compose.yaml](https://github.com/digitalservicebund/ris-backend-service/blob/40aec11b48cfb839a2103db2932ca6b74ed15448/compose.yaml#L3-L3)
+and then run:
+
 ```bash
 ./run.sh -i
 ```

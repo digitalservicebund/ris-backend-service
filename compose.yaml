@@ -1,6 +1,6 @@
 services:
   initialization:
-    image: ghcr.io/digitalservicebund/ris-data-migration:f09e86f8f5839feab9b6e790b00abe823d85fb32
+    image: ghcr.io/digitalservicebund/ris-data-migration:75a594bfa38bcf9a35503bc16838ead84c783819 # https://github.com/digitalservicebund/ris-data-migration/pkgs/container/ris-data-migration
     depends_on:
       - postgres14
     environment:
