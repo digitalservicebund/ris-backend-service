@@ -1,7 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.adapter.languagetool.LanguageToolConfig;
+import de.bund.digitalservice.ris.caselaw.adapter.languagetool.LanguageToolService;
 import de.bund.digitalservice.ris.caselaw.domain.TextRange;
-import de.bund.digitalservice.ris.caselaw.domain.languagetool.Match;
+import de.bund.digitalservice.ris.caselaw.domain.textcheck.Match;
 import java.util.List;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

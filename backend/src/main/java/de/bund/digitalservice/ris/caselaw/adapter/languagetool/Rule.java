@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.domain.languagetool;
+package de.bund.digitalservice.ris.caselaw.adapter.languagetool;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

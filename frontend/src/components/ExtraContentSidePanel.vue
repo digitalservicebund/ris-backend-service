@@ -6,6 +6,7 @@ import { useRoute } from "vue-router"
 import Tooltip from "./Tooltip.vue"
 import AttachmentView from "@/components/AttachmentView.vue"
 import CategoryImport from "@/components/category-import/CategoryImport.vue"
+import DocumentationUnitTextCheck from "@/components/DocumentationUnitTextCheck.vue"
 import FileNavigator from "@/components/FileNavigator.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
@@ -22,6 +23,7 @@ import IconEdit from "~icons/ic/outline-edit"
 import IconOpenInNewTab from "~icons/ic/outline-open-in-new"
 import IconPreview from "~icons/ic/outline-remove-red-eye"
 import IconStickyNote from "~icons/ic/outline-sticky-note-2"
+import IconSpellCheck from "~icons/material-symbols/spellcheck"
 import IconImportCategories from "~icons/material-symbols/text-select-move-back-word"
 
 const props = defineProps<{
@@ -90,6 +92,13 @@ function selectPreview() {
  */
 function selectImporter() {
   store.setSidePanelMode("category-import")
+}
+
+/**
+ * Sets the panel content to "text-check", so that the text check results are displayed in the panel.
+ */
+function selectTextCheck() {
+  store.setSidePanelMode("text-check")
 }
 
 /**
@@ -202,6 +211,22 @@ onMounted(() => {
               @click="() => selectImporter()"
             />
           </Tooltip>
+          <Tooltip
+            v-if="!hidePanelModeBar"
+            shortcut="t"
+            text="Rechtschreibprüfung"
+          >
+            <TextButton
+              id="text-check"
+              aria-label="Rechtschreibprüfung"
+              button-type="tertiary"
+              :class="store.panelMode === 'text-check' ? 'bg-blue-200' : ''"
+              data-testid="text-check-button"
+              :icon="IconSpellCheck"
+              size="small"
+              @click="() => selectTextCheck()"
+            />
+          </Tooltip>
         </div>
 
         <FileNavigator
@@ -295,6 +320,8 @@ onMounted(() => {
           v-if="store.panelMode === 'category-import'"
           :document-number="importDocumentNumber"
         />
+
+        <DocumentationUnitTextCheck v-if="store.panelMode === 'text-check'" />
       </div>
     </SideToggle>
   </FlexItem>

@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.domain.languagetool;
+package de.bund.digitalservice.ris.caselaw.adapter.languagetool;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;

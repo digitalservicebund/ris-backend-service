@@ -3,12 +3,13 @@ import { LanguageToolResponse } from "@/types/languagetool"
 
 interface LanguageToolService {
   check(text: string): Promise<ServiceResponse<LanguageToolResponse>>
+  checkAll(id: string): Promise<ServiceResponse<LanguageToolResponse>>
 }
 
 const service: LanguageToolService = {
   async check(text: string) {
     return await httpClient.post<string, LanguageToolResponse>(
-      `caselaw/languagetool/check`,
+      `caselaw/documentunits/text-check`,
       {
         headers: {
           Accept: "application/json",
@@ -16,6 +17,11 @@ const service: LanguageToolService = {
         },
       },
       text,
+    )
+  },
+  async checkAll(id: string) {
+    return await httpClient.get<LanguageToolResponse>(
+      `caselaw/documentunits/${id}/text-check/all`,
     )
   },
 }

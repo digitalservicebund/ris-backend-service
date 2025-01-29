@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter;
+package de.bund.digitalservice.ris.caselaw.adapter.languagetool;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

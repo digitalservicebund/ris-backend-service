@@ -69,9 +69,11 @@ export interface Match {
 }
 
 export interface LanguageToolResponse {
-  software: Software
-  warnings: Warnings
-  language: Language
+  suggestions: Suggestion[]
+}
+
+export interface Suggestion {
+  word: string
   matches: Match[]
 }
 
