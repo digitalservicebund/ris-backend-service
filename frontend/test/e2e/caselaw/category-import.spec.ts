@@ -1,10 +1,8 @@
 import { expect, Page } from "@playwright/test"
 import {
-  clickCategoryButton,
   fillActiveCitationInputs,
   fillNormInputs,
   navigateToCategories,
-  save,
 } from "./e2e-utils"
 import { caselawTest as test } from "./fixtures"
 import SingleNorm from "@/domain/singleNorm"
@@ -342,6 +340,8 @@ test.describe("category import", () => {
   )
 
   // Short text categories
+
+  // Titelzeile
   test(
     "import headline",
     { tag: ["@RISDEV-5888"] },
@@ -368,9 +368,24 @@ test.describe("category import", () => {
           page.getByLabel("Kurztexte").getByText("Titelzeile", { exact: true }),
         ).toBeInViewport()
       })
+
+      await test.step("import not possible anymore, when target category filled", async () => {
+        await expect(
+          page.getByLabel("Titelzeile übernehmen", { exact: true }),
+        ).toBeDisabled()
+        await page.getByTestId("Titelzeile").click()
+        await page.keyboard.press(`ControlOrMeta+A`)
+        await page.keyboard.press(`ControlOrMeta+Backspace`)
+        await expect(
+          page.getByLabel("Titelzeile übernehmen", {
+            exact: true,
+          }),
+        ).toBeEnabled()
+      })
     },
   )
 
+  // Leitsatz
   test(
     "import guiding principle",
     { tag: ["@RISDEV-5721"] },
@@ -398,9 +413,24 @@ test.describe("category import", () => {
           page.getByLabel("Kurztexte").getByText("Leitsatz", { exact: true }),
         ).toBeInViewport()
       })
+
+      await test.step("import not possible anymore, when target category filled", async () => {
+        await expect(
+          page.getByLabel("Leitsatz übernehmen", { exact: true }),
+        ).toBeDisabled()
+        await page.getByTestId("Leitsatz").click()
+        await page.keyboard.press(`ControlOrMeta+A`)
+        await page.keyboard.press(`ControlOrMeta+Backspace`)
+        await expect(
+          page.getByLabel("Leitsatz übernehmen", {
+            exact: true,
+          }),
+        ).toBeEnabled()
+      })
     },
   )
 
+  // Orientierungssatz
   test(
     "import headnote",
     { tag: ["@RISDEV-5721"] },
@@ -450,6 +480,7 @@ test.describe("category import", () => {
     },
   )
 
+  // Sonstiger Orientierungssatz
   test(
     "import other headnote",
     { tag: ["@RISDEV-5945"] },
@@ -497,31 +528,9 @@ test.describe("category import", () => {
     },
   )
 
-  test(
-    "import short texts not possible when target category filled",
-    { tag: ["@RISDEV-5721"] },
-    async ({ page, documentNumber, prefilledDocumentUnitWithTexts }) => {
-      await navigateToCategories(page, documentNumber)
-      await clickCategoryButton("Leitsatz", page)
-      const guidingPrincipleInput = page.locator("[data-testid='Leitsatz']")
-      await guidingPrincipleInput.click()
-      await page.keyboard.type(`Test`)
-      await save(page)
-
-      await navigateToCategoryImport(page, documentNumber)
-      await searchForDocumentUnitToImport(
-        page,
-        prefilledDocumentUnitWithTexts.documentNumber,
-      )
-      await expect(page.getByText("Zielrubrik ausgefüllt")).toBeVisible()
-      await guidingPrincipleInput.click()
-      await page.keyboard.press(`ControlOrMeta+A`)
-      await page.keyboard.press(`ControlOrMeta+Backspace`)
-      await expect(page.getByText("Zielrubrik ausgefüllt")).toBeHidden()
-    },
-  )
-
   // Long text categories
+
+  // Tenor
   test(
     "import tenor",
     { tag: ["@RISDEV-5945"] },
@@ -559,6 +568,7 @@ test.describe("category import", () => {
     },
   )
 
+  // Gründe
   test(
     "import reasons",
     { tag: ["@RISDEV-5945"] },
@@ -602,6 +612,7 @@ test.describe("category import", () => {
     },
   )
 
+  // Tatbestand
   test(
     "import case facts",
     { tag: ["@RISDEV-5945"] },
@@ -639,6 +650,7 @@ test.describe("category import", () => {
     },
   )
 
+  // Entscheidungsgründe
   test(
     "import decision reasons",
     { tag: ["@RISDEV-5945"] },
@@ -684,6 +696,7 @@ test.describe("category import", () => {
     },
   )
 
+  // Abweichende Meinung
   test(
     "import dissenting opinion",
     { tag: ["@RISDEV-5945"] },
@@ -729,6 +742,7 @@ test.describe("category import", () => {
     },
   )
 
+  // Mitwirkende Richter
   test(
     "import participating judges",
     { tag: ["@RISDEV-5945"] },
@@ -774,6 +788,7 @@ test.describe("category import", () => {
     },
   )
 
+  // Sonstiger Langtext
   test(
     "import other long text",
     { tag: ["@RISDEV-5945"] },
@@ -819,6 +834,7 @@ test.describe("category import", () => {
     },
   )
 
+  // Gliederung
   test(
     "import outline",
     { tag: ["@RISDEV-5945"] },
