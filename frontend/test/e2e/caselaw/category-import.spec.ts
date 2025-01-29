@@ -57,6 +57,7 @@ test.describe("category import", () => {
     },
   )
 
+  // Schlagwörter
   test(
     "import keywords",
     { tag: ["@RISDEV-5720"] },
@@ -121,6 +122,7 @@ test.describe("category import", () => {
       .click()
   }
 
+  // Sachgebiete
   test(
     "import fields of law",
     { tag: ["@RISDEV-5886"] },
@@ -187,6 +189,7 @@ test.describe("category import", () => {
     },
   )
 
+  // Normen
   test(
     "import norms",
     { tag: ["@RISDEV-5887"] },
@@ -246,6 +249,7 @@ test.describe("category import", () => {
     },
   )
 
+  // Aktivzitierung
   test(
     "import active citations",
     { tag: ["@RISDEV-5888"] },
@@ -344,7 +348,7 @@ test.describe("category import", () => {
   // Titelzeile
   test(
     "import headline",
-    { tag: ["@RISDEV-5888"] },
+    { tag: ["@RISDEV-5721"] },
     async ({ page, linkedDocumentNumber, prefilledDocumentUnitWithTexts }) => {
       await navigateToCategoryImport(page, linkedDocumentNumber)
 
