@@ -4,6 +4,7 @@ import static de.bund.digitalservice.ris.caselaw.adapter.converter.docx.Document
 import static de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocumentationUnitDocxBuilder.SOFT_HYPHEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -1468,14 +1469,15 @@ class DocumentationUnitDocxBuilderTest {
     assertInstanceOf(ParagraphElement.class, result);
 
     ParagraphElement paragraphElement = (ParagraphElement) result;
-    assertEquals(2, paragraphElement.getRunElements().size());
+    assertEquals(1, paragraphElement.getRunElements().size());
 
-    // expect soft hyphen and no break hyphen to be transformed
+    // expect soft hyphen not to be transformed
     RunElement firstRunElement = paragraphElement.getRunElements().get(0);
     assertEquals(RunTextElement.class, firstRunElement.getClass());
-    assertEquals("\u00AD", firstRunElement.toHtmlString());
+    assertFalse(firstRunElement.toHtmlString().contains("\u00AD"));
 
-    RunElement secondRunElement = paragraphElement.getRunElements().get(1);
+    // expect no break hyphen to be transformed
+    RunElement secondRunElement = paragraphElement.getRunElements().get(0);
     assertEquals(RunTextElement.class, secondRunElement.getClass());
     assertEquals("\u2011", secondRunElement.toHtmlString());
   }
