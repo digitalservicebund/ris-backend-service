@@ -118,15 +118,6 @@ test.describe("document unit search queries", () => {
       maxDuration: 500,
       minResults: 3,
     },
-    {
-      title: "with duplicate warning",
-      parameter: {
-        myDocOfficeOnly: "true",
-        withDuplicateWarning: "true",
-      },
-      maxDuration: 500,
-      minResults: 3,
-    },
   ]
 
   testConfigurations.forEach((search) =>
