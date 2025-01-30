@@ -63,8 +63,10 @@ public interface DatabaseDocumentationUnitRepository
   SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
   LEFT JOIN documentationUnit.court court
   LEFT JOIN documentationUnit.status status
-  LEFT JOIN FETCH documentationUnit.duplicateRelations1 duplicateRelation1
-  LEFT JOIN FETCH documentationUnit.duplicateRelations2 duplicateRelation2
+  LEFT JOIN documentationUnit.duplicateRelations1 duplicateRelation1
+    ON documentationUnit = duplicateRelation1.documentationUnit1
+  LEFT JOIN documentationUnit.duplicateRelations2 duplicateRelation2
+    ON documentationUnit = duplicateRelation2.documentationUnit2
   WHERE
   """
               + BASE_QUERY)
@@ -90,8 +92,10 @@ public interface DatabaseDocumentationUnitRepository
           """
   SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
   LEFT JOIN documentationUnit.court court
-  LEFT JOIN FETCH documentationUnit.duplicateRelations1 duplicateRelation1
-  LEFT JOIN FETCH documentationUnit.duplicateRelations2 duplicateRelation2
+  LEFT JOIN documentationUnit.duplicateRelations1 duplicateRelation1
+    ON documentationUnit = duplicateRelation1.documentationUnit1
+  LEFT JOIN documentationUnit.duplicateRelations2 duplicateRelation2
+    ON documentationUnit = duplicateRelation2.documentationUnit2
   LEFT JOIN documentationUnit.fileNumbers fileNumber
   WHERE (upper(fileNumber.value) like upper(concat(:fileNumber,'%')))
   AND
@@ -120,8 +124,10 @@ public interface DatabaseDocumentationUnitRepository
           """
   SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
   LEFT JOIN documentationUnit.court court
-  LEFT JOIN FETCH documentationUnit.duplicateRelations1 duplicateRelation1
-  LEFT JOIN FETCH documentationUnit.duplicateRelations2 duplicateRelation2
+  LEFT JOIN documentationUnit.duplicateRelations1 duplicateRelation1
+    ON documentationUnit = duplicateRelation1.documentationUnit1
+  LEFT JOIN documentationUnit.duplicateRelations2 duplicateRelation2
+    ON documentationUnit = duplicateRelation2.documentationUnit2
   LEFT JOIN documentationUnit.deviatingFileNumbers deviatingFileNumber
   WHERE (upper(deviatingFileNumber.value) like upper(concat(:fileNumber,'%')))
   AND
