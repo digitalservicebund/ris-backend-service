@@ -66,6 +66,11 @@ _env() {
     exit 1
   fi
 
+  if ! command -v op read op://Employee/AWS_ACCESS_KEY_ID/password > /dev/null 2>&1; then
+    fail "Setup requires AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY and AWS_BUCKET_NAME to be stored in 1Password. Please see Lookup Tables Initialization section in README.md "
+    exit 1
+  fi
+
   cat > ./.env<< EOF
 GH_PACKAGES_REPOSITORY_USER=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-juris-xml-export/username)
 GH_PACKAGES_REPOSITORY_TOKEN=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-juris-xml-export/token)
@@ -83,6 +88,10 @@ MY_GID=$(id -g)
 DB_URL=jdbc:postgresql://localhost:5432/postgres
 DB_USER=test
 DB_PASSWORD=test
+AWS_ACCESS_KEY_ID=$(op read op://Employee/AWS_ACCESS_KEY_ID/password)
+AWS_SECRET_ACCESS_KEY=$(op read op://Employee/AWS_SECRET_ACCESS_KEY/password)
+AWS_BUCKET_NAME=neuris-migration-juris-data
+
 EOF
 
   if ! command -v direnv > /dev/null 2>&1; then
@@ -106,6 +115,9 @@ _dev() {
   services=""
   for arg in "$@"; do
     case $arg in
+      -i|--init)
+        services="initialization"
+        ;;
       -n|--no-backend)
         services="traefik redis postgres14 frontend"
         ;;
@@ -162,8 +174,9 @@ _help() {
   echo "Available commands:"
   echo "init                  Set up repository for development"
   echo "env                   Provide shell env build/test tooling"
-  echo "dev                   Start full-stack development environment"
-  echo "                      Add '-' or '--no-backend' to start backend separately"
+  echo "dev                   Start full-stack development environment with loopup table initialization"
+  echo "                      Add '-n' or '--no-backend' to start everything but backend and initialization"
+  echo "                      Add '-i' or '--init' to only initialize the lookup tables (read ./migration_image.md for prerequisites)"
   echo "                      Add '-d' or '--detached' to check the health of the services in the background instead of showing the log stream"
   echo "down                  Stop development environment"
   echo "clean-staging         Deletes all existing documentunits on staging"

@@ -103,11 +103,9 @@ public class RunElementConverter {
         runTextElement.setText("\u2011");
         paragraphElement.addRunElement(runTextElement);
       } else if (declaredType == R.SoftHyphen.class) {
-        RunTextElement runTextElement = new RunTextElement();
-        runTextElement.setText("\u00AD");
-        paragraphElement.addRunElement(runTextElement);
-        //         carriage return = line break
+        //  ignored because soft hyphen are represented as constant -
       } else if (declaredType == R.Cr.class) {
+        //  carriage return = line break
         RunTextElement runTextElement = new RunTextElement();
         runTextElement.setText("<br/>");
         paragraphElement.addRunElement(runTextElement);

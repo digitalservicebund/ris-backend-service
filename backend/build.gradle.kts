@@ -1,17 +1,19 @@
 import com.adarshr.gradle.testlogger.theme.ThemeType
+import com.diffplug.spotless.FormatterFunc
 import com.github.jk1.license.filter.DependencyFilter
 import com.github.jk1.license.filter.LicenseBundleNormalizer
 import com.github.jk1.license.render.CsvReportRenderer
 import com.github.jk1.license.render.ReportRenderer
 import io.franzbecker.gradle.lombok.task.DelombokTask
 import org.flywaydb.gradle.task.FlywayMigrateTask
+import java.io.Serializable
 
 plugins {
     java
     jacoco
     id("org.springframework.boot") version "3.4.2"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.diffplug.spotless") version "6.25.0"
+    id("com.diffplug.spotless") version "7.0.2"
     id("org.sonarqube") version "6.0.1.5171"
     id("com.github.jk1.dependency-license-report") version "2.9"
     id("com.gorylenko.gradle-git-properties") version "2.4.2"
@@ -75,14 +77,15 @@ spotless {
     java {
         removeUnusedImports()
         googleJavaFormat()
-        custom("Refuse wildcard imports") {
-            // Wildcard imports can't be resolved by spotless itself.
-            // This will require the developer themselves to adhere to best practices.
-            if (it.contains("\nimport .*\\*;".toRegex())) {
-                throw AssertionError("Do not use wildcard imports. 'spotlessApply' cannot resolve this issue.")
+        // Wildcard imports can't be resolved by spotless itself.
+        custom("Refuse wildcard imports", object : Serializable, FormatterFunc {
+            override fun apply(input: String) : String {
+                if (input.contains("\nimport .*\\*;".toRegex())) {
+                    throw GradleException("No wildcard imports allowed.")
+                }
+                return input
             }
-            it
-        }
+        })
     }
     format("misc") {
 
@@ -187,11 +190,11 @@ dependencies {
     implementation("com.icegreen:greenmail:2.1.2")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.25") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.10.26") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
-//     implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.10.25.jar"))
+//     implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.10.26.jar"))
     // or with local gradle project (look also into settings.gradle.kts)
     // implementation(project(":exporter"))
 
@@ -210,12 +213,15 @@ dependencies {
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
 
-    implementation("io.getunleash:unleash-client-java:9.3.1")
+    implementation("io.getunleash:unleash-client-java:9.3.2")
     implementation("org.apache.commons:commons-text:1.13.0")
     implementation("org.jsoup:jsoup:1.18.3")
 
     implementation("net.javacrumbs.shedlock:shedlock-spring:6.2.0")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.2.0")
+
+    // CVE-2023-3635
+    implementation("com.squareup.okio:okio-jvm:3.10.2")
 
     val flywayCore = "org.flywaydb:flyway-core:11.2.0"
     implementation(flywayCore)
