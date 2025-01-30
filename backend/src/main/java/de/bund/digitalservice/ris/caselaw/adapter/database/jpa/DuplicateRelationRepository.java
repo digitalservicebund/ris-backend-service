@@ -35,7 +35,7 @@ WITH
      all_courts as(
         SELECT documentation_unit_id as id, court.id as value
         FROM incremental_migration.deviating_court
-        INNER JOIN incremental_migration.court\s
+        INNER JOIN incremental_migration.court
             ON UPPER(value) = (
                 CASE
                     WHEN court.is_superior_court = true THEN UPPER( type )
@@ -121,7 +121,7 @@ WITH
      all_courts as(
         SELECT documentation_unit_id as id, court.id as value
         FROM incremental_migration.deviating_court
-        INNER JOIN incremental_migration.court\s
+        INNER JOIN incremental_migration.court
             ON UPPER(value) = (
                 CASE
                     WHEN court.is_superior_court = true THEN UPPER( type )

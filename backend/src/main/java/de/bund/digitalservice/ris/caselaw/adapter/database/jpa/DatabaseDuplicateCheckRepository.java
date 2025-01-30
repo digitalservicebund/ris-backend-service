@@ -22,6 +22,11 @@ public interface DatabaseDuplicateCheckRepository
         ON documentationUnit.id = fileNumber.documentation_unit_id
     WHERE upper(fileNumber.value) IN (:allFileNumbers)
       AND documentationUnit.decision_date IN (:allDates)
+      AND (
+          SELECT COUNT(*)
+          FROM incremental_migration.file_number f
+          WHERE f.value = fileNumber.value
+      ) <= 50
 
     UNION
 
@@ -33,6 +38,11 @@ public interface DatabaseDuplicateCheckRepository
         ON documentationUnit.id = deviatingDate.documentation_unit_id
     WHERE upper(fileNumber.value) IN (:allFileNumbers)
       AND deviatingDate.value IN (:allDates)
+      AND (
+          SELECT COUNT(*)
+          FROM incremental_migration.file_number f
+          WHERE f.value = fileNumber.value
+      ) <= 50
 
     UNION
 
@@ -42,6 +52,11 @@ public interface DatabaseDuplicateCheckRepository
         ON documentationUnit.id = deviatingFileNumber.documentation_unit_id
     WHERE upper(deviatingFileNumber.value) IN (:allFileNumbers)
       AND documentationUnit.decision_date IN (:allDates)
+      AND (
+          SELECT COUNT(*)
+          FROM incremental_migration.deviating_file_number d
+          WHERE d.value = deviatingFileNumber.value
+      ) <= 50
 
     UNION
 
@@ -53,6 +68,11 @@ public interface DatabaseDuplicateCheckRepository
         ON documentationUnit.id = deviatingDate.documentation_unit_id
     WHERE upper(deviatingFileNumber.value) IN (:allFileNumbers)
       AND deviatingDate.value IN (:allDates)
+      AND (
+          SELECT COUNT(*)
+          FROM incremental_migration.deviating_file_number d
+          WHERE d.value = deviatingFileNumber.value
+      ) <= 50
 
     UNION
 
@@ -64,6 +84,11 @@ public interface DatabaseDuplicateCheckRepository
         ON documentationUnit.court_id = court.id
     WHERE upper(fileNumber.value) IN (:allFileNumbers)
       AND court.id IN (:allCourtIds)
+      AND (
+          SELECT COUNT(*)
+          FROM incremental_migration.file_number f
+          WHERE f.value = fileNumber.value
+      ) <= 50
 
     UNION
 
@@ -75,6 +100,11 @@ public interface DatabaseDuplicateCheckRepository
         ON documentationUnit.court_id = court.id
     WHERE upper(deviatingFileNumber.value) IN (:allFileNumbers)
       AND court.id IN (:allCourtIds)
+      AND (
+          SELECT COUNT(*)
+          FROM incremental_migration.deviating_file_number d
+          WHERE d.value = deviatingFileNumber.value
+      ) <= 50
 
     UNION
 
@@ -86,6 +116,11 @@ public interface DatabaseDuplicateCheckRepository
         ON documentationUnit.id = deviatingCourt.documentation_unit_id
     WHERE upper(fileNumber.value) IN (:allFileNumbers)
       AND upper(deviatingCourt.value) IN (:allDeviatingCourts)
+      AND (
+          SELECT COUNT(*)
+          FROM incremental_migration.file_number f
+          WHERE f.value = fileNumber.value
+      ) <= 50
 
     UNION
 
@@ -97,6 +132,11 @@ public interface DatabaseDuplicateCheckRepository
         ON documentationUnit.id = deviatingCourt.documentation_unit_id
     WHERE upper(deviatingFileNumber.value) IN (:allFileNumbers)
       AND upper(deviatingCourt.value) IN (:allDeviatingCourts)
+      AND (
+          SELECT COUNT(*)
+          FROM incremental_migration.deviating_file_number d
+          WHERE d.value = deviatingFileNumber.value
+      ) <= 50
 
     UNION
 
