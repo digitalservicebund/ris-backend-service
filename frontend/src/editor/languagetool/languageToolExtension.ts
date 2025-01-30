@@ -42,6 +42,7 @@ export const LanguageToolExtension = Extension.create<
       language: "auto",
       automaticMode: true,
       documentId: undefined,
+      textToolEnabled: false,
     }
   },
 
@@ -136,10 +137,6 @@ export const LanguageToolExtension = Extension.create<
           decorations(state) {
             return this.getState(state)
           },
-          attributes: {
-            spellcheck: "false",
-            isLanguageToolActive: `${this.storage.languageToolService?.languageToolActive}`,
-          },
         },
         state: {
           init: (_, state) => {
@@ -147,7 +144,7 @@ export const LanguageToolExtension = Extension.create<
               DecorationSet.create(state.doc, []),
             )
 
-            if (this.options.automaticMode) {
+            if (this.options.automaticMode && this.options.textToolEnabled) {
               this.storage.languageToolService.proofreadAndDecorateWholeDoc(
                 state.doc,
               )

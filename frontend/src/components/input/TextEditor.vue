@@ -139,8 +139,9 @@ const editor: Editor = new Editor({
       names: ["listItem", "paragraph"],
     }),
     LanguageToolExtension.configure({
-      automaticMode: props.textCheck,
+      automaticMode: true,
       documentId: "1",
+      textToolEnabled: props.textCheck,
     }),
   ],
   onUpdate: () => {
