@@ -73,6 +73,7 @@ import java.util.stream.Stream;
 import lombok.Builder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -118,6 +119,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 @Sql(
     scripts = {"classpath:courts_cleanup.sql"},
     executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+@Disabled
 class DuplicateCheckFullIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =

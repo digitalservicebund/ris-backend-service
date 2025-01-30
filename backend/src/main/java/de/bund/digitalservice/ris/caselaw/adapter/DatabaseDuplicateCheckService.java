@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -70,8 +68,8 @@ public class DatabaseDuplicateCheckService implements DuplicateCheckService {
   }
 
   // Runs every night at 05:05:10
-  @Scheduled(cron = "10 5 5 * * *")
-  @SchedulerLock(name = "duplicate-check-job", lockAtMostFor = "PT15M")
+  //  @Scheduled(cron = "10 5 5 * * *")
+  //  @SchedulerLock(name = "duplicate-check-job", lockAtMostFor = "PT15M")
   @Transactional
   @Override
   public void checkAllDuplicates() {
