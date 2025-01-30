@@ -102,7 +102,7 @@ public interface DatabaseDuplicateCheckRepository
         ON documentationUnit.id = fileNumber.documentation_unit_id
       JOIN incremental_migration.deviating_court deviatingCourt
         ON documentationUnit.id = deviatingCourt.documentation_unit_id
-    WHERE upper(fileNumber.value) IN (SELECT value FROM filtered_file_numbers)
+    WHERE upper(fileNumber.value) IN (SELECT value FROM file_numbers)
       AND upper(deviatingCourt.value) IN (:allDeviatingCourts)
 
     UNION
@@ -113,7 +113,7 @@ public interface DatabaseDuplicateCheckRepository
         ON documentationUnit.id = deviatingFileNumber.documentation_unit_id
       JOIN incremental_migration.deviating_court deviatingCourt
         ON documentationUnit.id = deviatingCourt.documentation_unit_id
-    WHERE upper(deviatingFileNumber.value) IN (SELECT value FROM filtered_file_numbers)
+    WHERE upper(deviatingFileNumber.value) IN (SELECT value FROM file_numbers)
       AND upper(deviatingCourt.value) IN (:allDeviatingCourts)
 
     UNION
