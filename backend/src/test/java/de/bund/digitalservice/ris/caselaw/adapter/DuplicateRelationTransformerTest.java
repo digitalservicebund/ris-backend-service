@@ -42,7 +42,7 @@ public class DuplicateRelationTransformerTest {
 
     DuplicateRelationDTO duplicateRelationDTO =
         DuplicateRelationDTO.builder()
-            .relationStatus(DuplicateRelationStatus.IGNORED)
+            .status(DuplicateRelationStatus.IGNORED)
             .id(
                 DuplicateRelationDTO.DuplicateRelationId.builder()
                     .documentationUnitId1(uuid1)
@@ -93,7 +93,7 @@ public class DuplicateRelationTransformerTest {
 
     DuplicateRelationDTO duplicateRelationDTO =
         DuplicateRelationDTO.builder()
-            .relationStatus(DuplicateRelationStatus.IGNORED)
+            .status(DuplicateRelationStatus.IGNORED)
             .id(
                 DuplicateRelationDTO.DuplicateRelationId.builder()
                     .documentationUnitId1(uuid1)
@@ -139,7 +139,7 @@ public class DuplicateRelationTransformerTest {
 
     DuplicateRelationDTO duplicateRelationDTO =
         DuplicateRelationDTO.builder()
-            .relationStatus(DuplicateRelationStatus.IGNORED)
+            .status(DuplicateRelationStatus.IGNORED)
             .id(
                 DuplicateRelationDTO.DuplicateRelationId.builder()
                     .documentationUnitId1(uuid1)
