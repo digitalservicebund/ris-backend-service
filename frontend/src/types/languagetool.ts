@@ -65,7 +65,6 @@ export interface Match {
   ignoreForIncompleteSentence: boolean
   contextForSureMatch: number
   content: string
-  textContent: string
 }
 
 export interface LanguageToolResponse {

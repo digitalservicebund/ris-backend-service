@@ -7,7 +7,7 @@ import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
 const props = defineProps<{
   documentNumber: string
-  matches: Match[]
+  matches?: Match[]
 }>()
 
 const categoriesRoute = computed(() => ({
@@ -19,7 +19,7 @@ const categoriesRoute = computed(() => ({
 <template>
   <div aria-label="Rechtschreibprüfung" class="flex flex-col">
     <h2 class="ds-label-01-bold mb-16">Rechtschreibprüfung</h2>
-    <div v-if="matches && props.matches.length > 0">
+    <div v-if="matches && props.matches!.length > 0">
       <div class="flex flex-col gap-16">
         <div class="flex flex-row gap-8">
           <IconErrorOutline class="text-red-800" />

@@ -25,6 +25,7 @@ import IconPreview from "~icons/ic/outline-remove-red-eye"
 import IconStickyNote from "~icons/ic/outline-sticky-note-2"
 import IconSpellCheck from "~icons/material-symbols/spellcheck"
 import IconImportCategories from "~icons/material-symbols/text-select-move-back-word"
+import { useFeatureToggle } from "@/composables/useFeatureToggle"
 
 const props = defineProps<{
   documentUnit?: DocumentUnit
@@ -38,6 +39,8 @@ const props = defineProps<{
 const store = useExtraContentSidePanelStore()
 
 const route = useRoute()
+
+const textCheck = useFeatureToggle("neuris.text-check")
 
 const hasNote = computed(() => {
   return !!props.documentUnit!.note && props.documentUnit!.note.length > 0
@@ -212,7 +215,7 @@ onMounted(() => {
             />
           </Tooltip>
           <Tooltip
-            v-if="!hidePanelModeBar"
+            v-if="!hidePanelModeBar && textCheck"
             shortcut="t"
             text="Rechtschreibprüfung"
           >
@@ -321,7 +324,9 @@ onMounted(() => {
           :document-number="importDocumentNumber"
         />
 
-        <DocumentationUnitTextCheck v-if="store.panelMode === 'text-check'" />
+        <DocumentationUnitTextCheck
+          v-if="textCheck && store.panelMode === 'text-check'"
+        />
       </div>
     </SideToggle>
   </FlexItem>

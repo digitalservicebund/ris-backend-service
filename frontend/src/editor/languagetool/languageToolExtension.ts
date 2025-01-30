@@ -24,7 +24,7 @@ declare module "@tiptap/core" {
 
       resetLanguageToolMatch: () => ReturnType
 
-      toggleLanguageTool: () => ReturnType
+      toggleLanguageTool: (state: boolean) => ReturnType
 
       getLanguageToolState: () => ReturnType
     }
@@ -112,11 +112,11 @@ export const LanguageToolExtension = Extension.create<
         },
 
       toggleLanguageTool:
-        () =>
+        (state) =>
         ({ commands }) => {
-          this.storage.languageToolService!.setLangugeTooActive()
+          this.storage.languageToolService!.languageToolActive = state
 
-          if (this.storage.languageToolService!.languageToolActiveState)
+          if (this.storage.languageToolService!.languageToolActive)
             commands.proofread()
           else commands.resetLanguageToolMatch()
 
@@ -124,7 +124,7 @@ export const LanguageToolExtension = Extension.create<
         },
 
       getLanguageToolState: () => () =>
-        this.storage.languageToolService!.languageToolActiveState,
+        this.storage.languageToolService!.languageToolActive,
     }
   },
 
@@ -156,7 +156,7 @@ export const LanguageToolExtension = Extension.create<
             return this.storage.languageToolService.decorationSet
           },
           apply: (tr) => {
-            if (!this.storage.languageToolService!.languageToolActiveState)
+            if (!this.storage.languageToolService!.languageToolActive)
               return DecorationSet.empty
 
             const loading = tr.getMeta(

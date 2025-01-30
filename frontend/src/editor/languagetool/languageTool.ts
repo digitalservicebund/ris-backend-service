@@ -58,26 +58,6 @@ export default class LanguageTool {
     this.decorationSet = decorationSet
   }
 
-  get languageToolActiveState(): boolean {
-    return this.languageToolActive
-  }
-
-  get getMatch() {
-    return this.match
-  }
-
-  public setMatch(match: Match) {
-    this.match = match
-  }
-
-  public setLangugeTooActive(toggle?: boolean) {
-    if (toggle) {
-      this.languageToolActive = toggle
-    } else {
-      this.languageToolActive = !this.languageToolActive
-    }
-  }
-
   public setEditorView(editorView: EditorView) {
     this.editorView = editorView
   }

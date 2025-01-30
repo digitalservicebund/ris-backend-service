@@ -25,9 +25,7 @@ function ignoreSuggestion() {
     class="flex flex-col flex-wrap items-start justify-start gap-16 border-2 border-solid border-blue-800 bg-white p-24"
   >
     <div class="flex flex-row gap-8">
-      <label class="font-bold">
-        {{ match.textContent }}
-      </label>
+      <label class="font-bold"> word should be added </label>
       <span> | </span>
       <button
         class="ds-link-01-bold whitespace-nowrap leading-24 focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"

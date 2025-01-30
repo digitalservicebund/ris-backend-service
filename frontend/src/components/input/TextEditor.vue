@@ -19,7 +19,7 @@ import { Underline } from "@tiptap/extension-underline"
 import { BubbleMenu, Editor, EditorContent } from "@tiptap/vue-3"
 import { computed, onMounted, ref, watch } from "vue"
 import TextEditorMenu from "@/components/input/TextEditorMenu.vue"
-import TextSuggestionsDropdown from "@/components/input/TextSuggestionsDropdown.vue"
+import TextSuggestionDropdown from "@/components/input/TextSuggestionsDropdown.vue"
 import { TextAreaInputAttributes } from "@/components/input/types"
 import {
   BorderNumber,
@@ -55,6 +55,7 @@ interface Props {
   /* If true, the color formatting of border numbers is disabled */
   plainBorderNumbers?: boolean
   fieldSize?: TextAreaInputAttributes["fieldSize"]
+  textCheck?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -64,12 +65,12 @@ const props = withDefaults(defineProps<Props>(), {
   plainBorderNumbers: false,
   ariaLabel: "Editor Feld",
   fieldSize: "medium",
+  textCheck: false,
 })
 
 const emit = defineEmits<{
   updateValue: [newValue: string]
 }>()
-
 const loading = ref(false)
 
 const editorElement = ref<HTMLElement>()
@@ -138,7 +139,7 @@ const editor: Editor = new Editor({
       names: ["listItem", "paragraph"],
     }),
     LanguageToolExtension.configure({
-      automaticMode: !props.preview,
+      automaticMode: props.textCheck,
       documentId: "1",
     }),
   ],
@@ -187,20 +188,6 @@ const editorStyleClasses = computed(() => {
     ? `${fieldSizeClasses[props.fieldSize]} ${plainBorderNumberStyle} p-4`
     : undefined
 })
-
-watch(
-  () => props.value,
-  (value) => {
-    if (!value || value === editor.getHTML()) {
-      return
-    }
-    // incoming changes
-    // the cursor should not jump to the end of the content but stay where it is
-    const cursorPos = editor.state.selection.anchor
-    editor.commands.setContent(value, false)
-    editor.commands.setTextSelection(cursorPos)
-  },
-)
 
 const buttonsDisabled = computed(
   () => !(props.editable && (hasFocus.value || isHovered.value)),
@@ -258,6 +245,27 @@ watch(
 
 const ariaLabel = props.ariaLabel ? props.ariaLabel : null
 
+watch(
+  () => props.value,
+  (value) => {
+    if (!value || value === editor.getHTML()) {
+      return
+    }
+    // incoming changes
+    // the cursor should not jump to the end of the content but stay where it is
+    const cursorPos = editor.state.selection.anchor
+    editor.commands.setContent(value, false)
+    editor.commands.setTextSelection(cursorPos)
+  },
+)
+
+watch(
+  () => props.textCheck,
+  (newValue) => {
+    editor.commands.toggleLanguageTool(newValue)
+  },
+)
+
 onMounted(async () => {
   const editorContainer = document.querySelector(".editor")
   if (editorContainer != null) resizeObserver.observe(editorContainer)
@@ -303,19 +311,21 @@ const resizeObserver = new ResizeObserver((entries) => {
       />
     </div>
 
-    <BubbleMenu
-      v-if="editor"
-      class="bubble-menu"
-      :editor="editor"
-      :should-show="shouldShow"
-      :tippy-options="{ placement: 'bottom', animation: 'fade' }"
-    >
-      <TextSuggestionsDropdown
-        v-if="match"
-        :match="match"
-        @suggestion:ignore="ignoreSuggestion"
-        @suggestion:update="acceptSuggestion"
-      />
-    </BubbleMenu>
+    <div v-if="props.textCheck">
+      <BubbleMenu
+        v-if="editor"
+        class="bubble-menu"
+        :editor="editor"
+        :should-show="shouldShow"
+        :tippy-options="{ placement: 'bottom', animation: 'fade' }"
+      >
+        <TextSuggestionDropdown
+          v-if="match"
+          :match="match"
+          @suggestion:ignore="ignoreSuggestion"
+          @suggestion:update="acceptSuggestion"
+        />
+      </BubbleMenu>
+    </div>
   </div>
 </template>
